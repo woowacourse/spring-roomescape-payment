@@ -7,13 +7,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
 
 import java.util.Objects;
 
 @Entity
-@Table(name = "payment")
-public class PaymentInfo {
+public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +27,7 @@ public class PaymentInfo {
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     private final Reservation reservation;
 
-    protected PaymentInfo() {
+    protected Payment() {
         this.id = null;
         this.paymentKey = null;
         this.orderId = null;
@@ -38,8 +36,8 @@ public class PaymentInfo {
         this.reservation = null;
     }
 
-    public PaymentInfo(final Long id, final String orderId, final String paymentKey, final String orderName,
-                       final Long totalAmount, final Reservation reservation) {
+    public Payment(final Long id, final String orderId, final String paymentKey, final String orderName,
+                   final Long totalAmount, final Reservation reservation) {
         this.id = id;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
@@ -80,7 +78,7 @@ public class PaymentInfo {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final PaymentInfo payment = (PaymentInfo) o;
+        final Payment payment = (Payment) o;
         return Objects.equals(getId(), payment.getId());
     }
 

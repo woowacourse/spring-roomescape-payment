@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.controller.reservation.dto.CreateReservationRequest;
-import roomescape.domain.PaymentInfo;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.payment.dto.CancelPaymentRequest;
 import roomescape.payment.dto.CreatePaymentRequest;
@@ -29,16 +29,16 @@ public class PaymentService {
     public void savePayment(final CreateReservationRequest request, final Reservation savedReservation) {
         final PaymentConfirmResponse paymentConfirmResponse = paymentClient.postPayment(
                 new CreatePaymentRequest(request.paymentKey(), request.orderId(), request.amount()));
-        final PaymentInfo payment = paymentConfirmResponse.toPayment(savedReservation);
+        final Payment payment = paymentConfirmResponse.toPayment(savedReservation);
         paymentRepository.save(payment);
     }
 
     @Transactional
     public void deletePayment(final long reservationId) {
         try {
-            final PaymentInfo paymentInfo = paymentRepository.fetchByReservationId(reservationId);
-            paymentClient.cancelPayment(new CancelPaymentRequest(paymentInfo.getPaymentKey(), "단순변심"));
-            paymentRepository.delete(paymentInfo);
+            final Payment payment = paymentRepository.fetchByReservationId(reservationId);
+            paymentClient.cancelPayment(new CancelPaymentRequest(payment.getPaymentKey(), "단순변심"));
+            paymentRepository.delete(payment);
         } catch (final PaymentInfoNotFoundException ignore) {
             log.warn("결제 정보가 존제하지 않습니다.");
         }
