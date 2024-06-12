@@ -54,11 +54,6 @@ public class Reservation {
         this.paymentKey = paymentKey;
     }
 
-    public static Reservation createNewBooking(Member member, LocalDate date, TimeSlot time, Theme theme,
-                                               String paymentKey) {
-        return new Reservation(null, member, date, time, theme, ReservationStatus.BOOKING, paymentKey);
-    }
-
     public Long getId() {
         return id;
     }
