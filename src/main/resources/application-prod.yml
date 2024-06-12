@@ -14,3 +14,7 @@ spring:
   sql:
     init:
       encoding: utf-8
+
+logging:
+  level:
+    root: info
