@@ -6,6 +6,7 @@ import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.core.domain.Reservation;
+import roomescape.core.domain.ReservationStatus;
 import roomescape.core.domain.ReservationTime;
 import roomescape.core.domain.Theme;
 import roomescape.core.dto.reservationtime.BookedTimeResponse;
@@ -60,8 +61,8 @@ public class ReservationTimeService {
     @Transactional(readOnly = true)
     public List<BookedTimeResponse> findAllWithBookable(final String date, final long themeId) {
         final Theme theme = themeRepository.findById(themeId).orElseThrow(IllegalArgumentException::new);
-        final List<Reservation> reservations = reservationRepository.findAllByDateAndTheme(LocalDate.parse(date),
-                theme);
+        final List<Reservation> reservations = reservationRepository.findAllByDateAndThemeAndStatus(
+                LocalDate.parse(date), theme, ReservationStatus.BOOKED);
         final List<ReservationTime> reservationTimes = reservationTimeRepository.findAll();
 
         return reservationTimes.stream()
