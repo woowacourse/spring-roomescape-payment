@@ -1,0 +1,27 @@
+name: Build
+
+on:
+  push:
+    branches: step2
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+
+      - name: Build project using Gradle
+        run: ./gradlew clean bootJar
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: spring-roomescape-payment-jar
+          path: build/libs/spring-roomescape-payment-0.0.1-SNAPSHOT.jar

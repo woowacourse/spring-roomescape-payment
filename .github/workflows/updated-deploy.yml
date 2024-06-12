@@ -1,4 +1,4 @@
-name: Local Deployment
+name: Deploy on EC2
 
 on:
   push:
@@ -7,9 +7,14 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
+    needs: build
+
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: spring-roomescape-payment-jar
+          path: ./build/libs
 
       - name: Check if room-esc server is running on port 8080
         id: check-server-on-port
@@ -30,17 +35,7 @@ jobs:
           kill -9 $PID
           echo "Server stopped."
 
-      - name: Move to project directory
-        run: cd /home/ubuntu/actions-runner/_work/spring-roomescape-payment
-
-      - name: Remove test codes
-        run: rm -rf src/test
-
-      - name: Build project using Gradle
-        run: ./gradlew clean bootJar
-
       - name: Start server
         run: |
-          cd build/libs
-          nohup java -jar spring-roomescape-payment-0.0.1-SNAPSHOT.jar &
+          nohup java -jar build/libs/spring-roomescape-payment-0.0.1-SNAPSHOT.jar &
           echo "Server started."
