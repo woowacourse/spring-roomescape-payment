@@ -41,6 +41,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
@@ -56,6 +57,7 @@ import roomescape.dto.theme.ReservedThemeResponse;
 import roomescape.exception.RoomescapeException;
 import roomescape.fixture.TestFixture;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -74,6 +76,9 @@ class ReservationServiceTest {
 
     @Mock
     private ThemeRepository themeRepository;
+
+    @Mock
+    private PaymentRepository paymentRepository;
 
     @InjectMocks
     private ReservationService reservationService;
@@ -241,6 +246,10 @@ class ReservationServiceTest {
                 .willReturn(List.of(memberReservation, memberWaiting));
         given(reservationRepository.findAll())
                 .willReturn(List.of(memberReservation, reservation, waiting, memberWaiting));
+        given(paymentRepository.findByReservationId(1L))
+                .willReturn(Optional.of(new Payment(1L, reservation, "paymentKey", "orderId", 1000L)));
+        given(paymentRepository.findByReservationId(4L))
+                .willReturn(Optional.of(new Payment(1L, reservation, "paymentKey", "orderId", 1000L)));
 
         // when
         final List<MyReservationWithRankResponse> actual = reservationService.findMyReservationsAndWaitings(

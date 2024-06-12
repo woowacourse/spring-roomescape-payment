@@ -11,7 +11,6 @@ import static roomescape.fixture.TestFixture.MEMBER_TENNY_EMAIL;
 import static roomescape.fixture.TestFixture.MEMBER_TENNY_NAME;
 import static roomescape.fixture.TestFixture.ORDER_ID;
 import static roomescape.fixture.TestFixture.PAYMENT_KEY;
-import static roomescape.fixture.TestFixture.START_AT_SIX;
 import static roomescape.fixture.TestFixture.THEME_HORROR_NAME;
 
 import org.junit.jupiter.api.DisplayName;
@@ -51,7 +50,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     void respondCreatedWhenAdminCreateReservation() {
         final Long timeId = saveReservationTime();
         final Long themeId = saveTheme();
-        final AdminReservationSaveRequest request = new AdminReservationSaveRequest(1L, DATE_MAY_EIGHTH, timeId, themeId);
+        final AdminReservationSaveRequest request = new AdminReservationSaveRequest(1L, DATE_MAY_EIGHTH, timeId,
+                themeId);
 
         final ReservationResponse response = assertPostResponseWithToken(
                 request, ADMIN_EMAIL, "/admin/reservations", 201)
@@ -90,17 +90,13 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("예약 목록을 성공적으로 조회하면 200을 응답한다.")
     void respondOkWhenFindReservations() {
-        final Long timeId = saveReservationTime();
-        final Long themeId = saveTheme();
-        saveReservation(timeId, themeId, MEMBER_TENNY_EMAIL);
-
         final JsonPath jsonPath = assertGetResponse("/reservations", 200)
                 .extract().response().jsonPath();
 
         assertAll(() -> {
-            assertThat(jsonPath.getString("name[0]")).isEqualTo(MEMBER_TENNY_NAME);
-            assertThat(jsonPath.getString("date[0]")).isEqualTo(DATE_MAY_EIGHTH.toString());
-            assertThat(jsonPath.getString("time[0].startAt")).isEqualTo(START_AT_SIX);
+            assertThat(jsonPath.getString("name[0]")).isEqualTo(ADMIN_NAME);
+            assertThat(jsonPath.getString("date[0]")).isEqualTo("2024-06-01");
+            assertThat(jsonPath.getString("time[0].startAt")).isEqualTo("13:00");
             assertThat(jsonPath.getString("theme[0].name")).isEqualTo(THEME_HORROR_NAME);
         });
     }
@@ -108,10 +104,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("테마, 사용자, 예약 날짜로 예약 목록을 성공적으로 조회하면 200을 응답한다.")
     void respondOkWhenFilteredFindReservations() {
-        final Long timeId = saveReservationTime();
-        final Long themeId = saveTheme();
-        saveReservation(timeId, themeId, MEMBER_TENNY_EMAIL);
-        final String accessToken = getAccessToken(MEMBER_TENNY_EMAIL);
+        final String accessToken = getAccessToken(ADMIN_EMAIL);
 
         final JsonPath jsonPath = RestAssured.given().log().all()
                 .queryParam("themeId", 1L)
@@ -125,10 +118,10 @@ class ReservationAcceptanceTest extends AcceptanceTest {
                 .extract().response().jsonPath();
 
         assertAll(() -> {
-            assertThat(jsonPath.getString("name[0]")).isEqualTo(MEMBER_TENNY_NAME);
-            assertThat(jsonPath.getString("date[0]")).isEqualTo(DATE_MAY_EIGHTH.toString());
-            assertThat(jsonPath.getString("time[0].startAt")).isEqualTo(START_AT_SIX);
-            assertThat(jsonPath.getString("theme[0].name")).isEqualTo(THEME_HORROR_NAME);
+            assertThat(jsonPath.getString("name[0]")).isEqualTo(ADMIN_NAME);
+            assertThat(jsonPath.getString("date[0]")).isEqualTo("2024-06-01");
+            assertThat(jsonPath.getString("time[0].startAt")).isEqualTo("13:00");
+            assertThat(jsonPath.getString("theme[0].name")).isEqualTo("호러");
         });
     }
 
@@ -156,19 +149,16 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("특정 사용자의 예약 및 예약 대기 목록을 성공적으로 조회하면 200을 응답한다.")
     void respondOkWhenFindMyReservations() {
-        final Long timeId = saveReservationTime();
-        final Long themeId = saveTheme();
-        saveReservationAndWaiting(timeId, themeId);
-        final String accessToken = getAccessToken(MEMBER_TENNY_EMAIL);
+        final String accessToken = getAccessToken(ADMIN_EMAIL);
 
         final JsonPath jsonPath = assertGetResponseWithToken(accessToken, "/reservations/mine", 200)
                 .extract().response().jsonPath();
 
         assertAll(() -> {
             assertThat(jsonPath.getString("theme[0]")).isEqualTo(THEME_HORROR_NAME);
-            assertThat(jsonPath.getString("date[0]")).isEqualTo(DATE_MAY_EIGHTH.toString());
-            assertThat(jsonPath.getString("time[0]")).isEqualTo(START_AT_SIX);
-            assertThat(jsonPath.getString("status[0]")).isEqualTo(ReservationStatus.WAITING.value());
+            assertThat(jsonPath.getString("date[0]")).isEqualTo("2024-06-01");
+            assertThat(jsonPath.getString("time[0]")).isEqualTo("13:00");
+            assertThat(jsonPath.getString("status[0]")).isEqualTo(ReservationStatus.RESERVED.value());
         });
     }
 }
