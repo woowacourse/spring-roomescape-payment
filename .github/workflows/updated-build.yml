@@ -1,4 +1,4 @@
-name: Build
+name: Build and Deploy
 
 on:
   push:
@@ -26,3 +26,38 @@ jobs:
         with:
           name: spring-roomescape-payment-jar
           path: build/libs/spring-roomescape-payment-0.0.1-SNAPSHOT.jar
+
+  deploy:
+    runs-on: self-hosted
+    needs: build
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: spring-roomescape-payment-jar
+          path: ./build/libs
+
+      - name: Check if room-esc server is running on port 8080
+        id: check-server-on-port
+        run: |
+          echo "Checking if port 8080 is in use..."
+          PID=$(lsof -t -i:8080 || true)
+          if [ -n "$PID" ]; then
+            echo "server_running=true" >> $GITHUB_ENV
+            echo "PID=$PID" >> $GITHUB_ENV
+          else
+            echo "server_running=false" >> $GITHUB_ENV
+          fi
+
+      - name: Stop server if running
+        if: env.server_running == 'true'
+        run: |
+          echo "Stopping server running on port 8080..."
+          kill -9 $PID
+          echo "Server stopped."
+
+      - name: Start server
+        run: |
+          nohup java -jar build/libs/spring-roomescape-payment-0.0.1-SNAPSHOT.jar &
+          echo "Server started."
