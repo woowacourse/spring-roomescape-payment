@@ -17,7 +17,7 @@ import roomescape.payment.dto.PaymentConfirmRequest;
 @Component
 public class TossPaymentClient implements PaymentClient {
     private static final String CONFIRM_URI = "/v1/payments/confirm";
-    private static final String CANCEL_URL = "/v1/payments/%s/cancel";
+    private static final String CANCEL_URI = "/v1/payments/%s/cancel";
     private final RestClient restClient;
     private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -44,7 +44,7 @@ public class TossPaymentClient implements PaymentClient {
     @Override
     public void cancelPayment(String paymentKey) {
         restClient.post()
-                .uri(String.format(CANCEL_URL, paymentKey))
+                .uri(String.format(CANCEL_URI, paymentKey))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(PaymentCancelRequest.makePaymentCancelRequest())
                 .retrieve()
