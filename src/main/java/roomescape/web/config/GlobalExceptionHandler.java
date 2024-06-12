@@ -13,15 +13,23 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import roomescape.exception.CustomException;
+import roomescape.exception.ErrorConstants;
 import roomescape.exception.ErrorResult;
+import roomescape.exception.payment.PaymentFailException;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    private static final String ERROR_PREFIX = "exception occur : {}";
 
     @ExceptionHandler(value = CustomException.class)
     public ResponseEntity<ErrorResult> handleCustomException(CustomException exception) {
+        log.warn(ErrorConstants.CUSTOM_ERROR_PREFIX, exception);
+        return new ResponseEntity<>(new ErrorResult(exception.getMessage()), exception.getStatus());
+    }
+
+    @ExceptionHandler(value = PaymentFailException.class)
+    public ResponseEntity<ErrorResult> handlePaymentFailException(PaymentFailException exception) {
+        log.error(ErrorConstants.PAYMENT_ERROR_PREFIX, exception);
         return new ResponseEntity<>(new ErrorResult(exception.getMessage()), exception.getStatus());
     }
 
@@ -43,7 +51,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ErrorResult> handleException(Exception exception) {
-        log.error(ERROR_PREFIX, exception);
+        log.error(ErrorConstants.SERVER_ERROR_PREFIX, exception);
         return new ResponseEntity<>(new ErrorResult("서버 에러입니다."), INTERNAL_SERVER_ERROR);
     }
 }
