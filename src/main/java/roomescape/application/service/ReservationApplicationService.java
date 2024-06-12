@@ -6,7 +6,7 @@ import roomescape.exception.RoomescapeException;
 import roomescape.exception.type.RoomescapeExceptionType;
 import roomescape.member.domain.LoginMember;
 import roomescape.payment.api.PaymentClient;
-import roomescape.payment.domain.PaymentInfo;
+import roomescape.payment.domain.PaymentResult;
 import roomescape.payment.dto.CancelReason;
 import roomescape.payment.entity.Payment;
 import roomescape.payment.repository.PaymentRepository;
@@ -34,8 +34,8 @@ public class ReservationApplicationService {
             LoginMember loginMember,
             ReservationPaymentRequest reservationPaymentRequest
     ) {
-        PaymentInfo paymentInfo = paymentClient.payment(reservationPaymentRequest.toPaymentRequest());
-        return reservationService.saveReservationPayment(loginMember, reservationPaymentRequest.toReservationRequest(), paymentInfo);
+        PaymentResult paymentResult = paymentClient.payment(reservationPaymentRequest.toPaymentRequest());
+        return reservationService.saveReservationPayment(loginMember, reservationPaymentRequest.toReservationRequest(), paymentResult);
     }
 
     public void cancelReservationPayment(long reservationId) {

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import roomescape.payment.config.PaymentClientResponseErrorHandler;
-import roomescape.payment.domain.PaymentInfo;
+import roomescape.payment.domain.PaymentResult;
 import roomescape.payment.dto.CancelReason;
 import roomescape.payment.dto.PaymentRequest;
 
@@ -39,34 +39,34 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public PaymentInfo payment(PaymentRequest paymentRequest) {
+    public PaymentResult payment(PaymentRequest paymentRequest) {
         String requestId = UUID.randomUUID().toString();
         log.info("RequestID: {}, URI: {}, RequestBody:{} ", requestId, APPROVE_PAYMENT_URI, paymentRequest);
-        PaymentInfo paymentInfo = restClient.post()
+        PaymentResult paymentResult = restClient.post()
                 .uri(APPROVE_PAYMENT_URI)
                 .header(AUTH_HEADER, AUTH_METHOD + encodedSecretKey)
                 .header("Request-ID", requestId)
                 .body(paymentRequest)
                 .retrieve()
                 .onStatus(paymentClientResponseErrorHandler)
-                .body(PaymentInfo.class);
-        log.info("RequestID: {}, URI: {}, Method: {}, ResponseBody:{} ", requestId, APPROVE_PAYMENT_URI, "POST", paymentInfo);
-        return paymentInfo;
+                .body(PaymentResult.class);
+        log.info("RequestID: {}, URI: {}, Method: {}, ResponseBody:{} ", requestId, APPROVE_PAYMENT_URI, "POST", paymentResult);
+        return paymentResult;
     }
 
     @Override
-    public PaymentInfo cancel(String paymentKey, CancelReason cancelReason) {
+    public PaymentResult cancel(String paymentKey, CancelReason cancelReason) {
         String requestId = UUID.randomUUID().toString();
         log.info("RequestID: {}, URI: {}, PaymentKey:{} ", requestId, CANCEL_PAYMENT_URI, paymentKey);
-        PaymentInfo paymentInfo = restClient.post()
+        PaymentResult paymentResult = restClient.post()
                 .uri(CANCEL_PAYMENT_URI, paymentKey)
                 .header(AUTH_HEADER, AUTH_METHOD + encodedSecretKey)
                 .header("Request-ID", requestId)
                 .body(cancelReason)
                 .retrieve()
                 .onStatus(paymentClientResponseErrorHandler)
-                .body(PaymentInfo.class);
-        log.info("RequestID: {}, URI: {}, Method: {}, ResponseBody:{} ", requestId, CANCEL_PAYMENT_URI, "POST", paymentInfo);
-        return paymentInfo;
+                .body(PaymentResult.class);
+        log.info("RequestID: {}, URI: {}, Method: {}, ResponseBody:{} ", requestId, CANCEL_PAYMENT_URI, "POST", paymentResult);
+        return paymentResult;
     }
 }

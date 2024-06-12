@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import roomescape.payment.dto.EasyPayTypeDetail;
 
-public record PaymentInfo(
+public record PaymentResult(
         String orderName,
         String paymentKey,
         String requestedAt,

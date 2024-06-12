@@ -21,7 +21,7 @@ import roomescape.exception.RoomescapeException;
 import roomescape.member.domain.LoginMember;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.payment.domain.PaymentInfo;
+import roomescape.payment.domain.PaymentResult;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.entity.Payment;
 import roomescape.payment.repository.PaymentRepository;
@@ -30,7 +30,6 @@ import roomescape.reservation.domain.Reservations;
 import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.dto.ReservationDetailResponse;
 import roomescape.reservation.dto.ReservationPaymentDetail;
-import roomescape.reservation.dto.ReservationPaymentResponse;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.entity.Reservation;
@@ -61,10 +60,10 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationPaymentResponse saveReservationPayment(
+    public roomescape.reservation.dto.ReservationPaymentResponse saveReservationPayment(
             LoginMember loginMember,
             ReservationRequest reservationRequest,
-            PaymentInfo paymentInfo
+            PaymentResult paymentResult
     ) {
         Reservation reservation = getReservation(loginMember.getId(), reservationRequest, ReservationStatus.BOOKED);
 
@@ -77,11 +76,11 @@ public class ReservationService {
                     reservationRequest.timeId());
         }
         Reservation savedReservation = reservationRepository.save(reservation);
-        paymentRepository.save(new Payment(savedReservation, paymentInfo));
+        paymentRepository.save(new Payment(savedReservation, paymentResult));
 
-        return new ReservationPaymentResponse(
+        return new roomescape.reservation.dto.ReservationPaymentResponse(
                 ReservationResponse.from(reservation),
-                PaymentResponse.from(paymentInfo)
+                PaymentResponse.from(paymentResult)
         );
     }
 

@@ -13,7 +13,7 @@ import jakarta.persistence.OneToOne;
 
 import roomescape.global.entity.BaseEntity;
 import roomescape.payment.domain.EasyPayType;
-import roomescape.payment.domain.PaymentInfo;
+import roomescape.payment.domain.PaymentResult;
 import roomescape.reservation.entity.Reservation;
 
 @Entity
@@ -63,17 +63,17 @@ public class Payment extends BaseEntity {
         this.currency = currency;
     }
 
-    public Payment(Reservation reservation, PaymentInfo paymentInfo) {
+    public Payment(Reservation reservation, PaymentResult paymentResult) {
         this(
                 null,
                 reservation,
-                paymentInfo.paymentKey(),
-                paymentInfo.orderName(),
-                paymentInfo.requestedAt(),
-                paymentInfo.approvedAt(),
-                paymentInfo.totalAmount(),
-                EasyPayType.from(paymentInfo.easyPay().provider()),
-                paymentInfo.currency()
+                paymentResult.paymentKey(),
+                paymentResult.orderName(),
+                paymentResult.requestedAt(),
+                paymentResult.approvedAt(),
+                paymentResult.totalAmount(),
+                EasyPayType.from(paymentResult.easyPay().provider()),
+                paymentResult.currency()
         );
     }
 
