@@ -21,6 +21,7 @@ public class TestFixture {
     public static final String MEMBER_BROWN_NAME = "브라운";
     public static final String MEMBER_BROWN_EMAIL = "brown@email.com";
     public static final String MEMBER_PASSWORD = "1234";
+    public static final String PAYMENT_KEY = "tgen_202406121547312Hgj3";
 
     public static final LocalDate DATE_MAY_TWENTY = LocalDate.of(2024, 5, 20);
     public static final LocalDate DATE_MAY_ONE = LocalDate.of(2034, 5, 1);
@@ -100,7 +101,7 @@ public class TestFixture {
     }
 
     public static Reservation RESERVATION() {
-        return new Reservation(ADMIN(1L), LocalDate.now(), RESERVATION_TIME_ONE(1L), THEME_ANIME(1L), "결제완",1_000);
+        return new Reservation(ADMIN(1L), LocalDate.now(), RESERVATION_TIME_ONE(1L), THEME_ANIME(1L), PAYMENT_KEY,1_000);
     }
 
     public static Waiting WAITING() {
@@ -108,7 +109,7 @@ public class TestFixture {
     }
 
     public static PaymentResponse DUMMY_PAYMENT_RESPONSE() {
-        return new PaymentResponse("dummy");
+        return new PaymentResponse(PAYMENT_KEY);
     }
 
 }

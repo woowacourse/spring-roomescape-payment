@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static roomescape.TestFixture.DATE_MAY_EIGHTH;
 import static roomescape.TestFixture.DATE_MAY_NINTH;
 import static roomescape.TestFixture.MEMBER_BROWN;
+import static roomescape.TestFixture.PAYMENT_KEY;
 import static roomescape.TestFixture.RESERVATION_TIME_SIX;
 
 @DataJpaTest
@@ -49,7 +50,7 @@ class ReservationRepositoryTest {
         member = memberRepository.save(MEMBER_BROWN());
         reservationTime = reservationTimeRepository.save(RESERVATION_TIME_SIX());
         theme = themeRepository.save(TestFixture.THEME_COMIC());
-        reservation = reservationRepository.save(new Reservation(member, DATE_MAY_EIGHTH, reservationTime, theme, "결제완",1_000));
+        reservation = reservationRepository.save(new Reservation(member, DATE_MAY_EIGHTH, reservationTime, theme, PAYMENT_KEY,1_000));
         testEntityManager.clear();
     }
 
@@ -57,7 +58,7 @@ class ReservationRepositoryTest {
     @DisplayName("예약을 저장한다.")
     void save() {
         // given
-        final Reservation reservation = new Reservation(member, DATE_MAY_NINTH, reservationTime, theme, "결제완",1_000);
+        final Reservation reservation = new Reservation(member, DATE_MAY_NINTH, reservationTime, theme, PAYMENT_KEY,1_000);
 
         // when
         final Reservation actual = reservationRepository.save(reservation);

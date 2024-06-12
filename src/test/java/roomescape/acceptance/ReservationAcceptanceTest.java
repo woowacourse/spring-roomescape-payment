@@ -28,7 +28,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     void respondCreatedWhenAdminCreateReservation() {
         final Long timeId = saveReservationTime();
         final Long themeId = saveTheme();
-        final ReservationSaveRequest request = new ReservationSaveRequest(1L, DATE_MAY_EIGHTH, timeId, themeId, "결제완",
+        final ReservationSaveRequest request = new ReservationSaveRequest(1L, DATE_MAY_EIGHTH, timeId, themeId, "tgen_202406121547312Hgj4",
                 1_000);
 
         assertCreateResponseWithToken(request, ADMIN_EMAIL, "/admin/reservations", 201);
