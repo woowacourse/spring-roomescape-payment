@@ -1,12 +1,10 @@
 package roomescape.payment.service;
 
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.service.dto.request.PaymentConfirmRequest;
 import roomescape.payment.service.dto.resonse.PaymentConfirmResponse;
 
-@Component
 public class TossPaymentClient {
 
     private final RestClient restClient;
