@@ -44,6 +44,7 @@ public class PaymentService {
         } catch (ResourceAccessException e) {
             throw new RoomescapeException(REQUEST_TIMEOUT);
         }
+
         paymentRepository.save(payment);
     }
 
