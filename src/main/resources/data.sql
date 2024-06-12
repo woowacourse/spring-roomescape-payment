@@ -12,8 +12,8 @@ VALUES ('몽키가든', '원숭지몽. 내가 원숭이 꿈을 꾸는 걸까 원
         'https://image.fmkorea.com/files/attach/new4/20240419/6938511254_494354581_0610c09d6dd2eb271bc1eb79d4bab922.png',
         DATEADD('DAY', -3, CURRENT_TIMESTAMP));
 INSERT INTO theme (name, description, thumbnail, CREATE_AT)
-VALUES ('시스테마', '시스테마는 러시아의 군용 무술입니다.'
-    'https://i.ytimg.com/vi/cGRPXgEH3vc/maxresdefault.jpg',
+VALUES ('시스테마', '시스테마는 러시아의 군용 무술입니다.',
+        'https://i.ytimg.com/vi/cGRPXgEH3vc/maxresdefault.jpg',
         DATEADD('DAY', -3, CURRENT_TIMESTAMP));
 
 -- 예약 시간 목록 : 5개
