@@ -35,6 +35,9 @@ include::{snippets}/member-signup-view/http-response.adoc[]
 ==== Request
 
 include::{snippets}/member-login/http-request.adoc[]
+
+===== Body
+
 include::{snippets}/member-login/request-fields.adoc[]
 
 ==== Response
@@ -46,6 +49,9 @@ include::{snippets}/member-login/http-response.adoc[]
 ==== Request
 
 include::{snippets}/member-login-check/http-request.adoc[]
+
+===== Header
+
 include::{snippets}/member-login-check/request-cookies.adoc[]
 
 ==== Response
@@ -68,6 +74,9 @@ include::{snippets}/member-logout/http-response.adoc[]
 ==== Request
 
 include::{snippets}/member-signup/http-request.adoc[]
+
+===== Body
+
 include::{snippets}/member-signup/request-fields.adoc[]
 
 ==== Response

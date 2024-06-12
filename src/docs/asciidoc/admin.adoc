@@ -5,6 +5,9 @@
 ==== Request
 
 include::{snippets}/admin-view/http-request.adoc[]
+
+===== Header
+
 include::{snippets}/admin-view/request-cookies.adoc[]
 
 ==== Response
@@ -16,6 +19,9 @@ include::{snippets}/admin-view/http-response.adoc[]
 ==== Request
 
 include::{snippets}/admin-reservation-view/http-request.adoc[]
+
+===== Header
+
 include::{snippets}/admin-reservation-view/request-cookies.adoc[]
 
 ==== Response
@@ -27,6 +33,9 @@ include::{snippets}/admin-reservation-view/http-response.adoc[]
 ==== Request
 
 include::{snippets}/admin-time-view/http-request.adoc[]
+
+===== Header
+
 include::{snippets}/admin-time-view/request-cookies.adoc[]
 
 ==== Response
@@ -38,6 +47,9 @@ include::{snippets}/admin-time-view/http-response.adoc[]
 ==== Request
 
 include::{snippets}/admin-theme-view/http-request.adoc[]
+
+===== Header
+
 include::{snippets}/admin-theme-view/request-cookies.adoc[]
 
 ==== Response
@@ -49,6 +61,9 @@ include::{snippets}/admin-theme-view/http-response.adoc[]
 ==== Request
 
 include::{snippets}/admin-waiting-view/http-request.adoc[]
+
+===== Header
+
 include::{snippets}/admin-waiting-view/request-cookies.adoc[]
 
 ==== Response
@@ -60,7 +75,13 @@ include::{snippets}/admin-waiting-view/http-response.adoc[]
 ==== Request
 
 include::{snippets}/admin-reservation-create/http-request.adoc[]
+
+===== Header
+
 include::{snippets}/admin-reservation-create/request-cookies.adoc[]
+
+===== Body
+
 include::{snippets}/admin-reservation-create/request-fields.adoc[]
 
 ==== Response
@@ -73,6 +94,9 @@ include::{snippets}/admin-reservation-create/response-fields.adoc[]
 ==== Request
 
 include::{snippets}/admin-reservation-delete/http-request.adoc[]
+
+===== Header
+
 include::{snippets}/admin-reservation-delete/request-cookies.adoc[]
 
 ==== Response
@@ -84,7 +108,13 @@ include::{snippets}/admin-reservation-delete/http-response.adoc[]
 ==== Request
 
 include::{snippets}/admin-time-create/http-request.adoc[]
+
+===== Header
+
 include::{snippets}/admin-time-create/request-cookies.adoc[]
+
+===== Body
+
 include::{snippets}/admin-time-create/request-fields.adoc[]
 
 ==== Response
@@ -97,7 +127,13 @@ include::{snippets}/admin-time-create/response-fields.adoc[]
 ==== Request
 
 include::{snippets}/admin-theme-create/http-request.adoc[]
+
+===== Header
+
 include::{snippets}/admin-theme-create/request-cookies.adoc[]
+
+===== Body
+
 include::{snippets}/admin-theme-create/request-fields.adoc[]
 
 ==== Response
@@ -110,6 +146,9 @@ include::{snippets}/admin-theme-create/response-fields.adoc[]
 ==== Request
 
 include::{snippets}/admin-theme-delete/http-request.adoc[]
+
+===== Header
+
 include::{snippets}/admin-theme-delete/request-cookies.adoc[]
 
 ==== Response
@@ -121,6 +160,9 @@ include::{snippets}/admin-theme-delete/http-response.adoc[]
 ==== Request
 
 include::{snippets}/admin-waiting-delete/http-request.adoc[]
+
+===== Header
+
 include::{snippets}/admin-waiting-delete/request-cookies.adoc[]
 
 ==== Response

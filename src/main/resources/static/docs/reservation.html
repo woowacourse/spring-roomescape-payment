@@ -451,7 +451,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /waitings HTTP/1.1
 Content-Type: application/json
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODIwODQ1MSwiZXhwIjoxNzE4MjEyMDUxfQ.mWz7EH1dSB1wzfb9qyg28N6VbwHJjnrdHdsdAwZScoU
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODIwOTU0MiwiZXhwIjoxNzE4MjEzMTQyfQ.hH_GxcuAzrYZPEW_YnBNzBVAirPTPPOUh9Ft4TxVZP4
 
 {
   "date" : "2024-06-14",
@@ -463,6 +463,8 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 }</code></pre>
 </div>
 </div>
+<div class="sect4">
+<h5 id="_header">Header</h5>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -481,6 +483,9 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 </tr>
 </tbody>
 </table>
+</div>
+<div class="sect4">
+<h5 id="_body">Body</h5>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -528,6 +533,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 </tbody>
 </table>
 </div>
+</div>
 <div class="sect3">
 <h4 id="_response">Response</h4>
 <div class="listingblock">
@@ -545,7 +551,7 @@ Content-Type: application/json
   "date" : "2024-06-14",
   "time" : {
     "id" : 1,
-    "startAt" : "01:08"
+    "startAt" : "01:26"
   },
   "theme" : {
     "id" : 1,
@@ -651,7 +657,7 @@ Content-Type: application/json
   },
   "time" : {
     "id" : 1,
-    "startAt" : "01:08"
+    "startAt" : "01:26"
   },
   "theme" : {
     "id" : 1,
@@ -787,7 +793,7 @@ Content-Type: application/json
   },
   "time" : {
     "id" : 1,
-    "startAt" : "01:08"
+    "startAt" : "01:26"
   },
   "theme" : {
     "id" : 1,
@@ -804,7 +810,7 @@ Content-Type: application/json
   },
   "time" : {
     "id" : 1,
-    "startAt" : "01:08"
+    "startAt" : "01:26"
   },
   "theme" : {
     "id" : 1,
@@ -890,9 +896,11 @@ Content-Type: application/json
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /reservations/mine HTTP/1.1
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODIwODQ1MSwiZXhwIjoxNzE4MjEyMDUxfQ.mWz7EH1dSB1wzfb9qyg28N6VbwHJjnrdHdsdAwZScoU</code></pre>
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODIwOTU0MiwiZXhwIjoxNzE4MjEzMTQyfQ.hH_GxcuAzrYZPEW_YnBNzBVAirPTPPOUh9Ft4TxVZP4</code></pre>
 </div>
 </div>
+<div class="sect4">
+<h5 id="_header_2">Header</h5>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -912,6 +920,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 </tbody>
 </table>
 </div>
+</div>
 <div class="sect3">
 <h4 id="_response_4">Response</h4>
 <div class="listingblock">
@@ -923,7 +932,7 @@ Content-Type: application/json
   "id" : 1,
   "theme" : "테마",
   "date" : "2024-06-13",
-  "time" : "01:08",
+  "time" : "01:26",
   "waitingOrder" : 0,
   "status" : "BOOKED",
   "paymentKey" : "paymentKey",
@@ -932,7 +941,7 @@ Content-Type: application/json
   "id" : 1,
   "theme" : "테마",
   "date" : "2024-06-14",
-  "time" : "01:08",
+  "time" : "01:26",
   "waitingOrder" : 1,
   "status" : "WAITING",
   "paymentKey" : null,
@@ -1005,9 +1014,11 @@ Content-Type: application/json
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /reservations/1 HTTP/1.1
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODIwODQ1MSwiZXhwIjoxNzE4MjEyMDUxfQ.mWz7EH1dSB1wzfb9qyg28N6VbwHJjnrdHdsdAwZScoU</code></pre>
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODIwOTU0MiwiZXhwIjoxNzE4MjEzMTQyfQ.hH_GxcuAzrYZPEW_YnBNzBVAirPTPPOUh9Ft4TxVZP4</code></pre>
 </div>
 </div>
+<div class="sect4">
+<h5 id="_header_3">Header</h5>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -1027,6 +1038,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 </tbody>
 </table>
 </div>
+</div>
 <div class="sect3">
 <h4 id="_response_5">Response</h4>
 <div class="listingblock">
@@ -1042,7 +1054,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-06-13 01:05:26 +0900
+Last updated 2024-06-13 01:20:00 +0900
 </div>
 </div>
 </body>

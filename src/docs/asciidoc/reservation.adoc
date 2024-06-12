@@ -5,7 +5,13 @@
 ==== Request
 
 include::{snippets}/reservation-create/http-request.adoc[]
+
+===== Header
+
 include::{snippets}/reservation-create/request-cookies.adoc[]
+
+===== Body
+
 include::{snippets}/reservation-create/request-fields.adoc[]
 
 ==== Response
@@ -41,6 +47,9 @@ include::{snippets}/reservations-condition/response-fields.adoc[]
 ==== Request
 
 include::{snippets}/reservations-mine/http-request.adoc[]
+
+===== Header
+
 include::{snippets}/reservations-mine/request-cookies.adoc[]
 
 ==== Response
@@ -53,6 +62,9 @@ include::{snippets}/reservations-mine/response-fields.adoc[]
 ==== Request
 
 include::{snippets}/reservation-delete/http-request.adoc[]
+
+===== Header
+
 include::{snippets}/reservation-delete/request-cookies.adoc[]
 
 ==== Response
