@@ -17,7 +17,8 @@ public class Theme {
     private ThemeName name;
     private String description;
     private String thumbnail;
-    private int price;
+    @Embedded
+    private ThemePrice price;
 
     protected Theme() {
     }
@@ -35,7 +36,7 @@ public class Theme {
         this.name = name;
         this.description = description;
         this.thumbnail = thumbnail;
-        this.price = price;
+        this.price = new ThemePrice(price);
     }
 
     public Long getId() {
@@ -55,7 +56,7 @@ public class Theme {
     }
 
     public int getPrice() {
-        return price;
+        return price.getPrice();
     }
 
     @Override
