@@ -52,6 +52,10 @@ public class Waiting {
         }
     }
 
+    public boolean isNotOwner(final Member member) {
+        return !this.member.equals(member);
+    }
+
     public Long getId() {
         return id;
     }
@@ -70,9 +74,5 @@ public class Waiting {
 
     public Theme getTheme() {
         return theme;
-    }
-
-    public boolean isNotOwner(final Member member) {
-        return !this.member.equals(member);
     }
 }
