@@ -2,6 +2,7 @@ package roomescape.reservation.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.IllegalRequestException;
@@ -123,10 +124,10 @@ public class ReservationService {
 
     @Transactional
     public void removeReservation(long id) {
-        Payment payment = paymentRepository.findByReservationId(id);
-        if (payment != null) {
-            paymentClient.cancelPayment(payment.getPaymentKey());
-            paymentRepository.deleteById(payment.getId());
+        Optional<Payment> payment = paymentRepository.findByReservationId(id);
+        if (payment.isPresent()) {
+            paymentClient.cancelPayment(payment.get().getPaymentKey());
+            paymentRepository.deleteById(payment.get().getId());
         }
         reservationRepository.deleteById(id);
     }

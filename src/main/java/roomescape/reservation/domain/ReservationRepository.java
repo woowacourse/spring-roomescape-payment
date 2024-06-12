@@ -25,7 +25,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             r1,
             COUNT(*),
             COALESCE(p.paymentKey, ''),
-            COALESCE(p.amount, 0L)
+            COALESCE(p.amount, java.math.BigDecimal.ZERO)
         )
         FROM Reservation AS r1
         INNER JOIN Reservation AS r2
