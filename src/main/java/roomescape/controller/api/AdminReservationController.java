@@ -22,10 +22,10 @@ import roomescape.service.AdminReservationService;
 
 @RestController
 @RequestMapping("/admin/reservations")
-public class AdminAdminReservationController implements AdminReservationApiDocs {
+public class AdminReservationController implements AdminReservationApiDocs {
     private final AdminReservationService adminReservationService;
 
-    public AdminAdminReservationController(AdminReservationService adminReservationService) {
+    public AdminReservationController(AdminReservationService adminReservationService) {
         this.adminReservationService = adminReservationService;
     }
 
