@@ -100,7 +100,7 @@ public class TestFixture {
     }
 
     public static Reservation RESERVATION() {
-        return new Reservation(ADMIN(1L), LocalDate.now(), RESERVATION_TIME_ONE(1L), THEME_ANIME(1L), "결제완",1000);
+        return new Reservation(ADMIN(1L), LocalDate.now(), RESERVATION_TIME_ONE(1L), THEME_ANIME(1L), "결제완",1_000);
     }
 
     public static Waiting WAITING() {
