@@ -36,30 +36,41 @@ public class ReservationMineResponse {
     }
 
     public static ReservationMineResponse ofReservationPayment(Reservation reservation, Optional<Payment> reservationPayment) {
+        return new ReservationMineResponse(reservation.getId(),
+                reservation.getTheme().getName().getName(),
+                reservation.getDate(),
+                reservation.getTime().getStartAt(),
+                getReservationStatus(reservation, reservationPayment),
+                getPaymentKey(reservationPayment),
+                getAmount(reservationPayment)
+        );
+    }
+
+    private static Integer getAmount(Optional<Payment> reservationPayment) {
+        int amount = 0;
         if (reservationPayment.isPresent()) {
-            String message = BOOKED_MESSAGE;
+            amount = reservationPayment.get().getAmount();
+        }
+        return amount;
+    }
+
+    private static String getPaymentKey(Optional<Payment> reservationPayment) {
+        String paymentKey = "";
+        if (reservationPayment.isPresent()) {
+            paymentKey = reservationPayment.get().getPaymentKey();
+        }
+        return paymentKey;
+    }
+
+    private static String getReservationStatus(Reservation reservation, Optional<Payment> reservationPayment) {
+        String message = PAYMENT_WAITING_MESSAGE;
+        if (reservationPayment.isPresent()) {
+            message = BOOKED_MESSAGE;
             if (reservation.isCancelStatus()) {
                 message = CANCELED_MESSAGE;
             }
-            Payment payment = reservationPayment.get();
-            return new ReservationMineResponse(reservation.getId(),
-                    reservation.getTheme().getName().getName(),
-                    reservation.getDate(),
-                    reservation.getTime().getStartAt(),
-                    message,
-                    payment.getPaymentKey(),
-                    payment.getAmount()
-            );
-        } else {
-            return new ReservationMineResponse(reservation.getId(),
-                    reservation.getTheme().getName().getName(),
-                    reservation.getDate(),
-                    reservation.getTime().getStartAt(),
-                    PAYMENT_WAITING_MESSAGE,
-                    "",
-                    reservation.getTheme().getPrice()
-            );
         }
+        return message;
     }
 
     public ReservationMineResponse(ReservationWaitingWithRank waitingWithRank) {
