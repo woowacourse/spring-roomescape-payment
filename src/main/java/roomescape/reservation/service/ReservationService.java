@@ -96,19 +96,7 @@ public class ReservationService {
     }
 
     public List<MemberMyReservationResponse> findMyReservation(Long memberId) {
-        Stream<MemberMyReservationResponse> reservedReservationWithPaymentResponses = reservationRepository.findAllNotWaitingReservationWithPaymentByMemberId(
-                        memberId)
-                .stream()
-                .map(MemberMyReservationResponse::new);
-
-        Stream<MemberMyReservationResponse> waitingReservationResponses = reservationRepository.findAllReservationWaitingByMemberId(
-                        memberId)
-                .stream()
-                .map(MemberMyReservationResponse::new);
-
-        return Stream.concat(reservedReservationWithPaymentResponses, waitingReservationResponses)
-                .sorted(Comparator.comparing(MemberMyReservationResponse::date))
-                .toList();
+        return reservationRepository.findAllMyReservation(memberId);
     }
 
     @Transactional
