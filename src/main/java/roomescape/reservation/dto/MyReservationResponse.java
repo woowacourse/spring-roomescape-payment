@@ -1,5 +1,6 @@
 package roomescape.reservation.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -19,7 +20,7 @@ public record MyReservationResponse(
         LocalTime time,
         String status,
         String paymentKey,
-        Long amount
+        BigDecimal amount
 ) {
     public static MyReservationResponse of(final Reservation reservation, final Payment payment) {
         return new MyReservationResponse(

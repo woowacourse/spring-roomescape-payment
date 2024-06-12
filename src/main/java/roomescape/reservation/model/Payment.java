@@ -1,5 +1,7 @@
 package roomescape.reservation.model;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 
 import roomescape.reservation.dto.PaymentResponse;
@@ -17,7 +19,7 @@ public class Payment {
     private String orderId;
 
     @Column(nullable = false)
-    private Long amount;
+    private BigDecimal amount;
 
     @OneToOne
     private Reservation reservation;
@@ -40,7 +42,7 @@ public class Payment {
         return paymentKey;
     }
 
-    public Long getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 }
