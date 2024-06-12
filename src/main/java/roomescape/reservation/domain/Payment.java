@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 
 @Entity
@@ -12,13 +13,21 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotNull
     private String paymentKey;
+    @NotNull
     private String orderId;
+    @NotNull
     private String orderName;
+    @NotNull
     private String method;
+    @NotNull
     private Long totalAmount;
+    @NotNull
     private String status;
+    @NotNull
     private String requestedAt;
+    @NotNull
     private String approvedAt;
 
     public Payment() {

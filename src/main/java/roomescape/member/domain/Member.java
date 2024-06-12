@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
 import roomescape.exception.custom.BadRequestException;
 
@@ -18,9 +19,11 @@ public class Member {
     private Long id;
     @Embedded
     private Name name;
+    @NotNull
     private String email;
+    @NotNull
     private String password;
-
+    @NotNull
     @Enumerated(EnumType.STRING)
     private Role role;
 
