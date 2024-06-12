@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import java.math.BigDecimal;
 import java.util.Objects;
 import roomescape.reservation.domain.Reservation;
 
@@ -25,17 +26,17 @@ public class Payment {
     private String paymentKey;
 
     @Column(nullable = false)
-    private int amount;
+    private BigDecimal amount;
 
-    public Payment(Long id, Reservation reservation, String paymentKey, int amount) {
+    public Payment(Long id, Reservation reservation, String paymentKey, BigDecimal amount) {
         this.id = id;
         this.reservation = reservation;
         this.paymentKey = paymentKey;
         this.amount = amount;
     }
 
-    public Payment(Reservation reservation, String paymentKey, int totalAmount) {
-        this(null, reservation, paymentKey, totalAmount);
+    public Payment(Reservation reservation, String paymentKey, BigDecimal amount) {
+        this(null, reservation, paymentKey, amount);
     }
 
     protected Payment() {
@@ -53,7 +54,7 @@ public class Payment {
         return paymentKey;
     }
 
-    public int getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 

@@ -1,5 +1,6 @@
 package roomescape.reservation.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.reservation.domain.ReservationWithInformation;
@@ -39,10 +40,10 @@ public record MemberReservationResponse(
         return paymentKey;
     }
 
-    private static String amount(int amount) {
-        if (amount == 0) {
+    private static String amount(BigDecimal amount) {
+        if (amount.equals(BigDecimal.ZERO)) {
             return "관리자에게 따로 문의";
         }
-        return Integer.toString(amount);
+        return amount.toString();
     }
 }

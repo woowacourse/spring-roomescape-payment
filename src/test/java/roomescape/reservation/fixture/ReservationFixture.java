@@ -7,6 +7,7 @@ import static roomescape.time.fixture.DateTimeFixture.YESTERDAY;
 import static roomescape.time.fixture.ReservationTimeFixture.RESERVATION_TIME_10_00_ID_1;
 import static roomescape.time.fixture.ReservationTimeFixture.RESERVATION_TIME_11_00_ID_2;
 
+import java.math.BigDecimal;
 import roomescape.member.fixture.MemberFixture;
 import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
@@ -34,7 +35,7 @@ public class ReservationFixture {
             1L,
             "invalid payment key",
             "invalid order id",
-            10000);
+            BigDecimal.TEN);
 
     public static final MemberReservationAddRequest RESERVATION_ADD_REQUEST_WITH_VALID_PAYMENTS = new MemberReservationAddRequest(
             TOMORROW,
@@ -42,7 +43,7 @@ public class ReservationFixture {
             1L,
             "valid payment key",
             "valid order id",
-            10000);
+            BigDecimal.TEN);
     public static final Reservation SAVED_RESERVATION_1 = new Reservation(
             1L,
             MemberFixture.MEMBER_ID_1,
@@ -110,5 +111,5 @@ public class ReservationFixture {
             1L,
             SAVED_RESERVATION_1,
             "paymentKey",
-            1000);
+            BigDecimal.ONE);
 }

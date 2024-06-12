@@ -19,6 +19,8 @@ import static roomescape.reservation.fixture.ReservationFixture.SAVED_RESERVATIO
 import static roomescape.theme.fixture.ThemeFixture.THEME_1;
 import static roomescape.time.fixture.ReservationTimeFixture.RESERVATION_TIME_10_00_ID_1;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -98,10 +100,10 @@ class ReservationServiceTest {
     @Test
     void should_return_response_when_my_reservations_requested_all() {
         when(reservationRepository.findByMemberIdWithInformation(1L))
-                .thenReturn(List.of(new ReservationWithInformation(MEMBER_ID_1_RESERVATION, 0, "PAYMENT_KEY", 1000)));
+                .thenReturn(List.of(new ReservationWithInformation(MEMBER_ID_1_RESERVATION, 0, "PAYMENT_KEY", new BigDecimal("1000"))));
 
         assertThat(reservationService.findMemberReservationWithInformation(1L))
-                .containsExactly(new MemberReservationResponse(new ReservationWithInformation(MEMBER_ID_1_RESERVATION, 0, "PAYMENT_KEY", 1000)));
+                .containsExactly(new MemberReservationResponse(new ReservationWithInformation(MEMBER_ID_1_RESERVATION, 0, "PAYMENT_KEY", new BigDecimal("1000"))));
     }
 
     @DisplayName("예약을 추가하고 응답을 반환할 수 있다")

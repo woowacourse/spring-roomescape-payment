@@ -1,5 +1,6 @@
 package roomescape.reservation.domain;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Objects;
@@ -9,16 +10,16 @@ public class ReservationWithInformation {
     private final Reservation reservation;
     private final int waitingNumber;
     private final String paymentKey;
-    private final int amount;
+    private final BigDecimal amount;
 
-    public ReservationWithInformation(Reservation reservation, int waitingNumber, String paymentKey, int amount) {
+    public ReservationWithInformation(Reservation reservation, int waitingNumber, String paymentKey, BigDecimal amount) {
         this.reservation = reservation;
         this.waitingNumber = waitingNumber;
         this.paymentKey = paymentKey;
         this.amount = amount;
     }
 
-    public ReservationWithInformation(Reservation reservation, Long waitingNumber, String paymentKey, int amount) {
+    public ReservationWithInformation(Reservation reservation, Long waitingNumber, String paymentKey, BigDecimal amount) {
         this(reservation, waitingNumber.intValue(), paymentKey, amount);
     }
 
@@ -50,7 +51,7 @@ public class ReservationWithInformation {
         return paymentKey;
     }
 
-    public int getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
