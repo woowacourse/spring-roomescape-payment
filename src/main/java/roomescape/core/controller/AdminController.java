@@ -1,7 +1,6 @@
 package roomescape.core.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -64,8 +63,7 @@ public class AdminController {
         return "admin/waiting";
     }
 
-    @Operation(summary = "관리자가 직접 예약 추가", description = "관리자가 예약을 추가할 때는 결제가 필요 없습니다.",
-            security = {@SecurityRequirement(name = "bearer-key")})
+    @Operation(summary = "관리자가 직접 예약 추가", description = "관리자가 예약을 추가할 때는 결제가 필요 없습니다.")
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> createReservation(
             @Valid @RequestBody final AdminReservationRequest adminReservationRequest) {
@@ -74,7 +72,7 @@ public class AdminController {
                 .body(reservationResponse);
     }
 
-    @Operation(summary = "예약 가능한 시간 추가", security = {@SecurityRequirement(name = "bearer-key")})
+    @Operation(summary = "예약 가능한 시간 추가")
     @PostMapping("/times")
     public ResponseEntity<ReservationTimeResponse> createTime(
             @Valid @RequestBody final ReservationTimeRequest request) {
@@ -83,7 +81,7 @@ public class AdminController {
                 .body(response);
     }
 
-    @Operation(summary = "예약 가능한 테마 추가", security = {@SecurityRequirement(name = "bearer-key")})
+    @Operation(summary = "예약 가능한 테마 추가")
     @PostMapping("/themes")
     public ResponseEntity<ThemeResponse> createTheme(@Valid @RequestBody final ThemeRequest request) {
         final ThemeResponse response = themeService.create(request);
@@ -91,7 +89,7 @@ public class AdminController {
                 .body(response);
     }
 
-    @Operation(summary = "예약 가능한 시간 삭제", security = {@SecurityRequirement(name = "bearer-key")})
+    @Operation(summary = "예약 가능한 시간 삭제")
     @DeleteMapping("/times/{id}")
     public ResponseEntity<Void> deleteTime(@PathVariable("id") final long id) {
         reservationTimeService.delete(id);
@@ -99,7 +97,7 @@ public class AdminController {
                 .build();
     }
 
-    @Operation(summary = "예약 가능한 테마 삭제", security = {@SecurityRequirement(name = "bearer-key")})
+    @Operation(summary = "예약 가능한 테마 삭제")
     @DeleteMapping("/themes/{id}")
     public ResponseEntity<Void> deleteTheme(@PathVariable("id") final long id) {
         themeService.delete(id);

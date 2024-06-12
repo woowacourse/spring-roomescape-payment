@@ -2,7 +2,6 @@ package roomescape.core.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -33,7 +32,7 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
-    @Operation(summary = "로그인 한 회원의 예약 생성", security = {@SecurityRequirement(name = "bearer-key")})
+    @Operation(summary = "로그인 한 회원의 예약 생성")
     @PostMapping
     public ResponseEntity<ReservationResponse> create(
             @Valid @RequestBody MemberReservationRequest memberReservationRequest,
@@ -67,7 +66,7 @@ public class ReservationController {
         );
     }
 
-    @Operation(summary = "로그인 한 회원의 모든 예약 조회", security = {@SecurityRequirement(name = "bearer-key")})
+    @Operation(summary = "로그인 한 회원의 모든 예약 조회")
     @GetMapping("/mine")
     public ResponseEntity<List<MyReservationResponse>> findAllByLoginMember(
             @Parameter(hidden = true) final LoginMember loginMember) {
