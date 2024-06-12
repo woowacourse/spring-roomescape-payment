@@ -11,9 +11,12 @@ public record ReservationStatusResponse(
         String theme,
         LocalDate date,
         LocalTime time,
-        long waitingCount
+        long waitingCount,
+        String paymentKey,
+        long amount
 ) {
-    public static ReservationStatusResponse of(Reservation reservation, long waitingCount) {
+    public static ReservationStatusResponse of(Reservation reservation, long waitingCount, String paymentKey,
+                                               long amount) {
         Theme theme = reservation.getTheme();
         ReservationTime time = reservation.getTime();
         return new ReservationStatusResponse(
@@ -21,7 +24,9 @@ public record ReservationStatusResponse(
                 theme.getName(),
                 reservation.getDate(),
                 time.getStartAt(),
-                waitingCount
+                waitingCount,
+                paymentKey,
+                amount
         );
     }
 }

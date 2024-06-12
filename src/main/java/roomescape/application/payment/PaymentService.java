@@ -5,7 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.payment.dto.request.PaymentRequest;
 import roomescape.domain.payment.ReservationPayment;
 import roomescape.domain.payment.ReservationPaymentRepository;
-import roomescape.domain.reservation.Reservation;
 
 @Component
 public class PaymentService {
@@ -19,9 +18,9 @@ public class PaymentService {
     }
 
     @Transactional
-    public void purchase(Reservation reservation, PaymentRequest request) {
+    public void purchase(Long reservationId, PaymentRequest request) {
         ReservationPayment reservationPayment = new ReservationPayment(
-                request.orderId(), reservation, request.paymentKey(), request.amount()
+                request.orderId(), reservationId, request.paymentKey(), request.amount()
         );
         reservationPaymentRepository.save(reservationPayment);
         paymentClient.requestPurchase(request);

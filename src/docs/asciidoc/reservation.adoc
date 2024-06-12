@@ -1,0 +1,22 @@
+== 예약
+=== 생성
+==== 성공 케이스
+operation::reservation/post/success[snippets='http-request,request-fields,http-response,response-fields']
+==== 실패 케이스
+operation::reservation/post/fail[snippets='http-request,http-response']
+
+=== 삭제
+==== 성공 케이스
+operation::reservation/delete/success[snippets='http-request,http-response']
+==== 실패 케이스
+operation::reservation/delete/fail[snippets='http-request,http-response']
+
+=== 조회
+==== 전체 조회 성공
+operation::reservation/get/all/success[snippets='http-request,response-fields,http-response']
+==== 전체 조회 실패
+operation::reservation/get/all/fail[snippets='http-request,http-response']
+==== 필터링 조회 성공
+operation::reservation/get/filter/success[snippets='http-request,query-parameters,http-response,response-fields']
+==== 자신의 예약 조회 성공
+operation::reservation/get/me/success[snippets='http-request,http-response,response-fields']

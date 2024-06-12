@@ -5,11 +5,12 @@ public enum BookStatus {
     BOOKED,
     WAITING_CANCELLED,
     BOOKING_CANCELLED,
+    PENDING_PAYMENT,
     ;
 
-    public BookStatus book() {
+    public BookStatus pendingPayment() {
         if (this == WAITING) {
-            return BOOKED;
+            return PENDING_PAYMENT;
         }
         throw new IllegalStateException("대기 중인 예약이 아닙니다.");
     }

@@ -1,6 +1,7 @@
 package roomescape.presentation.reservation;
 
 import jakarta.validation.Valid;
+import java.net.URI;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,7 +33,8 @@ public class ReservationWaitingController {
     public ResponseEntity<ReservationWaitingResponse> enqueueWaiting(@LoginMemberId long memberId,
                                                                      @RequestBody @Valid ReservationRequest request) {
         ReservationWaitingResponse response = reservationService.enqueueWaitingList(request.withMemberId(memberId));
-        return ResponseEntity.ok(response);
+        URI location = URI.create("/reservations/queue" + response.reservation().id());
+        return ResponseEntity.created(location).body(response);
     }
 
     @DeleteMapping("/reservations/queue/{id}")

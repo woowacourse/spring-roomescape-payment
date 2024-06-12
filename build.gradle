@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '3.2.4'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'java'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
 }
 
 group = 'nextstep'
@@ -10,6 +11,10 @@ sourceCompatibility = '17'
 
 repositories {
     mavenCentral()
+}
+
+configurations {
+    asciidoctorExt
 }
 
 dependencies {
@@ -26,10 +31,47 @@ dependencies {
 
     runtimeOnly 'com.h2database:h2'
 
+    testImplementation 'io.rest-assured:rest-assured'
+    testImplementation 'io.rest-assured:spring-mock-mvc'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'io.rest-assured:rest-assured:5.3.1'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+}
+
+ext {
+    set('snippetsDir', file("build/generated-snippets"))
 }
 
 test {
+    outputs.dir snippetsDir
     useJUnitPlatform()
+    systemProperty 'file.encoding', 'UTF-8'
+}
+
+asciidoctor {
+    configurations 'asciidoctorExt'
+    baseDirFollowsSourceFile()
+    inputs.dir snippetsDir
+    outputDir file('build/docs/asciidoc')
+    dependsOn test
+    doFirst {
+        delete file('src/main/resources/static/docs')
+    }
+}
+
+task cleanSnippets(type: Delete) {
+    delete snippetsDir
+}
+
+task createDocument(type: Copy) {
+    dependsOn asciidoctor
+    from file("build/docs/asciidoc/index.html")
+    into file("src/main/resources/static/docs")
+}
+
+bootJar {
+    dependsOn createDocument
+    from("${asciidoctor.outputDir}") {
+        into 'static/docs'
+    }
 }

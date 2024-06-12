@@ -7,7 +7,16 @@ spring:
     url: jdbc:h2:mem:database
     username: sa
     password:
-  jpa:
-    hibernate:
-      ddl-auto: update
-  sql.init.mode: never
+jpa:
+  hibernate:
+    ddl-auto: update
+sql.init.mode: never
+
+jwt:
+  secret: devdevdevdevdevdevdevdevdevdevdevdev
+  expire-in-millis: 1800000
+
+payment:
+  secret: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  url: https://api.tosspayments.com
+

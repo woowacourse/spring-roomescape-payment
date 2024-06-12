@@ -52,7 +52,7 @@ public class ReservationService {
     public ReservationResponse bookReservation(ReservationPaymentRequest request) {
         Reservation savedReservation = saveReservation(request.toReservationRequest());
         Theme theme = savedReservation.getTheme();
-        paymentService.purchase(savedReservation, request.toPaymentRequest(theme.getPrice()));
+        paymentService.purchase(savedReservation.getId(), request.toPaymentRequest(theme.getPrice()));
         return ReservationResponse.from(savedReservation);
     }
 
@@ -86,8 +86,9 @@ public class ReservationService {
         reservation.cancelBooking();
         reservationRepository.findFirstWaiting(
                 reservation.getTheme(), reservation.getDate(), reservation.getTime()
-        ).ifPresent(Reservation::book);
+        ).ifPresent(Reservation::pendingPayment);
     }
+
 
     @Transactional
     public ReservationWaitingResponse enqueueWaitingList(ReservationRequest request) {

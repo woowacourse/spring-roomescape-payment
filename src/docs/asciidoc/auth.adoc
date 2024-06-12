@@ -1,0 +1,18 @@
+== 인증
+
+
+=== 로그인
+==== 성공 케이스
+operation::auth/login/success[snippets='http-request,request-fields,http-response']
+==== 실패 케이스
+operation::auth/login/fail[snippets='http-request,http-response']
+
+=== 로그인 체크
+==== 성공 케이스
+operation::auth/loginCheck/success[snippets='http-request,http-response']
+==== 실패 케이스
+operation::auth/loginCheck/fail[snippets='http-request,http-response']
+
+=== 로그아웃
+==== 성공 케이스
+operation::auth/logout/success[snippets='http-request,http-response']

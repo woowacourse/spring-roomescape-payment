@@ -33,16 +33,16 @@ class BookStatusTest {
     @EnumSource(value = BookStatus.class, names = "WAITING", mode = Mode.EXCLUDE)
     @DisplayName("대기 중이 아닌 예약을 확정할 수 없다.")
     void bookOnNotWaitingReservation(BookStatus status) {
-        assertThatCode(status::book)
+        assertThatCode(status::pendingPayment)
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("대기 중인 예약이 아닙니다.");
     }
 
     @Test
-    @DisplayName("대기 중인 예약을 확정할 수 있다.")
+    @DisplayName("대기 중인 예약을 결제 대기로 변경 할 수 있다.")
     void bookOnWaitingReservation() {
         BookStatus status = BookStatus.WAITING;
-        assertThat(status.book()).isEqualTo(BookStatus.BOOKED);
+        assertThat(status.pendingPayment()).isEqualTo(BookStatus.PENDING_PAYMENT);
     }
 
     @Test
