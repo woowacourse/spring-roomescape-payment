@@ -2,23 +2,20 @@ package roomescape.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClient;
 import roomescape.domain.Payment;
 import roomescape.dto.PaymentInfo;
 import roomescape.dto.request.MemberReservationRequest;
-import roomescape.infrastructure.TossPaymentProperties;
+import roomescape.infrastructure.TossPaymentClient;
 import roomescape.repository.PaymentRepository;
 
 @Service
 public class PaymentService {
 
-    private final RestClient restClient;
-    private final TossPaymentProperties tossPaymentProperties;
+    private final TossPaymentClient tossPaymentClient;
     private final PaymentRepository paymentRepository;
 
-    public PaymentService(RestClient restClient, TossPaymentProperties tossPaymentProperties, PaymentRepository paymentRepository) {
-        this.restClient = restClient;
-        this.tossPaymentProperties = tossPaymentProperties;
+    public PaymentService(TossPaymentClient tossPaymentClient, PaymentRepository paymentRepository) {
+        this.tossPaymentClient = tossPaymentClient;
         this.paymentRepository = paymentRepository;
     }
 
@@ -30,11 +27,7 @@ public class PaymentService {
 
         PaymentInfo paymentInfo = new PaymentInfo(amount, orderId, paymentKey);
 
-        restClient.post()
-                .uri(tossPaymentProperties.url().confirm())
-                .body(paymentInfo)
-                .retrieve()
-                .toBodilessEntity();
+        tossPaymentClient.confirmPayment(paymentInfo);
 
         return savePayment(paymentInfo);
     }
