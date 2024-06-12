@@ -43,15 +43,15 @@ public class ExceptionApiController {
     }
 
     @ExceptionHandler(PaymentConfirmCustomException.class)
-    public ResponseEntity<String> paymentConfirmCustomException(
+    public ResponseEntity<String> paymentConfirmCustomExHandler(
             PaymentConfirmCustomException exception
     ) {
         logger.error(exception.getMessage(), exception);
-        return ResponseEntity.internalServerError().body("서버 내부 오류입니다.");
+        return ResponseEntity.internalServerError().body("결제 시도 중 서버 오류가 발생하였습니다.");
     }
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> exceptionHandler(RuntimeException exception) {
+    public ResponseEntity<String> runtimeExHandler(RuntimeException exception) {
         logger.error(exception.getMessage(), exception);
         return ResponseEntity.internalServerError().body("서버 내부 오류입니다.");
     }
