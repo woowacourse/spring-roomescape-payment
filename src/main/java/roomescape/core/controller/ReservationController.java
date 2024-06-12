@@ -81,7 +81,7 @@ public class ReservationController {
         reservationService.delete(id, loginMember);
         logger.info("Reservation with id {} canceled.", id);
 
-        paymentService.cancel(id);
+        paymentService.cancel(id, loginMember);
 
         return ResponseEntity.noContent().build();
     }

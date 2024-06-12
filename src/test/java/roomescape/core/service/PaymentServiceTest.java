@@ -49,6 +49,6 @@ class PaymentServiceTest {
     @Test
     @DisplayName("결제를 취소할 수 있다.")
     void cancelPayment() {
-        assertDoesNotThrow(() -> paymentService.cancel(1L));
+        assertDoesNotThrow(() -> paymentService.cancel(1L, new LoginMember(1L)));
     }
 }

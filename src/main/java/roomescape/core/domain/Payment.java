@@ -16,6 +16,8 @@ import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Payment {
+    protected static final String PAYMENT_CANCEL_NOT_YOURS_EXCEPTION_MESSAGE = "본인의 결제만 취소할 수 있습니다.";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -66,7 +68,10 @@ public class Payment {
         this.status = status;
     }
 
-    public void cancel() {
+    public void cancel(final Member requester) {
+        if (requester.isNotAdmin() && !member.equals(requester)) {
+            throw new IllegalArgumentException(PAYMENT_CANCEL_NOT_YOURS_EXCEPTION_MESSAGE);
+        }
         this.status = PaymentStatus.CANCELED;
     }
 

@@ -76,15 +76,17 @@ public class PaymentService {
     }
 
     @Transactional
-    public void cancel(final long id) {
+    public void cancel(final long id, final LoginMember loginMember) {
         final Reservation reservation = getReservation(id);
+        final Member requester = memberRepository.findById(loginMember.getId())
+                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_FOUND_EXCEPTION_MESSAGE));
 
         if (paymentRepository.existsByReservation(reservation)) {
             final Payment payment = paymentRepository.findByReservation(reservation)
                     .orElseThrow(() -> new IllegalArgumentException(PAYMENT_NOT_FOUND_EXCEPTION_MESSAGE));
 
             final PaymentCancelResponse response = paymentClient.getPaymentCancelResponse(payment.getPaymentKey());
-            payment.cancel();
+            payment.cancel(requester);
             logger.info("Payment {} canceled.", response.getPaymentKey());
             logger.info("Total amount: {}, Order Id: {}", response.getTotalAmount(), response.getOrderId());
         }

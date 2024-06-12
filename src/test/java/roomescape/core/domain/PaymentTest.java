@@ -37,7 +37,7 @@ class PaymentTest {
         final Payment payment = new Payment(reservation, TestFixture.getAdmin(), "paymentKey", "orderId",
                 1000, PaymentStatus.CONFIRMED);
 
-        payment.cancel();
+        payment.cancel(TestFixture.getAdmin());
 
         assertThat(payment.getStatus()).isEqualTo(PaymentStatus.CANCELED);
     }

@@ -71,7 +71,7 @@ public class AdminController {
     @DeleteMapping("/reservations/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable("id") final long id, final LoginMember loginMember) {
         reservationService.deleteByAdmin(id, loginMember);
-        paymentService.cancel(id);
+        paymentService.cancel(id, loginMember);
         logger.info("Admin delete reservation with id {}.", id);
 
         return ResponseEntity.noContent().build();
