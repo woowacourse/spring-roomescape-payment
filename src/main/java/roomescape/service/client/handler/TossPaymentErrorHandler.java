@@ -10,6 +10,7 @@ import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import roomescape.controller.dto.response.PaymentErrorMessageResponse;
+import roomescape.global.exception.PaymentServerException;
 import roomescape.global.exception.RoomescapeException;
 
 public class TossPaymentErrorHandler implements ErrorHandler {
@@ -19,6 +20,10 @@ public class TossPaymentErrorHandler implements ErrorHandler {
         ObjectMapper objectMapper = new ObjectMapper();
         String responseBodyAsString = new String(responseBody, StandardCharsets.UTF_8);
         PaymentErrorMessageResponse result = objectMapper.readValue(responseBodyAsString, PaymentErrorMessageResponse.class);
+
+        if(response.getStatusCode().is5xxServerError()) {
+            throw new PaymentServerException(result.message());
+        }
         throw new RoomescapeException(result.message());
     }
 }

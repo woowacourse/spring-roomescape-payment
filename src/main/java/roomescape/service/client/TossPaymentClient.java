@@ -36,13 +36,16 @@ public class TossPaymentClient implements PaymentClient {
 
     @Override
     public void requestPayment(PaymentRequest body) {
+        TossPaymentErrorHandler errorHandler = new TossPaymentErrorHandler();
+
         restClient.post()
                 .uri(TOSS_PAYMENTS_URL)
                 .body(body)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(AUTHORIZATION, authorizations)
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, new TossPaymentErrorHandler())
+                .onStatus(HttpStatusCode::is4xxClientError, errorHandler)
+                .onStatus(HttpStatusCode::is5xxServerError, errorHandler)
                 .toBodilessEntity();
     }
 }
