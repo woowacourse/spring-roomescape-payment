@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.math.BigDecimal;
 
 @Entity
@@ -24,6 +26,8 @@ public class Theme {
     private String thumbnail;
 
     @Column(nullable = false)
+    @Min(1000)
+    @Max(1000000000)
     private BigDecimal price;
 
     protected Theme() {
