@@ -75,12 +75,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     default void updateFirstWaiting(Reservation requestedReservation) {
         findByDateAndThemeAndTime(requestedReservation.getDate(),
                 requestedReservation.getTheme(),
-                requestedReservation.getReservationTime()
-        ).ifPresent(reservation -> {
-            if (reservation.getReservationStatus() == ReservationStatus.WAITING) {
-                reservation.book();
-            }
-        });
+                requestedReservation.getReservationTime())
+                .filter(reservation -> reservation.getReservationStatus() == ReservationStatus.WAITING)
+                .ifPresent(Reservation::book);
     }
 
     Optional<Reservation> findByDateAndThemeAndTime(LocalDate date, Theme theme, ReservationTime time);
