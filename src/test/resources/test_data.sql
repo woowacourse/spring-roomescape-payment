@@ -1,3 +1,6 @@
+DELETE  FROM payment;
+ALTER TABLE payment ALTER COLUMN id RESTART;
+
 DELETE FROM reservation;
 ALTER TABLE reservation ALTER COLUMN id RESTART;
 
@@ -9,9 +12,6 @@ ALTER TABLE theme ALTER COLUMN id RESTART;
 
 DELETE  FROM member;
 ALTER TABLE member ALTER COLUMN id RESTART;
-
-DELETE  FROM payment;
-ALTER TABLE payment ALTER COLUMN id RESTART;
 
 INSERT INTO member(name, email, password, role)
 VALUES ('스티치', 'lxxjn0@test.com', '123456', 'MEMBER'),
@@ -42,7 +42,7 @@ VALUES (1, TIMESTAMPADD(DAY,1, NOW()), 1, 1, 'RESERVED', TIMESTAMPADD(DAY, -1, N
        (3, TIMESTAMPADD(DAY,1, NOW()), 1, 2, 'RESERVED', TIMESTAMPADD(DAY, -1, NOW())),
        (4, TIMESTAMPADD(DAY,1, NOW()), 1, 1, 'WAITING', TIMESTAMPADD(DAY, 0, NOW()));
 
-INSERT INTO payment (reservation_id, member_id, payment_key, order_id, amount)
-VALUES (1, 1, 'test_payment_key', 'ROOMESCAPE_test_order_id', 20000),
-       (2, 2, 'test_payment_key', 'ROOMESCAPE_test_order_id', 20000),
-       (3, 3, 'test_payment_key', 'ROOMESCAPE_test_order_id', 20000);
+INSERT INTO payment (reservation_id, payment_key, order_id, amount)
+VALUES (1, 'test_payment_key', 'ROOMESCAPE_test_order_id', 20000),
+       (2, 'test_payment_key', 'ROOMESCAPE_test_order_id', 20000),
+       (3, 'test_payment_key', 'ROOMESCAPE_test_order_id', 20000);

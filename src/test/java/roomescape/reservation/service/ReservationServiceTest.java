@@ -78,10 +78,10 @@ class ReservationServiceTest {
     @DisplayName("특정 유저의 예약 목록을 읽는 요청을 처리할 수 있다")
     @Test
     void should_return_response_when_my_reservations_requested_all() {
-        when(reservationRepository.findAllReservedByMemberId(1L)).thenReturn(List.of(SAVED_RESERVATION_1));
+        when(paymentRepository.findAllByMemberId(1L)).thenReturn(List.of(PAYMENT_1));
 
         assertThat(reservationService.findAllByMemberId(1L))
-                .containsExactly(new MemberReservationResponse(SAVED_RESERVATION_1));
+                .containsExactly(MemberReservationResponse.from(PAYMENT_1));
     }
 
     @DisplayName("예약을 추가하고 응답을 반환할 수 있다")
@@ -89,6 +89,7 @@ class ReservationServiceTest {
     void should_save_reservation_when_requested() {
         when(memberRepository.findById(1L)).thenReturn(Optional.of(MEMBER_ID_1));
         when(reservationRepository.save(any(Reservation.class))).thenReturn(SAVED_RESERVATION_1);
+        when(reservationRepository.findById(1L)).thenReturn(Optional.of(SAVED_RESERVATION_1));
         when(reservationTimeRepository.findById(1L)).thenReturn(Optional.of(RESERVATION_TIME_10_00_ID_1));
         when(themeRepository.findById(1L)).thenReturn(Optional.of(THEME_1));
         when(paymentRepository.save(any(Payment.class))).thenReturn(PAYMENT_1);

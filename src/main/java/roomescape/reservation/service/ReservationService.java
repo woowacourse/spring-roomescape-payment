@@ -15,7 +15,6 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.payment.TossPaymentClient;
 import roomescape.payment.domain.Payment;
-import roomescape.payment.domain.PaymentMatcher;
 import roomescape.payment.domain.PaymentRepository;
 import roomescape.payment.dto.PaymentCancelRequest;
 import roomescape.payment.dto.PaymentCancelResponse;
@@ -100,12 +99,10 @@ public class ReservationService {
     }
 
     private void findAllMembersReservedReservation(List<MemberReservationResponse> responses, Long memberId) {
-        List<Reservation> reservations = reservationRepository.findAllReservedByMemberId(memberId);
-        PaymentMatcher paymentMatcher = new PaymentMatcher(paymentRepository.findAllByMemberId(memberId));
-        for (Reservation reservation : reservations) {
-            Payment payment = paymentMatcher.getPaymentByReservationId(reservation.getId());
-            responses.add(MemberReservationResponse.of(reservation, payment));
-        }
+        List<Payment> payments = paymentRepository.findAllByMemberId(memberId);
+        payments.stream()
+                .map(MemberReservationResponse::from)
+                .forEach(responses::add);
     }
 
     private void findAllMembersPendingReservation(List<MemberReservationResponse> responses, Long memberId) {
@@ -207,8 +204,8 @@ public class ReservationService {
 
     private void saveMemberPayment(ReservationResponse reservationResponse,
                                    PaymentConfirmResponse paymentConfirmResponse) {
-        Payment payment = new Payment(reservationResponse.id(),
-                reservationResponse.member().id(),
+        Reservation reservation = getReservation(reservationResponse.id());
+        Payment payment = new Payment(reservation,
                 paymentConfirmResponse.paymentKey(),
                 paymentConfirmResponse.orderId(),
                 paymentConfirmResponse.totalAmount());
@@ -222,6 +219,11 @@ public class ReservationService {
             throw new IllegalReservationDateException(
                     nowDate + " " + nowTime + ": 예약 날짜와 시간은 현재 보다 이전일 수 없습니다");
         }
+    }
+
+    private Reservation getReservation(Long reservationId) {
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new NoSuchRecordException("해당하는 예약이 존재하지 않습니다 ID: " + reservationId));
     }
 
     private ReservationTime getReservationTime(long timeId) {
@@ -252,6 +254,7 @@ public class ReservationService {
         if (response.isCancelNotFinished()) {
             throw new PaymentFailException("결제 취소가 완료되지 않았습니다.");
         }
+        paymentRepository.deleteById(paymentForCancel.getId());
         updateWaitingReservationStatus(reservationForDelete);
     }
 
@@ -273,9 +276,9 @@ public class ReservationService {
 
         PaymentConfirmRequest paymentConfirmRequest = request.extractPaymentConfirmRequest();
         PaymentConfirmResponse paymentConfirmResponse = tossPaymentClient.confirmPayments(paymentConfirmRequest);
+        Reservation pendingReservation = getReservation(request.reservationId());
         Payment payment = new Payment(
-                request.reservationId(),
-                memberId,
+                pendingReservation,
                 paymentConfirmResponse.paymentKey(),
                 paymentConfirmResponse.orderId(),
                 paymentConfirmResponse.totalAmount()

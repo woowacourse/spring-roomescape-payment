@@ -15,7 +15,8 @@ public record MemberReservationResponse(
         String orderId,
         Long amount) {
 
-    public static MemberReservationResponse of(Reservation reservation, Payment payment) {
+    public static MemberReservationResponse from(Payment payment) {
+        Reservation reservation = payment.getReservation();
         return new MemberReservationResponse(
                 reservation.getId(),
                 reservation.getTheme().getName(),

@@ -2,10 +2,15 @@ package roomescape.payment.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.util.Objects;
+import roomescape.member.domain.Member;
+import roomescape.reservation.domain.Reservation;
 
 @Entity
 public class Payment {
@@ -14,9 +19,8 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long reservationId;
-
-    private Long memberId;
+    @OneToOne(fetch = FetchType.LAZY)
+    private Reservation reservation;
 
     @Column(nullable = false)
     private String paymentKey;
@@ -30,29 +34,24 @@ public class Payment {
     public Payment() {
     }
 
-    public Payment(Long id, Long reservationId, Long memberId, String paymentKey, String orderId, Long amount) {
+    public Payment(Long id, Reservation reservation, String paymentKey, String orderId, Long amount) {
         this.id = id;
-        this.reservationId = reservationId;
-        this.memberId = memberId;
+        this.reservation = reservation;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
     }
 
-    public Payment(Long reservationId, Long memberId, String paymentKey, String orderId, Long amount) {
-        this(null, reservationId, memberId, paymentKey, orderId, amount);
+    public Payment(Reservation reservation, String paymentKey, String orderId, Long amount) {
+        this(null, reservation, paymentKey, orderId, amount);
     }
 
     public Long getId() {
         return id;
     }
 
-    public Long getReservationId() {
-        return reservationId;
-    }
-
-    public Long getMemberId() {
-        return memberId;
+    public Reservation getReservation() {
+        return reservation;
     }
 
     public String getPaymentKey() {
