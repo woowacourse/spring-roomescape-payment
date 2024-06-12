@@ -63,10 +63,10 @@ public class WaitingController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{waitingId}")
     public ResponseEntity<ReservationResponse> cancelWaiting(@AuthenticationPrincipal final LoginMember loginMember,
-                                                             @PathVariable final Long id) {
-        waitingService.cancel(loginMember.id(), id);
+                                                             @PathVariable final Long waitingId) {
+        waitingService.cancel(loginMember.id(), waitingId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
