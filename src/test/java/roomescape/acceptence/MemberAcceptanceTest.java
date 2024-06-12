@@ -31,6 +31,8 @@ class MemberAcceptanceTest extends AcceptanceFixture {
         // when & then
         RestAssured
                 .given(spec)
+                .contentType(ContentType.JSON)
+                .body(requestBody)
                 .filter(document("member/save",
                         requestFields(
                                 fieldWithPath("name").description("회원 이름"),
@@ -38,8 +40,6 @@ class MemberAcceptanceTest extends AcceptanceFixture {
                                 fieldWithPath("password").description("회원 비밀번호")
                         )
                 ))
-                .contentType(ContentType.JSON)
-                .body(requestBody)
 
                 .when()
                 .post("/members")
@@ -53,17 +53,7 @@ class MemberAcceptanceTest extends AcceptanceFixture {
     @DisplayName("로그인")
     void login_ShouldSignIn() {
         // given
-        RestAssured
-                .given()
-                .contentType(ContentType.JSON)
-                .body(Map.of("name", "aa", "email", "aa@aa.aa", "password", "aa"))
-
-                .when()
-                .post("/members")
-
-                .then()
-                .statusCode(is(HttpStatus.SC_CREATED))
-                .header(HttpHeaders.LOCATION, "/members/1");
+        signupRequest(Map.of("name", "aa", "email", "aa@aa.aa", "password", "aa"));
 
         // when & then
         RestAssured
@@ -94,30 +84,8 @@ class MemberAcceptanceTest extends AcceptanceFixture {
         // given
         Map<String, String> requestBody1 = Map.of("name", "aa", "email", "aa@aa.aa", "password", "aa");
         Map<String, String> requestBody2 = Map.of("name", "bb", "email", "bb@bb.bb", "password", "bb");
-
-        RestAssured
-                .given()
-                .contentType(ContentType.JSON)
-                .body(requestBody1)
-
-                .when()
-                .post("/members")
-
-                .then()
-                .statusCode(is(HttpStatus.SC_CREATED))
-                .header(HttpHeaders.LOCATION, "/members/1");
-
-        RestAssured
-                .given()
-                .contentType(ContentType.JSON)
-                .body(requestBody2)
-
-                .when()
-                .post("/members")
-
-                .then()
-                .statusCode(is(HttpStatus.SC_CREATED))
-                .header(HttpHeaders.LOCATION, "/members/2");
+        signupRequest(requestBody1);
+        signupRequest(requestBody2);
 
         // when & then
         RestAssured
@@ -147,34 +115,16 @@ class MemberAcceptanceTest extends AcceptanceFixture {
                 .body("[1].name", is("bb"));
     }
 
+
     @Test
     @DisplayName("로그인 상태 확인")
     void loginCheck_ShouldCheckLoginStatus() {
         // given
         // 회원가입
-        RestAssured
-                .given()
-                .contentType(ContentType.JSON)
-                .body(Map.of("name", "aa", "email", "aa@aa.aa", "password", "aa"))
-
-                .when()
-                .post("/members")
-
-                .then()
-                .statusCode(is(HttpStatus.SC_CREATED))
-                .header(HttpHeaders.LOCATION, "/members/1");
+        signupRequest(Map.of("name", "aa", "email", "aa@aa.aa", "password", "aa"));
 
         // 로그인
-        String token = RestAssured
-                .given()
-                .contentType(ContentType.JSON)
-                .body(Map.of("email", "aa@aa.aa", "password", "aa"))
-
-                .when()
-                .post("/login")
-
-                .thenReturn()
-                .cookie("token");
+        String token = loginRequest("aa@aa.aa", "aa");
 
         // when & then
         RestAssured
@@ -198,5 +148,30 @@ class MemberAcceptanceTest extends AcceptanceFixture {
                 .statusCode(HttpStatus.SC_OK)
                 .body("id", is(1))
                 .body("name", is("aa"));
+    }
+
+    private void signupRequest(Map<String, String> body) {
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(body)
+
+                .when()
+                .post("/members")
+
+                .then()
+                .statusCode(is(HttpStatus.SC_CREATED));
+    }
+
+    private String loginRequest(String email, String password) {
+        return RestAssured
+                .given()
+                .contentType(ContentType.JSON)
+                .body(Map.of("email", email, "password", password))
+
+                .when()
+                .post("/login")
+
+                .thenReturn()
+                .cookie("token");
     }
 }

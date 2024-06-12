@@ -75,31 +75,8 @@ class ReservationAcceptanceTest extends AcceptanceFixture {
                 "amount", "1000",
                 "paymentType", "type");
 
-        RestAssured
-                .given()
-                .contentType(ContentType.JSON)
-                .cookie("token", token)
-                .body(requestBody1)
-
-                .when()
-                .post("/reservations")
-
-                .then()
-                .statusCode(is(HttpStatus.SC_CREATED))
-                .header(HttpHeaders.LOCATION, "/reservations/1");
-
-        RestAssured
-                .given()
-                .contentType(ContentType.JSON)
-                .cookie("token", token)
-                .body(requestBody2)
-
-                .when()
-                .post("/reservations")
-
-                .then()
-                .statusCode(is(HttpStatus.SC_CREATED))
-                .header(HttpHeaders.LOCATION, "/reservations/2");
+        saveReservation(token, requestBody1);
+        saveReservation(token, requestBody2);
 
         // when
         RestAssured
@@ -192,8 +169,6 @@ class ReservationAcceptanceTest extends AcceptanceFixture {
         // when & then
         RestAssured
                 .given(spec)
-                .contentType(ContentType.JSON)
-                .cookie("token", token)
                 .filter(document("reservation/save-admin",
                         requestCookies(
                                 cookieWithName("token").description("어드민 권한 사용자 토큰")
@@ -216,6 +191,8 @@ class ReservationAcceptanceTest extends AcceptanceFixture {
                                 fieldWithPath("time.startAt").description("예약 시간")
                         )
                 ))
+                .contentType(ContentType.JSON)
+                .cookie("token", token)
                 .body(requestBody)
 
                 .when()
@@ -253,31 +230,8 @@ class ReservationAcceptanceTest extends AcceptanceFixture {
                 "amount", "1000",
                 "paymentType", "type");
 
-        RestAssured
-                .given()
-                .contentType(ContentType.JSON)
-                .cookie("token", token)
-                .body(requestBody1)
-
-                .when()
-                .post("/reservations")
-
-                .then()
-                .statusCode(is(HttpStatus.SC_CREATED))
-                .header(HttpHeaders.LOCATION, "/reservations/1");
-
-        RestAssured
-                .given()
-                .contentType(ContentType.JSON)
-                .cookie("token", token)
-                .body(requestBody2)
-
-                .when()
-                .post("/reservations")
-
-                .then()
-                .statusCode(is(HttpStatus.SC_CREATED))
-                .header(HttpHeaders.LOCATION, "/reservations/2");
+        saveReservation(token, requestBody1);
+        saveReservation(token, requestBody2);
 
         // when & then
         RestAssured
@@ -504,50 +458,10 @@ class ReservationAcceptanceTest extends AcceptanceFixture {
                 "amount", "1000",
                 "paymentType", "type");
 
-        RestAssured
-                .given()
-                .contentType(ContentType.JSON)
-                .cookie("token", token1)
-                .body(saveRequestBody1)
-
-                .when()
-                .post("/reservations")
-
-                .then()
-                .statusCode(is(HttpStatus.SC_CREATED));
-        RestAssured
-                .given()
-                .contentType(ContentType.JSON)
-                .cookie("token", token2)
-                .body(saveRequestBody2)
-
-                .when()
-                .post("/reservations")
-
-                .then()
-                .statusCode(is(HttpStatus.SC_CREATED));
-        RestAssured
-                .given()
-                .contentType(ContentType.JSON)
-                .cookie("token", token2)
-                .body(saveRequestBody1)
-
-                .when()
-                .post("/reservations")
-
-                .then()
-                .statusCode(is(HttpStatus.SC_CREATED));
-        RestAssured
-                .given()
-                .contentType(ContentType.JSON)
-                .cookie("token", token1)
-                .body(saveRequestBody2)
-
-                .when()
-                .post("/reservations")
-
-                .then()
-                .statusCode(is(HttpStatus.SC_CREATED));
+        saveReservation(token1, saveRequestBody1);
+        saveReservation(token2, saveRequestBody2);
+        saveReservation(token2, saveRequestBody1);
+        saveReservation(token1, saveRequestBody2);
 
         // when & then
         RestAssured
@@ -580,6 +494,20 @@ class ReservationAcceptanceTest extends AcceptanceFixture {
                 .body("[0].status", is("예약"))
                 .body("[1].id", is(3))
                 .body("[1].status", is("대기"));
+    }
+
+    private void saveReservation(String token, Map<String, String> requestBody) {
+        RestAssured
+                .given()
+                .contentType(ContentType.JSON)
+                .cookie("token", token)
+                .body(requestBody)
+
+                .when()
+                .post("/reservations")
+
+                .then()
+                .statusCode(is(HttpStatus.SC_CREATED));
     }
 
     private void saveTimeRequest(String startAt) {
