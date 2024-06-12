@@ -13,7 +13,7 @@ import roomescape.application.dto.response.time.ReservationTimeResponse;
 
 @RestController
 @RequiredArgsConstructor
-public class MemberReservationTimeController {
+public class MemberReservationTimeController implements MemberReservationTimeControllerDocs {
     private final ReservationTimeService reservationTimeService;
 
     @GetMapping("/times")

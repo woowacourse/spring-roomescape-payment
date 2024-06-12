@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.dto.request.member.LoginRequest;
+import roomescape.application.dto.request.member.MemberInfo;
 import roomescape.application.dto.request.member.SignupRequest;
 import roomescape.application.dto.response.member.MemberResponse;
 import roomescape.application.security.JwtProvider;
@@ -20,15 +21,20 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final JwtProvider jwtProvider;
 
+    public MemberInfo getMember(Long memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow(AuthenticationException::new);
+        return new MemberInfo(member.getId());
+    }
+
     public List<MemberResponse> findAllMember() {
-        return memberRepository.getAll()
+        return memberRepository.findAll()
                 .stream()
                 .map(member -> new MemberResponse(member.getId(), member.getName()))
                 .toList();
     }
 
     public String login(LoginRequest loginRequest) {
-        Member findMember = memberRepository.findMember(loginRequest.email(), loginRequest.password())
+        Member findMember = memberRepository.findByEmailAndPassword(loginRequest.email(), loginRequest.password())
                 .orElseThrow(AuthenticationException::new);
         return "token=" + jwtProvider.encode(findMember);
     }
@@ -41,14 +47,14 @@ public class MemberService {
     }
 
     private void checkDuplicateEmail(String email) {
-        if (memberRepository.existsMember(email)) {
+        if (memberRepository.existsByEmail(email)) {
             throw new RoomEscapeException("이미 가입된 이메일입니다.");
         }
     }
 
     @Transactional
     public void withdrawal(Long memberId) {
-        Member findMember = memberRepository.findMember(memberId).orElseThrow(AuthenticationException::new);
-        memberRepository.deleteMember(findMember);
+        Member findMember = memberRepository.findById(memberId).orElseThrow(AuthenticationException::new);
+        memberRepository.delete(findMember);
     }
 }

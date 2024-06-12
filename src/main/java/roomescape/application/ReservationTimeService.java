@@ -56,7 +56,7 @@ public class ReservationTimeService {
     }
 
     private ReservationTime findReservationTimeById(Long id) {
-        return reservationTimeRepository.findReservationTime(id)
+        return reservationTimeRepository.findById(id)
                 .orElseThrow(() -> new RoomEscapeException("존재하지 않는 시간입니다."));
     }
 }

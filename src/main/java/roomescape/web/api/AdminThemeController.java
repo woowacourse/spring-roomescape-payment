@@ -15,7 +15,7 @@ import roomescape.application.dto.response.theme.ThemeResponse;
 
 @RestController
 @RequiredArgsConstructor
-public class AdminThemeController {
+public class AdminThemeController implements AdminThemeControllerDocs {
     private final ThemeService themeService;
 
     @PostMapping("/admin/themes")

@@ -8,10 +8,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import roomescape.application.dto.request.member.MemberInfo;
-import roomescape.domain.event.CancelEventPublisher;
+import roomescape.application.dto.request.reservation.UserReservationRequest;
+import roomescape.application.dto.response.reservation.ReservationResponse;
+import roomescape.domain.event.TimeoutEventPublisher;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
+import roomescape.domain.payment.PaymentClient;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
@@ -32,6 +36,8 @@ class CancelServiceTest extends BaseServiceTest {
     @Autowired
     private CancelService cancelService;
     @Autowired
+    private ReservationService reservationService;
+    @Autowired
     private ReservationRepository reservationRepository;
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
@@ -42,11 +48,15 @@ class CancelServiceTest extends BaseServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @SpyBean
+    private PaymentClient paymentClient;
     @MockBean
-    private CancelEventPublisher eventPublisher;
+    private TimeoutEventPublisher eventPublisher;
 
     private Member user;
     private Member admin;
+    private MemberInfo userInfo;
+    private MemberInfo adminInfo;
     private ReservationTime time;
     private ReservationDetail detail;
     private Theme theme;
@@ -55,6 +65,8 @@ class CancelServiceTest extends BaseServiceTest {
     void setUp() {
         user = memberRepository.save(MemberFixture.user());
         admin = memberRepository.save(MemberFixture.admin());
+        userInfo = new MemberInfo(user.getId());
+        adminInfo = new MemberInfo(admin.getId());
         time = reservationTimeRepository.save(TimeFixture.createTime(LocalTime.now()));
         theme = themeRepository.save(ThemeFixture.createTheme("테마1"));
         detail = reservationDetailRepository.save(ReservationDetailFixture.createReservationDetail(
@@ -66,29 +78,49 @@ class CancelServiceTest extends BaseServiceTest {
     void when_cancelReservation_then_changedToCancelStatus() {
         // given
         Reservation reservation = reservationRepository.save(new Reservation(user, detail, Status.RESERVED));
-        MemberInfo memberInfo = new MemberInfo(user.getId());
 
         // when
-        cancelService.cancelReservation(reservation.getId(), memberInfo);
+        cancelService.cancelReservation(reservation.getId(), userInfo);
 
         // then
-        Reservation canceledReservation = reservationRepository.getReservation(reservation.getId());
+        Reservation canceledReservation = reservationRepository.getById(reservation.getId());
         Assertions.assertThat(canceledReservation.getStatus()).isEqualTo(Status.CANCELED);
+    }
+
+    @DisplayName("예약 취소 시, 결제도 취소된다")
+    @Test
+    void when_cancelReservation_then_paymentCanceled() {
+        // given
+        UserReservationRequest request = new UserReservationRequest(
+                CommonFixture.tomorrow,
+                time.getId(),
+                theme.getId(),
+                1000L,
+                "asdsds",
+                "asddsdsa",
+                "dsadsdsa");
+        ReservationResponse reserve = reservationService.reserve(request, userInfo);
+
+        // when
+        cancelService.cancelReservation(reserve.id(), userInfo);
+
+        // then
+        Mockito.verify(paymentClient, Mockito.times(1))
+                .cancel(Mockito.any(), Mockito.any());
     }
 
     @DisplayName("예약 취소 시, 다음 예약 대기가 결제 대기 상태로 전환된다")
     @Test
     void when_cancelReservation_then_nextWaitingReservationChangedToWaitingStatus() {
         // given
-        MemberInfo memberInfo = new MemberInfo(admin.getId());
         Reservation reservation = reservationRepository.save(new Reservation(admin, detail, Status.RESERVED));
         Reservation nextReservation = reservationRepository.save(new Reservation(user, detail, Status.WAITING));
 
         // when
-        cancelService.cancelReservation(reservation.getId(), memberInfo);
+        cancelService.cancelReservation(reservation.getId(), adminInfo);
 
         // then
-        Reservation waitingReservation = reservationRepository.getReservation(nextReservation.getId());
+        Reservation waitingReservation = reservationRepository.getById(nextReservation.getId());
         Assertions.assertThat(waitingReservation.getStatus()).isEqualTo(Status.PAYMENT_PENDING);
     }
 
@@ -96,30 +128,28 @@ class CancelServiceTest extends BaseServiceTest {
     @Test
     void when_cancelReservation_then_eventPublished() {
         // given
-        MemberInfo memberInfo = new MemberInfo(admin.getId());
         Reservation reservation = reservationRepository.save(new Reservation(admin, detail, Status.RESERVED));
         reservationRepository.save(new Reservation(user, detail, Status.WAITING));
 
         // when
-        cancelService.cancelReservation(reservation.getId(), memberInfo);
+        cancelService.cancelReservation(reservation.getId(), adminInfo);
 
         // then
         Mockito.verify(eventPublisher, Mockito.times(1))
-                .publishPaymentPendingEvent(Mockito.any());
+                .publishTimeoutEvent(Mockito.any());
     }
 
     @DisplayName("예약 취소 시, 다음 예약 대기가 없으면 아무 일도 일어나지 않는다")
     @Test
     void when_cancelReservation_then_nothingHappened() {
         // given
-        MemberInfo memberInfo = new MemberInfo(admin.getId());
         Reservation reservation = reservationRepository.save(new Reservation(admin, detail, Status.RESERVED));
 
         // when
-        cancelService.cancelReservation(reservation.getId(), memberInfo);
+        cancelService.cancelReservation(reservation.getId(), adminInfo);
 
         // then
         Mockito.verify(eventPublisher, Mockito.times(0))
-                .publishPaymentPendingEvent(Mockito.any());
+                .publishTimeoutEvent(Mockito.any());
     }
 }

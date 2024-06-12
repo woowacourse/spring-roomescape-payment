@@ -17,7 +17,7 @@ import roomescape.application.dto.response.member.MemberResponse;
 
 @RestController
 @RequiredArgsConstructor
-public class MemberManagementController {
+public class MemberManagementController implements MemberManagementControllerDocs {
     private final MemberService memberService;
 
     @PostMapping("/members")

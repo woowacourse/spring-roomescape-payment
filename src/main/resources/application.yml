@@ -19,3 +19,14 @@ payments:
   read-timeout: 3000
   connect-timeout: 3000
 payment-timeout: 60
+jwt:
+  token:
+    secret: hellowootecoworldhihowareyouiamfinethankyouandyou
+
+springdoc:
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+
+  swagger-ui:
+    enabled: true
+    defaultModelsExpandDepth: -1

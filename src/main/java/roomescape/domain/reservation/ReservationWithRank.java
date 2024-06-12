@@ -8,4 +8,8 @@ public record ReservationWithRank(Reservation reservation, Long rank) {
     public boolean isWaiting() {
         return reservation.isWaiting();
     }
+
+    public boolean isPaid() {
+        return reservation.isPaid();
+    }
 }

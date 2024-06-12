@@ -50,4 +50,8 @@ public class Member {
     public String getRoleAsString() {
         return role.getValue();
     }
+
+    public boolean isNotAdmin() {
+        return role != Role.ADMIN;
+    }
 }

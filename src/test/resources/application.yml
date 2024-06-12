@@ -15,3 +15,6 @@ spring:
       mode: never
 
 payment-timeout: 60
+jwt:
+  token:
+    secret: hellowootecoworldhihowareyouiamfinethankyouandyou

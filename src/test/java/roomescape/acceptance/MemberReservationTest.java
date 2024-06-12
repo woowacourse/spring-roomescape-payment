@@ -325,7 +325,7 @@ class MemberReservationTest {
                 .when().delete("/reservations/2")
                 .then().log().all()
                 .assertThat()
-                .statusCode(400);
+                .statusCode(403);
     }
 
     @DisplayName("뒤에 예약 대기가 존재하는 상태에서, 예약 대기를 취소하고 다시 예약 요청을 보내면, 예약 대기 상태가 된다")
@@ -603,7 +603,7 @@ class MemberReservationTest {
                 .statusCode(400);
     }
 
-    @DisplayName("예약으로 전환된 상태에서, 예약 취소 요청하면, 거절된다")
+    @DisplayName("예약으로 전환된 상태에서, 예약 취소 요청하면, 정상적으로 취소된다")
     @Test
     @Sql(value = {"/test-data/members.sql", "/test-data/themes.sql", "/test-data/times.sql"})
     void when_reservationStatusChangedIntoResolved_then_canNotDeleteWaitingReservation() {
@@ -649,13 +649,13 @@ class MemberReservationTest {
 
         RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
-                .when().delete("/reservations/" + 1)
+                .when().delete("/reservations/" + 2)
                 .then().log().all()
                 .assertThat()
-                .statusCode(400);
+                .statusCode(204);
     }
 
-    @DisplayName("예약 대기가 존재하는 상태에서, 해당 예약 대기에 취소 요청을 보내면, 요청이 거절된다")
+    @DisplayName("예약 대기가 존재하는 상태에서, 예약 대기 취소 요청을 보내면, 정상적으로 취소된다")
     @Test
     @Sql(value = {"/test-data/members.sql", "/test-data/themes.sql", "/test-data/times.sql"})
     void when_waitingReservationExists_then_canNotDeleteResolvedReservation() {
@@ -694,7 +694,7 @@ class MemberReservationTest {
         // when, then
         RestAssured.given().log().all()
                 .cookie("token", getToken(CommonFixture.userMangEmail, CommonFixture.password))
-                .when().delete("/reservations/1")
-                .then().log().all().statusCode(400);
+                .when().delete("/reservations/2")
+                .then().log().all().statusCode(204);
     }
 }

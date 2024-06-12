@@ -21,16 +21,16 @@ import roomescape.application.dto.response.reservation.UserReservationResponse;
 
 @RestController
 @RequiredArgsConstructor
-public class MemberReservationController {
+public class MemberReservationController implements MemberReservationControllerDocs {
     private final ReservationService reservationService;
     private final CancelService cancelService;
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> makeReservation(
             @RequestBody @Valid UserReservationRequest request,
-            MemberInfo memberInfo
+            MemberInfo member
     ) {
-        ReservationResponse response = reservationService.reserve(request, memberInfo.id());
+        ReservationResponse response = reservationService.reserve(request, member);
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
     }
@@ -38,33 +38,33 @@ public class MemberReservationController {
     @PostMapping("/reservations/payment")
     public ResponseEntity<ReservationResponse> paymentForPending(
             @RequestBody ReservationPaymentRequest request,
-            MemberInfo memberInfo
+            MemberInfo member
     ) {
-        ReservationResponse response = reservationService.payForPending(request, memberInfo.id());
+        ReservationResponse response = reservationService.payForPending(request, member);
         return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/reservations-mine")
-    public ResponseEntity<List<UserReservationResponse>> findAllMyReservations(MemberInfo memberInfo) {
-        List<UserReservationResponse> response = reservationService.findAllWithRank(memberInfo.id());
+    public ResponseEntity<List<UserReservationResponse>> findAllMyReservations(MemberInfo member) {
+        List<UserReservationResponse> response = reservationService.findAllWithRank(member);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/waitings/{idWaiting}")
     public ResponseEntity<Void> cancelWaiting(
             @PathVariable(value = "idWaiting") Long waitingId,
-            MemberInfo memberInfo
+            MemberInfo member
     ) {
-        cancelService.cancelReservation(waitingId, memberInfo);
+        cancelService.cancelReservation(waitingId, member);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/reservations/{idReservation}")
     public ResponseEntity<Void> cancelReservation(
             @PathVariable(value = "idReservation") Long reservationId,
-            MemberInfo memberInfo
+            MemberInfo member
     ) {
-        cancelService.cancelReservation(reservationId, memberInfo);
+        cancelService.cancelReservation(reservationId, member);
         return ResponseEntity.noContent().build();
     }
 }

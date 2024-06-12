@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import roomescape.application.dto.request.member.MemberInfo;
 import roomescape.application.dto.request.reservation.ReservationPaymentRequest;
 import roomescape.application.dto.request.reservation.ReservationSearchCondition;
 import roomescape.application.dto.request.reservation.UserReservationRequest;
@@ -50,6 +51,8 @@ class ReservationServiceTest extends BaseServiceTest {
 
     private Member user;
     private Member admin;
+    private MemberInfo userInfo;
+    private MemberInfo adminInfo;
     private ReservationTime time;
     private ReservationDetail detail1;
     private ReservationDetail detail2;
@@ -59,6 +62,8 @@ class ReservationServiceTest extends BaseServiceTest {
     void setUp() {
         user = memberRepository.save(MemberFixture.user());
         admin = memberRepository.save(MemberFixture.admin());
+        userInfo = new MemberInfo(user.getId());
+        adminInfo = new MemberInfo(admin.getId());
         time = reservationTimeRepository.save(TimeFixture.createTime(LocalTime.now()));
         theme = themeRepository.save(ThemeFixture.createTheme("테마1"));
         detail1 = reservationDetailRepository.save(ReservationDetailFixture.createReservationDetail(
@@ -81,10 +86,10 @@ class ReservationServiceTest extends BaseServiceTest {
                 CommonFixture.paymentType);
 
         // when
-        ReservationResponse response = reservationService.reserve(request, user.getId());
+        ReservationResponse response = reservationService.reserve(request, userInfo);
 
         // then
-        Reservation reservation = reservationRepository.getReservation(response.id());
+        Reservation reservation = reservationRepository.getById(response.id());
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(reservation.getStatus()).isEqualTo(Status.RESERVED);
             softly.assertThatCode(reservation::getPayment)
@@ -108,7 +113,7 @@ class ReservationServiceTest extends BaseServiceTest {
 
         // when
         try {
-            reservationService.reserve(request, user.getId());
+            reservationService.reserve(request, userInfo);
         } catch (Exception ignored) {
         }
 
@@ -121,7 +126,7 @@ class ReservationServiceTest extends BaseServiceTest {
     @Test
     void when_userReservationWaiting_then_noPaymentInfo() {
         // given
-        UserReservationRequest adminRequest = new UserReservationRequest(
+        UserReservationRequest adminReservationRequest = new UserReservationRequest(
                 CommonFixture.tomorrow,
                 time.getId(),
                 theme.getId(),
@@ -130,7 +135,7 @@ class ReservationServiceTest extends BaseServiceTest {
                 CommonFixture.paymentKey,
                 CommonFixture.paymentType);
 
-        reservationService.reserve(adminRequest, admin.getId());
+        reservationService.reserve(adminReservationRequest, adminInfo);
 
         UserReservationRequest memberRequest = new UserReservationRequest(
                 CommonFixture.tomorrow,
@@ -142,10 +147,10 @@ class ReservationServiceTest extends BaseServiceTest {
                 CommonFixture.paymentType);
 
         // when
-        ReservationResponse response = reservationService.reserve(memberRequest, user.getId());
+        ReservationResponse response = reservationService.reserve(memberRequest, userInfo);
 
         // then
-        Reservation reservation = reservationRepository.getReservation(response.id());
+        Reservation reservation = reservationRepository.getById(response.id());
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(reservation.getStatus()).isEqualTo(Status.WAITING);
             softly.assertThatThrownBy(reservation::getPayment)
@@ -168,10 +173,10 @@ class ReservationServiceTest extends BaseServiceTest {
                 CommonFixture.paymentKey);
 
         // when
-        ReservationResponse response = reservationService.payForPending(request, admin.getId());
+        ReservationResponse response = reservationService.payForPending(request, adminInfo);
 
         // then
-        Reservation reservation = reservationRepository.getReservation(response.id());
+        Reservation reservation = reservationRepository.getById(response.id());
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(reservation.getStatus()).isEqualTo(Status.RESERVED);
             softly.assertThatCode(reservation::getPayment)
@@ -185,7 +190,6 @@ class ReservationServiceTest extends BaseServiceTest {
         // given
         Reservation pendingReservation = reservationRepository.save(
                 new Reservation(admin, detail1, Status.PAYMENT_PENDING));
-        Long userId = user.getId();
 
         ReservationPaymentRequest request = new ReservationPaymentRequest(
                 pendingReservation.getId(),
@@ -194,7 +198,7 @@ class ReservationServiceTest extends BaseServiceTest {
                 CommonFixture.paymentKey);
 
         // when
-        Assertions.assertThatThrownBy(() -> reservationService.payForPending(request, userId))
+        Assertions.assertThatThrownBy(() -> reservationService.payForPending(request, userInfo))
                 .isInstanceOf(AuthorizationException.class);
     }
 
@@ -274,7 +278,7 @@ class ReservationServiceTest extends BaseServiceTest {
         reservationRepository.save(new Reservation(user, detail2, Status.RESERVED));
 
         // when
-        List<UserReservationResponse> response = reservationService.findAllWithRank(user.getId());
+        List<UserReservationResponse> response = reservationService.findAllWithRank(userInfo);
 
         // then
         SoftAssertions.assertSoftly(softly -> {

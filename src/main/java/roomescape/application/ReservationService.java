@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.application.dto.request.member.MemberInfo;
 import roomescape.application.dto.request.payment.PaymentRequest;
 import roomescape.application.dto.request.reservation.ReservationPaymentRequest;
 import roomescape.application.dto.request.reservation.ReservationRequest;
@@ -41,8 +42,8 @@ public class ReservationService {
     private final PaymentRepository paymentRepository;
 
     @Transactional
-    public ReservationResponse reserve(UserReservationRequest request, Long memberId) {
-        Reservation reservation = saveReservation(memberId, request.date(), request.timeId(), request.themeId());
+    public ReservationResponse reserve(UserReservationRequest request, MemberInfo member) {
+        Reservation reservation = saveReservation(member.getId(), request.date(), request.timeId(), request.themeId());
         if (reservation.isPending()) {
             Payment payment = savePayment(request.toPaymentRequest(), reservation);
             reservation.completePayment(payment);
@@ -62,7 +63,7 @@ public class ReservationService {
     }
 
     private Reservation saveReservation(Long memberId, LocalDate date, Long timeId, Long themeId) {
-        Member member = memberRepository.findMember(memberId).orElseThrow(AuthenticationException::new);
+        Member member = memberRepository.findById(memberId).orElseThrow(AuthenticationException::new);
         ReservationDetail reservationDetail = reservationDetailFactory.createReservationDetail(date, timeId, themeId);
         Reservation reservation = reservationFactory.createReservation(reservationDetail, member);
         return reservationRepository.save(reservation);
@@ -77,45 +78,46 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse payForPending(ReservationPaymentRequest request, Long memberId) {
-        Reservation reservation = reservationRepository.getReservation(request.reservationId());
-        rejectIfNotOwner(reservation, memberId);
+    public ReservationResponse payForPending(ReservationPaymentRequest request, MemberInfo memberInfo) {
+        Member member = memberRepository.findById(memberInfo.getId()).orElseThrow(AuthenticationException::new);
+        Reservation reservation = reservationRepository.getById(request.reservationId());
+        rejectIfNotOwner(reservation, member);
         Payment payment = savePayment(request.toPaymentRequest(), reservation);
         reservation.completePayment(payment);
         return ReservationResponse.from(reservation);
     }
 
-    private void rejectIfNotOwner(Reservation reservation, Long memberId) {
-        if (reservation.isNotOwner(memberId)) {
+    private void rejectIfNotOwner(Reservation reservation, Member member) {
+        if (reservation.isNotOwner(member)) {
             throw new AuthorizationException();
         }
     }
 
     public List<ReservationResponse> findAllReservedReservations() {
-        List<Reservation> reservations = reservationRepository.findAll(Status.RESERVED);
+        List<Reservation> reservations = reservationRepository.findAllByStatus(Status.RESERVED);
         return reservations.stream()
                 .map(ReservationResponse::from)
                 .toList();
     }
 
     public List<ReservationResponse> findAllReservationByConditions(ReservationSearchCondition condition) {
-        List<Reservation> reservations = reservationRepository.findReservation(
+        List<Reservation> reservations = reservationRepository.findByPeriodAndThemeAndMember(
                 condition.start(), condition.end(), condition.memberId(), condition.themeId());
         return reservations.stream()
                 .map(ReservationResponse::from)
                 .toList();
     }
 
-    public List<UserReservationResponse> findAllWithRank(Long memberId) {
-        List<ReservationWithRank> reservationWithRanks = reservationRepository.findWithRank(memberId);
-
+    public List<UserReservationResponse> findAllWithRank(MemberInfo memberInfo) {
+        Member member = memberRepository.findById(memberInfo.getId()).orElseThrow(AuthenticationException::new);
+        List<ReservationWithRank> reservationWithRanks = reservationRepository.findWithRank(member.getId());
         return reservationWithRanks.stream()
                 .map(UserReservationResponse::from)
                 .toList();
     }
 
     public List<ReservationResponse> findAllWaitings() {
-        List<Reservation> reservations = reservationRepository.findAll(Status.WAITING);
+        List<Reservation> reservations = reservationRepository.findAllByStatus(Status.WAITING);
         return reservations.stream()
                 .map(ReservationResponse::from)
                 .toList();

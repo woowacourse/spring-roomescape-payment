@@ -10,16 +10,18 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import roomescape.application.MemberService;
 import roomescape.application.dto.request.member.MemberInfo;
 import roomescape.application.security.JwtProvider;
 import roomescape.exception.AuthenticationException;
 
 @Component
 @RequiredArgsConstructor
-public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolver {
+public class MemberArgumentResolver implements HandlerMethodArgumentResolver {
     private static final String TARGET_COOKIE_NAME = "token";
 
     private final JwtProvider jwtProvider;
+    private final MemberService memberService;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -35,7 +37,7 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
     ) {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         String token = extractCookie(request.getCookies(), TARGET_COOKIE_NAME);
-        return new MemberInfo(jwtProvider.extractId(token));
+        return getMember(token);
     }
 
     private String extractCookie(Cookie[] cookies, String targetCookie) {
@@ -44,5 +46,10 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
                 .findAny()
                 .map(Cookie::getValue)
                 .orElseThrow(AuthenticationException::new);
+    }
+
+    private MemberInfo getMember(String token) {
+        Long memberId = jwtProvider.extractId(token);
+        return memberService.getMember(memberId);
     }
 }

@@ -9,6 +9,8 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import roomescape.application.dto.request.payment.PaymentRequest;
 import roomescape.application.dto.response.payment.PaymentResponse;
+import roomescape.domain.payment.CancelReason;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentClient;
 import roomescape.exception.PaymentServerException;
 
@@ -16,6 +18,7 @@ import roomescape.exception.PaymentServerException;
 @RequiredArgsConstructor
 public class TossPaymentClient implements PaymentClient {
     private static final String PAYMENTS_CONFIRM_URI = "/v1/payments/confirm";
+    private static final String PAYMENTS_CANCEL_URI = "/v1/payments/{paymentKey}/cancel";
     private static final String AUTHORIZATION_PREFIX = "Basic ";
 
     private final PaymentApiResponseErrorHandler errorHandler;
@@ -34,6 +37,21 @@ public class TossPaymentClient implements PaymentClient {
                             .onStatus(errorHandler)
                             .body(PaymentResponse.class))
                     .orElse(PaymentResponse.empty());
+        } catch (RestClientException e) {
+            throw new PaymentServerException(e.getMessage(), e.getCause());
+        }
+    }
+
+    @Override
+    public void cancel(Payment payment, CancelReason reason) {
+        try {
+            restClient.post()
+                    .uri(PAYMENTS_CANCEL_URI, payment.getPaymentKey())
+                    .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_PREFIX + secretKey.value())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(reason)
+                    .retrieve()
+                    .onStatus(errorHandler);
         } catch (RestClientException e) {
             throw new PaymentServerException(e.getMessage(), e.getCause());
         }
