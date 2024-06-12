@@ -19,7 +19,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.restassured.RestDocumentationFilter;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -29,15 +28,6 @@ class ReservationTimeAcceptanceTest extends AcceptanceFixture {
     @Test
     @DisplayName("예약 시간을 저장한다.")
     void save_ShouldSaveReservationTime() {
-        RestDocumentationFilter filter = document("time/save",
-                requestCookies(
-                        cookieWithName("token").description("일반 권한 사용자 토큰")
-                ),
-                requestFields(
-                        fieldWithPath("startAt").description("예약 시간(분/초)")
-                )
-        );
-
         // given
         Map<String, String> requestBody = Map.of("startAt", "12:11");
 
@@ -46,7 +36,14 @@ class ReservationTimeAcceptanceTest extends AcceptanceFixture {
                 .given(spec)
                 .contentType(ContentType.JSON)
                 .cookie(normalToken)
-                .filter(filter)
+                .filter(document("time/save",
+                        requestCookies(
+                                cookieWithName("token").description("일반 권한 사용자 토큰")
+                        ),
+                        requestFields(
+                                fieldWithPath("startAt").description("예약 시간(분/초)")
+                        )
+                ))
                 .body(requestBody)
 
                 .when()
@@ -61,15 +58,6 @@ class ReservationTimeAcceptanceTest extends AcceptanceFixture {
     @Test
     @DisplayName("예약 시간을 삭제한다.")
     void delete_ShouldRemoveReservationTime_ByReservationId() {
-        RestDocumentationFilter filter = document("time/delete",
-                pathParameters(
-                        parameterWithName("id").description("예약시간 식별자")
-                ),
-                requestCookies(
-                        cookieWithName("token").description("일반 권한 사용자 토큰")
-                )
-        );
-
         // given
         createTimeRequest("12:11");
         createTimeRequest("13:11");
@@ -78,7 +66,14 @@ class ReservationTimeAcceptanceTest extends AcceptanceFixture {
         RestAssured
                 .given(spec)
                 .accept(ContentType.JSON)
-                .filter(filter)
+                .filter(document("time/delete",
+                        pathParameters(
+                                parameterWithName("id").description("예약시간 식별자")
+                        ),
+                        requestCookies(
+                                cookieWithName("token").description("일반 권한 사용자 토큰")
+                        )
+                ))
                 .cookie(normalToken)
 
                 .when()
@@ -106,16 +101,6 @@ class ReservationTimeAcceptanceTest extends AcceptanceFixture {
     @Test
     @DisplayName("모든 예약 시간을 조회한다.")
     void findAll_ShouldInquiryAllReservationTime() {
-        RestDocumentationFilter filter = document("time/search",
-                requestCookies(
-                        cookieWithName("token").description("일반 권한 사용자 토큰")
-                ),
-                responseFields(
-                        fieldWithPath("[].id").description("예약 시간 식별자"),
-                        fieldWithPath("[].startAt").description("예약 시간")
-                )
-        );
-
         // given
         createTimeRequest("12:11");
         createTimeRequest("13:11");
@@ -123,7 +108,15 @@ class ReservationTimeAcceptanceTest extends AcceptanceFixture {
         // when & then
         RestAssured
                 .given(spec)
-                .filter(filter)
+                .filter(document("time/search",
+                        requestCookies(
+                                cookieWithName("token").description("일반 권한 사용자 토큰")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").description("예약 시간 식별자"),
+                                fieldWithPath("[].startAt").description("예약 시간")
+                        )
+                ))
                 .cookie(normalToken)
                 .accept(ContentType.JSON)
 
@@ -142,21 +135,6 @@ class ReservationTimeAcceptanceTest extends AcceptanceFixture {
     @Test
     @DisplayName("예약 가능한 모든 예약 시간을 조회한다.")
     void findAvailableTimes_ShouldInquiryAvailableAllReservationTime() {
-        RestDocumentationFilter filter = document("time/available",
-                requestCookies(
-                        cookieWithName("token").description("일반 사용자 권한 토큰")
-                ),
-                queryParameters(
-                        parameterWithName("date").description("조회할 날짜"),
-                        parameterWithName("theme-id").description("조회할 테마 식별자")
-                ),
-                responseFields(
-                        fieldWithPath("[].id").description("예약시간 식별자"),
-                        fieldWithPath("[].startAt").description("시간"),
-                        fieldWithPath("[].booked").description("예약 가능 상태(참/거짓)")
-                )
-        );
-
         // given
         String date = LocalDate.now().plusDays(1).toString();
 
@@ -233,7 +211,20 @@ class ReservationTimeAcceptanceTest extends AcceptanceFixture {
         // when & then
         RestAssured
                 .given(spec)
-                .filter(filter)
+                .filter(document("time/available",
+                        requestCookies(
+                                cookieWithName("token").description("일반 사용자 권한 토큰")
+                        ),
+                        queryParameters(
+                                parameterWithName("date").description("조회할 날짜"),
+                                parameterWithName("theme-id").description("조회할 테마 식별자")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").description("예약시간 식별자"),
+                                fieldWithPath("[].startAt").description("시간"),
+                                fieldWithPath("[].booked").description("예약 가능 상태(참/거짓)")
+                        )
+                ))
                 .accept(ContentType.JSON)
                 .queryParam("date", date)
                 .queryParam("theme-id", "1")

@@ -24,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.restdocs.restassured.RestDocumentationFilter;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -49,23 +48,6 @@ class ThemeAcceptanceTest extends AcceptanceFixture {
     @Test
     @DisplayName("테마를 저장한다.")
     void save_ShouldSaveTheme() {
-        RestDocumentationFilter document = document("theme/save",
-                requestCookies(
-                        cookieWithName("token").description("일반 권한 사용자 토큰")
-                ),
-                requestFields(
-                        fieldWithPath("name").description("테마명"),
-                        fieldWithPath("description").description("테마 설명"),
-                        fieldWithPath("thumbnail").description("테마 썸네일 사진 URL")
-                ),
-                responseFields(
-                        fieldWithPath("id").description("테마 식별자"),
-                        fieldWithPath("name").description("테마명"),
-                        fieldWithPath("description").description("테마 설명"),
-                        fieldWithPath("thumbnail").description("테마 썸네일 사진 URL")
-                )
-        );
-
         // given
         Map<String, String> requestBody = Map.of("name", "theme1", "description", "desc", "thumbnail", "thumbnail");
 
@@ -73,7 +55,22 @@ class ThemeAcceptanceTest extends AcceptanceFixture {
 
         RestAssured
                 .given(spec)
-                .filter(document)
+                .filter(document("theme/save",
+                        requestCookies(
+                                cookieWithName("token").description("일반 권한 사용자 토큰")
+                        ),
+                        requestFields(
+                                fieldWithPath("name").description("테마명"),
+                                fieldWithPath("description").description("테마 설명"),
+                                fieldWithPath("thumbnail").description("테마 썸네일 사진 URL")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("테마 식별자"),
+                                fieldWithPath("name").description("테마명"),
+                                fieldWithPath("description").description("테마 설명"),
+                                fieldWithPath("thumbnail").description("테마 썸네일 사진 URL")
+                        )
+                ))
                 .cookie(normalToken)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(requestBody)
@@ -93,18 +90,6 @@ class ThemeAcceptanceTest extends AcceptanceFixture {
     @Test
     @DisplayName("저장된 모든 테마들을 조회한다.")
     void findAll_ShouldInquiryAllThemes() {
-        RestDocumentationFilter filter = document("theme/search",
-                requestCookies(
-                        cookieWithName("token").description("일반 권한 사용자 토큰")
-                ),
-                responseFields(
-                        fieldWithPath("[].id").description("테마 식별자"),
-                        fieldWithPath("[].name").description("테마명"),
-                        fieldWithPath("[].description").description("테마 설명"),
-                        fieldWithPath("[].thumbnail").description("테마 썸네일 사진 url")
-                )
-        );
-
         // given
         saveThemeRequest("theme1");
         saveThemeRequest("theme2");
@@ -113,7 +98,17 @@ class ThemeAcceptanceTest extends AcceptanceFixture {
         // when & then
         RestAssured
                 .given(spec)
-                .filter(filter)
+                .filter(document("theme/search",
+                        requestCookies(
+                                cookieWithName("token").description("일반 권한 사용자 토큰")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").description("테마 식별자"),
+                                fieldWithPath("[].name").description("테마명"),
+                                fieldWithPath("[].description").description("테마 설명"),
+                                fieldWithPath("[].thumbnail").description("테마 썸네일 사진 url")
+                        )
+                ))
                 .cookie(normalToken)
                 .accept(ContentType.JSON)
 
@@ -131,15 +126,6 @@ class ThemeAcceptanceTest extends AcceptanceFixture {
     @Test
     @DisplayName("테마를 삭제한다.")
     void delete_ShouldRemoteTheme_ByThemeId() {
-        RestDocumentationFilter filter = document("theme/delete",
-                pathParameters(
-                        parameterWithName("id").description("테마 식별자")
-                ),
-                requestCookies(
-                        cookieWithName("token").description("일반 권한 사용자 토큰")
-                )
-        );
-
         // given
         saveThemeRequest("theme1");
         saveThemeRequest("theme2");
@@ -149,7 +135,14 @@ class ThemeAcceptanceTest extends AcceptanceFixture {
                 .given(spec)
                 .cookie(normalToken)
                 .accept(ContentType.JSON)
-                .filter(filter)
+                .filter(document("theme/delete",
+                        pathParameters(
+                                parameterWithName("id").description("테마 식별자")
+                        ),
+                        requestCookies(
+                                cookieWithName("token").description("일반 권한 사용자 토큰")
+                        )
+                ))
 
                 .when()
                 .delete("/themes/{id}", 1)
@@ -176,17 +169,6 @@ class ThemeAcceptanceTest extends AcceptanceFixture {
     @Test
     @DisplayName("주간 인기 테마 10개를 인기순으로 조회한다.")
     void findTopTenThemesOfLastWeek_ShouldGet10PopularThemes_WhileOnceAWeek() {
-        RestDocumentationFilter filter = document("theme/popular",
-                requestCookies(
-                        cookieWithName("token").description("일반 사용자 권한 토큰")
-                ),
-                responseFields(
-                        fieldWithPath("[].name").description("테마명"),
-                        fieldWithPath("[].description").description("테마 설명"),
-                        fieldWithPath("[].thumbnail").description("테마 썸네일 사진 url")
-                )
-        );
-
         // given
         Member member = memberRepository.save(new Member("aa", "aa@aa.aa", "aa"));
         List<ReservationTime> times = createTimes(1, 6);
@@ -214,7 +196,16 @@ class ThemeAcceptanceTest extends AcceptanceFixture {
         RestAssured
                 .given(spec)
                 .cookie(normalToken)
-                .filter(filter)
+                .filter(document("theme/popular",
+                        requestCookies(
+                                cookieWithName("token").description("일반 사용자 권한 토큰")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].name").description("테마명"),
+                                fieldWithPath("[].description").description("테마 설명"),
+                                fieldWithPath("[].thumbnail").description("테마 썸네일 사진 url")
+                        )
+                ))
                 .accept(ContentType.JSON)
 
                 .when()

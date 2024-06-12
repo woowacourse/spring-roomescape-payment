@@ -325,19 +325,6 @@ class ReservationAcceptanceTest extends AcceptanceFixture {
     @Test
     @DisplayName("모든 예약 대기를 조회한다.")
     void findWaiting_ShouldInquiryAllReservationWait() {
-        RestDocumentationFilter filter = document("reservation/waits-search",
-                requestCookies(
-                        cookieWithName("token").description("일반 사용자 권한 토큰")
-                ),
-                responseFields(
-                        fieldWithPath("[].id").description("예약 식별자"),
-                        fieldWithPath("[].name").description("예약자명"),
-                        fieldWithPath("[].theme").description("테마명"),
-                        fieldWithPath("[].date").description("예약 일자"),
-                        fieldWithPath("[].startAt").description("예약 시간")
-                )
-        );
-
         // given
         saveThemeRequest("name");
         saveMemberRequest("aa@aa.aa");
@@ -398,7 +385,18 @@ class ReservationAcceptanceTest extends AcceptanceFixture {
         // when & then
         RestAssured
                 .given(spec)
-                .filter(filter)
+                .filter(document("reservation/waits-search",
+                        requestCookies(
+                                cookieWithName("token").description("일반 사용자 권한 토큰")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").description("예약 식별자"),
+                                fieldWithPath("[].name").description("예약자명"),
+                                fieldWithPath("[].theme").description("테마명"),
+                                fieldWithPath("[].date").description("예약 일자"),
+                                fieldWithPath("[].startAt").description("예약 시간")
+                        )
+                ))
                 .accept(ContentType.JSON)
                 .cookie(normalToken)
 
@@ -415,14 +413,6 @@ class ReservationAcceptanceTest extends AcceptanceFixture {
     @Test
     @DisplayName("예약대기을 삭제한다.")
     void delete_ShouldRemoveReservation() {
-        RestDocumentationFilter filter = document("reservation/delete",
-                pathParameters(
-                        parameterWithName("id").description("예약 식별자")
-                ),
-                requestCookies(
-                        cookieWithName("token").description("일반 권한 사용자 토큰")
-                )
-        );
         // given
         saveThemeRequest("name");
         saveMemberRequest("aa@aa.aa");
@@ -469,7 +459,14 @@ class ReservationAcceptanceTest extends AcceptanceFixture {
         // when & then
         RestAssured
                 .given(spec)
-                .filter(filter)
+                .filter(document("reservation/delete",
+                        pathParameters(
+                                parameterWithName("id").description("예약 식별자")
+                        ),
+                        requestCookies(
+                                cookieWithName("token").description("일반 권한 사용자 토큰")
+                        )
+                ))
                 .cookie(normalToken)
 
                 .when()
@@ -482,22 +479,6 @@ class ReservationAcceptanceTest extends AcceptanceFixture {
     @Test
     @DisplayName("자신의 모든 예약 정보를 가져온다.")
     void myReservations_ShouldInquiryAllReservations() {
-        RestDocumentationFilter filter = document("reservation/mine",
-                requestCookies(
-                        cookieWithName("token").description("일반 사용자 권한 토큰")
-                ),
-                responseFields(
-                        fieldWithPath("[].id").description("예약 식별자"),
-                        fieldWithPath("[].theme").description("테마명"),
-                        fieldWithPath("[].date").description("예약 일자"),
-                        fieldWithPath("[].time").description("예약 시간"),
-                        fieldWithPath("[].status").description("예약 상태"),
-                        fieldWithPath("[].order").description("예약 대기 순위 (0은 예약완료)"),
-                        fieldWithPath("[].paymentKey").description("토스API 페이먼트 키"),
-                        fieldWithPath("[].amount").description("토스API 결제금액")
-                )
-        );
-
         // given
         saveThemeRequest("name");
         saveMemberRequest("aa@aa.aa");
@@ -571,7 +552,21 @@ class ReservationAcceptanceTest extends AcceptanceFixture {
         // when & then
         RestAssured
                 .given(spec)
-                .filter(filter)
+                .filter(document("reservation/mine",
+                        requestCookies(
+                                cookieWithName("token").description("일반 사용자 권한 토큰")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].id").description("예약 식별자"),
+                                fieldWithPath("[].theme").description("테마명"),
+                                fieldWithPath("[].date").description("예약 일자"),
+                                fieldWithPath("[].time").description("예약 시간"),
+                                fieldWithPath("[].status").description("예약 상태"),
+                                fieldWithPath("[].order").description("예약 대기 순위 (0은 예약완료)"),
+                                fieldWithPath("[].paymentKey").description("토스API 페이먼트 키"),
+                                fieldWithPath("[].amount").description("토스API 결제금액")
+                        )
+                ))
                 .cookie("token", token2)
                 .accept(ContentType.JSON)
 
