@@ -29,23 +29,26 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = PaymentFailException.class)
     public ResponseEntity<ErrorResult> handlePaymentFailException(PaymentFailException exception) {
-        log.error(ErrorConstants.PAYMENT_ERROR_PREFIX, exception);
+        log.warn(ErrorConstants.PAYMENT_ERROR_PREFIX, exception);
         return new ResponseEntity<>(new ErrorResult(exception.getMessage()), exception.getStatus());
     }
 
     @ExceptionHandler(value = BindException.class)
     public ResponseEntity<ErrorResult> handleValidationException(BindException exception) {
+        log.warn(ErrorConstants.BIND_ERROR_PREFIX, exception);
         String message = exception.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         return new ResponseEntity<>(new ErrorResult(message), BAD_REQUEST);
     }
 
     @ExceptionHandler(value = HttpMessageConversionException.class)
     public ResponseEntity<ErrorResult> handleJsonParsingException(HttpMessageConversionException exception) {
+        log.warn(ErrorConstants.HTTP_MESSAGE_CONVERSION_ERROR_PREFIX, exception);
         return new ResponseEntity<>(new ErrorResult("유효하지 않은 필드가 존재합니다."), BAD_REQUEST);
     }
 
     @ExceptionHandler(value = JwtException.class)
     public ProblemDetail handleJwtException(JwtException exception) {
+        log.warn(ErrorConstants.JWT_ERROR_PREFIX, exception);
         return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, exception.getMessage());
     }
 
