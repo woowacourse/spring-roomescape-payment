@@ -1,5 +1,7 @@
 package roomescape.global.exception;
 
+import java.util.Arrays;
+
 public class PaymentFailException extends RuntimeException {
 
     private final String code;
@@ -20,12 +22,7 @@ public class PaymentFailException extends RuntimeException {
     }
 
     public boolean isClientError() {
-        try {
-            TossPaymentConfirmClientErrorCode.valueOf(code);
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
+        return TossPaymentConfirmClientErrorCode.isClientError(code);
     }
 
     enum TossPaymentConfirmClientErrorCode {
@@ -56,5 +53,10 @@ public class PaymentFailException extends RuntimeException {
         FDS_ERROR,
         NOT_FOUND_PAYMENT_SESSION,
         ;
+
+        static boolean isClientError(String code) {
+            return Arrays.stream(values())
+                    .anyMatch(errorCode -> errorCode.name().equals(code));
+        }
     }
 }
