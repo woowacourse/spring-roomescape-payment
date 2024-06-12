@@ -897,15 +897,13 @@ Cookie: token=member-token</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight nowrap"><code class="language-http hljs" data-lang="http">HTTP/1.1 403 Forbidden
-Vary: Origin
-Vary: Access-Control-Request-Method
-Vary: Access-Control-Request-Headers
 Content-Type: application/json
 
 {
   "type" : "about:blank",
   "title" : "Forbidden",
   "status" : 403,
+  "detail" : "권한이 없습니다.",
   "instance" : "/admin"
 }</code></pre>
 </div>
@@ -2002,6 +2000,7 @@ Content-Type: application/json
   "type" : "about:blank",
   "title" : "Bad Request",
   "status" : 400,
+  "detail" : "이미 예약했거나 대기한 항목입니다.",
   "instance" : "/reservations/queue"
 }</code></pre>
 </div>

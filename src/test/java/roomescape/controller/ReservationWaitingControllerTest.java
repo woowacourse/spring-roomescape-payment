@@ -95,7 +95,7 @@ class ReservationWaitingControllerTest extends ControllerTest {
     @DisplayName("이미 예약한 곳에 대기할 수 없다.")
     void duplicateWaiting() {
         BDDMockito.given(reservationService.enqueueWaitingList(any(ReservationRequest.class)))
-                .willThrow(DuplicatedReservationException.class);
+                .willThrow(new DuplicatedReservationException(1, LocalDate.of(2024, 6, 12), 3));
         String request = """
                 {
                     "themeId": 1,

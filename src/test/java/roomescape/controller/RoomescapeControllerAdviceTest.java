@@ -18,7 +18,7 @@ class RoomescapeControllerAdviceTest extends ControllerTest {
     @Test
     @DisplayName("권한이 없는 사용자가 admin 페이지에 접근한다.")
     void unAuthorizedMemberTest() {
-        BDDMockito.willThrow(UnAuthorizedException.class)
+        BDDMockito.willThrow(new UnAuthorizedException())
                 .given(credentialContext)
                 .validatePermission(Role.ADMIN);
 
