@@ -3,18 +3,21 @@ package roomescape.application;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import roomescape.application.dto.request.theme.ThemeRequest;
 import roomescape.application.dto.response.theme.ThemeResponse;
 import roomescape.application.policy.RankingPolicy;
 import roomescape.domain.reservationdetail.Theme;
 import roomescape.exception.theme.ReservationReferencedThemeException;
+import roomescape.infrastructure.repository.ReservationRepository;
 import roomescape.infrastructure.repository.ThemeRepository;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ThemeService {
+    private final ReservationRepository reservationRepository;
     private final ThemeRepository themeRepository;
 
     public ThemeResponse saveTheme(ThemeRequest request) {
@@ -42,10 +45,9 @@ public class ThemeService {
     }
 
     public void deleteTheme(Long id) {
-        try {
-            themeRepository.deleteById(id);
-        } catch (DataIntegrityViolationException e) {
+        if (reservationRepository.existsByThemeId(id)) {
             throw new ReservationReferencedThemeException();
         }
+        themeRepository.deleteById(id);
     }
 }
