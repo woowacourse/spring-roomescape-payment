@@ -14,6 +14,7 @@ import roomescape.global.exception.IllegalReservationDateException;
 import roomescape.global.exception.NoSuchRecordException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
+import roomescape.payment.domain.PaymentRepository;
 import roomescape.payment.dto.request.PaymentConfirmRequest;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
@@ -33,6 +34,7 @@ import roomescape.time.domain.ReservationTimeRepository;
 public class ReservationService {
 
     private final PaymentService paymentService;
+    private final PaymentRepository paymentRepository;
     private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -43,13 +45,15 @@ public class ReservationService {
             ReservationRepository reservationRepository,
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
-            PaymentService paymentService
+            PaymentService paymentService,
+            PaymentRepository paymentRepository
     ) {
         this.memberRepository = memberRepository;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.paymentService = paymentService;
+        this.paymentRepository = paymentRepository;
     }
 
     public List<ReservationResponse> findAllReservation() {
@@ -187,6 +191,7 @@ public class ReservationService {
         if (reservationForDelete.isReserved()) {
             updateWaitingReservationStatus(reservationForDelete);
         }
+        paymentRepository.deleteByReservationId(id);
         reservationRepository.deleteById(id);
     }
 
