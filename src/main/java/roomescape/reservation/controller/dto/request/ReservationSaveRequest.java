@@ -15,7 +15,7 @@ public record ReservationSaveRequest(
         @NotNull Long themeId,
         @NotNull Long timeId,
         String paymentKey,
-        long amount
+        Long amount
 ) {
     public static ReservationSaveRequest of(ReservationPaymentSaveRequest detail, long memberId) {
         return new ReservationSaveRequest(
