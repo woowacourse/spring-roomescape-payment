@@ -146,13 +146,4 @@ class ReservationApplicationServiceTest {
         assertThatThrownBy(() -> reservationApplicationService.cancelReservationPayment(savedReservation.getId()))
                 .isInstanceOf(PaymentException.class);
     }
-
-    @DisplayName("특정 사용자의 예약 내역을 확인할 수 있다")
-    @Test
-    void saveReservationPaymentDetails() {
-        Reservation reservation = reservationRepository.save(ReservationFixture.ReservationOfDate(LocalDate.now()
-                .plusDays(1)));
-        paymentRepository.save(new Payment(reservation, PAYMENT_INFO));
-        assertThat(reservationApplicationService.reservationPaymentDetails(DEFAULT_MEMBER.getId()).size()).isEqualTo(1);
-    }
 }

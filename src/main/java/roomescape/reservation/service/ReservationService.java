@@ -9,6 +9,7 @@ import static roomescape.exception.type.RoomescapeExceptionType.PAST_TIME_RESERV
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.Reservations;
 import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.dto.ReservationDetailResponse;
+import roomescape.reservation.dto.ReservationPaymentDetail;
 import roomescape.reservation.dto.ReservationPaymentResponse;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
@@ -158,19 +160,43 @@ public class ReservationService {
     }
 
     @Transactional
-    public List<ReservationDetailResponse> findAllByMemberId(long memberId) {
+    public List<ReservationPaymentDetail> findAllByMemberId(long memberId) {
         Reservations reservations = new Reservations(reservationRepository.findAllByMemberId(memberId));
         List<Waiting> waitings = reservations.waiting().stream()
-                .map(reservation -> new Waiting(
-                        reservation,
-                        reservationRepository.findAndCountWaitingNumber(
-                                reservation.getDate(),
-                                reservation.getReservationTime(),
-                                reservation.getTheme(),
-                                reservation.getCreatedAt())))
+                .map(this::createWaiting)
                 .filter(waiting -> !waiting.isOver())
                 .toList();
-        return ReservationDetailResponse.of(reservations, waitings);
+        return getReservationPaymentDetailsBy(ReservationDetailResponse.of(reservations, waitings));
+    }
+
+    private List<ReservationPaymentDetail> getReservationPaymentDetailsBy(List<ReservationDetailResponse> reservationDetails) {
+        List<ReservationPaymentDetail> paymentDetails = new ArrayList<>();
+        for (ReservationDetailResponse response : reservationDetails) {
+            paymentRepository.findByReservationId(response.reservationId())
+                    .ifPresentOrElse(payment -> paymentDetails.add(new ReservationPaymentDetail(response, PaymentResponse.from(payment))),
+                            () -> paymentDetails.add(new ReservationPaymentDetail(response, PaymentResponse.nothing())));
+        }
+        return paymentDetails;
+    }
+
+    private Waiting createWaiting(Reservation reservation) {
+        return new Waiting(
+                reservation,
+                reservationRepository.findAndCountWaitingNumber(
+                        reservation.getDate(),
+                        reservation.getReservationTime(),
+                        reservation.getTheme(),
+                        reservation.getCreatedAt()));
+    }
+
+    @Transactional
+    public List<AdminReservationDetailResponse> findAllWaitingReservations() {
+        List<Reservation> reservations = reservationRepository.findAllByStatus(ReservationStatus.WAITING);
+        return reservations.stream()
+                .map(this::createWaiting)
+                .filter(waiting -> !waiting.isOver())
+                .map(AdminReservationDetailResponse::from)
+                .toList();
     }
 
     @Transactional
@@ -187,21 +213,5 @@ public class ReservationService {
     @Transactional
     public void deleteByMemberIdAndId(LoginMember loginMember, long id) {
         reservationRepository.deleteByMemberIdAndId(loginMember.getId(), id);
-    }
-
-    @Transactional
-    public List<AdminReservationDetailResponse> findAllWaitingReservations() {
-        List<Reservation> reservations = reservationRepository.findAllByStatus(ReservationStatus.WAITING);
-        return reservations.stream()
-                .map(reservation -> new Waiting(
-                        reservation,
-                        reservationRepository.findAndCountWaitingNumber(
-                                reservation.getDate(),
-                                reservation.getReservationTime(),
-                                reservation.getTheme(),
-                                reservation.getCreatedAt())))
-                .filter(waiting -> !waiting.isOver())
-                .map(AdminReservationDetailResponse::from)
-                .toList();
     }
 }

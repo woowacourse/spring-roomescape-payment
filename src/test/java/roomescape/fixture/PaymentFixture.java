@@ -15,12 +15,12 @@ public class PaymentFixture {
             LocalDateTime.now().toString(),
             new EasyPayTypeDetail("토스페이"),
             "currency",
-            BigDecimal.valueOf(10000));
+            BigDecimal.valueOf(10000, 4));
     public static final PaymentInfo INVALID_PAYMENT_INFO = new PaymentInfo("invalidOrderName", "invalidPaymentKey",
             LocalDateTime.now().toString(),
             LocalDateTime.now().toString(),
             new EasyPayTypeDetail("토스페이"),
             "currency",
-            BigDecimal.valueOf(10000));
+            BigDecimal.valueOf(10000, 4));
     public static final PaymentResponse PAYMENT_RESPONSE = PaymentResponse.from(PAYMENT_INFO);
 }

@@ -11,6 +11,7 @@ import static roomescape.exception.type.RoomescapeExceptionType.NOT_FOUND_RESERV
 import static roomescape.exception.type.RoomescapeExceptionType.NOT_FOUND_THEME;
 import static roomescape.exception.type.RoomescapeExceptionType.PAST_TIME_RESERVATION;
 import static roomescape.fixture.PaymentFixture.PAYMENT_INFO;
+import static roomescape.fixture.PaymentFixture.PAYMENT_RESPONSE;
 import static roomescape.fixture.ReservationFixture.ReservationOfDate;
 import static roomescape.fixture.ReservationFixture.ReservationOfDateAndMemberAndStatus;
 import static roomescape.fixture.ReservationFixture.ReservationOfDateAndStatus;
@@ -37,12 +38,14 @@ import roomescape.fixture.MemberFixture;
 import roomescape.member.domain.LoginMember;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.entity.Payment;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.Reservations;
 import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.dto.ReservationDetailResponse;
+import roomescape.reservation.dto.ReservationPaymentDetail;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.entity.Reservation;
@@ -192,26 +195,24 @@ class ReservationServiceTest {
         Member testMember = new Member(2L, "test", Role.USER, "test@test.com", "1234");
         memberRepository.save(testMember);
         Reservation reservation1 = ReservationOfDateAndMemberAndStatus(LocalDate.now().plusDays(1),
+                member, ReservationStatus.BOOKED);
+        Reservation reservation2 = ReservationOfDateAndMemberAndStatus(LocalDate.now().plusDays(2),
                 testMember, ReservationStatus.BOOKED);
-        Reservation reservation2 = ReservationOfDateAndMemberAndStatus(LocalDate.now().plusDays(1),
+        Reservation reservation3 = ReservationOfDateAndMemberAndStatus(LocalDate.now().plusDays(2),
                 member, ReservationStatus.WAITING);
-        Reservation reservation3 = ReservationOfDateAndMemberAndStatus(LocalDate.now().plusDays(3),
-                member, ReservationStatus.BOOKED);
-        Reservation reservation4 = ReservationOfDateAndMemberAndStatus(LocalDate.now().plusDays(4),
-                member, ReservationStatus.BOOKED);
         reservationRepository.save(reservation1);
         reservationRepository.save(reservation2);
         reservationRepository.save(reservation3);
-        reservationRepository.save(reservation4);
 
+        paymentRepository.save(new Payment(reservation1, PAYMENT_INFO));
         //when
-        List<ReservationDetailResponse> reservationResponses = reservationService.findAllByMemberId(member.getId());
+        List<ReservationPaymentDetail> reservationResponses = reservationService.findAllByMemberId(member.getId());
 
         //then
-        List<ReservationDetailResponse> expected = List.of(
-                ReservationDetailResponse.from(new Waiting(reservation2, 1)),
-                ReservationDetailResponse.from(reservation3),
-                ReservationDetailResponse.from(reservation4));
+        List<ReservationPaymentDetail> expected = List.of(
+                new ReservationPaymentDetail(ReservationDetailResponse.from(reservation1), PAYMENT_RESPONSE),
+                new ReservationPaymentDetail(ReservationDetailResponse.from(new Waiting(reservation3, 1)), PaymentResponse.nothing()));
+
         assertThat(reservationResponses).isEqualTo(expected);
     }
 

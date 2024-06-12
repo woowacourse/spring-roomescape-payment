@@ -159,6 +159,6 @@ public class ReservationController {
     @GetMapping("/member/reservation")
     public List<ReservationPaymentDetail> findMemberReservations(
             @Parameter(hidden = true) @Authenticated LoginMember loginMember) {
-        return reservationApplicationService.reservationPaymentDetails(loginMember.getId());
+        return reservationService.findAllByMemberId(loginMember.getId());
     }
 }
