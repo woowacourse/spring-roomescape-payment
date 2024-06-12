@@ -1,0 +1,11 @@
+==== 예약에 대한 대기 생성
+
+operation::reservation-waiting-enqueue[snippets="http-request,request-cookies,request-fields,http-response,response-fields"]
+
+==== 예약 대기 실패: 이미 예약/대기한 경우
+
+operation::reservation-waiting-enqueue-already-reserved[snippets="http-response"]
+
+==== 예약 대기 취소
+
+operation::reservation-waiting-dequeue[snippets="http-request,request-cookies,path-parameters,http-response"]

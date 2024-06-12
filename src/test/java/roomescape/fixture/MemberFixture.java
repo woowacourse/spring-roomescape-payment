@@ -1,5 +1,7 @@
 package roomescape.fixture;
 
+import roomescape.application.member.dto.request.MemberLoginRequest;
+import roomescape.application.member.dto.request.MemberRegisterRequest;
 import roomescape.domain.member.Email;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Password;
@@ -46,6 +48,14 @@ public enum MemberFixture {
                 new Email(name + "@test.com"),
                 new Password("12341234")
         );
+    }
+
+    public MemberRegisterRequest registerRequest() {
+        return new MemberRegisterRequest(name, email, password);
+    }
+
+    public MemberLoginRequest loginRequest() {
+        return new MemberLoginRequest(email, password);
     }
 
     public String email() {

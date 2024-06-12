@@ -55,7 +55,7 @@ class ReservationBookingServiceTest {
                 "paymentKey",
                 "orderId"
         );
-        assertThatCode(() -> reservationService.bookReservation(request))
+        assertThatCode(() -> reservationService.createReservation(request))
                 .isInstanceOf(AlreadyBookedException.class);
     }
 

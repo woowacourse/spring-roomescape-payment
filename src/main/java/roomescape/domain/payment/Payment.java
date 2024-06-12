@@ -2,6 +2,8 @@ package roomescape.domain.payment;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,13 +27,30 @@ public class Payment {
     @Column(name = "amount", nullable = false)
     private long amount;
 
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
+
     protected Payment() {
     }
 
-    public Payment(String orderId, String paymentKey, long amount) {
+    public Payment(String orderId, String paymentKey, long amount, PaymentStatus status) {
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.amount = amount;
+        this.status = status;
+    }
+
+    public Payment(String orderId, String paymentKey, long amount) {
+        this(orderId, paymentKey, amount, PaymentStatus.PENDING);
+    }
+
+    public Payment purchase() {
+        return new Payment(orderId, paymentKey, amount, status.purchase());
+    }
+
+    public boolean isPurchased() {
+        return status.isSuccess();
     }
 
     @Override
@@ -50,10 +69,6 @@ public class Payment {
         return Objects.hash(orderId);
     }
 
-    public Long getId() {
-        return id;
-    }
-
     public String getOrderId() {
         return orderId;
     }
@@ -64,5 +79,9 @@ public class Payment {
 
     public long getAmount() {
         return amount;
+    }
+
+    public PaymentStatus getStatus() {
+        return status;
     }
 }

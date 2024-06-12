@@ -47,7 +47,7 @@ public class ReservationController {
     @PostMapping
     public ResponseEntity<ReservationResponse> create(@LoginMemberId long memberId,
                                                       @RequestBody @Valid ReservationPaymentRequest request) {
-        ReservationResponse response = reservationService.bookReservation(request.withMemberId(memberId));
+        ReservationResponse response = reservationService.createReservation(request.withMemberId(memberId));
         URI location = URI.create("/reservations/" + response.id());
         return ResponseEntity.created(location).body(response);
     }

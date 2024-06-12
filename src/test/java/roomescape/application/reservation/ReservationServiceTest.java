@@ -79,7 +79,7 @@ class ReservationServiceTest {
                 "orderId"
         );
 
-        assertThatCode(() -> reservationService.bookReservation(request))
+        assertThatCode(() -> reservationService.createReservation(request))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("존재하지 않는 예약 시간입니다.");
     }
@@ -96,7 +96,7 @@ class ReservationServiceTest {
                 "paymentKey",
                 "orderId"
         );
-        assertThatCode(() -> reservationService.bookReservation(request))
+        assertThatCode(() -> reservationService.createReservation(request))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("존재하지 않는 테마입니다.");
     }
@@ -115,7 +115,7 @@ class ReservationServiceTest {
                 "orderId"
         );
 
-        assertThatCode(() -> reservationService.bookReservation(request))
+        assertThatCode(() -> reservationService.createReservation(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("현재 시간보다 과거로 예약할 수 없습니다.");
     }
