@@ -13,9 +13,7 @@ public class TimeDeleteService {
     private final TimeValidator timeValidator;
     private final ReservationTimeRepository timeRepository;
 
-    public TimeDeleteService(TimeValidator timeValidator,
-                             ReservationTimeRepository timeRepository
-    ) {
+    public TimeDeleteService(TimeValidator timeValidator, ReservationTimeRepository timeRepository) {
         this.timeValidator = timeValidator;
         this.timeRepository = timeRepository;
     }
