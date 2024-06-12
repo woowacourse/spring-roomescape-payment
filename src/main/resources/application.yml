@@ -21,4 +21,4 @@ payments:
       password: ":"
       connectionTimeoutSeconds: 3
       readTimeoutSeconds: 5
-payment-timeout: 60
+payment-timeout: 3600

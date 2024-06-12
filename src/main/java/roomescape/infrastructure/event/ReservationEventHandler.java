@@ -28,7 +28,7 @@ public class ReservationEventHandler {
     public void handlePaymentPendingEvent(PaymentPendingEvent event) {
         taskScheduler.schedule(
                 () -> checkPaymentStatusAndProcess(event),
-                Instant.now().plus(paymentTimeout, ChronoUnit.MINUTES)
+                Instant.now().plus(paymentTimeout, ChronoUnit.SECONDS)
         );
     }
 
