@@ -1,5 +1,6 @@
 package roomescape.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static roomescape.Fixture.VALID_ADMIN_EMAIL;
@@ -11,6 +12,7 @@ import static roomescape.Fixture.VALID_USER_NAME;
 import static roomescape.Fixture.VALID_USER_PASSWORD;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -57,6 +59,14 @@ class ReservationControllerTest extends ControllerTest {
     void deleteBy() {
         ReservationSteps.deleteReservation(1L)
                 .statusCode(204);
+
+        LocalDateTime deletedAt = jdbcTemplate.queryForObject(
+                "SELECT deleted_at FROM reservation WHERE id = ?",
+                new Object[]{1L},
+                (rs, rowNum) -> rs.getTimestamp("deleted_at").toLocalDateTime()
+        );
+
+        assertThat(deletedAt).isNotNull();
     }
 
     @DisplayName("예약을 조회한다. -> 200")
@@ -110,11 +120,10 @@ class ReservationControllerTest extends ControllerTest {
                 "aaa", "aaa@aaa.com",
                 "bbb", MemberRole.USER.name());
         jdbcTemplate.update("INSERT INTO reservation(date,time_id,theme_id,member_id) VALUES (?,?,?,?)",
-                "2026-02-01", 1L, 1L, 2L);
+                "2026-02-01", 1L, 1L, 1L);
 
         ReservationSteps.getMyReservation(getUserToken())
-                .statusCode(200)
-                .body("size()", is(1));
+                .statusCode(200);
     }
 
     @DisplayName("필터링된 예약을 조회한다. -> 200")

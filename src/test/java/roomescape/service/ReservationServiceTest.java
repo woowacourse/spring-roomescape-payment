@@ -9,11 +9,11 @@ import static roomescape.Fixture.VALID_THEME;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.controller.payment.TestPaymentConfiguration;
 import roomescape.domain.Member;
@@ -26,13 +26,14 @@ import roomescape.domain.repository.ThemeRepository;
 import roomescape.exception.RoomescapeErrorCode;
 import roomescape.exception.RoomescapeException;
 import roomescape.service.request.ReservationSaveAppRequest;
+import roomescape.service.response.PaymentAppResponse;
 import roomescape.service.response.ReservationAppResponse;
 import roomescape.service.response.ReservationTimeAppResponse;
 import roomescape.service.response.ThemeAppResponse;
 import roomescape.web.controller.request.MemberReservationRequest;
 
 @Sql(scripts = "/truncate.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-@SpringBootTest(webEnvironment = WebEnvironment.NONE, classes = TestPaymentConfiguration.class)
+@SpringBootTest(classes = TestPaymentConfiguration.class)
 class ReservationServiceTest {
 
     @Autowired
@@ -47,7 +48,7 @@ class ReservationServiceTest {
     @Autowired
     private ThemeRepository themeRepository;
 
-    @DisplayName("예약을 저장하고, 해당 예약을 id값과 함께 반환한다.")
+    @DisplayName("예약과 결제 정보를 저장하고 응답을 반환한다.")
     @Test
     void save() {
         LocalDate reservationDate = LocalDate.now().plusDays(1);
@@ -71,13 +72,17 @@ class ReservationServiceTest {
         ReservationDate date = reservationAppResponse.date();
         ReservationTimeAppResponse reservationTimeAppResponse = reservationAppResponse.reservationTimeAppResponse();
         ThemeAppResponse themeAppResponse = reservationAppResponse.themeAppResponse();
+        List<PaymentAppResponse> paymentAppResponses = reservationAppResponse.paymentAppResponses();
 
         assertAll(
                 () -> assertThat(reservationAppResponse.id()).isEqualTo(1L),
                 () -> assertThat(date.getDate()).isEqualTo(reservationDate),
                 () -> assertThat(reservationAppResponse.name()).isEqualTo(member.getName()),
                 () -> assertThat(reservationTimeAppResponse.id()).isEqualTo(reservationTime.getId()),
-                () -> assertThat(themeAppResponse.id()).isEqualTo(theme.getId())
+                () -> assertThat(themeAppResponse.id()).isEqualTo(theme.getId()),
+                () -> assertThat(paymentAppResponses.get(0).paymentKey()).isEqualTo("paymentKey"),
+                () -> assertThat(paymentAppResponses.get(0).orderId()).isEqualTo("orderId"),
+                () -> assertThat(paymentAppResponses.get(0).amount()).isEqualTo(BigDecimal.valueOf(1000))
         );
     }
 

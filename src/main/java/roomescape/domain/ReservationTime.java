@@ -7,11 +7,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import roomescape.exception.RoomescapeErrorCode;
 import roomescape.exception.RoomescapeException;
 
 @Entity
-public class ReservationTime {
+@SQLRestriction("deleted_at is NULL")
+@SQLDelete(sql = "UPDATE reservation_time SET deleted_at = NOW() WHERE id = ?")
+public class ReservationTime extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,6 +1,7 @@
 package roomescape.domain;
 
 import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -10,9 +11,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
-public class Reservation {
+@SQLRestriction("deleted_at is NULL")
+@SQLDelete(sql = "UPDATE reservation SET deleted_at = NOW() WHERE id = ?")
+public class Reservation extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,20 +42,30 @@ public class Reservation {
     @JoinColumn(nullable = false)
     private Theme theme;
 
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL)
+    private List<Payment> payments = new ArrayList<>();
+
     protected Reservation() {
     }
 
-    public Reservation(Member member, ReservationDate date, ReservationTime time, Theme theme) {
+    public Reservation(Member member,
+                       ReservationDate date,
+                       ReservationTime time,
+                       Theme theme) {
         this(null, member, date, time, theme);
     }
 
-    public Reservation(Long id, Member member, ReservationDate date, ReservationTime time, Theme theme) {
+    public Reservation(Long id,
+                       Member member,
+                       ReservationDate date,
+                       ReservationTime time,
+                       Theme theme) {
         validateMember(member);
         validateDate(date);
         validateTime(time);
         validateTheme(theme);
-        this.member = member;
         this.id = id;
+        this.member = member;
         this.date = date;
         this.time = time;
         this.theme = theme;
@@ -99,5 +117,9 @@ public class Reservation {
 
     public Theme getTheme() {
         return theme;
+    }
+
+    public List<Payment> getPayments() {
+        return payments;
     }
 }

@@ -1,5 +1,7 @@
 package roomescape.web.controller.api;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -20,6 +22,7 @@ import roomescape.web.controller.request.MemberReservationRequest;
 import roomescape.web.controller.response.MemberReservationResponse;
 import roomescape.web.controller.response.ReservationMineResponse;
 
+@Tag(name = "Member-Reservation", description = "회원 예약 API")
 @RestController
 @RequestMapping("/reservations")
 public class MemberReservationController {
@@ -30,6 +33,7 @@ public class MemberReservationController {
         this.reservationService = reservationService;
     }
 
+    @Operation(summary = "예약 추가", description = "로그인한 회원 권한으로 예약을 추가합니다.")
     @PostMapping
     public ResponseEntity<MemberReservationResponse> reserve(
             @Valid @RequestBody MemberReservationRequest memberReservationRequest,
@@ -44,6 +48,7 @@ public class MemberReservationController {
                 .body(memberReservationResponse);
     }
 
+    @Operation(summary = "예약 삭제", description = "예약 id로 예약을 삭제합니다.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBy(@PathVariable Long id) {
         reservationService.delete(id);
@@ -51,6 +56,7 @@ public class MemberReservationController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "전체 예약 조회", description = "전체 예약을 조회합니다.")
     @GetMapping
     public ResponseEntity<List<MemberReservationResponse>> getReservations() {
         List<ReservationAppResponse> appResponses = reservationService.findAll();
@@ -61,6 +67,7 @@ public class MemberReservationController {
         return ResponseEntity.ok(memberReservationResponse);
     }
 
+    @Operation(summary = "내 예약 조회", description = "로그인한 회원의 id로 예약된 예약들을 조회합니다.")
     @GetMapping("/mine")
     public ResponseEntity<List<ReservationMineResponse>> getMyReservations(@Auth LoginMember loginMember) {
         List<ReservationMineResponse> responses = reservationService.findByMemberId(loginMember.id()).stream()
@@ -69,5 +76,4 @@ public class MemberReservationController {
 
         return ResponseEntity.ok(responses);
     }
-
 }

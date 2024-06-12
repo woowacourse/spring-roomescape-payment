@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationDate;
@@ -22,4 +23,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
     List<Reservation> findAllByMemberId(Long id);
 
     Optional<Reservation> findByDateAndTimeIdAndThemeId(ReservationDate date, Long timeId, Long themeId);
+
+    @Query("""
+            SELECT r FROM Reservation r
+            JOIN FETCH r.payments p
+            WHERE r.member.id = :id
+            """)
+    List<Reservation> findAllByMemberIdWithPayments(Long id);
 }

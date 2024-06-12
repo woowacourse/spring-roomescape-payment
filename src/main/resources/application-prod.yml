@@ -1,0 +1,17 @@
+server:
+  port: 8080
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+logging.level:
+  org.hibernate.SQL: debug
+
+api:
+  version: 1.0.0

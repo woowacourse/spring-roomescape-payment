@@ -1,11 +1,13 @@
 package roomescape;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
 import roomescape.domain.Member;
 import roomescape.domain.MemberEmail;
 import roomescape.domain.MemberName;
 import roomescape.domain.MemberPassword;
 import roomescape.domain.MemberRole;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationDate;
 import roomescape.domain.ReservationTime;
@@ -26,10 +28,14 @@ public class Fixture {
     public static final Member VALID_MEMBER = new Member(VALID_USER_NAME, VALID_USER_EMAIL,
             VALID_USER_PASSWORD,
             MemberRole.USER);
-    public static final Reservation VALID_RESERVATION = new Reservation(VALID_MEMBER,
+    public static final Reservation VALID_RESERVATION = new Reservation(
+            VALID_MEMBER,
             VALID_RESERVATION_DATE,
             VALID_RESERVATION_TIME,
-            VALID_THEME);
+            VALID_THEME
+    );
+    private static final Payment VALID_PAYMENT = new Payment(VALID_RESERVATION, "paymentKey", "orderId",
+            BigDecimal.valueOf(1000));
     public static final String COOKIE_NAME = "token";
 
 }
