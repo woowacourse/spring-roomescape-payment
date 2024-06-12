@@ -8,21 +8,21 @@ public class PageController {
 
     @GetMapping("/")
     public String mainPage() {
-        return "/index";
+        return "index";
     }
 
     @GetMapping("/login")
     public String loginPage() {
-        return "/login";
+        return "login";
     }
 
     @GetMapping("/reservation")
     public String reservationPage() {
-        return "/reservation";
+        return "reservation";
     }
 
     @GetMapping("/reservation-mine")
     public String ReservationMinePage() {
-        return "/reservation-mine";
+        return "reservation-mine";
     }
 }
