@@ -9,7 +9,6 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
@@ -21,11 +20,8 @@ import org.junit.jupiter.api.TestFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import roomescape.BasicAcceptanceTest;
-import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
-import roomescape.domain.reservation.ReservationTime;
-import roomescape.domain.theme.Theme;
 import roomescape.dto.request.payment.PaymentRequest;
 import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.response.reservation.PaymentExceptionResponse;
@@ -106,7 +102,7 @@ class ReservationAcceptanceTest extends BasicAcceptanceTest {
                         clientToken, tomorrow.toString(), 1L, 1L, 201))),
                 dynamicTest("사용자 페이지에서 예약을 추가한다", () -> ReservationTestStep.postClientReservation(clientToken, tomorrow.toString(), 2L, 2L, 201)),
                 dynamicTest("모든 예약을 조회한다 (총 5개)", () -> ReservationTestStep.getReservations(200, 5)),
-                dynamicTest("예약을 삭제한다", () -> ReservationTestStep.deleteReservation(reservationId.longValue(), 204)),
+                dynamicTest("예약을 삭제한다", () -> ReservationTestStep.deleteReservation(clientToken, reservationId.longValue(), 204)),
                 dynamicTest("모든 예약을 조회한다 (총 4개)", () -> ReservationTestStep.getReservations(200, 4))
         );
     }

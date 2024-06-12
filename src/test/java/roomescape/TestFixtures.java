@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import roomescape.domain.member.Role;
+import roomescape.dto.LoginMember;
 import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.response.reservation.AvailableTimeResponse;
 import roomescape.dto.response.member.MemberResponse;
@@ -66,6 +67,8 @@ public class TestFixtures {
     public static final List<ThemeResponse> THEME_RESPONSES_4 = List.of(
             THEME_RESPONSE_1, THEME_RESPONSE_2, THEME_RESPONSE_3, THEME_RESPONSE_4, THEME_RESPONSE_5
     );
+    public static final LoginMember LOGIN_MEMBER_1 = new LoginMember(1L, "썬");
+    public static final LoginMember LOGIN_MEMBER_2 = new LoginMember(2L, "비토");
     public static final MemberSignUpRequest MEMBER_SIGN_UP_REQUEST = new MemberSignUpRequest(
             "새멤버", "newmember@wooteco.com", "wootecoCrew6!"
     );
@@ -218,8 +221,5 @@ public class TestFixtures {
     );
     public static final AdminReservationRequest ADMIN_RESERVATION_REQUEST_1 = new AdminReservationRequest(
             2L, TODAY.plusDays(5), 1L, 9L
-    );
-    public static final AdminReservationRequest ADMIN_RESERVATION_REQUEST_2 = new AdminReservationRequest(
-            3L, TODAY.plusDays(5), 1L, 9L
     );
 }

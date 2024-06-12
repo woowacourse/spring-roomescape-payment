@@ -69,8 +69,8 @@ public class ReservationService {
     }
 
     @Transactional
-    public void deleteById(long id) {
-        reservationDeleteService.deleteById(id);
+    public void deleteById(long id, LoginMember loginMember) {
+        reservationDeleteService.deleteById(id, loginMember);
     }
 
     @Transactional(readOnly = true)

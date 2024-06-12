@@ -62,8 +62,9 @@ public class ReservationTestStep {
         assertThat(reservationResponses).hasSize(expectedReservationsSize);
     }
 
-    public static void deleteReservation(Long reservationId, int expectedHttpCode) {
+    public static void deleteReservation(String token, Long reservationId, int expectedHttpCode) {
         RestAssured.given().log().all()
+                .cookies("token", token)
                 .when().delete("/reservations/" + reservationId)
                 .then().log().all()
                 .statusCode(expectedHttpCode);

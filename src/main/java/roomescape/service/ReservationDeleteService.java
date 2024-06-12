@@ -7,7 +7,9 @@ import roomescape.domain.reservation.CanceledReservationRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
+import roomescape.dto.LoginMember;
 import roomescape.exception.NotFoundException;
+import roomescape.exception.RoomescapeException;
 
 @Service
 @Transactional
@@ -27,13 +29,20 @@ public class ReservationDeleteService {
     }
 
     @Transactional
-    public void deleteById(long id) {
+    public void deleteById(long id, LoginMember loginMember) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("존재하지 않는 예약입니다. 요청 예약 id:%d", id)));
+        validateDeleteReservation(reservation, loginMember);
         CanceledReservation canceledReservation = canceledReservationRepository.save(reservation.canceled());
         paymentService.deletePayment(reservation, canceledReservation);
         reservationRepository.deleteById(reservation.getId());
         updateWaitingToReservation(reservation);
+    }
+
+    private void validateDeleteReservation(Reservation reservation, LoginMember loginMember) {
+        if (reservation.isNotMyReservation(loginMember)) {
+            throw new RoomescapeException("다른 사람의 예약은 삭제할 수 없습니다.");
+        }
     }
 
     private void updateWaitingToReservation(Reservation reservation) {

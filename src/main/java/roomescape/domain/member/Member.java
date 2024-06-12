@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.util.Objects;
+import roomescape.dto.LoginMember;
 import roomescape.exception.RoomescapeException;
 
 @Entity
@@ -50,6 +51,10 @@ public class Member {
 
     public boolean isSamePassword(String password) {
         return this.password.isSamePassword(password);
+    }
+
+    public boolean isNotMyReservation(LoginMember loginMember) {
+        return !Objects.equals(id, loginMember.id());
     }
 
     public Long getId() {

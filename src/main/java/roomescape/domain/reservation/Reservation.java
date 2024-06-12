@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 import roomescape.domain.member.Member;
 import roomescape.domain.theme.Theme;
+import roomescape.dto.LoginMember;
 import roomescape.exception.RoomescapeException;
 
 @Entity
@@ -62,6 +63,10 @@ public class Reservation {
 
     public void approve() {
         this.status = Status.RESERVATION;
+    }
+
+    public boolean isNotMyReservation(LoginMember loginMember) {
+        return member.isNotMyReservation(loginMember);
     }
 
     public Long getId() {

@@ -60,8 +60,8 @@ public class ReservationController {
 
     @Operation(summary = "사용자 예약 및 예약 대기 삭제 API")
     @DeleteMapping(value = {"/reservations/{id}", "/waitings/{id}"})
-    public ResponseEntity<Void> deleteByReservation(@PathVariable long id) {
-        reservationService.deleteById(id);
+    public ResponseEntity<Void> deleteByReservation(@PathVariable long id, @LoginMemberConverter LoginMember loginMember) {
+        reservationService.deleteById(id, loginMember);
         return ResponseEntity.noContent().build();
     }
 
