@@ -1,10 +1,22 @@
 package roomescape.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.domain.*;
 
 import java.time.LocalDate;
 
-public record WaitingRequest(Long memberId, LocalDate date, Long timeId, Long themeId) {
+@Schema(description = "Waiting Request Model")
+public record WaitingRequest(@Schema(description = "ID of the member", example = "1")
+                             Long memberId,
+
+                             @Schema(description = "Date of the waiting", example = "2024-06-30")
+                             LocalDate date,
+
+                             @Schema(description = "ID of the time slot", example = "1")
+                             Long timeId,
+
+                             @Schema(description = "ID of the theme", example = "1")
+                             Long themeId) {
 
     public WaitingRequest{
         isValid(memberId, date, timeId, themeId);

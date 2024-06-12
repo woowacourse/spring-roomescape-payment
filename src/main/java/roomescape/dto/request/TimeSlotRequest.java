@@ -2,9 +2,14 @@ package roomescape.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalTime;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.domain.TimeSlot;
 
-public record TimeSlotRequest(@JsonFormat(pattern = "HH:mm") LocalTime startAt) {
+@Schema(description = "Time Slot Request Model")
+public record TimeSlotRequest(@Schema(description = "Start time of the time slot", example = "14:30")
+                              @JsonFormat(pattern = "HH:mm")
+                              LocalTime startAt) {
 
     public TimeSlotRequest {
         isValid(startAt);

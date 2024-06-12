@@ -1,8 +1,16 @@
 package roomescape.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.domain.*;
 
-public record PaymentInfo(Long amount, String orderId, String paymentKey) {
+@Schema(description = "Payment Information Model")
+public record PaymentInfo(@Schema(description = "Amount of the payment", example = "10000")
+                          Long amount,
+                          @Schema(description = "Order ID for the payment", example = "ORDER123")
+                          String orderId,
+                          @Schema(description = "Payment key", example = "PAYMENT_KEY_123")
+                          String paymentKey) {
+
     public PaymentInfo{
         isValid(amount, orderId, paymentKey);
     }

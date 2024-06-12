@@ -1,10 +1,27 @@
 package roomescape.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.domain.*;
 
 import java.time.LocalDate;
 
-public record MemberReservationRequest(LocalDate date, Long timeId, Long themeId, String paymentKey, String orderId,
+@Schema(description = "Member Reservation Request Model")
+public record MemberReservationRequest(@Schema(description = "Reservation date", example = "2023-12-25")
+                                       LocalDate date,
+
+                                       @Schema(description = "Time Slot ID", example = "1")
+                                       Long timeId,
+
+                                       @Schema(description = "Theme ID", example = "1")
+                                       Long themeId,
+
+                                       @Schema(description = "Payment Key", example = "abcd1234")
+                                       String paymentKey,
+
+                                       @Schema(description = "Order ID", example = "order1234")
+                                       String orderId,
+
+                                       @Schema(description = "Payment Amount", example = "1000")
                                        Long amount) {
 
     public MemberReservationRequest {
