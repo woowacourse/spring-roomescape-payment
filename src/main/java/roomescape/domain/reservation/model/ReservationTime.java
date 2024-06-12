@@ -38,6 +38,14 @@ public class ReservationTime {
         }
     }
 
+    @Override
+    public String toString() {
+        return "ReservationTime{" +
+                "id=" + id +
+                ", startAt=" + startAt +
+                '}';
+    }
+
     public Long getId() {
         return id;
     }

@@ -15,6 +15,7 @@ import roomescape.config.TestConfig;
 import roomescape.domain.member.model.MemberRole;
 import roomescape.domain.reservation.dto.ReservationResponse;
 import roomescape.domain.reservation.dto.ReservationTimeResponse;
+import roomescape.domain.reservation.dto.SaveAdminReservationRequest;
 import roomescape.domain.reservation.dto.SaveReservationRequest;
 import roomescape.domain.reservation.dto.SaveReservationTimeRequest;
 import roomescape.domain.reservation.dto.SaveThemeRequest;
@@ -58,12 +59,13 @@ class AdminReservationControllerTest {
     @DisplayName("(관리자) - 사용자 아이디를 포함하여 예약 정보를 저장한다.")
     @Test
     void saveReservationForAdminTest() {
-        final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
+        final SaveAdminReservationRequest saveReservationRequest = new SaveAdminReservationRequest(
                 LocalDate.now().plusDays(1),
                 3L,
                 1L,
                 1L,
                 "test-order-id",
+                "test_order_name",
                 10000L,
                 "test_payment_key"
         );
@@ -117,7 +119,10 @@ class AdminReservationControllerTest {
                 .statusCode(200).extract()
                 .jsonPath().getList(".", ReservationResponse.class);
 
-        assertThat(reservations.size()).isEqualTo(15);
+        final boolean isCancel = reservations.stream()
+                .anyMatch(reservationResponse -> reservationResponse.status().equals("취소"));
+
+        assertThat(isCancel).isTrue();
     }
 
     @DisplayName("관리자가 아닌 클라이언트가 예약 정보를 삭제하려고 하면 에러 코드가 응답된다.")
@@ -174,7 +179,7 @@ class AdminReservationControllerTest {
         // 예약 시간 정보 조회
         final List<ReservationTimeResponse> reservationTimes = RestAssured.given().log().all()
                 .cookie("token", createAdminAccessToken())
-                .when().get("/times")
+                .when().get("/admin/times")
                 .then().log().all()
                 .statusCode(200).extract()
                 .jsonPath().getList(".", ReservationTimeResponse.class);

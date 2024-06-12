@@ -24,6 +24,13 @@ public class MemberPassword {
         }
     }
 
+    @Override
+    public String toString() {
+        return "MemberPassword{" +
+                "password='" + password + '\'' +
+                '}';
+    }
+
     public String getValue() {
         return password;
     }

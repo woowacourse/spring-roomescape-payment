@@ -41,7 +41,7 @@ class ReservationTimeServiceTest {
     @Test
     void saveReservationTimeTest() {
         // Given
-        final LocalTime startAt = LocalTime.now().plusHours(1);
+        final LocalTime startAt = LocalTime.now().plusHours(0);
         final SaveReservationTimeRequest saveReservationTimeRequest = new SaveReservationTimeRequest(startAt);
 
         // When

@@ -9,7 +9,8 @@ public record ReservationResponse(
         MemberResponse member,
         LocalDate date,
         ReservationTimeResponse time,
-        ThemeResponse theme
+        ThemeResponse theme,
+        String status
 ) {
     public static ReservationResponse from(final ReservationDto reservation) {
         return new ReservationResponse(
@@ -21,7 +22,8 @@ public record ReservationResponse(
                 ),
                 reservation.date().getValue(),
                 ReservationTimeResponse.from(reservation.time()),
-                ThemeResponse.from(reservation.theme())
+                ThemeResponse.from(reservation.theme()),
+                reservation.status().getDescription()
         );
     }
 }

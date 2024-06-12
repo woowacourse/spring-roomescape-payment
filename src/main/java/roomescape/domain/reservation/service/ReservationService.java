@@ -4,23 +4,29 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.model.Member;
 import roomescape.domain.member.repository.MemberRepository;
+import roomescape.domain.payment.model.PaymentHistory;
+import roomescape.domain.payment.model.PaymentStatus;
+import roomescape.domain.payment.repository.PaymentHistoryRepository;
 import roomescape.domain.payment.service.PaymentService;
 import roomescape.domain.reservation.dto.ReservationDto;
+import roomescape.domain.reservation.dto.ReservationWithPaymentHistoryDto;
+import roomescape.domain.reservation.dto.SaveAdminReservationRequest;
+import roomescape.domain.reservation.dto.PaymentHistoryDto;
 import roomescape.domain.reservation.dto.SaveReservationRequest;
 import roomescape.domain.reservation.dto.SearchReservationsParams;
 import roomescape.domain.reservation.dto.SearchReservationsRequest;
 import roomescape.domain.reservation.exception.InvalidReserveInputException;
 import roomescape.domain.reservation.model.Reservation;
 import roomescape.domain.reservation.model.ReservationDate;
+import roomescape.domain.reservation.model.ReservationStatus;
 import roomescape.domain.reservation.model.ReservationTime;
-import roomescape.domain.reservation.model.ReservationWaiting;
 import roomescape.domain.reservation.model.Theme;
 import roomescape.domain.reservation.repository.CustomReservationRepository;
 import roomescape.domain.reservation.repository.ReservationRepository;
 import roomescape.domain.reservation.repository.ReservationTimeRepository;
-import roomescape.domain.reservation.repository.ReservationWaitingRepository;
 import roomescape.domain.reservation.repository.ThemeRepository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -30,27 +36,27 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
-    private final ReservationWaitingRepository reservationWaitingRepository;
     private final CustomReservationRepository customReservationRepository;
     private final MemberRepository memberRepository;
     private final ThemeRepository themeRepository;
+    private final PaymentHistoryRepository paymentHistoryRepository;
     private final PaymentService paymentService;
 
     public ReservationService(
             final CustomReservationRepository customReservationRepository,
             final ReservationRepository reservationRepository,
             final ReservationTimeRepository reservationTimeRepository,
-            final ReservationWaitingRepository reservationWaitingRepository,
             final MemberRepository memberRepository,
             final ThemeRepository themeRepository,
+            final PaymentHistoryRepository paymentHistoryRepository,
             final PaymentService paymentService
     ) {
         this.customReservationRepository = customReservationRepository;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
-        this.reservationWaitingRepository = reservationWaitingRepository;
         this.memberRepository = memberRepository;
         this.themeRepository = themeRepository;
+        this.paymentHistoryRepository = paymentHistoryRepository;
         this.paymentService = paymentService;
     }
 
@@ -75,21 +81,76 @@ public class ReservationService {
                 .toList();
     }
 
-    public ReservationDto saveReservation(final SaveReservationRequest request) {
-        final ReservationTime reservationTime = reservationTimeRepository.findById(request.timeId())
-                .orElseThrow(() -> new NoSuchElementException("해당 id의 예약 시간이 존재하지 않습니다."));
-        final Theme theme = themeRepository.findById(request.themeId())
-                .orElseThrow(() -> new NoSuchElementException("해당 id의 테마가 존재하지 않습니다."));
-        final Member member = memberRepository.findById(request.memberId())
-                .orElseThrow(() -> new NoSuchElementException("해당 id의 회원이 존재하지 않습니다."));
-        final Reservation reservation = request.toReservation(reservationTime, theme, member);
+    @Transactional
+    public ReservationDto saveReservation(final SaveAdminReservationRequest request) {
+        final Reservation reservation = generateReservationModel(request.timeId(), request.themeId(), request.memberId(), request.date());
 
-        validateReservationDateAndTime(reservation.getDate(), reservationTime);
+        validateReservationDateAndTime(reservation.getDate(), reservation.getTime());
         validateReservationDuplicated(reservation);
 
-        paymentService.submitPayment(request.orderId(), request.amount(), request.paymentKey(), member);
+        final PaymentHistoryDto paymentHistoryDto = convertPaymentHistoryRequest(request, reservation);
+        paymentService.savePaymentHistory(paymentHistoryDto);
 
         return ReservationDto.from(reservationRepository.save(reservation));
+    }
+
+    private Reservation generateReservationModel(
+            final Long timeId,
+            final Long themeId,
+            final Long memberId,
+            final LocalDate date
+    ) {
+        final ReservationTime reservationTime = getReservationTime(timeId);
+        final Theme theme = getTheme(themeId);
+        final Member member = getMember(memberId);
+
+        return new Reservation(
+                ReservationStatus.RESERVATION,
+                date,
+                reservationTime,
+                theme,
+                member
+        );
+    }
+
+    private Member getMember(final Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new NoSuchElementException("해당 id의 회원이 존재하지 않습니다."));
+    }
+
+    private Theme getTheme(final Long themeId) {
+        return themeRepository.findById(themeId)
+                .orElseThrow(() -> new NoSuchElementException("해당 id의 테마가 존재하지 않습니다."));
+    }
+
+    private ReservationTime getReservationTime(final Long reservationId) {
+        return reservationTimeRepository.findById(reservationId)
+                .orElseThrow(() -> new NoSuchElementException("해당 id의 예약 시간이 존재하지 않습니다."));
+    }
+
+    private PaymentHistoryDto convertPaymentHistoryRequest(final SaveAdminReservationRequest request, final Reservation reservation) {
+        return new PaymentHistoryDto(
+                PaymentStatus.DONE,
+                request.orderName(),
+                request.amount(),
+                LocalDateTime.now(),
+                request.paymentKey(),
+                "관리자 직접 결제",
+                reservation
+        );
+    }
+
+    @Transactional
+    public ReservationDto saveReservationWithPaymentConfirm(final SaveReservationRequest request) {
+        final Reservation reservation = generateReservationModel(request.timeId(), request.themeId(), request.memberId(), request.date());
+
+        validateReservationDateAndTime(reservation.getDate(), reservation.getTime());
+        validateReservationDuplicated(reservation);
+
+        final Reservation savedReservation = reservationRepository.save(reservation);
+        paymentService.submitPayment(request.orderId(), request.amount(), request.paymentKey(), savedReservation);
+
+        return ReservationDto.from(savedReservation);
     }
 
     private static void validateReservationDateAndTime(final ReservationDate date, final ReservationTime time) {
@@ -100,11 +161,14 @@ public class ReservationService {
     }
 
     private void validateReservationDuplicated(final Reservation reservation) {
-        if (reservationRepository.existsByDateAndTime_IdAndTheme_Id(
+        final boolean existReservation = reservationRepository.existsByDateAndTime_IdAndTheme_IdAndStatus(
                 reservation.getDate(),
                 reservation.getTime().getId(),
-                reservation.getTheme().getId())
-        ) {
+                reservation.getTheme().getId(),
+                ReservationStatus.RESERVATION
+        );
+
+        if (existReservation) {
             throw new InvalidReserveInputException("이미 해당 날짜/시간의 테마 예약이 있습니다.");
         }
     }
@@ -113,24 +177,20 @@ public class ReservationService {
     public void deleteReservation(final Long reservationId) {
         final Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 예약 정보입니다."));
-        reservationRepository.deleteById(reservation.getId());
-        reservationWaitingRepository.findTopByDateAndTimeAndThemeOrderByCreatedAtAsc(
-                        reservation.getDate(),
-                        reservation.getTime(),
-                        reservation.getTheme())
-                .ifPresent(this::saveReservationWithWaiting);
+        reservation.cancel();
+        paymentService.cancelPayment(reservation);
     }
 
-    private void saveReservationWithWaiting(final ReservationWaiting reservationWaiting) {
-        final Reservation reservation = reservationWaiting.makeReservation();
-        reservationRepository.save(reservation);
-        reservationWaitingRepository.delete(reservationWaiting);
-    }
-
-    public List<ReservationDto> getMyReservations(final Long memberId) {
-        return reservationRepository.findAllByMember_Id(memberId)
-                .stream()
-                .map(ReservationDto::from)
+    public List<ReservationWithPaymentHistoryDto> getMyReservationsWithPaymentHistory(final Long memberId) {
+        return reservationRepository.findAllByMember_Id(memberId).stream()
+                .map(this::convertReservationToReservationWithPaymentHistory)
                 .toList();
+    }
+
+    private ReservationWithPaymentHistoryDto convertReservationToReservationWithPaymentHistory(final Reservation reservation) {
+        final PaymentHistory paymentHistory = paymentHistoryRepository.findByReservation(reservation)
+                .orElseThrow(() -> new NoSuchElementException("해당 예약의 결제 정보가 존재하지 않습니다."));
+
+        return ReservationWithPaymentHistoryDto.of(reservation, paymentHistory.getPaymentKey(), paymentHistory.getTotalAmount());
     }
 }

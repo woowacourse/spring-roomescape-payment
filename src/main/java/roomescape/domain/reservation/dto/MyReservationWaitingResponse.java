@@ -8,7 +8,8 @@ public record MyReservationWaitingResponse(
         String theme,
         LocalDate date,
         LocalTime time,
-        int order
+        int order,
+        boolean paymentAvailable
 ) {
     public static MyReservationWaitingResponse from(final ReservationWaitingWithOrderDto reservationWaiting) {
         return new MyReservationWaitingResponse(
@@ -16,7 +17,8 @@ public record MyReservationWaitingResponse(
                 reservationWaiting.theme().name().getValue(),
                 reservationWaiting.date().getValue(),
                 reservationWaiting.time().startAt(),
-                reservationWaiting.order()
+                reservationWaiting.order(),
+                reservationWaiting.paymentAvailable()
         );
     }
 }

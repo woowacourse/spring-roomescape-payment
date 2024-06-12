@@ -5,7 +5,7 @@ import roomescape.domain.reservation.model.ReservationTime;
 import java.time.LocalTime;
 
 public record SaveReservationTimeRequest(LocalTime startAt) {
-    public ReservationTime toReservationTime() {
+    public ReservationTime toModel() {
         return new ReservationTime(startAt);
     }
 }

@@ -32,14 +32,14 @@ class ReservationTimeControllerTest {
     @Test
     void getReservationTimesTest() {
         RestAssured.given().log().all()
-                .cookie("token", createUserAccessToken())
-                .when().get("/times")
+                .cookie("token", createAdminToken())
+                .when().get("/admin/times")
                 .then().log().all()
                 .statusCode(200)
                 .body("size()", is(8));
     }
 
-    private String createUserAccessToken() {
-        return tokenProvider.createToken(3L, MemberRole.USER);
+    private String createAdminToken() {
+        return tokenProvider.createToken(3L, MemberRole.ADMIN);
     }
 }

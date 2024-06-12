@@ -33,7 +33,7 @@ public class MemberService {
         validateEmailDuplicate(request.email());
         validatePlainPassword(request.password());
 
-        final Member member = request.toMember(passwordEncoder.encode(request.password()));
+        final Member member = request.toModel(passwordEncoder.encode(request.password()));
         return MemberDto.from(memberRepository.save(member));
     }
 

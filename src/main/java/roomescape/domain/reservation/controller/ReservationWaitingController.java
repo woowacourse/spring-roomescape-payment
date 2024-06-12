@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.principal.AuthenticatedMember;
+import roomescape.domain.reservation.dto.ApproveReservationWaitingRequest;
+import roomescape.domain.reservation.dto.ReservationDto;
+import roomescape.domain.reservation.dto.ReservationResponse;
 import roomescape.domain.reservation.service.ReservationWaitingService;
 import roomescape.domain.reservation.dto.MyReservationWaitingResponse;
 import roomescape.domain.reservation.dto.ReservationWaitingResponse;
@@ -54,6 +57,15 @@ public class ReservationWaitingController {
 
         return ResponseEntity.created(URI.create("/reservations/" + reservationWaitingId))
                 .body(saveReservationWaitingResponse);
+    }
+
+    @PostMapping("/reservation-waiting/approve")
+    public ResponseEntity<ReservationResponse> approveReservationWaiting(@RequestBody final ApproveReservationWaitingRequest request) {
+        final ReservationDto savedReservation = reservationWaitingService.approveReservationWaiting(request);
+        final ReservationResponse response = ReservationResponse.from(savedReservation);
+
+        return ResponseEntity.created(URI.create("/reservations/" + savedReservation.id()))
+                .body(response);
     }
 
     @DeleteMapping("/reservation-waiting/{reservationWaitingId}")

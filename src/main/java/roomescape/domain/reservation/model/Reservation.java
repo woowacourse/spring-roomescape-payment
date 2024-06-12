@@ -1,5 +1,6 @@
 package roomescape.domain.reservation.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -30,6 +31,7 @@ public class Reservation {
     private Member member;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 20, nullable = false)
     private ReservationStatus status;
 
     @Embedded
@@ -99,6 +101,26 @@ public class Reservation {
         if (status == null || reservationTime == null || theme == null || member == null) {
             throw new InvalidReserveInputException("예약 상태, 시간, 테마, 회원 정보는 Null을 입력할 수 없습니다.");
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Reservation{" +
+                "date=" + date +
+                ", id=" + id +
+                ", time=" + time +
+                ", theme=" + theme +
+                ", member=" + member +
+                ", status=" + status +
+                '}';
+    }
+
+    public void cancel() {
+        this.status = ReservationStatus.CANCEL;
+    }
+
+    public boolean isCancel() {
+        return this.status == ReservationStatus.CANCEL;
     }
 
     public Long getId() {

@@ -121,3 +121,40 @@ INSERT INTO reservation_waiting(member_id, date, time_id, theme_id, created_at)
 VALUES (3, CAST(TIMESTAMPADD(DAY, 6, NOW()) AS DATE), 3, 8, CAST(TIMESTAMPADD(MINUTE, 50, CURRENT_TIMESTAMP()) AS DATETIME));
 INSERT INTO reservation_waiting(member_id, date, time_id, theme_id, created_at)
 VALUES (2, CAST(TIMESTAMPADD(DAY, 6, NOW()) AS DATE), 3, 8, CAST(TIMESTAMPADD(MINUTE, 1, CURRENT_TIMESTAMP()) AS DATETIME));
+
+/**
+  Payment History
+ */
+
+INSERT INTO payment_history(reservation_id, payment_key, order_name, payment_status, total_amount, payment_provider, approved_at)
+VALUES (1, 'gen_test_payment_key_1', 'test_order_name', 'DONE', 30000, '토스페이', NOW());
+INSERT INTO payment_history(reservation_id, payment_key, order_name, payment_status, total_amount, payment_provider, approved_at)
+VALUES (2, 'gen_test_payment_key_2', 'test_order_name', 'DONE', 30000, '토스페이', CAST(TIMESTAMPADD(DAY, 0, NOW()) AS DATETIME));
+INSERT INTO payment_history(reservation_id, payment_key, order_name, payment_status, total_amount, payment_provider, approved_at)
+VALUES (3, 'gen_test_payment_key_3', 'test_order_name', 'DONE', 30000, '토스페이', CAST(TIMESTAMPADD(DAY, 0, NOW()) AS DATETIME));
+INSERT INTO payment_history(reservation_id, payment_key, order_name, payment_status, total_amount, payment_provider, approved_at)
+VALUES (4, 'gen_test_payment_key_4', 'test_order_name', 'DONE', 30000, '토스페이', CAST(TIMESTAMPADD(DAY, 0, NOW()) AS DATETIME));
+INSERT INTO payment_history(reservation_id, payment_key, order_name, payment_status, total_amount, payment_provider, approved_at)
+VALUES (5, 'gen_test_payment_key_5', 'test_order_name', 'DONE', 30000, '토스페이', CAST(TIMESTAMPADD(DAY, 0, NOW()) AS DATETIME));
+INSERT INTO payment_history(reservation_id, payment_key, order_name, payment_status, total_amount, payment_provider, approved_at)
+VALUES (6, 'gen_test_payment_key_6', 'test_order_name', 'DONE', 30000, '토스페이', CAST(TIMESTAMPADD(DAY, 0, NOW()) AS DATETIME));
+INSERT INTO payment_history(reservation_id, payment_key, order_name, payment_status, total_amount, payment_provider, approved_at)
+VALUES (7, 'gen_test_payment_key_7', 'test_order_name', 'DONE', 30000, '토스페이', CAST(TIMESTAMPADD(DAY, 0, NOW()) AS DATETIME));
+INSERT INTO payment_history(reservation_id, payment_key, order_name, payment_status, total_amount, payment_provider, approved_at)
+VALUES (8, 'gen_test_payment_key_8', 'test_order_name', 'DONE', 30000, '토스페이', CAST(TIMESTAMPADD(DAY, 0, NOW()) AS DATETIME));
+INSERT INTO payment_history(reservation_id, payment_key, order_name, payment_status, total_amount, payment_provider, approved_at)
+VALUES (9, 'gen_test_payment_key_9', 'test_order_name', 'DONE', 30000, '토스페이', CAST(TIMESTAMPADD(DAY, 0, NOW()) AS DATETIME));
+INSERT INTO payment_history(reservation_id, payment_key, order_name, payment_status, total_amount, payment_provider, approved_at)
+VALUES (10, 'gen_test_payment_key_10', 'test_order_name', 'DONE', 30000, '토스페이', CAST(TIMESTAMPADD(DAY, 0, NOW()) AS DATETIME));
+INSERT INTO payment_history(reservation_id, payment_key, order_name, payment_status, total_amount, payment_provider, approved_at)
+VALUES (11, 'gen_test_payment_key_11', 'test_order_name', 'DONE', 30000, '토스페이', CAST(TIMESTAMPADD(DAY, 0, NOW()) AS DATETIME));
+INSERT INTO payment_history(reservation_id, payment_key, order_name, payment_status, total_amount, payment_provider, approved_at)
+VALUES (12, 'gen_test_payment_key_12', 'test_order_name', 'DONE', 30000, '토스페이', CAST(TIMESTAMPADD(DAY, 0, NOW()) AS DATETIME));
+INSERT INTO payment_history(reservation_id, payment_key, order_name, payment_status, total_amount, payment_provider, approved_at)
+VALUES (13, 'gen_test_payment_key_13', 'test_order_name', 'DONE', 30000, '토스페이', CAST(TIMESTAMPADD(DAY, 0, NOW()) AS DATETIME));
+INSERT INTO payment_history(reservation_id, payment_key, order_name, payment_status, total_amount, payment_provider, approved_at)
+VALUES (14, 'gen_test_payment_key_14', 'test_order_name', 'DONE', 30000, '토스페이', CAST(TIMESTAMPADD(DAY, 0, NOW()) AS DATETIME));
+INSERT INTO payment_history(reservation_id, payment_key, order_name, payment_status, total_amount, payment_provider, approved_at)
+VALUES (15, 'gen_test_payment_key_15', 'test_order_name', 'DONE', 30000, '토스페이', CAST(TIMESTAMPADD(DAY, 0, NOW()) AS DATETIME));
+INSERT INTO payment_history(reservation_id, payment_key, order_name, payment_status, total_amount, payment_provider, approved_at)
+VALUES (16, 'gen_test_payment_key_16', 'test_order_name', 'DONE', 30000, '토스페이', CAST(TIMESTAMPADD(DAY, 0, NOW()) AS DATETIME));

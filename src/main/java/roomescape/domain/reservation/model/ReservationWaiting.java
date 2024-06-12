@@ -69,7 +69,7 @@ public class ReservationWaiting {
     protected ReservationWaiting() {
     }
 
-    public Reservation makeReservation() {
+    public Reservation reserve() {
         return new Reservation(
                 ReservationStatus.RESERVATION,
                 date.getValue(),

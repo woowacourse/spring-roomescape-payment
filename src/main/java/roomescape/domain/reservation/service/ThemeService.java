@@ -37,7 +37,7 @@ public class ThemeService {
     }
 
     public ThemeDto saveTheme(final SaveThemeRequest saveThemeRequest) {
-        final Theme savedTheme = themeRepository.save(saveThemeRequest.toTheme());
+        final Theme savedTheme = themeRepository.save(saveThemeRequest.toModel());
         return ThemeDto.from(savedTheme);
     }
 

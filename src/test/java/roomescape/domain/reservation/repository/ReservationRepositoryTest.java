@@ -12,7 +12,6 @@ import roomescape.domain.reservation.model.ReservationDate;
 import roomescape.domain.reservation.model.ReservationStatus;
 import roomescape.domain.reservation.model.ReservationTime;
 import roomescape.domain.reservation.model.Theme;
-import roomescape.domain.reservation.repository.ReservationRepository;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -62,17 +61,6 @@ class ReservationRepositoryTest {
                 () -> assertThat(savedReservation.getDate()).isEqualTo(reservation.getDate()),
                 () -> assertThat(savedReservation.getTime()).isEqualTo(reservation.getTime())
         );
-    }
-
-    @DisplayName("예약 정보를 삭제한다.")
-    @Test
-    void deleteByIdTest() {
-        // When
-        reservationRepository.deleteById(1L);
-
-        // Then
-        final long count = reservationRepository.count();
-        assertThat(count).isEqualTo(15);
     }
 
     @DisplayName("특정 날짜와 시간 아이디를 가진 예약이 존재하는지 조회한다.")

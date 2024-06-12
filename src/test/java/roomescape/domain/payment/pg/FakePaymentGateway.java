@@ -2,7 +2,6 @@ package roomescape.domain.payment.pg;
 
 import org.springframework.boot.test.context.TestComponent;
 import roomescape.domain.payment.dto.PaymentConfirmResponse;
-import roomescape.domain.payment.pg.PaymentGateway;
 
 import java.util.Map;
 
@@ -17,6 +16,7 @@ public class FakePaymentGateway implements PaymentGateway {
                 "테스트 결제",
                 10000L,
                 "2024-02-13T12:18:14+09:00",
+                "tgen_test_payment_key",
                 Map.of("provider", "토스페이")
         );
     }
