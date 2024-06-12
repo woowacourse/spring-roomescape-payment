@@ -1,6 +1,8 @@
 package roomescape.core.controller;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -63,6 +65,7 @@ class WaitingControllerTest {
                 .cookies("token", accessToken)
                 .contentType(ContentType.JSON)
                 .filter(document("waiting-create",
+                        requestCookies(cookieWithName("token").description("사용자 인가 토큰")),
                         requestFields(fieldWithPath("date").description("예약 대기할 날짜"),
                                 fieldWithPath("timeId").description("예약 대기할 시간"),
                                 fieldWithPath("themeId").description("예약 대기할 테마")),
@@ -144,8 +147,9 @@ class WaitingControllerTest {
 
         RestAssured.given(this.specification).log().all()
                 .cookies("token", accessToken)
-                .filter(document("waiting-delete", pathParameters(
-                        parameterWithName("id").description("취소하려는 예약 대기 ID"))))
+                .filter(document("waiting-delete",
+                        requestCookies(cookieWithName("token").description("사용자 인가 토큰")),
+                        pathParameters(parameterWithName("id").description("취소하려는 예약 대기 ID"))))
                 .when().delete("/waitings/{id}", 1L)
                 .then().log().all()
                 .statusCode(204);
@@ -165,7 +169,6 @@ class WaitingControllerTest {
                 .statusCode(201);
 
         RestAssured.given(this.specification).log().all()
-                .cookies("token", accessToken)
                 .accept("application/json")
                 .filter(document("waitings",
                         responseFields(fieldWithPath("[].id").description("예약 대기 ID"),

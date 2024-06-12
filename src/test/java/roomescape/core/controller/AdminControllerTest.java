@@ -1,5 +1,7 @@
 package roomescape.core.controller;
 
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -62,7 +64,8 @@ class AdminControllerTest {
     void moveToAdminPage() {
         RestAssured.given(this.specification).log().all()
                 .cookies("token", accessToken)
-                .filter(document("admin-view"))
+                .filter(document("admin-view",
+                        requestCookies(cookieWithName("token").description("사용자 인가 토큰. 어드민이어야 함."))))
                 .when().get("/admin")
                 .then().log().all()
                 .statusCode(200);
@@ -73,7 +76,8 @@ class AdminControllerTest {
     void moveToReservationManagePage() {
         RestAssured.given(this.specification).log().all()
                 .cookies("token", accessToken)
-                .filter(document("admin-reservation-view"))
+                .filter(document("admin-reservation-view",
+                        requestCookies(cookieWithName("token").description("사용자 인가 토큰. 어드민이어야 함."))))
                 .when().get("/admin/reservation")
                 .then().log().all()
                 .statusCode(200);
@@ -84,8 +88,9 @@ class AdminControllerTest {
     void deleteReservationByAdmin() {
         RestAssured.given(this.specification).log().all()
                 .cookies("token", AccessTokenGenerator.adminTokenGenerate())
-                .filter(document("admin-reservation-delete", pathParameters(
-                        parameterWithName("id").description("취소하려는 예약 ID"))))
+                .filter(document("admin-reservation-delete",
+                        requestCookies(cookieWithName("token").description("사용자 인가 토큰. 어드민이어야 함.")),
+                        pathParameters(parameterWithName("id").description("취소하려는 예약 ID"))))
                 .when().delete("/admin/reservations/{id}", 1L)
                 .then().log().all()
                 .statusCode(204);
@@ -106,7 +111,8 @@ class AdminControllerTest {
     void moveToTimeManagePage() {
         RestAssured.given(this.specification).log().all()
                 .cookies("token", accessToken)
-                .filter(document("admin-time-view"))
+                .filter(document("admin-time-view",
+                        requestCookies(cookieWithName("token").description("사용자 인가 토큰. 어드민이어야 함."))))
                 .when().get("/admin/time")
                 .then().log().all()
                 .statusCode(200);
@@ -121,6 +127,7 @@ class AdminControllerTest {
                 .cookies("token", accessToken)
                 .contentType(ContentType.JSON)
                 .filter(document("admin-time-create",
+                        requestCookies(cookieWithName("token").description("사용자 인가 토큰. 어드민이어야 함.")),
                         requestFields(fieldWithPath("startAt").description("시간 값")),
                         responseFields(fieldWithPath("id").description("시간 ID"),
                                 fieldWithPath("startAt").description("시간 값"))))
@@ -177,8 +184,9 @@ class AdminControllerTest {
 
         RestAssured.given(this.specification).log().all()
                 .cookies("token", AccessTokenGenerator.adminTokenGenerate())
-                .filter(document("admin-time-delete", pathParameters(
-                        parameterWithName("id").description("취소하려는 시간 ID"))))
+                .filter(document("admin-time-delete",
+                        requestCookies(cookieWithName("token").description("사용자 인가 토큰. 어드민이어야 함.")),
+                        pathParameters(parameterWithName("id").description("취소하려는 시간 ID"))))
                 .when().delete("/admin/times/{id}", 1L)
                 .then().log().all()
                 .statusCode(204);
@@ -211,7 +219,8 @@ class AdminControllerTest {
     void moveToThemeManagePage() {
         RestAssured.given(this.specification).log().all()
                 .cookies("token", accessToken)
-                .filter(document("admin-theme-view"))
+                .filter(document("admin-theme-view",
+                        requestCookies(cookieWithName("token").description("사용자 인가 토큰. 어드민이어야 함."))))
                 .when().get("/admin/theme")
                 .then().log().all()
                 .statusCode(200);
@@ -227,6 +236,7 @@ class AdminControllerTest {
                 .cookies("token", accessToken)
                 .contentType(ContentType.JSON)
                 .filter(document("admin-theme-create",
+                        requestCookies(cookieWithName("token").description("사용자 인가 토큰. 어드민이어야 함.")),
                         requestFields(fieldWithPath("name").description("테마 이름"),
                                 fieldWithPath("description").description("테마 설명"),
                                 fieldWithPath("thumbnail").description("테마 이미지")),
@@ -322,8 +332,9 @@ class AdminControllerTest {
 
         RestAssured.given(this.specification).log().all()
                 .cookies("token", AccessTokenGenerator.adminTokenGenerate())
-                .filter(document("admin-theme-delete", pathParameters(
-                        parameterWithName("id").description("취소하려는 예약 ID"))))
+                .filter(document("admin-theme-delete",
+                        requestCookies(cookieWithName("token").description("사용자 인가 토큰. 어드민이어야 함.")),
+                        pathParameters(parameterWithName("id").description("취소하려는 예약 ID"))))
                 .when().delete("/admin/themes/{id}", 1L)
                 .then().log().all()
                 .statusCode(204);
@@ -360,6 +371,7 @@ class AdminControllerTest {
                 .cookies("token", accessToken)
                 .contentType(ContentType.JSON)
                 .filter(document("admin-reservation-create",
+                        requestCookies(cookieWithName("token").description("사용자 인가 토큰. 어드민이어야 함.")),
                         requestFields(fieldWithPath("memberId").description("예약할 사용자"),
                                 fieldWithPath("date").description("예약할 날짜"),
                                 fieldWithPath("timeId").description("예약할 시간"),
@@ -387,7 +399,8 @@ class AdminControllerTest {
     void moveToWaitingManagePage() {
         RestAssured.given(this.specification).log().all()
                 .cookies("token", accessToken)
-                .filter(document("admin-waiting-view"))
+                .filter(document("admin-waiting-view",
+                        requestCookies(cookieWithName("token").description("사용자 인가 토큰. 어드민이어야 함."))))
                 .when().get("/admin/waiting")
                 .then().log().all()
                 .statusCode(200);
@@ -398,8 +411,9 @@ class AdminControllerTest {
     void deleteWaitingByAdmin() {
         RestAssured.given(this.specification).log().all()
                 .cookies("token", AccessTokenGenerator.adminTokenGenerate())
-                .filter(document("admin-waiting-delete", pathParameters(
-                        parameterWithName("id").description("취소하려는 예약 ID"))))
+                .filter(document("admin-waiting-delete",
+                        requestCookies(cookieWithName("token").description("사용자 인가 토큰. 어드민이어야 함.")),
+                        pathParameters(parameterWithName("id").description("취소하려는 예약 ID"))))
                 .when().delete("/admin/waitings/{id}", 1L)
                 .then().log().all()
                 .statusCode(204);

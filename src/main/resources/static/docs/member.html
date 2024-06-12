@@ -449,8 +449,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h4 id="_request">Request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /reservation HTTP/1.1
-Host: localhost:60698</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /reservation HTTP/1.1</code></pre>
 </div>
 </div>
 </div>
@@ -461,11 +460,6 @@ Host: localhost:60698</code></pre>
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
-Transfer-Encoding: chunked
-Date: Wed, 12 Jun 2024 08:11:53 GMT
-Keep-Alive: timeout=60
-Connection: keep-alive
-Content-Length: 3998
 
 &lt;!DOCTYPE html&gt;
 &lt;html lang="ko"&gt;
@@ -576,8 +570,7 @@ Content-Length: 3998
 <h4 id="_request_2">Request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /login HTTP/1.1
-Host: localhost:60698</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /login HTTP/1.1</code></pre>
 </div>
 </div>
 </div>
@@ -588,11 +581,6 @@ Host: localhost:60698</code></pre>
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
-Transfer-Encoding: chunked
-Date: Wed, 12 Jun 2024 08:11:53 GMT
-Keep-Alive: timeout=60
-Connection: keep-alive
-Content-Length: 2566
 
 &lt;!DOCTYPE html&gt;
 &lt;html lang="ko"&gt;
@@ -668,8 +656,7 @@ Content-Length: 2566
 <h4 id="_request_3">Request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /signup HTTP/1.1
-Host: localhost:60698</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /signup HTTP/1.1</code></pre>
 </div>
 </div>
 </div>
@@ -680,11 +667,6 @@ Host: localhost:60698</code></pre>
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: text/html;charset=UTF-8
 Content-Language: ko-KR
-Transfer-Encoding: chunked
-Date: Wed, 12 Jun 2024 08:11:53 GMT
-Keep-Alive: timeout=60
-Connection: keep-alive
-Content-Length: 2660
 
 &lt;!DOCTYPE html&gt;
 &lt;html lang="ko"&gt;
@@ -765,8 +747,6 @@ Content-Length: 2660
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /login HTTP/1.1
 Content-Type: application/json
-Host: localhost:60698
-Content-Length: 59
 
 {
   "email" : "test@email.com",
@@ -806,10 +786,7 @@ Content-Length: 59
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Set-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODE3OTkxNCwiZXhwIjoxNzE4MTgzNTE0fQ.cJLxVCIDjO4_AyWVXtTvaylROwwXQh1ladt1Zp5EKyo; Path=/; HttpOnly
-Date: Wed, 12 Jun 2024 08:11:53 GMT
-Keep-Alive: timeout=60
-Connection: keep-alive</code></pre>
+Set-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODIwODQ1MCwiZXhwIjoxNzE4MjEyMDUwfQ.V5BnjkKIIc3Djxo6EyEoujTWvvP7pm2duID0yzNCAbQ; Path=/; HttpOnly</code></pre>
 </div>
 </div>
 </div>
@@ -822,10 +799,27 @@ Connection: keep-alive</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /login/check HTTP/1.1
 Accept: application/json
-Host: localhost:60698
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODE3OTkxNCwiZXhwIjoxNzE4MTgzNTE0fQ.cJLxVCIDjO4_AyWVXtTvaylROwwXQh1ladt1Zp5EKyo</code></pre>
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODIwODQ1MCwiZXhwIjoxNzE4MjEyMDUwfQ.V5BnjkKIIc3Djxo6EyEoujTWvvP7pm2duID0yzNCAbQ</code></pre>
 </div>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>token</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">사용자 인가 토큰</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="sect3">
 <h4 id="_response_5">Response</h4>
@@ -833,11 +827,6 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Transfer-Encoding: chunked
-Date: Wed, 12 Jun 2024 08:11:53 GMT
-Keep-Alive: timeout=60
-Connection: keep-alive
-Content-Length: 35
 
 {
   "id" : 1,
@@ -880,8 +869,7 @@ Content-Length: 35
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /logout HTTP/1.1
-Content-Type: application/x-www-form-urlencoded; charset=ISO-8859-1
-Host: localhost:60698</code></pre>
+Content-Type: application/x-www-form-urlencoded; charset=ISO-8859-1</code></pre>
 </div>
 </div>
 </div>
@@ -890,10 +878,7 @@ Host: localhost:60698</code></pre>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
-Set-Cookie: token=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:10 GMT; Path=/
-Date: Wed, 12 Jun 2024 08:11:53 GMT
-Keep-Alive: timeout=60
-Connection: keep-alive</code></pre>
+Set-Cookie: token=; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:10 GMT; Path=/</code></pre>
 </div>
 </div>
 </div>
@@ -906,8 +891,6 @@ Connection: keep-alive</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /members HTTP/1.1
 Content-Type: application/json
-Host: localhost:60698
-Content-Length: 79
 
 {
   "email" : "hello@email.com",
@@ -955,11 +938,6 @@ Content-Length: 79
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 201 Created
 Location: /members/2
 Content-Type: application/json
-Transfer-Encoding: chunked
-Date: Wed, 12 Jun 2024 08:11:53 GMT
-Keep-Alive: timeout=60
-Connection: keep-alive
-Content-Length: 33
 
 {
   "id" : 2,
@@ -1001,8 +979,7 @@ Content-Length: 33
 <h4 id="_request_8">Request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /members HTTP/1.1
-Host: localhost:60698</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /members HTTP/1.1</code></pre>
 </div>
 </div>
 </div>
@@ -1012,11 +989,6 @@ Host: localhost:60698</code></pre>
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Transfer-Encoding: chunked
-Date: Wed, 12 Jun 2024 08:11:53 GMT
-Keep-Alive: timeout=60
-Connection: keep-alive
-Content-Length: 39
 
 [ {
   "id" : 1,
@@ -1058,7 +1030,7 @@ Content-Length: 39
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-06-10 02:33:50 +0900
+Last updated 2024-06-13 00:54:27 +0900
 </div>
 </div>
 </body>

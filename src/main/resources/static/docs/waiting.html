@@ -451,17 +451,33 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /waitings HTTP/1.1
 Content-Type: application/json
-Host: localhost:60698
-Content-Length: 60
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODE3OTkxNSwiZXhwIjoxNzE4MTgzNTE1fQ.TYtPL4QYF_bYVYfyWzWNdMW4bL6QgkGG4gc-7joVYlc
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODIwODQ1MiwiZXhwIjoxNzE4MjEyMDUyfQ.y1ErdzKwEYyR9s1W3zBUGmCRd6kUwQ15hzwRJixYX9c
 
 {
-  "date" : "2024-06-13",
+  "date" : "2024-06-14",
   "timeId" : 1,
   "themeId" : 1
 }</code></pre>
 </div>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>token</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">사용자 인가 토큰</p></td>
+</tr>
+</tbody>
+</table>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -501,11 +517,6 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 201 Created
 Location: /waitings/1
 Content-Type: application/json
-Transfer-Encoding: chunked
-Date: Wed, 12 Jun 2024 08:11:54 GMT
-Keep-Alive: timeout=60
-Connection: keep-alive
-Content-Length: 281
 
 {
   "id" : 1,
@@ -513,10 +524,10 @@ Content-Length: 281
     "id" : 1,
     "name" : "리건"
   },
-  "date" : "2024-06-13",
+  "date" : "2024-06-14",
   "time" : {
     "id" : 1,
-    "startAt" : "17:12"
+    "startAt" : "01:08"
   },
   "theme" : {
     "id" : 1,
@@ -602,9 +613,7 @@ Content-Length: 281
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /waitings HTTP/1.1
-Accept: application/json
-Host: localhost:60698
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODE3OTkxNSwiZXhwIjoxNzE4MTgzNTE1fQ.TYtPL4QYF_bYVYfyWzWNdMW4bL6QgkGG4gc-7joVYlc</code></pre>
+Accept: application/json</code></pre>
 </div>
 </div>
 </div>
@@ -614,11 +623,6 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBR
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
-Transfer-Encoding: chunked
-Date: Wed, 12 Jun 2024 08:11:54 GMT
-Keep-Alive: timeout=60
-Connection: keep-alive
-Content-Length: 285
 
 [ {
   "id" : 1,
@@ -626,10 +630,10 @@ Content-Length: 285
     "id" : 1,
     "name" : "리건"
   },
-  "date" : "2024-06-13",
+  "date" : "2024-06-14",
   "time" : {
     "id" : 1,
-    "startAt" : "17:12"
+    "startAt" : "01:08"
   },
   "theme" : {
     "id" : 1,
@@ -715,19 +719,33 @@ Content-Length: 285
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /waitings/1 HTTP/1.1
-Host: localhost:60698
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODE3OTkxNSwiZXhwIjoxNzE4MTgzNTE1fQ.TYtPL4QYF_bYVYfyWzWNdMW4bL6QgkGG4gc-7joVYlc</code></pre>
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGVtYWlsLmNvbSIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTcxODIwODQ1MiwiZXhwIjoxNzE4MjEyMDUyfQ.y1ErdzKwEYyR9s1W3zBUGmCRd6kUwQ15hzwRJixYX9c</code></pre>
 </div>
 </div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>token</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">사용자 인가 토큰</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="sect3">
 <h4 id="_response_3">Response</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 204 No Content
-Date: Wed, 12 Jun 2024 08:11:54 GMT
-Keep-Alive: timeout=60
-Connection: keep-alive</code></pre>
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 204 No Content</code></pre>
 </div>
 </div>
 </div>
@@ -738,7 +756,7 @@ Connection: keep-alive</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-06-10 02:35:25 +0900
+Last updated 2024-06-13 01:07:04 +0900
 </div>
 </div>
 </body>

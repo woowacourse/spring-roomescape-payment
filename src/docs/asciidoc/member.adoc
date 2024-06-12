@@ -46,6 +46,7 @@ include::{snippets}/member-login/http-response.adoc[]
 ==== Request
 
 include::{snippets}/member-login-check/http-request.adoc[]
+include::{snippets}/member-login-check/request-cookies.adoc[]
 
 ==== Response
 

@@ -5,6 +5,7 @@
 ==== Request
 
 include::{snippets}/waiting-create/http-request.adoc[]
+include::{snippets}/waiting-create/request-cookies.adoc[]
 include::{snippets}/waiting-create/request-fields.adoc[]
 
 ==== Response
@@ -28,6 +29,7 @@ include::{snippets}/waitings/response-fields.adoc[]
 ==== Request
 
 include::{snippets}/waiting-delete/http-request.adoc[]
+include::{snippets}/waiting-delete/request-cookies.adoc[]
 
 ==== Response
 

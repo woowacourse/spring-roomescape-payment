@@ -16,6 +16,7 @@ include::{snippets}/time/response-fields.adoc[]
 ==== Request
 
 include::{snippets}/time-bookable/http-request.adoc[]
+include::{snippets}/time-bookable/query-parameters.adoc[]
 
 === Response
 

@@ -1,6 +1,8 @@
 package roomescape.core.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -107,6 +109,7 @@ class MemberControllerTest {
                 .cookies("token", accessToken)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
                 .filter(document("member-login-check",
+                        requestCookies(cookieWithName("token").description("사용자 인가 토큰")),
                         responseFields(fieldWithPath("id").description("로그인 된 사용자 ID"),
                                 fieldWithPath("name").description("로그인 된 사용자 이름"))))
                 .when().get("/login/check")

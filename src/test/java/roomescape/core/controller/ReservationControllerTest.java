@@ -1,11 +1,14 @@
 package roomescape.core.controller;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 import io.restassured.RestAssured;
@@ -70,6 +73,7 @@ class ReservationControllerTest {
                 .cookies("token", accessToken)
                 .contentType(ContentType.JSON)
                 .filter(document("reservation-create",
+                        requestCookies(cookieWithName("token").description("사용자 인가 토큰")),
                         requestFields(fieldWithPath("date").description("예약할 날짜"),
                                 fieldWithPath("timeId").description("예약할 시간"),
                                 fieldWithPath("themeId").description("예약할 테마"),
@@ -223,7 +227,6 @@ class ReservationControllerTest {
     @DisplayName("모든 예약 내역을 조회한다.")
     void findAllReservations() {
         RestAssured.given(this.specification).log().all()
-                .cookies("token", accessToken)
                 .accept("application/json")
                 .filter(document("reservations",
                         responseFields(fieldWithPath("[].id").description("예약 ID"),
@@ -247,8 +250,9 @@ class ReservationControllerTest {
     void validateReservationDelete() {
         RestAssured.given(this.specification).log().all()
                 .cookies("token", accessToken)
-                .filter(document("reservation-delete", pathParameters(
-                        parameterWithName("id").description("취소하려는 예약 ID"))))
+                .filter(document("reservation-delete",
+                        requestCookies(cookieWithName("token").description("사용자 인가 토큰")),
+                        pathParameters(parameterWithName("id").description("취소하려는 예약 ID"))))
                 .when().delete("/reservations/{id}", 1L)
                 .then().log().all()
                 .statusCode(204);
@@ -261,7 +265,6 @@ class ReservationControllerTest {
         testFixture.persistReservationWithDateAndTimeAndTheme(DAY_AFTER_TOMORROW, 1L, 1L);
 
         RestAssured.given().log().all()
-                .cookies("token", accessToken)
                 .accept("application/json")
                 .queryParams(
                         "memberId", 1L,
@@ -274,7 +277,6 @@ class ReservationControllerTest {
                 .body("size()", is(1));
 
         RestAssured.given(this.specification).log().all()
-                .cookies("token", accessToken)
                 .accept("application/json")
                 .queryParams(
                         "memberId", 1L,
@@ -282,6 +284,10 @@ class ReservationControllerTest {
                         "dateFrom", TOMORROW,
                         "dateTo", DAY_AFTER_TOMORROW)
                 .filter(document("reservations-condition",
+                        queryParameters(parameterWithName("memberId").description("예약한 사용자 ID"),
+                                parameterWithName("themeId").description("예약된 테마 ID"),
+                                parameterWithName("dateFrom").description("예약 날짜 범위 시작"),
+                                parameterWithName("dateTo").description("예약 날짜 범위 끝")),
                         responseFields(fieldWithPath("[].id").description("예약 ID"),
                                 fieldWithPath("[].date").description("예약한 날짜"),
                                 fieldWithPath("[].member.id").description("예약한 사용자 ID"),
@@ -328,6 +334,7 @@ class ReservationControllerTest {
         RestAssured.given(this.specification).log().all()
                 .cookies("token", accessToken)
                 .filter(document("reservations-mine",
+                        requestCookies(cookieWithName("token").description("사용자 인가 토큰")),
                         responseFields(fieldWithPath("[].id").description("예약 ID"),
                                 fieldWithPath("[].date").description("예약한 날짜"),
                                 fieldWithPath("[].theme").description("예약한 테마"),
