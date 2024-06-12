@@ -30,6 +30,8 @@ import roomescape.member.domain.MemberRepository;
 import roomescape.payment.TossPaymentClient;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentRepository;
+import roomescape.payment.dto.PaymentCancelRequest;
+import roomescape.payment.dto.PaymentCancelResponse;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.dto.PaymentConfirmResponse;
 import roomescape.reservation.domain.Reservation;
@@ -105,6 +107,9 @@ class ReservationServiceTest {
     void should_throw_exception_when_request_with_non_exist_time() {
         when(memberRepository.findById(1L)).thenReturn(Optional.of(MEMBER_ID_1));
         when(reservationTimeRepository.findById(1L)).thenReturn(Optional.empty());
+        when(tossPaymentClient.confirmPayments(any(PaymentConfirmRequest.class)))
+                .thenReturn(new PaymentConfirmResponse("test_payment_key",
+                        "testOrderId", 20000L, "DONE"));
 
         assertThatThrownBy(
                 () -> reservationService.saveMemberReservation(1L, RESERVATION_PAYMENT_REQUEST_1))
@@ -117,6 +122,9 @@ class ReservationServiceTest {
         when(memberRepository.findById(1L)).thenReturn(Optional.of(MEMBER_ID_1));
         when(reservationTimeRepository.findById(1L)).thenReturn(Optional.of(RESERVATION_TIME_10_00_ID_1));
         when(themeRepository.findById(1L)).thenReturn(Optional.empty());
+        when(tossPaymentClient.confirmPayments(any(PaymentConfirmRequest.class)))
+                .thenReturn(new PaymentConfirmResponse("test_payment_key",
+                        "testOrderId", 20000L, "DONE"));
 
         assertThatThrownBy(
                 () -> reservationService.saveMemberReservation(1L, RESERVATION_PAYMENT_REQUEST_1))
@@ -128,6 +136,9 @@ class ReservationServiceTest {
     void should_throw_exception_when_request_with_past_date() {
         when(memberRepository.findById(1L)).thenReturn(Optional.of(MEMBER_ID_1));
         when(reservationTimeRepository.findById(1L)).thenReturn(Optional.of(RESERVATION_TIME_10_00_ID_1));
+        when(tossPaymentClient.confirmPayments(any(PaymentConfirmRequest.class)))
+                .thenReturn(new PaymentConfirmResponse("test_payment_key",
+                        "testOrderId", 20000L, "DONE"));
 
         assertThatThrownBy(
                 () -> reservationService.saveMemberReservation(1L,

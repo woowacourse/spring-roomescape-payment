@@ -89,7 +89,7 @@ class ReservationControllerE2ETest {
 
         when(tossPaymentClient.cancelPayments(any(PaymentCancelRequest.class), any(String.class)))
                 .thenReturn(new PaymentCancelResponse("test_payment_key",
-                        "testOrderId", 20000L));
+                        "testOrderId", 20000L, "CANCELED"));
 
         return Stream.of(
                 dynamicTest("현재 예약 개수를 확인한다", () -> {
@@ -211,7 +211,7 @@ class ReservationControllerE2ETest {
 
         when(tossPaymentClient.cancelPayments(any(PaymentCancelRequest.class), any(String.class)))
                 .thenReturn(new PaymentCancelResponse("test_payment_key",
-                        "testOrderId", 20000L));
+                        "testOrderId", 20000L, "CANCELED"));
 
         return Stream.of(
                 dynamicTest("예약을 추가한다", () -> {
@@ -346,6 +346,10 @@ class ReservationControllerE2ETest {
                 .contentType(ContentType.JSON).post("/login")
                 .then().log().all()
                 .extract().cookie("token");
+
+        when(tossPaymentClient.cancelPayments(any(PaymentCancelRequest.class), any(String.class)))
+                .thenReturn(new PaymentCancelResponse("test_payment_key",
+                        "testOrderId", 20000L, "CANCELED"));
 
         return Stream.of(
                 dynamicTest("현재 예약 개수를 확인한다", () -> {
