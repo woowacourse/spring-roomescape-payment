@@ -2,11 +2,10 @@ package roomescape.web.config;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.validation.BindException;
@@ -47,9 +46,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = JwtException.class)
-    public ProblemDetail handleJwtException(JwtException exception) {
+    public ResponseEntity<ErrorResult> handleJwtException(JwtException exception) {
         log.warn(ErrorConstants.JWT_ERROR_PREFIX, exception);
-        return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, exception.getMessage());
+        return new ResponseEntity<>(new ErrorResult(exception.getMessage()), UNAUTHORIZED);
     }
 
     @ExceptionHandler(value = Exception.class)
