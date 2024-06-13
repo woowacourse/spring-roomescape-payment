@@ -18,7 +18,7 @@ public class Payment {
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
-    private PaymentProvider paymentProvider;
+    private PaymentProvider provider;
 
     @Column(nullable = false)
     private String providerPaymentId;
@@ -29,13 +29,13 @@ public class Payment {
     protected Payment() {
     }
 
-    public Payment(PaymentProvider paymentProvider, String providerPaymentId, int amount) {
-        this(null, paymentProvider, providerPaymentId, amount);
+    public Payment(PaymentProvider provider, String providerPaymentId, int amount) {
+        this(null, provider, providerPaymentId, amount);
     }
 
-    public Payment(Long id, PaymentProvider paymentProvider, String providerPaymentId, int amount) {
+    public Payment(Long id, PaymentProvider provider, String providerPaymentId, int amount) {
         this.id = id;
-        this.paymentProvider = paymentProvider;
+        this.provider = provider;
         this.providerPaymentId = providerPaymentId;
         this.amount = amount;
     }
@@ -44,8 +44,8 @@ public class Payment {
         return id;
     }
 
-    public PaymentProvider getPaymentProvider() {
-        return paymentProvider;
+    public PaymentProvider getProvider() {
+        return provider;
     }
 
     public String getProviderPaymentId() {

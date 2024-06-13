@@ -1,8 +1,8 @@
 package roomescape.support;
 
+import roomescape.infrastructure.TossPaymentResponse;
 import roomescape.payment.PaymentClient;
 import roomescape.service.dto.request.PaymentRequest;
-import roomescape.payment.TossPaymentResponse;
 
 public class FakePaymentClient implements PaymentClient {
 

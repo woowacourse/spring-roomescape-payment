@@ -14,15 +14,15 @@ VALUES (1, '09:00'),
        (3, '17:00'),
        (4, '21:00');
 
-INSERT INTO payment(id, payment_key, amount)
-VALUES (1, 'paymentKey', 1000),
-       (2, 'paymentKey', 1000),
-       (3, 'paymentKey', 1000),
-       (4, 'paymentKey', 1000),
-       (5, 'paymentKey', 1000),
-       (6, 'paymentKey', 1000),
-       (7, 'paymentKey', 1000),
-       (8, 'paymentKey', 1000);
+INSERT INTO payment(id, provider, provider_payment_id, amount)
+VALUES (1, 'TOSS', 'paymentKey', 1000),
+       (2, 'TOSS', 'paymentKey', 1000),
+       (3, 'TOSS', 'paymentKey', 1000),
+       (4, 'TOSS', 'paymentKey', 1000),
+       (5, 'TOSS', 'paymentKey', 1000),
+       (6, 'TOSS', 'paymentKey', 1000),
+       (7, 'TOSS', 'paymentKey', 1000),
+       (8, 'TOSS', 'paymentKey', 1000);
 
 INSERT INTO reservation (id, date, member_id, time_id, theme_id, payment_id)
 VALUES (1, '2024-04-08', 1, 1, 1, 1),
