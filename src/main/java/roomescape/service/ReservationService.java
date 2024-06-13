@@ -1,9 +1,18 @@
 package roomescape.service;
 
+import java.time.Clock;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservationtime.ReservationTime;
@@ -13,26 +22,16 @@ import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
 import roomescape.domain.reservationwaiting.WaitingWithRank;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
-import roomescape.payment.PaymentClient;
 import roomescape.service.dto.request.CreateReservationRequest;
 import roomescape.service.dto.request.PaymentRequest;
 import roomescape.service.dto.response.PersonalReservationResponse;
 import roomescape.service.dto.response.ReservationResponse;
 
-import java.time.Clock;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 @Service
 @Transactional(readOnly = true)
 public class ReservationService {
 
-    private final PaymentClient paymentClient;
+    private final PaymentService paymentService;
     private final ReservationRepository reservationRepository;
     private final ReservationWaitingRepository reservationWaitingRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -40,16 +39,11 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final Clock clock;
 
-    public ReservationService(
-            PaymentClient paymentClient,
-            ReservationRepository reservationRepository,
-            ReservationWaitingRepository reservationWaitingRepository,
-            ReservationTimeRepository reservationTimeRepository,
-            ThemeRepository themeRepository,
-            MemberRepository memberRepository,
-            Clock clock
-    ) {
-        this.paymentClient = paymentClient;
+    public ReservationService(PaymentService paymentService, ReservationRepository reservationRepository,
+                              ReservationWaitingRepository reservationWaitingRepository,
+                              ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository,
+                              MemberRepository memberRepository, Clock clock) {
+        this.paymentService = paymentService;
         this.reservationRepository = reservationRepository;
         this.reservationWaitingRepository = reservationWaitingRepository;
         this.reservationTimeRepository = reservationTimeRepository;
@@ -73,33 +67,36 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse addReservationByAdmin(CreateReservationRequest createReservationRequest) {
-        Reservation reservation = createValidatedReservation(createReservationRequest);
+    public ReservationResponse addPendingReservation(CreateReservationRequest createReservationRequest) {
+        Reservation reservation = createReservation(createReservationRequest);
+        validatedReservation(reservation);
         Reservation savedReservation = reservationRepository.save(reservation);
         return ReservationResponse.from(savedReservation);
     }
 
     @Transactional
-    public ReservationResponse addReservation(CreateReservationRequest createReservationRequest,
-                                              PaymentRequest paymentRequest) {
-        Reservation reservation = createValidatedReservation(createReservationRequest);
-        paymentClient.confirm(paymentRequest);
+    public ReservationResponse addConfirmedReservation(CreateReservationRequest createReservationRequest,
+                                                       PaymentRequest paymentRequest) {
+        Reservation reservation = createReservation(createReservationRequest);
+        validatedReservation(reservation);
+
+        Payment payment = paymentService.addPayment(paymentRequest);
+        reservation.updatePayment(payment);
+
         Reservation savedReservation = reservationRepository.save(reservation);
         return ReservationResponse.from(savedReservation);
     }
 
-    private Reservation createValidatedReservation(CreateReservationRequest createReservationRequest) {
-        Reservation reservation = getReservation(createReservationRequest);
-        reservation.validateFutureReservation(LocalDateTime.now(clock));
-        validateDuplicatedReservation(reservation);
-        return reservation;
+    private Reservation createReservation(CreateReservationRequest createReservationRequest) {
+        Member member = getMember(createReservationRequest.memberId());
+        ReservationTime reservationTime = getTime(createReservationRequest.timeId());
+        Theme theme = getTheme(createReservationRequest.themeId());
+        return createReservationRequest.toReservation(reservationTime, theme, member);
     }
 
-    private Reservation getReservation(CreateReservationRequest request) {
-        Member member = getMember(request.memberId());
-        ReservationTime reservationTime = getTime(request.timeId());
-        Theme theme = getTheme(request.themeId());
-        return request.toReservation(reservationTime, theme, member);
+    private void validatedReservation(Reservation reservation) {
+        reservation.validateFutureReservation(LocalDateTime.now(clock));
+        validateDuplicatedReservation(reservation);
     }
 
     private Member getMember(long memberId) {

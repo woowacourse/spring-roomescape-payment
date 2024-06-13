@@ -1,5 +1,9 @@
 package roomescape.controller.api;
 
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
@@ -17,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.controller.BaseControllerTest;
+import roomescape.controller.FieldDescriptors;
 import roomescape.controller.dto.request.ReservationTimeRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
@@ -87,7 +92,10 @@ class ReservationTimeControllerTest extends BaseControllerTest {
     @DisplayName("이용가능한 시간들을 조회한다.")
     @Sql("/reservation.sql")
     void getAvailableReservationTimes() {
-        ExtractableResponse<Response> extractResponse = RestAssured.given().log().all()
+        ExtractableResponse<Response> extractResponse = RestAssured.given(spec).log().all()
+                .filter(document("time/getAvailableReservationTimes",
+                        queryParameters(FieldDescriptors.AVAILABLE_RESERVATION_TIME_PARAMETER),
+                        responseFields(FieldDescriptors.AVAILABLE_RESERVATION_TIME_RESPONSE)))
                 .param("date", "2024-04-09")
                 .param("themeId", 1L)
                 .when().get("/times/available")

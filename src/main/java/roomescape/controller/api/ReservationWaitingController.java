@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.controller.dto.request.ReservationRequest;
+import roomescape.controller.dto.request.ReservationWaitingRequest;
 import roomescape.controller.dto.response.ApiResponses;
 import roomescape.controller.support.Auth;
 import roomescape.security.authentication.Authentication;
@@ -32,7 +33,7 @@ public class ReservationWaitingController {
     }
 
     @PostMapping("/waitings")
-    public ResponseEntity<ReservationResponse> createReservationWaiting(@Valid @RequestBody ReservationRequest request,
+    public ResponseEntity<ReservationResponse> createReservationWaiting(@Valid @RequestBody ReservationWaitingRequest request,
                                                                         @Auth Authentication authentication) {
         long memberId = authentication.getId();
         ReservationResponse response = reservationWaitingService.addReservationWaiting(

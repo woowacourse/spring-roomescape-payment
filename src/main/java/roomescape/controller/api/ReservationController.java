@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.controller.dto.request.AdminReservationRequest;
+import roomescape.controller.dto.request.ReservationByAdminRequest;
 import roomescape.controller.dto.request.ReservationRequest;
 import roomescape.controller.dto.response.ApiResponses;
 import roomescape.controller.support.Auth;
@@ -44,15 +44,15 @@ public class ReservationController {
 
     @GetMapping("/reservations/mine")
     public ApiResponses<PersonalReservationResponse> getMyReservations(@Auth Authentication authentication) {
-        List<PersonalReservationResponse> reservationResponses = reservationService
-                .getReservationsByMemberId(authentication.getId());
+        List<PersonalReservationResponse> reservationResponses =
+                reservationService.getReservationsByMemberId(authentication.getId());
         return new ApiResponses<>(reservationResponses);
     }
 
     @PostMapping("/admin/reservations")
-    public ResponseEntity<ReservationResponse> addAdminReservation(
-            @RequestBody @Valid AdminReservationRequest request) {
-        ReservationResponse response = reservationService.addReservationByAdmin(request.toCreateReservationRequest());
+    public ResponseEntity<ReservationResponse> addReservationByAdmin(
+            @RequestBody @Valid ReservationByAdminRequest request) {
+        ReservationResponse response = reservationService.addPendingReservation(request.toCreateReservationRequest());
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
     }
@@ -61,7 +61,7 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> addReservation(@RequestBody @Valid ReservationRequest request,
                                                               @Auth Authentication authentication) {
         long memberId = authentication.getId();
-        ReservationResponse response = reservationService.addReservation(
+        ReservationResponse response = reservationService.addConfirmedReservation(
                 request.toCreateReservationRequest(memberId), request.toPaymentRequest()
         );
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))

@@ -90,7 +90,7 @@ class ReservationServiceTest extends BaseServiceTest {
         );
         PaymentRequest paymentRequest = new PaymentRequest("paymentKey", "orderId", 1000);
 
-        ReservationResponse response = reservationService.addReservation(createReservationRequest, paymentRequest);
+        ReservationResponse response = reservationService.addConfirmedReservation(createReservationRequest, paymentRequest);
 
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(response.date()).isEqualTo("2024-04-09");

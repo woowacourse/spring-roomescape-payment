@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.PaymentClient;
-import roomescape.payment.TossPaymentClientErrorHandler;
 import roomescape.payment.exception.PaymentServerException;
 import roomescape.service.dto.request.PaymentRequest;
 
@@ -23,7 +22,7 @@ public class TossPaymentClient implements PaymentClient {
 
     public TossPaymentClient(RestClient restClient,
                              TossPaymentClientErrorHandler tossPaymentClientErrorHandler,
-                             @Value("${toss.url}") String uri,
+                             @Value("${toss.uri}") String uri,
                              @Value("${toss.secret-key}") String secretKey) {
         this.restClient = restClient;
         this.tossPaymentClientErrorHandler = tossPaymentClientErrorHandler;
@@ -33,16 +32,16 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public void confirm(PaymentRequest paymentRequest) {
+    public TossPaymentResponse confirm(PaymentRequest paymentRequest) {
         try {
-            restClient.post()
+            return restClient.post()
                     .uri(uri)
                     .header("Authorization", "Basic " + encodedSecretKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(paymentRequest)
                     .retrieve()
                     .onStatus(tossPaymentClientErrorHandler)
-                    .toBodilessEntity();
+                    .toEntity(TossPaymentResponse.class).getBody();
         } catch (ResourceAccessException e) {
             throw new PaymentServerException(e.getMessage());
         }

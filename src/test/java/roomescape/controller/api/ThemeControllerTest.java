@@ -1,5 +1,8 @@
 package roomescape.controller.api;
 
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
@@ -17,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.controller.BaseControllerTest;
+import roomescape.controller.FieldDescriptors;
 import roomescape.controller.dto.request.ThemeRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
@@ -157,7 +161,9 @@ class ThemeControllerTest extends BaseControllerTest {
     }
 
     private void getAllThemes() {
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        ExtractableResponse<Response> response = RestAssured.given(spec).log().all()
+                .filter(document("theme/getAllThemes",
+                        responseFields(FieldDescriptors.THEME_RESPONSE)))
                 .when().get("/themes")
                 .then().log().all()
                 .extract();

@@ -8,12 +8,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.theme.Theme;
 
@@ -42,14 +44,21 @@ public class Reservation {
     @JoinColumn(nullable = false)
     private Theme theme;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    private Payment payment;
+
     protected Reservation() {
     }
 
     public Reservation(LocalDate date, Member member, ReservationTime time, Theme theme) {
-        this(null, date, member, time, theme);
+        this(null, date, member, time, theme, null);
     }
 
-    private Reservation(Long id, LocalDate date, Member member, ReservationTime time, Theme theme) {
+    public Reservation(LocalDate date, Member member, ReservationTime time, Theme theme, Payment payment) {
+        this(null, date, member, time, theme, payment);
+    }
+
+    private Reservation(Long id, LocalDate date, Member member, ReservationTime time, Theme theme, Payment payment) {
         validate(date, member, time, theme);
 
         this.id = id;
@@ -57,6 +66,7 @@ public class Reservation {
         this.member = member;
         this.time = time;
         this.theme = theme;
+        this.payment = payment;
     }
 
     private void validate(LocalDate date, Member member, ReservationTime time, Theme theme) {
@@ -94,21 +104,8 @@ public class Reservation {
         this.member = member;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        Reservation that = (Reservation) o;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
+    public void updatePayment(Payment payment) {
+        this.payment = payment;
     }
 
     public Long getId() {
@@ -129,5 +126,26 @@ public class Reservation {
 
     public Theme getTheme() {
         return theme;
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Reservation that = (Reservation) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
