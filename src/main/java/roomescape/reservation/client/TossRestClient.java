@@ -19,7 +19,9 @@ public class TossRestClient {
     private final TossPaymentProperties properties;
 
     public TossRestClient(RestTemplateBuilder builder, TossPaymentProperties properties) {
-        RestTemplate tossPaymentRestTemplate = builder.setConnectTimeout(properties.getConnectTimeout())
+        String authorization = BasicAuthEncoder.encode(properties.getSecretKey(), "");
+        RestTemplate tossPaymentRestTemplate = builder.defaultHeader("Authorization", authorization)
+                .setConnectTimeout(properties.getConnectTimeout())
                 .setReadTimeout(properties.getReadTimeout())
                 .uriTemplateHandler(new DefaultUriBuilderFactory(properties.getUrl() + properties.getPath()))
                 .build();
@@ -28,11 +30,8 @@ public class TossRestClient {
     }
 
     public PaymentApiResponse confirmPayment(PaymentRequest paymentRequest) {
-        String authorization = BasicAuthEncoder.encode(properties.getSecretKey(), "");
-
         return restClient.post()
                 .uri(properties.getConfirmPath())
-                .header("Authorization", authorization)
                 .body(paymentRequest, new ParameterizedTypeReference<>() {
                 })
                 .retrieve()
