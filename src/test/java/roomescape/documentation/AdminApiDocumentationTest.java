@@ -20,6 +20,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -52,6 +54,9 @@ class AdminApiDocumentationTest extends BaseDocumentationTest {
                                 fieldWithPath("timeId").description("예약 시간 id"),
                                 fieldWithPath("themeId").description("테마 id"),
                                 fieldWithPath("memberId").description("결제 금액")
+                        ),
+                        responseHeaders(
+                                headerWithName("Location").description("생성된 예약의 URI")
                         ),
                         responseFields(
                                 fieldWithPath("id").description("예약 id"),
