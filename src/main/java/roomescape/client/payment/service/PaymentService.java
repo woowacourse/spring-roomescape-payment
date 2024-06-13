@@ -1,8 +1,6 @@
 package roomescape.client.payment.service;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import roomescape.client.payment.Payment;
 import roomescape.client.payment.PaymentRepository;
 import roomescape.client.payment.dto.TossPaymentConfirmRequest;
@@ -12,8 +10,6 @@ import roomescape.exception.model.PaymentConfirmExceptionCode;
 import roomescape.reservation.domain.Reservation;
 
 @Tag(name = "결제 서비스", description = "결제 승인, 예약 id에 해당하는 결제를 반환하는 로직 수행")
-@Transactional
-@Service
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
