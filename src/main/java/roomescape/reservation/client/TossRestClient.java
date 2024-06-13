@@ -19,9 +19,6 @@ public class TossRestClient {
     private final RestClient restClient;
     private final TossPaymentProperties properties;
 
-    @Value("${custom.security.toss-payment.secret-key}")
-    private String tossSecretKey;
-
     public TossRestClient(RestTemplateBuilder builder, TossPaymentProperties properties) {
         RestTemplate tossPaymentRestTemplate = builder.setConnectTimeout(properties.getConnectTimeout())
                 .setReadTimeout(properties.getReadTimeout())
@@ -32,7 +29,7 @@ public class TossRestClient {
     }
 
     public PaymentApiResponse confirmPayment(PaymentRequest paymentRequest) {
-        String authorization = BasicAuthEncoder.encode(tossSecretKey, "");
+        String authorization = BasicAuthEncoder.encode(properties.getSecretKey(), "");
 
         return restClient.post()
                 .uri(properties.getConfirmPath())

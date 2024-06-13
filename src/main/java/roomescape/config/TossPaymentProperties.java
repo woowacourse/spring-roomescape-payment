@@ -9,6 +9,7 @@ public class TossPaymentProperties {
     private String confirmPath;
     private Duration connectTimeout;
     private Duration readTimeout;
+    private String secretKey;
 
     public String getUrl() {
         return url;
@@ -30,6 +31,10 @@ public class TossPaymentProperties {
         return readTimeout;
     }
 
+    public String getSecretKey() {
+        return secretKey;
+    }
+
     public void setUrl(String url) {
         this.url = url;
     }
@@ -48,5 +53,9 @@ public class TossPaymentProperties {
 
     public void setReadTimeout(Duration readTimeout) {
         this.readTimeout = readTimeout;
+    }
+
+    public void setSecretKey(String secretKey) {
+        this.secretKey = secretKey;
     }
 }

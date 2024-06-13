@@ -33,8 +33,7 @@ custom:
       hash-salt: -45,-5,-13,125,108,-103,-122,-41,107,-10,-60,1,73,-94,-118,85
       iteration-count: 65536
       key-length: 256
-    toss-payment:
-      secret-key: "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"
+
     jwt:
       token-secret-key: "YWNjZXNzLXRva2VuLXBhY2staXQtaXMtc28tYmVhdXRpZnVsLXByb2plY3Qtc3ByaW5nLWJvb3QtcmVhY3QtaXMtcGFjay1pdC10ZWNoLXN0YWNrLXRoaXMtYWNjZXNzLXRva2VuLWdlbmVyYXRlLWJ5LWVkZ2FyNmJmCg=="
       token-expiration-period: 604800000  # 7 DAY
@@ -46,4 +45,4 @@ third-party-api:
     confirm-path: "/confirm"
     connect-timeout: 3000 # ms
     read-timeout: 1000 # ms
-
+    secret-key: "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"
