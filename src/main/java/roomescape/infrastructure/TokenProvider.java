@@ -17,12 +17,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class TokenProvider {
     private static final String COOKIE_NAME = "token";
-    private static final String secretKey = "secretkeyofspringroomescapewaitingmissionstep1";
-    private static final long validityInMilliseconds = 3600 * 1000L;
+    private static final String SECRET_KEY = "secretkeyofspringroomescapewaitingmissionstep1";
+    private static final long VALIDITY_IN_MILLISECONDS = 3600 * 1000L;
+    public static final String LOGIN_REQUIRED = "로그인이 필요합니다.";
+    public static final String NOT_AUTHORIZED_ADMIN_ROLE_REQUIRED = "권한이 없습니다. 관리자 권한이 필요합니다.";
+    public static final String TOKEN_EXPIRED_LOGIN_REQUIRED = "로그인 기간이 만료되었습니다. 다시 로그인 해주세요.";
 
     public String createToken(final String payload, final String role) {
         Date now = new Date();
-        Date validity = new Date(now.getTime() + validityInMilliseconds);
+        Date validity = new Date(now.getTime() + VALIDITY_IN_MILLISECONDS);
 
         return Jwts.builder()
                 .setSubject(payload)
@@ -34,7 +37,7 @@ public class TokenProvider {
     }
 
     private SecretKey getSigningKey() {
-        final byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        final byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -53,35 +56,35 @@ public class TokenProvider {
                 .filter(cookie -> cookie.getName().equals(COOKIE_NAME))
                 .findFirst()
                 .map(Cookie::getValue)
-                .orElseThrow(() -> new IllegalArgumentException("토큰이 존재하지 않습니다."));
+                .orElseThrow(() -> new JwtException(LOGIN_REQUIRED));
     }
 
     private void validateRequestCookies(final HttpServletRequest request) {
         if (request.getCookies() == null) {
-            throw new JwtException("로그인이 필요합니다.");
+            throw new JwtException(LOGIN_REQUIRED);
         }
     }
 
     public void validateTokenExpiration(final String token) {
         try {
             Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
+                    .setSigningKey(SECRET_KEY)
                     .build()
                     .parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
-            throw new JwtException("로그인 기간이 만료되었습니다. 다시 로그인 해주세요.");
+            throw new JwtException(TOKEN_EXPIRED_LOGIN_REQUIRED);
         }
     }
 
     public void validateTokenRole(final String token) {
         final Jws<Claims> claims = Jwts.parserBuilder()
-                .setSigningKey(secretKey)
+                .setSigningKey(SECRET_KEY)
                 .build()
                 .parseClaimsJws(token);
         final boolean isNotAdmin = !claims.getBody().get("role").equals("ADMIN");
 
         if (isNotAdmin) {
-            throw new JwtException("권한이 없습니다. 관리자 권한이 필요합니다.");
+            throw new JwtException(NOT_AUTHORIZED_ADMIN_ROLE_REQUIRED);
         }
     }
 }

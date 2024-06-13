@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.util.Objects;
 
 @Entity
 public class Member {
@@ -27,7 +28,7 @@ public class Member {
     @Column(nullable = false)
     private Role role;
 
-    public Member() {
+    protected Member() {
     }
 
     public Member(final String name, final String email, final String password, final Role role) {
@@ -40,6 +41,10 @@ public class Member {
         this.email = email;
         this.password = password;
         this.role = role;
+    }
+
+    public boolean isNotAdmin() {
+        return role != Role.ADMIN;
     }
 
     public Long getId() {
@@ -62,7 +67,20 @@ public class Member {
         return role;
     }
 
-    public boolean isNotAdmin() {
-        return role != Role.ADMIN;
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Member member = (Member) o;
+        return Objects.equals(getId(), member.getId()) && Objects.equals(getName(), member.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName());
     }
 }

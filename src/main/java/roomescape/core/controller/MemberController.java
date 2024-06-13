@@ -77,7 +77,7 @@ public class MemberController {
     public ResponseEntity<MemberResponse> signupProcess(@RequestBody final MemberRequest request) {
         final MemberResponse response = memberService.create(request);
 
-        return ResponseEntity.created(URI.create("/members/" + response.getId()))
+        return ResponseEntity.created(URI.create("/members/" + response.id()))
                 .body(response);
     }
 

@@ -43,7 +43,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
         return RestClient.builder()
                 .requestFactory(factory)
-                .baseUrl("https://api.tosspayments.com/v1/payments/confirm")
+                .baseUrl("https://api.tosspayments.com/v1/payments")
                 .build();
     }
 

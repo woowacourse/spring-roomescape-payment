@@ -1,24 +1,29 @@
 package roomescape.core.controller;
 
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import jakarta.annotation.PostConstruct;
+import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import roomescape.core.dto.payment.PaymentConfirmResponse;
+import org.springframework.restdocs.RestDocumentationContextProvider;
 import roomescape.core.dto.reservation.ReservationPaymentRequest;
 import roomescape.core.dto.waiting.MemberWaitingRequest;
-import roomescape.infrastructure.PaymentProvider;
 import roomescape.utils.AccessTokenGenerator;
 import roomescape.utils.DatabaseCleaner;
+import roomescape.utils.DocumentHelper;
 import roomescape.utils.TestFixture;
 
 @AcceptanceTest
@@ -37,18 +42,13 @@ class WaitingControllerTest {
     @Autowired
     private TestFixture testFixture;
 
-    @MockBean
-    private PaymentProvider paymentProvider;
-
-    @PostConstruct
-    public void init() {
-        when(paymentProvider.getPaymentConfirmResponse(any()))
-                .thenReturn(new PaymentConfirmResponse(1000, "orderId", "paymentKey"));
-    }
+    private RequestSpecification specification;
 
     @BeforeEach
-    void setUp() {
+    void setUp(final RestDocumentationContextProvider restDocumentation) {
         RestAssured.port = port;
+
+        specification = DocumentHelper.specification(restDocumentation);
 
         databaseCleaner.executeTruncate();
         testFixture.initTestData();
@@ -61,13 +61,28 @@ class WaitingControllerTest {
     void createWaiting() {
         MemberWaitingRequest request = new MemberWaitingRequest(TOMORROW, 1L, 1L);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.specification).log().all()
                 .cookies("token", accessToken)
                 .contentType(ContentType.JSON)
+                .filter(document("waiting-create",
+                        requestCookies(cookieWithName("token").description("사용자 인가 토큰")),
+                        requestFields(fieldWithPath("date").description("예약 대기할 날짜"),
+                                fieldWithPath("timeId").description("예약 대기할 시간"),
+                                fieldWithPath("themeId").description("예약 대기할 테마")),
+                        responseFields(fieldWithPath("id").description("예약 대기 ID"),
+                                fieldWithPath("member.id").description("예약 대기한 사용자 ID"),
+                                fieldWithPath("member.name").description("예약 대기한 사용자 이름"),
+                                fieldWithPath("date").description("예약 대기된 날짜"),
+                                fieldWithPath("time.id").description("예약 대기된 시간 ID"),
+                                fieldWithPath("time.startAt").description("예약 대기된 시간 값"),
+                                fieldWithPath("theme.id").description("예약 대기된 테마 ID"),
+                                fieldWithPath("theme.name").description("예약 대기된 테마 이름"),
+                                fieldWithPath("theme.description").description("예약 대기된 테마 설명"),
+                                fieldWithPath("theme.thumbnail").description("예약 대기된 테마 이미지"))))
                 .body(request)
                 .when().post("/waitings")
-                .then().log().all()
-                .statusCode(201);
+                .then().assertThat()
+                .statusCode(is(201));
     }
 
     @Test
@@ -130,9 +145,12 @@ class WaitingControllerTest {
                 .then().log().all()
                 .statusCode(201);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.specification).log().all()
                 .cookies("token", accessToken)
-                .when().delete("/waitings/1")
+                .filter(document("waiting-delete",
+                        requestCookies(cookieWithName("token").description("사용자 인가 토큰")),
+                        pathParameters(parameterWithName("id").description("취소하려는 예약 대기 ID"))))
+                .when().delete("/waitings/{id}", 1L)
                 .then().log().all()
                 .statusCode(204);
     }
@@ -150,8 +168,19 @@ class WaitingControllerTest {
                 .then().log().all()
                 .statusCode(201);
 
-        RestAssured.given().log().all()
-                .cookies("token", accessToken)
+        RestAssured.given(this.specification).log().all()
+                .accept("application/json")
+                .filter(document("waitings",
+                        responseFields(fieldWithPath("[].id").description("예약 대기 ID"),
+                                fieldWithPath("[].member.id").description("예약 대기한 사용자 ID"),
+                                fieldWithPath("[].member.name").description("예약 대기한 사용자 이름"),
+                                fieldWithPath("[].date").description("예약 대기된 날짜"),
+                                fieldWithPath("[].time.id").description("예약 대기된 시간 ID"),
+                                fieldWithPath("[].time.startAt").description("예약 대기된 시간 값"),
+                                fieldWithPath("[].theme.id").description("예약 대기된 테마 ID"),
+                                fieldWithPath("[].theme.name").description("예약 대기된 테마 이름"),
+                                fieldWithPath("[].theme.description").description("예약 대기된 테마 설명"),
+                                fieldWithPath("[].theme.thumbnail").description("예약 대기된 테마 이미지"))))
                 .when().get("/waitings")
                 .then().log().all()
                 .statusCode(200)

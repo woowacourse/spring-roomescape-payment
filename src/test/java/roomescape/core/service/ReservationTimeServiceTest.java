@@ -9,9 +9,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.core.domain.Member;
 import roomescape.core.domain.Reservation;
+import roomescape.core.domain.ReservationStatus;
 import roomescape.core.domain.Theme;
 import roomescape.core.dto.reservationtime.ReservationTimeRequest;
 import roomescape.core.dto.reservationtime.ReservationTimeResponse;
+import roomescape.core.exception.ExceptionMessage;
 import roomescape.core.repository.MemberRepository;
 import roomescape.core.repository.ReservationRepository;
 import roomescape.core.repository.ReservationTimeRepository;
@@ -58,7 +60,7 @@ class ReservationTimeServiceTest {
     void create() {
         final ReservationTimeResponse response = reservationTimeService.create(request);
 
-        assertThat(response.getStartAt()).isEqualTo(START_AT);
+        assertThat(response.startAt()).isEqualTo(START_AT);
     }
 
     @Test
@@ -70,7 +72,7 @@ class ReservationTimeServiceTest {
 
         assertThatThrownBy(() -> reservationTimeService.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(ReservationTimeService.DUPLICATED_TIME_EXCEPTION_MESSAGE);
+                .hasMessage(ExceptionMessage.DUPLICATED_TIME_EXCEPTION.getMessage());
     }
 
     @Test
@@ -93,7 +95,7 @@ class ReservationTimeServiceTest {
     void delete() {
         final ReservationTimeResponse response = reservationTimeService.create(request);
 
-        reservationTimeService.delete(response.getId());
+        reservationTimeService.delete(response.id());
 
         assertThat(reservationTimeService.findAll()).hasSize(2);
     }
@@ -102,12 +104,12 @@ class ReservationTimeServiceTest {
     @DisplayName("예약 시간 삭제 시, 예약 내역이 존재하면 예외가 발생한다.")
     void deleteWithReservation() {
         final Reservation reservation = new Reservation(getMember(), TestFixture.getTodayDate(),
-                reservationTimeRepository.findById(1L).orElseThrow(), getTheme());
+                reservationTimeRepository.findById(1L).orElseThrow(), getTheme(), ReservationStatus.BOOKED);
         reservationRepository.save(reservation);
 
         assertThatThrownBy(() -> reservationTimeService.delete(1L))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(ReservationTimeService.RESERVATION_DELETE_EXCEPTION_MESSAGE);
+                .hasMessage(ExceptionMessage.BOOKED_TIME_DELETE_EXCEPTION.getMessage());
     }
 
     private Member getMember() {

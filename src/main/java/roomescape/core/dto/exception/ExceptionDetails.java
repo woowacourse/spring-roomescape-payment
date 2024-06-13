@@ -19,8 +19,8 @@ public class ExceptionDetails {
                 .map(fieldError -> new ExceptionDetails(
                         fieldError.getDefaultMessage(),
                         fieldError.getField(),
-                        String.valueOf(fieldError.getRejectedValue()))
-                ).toList();
+                        String.valueOf(fieldError.getRejectedValue())))
+                .toList();
     }
 
     public String getMessage() {

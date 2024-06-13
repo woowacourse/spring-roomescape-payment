@@ -1,0 +1,24 @@
+== Reservation Time API
+
+=== 전체 시간 조회
+
+==== Request
+
+include::{snippets}/time/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/time/http-response.adoc[]
+include::{snippets}/time/response-fields.adoc[]
+
+=== 예약 가능 시간 조회
+
+==== Request
+
+include::{snippets}/time-bookable/http-request.adoc[]
+include::{snippets}/time-bookable/query-parameters.adoc[]
+
+=== Response
+
+include::{snippets}/time-bookable/http-response.adoc[]
+include::{snippets}/time-bookable/response-fields.adoc[]

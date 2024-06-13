@@ -17,6 +17,7 @@ import roomescape.core.dto.reservationtime.ReservationTimeRequest;
 import roomescape.core.dto.reservationtime.ReservationTimeResponse;
 import roomescape.core.dto.theme.ThemeRequest;
 import roomescape.core.dto.theme.ThemeResponse;
+import roomescape.core.service.PaymentService;
 import roomescape.core.service.ReservationService;
 import roomescape.core.service.ReservationTimeService;
 import roomescape.core.service.ThemeService;
@@ -29,15 +30,17 @@ public class AdminController {
     private final ReservationTimeService reservationTimeService;
     private final ThemeService themeService;
     private final WaitingService waitingService;
+    private final PaymentService paymentService;
 
     public AdminController(final ReservationService reservationService,
                            final ReservationTimeService reservationTimeService,
                            final ThemeService themeService,
-                           final WaitingService waitingService) {
+                           final WaitingService waitingService, final PaymentService paymentService) {
         this.reservationService = reservationService;
         this.reservationTimeService = reservationTimeService;
         this.themeService = themeService;
         this.waitingService = waitingService;
+        this.paymentService = paymentService;
     }
 
     @GetMapping
@@ -54,13 +57,16 @@ public class AdminController {
     public ResponseEntity<ReservationResponse> createReservationAsAdmin(
             @Valid @RequestBody final ReservationRequest request) {
         final ReservationResponse response = reservationService.create(request);
-        return ResponseEntity.created(URI.create("/reservations/" + response.getId()))
+
+        return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
     }
 
     @DeleteMapping("/reservations/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable("id") final long id, final LoginMember loginMember) {
         reservationService.deleteByAdmin(id, loginMember);
+        paymentService.cancel(id, loginMember);
+
         return ResponseEntity.noContent().build();
     }
 
@@ -73,13 +79,15 @@ public class AdminController {
     public ResponseEntity<ReservationTimeResponse> createTime(
             @Valid @RequestBody final ReservationTimeRequest request) {
         final ReservationTimeResponse response = reservationTimeService.create(request);
-        return ResponseEntity.created(URI.create("/times/" + response.getId()))
+
+        return ResponseEntity.created(URI.create("/times/" + response.id()))
                 .body(response);
     }
 
     @DeleteMapping("/times/{id}")
     public ResponseEntity<Void> deleteTime(@PathVariable("id") final long id) {
         reservationTimeService.delete(id);
+
         return ResponseEntity.noContent().build();
     }
 
@@ -91,13 +99,15 @@ public class AdminController {
     @PostMapping("/themes")
     public ResponseEntity<ThemeResponse> createTheme(@Valid @RequestBody final ThemeRequest request) {
         final ThemeResponse response = themeService.create(request);
-        return ResponseEntity.created(URI.create("/themes/" + response.getId()))
+
+        return ResponseEntity.created(URI.create("/themes/" + response.id()))
                 .body(response);
     }
 
     @DeleteMapping("/themes/{id}")
     public ResponseEntity<Void> deleteTheme(@PathVariable("id") final long id) {
         themeService.delete(id);
+
         return ResponseEntity.noContent().build();
     }
 
@@ -109,6 +119,7 @@ public class AdminController {
     @DeleteMapping("/waitings/{id}")
     public ResponseEntity<Void> deleteWaiting(@PathVariable("id") final long id, final LoginMember loginMember) {
         waitingService.deleteByAdmin(id, loginMember);
+
         return ResponseEntity.noContent().build();
     }
 }

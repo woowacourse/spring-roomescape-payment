@@ -2,12 +2,15 @@ package roomescape.core.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -18,6 +21,7 @@ public class Reservation {
     protected static final String DATE_FORMAT_EXCEPTION_MESSAGE = "날짜 형식이 잘못되었습니다.";
     protected static final String PAST_DATE_EXCEPTION_MESSAGE = "지난 날짜에는 예약할 수 없습니다.";
     protected static final String PAST_TIME_EXCEPTION_MESSAGE = "지난 시간에는 예약할 수 없습니다.";
+    protected static final String RESERVATION_IS_NOT_YOURS_EXCEPTION_MESSAGE = "본인의 예약만 취소할 수 있습니다.";
     private static final String TIME_ZONE = "Asia/Seoul";
 
     @Id
@@ -39,31 +43,27 @@ public class Reservation {
     @JoinColumn(name = "theme_id", nullable = false)
     private Theme theme;
 
-    private String paymentKey;
+    @Enumerated(value = EnumType.STRING)
+    @NotNull(message = "예약 상태는 비어있을 수 없습니다.")
+    @Column(nullable = false)
+    private ReservationStatus status;
 
-    private String orderId;
-
-    public Reservation() {
-    }
-
-    public Reservation(final Member member, final String date, final ReservationTime time, final Theme theme) {
-        this(null, member, date, time, theme, null, null);
+    protected Reservation() {
     }
 
     public Reservation(final Member member, final String date, final ReservationTime time, final Theme theme,
-                       final String paymentKey, final String orderId) {
-        this(null, member, date, time, theme, paymentKey, orderId);
+                       final ReservationStatus status) {
+        this(null, member, date, time, theme, status);
     }
 
     public Reservation(final Long id, final Member member, final String date, final ReservationTime time,
-                       final Theme theme, final String paymentKey, final String orderId) {
+                       final Theme theme, final ReservationStatus status) {
         this.id = id;
         this.member = member;
         this.date = parseDate(date);
         this.time = time;
         this.theme = theme;
-        this.paymentKey = paymentKey;
-        this.orderId = orderId;
+        this.status = status;
     }
 
     private LocalDate parseDate(final String date) {
@@ -93,6 +93,13 @@ public class Reservation {
         return date.isEqual(LocalDate.now(kst));
     }
 
+    public void cancel(final Member requester) {
+        if (requester.isNotAdmin() && !member.equals(requester)) {
+            throw new IllegalArgumentException(RESERVATION_IS_NOT_YOURS_EXCEPTION_MESSAGE);
+        }
+        this.status = ReservationStatus.CANCELED;
+    }
+
     public Long getId() {
         return id;
     }
@@ -117,11 +124,7 @@ public class Reservation {
         return theme;
     }
 
-    public String getPaymentKey() {
-        return paymentKey;
-    }
-
-    public String getOrderId() {
-        return orderId;
+    public ReservationStatus getStatus() {
+        return status;
     }
 }

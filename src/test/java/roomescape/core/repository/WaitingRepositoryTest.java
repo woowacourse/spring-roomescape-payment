@@ -39,6 +39,6 @@ class WaitingRepositoryTest {
 
         final List<WaitingWithRank> waitingWithRanks = waitingRepository.findAllWithRankByMember(member);
 
-        assertThat(waitingWithRanks.get(0).getRank()).isZero();
+        assertThat(waitingWithRanks.get(0).rank()).isZero();
     }
 }

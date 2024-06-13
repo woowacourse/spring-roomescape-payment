@@ -19,7 +19,7 @@ class ReservationTest {
     @DisplayName("예약 날짜를 저장할 때, 문자열을 LocalDate 타입으로 변환한다.")
     void parseDate() {
         final String date = "2022-12-31";
-        final Reservation reservation = new Reservation(member, date, time, theme);
+        final Reservation reservation = new Reservation(member, date, time, theme, ReservationStatus.BOOKED);
 
         assertThat(reservation.getDate()).isEqualTo(LocalDate.of(2022, 12, 31));
     }
@@ -29,7 +29,7 @@ class ReservationTest {
     void parseDateWithInvalidFormat() {
         final String date = "2222222222";
 
-        assertThatThrownBy(() -> new Reservation(member, date, time, theme))
+        assertThatThrownBy(() -> new Reservation(member, date, time, theme, ReservationStatus.BOOKED))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(Reservation.DATE_FORMAT_EXCEPTION_MESSAGE);
     }
@@ -38,7 +38,7 @@ class ReservationTest {
     @DisplayName("예약 날짜가 현재 날짜보다 이전인지 확인할 수 있다.")
     void isDatePast() {
         final String date = LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE);
-        final Reservation reservation = new Reservation(member, date, time, theme);
+        final Reservation reservation = new Reservation(member, date, time, theme, ReservationStatus.BOOKED);
 
         assertThatThrownBy(reservation::validateDateAndTime)
                 .isInstanceOf(IllegalArgumentException.class)
@@ -49,7 +49,7 @@ class ReservationTest {
     @DisplayName("예약 날짜가 오늘이지만 지난 시간인지 확인할 수 있다.")
     void isDateTodayButTimePast() {
         final String date = LocalDate.now().format(DateTimeFormatter.ISO_DATE);
-        final Reservation reservation = new Reservation(member, date, pastTime, theme);
+        final Reservation reservation = new Reservation(member, date, pastTime, theme, ReservationStatus.BOOKED);
 
         assertThatThrownBy(reservation::validateDateAndTime)
                 .isInstanceOf(IllegalArgumentException.class)

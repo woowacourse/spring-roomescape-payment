@@ -1,0 +1,72 @@
+== Reservation API
+
+=== 예약 생성
+
+==== Request
+
+include::{snippets}/reservation-create/http-request.adoc[]
+
+===== Header
+
+include::{snippets}/reservation-create/request-cookies.adoc[]
+
+===== Body
+
+include::{snippets}/reservation-create/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-create/http-response.adoc[]
+include::{snippets}/reservation-create/response-fields.adoc[]
+
+=== 전체 예약 조회
+
+==== Request
+
+include::{snippets}/reservations/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/reservations/http-response.adoc[]
+include::{snippets}/reservations/response-fields.adoc[]
+
+=== 조건부 예약 조회
+
+==== Request
+
+include::{snippets}/reservations-condition/http-request.adoc[]
+include::{snippets}/reservations-condition/query-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/reservations-condition/http-response.adoc[]
+include::{snippets}/reservations-condition/response-fields.adoc[]
+
+=== 내 예약 조회
+
+==== Request
+
+include::{snippets}/reservations-mine/http-request.adoc[]
+
+===== Header
+
+include::{snippets}/reservations-mine/request-cookies.adoc[]
+
+==== Response
+
+include::{snippets}/reservations-mine/http-response.adoc[]
+include::{snippets}/reservations-mine/response-fields.adoc[]
+
+=== 예약 삭제
+
+==== Request
+
+include::{snippets}/reservation-delete/http-request.adoc[]
+
+===== Header
+
+include::{snippets}/reservation-delete/request-cookies.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-delete/http-response.adoc[]

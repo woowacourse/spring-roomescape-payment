@@ -1,0 +1,45 @@
+== Waiting API
+
+=== 예약 대기 생성
+
+==== Request
+
+include::{snippets}/waiting-create/http-request.adoc[]
+
+===== Header
+
+include::{snippets}/waiting-create/request-cookies.adoc[]
+
+===== Body
+
+include::{snippets}/waiting-create/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/waiting-create/http-response.adoc[]
+include::{snippets}/waiting-create/response-fields.adoc[]
+
+=== 전체 예약 대기 조회
+
+==== Request
+
+include::{snippets}/waitings/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/waitings/http-response.adoc[]
+include::{snippets}/waitings/response-fields.adoc[]
+
+=== 예약 대기 삭제
+
+==== Request
+
+include::{snippets}/waiting-delete/http-request.adoc[]
+
+===== Header
+
+include::{snippets}/waiting-delete/request-cookies.adoc[]
+
+==== Response
+
+include::{snippets}/waiting-delete/http-response.adoc[]

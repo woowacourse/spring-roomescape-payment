@@ -29,12 +29,12 @@ public class WaitingController {
     @PostMapping
     public ResponseEntity<WaitingResponse> create(@Valid @RequestBody final MemberWaitingRequest request,
                                                   final LoginMember loginMember) {
-        final WaitingRequest waitingRequest = new WaitingRequest(loginMember.getId(), request.getDate(),
+        final WaitingRequest waitingRequest = new WaitingRequest(loginMember.id(), request.getDate(),
                 request.getTimeId(),
                 request.getThemeId());
 
         final WaitingResponse response = waitingService.create(waitingRequest);
-        return ResponseEntity.created(URI.create("/waitings/" + response.getId()))
+        return ResponseEntity.created(URI.create("/waitings/" + response.id()))
                 .body(response);
     }
 

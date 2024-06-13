@@ -11,13 +11,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.core.domain.Member;
 import roomescape.core.domain.Reservation;
+import roomescape.core.domain.ReservationStatus;
 import roomescape.core.domain.ReservationTime;
 import roomescape.core.domain.Theme;
 import roomescape.core.dto.theme.ThemeRequest;
 import roomescape.core.dto.theme.ThemeResponse;
+import roomescape.core.exception.ExceptionMessage;
 import roomescape.core.repository.MemberRepository;
 import roomescape.core.repository.ReservationRepository;
-import roomescape.core.repository.ReservationTimeRepository;
 import roomescape.core.repository.ThemeRepository;
 import roomescape.utils.DatabaseCleaner;
 import roomescape.utils.TestFixture;
@@ -26,9 +27,6 @@ import roomescape.utils.TestFixture;
 class ThemeServiceTest {
     @Autowired
     private ThemeService themeService;
-
-    @Autowired
-    private ReservationTimeRepository reservationTimeRepository;
 
     @Autowired
     private ReservationRepository reservationRepository;
@@ -61,9 +59,9 @@ class ThemeServiceTest {
         final ThemeResponse response = themeService.create(request);
 
         assertAll(
-                () -> assertThat(response.getName()).isEqualTo(request.getName()),
-                () -> assertThat(response.getDescription()).isEqualTo(request.getDescription()),
-                () -> assertThat(response.getThumbnail()).isEqualTo(request.getThumbnail())
+                () -> assertThat(response.name()).isEqualTo(request.getName()),
+                () -> assertThat(response.description()).isEqualTo(request.getDescription()),
+                () -> assertThat(response.thumbnail()).isEqualTo(request.getThumbnail())
         );
     }
 
@@ -74,7 +72,7 @@ class ThemeServiceTest {
 
         assertThatThrownBy(() -> themeService.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(ThemeService.THEME_NAME_DUPLICATED_EXCEPTION_MESSAGE);
+                .hasMessage(ExceptionMessage.THEME_NAME_DUPLICATED_EXCEPTION.getMessage());
     }
 
     @Test
@@ -91,17 +89,17 @@ class ThemeServiceTest {
 
         final List<ThemeResponse> responses = themeService.findPopularTheme();
 
-        assertThat(responses.get(0).getName()).isEqualTo("테스트");
+        assertThat(responses.get(0).name()).isEqualTo("테스트");
     }
 
     private void createReservations() {
         final ReservationTime reservationTimeAfterOneMinute = testFixture.persistReservationTimeAfterMinute(1);
         final Reservation oneMinuteAfterReservation = new Reservation(getMember(), TestFixture.getTodayDate(),
-                reservationTimeAfterOneMinute, getTheme());
+                reservationTimeAfterOneMinute, getTheme(), ReservationStatus.BOOKED);
 
         final ReservationTime reservationTimeAfterTwoMinute = testFixture.persistReservationTimeAfterMinute(2);
         final Reservation twoMinuteAfterReservation = new Reservation(getMember(), TestFixture.getTodayDate(),
-                reservationTimeAfterTwoMinute, getTheme());
+                reservationTimeAfterTwoMinute, getTheme(), ReservationStatus.BOOKED);
 
         reservationRepository.save(oneMinuteAfterReservation);
         reservationRepository.save(twoMinuteAfterReservation);
@@ -120,7 +118,7 @@ class ThemeServiceTest {
     void delete() {
         final ThemeResponse response = themeService.create(request);
 
-        themeService.delete(response.getId());
+        themeService.delete(response.id());
 
         assertThat(themeService.findAll()).hasSize(1);
     }
@@ -129,15 +127,15 @@ class ThemeServiceTest {
     @DisplayName("테마를 삭제 시, 예약 내역이 존재하면 예외가 발생한다.")
     void deleteBookedTheme() {
         final ThemeResponse response = themeService.create(request);
-        final Long themeId = response.getId();
+        final Long themeId = response.id();
 
         final ReservationTime reservationTime = testFixture.persistReservationTimeAfterMinute(1);
         final Reservation reservation = new Reservation(getMember(), TestFixture.getTodayDate(),
-                reservationTime, themeRepository.findById(themeId).orElseThrow());
+                reservationTime, themeRepository.findById(themeId).orElseThrow(), ReservationStatus.BOOKED);
         reservationRepository.save(reservation);
 
         assertThatThrownBy(() -> themeService.delete(themeId))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(ThemeService.BOOKED_THEME_DELETE_EXCEPTION_MESSAGE);
+                .hasMessage(ExceptionMessage.BOOKED_THEME_DELETE_EXCEPTION.getMessage());
     }
 }

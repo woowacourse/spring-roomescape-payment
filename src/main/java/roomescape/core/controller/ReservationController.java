@@ -18,33 +18,38 @@ import roomescape.core.dto.reservation.MyReservationResponse;
 import roomescape.core.dto.reservation.ReservationPaymentRequest;
 import roomescape.core.dto.reservation.ReservationRequest;
 import roomescape.core.dto.reservation.ReservationResponse;
+import roomescape.core.service.PaymentService;
 import roomescape.core.service.ReservationService;
-import roomescape.infrastructure.PaymentProvider;
 
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
     private final ReservationService reservationService;
-    private final PaymentProvider paymentProvider;
+    private final PaymentService paymentService;
 
-    public ReservationController(final ReservationService reservationService,
-                                 final PaymentProvider paymentProvider) {
+    public ReservationController(final ReservationService reservationService, final PaymentService paymentService) {
         this.reservationService = reservationService;
-        this.paymentProvider = paymentProvider;
+        this.paymentService = paymentService;
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponse> create(@Valid @RequestBody final ReservationPaymentRequest request,
-                                                      final LoginMember member) {
-        final PaymentConfirmResponse confirmResponse = paymentProvider.getPaymentConfirmResponse(request);
+    public ResponseEntity<MyReservationResponse> create(@Valid @RequestBody final ReservationPaymentRequest request,
+                                                        final LoginMember member) {
+        final ReservationResponse reservation = getCreatedReservation(request, member);
+        final PaymentConfirmResponse payment = paymentService.confirmPayment(reservation, request, member);
 
-        final ReservationRequest reservationRequest = new ReservationRequest(member.getId(), request.getDate(),
-                request.getTimeId(), request.getThemeId(), confirmResponse.getPaymentKey(),
-                confirmResponse.getOrderId());
+        final MyReservationResponse response = MyReservationResponse.from(reservation, payment);
 
-        final ReservationResponse response = reservationService.create(reservationRequest);
-        return ResponseEntity.created(URI.create("/reservations/" + response.getId()))
+        return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
+    }
+
+    private ReservationResponse getCreatedReservation(final ReservationPaymentRequest request,
+                                                      final LoginMember member) {
+        final ReservationRequest reservationRequest = new ReservationRequest(member.id(), request.getDate(),
+                request.getTimeId(), request.getThemeId());
+
+        return reservationService.create(reservationRequest);
     }
 
     @GetMapping
@@ -70,6 +75,8 @@ public class ReservationController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") final long id, final LoginMember loginMember) {
         reservationService.delete(id, loginMember);
+        paymentService.cancel(id, loginMember);
+
         return ResponseEntity.noContent().build();
     }
 }

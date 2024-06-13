@@ -34,7 +34,7 @@ public class Waiting {
     @JoinColumn(name = "theme_id", nullable = false)
     private Theme theme;
 
-    public Waiting() {
+    protected Waiting() {
     }
 
     public Waiting(final Member member, final String date, final ReservationTime time, final Theme theme) {
@@ -50,6 +50,10 @@ public class Waiting {
         } catch (final DateTimeParseException e) {
             throw new IllegalArgumentException(DATE_FORMAT_EXCEPTION_MESSAGE);
         }
+    }
+
+    public boolean isNotOwner(final Member member) {
+        return !this.member.equals(member);
     }
 
     public Long getId() {
@@ -70,9 +74,5 @@ public class Waiting {
 
     public Theme getTheme() {
         return theme;
-    }
-
-    public boolean isNotOwner(final Member member) {
-        return !this.member.equals(member);
     }
 }

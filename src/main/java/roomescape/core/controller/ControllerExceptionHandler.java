@@ -15,7 +15,6 @@ import roomescape.core.exception.PaymentException;
 
 @RestControllerAdvice
 public class ControllerExceptionHandler {
-
     public static final String REQUEST_TIMEOUT_EXCEPTION_MESSAGE = "요청 시간이 만료되었습니다. 다시 요청해주세요.";
 
     @ExceptionHandler
@@ -50,6 +49,7 @@ public class ControllerExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<ProblemDetail> handlePaymentException(final PaymentException exception) {
         final HttpExceptionResponse responseBody = exception.getResponseBody();
+
         return ResponseEntity.status(exception.getStatusCode())
                 .body(ProblemDetail.forStatusAndDetail(exception.getStatusCode(), responseBody.getMessage()));
     }
