@@ -1,9 +1,9 @@
 INSERT INTO theme (name, description, thumbnail)
-VALUES ('테마 1', '설명 1', 'url 1');
+VALUES ('테마 1', '설명 1', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
 INSERT INTO theme (name, description, thumbnail)
-VALUES ('테마 2', '설명 2', 'url 2');
+VALUES ('테마 2', '설명 2', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
 INSERT INTO theme (name, description, thumbnail)
-VALUES ('테마 3', '설명 3', 'url 3');
+VALUES ('테마 3', '설명 3', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
 
 INSERT INTO reservation_time (start_at)
 VALUES ('12:00');
