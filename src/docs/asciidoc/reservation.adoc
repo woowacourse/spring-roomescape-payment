@@ -1,0 +1,9 @@
+== 예약 API
+
+=== 예약 생성
+
+operation::reservations/add[snippets='curl-request,http-request,http-response,request-fields,response-fields']
+
+=== 나의 예약과 예약 대기들을 대기 순번과 함께 조회
+
+operation::reservations/list/mine[snippets='curl-request,http-request,http-response,response-fields']

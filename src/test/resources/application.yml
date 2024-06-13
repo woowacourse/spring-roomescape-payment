@@ -1,8 +1,6 @@
 spring:
   profiles:
     active: test
-  main:
-    allow-bean-definition-overriding: true
   h2:
     console:
       enabled: true
@@ -26,10 +24,10 @@ security:
     secret-key: abcdefghijklmnopqrstuvwxyz0123456789
     expiration-time: 3600000 # 1 hour
 
-client:
-  connection-timeout-second: 5
-  read-timeout-second: 30
-
 payment:
-  base-url: https://api.tosspayments.com
-  secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  providers:
+    - name: toss
+      connection-timeout-in-seconds: 5s
+      read-timeout-in-seconds: 30s
+      base-url: https://api.tosspayments.com
+      secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6

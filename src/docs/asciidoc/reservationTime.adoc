@@ -1,0 +1,9 @@
+== 예약 시간 API
+
+=== 예약 시간 목록 조회
+
+operation::times/list[snippets='curl-request,http-request,http-response,response-fields']
+
+=== 이용 가능한 예약 시간 목록 조회
+
+operation::times/list/available[snippets='curl-request,http-request,http-response,response-fields']

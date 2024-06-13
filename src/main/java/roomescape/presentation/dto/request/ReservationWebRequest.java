@@ -29,14 +29,11 @@ public record ReservationWebRequest(
 
         @NotNull(message = "가격을 입력해주세요.")
         @Positive
-        BigDecimal amount,
-
-        @NotNull(message = "payment type을 입력해주세요.")
-        String paymentType
+        BigDecimal amount
 ) {
 
     public ReservationRequest toReservationRequest(Clock clock, Long memberId) {
-        PaymentRequest payment = new PaymentRequest(paymentKey, orderId, amount, paymentType);
+        PaymentRequest payment = new PaymentRequest(paymentKey, orderId, amount);
 
         return new ReservationRequest(
                 LocalDateTime.now(clock),

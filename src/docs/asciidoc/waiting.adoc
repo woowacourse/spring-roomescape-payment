@@ -1,0 +1,9 @@
+== 예약 대기 API
+
+=== 예약 대기 생성
+
+operation::waiting/add[snippets='curl-request,http-request,http-response,request-fields,response-fields']
+
+==== 예약 대기 삭제
+
+operation::waiting/delete[snippets='curl-request,http-request,http-response,path-parameters']

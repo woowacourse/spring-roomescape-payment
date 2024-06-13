@@ -9,11 +9,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import roomescape.exception.TokenException;
+import roomescape.infra.auth.JwtProperties;
+import roomescape.infra.auth.JwtTokenProvider;
 
 class JwtTokenProviderTest {
 
     private final String testKey = "woowacourse-6th-abcdefg-123456-abcdefg-123456";
-    private final JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(testKey, 3600000);
+    private final JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(new JwtProperties(testKey, 3600000));
 
     @Test
     @DisplayName("토큰을 생성한다.")
@@ -47,7 +49,7 @@ class JwtTokenProviderTest {
     @Test
     @DisplayName("토큰에서 멤버 아이디를 가져올 때, 토큰이 만료되었으면 예외를 발생시킨다.")
     void getMemberIdWhenTokenIsExpired() {
-        JwtTokenProvider expiredJwtTokenProvider = new JwtTokenProvider(testKey, 0);
+        JwtTokenProvider expiredJwtTokenProvider = new JwtTokenProvider(new JwtProperties(testKey, 1));
         String token = expiredJwtTokenProvider.createToken("1");
 
         assertThatThrownBy(() -> expiredJwtTokenProvider.getMemberId(token))

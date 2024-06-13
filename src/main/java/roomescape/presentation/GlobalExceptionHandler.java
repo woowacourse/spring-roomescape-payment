@@ -19,10 +19,9 @@ import roomescape.domain.exception.DomainValidationException;
 import roomescape.exception.AccessDeniedException;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorResponse;
-import roomescape.infra.payment.exception.PaymentConfirmException;
-import roomescape.infra.payment.exception.PaymentConfirmServerException;
 import roomescape.exception.TokenException;
 import roomescape.exception.UnauthorizedException;
+import roomescape.infra.payment.toss.exception.TossPaymentConfirmException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
@@ -125,8 +124,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(new ErrorResponse(e.getMessage()));
     }
 
-    @ExceptionHandler(PaymentConfirmException.class)
-    public ResponseEntity<ErrorResponse> handlePaymentClientException(PaymentConfirmException e) {
+    @ExceptionHandler(TossPaymentConfirmException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentClientException(TossPaymentConfirmException e) {
         log.error("[PaymentClientException]", e);
 
         return ResponseEntity

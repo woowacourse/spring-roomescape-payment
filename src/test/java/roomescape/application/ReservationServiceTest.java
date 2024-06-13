@@ -9,7 +9,6 @@ import static roomescape.fixture.Fixture.PAYMENT_REQUEST;
 import static roomescape.fixture.Fixture.RESERVATION_TIME_1;
 import static roomescape.fixture.Fixture.THEME_1;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,10 +20,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import roomescape.application.dto.request.PaymentRequest;
 import roomescape.application.dto.request.ReservationRequest;
 import roomescape.application.dto.response.MemberResponse;
-import roomescape.application.dto.response.PaymentApiResponse;
+import roomescape.application.dto.response.PaymentConfirmApiResponse;
 import roomescape.application.dto.response.ReservationResponse;
 import roomescape.application.dto.response.ReservationTimeResponse;
 import roomescape.application.dto.response.ThemeResponse;
@@ -85,7 +83,7 @@ class ReservationServiceTest extends BaseServiceTest {
         @Test
         @DisplayName("성공한다.")
         void success() {
-            BDDMockito.doReturn(new PaymentApiResponse("DONE", "123"))
+            BDDMockito.doReturn(new PaymentConfirmApiResponse("DONE"))
                     .when(paymentClient).confirmPayment(any());
 
             LocalDateTime currentDateTime = LocalDateTime.of(2024, 4, 8, 10, 0);
