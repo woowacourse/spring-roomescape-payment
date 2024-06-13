@@ -1,6 +1,6 @@
 spring:
   thymeleaf:
-    prefix: file:src/main/resources/templates/
+    prefix: classpath:/templates/
     suffix: .html
   h2:
     console:
