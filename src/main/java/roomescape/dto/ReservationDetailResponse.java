@@ -8,6 +8,7 @@ import roomescape.entity.Reservation;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Arrays;
 
 @Schema(description = "예약 응답 DTO 입니다.")
 public record ReservationDetailResponse(
@@ -29,19 +30,22 @@ public record ReservationDetailResponse(
 
     public static ReservationDetailResponse from(Waiting waiting) {
         Reservation reservation = waiting.getReservation();
-        return toReservationDetailResponse(reservation, String.format(getStatusName(reservation.getStatus()), waiting.getRank()));
+        String statusName = ReservationStatusName.findByReservationStatus(reservation.getStatus());
+        return toReservationDetailResponse(reservation, String.format(statusName, waiting.getRank()));
     }
 
     public static ReservationDetailResponse of(Reservation reservation, Payment payment) {
+        String statusName = ReservationStatusName.findByReservationStatus(reservation.getStatus());
+
         if (reservation.isWaitingForPaymentStatus()) {
-            return toReservationDetailResponse(reservation, getStatusName(reservation.getStatus()));
+            return toReservationDetailResponse(reservation, statusName);
         }
         return new ReservationDetailResponse(
                 reservation.getId(),
                 reservation.getTheme().getName(),
                 reservation.getDate(),
                 reservation.getReservationTime().getStartAt(),
-                getStatusName(reservation.getStatus()),
+                statusName,
                 payment.getPaymentKey(),
                 payment.getTotalAmount());
     }
@@ -57,11 +61,29 @@ public record ReservationDetailResponse(
                 null);
     }
 
-    private static String getStatusName(ReservationStatus status) {
-        return switch (status) {
-            case BOOKED -> "예약";
-            case WAITING -> "%d번째 예약대기";
-            case WAITING_FOR_PAYMENT -> "결제 대기";
-        };
+    private enum ReservationStatusName {
+        BOOKED("예약", ReservationStatus.BOOKED),
+        WAITING("%d번째 예약대기", ReservationStatus.WAITING),
+        WAITING_FOR_PAYMENT("결제 대기", ReservationStatus.WAITING_FOR_PAYMENT);
+
+        private final String statusName;
+        private final ReservationStatus status;
+
+        ReservationStatusName(String statusName, ReservationStatus status) {
+            this.statusName = statusName;
+            this.status = status;
+        }
+
+        public static String findByReservationStatus(ReservationStatus status) {
+            return Arrays.stream(values())
+                    .filter(it -> it.isStatusMatch(status))
+                    .findFirst()
+                    .map(it -> it.statusName)
+                    .orElseThrow(() -> new IllegalArgumentException("일치하는 상태명을 찾을 수 없습니다."));
+        }
+
+        private boolean isStatusMatch(ReservationStatus status) {
+            return this.status == status;
+        }
     }
 }
