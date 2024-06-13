@@ -1,5 +1,7 @@
 package roomescape.core.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +19,7 @@ import roomescape.core.dto.member.MemberResponse;
 import roomescape.core.service.CookieService;
 import roomescape.core.service.MemberService;
 
+@Tag(name = "회원 관리 API")
 @Controller
 public class MemberController {
     private final MemberService memberService;
@@ -41,6 +44,12 @@ public class MemberController {
         return "login";
     }
 
+    @GetMapping("/signup")
+    public String signup() {
+        return "signup";
+    }
+
+    @Operation(summary = "로그인 요청", description = "로그인에 성공하면 토큰을 쿠키에 반환합니다.")
     @PostMapping("/login")
     public ResponseEntity<Void> loginProcess(@RequestBody final TokenRequest request,
                                              final HttpServletResponse response) {
@@ -51,6 +60,7 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "로그인 확인", description = "로그인 API 실행이 선행되어야 합니다.")
     @GetMapping("/login/check")
     public ResponseEntity<MemberResponse> checkLogin(final HttpServletRequest request) {
         final Cookie[] cookies = request.getCookies();
@@ -60,6 +70,7 @@ public class MemberController {
         return ResponseEntity.ok().body(response);
     }
 
+    @Operation(summary = "로그아웃", description = "로그인 API 실행이 선행되어야 합니다.")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(final HttpServletResponse response) {
         final Cookie cookie = cookieService.createEmptyCookie();
@@ -68,11 +79,7 @@ public class MemberController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/signup")
-    public String signup() {
-        return "signup";
-    }
-
+    @Operation(summary = "회원가입")
     @PostMapping("/members")
     public ResponseEntity<MemberResponse> signupProcess(@RequestBody final MemberRequest request) {
         final MemberResponse result = memberService.create(request);
@@ -81,6 +88,7 @@ public class MemberController {
                 .body(result);
     }
 
+    @Operation(summary = "모든 회원 조회")
     @GetMapping("/members")
     public ResponseEntity<List<MemberResponse>> findMembers() {
         final List<MemberResponse> memberResponses = memberService.findAll();

@@ -25,7 +25,7 @@ public class PaymentRefundClient {
 
     public void refundPayment(final PaymentResponse paymentResponse,
                               final PaymentAuthorizationResponse paymentAuthorizationResponse) {
-        String requestUrl = tossPaymentsProperties.getApi().getRefundUrlTemplate()
+        String requestUrl = tossPaymentsProperties.api().refundUrlTemplate()
                 .replace("{paymentKey}", paymentResponse.getPaymentKey());
 
         paymentRefundRestTemplate.postForEntity(

@@ -15,7 +15,7 @@ public class PaymentAuthorizationProvider {
 
     public String getAuthorization() {
         final Base64.Encoder encoder = Base64.getEncoder();
-        final byte[] encodedBytes = encoder.encode((tossPaymentsProperties.getWidgetSecretKey() + ":")
+        final byte[] encodedBytes = encoder.encode((tossPaymentsProperties.widgetSecretKey() + ":")
                 .getBytes(StandardCharsets.UTF_8));
 
         return "Basic " + new String(encodedBytes);

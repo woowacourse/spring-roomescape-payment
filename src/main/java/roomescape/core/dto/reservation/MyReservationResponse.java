@@ -1,30 +1,57 @@
 package roomescape.core.dto.reservation;
 
+import java.time.format.DateTimeFormatter;
+import roomescape.core.domain.Reservation;
+
 public class MyReservationResponse {
+    private static final String NONEXISTENT_PAYMENT_KEY = "NOT_PAID";
+    private static final long NONEXISTENT_PAYMENT_AMOUNT = 0L;
+
     private Long reservationId;
     private String theme;
     private String date;
     private String time;
     private String status;
+    private String paymentKey;
+    private Long amount;
 
     private MyReservationResponse(final Long reservationId, final String theme, final String date, final String time,
-                                  final String status) {
+                                  final String status, final String paymentKey, final Long amount) {
         this.reservationId = reservationId;
         this.theme = theme;
         this.date = date;
         this.time = time;
         this.status = status;
+        this.paymentKey = paymentKey;
+        this.amount = amount;
     }
 
-    public static MyReservationResponse ofReservationWaiting(final Long reservationId, final String theme,
-                                                             final String date, final String time,
-                                                             final String status, final Integer rank) {
-        return new MyReservationResponse(reservationId, theme, date, time, waitingRankStatus(status, rank));
+    public static MyReservationResponse ofReservationWaiting(final Reservation reservation,
+                                                             final Integer rank,
+                                                             final String paymentKey,
+                                                             final Long amount) {
+        return new MyReservationResponse(reservation.getId(), reservation.getTheme().getName(),
+                reservation.getDate().format(DateTimeFormatter.ISO_DATE),
+                reservation.getReservationTime().getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")),
+                waitingRankStatus(reservation.getStatus().getValue(), rank), paymentKey, amount);
     }
 
-    public static MyReservationResponse ofReservation(final Long reservationId, final String theme,
-                                                      final String date, final String time, final String status) {
-        return new MyReservationResponse(reservationId, theme, date, time, status);
+    public static MyReservationResponse ofReservationWaiting(final Reservation reservation,
+                                                             final Integer rank) {
+        return MyReservationResponse.ofReservationWaiting(reservation, rank, NONEXISTENT_PAYMENT_KEY,
+                NONEXISTENT_PAYMENT_AMOUNT);
+    }
+
+    public static MyReservationResponse ofReservation(final Reservation reservation,
+                                                      final String paymentKey, final Long amount) {
+        return new MyReservationResponse(reservation.getId(), reservation.getTheme().getName(),
+                reservation.getDate().format(DateTimeFormatter.ISO_DATE),
+                reservation.getReservationTime().getStartAt().format(DateTimeFormatter.ofPattern("HH:mm")),
+                reservation.getStatus().getValue(), paymentKey, amount);
+    }
+
+    public static MyReservationResponse ofReservation(final Reservation reservation) {
+        return MyReservationResponse.ofReservation(reservation, NONEXISTENT_PAYMENT_KEY, NONEXISTENT_PAYMENT_AMOUNT);
     }
 
     private static String waitingRankStatus(final String status, final Integer rank) {
@@ -49,5 +76,13 @@ public class MyReservationResponse {
 
     public String getStatus() {
         return status;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public Long getAmount() {
+        return amount;
     }
 }

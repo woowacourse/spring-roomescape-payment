@@ -12,6 +12,7 @@ import roomescape.core.domain.Status;
 import roomescape.core.domain.Theme;
 import roomescape.core.dto.member.LoginMember;
 import roomescape.core.dto.payment.PaymentRequest;
+import roomescape.core.dto.payment.PaymentResponse;
 import roomescape.core.dto.reservation.AdminReservationRequest;
 import roomescape.core.dto.reservation.MemberReservationRequest;
 import roomescape.core.dto.reservation.MyReservationResponse;
@@ -129,20 +130,31 @@ public class ReservationService {
     }
 
     private MyReservationResponse getMyReservationResponse(final Reservation reservation) {
-        if (reservation.getStatus().equals(Status.BOOKED)) {
-            return MyReservationResponse.ofReservation(reservation.getId(), reservation.getTheme().getName(),
-                    reservation.getDateString(), reservation.getReservationTime().getStartAtString(),
-                    reservation.getStatus().getValue());
+        return paymentService.findByReservation(reservation)
+                .map(paymentResponse -> getMyReservationResponseWithPayment(reservation, paymentResponse))
+                .orElseGet(() -> getReservationResponseWithoutPayment(reservation));
+    }
+
+    private MyReservationResponse getMyReservationResponseWithPayment(final Reservation reservation,
+                                                                      final PaymentResponse paymentResponse) {
+        if (reservation.isBooked()) {
+            return MyReservationResponse.ofReservation(reservation, paymentResponse.getPaymentKey(),
+                    paymentResponse.getAmount());
         }
-        return MyReservationResponse.ofReservationWaiting(reservation.getId(),
-                reservation.getTheme().getName(),
-                reservation.getDateString(), reservation.getReservationTime().getStartAtString(),
-                reservation.getStatus().getValue(), findRankByCreateAt(reservation));
+        return MyReservationResponse.ofReservationWaiting(reservation, findRankByCreateAt(reservation),
+                paymentResponse.getPaymentKey(), paymentResponse.getAmount());
     }
 
     private Integer findRankByCreateAt(final Reservation reservation) {
         return reservationRepository.countByCreateAtRank(reservation.getDate(), reservation.getReservationTime(),
                 reservation.getTheme(), reservation.getCreateAt());
+    }
+
+    private MyReservationResponse getReservationResponseWithoutPayment(Reservation reservation) {
+        if (reservation.isBooked()) {
+            return MyReservationResponse.ofReservation(reservation);
+        }
+        return MyReservationResponse.ofReservationWaiting(reservation, findRankByCreateAt(reservation));
     }
 
     @Transactional

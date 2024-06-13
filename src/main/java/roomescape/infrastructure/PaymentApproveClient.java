@@ -24,7 +24,7 @@ public class PaymentApproveClient {
     public ResponseEntity<Void> approvePayment(final PaymentRequest paymentRequest,
                                                final PaymentAuthorizationResponse paymentAuthorizationResponse) {
         return paymentApproveRestTemplate.postForEntity(
-                tossPaymentsProperties.getApi().getConfirmUrl(),
+                tossPaymentsProperties.api().confirmUrl(),
                 new HttpEntity<>(paymentRequest, getHttpHeaders(paymentAuthorizationResponse)),
                 Void.class);
     }
