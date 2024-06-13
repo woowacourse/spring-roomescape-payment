@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.exception.InvalidReservationException;
@@ -14,6 +15,7 @@ import roomescape.exception.TossPaymentException;
 import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
+import roomescape.service.reservation.dto.WaitingPaymentRequest;
 
 class ReservationCommandServiceTest extends ReservationServiceTest {
 
@@ -113,5 +115,23 @@ class ReservationCommandServiceTest extends ReservationServiceTest {
         assertThatThrownBy(() -> reservationCreateService.createAdminReservation(adminReservationRequest))
             .isInstanceOf(InvalidReservationException.class)
             .hasMessage("더이상 존재하지 않는 테마입니다.");
+    }
+
+    @DisplayName("결제가 실패하면 예약 대기는 예약으로 변경되지 않는다.")
+    @Test
+    @Sql({"/truncate.sql", "/theme.sql", "/time.sql", "/reservation-detail.sql", "/member.sql", "/reservation.sql"})
+    void cannotCreateReservationWhenPaymentFails() {
+        //given
+        long memberId = 3L;
+        WaitingPaymentRequest waitingPaymentRequest = new WaitingPaymentRequest(5L, "failPaymentKey", "testOrderId", 1000L);
+
+        //when & then
+        assertAll(
+            () -> assertThatThrownBy(() -> {
+                reservationCreateService.createMemberReservationWithWaitingPayment(waitingPaymentRequest, memberId);
+            })
+                .isInstanceOf(TossPaymentException.class),
+            () -> assertThat(reservationRepository.findAllByStatus(ReservationStatus.RESERVED)).hasSize(4)
+        );
     }
 }
