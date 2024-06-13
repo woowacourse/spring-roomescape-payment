@@ -1,0 +1,37 @@
+spring:
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:database
+    username: sa
+    password:
+
+
+
+security:
+  jwt:
+    token:
+      secret-key: daijawligagaf@LIJ$@U)9nagnalkkgalijaddljfi
+      access:
+        expire-length: 1800000 # 30 분
+      refresh:
+        expire-length: 604800000 # 7일
+
+payment:
+  url:
+    toss:
+      base: https://api.tosspayments.com
+  widget:
+    confirm:
+      secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
