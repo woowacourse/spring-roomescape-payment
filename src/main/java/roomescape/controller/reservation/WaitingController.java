@@ -7,12 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import roomescape.controller.auth.AuthenticationPrincipal;
-import roomescape.dto.ErrorResponse;
 import roomescape.dto.auth.LoginMember;
 import roomescape.dto.reservation.ReservationDto;
 import roomescape.dto.reservation.ReservationResponse;
@@ -21,7 +16,7 @@ import roomescape.service.WaitingService;
 
 @RequestMapping("/waitings")
 @RestController
-public class WaitingController {
+public class WaitingController implements WaitingControllerDocs {
 
     private final WaitingService waitingService;
 
@@ -29,13 +24,6 @@ public class WaitingController {
         this.waitingService = waitingService;
     }
 
-    @Operation(summary = "예약 대기 생성")
-    @ApiResponse(responseCode = "201", description = "예약 대기 생성 성공")
-    @ApiResponse(
-            responseCode = "404",
-            description = "예약 대기 생성 실패 - 존재하지 않는 id",
-            content = @Content(schema = @Schema(implementation = ErrorResponse.class))
-    )
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservationWaiting(
             @AuthenticationPrincipal final LoginMember loginMember,

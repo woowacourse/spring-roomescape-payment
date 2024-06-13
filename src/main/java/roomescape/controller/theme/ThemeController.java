@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import roomescape.domain.theme.Theme;
 import roomescape.dto.theme.ThemeResponse;
 import roomescape.dto.theme.ThemeSaveRequest;
@@ -21,7 +19,7 @@ import roomescape.service.ThemeService;
 
 @RestController
 @RequestMapping("/themes")
-public class ThemeController {
+public class ThemeController implements ThemeControllerDocs {
     private final ThemeService themeService;
 
     public ThemeController(final ThemeService themeService) {
@@ -39,8 +37,6 @@ public class ThemeController {
         return ResponseEntity.ok(themeService.findAll());
     }
 
-    @Operation(summary = "인기 테마 조회")
-    @ApiResponse(responseCode = "200", description = "인기 테마 조회 성공")
     @GetMapping("/popular")
     public ResponseEntity<List<ThemeResponse>> findAllPopular() {
         return ResponseEntity.ok(themeService.findPopularThemes());
