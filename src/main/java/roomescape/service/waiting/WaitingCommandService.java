@@ -44,6 +44,7 @@ public class WaitingCommandService {
         this.reservationDetailRepository = reservationDetailRepository;
     }
 
+    @Transactional
     public ReservationResponse createWaiting(WaitingRequest waitingRequest, long memberId) {
         ReservationDate reservationDate = ReservationDate.of(waitingRequest.date());
         ReservationTime reservationTime = findTimeById(waitingRequest.timeId());

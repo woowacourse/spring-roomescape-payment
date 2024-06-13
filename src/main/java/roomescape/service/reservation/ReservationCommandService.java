@@ -27,7 +27,6 @@ import roomescape.service.reservation.dto.ReservationResponse;
 import roomescape.service.reservation.dto.WaitingPaymentRequest;
 
 @Service
-@Transactional
 public class ReservationCommandService {
 
     private final ReservationRepository reservationRepository;
@@ -48,6 +47,7 @@ public class ReservationCommandService {
         this.paymentService = paymentService;
     }
 
+    @Transactional
     public ReservationResponse createAdminReservation(AdminReservationRequest adminReservationRequest) {
         Reservation reservation = createReservation(adminReservationRequest.timeId(), adminReservationRequest.themeId(),
             adminReservationRequest.memberId(), adminReservationRequest.date());
@@ -55,6 +55,7 @@ public class ReservationCommandService {
         return new ReservationResponse(reservation);
     }
 
+    @Transactional
     public ReservationResponse createMemberReservation(ReservationRequest reservationRequest, long memberId) {
         Reservation reservation = createReservation(reservationRequest.timeId(), reservationRequest.themeId(), memberId,
             reservationRequest.date());
@@ -103,6 +104,7 @@ public class ReservationCommandService {
         }
     }
 
+    @Transactional
     public ReservationResponse createMemberReservationWithWaitingPayment(WaitingPaymentRequest waitingPaymentRequest, long memberId) {
         Reservation reservation = reservationRepository.findById(waitingPaymentRequest.reservationId())
             .orElseThrow(() -> new InvalidReservationException("존재하지 않는 예약 대기 입니다."));
