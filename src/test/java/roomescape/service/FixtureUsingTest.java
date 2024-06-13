@@ -11,10 +11,12 @@ import roomescape.domain.Email;
 import roomescape.domain.Member;
 import roomescape.domain.Name;
 import roomescape.domain.Password;
+import roomescape.domain.Payment;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Role;
 import roomescape.domain.Theme;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -32,6 +34,8 @@ public class FixtureUsingTest {
     protected ThemeRepository themeRepository;
     @Autowired
     protected MemberRepository memberRepository;
+    @Autowired
+    protected PaymentRepository paymentRepository;
 
     protected Member ADMIN = new Member(new Name("ADMIN"), Role.ADMIN, new Email("email@email.com"),
             new Password("password"));

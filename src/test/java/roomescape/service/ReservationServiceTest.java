@@ -9,6 +9,7 @@ import static roomescape.exception.RoomescapeExceptionType.NOT_FOUND_THEME;
 import static roomescape.exception.RoomescapeExceptionType.PAST_TIME_RESERVATION;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import roomescape.TestPaymentConfig;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
+import roomescape.domain.ReservationStatus;
 import roomescape.dto.LoginMemberRequest;
 import roomescape.dto.ReservationDetailResponse;
 import roomescape.dto.ReservationRequest;
@@ -99,14 +101,14 @@ class ReservationServiceTest extends FixtureUsingTest {
     @Test
     void findAllTest() {
         //given
-        reservationRepository.save(new Reservation(LocalDate.now().plusDays(1), reservationTime_10_0, theme1,
-                USER1));
-        reservationRepository.save(new Reservation(LocalDate.now().plusDays(2), reservationTime_10_0, theme1,
-                USER1));
-        reservationRepository.save(new Reservation(LocalDate.now().plusDays(3), reservationTime_10_0, theme1,
-                USER1));
-        reservationRepository.save(new Reservation(LocalDate.now().plusDays(4), reservationTime_10_0, theme1,
-                USER1));
+        reservationRepository.save(new Reservation(null, LocalDate.now().plusDays(1), reservationTime_10_0, theme1,
+                USER1, LocalDateTime.now(), ReservationStatus.BOOKED, null));
+        reservationRepository.save(new Reservation(null, LocalDate.now().plusDays(2), reservationTime_10_0, theme1,
+                USER1, LocalDateTime.now(), ReservationStatus.BOOKED, null));
+        reservationRepository.save(new Reservation(null, LocalDate.now().plusDays(3), reservationTime_10_0, theme1,
+                USER1, LocalDateTime.now(), ReservationStatus.BOOKED, null));
+        reservationRepository.save(new Reservation(null, LocalDate.now().plusDays(4), reservationTime_10_0, theme1,
+                USER1, LocalDateTime.now(), ReservationStatus.BOOKED, null));
 
         //when
         List<ReservationResponse> reservationResponses = reservationService.findAll();
@@ -126,7 +128,8 @@ class ReservationServiceTest extends FixtureUsingTest {
 
         @BeforeEach
         void addDefaultReservation() {
-            defaultReservation = new Reservation(defaultDate, reservationTime_10_0, theme1, USER1);
+            defaultReservation = new Reservation(null, defaultDate, reservationTime_10_0, theme1, USER1,
+                    LocalDateTime.now(), ReservationStatus.BOOKED, null);
             defaultReservation = reservationRepository.save(defaultReservation);
         }
 
@@ -210,13 +213,17 @@ class ReservationServiceTest extends FixtureUsingTest {
                         waitingReservation.theme().name(),
                         waitingReservation.date(),
                         waitingReservation.time().startAt(),
-                        "1번째 예약대기"
+                        "1번째 예약대기",
+                        null,
+                        null
                 ), new ReservationDetailResponse(
                         bookedReservation.id(),
                         bookedReservation.theme().name(),
                         bookedReservation.date(),
                         bookedReservation.time().startAt(),
-                        "예약"
+                        "결제 대기",
+                        null,
+                        null
                 )
         );
     }

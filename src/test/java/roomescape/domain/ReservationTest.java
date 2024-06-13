@@ -9,6 +9,7 @@ import static roomescape.exception.RoomescapeExceptionType.EMPTY_THEME;
 import static roomescape.exception.RoomescapeExceptionType.EMPTY_TIME;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -26,35 +27,40 @@ class ReservationTest {
     @Test
     void constructTest() {
         assertAll(
-                () -> assertThatThrownBy(() -> new Reservation(DEFAULT_DATE, DEFAULT_TIME, DEFAULT_THEME, null))
+                () -> assertThatThrownBy(() -> new Reservation(null, DEFAULT_DATE, DEFAULT_TIME, DEFAULT_THEME, null,
+                        LocalDateTime.now(), ReservationStatus.BOOKED, null))
                         .isInstanceOf(RoomescapeException.class)
                         .hasMessage(EMPTY_MEMBER.getMessage()),
 
                 () -> assertThatThrownBy(
-                        () -> new Reservation(null, DEFAULT_TIME, DEFAULT_THEME, Fixture.defaultMember))
+                        () -> new Reservation(null, null, DEFAULT_TIME, DEFAULT_THEME, Fixture.defaultMember,
+                                LocalDateTime.now(), ReservationStatus.BOOKED, null))
                         .isInstanceOf(RoomescapeException.class)
                         .hasMessage(EMPTY_DATE.getMessage()),
 
                 () -> assertThatThrownBy(
-                        () -> new Reservation(DEFAULT_DATE, null, DEFAULT_THEME, Fixture.defaultMember))
+                        () -> new Reservation(null, DEFAULT_DATE, null, DEFAULT_THEME, Fixture.defaultMember,
+                                LocalDateTime.now(), ReservationStatus.BOOKED, null))
                         .isInstanceOf(RoomescapeException.class)
                         .hasMessage(EMPTY_TIME.getMessage()),
 
                 () -> assertThatThrownBy(
-                        () -> new Reservation(DEFAULT_DATE, DEFAULT_TIME, null, Fixture.defaultMember))
+                        () -> new Reservation(null, DEFAULT_DATE, DEFAULT_TIME, null, Fixture.defaultMember,
+                                LocalDateTime.now(), ReservationStatus.BOOKED, null))
                         .isInstanceOf(RoomescapeException.class)
                         .hasMessage(EMPTY_THEME.getMessage())
         );
-
     }
 
     @Test
     @DisplayName("날짜를 기준으로 비교를 잘 하는지 확인.")
     void compareTo() {
         Reservation first = new Reservation(1L, LocalDate.of(1999, 12, 1), new ReservationTime(
-                LocalTime.of(16, 30)), DEFAULT_THEME, Fixture.defaultMember);
+                LocalTime.of(16, 30)), DEFAULT_THEME, Fixture.defaultMember, LocalDateTime.now(),
+                ReservationStatus.BOOKED, null);
         Reservation second = new Reservation(2L, LocalDate.of(1998, 1, 8), new ReservationTime(
-                LocalTime.of(16, 30)), DEFAULT_THEME, Fixture.defaultMember);
+                LocalTime.of(16, 30)), DEFAULT_THEME, Fixture.defaultMember, LocalDateTime.now(),
+                ReservationStatus.BOOKED, null);
         int compareTo = first.compareTo(second);
         Assertions.assertThat(compareTo)
                 .isGreaterThan(0);
@@ -67,8 +73,10 @@ class ReservationTest {
         Theme theme = new Theme(1L, "name", "description", "thumbnail");
         ReservationTime time = new ReservationTime(1L, LocalTime.now());
 
-        Reservation savedReservation = new Reservation(1L, date, time, theme, Fixture.defaultMember);
-        Reservation nonSavedReservation = new Reservation(date, time, theme, Fixture.defaultMember);
+        Reservation savedReservation = new Reservation(1L, date, time, theme, Fixture.defaultMember,
+                LocalDateTime.now(), ReservationStatus.BOOKED, null);
+        Reservation nonSavedReservation = new Reservation(null, date, time, theme, Fixture.defaultMember,
+                LocalDateTime.now(), ReservationStatus.BOOKED, null);
 
         assertThat(savedReservation.isSameReservation(nonSavedReservation))
                 .isTrue();
@@ -90,10 +98,14 @@ class ReservationTest {
                 LocalDate.of(2024, 6, 20)
         );
         Reservation reservation = new Reservation(
+                null,
                 LocalDate.of(2024, 5, 5),
                 new ReservationTime(LocalTime.of(16, 30)),
                 new Theme("name", "description", "thumbnail"),
-                Fixture.defaultMember
+                Fixture.defaultMember,
+                LocalDateTime.now(),
+                ReservationStatus.BOOKED,
+                null
         );
 
         assertAll(

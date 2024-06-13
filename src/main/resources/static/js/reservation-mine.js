@@ -30,7 +30,7 @@ function render(data) {
     const cancelCell = row.insertCell(5);
     const cancelButton = document.createElement('button');
     cancelButton.className = 'btn btn-danger';
-    if (status !== '예약') {
+    if (status !== '결제 완료') {
       cancelButton.textContent = '대기 취소';
       cancelButton.onclick = function () {
         requestDeleteWaiting(id).then(() => window.location.reload());
@@ -40,6 +40,8 @@ function render(data) {
       cancelButton.onclick = function () {
         requestDeleteReservation(id).then(() => window.location.reload());
       };
+      row.insertCell(6).textContent = item.paymentKey;
+      row.insertCell(7).textContent = item.amount;
     }
     cancelCell.appendChild(cancelButton);
   });

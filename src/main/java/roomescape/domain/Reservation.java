@@ -13,11 +13,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
+import java.util.Optional;
+import org.aspectj.apache.bcel.generic.RET;
 import roomescape.exception.RoomescapeException;
+import roomescape.exception.RoomescapeExceptionType;
 
 @Entity
 public class Reservation implements Comparable<Reservation> {
@@ -38,33 +42,15 @@ public class Reservation implements Comparable<Reservation> {
     @Enumerated(value = EnumType.STRING)
     private ReservationStatus reservationStatus;
 
+    @OneToOne
+    private Payment payment;
+
     protected Reservation() {
 
     }
 
-    public Reservation(long id, Reservation reservationBeforeSave) {
-        this(id,
-                reservationBeforeSave.date,
-                reservationBeforeSave.time,
-                reservationBeforeSave.theme,
-                reservationBeforeSave.member);
-    }
-
-    public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member) {
-        this(null, date, time, theme, member);
-    }
-
-    public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member) {
-        this(id, date, time, theme, member, LocalDateTime.now());
-    }
-
     public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member,
-                       LocalDateTime createdAt) {
-        this(id, date, time, theme, member, createdAt, ReservationStatus.WAITING);
-    }
-
-    public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member,
-                       LocalDateTime createdAt, ReservationStatus reservationStatus) {
+                       LocalDateTime createdAt, ReservationStatus reservationStatus, Payment payment) {
         validateDate(date);
         validateTime(time);
         validateTheme(theme);
@@ -76,6 +62,7 @@ public class Reservation implements Comparable<Reservation> {
         this.member = member;
         this.createdAt = createdAt;
         this.reservationStatus = reservationStatus;
+        this.payment = payment;
     }
 
     private void validateTheme(Theme theme) {
@@ -104,9 +91,13 @@ public class Reservation implements Comparable<Reservation> {
 
     public void book() {
         if (reservationStatus != ReservationStatus.WAITING) {
-            //todo 예외 처리
+            throw new RoomescapeException(RoomescapeExceptionType.ALREADY_BOOKED);
         }
         this.reservationStatus = ReservationStatus.BOOKED;
+    }
+
+    public void purchase(Payment payment) {
+        this.payment = payment;
     }
 
     public boolean isBefore(LocalDateTime base) {
@@ -185,6 +176,10 @@ public class Reservation implements Comparable<Reservation> {
         return reservationStatus;
     }
 
+    public Optional<Payment> getPayment() {
+        return Optional.ofNullable(payment);
+    }
+
     @Override
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
@@ -216,6 +211,23 @@ public class Reservation implements Comparable<Reservation> {
                 ", time=" + time +
                 ", theme=" + theme +
                 ", member=" + member +
+                ", createdAt=" + createdAt +
+                ", reservationStatus=" + reservationStatus +
+                ", payment=" + payment +
                 '}';
+    }
+
+    public Optional<String> getPaymentKey() {
+        if(payment == null) {
+            return Optional.empty();
+        }
+        return Optional.of(payment.getPaymentKey());
+    }
+
+    public Optional<Long> getAmount() {
+        if (payment == null) {
+            return Optional.empty();
+        }
+        return Optional.of(payment.getAmount());
     }
 }

@@ -14,7 +14,6 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,6 +30,7 @@ import roomescape.domain.Email;
 import roomescape.domain.Member;
 import roomescape.domain.Name;
 import roomescape.domain.Password;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationStatus;
 import roomescape.domain.ReservationTime;
@@ -38,6 +38,7 @@ import roomescape.domain.Role;
 import roomescape.domain.Theme;
 import roomescape.dto.ReservationResponse;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -61,6 +62,8 @@ public class ReservationControllerTest {
     private ThemeRepository themeRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     private Theme defaultTheme1 = new Theme("theme1", "description", "thumbnail");
     private Theme defaultTheme2 = new Theme("theme2", "description", "thumbnail");
@@ -78,6 +81,7 @@ public class ReservationControllerTest {
             new Email("admin@admin.com"),
             new Password("adminPassword")
     );
+    private Payment notPayed;
     private String token;
     private String othersToken;
     private String adminToken;
@@ -120,7 +124,8 @@ public class ReservationControllerTest {
                 defaultTheme1,
                 savedUser,
                 LocalDateTime.now(),
-                ReservationStatus.BOOKED
+                ReservationStatus.BOOKED,
+                notPayed
         );
 
         @BeforeEach
@@ -187,32 +192,6 @@ public class ReservationControllerTest {
                     .then().log().all()
                     .statusCode(200)
                     .body("size()", is(2));
-        }
-
-        @DisplayName("예약 생성시 결제를 실패하면 저장을 실패한다.")
-        @Test
-        @Disabled
-            //todo 결제 테스트 분리
-        void paymentFailTest() {
-            Map<String, Object> reservationParam = Map.of(
-                    "date", savedReservation.getDate().plusDays(1).toString(),
-                    "timeId", savedReservation.getReservationTime().getId(),
-                    "themeId", savedReservation.getTheme().getId());
-
-            RestAssured.given().log().all()
-                    .when()
-                    .cookie("token", token)
-                    .contentType(ContentType.JSON)
-                    .body(reservationParam)
-                    .post("/reservations")
-                    .then().log().all()
-                    .statusCode(400);
-
-            RestAssured.given().log().all()
-                    .when().get("/reservations")
-                    .then().log().all()
-                    .statusCode(200)
-                    .body("size()", is(1));
         }
 
         @DisplayName("예약이 이미 존재해도 예약을 추가로 생성할 수 있다. -> 예약 대기")
@@ -493,58 +472,68 @@ public class ReservationControllerTest {
         @BeforeEach
         void initData() {
             reservation1 = reservationRepository.save(
-                    new Reservation(LocalDate.now().minusDays(5), defaultTime, defaultTheme1,
-                            defaultMember));
+                    new Reservation(null, LocalDate.now().minusDays(5), defaultTime, defaultTheme1,
+                            defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
             reservation1_waiting1 = reservationRepository.save(new Reservation(
+                    null,
                     reservation1.getDate(),
                     reservation1.getReservationTime(),
                     reservation1.getTheme(),
-                    otherMember)
+                    otherMember,
+                    LocalDateTime.now(),
+                    ReservationStatus.WAITING, notPayed)
             );
             reservation2 = reservationRepository.save(
-                    new Reservation(LocalDate.now().minusDays(4), defaultTime, defaultTheme1,
-                            defaultMember));
+                    new Reservation(null, LocalDate.now().minusDays(4), defaultTime, defaultTheme1,
+                            defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
             reservation3 = reservationRepository.save(
-                    new Reservation(LocalDate.now().minusDays(3), defaultTime, defaultTheme1,
-                            defaultMember));
+                    new Reservation(null, LocalDate.now().minusDays(3), defaultTime, defaultTheme1,
+                            defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
             reservation4 = reservationRepository.save(
-                    new Reservation(LocalDate.now().minusDays(2), defaultTime, defaultTheme1,
-                            defaultMember));
-            reservation4_waiting1 = reservationRepository.save(new Reservation(
+                    new Reservation(null, LocalDate.now().minusDays(2), defaultTime, defaultTheme1,
+                            defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
+            reservation4_waiting1 = reservationRepository.save(new Reservation(null,
                     reservation4.getDate(),
                     reservation4.getReservationTime(),
                     reservation4.getTheme(),
-                    otherMember
+                    otherMember,
+                    LocalDateTime.now(),
+                    ReservationStatus.WAITING,
+                    notPayed
             ));
-            reservation4_waiting2 = reservationRepository.save(new Reservation(
+            reservation4_waiting2 = reservationRepository.save(new Reservation(null,
                     reservation4.getDate(),
                     reservation4.getReservationTime(),
                     reservation4.getTheme(),
-                    otherMember
+                    otherMember,
+                    LocalDateTime.now(),
+                    ReservationStatus.WAITING,
+                    notPayed
             ));
             reservation5 = reservationRepository.save(
-                    new Reservation(LocalDate.now().minusDays(1), defaultTime, defaultTheme1,
-                            defaultMember));
+                    new Reservation(null, LocalDate.now().minusDays(1), defaultTime, defaultTheme1,
+                            defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
 
             reservation6 = reservationRepository.save(
-                    new Reservation(LocalDate.now(), defaultTime, defaultTheme2, defaultMember));
+                    new Reservation(null, LocalDate.now(), defaultTime, defaultTheme2, defaultMember,
+                            LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
             reservation7 = reservationRepository.save(
-                    new Reservation(LocalDate.now().plusDays(1), defaultTime, defaultTheme2,
-                            defaultMember));
+                    new Reservation(null, LocalDate.now().plusDays(1), defaultTime, defaultTheme2,
+                            defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
             reservation8 = reservationRepository.save(
-                    new Reservation(LocalDate.now().plusDays(2), defaultTime, defaultTheme2,
-                            defaultMember));
+                    new Reservation(null, LocalDate.now().plusDays(2), defaultTime, defaultTheme2,
+                            defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
             reservation9 = reservationRepository.save(
-                    new Reservation(LocalDate.now().plusDays(3), defaultTime, defaultTheme2,
-                            defaultMember));
+                    new Reservation(null, LocalDate.now().plusDays(3), defaultTime, defaultTheme2,
+                            defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
             reservation10 = reservationRepository.save(
-                    new Reservation(LocalDate.now().plusDays(4), defaultTime, defaultTheme2,
-                            defaultMember));
-            reservation10_waiting1 = reservationRepository.save(new Reservation(
+                    new Reservation(null, LocalDate.now().plusDays(4), defaultTime, defaultTheme2,
+                            defaultMember, LocalDateTime.now(), ReservationStatus.BOOKED, notPayed));
+            reservation10_waiting1 = reservationRepository.save(new Reservation(null,
                     reservation10.getDate(),
                     reservation10.getReservationTime(),
                     reservation10.getTheme(),
-                    otherMember)
+                    otherMember, LocalDateTime.now(), ReservationStatus.WAITING, notPayed)
             );
 
             allReservation = List.of(

@@ -28,8 +28,8 @@ async function fetchReservationPayment(paymentData) {
     paymentType: paymentData.paymentType,
   }
 
-  const reservationId = window.location.pathname.split('/')[3];
-  const reservationURL = "/payment/reservations/" + reservationId;
+  const reservationId = window.location.pathname.split('/')[2];
+  const reservationURL = "/payment/" + reservationId;
   fetch(reservationURL, {
     method: "POST",
     headers: {
@@ -43,10 +43,9 @@ async function fetchReservationPayment(paymentData) {
         window.alert(errorBody.message);
       });
     } else {
-      response.json().then(successBody => {
-        console.log("예약 결제 성공 : " + JSON.stringify(successBody));
-        window.location.reload();
-      });
+      console.log(response);
+      window.alert("예약 결제 성공");
+      window.location = '/';
     }
   }).catch(error => {
     console.error(error.message);

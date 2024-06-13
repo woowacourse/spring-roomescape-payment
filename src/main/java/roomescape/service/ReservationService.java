@@ -7,26 +7,27 @@ import static roomescape.exception.RoomescapeExceptionType.NOT_FOUND_RESERVATION
 import static roomescape.exception.RoomescapeExceptionType.NOT_FOUND_THEME;
 import static roomescape.exception.RoomescapeExceptionType.PAST_TIME_RESERVATION;
 
-import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
+import roomescape.domain.ReservationStatus;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.dto.AdminReservationRequest;
 import roomescape.dto.LoginMemberRequest;
-import roomescape.dto.PaymentRequest;
 import roomescape.dto.ReservationDetailResponse;
 import roomescape.dto.ReservationRequest;
 import roomescape.dto.ReservationResponse;
 import roomescape.exception.RoomescapeException;
+import roomescape.exception.RoomescapeExceptionType;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -39,18 +40,17 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
-    private final PaymentClient paymentClient;
+    private final PaymentRepository paymentRepository;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
-                              MemberRepository memberRepository,
-                              PaymentClient paymentClient) {
+                              MemberRepository memberRepository, PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
-        this.paymentClient = paymentClient;
+        this.paymentRepository = paymentRepository;
     }
 
     @Transactional
@@ -65,7 +65,7 @@ public class ReservationService {
 
         return saveReservation(
                 new Reservation(null, reservationRequest.date(), requestedTime, requestedTheme, requestedMember,
-                        LocalDateTime.now()));
+                        LocalDateTime.now(), ReservationStatus.WAITING, null));
     }
 
     public ReservationResponse saveByAdmin(AdminReservationRequest reservationRequest) {
@@ -78,7 +78,7 @@ public class ReservationService {
 
         return saveReservation(
                 new Reservation(null, reservationRequest.date(), requestedTime, requestedTheme, requestedMember,
-                        LocalDateTime.now()));
+                        LocalDateTime.now(), ReservationStatus.WAITING, null));
     }
 
     private ReservationResponse saveReservation(Reservation reservation) {
@@ -92,15 +92,11 @@ public class ReservationService {
         return ReservationResponse.from(savedReservation);
     }
 
-    //todo -> 트랜잭션 내부에 외부 API 호출이 존재
-    //todo -> 결제 대기 상태 X
     @Transactional
-    public void pay(long reservationId, PaymentRequest paymentRequest) {
-        Reservation requestedReservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_RESERVATION));
-        //todo -> 결제 메서드를 Reservation 내부로 이동 고려
-        paymentClient.pay(paymentRequest);
-        requestedReservation.book();
+    public void pay(long reservationId, Payment payment) {
+        reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_RESERVATION))
+                .purchase(payment);
     }
 
     public List<ReservationResponse> findAll() {
@@ -174,5 +170,13 @@ public class ReservationService {
         return reservationRepository.findAllRemainedWaiting(LocalDateTime.now()).stream()
                 .map(ReservationResponse::from)
                 .toList();
+    }
+
+    public void validateReservationsAuthority(long id, LoginMemberRequest loginMemberRequest) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new RoomescapeException(NOT_FOUND_RESERVATION));
+        if (!reservation.isMemberIdOf(loginMemberRequest.id())) {
+            throw new RoomescapeException(RoomescapeExceptionType.NOT_MEMBERS_RESERVATION);
+        }
     }
 }

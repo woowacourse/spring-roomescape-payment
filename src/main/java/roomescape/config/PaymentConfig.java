@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.api.TossPaymentClient;
-import roomescape.service.PaymentClient;
+import roomescape.domain.PaymentClient;
 
 @Configuration
 public class PaymentConfig {

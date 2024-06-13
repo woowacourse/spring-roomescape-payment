@@ -8,6 +8,7 @@ import static roomescape.exception.RoomescapeExceptionType.DUPLICATE_RESERVATION
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
@@ -23,11 +24,14 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.Fixture;
 import roomescape.domain.Member;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
+import roomescape.domain.ReservationStatus;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.dto.AvailableTimeResponse;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -47,6 +51,8 @@ public class ReservationTimeControllerTest {
     private ThemeRepository themeRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     private Theme defaultTheme = new Theme("theme1", "description", "thumbnail");
     private Member defaultMember = Fixture.defaultMember;
@@ -72,7 +78,8 @@ public class ReservationTimeControllerTest {
 
         LocalDate findDate = LocalDate.of(2024, 5, 4);
         reservationRepository.save(
-                new Reservation(findDate, usedReservationTime, theme, defaultMember));
+                new Reservation(null, findDate, usedReservationTime, theme, defaultMember, LocalDateTime.now(),
+                        ReservationStatus.BOOKED, null));
 
         //when
         List<AvailableTimeResponse> availableTimeResponses = RestAssured.given().log().all()
@@ -157,7 +164,8 @@ public class ReservationTimeControllerTest {
         @Test
         void deleteUsedTimeTest() {
             reservationRepository.save(
-                    new Reservation(LocalDate.now(), usedReservationTime, defaultTheme, defaultMember)
+                    new Reservation(null, LocalDate.now(), usedReservationTime, defaultTheme, defaultMember,
+                            LocalDateTime.now(), ReservationStatus.BOOKED, null)
             );
 
             RestAssured.given().log().all()
