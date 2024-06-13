@@ -46,7 +46,7 @@ public class ReservationService {
         this.paymentService = paymentService;
     }
 
-    private static void validateReservationDateAndTime(final ReservationDate date, final ReservationTime time) {
+    private static void validateReservationNotInPast(final ReservationDate date, final ReservationTime time) {
         final LocalDateTime reservationLocalDateTime = LocalDateTime.of(date.getValue(), time.getStartAt());
         if (reservationLocalDateTime.isBefore(LocalDateTime.now())) {
             throw new IllegalArgumentException("현재 날짜보다 이전 날짜를 예약할 수 없습니다.");
@@ -76,7 +76,7 @@ public class ReservationService {
                 .orElseThrow(() -> new NoSuchElementException("해당 id의 회원이 존재하지 않습니다."));
 
         final Reservation reservation = request.toReservation(reservationTime, theme, member);
-        validateReservationDateAndTime(reservation.getDate(), reservationTime);
+        validateReservationNotInPast(reservation.getDate(), reservationTime);
         validateReservationDuplication(reservation);
 
         Reservation result = reservationRepository.save(reservation);
