@@ -46,7 +46,7 @@ public class PaymentInfo {
             return false;
         }
         PaymentInfo that = (PaymentInfo) o;
-        return Objects.equals(paymentKey, that.paymentKey) && Objects.equals(orderId, that.orderId);
+        return Objects.equals(paymentKey, that.paymentKey);
     }
 
     @Override
