@@ -11,8 +11,7 @@ import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
-import roomescape.payment.PaymentClient;
-import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.PaymentService;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
@@ -37,18 +36,18 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
-    private final PaymentClient paymentClient;
+    private final PaymentService paymentService;
 
     public ReservationService(final ReservationRepository reservationRepository,
                               final ReservationTimeRepository reservationTimeRepository,
                               final ThemeRepository themeRepository,
                               final MemberRepository memberRepository,
-                              final PaymentClient paymentClient) {
+                              final PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
-        this.paymentClient = paymentClient;
+        this.paymentService = paymentService;
     }
 
     @Transactional(readOnly = true)
@@ -95,15 +94,14 @@ public class ReservationService {
         final Theme theme = themeRepository.fetchById(request.themeId());
         final Member member = memberRepository.fetchById(request.memberId());
         final LocalDate date = request.date();
-
-        final Reservation reservation = new Reservation(null, member, date, time, theme);
-
-        final LocalDateTime reservationDateTime = reservation.getDate().atTime(time.getStartAt());
-        validateBeforeDay(reservationDateTime);
         validateReservation(member, theme, time, date);
-        paymentClient.postPayment(new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()));
+        validateBeforeDay(date.atTime(time.getStartAt()));
+        final Reservation reservation = new Reservation(null, member, date, time, theme);
+        final Reservation savedReservation = reservationRepository.save(reservation);
 
-        return reservationRepository.save(reservation);
+        paymentService.savePayment(request, savedReservation);
+
+        return savedReservation;
     }
 
     private void validateReservation(final Member member, final Theme theme, final ReservationTime time, final LocalDate date) {
@@ -117,6 +115,7 @@ public class ReservationService {
     @Transactional
     public void deleteReservation(final long id) {
         final Reservation fetchReservation = reservationRepository.fetchById(id);
+        paymentService.deletePayment(id);
         reservationRepository.deleteById(fetchReservation.getId());
     }
 
@@ -132,6 +131,8 @@ public class ReservationService {
         if (!isWaitReservation) {
             throw new UserDeleteReservationException("유저는 예약 대기만 삭제 가능합니다.");
         }
+
+        paymentService.deletePayment(reservationId);
         reservationRepository.deleteById(reservation.getId());
     }
 

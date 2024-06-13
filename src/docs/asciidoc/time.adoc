@@ -1,0 +1,15 @@
+=== 예약 시간 생성
+
+operation::saveTime[snippets="http-request,request-cookies,request-fields,response-fields"]
+
+=== 예약 시간 조회
+
+operation::getTimes[snippets="http-request,http-response,response-fields"]
+
+=== 예약 시간 삭제
+
+operation::deleteTime[snippets="http-request,request-cookies"]
+
+=== 예약 시간 삭제 실패
+
+operation::deleteTimeFail[snippets="http-request,request-cookies"]

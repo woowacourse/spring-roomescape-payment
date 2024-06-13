@@ -68,16 +68,17 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             (r.id, r.theme.name, r.date, r.time.startAt,
                 (SELECT COUNT(r2) AS waiting_rank FROM Reservation r2
                 WHERE r.id >= r2.id AND r.time = r2.time AND r.date = r2.date AND r.theme = r2.theme
-                )
+                ), p.paymentKey, p.totalAmount
             )
             FROM Reservation r
+            JOIN FETCH Payment p on p.reservation.id = r.id
             WHERE r.member.id = :memberId
             """)
     List<ReservationRankResponse> findMyReservation(@Param("memberId") long memberId);
 
     @Query("""
             SELECT new roomescape.repository.dto.WaitingReservationResponse
-            (r.id, r.member.name, r.theme.name, r.date, r.time.startAt) from Reservation r
+            (r.id, r.member.name, r.theme.name, r.date, r.time.startAt) FROM Reservation r
             WHERE r.date >= :fromDate
             """)
     List<WaitingReservationResponse> findAllWaitFromDate(@Param("fromDate") LocalDate fromDate);

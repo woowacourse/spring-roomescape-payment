@@ -13,6 +13,9 @@ spring:
       ddl-auto: validate
     open-in-view: false
 
+server:
+  port: 80
+
 security:
   jwt:
     token:
@@ -24,6 +27,7 @@ security:
 payments:
   toss:
     host-name: https://api.tosspayments.com
-    payment-api: /v1/payments/confirm
+    create-payment-api: /v1/payments/confirm
+    cancel-payment-api: /v1/payments/{paymentKey}/cancel
     secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
     password: ":"

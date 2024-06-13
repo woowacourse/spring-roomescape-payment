@@ -17,13 +17,15 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.is;
+import static roomescape.controller.doc.DocumentFilter.GET_TIMES;
 
 class TimeControllerTest extends IntegrationTestSupport {
 
     @Test
     @DisplayName("타임 조회")
     void getTimes() {
-        RestAssured.given().log().all()
+        RestAssured.given(specification).log().all()
+                .filter(GET_TIMES.getValue())
                 .cookie("token", ADMIN_TOKEN)
                 .when().get("/times")
                 .then().log().all()

@@ -12,12 +12,17 @@ public class UserPageController {
 
     @GetMapping
     public String showPopularThemePage() {
-        return "/index";
+        return "index";
+    }
+
+    @GetMapping("/api-docs")
+    public String showApiDocsPage() {
+        return "docs/index";
     }
 
     @GetMapping("/reservation")
     public String showUserPage() {
-        return "/reservation";
+        return "reservation";
     }
 
     @GetMapping("/login")
@@ -25,7 +30,7 @@ public class UserPageController {
         if (loginMember != null) {
             return showPopularThemePage();
         }
-        return "/login";
+        return "login";
     }
 
     @PostMapping("/logout")
@@ -38,11 +43,11 @@ public class UserPageController {
 
     @GetMapping("/signup")
     public String signup() {
-        return "/signup";
+        return "signup";
     }
 
     @GetMapping("/reservation-mine")
     public String mine() {
-        return "/reservation-mine";
+        return "reservation-mine";
     }
 }

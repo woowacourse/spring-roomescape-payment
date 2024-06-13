@@ -6,11 +6,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.IntegrationTestSupport;
-import roomescape.controller.reservation.dto.CreateReservationRequest;
+import roomescape.controller.reservation.dto.CreateAdminReservationRequest;
 
 import java.time.LocalDate;
 
 import static org.hamcrest.CoreMatchers.is;
+import static roomescape.controller.doc.DocumentFilter.ADMIN_SAVE_RESERVATION;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class AdminReservationControllerTest extends IntegrationTestSupport {
@@ -48,10 +49,10 @@ class AdminReservationControllerTest extends IntegrationTestSupport {
     @Test
     @DisplayName("ADMIN이 예약 생성")
     void createReservationAdmin() {
-        final CreateReservationRequest request = new CreateReservationRequest(1L,
-                1L, LocalDate.now().plusDays(1), 1L, "tgen_20240529194618t4hG2", "MC4wMzc1NDM4Njg4NTE1", 1000L);
+        final CreateAdminReservationRequest request = new CreateAdminReservationRequest(1L, 1L, LocalDate.now().plusDays(1), 1L);
 
-        RestAssured.given().log().all()
+        RestAssured.given(specification).log().all()
+                .filter(ADMIN_SAVE_RESERVATION.getValue())
                 .cookie("token", ADMIN_TOKEN)
                 .contentType(ContentType.JSON)
                 .body(request)

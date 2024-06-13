@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.is;
+import static roomescape.controller.doc.DocumentFilter.GET_THEMES;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class ThemeControllerTest extends IntegrationTestSupport {
@@ -25,7 +26,8 @@ class ThemeControllerTest extends IntegrationTestSupport {
     @Test
     @DisplayName("테마 조회")
     void getThemes() {
-        RestAssured.given().log().all()
+        RestAssured.given(specification).log().all()
+                .filter(GET_THEMES.getValue())
                 .cookie("token", ADMIN_TOKEN)
                 .when().get("/themes")
                 .then().log().all()

@@ -1,0 +1,11 @@
+=== 회원가입 성공
+
+operation::signUp[snippets="http-request,request-fields,http-response"]
+
+=== 회원가입 실패
+
+operation::signUpFail[snippets="http-response"]
+
+=== 사용자 조회
+
+operation::getMembers[snippets="http-request,request-cookies,http-response,response-fields"]

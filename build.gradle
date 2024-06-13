@@ -1,7 +1,12 @@
 plugins {
     id 'org.springframework.boot' version '3.2.4'
     id 'io.spring.dependency-management' version '1.1.4'
+    id "org.asciidoctor.jvm.convert" version "3.3.2"
     id 'java'
+}
+
+configurations {
+    asciidoctorExt
 }
 
 group = 'nextstep'
@@ -21,13 +26,43 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt:0.9.1'
     implementation 'javax.xml.bind:jaxb-api:2.3.1'
     implementation group: 'org.apache.httpcomponents.client5', name: 'httpclient5', version: '5.3.1'
+    implementation 'com.google.code.findbugs:jsr305:3.0.2' // warning: unknown enum constant When.MAYBE 오류 해결
 
     runtimeOnly 'com.h2database:h2'
 
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.rest-assured:rest-assured:5.3.1'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-restassured'
+}
+
+ext {
+    snippetsDir = file('build/generated-snippets')
 }
 
 test {
+    outputs.dir snippetsDir
     useJUnitPlatform()
+}
+
+asciidoctor {
+    configurations 'asciidoctorExt'
+    baseDirFollowsSourceDir()
+    inputs.dir snippetsDir
+
+    dependsOn test
+}
+
+tasks.register('copyApiDocuments', Copy) {
+    doFirst {
+        delete file('src/main/resources/static/docs')
+    }
+    dependsOn asciidoctor
+    from file("build/docs/asciidoc")
+    into file("src/main/resources/static/docs")
+}
+
+bootJar {
+    dependsOn copyApiDocuments
 }

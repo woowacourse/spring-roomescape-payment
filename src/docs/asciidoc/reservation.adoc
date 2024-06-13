@@ -1,0 +1,15 @@
+=== 예약 조회
+
+operation::getReservations[snippets="http-request,request-cookies,http-response,response-fields"]
+
+=== 어드민이 예약 생성
+
+operation::adminSaveReservation[snippets="http-request,request-cookies,request-fields,http-response"]
+
+=== 유저가 예약 생성
+
+operation::userSaveReservation[snippets="http-request,request-cookies,http-response"]
+
+=== 자신의 예약 취소
+
+operation::deleteReservation[snippets="http-request,request-cookies,http-response"]

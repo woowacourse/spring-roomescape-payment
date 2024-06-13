@@ -3,7 +3,7 @@ package roomescape.payment.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record PaymentRequest(
+public record CreatePaymentRequest(
         @NotBlank
         String paymentKey,
 

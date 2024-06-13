@@ -10,10 +10,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.IntegrationTestSupport;
+import roomescape.controller.reservation.dto.CreateReservationRequest;
 import roomescape.controller.reservation.dto.MemberResponse;
 import roomescape.controller.reservation.dto.ReservationResponse;
 import roomescape.controller.theme.dto.ReservationThemeResponse;
 import roomescape.controller.time.dto.AvailabilityTimeResponse;
+import roomescape.domain.Reservation;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -23,6 +25,9 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static roomescape.controller.doc.DocumentFilter.USER_SAVE_RESERVATION;
 
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class ReservationControllerTest extends IntegrationTestSupport {
@@ -75,6 +80,23 @@ class ReservationControllerTest extends IntegrationTestSupport {
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(400);
+    }
+
+    @Test
+    @DisplayName("USER이 예약 생성")
+    void createReservationUser() {
+        final CreateReservationRequest request = new CreateReservationRequest(2L,
+                2L, LocalDate.now().plusDays(3), 1L, "tgen_20240529194618t4hG2", "MC4wMzc1NDM4Njg4NTE1", 1000L);
+        doNothing().when(paymentService).savePayment(any(CreateReservationRequest.class), any(Reservation.class));
+
+        RestAssured.given(specification).log().all()
+                .filter(USER_SAVE_RESERVATION.getValue())
+                .cookie("token", USER_TOKEN)
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(201);
     }
 
     @Test

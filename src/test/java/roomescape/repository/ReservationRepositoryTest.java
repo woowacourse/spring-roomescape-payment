@@ -119,20 +119,28 @@ class ReservationRepositoryTest {
         return Stream.of(
                 Arguments.of(1L,
                         List.of(
-                                new ReservationRankResponse(1L, "봄", date.minusDays(3), LocalTime.of(15, 0), 1),
-                                new ReservationRankResponse(3L, "여름", date.minusDays(1), LocalTime.of(16, 0), 1)
+                                new ReservationRankResponse(1L, "봄", date.minusDays(3), LocalTime.of(15, 0), 1,
+                                        "payment_key1", 1000),
+                                new ReservationRankResponse(3L, "여름", date.minusDays(1), LocalTime.of(16, 0), 1,
+                                        "payment_key3", 1000)
                         )),
                 Arguments.of(2L,
                         List.of(
-                                new ReservationRankResponse(2L, "여름", date.minusDays(2), LocalTime.of(17, 0), 1),
-                                new ReservationRankResponse(4L, "여름", date.minusDays(1), LocalTime.of(15, 0), 1),
-                                new ReservationRankResponse(7L, "가을", date.plusDays(4), LocalTime.of(18, 0), 1)
+                                new ReservationRankResponse(2L, "여름", date.minusDays(2), LocalTime.of(17, 0), 1,
+                                        "payment_key2", 1000),
+                                new ReservationRankResponse(4L, "여름", date.minusDays(1), LocalTime.of(15, 0), 1,
+                                        "payment_key4", 1000),
+                                new ReservationRankResponse(7L, "가을", date.plusDays(4), LocalTime.of(18, 0), 1,
+                                        "payment_key7", 1000)
                         )),
                 Arguments.of(3L,
                         List.of(
-                                new ReservationRankResponse(5L, "가을", date.minusDays(7), LocalTime.of(15, 0), 1),
-                                new ReservationRankResponse(6L, "가을", date.plusDays(3), LocalTime.of(18, 0), 1),
-                                new ReservationRankResponse(8L, "가을", date.plusDays(4), LocalTime.of(18, 0), 2)
+                                new ReservationRankResponse(5L, "가을", date.minusDays(7), LocalTime.of(15, 0), 1,
+                                        "payment_key5", 1000),
+                                new ReservationRankResponse(6L, "가을", date.plusDays(3), LocalTime.of(18, 0), 1,
+                                        "payment_key6", 1000),
+                                new ReservationRankResponse(8L, "가을", date.plusDays(4), LocalTime.of(18, 0), 2,
+                                        "payment_key8", 1000)
                         ))
         );
     }
