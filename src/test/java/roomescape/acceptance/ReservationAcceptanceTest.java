@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import roomescape.global.dto.ErrorResponse;
 import roomescape.member.domain.Member;
-import roomescape.payment.application.PaymentConfirmRequest;
+import roomescape.payment.application.ProductPayRequest;
 import roomescape.reservation.dto.request.ReservationPayRequest;
 import roomescape.reservation.dto.request.ReservationSaveRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
@@ -29,7 +29,7 @@ import static roomescape.TestFixture.ADMIN_EMAIL;
 import static roomescape.TestFixture.MIA_EMAIL;
 import static roomescape.TestFixture.MIA_NAME;
 import static roomescape.TestFixture.MIA_RESERVATION_DATE;
-import static roomescape.TestFixture.PAYMENT_CONFIRM_REQUEST;
+import static roomescape.TestFixture.PRODUCT_PAY_REQUEST;
 import static roomescape.TestFixture.TOMMY_EMAIL;
 import static roomescape.TestFixture.TOMMY_NAME;
 import static roomescape.TestFixture.TOMMY_RESERVATION_DATE;
@@ -47,7 +47,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         Long timeId = createTestReservationTime();
 
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, themeId);
-        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST());
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PRODUCT_PAY_REQUEST());
         Cookie cookie = new Cookie.Builder("token", token).build();
 
         // when
@@ -113,7 +113,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         createTestReservation(MIA_RESERVATION_DATE, timeId, themeId, token, BOOKING);
 
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, themeId);
-        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST());
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PRODUCT_PAY_REQUEST());
         Cookie cookie = new Cookie.Builder("token", token).build();
 
         // when
@@ -147,8 +147,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         // when
         for (int i = 0; i < threadCount; i++) {
             int threadIndex = i;
-            PaymentConfirmRequest paymentConfirmRequest = PAYMENT_CONFIRM_REQUEST("key" + threadIndex, "orderId" + threadIndex);
-            ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
+            ProductPayRequest productPayRequest = PRODUCT_PAY_REQUEST("key" + threadIndex, "orderId" + threadIndex);
+            ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, productPayRequest);
             new Thread(() -> RestAssured.given()
                     .contentType(ContentType.JSON)
                     .cookie(cookies.get(threadIndex))
@@ -287,7 +287,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         Long timeId = createTestReservationTime();
 
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(null, timeId, themeId);
-        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST());
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PRODUCT_PAY_REQUEST());
         Cookie cookie = new Cookie.Builder("token", token).build();
 
         // when
@@ -317,7 +317,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         Long themeId = createTestTheme();
 
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, notExistingTimeId, themeId);
-        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST());
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PRODUCT_PAY_REQUEST());
         Cookie cookie = new Cookie.Builder("token", token).build();
 
         // when

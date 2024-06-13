@@ -67,7 +67,7 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody @Valid ReservationPayRequest request,
                                                                  Member loginMember) {
         Reservation newReservation = toNewReservation(request.reservationSaveRequest(), loginMember, ReservationStatus.BOOKING);
-        Reservation createdReservation = bookingScheduler.create(newReservation, request.paymentConfirmRequest());
+        Reservation createdReservation = bookingScheduler.create(newReservation, request.productPayRequest());
         Reservation scheduledReservation = bookingScheduler.scheduleRecentReservation(createdReservation);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ReservationResponse.from(scheduledReservation));

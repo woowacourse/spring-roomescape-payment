@@ -1,7 +1,7 @@
 package roomescape.payment.pg;
 
 import roomescape.global.exception.ViolationException;
-import roomescape.payment.application.PaymentConfirmRequest;
+import roomescape.payment.application.ProductPayRequest;
 
 import java.math.BigDecimal;
 import java.util.regex.Matcher;
@@ -17,7 +17,7 @@ public class TossPaymentsConfirmRequest {
     private final String orderId;
     private final BigDecimal amount;
 
-    public TossPaymentsConfirmRequest(PaymentConfirmRequest request) {
+    public TossPaymentsConfirmRequest(ProductPayRequest request) {
         this(request.paymentKey(), request.orderId(), request.amount());
     }
 

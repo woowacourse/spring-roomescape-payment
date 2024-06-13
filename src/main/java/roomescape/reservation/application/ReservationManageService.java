@@ -3,8 +3,8 @@ package roomescape.reservation.application;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.ViolationException;
 import roomescape.member.domain.Member;
-import roomescape.payment.application.PaymentConfirmRequest;
 import roomescape.payment.application.PaymentService;
+import roomescape.payment.application.ProductPayRequest;
 import roomescape.payment.domain.PaymentProduct;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
@@ -33,9 +33,9 @@ public abstract class ReservationManageService {
     abstract protected void validatePermissionForDeleting(Reservation reservation, Member agent);
 
     @Transactional
-    public Reservation create(Reservation reservation, PaymentConfirmRequest paymentConfirmRequest) {
+    public Reservation create(Reservation reservation, ProductPayRequest productPayRequest) {
         Reservation createdReservation = create(reservation);
-        paymentService.confirm(paymentConfirmRequest, new PaymentProduct(createdReservation.getId()));
+        paymentService.pay(productPayRequest, new PaymentProduct(createdReservation.getId()));
         return createdReservation;
     }
 

@@ -7,8 +7,8 @@ import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
-import roomescape.payment.application.PaymentConfirmRequest;
 import roomescape.payment.application.PaymentService;
+import roomescape.payment.application.ProductPayRequest;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentProduct;
 import roomescape.reservation.application.BookingManageService;
@@ -65,8 +65,8 @@ class ReservationApiDocumentTest extends DocumentTest {
     @DisplayName("예약 생성 API")
     void createReservation() throws Exception {
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, 1L, 1L);
-        PaymentConfirmRequest paymentConfirmRequest = new PaymentConfirmRequest("key", "orderId", BigDecimal.valueOf(1000L), "none");
-        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
+        ProductPayRequest productPayRequest = new ProductPayRequest("key", "orderId", BigDecimal.valueOf(1000L), "none");
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, productPayRequest);
         ReservationTime expectedTime = new ReservationTime(1L, MIA_RESERVATION_TIME);
         Theme expectedTheme = WOOTECO_THEME(1L);
         Reservation expectedReservation = MIA_RESERVATION(1L, expectedTime, expectedTheme, USER_MIA(1L), BOOKING);
@@ -91,10 +91,10 @@ class ReservationApiDocumentTest extends DocumentTest {
                                         fieldWithPath("reservationSaveRequest.date").type(JsonFieldType.STRING).description("예약 시간(10분 단위) ex) 13:00"),
                                         fieldWithPath("reservationSaveRequest.timeId").type(JsonFieldType.NUMBER).description("예약 시간 식별자"),
                                         fieldWithPath("reservationSaveRequest.themeId").type(JsonFieldType.NUMBER).description("테마 식별자"),
-                                        fieldWithPath("paymentConfirmRequest.paymentKey").type(JsonFieldType.STRING).description("결제 식별자"),
-                                        fieldWithPath("paymentConfirmRequest.orderId").type(JsonFieldType.STRING).description("주문 식별자"),
-                                        fieldWithPath("paymentConfirmRequest.amount").type(JsonFieldType.NUMBER).description("결제 금액"),
-                                        fieldWithPath("paymentConfirmRequest.paymentType").type(JsonFieldType.STRING).description("결제 타입")
+                                        fieldWithPath("productPayRequest.paymentKey").type(JsonFieldType.STRING).description("결제 식별자"),
+                                        fieldWithPath("productPayRequest.orderId").type(JsonFieldType.STRING).description("주문 식별자"),
+                                        fieldWithPath("productPayRequest.amount").type(JsonFieldType.NUMBER).description("결제 금액"),
+                                        fieldWithPath("productPayRequest.paymentType").type(JsonFieldType.STRING).description("결제 타입")
                                 ),
                                 RESERVATION_RESPONSE_SINGLE_SNIPPETS()
                         )

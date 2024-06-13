@@ -14,6 +14,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
+import roomescape.TestFixture;
 import roomescape.auth.dto.request.LoginRequest;
 import roomescape.common.DatabaseCleaner;
 import roomescape.member.domain.Email;
@@ -36,7 +37,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static roomescape.TestFixture.ADMIN_EMAIL;
 import static roomescape.TestFixture.ADMIN_NAME;
 import static roomescape.TestFixture.MIA_RESERVATION_TIME;
-import static roomescape.TestFixture.PAYMENT_CONFIRM_REQUEST;
 import static roomescape.TestFixture.TEST_PASSWORD;
 import static roomescape.TestFixture.THEME_THUMBNAIL;
 import static roomescape.TestFixture.WOOTECO_THEME_DESCRIPTION;
@@ -45,7 +45,7 @@ import static roomescape.member.domain.Role.ADMIN;
 import static roomescape.member.domain.Role.USER;
 
 @ActiveProfiles(value = "test")
-@Import(TestClientConfiguration.class)
+@Import(TestPaymentConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class AcceptanceTest {
     @LocalServerPort
@@ -107,7 +107,7 @@ public abstract class AcceptanceTest {
     }
 
     protected Long createTestBooking(ReservationSaveRequest reservationSaveRequest, Cookie cookie) {
-        ReservationPayRequest reservationPayRequest = new ReservationPayRequest(reservationSaveRequest, PAYMENT_CONFIRM_REQUEST());
+        ReservationPayRequest reservationPayRequest = new ReservationPayRequest(reservationSaveRequest, TestFixture.PRODUCT_PAY_REQUEST());
         return RestAssured.given()
                 .contentType(ContentType.JSON)
                 .cookie(cookie)

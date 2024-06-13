@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import roomescape.global.exception.ViolationException;
-import roomescape.payment.application.PaymentConfirmRequest;
 import roomescape.payment.application.PaymentServerException;
+import roomescape.payment.application.ProductPayRequest;
 
 import java.math.BigDecimal;
 
@@ -46,7 +46,7 @@ class TossPaymentsClientTest {
         mockServer.expect(anything())
                 .andRespond(withBadRequest().body(expectedBody));
 
-        PaymentConfirmRequest paymentConfirmRequest = new PaymentConfirmRequest(
+        ProductPayRequest productPayRequest = new ProductPayRequest(
                 "paymentKey",
                 "orderId",
                 BigDecimal.valueOf(1000L),
@@ -54,7 +54,7 @@ class TossPaymentsClientTest {
         );
 
         // when & then
-        TossPaymentsConfirmRequest request = new TossPaymentsConfirmRequest(paymentConfirmRequest);
+        TossPaymentsConfirmRequest request = new TossPaymentsConfirmRequest(productPayRequest);
         assertThatThrownBy(() -> paymentsClient.confirm(request))
                 .isInstanceOf(ViolationException.class)
                 .hasMessage("잘못된 요청");
@@ -70,7 +70,7 @@ class TossPaymentsClientTest {
         mockServer.expect(anything())
                 .andRespond(withServerError().body(expectedBody));
 
-        PaymentConfirmRequest paymentConfirmRequest = new PaymentConfirmRequest(
+        ProductPayRequest productPayRequest = new ProductPayRequest(
                 "paymentKey",
                 "orderId",
                 BigDecimal.valueOf(1000L),
@@ -78,7 +78,7 @@ class TossPaymentsClientTest {
         );
 
         // when & then
-        TossPaymentsConfirmRequest request = new TossPaymentsConfirmRequest(paymentConfirmRequest);
+        TossPaymentsConfirmRequest request = new TossPaymentsConfirmRequest(productPayRequest);
         assertThatThrownBy(() -> paymentsClient.confirm(request))
                 .isInstanceOf(PaymentServerException.class)
                 .hasMessage("내부 서버 오류");

@@ -3,67 +3,41 @@ package roomescape.payment.application;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.common.ServiceTest;
-import roomescape.global.exception.ViolationException;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentProduct;
 import roomescape.payment.domain.PaymentRepository;
-import roomescape.payment.pg.TossPaymentsClient;
-import roomescape.payment.pg.TossPaymentsPayment;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 
 class PaymentServiceTest extends ServiceTest {
-    @MockBean
-    private TossPaymentsClient client;
-
     @Autowired
     private PaymentService paymentService;
 
     @Autowired
     private PaymentRepository paymentRepository;
 
-    @Test
-    @DisplayName("결제를 승인한다.")
-    void confirm() {
-        TossPaymentsPayment request = Mockito.mock(TossPaymentsPayment.class);
-        BDDMockito.when(request.verify(any()))
-                .thenReturn(true);
-        BDDMockito.when(client.findBy(any()))
-                .thenReturn(request);
-        PaymentConfirmRequest confirmRequest = createRequest("paymentKey");
-        PaymentProduct product = new PaymentProduct(1L);
-
-        paymentService.confirm(confirmRequest, product);
-
-        Optional<Payment> payment = paymentRepository.findById("paymentKey");
-
-        assertThat(payment).isNotEmpty();
-    }
+    @MockBean
+    private PaymentGateway paymentGateway;
 
     @Test
-    @DisplayName("승인 정보가 잘못된 경우, 결제를 승인할 수 없다.")
-    void noConfirm() {
-        TossPaymentsPayment request = Mockito.mock(TossPaymentsPayment.class);
-        BDDMockito.when(request.verify(any()))
-                .thenReturn(false);
-        BDDMockito.when(client.findBy(any()))
-                .thenReturn(request);
-        PaymentConfirmRequest confirmRequest = createRequest("paymentKey");
+    @DisplayName("신규 결제를 생성한다.")
+    void pay() {
         PaymentProduct product = new PaymentProduct(1L);
+        Payment givenPayment = createPayment("paymentKey", "orderId", product);
+        BDDMockito.when(paymentGateway.createPayment(any(), any()))
+                .thenReturn(givenPayment);
 
-        assertThatThrownBy(() -> paymentService.confirm(confirmRequest, product))
-                .isInstanceOf(ViolationException.class)
-                .hasMessage("올바른 결제 정보를 입력해주세요.");
+        paymentService.pay(createRequest("paymentKey"), product);
+
+        List<Payment> payments = paymentRepository.findAll();
+        assertThat(payments).hasSize(1);
     }
 
     @Test
@@ -89,8 +63,8 @@ class PaymentServiceTest extends ServiceTest {
         return new Payment(paymentKey, orderId, BigDecimal.valueOf(1000L), paymentProduct);
     }
 
-    private PaymentConfirmRequest createRequest(String paymentKey) {
-        return new PaymentConfirmRequest(
+    private ProductPayRequest createRequest(String paymentKey) {
+        return new ProductPayRequest(
                 paymentKey,
                 "orderId",
                 BigDecimal.valueOf(1000L),

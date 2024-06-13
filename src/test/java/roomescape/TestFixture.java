@@ -3,7 +3,9 @@ package roomescape;
 import roomescape.member.domain.Email;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Name;
-import roomescape.payment.application.PaymentConfirmRequest;
+import roomescape.payment.application.ProductPayRequest;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentProduct;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
@@ -97,11 +99,15 @@ public class TestFixture {
         return new Theme(id, HORROR_THEME_NAME, HORROR_THEME_DESCRIPTION, THEME_THUMBNAIL);
     }
 
-    public static PaymentConfirmRequest PAYMENT_CONFIRM_REQUEST() {
-        return new PaymentConfirmRequest("key", "orderId", BigDecimal.valueOf(1000L), "none");
+    public static ProductPayRequest PRODUCT_PAY_REQUEST() {
+        return new ProductPayRequest("key", "orderId", BigDecimal.valueOf(1000L), "none");
     }
 
-    public static PaymentConfirmRequest PAYMENT_CONFIRM_REQUEST(String key, String orderId) {
-        return new PaymentConfirmRequest(key, orderId, BigDecimal.valueOf(1000L), "none");
+    public static ProductPayRequest PRODUCT_PAY_REQUEST(String key, String orderId) {
+        return new ProductPayRequest(key, orderId, BigDecimal.valueOf(1000L), "none");
+    }
+
+    public static Payment SIMPLE_PAYMENT(String paymentKey, String orderId, PaymentProduct paymentProduct) {
+        return new Payment(paymentKey, orderId, BigDecimal.valueOf(1000L), paymentProduct);
     }
 }
