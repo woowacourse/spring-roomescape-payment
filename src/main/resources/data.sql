@@ -17,15 +17,15 @@ VALUES ('스티치', 'lxxjn0@test.com', '123', 'MEMBER'),
 
 
 INSERT INTO reservation(member_id, date, time_id, theme_id, status, created_at)
-VALUES (1, TIMESTAMPADD(DAY, -1, NOW()), '1', '1', 'RESERVED', TIMESTAMPADD(DAY, -3, NOW())),
-       (2, TIMESTAMPADD(DAY, -1, NOW()), '2', '1', 'RESERVED', TIMESTAMPADD(DAY, -3, NOW())),
-       (1, TIMESTAMPADD(DAY, -1, NOW()), '3', '1', 'RESERVED', TIMESTAMPADD(DAY, -3, NOW())),
-       (3, TIMESTAMPADD(DAY, -2, NOW()), '1', '2', 'RESERVED', TIMESTAMPADD(DAY, -3, NOW())),
-       (2, TIMESTAMPADD(DAY, -2, NOW()), '2', '2', 'RESERVED', TIMESTAMPADD(DAY, -3, NOW()));
+VALUES (1, TIMESTAMPADD(DAY, 1, NOW()), 1, 1, 'RESERVED', TIMESTAMPADD(DAY, 1, NOW())),
+       (2, TIMESTAMPADD(DAY, 1, NOW()), 2, 1, 'RESERVED', TIMESTAMPADD(DAY, 1, NOW())),
+       (1, TIMESTAMPADD(DAY, 1, NOW()), 3, 1, 'RESERVED', TIMESTAMPADD(DAY, 1, NOW())),
+       (3, TIMESTAMPADD(DAY, 1, NOW()), 1, 2, 'RESERVED', TIMESTAMPADD(DAY, 1, NOW())),
+       (2, TIMESTAMPADD(DAY, 1, NOW()), 2, 2, 'RESERVED', TIMESTAMPADD(DAY, 1, NOW()));
 
-INSERT INTO payment(reservation_id, payment_key, order_id, total_amount, requested_at)
-VALUES (1, 'payment_key1', 'order_id1', 10000, TIMESTAMPADD(DAY, -3, NOW())),
-       (2, 'payment_key2', 'order_id2', 10000, TIMESTAMPADD(DAY, -3, NOW())),
-       (3, 'payment_key3', 'order_id3', 10000, TIMESTAMPADD(DAY, -3, NOW())),
-       (4, 'payment_key4', 'order_id4', 10000, TIMESTAMPADD(DAY, -3, NOW())),
-       (5, 'payment_key5', 'order_id5', 10000, TIMESTAMPADD(DAY, -3, NOW()));
+INSERT INTO payment(reservation_id, payment_key, order_id, order_name, total_amount, requested_at)
+VALUES (1, 'payment_key1', 'order_id1', '테마1 결제', 10000, TIMESTAMPADD(DAY, -3, NOW())),
+       (2, 'payment_key2', 'order_id2', '테마1 결제', 10000, TIMESTAMPADD(DAY, -3, NOW())),
+       (3, 'payment_key3', 'order_id3', '테마1 결제', 10000, TIMESTAMPADD(DAY, -3, NOW())),
+       (4, 'payment_key4', 'order_id4', '테마2 결제', 10000, TIMESTAMPADD(DAY, -3, NOW())),
+       (5, 'payment_key5', 'order_id5', '테마2 결제', 10000, TIMESTAMPADD(DAY, -3, NOW()));
