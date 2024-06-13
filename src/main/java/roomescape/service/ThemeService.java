@@ -19,7 +19,7 @@ import roomescape.service.dto.response.ThemeResponse;
 import roomescape.service.dto.response.ThemeResponses;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class ThemeService {
     private final ThemeRepository themeRepository;
     private final ReservationRepository reservationRepository;
@@ -29,6 +29,7 @@ public class ThemeService {
         this.reservationRepository = reservationRepository;
     }
 
+    @Transactional
     public ThemeResponse saveTheme(ThemeSaveRequest themeSaveRequest) {
         Theme theme = themeSaveRequest.toTheme();
         Theme savedTheme = themeRepository.save(theme);
@@ -69,6 +70,7 @@ public class ThemeService {
                 .toList();
     }
 
+    @Transactional
     public void deleteTheme(Long id) {
         Theme foundTheme = themeRepository.findById(id)
                 .orElseThrow(() -> new RoomEscapeBusinessException("존재하지 않는 테마입니다."));

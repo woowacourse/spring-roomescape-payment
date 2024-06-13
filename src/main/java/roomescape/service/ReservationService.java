@@ -29,7 +29,7 @@ import roomescape.service.dto.response.ReservationResponses;
 import roomescape.service.dto.response.UserReservationResponse;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class ReservationService {
 
     private final PaymentService paymentService;
@@ -55,6 +55,7 @@ public class ReservationService {
         this.timeRepository = timeRepository;
     }
 
+    @Transactional
     public ReservationResponse saveMemberReservation(LoginMember member, UserReservationSaveRequest userReservationSaveRequest){
         ReservationSaveRequest reservationSaveRequest = userReservationSaveRequest.toReservationSaveRequest(member.id());
         Reservation reservation = saveReservation(reservationSaveRequest);
@@ -64,6 +65,7 @@ public class ReservationService {
         return new ReservationResponse(reservation);
     }
 
+    @Transactional
     public ReservationResponse saveAdminReservation(ReservationSaveRequest reservationSaveRequest) {
         Reservation reservation = saveReservation(reservationSaveRequest);
         return new ReservationResponse(reservation);
@@ -81,6 +83,7 @@ public class ReservationService {
         }
     }
 
+    @Transactional
     public void deleteReservation(long id) {
         Reservation reservation = findReservation(id);
         List<Waiting> waitings = waitingRepository.findByReservationOrderById(reservation);
@@ -152,6 +155,7 @@ public class ReservationService {
                 .toList();
     }
 
+    @Transactional
     public Reservation createReservation(ReservationSaveRequest request) {
         ReservationSlot slot = new ReservationSlot(
                 request.date(),

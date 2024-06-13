@@ -1,6 +1,7 @@
 package roomescape.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
 import roomescape.repository.MemberRepository;
 import roomescape.exception.customexception.RoomEscapeBusinessException;
@@ -11,6 +12,7 @@ import roomescape.service.dto.response.MemberResponses;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class MemberService {
 
     private final MemberRepository memberRepository;
@@ -19,6 +21,7 @@ public class MemberService {
         this.memberRepository = memberRepository;
     }
 
+    @Transactional
     public MemberResponse join(MemberJoinRequest memberRequest) {
         Member member = memberRequest.toUserMember();
         if (memberRepository.existsByEmail(member.getEmail())) {
@@ -38,6 +41,7 @@ public class MemberService {
         return new MemberResponses(members);
     }
 
+    @Transactional
     public void withdraw(Long id) {
         Member foundMember = memberRepository.findById(id)
                 .orElseThrow(() -> new RoomEscapeBusinessException("회원이 존재하지 않습니다."));
