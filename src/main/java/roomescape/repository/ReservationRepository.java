@@ -8,14 +8,30 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.Status;
+import roomescape.exception.ErrorCode;
+import roomescape.exception.RoomEscapeException;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    @EntityGraph(attributePaths = {"member", "theme", "time"})
-    Optional<Reservation> findById(Long id);
+    default Reservation findByIdOrThrow(Long id) {
+        return findById(id).orElseThrow(() -> new RoomEscapeException(
+                ErrorCode.RESERVATION_NOT_FOUND_BY_ID,
+                "reservation_id = " + id
+        ));
+    }
+
+    default int findReservationOrder(Reservation reservation) {
+        return countByDateAndTimeIdAndThemeIdAndStatusAndIdLessThan(
+                reservation.getDate(),
+                reservation.getTime().getId(),
+                reservation.getTheme().getId(),
+                reservation.getStatus(),
+                reservation.getId()
+        ) + 1;
+    }
 
     @EntityGraph(attributePaths = {"member", "theme", "time"})
-    List<Reservation> findAll();
+    Optional<Reservation> findById(Long id);
 
     List<Reservation> findByMemberId(Long memberId);
 
@@ -29,11 +45,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             AND (:themeId IS NULL OR r.theme.id = :themeId)
             AND (:startDate IS NULL OR r.date >= :startDate)
             AND (:endDate IS NULL OR r.date <= :endDate)
+            AND (r.status = :status)
             """)
-    List<Reservation> findByMemberOrThemeOrDateRange(Long memberId, Long themeId, LocalDate startDate,
-                                                     LocalDate endDate);
+    List<Reservation> findByMemberOrThemeOrDateRangeAndStatus(Long memberId, Long themeId, LocalDate startDate, LocalDate endDate, Status status);
 
-    List<Reservation> findByDateAndTimeIdAndThemeIdAndStatus(LocalDate date, Long timeId, Long themeId, Status status);
+    List<Reservation> findByStatusEquals(Status status);
 
     @Query("""
               SELECT r.theme.id
@@ -45,13 +61,15 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             """)
     List<Long> findTopThemeIdsByReservationCountsForDate(LocalDate startDate, LocalDate endDate);
 
-    int countByDateAndTimeIdAndThemeIdAndStatus(LocalDate date, Long timeId, Long themeId, Status status);
+    int countByDateAndTimeIdAndThemeIdAndStatusAndIdLessThan(LocalDate date, Long timeId, Long themeId, Status status, Long id);
 
     boolean existsByTimeId(Long id);
 
     boolean existsByThemeId(Long id);
 
     boolean existsByDateAndTimeIdAndThemeId(LocalDate date, Long timeId, Long themeId);
+
+    boolean existsByDateAndTimeIdAndThemeIdAndStatus(LocalDate date, Long timeId, Long themeId, Status status);
 
     boolean existsByDateAndTimeIdAndThemeIdAndMemberId(LocalDate date, Long timeId, Long themeId, Long memberId);
 }

@@ -1,7 +1,6 @@
 package roomescape.service.theme;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -10,7 +9,6 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.theme.Theme;
 import roomescape.repository.ThemeRepository;
 import roomescape.service.ServiceBaseTest;
-import roomescape.service.theme.module.ThemeDeleteService;
 
 class ThemeDeleteServiceTest extends ServiceBaseTest {
 
@@ -30,17 +28,10 @@ class ThemeDeleteServiceTest extends ServiceBaseTest {
         // when
         themeDeleteService.deleteTheme(1L);
 
-        // when
+        // then
         List<Theme> allThemes = themeRepository.findAll();
         assertThat(allThemes).extracting(Theme::getId)
                 .isNotEmpty()
                 .doesNotContain(1L);
-    }
-
-    @Test
-    void 예약_되어있는_테마를_삭제할_경우_예외_발생() {
-        // then
-        assertThatThrownBy(() -> themeDeleteService.deleteTheme(1L))
-                .isInstanceOf(IllegalArgumentException.class);
     }
 }

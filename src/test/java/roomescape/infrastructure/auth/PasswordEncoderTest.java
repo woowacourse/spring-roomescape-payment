@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
 import roomescape.BaseTest;
+import roomescape.exception.RoomEscapeException;
 
 class PasswordEncoderTest extends BaseTest {
 
@@ -43,6 +44,6 @@ class PasswordEncoderTest extends BaseTest {
 
         //when, then
         assertThatThrownBy(() -> passwordEncoder.encode(rawPassword))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 }

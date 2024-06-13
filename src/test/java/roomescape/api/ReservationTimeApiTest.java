@@ -11,7 +11,7 @@ import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
-import roomescape.dto.reservationtime.ReservationTimeRequest;
+import roomescape.dto.time.ReservationTimeRequest;
 
 class ReservationTimeApiTest extends ApiBaseTest {
 

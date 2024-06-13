@@ -55,8 +55,20 @@ public class Reservation {
         status = Status.RESERVED;
     }
 
+    public void changeStatusToPaymentPending() {
+        status = Status.PAYMENT_PENDING;
+    }
+
     public boolean isReserved() {
         return status == Status.RESERVED;
+    }
+
+    public boolean isPaymentPending() {
+        return status == Status.PAYMENT_PENDING;
+    }
+
+    public boolean isWaiting() {
+        return status == Status.WAITING;
     }
 
     public Long getId() {

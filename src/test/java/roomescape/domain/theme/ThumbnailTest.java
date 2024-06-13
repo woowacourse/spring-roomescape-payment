@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
 import roomescape.BaseTest;
+import roomescape.exception.RoomEscapeException;
 
 class ThumbnailTest extends BaseTest {
 
@@ -14,6 +15,6 @@ class ThumbnailTest extends BaseTest {
 
         // when, then
         assertThatThrownBy(() -> new Thumbnail(thumbnail))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class);
     }
 }

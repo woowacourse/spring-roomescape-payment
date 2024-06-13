@@ -6,11 +6,13 @@ import static org.hamcrest.Matchers.is;
 import static roomescape.TestFixture.ADMIN_EMAIL;
 import static roomescape.TestFixture.ADMIN_PASSWORD;
 import static roomescape.TestFixture.USER_EMAIL;
+import static roomescape.TestFixture.USER_ID;
 import static roomescape.TestFixture.USER_PASSWORD;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Cookie;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -36,35 +38,6 @@ class ReservationApiTest extends ApiBaseTest {
     TossPaymentsClient tossPaymentsClient;
 
     @Test
-    void 사용자_예약_추가() {
-        Cookie cookieByUserLogin = getCookieByLogin(port, USER_EMAIL, USER_PASSWORD);
-        String userAccessToken = cookieByUserLogin.getValue();
-        String userId = jwtProvider.getSubject(userAccessToken);
-
-        UserReservationRequest userReservationRequest = createUserReservationRequest();
-
-        PaymentRequest paymentRequest = userReservationRequest.toPaymentRequest();
-        PaymentResponse paymentResponse = new PaymentResponse(paymentRequest.paymentKey(), paymentRequest.orderId());
-        Mockito.when(tossPaymentsClient.requestPayment(paymentRequest)).thenReturn(paymentResponse);
-
-        RestAssured
-                .given().log().all()
-                .port(port)
-                .contentType(ContentType.JSON)
-                .cookie(cookieByUserLogin)
-                .body(userReservationRequest)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(201)
-                .header("Location", "/reservations/33")
-                .body("id", equalTo(33))
-                .body("date", equalTo(userReservationRequest.date().toString()))
-                .body("time.id", equalTo(userReservationRequest.timeId().intValue()))
-                .body("theme.id", equalTo(userReservationRequest.themeId().intValue()))
-                .body("member.id", equalTo(Integer.parseInt(userId)));
-    }
-
-    @Test
     void 관리자_예약_추가() {
         Cookie cookieByAdminLogin = getCookieByLogin(port, ADMIN_EMAIL, ADMIN_PASSWORD);
         ReservationRequest reservationRequest = createReservationRequest();
@@ -78,8 +51,59 @@ class ReservationApiTest extends ApiBaseTest {
                 .when().post("/admin/reservations")
                 .then().log().all()
                 .statusCode(201)
-                .header("Location", "/reservations/33")
-                .body("id", equalTo(33))
+                .header("Location", "/reservations/34")
+                .body("id", equalTo(34))
+                .body("date", equalTo(reservationRequest.date().toString()))
+                .body("time.id", equalTo(reservationRequest.timeId().intValue()))
+                .body("theme.id", equalTo(reservationRequest.themeId().intValue()))
+                .body("member.id", equalTo(reservationRequest.memberId().intValue()));
+    }
+
+    @Test
+    void 사용자_예약_추가() {
+        Cookie cookieByUserLogin = getCookieByLogin(port, USER_EMAIL, USER_PASSWORD);
+        String userAccessToken = cookieByUserLogin.getValue();
+        String userId = jwtProvider.getSubject(userAccessToken);
+
+        UserReservationRequest userReservationRequest = createUserReservationRequest();
+
+        PaymentRequest paymentRequest = userReservationRequest.toPaymentRequest();
+        PaymentResponse paymentResponse = new PaymentResponse(paymentRequest.paymentKey(), paymentRequest.orderId(), paymentRequest.amount());
+        Mockito.when(tossPaymentsClient.requestPayment(paymentRequest)).thenReturn(paymentResponse);
+
+        RestAssured
+                .given().log().all()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .cookie(cookieByUserLogin)
+                .body(userReservationRequest)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(201)
+                .header("Location", "/reservations/34")
+                .body("id", equalTo(34))
+                .body("date", equalTo(userReservationRequest.date().toString()))
+                .body("time.id", equalTo(userReservationRequest.timeId().intValue()))
+                .body("theme.id", equalTo(userReservationRequest.themeId().intValue()))
+                .body("member.id", equalTo(Integer.parseInt(userId)));
+    }
+
+    @Test
+    void 사용자_예약_대기_추가() {
+        Cookie cookieByUserLogin = getCookieByLogin(port, USER_EMAIL, USER_PASSWORD);
+        ReservationRequest reservationRequest = createReservationRequest();
+
+        RestAssured
+                .given().log().all()
+                .port(port)
+                .contentType(ContentType.JSON)
+                .cookie(cookieByUserLogin)
+                .body(reservationRequest)
+                .when().post("/reservations/waiting")
+                .then().log().all()
+                .statusCode(201)
+                .header("Location", "/reservations/34")
+                .body("id", equalTo(34))
                 .body("date", equalTo(reservationRequest.date().toString()))
                 .body("time.id", equalTo(reservationRequest.timeId().intValue()))
                 .body("theme.id", equalTo(reservationRequest.themeId().intValue()))
@@ -102,14 +126,14 @@ class ReservationApiTest extends ApiBaseTest {
     }
 
     @Test
-    void 예약_전체_조회() {
+    void 확정된_예약_전체_조회() {
         RestAssured
                 .given().log().all()
                 .port(port)
                 .when().get("/reservations")
                 .then().log().all()
                 .statusCode(200)
-                .body("size()", is(32));
+                .body("size()", is(30));
     }
 
     @Test
@@ -120,18 +144,21 @@ class ReservationApiTest extends ApiBaseTest {
                 .given().log().all()
                 .port(port)
                 .cookie(cookieByUserLogin)
-                .when().get("/reservations-mine")
+                .when().get("/reservations/mine")
                 .then().log().all()
                 .statusCode(200)
-                .body("size()", is(29));
+                .body("size()", is(30));
     }
 
     @Test
     void 예약_조회시_조회필터_적용하여_조회() {
+        Cookie cookieByAdminLogin = getCookieByLogin(port, ADMIN_EMAIL, ADMIN_PASSWORD);
+
         RestAssured
                 .given().log().all()
                 .port(port)
-                .when().get("/reservations?member=2&theme=1")
+                .cookie(cookieByAdminLogin)
+                .when().get("/admin/reservations/search?member=2&theme=1&dateFrom=&dateTo=")
                 .then().log().all()
                 .statusCode(200)
                 .body("size()", is(8))
@@ -144,7 +171,7 @@ class ReservationApiTest extends ApiBaseTest {
         RestAssured
                 .given().log().all()
                 .port(port)
-                .when().delete("/reservations/1")
+                .when().delete("/reservations/32")
                 .then().log().all()
                 .statusCode(204);
     }
@@ -156,7 +183,7 @@ class ReservationApiTest extends ApiBaseTest {
                 1L,
                 "paymentKey",
                 "orderId",
-                1000,
+                BigDecimal.valueOf(1000),
                 "paymentType"
         );
     }
@@ -166,7 +193,7 @@ class ReservationApiTest extends ApiBaseTest {
                 LocalDate.now().plusDays(10),
                 1L,
                 1L,
-                2L
+                USER_ID
         );
     }
 }

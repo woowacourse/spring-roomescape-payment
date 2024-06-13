@@ -1,6 +1,9 @@
 package roomescape.domain.theme;
 
+import static roomescape.exception.ErrorCode.THEME_THUMBNAIL_LENGTH_ERROR;
+
 import jakarta.persistence.Embeddable;
+import roomescape.exception.RoomEscapeException;
 
 @Embeddable
 public class Thumbnail {
@@ -21,9 +24,9 @@ public class Thumbnail {
 
     private void validateThumbnail(String thumbnail) {
         if (thumbnail.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "[ERROR] 썸네일은 1자 이상 가능합니다.",
-                    new Throwable("theme_thumbnail : " + thumbnail)
+            throw new RoomEscapeException(
+                    THEME_THUMBNAIL_LENGTH_ERROR,
+                    "theme_thumbnail = " + thumbnail
             );
         }
     }

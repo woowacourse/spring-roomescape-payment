@@ -1,6 +1,9 @@
 package roomescape.domain.theme;
 
+import static roomescape.exception.ErrorCode.THEME_DESCRIPTION_LENGTH_ERROR;
+
 import jakarta.persistence.Embeddable;
+import roomescape.exception.RoomEscapeException;
 
 @Embeddable
 public class Description {
@@ -23,9 +26,9 @@ public class Description {
 
     private void validateDescription(String description) {
         if (description.length() < MIN_DESCRIPTION_LENGTH) {
-            throw new IllegalArgumentException(
-                    "[ERROR] 설명은 10글자 이상 입력해주세요.",
-                    new Throwable(" theme_description : " + description)
+            throw new RoomEscapeException(
+                    THEME_DESCRIPTION_LENGTH_ERROR,
+                    " theme_description = " + description
             );
         }
     }
