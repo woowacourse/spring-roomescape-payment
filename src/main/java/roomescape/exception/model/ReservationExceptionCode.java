@@ -13,7 +13,7 @@ public enum ReservationExceptionCode implements ExceptionCode {
     DATE_IS_NULL_EXCEPTION(HttpStatus.BAD_REQUEST, "필터링할 날짜 정보가 존재하지 않습니다."),
     SAME_RESERVATION_EXCEPTION(HttpStatus.BAD_REQUEST, "날짜, 시간, 테마가 같은 예약이 존재합니다."),
     RESERVATION_ALREADY_PAID_CAN_NOT_DELETE_EXCEPTION(HttpStatus.BAD_REQUEST, "이미 결제된 예약은 취소할 수 없습니다."),
-    ONLY_OWNER_CAN_DELETE(HttpStatus.BAD_REQUEST, "예약을 생성한 사람만 삭제할 수 있습니다.");
+    ONLY_OWNER_CAN_DELETE(HttpStatus.FORBIDDEN, "예약을 생성한 사람만 삭제할 수 있습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
