@@ -76,9 +76,29 @@ class ReservationTimeControllerTest extends IntegrationTest {
                 .header("Location", "/times/1");
     }
 
+    @DisplayName("이미 등록된 예약 시간을 저장하려하는 경우 실패한다.")
+    @Test
+    void failSaveWhenAlreadyHasDuplicatedStartAt() throws JsonProcessingException {
+        saveReservationTimeAsTen();
+        TimeSaveRequest timeSaveRequest = new TimeSaveRequest(LocalTime.parse("10:00"));
+
+        RestAssured.given(this.spec).log().all()
+                .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(timeSaveRequest))
+                .accept(ContentType.JSON)
+                .filter(document("/times/save/fail/already-saved"))
+                .when()
+                .post("/times")
+                .then().log().all()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
     @DisplayName("시간 삭제 성공시 204 응답을 받는다.")
     @Test
     void delete() {
+        saveReservationTimeAsTen();
+
         RestAssured.given(this.spec).log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .accept(ContentType.JSON)
@@ -87,5 +107,23 @@ class ReservationTimeControllerTest extends IntegrationTest {
                 .delete("/times/{id}", 1L)
                 .then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("삭제하려는 예약 시간에 예약된 방탈출 예약이 있는 경우 삭제에 실패한다.")
+    @Test
+    void failDeleteWhenAlreadyReservedInReservationTime() {
+        saveReservationTimeAsTen();
+        saveThemeAsHorror();
+        saveMemberAsKaki();
+        saveSuccessReservationAsDateNow();
+
+        RestAssured.given(this.spec).log().all()
+                .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
+                .accept(ContentType.JSON)
+                .filter(document("/times/delete/fail/already-reserved"))
+                .when()
+                .delete("/times/{id}", 1L)
+                .then().log().all()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 }

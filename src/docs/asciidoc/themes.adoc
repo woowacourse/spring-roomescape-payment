@@ -1,20 +1,38 @@
 [[Theme]]
 = 3. 테마
 
-== 3.1 테마 API
+== 3.1 테마 전체 조회
 
-=== 테마 전체 조회
+=== 성공
 
 operation::themes/findAll[snippets='http-request,http-response']
 
-=== 인기 있는 테마 조회
+== 3.2 인기 있는 테마 조회
+
+=== 성공
 
 operation::themes/popular[snippets='http-request,http-response']
 
-=== 테마 저장
+== 3.3 테마 저장
+
+=== 성공
 
 operation::themes/save[snippets='http-request,http-response']
 
-=== 테마 삭제
+=== 실패
+
+==== 이미 존재하는 테마 이름인 경우
+
+operation::themes/save/fail/duplicated[snippets='http-request,http-response']
+
+== 3.4 테마 삭제
+
+=== 성공
 
 operation::themes/delete[snippets='http-request,http-response']
+
+=== 실패
+
+==== 삭제하려는 테마에 예약된 방탈출 예약이 있는 경우
+
+operation::themes/delete/fail/already-reserved[snippets='http-request,http-response']

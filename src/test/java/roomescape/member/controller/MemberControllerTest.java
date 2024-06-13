@@ -28,6 +28,22 @@ class MemberControllerTest extends IntegrationTest {
                 .header("Location", "/members/1");
     }
 
+    @DisplayName("중복된 이메일이 존재하는 경우 회원가입에 실패한다.")
+    @Test
+    void failSignupWhenAlreadyHasDuplicatedEmail() {
+        saveMemberAsKaki();
+        MemberSignUpRequest memberSignUpRequest = new MemberSignUpRequest("카키", "kaki@email.com", "1234");
+
+        RestAssured.given(this.spec).log().all()
+                .contentType(ContentType.JSON)
+                .body(memberSignUpRequest)
+                .filter(document("/members/save/fail/duplicated"))
+                .when()
+                .post("/members")
+                .then().log().all()
+                .statusCode(400);
+    }
+
     @DisplayName("회원 목록 조회에 성공하면 200 응답을 받는다.")
     @Test
     void findAll() {

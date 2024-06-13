@@ -74,6 +74,31 @@ class WaitingReservationControllerTest extends IntegrationTest {
                 .header("Location", "/reservations/wait/2");
     }
 
+    @DisplayName("이미 같은 회원이 예약 대기 신청한 예약을 대기 등록 시도하면 실패한다. ")
+    @Test
+    void failSaveWhenDuplicatedWaitingReservation() throws JsonProcessingException {
+        saveMember(MEMBER_JOJO);
+        saveMember(MEMBER_KAKI);
+        saveThemeAsHorror();
+        saveReservationTimeAsTen();
+        saveSuccessReservationAsDateNow();
+        saveWaitReservationAsDateNowWithSecondMember();
+
+        WaitingReservationSaveRequest saveRequest = new WaitingReservationSaveRequest(LocalDate.now(), 1L, 1L);
+        String kakiToken = getToken(new Member(2L, Role.MEMBER, new MemberName(KAKI_NAME), KAKI_EMAIL, KAKI_PASSWORD));
+
+        RestAssured.given(this.spec).log().all()
+                .cookie(CookieUtils.TOKEN_KEY, kakiToken)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(saveRequest))
+                .accept(ContentType.JSON)
+                .filter(document("waitings/save/fail/duplicated"))
+                .when()
+                .post("/reservations/wait")
+                .then().log().all()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
     @DisplayName("예약 대기를 성공적으로 승인하면 204 응답을 받는다.")
     @Test
     void approveReservation() {

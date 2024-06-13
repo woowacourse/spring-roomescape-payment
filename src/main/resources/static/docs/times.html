@@ -445,29 +445,29 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_2_1_예약_시간_api">2.1 예약 시간 API</h2>
+<h2 id="_2_1_예약_시간_전체_조회">2.1 예약 시간 전체 조회</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_예약_시간_전체_조회">예약 시간 전체 조회</h3>
+<h3 id="_성공">성공</h3>
 <div class="sect3">
-<h4 id="_예약_시간_전체_조회_http_request">HTTP request</h4>
+<h4 id="_성공_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /times HTTP/1.1
 Accept: application/json, application/javascript, text/javascript, text/json
-Host: localhost:59589
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTc3NDE5NDEsImV4cCI6MTcxNzc3Nzk0MX0.88LfaT5i_7LQNAm3gW9b1OzgiZvmF11vTkevpw-bTY4</code></pre>
+Host: localhost:52357
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTgyNjU3OTQsImV4cCI6MTcxODMwMTc5NH0.fX6j11eG2xSAaZeOqtFPlDR0NnGAV5FtuidOpbf3uBM</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_예약_시간_전체_조회_http_response">HTTP response</h4>
+<h4 id="_성공_http_response">HTTP response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:32:21 GMT
+Date: Thu, 13 Jun 2024 08:03:13 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 25
@@ -479,27 +479,32 @@ Content-Length: 25
 </div>
 </div>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_2_2_예약_가능한_시간_조회">2.2 예약 가능한 시간 조회</h2>
+<div class="sectionbody">
 <div class="sect2">
-<h3 id="_예약_가능한_시간_조회">예약 가능한 시간 조회</h3>
+<h3 id="_성공_2">성공</h3>
 <div class="sect3">
-<h4 id="_예약_가능한_시간_조회_http_request">HTTP request</h4>
+<h4 id="_성공_2_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /times/available?date=2024-06-07&amp;theme-id=1 HTTP/1.1
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /times/available?date=2024-06-13&amp;theme-id=1 HTTP/1.1
 Accept: application/json, application/javascript, text/javascript, text/json
-Host: localhost:59589
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTc3NDE5NDEsImV4cCI6MTcxNzc3Nzk0MX0.88LfaT5i_7LQNAm3gW9b1OzgiZvmF11vTkevpw-bTY4</code></pre>
+Host: localhost:52357
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTgyNjU3OTQsImV4cCI6MTcxODMwMTc5NH0.fX6j11eG2xSAaZeOqtFPlDR0NnGAV5FtuidOpbf3uBM</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_예약_가능한_시간_조회_http_response">HTTP response</h4>
+<h4 id="_성공_2_http_response">HTTP response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:32:21 GMT
+Date: Thu, 13 Jun 2024 08:03:13 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 94
@@ -515,65 +520,141 @@ Content-Length: 94
 </div>
 </div>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_2_3_예약_시간_저장">2.3 예약 시간 저장</h2>
+<div class="sectionbody">
 <div class="sect2">
-<h3 id="_예약_시간_저장">예약 시간 저장</h3>
+<h3 id="_성공_3">성공</h3>
 <div class="sect3">
-<h4 id="_예약_시간_저장_http_request">HTTP request</h4>
+<h4 id="_성공_3_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /times HTTP/1.1
 Accept: application/json, application/javascript, text/javascript, text/json
 Content-Type: application/json
-Host: localhost:59589
+Host: localhost:52357
 Content-Length: 19
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTc3NDE5NDEsImV4cCI6MTcxNzc3Nzk0MX0.88LfaT5i_7LQNAm3gW9b1OzgiZvmF11vTkevpw-bTY4
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTgyNjU3OTQsImV4cCI6MTcxODMwMTc5NH0.fX6j11eG2xSAaZeOqtFPlDR0NnGAV5FtuidOpbf3uBM
 
-{"startAt":"15:32"}</code></pre>
+{"startAt":"17:03"}</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_예약_시간_저장_http_response">HTTP response</h4>
+<h4 id="_성공_3_http_response">HTTP response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 201 Created
 Location: /times/1
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:32:21 GMT
+Date: Thu, 13 Jun 2024 08:03:13 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 40
 
 {
   "id" : 1,
-  "startAt" : "15:32"
+  "startAt" : "17:03"
 }</code></pre>
 </div>
 </div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_예약_시간_삭제">예약 시간 삭제</h3>
+<h3 id="_실패">실패</h3>
 <div class="sect3">
-<h4 id="_예약_시간_삭제_http_request">HTTP request</h4>
+<h4 id="_이미_등록된_예약_시간인_경우">이미 등록된 예약 시간인 경우</h4>
+<div class="sect4">
+<h5 id="_이미_등록된_예약_시간인_경우_http_request">HTTP request</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /times HTTP/1.1
+Accept: application/json, application/javascript, text/javascript, text/json
+Content-Type: application/json
+Host: localhost:52357
+Content-Length: 19
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTgyNjU3OTQsImV4cCI6MTcxODMwMTc5NH0.fX6j11eG2xSAaZeOqtFPlDR0NnGAV5FtuidOpbf3uBM
+
+{"startAt":"10:00"}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_이미_등록된_예약_시간인_경우_http_response">HTTP response</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Content-Length: 33
+Date: Thu, 13 Jun 2024 08:03:13 GMT
+Connection: close
+
+이미 시간이 존재합니다.</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_2_4_예약_시간_삭제">2.4 예약 시간 삭제</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_성공_4">성공</h3>
+<div class="sect3">
+<h4 id="_성공_4_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /times/1 HTTP/1.1
 Accept: application/json, application/javascript, text/javascript, text/json
-Host: localhost:59589
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTc3NDE5NDEsImV4cCI6MTcxNzc3Nzk0MX0.88LfaT5i_7LQNAm3gW9b1OzgiZvmF11vTkevpw-bTY4</code></pre>
+Host: localhost:52357
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTgyNjU3OTQsImV4cCI6MTcxODMwMTc5NH0.fX6j11eG2xSAaZeOqtFPlDR0NnGAV5FtuidOpbf3uBM</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_예약_시간_삭제_http_response">HTTP response</h4>
+<h4 id="_성공_4_http_response">HTTP response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 204 No Content
-Date: Fri, 07 Jun 2024 06:32:21 GMT
+Date: Thu, 13 Jun 2024 08:03:13 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_실패_2">실패</h3>
+<div class="sect3">
+<h4 id="_삭제하려는_예약_시간에_예약된_방탈출_예약이_있는_경우">삭제하려는 예약 시간에 예약된 방탈출 예약이 있는 경우</h4>
+<div class="sect4">
+<h5 id="_삭제하려는_예약_시간에_예약된_방탈출_예약이_있는_경우_http_request">HTTP request</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /times/1 HTTP/1.1
+Accept: application/json, application/javascript, text/javascript, text/json
+Host: localhost:52357
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTgyNjU3OTQsImV4cCI6MTcxODMwMTc5NH0.fX6j11eG2xSAaZeOqtFPlDR0NnGAV5FtuidOpbf3uBM</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_삭제하려는_예약_시간에_예약된_방탈출_예약이_있는_경우_http_response">HTTP response</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Content-Length: 53
+Date: Thu, 13 Jun 2024 08:03:13 GMT
+Connection: close
+
+해당 시간으로 예약된 내역이 있습니다.</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -584,7 +665,7 @@ Connection: keep-alive</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-06-07 15:23:16 +0900
+Last updated 2024-06-13 16:44:34 +0900
 </div>
 </div>
 </body>

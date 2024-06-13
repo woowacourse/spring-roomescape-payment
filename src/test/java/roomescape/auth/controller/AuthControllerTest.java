@@ -47,6 +47,36 @@ class AuthControllerTest extends IntegrationTest {
                 .statusCode(200);
     }
 
+    @DisplayName("이메일이 일치하지 않으면 로그인에 실패한다.")
+    @Test
+    void failLoginWhenInvalidEmail() {
+        saveMemberAsAnna();
+
+        LoginRequest loginRequest = new LoginRequest("annna@email.com", "1234");
+        RestAssured.given(this.spec).log().all()
+                .contentType(ContentType.JSON)
+                .body(loginRequest)
+                .filter(document("/auth/login/fail/invalid-email"))
+                .when().post("/login")
+                .then().log().all()
+                .statusCode(400);
+    }
+
+    @DisplayName("비밀번호가 일치하지 않으면 로그인에 실패한다.")
+    @Test
+    void failLoginWhenInvalidPassword() {
+        saveMemberAsAnna();
+
+        LoginRequest loginRequest = new LoginRequest("anna@email.com", "123456");
+        RestAssured.given(this.spec).log().all()
+                .contentType(ContentType.JSON)
+                .body(loginRequest)
+                .filter(document("/auth/login/fail/invalid-password"))
+                .when().post("/login")
+                .then().log().all()
+                .statusCode(400);
+    }
+
     @DisplayName("로그아웃을 하면 해당 사용자의 쿠키를 제거한다.")
     @Test
     void logout() {

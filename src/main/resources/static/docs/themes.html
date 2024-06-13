@@ -445,29 +445,29 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_3_1_테마_api">3.1 테마 API</h2>
+<h2 id="_3_1_테마_전체_조회">3.1 테마 전체 조회</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_테마_전체_조회">테마 전체 조회</h3>
+<h3 id="_성공">성공</h3>
 <div class="sect3">
-<h4 id="_테마_전체_조회_http_request">HTTP request</h4>
+<h4 id="_성공_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /themes HTTP/1.1
 Accept: application/json, application/javascript, text/javascript, text/json
-Host: localhost:59589
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTc3NDE5NDIsImV4cCI6MTcxNzc3Nzk0Mn0.uDpcIklmkjRT9SPjEuv-qxu-319zSG6JNanJbwmoa0Y</code></pre>
+Host: localhost:52357
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTgyNjU3OTQsImV4cCI6MTcxODMwMTc5NH0.fX6j11eG2xSAaZeOqtFPlDR0NnGAV5FtuidOpbf3uBM</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_테마_전체_조회_http_response">HTTP response</h4>
+<h4 id="_성공_http_response">HTTP response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:32:21 GMT
+Date: Thu, 13 Jun 2024 08:03:13 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 25
@@ -479,27 +479,32 @@ Content-Length: 25
 </div>
 </div>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_3_2_인기_있는_테마_조회">3.2 인기 있는 테마 조회</h2>
+<div class="sectionbody">
 <div class="sect2">
-<h3 id="_인기_있는_테마_조회">인기 있는 테마 조회</h3>
+<h3 id="_성공_2">성공</h3>
 <div class="sect3">
-<h4 id="_인기_있는_테마_조회_http_request">HTTP request</h4>
+<h4 id="_성공_2_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /themes/popular HTTP/1.1
 Accept: application/json, application/javascript, text/javascript, text/json
-Host: localhost:59589
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTc3NDE5NDIsImV4cCI6MTcxNzc3Nzk0Mn0.uDpcIklmkjRT9SPjEuv-qxu-319zSG6JNanJbwmoa0Y</code></pre>
+Host: localhost:52357
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTgyNjU3OTQsImV4cCI6MTcxODMwMTc5NH0.fX6j11eG2xSAaZeOqtFPlDR0NnGAV5FtuidOpbf3uBM</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_인기_있는_테마_조회_http_response">HTTP response</h4>
+<h4 id="_성공_2_http_response">HTTP response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:32:21 GMT
+Date: Thu, 13 Jun 2024 08:03:13 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 25
@@ -511,32 +516,37 @@ Content-Length: 25
 </div>
 </div>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_3_3_테마_저장">3.3 테마 저장</h2>
+<div class="sectionbody">
 <div class="sect2">
-<h3 id="_테마_저장">테마 저장</h3>
+<h3 id="_성공_3">성공</h3>
 <div class="sect3">
-<h4 id="_테마_저장_http_request">HTTP request</h4>
+<h4 id="_성공_3_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /themes HTTP/1.1
 Accept: application/json, application/javascript, text/javascript, text/json
 Content-Type: application/json
-Host: localhost:59589
+Host: localhost:52357
 Content-Length: 94
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTc3NDE5NDIsImV4cCI6MTcxNzc3Nzk0Mn0.uDpcIklmkjRT9SPjEuv-qxu-319zSG6JNanJbwmoa0Y
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTgyNjU3OTQsImV4cCI6MTcxODMwMTc5NH0.fX6j11eG2xSAaZeOqtFPlDR0NnGAV5FtuidOpbf3uBM
 
 {"name":"공포","description":"진짜 무서움","thumbnail":"https://i.pinimg.com/236x.jpg"}</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_테마_저장_http_response">HTTP response</h4>
+<h4 id="_성공_3_http_response">HTTP response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 201 Created
 Location: /themes/1
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:32:21 GMT
+Date: Thu, 13 Jun 2024 08:03:13 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 127
@@ -552,26 +562,97 @@ Content-Length: 127
 </div>
 </div>
 <div class="sect2">
-<h3 id="_테마_삭제">테마 삭제</h3>
+<h3 id="_실패">실패</h3>
 <div class="sect3">
-<h4 id="_테마_삭제_http_request">HTTP request</h4>
+<h4 id="_이미_존재하는_테마_이름인_경우">이미 존재하는 테마 이름인 경우</h4>
+<div class="sect4">
+<h5 id="_이미_존재하는_테마_이름인_경우_http_request">HTTP request</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /themes HTTP/1.1
+Accept: application/json, application/javascript, text/javascript, text/json
+Content-Type: application/json
+Host: localhost:52357
+Content-Length: 94
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTgyNjU3OTQsImV4cCI6MTcxODMwMTc5NH0.fX6j11eG2xSAaZeOqtFPlDR0NnGAV5FtuidOpbf3uBM
+
+{"name":"공포","description":"진짜 무서움","thumbnail":"https://i.pinimg.com/236x.jpg"}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_이미_존재하는_테마_이름인_경우_http_response">HTTP response</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Content-Length: 43
+Date: Thu, 13 Jun 2024 08:03:13 GMT
+Connection: close
+
+이미 존재하는 테마 이름입니다.</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_3_4_테마_삭제">3.4 테마 삭제</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_성공_4">성공</h3>
+<div class="sect3">
+<h4 id="_성공_4_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /themes/1 HTTP/1.1
 Accept: application/json, application/javascript, text/javascript, text/json
-Host: localhost:59589
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTc3NDE5NDIsImV4cCI6MTcxNzc3Nzk0Mn0.uDpcIklmkjRT9SPjEuv-qxu-319zSG6JNanJbwmoa0Y</code></pre>
+Host: localhost:52357
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTgyNjU3OTQsImV4cCI6MTcxODMwMTc5NH0.fX6j11eG2xSAaZeOqtFPlDR0NnGAV5FtuidOpbf3uBM</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_테마_삭제_http_response">HTTP response</h4>
+<h4 id="_성공_4_http_response">HTTP response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 204 No Content
-Date: Fri, 07 Jun 2024 06:32:21 GMT
+Date: Thu, 13 Jun 2024 08:03:13 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_실패_2">실패</h3>
+<div class="sect3">
+<h4 id="_삭제하려는_테마에_예약된_방탈출_예약이_있는_경우">삭제하려는 테마에 예약된 방탈출 예약이 있는 경우</h4>
+<div class="sect4">
+<h5 id="_삭제하려는_테마에_예약된_방탈출_예약이_있는_경우_http_request">HTTP request</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">DELETE /themes/1 HTTP/1.1
+Accept: application/json, application/javascript, text/javascript, text/json
+Host: localhost:52357
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTgyNjU3OTQsImV4cCI6MTcxODMwMTc5NH0.fX6j11eG2xSAaZeOqtFPlDR0NnGAV5FtuidOpbf3uBM</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_삭제하려는_테마에_예약된_방탈출_예약이_있는_경우_http_response">HTTP response</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Content-Length: 50
+Date: Thu, 13 Jun 2024 08:03:13 GMT
+Connection: close
+
+해당 테마로 예약된 내역이 있습니다.</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -582,7 +663,7 @@ Connection: keep-alive</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-06-07 15:23:16 +0900
+Last updated 2024-06-13 16:47:56 +0900
 </div>
 </div>
 </body>

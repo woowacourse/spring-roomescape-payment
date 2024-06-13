@@ -445,29 +445,29 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="content">
 <div class="sect1">
-<h2 id="_4_1_예약_대기_api">4.1 예약 대기 API</h2>
+<h2 id="_4_1_예약_대기_전체_조회">4.1 예약 대기 전체 조회</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_예약_대기_전체_조회">예약 대기 전체 조회</h3>
+<h3 id="_성공">성공</h3>
 <div class="sect3">
-<h4 id="_예약_대기_전체_조회_http_request">HTTP request</h4>
+<h4 id="_성공_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">GET /reservations/wait HTTP/1.1
 Accept: application/json, application/javascript, text/javascript, text/json
-Host: localhost:59589
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTc3NDE5NDIsImV4cCI6MTcxNzc3Nzk0Mn0.uDpcIklmkjRT9SPjEuv-qxu-319zSG6JNanJbwmoa0Y</code></pre>
+Host: localhost:52357
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTgyNjU3OTQsImV4cCI6MTcxODMwMTc5NH0.fX6j11eG2xSAaZeOqtFPlDR0NnGAV5FtuidOpbf3uBM</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_예약_대기_전체_조회_http_response">HTTP response</h4>
+<h4 id="_성공_http_response">HTTP response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 200 OK
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:32:21 GMT
+Date: Thu, 13 Jun 2024 08:03:13 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 364
@@ -479,7 +479,7 @@ Content-Length: 364
       "id" : 1,
       "name" : "카키"
     },
-    "date" : "2024-06-07",
+    "date" : "2024-06-13",
     "theme" : {
       "id" : 1,
       "name" : "공포",
@@ -496,32 +496,37 @@ Content-Length: 364
 </div>
 </div>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_4_2_예약_대기_저장">4.2 예약 대기 저장</h2>
+<div class="sectionbody">
 <div class="sect2">
-<h3 id="_예약_대기_저장">예약 대기 저장</h3>
+<h3 id="_성공_2">성공</h3>
 <div class="sect3">
-<h4 id="_예약_대기_저장_http_request">HTTP request</h4>
+<h4 id="_성공_2_http_request">HTTP request</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /reservations/wait HTTP/1.1
 Accept: application/json, application/javascript, text/javascript, text/json
 Content-Type: application/json
-Host: localhost:59589
+Host: localhost:52357
 Content-Length: 44
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjIiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTc3NDE5NDIsImV4cCI6MTcxNzc3Nzk0Mn0.guYzJdxIsUAaGM8u3rf_iwMrzbwC9zFydfdRvM4PLo8
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjIiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTgyNjU3OTQsImV4cCI6MTcxODMwMTc5NH0.8N4nCUk_l2A4jz8q46lA77qHHzjaSUFbmYym-ELg8S0
 
-{"date":"2024-06-07","themeId":1,"timeId":1}</code></pre>
+{"date":"2024-06-13","themeId":1,"timeId":1}</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="_예약_대기_저장_http_response">HTTP response</h4>
+<h4 id="_성공_2_http_response">HTTP response</h4>
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 201 Created
 Location: /reservations/wait/2
 Content-Type: application/json
 Transfer-Encoding: chunked
-Date: Fri, 07 Jun 2024 06:32:21 GMT
+Date: Thu, 13 Jun 2024 08:03:14 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive
 Content-Length: 326
@@ -532,7 +537,7 @@ Content-Length: 326
     "id" : 2,
     "name" : "카키"
   },
-  "date" : "2024-06-07",
+  "date" : "2024-06-13",
   "theme" : {
     "id" : 1,
     "name" : "공포",
@@ -545,6 +550,41 @@ Content-Length: 326
   },
   "status" : "WAIT"
 }</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_실패">실패</h3>
+<div class="sect3">
+<h4 id="_이미_동일한_예약_대기를_신청한_회원인_경우">이미 동일한 예약 대기를 신청한 회원인 경우</h4>
+<div class="sect4">
+<h5 id="_이미_동일한_예약_대기를_신청한_회원인_경우_http_request">HTTP request</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">POST /reservations/wait HTTP/1.1
+Accept: application/json, application/javascript, text/javascript, text/json
+Content-Type: application/json
+Host: localhost:52357
+Content-Length: 44
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjIiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTgyNjU3OTUsImV4cCI6MTcxODMwMTc5NX0.jHzgL0IwfmOgjvZAsUmo3ehZxQ7SzrvZ8iQUmYXyG2Q
+
+{"date":"2024-06-13","themeId":1,"timeId":1}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="_이미_동일한_예약_대기를_신청한_회원인_경우_http_response">HTTP response</h5>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 400 Bad Request
+Content-Type: application/json
+Content-Length: 57
+Date: Thu, 13 Jun 2024 08:03:14 GMT
+Connection: close
+
+이미 회원이 예약 대기한 내역이 있습니다.</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -562,8 +602,8 @@ Content-Length: 326
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">PATCH /reservations/wait/1 HTTP/1.1
 Accept: application/json, application/javascript, text/javascript, text/json
-Host: localhost:59589
-Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTc3NDE5NDIsImV4cCI6MTcxNzc3Nzk0Mn0.uDpcIklmkjRT9SPjEuv-qxu-319zSG6JNanJbwmoa0Y</code></pre>
+Host: localhost:52357
+Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07YKkIiwiZW1haWwiOiJrYWtpQGVtYWlsLmNvbSIsInJvbGUiOiJNRU1CRVIiLCJpYXQiOjE3MTgyNjU3OTUsImV4cCI6MTcxODMwMTc5NX0.oLpDMaPE5Z9018Y0zrowwPbCnIQHWdPzoL6wfnLrvEs</code></pre>
 </div>
 </div>
 </div>
@@ -572,7 +612,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJtZW1iZXJJZCI6IjEiLCJtZW1iZXJOYW1lIjoi7Lm07
 <div class="listingblock">
 <div class="content">
 <pre class="highlight nowrap"><code class="language-http" data-lang="http">HTTP/1.1 204 No Content
-Date: Fri, 07 Jun 2024 06:32:21 GMT
+Date: Thu, 13 Jun 2024 08:03:14 GMT
 Keep-Alive: timeout=60
 Connection: keep-alive</code></pre>
 </div>
@@ -585,7 +625,7 @@ Connection: keep-alive</code></pre>
 <div id="footer">
 <div id="footer-text">
 Version 0.0.1-SNAPSHOT<br>
-Last updated 2024-06-07 15:23:16 +0900
+Last updated 2024-06-13 16:46:01 +0900
 </div>
 </div>
 </body>

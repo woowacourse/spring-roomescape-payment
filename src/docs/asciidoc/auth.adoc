@@ -1,16 +1,30 @@
 [[Auth]]
 = 4. 인증 및 인가
 
-== 4.1 인증 API
+== 4.1 로그인
 
-=== 로그인
+=== 성공
 
 operation::auth/login[snippets='http-request,http-response']
 
-=== 로그인된 회원 이름 조회
+=== 실패
+
+==== 올바르지 않은 이메일 입력인 경우
+
+operation::auth/login/fail/invalid-email[snippets='http-request,http-response']
+
+==== 올바르지 않은 비밀번호 입력인 경우
+
+operation::auth/login/fail/invalid-password[snippets='http-request,http-response']
+
+== 4.2 로그인된 회원 이름 조회
+
+=== 성공
 
 operation::auth/findMemberName[snippets='http-request,http-response']
 
-=== 로그아웃
+== 4.3 로그아웃
+
+=== 성공
 
 operation::auth/logout[snippets='http-request,http-response']

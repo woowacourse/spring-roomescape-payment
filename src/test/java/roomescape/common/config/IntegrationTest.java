@@ -93,6 +93,12 @@ public abstract class IntegrationTest {
         jdbcTemplate.update(sql);
     }
 
+    protected void saveMemberAsAnna() {
+        String sql = "insert into member (name, email, password, role) values ('안나', 'anna@email.com', '1234', 'MEMBER')";
+
+        jdbcTemplate.update(sql);
+    }
+
     protected void saveAdminMember() {
         String sql = "insert into member (name, email, password, role) values ('어드민', 'admin@email.com', '1234', 'ADMIN')";
 
@@ -130,6 +136,12 @@ public abstract class IntegrationTest {
 
     protected void saveWaitReservationAsDateNow() {
         String sql = "insert into reservation (member_id, date, theme_id, time_id, status) values (1, CURRENT_DATE, 1, 1, 'WAIT')";
+
+        jdbcTemplate.update(sql);
+    }
+
+    protected void saveWaitReservationAsDateNowWithSecondMember() {
+        String sql = "insert into reservation (member_id, date, theme_id, time_id, status) values (2, CURRENT_DATE, 1, 1, 'WAIT')";
 
         jdbcTemplate.update(sql);
     }

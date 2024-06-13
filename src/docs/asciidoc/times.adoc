@@ -1,20 +1,38 @@
 [[Reservation-Time]]
 = 2. 예약 시간
 
-== 2.1 예약 시간 API
+== 2.1 예약 시간 전체 조회
 
-=== 예약 시간 전체 조회
+=== 성공
 
 operation::times/findAll[snippets='http-request,http-response']
 
-=== 예약 가능한 시간 조회
+== 2.2 예약 가능한 시간 조회
+
+=== 성공
 
 operation::times/available[snippets='http-request,http-response']
 
-=== 예약 시간 저장
+== 2.3 예약 시간 저장
+
+=== 성공
 
 operation::times/save[snippets='http-request,http-response']
 
-=== 예약 시간 삭제
+=== 실패
+
+==== 이미 등록된 예약 시간인 경우
+
+operation::times/save/fail/already-saved[snippets='http-request,http-response']
+
+== 2.4 예약 시간 삭제
+
+=== 성공
 
 operation::times/delete[snippets='http-request,http-response']
+
+=== 실패
+
+==== 삭제하려는 예약 시간에 예약된 방탈출 예약이 있는 경우
+
+operation::times/delete/fail/already-reserved[snippets='http-request,http-response']
