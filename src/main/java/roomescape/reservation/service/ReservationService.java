@@ -10,16 +10,26 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.DuplicateSaveException;
 import roomescape.global.exception.IllegalReservationDateException;
 import roomescape.global.exception.NoSuchRecordException;
+import roomescape.global.exception.PaymentFailException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.payment.TossPaymentClient;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentRepository;
+import roomescape.payment.dto.PaymentCancelRequest;
+import roomescape.payment.dto.PaymentCancelResponse;
 import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.PaymentConfirmResponse;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationPending;
 import roomescape.reservation.domain.ReservationRepository;
+import roomescape.reservation.domain.ReservationWaiting;
 import roomescape.reservation.domain.Status;
+import roomescape.reservation.domain.WaitingRankCalculator;
 import roomescape.reservation.dto.MemberReservationAddRequest;
-import roomescape.reservation.dto.MemberReservationStatusResponse;
+import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.dto.MemberReservationWithPaymentAddRequest;
+import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeRepository;
@@ -29,21 +39,26 @@ import roomescape.time.domain.ReservationTimeRepository;
 @Service
 public class ReservationService {
 
+    private static final String DEFAULT_CANCEL_REASON = "단순 변심";
+
     private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
+    private final PaymentRepository paymentRepository;
     private final TossPaymentClient tossPaymentClient;
 
     public ReservationService(MemberRepository memberRepository,
                               ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
+                              PaymentRepository paymentRepository,
                               TossPaymentClient tossPaymentClient) {
         this.memberRepository = memberRepository;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
+        this.paymentRepository = paymentRepository;
         this.tossPaymentClient = tossPaymentClient;
     }
 
@@ -53,10 +68,10 @@ public class ReservationService {
                 .toList();
     }
 
-    public MemberReservationStatusResponse findById(Long id) {
+    public MemberReservationResponse findById(Long id) {
         Reservation foundReservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new NoSuchRecordException("해당하는 예약이 존재하지 않습니다 ID: " + id));
-        return new MemberReservationStatusResponse(foundReservation);
+        return new MemberReservationResponse(foundReservation);
     }
 
     public List<ReservationResponse> findAllWaitingReservation(Status status) {
@@ -73,27 +88,62 @@ public class ReservationService {
                 .toList();
     }
 
-    public List<MemberReservationStatusResponse> findAllByMemberId(Long memberId) {
-        List<MemberReservationStatusResponse> memberReservationStatusResponses = new ArrayList<>();
+    public List<MemberReservationResponse> findAllByMemberId(Long memberId) {
+        List<MemberReservationResponse> memberReservationResponse = new ArrayList<>();
 
-        findAllMembersReservedReservation(memberReservationStatusResponses, memberId);
-        findAllMembersWaitingReservation(memberReservationStatusResponses, memberId);
+        findAllMembersReservedReservation(memberReservationResponse, memberId);
+        findAllMembersPendingReservation(memberReservationResponse, memberId);
+        findAllMembersWaitingReservation(memberReservationResponse, memberId);
 
-        return memberReservationStatusResponses;
+        return memberReservationResponse;
     }
 
-    private void findAllMembersReservedReservation(List<MemberReservationStatusResponse> responses, Long memberId) {
-        reservationRepository.findAllReservedByMemberId(memberId)
-                .stream()
-                .map(MemberReservationStatusResponse::new)
+    private void findAllMembersReservedReservation(List<MemberReservationResponse> responses, Long memberId) {
+        List<Payment> payments = paymentRepository.findAllByMemberId(memberId);
+        payments.stream()
+                .map(MemberReservationResponse::from)
                 .forEach(responses::add);
     }
 
-    private void findAllMembersWaitingReservation(List<MemberReservationStatusResponse> responses, Long memberId) {
-        reservationRepository.findAllReservationWaitingByMemberId(memberId)
-                .stream()
-                .map(MemberReservationStatusResponse::new)
-                .forEach(responses::add);
+    private void findAllMembersPendingReservation(List<MemberReservationResponse> responses, Long memberId) {
+        List<ReservationPending> reservations = reservationRepository.findAllReservationPendingByMemberId(memberId);
+        for (ReservationPending reservation : reservations) {
+            responses.add(
+                    new MemberReservationResponse(
+                            reservation.getId(),
+                            reservation.getTheme().getName(),
+                            reservation.getDate(),
+                            reservation.getTime().getStartAt(),
+                            reservation.getStatus().getValue()
+                    )
+            );
+        }
+    }
+
+    private void findAllMembersWaitingReservation(List<MemberReservationResponse> responses, Long memberId) {
+        List<ReservationWaiting> reservationWaitings
+                = reservationRepository.findAllReservationWaitingByMemberId(memberId);
+
+        for (ReservationWaiting reservationWaiting : reservationWaitings) {
+            WaitingRankCalculator waitingRankCalculator
+                    = new WaitingRankCalculator(
+                    reservationRepository.findAllReservationWaitingByDateAndTimeAndTheme(reservationWaiting.getDate(),
+                            reservationWaiting.getTime().getId(),
+                            reservationWaiting.getTheme().getId()
+                    )
+            );
+
+            responses.add(
+                    new MemberReservationResponse(
+                            reservationWaiting.getId(),
+                            reservationWaiting.getTheme().getName(),
+                            reservationWaiting.getDate(),
+                            reservationWaiting.getTime().getStartAt(),
+                            reservationWaiting.getStatus().getValue(),
+                            waitingRankCalculator.calculateWaitingRank(reservationWaiting)
+                    )
+            );
+        }
     }
 
     public ReservationResponse saveAdminReservation(Long memberId, MemberReservationAddRequest request) {
@@ -108,8 +158,14 @@ public class ReservationService {
 
         validateDuplicatedReservation(memberReservationAddRequest);
 
-        tossPaymentClient.confirmPayments(paymentConfirmRequest);
-        return saveMemberReservation(memberId, memberReservationAddRequest, Status.RESERVED);
+        PaymentConfirmResponse paymentConfirmResponse = tossPaymentClient.confirmPayments(paymentConfirmRequest);
+        if (paymentConfirmResponse.isConfirmNotFinished()) {
+            throw new PaymentFailException("결제가 완료되지 않았습니다.");
+        }
+        ReservationResponse reservationResponse
+                = saveMemberReservation(memberId, memberReservationAddRequest, Status.RESERVED);
+        saveMemberPayment(reservationResponse, paymentConfirmResponse);
+        return reservationResponse;
     }
 
     public ReservationResponse saveMemberWaitingReservation(Long memberId, MemberReservationAddRequest request) {
@@ -146,6 +202,16 @@ public class ReservationService {
         return new ReservationResponse(saved);
     }
 
+    private void saveMemberPayment(ReservationResponse reservationResponse,
+                                   PaymentConfirmResponse paymentConfirmResponse) {
+        Reservation reservation = getReservation(reservationResponse.id());
+        Payment payment = new Payment(reservation,
+                paymentConfirmResponse.paymentKey(),
+                paymentConfirmResponse.orderId(),
+                paymentConfirmResponse.totalAmount());
+        paymentRepository.save(payment);
+    }
+
     private void validateReservingPastTime(LocalDate date, LocalTime time) {
         LocalDate nowDate = LocalDate.now();
         LocalTime nowTime = LocalTime.now();
@@ -153,6 +219,11 @@ public class ReservationService {
             throw new IllegalReservationDateException(
                     nowDate + " " + nowTime + ": 예약 날짜와 시간은 현재 보다 이전일 수 없습니다");
         }
+    }
+
+    private Reservation getReservation(Long reservationId) {
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new NoSuchRecordException("해당하는 예약이 존재하지 않습니다 ID: " + reservationId));
     }
 
     private ReservationTime getReservationTime(long timeId) {
@@ -170,9 +241,21 @@ public class ReservationService {
         Reservation reservationForDelete = reservationRepository.findById(id)
                 .orElseThrow(() -> new NoSuchRecordException("해당하는 예약이 존재하지 않습니다 ID: " + id));
         if (reservationForDelete.isReserved()) {
-            updateWaitingReservationStatus(reservationForDelete);
+            cancelPaymentByReservation(id, reservationForDelete);
         }
         reservationRepository.deleteById(id);
+    }
+
+    private void cancelPaymentByReservation(Long id, Reservation reservationForDelete) {
+        Payment paymentForCancel = paymentRepository.findByReservationId(id)
+                .orElseThrow(() -> new NoSuchRecordException("해당하는 결제 정보가 존재하지 않습니다 ID: " + id));
+        PaymentCancelRequest request = new PaymentCancelRequest(paymentForCancel.getPaymentKey());
+        PaymentCancelResponse response = tossPaymentClient.cancelPayments(request, DEFAULT_CANCEL_REASON);
+        if (response.isCancelNotFinished()) {
+            throw new PaymentFailException("결제 취소가 완료되지 않았습니다.");
+        }
+        paymentRepository.deleteById(paymentForCancel.getId());
+        updateWaitingReservationStatus(reservationForDelete);
     }
 
     private void updateWaitingReservationStatus(Reservation reservationForDelete) {
@@ -181,6 +264,37 @@ public class ReservationService {
                 reservationForDelete.getTime().getId(),
                 reservationForDelete.getTheme().getId(),
                 Status.WAITING
-        ).ifPresent(value -> value.updateStatus(Status.RESERVED));
+        ).ifPresent(value -> value.updateStatus(Status.PENDING));
+    }
+
+    @Transactional
+    public MemberReservationResponse payForPendingReservation(Long memberId, ReservationPaymentRequest request) {
+        Reservation reservationForPay = reservationRepository.findByIdAndMemberId(request.reservationId(), memberId)
+                .orElseThrow(
+                        () -> new NoSuchRecordException("해당하는 예약이 존재하지 않습니다 ID: " + request.reservationId())
+                );
+
+        PaymentConfirmRequest paymentConfirmRequest = request.extractPaymentConfirmRequest();
+        PaymentConfirmResponse paymentConfirmResponse = tossPaymentClient.confirmPayments(paymentConfirmRequest);
+        Reservation pendingReservation = getReservation(request.reservationId());
+        Payment payment = new Payment(
+                pendingReservation,
+                paymentConfirmResponse.paymentKey(),
+                paymentConfirmResponse.orderId(),
+                paymentConfirmResponse.totalAmount()
+        );
+
+        paymentRepository.save(payment);
+        reservationForPay.updateStatus(Status.RESERVED);
+        return new MemberReservationResponse(
+                reservationForPay.getId(),
+                reservationForPay.getTheme().getName(),
+                reservationForPay.getDate(),
+                reservationForPay.getTime().getStartAt(),
+                reservationForPay.getStatus().getValue(),
+                payment.getPaymentKey(),
+                payment.getOrderId(),
+                payment.getAmount()
+        );
     }
 }

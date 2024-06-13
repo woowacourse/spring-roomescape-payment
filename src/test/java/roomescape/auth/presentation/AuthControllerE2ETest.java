@@ -32,7 +32,7 @@ class AuthControllerE2ETest {
     void checkLogin() {
         Map<String, String> loginParams = Map.of(
                 "email", "mason@test.com",
-                "password", "123"
+                "password", "123456"
         );
 
         String token = RestAssured.given().log().all()
@@ -67,7 +67,7 @@ class AuthControllerE2ETest {
     void checkInvalidEmailFormatLogin() {
         Map<String, String> loginParams = Map.of(
                 "email", "jazz",
-                "password", "123"
+                "password", "123456"
         );
 
         RestAssured.given().log().all()
@@ -84,7 +84,7 @@ class AuthControllerE2ETest {
     void checkWrongPasswordLogin() {
         Map<String, String> loginParams = Map.of(
                 "email", "mason@test.com",
-                "password", "1234"
+                "password", "1234567"
         );
 
         RestAssured.given().log().all()
@@ -101,7 +101,7 @@ class AuthControllerE2ETest {
     void checkNameFromLoginToken() {
         Map<String, String> loginParams = Map.of(
                 "email", "mason@test.com",
-                "password", "123"
+                "password", "123456"
         );
 
         String token = RestAssured.given().log().all()
@@ -148,7 +148,7 @@ class AuthControllerE2ETest {
     void checkLogout() {
         Map<String, String> loginParams = Map.of(
                 "email", "mason@test.com",
-                "password", "123"
+                "password", "123456"
         );
 
         RestAssured.given().log().all()

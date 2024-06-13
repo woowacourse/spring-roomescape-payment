@@ -1,13 +1,13 @@
 package roomescape.payment.dto;
 
-public record PaymentConfirmResponse(
+public record PaymentCancelResponse(
         String paymentKey,
         String orderId,
         Long totalAmount,
         String status
 ) {
 
-    public boolean isConfirmNotFinished() {
-        return !this.status.equals("DONE");
+    public boolean isCancelNotFinished() {
+        return !this.status.equals("CANCELED");
     }
 }

@@ -37,20 +37,45 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                                                                             r1.time,
                                                                             r1.theme,
                                                                             r1.status,
-                                                                            r1.createdAt,
-                                                                            COUNT(r2.id))
+                                                                            r1.createdAt)
             FROM Reservation AS r1
-            LEFT JOIN Reservation AS r2
-                ON r1.date.value = r2.date.value
-                AND r1.time.id = r2.time.id
-                AND r1.theme.id = r2.theme.id
-                AND r1.createdAt > r2.createdAt
+            WHERE r1.status = 'WAITING'
+                AND r1.date.value = :date
+                AND r1.time.id = :timeId
+                AND r1.theme.id = :themeId
+            ORDER BY r1.createdAt ASC
+            """)
+    List<ReservationWaiting> findAllReservationWaitingByDateAndTimeAndTheme(LocalDate date, Long timeId, Long themeId);
+
+    @Query("""
+            SELECT new roomescape.reservation.domain.ReservationWaiting(r1.id,
+                                                                            r1.member,
+                                                                            r1.date.value,
+                                                                            r1.time,
+                                                                            r1.theme,
+                                                                            r1.status,
+                                                                            r1.createdAt)
+            FROM Reservation AS r1
             WHERE r1.status = 'WAITING'
                 AND r1.member.id = :memberId
-            GROUP BY r1.id, r1.member, r1.date.value, r1.time, r1.theme, r1.status, r1.createdAt
             ORDER BY r1.createdAt ASC
             """)
     List<ReservationWaiting> findAllReservationWaitingByMemberId(Long memberId);
+
+    @Query("""
+            SELECT new roomescape.reservation.domain.ReservationPending(r1.id,
+                                                                            r1.member,
+                                                                            r1.date.value,
+                                                                            r1.time,
+                                                                            r1.theme,
+                                                                            r1.status,
+                                                                            r1.createdAt)
+            FROM Reservation AS r1
+            WHERE r1.status = 'PENDING'
+                AND r1.member.id = :memberId
+            ORDER BY r1.createdAt ASC
+            """)
+    List<ReservationPending> findAllReservationPendingByMemberId(Long memberId);
 
     @Query("""
             SELECT new roomescape.reservation.domain.ReservationWaiting(r.id,
@@ -69,6 +94,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                                                                            Long timeId,
                                                                            Long themeId,
                                                                            Status status);
+
+    Optional<Reservation> findByIdAndMemberId(Long reservationId, Long memberId);
 
     boolean existsByDateValueAndTimeIdAndThemeId(LocalDate date, Long timeId, Long themeId);
 

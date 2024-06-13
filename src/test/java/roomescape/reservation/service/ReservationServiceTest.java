@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static roomescape.member.fixture.MemberFixture.MEMBER_ID_1;
+import static roomescape.payment.fixture.PaymentFixture.PAYMENT_1;
 import static roomescape.reservation.fixture.ReservationFixture.PAST_DATE_RESERVATION_REQUEST;
 import static roomescape.reservation.fixture.ReservationFixture.RESERVATION_PAYMENT_REQUEST_1;
 import static roomescape.reservation.fixture.ReservationFixture.RESERVATION_REQUEST_1;
@@ -27,9 +28,13 @@ import roomescape.global.exception.IllegalReservationDateException;
 import roomescape.global.exception.NoSuchRecordException;
 import roomescape.member.domain.MemberRepository;
 import roomescape.payment.TossPaymentClient;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentRepository;
+import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.PaymentConfirmResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
-import roomescape.reservation.dto.MemberReservationStatusResponse;
+import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.theme.domain.ThemeRepository;
 import roomescape.time.domain.ReservationTimeRepository;
@@ -53,6 +58,9 @@ class ReservationServiceTest {
     private ThemeRepository themeRepository;
 
     @Mock
+    private PaymentRepository paymentRepository;
+
+    @Mock
     private TossPaymentClient tossPaymentClient;
 
 
@@ -68,10 +76,10 @@ class ReservationServiceTest {
     @DisplayName("특정 유저의 예약 목록을 읽는 요청을 처리할 수 있다")
     @Test
     void should_return_response_when_my_reservations_requested_all() {
-        when(reservationRepository.findAllReservedByMemberId(1L)).thenReturn(List.of(SAVED_RESERVATION_1));
+        when(paymentRepository.findAllByMemberId(1L)).thenReturn(List.of(PAYMENT_1));
 
         assertThat(reservationService.findAllByMemberId(1L))
-                .containsExactly(new MemberReservationStatusResponse(SAVED_RESERVATION_1));
+                .containsExactly(MemberReservationResponse.from(PAYMENT_1));
     }
 
     @DisplayName("예약을 추가하고 응답을 반환할 수 있다")
@@ -79,8 +87,13 @@ class ReservationServiceTest {
     void should_save_reservation_when_requested() {
         when(memberRepository.findById(1L)).thenReturn(Optional.of(MEMBER_ID_1));
         when(reservationRepository.save(any(Reservation.class))).thenReturn(SAVED_RESERVATION_1);
+        when(reservationRepository.findById(1L)).thenReturn(Optional.of(SAVED_RESERVATION_1));
         when(reservationTimeRepository.findById(1L)).thenReturn(Optional.of(RESERVATION_TIME_10_00_ID_1));
         when(themeRepository.findById(1L)).thenReturn(Optional.of(THEME_1));
+        when(paymentRepository.save(any(Payment.class))).thenReturn(PAYMENT_1);
+        when(tossPaymentClient.confirmPayments(any(PaymentConfirmRequest.class)))
+                .thenReturn(new PaymentConfirmResponse("test_payment_key",
+                        "testOrderId", 20000L, "DONE"));
 
         ReservationResponse savedReservation = reservationService.saveMemberReservation(1L,
                 RESERVATION_PAYMENT_REQUEST_1);
@@ -93,6 +106,9 @@ class ReservationServiceTest {
     void should_throw_exception_when_request_with_non_exist_time() {
         when(memberRepository.findById(1L)).thenReturn(Optional.of(MEMBER_ID_1));
         when(reservationTimeRepository.findById(1L)).thenReturn(Optional.empty());
+        when(tossPaymentClient.confirmPayments(any(PaymentConfirmRequest.class)))
+                .thenReturn(new PaymentConfirmResponse("test_payment_key",
+                        "testOrderId", 20000L, "DONE"));
 
         assertThatThrownBy(
                 () -> reservationService.saveMemberReservation(1L, RESERVATION_PAYMENT_REQUEST_1))
@@ -105,6 +121,9 @@ class ReservationServiceTest {
         when(memberRepository.findById(1L)).thenReturn(Optional.of(MEMBER_ID_1));
         when(reservationTimeRepository.findById(1L)).thenReturn(Optional.of(RESERVATION_TIME_10_00_ID_1));
         when(themeRepository.findById(1L)).thenReturn(Optional.empty());
+        when(tossPaymentClient.confirmPayments(any(PaymentConfirmRequest.class)))
+                .thenReturn(new PaymentConfirmResponse("test_payment_key",
+                        "testOrderId", 20000L, "DONE"));
 
         assertThatThrownBy(
                 () -> reservationService.saveMemberReservation(1L, RESERVATION_PAYMENT_REQUEST_1))
@@ -116,6 +135,9 @@ class ReservationServiceTest {
     void should_throw_exception_when_request_with_past_date() {
         when(memberRepository.findById(1L)).thenReturn(Optional.of(MEMBER_ID_1));
         when(reservationTimeRepository.findById(1L)).thenReturn(Optional.of(RESERVATION_TIME_10_00_ID_1));
+        when(tossPaymentClient.confirmPayments(any(PaymentConfirmRequest.class)))
+                .thenReturn(new PaymentConfirmResponse("test_payment_key",
+                        "testOrderId", 20000L, "DONE"));
 
         assertThatThrownBy(
                 () -> reservationService.saveMemberReservation(1L,

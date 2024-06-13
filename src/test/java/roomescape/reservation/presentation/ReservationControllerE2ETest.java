@@ -23,6 +23,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.payment.TossPaymentClient;
+import roomescape.payment.dto.PaymentCancelRequest;
+import roomescape.payment.dto.PaymentCancelResponse;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.dto.PaymentConfirmResponse;
 
@@ -41,7 +43,7 @@ class ReservationControllerE2ETest {
     @BeforeEach
     public void beforeEach() {
         RestAssured.port = serverPort;
-        Map<String, String> loginParams = Map.of("email", "lxxjn0@test.com", "password", "123");
+        Map<String, String> loginParams = Map.of("email", "lxxjn0@test.com", "password", "123456");
 
         token = RestAssured.given().log().all()
                 .when().body(loginParams)
@@ -76,13 +78,18 @@ class ReservationControllerE2ETest {
                 "timeId", "1",
                 "themeId", "1",
                 "memberId", "1",
-                "paymentKey", "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm",
+                "paymentKey", "test_payment_key",
                 "orderId", "testOrderId",
-                "amount", "1000"
+                "amount", "20000"
         );
 
         when(tossPaymentClient.confirmPayments(any(PaymentConfirmRequest.class)))
-                .thenReturn(new PaymentConfirmResponse(null, null));
+                .thenReturn(new PaymentConfirmResponse("test_payment_key",
+                        "testOrderId", 20000L, "DONE"));
+
+        when(tossPaymentClient.cancelPayments(any(PaymentCancelRequest.class), any(String.class)))
+                .thenReturn(new PaymentCancelResponse("test_payment_key",
+                        "testOrderId", 20000L, "CANCELED"));
 
         return Stream.of(
                 dynamicTest("현재 예약 개수를 확인한다", () -> {
@@ -183,7 +190,7 @@ class ReservationControllerE2ETest {
                 "timeId", "1",
                 "themeId", "1",
                 "memberId", "1",
-                "paymentKey", "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm",
+                "paymentKey", "test_payment_key",
                 "orderId", "testOrderId",
                 "amount", "1000"
         );
@@ -193,13 +200,18 @@ class ReservationControllerE2ETest {
                 "timeId", "1",
                 "themeId", "1",
                 "memberId", "2",
-                "paymentKey", "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm",
+                "paymentKey", "test_payment_key",
                 "orderId", "testOrderId",
                 "amount", "1000"
         );
 
         when(tossPaymentClient.confirmPayments(any(PaymentConfirmRequest.class)))
-                .thenReturn(new PaymentConfirmResponse(null, null));
+                .thenReturn(new PaymentConfirmResponse("test_payment_key",
+                        "testOrderId", 20000L, "DONE"));
+
+        when(tossPaymentClient.cancelPayments(any(PaymentCancelRequest.class), any(String.class)))
+                .thenReturn(new PaymentCancelResponse("test_payment_key",
+                        "testOrderId", 20000L, "CANCELED"));
 
         return Stream.of(
                 dynamicTest("예약을 추가한다", () -> {
@@ -223,7 +235,7 @@ class ReservationControllerE2ETest {
     @DisplayName("예약 대기 추가와 삭제의 작동을 확인한다")
     @TestFactory
     Stream<DynamicTest> checkWaitingReservationCreateAndDelete() {
-        Map<String, String> loginParams = Map.of("email", "mason@test.com", "password", "123");
+        Map<String, String> loginParams = Map.of("email", "mason@test.com", "password", "123456");
 
         Map<String, String> reservationParams = Map.of(
                 "date", LocalDate.now().plusDays(1).toString(),
@@ -281,7 +293,7 @@ class ReservationControllerE2ETest {
     @DisplayName("동일 회원이 같은 날짜, 시각, 테마에 중복 대기가 불가능한지 확인한다")
     @TestFactory
     Stream<DynamicTest> checkDuplicatedWaitingReservation() {
-        Map<String, String> loginParams = Map.of("email", "mason@test.com", "password", "123");
+        Map<String, String> loginParams = Map.of("email", "mason@test.com", "password", "123456");
 
         Map<String, String> reservationParams = Map.of(
                 "date", LocalDate.now().plusDays(1).toString(),
@@ -327,13 +339,17 @@ class ReservationControllerE2ETest {
     @DisplayName("확정 예약 삭제 시 대기번호 1번인 예약이 자동으로 승인된다")
     @TestFactory
     Stream<DynamicTest> checkUpdateStatusWhenDeleteReservedStatusReservation() {
-        Map<String, String> loginParams = Map.of("email", "admin@test.com", "password", "123");
+        Map<String, String> loginParams = Map.of("email", "admin@test.com", "password", "123456");
 
         token = RestAssured.given().log().all()
                 .when().body(loginParams)
                 .contentType(ContentType.JSON).post("/login")
                 .then().log().all()
                 .extract().cookie("token");
+
+        when(tossPaymentClient.cancelPayments(any(PaymentCancelRequest.class), any(String.class)))
+                .thenReturn(new PaymentCancelResponse("test_payment_key",
+                        "testOrderId", 20000L, "CANCELED"));
 
         return Stream.of(
                 dynamicTest("현재 예약 개수를 확인한다", () -> {
@@ -375,7 +391,7 @@ class ReservationControllerE2ETest {
                     RestAssured.given().log().all()
                             .when().cookie("token", token).get("/reservations/4")
                             .then().log().all()
-                            .statusCode(200).body("status", equalTo("예약"));
+                            .statusCode(200).body("status", equalTo("결제대기"));
                 })
         );
     }

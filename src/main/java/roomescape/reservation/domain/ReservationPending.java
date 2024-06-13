@@ -7,7 +7,7 @@ import roomescape.member.domain.Member;
 import roomescape.theme.domain.Theme;
 import roomescape.time.domain.ReservationTime;
 
-public class ReservationWaiting implements Comparable<ReservationWaiting> {
+public class ReservationPending implements Comparable<ReservationPending> {
 
     private final Long id;
 
@@ -23,7 +23,7 @@ public class ReservationWaiting implements Comparable<ReservationWaiting> {
 
     private final LocalDateTime createdAt;
 
-    public ReservationWaiting(Long id,
+    public ReservationPending(Long id,
                               Member member,
                               LocalDate date,
                               ReservationTime time,
@@ -79,7 +79,7 @@ public class ReservationWaiting implements Comparable<ReservationWaiting> {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        ReservationWaiting that = (ReservationWaiting) o;
+        ReservationPending that = (ReservationPending) o;
         return Objects.equals(id, that.id) && Objects.equals(member, that.member)
                 && Objects.equals(date, that.date) && Objects.equals(time, that.time)
                 && Objects.equals(theme, that.theme) && status == that.status && Objects.equals(
@@ -92,7 +92,7 @@ public class ReservationWaiting implements Comparable<ReservationWaiting> {
     }
 
     @Override
-    public int compareTo(ReservationWaiting other) {
+    public int compareTo(ReservationPending other) {
         return this.createdAt.compareTo(other.createdAt);
     }
 }
