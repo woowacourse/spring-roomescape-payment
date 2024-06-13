@@ -14,6 +14,8 @@ public class TossPaymentClient implements PaymentClient {
 
     @Value("${atto.ash.secret-key}")
     private String secretKey;
+    @Value("${payment.uri}")
+    private String paymentUri;
     private final RestClient restClient;
 
     public TossPaymentClient(RestClient restClient) {
@@ -30,7 +32,7 @@ public class TossPaymentClient implements PaymentClient {
 
         try {
             return restClient.post()
-                    .uri("https://api.tosspayments.com/v1/payments/confirm")
+                    .uri(paymentUri)
                     .header("Authorization", "Basic " + base64SecretKey)
                     .body(paymentInfo)
                     .retrieve()
