@@ -2,16 +2,26 @@ package roomescape.dto.request;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.domain.Theme;
 
-public record ThemeRequest(String name, String description, String thumbnail) {
+@Schema(description = "Theme Request Model")
+public record ThemeRequest(@Schema(description = "Theme name", example = "Haunted House")
+                           String name,
+
+                           @Schema(description = "Theme description", example = "A scary haunted house theme")
+                           String description,
+
+                           @Schema(description = "Thumbnail URL", example = "http://example.com/thumbnail.jpg")
+                           String thumbnail) {
 
     public ThemeRequest {
         isValid(name, description, thumbnail);
     }
 
     public Theme toEntity() {
-        return new Theme(null, name, description, thumbnail);
+        return new Theme(name, description, thumbnail);
     }
 
     private void isValid(String name, String description, String thumbnail) {

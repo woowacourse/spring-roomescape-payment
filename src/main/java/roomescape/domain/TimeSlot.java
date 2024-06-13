@@ -15,11 +15,14 @@ public class TimeSlot {
     private LocalTime startAt;
 
     protected TimeSlot() {
-
     }
 
     public TimeSlot(Long id, LocalTime startAt) {
         this.id = id;
+        this.startAt = startAt;
+    }
+
+    public TimeSlot(LocalTime startAt) {
         this.startAt = startAt;
     }
 

@@ -1,13 +1,26 @@
 package roomescape.dto.request;
 
 import java.time.LocalDate;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationStatus;
 import roomescape.domain.Theme;
 import roomescape.domain.TimeSlot;
 
-public record ReservationRequest(Long memberId, LocalDate date, Long timeId, Long themeId) {
+@Schema(description = "Reservation Request Model")
+public record ReservationRequest(@Schema(description = "Member ID", example = "1")
+                                 Long memberId,
+
+                                 @Schema(description = "Reservation date", example = "2023-12-25")
+                                 LocalDate date,
+
+                                 @Schema(description = "Time Slot ID", example = "1")
+                                 Long timeId,
+
+                                 @Schema(description = "Theme ID", example = "1")
+                                 Long themeId) {
 
     public ReservationRequest {
         isValid(memberId, date, timeId, themeId);
@@ -19,7 +32,7 @@ public record ReservationRequest(Long memberId, LocalDate date, Long timeId, Lon
     }
 
     public Reservation toEntity(Member member, TimeSlot time, Theme theme) {
-        return new Reservation(null, member, date, time, theme, ReservationStatus.BOOKING);
+        return new Reservation(member, date, time, theme, ReservationStatus.BOOKING);
     }
 
     private void isValid(Long memberId, LocalDate date, Long timeId, Long themeId) {

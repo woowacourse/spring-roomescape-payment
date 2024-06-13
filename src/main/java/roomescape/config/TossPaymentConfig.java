@@ -31,7 +31,7 @@ public class TossPaymentConfig {
                 .builder()
                 .baseUrl(tossPaymentProperties.url().base())
                 .defaultHeader("Authorization", authorizationHeader())
-                .defaultStatusHandler(paymentExceptionHandler())
+                .defaultStatusHandler(new PaymentExceptionHandler())
                 .requestFactory(requestFactory())
                 .build();
     }
@@ -42,10 +42,6 @@ public class TossPaymentConfig {
                 .encodeToString((secretKey).getBytes());
         
         return "Basic " + credentials;
-    }
-
-    private ResponseErrorHandler paymentExceptionHandler() {
-        return new PaymentExceptionHandler();
     }
 
     private ClientHttpRequestFactory requestFactory() {
