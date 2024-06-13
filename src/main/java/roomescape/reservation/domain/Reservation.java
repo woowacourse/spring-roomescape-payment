@@ -14,6 +14,9 @@ import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Optional;
+import roomescape.advice.exception.ExceptionTitle;
+import roomescape.advice.exception.RoomEscapeException;
 import roomescape.member.domain.Member;
 import roomescape.theme.domain.Theme;
 import roomescape.time.domain.ReservationTime;
@@ -42,22 +45,23 @@ public class Reservation {
 
     public Reservation(Member member, LocalDate date, ReservationTime time, Theme theme,
                        ReservationStatus reservationStatus) {
-        this.id = null;
-        this.member = Objects.requireNonNull(member);
-        this.date = Objects.requireNonNull(date);
-        this.time = Objects.requireNonNull(time);
-        this.theme = Objects.requireNonNull(theme);
-        this.reservationStatus = reservationStatus;
+        this.member = Optional.ofNullable(member).orElseThrow(() ->
+                new RoomEscapeException("예약자는 null 일 수 없습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST));
+        this.date = Optional.ofNullable(date).orElseThrow(() ->
+                new RoomEscapeException("예약 날짜는 null 일 수 없습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST));
+        this.time = Optional.ofNullable(time).orElseThrow(() ->
+                new RoomEscapeException("예약 시간은 null 일 수 없습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST));
+        this.theme = Optional.ofNullable(theme).orElseThrow(() ->
+                new RoomEscapeException("예약 테마는 null 일 수 없습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST));
+        this.reservationStatus = Optional.ofNullable(reservationStatus).orElseThrow(() ->
+                new RoomEscapeException("예약 상태는 null 일 수 없습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST));
     }
 
     public Reservation(Long id, Member member, LocalDate date, ReservationTime time, Theme theme,
                        ReservationStatus reservationStatus) {
-        this.id = Objects.requireNonNull(id);
-        this.member = Objects.requireNonNull(member);
-        this.date = Objects.requireNonNull(date);
-        this.time = Objects.requireNonNull(time);
-        this.theme = Objects.requireNonNull(theme);
-        this.reservationStatus = reservationStatus;
+        this(member, date, time, theme, reservationStatus);
+        this.id = Optional.ofNullable(id).orElseThrow(() ->
+                new RoomEscapeException("예약 id는 null 일 수 없습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST));
     }
 
     protected Reservation() {

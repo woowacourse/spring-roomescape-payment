@@ -11,7 +11,8 @@ class ThemeNameTest {
     @Test
     void validateTest_whenValueIsNull() {
         assertThatThrownBy(() -> new ThemeName(null))
-                .isInstanceOf(NullPointerException.class);
+                .isInstanceOf(RoomEscapeException.class)
+                .hasMessage("테마 이름은 null 일 수 없습니다.");
     }
 
     @DisplayName("테마 이름이 1글자 이상일 경우 예외를 던진다.")

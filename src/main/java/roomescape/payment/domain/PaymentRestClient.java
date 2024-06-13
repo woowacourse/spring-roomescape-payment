@@ -87,14 +87,19 @@ public class PaymentRestClient {
 
     private void convertException(ClientHttpResponse httpResponse) throws IOException {
         PaymentErrorResponse response = objectMapper.readValue(httpResponse.getBody(), PaymentErrorResponse.class);
-        String code = Objects.requireNonNull(response.code());
-        String message = Objects.requireNonNull(response.message());
+        String code = response.code();
+        String message = response.message();
 
-        if (INTERNAL_SERVER_ERROR_CODES.contains(code)) {
+        if (isNullResponse(code, message) || INTERNAL_SERVER_ERROR_CODES.contains(code)) {
             throw new RoomEscapeException(
                     "서버에 문제가 발생해 결제가 실패했습니다. 관리자에게 문의해 주세요.", ExceptionTitle.INTERNAL_SERVER_ERROR);
         }
+
         throw new RoomEscapeException(message, ExceptionTitle.ILLEGAL_USER_REQUEST);
+    }
+
+    private boolean isNullResponse(String code, String message) {
+        return Objects.isNull(code) || Objects.isNull(message);
     }
 
     public String getSecretKey() {

@@ -11,7 +11,8 @@ class ThemeDescriptionTest {
     @Test
     void validateTest_whenValueIsNull() {
         assertThatThrownBy(() -> new ThemeDescription(null))
-                .isInstanceOf(NullPointerException.class);
+                .isInstanceOf(RoomEscapeException.class)
+                .hasMessage("테마 설명은 null 일 수 없습니다.");
     }
 
     @DisplayName("테마 설명이 1글자 미만일 경우 예외를 던진다.")

@@ -118,7 +118,7 @@ class ReservationControllerTest {
         Long timeId = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), cookies).id();
 
         AdminReservationCreateRequest params = new AdminReservationCreateRequest
-                (null, null, timeId, themeId);
+                (1L, null, timeId, themeId);
         Cookies userCookies = CookieProvider.makeUserCookie();
 
         RestAssured.given().log().all()
@@ -128,7 +128,7 @@ class ReservationControllerTest {
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(400)
-                .body("detail", is("인자 중 null 값이 존재합니다."));
+                .body("detail", is("예약 날짜는 null 일 수 없습니다."));
     }
 
     @DisplayName("예약 삭제 시 예약 대기가 존재하지 않는다면 삭제된다.")

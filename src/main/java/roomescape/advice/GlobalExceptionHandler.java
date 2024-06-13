@@ -13,7 +13,6 @@ import roomescape.advice.exception.RoomEscapeException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    private static final String NULL_POINTER_EXCEPTION_ERROR_MESSAGE = "인자 중 null 값이 존재합니다.";
     private static final String UNEXPECTED_EXCEPTION_ERROR_MESSAGE = "예상치 못한 예외가 발생했습니다. 관리자에게 문의하세요.";
     private static final String DATA_INTEGRITY_VIOLATION_EXCEPTION_ERROR_MESSAGE = "제약 조건에 어긋난 요청입니다.";
 
@@ -25,16 +24,6 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(e.getStatus())
                 .body(e.getProblemDetail());
-    }
-
-    @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<ProblemDetail> handleNullPointerException(NullPointerException e) {
-        ProblemDetail problemDetail = createProblemDetail(
-                NULL_POINTER_EXCEPTION_ERROR_MESSAGE, ExceptionTitle.ILLEGAL_USER_REQUEST);
-        logging(e, HttpStatus.valueOf(problemDetail.getStatus()));
-
-        return ResponseEntity.status(problemDetail.getStatus())
-                .body(problemDetail);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)

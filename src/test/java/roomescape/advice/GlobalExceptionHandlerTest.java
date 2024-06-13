@@ -11,22 +11,6 @@ import roomescape.advice.exception.ExceptionTitle;
 class GlobalExceptionHandlerTest {
     private final GlobalExceptionHandler globalExceptionHandler = new GlobalExceptionHandler();
 
-    @DisplayName("NullPointerException이 던져지면 400 에러를 반환한다.")
-    @Test
-    void handleNullPointerExceptionTest() {
-        NullPointerException exception = new NullPointerException();
-        ExceptionTitle title = ExceptionTitle.ILLEGAL_USER_REQUEST;
-        ProblemDetail problemDetail =
-                ProblemDetail.forStatusAndDetail(title.getStatusCode(), "인자 중 null 값이 존재합니다.");
-        problemDetail.setTitle(title.getTitle());
-        ResponseEntity<ProblemDetail> expected = ResponseEntity.status(400)
-                .body(problemDetail);
-
-        ResponseEntity<ProblemDetail> actual = globalExceptionHandler.handleNullPointerException(exception);
-
-        assertThat(actual).isEqualTo(expected);
-    }
-
     @DisplayName("예상치 못한 에러가 발생하면 500 에러를 반환한다.")
     @Test
     void handleUnexpectedExceptionTest() {

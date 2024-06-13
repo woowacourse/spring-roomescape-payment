@@ -11,7 +11,8 @@ class MemberNameTest {
     @Test
     void validateTest_whenValueIsNull() {
         assertThatThrownBy(() -> new MemberName(null))
-                .isInstanceOf(NullPointerException.class);
+                .isInstanceOf(RoomEscapeException.class)
+                .hasMessage("사용자 이름은 null 일 수 없습니다.");
     }
 
     @DisplayName("예약자 이름이 1자 미만일 경우 예외를 던진다.")
