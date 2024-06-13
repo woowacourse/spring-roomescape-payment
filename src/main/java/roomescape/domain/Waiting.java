@@ -20,18 +20,18 @@ public class Waiting {
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = false, name = "member_id")
     private Member member;
 
     @Column(nullable = false)
     private LocalDate date;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = false, name = "time_id")
     private TimeSlot time;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = false, name = "theme_id")
     private Theme theme;
 
     @Enumerated(value = EnumType.STRING)
