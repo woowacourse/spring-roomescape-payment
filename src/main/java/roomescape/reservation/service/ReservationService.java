@@ -11,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.model.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.dto.MyReservationResponse;
-import roomescape.reservation.dto.PaymentResponse;
 import roomescape.reservation.dto.SaveReservationRequest;
 import roomescape.reservation.dto.SearchReservationsRequest;
 import roomescape.reservation.model.*;
@@ -80,8 +79,7 @@ public class ReservationService {
         validateReservationDuplication(reservation);
 
         Reservation result = reservationRepository.save(reservation);
-        PaymentResponse paymentResponse = paymentService.requestTossPayment(request.toPaymentRequest());
-        paymentService.savePayment(paymentResponse, result);
+        paymentService.requestTossPayment(request.toPaymentRequest(), result);
         return result;
     }
 

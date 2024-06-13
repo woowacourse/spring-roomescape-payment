@@ -38,7 +38,7 @@ class ReservationControllerTest {
     @BeforeEach
     public void initReservation() {
         RestAssured.port = randomServerPort;
-        Mockito.when(paymentService.requestTossPayment(any())).thenReturn(null);
+        Mockito.when(paymentService.requestTossPayment(any(), any())).thenReturn(null);
     }
 
     @DisplayName("전체 예약 정보를 조회한다.")

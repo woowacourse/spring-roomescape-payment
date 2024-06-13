@@ -38,10 +38,10 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    public PaymentResponse requestTossPayment(PaymentRequest paymentRequest) {
+    public PaymentResponse requestTossPayment(PaymentRequest paymentRequest, Reservation reservation) {
         String authorization = TossSecretKeyEncoder.encode(tossSecretKey);
 
-        return tossRestClient.post()
+        PaymentResponse paymentResponse = tossRestClient.post()
                 .uri("/confirm")
                 .header(HttpHeaders.AUTHORIZATION, authorization)
                 .body(paymentRequest)
@@ -54,9 +54,11 @@ public class PaymentService {
                 })
                 .toEntity(PaymentResponse.class)
                 .getBody();
+        savePayment(paymentResponse, reservation);
+        return paymentResponse;
     }
 
-    public void savePayment(PaymentResponse paymentResponse, Reservation reservation) {
+    private void savePayment(PaymentResponse paymentResponse, Reservation reservation) {
         paymentRepository.save(Payment.of(paymentResponse.paymentKey(),
                 paymentResponse.orderId(),
                 paymentResponse.totalAmount(),
