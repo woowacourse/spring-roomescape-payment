@@ -170,7 +170,7 @@ public class ReservationService {
     public void removeReservation(long id) {
         Reservation reservationForDelete = reservationRepository.findById(id)
                 .orElseThrow(() -> new NoSuchRecordException("해당하는 예약이 존재하지 않습니다 ID: " + id));
-        if (reservationForDelete.isReserved()) {
+        if (reservationForDelete.isNotWaiting()) {
             updateWaitingReservationStatus(reservationForDelete);
         }
         paymentRepository.deleteByReservationId(id);

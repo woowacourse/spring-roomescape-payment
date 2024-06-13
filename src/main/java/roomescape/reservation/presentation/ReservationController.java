@@ -52,7 +52,7 @@ public class ReservationController {
     }
 
     @GetMapping("/reservations/my")
-    public ResponseEntity<List<MemberMyReservationResponse>> findMemberReservationStatusV2(
+    public ResponseEntity<List<MemberMyReservationResponse>> findMemberReservationStatus(
             @Authenticated Accessor accessor) {
         return ResponseEntity.ok(reservationService.findMyReservation(accessor.id()));
     }
@@ -72,7 +72,7 @@ public class ReservationController {
     }
 
     @PostMapping("/reservations/waiting")
-    public ResponseEntity<ReservationResponse> saveMemberWaitingReseravtion(
+    public ResponseEntity<ReservationResponse> saveMemberWaitingReservation(
             @Authenticated Accessor accessor,
             @Valid @RequestBody MemberReservationAddRequest memberReservationAddRequest) {
         ReservationResponse saveResponse = reservationService.saveMemberWaitingReservation(accessor.id(),

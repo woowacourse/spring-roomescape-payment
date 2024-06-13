@@ -380,7 +380,7 @@ class ReservationControllerE2ETest {
                     RestAssured.given().log().all()
                             .when().cookie("token", token).get("/reservations/4")
                             .then().log().all()
-                            .statusCode(200).body("status", equalTo("예약"));
+                            .statusCode(200).body("status", equalTo("결제대기"));
                 })
         );
     }
