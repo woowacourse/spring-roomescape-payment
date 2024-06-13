@@ -49,7 +49,6 @@ public class Payment {
 
     public void complete(Reservation reservation) {
         this.reservation = reservation;
-        this.status = PaymentStatus.DONE;
     }
 
     public void cancel() {
