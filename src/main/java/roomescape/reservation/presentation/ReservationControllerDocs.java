@@ -1,6 +1,8 @@
 package roomescape.reservation.presentation;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,7 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import roomescape.auth.Authenticated;
 import roomescape.auth.dto.Accessor;
@@ -57,6 +58,14 @@ public interface ReservationControllerDocs {
                     3. 존재하지 않는 회원, 테마, 시간인 경우
                     """)
     })
+    @Parameters({
+            @Parameter(name = "date", description = "예약 날짜 필수", required = true),
+            @Parameter(name = "timeId", description = "예약 시간 선택 필수", required = true),
+            @Parameter(name = "themeId", description = "테마 선택 필수", required = true),
+            @Parameter(name = "paymentKey", description = "결제키 필수", required = true),
+            @Parameter(name = "orderId", description = "주문 ID 필수", required = true),
+            @Parameter(name = "amount", description = "결제 금액 필수", required = true)
+    })
     public ResponseEntity<ReservationResponse> saveMemberReservation(
             @Authenticated Accessor accessor,
             @RequestBody MemberReservationWithPaymentAddRequest memberReservationWithPaymentAddRequest);
@@ -73,6 +82,11 @@ public interface ReservationControllerDocs {
                     """),
             @ApiResponse(responseCode = "500", description = "결제 승인 시 문제가 생긴 경우")
     })
+    @Parameters({
+            @Parameter(name = "date", description = "예약 날짜 필수", required = true),
+            @Parameter(name = "timeId", description = "예약 시간 선택 필수", required = true),
+            @Parameter(name = "themeId", description = "테마 선택 필수", required = true)
+    })
     public ResponseEntity<ReservationResponse> saveMemberWaitingReservation(
             @Authenticated Accessor accessor,
             @RequestBody MemberReservationAddRequest memberReservationAddRequest);
@@ -82,5 +96,5 @@ public interface ReservationControllerDocs {
             @ApiResponse(responseCode = "204", description = "예약 삭제 성공"),
             @ApiResponse(responseCode = "400", description = "해당하는 예약이 존재하지 않을 경우")
     })
-    public ResponseEntity<Void> removeReservation(@PathVariable("id") Long id);
+    public ResponseEntity<Void> removeReservation(Long id);
 }

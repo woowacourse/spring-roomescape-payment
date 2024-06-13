@@ -24,6 +24,7 @@ springdoc:
     operationsSorter: method
     defaultModelsExpandDepth: 0
     defaultModelRendering: example
+  paths-to-exclude: /admin/**
 
 roomescape:
   payment:

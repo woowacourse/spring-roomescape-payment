@@ -16,7 +16,7 @@ import roomescape.auth.service.AuthService;
 import roomescape.global.util.CookieUtils;
 
 @RestController
-public class AuthController {
+public class AuthController implements AuthControllerDocs {
 
     private final AuthService authService;
 

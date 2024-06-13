@@ -1,6 +1,8 @@
 package roomescape.member.presentation;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,5 +26,10 @@ public interface MemberControllerDocs {
     @Operation(summary = "회원 추가", description = "회원을 추가합니다.")
     @ApiResponse(responseCode = "201", description = "회원 추가 성공",
             content = @Content(schema = @Schema(implementation = MemberResponse.class)))
+    @Parameters({
+            @Parameter(name = "email", description = "최대 길이 320 글자", required = true),
+            @Parameter(name = "password", description = "최소 6글자, 최대 20글자", required = true),
+            @Parameter(name = "name", description = "최대 20글자", required = true)
+    })
     public ResponseEntity<MemberResponse> createMember(JoinRequest joinRequest);
 }
