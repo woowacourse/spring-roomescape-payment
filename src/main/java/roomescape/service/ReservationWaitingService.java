@@ -116,9 +116,6 @@ public class ReservationWaitingService {
 
     private Reservation getChangedReservation(ReservationWaiting reservationWaiting) {
         Reservation reservation = reservationWaiting.getReservation();
-        if (!reservation.isCanceled()) {
-            throw new IllegalArgumentException("기존 예약이 취소되어야 합니다.");
-        }
         reservation.changeMember(reservationWaiting.getMember());
         return reservation;
     }

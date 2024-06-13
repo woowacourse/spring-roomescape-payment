@@ -99,20 +99,18 @@ public class Reservation {
     }
 
     public void changeMember(Member member) {
-        validateAlreadyAccepted();
+        if (!status.isCanceled()) {
+            throw new IllegalArgumentException("기존 예약이 취소되어야 합니다.");
+        }
         accept();
         this.member = member;
     }
 
     public void accept() {
-        validateAlreadyAccepted();
-        this.status = ReservationStatus.ACCEPTED;
-    }
-
-    private void validateAlreadyAccepted() {
         if (status.isAccepted()) {
             throw new IllegalArgumentException("이미 확정된 예약입니다.");
         }
+        this.status = ReservationStatus.ACCEPTED;
     }
 
     public void cancel() {
@@ -120,10 +118,6 @@ public class Reservation {
             throw new IllegalArgumentException("이미 취소된 예약입니다.");
         }
         this.status = ReservationStatus.CANCELED;
-    }
-
-    public boolean isCanceled() {
-        return status.isCanceled();
     }
 
     @Override

@@ -9,6 +9,7 @@ import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.reservationtime.ReservationTimeRepository;
 import roomescape.domain.theme.Theme;
@@ -74,7 +75,8 @@ class ReservationManageServiceTest extends BaseServiceTest {
 
         Reservation canceledReservation = reservationManageService.cancel(id);
 
-        assertThat(canceledReservation.isCanceled()).isTrue();
+        assertThat(canceledReservation).extracting("status")
+                .isEqualTo(ReservationStatus.CANCELED);
     }
 
     @Test
@@ -87,6 +89,7 @@ class ReservationManageServiceTest extends BaseServiceTest {
         reservationManageService.rollbackCancellation(reservation);
 
         Reservation rollbackedReservation = reservationRepository.findById(id).orElseThrow();
-        assertThat(rollbackedReservation.isCanceled()).isFalse();
+        assertThat(rollbackedReservation).extracting("status")
+                .isEqualTo(ReservationStatus.ACCEPTED);
     }
 }
