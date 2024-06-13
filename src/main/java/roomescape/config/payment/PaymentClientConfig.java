@@ -39,6 +39,7 @@ public class PaymentClientConfig {
                 .baseUrl(BASE_URL)
                 .defaultHeader(HttpHeaders.AUTHORIZATION, createAuthorization())
                 .requestInterceptor(new PaymentClientTimeoutInterceptor())
+                .requestInterceptor(new PaymentClientLoggingInterceptor())
                 .build();
     }
 
