@@ -19,14 +19,11 @@ public interface UserReservationTimeApiDocs {
     @Operation(summary = "예약 가능한 시간 조회", description = "예약 가능 여부와 예약 시간을 함께 조회할 수 있다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공",
-                    content = {@Content(
-                            mediaType = "application/json", schema = @Schema(implementation = TimeAndAvailabilityResponse.class))}),
+                    content = {@Content(schema = @Schema(implementation = TimeAndAvailabilityResponse.class))}),
             @ApiResponse(responseCode = "400", description = "요청 정보 문제로 실패",
-                    content = {@Content(
-                            mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
+                    content = {@Content(schema = @Schema(implementation = ErrorMessageResponse.class))}),
             @ApiResponse(responseCode = "500", description = "서버 내부 문제로 실패",
-                    content = {@Content(
-                            mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
+                    content = {@Content(schema = @Schema(implementation = ErrorMessageResponse.class))}),
     })
     ResponseEntity<List<TimeAndAvailabilityResponse>> findAllWithAvailability(LocalDate date, Long id);
 }

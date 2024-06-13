@@ -19,31 +19,24 @@ public interface AdminReservationTimeApiDocs {
     @Operation(summary = "모든 시간 조회", description = "모든 예약 가능 시간을 조회할 수 있다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공",
-                    content = {@Content(
-                            mediaType = "application/json", schema = @Schema(implementation = TimeResponse.class))}),
+                    content = {@Content(schema = @Schema(implementation = TimeResponse.class))}),
             @ApiResponse(responseCode = "401", description = "접근 권한이 없어서 실패",
-                    content = {@Content(
-                            mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
+                    content = {@Content(schema = @Schema(implementation = ErrorMessageResponse.class))}),
             @ApiResponse(responseCode = "500", description = "서버 내부 문제로 실패",
-                    content = {@Content(
-                            mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
+                    content = {@Content(schema = @Schema(implementation = ErrorMessageResponse.class))}),
     })
     ResponseEntity<List<TimeResponse>> findAll();
 
     @Operation(summary = "시간 생성", description = "예약 가능 시간을 생성할 수 있다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "생성 성공",
-                    content = {@Content(
-                            mediaType = "application/json", schema = @Schema(implementation = TimeResponse.class))}),
+                    content = {@Content(schema = @Schema(implementation = TimeResponse.class))}),
             @ApiResponse(responseCode = "400", description = "요청 정보 문제로 실패",
-                    content = {@Content(
-                            mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
+                    content = {@Content(schema = @Schema(implementation = ErrorMessageResponse.class))}),
             @ApiResponse(responseCode = "401", description = "접근 권한이 없어서 실패",
-                    content = {@Content(
-                            mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
+                    content = {@Content(schema = @Schema(implementation = ErrorMessageResponse.class))}),
             @ApiResponse(responseCode = "500", description = "서버 내부 문제로 실패",
-                    content = {@Content(
-                            mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
+                    content = {@Content(schema = @Schema(implementation = ErrorMessageResponse.class))}),
     })
     ResponseEntity<TimeResponse> save(CreateTimeRequest request);
 
@@ -52,14 +45,11 @@ public interface AdminReservationTimeApiDocs {
             @ApiResponse(responseCode = "204", description = "삭제 성공",
                     content = {@Content(mediaType = "application/json")}),
             @ApiResponse(responseCode = "400", description = "요청 정보 문제로 실패",
-                    content = {@Content(
-                            mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
+                    content = {@Content(schema = @Schema(implementation = ErrorMessageResponse.class))}),
             @ApiResponse(responseCode = "401", description = "접근 권한이 없어서 실패",
-                    content = {@Content(
-                            mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
+                    content = {@Content(schema = @Schema(implementation = ErrorMessageResponse.class))}),
             @ApiResponse(responseCode = "500", description = "서버 내부 문제로 실패",
-                    content = {@Content(
-                            mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
+                    content = {@Content(schema = @Schema(implementation = ErrorMessageResponse.class))}),
     })
     ResponseEntity<Void> delete(Long id);
 }

@@ -17,14 +17,11 @@ public interface AdminThemeApiDocs {
     @Operation(summary = "테마 생성", description = "테마를 생성할 수 있다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공",
-                    content = {@Content(
-                            mediaType = "application/json", schema = @Schema(implementation = ThemeResponse.class))}),
+                    content = {@Content(schema = @Schema(implementation = ThemeResponse.class))}),
             @ApiResponse(responseCode = "401", description = "접근 권한이 없어서 실패",
-                    content = {@Content(
-                            mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
+                    content = {@Content(schema = @Schema(implementation = ErrorMessageResponse.class))}),
             @ApiResponse(responseCode = "500", description = "서버 내부 문제로 실패",
-                    content = {@Content(
-                            mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
+                    content = {@Content(schema = @Schema(implementation = ErrorMessageResponse.class))}),
     })
     ResponseEntity<ThemeResponse> save(CreateThemeRequest request);
 
@@ -33,14 +30,11 @@ public interface AdminThemeApiDocs {
             @ApiResponse(responseCode = "204", description = "삭제 성공",
                     content = {@Content(mediaType = "application/json")}),
             @ApiResponse(responseCode = "400", description = "요청 정보 문제로 실패",
-                    content = {@Content(
-                            mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
+                    content = {@Content(schema = @Schema(implementation = ErrorMessageResponse.class))}),
             @ApiResponse(responseCode = "401", description = "접근 권한이 없어서 실패",
-                    content = {@Content(
-                            mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
+                    content = {@Content(schema = @Schema(implementation = ErrorMessageResponse.class))}),
             @ApiResponse(responseCode = "500", description = "서버 내부 문제로 실패",
-                    content = {@Content(
-                            mediaType = "application/json", schema = @Schema(implementation = ErrorMessageResponse.class))}),
+                    content = {@Content(schema = @Schema(implementation = ErrorMessageResponse.class))}),
     })
     ResponseEntity<Void> delete(Long id);
 }
