@@ -24,7 +24,7 @@ public class PaymentClientResponseErrorHandler implements ResponseErrorHandler {
     private static final String ERROR_CODE = "code";
     private static final String DEFAULT_ERROR_MESSAGE = "알 수 없는 에러가 발생하였습니다.";
     private static final String DEFAULT_ERROR_CODE = "Unknown Error";
-    private static final Logger logger = LoggerFactory.getLogger(PaymentClientResponseErrorHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(PaymentClientResponseErrorHandler.class);
     private final ObjectMapper objectMapper;
 
     public PaymentClientResponseErrorHandler(ObjectMapper objectMapper) {
@@ -43,7 +43,7 @@ public class PaymentClientResponseErrorHandler implements ResponseErrorHandler {
         JsonNode jsonNode = objectMapper.readTree(responseBody);
         String errorCode = jsonNode.path(ERROR_CODE).asText(DEFAULT_ERROR_CODE);
         String errorMessage = jsonNode.path(ERROR_MESSAGE).asText(DEFAULT_ERROR_MESSAGE);
-        logger.error("ErrorCode : {}, Message : {}", errorCode, errorMessage);
+        log.error("ErrorCode : {}, Message : {}", errorCode, errorMessage);
         throw new PaymentException(UserPaymentExceptionResponse.of(errorCode, errorMessage));
     }
 }

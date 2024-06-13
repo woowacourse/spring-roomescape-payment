@@ -45,3 +45,24 @@ INSERT INTO reservation (date, created_at, time_id, theme_id, member_id, status)
 VALUES (CURRENT_DATE + 1, CURRENT_TIMESTAMP, 1, 2, 1, 'BOOKED');
 INSERT INTO reservation (date, created_at, time_id, theme_id, member_id, status)
 VALUES (CURRENT_DATE + 2, CURRENT_TIMESTAMP, 1, 2, 1, 'BOOKED');
+
+INSERT INTO payment (reservation_id, payment_key, order_name, requested_at, approved_at, amount, easy_pay_type, currency_code, created_at)
+VALUES (1, 'PK_001', 'Payment for reservation 1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 5000.00, 'TOSS_PAY', 'KRW', CURRENT_TIMESTAMP);
+INSERT INTO payment (reservation_id,payment_key,order_name,requested_at,approved_at,amount,easy_pay_type,currency_code,created_at)
+VALUES(4, 'PK_004', 'Payment for reservation 4', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 3000.00, 'TOSS_PAY', 'KRW', CURRENT_TIMESTAMP);
+INSERT INTO payment (reservation_id,payment_key,order_name,requested_at,approved_at,amount,easy_pay_type,currency_code,created_at)
+VALUES(5, 'PK_005', 'Payment for reservation 5', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 5000.00, 'KAKAO_PAY', 'KRW', CURRENT_TIMESTAMP);
+INSERT INTO payment (reservation_id,payment_key,order_name,requested_at,approved_at,amount,easy_pay_type,currency_code,created_at)
+VALUES(6, 'PK_006', 'Payment for reservation 6', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 7000.00, 'TOSS_PAY', 'KRW', CURRENT_TIMESTAMP);
+INSERT INTO payment (reservation_id,payment_key,order_name,requested_at,approved_at,amount,easy_pay_type,currency_code,created_at)
+VALUES(7, 'PK_007', 'Payment for reservation 7', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 4500.00, 'TOSS_PAY', 'KRW', CURRENT_TIMESTAMP);
+INSERT INTO payment (reservation_id,payment_key,order_name,requested_at,approved_at,amount,easy_pay_type,currency_code,created_at)
+VALUES(8, 'PK_008', 'Payment for reservation 8', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 5000.00, 'KAKAO_PAY', 'KRW', CURRENT_TIMESTAMP);
+INSERT INTO payment (reservation_id,payment_key,order_name,requested_at,approved_at,amount,easy_pay_type,currency_code,created_at)
+VALUES(9, 'PK_009', 'Payment for reservation 9', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 5000.00, 'TOSS_PAY', 'KRW', CURRENT_TIMESTAMP);
+INSERT INTO payment (reservation_id,payment_key,order_name,requested_at,approved_at,amount,easy_pay_type,currency_code,created_at)
+VALUES(10, 'PK_010', 'Payment for reservation 10', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 5500.00, 'TOSS_PAY', 'KRW', CURRENT_TIMESTAMP);
+INSERT INTO payment (reservation_id,payment_key,order_name,requested_at,approved_at,amount,easy_pay_type,currency_code,created_at)
+VALUES(11, 'PK_011', 'Payment for reservation 11', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 6000.00, 'KAKAO_PAY', 'KRW', CURRENT_TIMESTAMP);
+INSERT INTO payment (reservation_id,payment_key,order_name,requested_at,approved_at,amount,easy_pay_type,currency_code,created_at)
+VALUES(12, 'PK_012', 'Payment for reservation 12', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 6500.00, 'TOSS_PAY', 'KRW', CURRENT_TIMESTAMP);

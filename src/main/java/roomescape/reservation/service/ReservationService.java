@@ -9,21 +9,27 @@ import static roomescape.exception.type.RoomescapeExceptionType.PAST_TIME_RESERV
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import roomescape.admin.dto.AdminReservationDetailResponse;
+import roomescape.reservation.dto.ReservationWaitingDetailResponse;
 import roomescape.admin.dto.AdminReservationRequest;
 import roomescape.exception.RoomescapeException;
 import roomescape.member.domain.LoginMember;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.PaymentResult;
+import roomescape.payment.dto.PaymentResponse;
+import roomescape.payment.entity.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.Reservations;
 import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.dto.ReservationDetailResponse;
+import roomescape.reservation.dto.ReservationPaymentDetail;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.entity.Reservation;
@@ -39,20 +45,26 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentRepository paymentRepository;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
-                              MemberRepository memberRepository) {
+                              MemberRepository memberRepository,
+                              PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Transactional
-    public ReservationResponse save(LoginMember loginMember, ReservationRequest reservationRequest) {
-
+    public roomescape.reservation.dto.ReservationPaymentResponse saveReservationPayment(
+            LoginMember loginMember,
+            ReservationRequest reservationRequest,
+            PaymentResult paymentResult
+    ) {
         Reservation reservation = getReservation(loginMember.getId(), reservationRequest, ReservationStatus.BOOKED);
 
         Reservations reservations = new Reservations(reservationRepository.findAll());
@@ -63,8 +75,13 @@ public class ReservationService {
                     reservationRequest.themeId(),
                     reservationRequest.timeId());
         }
+        Reservation savedReservation = reservationRepository.save(reservation);
+        paymentRepository.save(new Payment(savedReservation, paymentResult));
 
-        return ReservationResponse.from(reservationRepository.save(reservation));
+        return new roomescape.reservation.dto.ReservationPaymentResponse(
+                ReservationResponse.from(reservation),
+                PaymentResponse.from(paymentResult)
+        );
     }
 
     @Transactional
@@ -142,19 +159,49 @@ public class ReservationService {
     }
 
     @Transactional
-    public List<ReservationDetailResponse> findAllByMemberId(long memberId) {
+    public List<ReservationPaymentDetail> findAllByMemberId(long memberId) {
         Reservations reservations = new Reservations(reservationRepository.findAllByMemberId(memberId));
         List<Waiting> waitings = reservations.waiting().stream()
-                .map(reservation -> new Waiting(
-                        reservation,
-                        reservationRepository.findAndCountWaitingNumber(
-                                reservation.getDate(),
-                                reservation.getReservationTime(),
-                                reservation.getTheme(),
-                                reservation.getCreatedAt())))
+                .map(this::createWaiting)
                 .filter(waiting -> !waiting.isOver())
                 .toList();
-        return ReservationDetailResponse.of(reservations, waitings);
+        return getReservationPaymentDetailsBy(ReservationDetailResponse.of(reservations, waitings));
+    }
+
+    private List<ReservationPaymentDetail> getReservationPaymentDetailsBy(List<ReservationDetailResponse> reservationDetails) {
+        List<ReservationPaymentDetail> paymentDetails = new ArrayList<>();
+        for (ReservationDetailResponse response : reservationDetails) {
+            paymentRepository.findByReservationId(response.reservationId())
+                    .ifPresentOrElse(payment -> paymentDetails.add(new ReservationPaymentDetail(response, PaymentResponse.from(payment))),
+                            () -> paymentDetails.add(new ReservationPaymentDetail(response, PaymentResponse.nothing())));
+        }
+        return paymentDetails;
+    }
+
+    private Waiting createWaiting(Reservation reservation) {
+        return new Waiting(
+                reservation,
+                reservationRepository.findAndCountWaitingNumber(
+                        reservation.getDate(),
+                        reservation.getReservationTime(),
+                        reservation.getTheme(),
+                        reservation.getCreatedAt()));
+    }
+
+    @Transactional
+    public List<ReservationWaitingDetailResponse> findAllWaitingReservations() {
+        List<Reservation> reservations = reservationRepository.findAllByStatus(ReservationStatus.WAITING);
+        return reservations.stream()
+                .map(this::createWaiting)
+                .filter(waiting -> !waiting.isOver())
+                .map(ReservationWaitingDetailResponse::from)
+                .toList();
+    }
+
+    @Transactional
+    public void cancelReservationPayment(long reservationId, long paymentId) {
+        paymentRepository.deleteById(paymentId);
+        reservationRepository.deleteById(reservationId);
     }
 
     @Transactional
@@ -165,21 +212,5 @@ public class ReservationService {
     @Transactional
     public void deleteByMemberIdAndId(LoginMember loginMember, long id) {
         reservationRepository.deleteByMemberIdAndId(loginMember.getId(), id);
-    }
-
-    @Transactional
-    public List<AdminReservationDetailResponse> findAllWaitingReservations() {
-        List<Reservation> reservations = reservationRepository.findAllByStatus(ReservationStatus.WAITING);
-        return reservations.stream()
-                .map(reservation -> new Waiting(
-                        reservation,
-                        reservationRepository.findAndCountWaitingNumber(
-                                reservation.getDate(),
-                                reservation.getReservationTime(),
-                                reservation.getTheme(),
-                                reservation.getCreatedAt())))
-                .filter(waiting -> !waiting.isOver())
-                .map(AdminReservationDetailResponse::from)
-                .toList();
     }
 }

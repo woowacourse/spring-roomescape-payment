@@ -1,6 +1,7 @@
 package roomescape.payment.api;
 
 import java.util.Base64;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,8 +10,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import roomescape.payment.config.PaymentClientResponseErrorHandler;
+import roomescape.payment.domain.PaymentResult;
+import roomescape.payment.dto.CancelReason;
 import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResponse;
 
 @Component
 public class TossPaymentClient implements PaymentClient {
@@ -18,6 +20,7 @@ public class TossPaymentClient implements PaymentClient {
     private static final String AUTH_HEADER = "Authorization";
     private static final String AUTH_METHOD = "Basic ";
     private static final String APPROVE_PAYMENT_URI = "/v1/payments/confirm";
+    private static final String CANCEL_PAYMENT_URI = "/v1/payments/{paymentKey}/cancel";
     private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.class);
     private final String encodedSecretKey;
     private final RestClient restClient;
@@ -36,16 +39,34 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public PaymentResponse payment(PaymentRequest paymentRequest) {
-        log.info("URI: {}, RequestBody:{} ", APPROVE_PAYMENT_URI, paymentRequest);
-        PaymentResponse paymentResponse = restClient.post()
+    public PaymentResult payment(PaymentRequest paymentRequest) {
+        String requestId = UUID.randomUUID().toString();
+        log.info("RequestID: {}, URI: {}, RequestBody:{} ", requestId, APPROVE_PAYMENT_URI, paymentRequest);
+        PaymentResult paymentResult = restClient.post()
                 .uri(APPROVE_PAYMENT_URI)
                 .header(AUTH_HEADER, AUTH_METHOD + encodedSecretKey)
+                .header("Request-ID", requestId)
                 .body(paymentRequest)
                 .retrieve()
                 .onStatus(paymentClientResponseErrorHandler)
-                .body(PaymentResponse.class);
-        log.info("URI: {}, Method: {}, ResponseBody:{} ", APPROVE_PAYMENT_URI, "POST", paymentResponse);
-        return paymentResponse;
+                .body(PaymentResult.class);
+        log.info("RequestID: {}, URI: {}, Method: {}, ResponseBody:{} ", requestId, APPROVE_PAYMENT_URI, "POST", paymentResult);
+        return paymentResult;
+    }
+
+    @Override
+    public PaymentResult cancel(String paymentKey, CancelReason cancelReason) {
+        String requestId = UUID.randomUUID().toString();
+        log.info("RequestID: {}, URI: {}, PaymentKey:{} ", requestId, CANCEL_PAYMENT_URI, paymentKey);
+        PaymentResult paymentResult = restClient.post()
+                .uri(CANCEL_PAYMENT_URI, paymentKey)
+                .header(AUTH_HEADER, AUTH_METHOD + encodedSecretKey)
+                .header("Request-ID", requestId)
+                .body(cancelReason)
+                .retrieve()
+                .onStatus(paymentClientResponseErrorHandler)
+                .body(PaymentResult.class);
+        log.info("RequestID: {}, URI: {}, Method: {}, ResponseBody:{} ", requestId, CANCEL_PAYMENT_URI, "POST", paymentResult);
+        return paymentResult;
     }
 }

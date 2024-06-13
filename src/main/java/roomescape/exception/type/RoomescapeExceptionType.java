@@ -35,6 +35,8 @@ public enum RoomescapeExceptionType {
 
     NOT_FOUND_RESERVATION_TIME("존재하지 않는 시간입니다.",
             "Reservation time not found. -> timeId = %s"),
+    NOT_FOUND_RESERVATION_PAYMENT("결제가 존재하지 않는 예약입니다.",
+            "Reservation payment not found. -> reservationId = %s"),
     NOT_FOUND_THEME("존재하지 않는 테마입니다.",
             "Theme not found. -> themeId = %s"),
     NOT_FOUND_MEMBER_BY_ID("존재하지 않는 사용자입니다.",

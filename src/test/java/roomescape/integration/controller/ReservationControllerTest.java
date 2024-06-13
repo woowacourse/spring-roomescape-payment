@@ -2,11 +2,14 @@ package roomescape.integration.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import static roomescape.exception.type.RoomescapeExceptionType.DUPLICATE_RESERVATION;
 import static roomescape.exception.type.RoomescapeExceptionType.NO_QUERY_PARAMETER;
 import static roomescape.exception.type.RoomescapeExceptionType.PAST_TIME_RESERVATION;
 import static roomescape.fixture.MemberFixture.DEFAULT_MEMBER;
+import static roomescape.fixture.PaymentFixture.PAYMENT_INFO;
 import static roomescape.fixture.ReservationFixture.ReservationOfDate;
 import static roomescape.fixture.ReservationFixture.ReservationOfDateAndTheme;
 import static roomescape.fixture.ReservationTimeFixture.DEFAULT_RESERVATION_TIME;
@@ -35,6 +38,9 @@ import roomescape.fixture.ThemeFixture;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.api.PaymentClient;
+import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.entity.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.entity.Reservation;
 import roomescape.reservation.repository.ReservationRepository;
@@ -53,6 +59,8 @@ public class ReservationControllerTest {
     private JwtGenerator JWT_GENERATOR;
     @Autowired
     private ReservationRepository reservationRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
     @Autowired
@@ -117,6 +125,17 @@ public class ReservationControllerTest {
             reservation10 = reservationRepository.save(
                     ReservationOfDateAndTheme(LocalDate.now().plusDays(4), theme)
             );
+
+            paymentRepository.save(new Payment(reservation1, PAYMENT_INFO));
+            paymentRepository.save(new Payment(reservation2, PAYMENT_INFO));
+            paymentRepository.save(new Payment(reservation3, PAYMENT_INFO));
+            paymentRepository.save(new Payment(reservation4, PAYMENT_INFO));
+            paymentRepository.save(new Payment(reservation5, PAYMENT_INFO));
+            paymentRepository.save(new Payment(reservation6, PAYMENT_INFO));
+            paymentRepository.save(new Payment(reservation7, PAYMENT_INFO));
+            paymentRepository.save(new Payment(reservation8, PAYMENT_INFO));
+            paymentRepository.save(new Payment(reservation9, PAYMENT_INFO));
+            paymentRepository.save(new Payment(reservation10, PAYMENT_INFO));
         }
 
         @DisplayName("존재하는 모든 예약을 조회할 수 있다.")
@@ -150,6 +169,8 @@ public class ReservationControllerTest {
                     "paymentKey", "invalidPaymentKey",
                     "orderId", "invalidOrderId",
                     "amount", 1000);
+
+            when(paymentClient.payment(any(PaymentRequest.class))).thenReturn(PAYMENT_INFO);
 
             RestAssured.given().log().all()
                     .when()

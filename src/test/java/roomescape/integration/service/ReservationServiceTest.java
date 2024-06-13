@@ -10,7 +10,8 @@ import static roomescape.exception.type.RoomescapeExceptionType.DUPLICATE_WAITIN
 import static roomescape.exception.type.RoomescapeExceptionType.NOT_FOUND_RESERVATION_TIME;
 import static roomescape.exception.type.RoomescapeExceptionType.NOT_FOUND_THEME;
 import static roomescape.exception.type.RoomescapeExceptionType.PAST_TIME_RESERVATION;
-import static roomescape.fixture.PaymentFixture.PAYMENT_REQUEST;
+import static roomescape.fixture.PaymentFixture.PAYMENT_INFO;
+import static roomescape.fixture.PaymentFixture.PAYMENT_RESPONSE;
 import static roomescape.fixture.ReservationFixture.ReservationOfDate;
 import static roomescape.fixture.ReservationFixture.ReservationOfDateAndMemberAndStatus;
 import static roomescape.fixture.ReservationFixture.ReservationOfDateAndStatus;
@@ -30,18 +31,21 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
-import roomescape.admin.dto.AdminReservationDetailResponse;
+import roomescape.reservation.dto.ReservationWaitingDetailResponse;
 import roomescape.auth.domain.Role;
 import roomescape.exception.RoomescapeException;
 import roomescape.fixture.MemberFixture;
 import roomescape.member.domain.LoginMember;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.dto.PaymentResponse;
+import roomescape.payment.entity.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.Reservations;
 import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.dto.ReservationDetailResponse;
-import roomescape.reservation.dto.ReservationPaymentRequest;
+import roomescape.reservation.dto.ReservationPaymentDetail;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.entity.Reservation;
@@ -66,6 +70,8 @@ class ReservationServiceTest {
     private ThemeRepository themeRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @BeforeEach
     void initService() {
@@ -78,18 +84,20 @@ class ReservationServiceTest {
     @Test
     void createFutureReservationTest() {
         //when
-        ReservationResponse saved = reservationService.save(
-                loginMember,
-                new ReservationRequest(
-                        LocalDate.now().plusDays(1),
-                        DEFAULT_THEME.getId(),
-                        DEFAULT_RESERVATION_TIME.getId()
-                ));
+        ReservationResponse saved = reservationService.saveReservationPayment(
+                        loginMember,
+                        new ReservationRequest(
+                                LocalDate.now().plusDays(1),
+                                DEFAULT_THEME.getId(),
+                                DEFAULT_RESERVATION_TIME.getId()
+                        ), PAYMENT_INFO)
+                .reservationResponse();
 
         //then
         assertAll(
                 () -> assertThat(new Reservations(reservationRepository.findAll()).getReservations())
                         .hasSize(1),
+                () -> assertThat(paymentRepository.findByReservationId(saved.id()).get()).isNotNull(),
                 () -> assertThat(saved.id()).isEqualTo(1L)
         );
     }
@@ -97,12 +105,13 @@ class ReservationServiceTest {
     @DisplayName("지난 시간에 대해 예약을 시도할 경우 예외가 발생한다.")
     @Test
     void createPastReservationFailTest() {
-        assertThatThrownBy(() -> reservationService.save(
+        assertThatThrownBy(() -> reservationService.saveReservationPayment(
                 loginMember,
                 new ReservationRequest(
                         LocalDate.now().minusDays(1),
                         DEFAULT_THEME.getId(),
-                        DEFAULT_RESERVATION_TIME.getId())))
+                        DEFAULT_RESERVATION_TIME.getId()),
+                PAYMENT_INFO))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(PAST_TIME_RESERVATION.getMessage());
     }
@@ -110,12 +119,13 @@ class ReservationServiceTest {
     @DisplayName("존재하지 않는 시간에 대해 예약을 생성하면 예외가 발생한다.")
     @Test
     void createReservationWithTimeNotExistsTest() {
-        assertThatThrownBy(() -> reservationService.save(
+        assertThatThrownBy(() -> reservationService.saveReservationPayment(
                 loginMember,
                 new ReservationRequest(
                         LocalDate.now().minusDays(1),
                         2L,
-                        DEFAULT_THEME.getId())))
+                        DEFAULT_THEME.getId()),
+                PAYMENT_INFO))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(NOT_FOUND_RESERVATION_TIME.getMessage());
     }
@@ -123,12 +133,13 @@ class ReservationServiceTest {
     @DisplayName("존재하지 않는 테마에 대해 예약을 생성하면 예외가 발생한다.")
     @Test
     void createReservationWithThemeNotExistsTest() {
-        assertThatThrownBy(() -> reservationService.save(
+        assertThatThrownBy(() -> reservationService.saveReservationPayment(
                 loginMember,
                 new ReservationRequest(
                         LocalDate.now().plusDays(1),
                         DEFAULT_RESERVATION_TIME.getId(),
-                        2L)))
+                        2L),
+                PAYMENT_INFO))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(NOT_FOUND_THEME.getMessage());
     }
@@ -171,7 +182,7 @@ class ReservationServiceTest {
         );
 
         //when
-        List<AdminReservationDetailResponse> reservationResponses = reservationService.findAllWaitingReservations();
+        List<ReservationWaitingDetailResponse> reservationResponses = reservationService.findAllWaitingReservations();
 
         //then
         assertThat(reservationResponses).hasSize(2);
@@ -184,26 +195,24 @@ class ReservationServiceTest {
         Member testMember = new Member(2L, "test", Role.USER, "test@test.com", "1234");
         memberRepository.save(testMember);
         Reservation reservation1 = ReservationOfDateAndMemberAndStatus(LocalDate.now().plusDays(1),
+                member, ReservationStatus.BOOKED);
+        Reservation reservation2 = ReservationOfDateAndMemberAndStatus(LocalDate.now().plusDays(2),
                 testMember, ReservationStatus.BOOKED);
-        Reservation reservation2 = ReservationOfDateAndMemberAndStatus(LocalDate.now().plusDays(1),
+        Reservation reservation3 = ReservationOfDateAndMemberAndStatus(LocalDate.now().plusDays(2),
                 member, ReservationStatus.WAITING);
-        Reservation reservation3 = ReservationOfDateAndMemberAndStatus(LocalDate.now().plusDays(3),
-                member, ReservationStatus.BOOKED);
-        Reservation reservation4 = ReservationOfDateAndMemberAndStatus(LocalDate.now().plusDays(4),
-                member, ReservationStatus.BOOKED);
         reservationRepository.save(reservation1);
         reservationRepository.save(reservation2);
         reservationRepository.save(reservation3);
-        reservationRepository.save(reservation4);
 
+        paymentRepository.save(new Payment(reservation1, PAYMENT_INFO));
         //when
-        List<ReservationDetailResponse> reservationResponses = reservationService.findAllByMemberId(member.getId());
+        List<ReservationPaymentDetail> reservationResponses = reservationService.findAllByMemberId(member.getId());
 
         //then
-        List<ReservationDetailResponse> expected = List.of(
-                ReservationDetailResponse.from(new Waiting(reservation2, 1)),
-                ReservationDetailResponse.from(reservation3),
-                ReservationDetailResponse.from(reservation4));
+        List<ReservationPaymentDetail> expected = List.of(
+                new ReservationPaymentDetail(ReservationDetailResponse.from(reservation1), PAYMENT_RESPONSE),
+                new ReservationPaymentDetail(ReservationDetailResponse.from(new Waiting(reservation3, 1)), PaymentResponse.nothing()));
+
         assertThat(reservationResponses).isEqualTo(expected);
     }
 
@@ -261,7 +270,7 @@ class ReservationServiceTest {
 
         //when
         reservationRepository.deleteById(1L);
-        List<AdminReservationDetailResponse> waitingResponses = reservationService.findAllWaitingReservations();
+        List<ReservationWaitingDetailResponse> waitingResponses = reservationService.findAllWaitingReservations();
         List<ReservationResponse> bookedResponses = reservationService.findAllReservations();
         //then
         assertAll(
@@ -286,12 +295,13 @@ class ReservationServiceTest {
         @DisplayName("이미 예약된 시간, 테마의 예약을 또 생성할 수 없다.")
         @Test
         void duplicatedReservationFailTest() {
-            assertThatThrownBy(() -> reservationService.save(
+            assertThatThrownBy(() -> reservationService.saveReservationPayment(
                     loginMember,
                     new ReservationRequest(
                             defaultDate,
                             DEFAULT_RESERVATION_TIME.getId(),
-                            DEFAULT_THEME.getId())))
+                            DEFAULT_THEME.getId()),
+                    PAYMENT_INFO))
                     .isInstanceOf(RoomescapeException.class)
                     .hasMessage(DUPLICATE_RESERVATION.getMessage());
         }
@@ -306,7 +316,18 @@ class ReservationServiceTest {
                     .hasMessage(DUPLICATE_WAITING_RESERVATION.getMessage());
         }
 
-        @DisplayName("예약을 삭제할 수 있다.")
+        @DisplayName("결제된 예약을 삭제할 수 있다.")
+        @Test
+        void deleteReservationPaymentTest() {
+            paymentRepository.save(new Payment(defaultReservation, PAYMENT_INFO));
+            //when
+            reservationService.cancelReservationPayment(1L, 1L);
+
+            //then
+            assertThat(new Reservations(reservationRepository.findAll()).getReservations()).isEmpty();
+        }
+
+        @DisplayName("결제되지 않은 예약을 삭제할 수 있다.")
         @Test
         void deleteReservationTest() {
             //when
