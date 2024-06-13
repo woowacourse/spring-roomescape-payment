@@ -38,7 +38,7 @@ public class AdminReservationController {
     @Operation(summary = "어드민 예약 추가 API")
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> saveReservationByAdmin(@RequestBody @Valid AdminReservationRequest adminReservationRequest) {
-        ReservationResponse reservationResponse = reservationService.saveReservationByAdmin(adminReservationRequest);
+        ReservationResponse reservationResponse = reservationService.reserveReservationByAdmin(adminReservationRequest);
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
                 .body(reservationResponse);
     }

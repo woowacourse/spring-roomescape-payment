@@ -62,11 +62,15 @@ public class Reservation {
     }
 
     public void approve() {
-        this.status = Status.RESERVATION;
+        this.status = Status.RESERVED;
     }
 
     public boolean isNotMyReservation(LoginMember loginMember) {
         return member.isNotMyReservation(loginMember);
+    }
+
+    public boolean isReserved() {
+        return status.isReserved();
     }
 
     public Long getId() {

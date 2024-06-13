@@ -27,7 +27,7 @@ class ReservationCreateServiceTest extends BasicAcceptanceTest {
                 1L, LocalDate.now().plusDays(1), 999L, 1L
         );
 
-        assertThatThrownBy(() -> reservationCreateService.saveReservationByAdmin(adminReservationRequest))
+        assertThatThrownBy(() -> reservationCreateService.reserveReservationByAdmin(adminReservationRequest))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("존재하지 않는 예약 시간입니다.");
     }
@@ -39,7 +39,7 @@ class ReservationCreateServiceTest extends BasicAcceptanceTest {
                 1L, LocalDate.now().plusDays(1), 1L, 999L
         );
 
-        assertThatThrownBy(() -> reservationCreateService.saveReservationByAdmin(adminReservationRequest))
+        assertThatThrownBy(() -> reservationCreateService.reserveReservationByAdmin(adminReservationRequest))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("존재하지 않는 테마입니다.");
     }
@@ -55,7 +55,7 @@ class ReservationCreateServiceTest extends BasicAcceptanceTest {
                 existReservation.getTheme().getId()
         );
 
-        assertThatThrownBy(() -> reservationCreateService.saveReservationByAdmin(adminReservationRequest))
+        assertThatThrownBy(() -> reservationCreateService.reserveReservationByAdmin(adminReservationRequest))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage("예약이 존재합니다.");
     }
@@ -67,7 +67,7 @@ class ReservationCreateServiceTest extends BasicAcceptanceTest {
                 1L, LocalDate.now().minusDays(1), 1L, 1L
         );
 
-        assertThatThrownBy(() -> reservationCreateService.saveReservationByAdmin(adminReservationRequest))
+        assertThatThrownBy(() -> reservationCreateService.reserveReservationByAdmin(adminReservationRequest))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage("현재 시간보다 과거로 예약할 수 없습니다.");
     }

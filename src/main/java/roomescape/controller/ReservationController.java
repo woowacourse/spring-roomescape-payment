@@ -35,7 +35,7 @@ public class ReservationController {
     @Operation(summary = "사용자 예약 조회 API")
     @GetMapping("/reservations")
     public ResponseEntity<List<ReservationResponse>> findAllByReservation() {
-        List<ReservationResponse> responses = reservationService.findAllByStatus(Status.RESERVATION);
+        List<ReservationResponse> responses = reservationService.findAllByStatus(Status.RESERVED);
         return ResponseEntity.ok(responses);
     }
 
@@ -44,7 +44,7 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> saveReservationByClient(
             @LoginMemberConverter LoginMember loginMember,
             @RequestBody @Valid ReservationRequest reservationRequest) {
-        ReservationResponse response = reservationService.saveReservationWithPaymentByClient(loginMember, reservationRequest);
+        ReservationResponse response = reservationService.reserveReservationWithPaymentByClient(loginMember, reservationRequest);
         return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
     }
 

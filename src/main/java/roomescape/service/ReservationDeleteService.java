@@ -36,7 +36,7 @@ public class ReservationDeleteService {
         CanceledReservation canceledReservation = canceledReservationRepository.save(reservation.canceled());
         paymentService.deletePayment(reservation, canceledReservation);
         reservationRepository.deleteById(reservation.getId());
-        updateWaitingToReservation(reservation);
+        updateWaitingToPaymentWaiting(reservation);
     }
 
     private void validateDeleteReservation(Reservation reservation, LoginMember loginMember) {
@@ -45,17 +45,16 @@ public class ReservationDeleteService {
         }
     }
 
-    private void updateWaitingToReservation(Reservation reservation) {
-        if (isWaitingUpdatableToReservation(reservation)) {
+    private void updateWaitingToPaymentWaiting(Reservation reservation) {
+        if (isWaitingUpdatableToPaymentWaiting(reservation)) {
             reservationRepository.findFirstByDateAndTimeIdAndThemeIdAndStatus(
                     reservation.getDate(), reservation.getTime().getId(), reservation.getTheme().getId(), Status.WAITING
             ).ifPresent(Reservation::changePaymentWaiting);
         }
     }
 
-    private boolean isWaitingUpdatableToReservation(Reservation reservation) {
-        return reservation.getStatus() == Status.RESERVATION &&
-                reservationRepository.existsByDateAndTimeIdAndThemeIdAndStatus(
+    private boolean isWaitingUpdatableToPaymentWaiting(Reservation reservation) {
+        return reservation.isReserved() && reservationRepository.existsByDateAndTimeIdAndThemeIdAndStatus(
                         reservation.getDate(), reservation.getTime().getId(),
                         reservation.getTheme().getId(), Status.WAITING
                 );

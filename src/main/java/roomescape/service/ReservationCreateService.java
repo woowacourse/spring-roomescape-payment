@@ -40,7 +40,7 @@ public class ReservationCreateService {
     }
 
     @Transactional
-    public Reservation saveReservationByClient(LoginMember loginMember, ReservationRequest reservationRequest) {
+    public Reservation reserveReservationByClient(LoginMember loginMember, ReservationRequest reservationRequest) {
         Reservation reservation = createReservation(
                 loginMember.id(),
                 reservationRequest.date(),
@@ -62,7 +62,7 @@ public class ReservationCreateService {
     }
 
     @Transactional
-    public Reservation saveReservationByAdmin(AdminReservationRequest adminReservationRequest) {
+    public Reservation reserveReservationByAdmin(AdminReservationRequest adminReservationRequest) {
         Reservation reservation = createReservation(
                 adminReservationRequest.memberId(),
                 adminReservationRequest.date(),
@@ -77,7 +77,7 @@ public class ReservationCreateService {
         LocalDateTime dateTime = LocalDateTime.of(date, reservationTime.getStartAt());
         validateRequestDateAfterCurrentTime(dateTime);
         validateUniqueReservation(date, timeId, themeId);
-        return new Reservation(getMember(memberId), date, reservationTime, getTheme(themeId), Status.RESERVATION);
+        return new Reservation(getMember(memberId), date, reservationTime, getTheme(themeId), Status.RESERVED);
     }
 
     private Reservation createWaiting(Long memberId, LocalDate date, Long timeId, Long themeId) {

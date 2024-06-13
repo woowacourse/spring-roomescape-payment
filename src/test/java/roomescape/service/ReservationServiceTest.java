@@ -39,9 +39,9 @@ class ReservationServiceTest extends BasicAcceptanceTest {
     void saveByClient() {
         LocalDate tomorrow = LocalDate.now().plusDays(1L);
         ReservationRequest reservationRequest = new ReservationRequest(tomorrow, 1L, 1L, null, null, new BigDecimal("0"));
-        reservationService.saveReservationWithPaymentByClient(TestFixtures.LOGIN_MEMBER_1, reservationRequest);
+        reservationService.reserveReservationWithPaymentByClient(TestFixtures.LOGIN_MEMBER_1, reservationRequest);
 
-        List<ReservationResponse> reservationResponses = reservationService.findAllByStatus(Status.RESERVATION);
+        List<ReservationResponse> reservationResponses = reservationService.findAllByStatus(Status.RESERVED);
 
         assertThat(reservationResponses).isEqualTo(TestFixtures.RESERVATION_RESPONSES_2);
     }
@@ -51,9 +51,9 @@ class ReservationServiceTest extends BasicAcceptanceTest {
     void saveByAdmin() {
         LocalDate tomorrow = LocalDate.now().plusDays(1L);
         AdminReservationRequest adminReservationRequest = new AdminReservationRequest(1L, tomorrow, 1L, 1L);
-        reservationService.saveReservationByAdmin(adminReservationRequest);
+        reservationService.reserveReservationByAdmin(adminReservationRequest);
 
-        List<ReservationResponse> reservationResponses = reservationService.findAllByStatus(Status.RESERVATION);
+        List<ReservationResponse> reservationResponses = reservationService.findAllByStatus(Status.RESERVED);
 
         assertThat(reservationResponses).isEqualTo(TestFixtures.RESERVATION_RESPONSES_2);
     }
@@ -62,7 +62,7 @@ class ReservationServiceTest extends BasicAcceptanceTest {
     @Test
     void deleteById() {
         reservationService.deleteById(1L, TestFixtures.LOGIN_MEMBER_1);
-        List<ReservationResponse> reservationResponses = reservationService.findAllByStatus(Status.RESERVATION);
+        List<ReservationResponse> reservationResponses = reservationService.findAllByStatus(Status.RESERVED);
 
         assertThat(reservationResponses).isEqualTo(TestFixtures.RESERVATION_RESPONSES_3);
     }
@@ -100,7 +100,7 @@ class ReservationServiceTest extends BasicAcceptanceTest {
         AtomicReference<ReservationResponse> secondReservationResponse = new AtomicReference<>();
         return Stream.of(
                 dynamicTest("예약 대기를 조회한다. (총 0개)", () -> assertThat(reservationService.findAllByStatus(Status.WAITING)).isEmpty()),
-                dynamicTest("예약을 추가한다.", () -> firstReservationResponse.set(reservationService.saveReservationByAdmin(TestFixtures.ADMIN_RESERVATION_REQUEST_1))),
+                dynamicTest("예약을 추가한다.", () -> firstReservationResponse.set(reservationService.reserveReservationByAdmin(TestFixtures.ADMIN_RESERVATION_REQUEST_1))),
                 dynamicTest("예약 대기를 추가한다.", () -> secondReservationResponse.set(reservationService.saveWaitingByClient(TestFixtures.LOGIN_MEMBER_1, new WaitingRequest(LocalDate.now().plusDays(5), 1L, 9L)))),
                 dynamicTest("예약의 상태를 확인한다 (WAITING)", () -> assertThat(reservationRepository.findById(secondReservationResponse.get().id()).orElseThrow().getStatus()).isEqualTo(Status.WAITING)),
                 dynamicTest("예약을 삭제한다.", () -> reservationService.deleteById(firstReservationResponse.get().id(), TestFixtures.LOGIN_MEMBER_2)),

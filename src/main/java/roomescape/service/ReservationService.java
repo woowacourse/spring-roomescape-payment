@@ -43,8 +43,8 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse saveReservationWithPaymentByClient(LoginMember loginMember, ReservationRequest reservationRequest) {
-        Reservation reservation = reservationCreateService.saveReservationByClient(
+    public ReservationResponse reserveReservationWithPaymentByClient(LoginMember loginMember, ReservationRequest reservationRequest) {
+        Reservation reservation = reservationCreateService.reserveReservationByClient(
                 loginMember, reservationRequest
         );
         PaymentRequest paymentRequest = new PaymentRequest(
@@ -63,8 +63,8 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse saveReservationByAdmin(AdminReservationRequest adminReservationRequest) {
-        Reservation reservation = reservationCreateService.saveReservationByAdmin(adminReservationRequest);
+    public ReservationResponse reserveReservationByAdmin(AdminReservationRequest adminReservationRequest) {
+        Reservation reservation = reservationCreateService.reserveReservationByAdmin(adminReservationRequest);
         return ReservationResponse.from(reservation);
     }
 
