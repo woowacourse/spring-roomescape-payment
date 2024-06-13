@@ -43,7 +43,7 @@ public class CustomReservationWaitingRepositoryImpl implements CustomReservation
                     INNER JOIN reservation_time AS rt ON rt.id = rw.time_id
                     INNER JOIN theme AS th ON th.id = rw.theme_id
                     INNER JOIN member AS m ON m.id = rw.member_id
-                    WHERE rw.member_id = :memberId
+                    WHERE rw.member_id = :memberId AND rw.is_deleted = false
                     GROUP BY
                         rw.id,
                         rw.date,
