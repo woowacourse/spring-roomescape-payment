@@ -25,11 +25,6 @@ public class LoginController {
         this.authService = authService;
     }
 
-    @GetMapping("/login")
-    public String page() {
-        return "login";
-    }
-
     @PostMapping("/login")
     public void login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         MemberResponse memberResponse = memberService.findByEmailAndPassword(loginRequest.email(), loginRequest.password());
