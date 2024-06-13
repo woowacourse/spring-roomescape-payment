@@ -44,14 +44,13 @@ public class ThemeService {
     }
 
     @Transactional(readOnly = true)
-    public ThemesResponse getWeeklyBestThemes() {
+    public ThemesResponse getMostReservedThemesByCount(int count) {
         LocalDate today = LocalDate.now();
         LocalDate startDate = today.minusDays(7);
         LocalDate endDate = today.minusDays(1);
-        int limit = 10;
 
         List<ThemeResponse> response = themeRepository.findTopNThemeBetweenStartDateAndEndDate(startDate, endDate,
-                        limit)
+                        count)
                 .stream()
                 .map(ThemeResponse::from)
                 .toList();

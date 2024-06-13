@@ -92,12 +92,12 @@ class ThemeServiceTest {
     @Test
     @DisplayName("예약 수 상위 10개 테마를 조회했을 때 내림차순으로 정렬된다. 만약 예약 수가 같다면, id 순으로 오름차순 정렬된다.")
     @Sql({"/truncate.sql", "/reservationData.sql"})
-    void getWeeklyBestThemes() {
+    void getMostReservedThemesByCount() {
         // given
         LocalDate today = LocalDate.now();
 
         // when
-        List<ThemeResponse> found = themeService.getWeeklyBestThemes().themes();
+        List<ThemeResponse> found = themeService.getMostReservedThemesByCount(10).themes();
 
         // then : 11번 테마는 조회되지 않아야 한다.
         assertThat(found).extracting("id").containsExactly(1L, 4L, 2L, 6L, 3L, 5L, 7L, 8L, 9L, 10L);

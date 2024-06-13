@@ -1,6 +1,7 @@
 package roomescape.theme.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.system.auth.annotation.Admin;
@@ -48,14 +50,16 @@ public class ThemeController {
         return RoomEscapeApiResponse.success(themeService.findAllThemes());
     }
 
-    @GetMapping("/themes/weeklyBest")
+    @GetMapping("/themes/most-reserved-last-week")
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "인기 테마 조회", description = "접속일 기준 지난 7일간 가장 많이 예약된 상위 10개 테마를 조회합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공", useReturnTypeSchema = true)
     })
-    public RoomEscapeApiResponse<ThemesResponse> getTop10Themes() {
-        return RoomEscapeApiResponse.success(themeService.getWeeklyBestThemes());
+    public RoomEscapeApiResponse<ThemesResponse> getMostReservedThemes(
+            @RequestParam(defaultValue = "10") @Parameter(description = "최대로 조회할 테마 갯수") int count
+    ) {
+        return RoomEscapeApiResponse.success(themeService.getMostReservedThemesByCount(count));
     }
 
     @Admin

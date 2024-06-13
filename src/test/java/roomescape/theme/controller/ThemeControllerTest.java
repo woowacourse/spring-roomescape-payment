@@ -120,7 +120,7 @@ class ThemeControllerTest {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .port(port)
-                .when().get("/themes/weeklyBest")
+                .when().get("/themes/most-reserved-last-week?count=10")
                 .then().log().all()
                 .statusCode(200)
                 .body("data.themes.size()", is(10))

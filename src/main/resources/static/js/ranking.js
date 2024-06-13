@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    requestRead(`/themes/weeklyBest`) // 인기 테마 목록 조회 API endpoint
+    requestRead(`/themes/most-reserved-last-week?count=10`) // 인기 테마 목록 조회 API endpoint
         .then(render)
         .catch(error => console.error('Error fetching times:', error));
 });
