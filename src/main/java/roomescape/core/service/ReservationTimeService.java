@@ -39,7 +39,7 @@ public class ReservationTimeService {
         validateDuplicatedStartAt(reservationTime);
 
         final ReservationTime savedReservationTime = reservationTimeRepository.save(reservationTime);
-        return new ReservationTimeResponse(savedReservationTime.getId(), savedReservationTime);
+        return ReservationTimeResponse.from(savedReservationTime);
     }
 
     private void validateDuplicatedStartAt(final ReservationTime reservationTime) {
@@ -54,7 +54,7 @@ public class ReservationTimeService {
     public List<ReservationTimeResponse> findAll() {
         return reservationTimeRepository.findAll()
                 .stream()
-                .map(ReservationTimeResponse::new)
+                .map(ReservationTimeResponse::from)
                 .toList();
     }
 

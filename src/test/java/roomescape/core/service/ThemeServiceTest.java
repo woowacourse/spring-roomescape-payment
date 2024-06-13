@@ -59,9 +59,9 @@ class ThemeServiceTest {
         final ThemeResponse response = themeService.create(request);
 
         assertAll(
-                () -> assertThat(response.getName()).isEqualTo(request.getName()),
-                () -> assertThat(response.getDescription()).isEqualTo(request.getDescription()),
-                () -> assertThat(response.getThumbnail()).isEqualTo(request.getThumbnail())
+                () -> assertThat(response.name()).isEqualTo(request.getName()),
+                () -> assertThat(response.description()).isEqualTo(request.getDescription()),
+                () -> assertThat(response.thumbnail()).isEqualTo(request.getThumbnail())
         );
     }
 
@@ -89,7 +89,7 @@ class ThemeServiceTest {
 
         final List<ThemeResponse> responses = themeService.findPopularTheme();
 
-        assertThat(responses.get(0).getName()).isEqualTo("테스트");
+        assertThat(responses.get(0).name()).isEqualTo("테스트");
     }
 
     private void createReservations() {
@@ -118,7 +118,7 @@ class ThemeServiceTest {
     void delete() {
         final ThemeResponse response = themeService.create(request);
 
-        themeService.delete(response.getId());
+        themeService.delete(response.id());
 
         assertThat(themeService.findAll()).hasSize(1);
     }
@@ -127,7 +127,7 @@ class ThemeServiceTest {
     @DisplayName("테마를 삭제 시, 예약 내역이 존재하면 예외가 발생한다.")
     void deleteBookedTheme() {
         final ThemeResponse response = themeService.create(request);
-        final Long themeId = response.getId();
+        final Long themeId = response.id();
 
         final ReservationTime reservationTime = testFixture.persistReservationTimeAfterMinute(1);
         final Reservation reservation = new Reservation(getMember(), TestFixture.getTodayDate(),

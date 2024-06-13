@@ -40,9 +40,9 @@ class PaymentServiceTest {
         final PaymentConfirmResponse response = paymentService.confirmPayment(request, loginMember);
 
         assertAll(
-                () -> assertThat(response.getTotalAmount()).isEqualTo(1000),
-                () -> assertThat(response.getOrderId()).isEqualTo("orderId"),
-                () -> assertThat(response.getPaymentKey()).isEqualTo("paymentKey")
+                () -> assertThat(response.totalAmount()).isEqualTo(1000),
+                () -> assertThat(response.orderId()).isEqualTo("orderId"),
+                () -> assertThat(response.paymentKey()).isEqualTo("paymentKey")
         );
     }
 

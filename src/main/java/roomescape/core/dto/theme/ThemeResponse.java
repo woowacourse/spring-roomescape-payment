@@ -2,36 +2,14 @@ package roomescape.core.dto.theme;
 
 import roomescape.core.domain.Theme;
 
-public class ThemeResponse {
-    private final Long id;
-    private final String name;
-    private final String description;
-    private final String thumbnail;
+public record ThemeResponse(Long id, String name, String description, String thumbnail) {
 
-    public ThemeResponse(final Theme theme) {
-        this(theme.getId(), theme);
-    }
+    public static ThemeResponse from(final Theme theme) {
+        final Long id = theme.getId();
+        final String name = theme.getName();
+        final String description = theme.getDescription();
+        final String thumbnail = theme.getThumbnail();
 
-    public ThemeResponse(final Long id, final Theme theme) {
-        this.id = id;
-        this.name = theme.getName();
-        this.description = theme.getDescription();
-        this.thumbnail = theme.getThumbnail();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getThumbnail() {
-        return thumbnail;
+        return new ThemeResponse(id, name, description, thumbnail);
     }
 }

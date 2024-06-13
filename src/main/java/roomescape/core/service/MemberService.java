@@ -53,14 +53,14 @@ public class MemberService {
         if (member == null) {
             throw new IllegalArgumentException(MEMBER_NOT_FOUND_EXCEPTION.getMessage());
         }
-        return new LoginMember(member);
+        return LoginMember.from(member);
     }
 
     @Transactional(readOnly = true)
     public List<MemberResponse> findAll() {
         return memberRepository.findAll()
                 .stream()
-                .map(MemberResponse::new)
+                .map(MemberResponse::from)
                 .toList();
     }
 

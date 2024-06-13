@@ -56,7 +56,7 @@ class MemberServiceTest {
 
         final MemberResponse response = memberService.findMemberByToken(token);
 
-        assertThat(response.getName()).isEqualTo("리건");
+        assertThat(response.name()).isEqualTo("리건");
     }
 
     @Test
@@ -68,7 +68,7 @@ class MemberServiceTest {
 
         final LoginMember response = memberService.findLoginMemberByToken(token);
 
-        assertThat(response.getId()).isEqualTo(1L);
+        assertThat(response.id()).isEqualTo(1L);
     }
 
     @Test
@@ -86,7 +86,7 @@ class MemberServiceTest {
 
         final MemberResponse response = memberService.create(request);
 
-        assertThat(response.getName()).isEqualTo("리건");
+        assertThat(response.name()).isEqualTo("리건");
     }
 
     @Test

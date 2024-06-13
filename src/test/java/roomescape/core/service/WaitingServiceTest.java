@@ -43,10 +43,10 @@ class WaitingServiceTest {
         final WaitingResponse response = waitingService.create(request);
 
         assertAll(
-                () -> assertThat(response.getTheme().getId()).isEqualTo(request.getThemeId()),
-                () -> assertThat(response.getDate()).isEqualTo(request.getDate()),
-                () -> assertThat(response.getMember().getId()).isEqualTo(request.getMemberId()),
-                () -> assertThat(response.getTime().getId()).isEqualTo(request.getTimeId())
+                () -> assertThat(response.theme().id()).isEqualTo(request.getThemeId()),
+                () -> assertThat(response.date()).isEqualTo(request.getDate()),
+                () -> assertThat(response.member().id()).isEqualTo(request.getMemberId()),
+                () -> assertThat(response.time().id()).isEqualTo(request.getTimeId())
         );
     }
 
@@ -89,7 +89,7 @@ class WaitingServiceTest {
         final WaitingResponse response = waitingService.create(request);
         final LoginMember loginMember = new LoginMember(1L);
 
-        waitingService.delete(response.getId(), loginMember);
+        waitingService.delete(response.id(), loginMember);
 
         assertThat(waitingService.findAll()).isEmpty();
     }
@@ -99,7 +99,7 @@ class WaitingServiceTest {
     void deleteNotMyWaiting() {
         final WaitingRequest request = new WaitingRequest(1L, TOMORROW, 1L, 1L);
         final WaitingResponse response = waitingService.create(request);
-        final Long waitingId = response.getId();
+        final Long waitingId = response.id();
         final LoginMember loginMember = new LoginMember(2L);
 
         assertThatThrownBy(() -> waitingService.delete(waitingId, loginMember))
@@ -112,7 +112,7 @@ class WaitingServiceTest {
     void deleteReservationByAdminRole() {
         final WaitingRequest request = new WaitingRequest(2L, TOMORROW, 1L, 1L);
         final WaitingResponse response = waitingService.create(request);
-        final Long waitingId = response.getId();
+        final Long waitingId = response.id();
         final LoginMember loginMember = new LoginMember(2L);
 
         assertThatThrownBy(() -> waitingService.deleteByAdmin(waitingId, loginMember))

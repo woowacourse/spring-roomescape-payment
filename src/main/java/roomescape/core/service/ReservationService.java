@@ -60,7 +60,7 @@ public class ReservationService {
         reservation.validateDateAndTime();
 
         final Reservation savedReservation = reservationRepository.save(reservation);
-        return new ReservationResponse(savedReservation.getId(), savedReservation);
+        return ReservationResponse.from(savedReservation);
     }
 
     private Reservation createReservation(final ReservationRequest request) {
@@ -104,13 +104,13 @@ public class ReservationService {
         return reservationRepository.findAll()
                 .stream()
                 .filter(reservation -> reservation.getStatus().equals(ReservationStatus.BOOKED))
-                .map(ReservationResponse::new)
+                .map(ReservationResponse::from)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public List<MyReservationResponse> findAllByMember(final LoginMember loginMember) {
-        final Member member = getMemberById(loginMember.getId());
+        final Member member = getMemberById(loginMember.id());
 
         final List<MyReservationResponse> waitings = getWaitingResponses(member);
         final List<MyReservationResponse> reservations = getReservationResponses(member);
@@ -166,7 +166,7 @@ public class ReservationService {
 
         return reservationRepository.findAllByMemberAndThemeAndDateBetween(member, theme, dateFrom, dateTo)
                 .stream()
-                .map(ReservationResponse::new)
+                .map(ReservationResponse::from)
                 .toList();
     }
 
@@ -174,7 +174,7 @@ public class ReservationService {
     public void delete(final long id, final LoginMember loginMember) {
         final Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(RESERVATION_NOT_FOUND_EXCEPTION.getMessage()));
-        final Member requester = memberRepository.findById(loginMember.getId())
+        final Member requester = memberRepository.findById(loginMember.id())
                 .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_FOUND_EXCEPTION.getMessage()));
 
         reservation.cancel(requester);
@@ -203,7 +203,7 @@ public class ReservationService {
     public void deleteByAdmin(final long id, final LoginMember loginMember) {
         final Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException(RESERVATION_NOT_FOUND_EXCEPTION.getMessage()));
-        final Member member = memberRepository.findById(loginMember.getId())
+        final Member member = memberRepository.findById(loginMember.id())
                 .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_FOUND_EXCEPTION.getMessage()));
 
         reservation.cancel(member);

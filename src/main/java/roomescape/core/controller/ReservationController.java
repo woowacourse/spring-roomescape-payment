@@ -3,8 +3,6 @@ package roomescape.core.controller;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,8 +24,6 @@ import roomescape.core.service.ReservationService;
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
-    private static final Logger logger = LoggerFactory.getLogger(ReservationController.class);
-
     private final ReservationService reservationService;
     private final PaymentService paymentService;
 
@@ -37,20 +33,20 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponse> create(@Valid @RequestBody final ReservationPaymentRequest request,
-                                                      final LoginMember member) {
-        final ReservationResponse response = getCreatedReservation(request, member);
-        final PaymentConfirmResponse payment = paymentService.confirmPayment(response, request, member);
-        logger.info("Reservation {} payment {} confirmed.", response.getId(), request.getPaymentKey());
-        logger.info("Total amount: {}, Order Id: {}", payment.getTotalAmount(), payment.getOrderId());
+    public ResponseEntity<MyReservationResponse> create(@Valid @RequestBody final ReservationPaymentRequest request,
+                                                        final LoginMember member) {
+        final ReservationResponse reservation = getCreatedReservation(request, member);
+        final PaymentConfirmResponse payment = paymentService.confirmPayment(reservation, request, member);
 
-        return ResponseEntity.created(URI.create("/reservations/" + response.getId()))
+        final MyReservationResponse response = MyReservationResponse.from(reservation, payment);
+
+        return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
     }
 
     private ReservationResponse getCreatedReservation(final ReservationPaymentRequest request,
                                                       final LoginMember member) {
-        final ReservationRequest reservationRequest = new ReservationRequest(member.getId(), request.getDate(),
+        final ReservationRequest reservationRequest = new ReservationRequest(member.id(), request.getDate(),
                 request.getTimeId(), request.getThemeId());
 
         return reservationService.create(reservationRequest);
@@ -79,8 +75,6 @@ public class ReservationController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") final long id, final LoginMember loginMember) {
         reservationService.delete(id, loginMember);
-        logger.info("Reservation with id {} canceled.", id);
-
         paymentService.cancel(id, loginMember);
 
         return ResponseEntity.noContent().build();

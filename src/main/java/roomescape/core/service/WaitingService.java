@@ -52,7 +52,7 @@ public class WaitingService {
         validateDuplicatedReservation(waiting);
         validateDuplicateWaiting(waiting);
 
-        return new WaitingResponse(waitingRepository.save(waiting));
+        return WaitingResponse.from(waitingRepository.save(waiting));
     }
 
     private void validateDuplicatedReservation(final Waiting waiting) {
@@ -108,13 +108,13 @@ public class WaitingService {
     public List<WaitingResponse> findAll() {
         return waitingRepository.findAll()
                 .stream()
-                .map(WaitingResponse::new)
+                .map(WaitingResponse::from)
                 .toList();
     }
 
     @Transactional
     public void delete(final long id, final LoginMember loginMember) {
-        final Member member = memberRepository.findById(loginMember.getId())
+        final Member member = memberRepository.findById(loginMember.id())
                 .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_FOUND_EXCEPTION.getMessage()));
 
         final Waiting waiting = waitingRepository.findById(id)
@@ -129,7 +129,7 @@ public class WaitingService {
 
     @Transactional
     public void deleteByAdmin(final long id, final LoginMember loginMember) {
-        final Member member = memberRepository.findById(loginMember.getId())
+        final Member member = memberRepository.findById(loginMember.id())
                 .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_FOUND_EXCEPTION.getMessage()));
 
         if (member.isNotAdmin()) {

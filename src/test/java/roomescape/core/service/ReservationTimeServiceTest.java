@@ -60,7 +60,7 @@ class ReservationTimeServiceTest {
     void create() {
         final ReservationTimeResponse response = reservationTimeService.create(request);
 
-        assertThat(response.getStartAt()).isEqualTo(START_AT);
+        assertThat(response.startAt()).isEqualTo(START_AT);
     }
 
     @Test
@@ -95,7 +95,7 @@ class ReservationTimeServiceTest {
     void delete() {
         final ReservationTimeResponse response = reservationTimeService.create(request);
 
-        reservationTimeService.delete(response.getId());
+        reservationTimeService.delete(response.id());
 
         assertThat(reservationTimeService.findAll()).hasSize(2);
     }

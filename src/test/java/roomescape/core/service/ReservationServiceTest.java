@@ -60,10 +60,10 @@ class ReservationServiceTest {
         final ReservationResponse response = reservationService.create(request);
 
         assertAll(
-                () -> assertThat(response.getTheme().getId()).isEqualTo(request.getThemeId()),
-                () -> assertThat(response.getDate()).isEqualTo(request.getDate()),
-                () -> assertThat(response.getMember().getId()).isEqualTo(request.getMemberId()),
-                () -> assertThat(response.getTime().getId()).isEqualTo(request.getTimeId())
+                () -> assertThat(response.theme().id()).isEqualTo(request.getThemeId()),
+                () -> assertThat(response.date()).isEqualTo(request.getDate()),
+                () -> assertThat(response.member().id()).isEqualTo(request.getMemberId()),
+                () -> assertThat(response.time().id()).isEqualTo(request.getTimeId())
         );
     }
 
@@ -167,7 +167,7 @@ class ReservationServiceTest {
         saveWaiting(TestFixture.getTomorrowDate());
         final LoginMember loginMember = new LoginMember(1L);
 
-        reservationService.delete(response.getId(), loginMember);
+        reservationService.delete(response.id(), loginMember);
 
         assertThat(reservationService.findAll()).hasSize(2);
         assertThat(waitingRepository.findAll()).isEmpty();
@@ -188,7 +188,7 @@ class ReservationServiceTest {
         final ReservationResponse response = reservationService.create(request);
         final LoginMember loginMember = new LoginMember(2L);
 
-        assertThatThrownBy(() -> reservationService.delete(response.getId(), loginMember))
+        assertThatThrownBy(() -> reservationService.delete(response.id(), loginMember))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -199,7 +199,7 @@ class ReservationServiceTest {
         final ReservationResponse response = reservationService.create(request);
         final LoginMember loginMember = new LoginMember(2L);
 
-        assertThatThrownBy(() -> reservationService.deleteByAdmin(response.getId(), loginMember))
+        assertThatThrownBy(() -> reservationService.deleteByAdmin(response.id(), loginMember))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

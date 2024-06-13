@@ -116,7 +116,7 @@ class MemberControllerTest {
                 .then().log().all()
                 .statusCode(200).extract().as(MemberResponse.class);
 
-        assertThat(user.getName()).isEqualTo("리건");
+        assertThat(user.name()).isEqualTo("리건");
     }
 
     @Test

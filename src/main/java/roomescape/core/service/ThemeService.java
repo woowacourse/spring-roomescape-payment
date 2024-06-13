@@ -32,7 +32,7 @@ public class ThemeService {
         validateDuplicatedName(theme);
         final Theme savedTheme = themeRepository.save(theme);
 
-        return new ThemeResponse(savedTheme.getId(), theme);
+        return ThemeResponse.from(savedTheme);
     }
 
     private void validateDuplicatedName(final Theme theme) {
@@ -46,7 +46,7 @@ public class ThemeService {
     public List<ThemeResponse> findAll() {
         return themeRepository.findAll()
                 .stream()
-                .map(ThemeResponse::new)
+                .map(ThemeResponse::from)
                 .toList();
     }
 
@@ -58,7 +58,7 @@ public class ThemeService {
 
         return themeRepository.findPopularThemeBetween(lastWeek, today)
                 .stream()
-                .map(ThemeResponse::new)
+                .map(ThemeResponse::from)
                 .toList();
     }
 
