@@ -1,8 +1,15 @@
 package roomescape.service;
 
+import static java.util.stream.Collectors.groupingBy;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
-import roomescape.domain.repository.ReservationRepository;
-import roomescape.domain.repository.ThemeRepository;
+import org.springframework.transaction.annotation.Transactional;
+import roomescape.repository.ReservationRepository;
+import roomescape.repository.ThemeRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.Theme;
 import roomescape.exception.customexception.RoomEscapeBusinessException;
@@ -11,14 +18,8 @@ import roomescape.service.dto.request.ThemeSaveRequest;
 import roomescape.service.dto.response.ThemeResponse;
 import roomescape.service.dto.response.ThemeResponses;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.groupingBy;
-
 @Service
+@Transactional(readOnly = true)
 public class ThemeService {
     private final ThemeRepository themeRepository;
     private final ReservationRepository reservationRepository;
@@ -28,6 +29,7 @@ public class ThemeService {
         this.reservationRepository = reservationRepository;
     }
 
+    @Transactional
     public ThemeResponse saveTheme(ThemeSaveRequest themeSaveRequest) {
         Theme theme = themeSaveRequest.toTheme();
         Theme savedTheme = themeRepository.save(theme);
@@ -68,6 +70,7 @@ public class ThemeService {
                 .toList();
     }
 
+    @Transactional
     public void deleteTheme(Long id) {
         Theme foundTheme = themeRepository.findById(id)
                 .orElseThrow(() -> new RoomEscapeBusinessException("존재하지 않는 테마입니다."));

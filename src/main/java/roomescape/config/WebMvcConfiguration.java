@@ -1,5 +1,6 @@
 package roomescape.config;
 
+import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -10,8 +11,6 @@ import roomescape.auth.AuthenticationPrincipalArgumentResolver;
 import roomescape.auth.CheckAdminInterceptor;
 import roomescape.auth.CheckLoginInterceptor;
 import roomescape.service.AuthService;
-
-import java.util.List;
 
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
@@ -26,8 +25,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/signup").setViewName("/signup");
-        registry.addViewController("/reservation").setViewName("/reservation");
+        registry.addViewController("/reservation").setViewName("reservation");
     }
 
     @Override
@@ -37,7 +35,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 .excludePathPatterns("/", "/error", "/login", "/signup",
                         "/members", "/themes/popular",
-                        "/css/**", "/*.ico", "/js/**", "/image/**");
+                        "/css/**", "/*.ico", "/js/**", "/image/**", "/swagger-ui/**", "/v3/**");
 
         registry.addInterceptor(new CheckAdminInterceptor())
                 .order(2)

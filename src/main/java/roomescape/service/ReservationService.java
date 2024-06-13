@@ -7,20 +7,20 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.controller.dto.PaymentApproveRequest;
+import roomescape.controller.dto.PaymentRequest;
 import roomescape.controller.dto.UserReservationSaveRequest;
 import roomescape.domain.member.Member;
-import roomescape.domain.repository.MemberRepository;
-import roomescape.domain.repository.ReservationRepository;
-import roomescape.domain.repository.ReservationTimeRepository;
-import roomescape.domain.repository.ThemeRepository;
-import roomescape.domain.repository.WaitingRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationSlot;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.reservation.Theme;
 import roomescape.domain.reservation.Waiting;
 import roomescape.exception.customexception.RoomEscapeBusinessException;
+import roomescape.repository.MemberRepository;
+import roomescape.repository.ReservationRepository;
+import roomescape.repository.ReservationTimeRepository;
+import roomescape.repository.ThemeRepository;
+import roomescape.repository.WaitingRepository;
 import roomescape.service.dto.request.LoginMember;
 import roomescape.service.dto.request.ReservationConditionRequest;
 import roomescape.service.dto.request.ReservationSaveRequest;
@@ -29,7 +29,7 @@ import roomescape.service.dto.response.ReservationResponses;
 import roomescape.service.dto.response.UserReservationResponse;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class ReservationService {
 
     private final PaymentService paymentService;
@@ -55,19 +55,26 @@ public class ReservationService {
         this.timeRepository = timeRepository;
     }
 
-    public ReservationResponse saveUserReservation(LoginMember member, UserReservationSaveRequest userReservationSaveRequest){
-        PaymentApproveRequest paymentApproveRequest = PaymentApproveRequest.from(userReservationSaveRequest);
-        paymentService.pay(paymentApproveRequest);
-
+    @Transactional
+    public ReservationResponse saveMemberReservation(LoginMember member, UserReservationSaveRequest userReservationSaveRequest){
         ReservationSaveRequest reservationSaveRequest = userReservationSaveRequest.toReservationSaveRequest(member.id());
-        return saveReservation(reservationSaveRequest);
+        Reservation reservation = saveReservation(reservationSaveRequest);
+
+        PaymentRequest paymentRequest = PaymentRequest.from(userReservationSaveRequest);
+        paymentService.pay(reservation, paymentRequest);
+        return new ReservationResponse(reservation);
     }
 
-    public ReservationResponse saveReservation(ReservationSaveRequest reservationSaveRequest) {
+    @Transactional
+    public ReservationResponse saveAdminReservation(ReservationSaveRequest reservationSaveRequest) {
+        Reservation reservation = saveReservation(reservationSaveRequest);
+        return new ReservationResponse(reservation);
+    }
+
+    private Reservation saveReservation(ReservationSaveRequest reservationSaveRequest) {
         Reservation reservation = createReservation(reservationSaveRequest);
         validateUnique(reservation);
-        Reservation savedReservation = reservationRepository.save(reservation);
-        return new ReservationResponse(savedReservation);
+        return reservationRepository.save(reservation);
     }
 
     private void validateUnique(Reservation reservation) {
@@ -76,6 +83,7 @@ public class ReservationService {
         }
     }
 
+    @Transactional
     public void deleteReservation(long id) {
         Reservation reservation = findReservation(id);
         List<Waiting> waitings = waitingRepository.findByReservationOrderById(reservation);
@@ -134,19 +142,20 @@ public class ReservationService {
     }
 
     private List<UserReservationResponse> findUserReservations(Member user) {
-        return reservationRepository.findByMemberAndDateGreaterThanEqual(user, LocalDate.now())
+        return reservationRepository.findMemberReservationsOrderByReservationSlot(user, LocalDate.now())
                 .stream()
                 .map(UserReservationResponse::reserved)
                 .toList();
     }
 
     private List<UserReservationResponse> findUserWaitings(Member user) {
-        return waitingRepository.findMemberWaitingWithRankAndDateGreaterThanEqual(user, LocalDate.now())
+        return waitingRepository.findMemberWaitingWithRank(user, LocalDate.now())
                 .stream()
                 .map(UserReservationResponse::from)
                 .toList();
     }
 
+    @Transactional
     public Reservation createReservation(ReservationSaveRequest request) {
         ReservationSlot slot = new ReservationSlot(
                 request.date(),

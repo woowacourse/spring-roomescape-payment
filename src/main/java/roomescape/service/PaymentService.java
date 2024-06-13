@@ -1,44 +1,43 @@
 package roomescape.service;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import roomescape.controller.PaymentApproveResponse;
-import roomescape.controller.dto.PaymentApproveRequest;
+import org.springframework.transaction.annotation.Transactional;
+import roomescape.controller.dto.PaymentRequest;
+import roomescape.domain.reservation.Payment;
+import roomescape.domain.reservation.Reservation;
+import roomescape.repository.PaymentRepository;
+import roomescape.service.dto.response.PaymentCancelRequest;
+import roomescape.service.dto.response.PaymentResponse;
 
 @Service
+@Transactional(readOnly = true)
 public class PaymentService {
-    private static final String PAYMENT_APPROVE_ENDPOINT = "https://api.tosspayments.com/v1/payments/confirm";
 
-    @Value("${payment.secret-key}")
-    private String secretKey;
-    private final RestTemplate restTemplate;
+    private final PaymentRepository paymentRepository;
+    private final PaymentClient paymentClient;
 
-    public PaymentService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    public PaymentService(PaymentRepository paymentRepository, PaymentClient paymentClient) {
+        this.paymentRepository = paymentRepository;
+        this.paymentClient = paymentClient;
     }
 
-    public PaymentApproveResponse pay(PaymentApproveRequest paymentApproveRequest) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBasicAuth(encodeSecretKey());
-        HttpEntity<PaymentApproveRequest> httpEntity = new HttpEntity<>(paymentApproveRequest, headers);
+    @Transactional
+    public void pay(Reservation reservation, PaymentRequest paymentRequest) {
+        PaymentResponse paymentResponse = paymentClient.pay(paymentRequest);
 
-        return restTemplate.postForEntity(
-                PAYMENT_APPROVE_ENDPOINT,
-                httpEntity,
-                PaymentApproveResponse.class
-        ).getBody();
+        try {
+            Payment payment = paymentResponse.toPayment(reservation);
+            paymentRepository.save(payment);
+
+            throw new RuntimeException();
+        } catch (RuntimeException runtimeException) {
+            cancel(paymentResponse);
+            throw new RuntimeException("예상치 못한 서버 에러가 발생했습니다.");
+        }
     }
 
-    private String encodeSecretKey() {
-        return Base64.getEncoder()
-                .encodeToString((secretKey + ":")
-                        .getBytes(StandardCharsets.UTF_8));
+    private void cancel(PaymentResponse paymentResponse) {
+        PaymentCancelRequest paymentCancelRequest = PaymentCancelRequest.from(paymentResponse);
+        paymentClient.cancel(paymentCancelRequest);
     }
 }

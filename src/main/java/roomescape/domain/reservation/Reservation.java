@@ -1,14 +1,20 @@
 package roomescape.domain.reservation;
 
-import jakarta.persistence.*;
-import roomescape.domain.member.Member;
-
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.util.Objects;
+import roomescape.domain.member.Member;
 
 @Entity
-@Table
 public class Reservation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,6 +24,9 @@ public class Reservation {
 
     @Embedded
     private ReservationSlot reservationSlot;
+
+    @OneToOne(mappedBy = "reservation")
+    private Payment payment;
 
     public Reservation(Member member, ReservationSlot reservationSlot) {
         this.member = member;
@@ -39,10 +48,6 @@ public class Reservation {
         return member;
     }
 
-    public void setMember(Member member) {
-        this.member = member;
-    }
-
     public LocalDate getDate() {
         return reservationSlot.getDate();
     }
@@ -57,6 +62,10 @@ public class Reservation {
 
     public ReservationSlot getReservationSlot() {
         return reservationSlot;
+    }
+
+    public Payment getPayment() {
+        return payment;
     }
 
     @Override

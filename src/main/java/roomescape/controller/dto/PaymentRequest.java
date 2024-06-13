@@ -1,12 +1,12 @@
 package roomescape.controller.dto;
 
-public record PaymentApproveRequest(
+public record PaymentRequest(
         String paymentKey,
         String orderId,
         String amount) {
 
-    public static PaymentApproveRequest from(UserReservationSaveRequest request) {
-        return new PaymentApproveRequest(
+    public static PaymentRequest from(UserReservationSaveRequest request) {
+        return new PaymentRequest(
                 request.paymentKey(),
                 request.orderId(),
                 request.amount());

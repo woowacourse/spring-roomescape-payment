@@ -1,15 +1,22 @@
 package roomescape.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static roomescape.domain.reservation.ReservationStatus.RESERVED;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import roomescape.IntegrationTestSupport;
 import roomescape.domain.member.Member;
-import roomescape.domain.repository.MemberRepository;
-import roomescape.domain.repository.ReservationRepository;
-import roomescape.domain.repository.ReservationTimeRepository;
-import roomescape.domain.repository.ThemeRepository;
+import roomescape.repository.MemberRepository;
+import roomescape.repository.ReservationRepository;
+import roomescape.repository.ReservationTimeRepository;
+import roomescape.repository.ThemeRepository;
 import roomescape.domain.reservation.ReservationSlot;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.reservation.Theme;
@@ -18,16 +25,6 @@ import roomescape.service.dto.request.ReservationSaveRequest;
 import roomescape.service.dto.response.ReservationResponse;
 import roomescape.service.dto.response.UserReservationResponse;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static roomescape.domain.reservation.ReservationStatus.RESERVED;
-
-@Transactional
 class ReservationServiceTest extends IntegrationTestSupport {
 
     @Autowired
@@ -55,7 +52,7 @@ class ReservationServiceTest extends IntegrationTestSupport {
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(member.getId(),
                 LocalDate.parse("2025-11-11"),
                 time.getId(), theme.getId());
-        ReservationResponse reservationResponse = reservationService.saveReservation(reservationSaveRequest);
+        ReservationResponse reservationResponse = reservationService.saveAdminReservation(reservationSaveRequest);
 
         assertAll(
                 () -> assertThat(reservationResponse.member().name()).isEqualTo("고구마"),
@@ -77,7 +74,7 @@ class ReservationServiceTest extends IntegrationTestSupport {
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(member.getId(),
                 LocalDate.parse("2025-11-11"), 100L, 1L);
         assertThatThrownBy(() -> {
-            reservationService.saveReservation(reservationSaveRequest);
+            reservationService.saveAdminReservation(reservationSaveRequest);
         }).isInstanceOf(RoomEscapeBusinessException.class);
     }
 
@@ -110,7 +107,7 @@ class ReservationServiceTest extends IntegrationTestSupport {
     void saveDuplicatedReservation() {
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(1L, LocalDate.parse("2024-05-04"),
                 1L, 1L);
-        assertThatThrownBy(() -> reservationService.saveReservation(reservationSaveRequest))
+        assertThatThrownBy(() -> reservationService.saveAdminReservation(reservationSaveRequest))
                 .isInstanceOf(RoomEscapeBusinessException.class);
     }
 
@@ -120,7 +117,7 @@ class ReservationServiceTest extends IntegrationTestSupport {
         // given
         long memberId = 1L;
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(memberId, LocalDate.now().plusDays(1L), 1L, 1L);
-        ReservationResponse reservationResponse = reservationService.saveReservation(reservationSaveRequest);
+        ReservationResponse reservationResponse = reservationService.saveAdminReservation(reservationSaveRequest);
 
         // when
         List<UserReservationResponse> allUserReservation = reservationService.findAllUserReservation(memberId);

@@ -1,9 +1,10 @@
 package roomescape.service;
 
 import org.springframework.stereotype.Service;
-import roomescape.domain.repository.ReservationRepository;
-import roomescape.domain.repository.ReservationTimeRepository;
-import roomescape.domain.repository.ThemeRepository;
+import org.springframework.transaction.annotation.Transactional;
+import roomescape.repository.ReservationRepository;
+import roomescape.repository.ReservationTimeRepository;
+import roomescape.repository.ThemeRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.reservation.Theme;
@@ -20,6 +21,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class ReservationTimeService {
 
     private final ReservationTimeRepository reservationTimeRepository;
@@ -45,6 +47,7 @@ public class ReservationTimeService {
         return new ReservationTimeResponses(reservationTimeResponses);
     }
 
+    @Transactional
     public ReservationTimeResponse saveTime(ReservationTimeSaveRequest reservationTimeSaveRequest) {
         ReservationTime reservationTime = reservationTimeSaveRequest.toReservationTime();
 
@@ -63,6 +66,7 @@ public class ReservationTimeService {
 
     }
 
+    @Transactional
     public void deleteTime(Long id) {
         ReservationTime foundTime = reservationTimeRepository.findById(id)
                 .orElseThrow(() -> new RoomEscapeBusinessException("존재하지 않는 시간입니다."));

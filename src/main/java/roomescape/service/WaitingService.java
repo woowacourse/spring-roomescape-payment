@@ -3,9 +3,9 @@ package roomescape.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
-import roomescape.domain.repository.MemberRepository;
-import roomescape.domain.repository.ReservationRepository;
-import roomescape.domain.repository.WaitingRepository;
+import roomescape.repository.MemberRepository;
+import roomescape.repository.ReservationRepository;
+import roomescape.repository.WaitingRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationSlot;
 import roomescape.domain.reservation.Waiting;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class WaitingService {
     private final WaitingRepository waitingRepository;
     private final ReservationRepository reservationRepository;
@@ -34,6 +34,7 @@ public class WaitingService {
         this.memberRepository = memberRepository;
     }
 
+    @Transactional
     public WaitingResponse saveWaiting(WaitingRequest waitingRequest, long memberId) {
         Reservation alreadyBookedReservation = findAlreadyBookedReservation(waitingRequest);
         Member member = findMemberById(memberId);
@@ -63,10 +64,12 @@ public class WaitingService {
         return new WaitingResponses(waitingResponses);
     }
 
+    @Transactional
     public void deleteWaiting(long id) {
         waitingRepository.delete(findWaitingById(id));
     }
 
+    @Transactional
     public void deleteUserWaiting(long waitingId, long memberId) {
         Member member = findMemberById(memberId);
         Waiting waiting = findWaitingById(waitingId);

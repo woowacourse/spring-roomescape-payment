@@ -9,10 +9,12 @@ import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.IntegrationTestSupport;
 import roomescape.controller.dto.UserReservationViewResponse;
 import roomescape.controller.dto.UserReservationViewResponses;
+import roomescape.exception.customexception.PaymentException;
 import roomescape.exception.customexception.RoomEscapeBusinessException;
 import roomescape.service.dto.response.ReservationResponses;
 
@@ -242,8 +244,9 @@ class ReservationControllerTest extends IntegrationTestSupport {
                 "themeId", 1L
         );
 
-        Mockito.when(paymentService.pay(any()))
-                .thenThrow(RoomEscapeBusinessException.class);
+        Mockito.doThrow(new PaymentException(HttpStatus.BAD_REQUEST, "테스트"))
+                .when(paymentService)
+                .pay(any(), any());
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -251,7 +254,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                 .body(params)
                 .when().post("/reservations")
                 .then().log().all()
-                .statusCode(400);
+                .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
     @DisplayName("결제에 성공할 시, 예약에 성공한다")

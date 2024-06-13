@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.IntegrationTestSupport;
-import roomescape.domain.repository.WaitingRepository;
+import roomescape.repository.WaitingRepository;
 import roomescape.exception.customexception.RoomEscapeBusinessException;
 import roomescape.service.dto.request.WaitingRequest;
 

@@ -1,6 +1,7 @@
 package roomescape.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.JwtTokenProvider;
 import roomescape.domain.member.Role;
 import roomescape.exception.customexception.AuthenticationException;
@@ -10,6 +11,7 @@ import roomescape.service.dto.response.MemberResponse;
 import java.util.Map;
 
 @Service
+@Transactional(readOnly = true)
 public class AuthService {
 
     private static final String TOKEN_NAME = "token";
@@ -23,6 +25,7 @@ public class AuthService {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    @Transactional
     public String createToken(MemberResponse memberResponse) {
         Map<String, Object> payload = Map.of(
                 CLAIM_SUB, String.valueOf(memberResponse.id()),

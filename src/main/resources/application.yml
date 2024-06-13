@@ -11,10 +11,7 @@ spring:
       hibernate:
         ddl-auto: create-drop
         format_sql: true
-#  mvc:
-#    converters:
-#      preferred-json-mapper: jackson
-
+    open-in-view: false
 
 security:
   jwt:
@@ -24,10 +21,7 @@ security:
 
 payment:
   secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
-
-logging:
-  level:
-    org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
+  payment-approve-endpoint: https://api.tosspayments.com/v1/payments/confirm
+  payment-cancel-endpoint: https://api.tosspayments.com/v1/payments/%s/cancel
 
 
