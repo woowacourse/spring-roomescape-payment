@@ -10,9 +10,8 @@ import java.nio.charset.StandardCharsets;
 import javax.crypto.SecretKey;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 import roomescape.BasicAcceptanceTest;
-import roomescape.exception.RoomescapeException;
+import roomescape.exception.AuthorizedException;
 
 class JwtTokenManagerTest extends BasicAcceptanceTest {
     private static final String TEST_SECRET_KEY = "i-appreciate-your-kindness-her0807";
@@ -44,9 +43,8 @@ class JwtTokenManagerTest extends BasicAcceptanceTest {
         String expiredToken = jwtTokenManager.createToken(payload);
 
         assertThatCode(() -> jwtTokenManager.getPayload(expiredToken))
-                .isInstanceOf(RoomescapeException.class)
-                .extracting("httpStatus")
-                .isEqualTo(HttpStatus.UNAUTHORIZED);
+                .isInstanceOf(AuthorizedException.class)
+                .hasMessage("인증 유효기간이 만료되었습니다.");
     }
 
     @DisplayName("쿠키에서 토큰을 추출한다")
@@ -68,9 +66,8 @@ class JwtTokenManagerTest extends BasicAcceptanceTest {
         Cookie[] cookies = new Cookie[1];
 
         assertThatCode(() -> jwtTokenManager.extractToken(cookies))
-                .isInstanceOf(RoomescapeException.class)
-                .extracting("httpStatus")
-                .isEqualTo(HttpStatus.UNAUTHORIZED);
+                .isInstanceOf(AuthorizedException.class)
+                .hasMessage("인증에 실패했습니다.");
     }
 
     @DisplayName("쿠키에 토큰이 담겨있지 않은 경우 예외가 발생한다.")
@@ -81,9 +78,8 @@ class JwtTokenManagerTest extends BasicAcceptanceTest {
         cookies[0] = new Cookie("test", "value");
 
         assertThatCode(() -> jwtTokenManager.extractToken(cookies))
-                .isInstanceOf(RoomescapeException.class)
-                .extracting("httpStatus")
-                .isEqualTo(HttpStatus.UNAUTHORIZED);
+                .isInstanceOf(AuthorizedException.class)
+                .hasMessage("토큰이 존재하지 않습니다.");
     }
 
     private JwtTokenManager createJwtTokenManager(int validityInMilliseconds) {

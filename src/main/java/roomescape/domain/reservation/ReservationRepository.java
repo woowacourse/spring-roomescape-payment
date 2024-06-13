@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.domain.dto.AvailableTimeDto;
 import roomescape.domain.theme.Theme;
+import roomescape.dto.response.reservation.CanceledReservationsDto;
+import roomescape.dto.response.reservation.MyReservationsDto;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     long countByTimeId(long timeId);
@@ -33,8 +35,32 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     boolean existsByDateAndTimeIdAndThemeIdAndMemberId(LocalDate date, long timeId, long themeId, long memberId);
 
-    @EntityGraph(attributePaths = {"time", "theme"})
-    List<Reservation> findAllByMemberIdOrderByDateAsc(Long memberId);
+    @Query("""
+            select new roomescape.dto.response.reservation.MyReservationsDto(
+            r, p.paymentKey, p.totalAmount
+            )
+            from Reservation r
+            join fetch ReservationTime rt on rt.id = r.time.id
+            join fetch Theme t on t.id = r.theme.id
+            join fetch Member m on m.id = r.member.id
+            left join fetch Payment p on p.reservation.id = r.id
+            where m.id = :memberId and
+            r.status <> roomescape.domain.reservation.Status.CANCELED
+            """)
+    List<MyReservationsDto> findMyReservation(Long memberId);
+
+    @Query("""
+            select new roomescape.dto.response.reservation.CanceledReservationsDto(
+            r, p.paymentKey, p.totalAmount
+            )
+            from Reservation r
+            join fetch ReservationTime rt on rt.id = r.time.id
+            join fetch Theme t on t.id = r.theme.id
+            join fetch Member m on m.id = r.member.id
+            left join fetch Payment p on p.reservation.id = r.id
+            where r.status = roomescape.domain.reservation.Status.CANCELED
+            """)
+    List<CanceledReservationsDto> findCanceledReservations();
 
     @Query("""
             select new roomescape.domain.dto.AvailableTimeDto(rt.id, rt.startAt,
@@ -58,7 +84,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             r.member.id = :memberId and
             :dateFrom <= r.date and
             r.date <= :dateTo and
-            r.status = roomescape.domain.reservation.Status.RESERVATION
+            r.status = roomescape.domain.reservation.Status.RESERVED
             """)
     List<Reservation> findByCriteria(Long themeId, Long memberId, LocalDate dateFrom, LocalDate dateTo);
 }

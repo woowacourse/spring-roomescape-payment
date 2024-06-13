@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.BasicAcceptanceTest;
 import roomescape.TestFixtures;
-import roomescape.dto.response.member.MemberResponse;
 import roomescape.dto.request.member.MemberSignUpRequest;
+import roomescape.dto.response.member.MemberResponse;
 import roomescape.exception.RoomescapeException;
 
 class MemberServiceTest extends BasicAcceptanceTest {

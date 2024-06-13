@@ -31,7 +31,7 @@ class MemberAcceptanceTest extends BasicAcceptanceTest {
     Stream<DynamicTest> duplicateMemberTest() {
         return Stream.of(
                 dynamicTest("멤버를 추가한다", () -> postMember("name1", "member1@wooteco.com", "wootecoCrew6!", 201)),
-                dynamicTest("동일한 이메일의 멤버를 추가한다", () -> postMember("name2", "member1@wooteco.com", "wootecoCrew6!!", 409))
+                dynamicTest("동일한 이메일의 멤버를 추가한다", () -> postMember("name2", "member1@wooteco.com", "wootecoCrew6!!", 400))
         );
     }
 

@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -16,9 +17,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import roomescape.BasicAcceptanceTest;
-import roomescape.dto.payment.PaymentRequest;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationRepository;
+import roomescape.dto.request.payment.PaymentRequest;
 import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.response.reservation.PaymentExceptionResponse;
 import roomescape.exception.PaymentException;
@@ -26,6 +30,8 @@ import roomescape.exception.PaymentException;
 class ReservationAcceptanceTest extends BasicAcceptanceTest {
     private String clientToken;
     private String adminToken;
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     @BeforeEach
     void SetUp() {
@@ -96,7 +102,7 @@ class ReservationAcceptanceTest extends BasicAcceptanceTest {
                         clientToken, tomorrow.toString(), 1L, 1L, 201))),
                 dynamicTest("사용자 페이지에서 예약을 추가한다", () -> ReservationTestStep.postClientReservation(clientToken, tomorrow.toString(), 2L, 2L, 201)),
                 dynamicTest("모든 예약을 조회한다 (총 5개)", () -> ReservationTestStep.getReservations(200, 5)),
-                dynamicTest("예약을 삭제한다", () -> ReservationTestStep.deleteReservation(reservationId.longValue(), 204)),
+                dynamicTest("예약을 삭제한다", () -> ReservationTestStep.deleteReservation(clientToken, reservationId.longValue(), 204)),
                 dynamicTest("모든 예약을 조회한다 (총 4개)", () -> ReservationTestStep.getReservations(200, 4))
         );
     }
@@ -104,16 +110,16 @@ class ReservationAcceptanceTest extends BasicAcceptanceTest {
     @DisplayName("결제가 실패하면 예약이 생성되지 않는다.")
     @Test
     void reservationPostWhenPaymentFail() {
-        LocalDate tomorrow = LocalDate.now().plusDays(1);
-        ReservationRequest request = new ReservationRequest(tomorrow, 1L, 1L, null, null, 1000);
+        Reservation reservation = reservationRepository.findById(1L).orElseThrow();
+        ReservationRequest request = new ReservationRequest(reservation.getDate(), 3L, 1L, null, null, new BigDecimal("1000"));
         PaymentRequest paymentRequest = new PaymentRequest(request.orderId(), request.amount(),
                 request.paymentKey());
-        given(paymentService.pay(paymentRequest))
+        given(paymentService.pay(paymentRequest, reservation))
                 .willThrow(new PaymentException(
                         HttpStatus.BAD_REQUEST, new PaymentExceptionResponse("EXCEPTION", "exception")));
 
         ReservationTestStep.postClientReservation(
-                clientToken, tomorrow.toString(), 1L, 1L, 400);
+                clientToken, reservation.getDate().toString(), 1L, 1L, 400);
         ReservationTestStep.getReservations(200, 3);
     }
 

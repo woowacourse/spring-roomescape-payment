@@ -33,7 +33,7 @@ class ReservationTimeAcceptanceTest extends BasicAcceptanceTest {
     Stream<DynamicTest> duplicateReservationTest() {
         return Stream.of(
                 dynamicTest("예약 시간을 추가한다 (10:00)", () -> postReservationTime(adminToken, "01:00", 201)),
-                dynamicTest("동일한 예약 시간을 추가한다 (10:00)", () -> postReservationTime(adminToken, "01:00", 409))
+                dynamicTest("동일한 예약 시간을 추가한다 (10:00)", () -> postReservationTime(adminToken, "01:00", 400))
         );
     }
 

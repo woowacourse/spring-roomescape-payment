@@ -8,7 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.BasicAcceptanceTest;
 import roomescape.dto.request.member.TokenRequest;
-import roomescape.exception.RoomescapeException;
+import roomescape.exception.AuthorizedException;
+import roomescape.exception.NotFoundException;
 import roomescape.infrastructure.auth.JwtTokenManager;
 import roomescape.infrastructure.auth.JwtTokenProperties;
 
@@ -25,7 +26,7 @@ class AuthServiceTest extends BasicAcceptanceTest {
         TokenRequest tokenRequest = new TokenRequest("notExist@wooteco.com", "wootecoCrew6!");
 
         assertThatThrownBy(() -> authService.createToken(tokenRequest))
-                .isInstanceOf(RoomescapeException.class)
+                .isInstanceOf(NotFoundException.class)
                 .hasMessage(String.format("존재하지 않는 회원입니다. 입력한 회원 email:%s", tokenRequest.email()));
     }
 
@@ -35,7 +36,7 @@ class AuthServiceTest extends BasicAcceptanceTest {
         TokenRequest tokenRequest = new TokenRequest("gomding@wooteco.com", "dffd@efg32");
 
         assertThatThrownBy(() -> authService.createToken(tokenRequest))
-                .isInstanceOf(RoomescapeException.class)
+                .isInstanceOf(NotFoundException.class)
                 .hasMessage(String.format("존재하지 않는 회원입니다. 입력한 회원 email:%s", tokenRequest.email()));
     }
 
@@ -49,7 +50,7 @@ class AuthServiceTest extends BasicAcceptanceTest {
         Cookie[] cookies = new Cookie[]{cookie};
 
         assertThatThrownBy(() -> authService.validateToken(cookies))
-                .isInstanceOf(RoomescapeException.class)
+                .isInstanceOf(AuthorizedException.class)
                 .hasMessage("인증 유효기간이 만료되었습니다.");
     }
 }

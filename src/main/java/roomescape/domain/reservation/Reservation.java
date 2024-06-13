@@ -11,9 +11,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import java.util.Objects;
-import org.springframework.http.HttpStatus;
 import roomescape.domain.member.Member;
 import roomescape.domain.theme.Theme;
+import roomescape.dto.LoginMember;
 import roomescape.exception.RoomescapeException;
 
 @Entity
@@ -41,7 +41,7 @@ public class Reservation {
 
     public Reservation(Long id, Member member, LocalDate date, ReservationTime time, Theme theme, Status status) {
         if (date == null) {
-            throw new RoomescapeException(HttpStatus.BAD_REQUEST, "예약 날짜는 필수입니다.");
+            throw new RoomescapeException("예약 날짜는 필수입니다.");
         }
         this.id = id;
         this.member = member;
@@ -49,6 +49,28 @@ public class Reservation {
         this.time = time;
         this.theme = theme;
         this.status = status;
+    }
+
+    public void changePaymentWaiting() {
+        if (status.isWaiting()) {
+            status = Status.PAYMENT_WAITING;
+        }
+    }
+
+    public void approve() {
+        this.status = Status.RESERVED;
+    }
+
+    public boolean isNotMyReservation(LoginMember loginMember) {
+        return member.isNotMyReservation(loginMember);
+    }
+
+    public boolean isReserved() {
+        return status.isReserved();
+    }
+
+    public void cancel() {
+        status = Status.CANCELED;
     }
 
     public Long getId() {
@@ -73,16 +95,6 @@ public class Reservation {
 
     public Status getStatus() {
         return status;
-    }
-
-    public void changePaymentWaiting() {
-        if (status.isWaiting()) {
-            status = Status.PAYMENT_WAITING;
-        }
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
     }
 
     @Override

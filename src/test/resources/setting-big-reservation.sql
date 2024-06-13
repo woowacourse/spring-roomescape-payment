@@ -79,24 +79,24 @@ values ('10:00'),
        ('22:00');
 
 insert into member (name, email, password, role)
-values ('찰리', 'gomding@wooteco.com', 'wootecoCrew6!', 'BASIC'),
+values ('썬', 'sun@wooteco.com', 'wootecoCrew6!', 'BASIC'),
        ('비토', 'bito@wooteco.com', 'wootecoCrew6!', 'BASIC'),
        ('회원', 'member@wooteco.com', 'wootecoCrew6!', 'BASIC'),
        ('운영자', 'admin@wooteco.com', 'wootecoCrew6!', 'ADMIN');
 
 insert into reservation (date, member_id, time_id, theme_id, status)
-values (DATEADD(DAY, -5, CURRENT_DATE), 1, 1, 1, 'RESERVATION'),
-       (DATEADD(DAY, -5, CURRENT_DATE), 1, 2, 1, 'RESERVATION'),
-       (DATEADD(DAY, -5, CURRENT_DATE), 1, 3, 1, 'RESERVATION'),
-       (DATEADD(DAY, -5, CURRENT_DATE), 1, 4, 1, 'RESERVATION'),
-       (DATEADD(DAY, -5, CURRENT_DATE), 1, 1, 2, 'RESERVATION'),
-       (DATEADD(DAY, -5, CURRENT_DATE), 1, 2, 2, 'RESERVATION'),
-       (DATEADD(DAY, -5, CURRENT_DATE), 2, 3, 2, 'RESERVATION'),
-       (DATEADD(DAY, -5, CURRENT_DATE), 2, 1, 3, 'RESERVATION'),
-       (DATEADD(DAY, -5, CURRENT_DATE), 2, 2, 3, 'RESERVATION'),
-       (DATEADD(DAY, -5, CURRENT_DATE), 2, 1, 4, 'RESERVATION'),
-       (DATEADD(DAY, -5, CURRENT_DATE), 2, 1, 5, 'RESERVATION'),
-       (DATEADD(DAY, -5, CURRENT_DATE), 2, 1, 6, 'RESERVATION'),
-       (DATEADD(DAY, -5, CURRENT_DATE), 3, 1, 7, 'RESERVATION'),
-       (DATEADD(DAY, -5, CURRENT_DATE), 3, 1, 8, 'RESERVATION'),
-       (DATEADD(DAY, -5, CURRENT_DATE), 3, 1, 9, 'RESERVATION');
+values (DATEADD(DAY, -5, CURRENT_DATE), 1, 1, 1, 'RESERVED'),
+       (DATEADD(DAY, -5, CURRENT_DATE), 1, 2, 1, 'RESERVED'),
+       (DATEADD(DAY, -5, CURRENT_DATE), 1, 3, 1, 'RESERVED'),
+       (DATEADD(DAY, -5, CURRENT_DATE), 1, 4, 1, 'RESERVED'),
+       (DATEADD(DAY, -5, CURRENT_DATE), 1, 1, 2, 'RESERVED'),
+       (DATEADD(DAY, -5, CURRENT_DATE), 1, 2, 2, 'RESERVED'),
+       (DATEADD(DAY, -5, CURRENT_DATE), 2, 3, 2, 'RESERVED'),
+       (DATEADD(DAY, -5, CURRENT_DATE), 2, 1, 3, 'RESERVED'),
+       (DATEADD(DAY, -5, CURRENT_DATE), 2, 2, 3, 'RESERVED'),
+       (DATEADD(DAY, -5, CURRENT_DATE), 2, 1, 4, 'RESERVED'),
+       (DATEADD(DAY, -5, CURRENT_DATE), 2, 1, 5, 'RESERVED'),
+       (DATEADD(DAY, -5, CURRENT_DATE), 2, 1, 6, 'RESERVED'),
+       (DATEADD(DAY, -5, CURRENT_DATE), 3, 1, 7, 'RESERVED'),
+       (DATEADD(DAY, -5, CURRENT_DATE), 3, 1, 8, 'RESERVED'),
+       (DATEADD(DAY, -5, CURRENT_DATE), 3, 1, 9, 'RESERVED');

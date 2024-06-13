@@ -2,7 +2,6 @@ package roomescape.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.ReservationRepository;
@@ -11,7 +10,7 @@ import roomescape.domain.theme.ThemeRepository;
 import roomescape.dto.request.theme.ThemeRequest;
 import roomescape.dto.response.theme.ThemePriceResponse;
 import roomescape.dto.response.theme.ThemeResponse;
-import roomescape.exception.RoomescapeException;
+import roomescape.exception.NotFoundException;
 
 @Service
 public class ThemeService {
@@ -27,11 +26,13 @@ public class ThemeService {
         this.reservationRepository = reservationRepository;
     }
 
+    @Transactional
     public ThemeResponse save(ThemeRequest themeRequest) {
         Theme savedTheme = themeRepository.save(themeRequest.toTheme());
         return ThemeResponse.from(savedTheme);
     }
 
+    @Transactional(readOnly = true)
     public List<ThemeResponse> findAll() {
         return themeRepository.findAll()
                 .stream()
@@ -42,11 +43,11 @@ public class ThemeService {
     @Transactional
     public void deleteById(long id) {
         Theme theme = themeRepository.findById(id)
-                .orElseThrow(() -> new RoomescapeException(HttpStatus.NOT_FOUND,
-                        String.format("존재하지 않는 테마입니다. 요청 테마 id:%d", id)));
+                .orElseThrow(() -> new NotFoundException(String.format("존재하지 않는 테마입니다. 요청 테마 id:%d", id)));
         themeRepository.deleteById(theme.getId());
     }
 
+    @Transactional(readOnly = true)
     public List<ThemeResponse> findPopularThemes() {
         LocalDate today = LocalDate.now();
         LocalDate startDate = today.minusDays(START_DAY_TO_SUBTRACT);
@@ -57,9 +58,10 @@ public class ThemeService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public ThemePriceResponse findThemePriceById(long id) {
         Theme theme = themeRepository.findById(id)
-                .orElseThrow(() -> new RoomescapeException(HttpStatus.NOT_FOUND, "존재하지 않는 테마입니다."));
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 테마입니다."));
         return new ThemePriceResponse(theme.getPrice());
     }
 }

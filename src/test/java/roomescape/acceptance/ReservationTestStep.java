@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import roomescape.dto.request.reservation.AdminReservationRequest;
@@ -12,7 +13,7 @@ import roomescape.dto.request.reservation.ReservationRequest;
 
 public class ReservationTestStep {
     public static Long postClientReservation(String token, String date, Long timeId, Long themeId, int expectedHttpCode) {
-        ReservationRequest reservationRequest = new ReservationRequest(LocalDate.parse(date), timeId, themeId, null, null, 1000);
+        ReservationRequest reservationRequest = new ReservationRequest(LocalDate.parse(date), timeId, themeId, null, null, new BigDecimal("1000"));
 
         Response response = RestAssured.given().log().all()
                 .cookies("token", token)
@@ -61,8 +62,9 @@ public class ReservationTestStep {
         assertThat(reservationResponses).hasSize(expectedReservationsSize);
     }
 
-    public static void deleteReservation(Long reservationId, int expectedHttpCode) {
+    public static void deleteReservation(String token, Long reservationId, int expectedHttpCode) {
         RestAssured.given().log().all()
+                .cookies("token", token)
                 .when().delete("/reservations/" + reservationId)
                 .then().log().all()
                 .statusCode(expectedHttpCode);

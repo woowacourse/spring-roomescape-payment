@@ -1,19 +1,38 @@
 package roomescape.exception;
 
 import java.time.format.DateTimeParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import roomescape.RoomescapeApplication;
 import roomescape.dto.response.reservation.PaymentExceptionResponse;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler extends AbstractExceptionHandler {
+public class GlobalExceptionHandler {
+    private final Logger log = LoggerFactory.getLogger(RoomescapeApplication.class);
+
     @ExceptionHandler
-    public ResponseEntity<String> roomescapeExceptionHandler(RoomescapeException exception) {
+    public ResponseEntity<ExceptionResponse> roomescapeExceptionHandler(RoomescapeException exception) {
         logError(exception);
-        return ResponseEntity.status(exception.getHttpStatus())
-                .body(exception.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(exception.getRoomescapeExceptionResponse());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ExceptionResponse> NotFoundExceptionHandler(NotFoundException exception) {
+        logError(exception);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(exception.getRoomescapeExceptionResponse());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ExceptionResponse> AuthorizedExceptionHandler(AuthorizedException exception) {
+        logError(exception);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(exception.getRoomescapeExceptionResponse());
     }
 
     @ExceptionHandler
@@ -24,17 +43,10 @@ public class GlobalExceptionHandler extends AbstractExceptionHandler {
     }
 
     @ExceptionHandler(PaymentException.class)
-    public ResponseEntity<PaymentExceptionResponse> exceptionHandler(PaymentException exception) {
+    public ResponseEntity<PaymentExceptionResponse> paymentExceptionHandler(PaymentException exception) {
         logError(exception);
         return ResponseEntity.status(exception.getHttpStatus())
                 .body(exception.getTossExceptionResponse());
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> exceptionHandler(RuntimeException exception) {
-        logError(exception);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("서버 내부에서 에러가 발생했습니다.");
     }
 
     @ExceptionHandler(Exception.class)
@@ -42,5 +54,9 @@ public class GlobalExceptionHandler extends AbstractExceptionHandler {
         logError(exception);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("서버 내부에서 에러가 발생했습니다.");
+    }
+
+    private void logError(Exception exception) {
+        log.error("Error occur {}", exception.toString());
     }
 }

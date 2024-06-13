@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import roomescape.domain.member.Role;
+import roomescape.dto.LoginMember;
 import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.response.reservation.AvailableTimeResponse;
 import roomescape.dto.response.member.MemberResponse;
@@ -66,11 +67,13 @@ public class TestFixtures {
     public static final List<ThemeResponse> THEME_RESPONSES_4 = List.of(
             THEME_RESPONSE_1, THEME_RESPONSE_2, THEME_RESPONSE_3, THEME_RESPONSE_4, THEME_RESPONSE_5
     );
+    public static final LoginMember LOGIN_MEMBER_1 = new LoginMember(1L, "썬");
+    public static final LoginMember LOGIN_MEMBER_2 = new LoginMember(2L, "비토");
     public static final MemberSignUpRequest MEMBER_SIGN_UP_REQUEST = new MemberSignUpRequest(
             "새멤버", "newmember@wooteco.com", "wootecoCrew6!"
     );
     public static final MemberResponse MEMBER_RESPONSE_1 = new MemberResponse(
-            1L, "찰리", "gomding@wooteco.com", Role.BASIC
+            1L, "썬", "sun@wooteco.com", Role.BASIC
     );
     public static final MemberResponse MEMBER_RESPONSE_2 = new MemberResponse(
             2L, "비토", "bito@wooteco.com", Role.BASIC
@@ -195,22 +198,22 @@ public class TestFixtures {
             RESERVATION_RESPONSE_14, RESERVATION_RESPONSE_15
     );
     public static final MyReservationResponse MY_RESERVATION_RESPONSE_1 = new MyReservationResponse(
-            1L, "name1", TODAY.minusDays(5), LocalTime.of(10, 0), "예약"
+            1L, "name1", TODAY.minusDays(5), LocalTime.of(10, 0), "예약", null, null
     );
     public static final MyReservationResponse MY_RESERVATION_RESPONSE_2 = new MyReservationResponse(
-            2L, "name1", TODAY.minusDays(5), LocalTime.of(11, 0), "예약"
+            2L, "name1", TODAY.minusDays(5), LocalTime.of(11, 0), "예약", null, null
     );
     public static final MyReservationResponse MY_RESERVATION_RESPONSE_3 = new MyReservationResponse(
-            3L, "name1", TODAY.minusDays(5), LocalTime.of(12, 0), "예약"
+            3L, "name1", TODAY.minusDays(5), LocalTime.of(12, 0), "예약", null, null
     );
     public static final MyReservationResponse MY_RESERVATION_RESPONSE_4 = new MyReservationResponse(
-            4L, "name1", TODAY.minusDays(5), LocalTime.of(13, 0), "예약"
+            4L, "name1", TODAY.minusDays(5), LocalTime.of(13, 0), "예약", null, null
     );
     public static final MyReservationResponse MY_RESERVATION_RESPONSE_5 = new MyReservationResponse(
-            5L, "name2", TODAY.minusDays(5), LocalTime.of(10, 0), "예약"
+            5L, "name2", TODAY.minusDays(5), LocalTime.of(10, 0), "예약", null, null
     );
     public static final MyReservationResponse MY_RESERVATION_RESPONSE_6 = new MyReservationResponse(
-            6L, "name2", TODAY.minusDays(5), LocalTime.of(11, 0), "예약"
+            6L, "name2", TODAY.minusDays(5), LocalTime.of(11, 0), "예약", null, null
     );
     public static final List<MyReservationResponse> MY_RESERVATION_RESPONSES = List.of(
             MY_RESERVATION_RESPONSE_1, MY_RESERVATION_RESPONSE_2, MY_RESERVATION_RESPONSE_3,
@@ -218,8 +221,5 @@ public class TestFixtures {
     );
     public static final AdminReservationRequest ADMIN_RESERVATION_REQUEST_1 = new AdminReservationRequest(
             2L, TODAY.plusDays(5), 1L, 9L
-    );
-    public static final AdminReservationRequest ADMIN_RESERVATION_REQUEST_2 = new AdminReservationRequest(
-            3L, TODAY.plusDays(5), 1L, 9L
     );
 }
