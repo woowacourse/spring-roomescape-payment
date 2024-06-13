@@ -128,7 +128,7 @@ class ThemeRepositoryTest {
 
         reservationRepository.save(new Reservation(kaki, LocalDate.now(), theme1, reservationTime));
         reservationRepository.save(new Reservation(kaki, LocalDate.now(), theme2, reservationTime));
-        reservationRepository.save(new Reservation(jojo, LocalDate.now(), theme2, reservationTime));
+        reservationRepository.save(new Reservation(jojo, LocalDate.now().plusDays(1), theme2, reservationTime));
 
         LocalDate dateFrom = LocalDate.now().minusWeeks(1);
         List<Theme> themes = themeRepository.findPopularThemesDescOfLastWeekForLimit(dateFrom, 2);
