@@ -194,7 +194,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
       themeId: reservationData.themeId,
       timeId: reservationData.timeId
     },
-    paymentConfirmRequest: {
+    productPayRequest: {
       paymentKey: paymentData.paymentKey,
       orderId: paymentData.orderId,
       amount: paymentData.amount,
