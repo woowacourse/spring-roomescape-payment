@@ -10,13 +10,17 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.waiting.domain.WaitingWithOrder;
 
 public record MyReservationWaitingResponse(
+        @Schema(description = "예약/대기 id", example = "1")
         Long ownerId,
+        @Schema(description = "테마 이름", example = "레벨 1 탈출")
         String themeName,
         @JsonFormat(pattern = "yyyy-MM-dd")
+        @Schema(description = "예약 날짜", example = "2024-06-22")
         LocalDate date,
         @JsonFormat(pattern = "HH:mm")
-        @Schema(type = "String", pattern = "HH:mm")
+        @Schema(description = "예약 시간", type = "String", pattern = "HH:mm", example = "23:00")
         LocalTime startAt,
+        @Schema(description = "예약 상태", example = "예약 확정")
         String status,
         PaymentResponse payment) {
     private static final String WAITING_STATUS = "%d번째 예약대기";

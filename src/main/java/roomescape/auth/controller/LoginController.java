@@ -50,6 +50,7 @@ public class LoginController {
                 .body(new LoginResponse(loggedInMember.name()));
     }
 
+    @Operation(summary = "로그아웃 요청", description = "로그아웃을 요청한다.")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
         ResponseCookie cookie = tokenCookieManager.createResponseCookie("");
