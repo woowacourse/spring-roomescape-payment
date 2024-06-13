@@ -1,6 +1,7 @@
 package roomescape.reservation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import org.springframework.http.HttpStatus;
@@ -33,7 +34,7 @@ public class ReservationController {
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(
             @RequestBody ReservationCreateRequest request,
-            LoggedInMember member) {
+            @Parameter(hidden = true) LoggedInMember member) {
         ReservationResponse response = reservationService.createReservation(request, member.id());
 
         URI location = URI.create("/reservations/" + response.id());

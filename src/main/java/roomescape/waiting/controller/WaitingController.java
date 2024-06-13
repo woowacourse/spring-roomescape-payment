@@ -1,6 +1,7 @@
 package roomescape.waiting.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
@@ -39,7 +40,7 @@ public class WaitingController {
     @PostMapping
     public ResponseEntity<WaitingResponse> createWaiting(
             @RequestBody WaitingCreateRequest request,
-            LoggedInMember member) {
+            @Parameter(hidden = true) LoggedInMember member) {
         WaitingResponse response = service.createWaiting(request, member.id());
 
         URI location = URI.create("/waitings/" + response.id());
