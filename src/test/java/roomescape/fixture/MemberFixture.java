@@ -9,7 +9,7 @@ public class MemberFixture {
     }
 
     public static Member getMemberClover() {
-        return new Member( "클로버", "dev.clover@gmail.com","password", Role.USER);
+        return new Member("클로버", "dev.clover@gmail.com", "password", Role.USER);
     }
 
     public static Member getMemberAdmin() {
@@ -17,6 +17,6 @@ public class MemberFixture {
     }
 
     public static Member getMemberTacan() {
-        return new Member( 3L, "타칸", "dev.tacan@gmail.com","1234", Role.USER);
+        return new Member(3L, "타칸", "dev.tacan@gmail.com", "1234", Role.USER);
     }
 }

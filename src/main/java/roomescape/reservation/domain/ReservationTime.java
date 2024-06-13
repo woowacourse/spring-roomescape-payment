@@ -4,10 +4,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import roomescape.exception.custom.BadRequestException;
-
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalTime;
 import java.util.Objects;
+import roomescape.exception.custom.BadRequestException;
 
 @Entity
 public class ReservationTime {
@@ -15,6 +15,7 @@ public class ReservationTime {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotNull
     private LocalTime startAt;
 
     public ReservationTime() {

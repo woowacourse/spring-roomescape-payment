@@ -50,6 +50,7 @@ public class AuthService {
             throw new ConflictException("중복된 이메일입니다.");
         }
         memberRepository.save(
-                new Member(signUpRequest.name(), signUpRequest.email(), passwordEncoder.encode(signUpRequest.password()), Role.USER));
+                new Member(signUpRequest.name(), signUpRequest.email(),
+                        passwordEncoder.encode(signUpRequest.password()), Role.USER));
     }
 }

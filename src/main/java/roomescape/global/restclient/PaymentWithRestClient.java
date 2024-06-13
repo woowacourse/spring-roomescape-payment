@@ -4,10 +4,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.reservation.controller.dto.PaymentRequest;
-import roomescape.reservation.controller.dto.PaymentResponse;
+import roomescape.reservation.domain.Payment;
 
 public class PaymentWithRestClient {
 
@@ -20,14 +19,14 @@ public class PaymentWithRestClient {
         this.restClient = restClient;
     }
 
-    public PaymentResponse confirm(PaymentRequest paymentRequest) {
+    public Payment confirm(PaymentRequest paymentRequest) {
         return restClient.post()
                 .uri("/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Basic " + createBasicHeader())
                 .body(paymentRequest)
                 .retrieve()
-                .body(PaymentResponse.class);
+                .body(Payment.class);
     }
 
     private String createBasicHeader() {

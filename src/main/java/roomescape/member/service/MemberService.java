@@ -1,7 +1,6 @@
 package roomescape.member.service;
 
 import java.util.List;
-
 import org.springframework.stereotype.Service;
 import roomescape.auth.controller.dto.SignUpRequest;
 import roomescape.auth.service.PasswordEncoder;

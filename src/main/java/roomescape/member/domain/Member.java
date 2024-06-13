@@ -1,9 +1,15 @@
 package roomescape.member.domain;
 
-import jakarta.persistence.*;
-import roomescape.exception.custom.BadRequestException;
-
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
+import roomescape.exception.custom.BadRequestException;
 
 @Entity
 public class Member {
@@ -13,9 +19,11 @@ public class Member {
     private Long id;
     @Embedded
     private Name name;
+    @NotNull
     private String email;
+    @NotNull
     private String password;
-
+    @NotNull
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -49,6 +57,10 @@ public class Member {
 
     public boolean isAdmin() {
         return role == Role.ADMIN;
+    }
+
+    public boolean isUser() {
+        return role == Role.USER;
     }
 
     public Long getId() {

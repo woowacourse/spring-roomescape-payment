@@ -1,12 +1,20 @@
 package roomescape.reservation.domain;
 
-import jakarta.persistence.*;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Objects;
-
 import org.hibernate.annotations.CreationTimestamp;
+import roomescape.exception.custom.BadRequestException;
 import roomescape.member.domain.Member;
+import roomescape.member.domain.Role;
 
 @Entity
 public class Reservation {
@@ -17,11 +25,17 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull
     @ManyToOne
     private Member member;
 
+    @NotNull
     @ManyToOne
     private ReservationSlot reservationSlot;
+
+    @NotNull
+    @OneToOne
+    private Payment payment;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -34,10 +48,19 @@ public class Reservation {
 
     public Reservation(Member member,
                        ReservationSlot reservationSlot,
-                       ReservationStatus status) {
+                       ReservationStatus status,
+                       Payment payment) {
+        validate(member, payment);
         this.member = member;
         this.reservationSlot = reservationSlot;
         this.status = status;
+        this.payment = payment;
+    }
+
+    private void validate(Member member, Payment payment) {
+        if (member.isUser() && !payment.hasSameAmount(AMOUNT)) {
+            throw new BadRequestException("결제 금액이 잘못되었습니다.");
+        }
     }
 
     public Reservation(Long id, Member member, ReservationSlot reservationSlot) {
@@ -46,11 +69,12 @@ public class Reservation {
         this.reservationSlot = reservationSlot;
     }
 
-    public Reservation(Member member, ReservationSlot reservationSlot) {
+    public Reservation(Member member, ReservationSlot reservationSlot, Payment payment) {
         this.member = member;
         this.reservationSlot = reservationSlot;
         this.createdAt = LocalDateTime.now();
         this.status = ReservationStatus.BOOKED;
+        this.payment = payment;
     }
 
     public boolean isBookedBy(Member member) {
@@ -71,6 +95,14 @@ public class Reservation {
 
     public ReservationSlot getReservationSlot() {
         return reservationSlot;
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     public ReservationStatus getStatus() {

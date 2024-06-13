@@ -4,8 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 import java.util.Objects;
-
 import roomescape.exception.custom.BadRequestException;
 
 @Entity
@@ -14,8 +14,11 @@ public class Theme {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotNull
     private String name;
+    @NotNull
     private String description;
+    @NotNull
     private String thumbnail;
 
     public Theme() {

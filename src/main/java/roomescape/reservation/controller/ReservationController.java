@@ -1,21 +1,32 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import roomescape.auth.domain.AuthInfo;
-import roomescape.global.annotation.LoginUser;
-import roomescape.global.restclient.PaymentWithRestClient;
-import roomescape.reservation.controller.dto.*;
-import roomescape.reservation.service.ReservationService;
-import roomescape.reservation.service.WaitingReservationService;
-
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import roomescape.auth.domain.AuthInfo;
+import roomescape.global.annotation.LoginUser;
+import roomescape.reservation.controller.dto.ReservationPaymentRequest;
+import roomescape.reservation.controller.dto.ReservationQueryRequest;
+import roomescape.reservation.controller.dto.ReservationResponse;
+import roomescape.reservation.controller.dto.ReservationViewResponse;
+import roomescape.reservation.controller.dto.ReservationWithStatus;
+import roomescape.reservation.service.ReservationService;
+import roomescape.reservation.service.WaitingReservationService;
 
+@Tag(name = "Reservation", description = "Reservation API")
 @RestController
 public class ReservationController {
 
@@ -42,7 +53,8 @@ public class ReservationController {
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> create(@LoginUser AuthInfo authInfo,
                                                       @RequestBody @Valid ReservationPaymentRequest reservationPaymentRequest) {
-        ReservationResponse response = reservationService.reserve(reservationPaymentRequest, authInfo.getId());
+        ReservationResponse response = reservationService.createReservation(reservationPaymentRequest,
+                authInfo.getId());
 
         return ResponseEntity.created(URI.create("/reservations/" + response.reservationId())).body(response);
     }
@@ -50,7 +62,7 @@ public class ReservationController {
     @DeleteMapping("/reservations/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@LoginUser AuthInfo authInfo,
-                                       @PathVariable("id") @Min(1) long reservationId) {
+                       @PathVariable("id") @Min(1) long reservationId) {
         waitingReservationService.deleteReservation(authInfo, reservationId);
     }
 

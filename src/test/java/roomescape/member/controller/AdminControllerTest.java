@@ -1,35 +1,17 @@
 package roomescape.member.controller;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.DynamicTest.dynamicTest;
-import static roomescape.fixture.MemberFixture.*;
+import static roomescape.fixture.MemberFixture.getMemberAdmin;
+import static roomescape.fixture.MemberFixture.getMemberTacan;
 
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import roomescape.auth.controller.dto.SignUpRequest;
-import roomescape.auth.domain.AuthInfo;
 import roomescape.auth.service.TokenProvider;
-import roomescape.fixture.MemberFixture;
-import roomescape.member.controller.dto.MemberResponse;
 import roomescape.member.service.MemberService;
-import roomescape.reservation.controller.dto.ReservationResponse;
-import roomescape.reservation.controller.dto.ReservationTimeRequest;
-import roomescape.reservation.controller.dto.ReservationTimeResponse;
-import roomescape.reservation.controller.dto.ThemeRequest;
-import roomescape.reservation.controller.dto.ThemeResponse;
 import roomescape.reservation.service.ReservationService;
 import roomescape.reservation.service.ReservationTimeService;
 import roomescape.reservation.service.ThemeService;
@@ -100,7 +82,7 @@ class AdminControllerTest extends ControllerTest {
 
     @DisplayName("예약 대기 페이지에 접근한다.")
     @Test
-    void waitingPage () {
+    void waitingPage() {
         //given
 
         //when & then

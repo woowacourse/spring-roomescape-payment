@@ -9,13 +9,14 @@ import static roomescape.fixture.ReservationTimeFixture.get2PM;
 import static roomescape.fixture.ReservationTimeFixture.getNoon;
 import static roomescape.fixture.ThemeFixture.getTheme1;
 
-import java.time.*;
+import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.exception.custom.BadRequestException;
 import roomescape.exception.custom.ForbiddenException;
+import roomescape.fixture.PaymentFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.reservation.controller.dto.AvailableTimeResponse;
@@ -121,7 +122,7 @@ class ReservationTimeServiceTest extends ServiceTest {
         Theme theme = themeRepository.save(getTheme1());
         ReservationSlot reservationSlot = reservationSlotRepository.save(getNextDayReservationSlot(time, theme));
         Member member = memberRepository.save(getMemberChoco());
-        reservationRepository.save(new Reservation(member, reservationSlot));
+        reservationRepository.save(new Reservation(member, reservationSlot, PaymentFixture.getPaymentWithId()));
 
         //when
         List<AvailableTimeResponse> availableTimes

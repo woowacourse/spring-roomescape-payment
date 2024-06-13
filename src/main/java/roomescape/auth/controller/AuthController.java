@@ -1,10 +1,15 @@
 package roomescape.auth.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.controller.dto.LoginRequest;
 import roomescape.auth.controller.dto.SignUpRequest;
 import roomescape.auth.domain.AuthInfo;
@@ -12,6 +17,7 @@ import roomescape.auth.handler.RequestHandler;
 import roomescape.auth.handler.ResponseHandler;
 import roomescape.auth.service.AuthService;
 
+@Tag(name = "Auth", description = "Auth API")
 @RestController
 public class AuthController {
 

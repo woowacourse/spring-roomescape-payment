@@ -6,6 +6,7 @@ public record PaymentRequest(
         Long amount
 ) {
     public PaymentRequest(ReservationPaymentRequest reservationPaymentRequest) {
-        this(reservationPaymentRequest.paymentKey(), reservationPaymentRequest.orderId(), reservationPaymentRequest.amount());
+        this(reservationPaymentRequest.paymentKey(), reservationPaymentRequest.orderId(),
+                reservationPaymentRequest.amount());
     }
 }
