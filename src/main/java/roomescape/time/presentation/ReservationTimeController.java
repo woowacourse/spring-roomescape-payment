@@ -18,7 +18,7 @@ import roomescape.time.dto.ReservationTimeResponse;
 import roomescape.time.service.ReservationTimeService;
 
 @RestController
-public class ReservationTimeController {
+public class ReservationTimeController implements ReservationTimeControllerDocs {
 
     private final ReservationTimeService reservationTimeService;
 

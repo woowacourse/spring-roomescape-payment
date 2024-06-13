@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +24,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
-import roomescape.payment.TossPaymentClient;
+import roomescape.payment.service.TossPaymentClient;
 import roomescape.payment.dto.request.PaymentConfirmRequest;
 import roomescape.payment.dto.response.PaymentConfirmResponse;
 
@@ -84,7 +85,8 @@ class ReservationControllerE2ETest {
         );
 
         when(tossPaymentClient.confirmPayments(any(PaymentConfirmRequest.class)))
-                .thenReturn(new PaymentConfirmResponse(null, null));
+                .thenReturn(new PaymentConfirmResponse("paymentKey", "orderId", "orderName"
+                        , 1000L, LocalDateTime.of(2030, 8, 5, 10, 0)));
 
         return Stream.of(
                 dynamicTest("현재 예약 개수를 확인한다", () -> {
@@ -201,7 +203,8 @@ class ReservationControllerE2ETest {
         );
 
         when(tossPaymentClient.confirmPayments(any(PaymentConfirmRequest.class)))
-                .thenReturn(new PaymentConfirmResponse(null, null));
+                .thenReturn(new PaymentConfirmResponse("paymentKey", "orderId", "orderName"
+                        , 1000L, LocalDateTime.of(2030, 8, 5, 10, 0)));
 
         return Stream.of(
                 dynamicTest("예약을 추가한다", () -> {
@@ -377,7 +380,7 @@ class ReservationControllerE2ETest {
                     RestAssured.given().log().all()
                             .when().cookie("token", token).get("/reservations/4")
                             .then().log().all()
-                            .statusCode(200).body("status", equalTo("예약"));
+                            .statusCode(200).body("status", equalTo("결제대기"));
                 })
         );
     }

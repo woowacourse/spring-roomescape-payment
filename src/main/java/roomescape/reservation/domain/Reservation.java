@@ -87,8 +87,8 @@ public class Reservation {
         this.status = status;
     }
 
-    public boolean isReserved() {
-        return this.status == Status.RESERVED;
+    public boolean isNotWaiting() {
+        return this.status != Status.WAITING;
     }
 
     public Long getId() {

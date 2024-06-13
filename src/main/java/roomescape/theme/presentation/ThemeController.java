@@ -15,7 +15,7 @@ import roomescape.theme.dto.ThemeResponse;
 import roomescape.theme.service.ThemeService;
 
 @RestController
-public class ThemeController {
+public class ThemeController implements ThemeControllerDocs {
 
     private final ThemeService themeService;
 

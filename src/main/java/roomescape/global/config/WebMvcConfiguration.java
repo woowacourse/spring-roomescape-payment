@@ -15,7 +15,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import roomescape.auth.AdminHandlerInterceptor;
 import roomescape.auth.AuthenticatedMemberArgumentResolver;
-import roomescape.payment.TossPaymentClient;
+import roomescape.payment.service.TossPaymentClient;
 
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {

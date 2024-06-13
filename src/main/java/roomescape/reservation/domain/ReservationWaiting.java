@@ -94,7 +94,7 @@ public class ReservationWaiting {
     }
 
     public Long getRank() {
-        return rank;
+        return rank + 1;
     }
 
     @Override
