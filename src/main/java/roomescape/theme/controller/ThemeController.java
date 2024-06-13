@@ -52,7 +52,7 @@ public class ThemeController {
 
     @GetMapping("/themes/most-reserved-last-week")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "인기 테마 조회", description = "접속일 기준 지난 7일간 가장 많이 예약된 상위 10개 테마를 조회합니다.")
+    @Operation(summary = "가장 많이 예약된 테마 조회")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공", useReturnTypeSchema = true)
     })
@@ -65,7 +65,7 @@ public class ThemeController {
     @Admin
     @PostMapping("/themes")
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "테마 추가", description = "새로운 테마를 추가합니다.", tags = "관리자 로그인이 필요한 API")
+    @Operation(summary = "테마 추가", tags = "관리자 로그인이 필요한 API")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "성공", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "409", description = "같은 이름의 테마를 추가할 수 없습니다.",
@@ -84,7 +84,7 @@ public class ThemeController {
     @Admin
     @DeleteMapping("/themes/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "테마 삭제", description = "특정 테마를 삭제합니다.", tags = "관리자 로그인이 필요한 API")
+    @Operation(summary = "테마 삭제", tags = "관리자 로그인이 필요한 API")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "성공", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "409", description = "예약된 테마는 삭제할 수 없습니다.",

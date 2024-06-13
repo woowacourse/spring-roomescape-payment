@@ -44,7 +44,7 @@ public class ReservationTimeController {
     @Admin
     @GetMapping("/times")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "모든 시간 조회", description = "모든 예약 시간을 조회합니다.", tags = "관리자 로그인이 필요한 API")
+    @Operation(summary = "모든 시간 조회", tags = "관리자 로그인이 필요한 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공", useReturnTypeSchema = true)
     })
@@ -55,7 +55,7 @@ public class ReservationTimeController {
     @Admin
     @PostMapping("/times")
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "시간 추가", description = "새로운 예약 시간을 추가합니다.", tags = "관리자 로그인이 필요한 API")
+    @Operation(summary = "시간 추가", tags = "관리자 로그인이 필요한 API")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "성공", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "409", description = "같은 시간을 추가할 수 없습니다.",
@@ -74,7 +74,7 @@ public class ReservationTimeController {
     @Admin
     @DeleteMapping("/times/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "시간 삭제", description = "특정 예약 시간을 삭제합니다.", tags = "관리자 로그인이 필요한 API")
+    @Operation(summary = "시간 삭제", tags = "관리자 로그인이 필요한 API")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "성공", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "409", description = "예약된 시간은 삭제할 수 없습니다.",
@@ -91,7 +91,7 @@ public class ReservationTimeController {
     @LoginRequired
     @GetMapping("/times/filter")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "예약 가능한 시간 조회", description = "특정 날짜와 테마에 대한 예약 가능한 시간을 조회합니다.", tags = "로그인이 필요한 API")
+    @Operation(summary = "예약 가능 여부를 포함한 모든 시간 조회", tags = "로그인이 필요한 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공", useReturnTypeSchema = true)
     })

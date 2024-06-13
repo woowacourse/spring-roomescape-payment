@@ -61,7 +61,7 @@ public class ReservationController {
     @Admin
     @GetMapping("/reservations")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "모든 예약 정보 조회", description = "관리자가 모든 예약 정보를 조회합니다. 대기중인 예약은 조회하지 않습니다.", tags = "관리자 로그인이 필요한 API")
+    @Operation(summary = "모든 예약 정보 조회", tags = "관리자 로그인이 필요한 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공", useReturnTypeSchema = true)
     })
@@ -72,7 +72,7 @@ public class ReservationController {
     @LoginRequired
     @GetMapping("/reservations-mine")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "회원의 예약 및 대기 조회", description = "현재 로그인된 회원의 모든 예약 및 대기 정보를 조회합니다.", tags = "로그인이 필요한 API")
+    @Operation(summary = "자신의 예약 및 대기 조회", tags = "로그인이 필요한 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공", useReturnTypeSchema = true)
     })
@@ -84,7 +84,7 @@ public class ReservationController {
     @Admin
     @GetMapping("/reservations/search")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "관리자의 예약 검색", description = "관리자가 테마, 회원, 날짜 범위로 예약을 조회합니다. 검색 조건이 없으면 모든 예약을 조회합니다.", tags = "관리자 로그인이 필요한 API")
+    @Operation(summary = "관리자의 예약 검색", description = "특정 조건에 해당되는 예약 검색", tags = "관리자 로그인이 필요한 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "400", description = "날짜 범위를 지정할 때, 종료 날짜는 시작 날짜 이전일 수 없습니다.",
@@ -103,8 +103,7 @@ public class ReservationController {
     @Admin
     @DeleteMapping("/reservations/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "관리자의 예약 취소", description = "결제 대기중인 예약은 바로 삭제하고, 결제 완료 된 예약에 대해선 결제 취소를 요청합니다.",
-            tags = "관리자 로그인이 필요한 API")
+    @Operation(summary = "관리자의 예약 취소", tags = "관리자 로그인이 필요한 API")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "성공"),
             @ApiResponse(responseCode = "404", description = "예약 또는 결제 정보를 찾을 수 없습니다.",
@@ -134,7 +133,7 @@ public class ReservationController {
     @LoginRequired
     @PostMapping("/reservations")
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "예약 추가", description = "결제 위젯에서 받은 결제 정보를 확인하고, 결제가 승인되면 예약을 추가합니다.", tags = "로그인이 필요한 API")
+    @Operation(summary = "예약 추가", tags = "로그인이 필요한 API")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "성공", useReturnTypeSchema = true,
                     headers = @Header(name = HttpHeaders.LOCATION, description = "생성된 예약 정보 URL", schema = @Schema(example = "/reservations/1")))
@@ -166,7 +165,7 @@ public class ReservationController {
     @Admin
     @PostMapping("/reservations/admin")
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "관리자 예약 추가", description = "관리자가 직접 예약을 추가합니다. 추가된 예약은 결제 대기 상태로 지정됩니다.", tags = "관리자 로그인이 필요한 API")
+    @Operation(summary = "관리자 예약 추가", tags = "관리자 로그인이 필요한 API")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "성공", useReturnTypeSchema = true,
                     headers = @Header(name = HttpHeaders.LOCATION, description = "생성된 예약 정보 URL", schema = @Schema(example = "/reservations/1"))),
@@ -183,7 +182,7 @@ public class ReservationController {
     @Admin
     @GetMapping("/reservations/waiting")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "모든 예약 대기 조회", description = "관리자가 모든 예약 대기 정보를 조회합니다.", tags = "관리자 로그인이 필요한 API")
+    @Operation(summary = "모든 예약 대기 조회", tags = "관리자 로그인이 필요한 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공", useReturnTypeSchema = true)
     })
@@ -194,7 +193,7 @@ public class ReservationController {
     @LoginRequired
     @PostMapping("/reservations/waiting")
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "예약 대기 신청", description = "이미 예약이 되어있는 날짜, 테마에 예약 대기를 신청합니다.", tags = "로그인이 필요한 API")
+    @Operation(summary = "예약 대기 신청", tags = "로그인이 필요한 API")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "성공", useReturnTypeSchema = true,
                     headers = @Header(name = HttpHeaders.LOCATION, description = "생성된 예약 정보 URL", schema = @Schema(example = "/reservations/1")))
@@ -211,7 +210,7 @@ public class ReservationController {
     @LoginRequired
     @DeleteMapping("/reservations/waiting/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "회원의 예약 대기 취소", description = "회원이 자신이 한 예약 대기를 취소합니다.", tags = "로그인이 필요한 API")
+    @Operation(summary = "예약 대기 취소", tags = "로그인이 필요한 API")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "성공"),
             @ApiResponse(responseCode = "404", description = "회원의 예약 대기 정보를 찾을 수 없습니다.",
@@ -228,7 +227,7 @@ public class ReservationController {
     @Admin
     @PostMapping("/reservations/waiting/{id}/approve")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "대기 중인 예약 승인", description = "관리자가 기존의 예약이 취소되었을 때 대기 중인 예약을 '결제 대기' 상태로 승인합니다.", tags = "관리자 로그인이 필요한 API")
+    @Operation(summary = "대기 중인 예약 승인", tags = "관리자 로그인이 필요한 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "404", description = "예약 대기 정보를 찾을 수 없습니다.",
@@ -248,7 +247,7 @@ public class ReservationController {
     @Admin
     @PostMapping("/reservations/waiting/{id}/deny")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @Operation(summary = "대기 중인 예약 거절", description = "관리자가 대기 중인 예약을 거절합니다.", tags = "관리자 로그인이 필요한 API")
+    @Operation(summary = "대기 중인 예약 거절", tags = "관리자 로그인이 필요한 API")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "대기 중인 예약 거절 성공"),
             @ApiResponse(responseCode = "404", description = "예약 대기 정보를 찾을 수 없습니다.",

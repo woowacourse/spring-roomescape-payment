@@ -26,7 +26,7 @@ public class MemberController {
     @Admin
     @GetMapping("/members")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "모든 회원 조회", description = "관리자가 모든 회원의 정보를 조회합니다.", tags = "관리자 로그인이 필요한 API")
+    @Operation(summary = "모든 회원 조회", tags = "관리자 로그인이 필요한 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공", useReturnTypeSchema = true)
     })

@@ -38,7 +38,7 @@ public class AuthController {
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "로그인", description = "입력받은 이메일, 비밀번호로 로그인합니다.")
+    @Operation(summary = "로그인")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "로그인 성공시 쿠키에 토큰 정보를 저장합니다."),
             @ApiResponse(responseCode = "400", description = "존재하지 않는 회원이거나, 이메일 또는 비밀번호가 잘못 입력되었습니다.",
@@ -55,7 +55,7 @@ public class AuthController {
 
     @GetMapping("/login/check")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "로그인 상태 확인", description = "로그인 상태를 확인합니다.")
+    @Operation(summary = "로그인 상태 확인")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "로그인 상태이며, 로그인된 회원의 이름을 반환합니다."),
             @ApiResponse(responseCode = "400", description = "쿠키에 있는 토큰 정보로 회원을 조회할 수 없습니다.",
@@ -69,7 +69,7 @@ public class AuthController {
     @LoginRequired
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
-    @Operation(summary = "로그아웃", description = "현재 로그인된 회원을 로그아웃합니다.", tags = "로그인이 필요한 API")
+    @Operation(summary = "로그아웃", tags = "로그인이 필요한 API")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "로그아웃 성공시 쿠키에 저장된 토큰 정보를 삭제합니다.")
     })
