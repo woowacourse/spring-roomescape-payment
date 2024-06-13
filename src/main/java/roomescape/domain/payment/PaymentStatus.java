@@ -8,5 +8,10 @@ public enum PaymentStatus {
     CANCELED,
     PARTIAL_CANCELED,
     ABORTED,
-    EXPIRED
+    EXPIRED,
+    ;
+
+    public boolean isNotDone() {
+        return this != DONE;
+    }
 }

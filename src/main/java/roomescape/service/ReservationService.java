@@ -1,5 +1,6 @@
 package roomescape.service;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
@@ -9,6 +10,7 @@ import roomescape.domain.reservation.*;
 import roomescape.domain.reservation.dto.ReservationReadOnly;
 import roomescape.domain.reservation.slot.ReservationSlot;
 import roomescape.exception.AuthorizationException;
+import roomescape.exception.PaymentException;
 import roomescape.exception.RoomEscapeBusinessException;
 import roomescape.infrastructure.PaymentClient;
 import roomescape.service.dto.*;
@@ -74,6 +76,9 @@ public class ReservationService {
             return ReservationResponse.createByWaiting(waiting);
         }
         PaymentResponse paymentResponse = paymentClient.confirmPayment(paymentConfirmRequest);
+        if (paymentResponse.isNotDone()) {
+            throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제를 실패하였습니다. 다시 시도해주세요.");
+        }
         PaymentInfo paymentInfo = paymentResponse.toPaymentInfo();
         Reservation savedReservation = reservationRepository.save(new Reservation(member, slot, paymentInfo));
         return ReservationResponse.createByReservation(savedReservation);

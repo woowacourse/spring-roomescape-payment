@@ -20,4 +20,8 @@ public record PaymentResponse(
     public PaymentInfo toPaymentInfo() {
         return new PaymentInfo(paymentKey, orderId, totalAmount);
     }
+
+    public boolean isNotDone() {
+        return status.isNotDone();
+    }
 }
