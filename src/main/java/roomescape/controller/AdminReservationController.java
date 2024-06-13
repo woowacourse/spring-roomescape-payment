@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.service.reservation.ReservationCommonService;
-import roomescape.service.reservation.ReservationCreateService;
+import roomescape.service.reservation.ReservationCommandService;
+import roomescape.service.reservation.ReservationQueryService;
 import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
@@ -22,18 +22,18 @@ import roomescape.service.reservation.dto.ReservationResponse;
 @RequestMapping("/admin/reservations")
 public class AdminReservationController {
 
-    private final ReservationCreateService reservationCreateService;
-    private final ReservationCommonService reservationCommonService;
+    private final ReservationCommandService reservationCommandService;
+    private final ReservationQueryService reservationQueryService;
 
-    public AdminReservationController(ReservationCreateService reservationCreateService, ReservationCommonService reservationCommonService) {
-        this.reservationCreateService = reservationCreateService;
-        this.reservationCommonService = reservationCommonService;
+    public AdminReservationController(ReservationCommandService reservationCommandService, ReservationQueryService reservationQueryService) {
+        this.reservationCommandService = reservationCommandService;
+        this.reservationQueryService = reservationQueryService;
     }
 
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(
         @RequestBody @Valid AdminReservationRequest adminReservationRequest) {
-        ReservationResponse reservationResponse = reservationCreateService.createAdminReservation(adminReservationRequest);
+        ReservationResponse reservationResponse = reservationCommandService.createAdminReservation(adminReservationRequest);
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
             .body(reservationResponse);
     }
@@ -41,12 +41,12 @@ public class AdminReservationController {
     @GetMapping("/search")
     public List<ReservationResponse> findReservations(
         @ModelAttribute("ReservationFindRequest") ReservationFilterRequest reservationFilterRequest) {
-        return reservationCommonService.findByCondition(reservationFilterRequest);
+        return reservationQueryService.findByCondition(reservationFilterRequest);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable("id") long reservationId) {
-        reservationCommonService.deleteById(reservationId);
+        reservationCommandService.deleteById(reservationId);
         return ResponseEntity.noContent().build();
     }
 }

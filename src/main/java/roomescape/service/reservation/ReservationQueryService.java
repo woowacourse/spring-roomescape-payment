@@ -1,28 +1,22 @@
 package roomescape.service.reservation;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.schedule.ReservationDate;
-import roomescape.exception.InvalidReservationException;
-import roomescape.service.payment.PaymentService;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
 
 @Service
 @Transactional(readOnly = true)
-public class ReservationCommonService {
+public class ReservationQueryService {
 
     private final ReservationRepository reservationRepository;
-    private final PaymentService paymentService;
 
-    public ReservationCommonService(ReservationRepository reservationRepository, PaymentService paymentService) {
+    public ReservationQueryService(ReservationRepository reservationRepository) {
         this.reservationRepository = reservationRepository;
-        this.paymentService = paymentService;
     }
 
     public List<ReservationResponse> findByCondition(ReservationFilterRequest reservationFilterRequest) {
@@ -36,28 +30,5 @@ public class ReservationCommonService {
         return reservationRepository.findAllByStatus(ReservationStatus.RESERVED).stream()
             .map(ReservationResponse::new)
             .toList();
-    }
-
-    @Transactional
-    public void deleteById(long id) {
-        reservationRepository.findById(id)
-            .ifPresent(this::deleteIfAvailable);
-    }
-
-    private void deleteIfAvailable(Reservation reservation) {
-        validatePastReservation(reservation);
-        paymentService.cancelPayment(reservation);
-        reservationRepository.deleteById(reservation.getId());
-    }
-
-    private void validatePastReservation(Reservation reservation) {
-        if (reservation.isReserved() && reservation.isPast()) {
-            throw new InvalidReservationException("이미 지난 예약은 삭제할 수 없습니다.");
-        }
-    }
-
-    public Reservation findById(long id) {
-        return reservationRepository.findById(id)
-            .orElseThrow(() -> new NoSuchElementException("존재하지 않는 예약 ID입니다."));
     }
 }

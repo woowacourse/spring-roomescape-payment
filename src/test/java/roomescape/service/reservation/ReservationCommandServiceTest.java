@@ -15,10 +15,10 @@ import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
 
-class ReservationCreateServiceTest extends ReservationServiceTest {
+class ReservationCommandServiceTest extends ReservationServiceTest {
 
     @Autowired
-    private ReservationCreateService reservationCreateService;
+    private ReservationCommandService reservationCreateService;
     @Autowired
     private ReservationRepository reservationRepository;
 

@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.LoginMemberId;
-import roomescape.service.reservation.ReservationCommonService;
-import roomescape.service.reservation.ReservationCreateService;
+import roomescape.service.reservation.ReservationCommandService;
+import roomescape.service.reservation.ReservationQueryService;
 import roomescape.service.reservation.dto.ReservationRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
 import roomescape.service.reservation.dto.WaitingPaymentRequest;
@@ -20,24 +20,24 @@ import roomescape.service.reservation.dto.WaitingPaymentRequest;
 @RequestMapping("/reservations")
 public class ReservationController {
 
-    private final ReservationCreateService reservationCreateService;
-    private final ReservationCommonService reservationReadService;
+    private final ReservationCommandService reservationCommandService;
+    private final ReservationQueryService reservationQueryService;
 
-    public ReservationController(ReservationCreateService reservationCreateService, ReservationCommonService reservationReadService) {
-        this.reservationCreateService = reservationCreateService;
-        this.reservationReadService = reservationReadService;
+    public ReservationController(ReservationCommandService reservationCommandService, ReservationQueryService reservationQueryService) {
+        this.reservationCommandService = reservationCommandService;
+        this.reservationQueryService = reservationQueryService;
     }
 
     @GetMapping
     public List<ReservationResponse> findAll() {
-        return reservationReadService.findAll();
+        return reservationQueryService.findAll();
     }
 
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(
         @RequestBody @Valid ReservationRequest reservationRequest,
         @LoginMemberId long memberId) {
-        ReservationResponse reservationResponse = reservationCreateService.createMemberReservation(reservationRequest, memberId);
+        ReservationResponse reservationResponse = reservationCommandService.createMemberReservation(reservationRequest, memberId);
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
             .body(reservationResponse);
     }
@@ -47,7 +47,7 @@ public class ReservationController {
         @RequestBody @Valid WaitingPaymentRequest reservationRequest,
         @LoginMemberId long memberId
     ) {
-        ReservationResponse reservationResponse = reservationCreateService.createMemberReservationWithWaitingPayment(reservationRequest, memberId);
+        ReservationResponse reservationResponse = reservationCommandService.createMemberReservationWithWaitingPayment(reservationRequest, memberId);
         return ResponseEntity.created(URI.create("/reservations/" + reservationResponse.id()))
             .body(reservationResponse);
     }

@@ -28,7 +28,7 @@ import roomescape.service.reservation.dto.WaitingPaymentRequest;
 
 @Service
 @Transactional
-public class ReservationCreateService {
+public class ReservationCommandService {
 
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -37,7 +37,7 @@ public class ReservationCreateService {
     private final ReservationDetailRepository reservationDetailRepository;
     private final PaymentService paymentService;
 
-    public ReservationCreateService(ReservationRepository reservationRepository,
+    public ReservationCommandService(ReservationRepository reservationRepository,
         ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository,
         MemberRepository memberRepository, ReservationDetailRepository reservationDetailRepository, PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
@@ -130,6 +130,22 @@ public class ReservationCreateService {
             throw new InvalidReservationException("이미 결제된 예약입니다.");
         }
     }
+
+    @Transactional
+    public void deleteById(long id) {
+        reservationRepository.findById(id)
+            .ifPresent(this::deleteIfAvailable);
+    }
+
+    private void deleteIfAvailable(Reservation reservation) {
+        validatePastReservation(reservation);
+        paymentService.cancelPayment(reservation);
+        reservationRepository.deleteById(reservation.getId());
+    }
+
+    private void validatePastReservation(Reservation reservation) {
+        if (reservation.isReserved() && reservation.isPast()) {
+            throw new InvalidReservationException("이미 지난 예약은 삭제할 수 없습니다.");
+        }
+    }
 }
-
-

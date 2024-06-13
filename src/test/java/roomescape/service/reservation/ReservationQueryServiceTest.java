@@ -15,10 +15,12 @@ import roomescape.exception.InvalidReservationException;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
 import roomescape.service.reservation.dto.ReservationResponse;
 
-class ReservationCommonServiceTest extends ReservationServiceTest {
+class ReservationQueryServiceTest extends ReservationServiceTest {
 
     @Autowired
-    private ReservationCommonService reservationCommonService;
+    private ReservationCommandService reservationCommandService;
+    @Autowired
+    private ReservationQueryService reservationQueryService;
     @Autowired
     private ReservationRepository reservationRepository;
 
@@ -28,7 +30,7 @@ class ReservationCommonServiceTest extends ReservationServiceTest {
         Reservation reservation = new Reservation(admin, reservationDetail, ReservationStatus.RESERVED);
         reservationRepository.save(reservation);
         //when
-        List<ReservationResponse> reservations = reservationCommonService.findAll();
+        List<ReservationResponse> reservations = reservationQueryService.findAll();
 
         //then
         assertThat(reservations).hasSize(1);
@@ -44,7 +46,7 @@ class ReservationCommonServiceTest extends ReservationServiceTest {
             null);
 
         //when
-        List<ReservationResponse> reservations = reservationCommonService.findByCondition(reservationFilterRequest);
+        List<ReservationResponse> reservations = reservationQueryService.findByCondition(reservationFilterRequest);
 
         //then
         assertThat(reservations).hasSize(1);
@@ -61,7 +63,7 @@ class ReservationCommonServiceTest extends ReservationServiceTest {
             notMemberThemeId, null, null);
 
         //when
-        List<ReservationResponse> reservations = reservationCommonService.findByCondition(reservationFilterRequest);
+        List<ReservationResponse> reservations = reservationQueryService.findByCondition(reservationFilterRequest);
 
         //then
         assertThat(reservations).isEmpty();
@@ -78,7 +80,7 @@ class ReservationCommonServiceTest extends ReservationServiceTest {
         reservationRepository.deleteById(target.getId());
 
         //then
-        assertThat(reservationCommonService.findAll()).isEmpty();
+        assertThat(reservationQueryService.findAll()).isEmpty();
     }
 
     @DisplayName("관리자가 과거 예약을 삭제하려고 하면 예외가 발생한다.")
@@ -89,7 +91,7 @@ class ReservationCommonServiceTest extends ReservationServiceTest {
         long id = 1;
 
         //when & then
-        assertThatThrownBy(() -> reservationCommonService.deleteById(id))
+        assertThatThrownBy(() -> reservationCommandService.deleteById(id))
             .isInstanceOf(InvalidReservationException.class)
             .hasMessage("이미 지난 예약은 삭제할 수 없습니다.");
     }
