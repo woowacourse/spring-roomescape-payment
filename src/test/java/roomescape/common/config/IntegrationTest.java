@@ -1,14 +1,26 @@
 package roomescape.common.config;
 
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
+import org.springframework.restdocs.restassured.RestAssuredRestDocumentation;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 import roomescape.auth.domain.Role;
 import roomescape.auth.jwt.JwtTokenProvider;
 import roomescape.member.domain.Member;
@@ -16,7 +28,8 @@ import roomescape.member.domain.MemberName;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class IntegrationTest {
+@ExtendWith(RestDocumentationExtension.class)
+public abstract class IntegrationTest {
 
     @LocalServerPort
     private int port;
@@ -30,9 +43,29 @@ public class IntegrationTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    protected RequestSpecification spec;
+
+    @Autowired
+    private WebApplicationContext context;
+
+    protected MockMvc mockMvc;
+
     @BeforeEach
-    void setPort() {
+    void setUp(RestDocumentationContextProvider restDocumentation) {
         RestAssured.port = port;
+        this.spec = new RequestSpecBuilder()
+                .addFilter(RestAssuredRestDocumentation.documentationConfiguration(restDocumentation)
+                        .operationPreprocessors()
+                        .withResponseDefaults(prettyPrint()))
+                .build();
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context)
+                .apply(MockMvcRestDocumentation.documentationConfiguration(restDocumentation)
+                        .uris()
+                        .withPort(8080)
+                        .and()
+                        .operationPreprocessors()
+                        .withResponseDefaults(prettyPrint()))
+                .build();
     }
 
     @AfterEach
@@ -56,6 +89,12 @@ public class IntegrationTest {
 
     protected void saveMemberAsKaki() {
         String sql = "insert into member (name, email, password, role) values ('카키', 'kaki@email.com', '1234', 'MEMBER')";
+
+        jdbcTemplate.update(sql);
+    }
+
+    protected void saveMemberAsAnna() {
+        String sql = "insert into member (name, email, password, role) values ('안나', 'anna@email.com', '1234', 'MEMBER')";
 
         jdbcTemplate.update(sql);
     }
@@ -97,6 +136,12 @@ public class IntegrationTest {
 
     protected void saveWaitReservationAsDateNow() {
         String sql = "insert into reservation (member_id, date, theme_id, time_id, status) values (1, CURRENT_DATE, 1, 1, 'WAIT')";
+
+        jdbcTemplate.update(sql);
+    }
+
+    protected void saveWaitReservationAsDateNowWithSecondMember() {
+        String sql = "insert into reservation (member_id, date, theme_id, time_id, status) values (2, CURRENT_DATE, 1, 1, 'WAIT')";
 
         jdbcTemplate.update(sql);
     }

@@ -77,7 +77,8 @@ class ReservationTimeRepositoryTest {
 
         Member member = memberRepository.save(new Member(new MemberName(KAKI_NAME), KAKI_EMAIL, KAKI_PASSWORD));
 
-        reservationRepository.save(new Reservation(member, LocalDate.now(), theme, reservationTime, Status.SUCCESS));
+        reservationRepository.save(
+                new Reservation(member, LocalDate.now(), theme, reservationTime, Status.SUCCESS));
 
         boolean exist = !reservationTimeRepository.findReservationTimesThatReservationReferById(reservationTime.getId())
                 .isEmpty();

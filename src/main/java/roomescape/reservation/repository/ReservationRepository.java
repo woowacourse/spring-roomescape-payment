@@ -23,15 +23,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Long> findTimeIdsByDateAndThemeId(LocalDate date, Long themeId);
 
     @Query("""
-            select new roomescape.reservation.domain.ReservationWithRank(
-            r, (select count(*)
-                from Reservation r2
-                where r2.theme = r.theme
-                and r2.date = r.date
-                and r2.reservationTime = r.reservationTime
-                and r2.id < r.id))
-            from Reservation r
-            where r.member.id = :memberId
+                SELECT new roomescape.reservation.domain.ReservationWithRank(
+                    r, (SELECT COUNT(*) FROM Reservation r2
+                        WHERE r2.theme = r.theme
+                        AND r2.date = r.date
+                        AND r2.reservationTime = r.reservationTime
+                        AND r2.id < r.id))
+                    FROM Reservation r
+                    WHERE r.member.id = :memberId
             """)
     List<ReservationWithRank> findReservationWithRanksByMemberId(Long memberId);
 

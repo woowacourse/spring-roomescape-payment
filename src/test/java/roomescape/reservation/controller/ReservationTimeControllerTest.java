@@ -1,6 +1,7 @@
 package roomescape.reservation.controller;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,9 +25,10 @@ class ReservationTimeControllerTest extends IntegrationTest {
     @DisplayName("모든 시간 조회 성공 시 200 응답을 받는다.")
     @Test
     void findAll() {
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .accept(ContentType.JSON)
+                .filter(document("times/findAll"))
                 .when()
                 .get("/times")
                 .then().log().all()
@@ -41,12 +43,13 @@ class ReservationTimeControllerTest extends IntegrationTest {
         saveReservationTimeAsTen();
         saveSuccessReservationAsDateNow();
 
-        RestAssured.given()
+        RestAssured.given(this.spec)
                 .param("date", LocalDate.now().toString())
                 .param("theme-id", 1)
                 .log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .accept(ContentType.JSON)
+                .filter(document("times/available"))
                 .when()
                 .get("/times/available")
                 .then().log().all()
@@ -60,11 +63,12 @@ class ReservationTimeControllerTest extends IntegrationTest {
     void save() throws JsonProcessingException {
         TimeSaveRequest timeSaveRequest = new TimeSaveRequest(LocalTime.now());
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(timeSaveRequest))
                 .accept(ContentType.JSON)
+                .filter(document("times/save"))
                 .when()
                 .post("/times")
                 .then().log().all()
@@ -72,15 +76,54 @@ class ReservationTimeControllerTest extends IntegrationTest {
                 .header("Location", "/times/1");
     }
 
+    @DisplayName("이미 등록된 예약 시간을 저장하려하는 경우 실패한다.")
+    @Test
+    void failSaveWhenAlreadyHasDuplicatedStartAt() throws JsonProcessingException {
+        saveReservationTimeAsTen();
+        TimeSaveRequest timeSaveRequest = new TimeSaveRequest(LocalTime.parse("10:00"));
+
+        RestAssured.given(this.spec).log().all()
+                .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(timeSaveRequest))
+                .accept(ContentType.JSON)
+                .filter(document("times/save/fail/already-saved"))
+                .when()
+                .post("/times")
+                .then().log().all()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
     @DisplayName("시간 삭제 성공시 204 응답을 받는다.")
     @Test
     void delete() {
-        RestAssured.given().log().all()
+        saveReservationTimeAsTen();
+
+        RestAssured.given(this.spec).log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .accept(ContentType.JSON)
+                .filter(document("times/delete"))
                 .when()
                 .delete("/times/{id}", 1L)
                 .then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("삭제하려는 예약 시간에 예약된 방탈출 예약이 있는 경우 삭제에 실패한다.")
+    @Test
+    void failDeleteWhenAlreadyReservedInReservationTime() {
+        saveReservationTimeAsTen();
+        saveThemeAsHorror();
+        saveMemberAsKaki();
+        saveSuccessReservationAsDateNow();
+
+        RestAssured.given(this.spec).log().all()
+                .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
+                .accept(ContentType.JSON)
+                .filter(document("times/delete/fail/already-reserved"))
+                .when()
+                .delete("/times/{id}", 1L)
+                .then().log().all()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 }

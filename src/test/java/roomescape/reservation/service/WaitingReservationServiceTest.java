@@ -82,7 +82,8 @@ class WaitingReservationServiceTest {
         Theme theme = themeRepository.save(HORROR_THEME);
         Member jojo = memberRepository.save(MEMBER_JOJO);
 
-        Reservation waiting = reservationRepository.save(new Reservation(jojo, TOMORROW, theme, reservationTime, WAIT));
+        Reservation waiting = reservationRepository.save(
+                new Reservation(jojo, TOMORROW, theme, reservationTime, WAIT));
         waitingReservationService.approveReservation(waiting.getId());
 
         Reservation afterUpdate = reservationRepository.findById(waiting.getId()).get();
@@ -98,8 +99,10 @@ class WaitingReservationServiceTest {
         Member jojo = memberRepository.save(MEMBER_JOJO);
         Member kaki = memberRepository.save(MEMBER_KAKI);
 
-        reservationRepository.save(new Reservation(kaki, TOMORROW, theme, reservationTime, SUCCESS));
-        Reservation waiting = reservationRepository.save(new Reservation(jojo, TOMORROW, theme, reservationTime, WAIT));
+        reservationRepository.save(
+                new Reservation(kaki, TOMORROW, theme, reservationTime, SUCCESS));
+        Reservation waiting = reservationRepository.save(
+                new Reservation(jojo, TOMORROW, theme, reservationTime, WAIT));
 
         assertThatThrownBy(() -> waitingReservationService.approveReservation(waiting.getId()))
                 .isInstanceOf(IllegalArgumentException.class);

@@ -1,5 +1,7 @@
 package roomescape.reservation.controller;
 
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
@@ -20,9 +22,10 @@ class ThemeControllerTest extends IntegrationTest {
     @DisplayName("인기 테마 목록 조회를 성공하면 200 응답을 받는다.")
     @Test
     void findTopTenThemesOfLastWeek() {
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .accept(ContentType.JSON)
+                .filter(document("themes/popular"))
                 .when()
                 .get("/themes/popular")
                 .then().log().all()
@@ -32,9 +35,10 @@ class ThemeControllerTest extends IntegrationTest {
     @DisplayName("테마 목록 조회에 성공하면 200 응답을 받는다.")
     @Test
     void findAll() {
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .accept(ContentType.JSON)
+                .filter(document("themes/findAll"))
                 .when()
                 .get("/themes")
                 .then().log().all()
@@ -46,11 +50,12 @@ class ThemeControllerTest extends IntegrationTest {
     void save() throws JsonProcessingException {
         ThemeSaveRequest themeSaveRequest = new ThemeSaveRequest("공포", "진짜 무서움", "https://i.pinimg.com/236x.jpg");
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .contentType(ContentType.JSON)
                 .body(objectMapper.writeValueAsString(themeSaveRequest))
                 .accept(ContentType.JSON)
+                .filter(document("themes/save"))
                 .when()
                 .post("/themes")
                 .then().log().all()
@@ -58,15 +63,54 @@ class ThemeControllerTest extends IntegrationTest {
                 .header("Location", "/themes/1");
     }
 
+    @DisplayName("테마 이름이 중복되면 저장에 실패한다.")
+    @Test
+    void failSaveWhenAlreadyHasSameThemeName() throws JsonProcessingException {
+        saveThemeAsHorror();
+
+        ThemeSaveRequest themeSaveRequest = new ThemeSaveRequest("공포", "진짜 무서움", "https://i.pinimg.com/236x.jpg");
+
+        RestAssured.given(this.spec).log().all()
+                .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(themeSaveRequest))
+                .accept(ContentType.JSON)
+                .filter(document("themes/save/fail/duplicated"))
+                .when()
+                .post("/themes")
+                .then().log().all()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
+    }
+
     @DisplayName("테마를 성공적으로 제거하면 204 응답을 받는다.")
     @Test
     void delete() {
-        RestAssured.given().log().all()
+        saveThemeAsHorror();
+        RestAssured.given(this.spec).log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
                 .accept(ContentType.JSON)
+                .filter(document("themes/delete"))
                 .when()
                 .delete("/themes/{id}", 1L)
                 .then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value());
+    }
+
+    @DisplayName("예약이 존재하는 테마인 경우 테마 삭제에 실패한다.")
+    @Test
+    void failDeleteWhenAlreadyReserved() {
+        saveThemeAsHorror();
+        saveMemberAsKaki();
+        saveReservationTimeAsTen();
+        saveSuccessReservationAsDateNow();
+
+        RestAssured.given(this.spec).log().all()
+                .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
+                .accept(ContentType.JSON)
+                .filter(document("themes/delete/fail/already-reserved"))
+                .when()
+                .delete("/themes/{id}", 1L)
+                .then().log().all()
+                .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 }

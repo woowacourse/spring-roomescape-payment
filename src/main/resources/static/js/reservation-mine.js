@@ -35,8 +35,12 @@ function render(data) {
                 requestDeleteWaiting(item.reservationId).then(() => window.location.reload());
             };
             cancelCell.appendChild(cancelButton);
+            row.insertCell(5).textContent = '';
+            row.insertCell(6).textContent = '';
         } else { // 예약 완료 상태일 때
             row.insertCell(4).textContent = '';
+            row.insertCell(5).textContent = item.paymentKey;
+            row.insertCell(6).textContent = item.amount;
         }
     });
 }

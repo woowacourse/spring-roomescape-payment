@@ -30,6 +30,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberName;
 import roomescape.member.repository.MemberRepository;
+import roomescape.reservation.controller.dto.request.ReservationSearchCondRequest;
 import roomescape.reservation.domain.Description;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
@@ -37,7 +38,6 @@ import roomescape.reservation.domain.ReservationWithRank;
 import roomescape.reservation.domain.Status;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.ThemeName;
-import roomescape.reservation.controller.dto.request.ReservationSearchCondRequest;
 
 @DataJpaTest
 class ReservationRepositoryTest {
@@ -92,8 +92,10 @@ class ReservationRepositoryTest {
         Member kaki = memberRepository.save(new Member(new MemberName(KAKI_NAME), KAKI_EMAIL, KAKI_PASSWORD));
         Member jojo = memberRepository.save(new Member(new MemberName(JOJO_NAME), JOJO_EMAIL, JOJO_PASSWORD));
 
-        reservationRepository.save(new Reservation(kaki, LocalDate.now(), theme, reservationTime, Status.SUCCESS));
-        reservationRepository.save(new Reservation(jojo, LocalDate.now(), theme, reservationTime, Status.SUCCESS));
+        reservationRepository.save(
+                new Reservation(kaki, LocalDate.now(), theme, reservationTime, Status.SUCCESS));
+        reservationRepository.save(
+                new Reservation(jojo, LocalDate.now(), theme, reservationTime, Status.SUCCESS));
 
         List<Reservation> reservations = reservationRepository.findAllByMemberId(kaki.getId());
 
@@ -108,17 +110,21 @@ class ReservationRepositoryTest {
         Member jojo = memberRepository.save(MEMBER_JOJO);
         Member kaki = memberRepository.save(MEMBER_KAKI);
 
-        reservationRepository.save(new Reservation(jojo, TODAY, theme, reservationTime, Status.SUCCESS));
-        reservationRepository.save(new Reservation(kaki, TODAY, theme, reservationTime, Status.WAIT));
-        reservationRepository.save(new Reservation(jojo, TODAY, theme, reservationTime, Status.WAIT));
-        reservationRepository.save(new Reservation(kaki, TODAY, theme, reservationTime, Status.WAIT));
+        reservationRepository.save(
+                new Reservation(jojo, TODAY, theme, reservationTime, Status.SUCCESS));
+        reservationRepository.save(
+                new Reservation(kaki, TODAY, theme, reservationTime, Status.WAIT));
+        reservationRepository.save(
+                new Reservation(jojo, TODAY, theme, reservationTime, Status.WAIT));
+        reservationRepository.save(
+                new Reservation(kaki, TODAY, theme, reservationTime, Status.WAIT));
 
-        List<ReservationWithRank> reservationWithRanks = reservationRepository.findReservationWithRanksByMemberId(
+        List<ReservationWithRank> reservationRespons = reservationRepository.findReservationWithRanksByMemberId(
                 jojo.getId());
 
         assertAll(
-                () -> assertThat(reservationWithRanks).hasSize(2),
-                () -> assertThat(reservationWithRanks.get(1)
+                () -> assertThat(reservationRespons).hasSize(2),
+                () -> assertThat(reservationRespons.get(1)
                         .getRank())
                         .isEqualTo(2L)
         );
@@ -177,8 +183,10 @@ class ReservationRepositoryTest {
         Theme theme = themeRepository.save(HORROR_THEME);
         Member member = memberRepository.save(MEMBER_JOJO);
 
-        reservationRepository.save(new Reservation(member, TODAY, theme, reservationTime, Status.WAIT));
-        reservationRepository.save(new Reservation(member, TOMORROW, theme, reservationTime, Status.SUCCESS));
+        reservationRepository.save(
+                new Reservation(member, TODAY, theme, reservationTime, Status.WAIT));
+        reservationRepository.save(
+                new Reservation(member, TOMORROW, theme, reservationTime, Status.SUCCESS));
 
         List<Reservation> reservations = reservationRepository.findAllByStatus(Status.WAIT);
         assertThat(reservations).hasSize(1);

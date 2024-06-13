@@ -7,13 +7,15 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;
 import org.springframework.boot.web.client.ClientHttpRequestFactorySettings;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
@@ -23,14 +25,15 @@ import roomescape.reservation.client.errorcode.PaymentConfirmErrorCode;
 import roomescape.reservation.service.dto.request.PaymentConfirmRequest;
 import roomescape.reservation.service.dto.response.PaymentConfirmResponse;
 
-@Service
-public class PaymentService {
+@Component
+public class PaymentConfirmClient {
+    private static final Logger logger = LoggerFactory.getLogger(PaymentConfirmClient.class);
 
     private final RestClient restClient;
     private final String encodedSecretKey;
     private final ObjectMapper objectMapper;
 
-    public PaymentService(
+    public PaymentConfirmClient(
             @Value("${payment.base-url}") String paymentBaseUrl,
             @Value("${payment.secret-key}") String secretKey,
             ObjectMapper objectMapper
@@ -41,6 +44,19 @@ public class PaymentService {
                 .build();
         this.encodedSecretKey = encodeSecretKey(secretKey);
         this.objectMapper = objectMapper;
+    }
+
+    private ClientHttpRequestFactory getClientHttpRequestFactory() {
+        ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
+                .withConnectTimeout(Duration.ofSeconds(10))
+                .withReadTimeout(Duration.ofSeconds(30));
+        return ClientHttpRequestFactories.get(settings);
+    }
+
+    private static String encodeSecretKey(String secretKey) {
+        Base64.Encoder encoder = Base64.getEncoder();
+        byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
+        return "Basic " + new String(encodedBytes);
     }
 
     public void confirmPayment(PaymentConfirmRequest paymentRequest) {
@@ -54,6 +70,7 @@ public class PaymentService {
                     .onStatus(HttpStatusCode::isError, createPaymentErrorHandler())
                     .toBodilessEntity();
         } catch (ResourceAccessException exception) {
+            logger.error(exception.getMessage(), exception.getCause());
             throw new RuntimeException("외부 시스템과의 연동에 실패했거나 응답을 가져올 수 없습니다.");
         }
     }
@@ -70,21 +87,8 @@ public class PaymentService {
 
     private static void throwByCustomErrorResponse(PaymentConfirmResponse confirmResponse) {
         Optional<PaymentConfirmErrorCode> customErrorCode = findByErrorCode(confirmResponse.code());
-        if (customErrorCode.isPresent()) {
-            throw new PaymentConfirmCustomException(customErrorCode.get(), confirmResponse.message());
-        }
-    }
-
-    private ClientHttpRequestFactory getClientHttpRequestFactory() {
-        ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(30))
-                .withReadTimeout(Duration.ofSeconds(30));
-        return ClientHttpRequestFactories.get(settings);
-    }
-
-    private static String encodeSecretKey(String secretKey) {
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
-        return "Basic " + new String(encodedBytes);
+        customErrorCode.ifPresent(code -> {
+            throw new PaymentConfirmCustomException(code, confirmResponse.message());
+        });
     }
 }

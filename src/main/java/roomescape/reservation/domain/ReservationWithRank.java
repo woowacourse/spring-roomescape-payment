@@ -13,7 +13,7 @@ public class ReservationWithRank {
         this.rank = rank;
     }
 
-    public Reservation getWaiting() {
+    public Reservation getReservation() {
         return reservation;
     }
 

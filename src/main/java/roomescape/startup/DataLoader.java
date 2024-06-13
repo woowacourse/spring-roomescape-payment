@@ -47,9 +47,13 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.reservation.domain.Payment;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationPayment;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
+import roomescape.reservation.repository.PaymentRepository;
+import roomescape.reservation.repository.ReservationPaymentRepository;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.repository.ThemeRepository;
@@ -62,17 +66,22 @@ public class DataLoader implements ApplicationRunner {
     private final ThemeRepository themeRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ReservationRepository reservationRepository;
+    private final PaymentRepository paymentRepository;
+    private final ReservationPaymentRepository reservationPaymentRepository;
 
     public DataLoader(
             MemberRepository memberRepository,
             ThemeRepository themeRepository,
             ReservationTimeRepository reservationTimeRepository,
-            ReservationRepository reservationRepository
+            ReservationRepository reservationRepository, PaymentRepository paymentRepository,
+            ReservationPaymentRepository reservationPaymentRepository
     ) {
         this.memberRepository = memberRepository;
         this.themeRepository = themeRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.reservationRepository = reservationRepository;
+        this.paymentRepository = paymentRepository;
+        this.reservationPaymentRepository = reservationPaymentRepository;
     }
 
     @Override
@@ -118,25 +127,67 @@ public class DataLoader implements ApplicationRunner {
         ReservationTime time14_00 = reservationTimeRepository.save(TIME_14_00);
         ReservationTime time14_30 = reservationTimeRepository.save(TIME_14_30);
 
+        // payment
+        Payment payment1 = paymentRepository.save(new Payment("paymentKey", 1000L));
+        Payment payment2 = paymentRepository.save(new Payment("paymentKey", 1000L));
+        Payment payment3 = paymentRepository.save(new Payment("paymentKey", 1000L));
+        Payment payment4 = paymentRepository.save(new Payment("paymentKey", 1000L));
+        Payment payment5 = paymentRepository.save(new Payment("paymentKey", 1000L));
+        Payment payment6 = paymentRepository.save(new Payment("paymentKey", 1000L));
+        Payment payment7 = paymentRepository.save(new Payment("paymentKey", 1000L));
+        Payment payment8 = paymentRepository.save(new Payment("paymentKey", 1000L));
+        Payment payment9 = paymentRepository.save(new Payment("paymentKey", 1000L));
+        Payment payment10 = paymentRepository.save(new Payment("paymentKey", 1000L));
+        Payment payment11 = paymentRepository.save(new Payment("paymentKey", 1000L));
+        Payment payment12 = paymentRepository.save(new Payment("paymentKey", 1000L));
+        Payment payment13 = paymentRepository.save(new Payment("paymentKey", 1000L));
+        Payment payment14 = paymentRepository.save(new Payment("paymentKey", 1000L));
+        Payment payment15 = paymentRepository.save(new Payment("paymentKey", 1000L));
+        Payment payment16 = paymentRepository.save(new Payment("paymentKey", 1000L));
+
         // reservation
-        List<Reservation> reservations = List.of(
-                new Reservation(jojo, TODAY, horror, time10_00, SUCCESS),
-                new Reservation(solar, TODAY, horror, time10_00, WAIT),
-                new Reservation(brown, TODAY, sf, time12_00, SUCCESS),
-                new Reservation(jojo, TODAY, sf, time12_00, WAIT),
-                new Reservation(googoo, TOMORROW, zombie, time14_30, SUCCESS),
-                new Reservation(jojo, TOMORROW, zombie, time14_30, WAIT),
-                new Reservation(jojo, TODAY.plusDays(2), monkey, time11_00, SUCCESS),
-                new Reservation(jojo, TODAY.plusDays(5), nagayaSanda, time10_00, SUCCESS),
-                new Reservation(jojo, TODAY.plusDays(7), virus, time12_30, SUCCESS),
-                new Reservation(neo, TODAY.plusDays(3), virus, time11_30, SUCCESS),
-                new Reservation(bre, TODAY.plusDays(2), horrorThemePark, time14_30, SUCCESS),
-                new Reservation(pobi, TODAY.plusDays(2), horror, time14_30, SUCCESS),
-                new Reservation(tomi, TODAY.plusDays(3), titanic, time10_30, SUCCESS),
-                new Reservation(risa, TODAY.plusDays(4), artGallery, time14_00, SUCCESS),
-                new Reservation(solar, TODAY.plusDays(2), horror, time14_30, WAIT),
-                new Reservation(jojo, TODAY.plusDays(2), horror, time14_30, WAIT)
+        Reservation reservation1 = reservationRepository.save(new Reservation(jojo, TODAY, horror, time10_00, SUCCESS));
+        Reservation reservation2 = reservationRepository.save(new Reservation(solar, TODAY, horror, time10_00, WAIT));
+        Reservation reservation3 = reservationRepository.save(new Reservation(brown, TODAY, sf, time12_00, SUCCESS));
+        Reservation reservation4 = reservationRepository.save(new Reservation(jojo, TODAY, sf, time12_00, WAIT));
+        Reservation reservation5 = reservationRepository.save(
+                new Reservation(googoo, TOMORROW, zombie, time14_30, SUCCESS));
+        Reservation reservation6 = reservationRepository.save(new Reservation(jojo, TOMORROW, zombie, time14_30, WAIT));
+        Reservation reservation7 = reservationRepository.save(
+                new Reservation(jojo, TODAY.plusDays(2), monkey, time11_00, SUCCESS));
+        Reservation reservation8 = reservationRepository.save(
+                new Reservation(jojo, TODAY.plusDays(5), nagayaSanda, time10_00, SUCCESS));
+        Reservation reservation9 = reservationRepository.save(
+                new Reservation(jojo, TODAY.plusDays(7), virus, time12_30, SUCCESS));
+        Reservation reservation10 = reservationRepository.save(
+                new Reservation(neo, TODAY.plusDays(3), virus, time11_30, SUCCESS));
+        Reservation reservation11 = reservationRepository.save(
+                new Reservation(bre, TODAY.plusDays(2), horrorThemePark, time14_30, SUCCESS));
+        Reservation reservation12 = reservationRepository.save(
+                new Reservation(pobi, TODAY.plusDays(2), horror, time14_30, SUCCESS));
+        Reservation reservation13 = reservationRepository.save(
+                new Reservation(tomi, TODAY.plusDays(3), titanic, time10_30, SUCCESS));
+        Reservation reservation14 = reservationRepository.save(
+                new Reservation(risa, TODAY.plusDays(4), artGallery, time14_00, SUCCESS));
+        Reservation reservation15 = reservationRepository.save(
+                new Reservation(solar, TODAY.plusDays(2), horror, time14_30, WAIT));
+        Reservation reservation16 = reservationRepository.save(
+                new Reservation(jojo, TODAY.plusDays(2), horror, time14_30, WAIT));
+
+        // ReservationPayment
+        List<ReservationPayment> reservationPayments = List.of(
+                new ReservationPayment(reservation1, payment1),
+                new ReservationPayment(reservation3, payment3),
+                new ReservationPayment(reservation5, payment5),
+                new ReservationPayment(reservation7, payment7),
+                new ReservationPayment(reservation8, payment8),
+                new ReservationPayment(reservation9, payment9),
+                new ReservationPayment(reservation10, payment10),
+                new ReservationPayment(reservation11, payment11),
+                new ReservationPayment(reservation12, payment12),
+                new ReservationPayment(reservation13, payment13),
+                new ReservationPayment(reservation14, payment14)
         );
-        reservationRepository.saveAll(reservations);
+        reservationPaymentRepository.saveAll(reservationPayments);
     }
 }

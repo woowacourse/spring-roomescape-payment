@@ -48,40 +48,60 @@ public class Reservation {
     }
 
     public Reservation(
-            Member member,
-            LocalDate date,
-            Theme theme,
-            ReservationTime reservationTime,
-            Status status
-    ) {
-        validateLastDate(date);
-        this.member = member;
-        this.date = date;
-        this.theme = theme;
-        this.reservationTime = reservationTime;
-        this.status = status;
-    }
-
-    public Reservation(
-            Long id,
-            Member member,
-            LocalDate date,
-            Theme theme,
-            ReservationTime reservationTime,
-            Status status
+            Long id, Member member, LocalDate date, Theme theme,
+            ReservationTime reservationTime, Status status
     ) {
         this.id = id;
+        validateMember(member);
         this.member = member;
+        validateDate(date);
         this.date = date;
+        validateTheme(theme);
         this.theme = theme;
+        validateReservationTime(reservationTime);
         this.reservationTime = reservationTime;
+        validateStatus(status);
         this.status = status;
     }
 
-    private void validateLastDate(LocalDate date) {
+    private static void validateMember(Member member) {
+        if (member == null) {
+            throw new IllegalArgumentException("회원 정보를 입력해주세요.");
+        }
+    }
+
+    private void validateDate(LocalDate date) {
+        if (date == null) {
+            throw new IllegalArgumentException("예약 날짜를 입력해주세요.");
+        }
         if (date.isBefore(LocalDate.now())) {
             throw new IllegalArgumentException("지난 날짜는 예약할 수 없습니다.");
         }
+    }
+
+    private void validateTheme(Theme theme) {
+        if (theme == null) {
+            throw new IllegalArgumentException("테마 정보를 입력해주세요.");
+        }
+    }
+
+    private void validateReservationTime(ReservationTime reservationTime) {
+        if (reservationTime == null) {
+            throw new IllegalArgumentException("예약 시간을 입력해주세요.");
+        }
+    }
+
+    private void validateStatus(Status status) {
+        if (status == null) {
+            throw new IllegalArgumentException("예약 상태를 입력해주세요.");
+        }
+    }
+
+    public Reservation(
+            Member member, LocalDate date, Theme theme,
+            ReservationTime reservationTime, Status status
+    ) {
+        this(null, member, date, theme, reservationTime, status);
     }
 
     public void updatePaymentPending() {
