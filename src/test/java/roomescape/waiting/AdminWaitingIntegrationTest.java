@@ -1,6 +1,7 @@
 package roomescape.waiting;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -23,12 +24,13 @@ import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.model.Theme;
 import roomescape.theme.repository.ThemeRepository;
 import roomescape.util.IntegrationTest;
+import roomescape.util.RestDocsConfiguration;
 import roomescape.waiting.dto.response.FindWaitingResponse;
 import roomescape.waiting.model.Waiting;
 import roomescape.waiting.repository.WaitingRepository;
 
 @IntegrationTest
-class AdminWaitingIntegrationTest {
+class AdminWaitingIntegrationTest extends RestDocsConfiguration {
 
     private final MemberRepository memberRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -59,7 +61,7 @@ class AdminWaitingIntegrationTest {
     private String getTokenByLogin() {
         memberRepository.save(new Member("비밥", Role.ADMIN, "admin@naver.com", "hihi"));
         return RestAssured
-                .given().log().all()
+                .given(this.spec).log().all()
                 .body(new LoginRequest("admin@naver.com", "hihi"))
                 .contentType(ContentType.JSON)
                 .when().post("/login")
@@ -83,7 +85,7 @@ class AdminWaitingIntegrationTest {
         Waiting waiting1 = waitingRepository.save(new Waiting(reservation1, memberRepository.getById(1L)));
         Waiting waiting2 = waitingRepository.save(new Waiting(reservation2, memberRepository.getById(1L)));
         // when
-        List<FindWaitingResponse> findReservationResponses = RestAssured.given().log().all()
+        List<FindWaitingResponse> findReservationResponses = RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin())
                 .when().get("/admin/waitings")

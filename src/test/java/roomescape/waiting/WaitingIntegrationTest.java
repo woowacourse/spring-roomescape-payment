@@ -24,6 +24,7 @@ import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.model.Theme;
 import roomescape.theme.repository.ThemeRepository;
 import roomescape.util.IntegrationTest;
+import roomescape.util.RestDocsConfiguration;
 import roomescape.waiting.dto.request.CreateWaitingRequest;
 import roomescape.waiting.dto.response.FindWaitingWithRankingResponse;
 import roomescape.waiting.model.Waiting;
@@ -31,7 +32,7 @@ import roomescape.waiting.model.WaitingWithRanking;
 import roomescape.waiting.repository.WaitingRepository;
 
 @IntegrationTest
-class WaitingIntegrationTest {
+class WaitingIntegrationTest extends RestDocsConfiguration {
 
     private final MemberRepository memberRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -61,7 +62,7 @@ class WaitingIntegrationTest {
 
     private String getTokenByLogin(Member member) {
         return RestAssured
-                .given().log().all()
+                .given(this.spec).log().all()
                 .body(new LoginRequest(member.getEmail().getEmail(), member.getPassword()))
                 .contentType(ContentType.JSON)
                 .when().post("/login")
@@ -79,7 +80,7 @@ class WaitingIntegrationTest {
 
         CreateWaitingRequest createWaitingRequest = new CreateWaitingRequest(date, 1L, 1L);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(member))
                 .body(createWaitingRequest)
@@ -102,7 +103,7 @@ class WaitingIntegrationTest {
 
         CreateWaitingRequest createWaitingRequest = new CreateWaitingRequest(date, 1L, 1L);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(member))
                 .body(createWaitingRequest)
@@ -125,7 +126,7 @@ class WaitingIntegrationTest {
         waitingRepository.save(new Waiting(reservation, member));
         CreateWaitingRequest createWaitingRequest = new CreateWaitingRequest(reservation.getDate(), 1L, 1L);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(member))
                 .body(createWaitingRequest)
@@ -152,7 +153,7 @@ class WaitingIntegrationTest {
         Waiting waiting2 = waitingRepository.save(new Waiting(otherReservation, member));
         Waiting waiting3 = waitingRepository.save(new Waiting(reservation, member));
 
-        List<FindWaitingWithRankingResponse> findWaitingWithRankingRespons = RestAssured.given().log().all()
+        List<FindWaitingWithRankingResponse> findWaitingWithRankingRespons = RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(member))
                 .when().get("/members/waitings")
@@ -177,7 +178,7 @@ class WaitingIntegrationTest {
 
         waitingRepository.save(new Waiting(reservation, member));
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(member))
                 .when().delete("/waitings/1")
@@ -194,7 +195,7 @@ class WaitingIntegrationTest {
         Theme theme = themeRepository.save(new Theme("테마이름", "설명", "썸네일"));
         reservationRepository.save(new Reservation(member, LocalDate.parse("2024-11-30"), reservationTime, theme));
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(member))
                 .when().delete("/waitings/1")
@@ -216,14 +217,14 @@ class WaitingIntegrationTest {
 
         waitingRepository.save(new Waiting(reservation, member));
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(forbiddenMember))
                 .when().delete("/waitings/1")
                 .then().log().all()
 
                 .statusCode(403)
-                .body("detail", equalTo("회원의 권한이 없어, 식별자 2인 예약 대기를 삭제할 수 없습니다."));
+                .body("detail", equalTo("회원의 권한이 없어, 식별자 1인 예약 대기를 삭제할 수 없습니다."));
     }
 
     @DisplayName("예약 대기 거절 성공")
@@ -237,7 +238,7 @@ class WaitingIntegrationTest {
 
         waitingRepository.save(new Waiting(reservation, admin));
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(admin))
                 .when().delete("/admin/waitings/reject/1")
@@ -255,7 +256,7 @@ class WaitingIntegrationTest {
         Reservation reservation = reservationRepository.save(
                 new Reservation(admin, LocalDate.parse("2024-11-30"), reservationTime, theme));
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(admin))
                 .when().delete("/admin/waitings/reject/1")

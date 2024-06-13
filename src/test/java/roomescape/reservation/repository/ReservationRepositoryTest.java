@@ -13,7 +13,10 @@ import roomescape.fixture.ReservationTimeFixture;
 import roomescape.fixture.ThemeFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.model.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.model.Reservation;
+import roomescape.reservation.model.ReservationWithPayment;
 import roomescape.reservationtime.model.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.model.Theme;
@@ -23,14 +26,11 @@ import roomescape.util.JpaRepositoryTest;
 @JpaRepositoryTest
 class ReservationRepositoryTest {
 
-    @Autowired
-    private ReservationRepository reservationRepository;
-    @Autowired
-    private ReservationTimeRepository reservationTimeRepository;
-    @Autowired
-    private ThemeRepository themeRepository;
-    @Autowired
-    private MemberRepository memberRepository;
+    @Autowired private ReservationRepository reservationRepository;
+    @Autowired private ReservationTimeRepository reservationTimeRepository;
+    @Autowired private ThemeRepository themeRepository;
+    @Autowired private MemberRepository memberRepository;
+    @Autowired private PaymentRepository paymentRepository;
 
     @Test
     @DisplayName("저장된 모든 예약을 조회한다.")
@@ -65,6 +65,30 @@ class ReservationRepositoryTest {
 
         assertThat(reservationRepository.findAllByMemberId(member.getId()))
                 .containsExactlyInAnyOrder(reservation1, reservation2, reservation3);
+    }
+
+    @Test
+    @DisplayName("동일한 회원인 모든 예약 및 결제 정보를 조회한다.")
+    void findReservationWithPaymentsByMemberId() {
+        LocalDate date = LocalDate.parse("2024-11-11");
+
+        Member member = memberRepository.save(MemberFixture.getOne());
+        ReservationTime reservationTime = reservationTimeRepository.save(ReservationTimeFixture.getOne());
+        Theme theme = themeRepository.save(ThemeFixture.getOne());
+        Reservation reservation1 = reservationRepository.save(
+                new Reservation(member, date, reservationTime, theme));
+        Reservation reservation2 = reservationRepository.save(
+                new Reservation(member, date.plusDays(1), reservationTime, theme));
+        Reservation reservation3 = reservationRepository.save(
+                new Reservation(member, date.plusDays(2), reservationTime, theme));
+
+        Payment payment = paymentRepository.save(new Payment("p", "o", 10L, reservation1));
+
+        assertThat(reservationRepository.findReservationWithPaymentsByMemberId(member.getId()))
+                .containsExactlyInAnyOrder(
+                        new ReservationWithPayment(reservation1, payment),
+                        new ReservationWithPayment(reservation2, null),
+                        new ReservationWithPayment(reservation3, null));
     }
 
     @Test

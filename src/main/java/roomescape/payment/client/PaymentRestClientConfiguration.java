@@ -23,18 +23,25 @@ public class PaymentRestClientConfiguration {
 
     @Bean
     public RestClient tossRestClient() {
+        return restClient()
+                .baseUrl("https://api.tosspayments.com/v1/payments")
+                .defaultHeader(HttpHeaders.AUTHORIZATION, getClientAuthorizationValue())
+                .defaultStatusHandler(new TossPaymentErrorHandler())
+                .build();
+    }
+
+    @Bean
+    public RestClient.Builder restClient() {
+        return RestClient.builder()
+                .requestFactory(getClientHttpRequestFactory());
+    }
+
+    private String getClientAuthorizationValue() {
         byte[] encodedBytes = Base64.getEncoder()
                 .encode((paymentProperties.getSecretKey() + paymentProperties.getPassword())
                         .getBytes(StandardCharsets.UTF_8));
 
-        String authorizations = BASIC_PREFIX + new String(encodedBytes);
-
-        return RestClient.builder()
-                .baseUrl("https://api.tosspayments.com/v1/payments")
-                .defaultHeader(HttpHeaders.AUTHORIZATION, authorizations)
-                .defaultStatusHandler(new TossPaymentErrorHandler())
-                .requestFactory(getClientHttpRequestFactory())
-                .build();
+        return BASIC_PREFIX + new String(encodedBytes);
     }
 
     private ClientHttpRequestFactory getClientHttpRequestFactory() {

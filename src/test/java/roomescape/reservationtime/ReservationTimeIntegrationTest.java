@@ -2,6 +2,7 @@ package roomescape.reservationtime;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -24,9 +25,10 @@ import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.model.Theme;
 import roomescape.theme.repository.ThemeRepository;
 import roomescape.util.IntegrationTest;
+import roomescape.util.RestDocsConfiguration;
 
 @IntegrationTest
-class ReservationTimeIntegrationTest {
+class ReservationTimeIntegrationTest extends RestDocsConfiguration {
 
     @Autowired
     private ThemeRepository themeRepository;
@@ -55,7 +57,7 @@ class ReservationTimeIntegrationTest {
         Map<String, Object> params = new HashMap<>();
         params.put("startAt", "10:00");
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .body(params)
                 .when().post("/times")
@@ -72,7 +74,7 @@ class ReservationTimeIntegrationTest {
         Map<String, Object> params = new HashMap<>();
         params.put("startAt", "10:0--");
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .body(params)
                 .when().post("/times")
@@ -89,7 +91,7 @@ class ReservationTimeIntegrationTest {
         Map<String, Object> params = new HashMap<>();
         params.put("startAt", "10:00");
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .body(params)
                 .when().post("/times")
@@ -105,7 +107,7 @@ class ReservationTimeIntegrationTest {
         reservationTimeRepository.save(new ReservationTime(LocalTime.of(20, 0)));
         reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .when().get("/times")
                 .then().log().all()
@@ -120,7 +122,7 @@ class ReservationTimeIntegrationTest {
     void getReservationTime() {
         reservationTimeRepository.save(new ReservationTime(LocalTime.of(20, 0)));
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .when().get("/times/1")
                 .then().log().all()
@@ -133,7 +135,7 @@ class ReservationTimeIntegrationTest {
     @Test
     @DisplayName("방탈출 시간 조회 실패: 없는 시간")
     void getReservationTime_WhenTimeNotExist() {
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .when().get("/times/1")
                 .then().log().all()
@@ -147,7 +149,7 @@ class ReservationTimeIntegrationTest {
     void deleteReservationTime() {
         reservationTimeRepository.save(new ReservationTime(LocalTime.of(20, 0)));
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .when().delete("/times/1")
                 .then().log().all()
@@ -158,7 +160,7 @@ class ReservationTimeIntegrationTest {
     @Test
     @DisplayName("방탈출 시간 조회 실패: 시간 없음")
     void deleteReservationTime_WhenTimeNotExist() {
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .when().delete("/times/1")
                 .then().log().all()
@@ -177,7 +179,7 @@ class ReservationTimeIntegrationTest {
         reservationRepository.save(
                 new Reservation(member, LocalDate.parse("2024-04-23"), reservationTime, theme));
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .when().delete("/times/1")
                 .then().log().all()

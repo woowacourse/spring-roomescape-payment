@@ -14,7 +14,7 @@ import roomescape.waiting.service.WaitingService;
 
 @RestController
 @RequestMapping("/admin/waitings")
-public class AdminWaitingController {
+public class AdminWaitingController extends AdminWaitingControllerApi {
     private final WaitingService waitingService;
 
     public AdminWaitingController(final WaitingService waitingService) {

@@ -1,0 +1,45 @@
+== 방탈출 시간대 API
+
+=== 방탈출 시간대 생성
+
+==== 방탈출 시간대 생성 성공
+
+operation::reservation-time-integration-test/create-reservation-time[snippets='http-request,http-response']
+
+==== 방탈출 시간대 생성 실패 - 이미 존재하는 시간대
+
+operation::reservation-time-integration-test/create-reservation-time_-when-time-is-exist[snippets='http-request,http-response']
+
+==== 방탈출 시간대 생성 실패 - 시간대의 형식이 올바르지 않음
+
+operation::reservation-time-integration-test/create-reservation-time_-when-time-is-exist[snippets='http-request,http-response']
+
+=== 시간대 단건 조회
+
+==== 시간대 단건 조회 성공
+
+operation::reservation-time-integration-test/get-reservation-time[snippets='http-request,http-response']
+
+==== 시간대 단건 조회 실패 - 존재하지 않는 시간
+
+operation::reservation-time-integration-test/get-reservation-time_-when-time-not-exist[snippets='http-request,http-response']
+
+=== 전체 시간대 조회
+
+==== 전체 시간대 성공
+
+operation::reservation-time-integration-test/get-reservation-times[snippets='http-request,http-response']
+
+=== 방탈출 시간대 삭제
+
+==== 방탈출 시간대 삭제 성공
+
+operation::reservation-time-integration-test/delete-reservation-time[snippets='http-request,http-response']
+
+==== 방탈출 시간대 삭제 실패 - 해당 시간대인 예약이 존재하는 경우
+
+operation::reservation-time-integration-test/delete-reservation-time_-when-time-in-usage[snippets='http-request,http-response']
+
+==== 방탈출 시간대 삭제 실패 - 존재하지 않는 시간
+
+operation::reservation-time-integration-test/delete-reservation-time_-when-time-not-exist[snippets='http-request,http-response']

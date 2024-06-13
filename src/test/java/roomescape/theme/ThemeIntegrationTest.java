@@ -3,6 +3,7 @@ package roomescape.theme;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -27,9 +28,10 @@ import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.model.Theme;
 import roomescape.theme.repository.ThemeRepository;
 import roomescape.util.IntegrationTest;
+import roomescape.util.RestDocsConfiguration;
 
 @IntegrationTest
-class ThemeIntegrationTest {
+class ThemeIntegrationTest extends RestDocsConfiguration {
 
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
@@ -59,7 +61,7 @@ class ThemeIntegrationTest {
         params.put("description", "설명");
         params.put("thumbnail", "썸네일");
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .body(params)
                 .when().post("/themes")
@@ -80,7 +82,7 @@ class ThemeIntegrationTest {
         params.put("description", "설명");
         params.put("thumbnail", "썸네일");
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .body(params)
                 .when().post("/themes")
@@ -98,7 +100,7 @@ class ThemeIntegrationTest {
         params.put("description", "설명");
         params.put("thumbnail", "썸네일");
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .body(params)
                 .when().post("/themes")
@@ -116,7 +118,7 @@ class ThemeIntegrationTest {
         params.put("description", "");
         params.put("thumbnail", "썸네일");
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .body(params)
                 .when().post("/themes")
@@ -134,7 +136,7 @@ class ThemeIntegrationTest {
         params.put("description", "a".repeat(256));
         params.put("thumbnail", "썸네일");
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .body(params)
                 .when().post("/themes")
@@ -152,7 +154,7 @@ class ThemeIntegrationTest {
         params.put("description", "테마설명");
         params.put("thumbnail", "");
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .body(params)
                 .when().post("/themes")
@@ -170,7 +172,7 @@ class ThemeIntegrationTest {
         params.put("description", "테마설명");
         params.put("thumbnail", "a".repeat(256));
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .body(params)
                 .when().post("/themes")
@@ -184,7 +186,7 @@ class ThemeIntegrationTest {
     @DisplayName("방탈출 테마 목록 조회 성공")
     void getThemes() {
         themeRepository.save(new Theme("테마이름", "설명", "썸네일"));
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .when().get("/themes")
                 .then().log().all()
@@ -209,7 +211,7 @@ class ThemeIntegrationTest {
                         new Reservation(member, LocalDate.parse("2024-04-23"), reservationTime,
                                 themeRepository.getById(index))));
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .when().get("/themes/popular")
                 .then().log().all()
@@ -223,7 +225,7 @@ class ThemeIntegrationTest {
     @DisplayName("방탈출 테마 삭제 성공")
     void deleteTheme() {
         themeRepository.save(new Theme("테마이름", "설명", "썸네일"));
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .when().delete("/themes/1")
                 .then().log().all()
@@ -234,7 +236,7 @@ class ThemeIntegrationTest {
     @Test
     @DisplayName("방탈출 테마 삭제 실패: 테마 없음")
     void deleteTheme_WhenAlreadyNotExist() {
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .when().delete("/themes/1")
                 .then().log().all()
@@ -254,7 +256,7 @@ class ThemeIntegrationTest {
         reservationRepository.save(
                 new Reservation(member, LocalDate.parse("2024-04-23"), reservationTime, theme));
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .when().delete("/themes/1")
                 .then().log().all()

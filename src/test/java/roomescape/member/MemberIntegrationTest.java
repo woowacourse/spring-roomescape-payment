@@ -14,9 +14,10 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
 import roomescape.util.IntegrationTest;
+import roomescape.util.RestDocsConfiguration;
 
 @IntegrationTest
-class MemberIntegrationTest {
+class MemberIntegrationTest extends RestDocsConfiguration {
 
     @Autowired
     private MemberRepository memberRepository;
@@ -35,7 +36,7 @@ class MemberIntegrationTest {
         memberRepository.save(new Member("몰리", Role.USER, "login@naver.com", "hihi"));
         memberRepository.save(new Member("로키", Role.USER, "qwer@naver.com", "hihi"));
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .when().get("/members")
                 .then().log().all()

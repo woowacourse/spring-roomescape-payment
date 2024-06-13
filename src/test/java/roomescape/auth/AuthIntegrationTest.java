@@ -7,29 +7,20 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
 import roomescape.util.IntegrationTest;
+import roomescape.util.RestDocsConfiguration;
 
 @IntegrationTest
-class AuthIntegrationTest {
+class AuthIntegrationTest extends RestDocsConfiguration {
 
     @Autowired
     private MemberRepository memberRepository;
-
-    @LocalServerPort
-    private int port;
-
-    @BeforeEach
-    void init() {
-        RestAssured.port = this.port;
-    }
 
     @Test
     @DisplayName("로그인 성공: Set-Cookie 헤더에 쿠키 값 전달")
@@ -40,7 +31,7 @@ class AuthIntegrationTest {
         params.put("email", "login@naver.com");
         params.put("password", "hihi");
 
-        String token = RestAssured.given().log().all()
+        String token = RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .body(params)
                 .when().post("/login")
@@ -57,7 +48,7 @@ class AuthIntegrationTest {
         params.put("email", "login@naver.com");
         params.put("password", "hihi");
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .body(params)
                 .when().post("/login")
@@ -75,7 +66,7 @@ class AuthIntegrationTest {
         params.put("email", null);
         params.put("password", "hihi");
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .body(params)
                 .when().post("/login")
@@ -93,7 +84,7 @@ class AuthIntegrationTest {
         params.put("email", "nulasdfl");
         params.put("password", "hihi");
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .body(params)
                 .when().post("/login")
@@ -111,7 +102,7 @@ class AuthIntegrationTest {
         params.put("email", "login@naver.com");
         params.put("password", "hihi123");
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .body(params)
                 .when().post("/login")
@@ -129,7 +120,7 @@ class AuthIntegrationTest {
         params.put("email", "login@naver.com");
         params.put("password", null);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .body(params)
                 .when().post("/login")
@@ -148,7 +139,7 @@ class AuthIntegrationTest {
         params.put("email", "login@naver.com");
         params.put("password", "hihi");
 
-        String token = RestAssured.given().log().all()
+        String token = RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .body(params)
                 .when().post("/login")
@@ -156,7 +147,7 @@ class AuthIntegrationTest {
                 .extract().cookie("token");
 
         // when
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
                 .when().get("/login/check")
@@ -168,7 +159,7 @@ class AuthIntegrationTest {
     @Test
     @DisplayName("로그인한 회원의 정보 조회 실패: 쿠키 없음")
     void loginCheck_WhenCookieNotExist() {
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .when().get("/login/check")
                 .then().log().all()
@@ -179,7 +170,7 @@ class AuthIntegrationTest {
     @Test
     @DisplayName("로그인한 회원의 정보 조회 실패: 토큰 쿠키 없음")
     void loginCheck_WhenTokenNotExist() {
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("tokenToken", null)
                 .when().get("/login/check")
@@ -197,7 +188,8 @@ class AuthIntegrationTest {
         params.put("email", "login@naver.com");
         params.put("password", "hihi");
 
-        String token = RestAssured.given().log().all()
+        String token = RestAssured.given(this.spec)
+                .log().all()
                 .contentType(ContentType.JSON)
                 .body(params)
                 .when().post("/login")
@@ -205,7 +197,7 @@ class AuthIntegrationTest {
                 .statusCode(200)
                 .extract().cookie("token");
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
                 .when().post("/logout")

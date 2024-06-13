@@ -1,0 +1,47 @@
+== 인증 API
+
+=== 로그인
+
+==== 로그인 성공
+
+operation::auth-integration-test/login[snippets='http-request,http-response']
+
+==== 로그인 실패 - 이메일 형식 오류
+
+operation::auth-integration-test/login_-when-email-is-invalid-type/[snippets='http-request,http-response']
+
+==== 로그인 실패 - 이메일 null
+
+operation::auth-integration-test/login_-when-email-is-null/[snippets='http-request,http-response']
+
+==== 로그인 실패 - 비밀번호 null
+
+operation::auth-integration-test/login_-when-password-is-null/[snippets='http-request,http-response']
+
+==== 로그인 실패 - 올바르지 않는 비밀번호
+
+operation::auth-integration-test/login_-when-password-not-correct/[snippets='http-request,http-response']
+
+==== 로그인 실패 - 존재하지 않는 계정
+
+operation::auth-integration-test/login_-when-member-not-exist/[snippets='http-request,http-response']
+
+=== 인증 정보 조회
+
+==== 인증 정보 조회 성공
+
+operation::auth-integration-test/login-check/[snippets='http-request,http-response']
+
+==== 인증 정보 조회 실패 - 빈 쿠키
+
+operation::auth-integration-test/login-check_-when-cookie-not-exist/[snippets='http-request,http-response']
+
+==== 인증 정보 조회 실패 - 토큰 없음
+
+operation::auth-integration-test/login-check_-when-token-not-exist/[snippets='http-request,http-response']
+
+=== 로그아웃
+
+==== 로그아웃 성공
+
+operation::auth-integration-test/logout/[snippets='http-request,http-response']

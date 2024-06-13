@@ -1,0 +1,7 @@
+== 회원 API
+
+=== 회원 정보 조회
+
+==== 회원 정보 조회 성공
+
+operation::member-integration-test/get-reservation-times[snippets='http-request,http-response']

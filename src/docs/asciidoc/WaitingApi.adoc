@@ -1,0 +1,45 @@
+== 대기 API
+
+=== 대기 생성
+
+==== 대기 생성 성공
+
+operation::waiting-integration-test/create-reservation-waiting[snippets='http-request,http-response']
+
+==== 대기 생성 실패 - 예약이 없는 경우
+
+operation::waiting-integration-test/create-reservation-waiting_-when-reservation-not-exists[snippets='http-request,http-response']
+
+==== 대기 생성 실패 - 중복 대기 신청인 경우
+
+operation::waiting-integration-test/create-reservation-waiting_-when-member-not-exists-reservations-and-member[snippets='http-request,http-response']
+
+=== 전체 대기 조회
+
+==== 전체 대기 조회 성공
+
+operation::waiting-integration-test/get-waitings[snippets='http-request,http-response']
+
+=== 대기 거절
+
+==== 대기 거절 성공
+
+operation::waiting-integration-test/reject-waiting[snippets='http-request,http-response']
+
+==== 대기 거절 실패 - 존재하지 않는 대기인 경우
+
+operation::waiting-integration-test/reject-waiting_-when-waiting-not-exist_throw-exception[snippets='http-request,http-response']
+
+=== 대기 삭제
+
+==== 대기 삭제 성공
+
+operation::waiting-integration-test/delete-waiting[snippets='http-request,http-response']
+
+==== 대기 삭제 실패 - 대기 삭제 권한이 없는 회원의 요청인 경우
+
+operation::waiting-integration-test/delete-waiting_-when-member[snippets='http-request,http-response']
+
+==== 대기 삭제 실패 - 존재하지 않는 대기를 삭제하려는 경우
+
+operation::waiting-integration-test/delete-waiting_-when-waiting-not-exists[snippets='http-request,http-response']

@@ -29,9 +29,10 @@ import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.model.Theme;
 import roomescape.theme.repository.ThemeRepository;
 import roomescape.util.IntegrationTest;
+import roomescape.util.RestDocsConfiguration;
 
 @IntegrationTest
-class AdminReservationIntegrationTest {
+class AdminReservationIntegrationTest extends RestDocsConfiguration {
     private final MemberRepository memberRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
@@ -59,7 +60,8 @@ class AdminReservationIntegrationTest {
     private String getTokenByLogin() {
         memberRepository.save(new Member("비밥", Role.ADMIN, "admin@naver.com", "hihi"));
         return RestAssured
-                .given().log().all()
+                .given(this.spec)
+                .log().all()
                 .body(new LoginRequest("admin@naver.com", "hihi"))
                 .contentType(ContentType.JSON)
                 .when().post("/login")
@@ -79,7 +81,8 @@ class AdminReservationIntegrationTest {
         params.put("timeId", 1);
         params.put("themeId", 1);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec)
+                .log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin())
                 .body(params)
@@ -103,7 +106,8 @@ class AdminReservationIntegrationTest {
         params.put("timeId", 1);
         params.put("themeId", 1);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec)
+                .log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin())
                 .body(params)
@@ -123,7 +127,8 @@ class AdminReservationIntegrationTest {
         params.put("timeId", 1);
         params.put("themeId", 1);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec)
+                .log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin())
                 .body(params)
@@ -144,7 +149,8 @@ class AdminReservationIntegrationTest {
         params.put("timeId", 1);
         params.put("themeId", 1);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec)
+                .log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin())
                 .body(params)
@@ -157,14 +163,15 @@ class AdminReservationIntegrationTest {
 
     @Test
     @DisplayName("관리자 권한 예약 생성 실패: 회원 식별자 없음")
-    void createReservationByAdmin_WhenMemberIdIsPast() {
+    void createReservationByAdmin_WhenMemberIdIsNull() {
         Map<String, Object> params = new HashMap<>();
         params.put("date", "2024-11-30");
         params.put("memberId", null);
         params.put("timeId", 1);
         params.put("themeId", 1);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec)
+                .log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin())
                 .body(params)
@@ -185,7 +192,8 @@ class AdminReservationIntegrationTest {
         params.put("timeId", timeId);
         params.put("themeId", 1);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec)
+                .log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin())
                 .body(params)
@@ -198,14 +206,15 @@ class AdminReservationIntegrationTest {
 
     @Test
     @DisplayName("관리자 권한 예약 생성 실패: 시간 식별자 없음")
-    void createReservationByAdmin_WhenTimeIsPast() {
+    void createReservationByAdmin_WhenTimeIsNull() {
         Map<String, Object> params = new HashMap<>();
         params.put("date", "2024-11-30");
         params.put("memberId", 1);
         params.put("timeId", null);
         params.put("themeId", 1);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec)
+                .log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin())
                 .body(params)
@@ -226,7 +235,8 @@ class AdminReservationIntegrationTest {
         params.put("timeId", 1);
         params.put("themeId", themeId);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec)
+                .log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin())
                 .body(params)
@@ -239,14 +249,15 @@ class AdminReservationIntegrationTest {
 
     @Test
     @DisplayName("관리자 권한 예약 생성 실패: 테마 식별자 없음")
-    void createReservationByAdmin_WhenThemeIdIsPast() {
+    void createReservationByAdmin_WhenThemeIdIsNull() {
         Map<String, Object> params = new HashMap<>();
         params.put("date", "2024-11-30");
         params.put("memberId", 1);
         params.put("timeId", 1);
         params.put("themeId", null);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec)
+                .log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin())
                 .body(params)
@@ -269,7 +280,8 @@ class AdminReservationIntegrationTest {
         params.put("timeId", 1);
         params.put("themeId", 1);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec)
+                .log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin())
                 .body(params)
@@ -292,7 +304,8 @@ class AdminReservationIntegrationTest {
         params.put("timeId", 1);
         params.put("themeId", 1);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec)
+                .log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin())
                 .body(params)
@@ -315,7 +328,8 @@ class AdminReservationIntegrationTest {
         params.put("timeId", 1);
         params.put("themeId", 1);
 
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec)
+                .log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin())
                 .body(params)
@@ -342,7 +356,7 @@ class AdminReservationIntegrationTest {
                         reservationTimeRepository.getById(1L), themeRepository.getById(1L)));
 
         // when
-        List<FindAdminReservationResponse> findReservationResponses = RestAssured.given().log().all()
+        List<FindAdminReservationResponse> findReservationResponses = RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin())
                 .when().get("/admin/reservations")
