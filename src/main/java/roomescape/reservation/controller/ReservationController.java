@@ -115,21 +115,16 @@ public class ReservationController {
             @NotNull(message = "reservationId는 null일 수 없습니다.") @PathVariable("id") @Parameter(description = "예약 ID") Long reservationId
     ) {
 
-        // 예약 대기 상태에서 관리자가 승인한 경우. 결제가 되지 않았기에 바로 제거합니다.
         if (reservationWithPaymentService.isNotPaidReservation(reservationId)) {
             reservationService.removeReservationById(reservationId, memberId);
             return RoomEscapeApiResponse.success();
         }
 
-        // DB에서 예약 정보와 결제 정보를 지우고, 결제 취소 테이블에 기존 결제 정보를 옮깁니다.
-        // 이때, 결제 취소 테이블에 있는 취소 시간은 현재 시간으로 입력합니다.
         PaymentCancelRequest paymentCancelRequest = reservationWithPaymentService.removeReservationWithPayment(
                 reservationId, memberId);
 
-        // DB 처리에서 문제가 없으면, API에 결제 취소를 요청합니다.
         PaymentCancelResponse paymentCancelResponse = paymentClient.cancelPayment(paymentCancelRequest);
 
-        // 결제 취소 테이블에 있는 취소 시간을, API 로부터 받은 실제 취소 시간으로 업데이트 합니다.
         reservationWithPaymentService.updateCanceledTime(paymentCancelRequest.paymentKey(),
                 paymentCancelResponse.canceledAt());
 
@@ -160,10 +155,8 @@ public class ReservationController {
             PaymentCancelRequest cancelRequest = new PaymentCancelRequest(paymentRequest.paymentKey(),
                     paymentRequest.amount(), e.getMessage());
 
-            // 결제 API 에 취소를 요청합니다.
             PaymentCancelResponse paymentCancelResponse = paymentClient.cancelPayment(cancelRequest);
 
-            // API에서 받은 취소 정보와, 기존 결제 정보를 결제 취소 테이블에 입력합니다.
             reservationWithPaymentService.saveCanceledPayment(paymentCancelResponse, paymentResponse.approvedAt(),
                     paymentRequest.paymentKey());
             throw e;
