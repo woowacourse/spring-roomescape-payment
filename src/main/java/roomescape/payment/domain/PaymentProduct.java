@@ -5,7 +5,7 @@ import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class PaymentProduct {
-    @Column(nullable = false, name = "reservation_id")
+    @Column(nullable = false, name = "product_id")
     private Long productId;
 
     protected PaymentProduct() {
