@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.domain.dto.AvailableTimeDto;
 import roomescape.domain.theme.Theme;
-import roomescape.dto.response.reservation.MyReservationResponse;
+import roomescape.dto.response.reservation.MyReservationsDto;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     long countByTimeId(long timeId);
@@ -35,7 +35,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     boolean existsByDateAndTimeIdAndThemeIdAndMemberId(LocalDate date, long timeId, long themeId, long memberId);
 
     @Query("""
-            select new roomescape.dto.response.reservation.MyReservationResponse(
+            select new roomescape.dto.response.reservation.MyReservationsDto(
             r, p.paymentKey, p.totalAmount
             )
             from Reservation r
@@ -45,7 +45,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             left join fetch Payment p on p.reservation.id = r.id
             where m.id = :memberId
             """)
-    List<MyReservationResponse> findMyReservation(Long memberId);
+    List<MyReservationsDto> findMyReservation(Long memberId);
 
     @Query("""
             select new roomescape.domain.dto.AvailableTimeDto(rt.id, rt.startAt,

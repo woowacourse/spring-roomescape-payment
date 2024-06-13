@@ -18,7 +18,7 @@ import roomescape.dto.LoginMember;
 import roomescape.dto.request.reservation.ReservationInformRequest;
 import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.request.reservation.WaitingRequest;
-import roomescape.dto.response.reservation.MyReservationWebResponse;
+import roomescape.dto.response.reservation.MyReservationResponse;
 import roomescape.dto.response.reservation.ReservationInformResponse;
 import roomescape.dto.response.reservation.ReservationResponse;
 import roomescape.service.ReservationService;
@@ -67,9 +67,9 @@ public class ReservationController {
 
     @Operation(summary = "사용자 내 예약 조회 API")
     @GetMapping("/reservations/mine")
-    public ResponseEntity<List<MyReservationWebResponse>> findMyReservations(
+    public ResponseEntity<List<MyReservationResponse>> findMyReservations(
             @LoginMemberConverter LoginMember loginMember) {
-        List<MyReservationWebResponse> responses = reservationService.findMyReservations(loginMember.id());
+        List<MyReservationResponse> responses = reservationService.findMyReservations(loginMember.id());
         return ResponseEntity.ok(responses);
     }
 
