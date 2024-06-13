@@ -83,7 +83,7 @@ class WaitingAcceptanceTest extends AcceptanceTest {
             })
         );
     }
-    
+
     @DisplayName("예약이나 예약 대기가 존재한다면 예약 대기 요청을 할 수 없다.")
     @TestFactory
     Stream<DynamicTest> cannotCreateWaitingByAlreadyReserved() {
