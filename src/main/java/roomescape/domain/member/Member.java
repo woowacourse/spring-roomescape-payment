@@ -20,7 +20,6 @@ public class Member {
     private Long id;
 
     @Embedded
-    @Column(nullable = false)
     private Name name;
 
     @Column(nullable = false)
@@ -29,7 +28,7 @@ public class Member {
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10)
     @Enumerated(value = EnumType.STRING)
     private Role role;
 

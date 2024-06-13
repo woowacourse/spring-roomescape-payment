@@ -19,39 +19,22 @@ VALUES ('포켓몬', '매우 귀엽습니다.', 'https://i.pinimg.com/474x/b3/aa
        ('추리5', '매우 어렵습니다.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg'),
        ('준비 중', '준비 중입니다.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
 
-INSERT INTO reservation (member_id, date, time_id, theme_id, payment_key)
-VALUES (2, '2034-05-08', 1, 2, 'success'),
-       (2, '2034-05-09', 1, 2, 'success'),
-       (2, '2034-05-10', 1, 2, 'success'),
-       (2, '2034-05-11', 1, 2, 'success'),
-       (2, '2034-05-12', 1, 2, 'success'),
-       (2, '2034-05-08', 1, 1, 'success'),
-       (2, '2034-05-09', 1, 1, 'success'),
-       (2, '2034-05-10', 1, 1, 'success'),
-       (2, '2034-05-11', 1, 1, 'success'),
-       (2, '2034-05-08', 1, 3, 'success'),
-       (2, '2034-05-08', 2, 3, 'success'),
-       (2, '2034-05-09', 2, 3, 'success'),
-       (2, '2034-05-08', 2, 4, 'success'),
-       (2, '2034-05-08', 1, 4, 'success'),
-       (2, '2034-05-09', 1, 4, 'success'),
-       (2, '2034-05-09', 1, 5, 'success'),
-       (2, '2034-05-09', 2, 5, 'success'),
-       (2, '2034-05-09', 1, 6, 'success'),
-       (2, '2034-05-09', 2, 6, 'success'),
-       (2, '2034-05-10', 1, 7, 'success'),
-       (2, '2034-05-10', 2, 7, 'success'),
-       (2, '2034-05-10', 1, 8, 'success'),
-       (2, '2034-05-10', 2, 8, 'success'),
-       (2, '2034-05-11', 1, 9, 'success'),
-       (2, '2034-05-11', 2, 9, 'success'),
-       (2, '2034-05-11', 1, 10, 'success'),
-       (2, '2034-05-11', 2, 10, 'success'),
-       (1, '2024-05-22', 2, 10, 'success');
+INSERT INTO reservation (member_id, date, time_id, theme_id, payment_key, amount)
+VALUES (2, '2034-05-08', 1, 2, 'success', 1000),
+       (2, '2034-05-08', 1, 1, 'success', 1000),
+       (2, '2034-05-09', 2, 3, 'success', 1000),
+       (2, '2034-05-09', 1, 4, 'success', 1000),
+       (2, '2034-05-09', 2, 5, 'success', 1000),
+       (2, '2034-05-09', 2, 6, 'success', 1000),
+       (2, '2034-05-10', 2, 7, 'success', 1000),
+       (2, '2034-05-10', 2, 8, 'success', 1000),
+       (2, '2034-05-11', 2, 9, 'success', 1000),
+       (2, '2034-05-11', 2, 10, 'success', 1000),
+       (2, '2024-06-08', 2, 10, 'success', 1000),
+       (1, '2024-05-22', 2, 10, 'success', 1000);
 
-INSERT INTO reservation (member_id, date, time_id, theme_id)
-VALUES (1, '2024-06-22', 2, 10);
-
+INSERT INTO reservation (member_id, date, time_id, theme_id, amount)
+VALUES (1, '2024-06-22', 2, 10, 1000);
 
 INSERT INTO waiting (member_id, date, time_id, theme_id)
 VALUES (1, '2024-05-22', 1, 2);

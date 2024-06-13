@@ -13,12 +13,16 @@ VALUES ('커비', '매우 재밌습니다.', 'https://i.pinimg.com/474x/e2/55/4d
 INSERT INTO theme (name, description, thumbnail)
 VALUES ('포켓몬', '매우 귀엽습니다.', 'https://i.pinimg.com/474x/b3/aa/d7/b3aad752a5fbda932dd37015bca3047f.jpg');
 
-INSERT INTO reservation (member_id, date, time_id, theme_id, payment_key)
-VALUES (1, '2024-05-20', 1, 1, '결제완');
-INSERT INTO reservation (member_id, date, time_id, theme_id)
-VALUES (1, '2024-05-20', 1, 2);
+INSERT INTO reservation (member_id, date, time_id, theme_id, payment_key, amount)
+VALUES (1, '2024-05-20', 1, 1, '결제완', 10000);
+INSERT INTO reservation (member_id, date, time_id, theme_id, payment_key, amount)
+VALUES (2, '2024-05-21', 1, 1, '결제완', 10000);
+INSERT INTO reservation (member_id, date, time_id, theme_id, amount)
+VALUES (1, '2024-05-20', 1, 2, 0);
 INSERT INTO waiting (member_id, date, time_id, theme_id)
 VALUES (2, '2024-05-20', 1, 1);
+INSERT INTO waiting (member_id, date, time_id, theme_id)
+VALUES (1, '2024-05-21', 1, 1);
 INSERT INTO waiting (member_id, date, time_id, theme_id)
 VALUES (1, '2024-05-20', 1, 2);
 INSERT INTO waiting (member_id, date, time_id, theme_id)

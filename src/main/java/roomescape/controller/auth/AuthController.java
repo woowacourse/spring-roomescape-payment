@@ -28,11 +28,11 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(@RequestBody final TokenRequest request, final HttpServletResponse response) {
+    public ResponseEntity<Void> login(@RequestBody final TokenRequest request, final HttpServletResponse response) {
         final TokenResponse tokenResponse = memberService.createToken(request);
         final Cookie cookie = cookieProvider.createCookie(tokenResponse.accessToken());
         response.addCookie(cookie);
-        return ResponseEntity.ok(tokenResponse);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/login/check")

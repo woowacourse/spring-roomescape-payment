@@ -1,5 +1,6 @@
 package roomescape.domain.member;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
 import java.util.Objects;
@@ -11,6 +12,7 @@ public class Name {
 
     private static final Pattern NAME_PATTERN = Pattern.compile("^\\d+$");
 
+    @Column(nullable = false)
     private String name;
 
     protected Name() {

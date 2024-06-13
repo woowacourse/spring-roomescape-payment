@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.theme.Theme;
 
 import java.time.LocalDate;
@@ -48,7 +49,7 @@ public class Waiting {
     }
 
     public Reservation toReservation() {
-        return new Reservation(member, date, time, theme, null);
+        return new Reservation(member, date, time, theme, new Payment(null, 0));
     }
 
     public boolean isNotReservedBy(Member member) {

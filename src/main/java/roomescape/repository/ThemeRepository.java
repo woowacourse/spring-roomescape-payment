@@ -14,11 +14,12 @@ import java.util.List;
 public interface ThemeRepository extends JpaRepository<Theme, Long> {
 
     @Query(value = """
-            SELECT th
-            FROM Theme AS th
-            LEFT OUTER JOIN Reservation AS r
-            ON r.theme.id = th.id  AND r.date BETWEEN :#{#filter.startDate} AND :#{#filter.endDate}
-            GROUP BY th.id ORDER BY COUNT(r.id) DESC
+                SELECT th
+                FROM Theme AS th
+                INNER JOIN Reservation AS r
+                ON r.theme.id = th.id
+                WHERE r.date BETWEEN :#{#filter.startDate} AND :#{#filter.endDate}
+                GROUP BY th.id ORDER BY COUNT(r.id) DESC
             """)
     List<Theme> findPopularThemesBy(@Param(value = "filter") final ThemePopularFilter filter, Pageable pageable);
 }
