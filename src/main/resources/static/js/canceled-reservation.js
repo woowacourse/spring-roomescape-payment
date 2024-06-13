@@ -22,10 +22,10 @@ function render(data) {
         const row = tableBody.insertRow();
 
         row.insertCell(0).textContent = item.id;
-        row.insertCell(1).textContent = item.member.name;
-        row.insertCell(2).textContent = item.theme.name;
+        row.insertCell(1).textContent = item.member;
+        row.insertCell(2).textContent = item.theme;
         row.insertCell(3).textContent = item.date;
-        row.insertCell(4).textContent = item.time.startAt;
+        row.insertCell(4).textContent = item.time;
         row.insertCell(5).textContent = item.status;
         row.insertCell(6).textContent = item.paymentKey;
         row.insertCell(7).textContent = item.totalAmount;

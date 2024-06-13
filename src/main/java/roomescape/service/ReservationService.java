@@ -14,6 +14,7 @@ import roomescape.dto.request.reservation.ReservationCriteriaRequest;
 import roomescape.dto.request.reservation.ReservationInformRequest;
 import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.request.reservation.WaitingRequest;
+import roomescape.dto.response.reservation.CanceledReservationResponse;
 import roomescape.dto.response.reservation.MyReservationResponse;
 import roomescape.dto.response.reservation.ReservationInformResponse;
 import roomescape.dto.response.reservation.ReservationResponse;
@@ -126,11 +127,12 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<MyReservationResponse> findAllCanceledReservation() {
+    public List<CanceledReservationResponse> findAllCanceledReservation() {
         return reservationRepository.findCanceledReservations().stream()
-                .map(myReservationsDto -> MyReservationResponse.of(
-                        myReservationsDto.reservation(), myReservationsDto.paymentKey(),
-                        myReservationsDto.totalAmount(), getWaitingOrder(myReservationsDto.reservation())))
-                .toList();
+                .map(canceledReservationsDto -> CanceledReservationResponse.of(
+                        canceledReservationsDto.reservation(),
+                        canceledReservationsDto.paymentKey(),
+                        canceledReservationsDto.totalAmount())
+                ).toList();
     }
 }

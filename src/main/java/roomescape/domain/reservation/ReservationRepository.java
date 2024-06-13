@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.domain.dto.AvailableTimeDto;
 import roomescape.domain.theme.Theme;
+import roomescape.dto.response.reservation.CanceledReservationsDto;
 import roomescape.dto.response.reservation.MyReservationsDto;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
@@ -49,7 +50,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<MyReservationsDto> findMyReservation(Long memberId);
 
     @Query("""
-            select new roomescape.dto.response.reservation.MyReservationsDto(
+            select new roomescape.dto.response.reservation.CanceledReservationsDto(
             r, p.paymentKey, p.totalAmount
             )
             from Reservation r
@@ -59,7 +60,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             left join fetch Payment p on p.reservation.id = r.id
             where r.status = roomescape.domain.reservation.Status.CANCELED
             """)
-    List<MyReservationsDto> findCanceledReservations();
+    List<CanceledReservationsDto> findCanceledReservations();
 
     @Query("""
             select new roomescape.domain.dto.AvailableTimeDto(rt.id, rt.startAt,
