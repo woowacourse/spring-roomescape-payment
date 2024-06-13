@@ -1,8 +1,5 @@
 package roomescape.controller.api;
 
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
@@ -22,9 +19,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.restdocs.operation.preprocess.Preprocessors;
-import org.springframework.restdocs.payload.JsonFieldType;
 import roomescape.controller.BaseControllerTest;
+import roomescape.controller.FieldDescriptors;
 import roomescape.controller.dto.request.ReservationByAdminRequest;
 import roomescape.controller.dto.request.ReservationRequest;
 import roomescape.domain.reservationtime.ReservationTime;
@@ -217,23 +213,8 @@ class ReservationControllerTest extends BaseControllerTest {
                 .contentType(ContentType.JSON)
                 .body(request)
                 .filter(document("reservation/addReservation",
-                        preprocessRequest(Preprocessors.prettyPrint()),
-                        preprocessResponse(Preprocessors.prettyPrint()),
-                        requestFields(
-                                fieldWithPath("date").type(JsonFieldType.STRING).description("예약할 날짜"),
-                                fieldWithPath("timeId").type(JsonFieldType.NUMBER).description("예약할 시간 아이디"),
-                                fieldWithPath("themeId").type(JsonFieldType.NUMBER).description("예약할 테마 아이디"),
-                                fieldWithPath("paymentKey").type(JsonFieldType.STRING).description("결제 키의 값"),
-                                fieldWithPath("orderId").type(JsonFieldType.STRING).description("주문번호"),
-                                fieldWithPath("amount").type(JsonFieldType.NUMBER).description("결제할 금액")
-                        ),
-                        responseFields(
-                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("예약 아이디"),
-                                fieldWithPath("date").type(JsonFieldType.STRING).description("예약 날짜"),
-                                fieldWithPath("name").type(JsonFieldType.STRING).description("예약자 이름"),
-                                fieldWithPath("startAt").type(JsonFieldType.STRING).description("예약 시작 시간"),
-                                fieldWithPath("theme").type(JsonFieldType.STRING).description("예약 테마 이름")
-                        )))
+                        requestFields(FieldDescriptors.RESERVATION_REQUEST),
+                        responseFields(FieldDescriptors.RESERVATION_RESPONSE)))
                 .when().post("/reservations")
                 .then().log().all()
                 .extract();

@@ -1,8 +1,5 @@
 package roomescape.controller.api;
 
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
@@ -13,9 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.restdocs.operation.preprocess.Preprocessors;
-import org.springframework.restdocs.payload.JsonFieldType;
 import roomescape.controller.BaseControllerTest;
+import roomescape.controller.FieldDescriptors;
 import roomescape.controller.dto.request.ReservationWaitingRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
@@ -64,20 +60,8 @@ class ReservationWaitingControllerTest extends BaseControllerTest {
                 .cookie("token", token)
                 .body(request)
                 .filter(document("waiting/addReservationWaiting",
-                        preprocessRequest(Preprocessors.prettyPrint()),
-                        preprocessResponse(Preprocessors.prettyPrint()),
-                        requestFields(
-                                fieldWithPath("date").type(JsonFieldType.STRING).description("예약 대기할 날짜"),
-                                fieldWithPath("timeId").type(JsonFieldType.NUMBER).description("예약 대기할 시간 아이디"),
-                                fieldWithPath("themeId").type(JsonFieldType.NUMBER).description("예약 대기할 테마 아이디")
-                        ),
-                        responseFields(
-                                fieldWithPath("id").type(JsonFieldType.NUMBER).description("예약 아이디"),
-                                fieldWithPath("date").type(JsonFieldType.STRING).description("예약 날짜"),
-                                fieldWithPath("name").type(JsonFieldType.STRING).description("예약자 이름"),
-                                fieldWithPath("startAt").type(JsonFieldType.STRING).description("예약 시작 시간"),
-                                fieldWithPath("theme").type(JsonFieldType.STRING).description("예약 테마 이름")
-                        )))
+                        requestFields(FieldDescriptors.RESERVATION_WAITING_REQUEST),
+                        responseFields(FieldDescriptors.RESERVATION_RESPONSE)))
                 .when().post("/waitings")
                 .then().log().all()
                 .statusCode(201);

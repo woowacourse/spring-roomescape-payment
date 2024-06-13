@@ -1,8 +1,5 @@
 package roomescape.controller.api;
 
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
@@ -21,10 +18,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.restdocs.operation.preprocess.Preprocessors;
-import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.controller.BaseControllerTest;
+import roomescape.controller.FieldDescriptors;
 import roomescape.controller.dto.request.ThemeRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
@@ -167,14 +163,7 @@ class ThemeControllerTest extends BaseControllerTest {
     private void getAllThemes() {
         ExtractableResponse<Response> response = RestAssured.given(spec).log().all()
                 .filter(document("theme/getAllThemes",
-                        preprocessRequest(Preprocessors.prettyPrint()),
-                        preprocessResponse(Preprocessors.prettyPrint()),
-                        responseFields(
-                                fieldWithPath("list[].id").type(JsonFieldType.NUMBER).description("테마 아이디"),
-                                fieldWithPath("list[].name").type(JsonFieldType.STRING).description("테마 이름"),
-                                fieldWithPath("list[].description").type(JsonFieldType.STRING).description("테마 설명"),
-                                fieldWithPath("list[].thumbnail").type(JsonFieldType.STRING).description("테마 썸네일")
-                        )))
+                        responseFields(FieldDescriptors.THEME_RESPONSE)))
                 .when().get("/themes")
                 .then().log().all()
                 .extract();
