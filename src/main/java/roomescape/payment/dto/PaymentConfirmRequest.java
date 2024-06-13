@@ -2,6 +2,7 @@ package roomescape.payment.dto;
 
 import java.math.BigDecimal;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentRequest;
 import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.dto.UserReservationCreateRequest;
 
@@ -22,5 +23,9 @@ public record PaymentConfirmRequest(
 
     public Payment createPayment() {
         return new Payment(reservationId, memberId, orderId, paymentKey, amount);
+    }
+
+    public PaymentRequest createPaymentRequest() {
+        return new PaymentRequest(orderId, paymentKey, amount);
     }
 }

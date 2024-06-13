@@ -1,7 +1,8 @@
 package roomescape.reservation.domain;
 
 public enum PaymentStatus {
-    COMPLETED,
+    READY,
     PENDING,
+    COMPLETED,
     ;
 }
