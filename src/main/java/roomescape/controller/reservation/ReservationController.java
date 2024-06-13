@@ -86,7 +86,7 @@ public class ReservationController {
 
         ReservationResponse response = reservationService.payReservation(
                 reservationId, paymentConfirmInput, member);
-        return ResponseEntity.created(URI.create("/reservations/" + response.getId())).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @RoleAllowed(MemberRole.ADMIN)

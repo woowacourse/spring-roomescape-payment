@@ -14,6 +14,7 @@ import roomescape.exception.payment.PaymentConfirmErrorCode;
 import roomescape.exception.payment.PaymentConfirmException;
 import roomescape.service.payment.PaymentStatus;
 import roomescape.service.payment.dto.PaymentCancelOutput;
+import roomescape.service.payment.dto.PaymentConfirmInput;
 import roomescape.service.payment.dto.PaymentConfirmOutput;
 
 import java.time.ZonedDateTime;
@@ -304,6 +305,41 @@ class ReservationIntegrationTest extends IntegrationTest {
                     .when().delete("/reservations/" + reservation.getId() + "/cancel")
                     .then().log().all()
                     .statusCode(403);
+        }
+    }
+
+    @Nested
+    @DisplayName("예약 결제 API")
+    class PayReservation {
+        Member member;
+        Reservation reservation;
+
+        @BeforeEach
+        void setUp() {
+            ReservationTime time = timeFixture.createFutureTime();
+            Theme theme = themeFixture.createFirstTheme();
+            member = memberFixture.createUserMember();
+            reservation = reservationFixture.createPaymentWaitingReservation(time, theme, member);
+        }
+
+        @Test
+        void 결제_대기중인_예약을_결제하면_예약상태로_변경되고_결제정보가_추가된다() {
+            given(paymentClient.confirmPayment(any())).willReturn(
+                    new PaymentConfirmOutput("paymentKey", "orderId", "orderName",
+                            1000, ZonedDateTime.now(), ZonedDateTime.now(), PaymentStatus.DONE));
+
+            PaymentConfirmInput paymentConfirmInput = new PaymentConfirmInput("orderId", 1000, "paymentKey");
+
+            RestAssured.given().log().all()
+                    .cookies(cookieProvider.createUserCookies())
+                    .when()
+                    .body(paymentConfirmInput)
+                    .contentType(ContentType.JSON)
+                    .post("/reservations/" + reservation.getId() + "/payment")
+                    .then().log().all()
+                    .statusCode(200)
+                    .body("id", is(reservation.getId().intValue()));
+            ;
         }
     }
 

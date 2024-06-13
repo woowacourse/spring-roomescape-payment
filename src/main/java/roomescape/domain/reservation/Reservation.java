@@ -65,6 +65,10 @@ public class Reservation {
         return this.status == ReservationStatus.PAYMENT_WAITING;
     }
 
+    public boolean isBookedStatus() {
+        return this.status == ReservationStatus.BOOKED;
+    }
+
     public boolean isCancelStatus() {
         return this.status == ReservationStatus.CANCELED;
     }

@@ -12,5 +12,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     @EntityGraph(attributePaths = "reservation")
     List<Payment> findByReservationIn(List<Reservation> reservations);
 
+    @EntityGraph(attributePaths = "reservation")
     Optional<Payment> findByReservation(Reservation reservation);
 }

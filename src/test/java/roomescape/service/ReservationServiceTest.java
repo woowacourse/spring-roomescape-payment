@@ -17,6 +17,8 @@ import roomescape.exception.reservation.NotFoundReservationException;
 import roomescape.exception.reservation.ReservationAuthorityNotExistException;
 import roomescape.service.payment.PaymentStatus;
 import roomescape.service.payment.dto.PaymentCancelOutput;
+import roomescape.service.payment.dto.PaymentConfirmInput;
+import roomescape.service.payment.dto.PaymentConfirmOutput;
 import roomescape.service.reservation.ReservationService;
 import roomescape.service.reservation.dto.ReservationListResponse;
 import roomescape.service.reservation.dto.ReservationMineListResponse;
@@ -167,6 +169,41 @@ class ReservationServiceTest extends ServiceTest {
 
             assertThatThrownBy(() -> reservationService.saveReservationWithoutPayment(input, member))
                     .isInstanceOf(InvalidDateTimeReservationException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("예약 결제")
+    class PayReservation {
+        Member member;
+        Reservation reservation;
+
+        @BeforeEach
+        void setUp() {
+            ReservationTime time = timeFixture.createFutureTime();
+            Theme theme = themeFixture.createFirstTheme();
+            member = memberFixture.createUserMember();
+            reservation = reservationFixture.createPaymentWaitingReservation(time, theme, member);
+        }
+
+        @Test
+        void 결제_대기중인_예약을_결제하면_예약상태로_변경되고_결제정보가_추가된다() {
+            given(paymentClient.confirmPayment(any())).willReturn(
+                    new PaymentConfirmOutput("paymentKey", "orderId", "orderName",
+                            1000, ZonedDateTime.now(), ZonedDateTime.now(), PaymentStatus.DONE));
+
+            PaymentConfirmInput paymentConfirmInput = new PaymentConfirmInput("orderId", 1000, "paymentKey");
+            reservationService.payReservation(reservation.getId(), paymentConfirmInput, reservation.getMember());
+
+            Reservation payedReservation = reservationFixture.findAllReservation().stream()
+                    .filter(reservation -> reservation.equals(this.reservation))
+                    .findAny()
+                    .get();
+            Payment payment = paymentFixture.findByReservation(payedReservation).get();
+
+            assertThat(payedReservation.isBookedStatus()).isTrue();
+            assertThat(payment.getReservation()).isEqualTo(payedReservation);
+            assertThat(payment.isDoneStatus()).isTrue();
         }
     }
 

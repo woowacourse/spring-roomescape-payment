@@ -57,6 +57,10 @@ public class Payment {
         return this.status == PaymentStatus.CANCELED;
     }
 
+    public boolean isDoneStatus() {
+        return this.status == PaymentStatus.DONE;
+    }
+
     public Long getId() {
         return id;
     }
