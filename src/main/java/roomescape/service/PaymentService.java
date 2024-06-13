@@ -3,9 +3,9 @@ package roomescape.service;
 import org.springframework.stereotype.Service;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
+import roomescape.payment.PaymentResponse;
 import roomescape.payment.PaymentClient;
 import roomescape.service.dto.request.PaymentRequest;
-import roomescape.payment.TossPaymentResponse;
 
 @Service
 public class PaymentService {
@@ -19,7 +19,7 @@ public class PaymentService {
     }
 
     public Payment addPayment(PaymentRequest paymentRequest) {
-        TossPaymentResponse tossPaymentResponse = paymentClient.confirm(paymentRequest);
-        return paymentRepository.save(tossPaymentResponse.toPayment());
+        PaymentResponse paymentResponse = paymentClient.confirm(paymentRequest);
+        return paymentRepository.save(paymentResponse.toPayment());
     }
 }

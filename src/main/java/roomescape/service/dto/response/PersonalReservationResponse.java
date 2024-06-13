@@ -19,7 +19,7 @@ public record PersonalReservationResponse(
 
     public static PersonalReservationResponse from(Reservation reservation) {
         Optional<PaymentResponse> payment = Optional.ofNullable(reservation.getPayment())
-                .map(p -> new PaymentResponse(p.getPaymentKey(), p.getAmount()));
+                .map(p -> new PaymentResponse(p.getProviderPaymentId(), p.getAmount()));
 
         return new PersonalReservationResponse(
                 reservation.getId(),

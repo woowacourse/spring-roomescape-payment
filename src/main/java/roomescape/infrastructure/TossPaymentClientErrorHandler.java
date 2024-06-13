@@ -1,14 +1,13 @@
-package roomescape.payment;
+package roomescape.infrastructure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.Arrays;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
 import roomescape.payment.exception.PaymentClientException;
 import roomescape.payment.exception.PaymentServerException;
-
-import java.io.IOException;
-import java.util.Arrays;
 
 @Component
 public class TossPaymentClientErrorHandler implements ResponseErrorHandler {
@@ -26,7 +25,8 @@ public class TossPaymentClientErrorHandler implements ResponseErrorHandler {
 
     @Override
     public void handleError(ClientHttpResponse response) throws IOException {
-        TossErrorResponse errorResponse = objectMapper.readValue(response.getBody(), TossErrorResponse.class);
+        TossPaymentErrorResponse errorResponse =
+                objectMapper.readValue(response.getBody(), TossPaymentErrorResponse.class);
         boolean shouldConvertToServerError = TossErrorCode.shouldConvertToServerError(errorResponse.errorCode());
         if (shouldConvertToServerError) {
             throw new PaymentServerException(errorResponse.message());

@@ -7,10 +7,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.PaymentClient;
-import roomescape.payment.TossPaymentClientErrorHandler;
 import roomescape.payment.exception.PaymentServerException;
 import roomescape.service.dto.request.PaymentRequest;
-import roomescape.payment.TossPaymentResponse;
 
 @Component
 public class TossPaymentClient implements PaymentClient {
