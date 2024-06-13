@@ -1,4 +1,4 @@
-package roomescape.reservation.service;
+package roomescape.reservation.service.component;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -9,8 +9,6 @@ import static roomescape.Fixture.RESERVATION_TIME_10_00;
 import static roomescape.Fixture.TODAY;
 import static roomescape.Fixture.TOMORROW;
 import static roomescape.reservation.domain.Status.PAYMENT_PENDING;
-import static roomescape.reservation.domain.Status.SUCCESS;
-import static roomescape.reservation.domain.Status.WAIT;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,14 +23,16 @@ import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
+import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.repository.ThemeRepository;
+import roomescape.reservation.repository.WaitingRepository;
 import roomescape.reservation.service.dto.request.WaitingReservationRequest;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test")
-class WaitingReservationServiceTest {
+class WaitingComponentServiceTest {
 
     @Autowired
     private DatabaseCleaner databaseCleaner;
@@ -50,7 +50,10 @@ class WaitingReservationServiceTest {
     private ReservationRepository reservationRepository;
 
     @Autowired
-    private WaitingReservationService waitingReservationService;
+    private WaitingRepository waitingRepository;
+
+    @Autowired
+    private WaitingComponentService waitingComponentService;
 
     @AfterEach
     void init() {
@@ -71,7 +74,7 @@ class WaitingReservationServiceTest {
                 hour10.getId()
         );
 
-        assertThatThrownBy(() -> waitingReservationService.save(saveRequest))
+        assertThatThrownBy(() -> waitingComponentService.save(saveRequest))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -82,11 +85,10 @@ class WaitingReservationServiceTest {
         Theme theme = themeRepository.save(HORROR_THEME);
         Member jojo = memberRepository.save(MEMBER_JOJO);
 
-        Reservation waiting = reservationRepository.save(new Reservation(jojo, TOMORROW, theme, reservationTime, WAIT));
-        waitingReservationService.approveReservation(waiting.getId());
+        Waiting waiting = waitingRepository.save(new Waiting(jojo, TOMORROW, theme, reservationTime));
+        waitingComponentService.approveReservation(waiting.getId());
 
-        Reservation afterUpdate = reservationRepository.findById(waiting.getId()).get();
-
+        Waiting afterUpdate = waitingRepository.findById(waiting.getId()).get();
         assertThat(afterUpdate.getStatus()).isEqualTo(PAYMENT_PENDING);
     }
 
@@ -98,10 +100,10 @@ class WaitingReservationServiceTest {
         Member jojo = memberRepository.save(MEMBER_JOJO);
         Member kaki = memberRepository.save(MEMBER_KAKI);
 
-        reservationRepository.save(new Reservation(kaki, TOMORROW, theme, reservationTime, SUCCESS));
-        Reservation waiting = reservationRepository.save(new Reservation(jojo, TOMORROW, theme, reservationTime, WAIT));
+        reservationRepository.save(new Reservation(kaki, TOMORROW, theme, reservationTime));
+        Waiting waiting = waitingRepository.save(new Waiting(jojo, TOMORROW, theme, reservationTime));
 
-        assertThatThrownBy(() -> waitingReservationService.approveReservation(waiting.getId()))
+        assertThatThrownBy(() -> waitingComponentService.approveReservation(waiting.getId()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

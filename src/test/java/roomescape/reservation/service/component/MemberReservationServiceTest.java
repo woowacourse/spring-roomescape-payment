@@ -1,15 +1,12 @@
-package roomescape.reservation.service;
+package roomescape.reservation.service.component;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static roomescape.Fixture.HORROR_THEME;
 import static roomescape.Fixture.MEMBER_JOJO;
 import static roomescape.Fixture.MEMBER_KAKI;
 import static roomescape.Fixture.RESERVATION_TIME_10_00;
 import static roomescape.Fixture.TODAY;
-import static roomescape.reservation.domain.Status.SUCCESS;
-import static roomescape.reservation.domain.Status.WAIT;
 
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -19,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
-import roomescape.auth.domain.Role;
-import roomescape.auth.dto.LoginMember;
 import roomescape.common.util.DatabaseCleaner;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
@@ -29,16 +24,18 @@ import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.controller.dto.response.MemberReservationResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.ReservationWithRankAndPayment;
+import roomescape.reservation.domain.ReservationWithPayment;
 import roomescape.reservation.domain.Theme;
+import roomescape.reservation.domain.Waiting;
+import roomescape.reservation.domain.WaitingWithRank;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.repository.ThemeRepository;
-import roomescape.reservation.service.dto.request.ReservationPaymentSaveRequest;
+import roomescape.reservation.repository.WaitingRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test")
-class ReservationServiceTest {
+class MemberReservationServiceTest {
 
     @Autowired
     private DatabaseCleaner databaseCleaner;
@@ -56,69 +53,46 @@ class ReservationServiceTest {
     private ReservationRepository reservationRepository;
 
     @Autowired
-    private ReservationService reservationService;
+    private PaymentRepository paymentRepository;
 
     @Autowired
-    private PaymentRepository paymentRepository;
+    private WaitingRepository waitingRepository;
+
+    @Autowired
+    private MemberReservationService memberReservationService;
 
     @AfterEach
     void init() {
         databaseCleaner.cleanUp();
     }
 
-    @DisplayName("존재하지 않는 예약 시간에 예약을 하면 예외가 발생한다.")
-    @Test
-    void notExistReservationTimeIdExceptionTest() {
-        Theme horror = themeRepository.save(HORROR_THEME);
-        Member jojo = memberRepository.save(MEMBER_JOJO);
-
-        ReservationPaymentSaveRequest saveRequest = new ReservationPaymentSaveRequest(
-                jojo.getId(), TODAY, horror.getId(), 1L, "paymentKey", "orderId", 1000L
-        );
-
-        assertThatThrownBy(() -> reservationService.saveWithPayment(saveRequest))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
-
-    @DisplayName("예약 아이디로 조회 시 존재하지 않는 아이디면 예외가 발생한다.")
-    @Test
-    void findByIdExceptionTest() {
-        assertThatThrownBy(() -> reservationService.findById(1L))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
     @DisplayName("회원의 예약 목록과 예약 대기 목록을 조회한다.")
     @Test
-    void findReservationsAndWaitingsByMember() {
+    void findReservationsAndWaitings() {
         // given
         ReservationTime reservationTime = reservationTimeRepository.save(RESERVATION_TIME_10_00);
         Theme theme = themeRepository.save(HORROR_THEME);
         Member jojo = memberRepository.save(MEMBER_JOJO);
         Member kaki = memberRepository.save(MEMBER_KAKI);
 
-        Reservation success = reservationRepository.save(new Reservation(jojo, TODAY, theme, reservationTime, SUCCESS));
-        Payment payment = paymentRepository.save(new Payment("paymentKey", "orderId", 1000L, success));
+        Reservation reservation = reservationRepository.save(new Reservation(jojo, TODAY, theme, reservationTime));
+        Payment payment = paymentRepository.save(new Payment("paymentKey", "orderId", 1000L, reservation));
 
-        reservationRepository.save(new Reservation(kaki, TODAY, theme, reservationTime, WAIT));
-        Reservation secondWait = reservationRepository.save(new Reservation(jojo, TODAY, theme, reservationTime, WAIT));
+        waitingRepository.save(new Waiting(kaki, TODAY, theme, reservationTime));
+        Waiting secondWait = waitingRepository.save(new Waiting(jojo, TODAY, theme, reservationTime));
 
         MemberReservationResponse expectedSuccess = MemberReservationResponse.toResponse(
-                new ReservationWithRankAndPayment(success, 0, payment)
-        );
+                new ReservationWithPayment(reservation, payment));
         MemberReservationResponse expectedWait = MemberReservationResponse.toResponse(
-                new ReservationWithRankAndPayment(secondWait, 2, null)
-        );
+                new WaitingWithRank(secondWait, 2L));
 
         // when
-        LoginMember loginJojo = new LoginMember(1L, Role.MEMBER, jojo.getName(), jojo.getEmail());
-        List<MemberReservationResponse> jojoReservations = reservationService.findReservationsAndWaitingsByMember(
-                loginJojo);
+        List<MemberReservationResponse> jojoReservations = memberReservationService.findReservationsAndWaitings(1L);
 
         // then
         assertAll(
                 () -> assertThat(jojoReservations).hasSize(2),
-                () -> assertThat(jojoReservations).containsExactly(expectedSuccess, expectedWait)
+                () -> assertThat(jojoReservations).contains(expectedSuccess, expectedWait)
         );
     }
 }

@@ -8,7 +8,6 @@ import roomescape.payment.service.dto.resonse.PaymentConfirmResponse;
 import roomescape.reservation.domain.Description;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.Status;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.ThemeName;
 
@@ -58,8 +57,7 @@ public class Fixture {
             MEMBER_JOJO,
             TODAY,
             HORROR_THEME,
-            RESERVATION_TIME_10_00,
-            Status.SUCCESS
+            RESERVATION_TIME_10_00
     );
 
     private Fixture() {

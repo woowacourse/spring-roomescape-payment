@@ -5,7 +5,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationWithRankAndPayment;
+import roomescape.reservation.domain.ReservationWithPayment;
+import roomescape.reservation.domain.Status;
+import roomescape.reservation.domain.Waiting;
+import roomescape.reservation.domain.WaitingWithRank;
 
 public record MemberReservationResponse(
         long reservationId,
@@ -18,9 +21,9 @@ public record MemberReservationResponse(
         Long amount
 ) {
 
-    public static MemberReservationResponse toResponse(ReservationWithRankAndPayment reservationWithRankAndPayment) {
-        Reservation reservation = reservationWithRankAndPayment.getReservation();
-        Payment payment = reservationWithRankAndPayment.getPayment();
+    public static MemberReservationResponse toResponse(ReservationWithPayment reservationWithPayment) {
+        Reservation reservation = reservationWithPayment.getReservation();
+        Payment payment = reservationWithPayment.getPayment();
 
         if (payment != null) {
             return new MemberReservationResponse(
@@ -28,8 +31,8 @@ public record MemberReservationResponse(
                     reservation.getThemeName(),
                     reservation.getDate(),
                     reservation.getStartAt(),
-                    reservation.getStatusDisplayName(),
-                    reservationWithRankAndPayment.getRank(),
+                    Status.SUCCESS.getDisplayName(),
+                    0L,
                     payment.getPaymentKey(),
                     payment.getAmount()
             );
@@ -39,8 +42,23 @@ public record MemberReservationResponse(
                 reservation.getThemeName(),
                 reservation.getDate(),
                 reservation.getStartAt(),
-                reservation.getStatusDisplayName(),
-                reservationWithRankAndPayment.getRank(),
+                Status.SUCCESS.getDisplayName(),
+                0L,
+                null,
+                null
+        );
+    }
+
+    public static MemberReservationResponse toResponse(WaitingWithRank waitingWithRank) {
+        Waiting waiting = waitingWithRank.getWaiting();
+
+        return new MemberReservationResponse(
+                waiting.getId(),
+                waiting.getThemeName(),
+                waiting.getDate(),
+                waiting.getStartAt(),
+                waiting.getStatusDisplayName(),
+                waitingWithRank.getRank(),
                 null,
                 null
         );

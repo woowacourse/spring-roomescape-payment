@@ -1,4 +1,4 @@
-package roomescape.reservation.service;
+package roomescape.reservation.service.module;
 
 import org.springframework.stereotype.Service;
 import roomescape.member.domain.Member;
@@ -7,18 +7,19 @@ import roomescape.reservation.controller.dto.request.ReservationSaveRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
+import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.repository.ThemeRepository;
 import roomescape.reservation.service.dto.request.WaitingReservationRequest;
 
 @Service
-public class ReservationFactoryService {
+public class ReservationCreateService {
 
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
 
-    public ReservationFactoryService(
+    public ReservationCreateService(
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
             MemberRepository memberRepository
@@ -28,7 +29,7 @@ public class ReservationFactoryService {
         this.memberRepository = memberRepository;
     }
 
-    public Reservation createSuccess(ReservationSaveRequest saveRequest) {
+    public Reservation createReservation(ReservationSaveRequest saveRequest) {
         Member member = findMember(saveRequest.memberId());
         Theme theme = findTheme(saveRequest.themeId());
         ReservationTime reservationTime = findReservationTime(saveRequest.timeId());
@@ -36,7 +37,7 @@ public class ReservationFactoryService {
         return saveRequest.toReservation(member, theme, reservationTime);
     }
 
-    public Reservation createWaiting(WaitingReservationRequest saveRequest) {
+    public Waiting createWaiting(WaitingReservationRequest saveRequest) {
         Member member = findMember(saveRequest.memberId());
         Theme theme = findTheme(saveRequest.themeId());
         ReservationTime reservationTime = findReservationTime(saveRequest.timeId());

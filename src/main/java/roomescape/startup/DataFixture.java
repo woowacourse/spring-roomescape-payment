@@ -40,9 +40,9 @@ public class DataFixture {
             "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg");
     public static final Theme THEME_MONKEY = new Theme(new ThemeName("원숭이 사원"), new Description("원숭이들의 공격"),
             "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg");
-    public static final Theme THEME_ZOMBIE = new Theme(new ThemeName("나가야 산다"), new Description("빨리 탈출"),
+    public static final Theme THEME_ZOMBIE = new Theme(new ThemeName("좀비 사태"), new Description("좀비들의 공격"),
             "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg");
-    public static final Theme THEME_NAGAYA_SANDA = new Theme(new ThemeName("좀비 사태"), new Description("좀비들의 공격"),
+    public static final Theme THEME_NAGAYA_SANDA = new Theme(new ThemeName("나가야 산다"), new Description("빨리 탈출"),
             "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg");
     public static final Theme THEME_HORROR_THEME_PARK = new Theme(new ThemeName("공포의 놀이공원"), new Description("놀이공원 탈출"),
             "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg");

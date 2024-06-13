@@ -55,7 +55,7 @@ class ReservationTimeControllerTest extends ControllerTest {
         reservationTimeJdbcUtil.saveReservationTime(new ReservationTime(LocalTime.parse("11:00")));
         reservationTimeJdbcUtil.saveReservationTime(new ReservationTime(LocalTime.parse("12:00")));
 
-        reservationJdbcUtil.saveSuccessReservationAsDateNow();
+        reservationJdbcUtil.saveReservationAsDateNow();
 
         RestAssured.given(spec)
                 .param("date", LocalDate.now().toString())

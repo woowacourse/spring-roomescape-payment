@@ -26,7 +26,6 @@ import roomescape.payment.service.dto.request.PaymentConfirmRequest;
 import roomescape.payment.service.dto.resonse.PaymentConfirmResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.Status;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
@@ -72,7 +71,7 @@ class PaymentServiceTest {
         ReservationTime reservationTime = reservationTimeRepository.save(RESERVATION_TIME_10_00);
         Theme theme = themeRepository.save(HORROR_THEME);
         Reservation reservation = reservationRepository.save(
-                new Reservation(jojo, TOMORROW, theme, reservationTime, Status.SUCCESS));
+                new Reservation(jojo, TOMORROW, theme, reservationTime));
 
         PaymentConfirmRequest confirmRequest = new PaymentConfirmRequest("paymentKey", "orderId", 1000);
 
@@ -105,7 +104,7 @@ class PaymentServiceTest {
         ReservationTime reservationTime = reservationTimeRepository.save(RESERVATION_TIME_10_00);
         Theme theme = themeRepository.save(HORROR_THEME);
         Reservation reservation = reservationRepository.save(
-                new Reservation(jojo, TOMORROW, theme, reservationTime, Status.SUCCESS));
+                new Reservation(jojo, TOMORROW, theme, reservationTime));
         Payment payment = paymentRepository.save(new Payment("paymentKey", "orderId", 10000L, reservation));
 
         paymentService.deleteByReservationId(reservation.getId());
@@ -121,7 +120,7 @@ class PaymentServiceTest {
         ReservationTime reservationTime = reservationTimeRepository.save(RESERVATION_TIME_10_00);
         Theme theme = themeRepository.save(HORROR_THEME);
         Reservation reservation = reservationRepository.save(
-                new Reservation(jojo, TOMORROW, theme, reservationTime, Status.SUCCESS));
+                new Reservation(jojo, TOMORROW, theme, reservationTime));
         paymentRepository.save(new Payment("paymentKey", "orderId", 10000L, reservation));
 
         assertThat(paymentService.findAll()).hasSize(1);

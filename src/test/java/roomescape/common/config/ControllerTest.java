@@ -23,6 +23,7 @@ import roomescape.common.util.PaymentJdbcUtil;
 import roomescape.common.util.ReservationJdbcUtil;
 import roomescape.common.util.ReservationTimeJdbcUtil;
 import roomescape.common.util.ThemeJdbcUtil;
+import roomescape.common.util.WaitingJdbcUtil;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberName;
 
@@ -47,6 +48,9 @@ public class ControllerTest {
 
     @Autowired
     protected ReservationJdbcUtil reservationJdbcUtil;
+
+    @Autowired
+    protected WaitingJdbcUtil waitingJdbcUtil;
 
     @Autowired
     protected ReservationTimeJdbcUtil reservationTimeJdbcUtil;

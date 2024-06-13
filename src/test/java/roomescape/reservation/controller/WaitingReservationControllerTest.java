@@ -42,11 +42,11 @@ class WaitingReservationControllerTest extends ControllerTest {
 
     @DisplayName("예약 대기 목록 조회에 성공하면 200 응답을 받는다.")
     @Test
-    void findAll() {
+    void findWaitings() {
         memberJdbcUtil.saveMemberAsKaki();
         themeJdbcUtil.saveThemeAsHorror();
         reservationTimeJdbcUtil.saveReservationTimeAsTen();
-        reservationJdbcUtil.saveWaitReservationAsDateNow();
+        waitingJdbcUtil.saveWaitAsDateNow();
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
@@ -66,7 +66,7 @@ class WaitingReservationControllerTest extends ControllerTest {
         memberJdbcUtil.saveMember(MEMBER_KAKI);
         themeJdbcUtil.saveThemeAsHorror();
         reservationTimeJdbcUtil.saveReservationTimeAsTen();
-        reservationJdbcUtil.saveSuccessReservationAsDateNow();
+        reservationJdbcUtil.saveReservationAsDateNow();
 
         WaitingReservationSaveRequest saveRequest = new WaitingReservationSaveRequest(LocalDate.now(), 1L, 1L);
         String kakiToken = getToken(new Member(2L, Role.MEMBER, new MemberName(KAKI_NAME), KAKI_EMAIL, KAKI_PASSWORD));
@@ -103,8 +103,8 @@ class WaitingReservationControllerTest extends ControllerTest {
                 .post("/reservations/wait")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
-                .body("id", is(2))
-                .header("Location", "/reservations/wait/2");
+                .body("id", is(1))
+                .header("Location", "/reservations/wait/1");
     }
 
     @DisplayName("예약 대기를 성공적으로 승인하면 204 응답을 받는다.")
@@ -113,7 +113,7 @@ class WaitingReservationControllerTest extends ControllerTest {
         memberJdbcUtil.saveMember(MEMBER_KAKI);
         themeJdbcUtil.saveThemeAsHorror();
         reservationTimeJdbcUtil.saveReservationTimeAsTen();
-        reservationJdbcUtil.saveWaitReservationAsDateNow();
+        waitingJdbcUtil.saveWaitAsDateNow();
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())

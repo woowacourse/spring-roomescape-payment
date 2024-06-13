@@ -16,21 +16,27 @@ import roomescape.common.dto.ResourcesResponse;
 import roomescape.reservation.controller.dto.request.ReservationSearchCondRequest;
 import roomescape.reservation.controller.dto.response.MemberReservationResponse;
 import roomescape.reservation.controller.dto.response.ReservationResponse;
-import roomescape.reservation.service.ReservationService;
+import roomescape.reservation.service.component.MemberReservationService;
+import roomescape.reservation.service.component.ReservationComponentService;
 import roomescape.reservation.service.dto.request.ReservationPaymentSaveRequest;
 
 @RestController
 public class ReservationController {
 
-    private final ReservationService reservationService;
+    private final ReservationComponentService reservationComponentService;
+    private final MemberReservationService memberReservationService;
 
-    public ReservationController(ReservationService reservationService) {
-        this.reservationService = reservationService;
+    public ReservationController(
+            ReservationComponentService reservationComponentService,
+            MemberReservationService memberReservationService
+    ) {
+        this.reservationComponentService = reservationComponentService;
+        this.memberReservationService = memberReservationService;
     }
 
     @GetMapping("/reservations")
     public ResponseEntity<ResourcesResponse<ReservationResponse>> findAll() {
-        List<ReservationResponse> reservations = reservationService.findAll();
+        List<ReservationResponse> reservations = reservationComponentService.findAll();
         ResourcesResponse<ReservationResponse> response = new ResourcesResponse<>(reservations);
 
         return ResponseEntity.ok(response);
@@ -40,7 +46,7 @@ public class ReservationController {
     public ResponseEntity<ResourcesResponse<ReservationResponse>> findAllBySearchCond(
             @Valid @ModelAttribute ReservationSearchCondRequest searchCondRequest
     ) {
-        List<ReservationResponse> reservations = reservationService.findAllBySearchCond(searchCondRequest);
+        List<ReservationResponse> reservations = reservationComponentService.findAllBySearchCond(searchCondRequest);
         ResourcesResponse<ReservationResponse> response = new ResourcesResponse<>(reservations);
 
         return ResponseEntity.ok(response);
@@ -50,8 +56,7 @@ public class ReservationController {
     public ResponseEntity<ResourcesResponse<MemberReservationResponse>> findReservationsAndWaitingsByMember(
             LoginMember loginMember
     ) {
-        List<MemberReservationResponse> reservations =
-                reservationService.findReservationsAndWaitingsByMember(loginMember);
+        List<MemberReservationResponse> reservations = memberReservationService.findReservationsAndWaitings(loginMember.id());
         ResourcesResponse<MemberReservationResponse> response = new ResourcesResponse<>(reservations);
 
         return ResponseEntity.ok(response);
@@ -59,11 +64,11 @@ public class ReservationController {
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> save(
-            @Valid @RequestBody roomescape.reservation.controller.dto.request.ReservationPaymentSaveRequest saveRequest,
+            @Valid @RequestBody ReservationPaymentSaveRequest saveRequest,
             LoginMember loginMember
     ) {
         ReservationPaymentSaveRequest request = ReservationPaymentSaveRequest.of(saveRequest, loginMember);
-        ReservationResponse response = reservationService.saveWithPayment(request);
+        ReservationResponse response = reservationComponentService.saveWithPayment(request);
 
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
@@ -71,7 +76,7 @@ public class ReservationController {
 
     @DeleteMapping("/reservations/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") Long id) {
-        reservationService.delete(id);
+        reservationComponentService.delete(id);
 
         return ResponseEntity.noContent().build();
     }

@@ -8,20 +8,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.reservation.controller.dto.request.ReservationSaveRequest;
 import roomescape.reservation.controller.dto.response.ReservationResponse;
-import roomescape.reservation.service.ReservationService;
+import roomescape.reservation.service.component.ReservationComponentService;
 
 @RestController
 public class AdminReservationController {
 
-    private final ReservationService reservationService;
+    private final ReservationComponentService reservationComponentService;
 
-    public AdminReservationController(ReservationService reservationService) {
-        this.reservationService = reservationService;
+    public AdminReservationController(ReservationComponentService reservationComponentService) {
+        this.reservationComponentService = reservationComponentService;
     }
 
     @PostMapping("/admin/reservations")
     public ResponseEntity<ReservationResponse> save(@Valid @RequestBody ReservationSaveRequest saveRequest) {
-        ReservationResponse response = reservationService.saveWithoutPayment(saveRequest);
+        ReservationResponse response = reservationComponentService.saveWithoutPayment(saveRequest);
 
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);

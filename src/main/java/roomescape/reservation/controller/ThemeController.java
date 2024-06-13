@@ -15,7 +15,7 @@ import roomescape.common.dto.ResourcesResponse;
 import roomescape.reservation.controller.dto.request.ThemeSaveRequest;
 import roomescape.reservation.controller.dto.response.PopularThemeResponse;
 import roomescape.reservation.controller.dto.response.ThemeResponse;
-import roomescape.reservation.service.ThemeService;
+import roomescape.reservation.service.module.ThemeService;
 
 @RestController
 public class ThemeController {

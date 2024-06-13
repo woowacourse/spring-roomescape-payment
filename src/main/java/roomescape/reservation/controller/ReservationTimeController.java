@@ -16,7 +16,7 @@ import roomescape.common.dto.ResourcesResponse;
 import roomescape.reservation.controller.dto.request.TimeSaveRequest;
 import roomescape.reservation.controller.dto.response.AvailableReservationTimeResponse;
 import roomescape.reservation.controller.dto.response.TimeResponse;
-import roomescape.reservation.service.ReservationTimeService;
+import roomescape.reservation.service.module.ReservationTimeService;
 
 @RestController
 public class ReservationTimeController {

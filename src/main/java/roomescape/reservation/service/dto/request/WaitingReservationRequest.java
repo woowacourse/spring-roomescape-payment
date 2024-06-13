@@ -3,10 +3,9 @@ package roomescape.reservation.service.dto.request;
 import java.time.LocalDate;
 import roomescape.member.domain.Member;
 import roomescape.reservation.controller.dto.request.WaitingReservationSaveRequest;
-import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.Status;
 import roomescape.reservation.domain.Theme;
+import roomescape.reservation.domain.Waiting;
 
 public record WaitingReservationRequest(
         long memberId,
@@ -24,7 +23,7 @@ public record WaitingReservationRequest(
         );
     }
 
-    public Reservation toWaitingReservation(Member member, Theme theme, ReservationTime reservationTime) {
-        return new Reservation(member, date, theme, reservationTime, Status.WAIT);
+    public Waiting toWaitingReservation(Member member, Theme theme, ReservationTime reservationTime) {
+        return new Waiting(member, date, theme, reservationTime);
     }
 }

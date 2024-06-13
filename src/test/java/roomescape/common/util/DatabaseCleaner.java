@@ -15,6 +15,7 @@ public class DatabaseCleaner {
     public void cleanUp() {
         clearPayment();
         clearReservation();
+        clearWaiting();
         clearTime();
         clearTheme();
         clearMember();
@@ -23,6 +24,11 @@ public class DatabaseCleaner {
     private void clearReservation() {
         jdbcTemplate.update("delete from reservation");
         jdbcTemplate.update("alter table reservation alter column id restart with 1");
+    }
+
+    private void clearWaiting() {
+        jdbcTemplate.update("delete from waiting");
+        jdbcTemplate.update("alter table waiting alter column id restart with 1");
     }
 
     private void clearTime() {

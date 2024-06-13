@@ -2,6 +2,8 @@ package roomescape.reservation.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,7 +15,7 @@ import java.time.LocalTime;
 import roomescape.member.domain.Member;
 
 @Entity
-public class Reservation {
+public class Waiting {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,6 +23,10 @@ public class Reservation {
 
     @Column(nullable = false)
     private LocalDate date;
+
+    @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
+    private Status status = Status.WAIT;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
@@ -34,10 +40,10 @@ public class Reservation {
     @JoinColumn(name = "time_id", nullable = false)
     private ReservationTime reservationTime;
 
-    protected Reservation() {
+    protected Waiting() {
     }
 
-    public Reservation(
+    public Waiting(
             Member member,
             LocalDate date,
             Theme theme,
@@ -50,7 +56,7 @@ public class Reservation {
         this.reservationTime = reservationTime;
     }
 
-    public Reservation(
+    public Waiting(
             Long id,
             Member member,
             LocalDate date,
@@ -68,6 +74,13 @@ public class Reservation {
         if (date.isBefore(LocalDate.now())) {
             throw new IllegalArgumentException("지난 날짜는 예약할 수 없습니다.");
         }
+    }
+
+    public void updatePaymentPending() {
+        if (status.isPaymentPending()) {
+            throw new IllegalArgumentException("이미 결제 대기된 예약입니다.");
+        }
+        status = Status.PAYMENT_PENDING;
     }
 
     public Long getId() {
@@ -96,5 +109,13 @@ public class Reservation {
 
     public LocalTime getStartAt() {
         return reservationTime.getStartAt();
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public String getStatusDisplayName() {
+        return status.getDisplayName();
     }
 }

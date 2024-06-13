@@ -12,8 +12,7 @@ public record ReservationPaymentSaveRequest(
         String orderId,
         long amount
 ) {
-    public static ReservationPaymentSaveRequest of(
-            roomescape.reservation.controller.dto.request.ReservationPaymentSaveRequest saveRequest, LoginMember loginMember) {
+    public static ReservationPaymentSaveRequest of(ReservationPaymentSaveRequest saveRequest, LoginMember loginMember) {
         return new ReservationPaymentSaveRequest(
                 loginMember.id(),
                 saveRequest.date(),

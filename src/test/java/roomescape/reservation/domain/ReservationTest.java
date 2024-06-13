@@ -32,8 +32,7 @@ class ReservationTest {
                         new Member(new MemberName(KAKI_NAME), KAKI_EMAIL, KAKI_PASSWORD),
                         LocalDate.now().minusDays(1),
                         theme,
-                        reservationTime,
-                        Status.SUCCESS
+                        reservationTime
                 )
         ).isInstanceOf(IllegalArgumentException.class);
     }
@@ -41,47 +40,32 @@ class ReservationTest {
     @DisplayName("예약 상태를 결제 대기로 변경한다.")
     @Test
     void updatePaymentPendingWithWaitingReservation() {
-        Reservation waitingReservation = new Reservation(
+        Waiting waiting = new Waiting(
                 MEMBER_JOJO,
                 TOMORROW,
                 HORROR_THEME,
-                RESERVATION_TIME_10_00,
-                Status.WAIT
+                RESERVATION_TIME_10_00
         );
 
-        waitingReservation.updatePaymentPending();
+        waiting.updatePaymentPending();
 
-        assertThat(waitingReservation.getStatus()).isEqualTo(Status.PAYMENT_PENDING);
+        assertThat(waiting.getStatus()).isEqualTo(Status.PAYMENT_PENDING);
 
-    }
-
-    @DisplayName("예약 결제 대기로 변경 시, 이미 성공 상태이면 예외가 발생한다.")
-    @Test
-    void updatePaymentPendingWithSuccessReservation() {
-        Reservation reservation = new Reservation(
-                MEMBER_JOJO,
-                TOMORROW,
-                HORROR_THEME,
-                RESERVATION_TIME_10_00,
-                Status.SUCCESS
-        );
-
-        assertThatThrownBy(reservation::updatePaymentPending)
-                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("예약 결제 대기로 변경 시, 이미 결제 대기 상태이면 예외가 발생한다.")
     @Test
     void updatePaymentPendingWithPaymentPendingReservation() {
-        Reservation reservation = new Reservation(
+        Waiting waiting = new Waiting(
                 MEMBER_JOJO,
                 TOMORROW,
                 HORROR_THEME,
-                RESERVATION_TIME_10_00,
-                Status.PAYMENT_PENDING
+                RESERVATION_TIME_10_00
         );
 
-        assertThatThrownBy(reservation::updatePaymentPending)
+        waiting.updatePaymentPending();
+
+        assertThatThrownBy(waiting::updatePaymentPending)
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

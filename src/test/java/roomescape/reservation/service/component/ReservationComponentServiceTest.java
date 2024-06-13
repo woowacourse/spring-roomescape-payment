@@ -1,13 +1,13 @@
-package roomescape.reservation.service;
+package roomescape.reservation.service.component;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static roomescape.Fixture.HORROR_THEME;
+import static roomescape.Fixture.JOJO_RESERVATION;
 import static roomescape.Fixture.MEMBER_JOJO;
 import static roomescape.Fixture.RESERVATION_TIME_10_00;
 import static roomescape.Fixture.TODAY;
-import static roomescape.Fixture.JOJO_RESERVATION;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +30,7 @@ import roomescape.reservation.service.dto.request.ReservationPaymentSaveRequest;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test")
-class ReservationSaveServiceTest {
+class ReservationComponentServiceTest {
 
     @Autowired
     private DatabaseCleaner databaseCleaner;
@@ -45,7 +45,7 @@ class ReservationSaveServiceTest {
     private MemberRepository memberRepository;
 
     @Autowired
-    private ReservationService reservationService;
+    private ReservationComponentService reservationComponentService;
 
     @MockBean
     private PaymentService paymentService;
@@ -57,21 +57,22 @@ class ReservationSaveServiceTest {
 
     @DisplayName("예약 시, 중복된 예약이 있다면 예외가 발생한다.")
     @Test
-    void duplicateReservationExceptionTest() {
+    void saveWithDuplicateReservation() {
+        // given
         Theme horror = themeRepository.save(HORROR_THEME);
         ReservationTime hour10 = reservationTimeRepository.save(RESERVATION_TIME_10_00);
         Member jojo = memberRepository.save(MEMBER_JOJO);
 
         ReservationPaymentSaveRequest saveRequest = new ReservationPaymentSaveRequest(
-                jojo.getId(), TODAY, horror.getId(), hour10.getId(), "paymentKey", "orderId", 1000L
-        );
+                jojo.getId(), TODAY, horror.getId(), hour10.getId(), "paymentKey", "orderId", 1000L);
 
         when(paymentService.confirm(any(), any())).thenReturn(
                 new Payment(1L, "paymentKey", "orderId", 1000L, JOJO_RESERVATION));
 
-        reservationService.saveWithPayment(saveRequest);
+        reservationComponentService.saveWithPayment(saveRequest);
 
-        assertThatThrownBy(() -> reservationService.saveWithPayment(saveRequest))
+        // when & then
+        assertThatThrownBy(() -> reservationComponentService.saveWithPayment(saveRequest))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

@@ -1,4 +1,4 @@
-package roomescape.reservation.service;
+package roomescape.reservation.service.module;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -65,10 +65,7 @@ public class ReservationTimeService {
                 .toList();
     }
 
-    private AvailableReservationTimeResponse createResponse(
-            ReservationTime reservationTime,
-            List<Long> bookedTimeIds
-    ) {
+    private AvailableReservationTimeResponse createResponse(ReservationTime reservationTime, List<Long> bookedTimeIds) {
         return AvailableReservationTimeResponse.toResponse(reservationTime, isBooked(reservationTime, bookedTimeIds));
     }
 

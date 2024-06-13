@@ -18,7 +18,7 @@ class PaymentControllerTest extends ControllerTest {
         memberJdbcUtil.saveMemberAsKaki();
         themeJdbcUtil.saveThemeAsHorror();
         reservationTimeJdbcUtil.saveReservationTimeAsTen();
-        reservationJdbcUtil.saveSuccessReservationAsDateNow();
+        reservationJdbcUtil.saveReservationAsDateNow();
         paymentJdbcUtil.savePayment();
 
         RestAssured.given().log().all()

@@ -4,16 +4,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ReservationJdbcUtil {
+public class WaitingJdbcUtil {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public ReservationJdbcUtil(JdbcTemplate jdbcTemplate) {
+    public WaitingJdbcUtil(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public void saveReservationAsDateNow() {
-        String sql = "insert into reservation (member_id, date, theme_id, time_id) values (1, CURRENT_DATE, 1, 1)";
+    public void saveWaitAsDateNow() {
+        String sql = "insert into waiting (member_id, date, theme_id, time_id, status) values (1, CURRENT_DATE, 1, 1, 'WAIT')";
 
         jdbcTemplate.update(sql);
     }

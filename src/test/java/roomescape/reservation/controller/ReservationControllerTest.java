@@ -19,7 +19,7 @@ class ReservationControllerTest extends ControllerTest {
         memberJdbcUtil.saveMemberAsKaki();
         themeJdbcUtil.saveThemeAsHorror();
         reservationTimeJdbcUtil.saveReservationTimeAsTen();
-        reservationJdbcUtil.saveSuccessReservationAsDateNow();
+        reservationJdbcUtil.saveReservationAsDateNow();
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
@@ -36,8 +36,8 @@ class ReservationControllerTest extends ControllerTest {
         memberJdbcUtil.saveMemberAsKaki();
         themeJdbcUtil.saveThemeAsHorror();
         reservationTimeJdbcUtil.saveReservationTimeAsTen();
-        reservationJdbcUtil.saveSuccessReservationAsDateNow();
-        reservationJdbcUtil.saveWaitReservationAsDateNow();
+        reservationJdbcUtil.saveReservationAsDateNow();
+        waitingJdbcUtil.saveWaitAsDateNow();
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())
@@ -55,7 +55,7 @@ class ReservationControllerTest extends ControllerTest {
         memberJdbcUtil.saveAdminMember();
         themeJdbcUtil.saveThemeAsHorror();
         reservationTimeJdbcUtil.saveReservationTimeAsTen();
-        reservationJdbcUtil.saveSuccessReservationAsDateNow();
+        reservationJdbcUtil.saveReservationAsDateNow();
 
         String yesterday = LocalDate.now().minusDays(1).toString();
         String tomorrow = LocalDate.now().plusDays(1).toString();
@@ -80,7 +80,7 @@ class ReservationControllerTest extends ControllerTest {
         memberJdbcUtil.saveMemberAsKaki();
         themeJdbcUtil.saveThemeAsHorror();
         reservationTimeJdbcUtil.saveReservationTimeAsTen();
-        reservationJdbcUtil.saveSuccessReservationAsDateNow();
+        reservationJdbcUtil.saveReservationAsDateNow();
 
         RestAssured.given().log().all()
                 .cookie(CookieUtils.TOKEN_KEY, getMemberToken())

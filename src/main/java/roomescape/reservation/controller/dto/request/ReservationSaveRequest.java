@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.Status;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.service.dto.request.ReservationPaymentSaveRequest;
 
@@ -26,6 +25,6 @@ public record ReservationSaveRequest(
     }
 
     public Reservation toReservation(Member member, Theme theme, ReservationTime reservationTime) {
-        return new Reservation(member, date, theme, reservationTime, Status.SUCCESS);
+        return new Reservation(member, date, theme, reservationTime);
     }
 }
