@@ -1,5 +1,8 @@
 package roomescape.core.service;
 
+import static roomescape.core.exception.ExceptionMessage.BOOKED_TIME_DELETE_EXCEPTION;
+import static roomescape.core.exception.ExceptionMessage.DUPLICATED_TIME_EXCEPTION;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
@@ -18,9 +21,6 @@ import roomescape.core.repository.ThemeRepository;
 
 @Service
 public class ReservationTimeService {
-    protected static final String DUPLICATED_TIME_EXCEPTION_MESSAGE = "해당 시간이 이미 존재합니다.";
-    protected static final String RESERVATION_DELETE_EXCEPTION_MESSAGE = "예약 내역이 존재하여 삭제할 수 없습니다.";
-
     private final ReservationTimeRepository reservationTimeRepository;
     private final ReservationRepository reservationRepository;
     private final ThemeRepository themeRepository;
@@ -46,7 +46,7 @@ public class ReservationTimeService {
         final Integer reservationTimeCount = reservationTimeRepository.countByStartAt(reservationTime.getStartAt());
 
         if (reservationTimeCount > 0) {
-            throw new IllegalArgumentException(DUPLICATED_TIME_EXCEPTION_MESSAGE);
+            throw new IllegalArgumentException(DUPLICATED_TIME_EXCEPTION.getMessage());
         }
     }
 
@@ -87,7 +87,7 @@ public class ReservationTimeService {
         final int reservationCount = reservationRepository.countByTime(time);
 
         if (reservationCount > 0) {
-            throw new IllegalArgumentException(RESERVATION_DELETE_EXCEPTION_MESSAGE);
+            throw new IllegalArgumentException(BOOKED_TIME_DELETE_EXCEPTION.getMessage());
         }
 
         reservationTimeRepository.deleteById(id);

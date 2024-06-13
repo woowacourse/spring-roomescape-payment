@@ -1,5 +1,9 @@
 package roomescape.core.service;
 
+import static roomescape.core.exception.ExceptionMessage.MEMBER_NOT_FOUND_EXCEPTION;
+import static roomescape.core.exception.ExceptionMessage.PAYMENT_NOT_FOUND_EXCEPTION;
+import static roomescape.core.exception.ExceptionMessage.RESERVATION_NOT_FOUND_EXCEPTION;
+
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,9 +25,6 @@ import roomescape.infrastructure.PaymentClient;
 
 @Service
 public class PaymentService {
-    protected static final String MEMBER_NOT_FOUND_EXCEPTION_MESSAGE = "존재하지 않는 회원입니다.";
-    protected static final String RESERVATION_NOT_FOUND_EXCEPTION_MESSAGE = "존재하지 않는 예약입니다.";
-    protected static final String PAYMENT_NOT_FOUND_EXCEPTION_MESSAGE = "해당 예약의 결제 내역이 존재하지 않습니다.";
     private static final Logger logger = LoggerFactory.getLogger(PaymentService.class);
 
     private final PaymentRepository paymentRepository;
@@ -45,7 +46,7 @@ public class PaymentService {
                                                  final LoginMember loginMember) {
         final Reservation reservation = getReservation(reservationResponse.getId());
         final Member member = memberRepository.findById(loginMember.getId())
-                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_FOUND_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_FOUND_EXCEPTION.getMessage()));
 
         final PaymentRequest paymentRequest = new PaymentRequest(reservation.getId(), request);
         return getPaymentConfirmResponse(paymentRequest, reservation, member);
@@ -55,14 +56,14 @@ public class PaymentService {
     public PaymentConfirmResponse confirmPayment(final PaymentRequest request, final LoginMember loginMember) {
         final Reservation reservation = getReservation(request.getReservationId());
         final Member member = memberRepository.findById(loginMember.getId())
-                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_FOUND_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_FOUND_EXCEPTION.getMessage()));
 
         return getPaymentConfirmResponse(request, reservation, member);
     }
 
     private Reservation getReservation(final Long reservationId) {
         return reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException(RESERVATION_NOT_FOUND_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new IllegalArgumentException(RESERVATION_NOT_FOUND_EXCEPTION.getMessage()));
     }
 
     private PaymentConfirmResponse getPaymentConfirmResponse(final PaymentRequest paymentRequest,
@@ -79,11 +80,11 @@ public class PaymentService {
     public void cancel(final long id, final LoginMember loginMember) {
         final Reservation reservation = getReservation(id);
         final Member requester = memberRepository.findById(loginMember.getId())
-                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_FOUND_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_FOUND_EXCEPTION.getMessage()));
 
         if (paymentRepository.existsByReservation(reservation)) {
             final Payment payment = paymentRepository.findByReservation(reservation)
-                    .orElseThrow(() -> new IllegalArgumentException(PAYMENT_NOT_FOUND_EXCEPTION_MESSAGE));
+                    .orElseThrow(() -> new IllegalArgumentException(PAYMENT_NOT_FOUND_EXCEPTION.getMessage()));
 
             final PaymentCancelResponse response = paymentClient.getPaymentCancelResponse(payment.getPaymentKey());
             payment.cancel(requester);

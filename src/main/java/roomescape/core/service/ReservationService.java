@@ -1,5 +1,11 @@
 package roomescape.core.service;
 
+import static roomescape.core.exception.ExceptionMessage.ALREADY_BOOKED_TIME_EXCEPTION;
+import static roomescape.core.exception.ExceptionMessage.MEMBER_NOT_FOUND_EXCEPTION;
+import static roomescape.core.exception.ExceptionMessage.RESERVATION_NOT_FOUND_EXCEPTION;
+import static roomescape.core.exception.ExceptionMessage.THEME_NOT_FOUND_EXCEPTION;
+import static roomescape.core.exception.ExceptionMessage.TOKEN_NOT_FOUND_EXCEPTION;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
@@ -27,12 +33,6 @@ import roomescape.core.repository.WaitingRepository;
 
 @Service
 public class ReservationService {
-    protected static final String MEMBER_NOT_EXISTS_EXCEPTION_MESSAGE = "존재하지 않는 회원입니다.";
-    protected static final String TIME_NOT_EXISTS_EXCEPTION_MESSAGE = "존재하지 않는 예약 시간입니다.";
-    protected static final String THEME_NOT_EXISTS_EXCEPTION_MESSAGE = "존재하지 않는 테마입니다.";
-    protected static final String ALREADY_BOOKED_TIME_EXCEPTION_MESSAGE = "해당 시간에 이미 예약 내역이 존재합니다.";
-    protected static final String RESERVATION_NOT_EXISTS_EXCEPTION_MESSAGE = "존재하지 않는 예약입니다.";
-
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
@@ -78,24 +78,24 @@ public class ReservationService {
 
     private Member getMemberById(final Long id) {
         return memberRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_EXISTS_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_FOUND_EXCEPTION.getMessage()));
     }
 
     private ReservationTime getReservationTimeById(final Long id) {
         return reservationTimeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(TIME_NOT_EXISTS_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new IllegalArgumentException(TOKEN_NOT_FOUND_EXCEPTION.getMessage()));
     }
 
     private Theme getThemeById(final Long id) {
         return themeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(THEME_NOT_EXISTS_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new IllegalArgumentException(THEME_NOT_FOUND_EXCEPTION.getMessage()));
     }
 
     private void validateDuplicatedReservation(final Reservation reservation, final ReservationTime reservationTime) {
         final Integer reservationCount = reservationRepository.countByDateAndTimeAndThemeAndStatus(
                 reservation.getDate(), reservationTime, reservation.getTheme(), ReservationStatus.BOOKED);
         if (reservationCount > 0) {
-            throw new IllegalArgumentException(ALREADY_BOOKED_TIME_EXCEPTION_MESSAGE);
+            throw new IllegalArgumentException(ALREADY_BOOKED_TIME_EXCEPTION.getMessage());
         }
     }
 
@@ -173,9 +173,9 @@ public class ReservationService {
     @Transactional
     public void delete(final long id, final LoginMember loginMember) {
         final Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(RESERVATION_NOT_EXISTS_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new IllegalArgumentException(RESERVATION_NOT_FOUND_EXCEPTION.getMessage()));
         final Member requester = memberRepository.findById(loginMember.getId())
-                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_EXISTS_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_FOUND_EXCEPTION.getMessage()));
 
         reservation.cancel(requester);
         changeFirstWaitingToReservation(reservation);
@@ -202,9 +202,9 @@ public class ReservationService {
     @Transactional
     public void deleteByAdmin(final long id, final LoginMember loginMember) {
         final Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(RESERVATION_NOT_EXISTS_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new IllegalArgumentException(RESERVATION_NOT_FOUND_EXCEPTION.getMessage()));
         final Member member = memberRepository.findById(loginMember.getId())
-                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_EXISTS_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_FOUND_EXCEPTION.getMessage()));
 
         reservation.cancel(member);
         changeFirstWaitingToReservation(reservation);

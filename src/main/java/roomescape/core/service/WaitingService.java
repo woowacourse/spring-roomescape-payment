@@ -1,5 +1,14 @@
 package roomescape.core.service;
 
+import static roomescape.core.exception.ExceptionMessage.ALLOWED_TO_ADMIN_ONLY_EXCEPTION;
+import static roomescape.core.exception.ExceptionMessage.BOOKED_TIME_WAITING_EXCEPTION;
+import static roomescape.core.exception.ExceptionMessage.MEMBER_NOT_FOUND_EXCEPTION;
+import static roomescape.core.exception.ExceptionMessage.THEME_NOT_FOUND_EXCEPTION;
+import static roomescape.core.exception.ExceptionMessage.TIME_NOT_FOUND_EXCEPTION;
+import static roomescape.core.exception.ExceptionMessage.WAITED_TIME_WAITING_EXCEPTION;
+import static roomescape.core.exception.ExceptionMessage.WAITING_IS_NOT_YOURS_EXCEPTION;
+import static roomescape.core.exception.ExceptionMessage.WAITING_NOT_FOUND_EXCEPTION;
+
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -19,15 +28,6 @@ import roomescape.core.repository.WaitingRepository;
 
 @Service
 public class WaitingService {
-    public static final String BOOKED_TIME_WAITING_EXCEPTION_MESSAGE = "해당 시간에 이미 예약한 내역이 존재합니다. 예약 대기할 수 없습니다.";
-    public static final String WAITED_TIME_WAITING_EXCEPTION_MESSAGE = "해당 시간에 이미 예약 대기한 내역이 존재합니다. 예약 대기할 수 없습니다.";
-    public static final String MEMBER_NOT_EXISTS_EXCEPTION_MESSAGE = "존재하지 않는 회원입니다.";
-    public static final String TIME_NOT_EXISTS_EXCEPTION_MESSAGE = "존재하지 않는 예약 시간입니다.";
-    public static final String THEME_NOT_EXISTS_EXCEPTION_MESSAGE = "존재하지 않는 테마입니다.";
-    public static final String ALLOWED_TO_ADMIN_ONLY_EXCEPTION_MESSAGE = "관리자만 삭제할 수 있습니다.";
-    public static final String WAITING_IS_NOT_YOURS_EXCEPTION_MESSAGE = "본인의 예약 대기만 취소할 수 있습니다.";
-    public static final String WAITING_NOT_FOUND_EXCEPTION_MESSAGE = "존재하지 않는 예약 대기입니다.";
-
     private final WaitingRepository waitingRepository;
     private final MemberRepository memberRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -64,7 +64,7 @@ public class WaitingService {
                 theme);
 
         if (reservationCount > 0) {
-            throw new IllegalArgumentException(BOOKED_TIME_WAITING_EXCEPTION_MESSAGE);
+            throw new IllegalArgumentException(BOOKED_TIME_WAITING_EXCEPTION.getMessage());
         }
     }
 
@@ -77,7 +77,7 @@ public class WaitingService {
                 theme);
 
         if (isWaitingExist) {
-            throw new IllegalArgumentException(WAITED_TIME_WAITING_EXCEPTION_MESSAGE);
+            throw new IllegalArgumentException(WAITED_TIME_WAITING_EXCEPTION.getMessage());
         }
     }
 
@@ -91,17 +91,17 @@ public class WaitingService {
 
     private Member getMemberById(final Long id) {
         return memberRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_EXISTS_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_FOUND_EXCEPTION.getMessage()));
     }
 
     private ReservationTime getReservationTimeById(final Long id) {
         return reservationTimeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(TIME_NOT_EXISTS_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new IllegalArgumentException(TIME_NOT_FOUND_EXCEPTION.getMessage()));
     }
 
     private Theme getThemeById(final Long id) {
         return themeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(THEME_NOT_EXISTS_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new IllegalArgumentException(THEME_NOT_FOUND_EXCEPTION.getMessage()));
     }
 
     @Transactional(readOnly = true)
@@ -115,13 +115,13 @@ public class WaitingService {
     @Transactional
     public void delete(final long id, final LoginMember loginMember) {
         final Member member = memberRepository.findById(loginMember.getId())
-                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_EXISTS_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_FOUND_EXCEPTION.getMessage()));
 
         final Waiting waiting = waitingRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(WAITING_NOT_FOUND_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new IllegalArgumentException(WAITING_NOT_FOUND_EXCEPTION.getMessage()));
 
         if (waiting.isNotOwner(member)) {
-            throw new IllegalArgumentException(WAITING_IS_NOT_YOURS_EXCEPTION_MESSAGE);
+            throw new IllegalArgumentException(WAITING_IS_NOT_YOURS_EXCEPTION.getMessage());
         }
 
         waitingRepository.delete(waiting);
@@ -130,10 +130,10 @@ public class WaitingService {
     @Transactional
     public void deleteByAdmin(final long id, final LoginMember loginMember) {
         final Member member = memberRepository.findById(loginMember.getId())
-                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_EXISTS_EXCEPTION_MESSAGE));
+                .orElseThrow(() -> new IllegalArgumentException(MEMBER_NOT_FOUND_EXCEPTION.getMessage()));
 
         if (member.isNotAdmin()) {
-            throw new IllegalArgumentException(ALLOWED_TO_ADMIN_ONLY_EXCEPTION_MESSAGE);
+            throw new IllegalArgumentException(ALLOWED_TO_ADMIN_ONLY_EXCEPTION.getMessage());
         }
         waitingRepository.deleteById(id);
     }
