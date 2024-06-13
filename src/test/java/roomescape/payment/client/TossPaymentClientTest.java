@@ -10,11 +10,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
@@ -93,7 +95,10 @@ class TossPaymentClientTest {
         // when & then
         assertThatThrownBy(() -> paymentClient.confirmPayment(paymentRequest))
                 .isInstanceOf(RoomEscapeException.class)
-                .hasFieldOrPropertyWithValue("errorType", ErrorType.PAYMENT_ERROR);
+                .hasFieldOrPropertyWithValue("errorType", ErrorType.PAYMENT_ERROR)
+                .hasFieldOrPropertyWithValue("invalidValue",
+                        Optional.of("[ErrorCode = ERROR_CODE, ErrorMessage = Error message]"))
+                .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.BAD_REQUEST);
     }
 
     @Test
@@ -154,6 +159,9 @@ class TossPaymentClientTest {
         // when & then
         assertThatThrownBy(() -> paymentClient.cancelPayment(cancelRequest))
                 .isInstanceOf(RoomEscapeException.class)
-                .hasFieldOrPropertyWithValue("errorType", ErrorType.PAYMENT_SERVER_ERROR);
+                .hasFieldOrPropertyWithValue("errorType", ErrorType.PAYMENT_SERVER_ERROR)
+                .hasFieldOrPropertyWithValue("invalidValue",
+                        Optional.of("[ErrorCode = ERROR_CODE, ErrorMessage = Error message]"))
+                .hasFieldOrPropertyWithValue("httpStatus", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
