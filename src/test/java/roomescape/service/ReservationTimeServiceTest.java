@@ -11,18 +11,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
-import io.restassured.RestAssured;
 import roomescape.controller.dto.response.TimeAndAvailabilityResponse;
 import roomescape.controller.dto.response.TimeResponse;
 import roomescape.domain.member.Member;
@@ -36,27 +32,25 @@ import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class ReservationTimeServiceTest {
     private final String rawTime = "19:00";
-    @LocalServerPort
-    int port;
+
     @Autowired
     private ReservationTimeService reservationTimeService;
+
     @Autowired
     private MemberRepository memberRepository;
+
     @Autowired
     private ThemeRepository themeRepository;
+
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
+
     @Autowired
     private ReservationRepository reservationRepository;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
 
     @Nested
     @DisplayName("예약 시간 생성")

@@ -15,12 +15,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
-import io.restassured.RestAssured;
 import roomescape.controller.dto.request.CreateReservationRequest;
 import roomescape.controller.dto.request.CreateUserReservationStandbyRequest;
 import roomescape.controller.dto.response.MyReservationResponse;
@@ -36,7 +33,7 @@ import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class UserReservationServiceTest {
     private final LocalDate date = LocalDate.parse("2060-01-01");
@@ -45,9 +42,6 @@ class UserReservationServiceTest {
     private final Long paymentId = 1L;
     private final Long userId = 1L;
     private final Long adminId = 2L;
-
-    @LocalServerPort
-    int port;
 
     @Autowired
     private UserReservationService userReservationService;
@@ -66,8 +60,6 @@ class UserReservationServiceTest {
 
     @BeforeEach
     void setUpData() {
-        RestAssured.port = port;
-
         memberRepository.save(new Member("러너덕", "deock@test.com", "123a!", Role.USER));
         memberRepository.save(new Member("트레", "tretre@test.com", "123a!", Role.USER));
         themeRepository.save(new Theme("테마1", "d1", "https://test.com/test1.jpg"));

@@ -6,18 +6,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
-import io.restassured.RestAssured;
 import roomescape.controller.dto.request.CreateThemeRequest;
 import roomescape.controller.dto.response.ThemeResponse;
 import roomescape.domain.member.Member;
@@ -32,15 +28,12 @@ import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class ThemeServiceTest {
     private final String name = "테마1";
     private final String description = "테마1에 대한 설명입니다.";
     private final String thumbnail = "https://test.com/test.jpg";
-
-    @LocalServerPort
-    int port;
 
     @Autowired
     private ThemeService themeService;
@@ -56,11 +49,6 @@ class ThemeServiceTest {
 
     @Autowired
     private ReservationRepository reservationRepository;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
 
     @Nested
     @DisplayName("테마 생성")
