@@ -22,7 +22,7 @@ public class CanceledPayment {
     private OffsetDateTime approvedAt;
     private OffsetDateTime canceledAt;
 
-    public CanceledPayment() {
+    protected CanceledPayment() {
     }
 
     public CanceledPayment(String paymentKey, String cancelReason, Long cancelAmount, OffsetDateTime approvedAt,

@@ -37,7 +37,7 @@ public class Payment {
     @Column(nullable = false)
     private OffsetDateTime approvedAt;
 
-    public Payment() {
+    protected Payment() {
     }
 
     public Payment(String orderId, String paymentKey, Long totalAmount, Reservation reservation,
