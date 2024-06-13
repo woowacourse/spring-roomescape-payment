@@ -8,6 +8,7 @@ import roomescape.core.domain.ReservationTime;
 import roomescape.core.domain.Theme;
 import roomescape.core.domain.Waiting;
 import roomescape.core.domain.WaitingWithRank;
+import roomescape.core.dto.payment.PaymentConfirmResponse;
 
 public record MyReservationResponse(Long id, String theme, String date, String time, long waitingOrder,
                                     ReservationResponseType status, String paymentKey, Integer amount) {
@@ -38,5 +39,19 @@ public record MyReservationResponse(Long id, String theme, String date, String t
 
         return new MyReservationResponse(reservation.getId(), theme.getName(), reservation.getDateString(),
                 time.getStartAtString(), 0, ReservationResponseType.PAYMENT_WAITING, null, null);
+    }
+
+    public static MyReservationResponse from(final ReservationResponse reservation,
+                                             final PaymentConfirmResponse payment) {
+        final Long id = reservation.id();
+        final String theme = reservation.theme().name();
+        final String date = reservation.date();
+        final String time = reservation.time().startAt();
+        final long waitingOrder = 0;
+        final ReservationResponseType status = ReservationResponseType.BOOKED;
+        final String paymentKey = payment.paymentKey();
+        final Integer amount = payment.totalAmount();
+
+        return new MyReservationResponse(id, theme, date, time, waitingOrder, status, paymentKey, amount);
     }
 }
