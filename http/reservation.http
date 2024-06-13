@@ -12,9 +12,9 @@ Content-Type: application/json
   "date": "2024-08-06",
   "themeId": 1,
   "timeId": 1,
-  "paymentKey": "",
-  "orderId": "",
-  "amount": 1
+  "paymentKey": "paymentKey",
+  "orderId": "orderId",
+  "amount": 1000
 }
 
 ### 관리자용 예약 추가 API (접근 권한: 관리자)
@@ -22,7 +22,7 @@ POST {{base-url}}/admin/reservations
 Content-Type: application/json
 
 {
-  "date": "2024-08-07",
+  "date": "2024-08-08",
   "themeId": 1,
   "timeId": 1,
   "memberId": 1
