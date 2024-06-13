@@ -7,7 +7,7 @@ import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.theme.Theme;
 
 public record ReservationSaveInput(LocalDate date, Long timeId, Long themeId) {
-    public Reservation toReservation(ReservationTime time, Theme theme, Member member) {
-        return new Reservation(date, time, theme, member);
+    public Reservation toReservation(ReservationTime reservationTime, Theme theme, Member member) {
+        return new Reservation(date, reservationTime, theme, member);
     }
 }

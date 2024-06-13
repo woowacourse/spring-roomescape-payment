@@ -33,7 +33,7 @@ class ReservationTimeServiceTest extends ServiceTest {
     class FindAllReservation {
         @Test
         void 시간_목록을_조회할_수_있다() {
-            timeFixture.createFutureTime();
+            reservationTimeFixture.createFutureReservationTime();
 
             ReservationTimeListResponse response = reservationTimeService.findAllReservationTime();
 
@@ -50,10 +50,10 @@ class ReservationTimeServiceTest extends ServiceTest {
 
         @BeforeEach
         void setUp() {
-            ReservationTime time = timeFixture.createFutureTime();
+            ReservationTime reservationTime = reservationTimeFixture.createFutureReservationTime();
             Member member = memberFixture.createUserMember();
             theme = themeFixture.createFirstTheme();
-            reservation = reservationFixture.createFutureReservation(time, theme, member);
+            reservation = reservationFixture.createFutureReservation(reservationTime, theme, member);
         }
 
         @Test
@@ -93,8 +93,8 @@ class ReservationTimeServiceTest extends ServiceTest {
 
         @Test
         void 중복된_시간_추가시_예외가_발생한다() {
-            ReservationTime time = timeFixture.createFutureTime();
-            LocalTime startAt = time.getStartAt();
+            ReservationTime reservationTime = reservationTimeFixture.createFutureReservationTime();
+            LocalTime startAt = reservationTime.getStartAt();
             ReservationTimeRequest request = new ReservationTimeRequest(startAt);
 
             assertThatThrownBy(() -> reservationTimeService.saveReservationTime(request))
@@ -105,12 +105,12 @@ class ReservationTimeServiceTest extends ServiceTest {
     @Nested
     @DisplayName("시간 삭제")
     class DeleteReservationTime {
-        ReservationTime time;
+        ReservationTime reservationTime;
         Member member;
 
         @BeforeEach
         void setUp() {
-            time = timeFixture.createFutureTime();
+            reservationTime = reservationTimeFixture.createFutureReservationTime();
             member = memberFixture.createUserMember();
         }
 
@@ -118,8 +118,8 @@ class ReservationTimeServiceTest extends ServiceTest {
         void 시간을_삭제할_수_있다() {
             reservationTimeService.deleteReservationTime(1L);
 
-            List<ReservationTime> times = timeFixture.findAllTime();
-            assertThat(times)
+            List<ReservationTime> reservationTimes = reservationTimeFixture.findAllReservationTime();
+            assertThat(reservationTimes)
                     .isEmpty();
         }
 
@@ -132,7 +132,7 @@ class ReservationTimeServiceTest extends ServiceTest {
         @Test
         void 예약이_존재하는_시간_삭제_시_예외가_발생한다() {
             Theme theme = themeFixture.createFirstTheme();
-            reservationFixture.createFutureReservation(time, theme, member);
+            reservationFixture.createFutureReservation(reservationTime, theme, member);
 
             assertThatThrownBy(() -> reservationTimeService.deleteReservationTime(1L))
                     .isInstanceOf(ReservationReferencedTimeException.class);

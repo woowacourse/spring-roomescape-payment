@@ -1,4 +1,4 @@
-package roomescape.service.payment;
+package roomescape.domain.payment;
 
 public enum PaymentStatus {
     READY,

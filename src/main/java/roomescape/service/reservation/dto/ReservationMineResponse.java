@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
+import roomescape.domain.reservation.ReservationWithPayment;
 import roomescape.domain.reservationwaiting.ReservationWaitingWithRank;
 
 public class ReservationMineResponse {
@@ -15,21 +16,39 @@ public class ReservationMineResponse {
     private final LocalDate date;
     private final LocalTime time;
     private final String status;
+    private final String paymentKey;
+    private final String totalAmount;
 
-    public ReservationMineResponse(Long reservationId, String theme, LocalDate date, LocalTime time, String status) {
+    public ReservationMineResponse(Long reservationId, String theme, LocalDate date, LocalTime time, String status,
+                                   String paymentKey, String totalAmount) {
         this.reservationId = reservationId;
         this.theme = theme;
         this.date = date;
         this.time = time;
         this.status = status;
+        this.paymentKey = paymentKey;
+        this.totalAmount = totalAmount;
     }
 
-    public ReservationMineResponse(Reservation reservation) {
-        this(reservation.getId(),
-                reservation.getTheme().getName().getName(),
-                reservation.getDate(),
-                reservation.getTime().getStartAt(),
-                ReservationStatus.BOOKED.getDescription()
+    public ReservationMineResponse(ReservationWithPayment reservationWithPayment) {
+        this(reservationWithPayment.getReservation().getId(),
+                reservationWithPayment.getReservation().getTheme().getName().getName(),
+                reservationWithPayment.getReservation().getDate(),
+                reservationWithPayment.getReservation().getReservationTime().getStartAt(),
+                ReservationStatus.BOOKED.getDescription(),
+                reservationWithPayment.getReservationPayment().getInfo().getPaymentKey(),
+                reservationWithPayment.getReservationPayment().getInfo().getTotalAmountWithCurrency()
+        );
+    }
+
+    public ReservationMineResponse(Reservation reservationWithoutPayment) {
+        this(reservationWithoutPayment.getId(),
+                reservationWithoutPayment.getTheme().getName().getName(),
+                reservationWithoutPayment.getDate(),
+                reservationWithoutPayment.getReservationTime().getStartAt(),
+                ReservationStatus.BOOKED.getDescription(),
+                null,
+                null
         );
     }
 
@@ -37,8 +56,10 @@ public class ReservationMineResponse {
         this(waitingWithRank.getWaiting().getReservation().getId(),
                 waitingWithRank.getWaiting().getReservation().getTheme().getName().getName(),
                 waitingWithRank.getWaiting().getReservation().getDate(),
-                waitingWithRank.getWaiting().getReservation().getTime().getStartAt(),
-                String.format(ReservationStatus.WAITING.getDescription(), waitingWithRank.getRank())
+                waitingWithRank.getWaiting().getReservation().getReservationTime().getStartAt(),
+                String.format(ReservationStatus.WAITING.getDescription(), waitingWithRank.getRank()),
+                null,
+                null
         );
     }
 
@@ -65,5 +86,13 @@ public class ReservationMineResponse {
 
     public String getStatus() {
         return status;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public String getTotalAmount() {
+        return totalAmount;
     }
 }

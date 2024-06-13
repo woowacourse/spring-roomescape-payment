@@ -1,7 +1,6 @@
 package roomescape.domain.reservation;
 
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,8 +13,7 @@ public class ReservationInfo {
     private LocalDate date;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "reservation_time_id")
-    private ReservationTime time;
+    private ReservationTime reservationTime;
 
     @ManyToOne(optional = false)
     private Theme theme;
@@ -23,18 +21,18 @@ public class ReservationInfo {
     protected ReservationInfo() {
     }
 
-    public ReservationInfo(LocalDate date, ReservationTime time, Theme theme) {
+    public ReservationInfo(LocalDate date, ReservationTime reservationTime, Theme theme) {
         this.date = date;
-        this.time = time;
+        this.reservationTime = reservationTime;
         this.theme = theme;
     }
 
-    public ReservationInfo(LocalDate date, Long timeId, Long themeId) {
-        this(date, new ReservationTime(timeId), new Theme(themeId));
+    public ReservationInfo(LocalDate date, Long reservationTimeId, Long themeId) {
+        this(date, new ReservationTime(reservationTimeId), new Theme(themeId));
     }
 
     public boolean isPast(LocalDateTime now) {
-        LocalDateTime dateTime = date.atTime(time.getStartAt());
+        LocalDateTime dateTime = date.atTime(reservationTime.getStartAt());
         return dateTime.isBefore(now);
     }
 
@@ -42,8 +40,8 @@ public class ReservationInfo {
         return date;
     }
 
-    public ReservationTime getTime() {
-        return time;
+    public ReservationTime getReservationTime() {
+        return reservationTime;
     }
 
     public Theme getTheme() {
@@ -59,12 +57,12 @@ public class ReservationInfo {
             return false;
         }
         ReservationInfo that = (ReservationInfo) o;
-        return Objects.equals(date, that.date) && Objects.equals(time, that.time)
+        return Objects.equals(date, that.date) && Objects.equals(reservationTime, that.reservationTime)
                 && Objects.equals(theme, that.theme);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(date, time, theme);
+        return Objects.hash(date, reservationTime, theme);
     }
 }

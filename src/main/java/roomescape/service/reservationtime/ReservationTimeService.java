@@ -38,7 +38,7 @@ public class ReservationTimeService {
 
     @Transactional(readOnly = true)
     public ReservationTimeAvailableListResponse findAllAvailableReservationTime(LocalDate date, long themeId) {
-        List<Long> bookedTimeIds = reservationRepository.findTimeIdByDateAndThemeId(date, themeId);
+        List<Long> bookedTimeIds = reservationRepository.findReservationTimeIdByDateAndThemeId(date, themeId);
         List<ReservationTime> reservationTimes = reservationTimeRepository.findAll();
         return new ReservationTimeAvailableListResponse(reservationTimes.stream()
                 .map(time -> toAvailableReservationTimeResponse(time, bookedTimeIds))
@@ -46,9 +46,9 @@ public class ReservationTimeService {
     }
 
     private ReservationTimeAvailableResponse toAvailableReservationTimeResponse(
-            ReservationTime time, List<Long> bookedTimeIds) {
-        boolean alreadyBooked = time.isAlreadyBooked(bookedTimeIds);
-        return new ReservationTimeAvailableResponse(time, alreadyBooked);
+            ReservationTime reservationTime, List<Long> bookedTimeIds) {
+        boolean alreadyBooked = reservationTime.isAlreadyBooked(bookedTimeIds);
+        return new ReservationTimeAvailableResponse(reservationTime, alreadyBooked);
     }
 
     public ReservationTimeResponse saveReservationTime(ReservationTimeRequest request) {
@@ -62,7 +62,7 @@ public class ReservationTimeService {
 
     public void deleteReservationTime(long id) {
         ReservationTime reservationTime = findReservationTimeById(id);
-        if (reservationRepository.existsByInfoTime(reservationTime)) {
+        if (reservationRepository.existsByInfoReservationTime(reservationTime)) {
             throw new ReservationReferencedTimeException();
         }
         reservationTimeRepository.delete(reservationTime);

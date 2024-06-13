@@ -1,0 +1,31 @@
+=== 로그인 API
+
+==== 200
+
+operation::login-success[snippets="http-request,request-fields,http-response"]
+
+==== 401: 이메일이나 비밀번호가 잘못됐을 때
+
+operation::login-bad-request[snippets="http-request,http-response"]
+
+=== 로그아웃 API
+
+==== 200
+
+operation::logout-success[snippets="http-request,http-response"]
+
+=== 인증 정보 조회 API
+
+==== 200
+
+operation::login-check-success[snippets="http-request,http-response,response-fields"]
+
+==== 401: 토큰이 없거나 유효하지 않을 때
+
+operation::login-check-unauthorized[snippets="http-request,http-response"]
+
+=== 회원가입 API
+
+==== 201
+
+operation::signup-success[snippets="http-request,request-fields,http-response,response-fields"]

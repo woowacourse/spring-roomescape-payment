@@ -2,10 +2,15 @@ package roomescape.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +18,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.payload.FieldDescriptor;
 import roomescape.domain.member.Member;
 import roomescape.service.login.dto.LoginCheckResponse;
 
@@ -20,6 +26,10 @@ class LoginIntegrationTest extends IntegrationTest {
     @Nested
     @DisplayName("로그인 API")
     class Login {
+        List<FieldDescriptor> loginRequestDescriptors = List.of(
+                fieldWithPath("password").description("비밀번호"),
+                fieldWithPath("email").description("이메일")
+        );
         Map<String, String> params = new HashMap<>();
         Member member;
 
@@ -33,7 +43,11 @@ class LoginIntegrationTest extends IntegrationTest {
             params.put("email", member.getEmail().getAddress());
             params.put("password", member.getPassword().getPassword());
 
-            RestAssured.given().log().all()
+            RestAssured.given(spec).log().all()
+                    .filter(document(
+                            "login-success",
+                            requestFields(loginRequestDescriptors)
+                    ))
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .body(params)
                     .when().post("/login")
@@ -46,7 +60,8 @@ class LoginIntegrationTest extends IntegrationTest {
             params.put("email", member.getEmail().getAddress());
             params.put("password", "wrongpassword");
 
-            RestAssured.given().log().all()
+            RestAssured.given(spec).log().all()
+                    .filter(document("login-bad-request"))
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .body(params)
                     .when().post("/login")
@@ -58,6 +73,10 @@ class LoginIntegrationTest extends IntegrationTest {
     @Nested
     @DisplayName("인증 정보 조회 API")
     class LoginCheck {
+        List<FieldDescriptor> loginCheckResponseDescriptors = List.of(
+                fieldWithPath("name").description("현재 로그인한 사용자 이름")
+        );
+
         @BeforeEach
         void setUp() {
             memberFixture.createUserMember();
@@ -65,7 +84,11 @@ class LoginIntegrationTest extends IntegrationTest {
 
         @Test
         void 쿠키에_토큰을_담아_로그인한_사용자_정보를_조회할_수_있다() {
-            LoginCheckResponse response = RestAssured.given().log().all()
+            LoginCheckResponse response = RestAssured.given(spec).log().all()
+                    .filter(document(
+                            "login-check-success",
+                            responseFields(loginCheckResponseDescriptors)
+                    ))
                     .cookies(cookieProvider.createUserCookies())
                     .when().get("/login/check")
                     .then().log().all()
@@ -76,7 +99,8 @@ class LoginIntegrationTest extends IntegrationTest {
 
         @Test
         void 쿠키에_토큰이_존재하지_않으면_예외가_발생한다() {
-            RestAssured.given().log().all()
+            RestAssured.given(spec).log().all()
+                    .filter(document("login-check-unauthorized"))
                     .when().get("/login/check")
                     .then().log().all()
                     .statusCode(HttpStatus.UNAUTHORIZED.value());
@@ -99,7 +123,8 @@ class LoginIntegrationTest extends IntegrationTest {
         void 쿠키에_토큰을_담아_로그아웃_할_수_있다() {
             memberFixture.createUserMember();
 
-            RestAssured.given().log().all()
+            RestAssured.given(spec).log().all()
+                    .filter(document("logout-success"))
                     .cookies(cookieProvider.createUserCookies())
                     .when().post("/logout")
                     .then().log().all()
@@ -110,6 +135,18 @@ class LoginIntegrationTest extends IntegrationTest {
     @Nested
     @DisplayName("회원가입 API")
     class Signup {
+        List<FieldDescriptor> signupRequestDescriptors = List.of(
+                fieldWithPath("email").description("이메일"),
+                fieldWithPath("password").description("비밀번호"),
+                fieldWithPath("name").description("이름")
+        );
+        List<FieldDescriptor> signupResponseDescriptors = List.of(
+                fieldWithPath("id").description("사용자 id"),
+                fieldWithPath("name").description("이름"),
+                fieldWithPath("email").description("이메일"),
+                fieldWithPath("role").description("역할")
+        );
+
         @Test
         void 일반유저_권한으로_회원가입을_할_수_있다() {
             Map<String, String> params = new HashMap<>();
@@ -117,7 +154,12 @@ class LoginIntegrationTest extends IntegrationTest {
             params.put("password", "1234567890");
             params.put("name", "사용자");
 
-            RestAssured.given().log().all()
+            RestAssured.given(spec).log().all()
+                    .filter(document(
+                            "signup-success",
+                            requestFields(signupRequestDescriptors),
+                            responseFields(signupResponseDescriptors)
+                    ))
                     .contentType(ContentType.JSON)
                     .body(params)
                     .when().post("/signup")

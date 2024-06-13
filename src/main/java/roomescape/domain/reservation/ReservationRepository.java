@@ -13,25 +13,41 @@ import roomescape.domain.theme.Theme;
 public interface ReservationRepository extends JpaRepository<Reservation, Long>, JpaSpecificationExecutor<Reservation> {
     boolean existsByInfo(ReservationInfo info);
 
-    boolean existsByInfoTime(ReservationTime time);
+    boolean existsByInfoReservationTime(ReservationTime reservationTime);
 
     boolean existsByInfoTheme(Theme theme);
-
-    List<Reservation> findByMemberId(Long id);
 
     Optional<Reservation> findByInfo(ReservationInfo info);
 
     @Query("""
-            SELECT r.info.time.id
+            SELECT new roomescape.domain.reservation.ReservationWithPayment(r, p)
+            FROM Reservation r
+            INNER JOIN ReservationPayment p
+                ON p.reservation.id = r.id
+            WHERE r.member.id = :memberId
+            """)
+    List<ReservationWithPayment> findAllReservationWithPaymentByMemberId(Long memberId);
+
+    @Query("""
+            SELECT r
+            FROM Reservation r
+            LEFT JOIN ReservationPayment p
+                ON p.reservation.id = r.id
+            WHERE r.member.id = :memberId AND p.id is null
+            """)
+    List<Reservation> findAllReservationWithoutPaymentByMemberId(Long memberId);
+
+    @Query("""
+            SELECT r.info.reservationTime.id
             FROM Reservation r
             WHERE r.info.date = :date AND r.info.theme.id = :themeId
             """)
-    List<Long> findTimeIdByDateAndThemeId(LocalDate date, long themeId);
+    List<Long> findReservationTimeIdByDateAndThemeId(LocalDate date, long themeId);
 
     @Query("""
             SELECT t
             FROM Reservation r
-            LEFT JOIN Theme t ON t.id=r.info.theme.id
+            LEFT JOIN Theme t ON t.id = r.info.theme.id
             WHERE r.info.date > :startDate AND r.info.date < :endDate
             GROUP BY t.id
             ORDER BY COUNT(*) DESC

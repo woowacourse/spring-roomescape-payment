@@ -42,10 +42,10 @@ class ThemeServiceTest extends ServiceTest {
     class FindAllPopularTheme {
         @Test
         void 최근_일주일동안_예약_건수_많은_순서대로_10개_테마를_인기_테마로_조회할_수_있다() {
-            ReservationTime time = timeFixture.createPastTime();
+            ReservationTime reservationTime = reservationTimeFixture.createPastReservationTime();
             Theme theme = themeFixture.createFirstTheme();
             Member member = memberFixture.createUserMember();
-            reservationFixture.createPastReservation(time, theme, member);
+            reservationFixture.createPastReservation(reservationTime, theme, member);
 
             ThemeListResponse response = themeService.findAllPopularTheme();
 
@@ -94,10 +94,10 @@ class ThemeServiceTest extends ServiceTest {
         }
 
         @Test
-        void 예약이_존재하는_테마_삭제_시_예외가_발생한() {
-            ReservationTime time = timeFixture.createPastTime();
+        void 예약이_존재하는_테마_삭제_시_예외가_발생한다() {
+            ReservationTime reservationTime = reservationTimeFixture.createPastReservationTime();
             Member member = memberFixture.createUserMember();
-            reservationFixture.createFutureReservation(time, theme, member);
+            reservationFixture.createFutureReservation(reservationTime, theme, member);
 
             assertThatThrownBy(() -> themeService.deleteTheme(theme.getId()))
                     .isInstanceOf(ReservationReferencedThemeException.class);

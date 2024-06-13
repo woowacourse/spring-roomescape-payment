@@ -12,17 +12,17 @@ public class ReservationTimeFixture {
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
 
-    public ReservationTime createFutureTime() {
+    public ReservationTime createFutureReservationTime() {
         ReservationTime reservationTime = new ReservationTime(LocalTime.of(2, 30));
         return reservationTimeRepository.save(reservationTime);
     }
 
-    public ReservationTime createPastTime() {
+    public ReservationTime createPastReservationTime() {
         ReservationTime reservationTime = new ReservationTime(LocalTime.of(1, 30));
         return reservationTimeRepository.save(reservationTime);
     }
 
-    public List<ReservationTime> findAllTime() {
+    public List<ReservationTime> findAllReservationTime() {
         return reservationTimeRepository.findAll();
     }
 }

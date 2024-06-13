@@ -15,8 +15,11 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.ReservationPayment;
+import roomescape.domain.payment.ReservationPaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.reservation.ReservationWithPayment;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.reservationtime.ReservationTimeRepository;
 import roomescape.domain.reservationwaiting.ReservationWaiting;
@@ -32,6 +35,7 @@ import roomescape.exception.reservationtime.NotFoundReservationTimeException;
 import roomescape.exception.theme.NotFoundThemeException;
 import roomescape.service.payment.PaymentClient;
 import roomescape.service.payment.dto.PaymentConfirmInput;
+import roomescape.service.payment.dto.PaymentConfirmOutput;
 import roomescape.service.reservation.dto.ReservationListResponse;
 import roomescape.service.reservation.dto.ReservationMineListResponse;
 import roomescape.service.reservation.dto.ReservationMineResponse;
@@ -41,10 +45,12 @@ import roomescape.service.reservation.dto.ReservationSaveInput;
 @Service
 @Transactional
 public class ReservationService {
+    private static final long RANK_PREFIX = 1L;
     private final ReservationRepository reservationRepository;
     private final ReservationWaitingRepository reservationWaitingRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
+    private final ReservationPaymentRepository reservationPaymentRepository;
     private final PaymentClient paymentClient;
     private final Clock clock;
 
@@ -52,12 +58,14 @@ public class ReservationService {
                               ReservationWaitingRepository reservationWaitingRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
+                              ReservationPaymentRepository reservationPaymentRepository,
                               PaymentClient paymentClient,
                               Clock clock) {
         this.reservationRepository = reservationRepository;
         this.reservationWaitingRepository = reservationWaitingRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
+        this.reservationPaymentRepository = reservationPaymentRepository;
         this.paymentClient = paymentClient;
         this.clock = clock;
     }
@@ -78,24 +86,35 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public ReservationMineListResponse findMyReservation(Member member) {
-        List<Reservation> reservations = reservationRepository.findByMemberId(member.getId());
-        List<ReservationWaitingWithRank> reservationWaitingWithRanks
-                = reservationWaitingRepository.findAllWaitingWithRankByMemberId(member.getId());
+        List<ReservationWithPayment> reservationsWithPayment
+                = reservationRepository.findAllReservationWithPaymentByMemberId(member.getId());
+        List<Reservation> reservationsWithoutPayment
+                = reservationRepository.findAllReservationWithoutPaymentByMemberId(member.getId());
+        List<ReservationWaitingWithRank> reservationWaitingsWithRank
+                = findAllWaitingWithRankByMemberId(member.getId());
 
-        List<ReservationMineResponse> myReservations = Stream.concat(
-                        reservations.stream().map(ReservationMineResponse::new),
-                        reservationWaitingWithRanks.stream().map(ReservationMineResponse::new)
+        List<ReservationMineResponse> myReservations = Stream.of(
+                        reservationsWithPayment.stream().map(ReservationMineResponse::new),
+                        reservationsWithoutPayment.stream().map(ReservationMineResponse::new),
+                        reservationWaitingsWithRank.stream().map(ReservationMineResponse::new)
                 )
+                .flatMap(s -> s)
                 .sorted(Comparator.comparing(ReservationMineResponse::retrieveDateTime))
                 .toList();
         return new ReservationMineListResponse(myReservations);
     }
 
-    public ReservationResponse saveReservationWithPayment(
-            ReservationSaveInput reservationSaveInput, PaymentConfirmInput paymentConfirmInput, Member member) {
-        Reservation savedReservation = saveReservation(reservationSaveInput, member);
-        paymentClient.confirmPayment(paymentConfirmInput);
-        return new ReservationResponse(savedReservation);
+    private List<ReservationWaitingWithRank> findAllWaitingWithRankByMemberId(Long memberId) {
+        List<ReservationWaiting> reservationWaitings = reservationWaitingRepository.findAllWaitingByMemberId(memberId);
+        return reservationWaitings.stream()
+                .map(this::calculateRank)
+                .toList();
+    }
+
+    private ReservationWaitingWithRank calculateRank(ReservationWaiting reservationWaiting) {
+        long rank = reservationWaitingRepository.countByReservationIdAndIdLessThan(
+                reservationWaiting.getReservation().getId(), reservationWaiting.getId()) + RANK_PREFIX;
+        return new ReservationWaitingWithRank(reservationWaiting, rank);
     }
 
     public ReservationResponse saveReservationWithoutPayment(ReservationSaveInput reservationSaveInput, Member member) {
@@ -103,14 +122,26 @@ public class ReservationService {
         return new ReservationResponse(savedReservation);
     }
 
+    public ReservationResponse saveReservationWithPayment(
+            ReservationSaveInput reservationSaveInput, PaymentConfirmInput paymentConfirmInput, Member member) {
+        Reservation savedReservation = saveReservation(reservationSaveInput, member);
+        confirmAndSavePayment(paymentConfirmInput, savedReservation);
+        return new ReservationResponse(savedReservation);
+    }
+
     private Reservation saveReservation(ReservationSaveInput input, Member member) {
-        ReservationTime time = findReservationTimeById(input.timeId());
+        ReservationTime reservationTime = findReservationTimeById(input.timeId());
         Theme theme = findThemeById(input.themeId());
-        Reservation reservation = input.toReservation(time, theme, member);
+        Reservation reservation = input.toReservation(reservationTime, theme, member);
         validateDuplicateReservation(reservation);
         validateDateTimeReservation(reservation);
-
         return reservationRepository.save(reservation);
+    }
+
+    private void confirmAndSavePayment(PaymentConfirmInput input, Reservation reservation) {
+        PaymentConfirmOutput output = paymentClient.confirmPayment(input);
+        ReservationPayment reservationPayment = output.toReservationPayment(reservation);
+        reservationPaymentRepository.save(reservationPayment);
     }
 
     private ReservationTime findReservationTimeById(long id) {
