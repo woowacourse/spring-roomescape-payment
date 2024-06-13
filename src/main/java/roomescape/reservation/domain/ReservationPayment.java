@@ -24,8 +24,22 @@ public class ReservationPayment {
     }
 
     public ReservationPayment(Reservation reservation, Payment payment) {
+        validateReservation(reservation);
         this.reservation = reservation;
+        validatePayment(payment);
         this.payment = payment;
+    }
+
+    private void validateReservation(Reservation reservation) {
+        if (reservation == null) {
+            throw new IllegalArgumentException("예약 정보를 입력해주세요.");
+        }
+    }
+
+    private void validatePayment(Payment payment) {
+        if (payment == null) {
+            throw new IllegalArgumentException("결제 정보를 입력해주세요.");
+        }
     }
 
     public Reservation getReservation() {
