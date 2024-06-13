@@ -45,6 +45,7 @@ import roomescape.service.reservation.dto.ReservationSaveInput;
 @Service
 @Transactional
 public class ReservationService {
+    private static final long RANK_PREFIX = 1L;
     private final ReservationRepository reservationRepository;
     private final ReservationWaitingRepository reservationWaitingRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -90,7 +91,7 @@ public class ReservationService {
         List<Reservation> reservationsWithoutPayment
                 = reservationRepository.findAllReservationWithoutPaymentByMemberId(member.getId());
         List<ReservationWaitingWithRank> reservationWaitingsWithRank
-                = reservationWaitingRepository.findAllWaitingWithRankByMemberId(member.getId());
+                = findAllWaitingWithRankByMemberId(member.getId());
 
         List<ReservationMineResponse> myReservations = Stream.of(
                         reservationsWithPayment.stream().map(ReservationMineResponse::new),
@@ -101,6 +102,19 @@ public class ReservationService {
                 .sorted(Comparator.comparing(ReservationMineResponse::retrieveDateTime))
                 .toList();
         return new ReservationMineListResponse(myReservations);
+    }
+
+    private List<ReservationWaitingWithRank> findAllWaitingWithRankByMemberId(Long memberId) {
+        List<ReservationWaiting> reservationWaitings = reservationWaitingRepository.findAllWaitingByMemberId(memberId);
+        return reservationWaitings.stream()
+                .map(this::calculateRank)
+                .toList();
+    }
+
+    private ReservationWaitingWithRank calculateRank(ReservationWaiting reservationWaiting) {
+        long rank = reservationWaitingRepository.countByReservationIdAndIdLessThan(
+                reservationWaiting.getReservation().getId(), reservationWaiting.getId()) + RANK_PREFIX;
+        return new ReservationWaitingWithRank(reservationWaiting, rank);
     }
 
     public ReservationResponse saveReservationWithoutPayment(ReservationSaveInput reservationSaveInput, Member member) {

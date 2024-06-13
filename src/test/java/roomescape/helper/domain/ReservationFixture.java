@@ -25,6 +25,12 @@ public class ReservationFixture {
         return reservationRepository.save(reservation);
     }
 
+    public Reservation createReservationWithDate(
+            LocalDate date, ReservationTime reservationTime, Theme theme, Member member) {
+        Reservation reservation = new Reservation(date, reservationTime, theme, member);
+        return reservationRepository.save(reservation);
+    }
+
     public List<Reservation> findAllReservation() {
         return reservationRepository.findAll();
     }

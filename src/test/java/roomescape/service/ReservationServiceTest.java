@@ -112,7 +112,9 @@ class ReservationServiceTest extends ServiceTest {
             ReservationTime reservationTime = reservationTimeFixture.createFutureReservationTime();
             Theme theme = themeFixture.createFirstTheme();
             member = memberFixture.createUserMember();
-            Reservation reservation = reservationFixture.createFutureReservation(reservationTime, theme, member);
+            Member admin = memberFixture.createAdminMember();
+            Reservation reservation = reservationFixture.createFutureReservation(reservationTime, theme, admin);
+            reservationFixture.createReservationWithDate(LocalDate.of(2000, 4, 9), reservationTime, theme, member);
             waitingFixture.createWaiting(reservation, member);
         }
 
@@ -128,7 +130,7 @@ class ReservationServiceTest extends ServiceTest {
         void 내_예약_목록_조회_시_대기_상태로_몇_번째_대기인지도_확인할_수_있다() {
             ReservationMineListResponse response = reservationService.findMyReservation(member);
 
-            assertThat(response.getReservations().get(1).getStatus())
+            assertThat(response.getReservations().get(0).getStatus())
                     .isEqualTo(String.format(ReservationStatus.WAITING.getDescription(), 1));
         }
     }
