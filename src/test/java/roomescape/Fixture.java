@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberName;
-import roomescape.payment.service.dto.resonse.PaymentConfirmResponse;
 import roomescape.reservation.domain.Description;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
@@ -41,16 +40,6 @@ public class Fixture {
 
     public static final LocalDate TODAY = LocalDate.now();
     public static final LocalDate TOMORROW = TODAY.plusDays(1);
-
-    public static final PaymentConfirmResponse PAYMENT_CONFIRM_RESPONSE = new PaymentConfirmResponse(
-            "paymentKey",
-            "orderId",
-            1000,
-            "orderName",
-            "DONE",
-            "2024-02-13T12:17:57+09:00",
-            "2024-02-13T12:18:14+09:00"
-    );
 
     public static final Reservation JOJO_RESERVATION = new Reservation(
             1L,

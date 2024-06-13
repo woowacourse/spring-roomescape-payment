@@ -35,7 +35,7 @@ class PaymentSaveServiceTest {
         when(paymentRepository.save(payment)).thenThrow(IllegalArgumentException.class);
 
         Assertions.assertThatThrownBy(() -> paymentService.save(payment))
-                        .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
 
         verify(paymentService, times(2)).save(any());
     }
