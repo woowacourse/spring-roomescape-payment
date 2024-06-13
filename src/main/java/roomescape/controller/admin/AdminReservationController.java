@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.domain.reservation.Status;
 import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.request.reservation.ReservationCriteriaRequest;
-import roomescape.dto.response.reservation.CanceledReservationWebResponse;
+import roomescape.dto.response.reservation.MyReservationResponse;
 import roomescape.dto.response.reservation.ReservationResponse;
 import roomescape.service.ReservationService;
 
@@ -52,8 +52,8 @@ public class AdminReservationController {
 
     @Operation(summary = "어드민 취소 예약 조회 API")
     @GetMapping("/reservations/canceled")
-    public ResponseEntity<List<CanceledReservationWebResponse>> findAllCanceledReservation() {
-        List<CanceledReservationWebResponse> canceledReservationResponses = reservationService.findAllCanceledReservation();
-        return ResponseEntity.ok(canceledReservationResponses);
+    public ResponseEntity<List<MyReservationResponse>> findAllCanceledReservation() {
+        List<MyReservationResponse> myReservationResponses = reservationService.findAllCanceledReservation();
+        return ResponseEntity.ok(myReservationResponses);
     }
 }

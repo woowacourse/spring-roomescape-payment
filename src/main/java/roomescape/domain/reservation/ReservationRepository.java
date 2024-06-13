@@ -43,9 +43,23 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             join fetch Theme t on t.id = r.theme.id
             join fetch Member m on m.id = r.member.id
             left join fetch Payment p on p.reservation.id = r.id
-            where m.id = :memberId
+            where m.id = :memberId and
+            r.status <> roomescape.domain.reservation.Status.CANCELED
             """)
     List<MyReservationsDto> findMyReservation(Long memberId);
+
+    @Query("""
+            select new roomescape.dto.response.reservation.MyReservationsDto(
+            r, p.paymentKey, p.totalAmount
+            )
+            from Reservation r
+            join fetch ReservationTime rt on rt.id = r.time.id
+            join fetch Theme t on t.id = r.theme.id
+            join fetch Member m on m.id = r.member.id
+            left join fetch Payment p on p.reservation.id = r.id
+            where r.status = roomescape.domain.reservation.Status.CANCELED
+            """)
+    List<MyReservationsDto> findCanceledReservations();
 
     @Query("""
             select new roomescape.domain.dto.AvailableTimeDto(rt.id, rt.startAt,

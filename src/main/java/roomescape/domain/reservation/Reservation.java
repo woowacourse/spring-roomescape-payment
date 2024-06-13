@@ -57,10 +57,6 @@ public class Reservation {
         }
     }
 
-    public CanceledReservation canceled() {
-        return new CanceledReservation(member, date, time, theme, status);
-    }
-
     public void approve() {
         this.status = Status.RESERVED;
     }
@@ -71,6 +67,10 @@ public class Reservation {
 
     public boolean isReserved() {
         return status.isReserved();
+    }
+
+    public void cancel() {
+        status = Status.CANCELED;
     }
 
     public Long getId() {

@@ -3,7 +3,8 @@ package roomescape.domain.reservation;
 public enum Status {
     RESERVED("예약"),
     PAYMENT_WAITING("결제대기"),
-    WAITING("예약대기")
+    WAITING("예약대기"),
+    CANCELED("예약취소")
     ;
 
     private final String value;

@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.reservation.CanceledReservationRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
@@ -15,7 +14,6 @@ import roomescape.dto.request.reservation.ReservationCriteriaRequest;
 import roomescape.dto.request.reservation.ReservationInformRequest;
 import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.request.reservation.WaitingRequest;
-import roomescape.dto.response.reservation.CanceledReservationWebResponse;
 import roomescape.dto.response.reservation.MyReservationResponse;
 import roomescape.dto.response.reservation.ReservationInformResponse;
 import roomescape.dto.response.reservation.ReservationResponse;
@@ -26,20 +24,17 @@ public class ReservationService {
     private final ReservationCreateService reservationCreateService;
     private final ReservationDeleteService reservationDeleteService;
     private final ReservationRepository reservationRepository;
-    private final CanceledReservationRepository canceledReservationRepository;
 
     public ReservationService(
             PaymentService paymentService,
             ReservationCreateService reservationCreateService,
             ReservationDeleteService reservationDeleteService,
-            ReservationRepository reservationRepository,
-            CanceledReservationRepository canceledReservationRepository
+            ReservationRepository reservationRepository
     ) {
         this.paymentService = paymentService;
         this.reservationCreateService = reservationCreateService;
         this.reservationDeleteService = reservationDeleteService;
         this.reservationRepository = reservationRepository;
-        this.canceledReservationRepository = canceledReservationRepository;
     }
 
     @Transactional
@@ -99,9 +94,9 @@ public class ReservationService {
     @Transactional(readOnly = true)
     public List<MyReservationResponse> findMyReservations(Long memberId) {
         return reservationRepository.findMyReservation(memberId).stream()
-                .map(myReservationResponse -> MyReservationResponse.of(
-                        myReservationResponse.reservation(), myReservationResponse.paymentKey(),
-                        myReservationResponse.totalAmount(), getWaitingOrder(myReservationResponse.reservation())))
+                .map(myReservationsDto -> MyReservationResponse.of(
+                        myReservationsDto.reservation(), myReservationsDto.paymentKey(),
+                        myReservationsDto.totalAmount(), getWaitingOrder(myReservationsDto.reservation())))
                 .toList();
     }
 
@@ -131,12 +126,11 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<CanceledReservationWebResponse> findAllCanceledReservation() {
-        return canceledReservationRepository.findAllCanceledReservationInform().stream()
-                .map(canceledReservationResponse -> CanceledReservationWebResponse.of(
-                        canceledReservationResponse.canceledReservation(),
-                        canceledReservationResponse.paymentKey(),
-                        canceledReservationResponse.totalAmount()))
+    public List<MyReservationResponse> findAllCanceledReservation() {
+        return reservationRepository.findCanceledReservations().stream()
+                .map(myReservationsDto -> MyReservationResponse.of(
+                        myReservationsDto.reservation(), myReservationsDto.paymentKey(),
+                        myReservationsDto.totalAmount(), getWaitingOrder(myReservationsDto.reservation())))
                 .toList();
     }
 }

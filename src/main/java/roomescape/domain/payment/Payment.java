@@ -9,7 +9,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import java.math.BigDecimal;
 import java.util.Objects;
-import roomescape.domain.reservation.CanceledReservation;
 import roomescape.domain.reservation.Reservation;
 
 @Entity
@@ -34,10 +33,6 @@ public class Payment {
         this.orderId = orderId;
         this.totalAmount = totalAmount;
         this.reservation = reservation;
-    }
-
-    public CanceledPayment canceled(CanceledReservation canceledReservation) {
-        return new CanceledPayment(paymentKey, orderId, totalAmount, canceledReservation);
     }
 
     public Long getId() {

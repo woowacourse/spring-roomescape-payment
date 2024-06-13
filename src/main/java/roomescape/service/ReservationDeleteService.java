@@ -2,8 +2,6 @@ package roomescape.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.reservation.CanceledReservation;
-import roomescape.domain.reservation.CanceledReservationRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
@@ -14,18 +12,10 @@ import roomescape.exception.RoomescapeException;
 @Service
 @Transactional
 public class ReservationDeleteService {
-    private final PaymentService paymentService;
     private final ReservationRepository reservationRepository;
-    private final CanceledReservationRepository canceledReservationRepository;
 
-    public ReservationDeleteService(
-            PaymentService paymentService,
-            ReservationRepository reservationRepository,
-            CanceledReservationRepository canceledReservationRepository
-    ) {
-        this.paymentService = paymentService;
+    public ReservationDeleteService(ReservationRepository reservationRepository) {
         this.reservationRepository = reservationRepository;
-        this.canceledReservationRepository = canceledReservationRepository;
     }
 
     @Transactional
@@ -33,10 +23,8 @@ public class ReservationDeleteService {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("존재하지 않는 예약입니다. 요청 예약 id:%d", id)));
         validateDeleteReservation(reservation, loginMember);
-        CanceledReservation canceledReservation = canceledReservationRepository.save(reservation.canceled());
-        paymentService.deletePayment(reservation, canceledReservation);
-        reservationRepository.deleteById(reservation.getId());
         updateWaitingToPaymentWaiting(reservation);
+        reservation.cancel();
     }
 
     private void validateDeleteReservation(Reservation reservation, LoginMember loginMember) {
