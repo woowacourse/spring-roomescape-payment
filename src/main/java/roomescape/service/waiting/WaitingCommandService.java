@@ -1,6 +1,7 @@
 package roomescape.service.waiting;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.Reservation;
@@ -14,13 +15,14 @@ import roomescape.domain.schedule.ReservationTimeRepository;
 import roomescape.domain.schedule.Schedule;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
+import roomescape.exception.ForbiddenException;
 import roomescape.exception.InvalidMemberException;
 import roomescape.exception.InvalidReservationException;
 import roomescape.service.reservation.dto.ReservationResponse;
 import roomescape.service.waiting.dto.WaitingRequest;
 
 @Service
-public class WaitingCreateService {
+public class WaitingCommandService {
 
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -28,7 +30,7 @@ public class WaitingCreateService {
     private final MemberRepository memberRepository;
     private final ReservationDetailRepository reservationDetailRepository;
 
-    public WaitingCreateService(
+    public WaitingCommandService(
         ReservationRepository reservationRepository,
         ReservationTimeRepository reservationTimeRepository,
         ThemeRepository themeRepository,
@@ -81,6 +83,36 @@ public class WaitingCreateService {
         }
         if (!reservationRepository.existsByDetailIdAndStatus(reservationDetail.getId(), ReservationStatus.RESERVED)) {
             throw new InvalidReservationException("존재하는 예약이 없습니다. 예약으로 다시 시도해주세요.");
+        }
+    }
+
+    @Transactional
+    public void deleteWaitingById(long reservationId, long memberId) {
+        Member member = getById(memberId);
+        reservationRepository.findById(reservationId)
+            .ifPresent(reservation -> deleteIfAvailable(member, reservation));
+    }
+
+    private Member getById(long memberId) {
+        return memberRepository.findById(memberId)
+            .orElseThrow(() -> new InvalidMemberException("회원 정보를 찾을 수 없습니다."));
+    }
+
+    private void deleteIfAvailable(Member member, Reservation reservation) {
+        validateAuthority(reservation, member);
+        validateStatus(reservation);
+        reservationRepository.deleteById(reservation.getId());
+    }
+
+    private void validateAuthority(Reservation reservation, Member member) {
+        if (member.isGuest() && !reservation.isReservationOf(member)) {
+            throw new ForbiddenException("예약 대기를 삭제할 권한이 없습니다.");
+        }
+    }
+
+    private void validateStatus(Reservation reservation) {
+        if (reservation.isReserved()) {
+            throw new InvalidReservationException("예약은 삭제할 수 없습니다. 관리자에게 문의해주세요.");
         }
     }
 }

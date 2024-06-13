@@ -1,7 +1,6 @@
 package roomescape.service.waiting;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -15,9 +14,7 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.member.Role;
-import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
-import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationdetail.ReservationDetail;
 import roomescape.domain.reservationdetail.ReservationDetailRepository;
 import roomescape.domain.schedule.ReservationDate;
@@ -26,17 +23,15 @@ import roomescape.domain.schedule.ReservationTimeRepository;
 import roomescape.domain.schedule.Schedule;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
-import roomescape.exception.ForbiddenException;
-import roomescape.exception.InvalidReservationException;
 import roomescape.service.reservation.dto.ReservationResponse;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Sql("/truncate.sql")
-class WaitingCommonServiceTest {
+class WaitingQueryServiceTest {
 
 
     @Autowired
-    private WaitingCommonService waitingCommonService;
+    private WaitingQueryService waitingQueryService;
     @Autowired
     private ReservationRepository reservationRepository;
     @Autowired
@@ -68,36 +63,9 @@ class WaitingCommonServiceTest {
     @Sql({"/truncate.sql", "/theme.sql", "/time.sql", "/reservation-detail.sql", "/member.sql", "/reservation.sql"})
     void findAllWaitings() {
         //when
-        List<ReservationResponse> reservations = waitingCommonService.findAll();
+        List<ReservationResponse> reservations = waitingQueryService.findAll();
 
         //then
         assertThat(reservations).hasSize(1);
-    }
-
-
-    @DisplayName("사용자가 예약 대기를 삭제하려고 할 때 예약으로 바뀌었다면 예외가 발생한다.")
-    @Test
-    void cannotDeleteWaitingByIdIfReserved() {
-        //given
-        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.RESERVED);
-        Reservation target = reservationRepository.save(reservation);
-
-        //when
-        assertThatThrownBy(() -> waitingCommonService.deleteWaitingById(target.getId(), member.getId()))
-            .isInstanceOf(InvalidReservationException.class)
-            .hasMessage("예약은 삭제할 수 없습니다. 관리자에게 문의해주세요.");
-    }
-
-    @DisplayName("사용자가 본인 외 예약 대기를 삭제하려고 하면 예외가 발생한다.")
-    @Test
-    void cannotDeleteWaitingByIdIfNotOwner() {
-        //given
-        Reservation reservation = new Reservation(member, reservationDetail, ReservationStatus.WAITING);
-        Reservation target = reservationRepository.save(reservation);
-
-        //when
-        assertThatThrownBy(() -> waitingCommonService.deleteWaitingById(target.getId(), anotherMember.getId()))
-            .isInstanceOf(ForbiddenException.class)
-            .hasMessage("예약 대기를 삭제할 권한이 없습니다.");
     }
 }
