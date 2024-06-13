@@ -8,14 +8,18 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import roomescape.service.dto.response.PaymentResponse;
 import roomescape.controller.dto.PaymentRequest;
+import roomescape.service.dto.response.PaymentCancelRequest;
+import roomescape.service.dto.response.PaymentCancelRequestBody;
+import roomescape.service.dto.response.PaymentResponse;
 
 @Component
 public class PaymentClient {
 
     @Value("${payment.payment-approve-endpoint}")
     private String paymentApproveEndpoint;
+    @Value("${payment.payment-cancel-endpoint}")
+    private String paymentCancelEndpoint;
     @Value("${payment.secret-key}")
     private String secretKey;
 
@@ -36,6 +40,19 @@ public class PaymentClient {
                 httpEntity,
                 PaymentResponse.class
         ).getBody();
+    }
+
+    public void cancel(PaymentCancelRequest cancelRequest) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBasicAuth(encodeSecretKey());
+        HttpEntity<PaymentCancelRequestBody> httpEntity = new HttpEntity<>(cancelRequest.cancelRequestBody(), headers);
+
+        restTemplate.postForEntity(
+                String.format(paymentCancelEndpoint, cancelRequest.paymentKey()),
+                httpEntity,
+                PaymentResponse.class
+        );
     }
 
     private String encodeSecretKey() {
