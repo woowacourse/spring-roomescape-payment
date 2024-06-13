@@ -19,14 +19,14 @@ VALUES ('브라운', 'brown@abc.com', 'USER', '1234');
 INSERT INTO member(name, email, role, password)
 VALUES ('오리', 'duck@abc.com', 'USER', '1234');
 
-INSERT INTO reservation (member_id, date, time_id, theme_id)
-VALUES (2, CURRENT_DATE - 1, 1, 1);
-INSERT INTO reservation (member_id, date, time_id, theme_id)
-VALUES (1, CURRENT_DATE - 2, 1, 1);
-INSERT INTO reservation (member_id, date, time_id, theme_id)
-VALUES (3, CURRENT_DATE - 2, 2, 2);
-INSERT INTO reservation (member_id, date, time_id, theme_id)
-VALUES (2, CURRENT_DATE + 1, 1, 2);
+INSERT INTO reservation (member_id, date, time_id, theme_id, payment_status)
+VALUES (2, CURRENT_DATE - 1, 1, 1, 'PENDING');
+INSERT INTO reservation (member_id, date, time_id, theme_id, payment_status)
+VALUES (1, CURRENT_DATE - 2, 1, 1, 'PENDING');
+INSERT INTO reservation (member_id, date, time_id, theme_id, payment_status)
+VALUES (3, CURRENT_DATE - 2, 2, 2, 'PENDING');
+INSERT INTO reservation (member_id, date, time_id, theme_id, payment_status)
+VALUES (2, CURRENT_DATE + 1, 1, 2, 'PENDING');
 
 INSERT INTO waiting (reservation_id, member_id, created_at)
 VALUES (4, 3, '2024-05-20 12:10:00.000');

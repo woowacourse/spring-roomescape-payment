@@ -1,0 +1,47 @@
+= 시간
+
+=== 시간 생성
+
+==== Request
+
+include::{snippets}/times/create/request-fields.adoc[]
+include::{snippets}/times/create/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/times/create/response-fields.adoc[]
+include::{snippets}/times/create/http-response.adoc[]
+
+=== 시간 조회
+
+==== Request
+
+include::{snippets}/times/findTimes/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/times/findTimes/response-fields.adoc[]
+include::{snippets}/times/findTimes/http-response.adoc[]
+
+=== 시간과 예약 가능 여부 조회
+
+==== Request
+
+include::{snippets}/times/available/query-parameters.adoc[]
+include::{snippets}/times/available/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/times/available/response-fields.adoc[]
+include::{snippets}/times/available/http-response.adoc[]
+
+=== 시간 삭제
+
+==== Request
+
+include::{snippets}/times/delete/path-parameters.adoc[]
+include::{snippets}/times/delete/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/times/delete/http-response.adoc[]

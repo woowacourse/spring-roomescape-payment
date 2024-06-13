@@ -36,4 +36,12 @@ public class LoginController {
         String name = member.name();
         return new LoginResponse(name);
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        ResponseCookie cookie = tokenCookieManager.createLogoutResponseCookie();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .build();
+    }
 }

@@ -1,0 +1,24 @@
+= 예약 대기
+
+=== 예약 대기 생성
+
+==== Request
+
+include::{snippets}/waitings/create/request-fields.adoc[]
+include::{snippets}/waitings/create/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/waitings/create/response-fields.adoc[]
+include::{snippets}/waitings/create/http-response.adoc[]
+
+=== 예약 삭제
+
+==== Request
+
+include::{snippets}/waitings/delete/path-parameters.adoc[]
+include::{snippets}/waitings/delete/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/waitings/delete/http-response.adoc[]

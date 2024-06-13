@@ -1,0 +1,35 @@
+// admin/admin.adoc
+== 어드민
+
+=== 예약 찾기
+
+==== Request
+
+include::{snippets}/admin/find-reservations/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/admin/find-reservations/http-response.adoc[]
+
+=== 예약 생성
+
+==== Request
+
+include::{snippets}/admin/create-reservations/request-fields.adoc[]
+include::{snippets}/admin/create-reservations/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/admin/create-reservations/response-fields.adoc[]
+include::{snippets}/admin/find-reservations/http-response.adoc[]
+
+=== 예약대기 찾기
+
+==== Request
+
+include::{snippets}/admin/find-waitings/http-request.adoc[]
+
+==== Response
+include::{snippets}/admin/find-waitings/response-fields.adoc[]
+include::{snippets}/admin/find-waitings/http-response.adoc[]
+

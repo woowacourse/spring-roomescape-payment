@@ -13,11 +13,11 @@ import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.dto.PaymentErrorResponse;
 import roomescape.payment.exception.PaymentException;
 
-public class TossPaymentService implements PaymentService {
+public class TossPaymentClient implements PaymentClient {
     private final Logger log = LoggerFactory.getLogger(getClass());
     private final RestClient restClient;
 
-    public TossPaymentService(RestClient restClient) {
+    public TossPaymentClient(RestClient restClient) {
         this.restClient = restClient;
     }
 

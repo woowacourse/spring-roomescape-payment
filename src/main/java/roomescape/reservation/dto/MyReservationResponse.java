@@ -3,6 +3,7 @@ package roomescape.reservation.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import roomescape.reservation.domain.PaymentStatus;
 import roomescape.reservation.domain.Reservation;
 import roomescape.waiting.domain.Waiting;
 
@@ -10,6 +11,7 @@ public record MyReservationResponse(Long id,
                                     String themeName,
                                     @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
                                     @JsonFormat(pattern = "HH:mm") LocalTime startAt,
+                                    PaymentStatus paymentStatus,
                                     String status,
                                     Long waitingId) {
     private static final String RESERVATION_STATUS = "예약";
@@ -30,6 +32,7 @@ public record MyReservationResponse(Long id,
                 reservation.getTheme().getName(),
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
+                reservation.getPaymentStatus(),
                 status,
                 waitingId);
     }

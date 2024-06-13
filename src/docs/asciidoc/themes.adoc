@@ -1,0 +1,46 @@
+= 테마
+
+=== 테마 생성
+
+==== Request
+
+include::{snippets}/themes/create/request-fields.adoc[]
+include::{snippets}/themes/create/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/themes/create/response-fields.adoc[]
+include::{snippets}/themes/create/http-response.adoc[]
+
+=== 테마 조회
+
+==== Request
+
+include::{snippets}/themes/findThemes/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/themes/findThemes/response-fields.adoc[]
+include::{snippets}/themes/findThemes/http-response.adoc[]
+
+=== 인기 테마 조회
+
+==== Request
+
+include::{snippets}/themes/findPopularThemes/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/themes/findPopularThemes/response-fields.adoc[]
+include::{snippets}/themes/findPopularThemes/http-response.adoc[]
+
+==== 테마 삭제
+
+==== Request
+
+include::{snippets}/themes/delete/path-parameters.adoc[]
+include::{snippets}/themes/delete/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/themes/delete/http-response.adoc[]

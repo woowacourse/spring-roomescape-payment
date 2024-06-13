@@ -2,6 +2,8 @@ package roomescape.reservation.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -32,21 +34,24 @@ public class Reservation {
     @ManyToOne(optional = false)
     @JoinColumn(name = "theme_id")
     private Theme theme;
-
-    public Reservation(Member member, LocalDate date, ReservationTime time, Theme theme) {
-        this.id = null;
-        this.member = Objects.requireNonNull(member);
-        this.date = Objects.requireNonNull(date);
-        this.time = Objects.requireNonNull(time);
-        this.theme = Objects.requireNonNull(theme);
-    }
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
 
     public Reservation(Long id, Member member, LocalDate date, ReservationTime time, Theme theme) {
-        this.id = Objects.requireNonNull(id);
+        this.id = id;
         this.member = Objects.requireNonNull(member);
         this.date = Objects.requireNonNull(date);
         this.time = Objects.requireNonNull(time);
         this.theme = Objects.requireNonNull(theme);
+        this.paymentStatus = PaymentStatus.PENDING;
+    }
+
+    public Reservation(Member member, LocalDate date, ReservationTime time, Theme theme) {
+        this(null,
+                Objects.requireNonNull(member),
+                Objects.requireNonNull(date),
+                Objects.requireNonNull(time),
+                Objects.requireNonNull(theme));
     }
 
     protected Reservation() {
@@ -85,6 +90,14 @@ public class Reservation {
 
     public Theme getTheme() {
         return theme;
+    }
+
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public void updatePaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
     }
 
     @Override

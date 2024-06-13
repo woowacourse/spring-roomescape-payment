@@ -7,8 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.BadArgumentRequestException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.payment.dto.PaymentConfirmRequest;
-import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.AdminReservationCreateRequest;
 import roomescape.reservation.dto.ReservationResponse;
@@ -25,17 +23,15 @@ public class ReservationCreateService {
     private final MemberRepository memberRepository;
     private final TimeRepository timeRepository;
     private final ThemeRepository themeRepository;
-    private final PaymentService paymentService;
 
     public ReservationCreateService(ReservationRepository reservationRepository,
                                     MemberRepository memberRepository,
                                     TimeRepository timeRepository,
-                                    ThemeRepository themeRepository, PaymentService paymentService) {
+                                    ThemeRepository themeRepository) {
         this.reservationRepository = reservationRepository;
         this.memberRepository = memberRepository;
         this.timeRepository = timeRepository;
         this.themeRepository = themeRepository;
-        this.paymentService = paymentService;
     }
 
     @Transactional
@@ -48,10 +44,7 @@ public class ReservationCreateService {
     @Transactional
     public ReservationResponse createReservation(UserReservationCreateRequest request, Long memberId) {
         Reservation reservation = makeReservation(memberId, request.date(), request.timeId(), request.themeId());
-        ReservationResponse reservationResponse = saveReservation(reservation);
-
-        paymentService.confirmPayment(PaymentConfirmRequest.from(request));
-        return reservationResponse;
+        return saveReservation(reservation);
     }
 
     private Reservation makeReservation(Long memberId, LocalDate date, Long timeId, Long themeId) {

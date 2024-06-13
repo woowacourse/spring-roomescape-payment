@@ -1,0 +1,33 @@
+// auth.adoc
+== 로그인(login)
+
+=== 토큰 요청
+
+==== Request
+
+include::{snippets}/auth/login/request-fields.adoc[]
+include::{snippets}/auth/login/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/auth/login/http-response.adoc[]
+
+=== 현재 로그인 회원 정보 얻기
+
+==== Request
+
+include::{snippets}/auth/check/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/auth/check/response-fields.adoc[]
+include::{snippets}/auth/check/http-response.adoc[]
+
+=== 로그아웃
+
+==== Request
+
+include::{snippets}/auth/logout/http-request.adoc[]
+
+==== Response
+include::{snippets}/auth/logout/http-response.adoc[]

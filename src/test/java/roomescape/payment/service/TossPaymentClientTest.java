@@ -22,9 +22,9 @@ import roomescape.payment.domain.RestClientBuilders;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.exception.PaymentException;
 
-class TossPaymentServiceTest {
+class TossPaymentClientTest {
     private MockRestServiceServer mockRestServiceServer;
-    private TossPaymentService tossPaymentService;
+    private TossPaymentClient tossPaymentService;
 
     @BeforeEach
     void setUp() {
@@ -39,7 +39,7 @@ class TossPaymentServiceTest {
         RestClientBuilders builders = new RestClientBuilders(properties);
         Builder builder = builders.getBuilder("toss");
         mockRestServiceServer = MockRestServiceServer.bindTo(builder).build();
-        tossPaymentService = new TossPaymentService(builder.build());
+        tossPaymentService = new TossPaymentClient(builder.build());
     }
 
     @AfterEach
@@ -51,7 +51,7 @@ class TossPaymentServiceTest {
     @Test
     void confirmPaymentTest() {
         PaymentConfirmRequest request = new PaymentConfirmRequest("testPaymentKey", "TestOrderId",
-                BigDecimal.valueOf(1000));
+                BigDecimal.valueOf(1000), 1L, 1L);
 
         mockRestServiceServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andRespond(withSuccess());
@@ -63,7 +63,7 @@ class TossPaymentServiceTest {
     @Test
     void confirmPaymentTest_whenNotConfirmed() {
         PaymentConfirmRequest request = new PaymentConfirmRequest("testPaymentKey", "TestOrderId",
-                BigDecimal.valueOf(1000));
+                BigDecimal.valueOf(1000), 1L, 1L);
 
         String errorResponse = """
                 {
@@ -83,7 +83,7 @@ class TossPaymentServiceTest {
     @Test
     void confirmPaymentTest_whenUnauthorized() {
         PaymentConfirmRequest request = new PaymentConfirmRequest("testPaymentKey", "TestOrderId",
-                BigDecimal.valueOf(1000));
+                BigDecimal.valueOf(1000), 1L, 1L);
 
         String errorResponse = """
                 {

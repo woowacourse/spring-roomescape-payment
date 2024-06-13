@@ -1,0 +1,12 @@
+= 멤버
+
+=== 멤버 찾기
+
+==== Request
+
+include::{snippets}/members/find-members/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/members/find-members/response-fields.adoc[]
+include::{snippets}/members/find-members/http-response.adoc[]

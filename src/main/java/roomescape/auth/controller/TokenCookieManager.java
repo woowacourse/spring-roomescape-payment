@@ -11,6 +11,7 @@ public class TokenCookieManager {
     private static final String ACCESS_TOKEN_KEY = "token";
     private static final int MIN = 60;
     private static final int ACCESS_TOKEN_MAX_AGE = 30 * MIN;
+    private static final int LOGOUT_TOKEN_AGE = 0;
 
     public String getToken(Cookie[] cookies) {
         if (cookies == null) {
@@ -28,6 +29,14 @@ public class TokenCookieManager {
                 .httpOnly(true)
                 .path("/")
                 .maxAge(ACCESS_TOKEN_MAX_AGE)
+                .build();
+    }
+
+    public ResponseCookie createLogoutResponseCookie() {
+        return ResponseCookie.from(ACCESS_TOKEN_KEY)
+                .httpOnly(true)
+                .maxAge(LOGOUT_TOKEN_AGE)
+                .path("/")
                 .build();
     }
 }

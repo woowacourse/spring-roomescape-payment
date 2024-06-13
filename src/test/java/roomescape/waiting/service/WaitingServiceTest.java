@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.exception.BadArgumentRequestException;
 import roomescape.member.domain.Member;
+import roomescape.reservation.domain.PaymentStatus;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.theme.domain.Theme;
@@ -42,7 +43,7 @@ class WaitingServiceTest {
     private static final WaitingResponse RESPONSE1 = new WaitingResponse(3L, "브리", "레벨2 탈출",
             LocalDate.now().plusDays(7), LocalTime.of(19, 0));
     private static final MyReservationResponse MY_RESPONSE1 = new MyReservationResponse(1L, "레벨2 탈출",
-            LocalDate.now().plusDays(7), LocalTime.of(19, 0), "1번째 예약 대기", 3L);
+            LocalDate.now().plusDays(7), LocalTime.of(19, 0), PaymentStatus.COMPLETED, "1번째 예약 대기", 3L);
 
     @Mock
     private WaitingRepository waitingRepository;
