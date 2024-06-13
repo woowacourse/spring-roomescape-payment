@@ -75,6 +75,11 @@ public class Reservation {
         this.status = ReservationStatus.PENDING;
     }
 
+    public void payReservation(Payment payment) {
+        this.payment = payment;
+        this.status = ReservationStatus.BOOKED;
+    }
+
     public Long getId() {
         return id;
     }

@@ -2,14 +2,17 @@ package roomescape.reservation.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.fixture.MemberFixture;
 import roomescape.fixture.ReservationFixture;
 import roomescape.fixture.ReservationTimeFixture;
 import roomescape.member.domain.Member;
-import roomescape.reservation.controller.dto.ReservationRequest;
-import roomescape.reservation.controller.dto.ReservationWithStatus;
+import roomescape.payment.dto.PaymentResponse;
+import roomescape.payment.infra.PaymentClient;
+import roomescape.reservation.controller.dto.*;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationSlot;
 import roomescape.reservation.domain.ReservationStatus;
@@ -17,13 +20,15 @@ import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationSlotRepository;
 import roomescape.util.ServiceTest;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static roomescape.fixture.MemberFixture.getMemberChoco;
-import static roomescape.fixture.MemberFixture.getMemberTacan;
+import static org.mockito.ArgumentMatchers.any;
+import static roomescape.fixture.MemberFixture.*;
 import static roomescape.fixture.ReservationSlotFixture.getNextDayReservationSlot;
 import static roomescape.fixture.ThemeFixture.getTheme1;
 
@@ -38,6 +43,8 @@ class WaitingReservationServiceTest extends ServiceTest {
     ReservationRepository reservationRepository;
     @Autowired
     ReservationSlotRepository reservationSlotRepository;
+    @SpyBean
+    PaymentClient paymentClient;
 
     @DisplayName("예약 대기 성공")
     @Test
@@ -84,5 +91,42 @@ class WaitingReservationServiceTest extends ServiceTest {
                 .get();
 
         assertThat(nextReservationWithStatus.status()).isEqualTo(ReservationStatus.PENDING);
+    }
+
+    @DisplayName("예약 대기 확정 성공 : 대기 예약을 결제한다.")
+    @Test
+    void payReservation() {
+        //given
+        PaymentResponse paymentResponse = new PaymentResponse(
+                "test",
+                "test",
+                1000L,
+                "test",
+                LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+        );
+
+        BDDMockito.doReturn(paymentResponse)
+                .when(paymentClient)
+                .confirm(any());
+        Reservation reservation = ReservationFixture.getBookedReservation();
+        ReservationSlot reservationSlot = reservation.getReservationSlot();
+
+        //when
+        waitingReservationService.deleteReservation(AuthInfo.of(MemberFixture.getMemberChoco()), reservation.getId());
+        WaitingReservationPaymentRequest reservationPaymentRequest = new WaitingReservationPaymentRequest(
+                reservationSlot.getDate().format(DateTimeFormatter.ISO_DATE),
+                reservationSlot.getTime().getStartAt().format(DateTimeFormatter.ISO_TIME),
+                reservationSlot.getTheme().getName(),
+                paymentResponse.paymentKey(),
+                paymentResponse.orderId(),
+                paymentResponse.totalAmount(),
+                paymentResponse.method(
+                ));
+
+        //then
+        assertThatNoException().isThrownBy(() -> {
+            waitingReservationService.confirmReservation(reservationPaymentRequest, getMemberAdmin().getId());
+        });
     }
 }

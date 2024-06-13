@@ -9,6 +9,7 @@ import roomescape.reservation.domain.ReservationSlot;
 import roomescape.reservation.domain.ReservationStatus;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,6 +50,16 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
             AND r.reservationSlot.time.id = :timeId
             """)
     boolean existsByDateAndTimeIdAndThemeId(LocalDate date, Long themeId, Long timeId);
+
+    @Query("""
+            SELECT r
+            FROM Reservation r
+            WHERE r.reservationSlot.date = :date
+            AND r.reservationSlot.theme.name = :theme
+            AND r.reservationSlot.time.startAt = :time
+            AND r.member.id = :memberId
+            """)
+    Reservation findByDateAndTimeAndThemeNameAndMemberId(LocalDate date, String theme, LocalTime time, Long memberId);
 
     void deleteByReservationSlot_Id(long reservationSlotId);
 

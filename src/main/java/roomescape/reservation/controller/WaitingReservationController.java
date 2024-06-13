@@ -7,15 +7,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.global.annotation.LoginUser;
+import roomescape.reservation.controller.dto.ReservationPaymentRequest;
 import roomescape.reservation.controller.dto.ReservationRequest;
 import roomescape.reservation.controller.dto.ReservationResponse;
+import roomescape.reservation.controller.dto.WaitingReservationPaymentRequest;
 import roomescape.reservation.service.WaitingReservationService;
 
 import java.net.URI;
@@ -46,5 +46,12 @@ public class WaitingReservationController {
             @RequestBody @Valid ReservationRequest reservationRequest) {
         ReservationResponse response = waitingReservationService.reserveWaiting(reservationRequest, authInfo.getId());
         return ResponseEntity.created(URI.create("/reservations/" + response.reservationId())).body(response);
+    }
+
+    @PatchMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ReservationResponse confirmReservation(@LoginUser AuthInfo authInfo,
+                                                     @RequestBody @Valid WaitingReservationPaymentRequest waitingReservationPaymentRequest) {
+        return waitingReservationService.confirmReservation(waitingReservationPaymentRequest, authInfo.getId());
     }
 }

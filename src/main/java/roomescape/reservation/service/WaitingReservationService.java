@@ -7,10 +7,7 @@ import roomescape.exception.custom.BadRequestException;
 import roomescape.exception.custom.ForbiddenException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
-import roomescape.reservation.controller.dto.ReservationRequest;
-import roomescape.reservation.controller.dto.ReservationResponse;
-import roomescape.reservation.controller.dto.ReservationViewResponse;
-import roomescape.reservation.controller.dto.ReservationWithStatus;
+import roomescape.reservation.controller.dto.*;
 import roomescape.reservation.domain.*;
 import roomescape.reservation.domain.repository.ReservationRepository;
 
@@ -75,5 +72,10 @@ public class WaitingReservationService {
     @Transactional
     public ReservationResponse reserveWaiting(ReservationRequest reservationRequest, Long memberId) {
         return reservationService.createReservation(reservationRequest, memberId, ReservationStatus.WAITING);
+    }
+
+    @Transactional
+    public ReservationResponse confirmReservation(WaitingReservationPaymentRequest waitingReservationPaymentRequest, Long memberId) {
+        return reservationService.confirmReservation(waitingReservationPaymentRequest, memberId);
     }
 }

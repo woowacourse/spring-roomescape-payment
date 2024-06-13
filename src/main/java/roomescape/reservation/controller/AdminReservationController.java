@@ -44,7 +44,7 @@ public class AdminReservationController {
     public ResponseEntity<ReservationResponse> create(
             @RequestBody @Valid AdminReservationRequest adminReservationRequest) {
         ReservationResponse reservationResponse = reservationService
-                .createReservation(adminReservationRequest.toReservationRequest(), adminReservationRequest.memberId(), ReservationStatus.BOOKED); // TODO 상태도 요청으로 받기
+                .createReservation(adminReservationRequest.toReservationRequest(), adminReservationRequest.memberId(), ReservationStatus.BOOKED);
         return ResponseEntity.created(URI.create("/admin/reservations/" + reservationResponse.reservationId()))
                 .body(reservationResponse);
     }

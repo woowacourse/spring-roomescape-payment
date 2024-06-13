@@ -20,6 +20,7 @@ import roomescape.reservation.domain.repository.ThemeRepository;
 import roomescape.reservation.domain.specification.ReservationSpecification;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
@@ -82,6 +83,21 @@ public class ReservationService {
         PaymentRequest paymentRequest = new PaymentRequest(reservationPaymentRequest);
         Payment payment = paymentService.purchase(paymentRequest, reservationPaymentRequest.amount());
         return createReservationWithPayment(reservationRequest, memberId, ReservationStatus.BOOKED, payment);
+    }
+
+    @Transactional
+    public ReservationResponse confirmReservation(WaitingReservationPaymentRequest waitingReservationPaymentRequest, Long memberId) {
+        PaymentRequest paymentRequest = new PaymentRequest(waitingReservationPaymentRequest);
+        Payment payment = paymentService.purchase(paymentRequest, waitingReservationPaymentRequest.amount());
+
+        Reservation reservation = reservationRepository.findByDateAndTimeAndThemeNameAndMemberId(
+                LocalDate.parse(waitingReservationPaymentRequest.date()),
+                waitingReservationPaymentRequest.theme(),
+                LocalTime.parse(waitingReservationPaymentRequest.time()),
+                memberId);
+
+        reservation.payReservation(payment);
+        return ReservationResponse.from(reservation);
     }
 
     @Transactional
