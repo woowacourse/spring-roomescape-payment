@@ -20,6 +20,10 @@ public class Payment {
 
     private Long totalAmount;
 
+    private String requestedAt;
+
+    private String approvedAt;
+
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
@@ -32,13 +36,15 @@ public class Payment {
     public Payment(
         String paymentKey,
         Long totalAmount,
-        PaymentStatus status,
-        Reservation reservation
+        String requestedAt,
+        String approvedAt,
+        PaymentStatus status
     ) {
         this.paymentKey = paymentKey;
         this.totalAmount = totalAmount;
+        this.requestedAt = requestedAt;
+        this.approvedAt = approvedAt;
         this.status = status;
-        this.reservation = reservation;
     }
 
     public void complete(Reservation reservation) {

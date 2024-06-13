@@ -9,6 +9,8 @@ import roomescape.domain.dto.PaymentCancelRequest;
 import roomescape.domain.dto.PaymentRequest;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentClient;
+import roomescape.domain.payment.PaymentStatus;
+import roomescape.service.payment.dto.TossPaymentResponse;
 
 @Component
 @Profile("!local")
@@ -23,12 +25,19 @@ public class TossPaymentClient implements PaymentClient {
 
     @Override
     public Payment approve(PaymentRequest request) {
-        return restClient.post()
+        TossPaymentResponse response = restClient.post()
             .uri("/v1/payments/confirm")
             .contentType(APPLICATION_JSON)
             .body(request)
             .retrieve()
-            .body(Payment.class);
+            .body(TossPaymentResponse.class);
+
+        return new Payment(response.paymentKey(),
+            Long.parseLong(response.totalAmount()),
+            response.requestedAt(),
+            response.approvedAt(),
+            PaymentStatus.from(response.status())
+        );
     }
 
     @Override
@@ -39,7 +48,6 @@ public class TossPaymentClient implements PaymentClient {
             .uri("/v1/payments/{paymentKey}/cancel", paymentKey)
             .contentType(APPLICATION_JSON)
             .body(request)
-            .retrieve()
-            .body(Payment.class);
+            .retrieve();
     }
 }

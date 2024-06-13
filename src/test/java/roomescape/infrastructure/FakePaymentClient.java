@@ -1,5 +1,6 @@
 package roomescape.infrastructure;
 
+import java.time.LocalDateTime;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import roomescape.domain.dto.PaymentRequest;
@@ -21,8 +22,10 @@ public class FakePaymentClient implements PaymentClient {
         return new Payment(
             request.paymentKey(),
             request.amount(),
-            PaymentStatus.DONE,
-            null);
+            LocalDateTime.now().minusSeconds(5).toString(),
+            LocalDateTime.now().toString(),
+            PaymentStatus.DONE
+        );
     }
 
     @Override
