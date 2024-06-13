@@ -15,7 +15,7 @@ import roomescape.domain.reservationwaiting.ReservationWaiting;
 import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
-import roomescape.service.dto.request.CreateReservationRequest;
+import roomescape.service.dto.request.WaitingCreateRequest;
 import roomescape.service.dto.response.ReservationResponse;
 import roomescape.support.fixture.MemberFixture;
 import roomescape.support.fixture.ReservationFixture;
@@ -70,8 +70,8 @@ class ReservationWaitingServiceTest extends BaseServiceTest {
     @DisplayName("예약 대기를 생성한다.")
     void createReservationWaiting() {
         Reservation reservation = reservationRepository.save(notSavedReservation);
-        CreateReservationRequest request = new CreateReservationRequest(reservation.getDate(), time.getId(),
-                theme.getId(), prin.getId());
+        WaitingCreateRequest request = new WaitingCreateRequest(reservation.getDate(), time.getId(),
+                theme.getId(), prin);
 
         ReservationResponse response = reservationWaitingService.addReservationWaiting(request);
 
@@ -87,8 +87,8 @@ class ReservationWaitingServiceTest extends BaseServiceTest {
     @DisplayName("확정된 예약이 존재하지 않으면 예약 대기를 생성할 수 없다.")
     void createReservationWaitingFailWhenReservationNotFound() {
         LocalDate date = LocalDate.parse("2024-05-24");
-        CreateReservationRequest request = new CreateReservationRequest(date, time.getId(), theme.getId(),
-                prin.getId());
+        WaitingCreateRequest request = new WaitingCreateRequest(date, time.getId(), theme.getId(),
+                prin);
 
         assertThatThrownBy(() -> reservationWaitingService.addReservationWaiting(request))
                 .isExactlyInstanceOf(NoSuchElementException.class)
@@ -99,8 +99,8 @@ class ReservationWaitingServiceTest extends BaseServiceTest {
     @DisplayName("이미 예약한 멤버는 예약 대기를 생성할 수 없다")
     void createReservationWaitingFailWhenAlreadyReserved() {
         Reservation reservation = reservationRepository.save(notSavedReservation);
-        CreateReservationRequest request = new CreateReservationRequest(reservation.getDate(), time.getId(),
-                theme.getId(), reservation.getMember().getId());
+        WaitingCreateRequest request = new WaitingCreateRequest(reservation.getDate(), time.getId(),
+                theme.getId(), reservation.getMember());
 
         assertThatThrownBy(() -> reservationWaitingService.addReservationWaiting(request))
                 .isExactlyInstanceOf(IllegalArgumentException.class)
@@ -115,8 +115,8 @@ class ReservationWaitingServiceTest extends BaseServiceTest {
             Member prevWaitingMember = memberRepository.save(MemberFixture.create("waiting" + count + "@email.com"));
             reservationWaitingRepository.save(ReservationWaitingFixture.create(reservation, prevWaitingMember));
         }
-        CreateReservationRequest request = new CreateReservationRequest(reservation.getDate(), time.getId(),
-                theme.getId(), prin.getId());
+        WaitingCreateRequest request = new WaitingCreateRequest(reservation.getDate(), time.getId(),
+                theme.getId(), prin);
 
         assertThatThrownBy(() -> reservationWaitingService.addReservationWaiting(request))
                 .isExactlyInstanceOf(IllegalArgumentException.class)
@@ -128,8 +128,8 @@ class ReservationWaitingServiceTest extends BaseServiceTest {
     void createReservationWaitingFailWhenAlreadyWaiting() {
         Reservation reservation = reservationRepository.save(notSavedReservation);
         reservationWaitingRepository.save(ReservationWaitingFixture.create(reservation, prin));
-        CreateReservationRequest request = new CreateReservationRequest(reservation.getDate(), time.getId(),
-                theme.getId(), prin.getId());
+        WaitingCreateRequest request = new WaitingCreateRequest(reservation.getDate(), time.getId(),
+                theme.getId(), prin);
 
         assertThatThrownBy(() -> reservationWaitingService.addReservationWaiting(request))
                 .isExactlyInstanceOf(IllegalArgumentException.class)
@@ -143,7 +143,7 @@ class ReservationWaitingServiceTest extends BaseServiceTest {
         ReservationWaiting savedWaiting = reservationWaitingRepository.save(
                 ReservationWaitingFixture.create(reservation, prin));
 
-        reservationWaitingService.deleteReservationWaiting(savedWaiting.getId(), prin.getId());
+        reservationWaitingService.deleteReservationWaiting(savedWaiting.getId(), prin);
 
         assertThat(reservationWaitingRepository.findById(savedWaiting.getId())).isEmpty();
     }
@@ -152,7 +152,7 @@ class ReservationWaitingServiceTest extends BaseServiceTest {
     @DisplayName("존재하지 않은 예약 대기는 삭제할 수 없다.")
     void deleteReservationWaitingFailWhenNotFound() {
         assertThatThrownBy(
-                () -> reservationWaitingService.deleteReservationWaiting(1L, prin.getId()))
+                () -> reservationWaitingService.deleteReservationWaiting(1L, prin))
                 .isExactlyInstanceOf(NoSuchElementException.class)
                 .hasMessageContaining("존재하지 않는 예약 대기입니다.");
     }
@@ -166,7 +166,7 @@ class ReservationWaitingServiceTest extends BaseServiceTest {
 
         Member notAdmin = memberRepository.save(MemberFixture.jamie());
         assertThatThrownBy(
-                () -> reservationWaitingService.deleteReservationWaiting(savedWaiting.getId(), notAdmin.getId()))
+                () -> reservationWaitingService.deleteReservationWaiting(savedWaiting.getId(), notAdmin))
                 .isExactlyInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("예약 대기한 회원이 아닙니다.");
     }
@@ -179,7 +179,7 @@ class ReservationWaitingServiceTest extends BaseServiceTest {
                 ReservationWaitingFixture.create(reservation, prin));
 
         Member admin = memberRepository.save(MemberFixture.admin());
-        reservationWaitingService.deleteReservationWaiting(savedWaiting.getId(), admin.getId());
+        reservationWaitingService.deleteReservationWaiting(savedWaiting.getId(), admin);
 
         assertThat(reservationWaitingRepository.findById(savedWaiting.getId())).isEmpty();
     }

@@ -1,0 +1,88 @@
+=== 어드민
+
+==== 예약 생성
+
+===== curl
+
+include::{snippets}/admin/reservation/create/curl-request.adoc[]
+
+===== request
+
+include::{snippets}/admin/reservation/create/http-request.adoc[]
+
+Body
+
+include::{snippets}/admin/reservation/create/request-fields.adoc[]
+
+===== response
+
+include::{snippets}/admin/reservation/create/http-response.adoc[]
+
+Header
+
+include::{snippets}/admin/reservation/create/response-headers.adoc[]
+
+Body
+
+include::{snippets}/admin/reservation/create/response-fields.adoc[]
+
+==== 예약 대기 승인
+
+===== curl
+
+include::{snippets}/admin/waiting/approve/curl-request.adoc[]
+
+===== request
+
+include::{snippets}/admin/waiting/approve/http-request.adoc[]
+
+Body
+
+include::{snippets}/admin/waiting/approve/request-fields.adoc[]
+
+include::{snippets}/admin/waiting/approve/path-parameters.adoc[]
+
+===== response
+
+include::{snippets}/admin/waiting/approve/http-response.adoc[]
+
+Body
+
+include::{snippets}/admin/waiting/approve/response-fields.adoc[]
+
+==== 예약 대기 목록 조회
+
+===== curl
+
+include::{snippets}/admin/waiting/findAll/curl-request.adoc[]
+
+===== request
+
+include::{snippets}/admin/waiting/findAll/http-request.adoc[]
+
+===== response
+
+include::{snippets}/admin/waiting/findAll/http-response.adoc[]
+
+Body
+
+include::{snippets}/admin/waiting/findAll/response-fields.adoc[]
+
+==== 예약 대기 거절
+
+===== curl
+
+include::{snippets}/admin/waiting/deny/curl-request.adoc[]
+
+===== request
+
+include::{snippets}/admin/waiting/deny/http-request.adoc[]
+
+include::{snippets}/admin/waiting/deny/path-parameters.adoc[]
+
+===== response
+
+include::{snippets}/admin/waiting/deny/http-response.adoc[]
+
+
+

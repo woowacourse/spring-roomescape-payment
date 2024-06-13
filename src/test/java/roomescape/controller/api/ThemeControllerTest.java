@@ -99,7 +99,7 @@ class ThemeControllerTest extends BaseControllerTest {
 
     @Test
     @DisplayName("인기있는 테마들을 조회한다.")
-    @Sql("/popular-themes.sql")
+    @Sql("/reservation.sql")
     void getPopularThemes() {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .param("startDate", "2024-04-06")

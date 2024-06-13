@@ -64,6 +64,6 @@ class AuthServiceTest extends BaseServiceTest {
 
         Authentication authentication = authService.createAuthentication("token");
 
-        assertThat(authentication.getId()).isEqualTo(1L);
+        assertThat(authentication.getPrincipal().getId()).isEqualTo(1L);
     }
 }

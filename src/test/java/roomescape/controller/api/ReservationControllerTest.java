@@ -90,7 +90,7 @@ class ReservationControllerTest extends BaseControllerTest {
     @DisplayName("존재하지 않는 예약을 삭제하면 실패한다.")
     void failWhenNotFoundReservation() {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().delete("/reservations/1")
+                .when().delete("/reservations/1?reason=단순 변심")
                 .then().log().all()
                 .extract();
 
@@ -177,7 +177,7 @@ class ReservationControllerTest extends BaseControllerTest {
 
     private void deleteReservationById() {
         ExtractableResponse<Response> response = RestAssured.given().log().all()
-                .when().delete("/reservations/1")
+                .when().delete("/reservations/1?reason=단순 변심")
                 .then().log().all()
                 .extract();
 

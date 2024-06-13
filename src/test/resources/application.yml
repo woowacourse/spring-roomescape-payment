@@ -32,7 +32,10 @@ security:
     secret-key: abcdefghijklmnopqrstuvwxyz0123456789
     expiration-time: 3600000 # 1 hour
 
-toss:
-  payment-uri: https://test.com
-  confirm-path: /confirm
-  secret-key: jerry-prin-secret-key
+payment:
+  gateways:
+    toss:
+      uri: https://test.com
+      secret-key: jerry-prin-secret-key
+      connect-timeout: 5s
+      read-timeout: 30s

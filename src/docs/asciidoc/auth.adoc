@@ -1,0 +1,60 @@
+=== 인증
+
+==== 로그인
+
+===== curl
+
+include::{snippets}/auth/login/curl-request.adoc[]
+
+===== request
+
+include::{snippets}/auth/login/http-request.adoc[]
+
+Body
+include::{snippets}/auth/login/request-fields.adoc[]
+
+===== response
+
+include::{snippets}/auth/login/http-response.adoc[]
+
+Header
+include::{snippets}/auth/login/response-headers.adoc[]
+
+==== 로그인 체크
+
+===== curl
+
+include::{snippets}/auth/check/curl-request.adoc[]
+
+===== request
+
+include::{snippets}/auth/check/http-request.adoc[]
+
+Cookie
+include::{snippets}/auth/check/request-cookies.adoc[]
+
+===== response
+
+include::{snippets}/auth/check/http-response.adoc[]
+
+include::{snippets}/auth/check/response-fields.adoc[]
+
+==== 로그아웃
+
+===== curl
+
+include::{snippets}/auth/logout/curl-request.adoc[]
+
+===== request
+
+include::{snippets}/auth/logout/http-request.adoc[]
+
+Cookie
+include::{snippets}/auth/logout/request-cookies.adoc[]
+
+===== response
+
+include::{snippets}/auth/logout/http-response.adoc[]
+
+Header
+include::{snippets}/auth/logout/response-headers.adoc[]

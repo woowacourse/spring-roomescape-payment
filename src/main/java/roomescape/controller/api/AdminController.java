@@ -12,11 +12,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.controller.dto.request.AdminReservationRequest;
+import roomescape.controller.dto.request.WaitingToReservationRequest;
 import roomescape.controller.dto.response.ApiResponses;
 import roomescape.controller.support.Auth;
 import roomescape.security.authentication.Authentication;
-import roomescape.service.ReservationService;
+import roomescape.service.ReservationManageService;
 import roomescape.service.ReservationWaitingService;
+import roomescape.service.dto.request.WaitingApproveRequest;
 import roomescape.service.dto.response.ReservationResponse;
 
 import java.net.URI;
@@ -26,18 +28,28 @@ import java.util.List;
 @RequestMapping("/admin")
 public class AdminController {
 
-    private final ReservationService reservationService;
+    private final ReservationManageService reservationManageService;
     private final ReservationWaitingService reservationWaitingService;
 
-    public AdminController(ReservationService reservationService, ReservationWaitingService reservationWaitingService) {
-        this.reservationService = reservationService;
+    public AdminController(ReservationManageService reservationManageService, ReservationWaitingService reservationWaitingService) {
+        this.reservationManageService = reservationManageService;
         this.reservationWaitingService = reservationWaitingService;
     }
 
     @PostMapping("/reservations")
-    public ResponseEntity<ReservationResponse> addAdminReservation(
-            @RequestBody @Valid AdminReservationRequest request) {
-        ReservationResponse response = reservationService.addReservationByAdmin(request.toCreateReservationRequest());
+    public ResponseEntity<ReservationResponse> addAdminReservation(@RequestBody @Valid AdminReservationRequest request) {
+        ReservationResponse response = reservationManageService.addReservationByAdmin(request.toAdminReservationCreateRequest());
+        return ResponseEntity.created(URI.create("/reservation/" + response.id()))
+                .body(response);
+    }
+
+    @PostMapping("/waitings/{id}")
+    public ResponseEntity<ReservationResponse> approveReservationWaiting(@PathVariable long id,
+                                                                         @Valid @RequestBody WaitingToReservationRequest request,
+                                                                         @Auth Authentication authentication) {
+
+        WaitingApproveRequest waitingApproveRequest = request.toWaitingApproveRequest(id, authentication.getPrincipal());
+        ReservationResponse response = reservationWaitingService.approveReservationWaiting(waitingApproveRequest);
         return ResponseEntity.created(URI.create("/reservation/" + response.id()))
                 .body(response);
     }
@@ -51,7 +63,6 @@ public class AdminController {
     @DeleteMapping("/waitings/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteReservationWaiting(@PathVariable long id, @Auth Authentication authentication) {
-        long memberId = authentication.getId();
-        reservationWaitingService.deleteReservationWaiting(id, memberId);
+        reservationWaitingService.deleteReservationWaiting(id, authentication.getPrincipal());
     }
 }

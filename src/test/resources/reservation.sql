@@ -14,12 +14,28 @@ VALUES (1, '09:00'),
        (3, '17:00'),
        (4, '21:00');
 
-INSERT INTO reservation (id, date, member_id, time_id, theme_id)
-VALUES (1, '2024-04-08', 1, 1, 1),
-       (4, '2024-04-08', 1, 2, 2),
-       (5, '2024-04-09', 2, 2, 1),
-       (6, '2024-04-09', 1, 2, 2),
-       (7, '2024-04-09', 2, 3, 3),
-       (8, '2024-04-09', 1, 4, 1),
-       (9, '2024-04-10', 1, 1, 4),
-       (10, '2024-04-10', 2, 2, 4);
+INSERT INTO reservation (id, date, member_id, time_id, theme_id, status)
+VALUES (1, '2024-04-05', 1, 1, 1, 'ACCEPTED'),
+       (2, '2024-04-06', 2, 2, 1, 'ACCEPTED'),
+       (3, '2024-04-06', 2, 3, 2, 'ACCEPTED'),
+       (4, '2024-04-07', 1, 2, 2, 'ACCEPTED'),
+       (5, '2024-04-07', 2, 2, 3, 'ACCEPTED'),
+       (6, '2024-04-08', 1, 2, 3, 'ACCEPTED'),
+       (7, '2024-04-08', 2, 3, 3, 'ACCEPTED'),
+       (8, '2024-04-09', 1, 4, 4, 'ACCEPTED'),
+       (9, '2024-04-10', 1, 1, 4, 'ACCEPTED'),
+       (10, '2024-04-10', 2, 2, 4, 'ACCEPTED'),
+       (11, '2024-04-11', 1, 2, 4, 'ACCEPTED');
+
+INSERT INTO payment (id, payment_key, account_number, account_holder, bank_name, amount, reservation_id, pay_type)
+VALUES (1, 'payment_key1', null, null, null, 10000, 1, 'TOSS_PAY'),
+       (2, 'payment_key2', null, null, null, 10000, 2, 'TOSS_PAY'),
+       (3, 'payment_key3', null, null, null, 10000, 3, 'TOSS_PAY'),
+       (4, 'payment_key4', null, null, null, 10000, 4, 'TOSS_PAY'),
+       (5, 'payment_key5', null, null, null, 10000, 5, 'TOSS_PAY'),
+       (6, 'payment_key6', null, null, null, 10000, 6, 'TOSS_PAY'),
+       (7, 'payment_key7', null, null, null, 10000, 7, 'TOSS_PAY'),
+       (8, 'payment_key8', null, null, null, 10000, 8, 'TOSS_PAY'),
+       (9, 'payment_key9', null, null, null, 10000, 9, 'TOSS_PAY'),
+       (10, 'payment_key10', null, null, null, 10000, 10, 'TOSS_PAY'),
+       (11, 'payment_key11', null, null, null, 10000, 11, 'TOSS_PAY');
