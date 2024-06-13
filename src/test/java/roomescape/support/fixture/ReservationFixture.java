@@ -12,6 +12,8 @@ import java.time.LocalDate;
 
 public class ReservationFixture {
 
+    public final static Reservation DEFAULT = create("2024-05-23", MemberFixture.prin(), ReservationTimeFixture.ten(), ThemeFixture.theme());
+
     public static Reservation create(Member member, ReservationTime time, Theme theme) {
         return create("2024-05-23", member, time, theme);
     }
