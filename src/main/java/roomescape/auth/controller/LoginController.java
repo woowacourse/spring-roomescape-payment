@@ -2,6 +2,7 @@ package roomescape.auth.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -38,9 +39,15 @@ public class LoginController {
 
     @Operation(summary = "로그인 체크", description = "로그인 중인 사용자를 체크한다.")
     @GetMapping("/login/check")
-    public LoginResponse loginCheck(LoggedInMember member) {
-        String name = member.name();
-        return new LoginResponse(name);
+    public ResponseEntity<LoginResponse> loginCheck(HttpServletRequest request) {
+        String token = tokenCookieManager.getToken(request.getCookies());
+        if (token.isBlank()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        LoggedInMember loggedInMember = authService.findLoggedInMember(token);
+        return ResponseEntity.ok()
+                .body(new LoginResponse(loggedInMember.name()));
     }
 
     @PostMapping("/logout")
