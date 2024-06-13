@@ -12,7 +12,7 @@ public class ReservationTimeResponse {
     @JsonFormat(pattern = "HH:mm")
     private LocalTime startAt;
 
-    public ReservationTimeResponse() {
+    private ReservationTimeResponse() {
     }
 
     public ReservationTimeResponse(Long id, LocalTime startAt) {

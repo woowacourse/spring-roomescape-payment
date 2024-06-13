@@ -20,7 +20,7 @@ public class Payment {
     @OneToOne(fetch = FetchType.LAZY)
     private Reservation reservation;
 
-    public Payment() {
+    protected Payment() {
     }
 
     public Payment(final Long id, final String paymentKey, final Long amount, final Reservation reservation) {
