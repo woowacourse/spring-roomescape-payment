@@ -2,18 +2,10 @@ package roomescape.domain.reservation;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Objects;
+import java.util.Optional;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import roomescape.domain.member.Member;
@@ -22,7 +14,6 @@ import roomescape.domain.theme.Theme;
 @Table(name = "reservation")
 @Entity
 public class Reservation {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -51,6 +42,10 @@ public class Reservation {
     @JoinColumn(name = "theme_id")
     private Theme theme;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
+
     @Enumerated(EnumType.STRING)
     @NotNull
     @Column(name = "status")
@@ -58,11 +53,16 @@ public class Reservation {
 
     public Reservation(Member Member, LocalDate date, LocalDateTime createdAt, ReservationTime time, Theme theme,
                        ReservationStatus status) {
-        this(null, Member, date, createdAt, time, theme, status);
+        this(null, Member, date, createdAt, time, theme, null, status);
+    }
+
+    public Reservation(Member Member, LocalDate date, LocalDateTime createdAt, ReservationTime time,
+                       Theme theme, Payment payment, ReservationStatus status) {
+        this(null, Member, date, createdAt, time, theme, payment, status);
     }
 
     public Reservation(Long id, Member Member, LocalDate date, LocalDateTime createdAt,
-                       ReservationTime time, Theme theme, ReservationStatus status) {
+                       ReservationTime time, Theme theme, Payment payment, ReservationStatus status) {
 
         this.id = id;
         this.member = Member;
@@ -70,6 +70,7 @@ public class Reservation {
         this.createdAt = createdAt;
         this.time = time;
         this.theme = theme;
+        this.payment = payment;
         this.status = status;
     }
 
@@ -108,7 +109,33 @@ public class Reservation {
         return member;
     }
 
+    public Optional<Payment> getPayment() {
+        if (payment == null) {
+            return Optional.empty();
+        }
+        return Optional.of(payment);
+    }
+
     public ReservationStatus getStatus() {
         return status;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Reservation that = (Reservation) o;
+        if (id == null || that.id == null) {
+            return Objects.equals(member, that.member) && Objects.equals(date, that.date) && Objects.equals(time, that.time) && Objects.equals(theme, that.theme);
+        }
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        if (id == null) {
+            return Objects.hash(member, date, time, theme);
+        }
+        return Objects.hash(id);
     }
 }

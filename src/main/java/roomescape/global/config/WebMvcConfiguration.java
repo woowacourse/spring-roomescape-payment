@@ -2,8 +2,10 @@ package roomescape.global.config;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
@@ -14,7 +16,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
-
     private final HandlerMethodArgumentResolver argumentResolver;
     private final HandlerInterceptor checkRoleInterceptor;
     private final HandlerInterceptor checkUserInterceptor;
@@ -46,11 +47,10 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     }
 
     @Bean
-    public RestClient restClient() {
-        String TOSS_PAYMENTS_URL = "https://api.tosspayments.com/v1/payments/confirm";
-
+    @Profile("dev")
+    public RestClient restClient(@Value("${toss-payment.payment-url}") String PAYMENTS_URL) {
         return RestClient.builder()
-                .baseUrl(TOSS_PAYMENTS_URL)
+                .baseUrl(PAYMENTS_URL)
                 .requestFactory(clientHttpRequestFactory())
                 .build();
     }
@@ -58,7 +58,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     private ClientHttpRequestFactory clientHttpRequestFactory() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(3000);
-        factory.setReadTimeout(3000);
+        factory.setReadTimeout(10000);
 
         return factory;
     }

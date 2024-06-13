@@ -10,7 +10,6 @@ import roomescape.domain.reservation.ReservationTime;
 
 @Repository
 public interface ReservationTimeRepository extends JpaRepository<ReservationTime, Long> {
-
     Boolean existsByStartAt(LocalTime startAt);
 
     List<ReservationTime> findAllByOrderByStartAtAsc();

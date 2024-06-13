@@ -6,20 +6,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
-import io.restassured.RestAssured;
-import roomescape.controller.dto.CreateThemeResponse;
-import roomescape.controller.dto.FindThemeResponse;
+import roomescape.controller.dto.request.CreateThemeRequest;
+import roomescape.controller.dto.response.ThemeResponse;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.domain.reservation.Reservation;
@@ -32,12 +28,12 @@ import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class ThemeServiceTest {
-
-    @LocalServerPort
-    int port;
+    private final String name = "테마1";
+    private final String description = "테마1에 대한 설명입니다.";
+    private final String thumbnail = "https://test.com/test.jpg";
 
     @Autowired
     private ThemeService themeService;
@@ -54,15 +50,6 @@ class ThemeServiceTest {
     @Autowired
     private ReservationRepository reservationRepository;
 
-    private final String name = "테마1";
-    private final String description = "테마1에 대한 설명입니다.";
-    private final String thumbnail = "https://test.com/test.jpg";
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
-
     @Nested
     @DisplayName("테마 생성")
     class Save {
@@ -70,16 +57,16 @@ class ThemeServiceTest {
         @DisplayName("성공: 테마 추가")
         @Test
         void save() {
-            CreateThemeResponse saved = themeService.save(name, description, thumbnail);
+            ThemeResponse saved = themeService.save(new CreateThemeRequest(name, description, thumbnail));
             assertThat(saved.id()).isEqualTo(1L);
         }
 
         @DisplayName("실패: 이름이 동일한 방탈출 테마를 저장하면 예외 발생")
         @Test
         void save_DuplicatedName() {
-            themeService.save(name, description, thumbnail);
+            themeService.save(new CreateThemeRequest(name, description, thumbnail));
 
-            assertThatThrownBy(() -> themeService.save(name, "description", "https://new.com/new.jpg"))
+            assertThatThrownBy(() -> themeService.save(new CreateThemeRequest(name, "description", "https://new.com/new.jpg")))
                     .isInstanceOf(RoomescapeException.class)
                     .hasMessage("같은 이름의 테마가 이미 존재합니다.");
         }
@@ -96,7 +83,7 @@ class ThemeServiceTest {
             themeRepository.save(new Theme("테마3", "d3", "https://test.com/test3.jpg"));
 
             assertThat(themeService.findAll())
-                    .extracting(FindThemeResponse::id)
+                    .extracting(ThemeResponse::id)
                     .containsExactly(1L, 2L, 3L);
         }
     }
@@ -113,7 +100,7 @@ class ThemeServiceTest {
 
             themeService.delete(2L);
             assertThat(themeService.findAll())
-                    .extracting(FindThemeResponse::id)
+                    .extracting(ThemeResponse::id)
                     .containsExactly(1L, 3L);
         }
 

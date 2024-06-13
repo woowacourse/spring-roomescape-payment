@@ -1,19 +1,17 @@
 package roomescape.service.facade;
 
-import java.time.LocalDate;
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 
-import roomescape.controller.dto.CreateReservationResponse;
-import roomescape.controller.dto.FindMyReservationResponse;
-import roomescape.domain.member.Member;
+import roomescape.controller.dto.request.CreateReservationRequest;
+import roomescape.controller.dto.request.CreateUserReservationRequest;
+import roomescape.controller.dto.response.ReservationResponse;
+import roomescape.domain.reservation.Payment;
 import roomescape.service.PaymentService;
 import roomescape.service.UserReservationService;
+import roomescape.service.dto.PaymentRequest;
 
 @Service
 public class UserReservationGeneralService {
-
     private final UserReservationService userReservationService;
     private final PaymentService paymentService;
 
@@ -22,21 +20,9 @@ public class UserReservationGeneralService {
         this.paymentService = paymentService;
     }
 
-    public CreateReservationResponse reserve(String orderId, long amount, String paymentKey,
-                                             Long memberId, LocalDate date, Long timeId, Long themeId) {
-        paymentService.pay(orderId, amount, paymentKey);
-        return userReservationService.reserve(memberId, date, timeId, themeId);
-    }
-
-    public CreateReservationResponse standby(Long memberId, LocalDate date, Long timeId, Long themeId) {
-        return userReservationService.standby(memberId, date, timeId, themeId);
-    }
-
-    public void deleteStandby(Long id, Member member) {
-        userReservationService.deleteStandby(id, member);
-    }
-
-    public List<FindMyReservationResponse> findMyReservationsWithRank(Long memberId) {
-        return userReservationService.findMyReservationsWithRank(memberId);
+    public ReservationResponse reserve(Long memberId, CreateUserReservationRequest request) {
+        PaymentRequest paymentRequest = new PaymentRequest(request.orderId(), request.amount(), request.paymentKey());
+        Payment payment = paymentService.pay(paymentRequest);
+        return userReservationService.reserve(CreateReservationRequest.to(memberId, request), payment.getId());
     }
 }

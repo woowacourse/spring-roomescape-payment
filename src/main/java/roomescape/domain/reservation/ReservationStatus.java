@@ -1,6 +1,9 @@
 package roomescape.domain.reservation;
 
 public enum ReservationStatus {
-
-    RESERVED, STANDBY
+    PAYMENT_RESERVED,
+    ADMIN_PAYMENT_RESERVED,
+    RESERVED,
+    STANDBY,
+    ;
 }

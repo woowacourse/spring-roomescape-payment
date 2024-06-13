@@ -8,7 +8,6 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component
 public class CheckUserInterceptor implements HandlerInterceptor {
-
     private final JwtManager jwtManager;
 
     public CheckUserInterceptor(JwtManager jwtManager) {

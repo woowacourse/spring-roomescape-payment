@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import roomescape.controller.dto.CreateThemeRequest;
-import roomescape.controller.dto.CreateThemeResponse;
+import roomescape.controller.api.docs.AdminThemeApiDocs;
+import roomescape.controller.dto.request.CreateThemeRequest;
+import roomescape.controller.dto.response.ThemeResponse;
 import roomescape.service.ThemeService;
 
 @RestController
 @RequestMapping("/admin/themes")
-public class AdminThemeController {
-
+public class AdminThemeController implements AdminThemeApiDocs {
     private final ThemeService themeService;
 
     public AdminThemeController(ThemeService themeService) {
@@ -27,8 +27,8 @@ public class AdminThemeController {
     }
 
     @PostMapping
-    public ResponseEntity<CreateThemeResponse> save(@Valid @RequestBody CreateThemeRequest request) {
-        CreateThemeResponse response = themeService.save(request.name(), request.description(), request.thumbnail());
+    public ResponseEntity<ThemeResponse> save(@Valid @RequestBody CreateThemeRequest request) {
+        ThemeResponse response = themeService.save(request);
         return ResponseEntity.created(URI.create("/themes/" + response.id()))
                 .body(response);
     }

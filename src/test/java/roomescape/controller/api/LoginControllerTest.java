@@ -19,7 +19,7 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import roomescape.controller.dto.LoginRequest;
+import roomescape.controller.dto.request.LoginRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.repository.MemberRepository;
@@ -27,15 +27,14 @@ import roomescape.repository.MemberRepository;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class LoginControllerTest {
+    private static final String ID = "admin@a.com";
+    private static final String PASSWORD = "123a!";
 
     @LocalServerPort
     int port;
 
     @Autowired
     private MemberRepository memberRepository;
-
-    private static final String ID = "admin@a.com";
-    private static final String PASSWORD = "123a!";
 
     @BeforeEach
     void setUpData() {

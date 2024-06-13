@@ -8,10 +8,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import roomescape.controller.api.docs.LogoutApiDocs;
+
 @RestController
 @RequestMapping("/logout")
-public class LogoutController {
-
+public class LogoutController implements LogoutApiDocs {
     @PostMapping
     public ResponseEntity<Void> logout(HttpServletResponse response) {
         Cookie cookie = new Cookie("token", null);

@@ -3,7 +3,7 @@ package roomescape.controller.api;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 
@@ -20,26 +20,41 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import roomescape.controller.dto.CreateUserReservationRequest;
-import roomescape.controller.dto.CreateUserReservationStandbyRequest;
-import roomescape.controller.dto.LoginRequest;
+import roomescape.controller.dto.request.CreateReservationRequest;
+import roomescape.controller.dto.request.CreateThemeRequest;
+import roomescape.controller.dto.request.CreateUserReservationRequest;
+import roomescape.controller.dto.request.CreateUserReservationStandbyRequest;
+import roomescape.controller.dto.request.LoginRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
+import roomescape.domain.reservation.Payment;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.service.PaymentService;
 import roomescape.service.ReservationTimeService;
 import roomescape.service.ThemeService;
 import roomescape.service.UserReservationService;
+import roomescape.service.dto.PaymentRequest;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class UserReservationControllerTest {
+    private static final Long USER_ID = 1L;
+    private static final Long ANOTHER_USER_ID = 2L;
+    private static final Long TIME_ID = 1L;
+    private static final Long THEME_ID = 1L;
+    private static final Long PAYMENT_ID = 1L;
+    private static final LocalDate DATE_FIRST = LocalDate.parse("2060-01-01");
+    private static final LocalDate DATE_SECOND = LocalDate.parse("2060-01-02");
 
     @LocalServerPort
     int port;
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Autowired
     private ThemeService themeService;
@@ -53,15 +68,6 @@ class UserReservationControllerTest {
     @MockBean
     private PaymentService paymentService;
 
-    private static final Long USER_ID = 1L;
-    private static final Long ANOTHER_USER_ID = 2L;
-
-    private static final Long TIME_ID = 1L;
-    private static final Long THEME_ID = 1L;
-
-    private static final LocalDate DATE_FIRST = LocalDate.parse("2060-01-01");
-    private static final LocalDate DATE_SECOND = LocalDate.parse("2060-01-02");
-
     private String userToken;
 
     @BeforeEach
@@ -69,9 +75,14 @@ class UserReservationControllerTest {
         RestAssured.port = port;
 
         reservationTimeService.save("10:00");
-        themeService.save("t1", "설명1", "https://test.com/test.jpg");
+        themeService.save(new CreateThemeRequest("t1", "설명1", "https://test.com/test.jpg"));
         memberRepository.save(new Member("러너덕", "user@a.com", "123a!", Role.USER));
         memberRepository.save(new Member("트레", "tre@a.com", "123a!", Role.USER));
+        Payment payment = new Payment("1", 1000, "1");
+        payment = paymentRepository.save(payment);
+        when(paymentService.pay(any(PaymentRequest.class)))
+                .thenReturn(payment);
+
 
         LoginRequest user = new LoginRequest("user@a.com", "123a!");
 
@@ -85,10 +96,6 @@ class UserReservationControllerTest {
     @DisplayName("성공: 예약 저장 -> 201")
     @Test
     void save() {
-        doNothing()
-                .when(paymentService)
-                .pay(any(String.class), any(Long.class), any(String.class));
-
         CreateUserReservationRequest request = new CreateUserReservationRequest(
                 DATE_FIRST, THEME_ID, TIME_ID, "1", "1", 1000, "1");
 
@@ -100,16 +107,16 @@ class UserReservationControllerTest {
                 .then().log().all()
                 .statusCode(201)
                 .body("id", is(1))
-                .body("memberName", is("러너덕"))
+                .body("member.name", is("러너덕"))
                 .body("date", is("2060-01-01"))
-                .body("time", is("10:00"))
-                .body("themeName", is("t1"));
+                .body("time.startAt", is("10:00"))
+                .body("theme.name", is("t1"));
     }
 
     @DisplayName("성공: 예약대기 추가 -> 201")
     @Test
     void standby() {
-        userReservationService.reserve(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
+        userReservationService.reserve(new CreateReservationRequest(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID), PAYMENT_ID);
 
         CreateUserReservationStandbyRequest request = new CreateUserReservationStandbyRequest(
                 DATE_FIRST, THEME_ID, TIME_ID);
@@ -122,17 +129,17 @@ class UserReservationControllerTest {
                 .then().log().all()
                 .statusCode(201)
                 .body("id", is(2))
-                .body("memberName", is("러너덕"))
+                .body("member.name", is("러너덕"))
                 .body("date", is("2060-01-01"))
-                .body("time", is("10:00"))
-                .body("themeName", is("t1"));
+                .body("time.startAt", is("10:00"))
+                .body("theme.name", is("t1"));
     }
 
     @DisplayName("성공: 예약대기 삭제 -> 204")
     @Test
     void deleteStandby() {
-        userReservationService.reserve(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
-        userReservationService.standby(USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
+        userReservationService.reserve(new CreateReservationRequest(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID), PAYMENT_ID);
+        userReservationService.standby(USER_ID, new CreateUserReservationStandbyRequest(DATE_FIRST, TIME_ID, THEME_ID));
 
         RestAssured.given().log().all()
                 .cookie("token", userToken)
@@ -144,8 +151,8 @@ class UserReservationControllerTest {
     @DisplayName("실패: 다른 사람의 예약대기 삭제 -> 400")
     @Test
     void deleteStandby_ReservedByOther() {
-        userReservationService.reserve(USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
-        userReservationService.standby(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
+        userReservationService.reserve(new CreateReservationRequest(USER_ID, DATE_FIRST, TIME_ID, THEME_ID), PAYMENT_ID);
+        userReservationService.standby(ANOTHER_USER_ID, new CreateUserReservationStandbyRequest(DATE_FIRST, TIME_ID, THEME_ID));
 
         RestAssured.given().log().all()
                 .cookie("token", userToken)
@@ -158,10 +165,6 @@ class UserReservationControllerTest {
     @DisplayName("실패: 존재하지 않는 time id 예약 -> 400")
     @Test
     void save_TimeIdNotFound() {
-        doNothing()
-                .when(paymentService)
-                .pay(any(String.class), any(Long.class), any(String.class));
-
         CreateUserReservationRequest request = new CreateUserReservationRequest(
                 DATE_FIRST, THEME_ID, 2L, "1", "1", 1000, "1");
 
@@ -178,10 +181,6 @@ class UserReservationControllerTest {
     @DisplayName("실패: 존재하지 않는 theme id 예약 -> 400")
     @Test
     void save_ThemeIdNotFound() {
-        doNothing()
-                .when(paymentService)
-                .pay(any(String.class), any(Long.class), any(String.class));
-
         CreateUserReservationRequest request = new CreateUserReservationRequest(
                 DATE_FIRST, 2L, TIME_ID, "1", "1", 1000, "1");
 
@@ -198,11 +197,7 @@ class UserReservationControllerTest {
     @DisplayName("실패: 중복 예약 -> 400")
     @Test
     void save_Duplication() {
-        doNothing()
-                .when(paymentService)
-                .pay(any(String.class), any(Long.class), any(String.class));
-
-        userReservationService.reserve(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
+        userReservationService.reserve(new CreateReservationRequest(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID), PAYMENT_ID);
 
         CreateUserReservationRequest request
                 = new CreateUserReservationRequest(DATE_FIRST, THEME_ID, TIME_ID, "123", "123", 1000, "123");
@@ -236,9 +231,9 @@ class UserReservationControllerTest {
     @DisplayName("성공: 나의 예약 목록 조회 -> 200")
     @Test
     void findMyReservations() {
-        userReservationService.reserve(USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
-        userReservationService.reserve(ANOTHER_USER_ID, DATE_SECOND, TIME_ID, THEME_ID);
-        userReservationService.standby(USER_ID, DATE_SECOND, TIME_ID, THEME_ID);
+        userReservationService.reserve(new CreateReservationRequest(USER_ID, DATE_FIRST, TIME_ID, THEME_ID), PAYMENT_ID);
+        userReservationService.reserve(new CreateReservationRequest(ANOTHER_USER_ID, DATE_SECOND, TIME_ID, THEME_ID), PAYMENT_ID);
+        userReservationService.standby(USER_ID, new CreateUserReservationStandbyRequest(DATE_SECOND, TIME_ID, THEME_ID));
 
         RestAssured.given().log().all()
                 .cookie("token", userToken)
@@ -246,8 +241,8 @@ class UserReservationControllerTest {
                 .when().get("/reservations/mine")
                 .then().log().all()
                 .statusCode(200)
-                .body("id", contains(1, 3))
-                .body("status", contains("RESERVED", "STANDBY"))
+                .body("reservation.id", contains(1, 3))
+                .body("reservation.status", contains("PAYMENT_RESERVED", "STANDBY"))
                 .body("rank", contains(0, 1));
     }
 }

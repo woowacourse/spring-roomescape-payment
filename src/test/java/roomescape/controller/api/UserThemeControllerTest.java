@@ -15,13 +15,13 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import roomescape.controller.dto.LoginRequest;
+import roomescape.controller.dto.request.CreateThemeRequest;
+import roomescape.controller.dto.request.LoginRequest;
 import roomescape.service.ThemeService;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class UserThemeControllerTest {
-
     @LocalServerPort
     int port;
 
@@ -52,8 +52,8 @@ class UserThemeControllerTest {
     @DisplayName("성공: 테마 조회 -> 200")
     @Test
     void findAll() {
-        themeService.save("t1", "d1", "https://test.com/test1.jpg");
-        themeService.save("t2", "d2", "https://test.com/test2.jpg");
+        themeService.save(new CreateThemeRequest("t1", "d1", "https://test.com/test1.jpg"));
+        themeService.save(new CreateThemeRequest("t2", "d2", "https://test.com/test2.jpg"));
 
         RestAssured.given().log().all()
                 .cookie("token", userToken)

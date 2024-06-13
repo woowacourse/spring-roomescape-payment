@@ -16,7 +16,9 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import roomescape.controller.dto.LoginRequest;
+import roomescape.controller.dto.request.CreateReservationRequest;
+import roomescape.controller.dto.request.CreateThemeRequest;
+import roomescape.controller.dto.request.LoginRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.repository.MemberRepository;
@@ -27,7 +29,6 @@ import roomescape.service.ThemeService;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class UserReservationTimeControllerTest {
-
     @LocalServerPort
     int port;
 
@@ -65,8 +66,8 @@ class UserReservationTimeControllerTest {
     void findAllWithAvailability() {
         reservationTimeService.save("10:00");
         reservationTimeService.save("23:00");
-        themeService.save("t1", "d1", "https://test.com/test.jpg");
-        adminReservationService.reserve(1L, LocalDate.parse("2060-01-01"), 1L, 1L);
+        themeService.save(new CreateThemeRequest("t1", "d1", "https://test.com/test.jpg"));
+        adminReservationService.reserve(new CreateReservationRequest(1L, LocalDate.parse("2060-01-01"), 1L, 1L));
 
         RestAssured.given().log().all()
                 .cookie("token", userToken)
@@ -75,8 +76,8 @@ class UserReservationTimeControllerTest {
                 .when().get("/times/available")
                 .then().log().all()
                 .statusCode(200)
-                .body("id", contains(1, 2))
-                .body("startAt", contains("10:00", "23:00"))
+                .body("time.id", contains(1, 2))
+                .body("time.startAt", contains("10:00", "23:00"))
                 .body("alreadyBooked", contains(true, false));
     }
 }

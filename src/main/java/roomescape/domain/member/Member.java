@@ -1,5 +1,7 @@
 package roomescape.domain.member;
 
+import java.util.Objects;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,7 +15,6 @@ import jakarta.validation.constraints.NotNull;
 @Table(name = "member")
 @Entity
 public class Member {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -24,7 +25,7 @@ public class Member {
     private String name;
 
     @NotNull
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
     @NotNull
@@ -67,11 +68,30 @@ public class Member {
         return password;
     }
 
-    public String getRole() {
-        return role.toString();
+    public Role getRole() {
+        return role;
     }
 
     public boolean isNotAdmin() {
         return role != Role.ADMIN;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Member member = (Member) o;
+        if (id == null || member.id == null) {
+            return Objects.equals(email, member.email);
+        }
+        return Objects.equals(id, member.id);
+    }
+
+    @Override
+    public int hashCode() {
+        if (id == null) {
+            return Objects.hash(email);
+        }
+        return Objects.hash(id);
     }
 }

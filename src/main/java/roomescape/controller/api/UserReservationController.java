@@ -14,54 +14,50 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import roomescape.controller.dto.CreateReservationResponse;
-import roomescape.controller.dto.CreateUserReservationRequest;
-import roomescape.controller.dto.CreateUserReservationStandbyRequest;
-import roomescape.controller.dto.FindMyReservationResponse;
+import roomescape.controller.api.docs.UserReservationApiDocs;
+import roomescape.controller.dto.request.CreateUserReservationRequest;
+import roomescape.controller.dto.request.CreateUserReservationStandbyRequest;
+import roomescape.controller.dto.response.MyReservationResponse;
+import roomescape.controller.dto.response.ReservationResponse;
 import roomescape.domain.member.Member;
 import roomescape.global.argumentresolver.AuthenticationPrincipal;
+import roomescape.service.UserReservationService;
 import roomescape.service.facade.UserReservationGeneralService;
 
 @RestController
 @RequestMapping("/reservations")
-public class UserReservationController {
+public class UserReservationController implements UserReservationApiDocs {
+    private final UserReservationGeneralService reservationGeneralService;
+    private final UserReservationService reservationService;
 
-    private final UserReservationGeneralService reservationFacadeService;
+    public UserReservationController(UserReservationGeneralService reservationGeneralService, UserReservationService reservationService) {
+        this.reservationGeneralService = reservationGeneralService;
+        this.reservationService = reservationService;
+    }
 
-    public UserReservationController(UserReservationGeneralService reservationFacadeService) {
-        this.reservationFacadeService = reservationFacadeService;
+    @GetMapping("/mine")
+    public ResponseEntity<List<MyReservationResponse>> findMyReservations(@AuthenticationPrincipal Member member) {
+        List<MyReservationResponse> response = reservationService.findMyReservationsWithRank(member.getId());
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public ResponseEntity<CreateReservationResponse> save(
+    public ResponseEntity<ReservationResponse> save(
             @Valid @RequestBody CreateUserReservationRequest request,
             @AuthenticationPrincipal Member member) {
 
-        CreateReservationResponse response = reservationFacadeService.reserve(
-                request.orderId(),
-                request.amount(),
-                request.paymentKey(),
-                member.getId(),
-                request.date(),
-                request.timeId(),
-                request.themeId()
-        );
+        ReservationResponse response = reservationGeneralService.reserve(member.getId(), request);
 
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
     }
 
     @PostMapping("/standby")
-    public ResponseEntity<CreateReservationResponse> standby(
+    public ResponseEntity<ReservationResponse> standby(
             @Valid @RequestBody CreateUserReservationStandbyRequest request,
             @AuthenticationPrincipal Member member) {
 
-        CreateReservationResponse response = reservationFacadeService.standby(
-                member.getId(),
-                request.date(),
-                request.timeId(),
-                request.themeId()
-        );
+        ReservationResponse response = reservationService.standby(member.getId(), request);
 
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
@@ -69,13 +65,7 @@ public class UserReservationController {
 
     @DeleteMapping("/standby/{id}")
     public ResponseEntity<Void> deleteStandby(@PathVariable Long id, @AuthenticationPrincipal Member member) {
-        reservationFacadeService.deleteStandby(id, member);
+        reservationService.deleteStandby(id, member);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/mine")
-    public ResponseEntity<List<FindMyReservationResponse>> findMyReservations(@AuthenticationPrincipal Member member) {
-        List<FindMyReservationResponse> response = reservationFacadeService.findMyReservationsWithRank(member.getId());
-        return ResponseEntity.ok(response);
     }
 }

@@ -7,13 +7,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import roomescape.controller.dto.FindMemberResponse;
+import roomescape.controller.api.docs.MemberApiDocs;
+import roomescape.controller.dto.response.MemberResponse;
 import roomescape.service.MemberService;
 
 @RestController
 @RequestMapping("/members")
-public class MemberController {
-
+public class MemberController implements MemberApiDocs {
     private final MemberService memberService;
 
     public MemberController(MemberService memberService) {
@@ -21,8 +21,8 @@ public class MemberController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FindMemberResponse>> findAll() {
-        List<FindMemberResponse> response = memberService.findAll();
+    public ResponseEntity<List<MemberResponse>> findAll() {
+        List<MemberResponse> response = memberService.findAll();
         return ResponseEntity.ok(response);
     }
 }

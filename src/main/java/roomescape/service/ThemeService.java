@@ -6,8 +6,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import roomescape.controller.dto.CreateThemeResponse;
-import roomescape.controller.dto.FindThemeResponse;
+import roomescape.controller.dto.request.CreateThemeRequest;
+import roomescape.controller.dto.response.ThemeResponse;
 import roomescape.domain.theme.Theme;
 import roomescape.global.exception.RoomescapeException;
 import roomescape.repository.ReservationRepository;
@@ -15,7 +15,6 @@ import roomescape.repository.ThemeRepository;
 
 @Service
 public class ThemeService {
-
     private static final int POPULAR_START_DATE = 8;
     private static final int POPULAR_END_DATE = 1;
     private static final int POPULAR_THEME_COUNT = 10;
@@ -29,10 +28,10 @@ public class ThemeService {
     }
 
     @Transactional
-    public CreateThemeResponse save(String name, String description, String thumbnail) {
-        Theme theme = new Theme(name, description, thumbnail);
-        validateDuplication(name);
-        return CreateThemeResponse.from(themeRepository.save(theme));
+    public ThemeResponse save(CreateThemeRequest request) {
+        Theme theme = new Theme(request.name(), request.description(), request.thumbnail());
+        validateDuplication(request.name());
+        return ThemeResponse.from(themeRepository.save(theme));
     }
 
     private void validateDuplication(String name) {
@@ -50,20 +49,20 @@ public class ThemeService {
     }
 
     @Transactional(readOnly = true)
-    public List<FindThemeResponse> findAll() {
+    public List<ThemeResponse> findAll() {
         List<Theme> themes = themeRepository.findAll();
         return themes.stream()
-                .map(FindThemeResponse::from)
+                .map(ThemeResponse::from)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<FindThemeResponse> findPopular() {
+    public List<ThemeResponse> findPopular() {
         LocalDate start = LocalDate.now().minusDays(POPULAR_START_DATE);
         LocalDate end = LocalDate.now().minusDays(POPULAR_END_DATE);
         List<Theme> themes = themeRepository.findPopular(start, end, POPULAR_THEME_COUNT);
         return themes.stream()
-                .map(FindThemeResponse::from)
+                .map(ThemeResponse::from)
                 .toList();
     }
 }

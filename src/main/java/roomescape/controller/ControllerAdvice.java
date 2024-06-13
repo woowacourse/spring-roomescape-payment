@@ -10,8 +10,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import roomescape.controller.dto.ErrorMessageResponse;
+import roomescape.controller.dto.response.ErrorMessageResponse;
 import roomescape.global.exception.AuthorizationException;
+import roomescape.global.exception.PaymentServerException;
 import roomescape.global.exception.RoomescapeException;
 
 @RestControllerAdvice
@@ -48,7 +49,7 @@ public class ControllerAdvice {
         return ResponseEntity.badRequest().body(response);
     }
 
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler({Exception.class, PaymentServerException.class})
     public ResponseEntity<ErrorMessageResponse> handleRuntimeException(Exception exception) {
         logger.error(exception.getMessage());
         exception.printStackTrace();

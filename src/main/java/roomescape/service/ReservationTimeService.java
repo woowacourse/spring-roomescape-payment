@@ -7,9 +7,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import roomescape.controller.dto.CreateTimeResponse;
-import roomescape.controller.dto.FindTimeAndAvailabilityResponse;
-import roomescape.controller.dto.FindTimeResponse;
+import roomescape.controller.dto.response.TimeAndAvailabilityResponse;
+import roomescape.controller.dto.response.TimeResponse;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.global.exception.RoomescapeException;
@@ -18,7 +17,6 @@ import roomescape.repository.ReservationTimeRepository;
 
 @Service
 public class ReservationTimeService {
-
     private final ReservationTimeRepository reservationTimeRepository;
     private final ReservationRepository reservationRepository;
 
@@ -29,10 +27,10 @@ public class ReservationTimeService {
     }
 
     @Transactional
-    public CreateTimeResponse save(String startAt) {
+    public TimeResponse save(String startAt) {
         ReservationTime reservationTime = new ReservationTime(startAt);
         validateDuplication(startAt);
-        return CreateTimeResponse.from(reservationTimeRepository.save(reservationTime));
+        return TimeResponse.from(reservationTimeRepository.save(reservationTime));
     }
 
     private void validateDuplication(String time) {
@@ -50,15 +48,15 @@ public class ReservationTimeService {
     }
 
     @Transactional(readOnly = true)
-    public List<FindTimeResponse> findAll() {
+    public List<TimeResponse> findAll() {
         List<ReservationTime> times = reservationTimeRepository.findAllByOrderByStartAtAsc();
         return times.stream()
-                .map(FindTimeResponse::from)
+                .map(TimeResponse::from)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<FindTimeAndAvailabilityResponse> findAllWithBookAvailability(LocalDate date, Long themeId) {
+    public List<TimeAndAvailabilityResponse> findAllWithBookAvailability(LocalDate date, Long themeId) {
         List<ReservationTime> times = reservationTimeRepository.findAll();
 
         List<Reservation> reservations =
@@ -69,9 +67,8 @@ public class ReservationTimeService {
                 .toList();
 
         return times.stream()
-                .map(time -> new FindTimeAndAvailabilityResponse(
-                        time.getId(),
-                        time.getStartAt(),
+                .map(time -> TimeAndAvailabilityResponse.from(
+                        time,
                         reservedTimes.contains(time)
                 )).toList();
     }

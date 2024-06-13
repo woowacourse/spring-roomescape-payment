@@ -16,17 +16,18 @@ import roomescape.repository.dto.ReservationWithRank;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
-
     Boolean existsByTimeId(Long id);
 
     Boolean existsByThemeId(Long id);
 
     Boolean existsByDateAndTimeIdAndThemeId(LocalDate date, Long timeId, Long themeId);
 
-    Boolean existsByMemberIdAndDateAndTimeIdAndThemeIdAndStatus(
-            Long memberId, LocalDate date, Long timeId, Long themeId, ReservationStatus status);
+    Boolean existsByMemberIdAndDateAndTimeIdAndThemeId(
+            Long memberId, LocalDate date, Long timeId, Long themeId);
 
     Optional<Reservation> findByIdAndStatus(Long id, ReservationStatus status);
+
+    Optional<Reservation> findByIdAndStatusNot(Long id, ReservationStatus status);
 
     @EntityGraph(attributePaths = {"member", "theme", "time"}, type = EntityGraphType.FETCH)
     List<Reservation> findAllByDateAndThemeIdOrderByTimeStartAtAsc(LocalDate date, Long themeId);
@@ -37,6 +38,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @EntityGraph(attributePaths = {"member", "theme", "time"}, type = EntityGraphType.FETCH)
     List<Reservation> findAllByStatusOrderByDateAscTimeStartAtAsc(ReservationStatus status);
+
+    @EntityGraph(attributePaths = {"member", "theme", "time"}, type = EntityGraphType.FETCH)
+    List<Reservation> findAllByStatusNotOrderByDateAscTimeStartAtAsc(ReservationStatus status);
 
     Optional<Reservation> findFirstByDateAndTimeIdAndThemeIdOrderByCreatedAtAsc(LocalDate date, Long timeId, Long themeId);
 

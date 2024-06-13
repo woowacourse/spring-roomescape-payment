@@ -14,31 +14,42 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import roomescape.controller.dto.CreateReservationRequest;
-import roomescape.controller.dto.CreateReservationResponse;
-import roomescape.controller.dto.FindReservationResponse;
-import roomescape.controller.dto.FindReservationStandbyResponse;
-import roomescape.controller.dto.SearchReservationFilterRequest;
+import roomescape.controller.api.docs.AdminReservationApiDocs;
+import roomescape.controller.dto.request.CreateReservationRequest;
+import roomescape.controller.dto.request.SearchReservationFilterRequest;
+import roomescape.controller.dto.response.ReservationResponse;
 import roomescape.service.AdminReservationService;
 
 @RestController
 @RequestMapping("/admin/reservations")
-public class AdminReservationController {
-
+public class AdminReservationController implements AdminReservationApiDocs {
     private final AdminReservationService adminReservationService;
 
     public AdminReservationController(AdminReservationService adminReservationService) {
         this.adminReservationService = adminReservationService;
     }
 
+    @GetMapping
+    public ResponseEntity<List<ReservationResponse>> findAll() {
+        List<ReservationResponse> response = adminReservationService.findAllReserved();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ReservationResponse>> find(SearchReservationFilterRequest request) {
+        List<ReservationResponse> response = adminReservationService.findAllByFilter(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/standby")
+    public ResponseEntity<List<ReservationResponse>> findAllStandby() {
+        List<ReservationResponse> response = adminReservationService.findAllStandby();
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping
-    public ResponseEntity<CreateReservationResponse> save(@Valid @RequestBody CreateReservationRequest request) {
-        CreateReservationResponse response = adminReservationService.reserve(
-                request.memberId(),
-                request.date(),
-                request.timeId(),
-                request.themeId()
-        );
+    public ResponseEntity<ReservationResponse> save(@Valid @RequestBody CreateReservationRequest request) {
+        ReservationResponse response = adminReservationService.reserve(request);
 
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
@@ -50,28 +61,9 @@ public class AdminReservationController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping
-    public ResponseEntity<List<FindReservationResponse>> findAll() {
-        List<FindReservationResponse> response = adminReservationService.findAllReserved();
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/standby")
-    public ResponseEntity<List<FindReservationStandbyResponse>> findAllStandby() {
-        List<FindReservationStandbyResponse> response = adminReservationService.findAllStandby();
-        return ResponseEntity.ok(response);
-    }
-
     @DeleteMapping("/standby/{id}")
     public ResponseEntity<Void> deleteStandby(@PathVariable Long id) {
         adminReservationService.deleteStandby(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/search")
-    public ResponseEntity<List<FindReservationResponse>> find(SearchReservationFilterRequest request) {
-        List<FindReservationResponse> response = adminReservationService.findAllByFilter(
-                request.themeId(), request.memberId(), request.dateFrom(), request.dateTo());
-        return ResponseEntity.ok(response);
     }
 }

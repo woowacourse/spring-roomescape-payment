@@ -18,8 +18,10 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import roomescape.controller.dto.CreateTimeRequest;
-import roomescape.controller.dto.LoginRequest;
+import roomescape.controller.dto.request.CreateReservationRequest;
+import roomescape.controller.dto.request.CreateThemeRequest;
+import roomescape.controller.dto.request.CreateTimeRequest;
+import roomescape.controller.dto.request.LoginRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.repository.MemberRepository;
@@ -30,7 +32,6 @@ import roomescape.service.ThemeService;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class AdminReservationTimeControllerTest {
-
     @LocalServerPort
     int port;
 
@@ -135,8 +136,8 @@ class AdminReservationTimeControllerTest {
     @Test
     void delete_ReservationExists() {
         reservationTimeService.save("10:00");
-        themeService.save("테마1", "설명1", "https://test.com/test.jpg");
-        adminReservationService.reserve(1L, LocalDate.parse("2060-01-01"), 1L, 1L);
+        themeService.save(new CreateThemeRequest("테마1", "설명1", "https://test.com/test.jpg"));
+        adminReservationService.reserve(new CreateReservationRequest(1L, LocalDate.parse("2060-01-01"), 1L, 1L));
 
         RestAssured.given().log().all()
                 .cookie("token", adminToken)

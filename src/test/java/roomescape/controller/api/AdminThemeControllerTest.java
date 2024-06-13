@@ -18,8 +18,9 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import roomescape.controller.dto.CreateThemeRequest;
-import roomescape.controller.dto.LoginRequest;
+import roomescape.controller.dto.request.CreateReservationRequest;
+import roomescape.controller.dto.request.CreateThemeRequest;
+import roomescape.controller.dto.request.LoginRequest;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.repository.MemberRepository;
@@ -30,7 +31,6 @@ import roomescape.service.ThemeService;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
 class AdminThemeControllerTest {
-
     @LocalServerPort
     int port;
 
@@ -84,9 +84,9 @@ class AdminThemeControllerTest {
     @DisplayName("성공: 테마 삭제 -> 204")
     @Test
     void delete() {
-        themeService.save("t1", "d1", "https://test.com/test1.jpg");
-        themeService.save("t2", "d2", "https://test.com/test2.jpg");
-        themeService.save("t3", "d3", "https://test.com/test3.jpg");
+        themeService.save(new CreateThemeRequest("t1", "d1", "https://test.com/test1.jpg"));
+        themeService.save(new CreateThemeRequest("t2", "d2", "https://test.com/test2.jpg"));
+        themeService.save(new CreateThemeRequest("t3", "d3", "https://test.com/test3.jpg"));
 
         RestAssured.given().log().all()
                 .cookie("token", adminToken)
@@ -120,7 +120,7 @@ class AdminThemeControllerTest {
     @DisplayName("실패: 중복 테마 추가 -> 400")
     @Test
     void save_Duplicate() {
-        themeService.save("t1", "d1", "https://test.com/test.jpg");
+        themeService.save(new CreateThemeRequest("t1", "d1", "https://test.com/test.jpg"));
 
         CreateThemeRequest request = new CreateThemeRequest("t1", "d2", "https://test2.com/test.jpg");
 
@@ -138,8 +138,8 @@ class AdminThemeControllerTest {
     @Test
     void delete_ReservationExists() {
         reservationTimeService.save("10:00");
-        themeService.save("테마1", "설명1", "https://test.com/test.jpg");
-        adminReservationService.reserve(1L, LocalDate.parse("2060-01-01"), 1L, 1L);
+        themeService.save(new CreateThemeRequest("테마1", "설명1", "https://test.com/test.jpg"));
+        adminReservationService.reserve(new CreateReservationRequest(1L, LocalDate.parse("2060-01-01"), 1L, 1L));
 
         RestAssured.given().log().all()
                 .cookie("token", adminToken)

@@ -20,6 +20,8 @@ VALUES ('관리자', 'admin@a.com', '123a!', 'ADMIN'),
        ('도도', 'dodo@woowahan.com', '123a!', 'USER'),
        ('제리', 'jerry@woowahan.com', '123a!', 'ADMIN');
 
+INSERT INTO payment(order_id, amount, payment_key) VALUES ('ddd1234ndewrf', 10000, 'kdjoewnsl345fbler');
+
 INSERT INTO reservation(member_id, reserved_date, created_at, time_id, theme_id, status)
 VALUES (1, TIMESTAMPADD(DAY, -1, CURRENT_DATE), TIMESTAMPADD(DAY, -2, CURRENT_DATE), 1, 1, 'RESERVED'),
        (2, TIMESTAMPADD(DAY, -2, CURRENT_DATE), TIMESTAMPADD(DAY, -3, CURRENT_DATE), 1, 1, 'RESERVED'),
@@ -28,3 +30,6 @@ VALUES (1, TIMESTAMPADD(DAY, -1, CURRENT_DATE), TIMESTAMPADD(DAY, -2, CURRENT_DA
        (5, TIMESTAMPADD(DAY, 2, CURRENT_DATE), TIMESTAMPADD(DAY, -3, CURRENT_DATE), 1, 3, 'RESERVED'),
        (6, TIMESTAMPADD(DAY, 2, CURRENT_DATE), TIMESTAMPADD(DAY, -2, CURRENT_DATE), 1, 3, 'STANDBY'),
        (7, TIMESTAMPADD(DAY, 2, CURRENT_DATE), TIMESTAMPADD(DAY, -1, CURRENT_DATE), 1, 3, 'STANDBY');
+
+INSERT INTO reservation(member_id, reserved_date, created_at, time_id, theme_id, payment_id, status)
+VALUES (2, TIMESTAMPADD(DAY, -1, CURRENT_DATE), TIMESTAMPADD(DAY, -3, CURRENT_DATE), 1, 2, 1, 'PAYMENT_RESERVED');
