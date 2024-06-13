@@ -1,42 +1,44 @@
 package roomescape.controller;
 
 import io.restassured.RestAssured;
-import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
-import io.restassured.specification.RequestSpecification;
-import org.junit.jupiter.api.*;
-import org.springframework.restdocs.RestDocumentationContextProvider;
-import roomescape.IntegrationTestSupport;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
+import org.springframework.restdocs.cookies.RequestCookiesSnippet;
+import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.restdocs.payload.RequestFieldsSnippet;
+import org.springframework.restdocs.payload.ResponseFieldsSnippet;
+import roomescape.controller.config.ControllerTestSupport;
 
 import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 
-class ReservationTimeControllerTest extends IntegrationTestSupport {
-
-    private RequestSpecification specification;
+class ReservationTimeControllerTest extends ControllerTestSupport {
 
     String createdId;
     int timeSize;
 
-    @BeforeEach
-    void setUp(RestDocumentationContextProvider restDocumentation) {
-        this.specification = new RequestSpecBuilder()
-                .addFilter(documentationConfiguration(restDocumentation))
-                .build();
-    }
-
     @Test
     @DisplayName("예약 시간 목록 조회")
     void showReservationTime() {
+        RequestCookiesSnippet requestCookies = requestCookies(
+                cookieWithName("token").description("회원 인증 토큰"));
+        ResponseFieldsSnippet responseFields = responseFields(
+                fieldWithPath("[]").type(JsonFieldType.ARRAY).description("응답 배열"),
+                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("키"),
+                fieldWithPath("[].startAt").type(JsonFieldType.STRING).description("시간"));
         RestAssured.given(specification).log().all()
+                .filter(makeDocumentFilter(requestCookies, responseFields))
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
-                .filter(document("time-show"))
                 .cookie("token", ADMIN_TOKEN)
                 .when().get("/times")
                 .then().log().all()
@@ -46,11 +48,19 @@ class ReservationTimeControllerTest extends IntegrationTestSupport {
     @Test
     @DisplayName("예약 시간 추가")
     void saveReservationTime() {
+        RequestCookiesSnippet requestCookies = requestCookies(
+                cookieWithName("token").description("회원 인증 토큰 (어드민이어야 합니다)"));
+        RequestFieldsSnippet requestFields = requestFields(
+                fieldWithPath("startAt").type(JsonFieldType.STRING).description("시간"));
+        ResponseFieldsSnippet responseFields = responseFields(
+                fieldWithPath("id").type(JsonFieldType.NUMBER).description("키"),
+                fieldWithPath("startAt").type(JsonFieldType.STRING).description("시간"));
+
         Map<String, String> param = Map.of("startAt", "12:12");
         RestAssured.given(specification).log().all()
+                .filter(makeDocumentFilter(requestCookies, requestFields, responseFields))
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
-                .filter(document("time-save"))
                 .cookie("token", ADMIN_TOKEN)
                 .body(param)
                 .when().post("/admin/times")
@@ -61,6 +71,9 @@ class ReservationTimeControllerTest extends IntegrationTestSupport {
     @Test
     @DisplayName("예약 시간 삭제")
     void deleteReservationTime() {
+        RequestCookiesSnippet requestCookies = requestCookies(
+                cookieWithName("token").description("회원 인증 토큰 (어드민이어야 합니다)"));
+
         Map<String, String> param = Map.of("startAt", "13:13");
         String createdId = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -73,7 +86,7 @@ class ReservationTimeControllerTest extends IntegrationTestSupport {
         RestAssured.given(specification).log().all()
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
-                .filter(document("time-delete"))
+                .filter(makeDocumentFilter(requestCookies))
                 .cookie("token", ADMIN_TOKEN)
                 .when().delete("/admin/times/" + createdId)
                 .then().log().all()

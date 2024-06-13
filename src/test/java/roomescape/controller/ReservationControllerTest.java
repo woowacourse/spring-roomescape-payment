@@ -1,12 +1,16 @@
 package roomescape.controller;
 
 import io.restassured.RestAssured;
-import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
-import io.restassured.specification.RequestSpecification;
-import org.junit.jupiter.api.*;
-import org.springframework.restdocs.RestDocumentationContextProvider;
-import roomescape.IntegrationTestSupport;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
+import org.springframework.restdocs.cookies.RequestCookiesSnippet;
+import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.restdocs.payload.RequestFieldsSnippet;
+import org.springframework.restdocs.payload.ResponseFieldsSnippet;
+import roomescape.controller.config.ControllerTestSupport;
 import roomescape.domain.payment.PaymentResponse;
 import roomescape.domain.payment.PaymentStatus;
 import roomescape.service.dto.PaymentConfirmRequest;
@@ -24,30 +28,41 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static org.mockito.Mockito.doReturn;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 
-class ReservationControllerTest extends IntegrationTestSupport {
-
-    private RequestSpecification specification;
+class ReservationControllerTest extends ControllerTestSupport {
 
     String userReservationId;
     String adminReservationId;
     int adminReservationSize;
     int userReservationSize;
 
-    @BeforeEach
-    void setUp(RestDocumentationContextProvider restDocumentation) {
-        this.specification = new RequestSpecBuilder()
-                .addFilter(documentationConfiguration(restDocumentation))
-                .build();
-    }
-
     @Test
     @DisplayName("예약 목록 조회")
     void showReservation() {
+        RequestCookiesSnippet requestCookies = requestCookies(
+                cookieWithName("token").description("회원 인증 토큰 (어드민이어야 합니다)"));
+        ResponseFieldsSnippet responseFields = responseFields(
+                fieldWithPath("[]").type(JsonFieldType.ARRAY).description("응답 배열"),
+                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("키"),
+                fieldWithPath("[].date").type(JsonFieldType.STRING).description("추가 날짜"),
+                fieldWithPath("[].member").type(JsonFieldType.OBJECT).description("회원"),
+                fieldWithPath("[].member.id").type(JsonFieldType.NUMBER).description("회원 - 키"),
+                fieldWithPath("[].member.name").type(JsonFieldType.STRING).description("회원 - 이름"),
+                fieldWithPath("[].member.role").type(JsonFieldType.STRING).description("회원 - 역할"),
+                fieldWithPath("[].time").type(JsonFieldType.OBJECT).description("시간"),
+                fieldWithPath("[].time.id").type(JsonFieldType.NUMBER).description("시간 - 키"),
+                fieldWithPath("[].time.startAt").type(JsonFieldType.STRING).description("시간 - 시작 시간"),
+                fieldWithPath("[].theme").type(JsonFieldType.OBJECT).description("테마"),
+                fieldWithPath("[].theme.id").type(JsonFieldType.NUMBER).description("테마 - 키"),
+                fieldWithPath("[].theme.name").type(JsonFieldType.STRING).description("테마 - 이름"),
+                fieldWithPath("[].theme.description").type(JsonFieldType.STRING).description("테마 - 설명"),
+                fieldWithPath("[].theme.thumbnail").type(JsonFieldType.STRING).description("테마 - 썸네일"),
+                fieldWithPath("[].status").type(JsonFieldType.STRING).description("예약 혹은 대기 상태"));
         RestAssured.given(specification).log().all()
-                .filter(document("reservation-show"))
+                .filter(makeDocumentFilter(requestCookies, responseFields))
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
                 .cookie("token", ADMIN_TOKEN)
@@ -59,17 +74,38 @@ class ReservationControllerTest extends IntegrationTestSupport {
     @Test
     @DisplayName("예약 추가")
     void saveReservation() {
+        RequestCookiesSnippet requestCookies = requestCookies(
+                cookieWithName("token").description("회원 인증 토큰"));
+        RequestFieldsSnippet requestFields = requestFields(
+                fieldWithPath("date").type(JsonFieldType.STRING).description("날짜"),
+                fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("회원 키"),
+                fieldWithPath("timeId").type(JsonFieldType.NUMBER).description("시간 키"),
+                fieldWithPath("themeId").type(JsonFieldType.NUMBER).description("테마 키"));
+        ResponseFieldsSnippet responseFields = responseFields(
+                fieldWithPath("id").type(JsonFieldType.NUMBER).description("키"),
+                fieldWithPath("date").type(JsonFieldType.STRING).description("추가 날짜"),
+                fieldWithPath("member").type(JsonFieldType.OBJECT).description("회원"),
+                fieldWithPath("member.id").type(JsonFieldType.NUMBER).description("회원 - 키"),
+                fieldWithPath("member.name").type(JsonFieldType.STRING).description("회원 - 이름"),
+                fieldWithPath("member.role").type(JsonFieldType.STRING).description("회원 - 역할"),
+                fieldWithPath("time").type(JsonFieldType.OBJECT).description("시간"),
+                fieldWithPath("time.id").type(JsonFieldType.NUMBER).description("시간 - 키"),
+                fieldWithPath("time.startAt").type(JsonFieldType.STRING).description("시간 - 시작 시간"),
+                fieldWithPath("theme").type(JsonFieldType.OBJECT).description("테마"),
+                fieldWithPath("theme.id").type(JsonFieldType.NUMBER).description("테마 - 키"),
+                fieldWithPath("theme.name").type(JsonFieldType.STRING).description("테마 - 이름"),
+                fieldWithPath("theme.description").type(JsonFieldType.STRING).description("테마 - 설명"),
+                fieldWithPath("theme.thumbnail").type(JsonFieldType.STRING).description("테마 - 썸네일"),
+                fieldWithPath("status").type(JsonFieldType.STRING).description("예약 혹은 대기 상태"));
+
         Map<String, Object> params = Map.of(
                 "memberId", 1L,
                 "date", "9999-09-09",
                 "timeId", 1L,
-                "themeId", 1L,
-                "amount", 1000,
-                "orderId", "orderId",
-                "paymentKey", "paymentKey");
+                "themeId", 1L);
 
         RestAssured.given(specification).log().all()
-                .filter(document("reservation-save"))
+                .filter(makeDocumentFilter(requestCookies, requestFields, responseFields))
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
                 .cookie("token", ADMIN_TOKEN)
@@ -82,6 +118,8 @@ class ReservationControllerTest extends IntegrationTestSupport {
     @Test
     @DisplayName("예약 삭제")
     void deleteReservation() {
+        RequestCookiesSnippet requestCookies = requestCookies(
+                cookieWithName("token").description("회원 인증 토큰 (어드민이어야 합니다)"));
         Map<String, Object> params = Map.of(
                 "memberId", 1L,
                 "date", "9999-09-09",
@@ -99,7 +137,7 @@ class ReservationControllerTest extends IntegrationTestSupport {
                 .statusCode(201).extract().header("location").split("/")[2];
 
         RestAssured.given(specification).log().all()
-                .filter(document("reservation-delete"))
+                .filter(makeDocumentFilter(requestCookies))
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
                 .cookie("token", ADMIN_TOKEN)

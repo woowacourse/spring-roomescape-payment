@@ -1,42 +1,50 @@
 package roomescape.controller;
 
 import io.restassured.RestAssured;
-import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
-import io.restassured.specification.RequestSpecification;
-import org.junit.jupiter.api.*;
-import org.springframework.restdocs.RestDocumentationContextProvider;
-import roomescape.IntegrationTestSupport;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
+import org.springframework.restdocs.cookies.RequestCookiesSnippet;
+import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.restdocs.payload.RequestFieldsSnippet;
+import org.springframework.restdocs.payload.ResponseFieldsSnippet;
+import org.springframework.restdocs.request.QueryParametersSnippet;
+import roomescape.controller.config.ControllerTestSupport;
 
 import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 
-class ThemeControllerTest extends IntegrationTestSupport {
-
-    private RequestSpecification specification;
+class ThemeControllerTest extends ControllerTestSupport {
 
     String createdId;
     int themeSize;
 
-    @BeforeEach
-    void setUp(RestDocumentationContextProvider restDocumentation) {
-        this.specification = new RequestSpecBuilder()
-                .addFilter(documentationConfiguration(restDocumentation))
-                .build();
-    }
-
     @Test
     @DisplayName("테마 목록 조회")
     void showTheme() {
+        RequestCookiesSnippet requestCookies = requestCookies(
+                cookieWithName("token").description("회원 인증 토큰"));
+        ResponseFieldsSnippet responseFields = responseFields(
+                fieldWithPath("[]").type(JsonFieldType.ARRAY).description("응답 배열"),
+                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("키"),
+                fieldWithPath("[].name").type(JsonFieldType.STRING).description("이름"),
+                fieldWithPath("[].description").type(JsonFieldType.STRING).description("설명"),
+                fieldWithPath("[].thumbnail").type(JsonFieldType.STRING).description("썸네일"));
+
         RestAssured.given(specification).log().all()
+                .filter(makeDocumentFilter(requestCookies, responseFields))
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
-                .filter(document("theme-show"))
                 .cookie("token", ADMIN_TOKEN)
                 .when().get("/themes")
                 .then().log().all()
@@ -46,14 +54,26 @@ class ThemeControllerTest extends IntegrationTestSupport {
     @Test
     @DisplayName("테마 추가")
     void saveTheme() {
+        RequestCookiesSnippet requestCookies = requestCookies(
+                cookieWithName("token").description("회원 인증 토큰"));
+        RequestFieldsSnippet requestFields = requestFields(
+                fieldWithPath("name").type(JsonFieldType.STRING).description("이름"),
+                fieldWithPath("description").type(JsonFieldType.STRING).description("설명"),
+                fieldWithPath("thumbnail").type(JsonFieldType.STRING).description("썸네일"));
+        ResponseFieldsSnippet responseFields = responseFields(
+                fieldWithPath("id").type(JsonFieldType.NUMBER).description("키"),
+                fieldWithPath("name").type(JsonFieldType.STRING).description("이름"),
+                fieldWithPath("description").type(JsonFieldType.STRING).description("설명"),
+                fieldWithPath("thumbnail").type(JsonFieldType.STRING).description("썸네일"));
+
         Map<String, String> param = Map.of(
                 "name", "테마_테스트",
                 "description", "설명_테스트",
                 "thumbnail", "썸네일");
         RestAssured.given(specification).log().all()
+                .filter(makeDocumentFilter(requestCookies, requestFields, responseFields))
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
-                .filter(document("theme-save"))
                 .cookie("token", ADMIN_TOKEN)
                 .body(param)
                 .when().post("/admin/themes")
@@ -64,6 +84,9 @@ class ThemeControllerTest extends IntegrationTestSupport {
     @Test
     @DisplayName("테마 삭제")
     void deleteTheme() {
+        RequestCookiesSnippet requestCookies = requestCookies(
+                cookieWithName("token").description("회원 인증 토큰 (어드민이어야 합니다)"));
+
         Map<String, String> param = Map.of(
                 "name", "테마_테스트",
                 "description", "설명_테스트",
@@ -79,7 +102,7 @@ class ThemeControllerTest extends IntegrationTestSupport {
         RestAssured.given(specification).log().all()
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
-                .filter(document("theme-delete"))
+                .filter(makeDocumentFilter(requestCookies))
                 .cookie("token", ADMIN_TOKEN)
                 .when().delete("/admin/themes/" + createdId)
                 .then().log().all()
@@ -89,14 +112,25 @@ class ThemeControllerTest extends IntegrationTestSupport {
     @Test
     @DisplayName("인기 테마 조회")
     void showPopularTheme() {
+        QueryParametersSnippet request = queryParameters(
+                parameterWithName("startDate").description("시작 날짜"),
+                parameterWithName("endDate").description("끝 날짜"),
+                parameterWithName("limit").description("개수"));
+        ResponseFieldsSnippet response = responseFields(
+                fieldWithPath("[]").type(JsonFieldType.ARRAY).description("응답 배열"),
+                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("키"),
+                fieldWithPath("[].name").type(JsonFieldType.STRING).description("이름"),
+                fieldWithPath("[].description").type(JsonFieldType.STRING).description("설명"),
+                fieldWithPath("[].thumbnail").type(JsonFieldType.STRING).description("썸네일"));
+
         Map<String, String> params = Map.of(
-                "startDate", "2024-05-04",
-                "endDate", "2024-05-09",
+                "startDate", "2000-01-01",
+                "endDate", "9999-09-09",
                 "limit", "2");
         RestAssured.given(specification).log().all()
+                .filter(makeDocumentFilter(request, response))
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
-                .filter(document("theme-show-popular"))
                 .queryParams(params)
                 .when().get("/themes/popular")
                 .then().log().all()

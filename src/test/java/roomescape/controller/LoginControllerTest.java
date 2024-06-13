@@ -1,13 +1,19 @@
 package roomescape.controller;
 
 import io.restassured.RestAssured;
-import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.specification.RequestSpecification;
-import org.junit.jupiter.api.*;
+import io.restassured.http.ContentType;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.RestDocumentationContextProvider;
-import roomescape.IntegrationTestSupport;
+import org.springframework.restdocs.cookies.RequestCookiesSnippet;
+import org.springframework.restdocs.cookies.ResponseCookiesSnippet;
+import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.restdocs.payload.RequestFieldsSnippet;
+import org.springframework.restdocs.payload.ResponseFieldsSnippet;
+import roomescape.controller.config.ControllerTestSupport;
 import roomescape.controller.dto.LoginRequest;
 import roomescape.service.dto.MemberResponse;
 
@@ -15,29 +21,25 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.cookies.CookieDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 
-class LoginControllerTest extends IntegrationTestSupport {
-
-    private RequestSpecification specification;
+class LoginControllerTest extends ControllerTestSupport {
 
     String accessToken;
-
-    @BeforeEach
-    void setUp(RestDocumentationContextProvider restDocumentation) {
-        this.specification = new RequestSpecBuilder()
-                .addFilter(documentationConfiguration(restDocumentation))
-                .build();
-    }
 
     @Test
     @DisplayName("로그인")
     void login() {
+        RequestFieldsSnippet requestFields = requestFields(
+                fieldWithPath("email").type(JsonFieldType.STRING).description("이메일"),
+                fieldWithPath("password").type(JsonFieldType.STRING).description("패스워드"));
+        ResponseCookiesSnippet responseCookies = responseCookies(
+                cookieWithName("token").description("회원 인증 토큰"));
         RestAssured.given(specification).log().all()
-                .filter(document("auth-login"))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .filter(makeDocumentFilter(requestFields, responseCookies))
+                .contentType(ContentType.JSON)
+                .accept(ContentType.JSON)
                 .body(new LoginRequest(ADMIN_EMAIL, ADMIN_PASSWORD))
                 .when().post("/login")
                 .then().log().all()
@@ -47,9 +49,11 @@ class LoginControllerTest extends IntegrationTestSupport {
     @Test
     @DisplayName("로그아웃")
     void logout() {
+        RequestCookiesSnippet requestCookies = requestCookies(
+                cookieWithName("token").description("회원 인증 토큰"));
         String cookie = RestAssured.given(specification).log().all()
-                .filter(document("auth-logout"))
-                .accept(MediaType.APPLICATION_JSON_VALUE)
+                .filter(makeDocumentFilter(requestCookies))
+                .accept(ContentType.JSON)
                 .cookie("token", ADMIN_TOKEN)
                 .when().post("/logout")
                 .then().log().all()
@@ -61,9 +65,15 @@ class LoginControllerTest extends IntegrationTestSupport {
     @Test
     @DisplayName("로그인 확인")
     void loginCheck() {
+        RequestCookiesSnippet requestCookies = requestCookies(
+                cookieWithName("token").description("회원 인증 토큰"));
+        ResponseFieldsSnippet responseFields = responseFields(
+                fieldWithPath("id").type(JsonFieldType.NUMBER).description("키"),
+                fieldWithPath("name").type(JsonFieldType.STRING).description("이름"),
+                fieldWithPath("role").type(JsonFieldType.STRING).description("역할"));
         MemberResponse member = RestAssured.given(specification).log().all()
-                .accept(MediaType.APPLICATION_JSON_VALUE)
-                .filter(document("auth-check"))
+                .filter(makeDocumentFilter(requestCookies, responseFields))
+                .accept(ContentType.JSON)
                 .cookie("token", ADMIN_TOKEN)
                 .when().get("/login/check")
                 .then().log().all()

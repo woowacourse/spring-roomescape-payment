@@ -1,47 +1,50 @@
 package roomescape.controller;
 
 import io.restassured.RestAssured;
-import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
-import io.restassured.specification.RequestSpecification;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.RestDocumentationContextProvider;
-import roomescape.IntegrationTestSupport;
+import org.springframework.restdocs.cookies.RequestCookiesSnippet;
+import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.restdocs.payload.RequestFieldsSnippet;
+import org.springframework.restdocs.payload.ResponseFieldsSnippet;
+import roomescape.controller.config.ControllerTestSupport;
 
 import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 
-class MemberControllerTest extends IntegrationTestSupport {
+class MemberControllerTest extends ControllerTestSupport {
 
-    public static final String TEST_EMAIL = "test@test.com";
-    public static final String TEST_PASSWORD = "1234";
-    public static final String TEST_NAME = "테스트";
-
-    private RequestSpecification specification;
+    private static final String TEST_EMAIL = "test@test.com";
+    private static final String TEST_PASSWORD = "1234";
+    private static final String TEST_NAME = "테스트";
 
     String createdId;
     int memberSize;
 
-    @BeforeEach
-    void setUp(RestDocumentationContextProvider restDocumentation) {
-        this.specification = new RequestSpecBuilder()
-                .addFilter(documentationConfiguration(restDocumentation))
-                .build();
-    }
-
     @Test
     @DisplayName("회원 목록 조회")
     void showMember() {
+        RequestCookiesSnippet requestCookies = requestCookies(
+                cookieWithName("token").description("회원 인증 토큰 (어드민이어야 합니다)"));
+        ResponseFieldsSnippet responseFields = responseFields(
+                fieldWithPath("[]").type(JsonFieldType.ARRAY).description("응답 배열"),
+                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("키"),
+                fieldWithPath("[].name").type(JsonFieldType.STRING).description("이름"),
+                fieldWithPath("[].role").type(JsonFieldType.STRING).description("역할"));
         RestAssured.given(specification).log().all()
+                .filter(makeDocumentFilter(requestCookies, responseFields))
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
-                .filter(document("member-show"))
                 .cookie("token", ADMIN_TOKEN)
                 .when().get("/admin/members")
                 .then().log().all()
@@ -51,15 +54,19 @@ class MemberControllerTest extends IntegrationTestSupport {
     @Test
     @DisplayName("회원 추가")
     void saveMember() {
+        RequestFieldsSnippet requestFields = requestFields(
+                fieldWithPath("email").type(JsonFieldType.STRING).description("이메일"),
+                fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호"),
+                fieldWithPath("name").type(JsonFieldType.STRING).description("이름"));
         Map<String, String> params = Map.of(
                 "email", "ever@email.com",
                 "password", "password",
                 "name", "ever");
         RestAssured.given(specification).log().all()
-                .body(params)
+                .filter(makeDocumentFilter(requestFields))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .accept(ContentType.JSON)
-                .filter(document("member-save"))
+                .body(params)
                 .when().post("/members")
                 .then().log().all()
                 .statusCode(201);
@@ -68,6 +75,8 @@ class MemberControllerTest extends IntegrationTestSupport {
     @Test
     @DisplayName("회원 삭제")
     void deleteMember() {
+        RequestCookiesSnippet requestCookies = requestCookies(
+                cookieWithName("token").description("회원 인증 토큰 (어드민이어야 합니다)"));
         Map<String, String> params = Map.of(
                 "email", "ever2@email.com",
                 "password", "password",
@@ -80,9 +89,9 @@ class MemberControllerTest extends IntegrationTestSupport {
                 .statusCode(201).extract().header("location").split("/")[2];
 
         RestAssured.given(specification).log().all()
+                .filter(makeDocumentFilter(requestCookies))
                 .contentType(ContentType.JSON)
                 .accept(ContentType.JSON)
-                .filter(document("member-delete"))
                 .cookie("token", ADMIN_TOKEN)
                 .when().delete("/admin/members/" + createdId)
                 .then().log().all()

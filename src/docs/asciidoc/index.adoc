@@ -3,133 +3,80 @@ ifndef::snippets[]
 endif::[]
 
 
-== 1. 회원
+== 1️⃣ 회원
 :domain: member
+:class-name: member-controller-test
 
 === 조회
-==== request
-include::{snippets}/{domain}-show/http-request.adoc[]
-==== response
-include::{snippets}/{domain}-show/http-response.adoc[]
+operation::{class-name}/show-{domain}[snippets='request-cookies,response-fields,http-request,http-response']
 
 === 저장
-==== request
-include::{snippets}/{domain}-save/http-request.adoc[]
-==== response
-include::{snippets}/{domain}-save/http-response.adoc[]
+operation::{class-name}/save-{domain}[snippets='request-fields,http-request,http-response']
 
 === 삭제
-==== request
-include::{snippets}/{domain}-delete/http-request.adoc[]
-==== response
-include::{snippets}/{domain}-delete/http-response.adoc[]
+operation::{class-name}/delete-{domain}[snippets='request-cookies,http-request,http-response']
 
-
-== 2. 인증
+== 2️⃣ 인증
 :domain: auth
+:class-name: login-controller-test
 
 === 로그인
-==== request
-include::{snippets}/{domain}-login/http-request.adoc[]
-==== response
-include::{snippets}/{domain}-login/http-response.adoc[]
+operation::{class-name}/login[snippets='request-fields,http-request,http-response']
 
 === 로그아웃
-==== request
-include::{snippets}/{domain}-logout/http-request.adoc[]
-==== response
-include::{snippets}/{domain}-logout/http-response.adoc[]
+operation::{class-name}/logout[snippets='request-cookies,http-request,http-response']
 
 === 로그인 여부 확인
-==== request
-include::{snippets}/{domain}-check/http-request.adoc[]
-==== response
-include::{snippets}/{domain}-check/http-response.adoc[]
+operation::{class-name}/login-check[snippets='request-cookies,response-fields,http-request,http-response']
 
-
-== 3. 예약 시간
-:domain: time
+== 3️⃣ 예약 시간
+:domain: reservation-time
+:class-name: reservation-time-controller-test
 
 === 조회
-==== request
-include::{snippets}/{domain}-show/http-request.adoc[]
-==== response
-include::{snippets}/{domain}-show/http-response.adoc[]
+operation::{class-name}/show-{domain}[snippets='request-cookies,response-fields,http-request,http-response']
 
 === 저장
-==== request
-include::{snippets}/{domain}-save/http-request.adoc[]
-==== response
-include::{snippets}/{domain}-save/http-response.adoc[]
+operation::{class-name}/save-{domain}[snippets='request-cookies,request-fields,response-fields,http-request,http-response']
 
 === 삭제
-==== request
-include::{snippets}/{domain}-delete/http-request.adoc[]
-==== response
-include::{snippets}/{domain}-delete/http-response.adoc[]
+operation::{class-name}/delete-{domain}[snippets='request-cookies,http-request,http-response']
 
-
-== 4. 테마
+== 4️⃣ 테마
 :domain: theme
+:class-name: theme-controller-test
 
 === 조회
-==== request
-include::{snippets}/{domain}-show/http-request.adoc[]
-==== response
-include::{snippets}/{domain}-show/http-response.adoc[]
+operation::{class-name}/show-{domain}[snippets='request-cookies,response-fields,http-request,http-response']
 
 === 저장
-==== request
-include::{snippets}/{domain}-save/http-request.adoc[]
-==== response
-include::{snippets}/{domain}-save/http-response.adoc[]
+operation::{class-name}/save-{domain}[snippets='request-cookies,request-fields,response-fields,http-request,http-response']
 
 === 삭제
-==== request
-include::{snippets}/{domain}-delete/http-request.adoc[]
-==== response
-include::{snippets}/{domain}-delete/http-response.adoc[]
+operation::{class-name}/delete-{domain}[snippets='request-cookies,http-request,http-response']
 
 === 인기 조회
-==== request
-include::{snippets}/{domain}-show-popular/http-request.adoc[]
-==== response
-include::{snippets}/{domain}-show-popular/http-response.adoc[]
+operation::{class-name}/show-popular-theme[snippets='response-fields,http-request,http-response']
 
-
-== 5. 예약
+== 5️⃣ 예약
 :domain: reservation
+:class-name: reservation-controller-test
 
 === 조회
-==== request
-include::{snippets}/{domain}-show/http-request.adoc[]
-==== response
-include::{snippets}/{domain}-show/http-response.adoc[]
+operation::{class-name}/show-{domain}[snippets='request-cookies,response-fields,http-request,http-response']
 
 === 저장
-==== request
-include::{snippets}/{domain}-save/http-request.adoc[]
-==== response
-include::{snippets}/{domain}-save/http-response.adoc[]
+operation::{class-name}/save-{domain}[snippets='request-cookies,request-fields,response-fields,http-request,http-response']
 
 === 삭제
-==== request
-include::{snippets}/{domain}-delete/http-request.adoc[]
-==== response
-include::{snippets}/{domain}-delete/http-response.adoc[]
+operation::{class-name}/delete-{domain}[snippets='request-cookies,http-request,http-response']
 
 === 검색 (필터링)
-==== request
-include::{snippets}/{domain}-filter/http-request.adoc[]
-==== response
-include::{snippets}/{domain}-filter/http-response.adoc[]
+operation::admin-reservation-controller-test/find-reservation-by-filter[snippets='request-cookies,response-fields,http-request,http-response']
 
-
-== 6. 대기
+== 6️⃣ 대기
 :domain: waiting
+:class-name: reservation-controller-test
 
 === 조회
-==== request
-include::{snippets}/{domain}-show/http-request.adoc[]
-==== response
-include::{snippets}/{domain}-show/http-response.adoc[]
+operation::admin-reservation-controller-test/find-all-waiting[snippets='request-cookies,response-fields,http-request,http-response']
