@@ -5,7 +5,6 @@ import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservationwaiting.WaitingWithRank;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -16,12 +15,7 @@ public record PersonalReservationResponse(
         LocalTime time,
         String theme,
         String status,
-        String paymentKey,
-        BigDecimal amount,
-        String paymentType,
-        String accountNumber,
-        String accountHolder,
-        String bankName
+        PaymentResponse payment
 ) {
 
     public static PersonalReservationResponse from(Reservation reservation, Payment payment) {
@@ -31,12 +25,7 @@ public record PersonalReservationResponse(
                 reservation.getTime().getStartAt(),
                 reservation.getTheme().getRawName(),
                 "예약",
-                payment.getPaymentKey(),
-                payment.getAmount(),
-                payment.getPayType().getDescription(),
-                payment.getAccountNumber(),
-                payment.getAccountHolder(),
-                payment.getBankName()
+                PaymentResponse.from(payment)
         );
     }
 
@@ -47,12 +36,7 @@ public record PersonalReservationResponse(
                 waitingWithRank.time(),
                 waitingWithRank.themeName(),
                 String.format("%d번째 예약 대기", waitingWithRank.rank()),
-                null,
-                null,
-                null,
-                null,
-                null,
-                null
+                PaymentResponse.empty()
         );
     }
 }

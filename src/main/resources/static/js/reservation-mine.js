@@ -35,13 +35,14 @@ function render(data) {
       };
       cancelCell.appendChild(cancelButton);
     } else { // 예약 완료 상태일 때
+      const payment = item.payment;
       row.insertCell(4).textContent = '';
-      row.insertCell(5).textContent = item.paymentKey;
-      row.insertCell(6).textContent = item.amount;
-      row.insertCell(7).textContent = item.paymentType;
-      row.insertCell(8).textContent = item.accountNumber;
-      row.insertCell(9).textContent = item.accountHolder;
-      row.insertCell(10).textContent = item.bankName;
+      row.insertCell(5).textContent = payment.paymentKey;
+      row.insertCell(6).textContent = payment.amount;
+      row.insertCell(7).textContent = payment.paymentType;
+      row.insertCell(8).textContent = payment.accountNumber;
+      row.insertCell(9).textContent = payment.accountHolder;
+      row.insertCell(10).textContent = payment.bankName;
     }
   });
 }

@@ -8,6 +8,7 @@ import roomescape.controller.api.ReservationController;
 import roomescape.controller.dto.request.ReservationRequest;
 import roomescape.service.ReservationPaymentFacadeService;
 import roomescape.service.ReservationQueryService;
+import roomescape.service.dto.response.PaymentResponse;
 import roomescape.service.dto.response.PersonalReservationResponse;
 import roomescape.service.dto.response.ReservationResponse;
 
@@ -74,9 +75,9 @@ public class ReservationApiDocumentationTest extends BaseDocumentationTest {
     void getMyReservations() throws Exception {
         when(reservationQueryService.getMyReservations(any()))
                 .thenReturn(List.of(
-                        new PersonalReservationResponse(1L, LocalDate.parse("2024-06-10"), LocalTime.parse("10:00"), "테마명1", "예약", "testPaymentKey", BigDecimal.valueOf(10000), "토스페이", null, null, null),
-                        new PersonalReservationResponse(2L, LocalDate.parse("2024-06-11"), LocalTime.parse("11:00"), "테마명2", "예약", null, BigDecimal.valueOf(20000), "계좌이체", "1111-2222-333", "프린", "우아한은행"),
-                        new PersonalReservationResponse(1L, LocalDate.parse("2024-06-12"), LocalTime.parse("12:00"), "테마명3", "예약대기", null, null, null, null, null, null)
+                        new PersonalReservationResponse(1L, LocalDate.parse("2024-06-10"), LocalTime.parse("10:00"), "테마명1", "예약", new PaymentResponse("testPaymentKey", BigDecimal.valueOf(10000), "토스페이", null, null, null)),
+                        new PersonalReservationResponse(2L, LocalDate.parse("2024-06-11"), LocalTime.parse("11:00"), "테마명2", "예약", new PaymentResponse(null, BigDecimal.valueOf(20000), "계좌이체", "1111-2222-333", "프린", "우아한은행")),
+                        new PersonalReservationResponse(1L, LocalDate.parse("2024-06-12"), LocalTime.parse("12:00"), "테마명3", "예약대기", PaymentResponse.empty())
                 ));
 
         mockMvc.perform(get("/reservations/mine")
@@ -90,12 +91,12 @@ public class ReservationApiDocumentationTest extends BaseDocumentationTest {
                                 fieldWithPath("list.[].time").description("예약 시간"),
                                 fieldWithPath("list.[].theme").description("테마명"),
                                 fieldWithPath("list.[].status").description("예약 상태 (예약 or 예약대기)"),
-                                fieldWithPath("list.[].paymentKey").description("결제 키 (결제 수단이 계좌이체가 아닐 경우)").optional(),
-                                fieldWithPath("list.[].amount").description("결제 금액 (예약 상태가 예약일 경우)").optional(),
-                                fieldWithPath("list.[].paymentType").description("결제 수단 (예약 상태가 예약일 경우)").optional(),
-                                fieldWithPath("list.[].accountNumber").description("계좌번호 (결제 수단이 계좌이체일 경우)").optional(),
-                                fieldWithPath("list.[].accountHolder").description("예금주 (결제 수단이 계좌이체일 경우)").optional(),
-                                fieldWithPath("list.[].bankName").description("은행명 (결제 수단이 계좌이체일 경우)").optional()
+                                fieldWithPath("list.[].payment.paymentKey").description("결제 키 (결제 수단이 계좌이체가 아닐 경우)").optional(),
+                                fieldWithPath("list.[].payment.amount").description("결제 금액 (예약 상태가 예약일 경우)").optional(),
+                                fieldWithPath("list.[].payment.paymentType").description("결제 수단 (예약 상태가 예약일 경우)").optional(),
+                                fieldWithPath("list.[].payment.accountNumber").description("계좌번호 (결제 수단이 계좌이체일 경우)").optional(),
+                                fieldWithPath("list.[].payment.accountHolder").description("예금주 (결제 수단이 계좌이체일 경우)").optional(),
+                                fieldWithPath("list.[].payment.bankName").description("은행명 (결제 수단이 계좌이체일 경우)").optional()
                         )
                 ));
     }
