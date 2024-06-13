@@ -10,11 +10,19 @@ include::{snippets}/member/signup/curl-request.adoc[]
 
 include::{snippets}/member/signup/http-request.adoc[]
 
+Body
+
 include::{snippets}/member/signup/request-fields.adoc[]
 
 ===== response
 
 include::{snippets}/member/signup/http-response.adoc[]
+
+Header
+
+include::{snippets}/member/signup/response-headers.adoc[]
+
+Body
 
 include::{snippets}/member/signup/response-fields.adoc[]
 
@@ -31,6 +39,8 @@ include::{snippets}/member/findAll/http-request.adoc[]
 ===== response
 
 include::{snippets}/member/findAll/http-response.adoc[]
+
+Body
 
 include::{snippets}/member/findAll/response-fields.adoc[]
 

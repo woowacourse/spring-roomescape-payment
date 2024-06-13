@@ -10,12 +10,14 @@ include::{snippets}/reservation/conditions/curl-request.adoc[]
 
 include::{snippets}/reservation/conditions/http-request.adoc[]
 
+Parameter
 include::{snippets}/reservation/conditions/query-parameters.adoc[]
 
 ===== response
 
 include::{snippets}/reservation/conditions/http-response.adoc[]
 
+Body
 include::{snippets}/reservation/conditions/response-fields.adoc[]
 
 ==== 나의 예약 조회
@@ -32,6 +34,7 @@ include::{snippets}/reservation/mine/http-request.adoc[]
 
 include::{snippets}/reservation/mine/http-response.adoc[]
 
+Body
 include::{snippets}/reservation/mine/response-fields.adoc[]
 
 ==== 예약 생성
@@ -44,12 +47,17 @@ include::{snippets}/reservation/create/curl-request.adoc[]
 
 include::{snippets}/reservation/create/http-request.adoc[]
 
+Body
 include::{snippets}/reservation/create/request-fields.adoc[]
 
 ===== response
 
 include::{snippets}/reservation/create/http-response.adoc[]
 
+Header
+include::{snippets}/reservation/create/response-headers.adoc[]
+
+Body
 include::{snippets}/reservation/create/response-fields.adoc[]
 
 ==== 예약 취소
@@ -62,6 +70,7 @@ include::{snippets}/reservation/cancel/curl-request.adoc[]
 
 include::{snippets}/reservation/cancel/http-request.adoc[]
 
+Parameter
 include::{snippets}/reservation/cancel/query-parameters.adoc[]
 
 include::{snippets}/reservation/cancel/path-parameters.adoc[]

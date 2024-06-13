@@ -14,6 +14,8 @@ include::{snippets}/theme/findAll/http-request.adoc[]
 
 include::{snippets}/theme/findAll/http-response.adoc[]
 
+Body
+
 include::{snippets}/theme/findAll/response-fields.adoc[]
 
 ==== 테마 생성
@@ -26,11 +28,19 @@ include::{snippets}/theme/create/curl-request.adoc[]
 
 include::{snippets}/theme/create/http-request.adoc[]
 
+Body
+
 include::{snippets}/theme/create/request-fields.adoc[]
 
 ===== response
 
 include::{snippets}/theme/create/http-response.adoc[]
+
+Header
+
+include::{snippets}/theme/create/response-headers.adoc[]
+
+Body
 
 include::{snippets}/theme/create/response-fields.adoc[]
 
@@ -60,10 +70,14 @@ include::{snippets}/theme/popular/curl-request.adoc[]
 
 include::{snippets}/theme/popular/http-request.adoc[]
 
+Parameter
+
 include::{snippets}/theme/popular/query-parameters.adoc[]
 
 ===== response
 
 include::{snippets}/theme/popular/http-response.adoc[]
+
+Body
 
 include::{snippets}/theme/popular/response-fields.adoc[]

@@ -10,12 +10,17 @@ include::{snippets}/reservationWaiting/create/curl-request.adoc[]
 
 include::{snippets}/reservationWaiting/create/http-request.adoc[]
 
+Body
 include::{snippets}/reservationWaiting/create/request-fields.adoc[]
 
 ===== response
 
 include::{snippets}/reservationWaiting/create/http-response.adoc[]
 
+Header
+include::{snippets}/reservationWaiting/create/response-headers.adoc[]
+
+Body
 include::{snippets}/reservationWaiting/create/response-fields.adoc[]
 
 ==== 예약 대기 삭제

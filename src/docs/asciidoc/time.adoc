@@ -14,6 +14,8 @@ include::{snippets}/time/findAll/http-request.adoc[]
 
 include::{snippets}/time/findAll/http-response.adoc[]
 
+Body
+
 include::{snippets}/time/findAll/response-fields.adoc[]
 
 ==== 예약 시간 생성
@@ -26,11 +28,19 @@ include::{snippets}/time/create/curl-request.adoc[]
 
 include::{snippets}/time/create/http-request.adoc[]
 
+Body
+
 include::{snippets}/time/create/request-fields.adoc[]
 
 ===== response
 
 include::{snippets}/time/create/http-response.adoc[]
+
+Header
+
+include::{snippets}/time/create/response-headers.adoc[]
+
+Body
 
 include::{snippets}/time/create/response-fields.adoc[]
 
@@ -60,10 +70,14 @@ include::{snippets}/time/available/curl-request.adoc[]
 
 include::{snippets}/time/available/http-request.adoc[]
 
+Parameter
+
 include::{snippets}/time/available/query-parameters.adoc[]
 
 ===== response
 
 include::{snippets}/time/available/http-response.adoc[]
+
+Body
 
 include::{snippets}/time/available/response-fields.adoc[]

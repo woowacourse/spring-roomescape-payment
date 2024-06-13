@@ -10,11 +10,19 @@ include::{snippets}/admin/reservation/create/curl-request.adoc[]
 
 include::{snippets}/admin/reservation/create/http-request.adoc[]
 
+Body
+
 include::{snippets}/admin/reservation/create/request-fields.adoc[]
 
 ===== response
 
 include::{snippets}/admin/reservation/create/http-response.adoc[]
+
+Header
+
+include::{snippets}/admin/reservation/create/response-headers.adoc[]
+
+Body
 
 include::{snippets}/admin/reservation/create/response-fields.adoc[]
 
@@ -28,6 +36,8 @@ include::{snippets}/admin/waiting/approve/curl-request.adoc[]
 
 include::{snippets}/admin/waiting/approve/http-request.adoc[]
 
+Body
+
 include::{snippets}/admin/waiting/approve/request-fields.adoc[]
 
 include::{snippets}/admin/waiting/approve/path-parameters.adoc[]
@@ -35,6 +45,8 @@ include::{snippets}/admin/waiting/approve/path-parameters.adoc[]
 ===== response
 
 include::{snippets}/admin/waiting/approve/http-response.adoc[]
+
+Body
 
 include::{snippets}/admin/waiting/approve/response-fields.adoc[]
 
@@ -51,6 +63,8 @@ include::{snippets}/admin/waiting/findAll/http-request.adoc[]
 ===== response
 
 include::{snippets}/admin/waiting/findAll/http-response.adoc[]
+
+Body
 
 include::{snippets}/admin/waiting/findAll/response-fields.adoc[]
 
