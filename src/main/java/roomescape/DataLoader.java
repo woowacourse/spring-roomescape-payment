@@ -1,8 +1,10 @@
 package roomescape;
 
 import jakarta.transaction.Transactional;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -10,13 +12,15 @@ import org.springframework.stereotype.Component;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.domain.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentType;
+import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.reservation.domain.MemberReservation;
-import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationInfo;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.repository.MemberReservationRepository;
-import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.domain.repository.ThemeRepository;
 
@@ -28,11 +32,11 @@ public class DataLoader implements ApplicationRunner {
 
     private final ReservationTimeRepository timeRepository;
 
-    private final ReservationRepository reservationRepository;
 
     private final MemberRepository memberRepository;
 
     private final MemberReservationRepository memberReservationRepository;
+    private final PaymentRepository paymentRepository;
 
 
     @Value("${dataloader.enable}")
@@ -40,14 +44,13 @@ public class DataLoader implements ApplicationRunner {
 
     public DataLoader(ThemeRepository themeRepository,
                       ReservationTimeRepository timeRepository,
-                      ReservationRepository reservationRepository,
                       MemberRepository memberRepository,
-                      MemberReservationRepository memberReservationRepository) {
+                      MemberReservationRepository memberReservationRepository, final PaymentRepository paymentRepository) {
         this.themeRepository = themeRepository;
         this.timeRepository = timeRepository;
-        this.reservationRepository = reservationRepository;
         this.memberRepository = memberRepository;
         this.memberReservationRepository = memberReservationRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Override
@@ -59,7 +62,7 @@ public class DataLoader implements ApplicationRunner {
 
     private void runDataLoader() {
         Theme theme1 = themeRepository.save(new Theme("파라오의 비밀(이집트덕후모험/중급)", """
-                새로운 피라미드유적을 탐사하던 우리 일행은 마침내 파라오의 무덤을 발견하였고 잠입에 성공하여 그의 비밀을 파헤치던 중 실수로 부비트랩을 건드려 파라오의 방이 무너지기 시작하고 60분뒤면 파라오와 함께 생매장 당하게 될 위기에 처해졌다! 
+                새로운 피라미드유적을 탐사하던 우리 일행은 마침내 파라오의 무덤을 발견하였고 잠입에 성공하여 그의 비밀을 파헤치던 중 실수로 부비트랩을 건드려 파라오의 방이 무너지기 시작하고 60분뒤면 파라오와 함께 생매장 당하게 될 위기에 처해졌다!
                 상형문자를 해독하여 분노한 파라오에게 제사를 지내고 아누비스의 저주를 풀어서 안전하게 피라미드 밖으로 탈출하자!!
                 """,
                 "https://naverbooking-phinf.pstatic.net/20201109_121/1604908062178KzsNV_JPEG/%C6%C4%B6%F3%BF%C0%C0%C7%BA%F1%B9%D0.jpeg",
@@ -87,8 +90,8 @@ public class DataLoader implements ApplicationRunner {
 
         Theme theme4 = themeRepository.save(
                 new Theme("비밀갤러리생일파티(안무서워/중급)", """
-                        1920년대 프랑스 파리에 어느 평범한 가정, 그러나 불치병에 걸린 아이가 그만 생일을 몇일 앞두고 하늘나라로... 
-                        시간이 흘러 지금은 갤러리로 쓰이고 있는 집에 떠도는 소문으로 몰래 들어가서 생일파티를 하면 100여년전 아이가 자기의 생일파티인줄 알고 기뻐하며 생일인 친구의 소원을 들어준다고하여 기억에 남는 생일파티를 하기 위해 미스터리한 비밀갤러리에 몰래 들어갔다! 
+                        1920년대 프랑스 파리에 어느 평범한 가정, 그러나 불치병에 걸린 아이가 그만 생일을 몇일 앞두고 하늘나라로...
+                        시간이 흘러 지금은 갤러리로 쓰이고 있는 집에 떠도는 소문으로 몰래 들어가서 생일파티를 하면 100여년전 아이가 자기의 생일파티인줄 알고 기뻐하며 생일인 친구의 소원을 들어준다고하여 기억에 남는 생일파티를 하기 위해 미스터리한 비밀갤러리에 몰래 들어갔다!
                         경비원에게 들키지 않게 오래전 생일파티만을 기다리던 아이의 마지막 소원을 들어주고 우리만의 비밀 생일파티를 즐겁게 마치고 탈출하자..
                         """,
                         "https://naverbooking-phinf.pstatic.net/20201104_210/160445696075352J6M_JPEG/%BA%F1%B9%D0%B0%B6%B7%AF%B8%AE.jpeg",
@@ -99,28 +102,36 @@ public class DataLoader implements ApplicationRunner {
         ReservationTime time2 = timeRepository.save(new ReservationTime(LocalTime.of(13, 10)));
         ReservationTime time3 = timeRepository.save(new ReservationTime(LocalTime.of(14, 30)));
         ReservationTime time4 = timeRepository.save(new ReservationTime(LocalTime.of(15, 50)));
-        ReservationTime time5 = timeRepository.save(new ReservationTime(LocalTime.of(17, 10)));
+        timeRepository.save(new ReservationTime(LocalTime.of(17, 10)));
         ReservationTime time6 = timeRepository.save(new ReservationTime(LocalTime.of(18, 30)));
-        ReservationTime time7 = timeRepository.save(new ReservationTime(LocalTime.of(19, 50)));
+        timeRepository.save(new ReservationTime(LocalTime.of(19, 50)));
         ReservationTime time8 = timeRepository.save(new ReservationTime(LocalTime.of(21, 10)));
-        ReservationTime time9 = timeRepository.save(new ReservationTime(LocalTime.of(22, 30)));
+        timeRepository.save(new ReservationTime(LocalTime.of(22, 30)));
 
-        Reservation reservation1 = reservationRepository.save(
-                new Reservation(LocalDate.now().minusDays(2), time1, theme1));
-        Reservation reservation2 = reservationRepository.save(
-                new Reservation(LocalDate.now().plusDays(16), time1, theme2));
-        Reservation reservation3 = reservationRepository.save(
-                new Reservation(LocalDate.now().plusYears(1), time2, theme1));
-        Reservation reservation4 = reservationRepository.save(
-                new Reservation(LocalDate.now().plusDays(1), time2, theme2));
-        Reservation reservation5 = reservationRepository.save(
-                new Reservation(LocalDate.now().minusDays(4), time3, theme3));
-        Reservation reservation6 = reservationRepository.save(
-                new Reservation(LocalDate.now().plusDays(4), time4, theme4));
-        Reservation reservation7 = reservationRepository.save(
-                new Reservation(LocalDate.now().plusMonths(1), time6, theme4));
-        Reservation reservation8 = reservationRepository.save(
-                new Reservation(LocalDate.now().plusDays(4), time8, theme4));
+        ReservationInfo reservation1 =
+                new ReservationInfo(LocalDate.now()
+                        .minusDays(2), time1, theme1);
+        ReservationInfo reservation2 =
+                new ReservationInfo(LocalDate.now()
+                        .plusDays(16), time1, theme2);
+        ReservationInfo reservation3 =
+                new ReservationInfo(LocalDate.now()
+                        .plusYears(1), time2, theme1);
+        ReservationInfo reservation4 =
+                new ReservationInfo(LocalDate.now()
+                        .plusDays(1), time2, theme2);
+        ReservationInfo reservation5 =
+                new ReservationInfo(LocalDate.now()
+                        .minusDays(4), time3, theme3);
+        ReservationInfo reservation6 =
+                new ReservationInfo(LocalDate.now()
+                        .plusDays(4), time4, theme4);
+        ReservationInfo reservation7 =
+                new ReservationInfo(LocalDate.now()
+                        .plusMonths(1), time6, theme4);
+        ReservationInfo reservation8 =
+                new ReservationInfo(LocalDate.now()
+                        .plusDays(4), time8, theme4);
 
         Member member1 = memberRepository.save(
                 new Member("초코칩", "dev.chocochip@gmail.com",
@@ -132,33 +143,55 @@ public class DataLoader implements ApplicationRunner {
         Member member3 = memberRepository.save(
                 new Member("클로버", "dev.clover@gmail.com",
                         "$2a$10$SpRsR566UrP/bK2pfKJhe.ghb5Y9/GLjXi/kifJ8x53y5opxHqkr6", Role.USER));
-        Member member4 = memberRepository.save(
+        memberRepository.save(
                 new Member("관리자", "admin@roomescape.com",
                         "$2a$10$5xUHgA2/scLa/9YzqkCrXuAoIwLYiZTif8F8QrjuFfSFRgsUdJYhC", Role.ADMIN));
 
         MemberReservation memberReservation1 = memberReservationRepository.save(
                 new MemberReservation(member1, reservation1, ReservationStatus.APPROVED));
+        createPayment(memberReservation1);
+
         MemberReservation memberReservation2 = memberReservationRepository.save(
                 new MemberReservation(member1, reservation3, ReservationStatus.APPROVED));
+        createPayment(memberReservation2);
         MemberReservation memberReservation3 = memberReservationRepository.save(
                 new MemberReservation(member1, reservation7, ReservationStatus.APPROVED));
+        createPayment(memberReservation3);
         MemberReservation memberReservation4 = memberReservationRepository.save(
                 new MemberReservation(member2, reservation2, ReservationStatus.APPROVED));
+        createPayment(memberReservation4);
         MemberReservation memberReservation5 = memberReservationRepository.save(
                 new MemberReservation(member2, reservation4, ReservationStatus.APPROVED));
+        createPayment(memberReservation5);
         MemberReservation memberReservation6 = memberReservationRepository.save(
                 new MemberReservation(member2, reservation8, ReservationStatus.APPROVED));
+        createPayment(memberReservation6);
         MemberReservation memberReservation8 = memberReservationRepository.save(
                 new MemberReservation(member3, reservation5, ReservationStatus.APPROVED));
+        createPayment(memberReservation8);
         MemberReservation memberReservation9 = memberReservationRepository.save(
                 new MemberReservation(member3, reservation6, ReservationStatus.APPROVED));
+        createPayment(memberReservation9);
 
-        MemberReservation memberReservation10 = memberReservationRepository.save(
+        memberReservationRepository.save(
                 new MemberReservation(member1, reservation4, ReservationStatus.PENDING));
-        MemberReservation memberReservation11 = memberReservationRepository.save(
+        memberReservationRepository.save(
                 new MemberReservation(member2, reservation6, ReservationStatus.PENDING));
-        MemberReservation memberReservation12 = memberReservationRepository.save(
+        memberReservationRepository.save(
                 new MemberReservation(member1, reservation6, ReservationStatus.PENDING));
+    }
+
+    private void createPayment(MemberReservation memberReservation) {
+        paymentRepository.save(
+                new Payment(
+                        "paymentKey1",
+                        PaymentType.CARD,
+                        memberReservation.getReservation()
+                                .getTheme()
+                                .getPayAmount(),
+                        memberReservation.getId()
+                )
+        );
     }
 
 }

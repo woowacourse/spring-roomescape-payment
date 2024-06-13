@@ -11,22 +11,23 @@ import static roomescape.fixture.ThemeFixture.getTheme1;
 
 import java.time.LocalTime;
 import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
+import roomescape.fixture.MemberFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.reservation.controller.dto.AvailableTimeResponse;
 import roomescape.reservation.controller.dto.ReservationTimeResponse;
 import roomescape.reservation.domain.MemberReservation;
-import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationInfo;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.repository.MemberReservationRepository;
-import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.domain.repository.ThemeRepository;
 import roomescape.reservation.service.dto.ReservationTimeCreate;
@@ -34,8 +35,6 @@ import roomescape.util.ServiceTest;
 
 @DisplayName("예약 시간 로직 테스트")
 class ReservationTimeServiceTest extends ServiceTest {
-    @Autowired
-    ReservationRepository reservationRepository;
     @Autowired
     ReservationTimeRepository reservationTimeRepository;
     @Autowired
@@ -84,7 +83,7 @@ class ReservationTimeServiceTest extends ServiceTest {
         reservationTimeService.delete(time.getId());
 
         //then
-        assertThat(reservationTimeRepository.findAll()).hasSize(0);
+        assertThat(reservationTimeRepository.findAll()).isEmpty();
     }
 
     @DisplayName("예약이 존재하는 예약 시간을 삭제할 경우 예외가 발생한다.")
@@ -93,11 +92,14 @@ class ReservationTimeServiceTest extends ServiceTest {
         //given
         ReservationTime time = reservationTimeRepository.save(getNoon());
         Theme theme = themeRepository.save(getTheme1());
-        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme));
+        ReservationInfo reservation = getNextDayReservation(time, theme);
+        Member member = memberRepository.save(MemberFixture.getMemberChoco());
+        memberReservationRepository.save(new MemberReservation(member,reservation,ReservationStatus.APPROVED));
+
 
         //when & then
-        assertThatThrownBy(() -> reservationTimeService.delete(reservation.getId()))
-                .isInstanceOf(BadRequestException.class)
+        assertThatThrownBy(() -> reservationTimeService.delete(time.getId()))
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessage(ErrorType.RESERVATION_NOT_DELETED.getMessage());
     }
 
@@ -110,7 +112,7 @@ class ReservationTimeServiceTest extends ServiceTest {
 
         //when & then
         assertThatThrownBy(() -> reservationTimeService.create(reservationTimeCreate))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessage(ErrorType.DUPLICATED_RESERVATION_TIME_ERROR.getMessage());
     }
 
@@ -122,7 +124,7 @@ class ReservationTimeServiceTest extends ServiceTest {
         reservationTimeRepository.save(get1PM());
         reservationTimeRepository.save(get2PM());
         Theme theme = themeRepository.save(getTheme1());
-        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme));
+        ReservationInfo reservation = getNextDayReservation(time, theme);
         Member member = memberRepository.save(getMemberChoco());
         memberReservationRepository.save(new MemberReservation(member, reservation, ReservationStatus.APPROVED));
 
@@ -132,9 +134,12 @@ class ReservationTimeServiceTest extends ServiceTest {
 
         //then
         long count = availableTimes.stream()
-                .filter(availableTimeResponse -> !availableTimeResponse.alreadyBooked()).count();
-        long expectedCount = reservationTimeService.findAll().size() -
-                reservationTimeRepository.findReservedTime(reservation.getDate(), theme.getId()).size();
+                .filter(availableTimeResponse -> !availableTimeResponse.alreadyBooked())
+                .count();
+        long expectedCount = reservationTimeService.findAll()
+                .size() -
+                reservationTimeRepository.findReservedTime(reservation.getDate(), theme.getId())
+                        .size();
 
         assertThat(count)
                 .isEqualTo(expectedCount);

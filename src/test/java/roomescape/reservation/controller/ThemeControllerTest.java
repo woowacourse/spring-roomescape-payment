@@ -20,8 +20,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.MediaType;
-import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
 import roomescape.reservation.controller.dto.ThemeResponse;
 import roomescape.util.ControllerTest;
 
@@ -99,7 +99,7 @@ class ThemeControllerTest extends ControllerTest {
         ThemeResponse themeResponse = new ThemeResponse(3L, "이름", "설명", "썸네일");
 
         //when
-        doThrow(new BadRequestException(ErrorType.RESERVATION_NOT_DELETED))
+        doThrow(new RoomescapeException(ErrorType.RESERVATION_NOT_DELETED))
                 .when(themeService)
                 .delete(isA(Long.class));
 
@@ -141,7 +141,7 @@ class ThemeControllerTest extends ControllerTest {
         params.put("thumbnail", "thumbnail");
 
         //when
-        doThrow(new BadRequestException(ErrorType.NAME_FORMAT_ERROR))
+        doThrow(new RoomescapeException(ErrorType.NAME_FORMAT_ERROR))
                 .when(themeService)
                 .create(any());
 
@@ -163,7 +163,7 @@ class ThemeControllerTest extends ControllerTest {
         String endDate = "2024-05-06";
 
         //when
-        doThrow(new BadRequestException(ErrorType.NAME_FORMAT_ERROR))
+        doThrow(new RoomescapeException(ErrorType.NAME_FORMAT_ERROR))
                 .when(themeService)
                 .create(any());
 

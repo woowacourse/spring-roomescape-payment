@@ -14,18 +14,16 @@ class ReservationTest {
     @Test
     void equals() {
         //given
-        long id = 1L;
         LocalDate date1 = LocalDate.now().plusYears(1);
         long timeId = 1;
         LocalTime localTime = LocalTime.of(12, 23, 0);
         ReservationTime time1 = new ReservationTime(timeId, localTime);
 
         LocalDate date2 = LocalDate.now().plusYears(1);
-        LocalTime time2 = LocalTime.of(11, 23, 0);
 
         //when
-        Reservation reservation1 = new Reservation(id, date1, time1, getTheme1());
-        Reservation reservation2 = new Reservation(id, date2, time1, getTheme1());
+        ReservationInfo reservation1 = new ReservationInfo(date1, time1, getTheme1());
+        ReservationInfo reservation2 = new ReservationInfo(date2, time1, getTheme1());
 
         //then
         assertThat(reservation1).isEqualTo(reservation2);

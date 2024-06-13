@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.controller.dto.MemberResponse;
 import roomescape.exception.ErrorType;
-import roomescape.exception.NotFoundException;
+import roomescape.exception.RoomescapeException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 
@@ -27,6 +27,6 @@ public class MemberService {
 
     public Member findById(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new NotFoundException(ErrorType.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new RoomescapeException(ErrorType.MEMBER_NOT_FOUND));
     }
 }

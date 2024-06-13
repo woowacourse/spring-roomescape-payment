@@ -7,9 +7,8 @@ import roomescape.auth.controller.dto.MemberResponse;
 import roomescape.auth.controller.dto.TokenResponse;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.auth.service.dto.SignUpCommand;
-import roomescape.exception.AuthenticationException;
-import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.domain.repository.MemberRepository;
@@ -32,10 +31,10 @@ public class AuthService {
 
     public void authenticate(LoginRequest loginRequest) {
         Member member = memberRepository.findMemberByEmailAddress(loginRequest.email())
-                .orElseThrow(() -> new AuthenticationException(ErrorType.MEMBER_NOT_FOUND));
+                .orElseThrow(() -> new RoomescapeException(ErrorType.MEMBER_NOT_FOUND));
 
         if (!passwordEncoder.matches(loginRequest.password(), member.getPassword())) {
-            throw new AuthenticationException(ErrorType.SECURITY_EXCEPTION);
+            throw new RoomescapeException(ErrorType.SECURITY_EXCEPTION);
         }
     }
 
@@ -45,14 +44,14 @@ public class AuthService {
 
     public AuthInfo fetchByToken(String token) {
         Member member = memberRepository.findMemberByEmailAddress(tokenProvider.getPayload(token).getValue())
-                .orElseThrow(() -> new AuthenticationException(ErrorType.TOKEN_PAYLOAD_EXTRACTION_FAILURE));
+                .orElseThrow(() -> new RoomescapeException(ErrorType.TOKEN_PAYLOAD_EXTRACTION_FAILURE));
         return AuthInfo.from(member);
     }
 
     @Transactional
     public MemberResponse signUp(SignUpCommand signUpCommand) {
         if (memberRepository.existsByEmailAddress(signUpCommand.email())) {
-            throw new BadRequestException(ErrorType.DUPLICATED_EMAIL_ERROR);
+            throw new RoomescapeException(ErrorType.DUPLICATED_EMAIL_ERROR);
         }
         return MemberResponse.from(
                 memberRepository.save(new Member(

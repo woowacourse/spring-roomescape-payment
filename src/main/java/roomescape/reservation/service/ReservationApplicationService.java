@@ -61,7 +61,7 @@ public class ReservationApplicationService {
 
         paymentService.pay(
                 new PaymentRequest(reservationPaymentRequest.amount(), reservationPaymentRequest.orderId(),
-                        reservationPaymentRequest.paymentKey()), memberReservation);
+                        reservationPaymentRequest.paymentKey()), memberReservation.getId());
 
         return ReservationResponse.from(memberReservation);
     }
@@ -72,7 +72,7 @@ public class ReservationApplicationService {
                 memberReservationCreate.toReservationCreate());
         paymentService.pay(
                 new PaymentRequest(memberReservationCreate.amount(), memberReservationCreate.orderId(),
-                        memberReservationCreate.paymentKey()), memberReservation);
+                        memberReservationCreate.paymentKey()), memberReservation.getId());
         return ReservationResponse.from(memberReservation);
     }
 
@@ -80,6 +80,7 @@ public class ReservationApplicationService {
     public void deleteMemberReservation(AuthInfo authInfo, long memberReservationId) {
         MemberReservation memberReservation = reservationCommonService.getMemberReservation(memberReservationId);
         Member member = reservationCommonService.getMember(authInfo.getId());
+        paymentService.refund(memberReservationId);
         reservationCommonService.delete(member, memberReservation);
         memberReservationService.updateStatus(memberReservation.getReservation());
     }
@@ -106,7 +107,6 @@ public class ReservationApplicationService {
         waitingReservationService.validateWaitingReservation(memberReservation);
 
         reservationCommonService.delete(member, memberReservation);
-        paymentService.refund(memberReservationId);
     }
 
     @Transactional

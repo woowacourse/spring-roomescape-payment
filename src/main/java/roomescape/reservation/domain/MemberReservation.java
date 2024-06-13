@@ -1,14 +1,7 @@
 package roomescape.reservation.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+
 import java.util.Objects;
 import roomescape.global.entity.BaseEntity;
 import roomescape.member.domain.Member;
@@ -24,9 +17,8 @@ public class MemberReservation extends BaseEntity {
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "RESERVATION_ID")
-    private Reservation reservation;
+    @Embedded
+    private ReservationInfo reservation;
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus reservationStatus;
@@ -34,14 +26,14 @@ public class MemberReservation extends BaseEntity {
     protected MemberReservation() {
     }
 
-    public MemberReservation(Long id, Member member, Reservation reservation, ReservationStatus reservationStatus) {
+    public MemberReservation(Long id, Member member, ReservationInfo reservation, ReservationStatus reservationStatus) {
         this.id = id;
         this.member = member;
         this.reservation = reservation;
         this.reservationStatus = reservationStatus;
     }
 
-    public MemberReservation(Member member, Reservation reservation, ReservationStatus reservationStatus) {
+    public MemberReservation(Member member, ReservationInfo reservation, ReservationStatus reservationStatus) {
         this(null, member, reservation, reservationStatus);
     }
 
@@ -83,7 +75,7 @@ public class MemberReservation extends BaseEntity {
         return member;
     }
 
-    public Reservation getReservation() {
+    public ReservationInfo getReservation() {
         return reservation;
     }
 

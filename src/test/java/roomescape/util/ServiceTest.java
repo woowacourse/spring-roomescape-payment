@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.payment.service.PaymentClient;
 import roomescape.reservation.domain.repository.MemberReservationRepository;
-import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.domain.repository.ThemeRepository;
 
@@ -21,9 +20,6 @@ import roomescape.reservation.domain.repository.ThemeRepository;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(classes = TestConfig.class)
 public class ServiceTest {
-
-    @Autowired
-    protected ReservationRepository reservationRepository;
 
     @Autowired
     protected ReservationTimeRepository reservationTimeRepository;

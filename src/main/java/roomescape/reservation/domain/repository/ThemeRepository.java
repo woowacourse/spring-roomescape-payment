@@ -12,11 +12,11 @@ public interface ThemeRepository extends JpaRepository<Theme, Long> {
     @Query("""
                 SELECT t
                 FROM Theme t
-                JOIN Reservation r ON r.theme.id = t.id
-                JOIN MemberReservation mr ON mr.reservation.id = r.id
-                WHERE r.date BETWEEN :startDate AND :endDate
+                JOIN MemberReservation mr ON mr.reservation.theme.id = t.id 
+                WHERE mr.reservation.date BETWEEN :startDate AND :endDate
                 GROUP BY t.id, t.name
                 ORDER BY COUNT(*) DESC
             """)
-    List<Theme> findTopThemesByReservations(LocalDate startDate, LocalDate endDate, Pageable pageable);
+    List<Theme> findTopThemesByMemberReservations(LocalDate startDate, LocalDate endDate, Pageable pageable);
 }
+

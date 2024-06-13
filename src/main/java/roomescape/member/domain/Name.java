@@ -4,8 +4,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.util.Objects;
 import java.util.regex.Pattern;
-import roomescape.exception.BadRequestException;
+
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
 
 @Embeddable
 public class Name {
@@ -26,7 +27,7 @@ public class Name {
 
     private void validate(String name) {
         if (name.isEmpty() || name.length() > MAX_NAME_LENGTH || !PATTERN.matcher(name).matches()) {
-            throw new BadRequestException(ErrorType.NAME_FORMAT_ERROR);
+            throw new RoomescapeException(ErrorType.NAME_FORMAT_ERROR);
         }
     }
 

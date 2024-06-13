@@ -4,14 +4,12 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import roomescape.global.entity.BaseEntity;
-import roomescape.reservation.domain.MemberReservation;
+
+import java.math.BigDecimal;
 
 @Entity
 public class Payment extends BaseEntity {
@@ -27,23 +25,21 @@ public class Payment extends BaseEntity {
     @Embedded
     private PayAmount amount;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MEMBER_RESERVATION_ID")
-    private MemberReservation memberReservation;
+    private long relatedId;
 
-    public Payment(String paymentKey, PaymentType paymentType, PayAmount amount, MemberReservation memberReservation) {
+    public Payment(String paymentKey, PaymentType paymentType, PayAmount amount, long relatedId) {
         this.paymentKey = paymentKey;
         this.paymentType = paymentType;
         this.amount = amount;
-        this.memberReservation = memberReservation;
+        this.relatedId = relatedId;
     }
 
     protected Payment() {
     }
 
     public static Payment from(String paymentKey, String paymentType, long amount,
-                               MemberReservation memberReservation) {
-        return new Payment(paymentKey, PaymentType.from(paymentType), PayAmount.from(amount), memberReservation);
+                               long relatedId) {
+        return new Payment(paymentKey, PaymentType.from(paymentType), PayAmount.from(amount), relatedId);
     }
 
     public Long getId() {
@@ -61,9 +57,12 @@ public class Payment extends BaseEntity {
     public PayAmount getAmount() {
         return amount;
     }
+    public BigDecimal getAmountAsValue(){
+        return amount.getAmount();
+    }
 
-    public MemberReservation getMemberReservation() {
-        return memberReservation;
+    public long getRelatedId() {
+        return relatedId;
     }
 }
 

@@ -3,13 +3,12 @@ package roomescape.reservation.service.services;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.exception.AuthorizationException;
-import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
 import roomescape.member.domain.Member;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.domain.MemberReservation;
-import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationInfo;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.repository.MemberReservationRepository;
 
@@ -25,7 +24,7 @@ public class WaitingReservationService {
 
     private static void validateAdminPermission(Member member) {
         if (!member.isAdmin()) {
-            throw new AuthorizationException(ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
+            throw new RoomescapeException(ErrorType.NOT_ALLOWED_PERMISSION_ERROR);
         }
     }
 
@@ -37,7 +36,7 @@ public class WaitingReservationService {
     }
 
     @Transactional
-    public MemberReservation addWaiting(Member member, Reservation reservation) {
+    public MemberReservation addWaiting(Member member, ReservationInfo reservation) {
         return memberReservationRepository.save(
                 new MemberReservation(member, reservation, ReservationStatus.PENDING));
     }
@@ -58,7 +57,7 @@ public class WaitingReservationService {
 
     public void validateWaitingReservation(MemberReservation memberReservation) {
         if (!memberReservation.isPending()) {
-            throw new BadRequestException(ErrorType.NOT_A_WAITING_RESERVATION);
+            throw new RoomescapeException(ErrorType.NOT_A_WAITING_RESERVATION);
         }
     }
 }

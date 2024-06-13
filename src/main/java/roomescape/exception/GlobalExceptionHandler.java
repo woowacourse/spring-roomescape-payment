@@ -14,33 +14,15 @@ public class GlobalExceptionHandler {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ExceptionResponse> handleBadRequestException(BadRequestException e) {
-        log.warn(e.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getExceptionResponse());
-    }
-
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleNotFoundException(NotFoundException e) {
-        log.warn(e.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getExceptionResponse());
-    }
-
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ExceptionResponse> handleAuthenticationException(AuthenticationException e) {
-        log.warn(e.getMessage());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getExceptionResponse());
-    }
-
-    @ExceptionHandler(AuthorizationException.class)
-    public ResponseEntity<ExceptionResponse> handleAuthorizationException(AuthorizationException e) {
-        log.warn(e.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getExceptionResponse());
+    @ExceptionHandler(RoomescapeException.class)
+    public ResponseEntity<ExceptionResponse> handle(RoomescapeException ex) {
+        log.warn("Roomescape exception [status={},errorCode={},message={}]", ex.getStatusCode(), ex.getErrorCode(), ex.getMessage(), ex);
+        return ResponseEntity.status(ex.getStatusCode())
+                .body(new ExceptionResponse(ex.getErrorCode(), ex.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        log.warn(e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ExceptionResponse.of(ErrorType.INVALID_REQUEST_ERROR));
     }
@@ -48,14 +30,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HandlerMethodValidationException.class)
     public ResponseEntity<ExceptionResponse> handleHandlerMethodValidationException(
             HandlerMethodValidationException e) {
-        log.warn(e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ExceptionResponse.of(ErrorType.INVALID_REQUEST_ERROR));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleException(Exception e) {
-        log.error(e.getMessage());
+        log.error("Server Exception [message={}]",e.getMessage(),e);
         return ResponseEntity.internalServerError()
                 .body(ExceptionResponse.of(ErrorType.UNEXPECTED_SERVER_ERROR));
     }

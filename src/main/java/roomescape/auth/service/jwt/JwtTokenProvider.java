@@ -6,19 +6,14 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import roomescape.auth.domain.Payload;
 import roomescape.auth.service.TokenProvider;
-import roomescape.exception.AuthenticationException;
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
 
 @Component
 public class JwtTokenProvider implements TokenProvider {
-
-    private final Logger log = LoggerFactory.getLogger(getClass());
-
     private final JwtProperties jwtProperties;
 
     public JwtTokenProvider(JwtProperties jwtProperties) {
@@ -48,8 +43,7 @@ public class JwtTokenProvider implements TokenProvider {
                     () -> isToken(token)
             );
         } catch (JwtException | IllegalArgumentException e) {
-            log.warn(e.getMessage());
-            throw new AuthenticationException(ErrorType.SECURITY_EXCEPTION);
+            throw new RoomescapeException(ErrorType.SECURITY_EXCEPTION);
         }
 
     }
@@ -60,7 +54,6 @@ public class JwtTokenProvider implements TokenProvider {
             Jws<Claims> claims = Jwts.parser().setSigningKey(jwtProperties.getSecretKey()).parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (JwtException | IllegalArgumentException e) {
-            log.warn(e.getMessage());
             return false;
         }
     }

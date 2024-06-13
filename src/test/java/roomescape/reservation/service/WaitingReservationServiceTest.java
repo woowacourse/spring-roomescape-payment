@@ -16,14 +16,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import roomescape.exception.AuthorizationException;
-import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.domain.MemberReservation;
-import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationInfo;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
@@ -59,7 +58,7 @@ class WaitingReservationServiceTest extends ServiceTest {
     void addWaitingList() {
         //given
         Member memberClover = memberRepository.save(getMemberClover());
-        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
+        ReservationInfo reservation = getNextDayReservation(time, theme1);
         memberReservationRepository.save(new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
 
         //when
@@ -81,7 +80,7 @@ class WaitingReservationServiceTest extends ServiceTest {
         Member memberClover = memberRepository.save(getMemberClover());
         Member memberEden = memberRepository.save(getMemberEden());
 
-        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
+        ReservationInfo reservation =getNextDayReservation(time, theme1);
         memberReservationRepository.save(new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
         memberReservationRepository.save(new MemberReservation(memberClover, reservation, ReservationStatus.PENDING));
         memberReservationRepository.save(new MemberReservation(memberEden, reservation, ReservationStatus.PENDING));
@@ -100,7 +99,7 @@ class WaitingReservationServiceTest extends ServiceTest {
         //given
         Member memberClover = memberRepository.save(getMemberClover());
 
-        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
+        ReservationInfo reservation = getNextDayReservation(time, theme1);
         memberReservationRepository.save(new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
         MemberReservation waitingReservation = memberReservationRepository.save(
                 new MemberReservation(memberClover, reservation, ReservationStatus.PENDING));
@@ -119,14 +118,14 @@ class WaitingReservationServiceTest extends ServiceTest {
     @Test
     void approveNotWaitingReservation() {
         //given
-        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
+        ReservationInfo reservation = getNextDayReservation(time, theme1);
         MemberReservation memberReservation = memberReservationRepository.save(
                 new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
         Member admin = memberRepository.findMemberByEmailAddress(getMemberAdmin().getEmail()).orElseThrow();
 
         //when & then
         assertThatThrownBy(() -> waitingReservationService.approveWaiting(admin, memberReservation))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessage(ErrorType.NOT_A_WAITING_RESERVATION.getMessage());
     }
 
@@ -136,7 +135,7 @@ class WaitingReservationServiceTest extends ServiceTest {
         //given
         Member memberClover = memberRepository.save(getMemberClover());
 
-        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
+        ReservationInfo reservation = getNextDayReservation(time, theme1);
         memberReservationRepository.save(new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
         MemberReservation waitingReservation = memberReservationRepository.save(
                 new MemberReservation(memberClover, reservation, ReservationStatus.PENDING));
@@ -155,14 +154,14 @@ class WaitingReservationServiceTest extends ServiceTest {
     @Test
     void denyNotWaitingReservation() {
         //given
-        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
+        ReservationInfo reservation = getNextDayReservation(time, theme1);
         MemberReservation memberReservation = memberReservationRepository.save(
                 new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
         Member admin = memberRepository.findMemberByEmailAddress(getMemberAdmin().getEmail()).orElseThrow();
 
         //when & then
         assertThatThrownBy(() -> waitingReservationService.denyWaiting(admin, memberReservation))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessage(ErrorType.NOT_A_WAITING_RESERVATION.getMessage());
     }
 
@@ -170,17 +169,17 @@ class WaitingReservationServiceTest extends ServiceTest {
     @Test
     void approveAndDenyPermissionException() {
         //given
-        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
+        ReservationInfo reservation = getNextDayReservation(time, theme1);
         MemberReservation memberReservation = memberReservationRepository.save(
                 new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
 
         //when & then
         assertAll(
                 () -> assertThatThrownBy(() -> waitingReservationService.approveWaiting(memberChoco, memberReservation))
-                        .isInstanceOf(AuthorizationException.class)
+                        .isInstanceOf(RoomescapeException.class)
                         .hasMessage(ErrorType.NOT_ALLOWED_PERMISSION_ERROR.getMessage()),
                 () -> assertThatThrownBy(() -> waitingReservationService.denyWaiting(memberChoco, memberReservation))
-                        .isInstanceOf(AuthorizationException.class)
+                        .isInstanceOf(RoomescapeException.class)
                         .hasMessage(ErrorType.NOT_ALLOWED_PERMISSION_ERROR.getMessage())
         );
     }

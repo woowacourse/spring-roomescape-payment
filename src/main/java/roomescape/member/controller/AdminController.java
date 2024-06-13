@@ -1,20 +1,14 @@
 package roomescape.member.controller;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
-import java.net.URI;
 import java.util.List;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
 import roomescape.auth.controller.dto.MemberResponse;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.global.annotation.LoginUser;
+import roomescape.member.domain.specification.AdminControllerSpecification;
 import roomescape.member.service.MemberService;
 import roomescape.reservation.controller.dto.MemberReservationRequest;
 import roomescape.reservation.controller.dto.ReservationResponse;
@@ -23,49 +17,44 @@ import roomescape.reservation.service.dto.MemberReservationCreate;
 
 @RestController
 @RequestMapping("/admin")
-public class AdminController {
+public class AdminController implements AdminControllerSpecification {
 
     private final ReservationApplicationService reservationApplicationService;
 
     private final MemberService memberService;
 
-    public AdminController(ReservationApplicationService reservationApplicationService, MemberService memberService) {
+    public AdminController(final ReservationApplicationService reservationApplicationService, final MemberService memberService) {
         this.reservationApplicationService = reservationApplicationService;
         this.memberService = memberService;
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/reservations")
-    public ResponseEntity<ReservationResponse> create(
-            @RequestBody @Valid MemberReservationRequest memberReservationRequest) {
-        ReservationResponse reservationResponse = reservationApplicationService.createMemberReservation(
+    public ReservationResponse create(@RequestBody final MemberReservationRequest memberReservationRequest) {
+        return reservationApplicationService.createMemberReservation(
                 MemberReservationCreate.from(memberReservationRequest)
         );
-        return ResponseEntity.created(URI.create("/admin/reservations/" + reservationResponse.memberReservationId()))
-                .body(reservationResponse);
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/reservations/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") @Min(1) long reservationId) {
+    public void delete(@PathVariable("id") final long reservationId) {
         reservationApplicationService.delete(reservationId);
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/members")
-    public ResponseEntity<List<MemberResponse>> findAll() {
-        return ResponseEntity.ok().body(memberService.findAll());
+    public List<MemberResponse> findAll() {
+        return memberService.findAll();
     }
 
     @PostMapping("/reservations/{id}/waiting/approve")
-    public ResponseEntity<Void> approve(@LoginUser AuthInfo authInfo,
-                                        @PathVariable("id") @Min(1) long memberReservationId) {
+    public void approve(@LoginUser AuthInfo authInfo, @PathVariable("id") long memberReservationId) {
         reservationApplicationService.approveWaiting(authInfo, memberReservationId);
-        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/reservations/{id}/waiting/deny")
-    public ResponseEntity<Void> deny(@LoginUser AuthInfo authInfo,
-                                     @PathVariable("id") @Min(1) long memberReservationId) {
+    public void deny(@LoginUser AuthInfo authInfo,
+                     @PathVariable("id") long memberReservationId) {
         reservationApplicationService.denyWaiting(authInfo, memberReservationId);
-        return ResponseEntity.ok().build();
     }
 }

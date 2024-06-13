@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.reservation.domain.MemberReservation;
-import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationInfo;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
@@ -31,8 +31,6 @@ class MemberReservationRepositoryTest extends RepositoryTest {
     @Autowired
     private ThemeRepository themeRepository;
 
-    @Autowired
-    private ReservationRepository reservationRepository;
 
     @Autowired
     private MemberReservationRepository memberReservationRepository;
@@ -43,7 +41,7 @@ class MemberReservationRepositoryTest extends RepositoryTest {
         //given & when
         ReservationTime time = timeRepository.save(getNoon());
         Theme theme = themeRepository.save(getTheme1());
-        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme));
+        ReservationInfo reservation = getNextDayReservation(time,theme);
         Member member = memberRepository.save(getMemberChoco());
 
         MemberReservation memberReservation = memberReservationRepository.save(

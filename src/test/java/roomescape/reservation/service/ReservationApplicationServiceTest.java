@@ -23,14 +23,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.auth.domain.AuthInfo;
-import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.service.dto.PaymentResponse;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.domain.MemberReservation;
-import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationInfo;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
@@ -59,7 +60,8 @@ class ReservationApplicationServiceTest extends ServiceTest {
         String paymentType = "카드";
         long totalAmount = 1000L;
         PaymentResponse okResponse = new PaymentResponse("paymentKey", "DONE", "MC4wOTA5NzEwMjg3MjQ2", totalAmount, paymentType);
-        doReturn(okResponse).when(paymentClient).confirm(any());
+        doReturn(okResponse).when(paymentClient)
+                .confirm(any());
     }
 
 
@@ -67,7 +69,7 @@ class ReservationApplicationServiceTest extends ServiceTest {
     @Test
     void duplicatedWaitingList() {
         //given
-        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
+        ReservationInfo reservation = getNextDayReservation(time, theme1);
         memberReservationRepository.save(new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
 
         //when & then
@@ -76,7 +78,7 @@ class ReservationApplicationServiceTest extends ServiceTest {
                         .getId(),
                         reservation.getTheme()
                                 .getId())))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessage(ErrorType.DUPLICATED_RESERVATION_ERROR.getMessage());
     }
 
@@ -86,6 +88,10 @@ class ReservationApplicationServiceTest extends ServiceTest {
         //given
         Member memberClover = memberRepository.save(getMemberClover());
         LocalDate date = getNextDay();
+        reservationApplicationService.createMemberReservation(new MemberReservationCreate(
+                memberChoco.getId(), theme1.getId(), time.getId(), "1234", "orderId", 15000L,
+                date
+        ));
         ReservationResponse waitingResponse = reservationApplicationService.addWaiting(
                 new WaitingCreate(memberClover.getId(), date, time.getId(), theme1.getId())
         );
@@ -93,7 +99,7 @@ class ReservationApplicationServiceTest extends ServiceTest {
         //when
         AuthInfo authInfo = new AuthInfo(memberClover.getId(), memberClover.getName(), memberClover.getEmail(),
                 memberClover.getRole());
-        reservationApplicationService.deleteMemberReservation(authInfo, waitingResponse.memberReservationId());
+        reservationApplicationService.deleteWaiting(authInfo, waitingResponse.memberReservationId());
 
         //then
         assertThat(memberReservationRepository.findByMemberId(memberClover.getId())).isEmpty();
@@ -112,7 +118,7 @@ class ReservationApplicationServiceTest extends ServiceTest {
         //when & then
         assertThatThrownBy(() -> reservationApplicationService.deleteWaiting(AuthInfo.from(memberChoco),
                 reservationResponse.memberReservationId()))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessage(ErrorType.NOT_A_WAITING_RESERVATION.getMessage());
     }
 
@@ -120,7 +126,7 @@ class ReservationApplicationServiceTest extends ServiceTest {
     @Test
     void duplicatedReservation() {
         //given
-        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
+        ReservationInfo reservation = getNextDayReservation(time, theme1);
         memberReservationRepository.save(new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
         LocalDate date = getNextDay();
 
@@ -129,7 +135,7 @@ class ReservationApplicationServiceTest extends ServiceTest {
                 new MemberReservationCreate(memberChoco.getId(), theme1.getId(), time.getId(), "paymentKey", "orderId",
                         10000L, date)
         )).isInstanceOf(
-                        BadRequestException.class)
+                        RoomescapeException.class)
                 .hasMessage(ErrorType.DUPLICATED_RESERVATION_ERROR.getMessage());
     }
 
@@ -139,12 +145,12 @@ class ReservationApplicationServiceTest extends ServiceTest {
         //given
         Member memberClover = memberRepository.save(getMemberClover());
 
-        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
+        ReservationInfo reservation = getNextDayReservation(time, theme1);
         MemberReservation firstReservation = memberReservationRepository.save(
                 new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
         MemberReservation waitingReservation = memberReservationRepository.save(
                 new MemberReservation(memberClover, reservation, ReservationStatus.PENDING));
-
+        paymentRepository.save(Payment.from("paymentKey", "카드", 15000l, firstReservation.getId()));
         entityManager.clear();
         entityManager.flush();
 
@@ -165,14 +171,14 @@ class ReservationApplicationServiceTest extends ServiceTest {
     @Test
     void deleteRefund() {
         //given
-        Reservation reservation = reservationRepository.save(getNextDayReservation(time, theme1));
+        ReservationInfo reservation = getNextDayReservation(time, theme1);
         MemberReservation memberReservation = memberReservationRepository.save(
                 new MemberReservation(memberChoco, reservation, ReservationStatus.APPROVED));
 
         //when
-        reservationApplicationService.delete(reservation.getId());
+        reservationApplicationService.delete(memberReservation.getId());
 
         //then
-        assertThat(paymentRepository.findByMemberReservationId(memberReservation.getId())).isEmpty();
+        assertThat(paymentRepository.findByRelatedId(memberReservation.getId())).isEmpty();
     }
 }

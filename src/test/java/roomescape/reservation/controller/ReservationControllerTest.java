@@ -22,9 +22,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import roomescape.auth.controller.dto.MemberResponse;
 import roomescape.auth.domain.AuthInfo;
-import roomescape.exception.AuthorizationException;
-import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.controller.dto.ReservationTimeResponse;
 import roomescape.reservation.controller.dto.ThemeResponse;
@@ -111,7 +110,7 @@ class ReservationControllerTest extends ControllerTest {
         );
 
         //when
-        doThrow(new AuthorizationException(ErrorType.NOT_A_RESERVATION_MEMBER))
+        doThrow(new RoomescapeException(ErrorType.NOT_A_RESERVATION_MEMBER))
                 .when(reservationApplicationService)
                 .deleteMemberReservation(isA(AuthInfo.class), isA(Long.class));
 
@@ -163,7 +162,7 @@ class ReservationControllerTest extends ControllerTest {
         params.put("themeId", themeResponse.id());
 
         //when
-        doThrow(new BadRequestException(ErrorType.INVALID_REQUEST_ERROR))
+        doThrow(new RoomescapeException(ErrorType.INVALID_REQUEST_ERROR))
                 .when(reservationApplicationService)
                 .createMemberReservation(any());
 

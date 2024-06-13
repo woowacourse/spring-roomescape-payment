@@ -53,8 +53,7 @@ CREATE TABLE IF NOT EXISTS payment
     payment_key           VARCHAR(1023) NOT NULL,
     payment_type          VARCHAR(255)  NOT NULL,
     amount                DECIMAL       NOT NULL,
-    member_reservation_id BIGINT        NOT NULL,
-    FOREIGN KEY (member_reservation_id) REFERENCES member (id),
+    relatedId BIGINT        NOT NULL,
     PRIMARY KEY (id)
 )
 ;

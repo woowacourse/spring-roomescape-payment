@@ -2,14 +2,15 @@ package roomescape.reservation.service;
 
 import java.time.LocalDate;
 import java.util.List;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
 import roomescape.reservation.controller.dto.ThemeResponse;
 import roomescape.reservation.domain.Theme;
-import roomescape.reservation.domain.repository.ReservationRepository;
+import roomescape.reservation.domain.repository.MemberReservationRepository;
 import roomescape.reservation.domain.repository.ThemeRepository;
 import roomescape.reservation.service.dto.ThemeCreate;
 
@@ -18,12 +19,12 @@ import roomescape.reservation.service.dto.ThemeCreate;
 public class ThemeService {
 
     private final ThemeRepository themeRepository;
+    private final MemberReservationRepository memberReservationRepository;
 
-    private final ReservationRepository reservationRepository;
 
-    public ThemeService(ThemeRepository themeRepository, ReservationRepository reservationRepository) {
+    public ThemeService(ThemeRepository themeRepository, final MemberReservationRepository memberReservationRepository) {
         this.themeRepository = themeRepository;
-        this.reservationRepository = reservationRepository;
+        this.memberReservationRepository = memberReservationRepository;
     }
 
     public List<ThemeResponse> findAllThemes() {
@@ -42,8 +43,8 @@ public class ThemeService {
 
     @Transactional
     public void delete(long themeId) {
-        if (reservationRepository.existsByThemeId(themeId)) {
-            throw new BadRequestException(ErrorType.RESERVATION_NOT_DELETED);
+        if (memberReservationRepository.existsByReservationThemeId(themeId)) {
+            throw new RoomescapeException(ErrorType.RESERVATION_NOT_DELETED);
         }
 
         themeRepository.deleteById(themeId);
@@ -51,10 +52,11 @@ public class ThemeService {
 
     public List<ThemeResponse> findPopularThemes(LocalDate startDate, LocalDate endDate, int limit) {
         if (startDate.isAfter(endDate)) {
-            throw new BadRequestException(ErrorType.INVALID_REQUEST_ERROR);
+            throw new RoomescapeException(ErrorType.INVALID_REQUEST_ERROR);
         }
         PageRequest pageRequest = PageRequest.of(0, limit);
-        return themeRepository.findTopThemesByReservations(startDate, endDate, pageRequest).stream()
+        return themeRepository.findTopThemesByMemberReservations(startDate, endDate, pageRequest)
+                .stream()
                 .map(ThemeResponse::from)
                 .toList();
     }

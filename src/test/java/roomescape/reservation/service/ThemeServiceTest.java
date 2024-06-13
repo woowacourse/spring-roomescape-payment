@@ -12,13 +12,14 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import roomescape.exception.BadRequestException;
 import roomescape.exception.ErrorType;
+import roomescape.exception.RoomescapeException;
+import roomescape.fixture.MemberFixture;
+import roomescape.member.domain.Member;
+import roomescape.member.domain.repository.MemberRepository;
 import roomescape.reservation.controller.dto.ThemeResponse;
-import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.Theme;
+import roomescape.reservation.domain.*;
 import roomescape.reservation.domain.repository.MemberReservationRepository;
-import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.domain.repository.ThemeRepository;
 import roomescape.reservation.service.dto.ThemeCreate;
@@ -28,11 +29,11 @@ import roomescape.util.ServiceTest;
 @DisplayName("테마 로직 테스트")
 class ThemeServiceTest extends ServiceTest {
     @Autowired
-    ReservationRepository reservationRepository;
-    @Autowired
     ThemeRepository themeRepository;
     @Autowired
     ReservationTimeRepository timeRepository;
+    @Autowired
+    MemberRepository memberRepository;
     @Autowired
     MemberReservationRepository memberReservationRepository;
     @Autowired
@@ -84,7 +85,7 @@ class ThemeServiceTest extends ServiceTest {
         themeService.delete(theme.getId());
 
         //then
-        assertThat(themeRepository.findAll()).hasSize(0);
+        assertThat(themeRepository.findAll()).isEmpty();
     }
 
     @DisplayName("예약이 존재하는 테마 삭제 시, 예외가 발생한다.")
@@ -93,11 +94,13 @@ class ThemeServiceTest extends ServiceTest {
         //given
         ReservationTime time = timeRepository.save(getNoon());
         Theme theme = themeRepository.save(getTheme1());
-        reservationRepository.save(getNextDayReservation(time, theme));
+        ReservationInfo reservation = getNextDayReservation(time, theme);
+        Member member = memberRepository.save(MemberFixture.getMemberChoco());
+        memberReservationRepository.save(new MemberReservation(member,reservation, ReservationStatus.APPROVED));
 
         //when & then
         assertThatThrownBy(() -> themeService.delete(theme.getId()))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessage(ErrorType.RESERVATION_NOT_DELETED.getMessage());
     }
 
@@ -112,7 +115,7 @@ class ThemeServiceTest extends ServiceTest {
 
         //when & then
         assertThatThrownBy(() -> themeService.findPopularThemes(startDate, endDate, limit))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(RoomescapeException.class)
                 .hasMessage(ErrorType.INVALID_REQUEST_ERROR.getMessage());
     }
 }
