@@ -13,6 +13,8 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
@@ -44,6 +46,9 @@ class MemberApiDocumentationTest extends BaseDocumentationTest {
                                 fieldWithPath("password").description("비밀번호"),
                                 fieldWithPath("name").description("이름")
                         ),
+                        responseHeaders(
+                                headerWithName("Location").description("생성된 회원의 URI")
+                        ),
                         responseFields(
                                 fieldWithPath("id").description("회원 id"),
                                 fieldWithPath("name").description("이름")
@@ -60,7 +65,9 @@ class MemberApiDocumentationTest extends BaseDocumentationTest {
                         new MemberResponse(2L, "프린")
                 ));
 
-        mockMvc.perform(get("/members"))
+        mockMvc.perform(get("/members")
+                        .cookie(adminCookie)
+                )
                 .andExpect(status().isOk())
                 .andDo(document("member/findAll",
                         responseFields(

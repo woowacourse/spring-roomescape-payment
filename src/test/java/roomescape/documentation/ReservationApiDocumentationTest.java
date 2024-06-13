@@ -19,6 +19,8 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -88,12 +90,12 @@ public class ReservationApiDocumentationTest extends BaseDocumentationTest {
                                 fieldWithPath("list.[].time").description("예약 시간"),
                                 fieldWithPath("list.[].theme").description("테마명"),
                                 fieldWithPath("list.[].status").description("예약 상태 (예약 or 예약대기)"),
-                                fieldWithPath("list.[].paymentKey").description("결제 키 (결제 수단이 계좌이체가 아닐 경우 필수)").optional(),
-                                fieldWithPath("list.[].amount").description("결제 금액 (예약 상태가 예약일 경우 필수)").optional(),
-                                fieldWithPath("list.[].paymentType").description("결제 수단 (예약 상태가 예약일 경우 필수)").optional(),
-                                fieldWithPath("list.[].accountNumber").description("계좌번호 (결제 수단이 계좌이체일 경우 필수)").optional(),
-                                fieldWithPath("list.[].accountHolder").description("예금주 (결제 수단이 계좌이체일 경우 필수)").optional(),
-                                fieldWithPath("list.[].bankName").description("은행명 (결제 수단이 계좌이체일 경우 필수)").optional()
+                                fieldWithPath("list.[].paymentKey").description("결제 키 (결제 수단이 계좌이체가 아닐 경우)").optional(),
+                                fieldWithPath("list.[].amount").description("결제 금액 (예약 상태가 예약일 경우)").optional(),
+                                fieldWithPath("list.[].paymentType").description("결제 수단 (예약 상태가 예약일 경우)").optional(),
+                                fieldWithPath("list.[].accountNumber").description("계좌번호 (결제 수단이 계좌이체일 경우)").optional(),
+                                fieldWithPath("list.[].accountHolder").description("예금주 (결제 수단이 계좌이체일 경우)").optional(),
+                                fieldWithPath("list.[].bankName").description("은행명 (결제 수단이 계좌이체일 경우)").optional()
                         )
                 ));
     }
@@ -122,6 +124,9 @@ public class ReservationApiDocumentationTest extends BaseDocumentationTest {
                                 fieldWithPath("paymentKey").description("결제 키"),
                                 fieldWithPath("orderId").description("주문 id"),
                                 fieldWithPath("amount").description("결제 금액")
+                        ),
+                        responseHeaders(
+                                headerWithName("Location").description("생성된 예약의 URI")
                         ),
                         responseFields(
                                 fieldWithPath("id").description("예약 id"),

@@ -16,6 +16,8 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -66,6 +68,9 @@ class ReservationTimeApiDocumentationTest extends BaseDocumentationTest {
                 .andDo(document("time/create",
                         requestFields(
                                 fieldWithPath("startAt").description("예약 시간")
+                        ),
+                        responseHeaders(
+                                headerWithName("Location").description("생성된 예약 시간의 URI")
                         ),
                         responseFields(
                                 fieldWithPath("id").description("예약 시간 id"),

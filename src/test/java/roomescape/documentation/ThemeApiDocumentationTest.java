@@ -17,6 +17,8 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.responseHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -70,6 +72,9 @@ public class ThemeApiDocumentationTest extends BaseDocumentationTest {
                                 fieldWithPath("name").description("테마명"),
                                 fieldWithPath("description").description("테마 설명"),
                                 fieldWithPath("thumbnail").description("테마 이미지 경로")
+                        ),
+                        responseHeaders(
+                                headerWithName("Location").description("생성된 테마의 URI")
                         ),
                         responseFields(
                                 fieldWithPath("id").description("테마 id"),
