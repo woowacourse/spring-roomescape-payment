@@ -1,7 +1,7 @@
 -- 테마 목록 : 4개
 INSERT INTO theme (name, description, thumbnail, CREATE_AT)
 VALUES ('공대 탈출', '정신 차려보니 주변엔 체크무늬 셔츠뿐.. 이 곳에서 탈출할 수 있을까?',
-        'https://upload2.inven.co.kr/upload/2019/12/13/bbs/i13979925128.jpg',
+        'https://mblogthumb-phinf.pstatic.net/MjAxNzEyMjBfMTgg/MDAxNTEzNzM4NzA3NjQw.WU32EBJ4bI57_18DFFaPhQO1U0yOQyu9AwX5-ZjAtfMg.6jLA6B4AIQjPH6ySuu1q5ZpMc2LeK2aeiGextEkrzmAg.JPEG.animaking/45c1d89e8d084a0b800.JPG?type=w800',
         DATEADD('DAY', -3, CURRENT_TIMESTAMP));
 INSERT INTO theme (name, description, thumbnail, CREATE_AT)
 VALUES ('짱구야 아빠를 속인거니?', '올 여름을 강타할 단 하나의 호러 서바이벌 생존 스릴러',
