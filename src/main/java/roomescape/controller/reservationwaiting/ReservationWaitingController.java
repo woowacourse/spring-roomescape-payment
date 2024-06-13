@@ -57,7 +57,6 @@ public class ReservationWaitingController {
         return ResponseEntity.noContent().build();
     }
 
-    // TODO: deleteReservation 과 하나로 통합
     @RoleAllowed(MemberRole.ADMIN)
     @DeleteMapping("/admin/reservations/waitings/{waitingId}")
     @Operation(summary = "[관리자] 예약 대기 삭제", description = "예약 대기를 삭제한다.")
