@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import roomescape.infra.AdminCheckInterceptor;
 import roomescape.infra.AuthArgumentResolver;
+import roomescape.service.TokenService;
 
 @Disabled
 @Import(RestDocsConfiguration.class)
@@ -33,6 +34,9 @@ public class RestDocsSupport {
     protected ObjectMapper objectMapper;
 
     @MockBean
+    protected TokenService tokenService;
+
+    @Autowired
     protected AuthArgumentResolver authArgumentResolver;
 
     @MockBean

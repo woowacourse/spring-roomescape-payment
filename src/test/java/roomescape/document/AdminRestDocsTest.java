@@ -11,7 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDate;
 import java.util.List;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -67,7 +66,7 @@ public class AdminRestDocsTest extends RestDocsSupport {
                                 fieldWithPath("theme.name").description("예약 테마 이름"),
                                 fieldWithPath("theme.description").description("예약 테마 설명"),
                                 fieldWithPath("theme.thumbnail").description("예약 테마 썸네일 URL"),
-                                fieldWithPath("status").description("예약 상태")    // TODO: enum 문서화 방법 찾아보기
+                                fieldWithPath("status").description("예약 상태")
                         )
                 ));
     }
@@ -100,7 +99,7 @@ public class AdminRestDocsTest extends RestDocsSupport {
                                 fieldWithPath("[].theme.name").description("예약 테마 이름"),
                                 fieldWithPath("[].theme.description").description("예약 테마 설명"),
                                 fieldWithPath("[].theme.thumbnail").description("예약 테마 썸네일 URL"),
-                                fieldWithPath("[].status").description("예약 상태")    // TODO: enum 문서화 방법 찾아보기
+                                fieldWithPath("[].status").description("예약 상태")
                         )
                 ));
     }
@@ -129,7 +128,7 @@ public class AdminRestDocsTest extends RestDocsSupport {
                                 fieldWithPath("[].theme.name").description("예약 테마 이름"),
                                 fieldWithPath("[].theme.description").description("예약 테마 설명"),
                                 fieldWithPath("[].theme.thumbnail").description("예약 테마 썸네일 URL"),
-                                fieldWithPath("[].status").description("예약 상태")    // TODO: enum 문서화 방법 찾아보기
+                                fieldWithPath("[].status").description("예약 상태")
                         )
                 ));
     }

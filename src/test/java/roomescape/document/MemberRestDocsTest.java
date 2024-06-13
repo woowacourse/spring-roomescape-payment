@@ -1,5 +1,6 @@
 package roomescape.document;
 
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -11,7 +12,6 @@ import roomescape.dto.LoginRequest;
 import roomescape.dto.MemberInfo;
 import roomescape.fixture.MemberFixture;
 import roomescape.service.MemberService;
-import roomescape.service.TokenService;
 
 import java.util.List;
 
@@ -31,9 +31,6 @@ public class MemberRestDocsTest extends RestDocsSupport {
 
     @MockBean
     private MemberService memberService;
-
-    @MockBean
-    private TokenService tokenService;
 
     @Test
     public void login() throws Exception {
@@ -65,9 +62,8 @@ public class MemberRestDocsTest extends RestDocsSupport {
         given(memberService.findByMemberId(anyLong()))
                 .willReturn(response);
 
-        // TODO: param이 아닌 cookie의 값을 argumentResolver를 통해 주입받아야 함
         mockMvc.perform(get("/login/check")
-                        .param("memberId", "1"))
+                        .cookie(new Cookie("token", "eyJhbGciO.eyJleHAiOjE3MTc5MT.qfeIl0AmZSD3_d8x-Ysxbso")))
                 .andExpect(status().isOk())
                 .andDo(restDocs.document(
                     responseFields(
@@ -91,9 +87,9 @@ public class MemberRestDocsTest extends RestDocsSupport {
                 .andExpect(status().isOk())
                 .andDo(restDocs.document(
                         responseFields(
-                                fieldWithPath("[].id").description("로그인한 회원 id"),
-                                fieldWithPath("[].name").description("로그인한 회원 이름"),
-                                fieldWithPath("[].role").description("로그인한 회원 권한")
+                                fieldWithPath("[].id").description("회원 id"),
+                                fieldWithPath("[].name").description("회원 이름"),
+                                fieldWithPath("[].role").description("회원 권한")
                         )
                 ));
     }

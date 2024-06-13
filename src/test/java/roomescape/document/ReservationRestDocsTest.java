@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import jakarta.servlet.http.Cookie;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -46,7 +47,7 @@ public class ReservationRestDocsTest extends RestDocsSupport {
 
         mockMvc.perform(post("/reservations")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("memberId", "1")
+                        .cookie(new Cookie("token", "eyJhbGciO.eyJleHAiOjE3MTc5MT.qfeIl0AmZSD3_d8x-Ysxbso"))
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andDo(restDocs.document(
@@ -68,7 +69,7 @@ public class ReservationRestDocsTest extends RestDocsSupport {
                                 fieldWithPath("theme.name").description("예약 테마 이름"),
                                 fieldWithPath("theme.description").description("예약 테마 설명"),
                                 fieldWithPath("theme.thumbnail").description("예약 테마 썸네일 URL"),
-                                fieldWithPath("status").description("예약 상태")    // TODO: enum 문서화 방법 찾아보기
+                                fieldWithPath("status").description("예약 상태")
                         )
                 ));
     }
@@ -97,7 +98,7 @@ public class ReservationRestDocsTest extends RestDocsSupport {
                                 fieldWithPath("[].theme.name").description("예약 테마 이름"),
                                 fieldWithPath("[].theme.description").description("예약 테마 설명"),
                                 fieldWithPath("[].theme.thumbnail").description("예약 테마 썸네일 URL"),
-                                fieldWithPath("[].status").description("예약 상태")    // TODO: enum 문서화 방법 찾아보기
+                                fieldWithPath("[].status").description("예약 상태")
                         )
                 ));
     }
@@ -119,9 +120,8 @@ public class ReservationRestDocsTest extends RestDocsSupport {
         given(reservationService.findByMemberId(anyLong()))
                 .willReturn(response);
 
-        // TODO: argmuent resolver
         mockMvc.perform(get("/reservations/mine")
-                        .param("memberId", "1"))
+                        .cookie(new Cookie("token", "eyJhbGciO.eyJleHAiOjE3MTc5MT.qfeIl0AmZSD3_d8x-Ysxbso")))
                 .andExpect(status().isOk())
                 .andDo(restDocs.document(
                         responseFields(
@@ -129,7 +129,7 @@ public class ReservationRestDocsTest extends RestDocsSupport {
                                 fieldWithPath("[].theme").description("예약 테마 이름"),
                                 fieldWithPath("[].date").description("예약 날짜"),
                                 fieldWithPath("[].time").description("예약 시간"),
-                                fieldWithPath("[].status").description("예약 상태"),    // TODO: enum 문서화 방법 찾아보기
+                                fieldWithPath("[].status").description("예약 상태"),
                                 fieldWithPath("[].paymentKey").description("paymentKey"),
                                 fieldWithPath("[].amount").description("결제 금액")
                         )
@@ -141,10 +141,9 @@ public class ReservationRestDocsTest extends RestDocsSupport {
         doNothing().when(reservationService)
                 .delete(anyLong(), anyLong());
 
-        // TODO: argmuent resolver
         mockMvc.perform(RestDocumentationRequestBuilders.delete(
                                 "/reservations/{reservationId}", ReservationFixture.DEFAULT_RESERVATION.getId())
-                        .param("memberId", "1"))
+                        .cookie(new Cookie("token", "eyJhbGciO.eyJleHAiOjE3MTc5MT.qfeIl0AmZSD3_d8x-Ysxbso")))
                 .andExpect(status().isNoContent())
                 .andDo(restDocs.document(
                         pathParameters(
