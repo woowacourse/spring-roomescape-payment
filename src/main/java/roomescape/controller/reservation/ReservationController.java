@@ -1,5 +1,7 @@
 package roomescape.controller.reservation;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -34,6 +36,7 @@ import roomescape.service.WaitingService;
 
 import java.util.List;
 
+@Tag(name = "예약 API(공용)")
 @RequestMapping("/reservations")
 @RestController
 public class ReservationController {
@@ -62,6 +65,7 @@ public class ReservationController {
         this.autoReserveService = autoReserveService;
     }
 
+    @Operation(summary = "예약생성 및 결제",description = "예약생성과 결제승인을 진행합니다.")
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(@AuthenticationPrincipal final LoginMember loginMember,
                                                                  @RequestBody final MemberReservationSaveRequest request) {
@@ -80,6 +84,7 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Operation(summary = "예약결제",description = "미결제 예약에 대한 결제승인을 진행합니다.")
     @PatchMapping("/{id}")
     public ResponseEntity<MyReservationResponse> payReservation(@AuthenticationPrincipal final LoginMember loginMember,
                                                                 @PathVariable final Long id,
@@ -90,11 +95,13 @@ public class ReservationController {
         return ResponseEntity.ok(reservationResponse);
     }
 
+    @Operation(summary = "예약 목록")
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> findReservations() {
         return ResponseEntity.ok(reservationService.findAll());
     }
 
+    @Operation(summary = "예약 삭제")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable final Long id) {
         final ReservationResponse response = reservationService.delete(id);
@@ -103,6 +110,7 @@ public class ReservationController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "내 예약 목록",description = "주어진 토큰 정보로 자신의 예약 목록을 불러옵니다.")
     @GetMapping("/mine")
     public ResponseEntity<List<MyReservationResponse>> findMyReservations(@AuthenticationPrincipal final LoginMember loginMember) {
         final List<MyReservationResponse> myReservations = reservationService.findMyReservations(loginMember.id());

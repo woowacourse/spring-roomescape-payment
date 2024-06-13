@@ -7,12 +7,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import roomescape.domain.member.Member;
-import roomescape.domain.theme.Theme;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Objects;
+import roomescape.domain.member.Member;
+import roomescape.domain.theme.Theme;
 
 @Entity
 public class Reservation {
@@ -39,16 +38,21 @@ public class Reservation {
     @Column
     private String paymentKey;
 
+    @Column
+    private Integer amount;
+
     protected Reservation() {
     }
 
-    public Reservation(final Member member, final LocalDate date, final ReservationTime time, final Theme theme, final String paymentKey) {
+    public Reservation(final Member member, final LocalDate date, final ReservationTime time, final Theme theme,
+                       final String paymentKey, final Integer amount) {
         this.id = null;
         this.member = member;
         this.date = date;
         this.time = time;
         this.theme = theme;
         this.paymentKey = paymentKey;
+        this.amount = amount;
     }
 
     public boolean hasSameDateTime(final LocalDate date, final ReservationTime time) {
@@ -112,10 +116,18 @@ public class Reservation {
         return paymentKey;
     }
 
+    public Integer getAmount() {
+        return amount;
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Reservation that = (Reservation) o;
         return Objects.equals(id, that.id);
     }

@@ -1,5 +1,7 @@
 package roomescape.controller.reservation;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,6 +26,7 @@ import roomescape.service.ReservationTimeService;
 import roomescape.service.ThemeService;
 import roomescape.service.WaitingService;
 
+@Tag(name = "예약대기 API(공용)")
 @RestController
 @RequestMapping("/waiting")
 public class WaitingController {
@@ -46,6 +49,7 @@ public class WaitingController {
         this.autoReserveService = autoReserveService;
     }
 
+    @Operation(summary = "예약대기 생성")
     @PostMapping
     public ResponseEntity<ReservationResponse> createWaiting(@AuthenticationPrincipal final LoginMember loginMember,
                                                              @RequestBody final MemberReservationSaveRequest request) {
@@ -63,6 +67,7 @@ public class WaitingController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Operation(summary = "예약대기 취소")
     @DeleteMapping("/{reservationId}")
     public ResponseEntity<ReservationResponse> cancelWaiting(@AuthenticationPrincipal final LoginMember loginMember,
                                                              @PathVariable final Long reservationId) {

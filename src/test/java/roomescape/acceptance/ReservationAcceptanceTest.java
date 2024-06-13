@@ -1,14 +1,14 @@
 package roomescape.acceptance;
 
+import static roomescape.TestFixture.ADMIN_EMAIL;
+import static roomescape.TestFixture.DATE_MAY_EIGHTH;
+import static roomescape.TestFixture.MEMBER_CAT_EMAIL;
+
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.dto.reservation.MemberReservationSaveRequest;
 import roomescape.dto.reservation.ReservationSaveRequest;
-
-import static roomescape.TestFixture.ADMIN_EMAIL;
-import static roomescape.TestFixture.DATE_MAY_EIGHTH;
-import static roomescape.TestFixture.MEMBER_CAT_EMAIL;
 
 class ReservationAcceptanceTest extends AcceptanceTest {
 
@@ -17,7 +17,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     void respondCreatedWhenCreateReservation() {
         final Long timeId = saveReservationTime();
         final Long themeId = saveTheme();
-        final MemberReservationSaveRequest request = new MemberReservationSaveRequest(DATE_MAY_EIGHTH, timeId, themeId, null, null, null);
+        final MemberReservationSaveRequest request = new MemberReservationSaveRequest(DATE_MAY_EIGHTH, timeId, themeId,
+                null, null, null);
 
         assertCreateResponseWithToken(request, MEMBER_CAT_EMAIL, "/reservations", 201);
     }
@@ -27,7 +28,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     void respondCreatedWhenAdminCreateReservation() {
         final Long timeId = saveReservationTime();
         final Long themeId = saveTheme();
-        final ReservationSaveRequest request = new ReservationSaveRequest(1L, DATE_MAY_EIGHTH, timeId, themeId, "결제완");
+        final ReservationSaveRequest request = new ReservationSaveRequest(1L, DATE_MAY_EIGHTH, timeId, themeId, "tgen_202406121547312Hgj4",
+                1_000);
 
         assertCreateResponseWithToken(request, ADMIN_EMAIL, "/admin/reservations", 201);
     }
@@ -37,7 +39,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     void respondBadRequestWhenNotExistingReservationTime() {
         saveReservationTime();
         final Long themeId = saveTheme();
-        final MemberReservationSaveRequest request = new MemberReservationSaveRequest(DATE_MAY_EIGHTH, 0L, themeId, null, null, null);
+        final MemberReservationSaveRequest request = new MemberReservationSaveRequest(DATE_MAY_EIGHTH, 0L, themeId,
+                null, null, null);
 
         assertCreateResponseWithToken(request, MEMBER_CAT_EMAIL, "/reservations", 400);
     }
@@ -47,7 +50,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     void respondBadRequestWhenNotExistingTheme() {
         saveTheme();
         final Long timeId = saveReservationTime();
-        final MemberReservationSaveRequest request = new MemberReservationSaveRequest(DATE_MAY_EIGHTH, timeId, 0L, null, null, null);
+        final MemberReservationSaveRequest request = new MemberReservationSaveRequest(DATE_MAY_EIGHTH, timeId, 0L, null,
+                null, null);
 
         assertCreateResponseWithToken(request, MEMBER_CAT_EMAIL, "/reservations", 400);
     }

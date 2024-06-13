@@ -37,6 +37,9 @@ public class Waiting {
     @JoinColumn(nullable = false)
     private Theme theme;
 
+    @Column
+    private Integer amount;
+
     protected Waiting() {
     }
 
@@ -48,7 +51,7 @@ public class Waiting {
     }
 
     public Reservation toReservation() {
-        return new Reservation(member, date, time, theme, null);
+        return new Reservation(member, date, time, theme, null, amount);
     }
 
     public boolean isNotReservedBy(Member member) {
@@ -98,6 +101,10 @@ public class Waiting {
 
     public String getThemeName() {
         return theme.getName();
+    }
+
+    public Integer getAmount() {
+        return amount;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package roomescape.controller.reservation;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,7 @@ import roomescape.service.ThemeService;
 
 import java.util.List;
 
+@Tag(name = "예약 API(어드민전용)")
 @RequestMapping("/admin/reservations")
 @RestController
 public class AdminReservationController {
@@ -41,6 +44,7 @@ public class AdminReservationController {
         this.themeService = themeService;
     }
 
+    @Operation(summary = "예약 생성")
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody final ReservationSaveRequest request) {
         final MemberResponse memberResponse = memberService.findById(request.memberId());
@@ -51,6 +55,7 @@ public class AdminReservationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.create(reservation));
     }
 
+    @Operation(summary = "예약 목록")
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> findReservations(
             @ModelAttribute final ReservationFilterParam reservationFilterParam) {

@@ -37,6 +37,7 @@ import static roomescape.TestFixture.DATE_MAY_NINTH;
 import static roomescape.TestFixture.DATE_MAY_ONE;
 import static roomescape.TestFixture.MEMBER_CAT;
 import static roomescape.TestFixture.MEMBER_CAT_NAME;
+import static roomescape.TestFixture.PAYMENT_KEY;
 import static roomescape.TestFixture.RESERVATION_TIME_ONE;
 import static roomescape.TestFixture.RESERVATION_TIME_SEVEN;
 import static roomescape.TestFixture.RESERVATION_TIME_SIX;
@@ -67,9 +68,9 @@ class ReservationServiceTest {
     @DisplayName("예약을 생성한다.")
     void create() {
         // given
-        final Reservation reservation = new Reservation(MEMBER_CAT(), DATE_MAY_EIGHTH, RESERVATION_TIME_SIX(), THEME_COMIC(), "결제완");
+        final Reservation reservation = new Reservation(MEMBER_CAT(), DATE_MAY_EIGHTH, RESERVATION_TIME_SIX(), THEME_COMIC(), PAYMENT_KEY,1_000);
         given(reservationRepository.save(reservation))
-                .willReturn(new Reservation(reservation.getMember(), reservation.getDate(), reservation.getTime(), reservation.getTheme(), "결제완"));
+                .willReturn(new Reservation(reservation.getMember(), reservation.getDate(), reservation.getTime(), reservation.getTheme(), PAYMENT_KEY,1_000));
 
         // when
         final ReservationResponse response = reservationService.create(reservation);
@@ -84,7 +85,7 @@ class ReservationServiceTest {
     @DisplayName("예약 날짜가 현재 날짜 이후가 아닌 경우 예외가 발생한다.")
     void throwExceptionWhenInvalidDate(final LocalDate invalidDate) {
         ReservationTime oneHourBefore = new ReservationTime(LocalTime.now().minusHours(1L).toString());
-        assertThatThrownBy(() -> reservationService.create(new Reservation(MEMBER_CAT(), invalidDate, oneHourBefore, THEME_COMIC(), "결제완")))
+        assertThatThrownBy(() -> reservationService.create(new Reservation(MEMBER_CAT(), invalidDate, oneHourBefore, THEME_COMIC(), PAYMENT_KEY,1_000)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -93,7 +94,7 @@ class ReservationServiceTest {
     void throwExceptionWhenCreateDuplicatedReservation() {
         // given
         final Theme theme = THEME_COMIC(1L);
-        final Reservation reservation = new Reservation(MEMBER_CAT(), DATE_MAY_EIGHTH, RESERVATION_TIME_SIX(), theme, "결제완");
+        final Reservation reservation = new Reservation(MEMBER_CAT(), DATE_MAY_EIGHTH, RESERVATION_TIME_SIX(), theme, PAYMENT_KEY,1_000);
         given(reservationRepository.existsByDateAndTime_IdAndTheme_Id(DATE_MAY_EIGHTH, RESERVATION_TIME_SIX().getId(), theme.getId()))
                 .willReturn(true);
 
@@ -106,8 +107,8 @@ class ReservationServiceTest {
     @DisplayName("모든 예약 목록을 조회한다.")
     void findAllReservations() {
         // given
-        final Reservation reservation1 = new Reservation(MEMBER_CAT(), DATE_MAY_EIGHTH, RESERVATION_TIME_SIX(), THEME_COMIC(), "결제완");
-        final Reservation reservation2 = new Reservation(ADMIN(), DATE_MAY_EIGHTH, RESERVATION_TIME_SEVEN(), THEME_ANIME(), "결제완");
+        final Reservation reservation1 = new Reservation(MEMBER_CAT(), DATE_MAY_EIGHTH, RESERVATION_TIME_SIX(), THEME_COMIC(), PAYMENT_KEY,1_000);
+        final Reservation reservation2 = new Reservation(ADMIN(), DATE_MAY_EIGHTH, RESERVATION_TIME_SEVEN(), THEME_ANIME(), PAYMENT_KEY,1_000);
         given(reservationRepository.findAll())
                 .willReturn(List.of(reservation1, reservation2));
 
@@ -134,8 +135,8 @@ class ReservationServiceTest {
     @DisplayName("검색 조건에 따른 예약 목록을 조회한다.")
     void findAllByFilterParameter() {
         // given
-        final Reservation reservation1 = new Reservation(MEMBER_CAT(), DATE_MAY_EIGHTH, RESERVATION_TIME_SIX(), THEME_COMIC(), "결제완");
-        final Reservation reservation2 = new Reservation(MEMBER_CAT(), DATE_MAY_NINTH, RESERVATION_TIME_SIX(), THEME_COMIC(), "결제완");
+        final Reservation reservation1 = new Reservation(MEMBER_CAT(), DATE_MAY_EIGHTH, RESERVATION_TIME_SIX(), THEME_COMIC(), PAYMENT_KEY,1_000);
+        final Reservation reservation2 = new Reservation(MEMBER_CAT(), DATE_MAY_NINTH, RESERVATION_TIME_SIX(), THEME_COMIC(), PAYMENT_KEY,1_000);
         final ReservationFilterParam reservationFilterParam = new ReservationFilterParam(
                 1L, 1L, LocalDate.parse("2034-05-08"), LocalDate.parse("2034-05-28")
         );
@@ -167,7 +168,7 @@ class ReservationServiceTest {
         // given
         final Long existingId = 1L;
         given(reservationRepository.findById(existingId)).willReturn(
-                Optional.of(new Reservation(MEMBER_CAT(1L), DATE_MAY_ONE, RESERVATION_TIME_SEVEN(), THEME_COMIC(), "결제완"))
+                Optional.of(new Reservation(MEMBER_CAT(1L), DATE_MAY_ONE, RESERVATION_TIME_SEVEN(), THEME_COMIC(), PAYMENT_KEY,1_000))
         );
 
         // when & then
@@ -191,7 +192,7 @@ class ReservationServiceTest {
     void throwExceptionWhenNotEqualMemberAndReservationMember() {
         // given
         given(reservationRepository.findById(anyLong())).willReturn(
-                Optional.of(new Reservation(MEMBER_CAT(1L), DATE_MAY_NINTH, RESERVATION_TIME_ONE(), THEME_COMIC(), "dummyKey"))
+                Optional.of(new Reservation(MEMBER_CAT(1L), DATE_MAY_NINTH, RESERVATION_TIME_ONE(), THEME_COMIC(), "dummyKey",1_000))
         );
         LoginMember loginMember = new LoginMember(0L, ADMIN_NAME, ADMIN);
 
