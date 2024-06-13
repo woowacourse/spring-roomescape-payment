@@ -1,18 +1,7 @@
 package roomescape.reservationtime.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.time.LocalTime;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +14,18 @@ import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.dto.ReservationTimeRequest;
 import roomescape.reservationtime.dto.ReservationTimeResponse;
 import roomescape.reservationtime.service.ReservationTimeService;
+
+import java.time.LocalTime;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ReservationTimeController.class)
 class ReservationTimeControllerTest extends ControllerTest {
@@ -47,7 +48,7 @@ class ReservationTimeControllerTest extends ControllerTest {
                 .registerModule(new JavaTimeModule())
                 .writeValueAsString(new ReservationTimeRequest(time.getStartAt()));
 
-        mockMvc.perform(post("/times")
+        mockMvc.perform(post("/admin/times")
                         .content(content)
                         .contentType("application/Json")
                         .accept(MediaType.APPLICATION_JSON)
@@ -74,7 +75,7 @@ class ReservationTimeControllerTest extends ControllerTest {
     @Test
     @DisplayName("예약 정보를 잘 지우는지 확인한다.")
     void reservationTimeRemove() throws Exception {
-        mockMvc.perform(delete("/times/4"))
+        mockMvc.perform(delete("/admin/times/4"))
                 .andDo(print())
                 .andExpect(status().isNoContent());
     }

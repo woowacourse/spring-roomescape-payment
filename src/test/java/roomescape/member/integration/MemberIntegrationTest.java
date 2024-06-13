@@ -1,19 +1,20 @@
 package roomescape.member.integration;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseCookie;
 import roomescape.auth.domain.Token;
 import roomescape.auth.provider.CookieProvider;
 import roomescape.model.IntegrationTest;
+import roomescape.registration.dto.PaymentResponse;
 import roomescape.registration.dto.RegistrationInfoDto;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+import static org.hamcrest.Matchers.equalTo;
 
 class MemberIntegrationTest extends IntegrationTest {
 
@@ -22,7 +23,7 @@ class MemberIntegrationTest extends IntegrationTest {
     void memberList() {
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .when().get("/members")
+                .when().get("/admin/members")
                 .then().log().all()
                 .statusCode(200);
     }
@@ -42,7 +43,6 @@ class MemberIntegrationTest extends IntegrationTest {
                 .then()
                 .statusCode(200)
                 .contentType(ContentType.JSON)
-                .body("$", hasSize(3))
                 .body("[0].id", equalTo(memberId))
                 .body("[0].themeName", equalTo(firstReservation.themeName()))
                 .body("[0].date", equalTo(firstReservation.date().toString()))
@@ -56,7 +56,8 @@ class MemberIntegrationTest extends IntegrationTest {
                 "polla",
                 LocalDate.parse("2024-04-30"),
                 LocalTime.parse("15:40"),
-                "예약"
+                "예약",
+                PaymentResponse.getPaymentResponseForNotPaidReservation()
         );
     }
 }

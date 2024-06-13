@@ -5,8 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.admin.domain.FilterInfo;
 import roomescape.admin.dto.AdminReservationRequest;
 import roomescape.admin.dto.ReservationFilterRequest;
-import roomescape.client.payment.TossPaymentClient;
-import roomescape.client.payment.dto.PaymentConfirmToTossDto;
 import roomescape.exception.RoomEscapeException;
 import roomescape.exception.model.MemberExceptionCode;
 import roomescape.exception.model.ReservationExceptionCode;
@@ -14,6 +12,8 @@ import roomescape.exception.model.ReservationTimeExceptionCode;
 import roomescape.exception.model.ThemeExceptionCode;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.repository.PaymentRepository;
+import roomescape.payment.service.PaymentService;
 import roomescape.registration.domain.reservation.domain.Reservation;
 import roomescape.registration.domain.reservation.dto.ReservationRequest;
 import roomescape.registration.domain.reservation.dto.ReservationResponse;
@@ -39,18 +39,20 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
-    private final TossPaymentClient tossPaymentClient;
+    private final PaymentService paymentService;
+    private final PaymentRepository paymentRepository;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository,
                               MemberRepository memberRepository, WaitingRepository waitingRepository,
-                              TossPaymentClient tossPaymentClient) {
+                              PaymentService paymentService, PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
-        this.tossPaymentClient = tossPaymentClient;
+        this.paymentService = paymentService;
+        this.paymentRepository = paymentRepository;
     }
 
     @Transactional
@@ -66,8 +68,8 @@ public class ReservationService {
         Reservation saveReservation = new Reservation(reservationRequest.date(), time, theme, member);
         Reservation reservation = reservationRepository.save(saveReservation);
 
-        PaymentConfirmToTossDto paymentConfirmToTossDto = PaymentConfirmToTossDto.from(reservationRequest);
-        tossPaymentClient.sendPaymentConfirm(paymentConfirmToTossDto);
+        paymentService.sendConfirmRequestAndSavePayment(reservationRequest, reservation);
+
         return ReservationResponse.from(reservation);
     }
 
@@ -117,17 +119,16 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public List<ReservationResponse> findMemberReservations(long id) {
-        List<Reservation> reservations = reservationRepository.findAllByMemberId(id);
-
-        return reservations.stream()
-                .map(ReservationResponse::from)
-                .toList();
+        return reservationRepository.findAllReservationsWithPaymentsByMemberId(id);
     }
 
     @Transactional
-    public void removeReservation(long reservationId) {
-        Optional<Waiting> waiting = waitingRepository.findFirstByReservationIdOrderByCreatedAt(reservationId);
+    public void removeReservation(long reservationId, Long memberId) {
+        if (paymentRepository.existsByReservationId(reservationId)) {
+            throw new RoomEscapeException(ReservationExceptionCode.RESERVATION_ALREADY_PAID_CAN_NOT_DELETE_EXCEPTION);
+        }
 
+        Optional<Waiting> waiting = waitingRepository.findFirstByReservationIdOrderByCreatedAt(reservationId);
         if (waiting.isEmpty()) {
             reservationRepository.deleteById(reservationId);
             return;
@@ -135,7 +136,12 @@ public class ReservationService {
 
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new RoomEscapeException(ReservationExceptionCode.RESERVATION_NOT_EXIST));
-        reservation.setMember(waiting.get().getMember());
+        if(reservation.getMember() != memberRepository.findMemberById(memberId)
+                .orElseThrow(() -> new RoomEscapeException(MemberExceptionCode.MEMBER_NOT_EXIST_EXCEPTION))){
+            throw new RoomEscapeException(ReservationExceptionCode.ONLY_OWNER_CAN_DELETE);
+        }
+
+        reservation.setMember(waiting.get().getReservation().getMember());
 
         reservationRepository.save(reservation);
         waitingRepository.deleteById(waiting.get().getId());

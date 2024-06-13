@@ -10,15 +10,18 @@ import java.util.Arrays;
 
 public class CookieProvider {
 
-    private static final String TOKEN_NAME = "token";
     public static final String SAME_SITE_OPTION = "Strict";
+    private static final String TOKEN_NAME = "token";
+
+    private CookieProvider() {
+    }
 
     public static ResponseCookie setCookieFrom(Token token) {
         return ResponseCookie.from(TOKEN_NAME, token.getToken())
                 .path("/")
                 .sameSite(SAME_SITE_OPTION)
                 .httpOnly(true)
-                .maxAge(60 * 60 * 24)
+                .maxAge((long)60 * 60 * 24)
                 .build();
     }
 

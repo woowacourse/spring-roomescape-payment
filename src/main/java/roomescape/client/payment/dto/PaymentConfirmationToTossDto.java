@@ -4,13 +4,13 @@ import roomescape.registration.domain.reservation.dto.ReservationRequest;
 
 import java.io.Serializable;
 
-public record PaymentConfirmToTossDto(
+public record PaymentConfirmationToTossDto(
         String orderId,
         Integer amount,
         String paymentKey) implements Serializable {
 
-    public static PaymentConfirmToTossDto from(ReservationRequest reservationRequest) {
-        return new PaymentConfirmToTossDto(
+    public static PaymentConfirmationToTossDto from(ReservationRequest reservationRequest) {
+        return new PaymentConfirmationToTossDto(
                 reservationRequest.orderId(),
                 reservationRequest.amount(),
                 reservationRequest.paymentKey()

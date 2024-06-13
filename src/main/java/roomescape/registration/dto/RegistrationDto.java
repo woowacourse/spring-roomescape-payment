@@ -6,7 +6,11 @@ import roomescape.registration.domain.waiting.domain.Waiting;
 
 import java.time.LocalDate;
 
-public record RegistrationDto(LocalDate date, long themeId, long timeId, long memberId) {
+public record RegistrationDto(
+        LocalDate date,
+        long themeId,
+        long timeId,
+        long memberId) {
 
     public static RegistrationDto from(Waiting waiting) {
         Reservation reservation = waiting.getReservation();

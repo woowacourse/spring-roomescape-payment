@@ -9,7 +9,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.client.payment.TossPaymentClient;
-import roomescape.client.payment.dto.PaymentConfirmToTossDto;
+import roomescape.client.payment.dto.PaymentConfirmationFromTossDto;
+import roomescape.client.payment.dto.PaymentConfirmationToTossDto;
 import roomescape.exception.RoomEscapeException;
 import roomescape.exception.model.ReservationExceptionCode;
 import roomescape.member.domain.Member;
@@ -38,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.BDDMockito.given;
 
 @Sql(scripts = "/init.sql")
 @Transactional
@@ -48,17 +49,17 @@ class ReservationServiceTest {
     private static final LocalDate BEFORE = LocalDate.now().minusDays(1);
     private static final LocalTime TIME = LocalTime.of(9, 0);
 
+    private final Member reservationOwner = new Member(1L, new Name("polla"), "kyunellroll@gmail.com", "polla99", MemberRole.MEMBER);
     private final Reservation reservation = new Reservation(
             1L,
             LocalDate.now().plusDays(2),
             new ReservationTime(1L, TIME),
-            new Theme(1L, new Name("pollaBang"), "폴라 방탈출", "thumbnail"),
-            new Member(1L, new Name("polla"), "kyunellroll@gmail.com", "polla99", MemberRole.MEMBER)
+            new Theme(1L, new Name("pollaBang"), "폴라 방탈출", "thumbnail",15000L),
+            reservationOwner
     );
     private final Waiting waiting = new Waiting(
             1L,
             reservation,
-            new Member(1L, new Name("polla"), "kyunellroll@gmail.com", "polla99", MemberRole.MEMBER),
             LocalDateTime.now()
     );
 
@@ -92,8 +93,9 @@ class ReservationServiceTest {
         ReservationRequest reservationRequest = new ReservationRequest(reservation.getDate(),
                 reservation.getReservationTime().getId(), reservation.getTheme().getId(),
                 "paymentType", "paymentKey", "orderId", 1000);
-        PaymentConfirmToTossDto paymentConfirmToTossDto = PaymentConfirmToTossDto.from(reservationRequest);
-        willDoNothing().given(tossPaymentClient).sendPaymentConfirm(paymentConfirmToTossDto);
+        PaymentConfirmationToTossDto paymentConfirmationToTossDto = PaymentConfirmationToTossDto.from(reservationRequest);
+        given(tossPaymentClient.sendPaymentConfirm(paymentConfirmationToTossDto))
+                .willReturn(getValidPaymentConfirmationFromTossDto());
 
         ReservationResponse reservationResponse = reservationService
                 .addReservation(reservationRequest, 1L);
@@ -123,7 +125,7 @@ class ReservationServiceTest {
         reservationRepository.save(reservation);
         waitingRepository.save(waiting);
 
-        assertDoesNotThrow(() -> reservationService.removeReservation(reservation.getId()));
+        assertDoesNotThrow(() -> reservationService.removeReservation(reservation.getId(), reservationOwner.getId()));
     }
 
     @Test
@@ -136,12 +138,30 @@ class ReservationServiceTest {
         waitingRepository.save(waiting);
 
         assertAll(
-                () -> assertDoesNotThrow(() -> reservationService.removeReservation(reservation.getId())),
+                () -> assertDoesNotThrow(() -> reservationService.removeReservation(reservation.getId(), reservationOwner.getId())),
                 () -> assertThat(reservationService.findReservations()).hasSize(1),
                 () -> assertThat(reservationService.findReservations().get(0).memberName()).isEqualTo(
-                        waiting.getMember().getName()),
+                        waiting.getReservation().getMember().getName()),
                 () -> assertThat(waitingRepository.findAll()).isEmpty()
         );
+    }
+
+    @Test
+    @DisplayName("자신의 것이 아닌 것을 삭제하려 하면 예외가 발생한다.")
+    void cannotDeleteOtherReservation() {
+        reservationTimeRepository.save(reservation.getReservationTime());
+        themeRepository.save(reservation.getTheme());
+        memberRepository.save(reservation.getMember());
+        reservationRepository.save(reservation);
+        waitingRepository.save(waiting);
+        Member notOwner = memberRepository.save(
+                new Member(new Name("주인이 아님"), "notOwner1@email.com", "password1", MemberRole.MEMBER)
+        );
+
+        Throwable cannotDeleteOthersException = assertThrows(RoomEscapeException.class,
+                () -> reservationService.removeReservation(reservation.getId(), notOwner.getId()));
+        assertEquals(ReservationExceptionCode.ONLY_OWNER_CAN_DELETE.getMessage(),
+                cannotDeleteOthersException.getMessage());
     }
 
     @Test
@@ -159,5 +179,11 @@ class ReservationServiceTest {
 
         assertEquals(ReservationExceptionCode.RESERVATION_DATE_IS_PAST_EXCEPTION.getMessage(),
                 pastDateReservation.getMessage());
+    }
+
+    private PaymentConfirmationFromTossDto getValidPaymentConfirmationFromTossDto() {
+        return new PaymentConfirmationFromTossDto(
+                "test-payment-key", "test-order-id", 10000L, "DONE"
+        );
     }
 }

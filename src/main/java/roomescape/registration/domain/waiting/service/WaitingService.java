@@ -2,6 +2,8 @@ package roomescape.registration.domain.waiting.service;
 
 import org.springframework.stereotype.Service;
 import roomescape.exception.RoomEscapeException;
+import roomescape.exception.model.MemberExceptionCode;
+import roomescape.exception.model.ReservationExceptionCode;
 import roomescape.exception.model.WaitingExceptionCode;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
@@ -24,8 +26,7 @@ public class WaitingService {
     private final ReservationRepository reservationRepository;
     private final MemberRepository memberRepository;
 
-    public WaitingService(WaitingRepository waitingRepository, ReservationRepository reservationRepository,
-                          MemberRepository memberRepository) {
+    public WaitingService(WaitingRepository waitingRepository, ReservationRepository reservationRepository, MemberRepository memberRepository) {
         this.waitingRepository = waitingRepository;
         this.reservationRepository = reservationRepository;
         this.memberRepository = memberRepository;
@@ -40,10 +41,8 @@ public class WaitingService {
                 waitingRequest.themeId(),
                 waitingRequest.timeId()
         );
-        Member member = memberRepository.findMemberById(memberId)
-                .orElseThrow(() -> new RoomEscapeException(WaitingExceptionCode.MEMBER_INFO_IS_NULL_EXCEPTION));
 
-        Waiting unSavedWaiting = new Waiting(reservation, member, LocalDateTime.now());
+        Waiting unSavedWaiting = new Waiting(reservation, LocalDateTime.now());
 
         return WaitingResponse.from(waitingRepository.save(unSavedWaiting));
     }
@@ -66,7 +65,7 @@ public class WaitingService {
     }
 
     public long countWaitingRank(RegistrationDto registrationDto) {
-        Waiting waiting = waitingRepository.findByReservationDateAndReservationThemeIdAndReservationReservationTimeIdAndMemberId(
+        Waiting waiting = waitingRepository.findByReservationDateAndReservationThemeIdAndReservationReservationTimeIdAndReservationMemberId(
                 registrationDto.date(),
                 registrationDto.themeId(),
                 registrationDto.timeId(),
@@ -81,8 +80,18 @@ public class WaitingService {
         );
     }
 
-    public void removeWaiting(long waitingId) {
-        waitingRepository.deleteById(waitingId);
+    public void removeWaiting(long waitingId, Long memberId) {
+        Waiting waiting = waitingRepository.findById(waitingId)
+                .orElseThrow(() -> new RoomEscapeException(WaitingExceptionCode.WAITING_NOT_EXIST_EXCEPTION));
+        Reservation reservation = reservationRepository.findById(waiting.getId())
+                .orElseThrow(() -> new RoomEscapeException(ReservationExceptionCode.RESERVATION_NOT_EXIST));
+        Member member = memberRepository.findMemberById(memberId)
+                .orElseThrow(() -> new RoomEscapeException(MemberExceptionCode.MEMBER_NOT_EXIST_EXCEPTION));
+
+        if(!reservation.getMember().equals(member)) {
+            throw new RoomEscapeException(WaitingExceptionCode.ONLY_OWNER_CAN_DELETE);
+        }
+        waitingRepository.delete(waiting);
     }
 
     private void validateAlreadyReservation(WaitingRequest waitingRequest, long memberId) {
@@ -99,7 +108,7 @@ public class WaitingService {
     }
 
     private void validateAlreadyWaiting(WaitingRequest waitingRequest, long memberId) {
-        boolean existWaiting = waitingRepository.existsByReservationDateAndReservationThemeIdAndReservationReservationTimeIdAndMemberId(
+        boolean existWaiting = waitingRepository.existsByReservationDateAndReservationThemeIdAndReservationReservationTimeIdAndReservationMemberId(
                 waitingRequest.date(),
                 waitingRequest.themeId(),
                 waitingRequest.timeId(),

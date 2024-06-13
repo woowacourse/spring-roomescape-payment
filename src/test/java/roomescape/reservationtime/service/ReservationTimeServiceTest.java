@@ -100,7 +100,7 @@ class ReservationTimeServiceTest {
         List<Reservation> reservations = List.of(new Reservation(
                 LocalDate.now().plusDays(1),
                 new ReservationTime(1L, LocalTime.of(10,0)),
-                new Theme(1L, new Name("테스트 테마"), "테마 설명", "썸네일"),
+                new Theme(1L, new Name("테스트 테마"), "테마 설명", "썸네일", 15000L),
                 new Member(1L, new Name("레모네"), "lemone@gmail.com", "lemon12", MemberRole.MEMBER))
         );
 

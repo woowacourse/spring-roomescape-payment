@@ -1,24 +1,17 @@
 package roomescape.theme.controller;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.time.LocalDate;
-import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import roomescape.auth.provider.model.TokenProvider;
+import roomescape.member.domain.Member;
+import roomescape.member.domain.MemberRole;
 import roomescape.model.ControllerTest;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.dto.ThemeRankResponse;
@@ -27,12 +20,27 @@ import roomescape.theme.dto.ThemeResponse;
 import roomescape.theme.service.ThemeService;
 import roomescape.vo.Name;
 
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 @WebMvcTest(ThemeController.class)
+@Import(TokenProvider.class)
 public class ThemeControllerTest extends ControllerTest {
 
     public static final LocalDate TODAY = LocalDate.now();
     private final Theme theme = new Theme(1L, new Name("포레스트"), "공포 테마",
-            "https://zerogangnam.com/storage/AVISPw8N2JfMThKvnk3VJzeY9qywIaYd8pTy46Xx.jpg");
+            "https://zerogangnam.com/storage/AVISPw8N2JfMThKvnk3VJzeY9qywIaYd8pTy46Xx.jpg",15000L);
+    private final Member admin = new Member(1L, new Name("admin"), "admin1@email.com", "admin1", MemberRole.ADMIN);
 
     @Autowired
     private MockMvc mockMvc;
@@ -40,16 +48,18 @@ public class ThemeControllerTest extends ControllerTest {
     @MockBean
     private ThemeService themeService;
 
+    @Autowired
+    private TokenProvider tokenProvider;
+
     @Test
     @DisplayName("테마 정보를 정상적으로 저장하는지 확인한다.")
     void saveTheme() throws Exception {
-        when(themeService.addTheme(any()))
-                .thenReturn(ThemeResponse.fromTheme(theme));
-
+        given(themeService.addTheme(any()))
+                .willReturn(ThemeResponse.fromTheme(theme));
         String content = new ObjectMapper()
-                .writeValueAsString(new ThemeRequest(theme.getName(), theme.getDescription(), theme.getThumbnail()));
+                .writeValueAsString(new ThemeRequest(theme.getName(), theme.getDescription(), theme.getThumbnail(), theme.getPrice()));
 
-        mockMvc.perform(post("/themes")
+        mockMvc.perform(post("/admin/themes")
                         .content(content)
                         .contentType("application/Json")
                         .accept(MediaType.APPLICATION_JSON)
@@ -94,7 +104,7 @@ public class ThemeControllerTest extends ControllerTest {
     @Test
     @DisplayName("예약 정보를 정상적으로 지우는지 확인한다.")
     void deleteTheme() throws Exception {
-        mockMvc.perform(delete("/themes/1"))
+        mockMvc.perform(delete("/admin/themes/1"))
                 .andDo(print())
                 .andExpect(status().isNoContent());
     }

@@ -2,7 +2,6 @@ package roomescape.admin.integration;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseCookie;
@@ -11,7 +10,9 @@ import roomescape.auth.domain.Token;
 import roomescape.auth.provider.CookieProvider;
 import roomescape.model.IntegrationTest;
 
-public class AdminIntegrationTest extends IntegrationTest {
+import java.time.LocalDate;
+
+class AdminIntegrationTest extends IntegrationTest {
 
     @Test
     @DisplayName("관리자가 아닌 경우 관리자 예매를 시도하지 못한다.")

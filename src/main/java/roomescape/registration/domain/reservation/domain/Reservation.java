@@ -12,6 +12,7 @@ import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Objects;
 
 @Entity
@@ -50,10 +51,6 @@ public class Reservation {
         this(NULL_ID, date, reservationTime, theme, member);
     }
 
-    public void setMember(Member member) {
-        this.member = member;
-    }
-
     public long getId() {
         return id;
     }
@@ -72,6 +69,22 @@ public class Reservation {
 
     public Member getMember() {
         return member;
+    }
+
+    public String getThemName() {
+        return this.theme.getName();
+    }
+
+    public String getMemberName() {
+        return this.member.getName();
+    }
+
+    public LocalTime getReservationTimeStartAt() {
+        return this.reservationTime.getStartAt();
+    }
+
+    public void setMember(Member member) {
+        this.member = member;
     }
 
     @Override

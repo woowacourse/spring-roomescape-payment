@@ -48,7 +48,18 @@ function render(data) {
       };
       cancelCell.appendChild(cancelButton);
     } else { // 예약 완료 상태일 때
+      /*
+     TODO: [미션4 - 2단계] 내 예약 목록 조회 시,
+      예약 완료 상태일 때 결제 정보를 함께 보여주기
+      결제 정보 필드명은 자신의 response 에 맞게 변경하기
+      */
       row.insertCell(4).textContent = '';
+      row.insertCell(5).textContent = item.payment.amount;
+      if(item.payment.createdAt == null) {
+        row.insertCell(6).textContent = '결제 대기 중';
+      } else {
+        row.insertCell(6).textContent = item.payment.createdAt;
+      }
     }
   });
 }

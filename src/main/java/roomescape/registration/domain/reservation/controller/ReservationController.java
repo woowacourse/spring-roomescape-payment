@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.annotation.LoginMemberId;
@@ -19,9 +18,8 @@ import roomescape.registration.domain.reservation.service.ReservationService;
 import java.time.LocalDate;
 import java.util.List;
 
-@RequestMapping("/reservations")
 @RestController
-public class ReservationController {
+public class ReservationController implements ReservationControllerSwagger {
 
     private final ReservationService reservationService;
 
@@ -29,9 +27,10 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
-    @PostMapping
+    @Override
+    @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> reservationSave(@RequestBody ReservationRequest reservationRequest,
-                                                               @LoginMemberId long id) {
+                                                               @LoginMemberId Long id) {
         ReservationResponse reservationResponse = reservationService.addReservation(reservationRequest, id);
 
         return ResponseEntity
@@ -39,20 +38,17 @@ public class ReservationController {
                 .body(reservationResponse);
     }
 
-    @GetMapping
-    public List<ReservationResponse> reservaionList() {
-        return reservationService.findReservations();
-    }
-
-    @GetMapping("/{themeId}")
+    @Override
+    @GetMapping("/reservations/{themeId}")
     public List<ReservationTimeAvailabilityResponse> reservationTimeList(@PathVariable long themeId,
                                                                          @RequestParam LocalDate date) {
         return reservationService.findTimeAvailability(themeId, date);
     }
 
-    @DeleteMapping("/{reservationId}")
-    public ResponseEntity<Void> reservationRemove(@PathVariable long reservationId) {
-        reservationService.removeReservation(reservationId);
+    @Override
+    @DeleteMapping("/reservations/{reservationId}")
+    public ResponseEntity<Void> reservationRemove(@PathVariable long reservationId, @LoginMemberId Long memberId) {
+        reservationService.removeReservation(reservationId, memberId);
         return ResponseEntity.noContent().build();
     }
 }

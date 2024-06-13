@@ -15,7 +15,7 @@ import roomescape.member.dto.MemberLoginCheckResponse;
 import roomescape.member.service.MemberService;
 
 @RestController
-public class AuthController {
+public class AuthController implements AuthControllerSwagger {
 
     private final AuthService authService;
     private final MemberService memberService;
@@ -25,6 +25,7 @@ public class AuthController {
         this.memberService = memberService;
     }
 
+    @Override
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest) {
         Token token = authService.login(loginRequest);
@@ -35,6 +36,7 @@ public class AuthController {
                 .build();
     }
 
+    @Override
     @GetMapping("/login/check")
     public MemberLoginCheckResponse loginCheck(@LoginMemberId Long id) {
         return memberService.findLoginMemberInfo(id);
