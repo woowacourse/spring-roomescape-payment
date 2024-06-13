@@ -1,6 +1,5 @@
 package roomescape.reservation.service;
 
-import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -100,8 +99,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse saveMemberReservation(Long memberId,
-            @Valid MemberReservationWithPaymentAddRequest request) {
+    public ReservationResponse saveMemberReservation(Long memberId, MemberReservationWithPaymentAddRequest request) {
         MemberReservationAddRequest memberReservationAddRequest = new MemberReservationAddRequest(request);
         validateDuplicatedReservation(memberReservationAddRequest);
 
@@ -110,8 +108,7 @@ public class ReservationService {
         return new ReservationResponse(reservation);
     }
 
-    public ReservationResponse saveAdminReservation(Long memberId,
-            @Valid MemberReservationAddRequest request) {
+    public ReservationResponse saveAdminReservation(Long memberId, MemberReservationAddRequest request) {
         MemberReservationAddRequest memberReservationAddRequest = new MemberReservationAddRequest(request);
         validateDuplicatedReservation(memberReservationAddRequest);
 

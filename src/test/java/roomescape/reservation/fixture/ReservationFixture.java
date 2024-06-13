@@ -7,7 +7,6 @@ import static roomescape.time.fixture.DateTimeFixture.YESTERDAY;
 import static roomescape.time.fixture.ReservationTimeFixture.RESERVATION_TIME_10_00_ID_1;
 import static roomescape.time.fixture.ReservationTimeFixture.RESERVATION_TIME_11_00_ID_2;
 
-import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import roomescape.member.fixture.MemberFixture;
@@ -18,7 +17,7 @@ import roomescape.reservation.dto.MemberReservationWithPaymentAddRequest;
 
 public class ReservationFixture {
 
-    public static final @Valid MemberReservationWithPaymentAddRequest RESERVATION_WITH_PAYMENT_REQUEST_1 = new MemberReservationWithPaymentAddRequest(
+    public static final MemberReservationWithPaymentAddRequest RESERVATION_WITH_PAYMENT_REQUEST_1 = new MemberReservationWithPaymentAddRequest(
             TOMORROW,
             1L,
             1L,
@@ -26,7 +25,7 @@ public class ReservationFixture {
             "orderId",
             1000L);
 
-    public static final @Valid MemberReservationWithPaymentAddRequest PAST_RESERVATION_WITH_PAYMENT_REQUEST_1 = new MemberReservationWithPaymentAddRequest(
+    public static final MemberReservationWithPaymentAddRequest PAST_RESERVATION_WITH_PAYMENT_REQUEST_1 = new MemberReservationWithPaymentAddRequest(
             YESTERDAY,
             1L,
             1L,
@@ -34,7 +33,7 @@ public class ReservationFixture {
             "orderId",
             1000L);
 
-    public static final @Valid MemberReservationAddRequest RESERVATION_REQUEST_1 = new MemberReservationAddRequest(
+    public static final MemberReservationAddRequest RESERVATION_REQUEST_1 = new MemberReservationAddRequest(
             TOMORROW,
             1L,
             1L);
