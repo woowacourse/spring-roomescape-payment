@@ -25,7 +25,6 @@ import roomescape.reservation.dto.request.ReservationPayRequest;
 import roomescape.reservation.dto.request.ReservationSaveRequest;
 import roomescape.reservation.presentation.ReservationController;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -45,6 +44,8 @@ import static roomescape.TestFixture.HORROR_THEME;
 import static roomescape.TestFixture.MIA_RESERVATION;
 import static roomescape.TestFixture.MIA_RESERVATION_DATE;
 import static roomescape.TestFixture.MIA_RESERVATION_TIME;
+import static roomescape.TestFixture.PRODUCT_PAY_REQUEST;
+import static roomescape.TestFixture.SIMPLE_PAYMENT;
 import static roomescape.TestFixture.USER_MIA;
 import static roomescape.TestFixture.WOOTECO_THEME;
 import static roomescape.common.StubLoginMemberArgumentResolver.STUBBED_LOGIN_MEMBER;
@@ -65,7 +66,7 @@ class ReservationApiDocumentTest extends DocumentTest {
     @DisplayName("예약 생성 API")
     void createReservation() throws Exception {
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, 1L, 1L);
-        ProductPayRequest productPayRequest = new ProductPayRequest("key", "orderId", BigDecimal.valueOf(1000L), "none");
+        ProductPayRequest productPayRequest = PRODUCT_PAY_REQUEST();
         ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, productPayRequest);
         ReservationTime expectedTime = new ReservationTime(1L, MIA_RESERVATION_TIME);
         Theme expectedTheme = WOOTECO_THEME(1L);
@@ -142,7 +143,7 @@ class ReservationApiDocumentTest extends DocumentTest {
         Reservation expectedReservation = MIA_RESERVATION(1L, expectedTime, WOOTECO_THEME(), USER_MIA(), BOOKING);
         WaitingReservation expectedWaitingReservation = new WaitingReservation(
                 MIA_RESERVATION(1L, expectedTime, HORROR_THEME(1L), USER_MIA(1L), WAITING), 0);
-        Payment expectedPayment = new Payment("paymentKey", "orderId", BigDecimal.valueOf(1000), new PaymentProduct(1L));
+        Payment expectedPayment = SIMPLE_PAYMENT("paymentKey", "orderId", new PaymentProduct(1L));
 
         BDDMockito.given(bookingQueryService.findAllByMember(any()))
                 .willReturn(List.of(expectedReservation));

@@ -7,10 +7,9 @@ import org.mockito.Mockito;
 import roomescape.global.exception.ViolationException;
 import roomescape.payment.application.ProductPayRequest;
 
-import java.math.BigDecimal;
-
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static roomescape.TestFixture.PRODUCT_PAY_REQUEST;
 
 class TossPaymentGatewayTest {
     private final TossPaymentsClient client = Mockito.mock(TossPaymentsClient.class);
@@ -24,19 +23,10 @@ class TossPaymentGatewayTest {
                 .thenReturn(false);
         BDDMockito.when(client.findBy(any()))
                 .thenReturn(payment);
-        ProductPayRequest request = createRequest("paymentKey");
+        ProductPayRequest request = PRODUCT_PAY_REQUEST("paymentKey", "orderId");
 
         assertThatThrownBy(() -> tossPaymentGateway.processAfterPaid(request))
                 .isInstanceOf(ViolationException.class)
                 .hasMessage("올바른 결제 정보를 입력해주세요.");
-    }
-
-    private ProductPayRequest createRequest(String paymentKey) {
-        return new ProductPayRequest(
-                paymentKey,
-                "orderId",
-                BigDecimal.valueOf(1000L),
-                "card"
-        );
     }
 }

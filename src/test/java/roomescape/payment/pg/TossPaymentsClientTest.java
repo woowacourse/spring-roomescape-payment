@@ -12,12 +12,11 @@ import roomescape.global.exception.ViolationException;
 import roomescape.payment.application.PaymentServerException;
 import roomescape.payment.application.ProductPayRequest;
 
-import java.math.BigDecimal;
-
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.anything;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
+import static roomescape.TestFixture.PRODUCT_PAY_REQUEST;
 
 @RestClientTest
 @Import(TossRestClientConfiguration.class)
@@ -46,12 +45,7 @@ class TossPaymentsClientTest {
         mockServer.expect(anything())
                 .andRespond(withBadRequest().body(expectedBody));
 
-        ProductPayRequest productPayRequest = new ProductPayRequest(
-                "paymentKey",
-                "orderId",
-                BigDecimal.valueOf(1000L),
-                "card"
-        );
+        ProductPayRequest productPayRequest = PRODUCT_PAY_REQUEST();
 
         // when & then
         TossPaymentsConfirmRequest request = new TossPaymentsConfirmRequest(productPayRequest);
@@ -70,12 +64,7 @@ class TossPaymentsClientTest {
         mockServer.expect(anything())
                 .andRespond(withServerError().body(expectedBody));
 
-        ProductPayRequest productPayRequest = new ProductPayRequest(
-                "paymentKey",
-                "orderId",
-                BigDecimal.valueOf(1000L),
-                "card"
-        );
+        ProductPayRequest productPayRequest = PRODUCT_PAY_REQUEST();
 
         // when & then
         TossPaymentsConfirmRequest request = new TossPaymentsConfirmRequest(productPayRequest);
