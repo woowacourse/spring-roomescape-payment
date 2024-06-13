@@ -1,7 +1,6 @@
 package roomescape.reservation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -54,7 +53,7 @@ public class ReservationController {
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(
             @RequestBody ReservationCreateRequest request,
-            @Parameter(hidden = true) LoggedInMember member) {
+            LoggedInMember member) {
         ReservationResponse response = reservationPaymentService.saveReservationWithPayment(request, member);
 
         URI location = URI.create("/reservations/" + response.id());

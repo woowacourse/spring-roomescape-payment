@@ -1,7 +1,9 @@
 package roomescape.auth.dto;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import roomescape.member.domain.Member;
 
+@Hidden
 public record LoggedInMember(
         Long id,
         String name,
