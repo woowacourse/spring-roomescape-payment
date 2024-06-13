@@ -18,6 +18,6 @@ public class SwaggerConfig {
         return new Info()
                 .title("API Documentation")
                 .description("방탈출 예약 서비스 API")
-                .version("v2");
+                .version("v1.1");
     }
 }

@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import roomescape.reservation.dto.MemberMyReservationResponse;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
@@ -78,10 +77,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             FROM Reservation AS r
             LEFT JOIN Payment AS p
             ON r.id = p.reservationId
-            WHERE r.member.id = :memberId
-            ORDER BY r.date.value, r.time.startAt
+            WHERE r.member.id = :memberId AND r.status != 'WAITING'
             """)
-    List<MemberMyReservationResponse> findAllMyReservation(Long memberId);
+    List<ReservationWithPayment> findAllNotWaitingReservationByMemberId(Long memberId);
 
     Optional<Reservation> findFirstByDateValueAndTimeIdAndThemeIdAndStatus(LocalDate date,
                                                                            Long timeId,

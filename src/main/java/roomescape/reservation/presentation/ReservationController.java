@@ -52,12 +52,6 @@ public class ReservationController {
     }
 
     @GetMapping("/reservations/my")
-    public ResponseEntity<List<MemberReservationStatusResponse>> findMemberReservationStatus(
-            @Authenticated Accessor accessor) {
-        return ResponseEntity.ok(reservationService.findAllByMemberId(accessor.id()));
-    }
-
-    @GetMapping("/reservations/v2/my")
     public ResponseEntity<List<MemberMyReservationResponse>> findMemberReservationStatusV2(
             @Authenticated Accessor accessor) {
         return ResponseEntity.ok(reservationService.findMyReservation(accessor.id()));
