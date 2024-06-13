@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import roomescape.domain.member.Member;
 import roomescape.domain.payment.PaymentStatus;
-import roomescape.domain.payment.PaymentType;
 import roomescape.domain.payment.ReservationPayment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
@@ -202,7 +201,7 @@ class ReservationServiceTest extends ServiceTest {
         @Test
         void 결제와_함께_예약을_추가할_수_있다() {
             PaymentConfirmOutput paymentConfirmOutput = new PaymentConfirmOutput(
-                    "paymentKey", PaymentType.NORMAL, "orderId", "orderName",
+                    "paymentKey", "NORMAL", "orderId", "orderName",
                     "KRW", "간편결제", 1000L, PaymentStatus.DONE);
             given(paymentClient.confirmPayment(any()))
                     .willReturn(paymentConfirmOutput);

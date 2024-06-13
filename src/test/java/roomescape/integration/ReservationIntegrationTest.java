@@ -25,7 +25,6 @@ import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.request.ParameterDescriptor;
 import roomescape.domain.member.Member;
 import roomescape.domain.payment.PaymentStatus;
-import roomescape.domain.payment.PaymentType;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.theme.Theme;
@@ -219,7 +218,7 @@ class ReservationIntegrationTest extends IntegrationTest {
         void 결제_성공_시_예약을_추가할_수_있다() {
             params.put("date", "2000-04-07");
             PaymentConfirmOutput paymentConfirmOutput = new PaymentConfirmOutput(
-                    "paymentKey", PaymentType.NORMAL, "orderId", "orderName",
+                    "paymentKey", "NORMAL", "orderId", "orderName",
                     "KRW", "간편결제", 1000L, PaymentStatus.DONE);
             given(paymentClient.confirmPayment(any()))
                     .willReturn(paymentConfirmOutput);

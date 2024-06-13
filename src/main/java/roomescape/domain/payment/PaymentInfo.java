@@ -9,17 +9,9 @@ import java.util.Objects;
 public class PaymentInfo {
     private String paymentKey;
 
-    @Enumerated(EnumType.STRING)
-    private PaymentType type;
-
     private String orderId;
 
-    private String orderName;
-
     private String currency;
-
-    @Enumerated(EnumType.STRING)
-    private PaymentMethod method;
 
     private Long totalAmount;
 
@@ -29,44 +21,24 @@ public class PaymentInfo {
     protected PaymentInfo() {
     }
 
-    public PaymentInfo(String paymentKey, PaymentType type, String orderId, String orderName, String currency,
-                       PaymentMethod method, Long totalAmount, PaymentStatus status) {
+    public PaymentInfo(String paymentKey, String orderId, String currency, Long totalAmount, PaymentStatus status) {
         this.paymentKey = paymentKey;
-        this.type = type;
         this.orderId = orderId;
-        this.orderName = orderName;
         this.currency = currency;
-        this.method = method;
         this.totalAmount = totalAmount;
         this.status = status;
-    }
-
-    public String getTotalAmountWithCurrency() {
-        return totalAmount + currency;
     }
 
     public String getPaymentKey() {
         return paymentKey;
     }
 
-    public PaymentType getType() {
-        return type;
-    }
-
     public String getOrderId() {
         return orderId;
     }
 
-    public String getOrderName() {
-        return orderName;
-    }
-
     public String getCurrency() {
         return currency;
-    }
-
-    public PaymentMethod getMethod() {
-        return method;
     }
 
     public Long getTotalAmount() {
@@ -75,6 +47,10 @@ public class PaymentInfo {
 
     public PaymentStatus getStatus() {
         return status;
+    }
+
+    public String getTotalAmountWithCurrency() {
+        return totalAmount + currency;
     }
 
     @Override
@@ -86,14 +62,13 @@ public class PaymentInfo {
             return false;
         }
         PaymentInfo that = (PaymentInfo) o;
-        return Objects.equals(paymentKey, that.paymentKey) && type == that.type && Objects.equals(
-                orderId, that.orderId) && Objects.equals(orderName, that.orderName) && Objects.equals(
-                currency, that.currency) && method == that.method && Objects.equals(totalAmount, that.totalAmount)
-                && status == that.status;
+        return Objects.equals(paymentKey, that.paymentKey) && Objects.equals(orderId, that.orderId)
+                && Objects.equals(currency, that.currency) && Objects.equals(totalAmount,
+                that.totalAmount) && status == that.status;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(paymentKey, type, orderId, orderName, currency, method, totalAmount, status);
+        return Objects.hash(paymentKey, orderId, currency, totalAmount, status);
     }
 }

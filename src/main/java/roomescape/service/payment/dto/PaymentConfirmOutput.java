@@ -1,15 +1,13 @@
 package roomescape.service.payment.dto;
 
 import roomescape.domain.payment.PaymentInfo;
-import roomescape.domain.payment.PaymentMethod;
 import roomescape.domain.payment.PaymentStatus;
-import roomescape.domain.payment.PaymentType;
 import roomescape.domain.payment.ReservationPayment;
 import roomescape.domain.reservation.Reservation;
 
 public record PaymentConfirmOutput(
         String paymentKey,
-        PaymentType type,
+        String type,
         String orderId,
         String orderName,
         String currency,
@@ -17,9 +15,7 @@ public record PaymentConfirmOutput(
         Long totalAmount,
         PaymentStatus status) {
     public ReservationPayment toReservationPayment(Reservation reservation) {
-        PaymentMethod findMethod = PaymentMethod.findByDescription(method);
-        PaymentInfo info = new PaymentInfo(
-                paymentKey, type, orderId, orderName, currency, findMethod, totalAmount, status);
+        PaymentInfo info = new PaymentInfo(paymentKey, orderId, currency, totalAmount, status);
         return new ReservationPayment(info, reservation);
     }
 }
