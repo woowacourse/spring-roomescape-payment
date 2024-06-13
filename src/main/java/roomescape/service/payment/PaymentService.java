@@ -1,5 +1,6 @@
 package roomescape.service.payment;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.dto.PaymentRequest;
@@ -15,7 +16,9 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentClient paymentClient;
 
-    public PaymentService(PaymentRepository paymentRepository, PaymentClient paymentClient) {
+    public PaymentService(
+        PaymentRepository paymentRepository,
+        @Qualifier("paymentClientProxy") PaymentClient paymentClient) {
         this.paymentRepository = paymentRepository;
         this.paymentClient = paymentClient;
     }
