@@ -26,7 +26,7 @@ public class PaymentService {
         if (paymentApiResponse == null) {
             throw new PaymentException("응답 정보가 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        Payment payment = paymentApiResponse.toEntity(paymentRequest.amount());
+        Payment payment = paymentApiResponse.toEntity();
 
         return paymentRepository.save(payment);
     }
