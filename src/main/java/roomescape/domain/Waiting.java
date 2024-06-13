@@ -50,6 +50,9 @@ public class Waiting {
     }
 
     public void toPending() {
+        if (!status.isWaiting()) {
+            throw new IllegalStateException("[ERROR] 결제 대기로 변경될 수 없습니다.");
+        }
         status = ReservationStatus.PENDING;
     }
 

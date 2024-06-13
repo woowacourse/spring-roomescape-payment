@@ -13,6 +13,10 @@ public enum ReservationStatus {
         this.message = message;
     }
 
+    boolean isWaiting() {
+        return this == WAITING;
+    }
+
     public String getMessage() {
         return message;
     }
