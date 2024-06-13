@@ -1,4 +1,6 @@
 spring:
+  thymeleaf:
+    prefix: file:src/main/resources/templates/
   h2:
     console:
       enabled: true
