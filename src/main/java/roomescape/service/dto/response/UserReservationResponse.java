@@ -33,7 +33,7 @@ public record UserReservationResponse(
                 waitingWithRank.getWaitingId(),
                 waitingWithRank.getReservationSlot(),
                 WAITING,
-                getPayment(waitingWithRank.getReservation()),
+                EMPTY_PAYMENT,
                 OptionalLong.of(waitingWithRank.getRank())
         );
     }

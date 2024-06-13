@@ -1,4 +1,4 @@
-package roomescape.domain.repository;
+package roomescape.repository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,6 +15,7 @@ import roomescape.domain.reservation.Theme;
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     @Query("select r from Reservation r where r.reservationSlot.date = :date and r.reservationSlot.theme = :theme")
     List<Reservation> findByDateAndTheme(@Param("date") LocalDate date, @Param("theme") Theme theme);
+
 
     @Query("select r from Reservation r where r.reservationSlot.date between :startDate and :endDate")
     List<Reservation> findAllByDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
