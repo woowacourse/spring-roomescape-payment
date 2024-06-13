@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import roomescape.reservation.dto.request.ReservationRequest;
+import roomescape.system.payment.PaymentClient;
 
 @Service
 public class PaymentService {
@@ -15,21 +16,16 @@ public class PaymentService {
     @Value("${payment.widget.confirm.secret-key}")
     private String widgetSecretKey;
 
-    private final RestClient restClient;
+    private final PaymentClient paymentClient;
 
-    public PaymentService(RestClient restClient) {
-        this.restClient = restClient;
+    public PaymentService(PaymentClient paymentClient) {
+        this.paymentClient = paymentClient;
     }
 
     public void confirm(ReservationRequest reservationRequest) {
         String authorizations = getAuthorizations();
 
-        restClient.post()
-                .uri("/v1/payments/confirm")
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(reservationRequest)
-                .header("Authorization", authorizations)
-                .retrieve();
+        paymentClient.confirm(authorizations, reservationRequest);
     }
 
     private String getAuthorizations() {

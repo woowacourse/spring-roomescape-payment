@@ -9,6 +9,8 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import roomescape.system.auth.interceptor.AdminInterceptor;
 import roomescape.system.auth.resolver.MemberIdResolver;
+import roomescape.system.payment.PaymentClient;
+import roomescape.system.payment.TossClient;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
@@ -31,7 +33,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public RestClient paymentClient() {
-        return RestClient.builder().baseUrl("https://api.tosspayments.com").build();
+    public PaymentClient paymentClient() {
+        return new TossClient(RestClient.builder().baseUrl("https://api.tosspayments.com").build());
     }
 }

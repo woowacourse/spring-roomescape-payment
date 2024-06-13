@@ -18,6 +18,7 @@ import roomescape.system.exception.model.CustomException;
 import roomescape.system.exception.model.DataDuplicateException;
 import roomescape.system.exception.model.ForbiddenException;
 import roomescape.system.exception.model.NotFoundException;
+import roomescape.system.exception.model.PaymentException;
 import roomescape.system.exception.model.UnauthorizedException;
 import roomescape.system.exception.model.ValidateException;
 
@@ -69,10 +70,10 @@ public class ExceptionControllerAdvice {
         return ErrorResponse.of(ErrorType.METHOD_NOT_ALLOWED, ErrorType.METHOD_NOT_ALLOWED.getDescription());
     }
 
-    @ExceptionHandler(value = HttpClientErrorException.class)
-    public ErrorResponse handlePaymentException(final HttpClientErrorException e, final HttpServletResponse response) {
+    @ExceptionHandler(value = PaymentException.class)
+    public ErrorResponse handlePaymentException(final PaymentException e, final HttpServletResponse response) {
         logger.error(e.getMessage(), e);
-        response.setStatus(e.getStatusCode().value());
+        response.setStatus(e.getStatusCode());
 
         return ErrorResponse.of(ErrorType.PAYMENT_ERROR, e.getMessage());
     }
