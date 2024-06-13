@@ -259,6 +259,8 @@ public class ReservationControllerTest {
         @Test
         void deleteReservationTest() {
             RestAssured.given().log().all()
+                    .contentType(ContentType.JSON)
+                    .body(Map.of("cancelReason", "단순 변심"))
                     .when().delete("/reservations/1")
                     .then().log().all()
                     .statusCode(204);

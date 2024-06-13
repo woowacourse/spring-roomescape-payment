@@ -64,8 +64,9 @@ public class ReservationController {
 
     @Operation(summary = "사용자의 예약 삭제", description = "사용자의 예약을 삭제합니다.")
     @DeleteMapping("/reservations/{id}")
-    public ResponseEntity<Void> delete(@PathVariable long id) {
-        reservationService.deleteById(id);
+    public ResponseEntity<Void> delete(@PathVariable long id,
+                                       @RequestBody ReservationCancelRequest request) {
+        reservationService.deleteById(id, request);
         return ResponseEntity.noContent().build();
     }
 

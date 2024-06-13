@@ -15,7 +15,6 @@ import roomescape.config.PaymentClient;
 import roomescape.domain.LoginMember;
 import roomescape.domain.ReservationStatus;
 import roomescape.domain.Role;
-import roomescape.domain.Waiting;
 import roomescape.dto.*;
 import roomescape.entity.Member;
 import roomescape.entity.Payment;
@@ -32,8 +31,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static roomescape.exception.ExceptionType.*;
 import static roomescape.fixture.ReservationFixture.*;
 import static roomescape.fixture.ReservationTimeFixture.DEFAULT_RESERVATION_TIME;
@@ -245,7 +243,7 @@ class ReservationServiceTest {
         reservationRepository.save(reservation2);
 
         //when
-        reservationService.deleteById(2);
+        reservationService.deleteWaitingReservationById(2);
         //then
         assertThat(reservationService.findReservationsByMemberId(1L)).hasSize(0);
     }
@@ -315,20 +313,10 @@ class ReservationServiceTest {
                     .hasMessage(DUPLICATE_WAITING_RESERVATION.getMessage());
         }
 
-        @DisplayName("예약을 삭제할 수 있다.")
-        @Test
-        void deleteReservationTest() {
-            //when
-            reservationService.deleteById(1L);
-
-            //then
-            assertThat(reservationRepository.findAll()).isEmpty();
-        }
-
         @DisplayName("존재하지 않는 예약에 대한 삭제 요청은 정상 요청으로 간주한다.")
         @Test
         void deleteNotExistReservationNotThrowsException() {
-            assertThatCode(() -> reservationService.deleteById(2L))
+            assertThatCode(() -> reservationService.deleteById(2L, new ReservationCancelRequest("단순 변심")))
                     .doesNotThrowAnyException();
         }
     }

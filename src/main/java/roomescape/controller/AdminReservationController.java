@@ -39,7 +39,7 @@ public class AdminReservationController {
     @Operation(summary = "관리자 예약 대기 삭제", description = "관리자가 예약 대기를 삭제합니다.")
     @DeleteMapping("/admin/reservations-waiting/{id}")
     public ResponseEntity<Void> deleteReservationWaitingByAdmin(@PathVariable long id) {
-        reservationService.deleteById(id);
+        reservationService.deleteWaitingReservationById(id);
         return ResponseEntity.noContent().build();
     }
 }

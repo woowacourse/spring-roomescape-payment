@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import roomescape.config.PaymentClient;
 import roomescape.dto.PaymentRequest;
 import roomescape.dto.PaymentResponse;
+import roomescape.dto.ReservationCancelRequest;
 import roomescape.entity.Payment;
 import roomescape.repository.PaymentRepository;
 
@@ -25,5 +26,10 @@ public class PaymentService {
 
     public Payment findByReservationId(long reservationId) {
         return paymentRepository.findByReservationId(reservationId);
+    }
+
+    public void refundByReservationId(long reservationId, ReservationCancelRequest request) {
+        Payment payment = paymentRepository.findByReservationId(reservationId);
+        paymentClient.refund(payment.getPaymentKey(), request);
     }
 }
