@@ -60,18 +60,18 @@ class ReservationControllerTest {
     @Test
     void findCreateDeleteReservations() {
         doNothing().when(paymentService).approvePayment(any());
-
-        Cookies cookies = RestAssuredTemplate.makeUserCookie(MEMBER_BRI);
+        Cookies adminCookies = RestAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
+        Cookies userCookies = RestAssuredTemplate.makeUserCookie(MEMBER_BRI);
         LocalDate date = LocalDate.now().plusDays(1);
-        Long themeId = RestAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), cookies).id();
-        Long timeId = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), cookies).id();
+        Long themeId = RestAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), userCookies).id();
+        Long timeId = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), userCookies).id();
 
         ReservationCreateRequest params = new ReservationCreateRequest(date, timeId, themeId, "paymentKey", "orderId",
                 BigDecimal.valueOf(1000), PaymentType.NORMAL);
 
         // 예약 추가
         ReservationResponse response = RestAssured.given().log().all()
-                .cookies(cookies)
+                .cookies(userCookies)
                 .contentType(ContentType.JSON)
                 .body(params)
                 .when().post("/reservations")
@@ -83,7 +83,8 @@ class ReservationControllerTest {
 
         // 예약 조회
         List<ReservationResponse> reservationResponses = RestAssured.given().log().all()
-                .when().get("/reservations")
+                .cookies(adminCookies)
+                .when().get("/admin/reservations")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -100,7 +101,8 @@ class ReservationControllerTest {
 
         // 예약 조회
         reservationResponses = RestAssured.given().log().all()
-                .when().get("/reservations")
+                .cookies(adminCookies)
+                .when().get("/admin/reservations")
                 .then().log().all()
                 .statusCode(200)
                 .extract()
@@ -113,9 +115,9 @@ class ReservationControllerTest {
     @DisplayName("예약 추가 시 인자 중 null이 있을 경우, 예약을 추가할 수 없다.")
     @Test
     void createReservation_whenNameIsNull() {
-        Cookies cookies = RestAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
-        Long themeId = RestAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), cookies).id();
-        Long timeId = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), cookies).id();
+        Cookies adminCookies = RestAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
+        Long themeId = RestAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), adminCookies).id();
+        Long timeId = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), adminCookies).id();
 
         AdminReservationCreateRequest params = new AdminReservationCreateRequest
                 (1L, null, timeId, themeId);
@@ -134,14 +136,14 @@ class ReservationControllerTest {
     @DisplayName("예약 삭제 시 예약 대기가 존재하지 않는다면 삭제된다.")
     @Test
     void deleteReservation_whenWaitingNotExists() {
-        Cookies cookies = RestAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
+        Cookies adminCookies = RestAssuredTemplate.makeUserCookie(MEMBER_ADMIN);
         LocalDate date = LocalDate.now().plusDays(1);
-        Long themeId = RestAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), cookies).id();
-        Long timeId = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), cookies).id();
+        Long themeId = RestAssuredTemplate.create(ThemeFixture.toThemeCreateRequest(THEME_1), adminCookies).id();
+        Long timeId = RestAssuredTemplate.create(TimeFixture.toTimeCreateRequest(TIME_1), adminCookies).id();
 
         AdminReservationCreateRequest reservationParams =
                 new AdminReservationCreateRequest(MEMBER_ADMIN.getId(), date, timeId, themeId);
-        ReservationResponse response = RestAssuredTemplate.create(reservationParams, cookies);
+        ReservationResponse response = RestAssuredTemplate.create(reservationParams, adminCookies);
 
         // 예약 삭제
         RestAssured.given().log().all()
@@ -151,7 +153,8 @@ class ReservationControllerTest {
 
         // 예약 조회
         List<ReservationResponse> reservationResponses = RestAssured.given().log().all()
-                .when().get("/reservations")
+                .cookies(adminCookies)
+                .when().get("/admin/reservations")
                 .then().log().all()
                 .statusCode(200).extract()
                 .jsonPath().getList("", ReservationResponse.class);

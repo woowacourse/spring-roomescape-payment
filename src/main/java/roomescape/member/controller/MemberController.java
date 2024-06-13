@@ -1,5 +1,6 @@
 package roomescape.member.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ public class MemberController {
         this.memberService = memberService;
     }
 
+    @Operation(summary = "전체 사용자 조회", description = "전차 사용자 목록을 조회한다.")
     @GetMapping
     public ResponseEntity<List<MemberResponse>> findMembers() {
         List<MemberResponse> response = memberService.findMembers();

@@ -87,7 +87,8 @@ class AdminReservationControllerTest {
 
         // 예약 조회
         List<ReservationResponse> reservationResponses = RestAssured.given().log().all()
-                .when().get("/reservations")
+                .cookies(cookies)
+                .when().get("/admin/reservations")
                 .then().log().all()
                 .statusCode(200)
                 .extract()

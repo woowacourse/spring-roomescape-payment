@@ -1,5 +1,6 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -25,6 +26,7 @@ public class MyReservationController {
         this.waitingService = waitingService;
     }
 
+    @Operation(summary = "나의 예약 조회", description = "나의 예약 목록을 조회한다.")
     @GetMapping
     public List<MyReservationWaitingResponse> findMyReservations(LoggedInMember member) {
         Long memberId = member.id();

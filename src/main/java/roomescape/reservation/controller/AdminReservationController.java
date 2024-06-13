@@ -1,5 +1,6 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
@@ -26,12 +27,14 @@ public class AdminReservationController {
         this.service = service;
     }
 
+    @Operation(summary = "전체 예약 조회", description = "전차 예약 목록을 조회한다.")
     @GetMapping
     public List<ReservationResponse> findReservations(
             @ModelAttribute ReservationSearchRequest searchRequest) {
         return service.findReservations(searchRequest);
     }
 
+    @Operation(summary = "예약 추가 - 어드민용", description = "어드민용 예약을 추가한다.")
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody AdminReservationCreateRequest request) {
         ReservationResponse response = service.createAdminReservation(request);
