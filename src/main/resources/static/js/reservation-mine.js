@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('/my/reservaitons') // 내 예약 목록 조회 API 호출
+    fetch('/my/reservations') // 내 예약 목록 조회 API 호출
         .then(response => {
             if (response.status === 200) return response.json();
             throw new Error('Read failed');
@@ -36,6 +36,8 @@ function render(data) {
             cancelCell.appendChild(cancelButton);
         } else { // 예약 완료 상태일 때
             row.insertCell(4).textContent = '';
+            row.insertCell(5).textContent = item.paymentKey;
+            row.insertCell(6).textContent = item.amount;
         }
     });
 }

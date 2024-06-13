@@ -8,7 +8,7 @@ import roomescape.member.repository.MemberRepository;
 import roomescape.paymenthistory.service.TossPaymentHistoryService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.AdminReservationCreateRequest;
-import roomescape.reservation.dto.MyReservationWaitingResponse;
+import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.ReservationCreateRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSaveResponse;
@@ -57,10 +57,10 @@ public class ReservationService {
                 .toList();
     }
 
-    public List<MyReservationWaitingResponse> findMyReservations(Long memberId) {
+    public List<MyReservationResponse> findMyReservations(Long memberId) {
         return reservationRepository.findByMember_id(memberId)
                 .stream()
-                .map(MyReservationWaitingResponse::from)
+                .map(MyReservationResponse::from)
                 .toList();
     }
 

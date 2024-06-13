@@ -27,7 +27,7 @@ public class TossPaymentRestClient {
     private final ClientResponseConverter clientResponseConverter;
 
     public TossPaymentRestClient(PaymentProperties properties) {
-        this.restClient = new RestClientConfigMaker(properties.getPaymentUrl()).makeRestClient();
+        this.restClient = new RestClientConfigMaker(properties).makeRestClient();
         this.secretKey = properties.getSecretKey();
         this.clientResponseConverter = new ClientResponseConverter();
     }

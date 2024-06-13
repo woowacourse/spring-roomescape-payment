@@ -2,17 +2,20 @@ package roomescape.maker;
 
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
+import roomescape.config.properties.PaymentProperties;
 import roomescape.paymenthistory.domain.PaymentUrl;
+import roomescape.paymenthistory.domain.TimeOut;
 
 public class RestClientConfigMaker {
 
-    public static final int CONNECT_TIMEOUT = 3000;
-    public static final int READ_TIMEOUT = 30000;
-
     private final PaymentUrl paymentUrl;
+    private final TimeOut connectTimeOut;
+    private final TimeOut readTimeOut;
 
-    public RestClientConfigMaker(PaymentUrl paymentUrl) {
-        this.paymentUrl = paymentUrl;
+    public RestClientConfigMaker(PaymentProperties properties) {
+        this.paymentUrl = properties.getPaymentUrl();
+        this.connectTimeOut = properties.getConnectTimeOut();
+        this.readTimeOut = properties.getReadTimeOut();
     }
 
     public RestClient makeRestClient() {
@@ -25,8 +28,8 @@ public class RestClientConfigMaker {
     private SimpleClientHttpRequestFactory getClientHttpRequestFactory() {
         SimpleClientHttpRequestFactory simpleClientHttpRequestFactory = new SimpleClientHttpRequestFactory();
 
-        simpleClientHttpRequestFactory.setConnectTimeout(CONNECT_TIMEOUT);
-        simpleClientHttpRequestFactory.setReadTimeout(READ_TIMEOUT);
+        simpleClientHttpRequestFactory.setConnectTimeout(connectTimeOut.getTimeOutTime());
+        simpleClientHttpRequestFactory.setReadTimeout(readTimeOut.getTimeOutTime());
         return simpleClientHttpRequestFactory;
     }
 }

@@ -10,4 +10,8 @@ public enum ReservationStatus {
     ReservationStatus(String name) {
         this.name = name;
     }
+
+    public String getName() {
+        return name;
+    }
 }

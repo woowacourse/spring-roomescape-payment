@@ -6,13 +6,15 @@ import roomescape.paymenthistory.exception.PaymentException.PaymentServerError;
 
 public class SecretKey {
 
-    public static final String BASIC = "Basic ";
+    private static final String BASIC = "Basic ";
+    private static final String Delimiter = ":";
 
     private final String secretKey;
 
     public SecretKey(String secretKey) {
         validation(secretKey);
-        this.secretKey = new String(Base64.getEncoder().encode((secretKey + ":").getBytes(StandardCharsets.UTF_8)));
+        this.secretKey = new String(
+                Base64.getEncoder().encode((secretKey + Delimiter).getBytes(StandardCharsets.UTF_8)));
     }
 
     public String makeAuthorization() {
