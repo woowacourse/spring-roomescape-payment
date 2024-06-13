@@ -5,47 +5,43 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.context.annotation.Import;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.DefaultUriBuilderFactory;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import roomescape.config.TossRestClientConfig;
+import roomescape.reservation.model.Payment;
+import roomescape.reservation.repository.PaymentRepository;
 import roomescape.exception.PaymentException;
 import roomescape.reservation.dto.PaymentRequest;
 import roomescape.reservation.dto.PaymentResponse;
 import roomescape.reservation.encoder.TossSecretKeyEncoder;
+import roomescape.reservation.model.Reservation;
 
 @Service
 public class PaymentService {
 
     private final RestClient tossRestClient;
+    private final PaymentRepository paymentRepository;
 
     @Value("${custom.security.toss-payment.secret-key}")
     private String tossSecretKey;
 
-    public PaymentService(RestClient tossRestClient) {
+    public PaymentService(RestClient tossRestClient, PaymentRepository paymentRepository) {
         this.tossRestClient = tossRestClient;
+        this.paymentRepository = paymentRepository;
     }
 
-    public PaymentResponse requestTossPayment(PaymentRequest paymentRequest) {
+    public PaymentResponse requestTossPayment(PaymentRequest paymentRequest, Reservation reservation) {
         String authorization = TossSecretKeyEncoder.encode(tossSecretKey);
 
-        return tossRestClient.post()
+        PaymentResponse paymentResponse = tossRestClient.post()
                 .uri("/confirm")
                 .header(HttpHeaders.AUTHORIZATION, authorization)
                 .body(paymentRequest)
@@ -58,6 +54,15 @@ public class PaymentService {
                 })
                 .toEntity(PaymentResponse.class)
                 .getBody();
+        savePayment(paymentResponse, reservation);
+        return paymentResponse;
+    }
+
+    private void savePayment(PaymentResponse paymentResponse, Reservation reservation) {
+        paymentRepository.save(Payment.of(paymentResponse.paymentKey(),
+                paymentResponse.orderId(),
+                paymentResponse.totalAmount(),
+                reservation));
     }
 
     private String parseErrorMessage(ClientHttpResponse response) throws IOException {
@@ -65,5 +70,9 @@ public class PaymentService {
         Reader inputStreamReader = new InputStreamReader(body, StandardCharsets.UTF_8);
         JsonObject jsonObject = (JsonObject) JsonParser.parseReader(inputStreamReader);
         return jsonObject.get("message").toString().replace("\"", "");
+    }
+
+    public Payment getPayment(Reservation reservation) {
+        return paymentRepository.findByReservation(reservation);
     }
 }

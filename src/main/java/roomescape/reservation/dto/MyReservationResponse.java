@@ -1,10 +1,13 @@
 package roomescape.reservation.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import roomescape.reservation.model.Payment;
 import roomescape.reservation.model.Reservation;
 import roomescape.reservation.model.WaitingWithRank;
 
@@ -12,16 +15,22 @@ public record MyReservationResponse(
         Long id,
         String theme,
         LocalDate date,
-        @JsonFormat(pattern = "HH:mm") LocalTime time,
-        String status
+        @JsonFormat(pattern = "HH:mm")
+        @Schema(type = "string", example = "14:30", pattern = "HH:mm")
+        LocalTime time,
+        String status,
+        String paymentKey,
+        BigDecimal amount
 ) {
-    public static MyReservationResponse from(final Reservation reservation) {
+    public static MyReservationResponse of(final Reservation reservation, final Payment payment) {
         return new MyReservationResponse(
                 reservation.getId(),
                 reservation.getTheme().getName().getValue(),
                 reservation.getDate().getValue(),
                 reservation.getTime().getStartAt(),
-                "예약"
+                "예약",
+                payment.getPaymentKey(),
+                payment.getAmount()
         );
     }
 
@@ -31,7 +40,9 @@ public record MyReservationResponse(
                 waitingWithRank.getWaiting().getReservation().getTheme().getName().getValue(),
                 waitingWithRank.getWaiting().getReservation().getDate().getValue(),
                 waitingWithRank.getWaiting().getReservation().getTime().getStartAt(),
-                waitingWithRank.getRank() + "번째 예약대기"
+                waitingWithRank.getRank() + "번째 예약대기",
+                null,
+                null
         );
     }
 }

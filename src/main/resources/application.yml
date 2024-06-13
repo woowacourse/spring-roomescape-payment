@@ -38,3 +38,5 @@ custom:
     jwt:
       token-secret-key: "YWNjZXNzLXRva2VuLXBhY2staXQtaXMtc28tYmVhdXRpZnVsLXByb2plY3Qtc3ByaW5nLWJvb3QtcmVhY3QtaXMtcGFjay1pdC10ZWNoLXN0YWNrLXRoaXMtYWNjZXNzLXRva2VuLWdlbmVyYXRlLWJ5LWVkZ2FyNmJmCg=="
       token-expiration-period: 604800000  # 7 DAY
+  swagger:
+    version: 1.0.0

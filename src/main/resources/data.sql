@@ -134,3 +134,37 @@ INSERT INTO Waiting(reservation_id, member_id)
 VALUES (15, 4);
 INSERT INTO Waiting(reservation_id, member_id)
 VALUES (15, 6);
+
+
+INSERT INTO payment(order_id, payment_key, reservation_id, amount)
+VALUES ('test orderId', 'test paymentKey', 1, 1000);
+INSERT INTO payment(order_id, payment_key, reservation_id, amount)
+VALUES ('test orderId', 'test paymentKey', 2, 1000);
+INSERT INTO payment(order_id, payment_key, reservation_id, amount)
+VALUES ('test orderId', 'test paymentKey', 3, 1000);
+INSERT INTO payment(order_id, payment_key, reservation_id, amount)
+VALUES ('test orderId', 'test paymentKey', 4, 1000);
+INSERT INTO payment(order_id, payment_key, reservation_id, amount)
+VALUES ('test orderId', 'test paymentKey', 5, 1000);
+INSERT INTO payment(order_id, payment_key, reservation_id, amount)
+VALUES ('test orderId', 'test paymentKey', 6, 1000);
+INSERT INTO payment(order_id, payment_key, reservation_id, amount)
+VALUES ('test orderId', 'test paymentKey', 7, 1000);
+INSERT INTO payment(order_id, payment_key, reservation_id, amount)
+VALUES ('test orderId', 'test paymentKey', 8, 1000);
+INSERT INTO payment(order_id, payment_key, reservation_id, amount)
+VALUES ('test orderId', 'test paymentKey', 9, 1000);
+INSERT INTO payment(order_id, payment_key, reservation_id, amount)
+VALUES ('test orderId', 'test paymentKey', 10, 1000);
+INSERT INTO payment(order_id, payment_key, reservation_id, amount)
+VALUES ('test orderId', 'test paymentKey', 11, 1000);
+INSERT INTO payment(order_id, payment_key, reservation_id, amount)
+VALUES ('test orderId', 'test paymentKey', 12, 1000);
+INSERT INTO payment(order_id, payment_key, reservation_id, amount)
+VALUES ('test orderId', 'test paymentKey', 13, 1000);
+INSERT INTO payment(order_id, payment_key, reservation_id, amount)
+VALUES ('test orderId', 'test paymentKey', 14, 1000);
+INSERT INTO payment(order_id, payment_key, reservation_id, amount)
+VALUES ('test orderId', 'test paymentKey', 15, 1000);
+INSERT INTO payment(order_id, payment_key, reservation_id, amount)
+VALUES ('test orderId', 'test paymentKey', 16, 1000);
