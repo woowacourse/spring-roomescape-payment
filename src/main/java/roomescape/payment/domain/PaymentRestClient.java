@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Objects;
-import java.util.Set;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
@@ -23,9 +22,6 @@ import roomescape.payment.dto.RestClientPaymentCancelRequest;
 public class PaymentRestClient {
 
     private static final String BASIC = "Basic ";
-    private static final Set<String> INTERNAL_SERVER_ERROR_CODES = Set.of(
-            "INVALID_ORDER_ID", "INVALID_API_KEY", "UNAUTHORIZED_KEY", "INCORRECT_BASIC_AUTH_FORMAT"
-    );
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final RestClient restClient;
@@ -90,7 +86,7 @@ public class PaymentRestClient {
         String code = response.code();
         String message = response.message();
 
-        if (isNullResponse(code, message) || INTERNAL_SERVER_ERROR_CODES.contains(code)) {
+        if (isNullResponse(code, message) || ServerErrorCode.isServerErrorCode(code)) {
             throw new RoomEscapeException(
                     "서버에 문제가 발생해 결제가 실패했습니다. 관리자에게 문의해 주세요.", ExceptionTitle.INTERNAL_SERVER_ERROR);
         }
