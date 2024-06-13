@@ -26,10 +26,7 @@ public class ReservationController {
 
     @GetMapping("/reservations-mine")
     public List<MyReservationResponse> getMyReservations(@Authenticated final AuthenticatedMember authenticatedMember) {
-        return reservationService.getMyReservations(authenticatedMember.id())
-                .stream()
-                .map(MyReservationResponse::from)
-                .toList();
+        return reservationService.getMyReservations(authenticatedMember.id());
     }
 
     @PostMapping("/reservations")
@@ -37,8 +34,7 @@ public class ReservationController {
             @RequestBody final SaveReservationRequest request,
             @Authenticated final AuthenticatedMember authenticatedMember
     ) {
-        final ReservationDto savedReservation = reservationService.saveReservation(
-                request.setMemberId(authenticatedMember.id()));
+        final ReservationDto savedReservation = reservationService.saveReservation(request, authenticatedMember.id());
         final ReservationResponse response = ReservationResponse.from(savedReservation);
 
         return ResponseEntity.created(URI.create("/reservations/" + savedReservation.id()))

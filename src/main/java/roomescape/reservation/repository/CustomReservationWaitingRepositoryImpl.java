@@ -26,7 +26,7 @@ public class CustomReservationWaitingRepositoryImpl implements CustomReservation
     public List<ReservationWaitingWithOrder> findAllReservationWaitingWithOrdersByMemberId(final Long memberId) {
         final String sql = """
                     SELECT
-                        rw.id AS reservation_waiting_id, rw.date AS reservation_waiting_date, rw.created_at AS reservation_waiting_created_at,
+                        rw.id AS reservation_waiting_id, rw.date AS reservation_waiting_date, rw.created_at AS reservation_waiting_created_at, rw.is_deleted,
                         rt.id AS time_id, rt.start_at AS reservation_time,
                         th.id AS theme_id, th.name AS theme_name, th.description AS theme_description, th.thumbnail AS theme_thumbnail,
                         m.id AS member_id, m.name AS member_name, m.email AS member_email, m.password AS member_password, m.role AS member_role,
@@ -43,7 +43,7 @@ public class CustomReservationWaitingRepositoryImpl implements CustomReservation
                     INNER JOIN reservation_time AS rt ON rt.id = rw.time_id
                     INNER JOIN theme AS th ON th.id = rw.theme_id
                     INNER JOIN member AS m ON m.id = rw.member_id
-                    WHERE rw.member_id = :memberId
+                    WHERE rw.member_id = :memberId AND rw.is_deleted = false
                     GROUP BY
                         rw.id,
                         rw.date,
@@ -54,7 +54,6 @@ public class CustomReservationWaitingRepositoryImpl implements CustomReservation
                 """;
         final MapSqlParameterSource param = new MapSqlParameterSource()
                 .addValue("memberId", memberId);
-
         return template.query(sql, param, itemRowMapperToReservationWaitingWithOrder());
     }
 

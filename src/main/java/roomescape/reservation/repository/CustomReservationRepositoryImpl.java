@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import roomescape.member.model.Member;
 import roomescape.member.model.MemberRole;
 import roomescape.reservation.dto.SearchReservationsParams;
+import roomescape.reservation.model.PaymentStatus;
 import roomescape.reservation.model.Reservation;
 import roomescape.reservation.model.ReservationStatus;
 import roomescape.reservation.model.ReservationTime;
@@ -28,10 +29,10 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
                 searchReservationsParams,
                 """
                             SELECT
-                                r.id AS reservation_id, r.date AS reservation_date, r.status AS reservation_status,
+                                r.id AS reservation_id, r.date AS reservation_date, r.status AS reservation_status, r.payment_status AS reservation_payment_status,
                                 rt.id AS time_id, rt.start_at AS reservation_time,
                                 th.id AS theme_id, th.name AS theme_name, th.description AS theme_description, th.thumbnail AS theme_thumbnail,
-                                m.id AS member_id, m.name AS member_name, m.email AS member_email, m.password AS member_password, m.role AS member_role
+                                m.id AS member_id, m.name AS member_name, m.email AS member_email, m.password AS member_password, m.role AS member_role,
                             FROM reservation AS r
                             INNER JOIN reservation_time AS rt on r.time_id = rt.id
                             INNER JOIN theme AS th ON r.theme_id = th.id
@@ -58,8 +59,8 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
                         MemberRole.valueOf(rs.getString("member_role")),
                         rs.getString("member_password"),
                         rs.getString("member_name"),
-                        rs.getString("member_email")
-                )
+                        rs.getString("member_email")),
+                PaymentStatus.valueOf(rs.getString("reservation_payment_status"))
         ));
     }
 }

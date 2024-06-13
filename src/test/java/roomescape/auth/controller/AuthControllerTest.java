@@ -1,35 +1,22 @@
 package roomescape.auth.controller;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+import roomescape.RestClientControllerTest;
 import roomescape.auth.dto.LoginRequest;
 import roomescape.auth.token.TokenProvider;
 import roomescape.member.model.MemberRole;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
-class AuthControllerTest {
+class AuthControllerTest extends RestClientControllerTest {
 
     @Autowired
     private TokenProvider tokenProvider;
-
-    @LocalServerPort
-    int randomServerPort;
-
-    @BeforeEach
-    public void initReservation() {
-        RestAssured.port = randomServerPort;
-    }
 
     @DisplayName("로그인에 성공하면 인증 토큰이 담긴 쿠키를 반환한다.")
     @Test
@@ -40,7 +27,8 @@ class AuthControllerTest {
         final LoginRequest loginRequest = new LoginRequest(email, password);
 
         // When && Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("login-success"))
                 .contentType(ContentType.JSON)
                 .body(loginRequest)
                 .when().post("/login")
@@ -58,7 +46,8 @@ class AuthControllerTest {
         final LoginRequest loginRequest = new LoginRequest(email, password);
 
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-login-not-exist-id"))
                 .contentType(ContentType.JSON)
                 .body(loginRequest)
                 .when().post("/login")
@@ -76,7 +65,8 @@ class AuthControllerTest {
         final LoginRequest loginRequest = new LoginRequest(email, password);
 
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-login-not-exist-pw"))
                 .contentType(ContentType.JSON)
                 .body(loginRequest)
                 .when().post("/login")
@@ -94,7 +84,8 @@ class AuthControllerTest {
         final String accessToken = tokenProvider.createToken(memberId, role);
 
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("login-check"))
                 .cookie("token", accessToken)
                 .when().get("/login/check")
                 .then().log().all()
@@ -111,7 +102,8 @@ class AuthControllerTest {
         final String accessToken = tokenProvider.createToken(memberId, role);
 
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-login-check-invalid-member"))
                 .cookie("token", accessToken)
                 .when().get("/login/check")
                 .then().log().all()
@@ -123,7 +115,8 @@ class AuthControllerTest {
     @Test
     void loginCheckWithInvalidCookie() {
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-login-check-invalid-cookie"))
                 .cookie("invalid-cookie", "그냥 좀 해주면 안되요?ㅋ")
                 .when().get("/login/check")
                 .then().log().all()
@@ -135,7 +128,8 @@ class AuthControllerTest {
     @Test
     void loginCheckWithoutCookie() {
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-login-check-non-contains-token"))
                 .when().get("/login/check")
                 .then().log().all()
                 .statusCode(401)
@@ -146,7 +140,8 @@ class AuthControllerTest {
     @Test
     void loginCheckWithInvalidTokenTest() {
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-login-check-invalid-token"))
                 .cookie("token", "invalid-token")
                 .when().get("/login/check")
                 .then().log().all()
@@ -163,11 +158,30 @@ class AuthControllerTest {
                                     "mLgs2dqD9oCOUtleHtpcmf4tTw39bC9pmqFaUBPQZy9ADPsgRXEu3qhLS8qqs3UiV6MPmP_03FaZHX8UrieK4A";
 
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-login-check-expired-token"))
                 .cookie("token", expiredToken)
                 .when().get("/login/check")
                 .then().log().all()
                 .statusCode(401)
                 .body("message", is("만료된 인증 토큰입니다."));
+    }
+
+    @DisplayName("로그아웃을 하면 200ok와 쿠키가 삭제된다.")
+    @Test
+    void logout() {
+        // Given
+        final Long memberId = 10L;
+        final MemberRole role = MemberRole.USER;
+        final String accessToken = tokenProvider.createToken(memberId, role);
+
+        // When & Then
+        RestAssured.given(spec).log().all()
+                .filter(document("logout"))
+                .cookie("token", accessToken)
+                .when().post("/logout")
+                .then().log().all()
+                .statusCode(200)
+                .cookie("token", is(""));
     }
 }

@@ -1,6 +1,7 @@
 package roomescape.reservation.dto;
 
 import roomescape.member.dto.MemberDto;
+import roomescape.reservation.model.PaymentStatus;
 import roomescape.reservation.model.Reservation;
 import roomescape.reservation.model.ReservationDate;
 import roomescape.reservation.model.ReservationStatus;
@@ -11,7 +12,8 @@ public record ReservationDto(
         ReservationDate date,
         ReservationTimeDto time,
         ThemeDto theme,
-        MemberDto member
+        MemberDto member,
+        PaymentStatus paymentStatus
 ) {
 
     public static ReservationDto from(Reservation reservation) {
@@ -21,7 +23,8 @@ public record ReservationDto(
                 reservation.getDate(),
                 ReservationTimeDto.from(reservation.getTime()),
                 ThemeDto.from(reservation.getTheme()),
-                MemberDto.from(reservation.getMember())
+                MemberDto.from(reservation.getMember()),
+                reservation.getPaymentStatus()
         );
     }
 }

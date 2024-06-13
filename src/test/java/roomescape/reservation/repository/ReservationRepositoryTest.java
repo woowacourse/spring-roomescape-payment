@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import roomescape.member.model.Member;
 import roomescape.member.model.MemberRole;
+import roomescape.reservation.model.PaymentStatus;
 import roomescape.reservation.model.Reservation;
 import roomescape.reservation.model.ReservationDate;
 import roomescape.reservation.model.ReservationStatus;
@@ -43,8 +44,9 @@ class ReservationRepositoryTest {
         final ReservationTime reservationTime = new ReservationTime(1L, LocalTime.of(10, 10));
         final Theme theme = new Theme(1L, "테바의 비밀친구", "테바의 은밀한 비밀친구", "대충 테바 사진 링크");
         final Member member = new Member(1L, MemberRole.USER, "password1111", "kelly", "kelly6bf@mail.com");
+        final PaymentStatus paymentStatus = PaymentStatus.WAITING;
         final Reservation reservation =
-                new Reservation(reservationStatus, reservationDate, reservationTime, theme, member);
+                new Reservation(reservationStatus, reservationDate, reservationTime, theme, member, paymentStatus);
 
         // When
         final Reservation savedReservation = reservationRepository.save(reservation);
@@ -56,7 +58,8 @@ class ReservationRepositoryTest {
                 () -> assertThat(savedReservation.getId()).isEqualTo(17L),
                 () -> assertThat(savedReservation.getMember()).isEqualTo(reservation.getMember()),
                 () -> assertThat(savedReservation.getDate()).isEqualTo(reservation.getDate()),
-                () -> assertThat(savedReservation.getTime()).isEqualTo(reservation.getTime())
+                () -> assertThat(savedReservation.getTime()).isEqualTo(reservation.getTime()),
+                () -> assertThat(savedReservation.getPaymentStatus()).isEqualTo(reservation.getPaymentStatus())
         );
     }
 
@@ -108,8 +111,8 @@ class ReservationRepositoryTest {
         final Long themeId = 1L;
 
         // When
-        final List<Reservation> allByDateAndThemeId = reservationRepository.findAllByDateAndThemeId(reservationDate,
-                themeId);
+        final List<Reservation> allByDateAndThemeId =
+                reservationRepository.findAllByDateAndThemeId(reservationDate, themeId);
 
         // Then
         assertThat(allByDateAndThemeId).hasSize(2);

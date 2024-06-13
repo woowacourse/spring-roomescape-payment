@@ -21,11 +21,18 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.fixture.PaymentConfirmFixtures;
+import roomescape.member.model.Member;
+import roomescape.member.repository.MemberRepository;
 import roomescape.payment.dto.SavePaymentCredentialRequest;
 import roomescape.payment.infrastructure.PaymentGateway;
+import roomescape.payment.model.PaymentHistory;
+import roomescape.payment.repository.PaymentHistoryRepository;
 import roomescape.payment.service.PaymentService;
+import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.ReservationDto;
+import roomescape.reservation.dto.SaveAdminReservationRequest;
 import roomescape.reservation.dto.SaveReservationRequest;
+import roomescape.reservation.model.PaymentStatus;
 import roomescape.reservation.model.Reservation;
 import roomescape.reservation.model.ReservationWaiting;
 import roomescape.reservation.repository.ReservationRepository;
@@ -42,7 +49,13 @@ class ReservationServiceTest {
     private ReservationWaitingRepository reservationWaitingRepository;
 
     @Autowired
+    private MemberRepository memberRepository;
+
+    @Autowired
     private ReservationRepository reservationRepository;
+
+    @Autowired
+    private PaymentHistoryRepository paymentHistoryRepository;
 
     @MockBean
     private PaymentGateway paymentGateway;
@@ -62,26 +75,28 @@ class ReservationServiceTest {
 
     @DisplayName("예약 정보를 저장한다.")
     @Test
+    @Sql("classpath:test-payment-credential-data.sql")
     void saveReservationTest() {
         // Given
         final LocalDate date = LocalDate.now().plusDays(10);
-        String orderId = "orderId";
-        long amount = 1000L;
+        final String orderId = "orderId";
+        final long amount = 1000L;
+        final String paymentKey = "paymentKey";
         final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
                 date,
-                3L,
                 1L,
                 1L,
                 orderId,
                 amount,
-                "paymentKey"
+                paymentKey
         );
-        paymentService.saveCredential(new SavePaymentCredentialRequest(orderId, amount));
+        final Member member = memberRepository.findById(3L).orElseThrow();
+        paymentService.saveCredential(new SavePaymentCredentialRequest(paymentKey, amount));
         given(paymentGateway.confirm(anyString(), anyLong(), anyString()))
-                .willReturn(PaymentConfirmFixtures.getDefaultResponse("1234", 1000L));
+                .willReturn(PaymentConfirmFixtures.getDefaultResponse(orderId, paymentKey, amount));
 
         // When
-        final ReservationDto reservation = reservationService.saveReservation(saveReservationRequest);
+        final ReservationDto reservation = reservationService.saveReservation(saveReservationRequest, member.getId());
 
         // Then
         final List<ReservationDto> reservations = reservationService.getReservations();
@@ -91,6 +106,7 @@ class ReservationServiceTest {
                 () -> assertThat(reservation.member().id()).isEqualTo(3L),
                 () -> assertThat(reservation.date().getValue()).isEqualTo(date),
                 () -> assertThat(reservation.time().startAt()).isEqualTo(LocalTime.of(9, 30)),
+                () -> assertThat(reservation.paymentStatus()).isEqualTo(PaymentStatus.DONE),
                 () -> verify(paymentGateway, times(1)).confirm(anyString(), anyLong(), anyString())
         );
     }
@@ -101,12 +117,55 @@ class ReservationServiceTest {
         // Given
         final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
                 LocalDate.now(),
-                3L,
                 9L,
                 1L,
                 "orderId",
                 1000L,
                 "paymentKey"
+        );
+        final Member member = memberRepository.findById(3L).orElseThrow();
+        final Long id = member.getId();
+
+        // When & Then
+        assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest, id))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage("해당 id의 예약 시간이 존재하지 않습니다.");
+    }
+
+    @DisplayName("관리자의 요청으로 예약 정보를 저장한다.")
+    @Test
+    void saveReservationAdmin() {
+        // Given
+        final LocalDate date = LocalDate.now().plusDays(10);
+        final SaveAdminReservationRequest saveReservationRequest = new SaveAdminReservationRequest(
+                date,
+                3L,
+                3L,
+                1L
+        );
+        // When
+        final ReservationDto reservation = reservationService.saveReservation(saveReservationRequest);
+
+        // Then
+        final List<ReservationDto> reservations = reservationService.getReservations();
+        assertAll(
+                () -> assertThat(reservations).hasSize(17),
+                () -> assertThat(reservation.id()).isEqualTo(17L),
+                () -> assertThat(reservation.member().id()).isEqualTo(3L),
+                () -> assertThat(reservation.date().getValue()).isEqualTo(date),
+                () -> assertThat(reservation.paymentStatus()).isEqualTo(PaymentStatus.WAITING)
+        );
+    }
+
+    @DisplayName("관리자 저장하려는 예약 시간이 존재하지 않는다면 예외를 발생시킨다.")
+    @Test
+    void throwExceptionWhenSaveAdminReservationWithNotExistReservationTimeTest() {
+        // Given
+        final SaveAdminReservationRequest saveReservationRequest = new SaveAdminReservationRequest(
+                LocalDate.now(),
+                3L,
+                9L,
+                1L
         );
 
         // When & Then
@@ -119,20 +178,30 @@ class ReservationServiceTest {
     @Test
     void deleteReservationTest() {
         // When
-        reservationService.deleteReservation(1L);
-
-        // When & Then
+        reservationService.deleteReservation(5L);
         final List<ReservationDto> reservations = reservationService.getReservations();
-        assertThat(reservations).hasSize(15);
+        final List<PaymentHistory> paymentHistories = paymentHistoryRepository.findAll();
+
+        //then
+        assertAll(
+                () -> assertThat(reservations).hasSize(15),
+                () -> assertThat(paymentHistories).hasSize(2)
+        );
     }
 
     @DisplayName("예약 정보를 삭제하면 가장 우선 순위가 빠른 예약 대기가 예약으로 등록된다.")
     @Test
     void changeWaitingToReservationWhenDeleteReservationTest() {
+        final long targetId = 13L;
+        final long newGeneratedReservationId = 17L;
+        final long highPriorityWaitingReservationId = 1L;
+
         // When
-        final ReservationWaiting reservationWaiting = reservationWaitingRepository.findById(1L).get();
-        reservationService.deleteReservation(13L);
-        final Reservation newReservation = reservationRepository.findById(17L).get();
+        final ReservationWaiting reservationWaiting = reservationWaitingRepository.findById(
+                        highPriorityWaitingReservationId)
+                .orElseThrow();
+        reservationService.deleteReservation(targetId);
+        final Reservation newReservation = reservationRepository.findById(newGeneratedReservationId).orElseThrow();
 
         // Then
         assertAll(
@@ -143,7 +212,8 @@ class ReservationServiceTest {
                 () -> assertThat(reservationWaiting.getDate().getValue())
                         .isEqualTo(newReservation.getDate().getValue()),
                 () -> assertThat(reservationWaiting.getTime().getStartAt())
-                        .isEqualTo(newReservation.getTime().getStartAt())
+                        .isEqualTo(newReservation.getTime().getStartAt()),
+                () -> assertThat(newReservation.getPaymentStatus()).isEqualTo(PaymentStatus.WAITING)
         );
     }
 
@@ -153,16 +223,17 @@ class ReservationServiceTest {
         // Given
         final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
                 LocalDate.now().minusDays(3),
-                3L,
                 1L,
                 1L,
                 "orderId",
                 1000L,
                 "paymentKey"
         );
+        final Member member = memberRepository.findById(3L).orElseThrow();
+        final Long id = member.getId();
 
         // When & Then
-        assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest))
+        assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest, id))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("현재 날짜보다 이전 날짜를 예약할 수 없습니다.");
     }
@@ -173,17 +244,31 @@ class ReservationServiceTest {
         // Given
         final SaveReservationRequest saveReservationRequest = new SaveReservationRequest(
                 LocalDate.now().plusDays(2),
-                3L,
                 4L,
                 9L,
                 "orderId",
                 1000L,
                 "paymentKey"
         );
+        final Member member = memberRepository.findById(3L).orElseThrow();
+        final Long id = member.getId();
 
         // When & Then
-        assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest))
+        assertThatThrownBy(() -> reservationService.saveReservation(saveReservationRequest, id))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("이미 해당 날짜/시간의 테마 예약이 있습니다.");
+    }
+
+    @DisplayName("회원 아이디로 예약한 예약 정보를 가져온다.")
+    @Test
+    void getMyReservations() {
+        //given
+        final Long memberId = 1L;
+
+        //when
+        final List<MyReservationResponse> results = reservationService.getMyReservations(memberId);
+
+        //then
+        assertThat(results).hasSize(3);
     }
 }

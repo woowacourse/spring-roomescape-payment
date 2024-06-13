@@ -4,14 +4,19 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
-import roomescape.member.model.Member;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+import roomescape.reservation.model.Reservation;
 
 @Entity
+@SQLDelete(sql = "UPDATE payment_history SET payment_status = 'RESERVATION_CANCELED' WHERE id = ?")
+@SQLRestriction(value = "payment_status <> 'RESERVATION_CANCELED'")
 public class PaymentHistory {
 
     @Id
@@ -22,11 +27,10 @@ public class PaymentHistory {
     private String orderId;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private PaymentStatus paymentStatus;
+    private String paymentKey;
 
     @Column(nullable = false)
-    private String orderName;
+    private String status;
 
     @Column(nullable = false)
     private Long totalAmount;
@@ -35,46 +39,44 @@ public class PaymentHistory {
     private LocalDateTime approvedAt;
 
     @Column(nullable = false)
-    private String paymentProvider;
+    @Enumerated(EnumType.STRING)
+    private PaymentHistoryStatus paymentStatus;
 
-    @ManyToOne
-    private Member member;
+    @OneToOne(fetch = FetchType.LAZY)
+    private Reservation reservation;
 
     protected PaymentHistory() {
     }
 
-    public PaymentHistory(
-            final String orderId,
-            final PaymentStatus paymentStatus,
-            final String orderName,
-            final Long totalAmount,
-            final LocalDateTime approvedAt,
-            final String paymentProvider,
-            final Member member
-    ) {
+    public PaymentHistory(final String orderId, final String paymentKey, final String status, final Long totalAmount,
+                          final LocalDateTime approvedAt, final Reservation reservation) {
         this.orderId = orderId;
-        this.paymentStatus = paymentStatus;
-        this.orderName = orderName;
-        this.totalAmount = totalAmount;
+        this.paymentKey = paymentKey;
         this.approvedAt = approvedAt;
-        this.paymentProvider = paymentProvider;
-        this.member = member;
+        this.status = status;
+        this.totalAmount = totalAmount;
+        this.paymentStatus = PaymentHistoryStatus.DONE;
+        this.reservation = reservation;
+    }
+
+    public boolean hasSameReservation(final Reservation other) {
+        return reservation.equals(other);
     }
 
     public Long getId() {
         return id;
     }
 
-    public PaymentStatus getPaymentStatus() {
-        return paymentStatus;
-    }
-
     public String getOrderId() {
         return orderId;
     }
 
-    public String getOrderName() {
-        return orderName;
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public String getStatus() {
+        return status;
     }
 
     public Long getTotalAmount() {
@@ -85,11 +87,11 @@ public class PaymentHistory {
         return approvedAt;
     }
 
-    public String getPaymentProvider() {
-        return paymentProvider;
+    public PaymentHistoryStatus getPaymentStatus() {
+        return paymentStatus;
     }
 
-    public Member getMember() {
-        return member;
+    public Reservation getReservation() {
+        return reservation;
     }
 }

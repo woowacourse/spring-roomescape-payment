@@ -8,13 +8,11 @@ import roomescape.reservation.model.ReservationStatus;
 import roomescape.reservation.model.ReservationTime;
 import roomescape.reservation.model.Theme;
 
-public record SaveReservationRequest(
+public record SaveAdminReservationRequest(
         LocalDate date,
+        Long memberId,
         Long timeId,
-        Long themeId,
-        String orderId,
-        Long amount,
-        String paymentKey
+        Long themeId
 ) {
 
     public Reservation toReservation(
@@ -28,7 +26,7 @@ public record SaveReservationRequest(
                 reservationTime,
                 theme,
                 member,
-                PaymentStatus.DONE
+                PaymentStatus.WAITING
         );
     }
 }

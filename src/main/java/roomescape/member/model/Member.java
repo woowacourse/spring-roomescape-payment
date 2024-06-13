@@ -8,8 +8,12 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
+@SQLDelete(sql = "UPDATE member SET is_deleted = true WHERE id = ?")
+@SQLRestriction(value = "is_deleted = false")
 public class Member {
 
     @Id
@@ -28,6 +32,9 @@ public class Member {
 
     @Embedded
     private MemberPassword password;
+
+    @Column(nullable = false)
+    private boolean isDeleted;
 
     protected Member() {
     }
@@ -75,6 +82,7 @@ public class Member {
         this.password = password;
         this.name = name;
         this.email = email;
+        this.isDeleted = false;
     }
 
     public MemberEmail getEmail() {
@@ -95,5 +103,9 @@ public class Member {
 
     public MemberRole getRole() {
         return role;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
     }
 }

@@ -24,7 +24,7 @@ class QueryGeneratorTest {
         final String expect = "SELECT * FROM member " +
                               "WHERE member_id = " + memberId + " " +
                               "AND theme_id = " + themeId + " " +
-                              "AND date BETWEEN '" + from + "' " +
+                              "AND status <> 'CANCELED' AND date BETWEEN '" + from + "' " +
                               "AND '" + to + "'";
 
         // When
@@ -47,7 +47,7 @@ class QueryGeneratorTest {
 
         final String expect = "SELECT * FROM member " +
                               "WHERE theme_id = " + themeId + " " +
-                              "AND date BETWEEN '" + from + "' " +
+                              "AND status <> 'CANCELED' AND date BETWEEN '" + from + "' " +
                               "AND '" + to + "'";
 
         // When
@@ -68,7 +68,7 @@ class QueryGeneratorTest {
         final String baseQuery = "SELECT * FROM member";
 
         final String expect = "SELECT * FROM member " +
-                              "WHERE date BETWEEN '" + from + "' " +
+                              "WHERE status <> 'CANCELED' AND date BETWEEN '" + from + "' " +
                               "AND '" + to + "'";
 
         // When
@@ -88,7 +88,7 @@ class QueryGeneratorTest {
         final String baseQuery = "SELECT * FROM member";
 
         final String expect = "SELECT * FROM member " +
-                              "WHERE date >= '" + from + "'";
+                              "WHERE status <> 'CANCELED' AND date >= '" + from + "'";
 
         // When
         final String generateSql =

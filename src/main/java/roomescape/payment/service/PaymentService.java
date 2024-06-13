@@ -3,7 +3,6 @@ package roomescape.payment.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.PaymentCredentialMissMatchException;
-import roomescape.member.model.Member;
 import roomescape.payment.dto.PaymentConfirmResponse;
 import roomescape.payment.dto.SavePaymentCredentialRequest;
 import roomescape.payment.infrastructure.PaymentGateway;
@@ -11,6 +10,7 @@ import roomescape.payment.model.PaymentCredential;
 import roomescape.payment.model.PaymentHistory;
 import roomescape.payment.repository.PaymentCredentialRepository;
 import roomescape.payment.repository.PaymentHistoryRepository;
+import roomescape.reservation.model.Reservation;
 
 @Service
 public class PaymentService {
@@ -39,15 +39,13 @@ public class PaymentService {
             final String orderId,
             final Long amount,
             final String paymentKey,
-            final Member member
+            final Reservation reservation
     ) {
         matchPaymentCredential(orderId, amount);
 
         final PaymentConfirmResponse confirmResponse = paymentGateway.confirm(orderId, amount, paymentKey);
-        final PaymentHistory paymentHistory = confirmResponse.toPaymentHistory(member);
-
+        final PaymentHistory paymentHistory = confirmResponse.toPaymentHistory(reservation);
         paymentHistoryRepository.save(paymentHistory);
-
         paymentCredentialRepository.deleteAllByOrderIdAndAmount(orderId, amount);
     }
 

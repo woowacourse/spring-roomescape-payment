@@ -9,9 +9,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
+import java.util.Objects;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import roomescape.member.model.Member;
 
 @Entity
+@SQLDelete(sql = "UPDATE reservation SET status = 'CANCELED' WHERE id = ?")
+@SQLRestriction(value = "status <> 'CANCELED'")
 public class Reservation {
 
     @Id
@@ -33,6 +38,9 @@ public class Reservation {
     @Embedded
     private ReservationDate date;
 
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
+
     protected Reservation() {
     }
 
@@ -41,7 +49,8 @@ public class Reservation {
             final LocalDate date,
             final ReservationTime time,
             final Theme theme,
-            final Member member
+            final Member member,
+            final PaymentStatus paymentStatus
     ) {
         this(
                 null,
@@ -49,7 +58,8 @@ public class Reservation {
                 new ReservationDate(date),
                 time,
                 theme,
-                member
+                member,
+                paymentStatus
         );
     }
 
@@ -59,7 +69,8 @@ public class Reservation {
             final LocalDate date,
             final ReservationTime time,
             final Theme theme,
-            final Member member
+            final Member member,
+            final PaymentStatus paymentStatus
     ) {
         this(
                 id,
@@ -67,17 +78,19 @@ public class Reservation {
                 new ReservationDate(date),
                 time,
                 theme,
-                member
+                member,
+                paymentStatus
         );
     }
 
-    private Reservation(
+    protected Reservation(
             final Long id,
             final ReservationStatus status,
             final ReservationDate date,
             final ReservationTime time,
             final Theme theme,
-            final Member member
+            final Member member,
+            final PaymentStatus paymentStatus
     ) {
         checkRequiredData(status, time, theme, member);
         this.id = id;
@@ -86,6 +99,7 @@ public class Reservation {
         this.time = time;
         this.theme = theme;
         this.member = member;
+        this.paymentStatus = paymentStatus;
     }
 
     private static void checkRequiredData(
@@ -97,6 +111,10 @@ public class Reservation {
         if (status == null || reservationTime == null || theme == null || member == null) {
             throw new IllegalArgumentException("예약 상태, 시간, 테마, 회원 정보는 Null을 입력할 수 없습니다.");
         }
+    }
+
+    public boolean isPaid() {
+        return paymentStatus.isPaid();
     }
 
     public Long getId() {
@@ -121,5 +139,26 @@ public class Reservation {
 
     public ReservationStatus getStatus() {
         return status;
+    }
+
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final Reservation other = (Reservation) o;
+        return Objects.equals(id, other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }

@@ -1,42 +1,30 @@
 package roomescape.reservation.controller;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+import roomescape.RestClientControllerTest;
 import roomescape.auth.token.TokenProvider;
 import roomescape.member.model.MemberRole;
 import roomescape.reservation.dto.SaveReservationWaitingRequest;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(value = "classpath:test-data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
-class ReservationWaitingControllerTest {
+class ReservationWaitingControllerTest extends RestClientControllerTest {
 
     @Autowired
     private TokenProvider tokenProvider;
-
-    @LocalServerPort
-    int randomServerPort;
-
-    @BeforeEach
-    public void initReservation() {
-        RestAssured.port = randomServerPort;
-    }
 
     @DisplayName("예약 대기 정보를 모두 조회한다.")
     @Test
     void getReservationWaitingTest() {
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("findAll-waiting-reservations"))
                 .contentType(ContentType.JSON)
                 .cookie("token", createAccessToken(1L, MemberRole.ADMIN))
                 .when().get("/admin/reservation-waiting")
@@ -49,7 +37,8 @@ class ReservationWaitingControllerTest {
     @Test
     void getMyReservationWaitingTest() {
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("findAll-my-waiting-reservations"))
                 .contentType(ContentType.JSON)
                 .cookie("token", createAccessToken(1L, MemberRole.ADMIN))
                 .when().get("/reservation-waiting-mine")
@@ -66,7 +55,8 @@ class ReservationWaitingControllerTest {
                 LocalDate.now().plusDays(3), 2L, 1L, 10L);
 
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("save-waiting-reservation"))
                 .contentType(ContentType.JSON)
                 .cookie("token", createAccessToken(2L, MemberRole.USER))
                 .body(saveReservationWaitingRequest)
@@ -84,7 +74,8 @@ class ReservationWaitingControllerTest {
                 LocalDate.now(), 1L, 1L, 2L);
 
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-save-waiting-reservation-non-exist-reservation"))
                 .contentType(ContentType.JSON)
                 .cookie("token", createAccessToken(2L, MemberRole.USER))
                 .body(saveReservationWaitingRequest)
@@ -102,7 +93,8 @@ class ReservationWaitingControllerTest {
                 LocalDate.now().plusDays(6), 2L, 3L, 8L);
 
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("fail-save-waiting-reservation-already-exist"))
                 .contentType(ContentType.JSON)
                 .cookie("token", createAccessToken(2L, MemberRole.USER))
                 .body(saveReservationWaitingRequest)
@@ -116,7 +108,8 @@ class ReservationWaitingControllerTest {
     @Test
     void deleteReservationWaitingTest() {
         // When & Then
-        RestAssured.given().log().all()
+        RestAssured.given(spec).log().all()
+                .filter(document("delete-waiting-reservations"))
                 .contentType(ContentType.JSON)
                 .cookie("token", createAccessToken(2L, MemberRole.USER))
                 .when().delete("/reservation-waiting/" + 2L)

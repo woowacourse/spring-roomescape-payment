@@ -3,6 +3,7 @@ package roomescape.reservation.repository.param;
 import java.util.ArrayList;
 import java.util.List;
 import roomescape.reservation.dto.SearchReservationsParams;
+import roomescape.reservation.model.ReservationStatus;
 
 public class QueryGenerator {
 
@@ -28,7 +29,8 @@ public class QueryGenerator {
             searchParams.add(new SearchDataParam<>(isFirst, "theme_id", params.themeId()));
             isFirst = false;
         }
-
+        searchParams.add(new SearchNotDeletedParam<>(isFirst, "status", ReservationStatus.CANCELED));
+        isFirst = false;
         searchParams.add(new SearchDateParam(isFirst, "date", params.from(), params.to()));
         return searchParams;
     }

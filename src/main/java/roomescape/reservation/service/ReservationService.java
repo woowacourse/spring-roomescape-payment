@@ -3,12 +3,18 @@ package roomescape.reservation.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.model.Member;
 import roomescape.member.service.MemberService;
+import roomescape.payment.dto.PaymentHistoryDto;
+import roomescape.payment.model.PaymentHistory;
+import roomescape.payment.repository.PaymentHistoryRepository;
 import roomescape.payment.service.PaymentService;
+import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.ReservationDto;
+import roomescape.reservation.dto.SaveAdminReservationRequest;
 import roomescape.reservation.dto.SaveReservationRequest;
 import roomescape.reservation.dto.SearchReservationsParams;
 import roomescape.reservation.dto.SearchReservationsRequest;
@@ -27,6 +33,7 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final ReservationWaitingRepository reservationWaitingRepository;
     private final CustomReservationRepository customReservationRepository;
+    private final PaymentHistoryRepository paymentHistoryRepository;
     private final MemberService memberService;
     private final ThemeService themeService;
     private final ReservationTimeService reservationTimeService;
@@ -36,6 +43,7 @@ public class ReservationService {
             final CustomReservationRepository customReservationRepository,
             final ReservationRepository reservationRepository,
             final ReservationWaitingRepository reservationWaitingRepository,
+            PaymentHistoryRepository paymentHistoryRepository,
             final MemberService memberService,
             final ThemeService themeService,
             final ReservationTimeService reservationTimeService,
@@ -44,6 +52,7 @@ public class ReservationService {
         this.customReservationRepository = customReservationRepository;
         this.reservationRepository = reservationRepository;
         this.reservationWaitingRepository = reservationWaitingRepository;
+        this.paymentHistoryRepository = paymentHistoryRepository;
         this.memberService = memberService;
         this.themeService = themeService;
         this.reservationTimeService = reservationTimeService;
@@ -71,7 +80,7 @@ public class ReservationService {
                 .toList();
     }
 
-    public ReservationDto saveReservation(final SaveReservationRequest request) {
+    public ReservationDto saveReservation(final SaveAdminReservationRequest request) {
         final ReservationTime reservationTime = reservationTimeService.getReservationTime(request.timeId());
         final Theme theme = themeService.getTheme(request.themeId());
         final Member member = memberService.getMember(request.memberId());
@@ -80,9 +89,22 @@ public class ReservationService {
         validateReservationDateAndTime(reservation.getDate(), reservationTime);
         validateReservationDuplicated(reservation);
 
-        paymentService.submitPayment(request.orderId(), request.amount(), request.paymentKey(), member);
-
         return ReservationDto.from(reservationRepository.save(reservation));
+    }
+
+    public ReservationDto saveReservation(final SaveReservationRequest request,
+                                          final Long memberId) {
+        final ReservationTime reservationTime = reservationTimeService.getReservationTime(request.timeId());
+        final Theme theme = themeService.getTheme(request.themeId());
+        final Member member = memberService.getMember(memberId);
+        final Reservation reservation = request.toReservation(reservationTime, theme, member);
+
+        validateReservationDateAndTime(reservation.getDate(), reservationTime);
+        validateReservationDuplicated(reservation);
+
+        final Reservation savedReservation = reservationRepository.save(reservation);
+        paymentService.submitPayment(request.orderId(), request.amount(), request.paymentKey(), reservation);
+        return ReservationDto.from(savedReservation);
     }
 
     private static void validateReservationDateAndTime(final ReservationDate date, final ReservationTime time) {
@@ -106,6 +128,11 @@ public class ReservationService {
     public void deleteReservation(final Long reservationId) {
         final Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 예약 정보입니다."));
+        if (reservation.isPaid()) {
+            final PaymentHistory paymentHistory = paymentHistoryRepository.findByReservation(reservation)
+                    .orElseThrow(() -> new NoSuchElementException("존재하지 않는 결제 정보입니다."));
+            paymentHistoryRepository.deleteById(paymentHistory.getId());
+        }
         reservationRepository.deleteById(reservation.getId());
         reservationWaitingRepository.findTopByDateAndTimeAndThemeOrderByCreatedAtAsc(
                         reservation.getDate(),
@@ -120,10 +147,23 @@ public class ReservationService {
         reservationWaitingRepository.delete(reservationWaiting);
     }
 
-    public List<ReservationDto> getMyReservations(final Long memberId) {
-        return reservationRepository.findAllByMember_Id(memberId)
-                .stream()
-                .map(ReservationDto::from)
+    public List<MyReservationResponse> getMyReservations(final Long memberId) {
+        final Member member = memberService.getMember(memberId);
+        final List<Reservation> allByMemberId = reservationRepository.findAllByMember_Id(memberId);
+        final List<PaymentHistory> paymentHistories = paymentHistoryRepository.findAllByReservation_Member(member);
+        return allByMemberId.stream()
+                .map(reservation -> MyReservationResponse.from(
+                        ReservationDto.from(reservation),
+                        getPaymentHistoryDto(reservation, paymentHistories)
+                ))
                 .toList();
+    }
+
+    private PaymentHistoryDto getPaymentHistoryDto(Reservation reservation, List<PaymentHistory> paymentHistories) {
+        Optional<PaymentHistory> optionalHistory = paymentHistories.stream()
+                .filter(paymentHistory -> paymentHistory.hasSameReservation(reservation))
+                .findFirst();
+        return optionalHistory.map(PaymentHistoryDto::from)
+                .orElseGet(PaymentHistoryDto::getDefault);
     }
 }

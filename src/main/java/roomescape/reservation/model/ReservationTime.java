@@ -6,8 +6,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalTime;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
+@SQLDelete(sql = "UPDATE reservation_time SET is_deleted = true WHERE id = ?")
+@SQLRestriction(value = "is_deleted = false")
 public class ReservationTime {
 
     @Id
@@ -16,6 +20,9 @@ public class ReservationTime {
 
     @Column(nullable = false)
     private LocalTime startAt;
+
+    @Column(nullable = false)
+    private boolean isDeleted;
 
     protected ReservationTime() {
     }
@@ -28,6 +35,7 @@ public class ReservationTime {
         validateTime(startAt);
         this.id = id;
         this.startAt = startAt;
+        this.isDeleted = false;
     }
 
     private void validateTime(final LocalTime startAt) {
@@ -42,5 +50,9 @@ public class ReservationTime {
 
     public LocalTime getStartAt() {
         return startAt;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
     }
 }

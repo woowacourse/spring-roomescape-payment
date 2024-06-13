@@ -91,10 +91,19 @@ public class ReservationWaitingService {
             final ReservationTime reservationTime,
             final Theme theme
     ) {
-        if (reservationWaitingRepository.existsByMemberAndDateAndTimeAndTheme(member, reservationDate, reservationTime,
-                theme)) {
+        if (hasReservationWaiting(member, reservationDate, reservationTime, theme)) {
             throw new IllegalStateException("이미 해당 예약 대기가 존재합니다.");
         }
+    }
+
+    private boolean hasReservationWaiting(final Member member, final ReservationDate reservationDate,
+                                          final ReservationTime reservationTime, final Theme theme) {
+        return reservationWaitingRepository.existsByMemberAndDateAndTimeAndTheme(
+                member,
+                reservationDate,
+                reservationTime,
+                theme
+        );
     }
 
     public void deleteReservationWaiting(final Long reservationWaitingId) {

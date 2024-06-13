@@ -25,11 +25,11 @@ public class CustomThemeRepositoryImpl implements CustomThemeRepository {
     ) {
         final String sql = """
                     SELECT
-                        th.id, th.name, th.description, th.thumbnail
+                        th.id, th.name, th.description, th.thumbnail, th.is_deleted
                     FROM theme AS th
                     INNER JOIN reservation AS r
                     ON r.theme_id = th.id
-                    WHERE r.date BETWEEN :startAt AND :endAt
+                    WHERE r.date BETWEEN :startAt AND :endAt AND is_deleted = false
                     GROUP BY r.theme_id
                     ORDER BY COUNT(r.theme_id) DESC
                     LIMIT :maximumThemeCount

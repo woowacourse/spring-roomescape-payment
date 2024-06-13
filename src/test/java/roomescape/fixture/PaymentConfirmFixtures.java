@@ -1,6 +1,6 @@
 package roomescape.fixture;
 
-import java.util.Map;
+import java.time.OffsetDateTime;
 import roomescape.payment.dto.PaymentConfirmResponse;
 
 public class PaymentConfirmFixtures {
@@ -8,14 +8,7 @@ public class PaymentConfirmFixtures {
     private PaymentConfirmFixtures() {
     }
 
-    public static PaymentConfirmResponse getDefaultResponse(String orderId, long amount) {
-        return new PaymentConfirmResponse(
-                orderId,
-                "DONE",
-                "orderName",
-                amount,
-                "2011-12-03T10:15:30+01:00",
-                Map.of("provider", "TossPayment")
-        );
+    public static PaymentConfirmResponse getDefaultResponse(String orderId, String paymentKey, long amount) {
+        return new PaymentConfirmResponse(orderId, paymentKey, "DONE", amount, OffsetDateTime.now().toString());
     }
 }
