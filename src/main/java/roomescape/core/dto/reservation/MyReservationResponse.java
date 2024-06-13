@@ -13,11 +13,11 @@ public record MyReservationResponse(Long id, String theme, String date, String t
                                     ReservationResponseType status, String paymentKey, Integer amount) {
 
     public static MyReservationResponse from(final WaitingWithRank waitingWithRank) {
-        final Waiting waiting = waitingWithRank.getWaiting();
+        final Waiting waiting = waitingWithRank.waiting();
         final Theme theme = waiting.getTheme();
         final LocalDate date = waiting.getDate();
         final ReservationTime time = waiting.getTime();
-        final long waitingOrder = waitingWithRank.getRank() + 1;
+        final long waitingOrder = waitingWithRank.rank() + 1;
 
         return new MyReservationResponse(waiting.getId(), theme.getName(), date.format(DateTimeFormatter.ISO_DATE),
                 time.getStartAtString(), waitingOrder, ReservationResponseType.WAITING, null, null);
