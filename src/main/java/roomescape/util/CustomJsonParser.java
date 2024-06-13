@@ -9,12 +9,12 @@ import java.io.InputStreamReader;
 
 public class CustomJsonParser {
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public static String parseResponse(ClientHttpResponse response, String key) {
         try {
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response.getBody()));
-            return objectMapper.readTree(bufferedReader)
+            return OBJECT_MAPPER.readTree(bufferedReader)
                     .findValue(key)
                     .asText();
         } catch (IOException e) {
