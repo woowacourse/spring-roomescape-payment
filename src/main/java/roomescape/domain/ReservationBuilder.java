@@ -10,6 +10,7 @@ public class ReservationBuilder {
     private ReservationTime time;
     private Theme theme;
     private ReservationStatus status;
+    private Payment payment;
 
     public ReservationBuilder id(Long id) {
         this.id = id;
@@ -41,7 +42,12 @@ public class ReservationBuilder {
         return this;
     }
 
+    public ReservationBuilder payment(Payment payment) {
+        this.payment = payment;
+        return this;
+    }
+
     public Reservation build() {
-        return new Reservation(id, member, date, time, theme, status);
+        return new Reservation(id, member, date, time, theme, status, payment);
     }
 }

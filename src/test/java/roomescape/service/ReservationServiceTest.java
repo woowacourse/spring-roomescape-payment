@@ -2,17 +2,14 @@ package roomescape.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static roomescape.fixture.MemberFixture.DEFAULT_ADMIN;
-import static roomescape.fixture.MemberFixture.DEFAULT_MEMBER;
-import static roomescape.fixture.ReservationTimeFixture.DEFAULT_TIME;
-import static roomescape.fixture.ThemeFixture.DEFAULT_THEME;
 
 import java.time.LocalDate;
-import org.junit.jupiter.api.BeforeEach;
+import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.Member;
 import roomescape.domain.ReservationStatus;
 import roomescape.domain.ReservationTime;
@@ -22,11 +19,11 @@ import roomescape.dto.ReservationResponse;
 import roomescape.exception.ExceptionType;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
-import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 
 @SpringBootTest
+@Sql("/data/reservation.sql")
 class ReservationServiceTest {
 
     @Autowired
@@ -41,24 +38,13 @@ class ReservationServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    @Autowired
-    private ReservationRepository reservationRepository;
-
-    @BeforeEach
-    void cleanUp() {
-        reservationRepository.deleteAll();
-        reservationTimeRepository.deleteAll();
-        themeRepository.deleteAll();
-        memberRepository.deleteAll();
-    }
-
     @Test
     @DisplayName("없는 시간에 예약 시도시 실패하는지 확인")
     void saveFailWhenTimeNotFound() {
-        Member member = memberRepository.save(DEFAULT_MEMBER);
-        Theme theme = themeRepository.save(DEFAULT_THEME);
+        Member member = memberRepository.findById(1L).orElseThrow();
+        Theme theme = themeRepository.findById(1L).orElseThrow();
 
-        ReservationTime notSavedTime = DEFAULT_TIME;
+        ReservationTime notSavedTime = new ReservationTime(999L, LocalTime.of(11, 56));
         ReservationRequest reservationRequest = new ReservationRequest(
                 LocalDate.now().plusDays(1), member.getId(), notSavedTime.getId(), theme.getId());
 
@@ -70,10 +56,10 @@ class ReservationServiceTest {
     @Test
     @DisplayName("없는 테마에 예약 시도시 실패하는지 확인")
     void saveFailWhenThemeNotFound() {
-        Member member = memberRepository.save(DEFAULT_MEMBER);
-        ReservationTime time = reservationTimeRepository.save(DEFAULT_TIME);
+        Member member = memberRepository.findById(1L).orElseThrow();
+        ReservationTime time = reservationTimeRepository.findById(1L).orElseThrow();
 
-        Theme notSavedTheme = DEFAULT_THEME;
+        Theme notSavedTheme = new Theme(999L, "theme", "description", "https://thumbnail.com");
         ReservationRequest reservationRequest = new ReservationRequest(
                 LocalDate.now().plusDays(1), member.getId(), time.getId(), notSavedTheme.getId());
 
@@ -85,13 +71,13 @@ class ReservationServiceTest {
     @Test
     @DisplayName("없는 회원 예약 시도시 실패하는지 확인")
     void saveFailWhenMemberNotFound() {
-        ReservationTime time = reservationTimeRepository.save(DEFAULT_TIME);
-        Theme theme = themeRepository.save(DEFAULT_THEME);
+        ReservationTime time = reservationTimeRepository.findById(1L).orElseThrow();
+        Theme theme = themeRepository.findById(1L).orElseThrow();
 
-        Member notSavedMember = DEFAULT_MEMBER;
+        Long notSavedMemberId = 999L;
 
         ReservationRequest reservationRequest = new ReservationRequest(
-                LocalDate.now().plusDays(1), notSavedMember.getId(), time.getId(), theme.getId());
+                LocalDate.now().plusDays(1), notSavedMemberId, time.getId(), theme.getId());
 
         assertThatThrownBy(() -> reservationService.save(reservationRequest))
                 .isInstanceOf(RoomescapeException.class)
@@ -101,9 +87,9 @@ class ReservationServiceTest {
     @Test
     @DisplayName("첫 예약 시도시 status가 APPROVED 인지 확인")
     void saveFirstReservationApprove() {
-        Member member = memberRepository.save(DEFAULT_MEMBER);
-        ReservationTime time = reservationTimeRepository.save(DEFAULT_TIME);
-        Theme theme = themeRepository.save(DEFAULT_THEME);
+        Member member = memberRepository.findById(1L).orElseThrow();
+        ReservationTime time = reservationTimeRepository.findById(1L).orElseThrow();
+        Theme theme = themeRepository.findById(1L).orElseThrow();
         LocalDate date = LocalDate.now().plusDays(1);
 
         ReservationRequest reservationRequest = new ReservationRequest(date, member.getId(), time.getId(),
@@ -116,9 +102,9 @@ class ReservationServiceTest {
     @Test
     @DisplayName("동일한 회원이 중복 예약 시도시 실패하는지 확인")
     void saveFailDuplicateReservationBySameMember() {
-        Member member = memberRepository.save(DEFAULT_MEMBER);
-        ReservationTime time = reservationTimeRepository.save(DEFAULT_TIME);
-        Theme theme = themeRepository.save(DEFAULT_THEME);
+        Member member = memberRepository.findById(1L).orElseThrow();
+        ReservationTime time = reservationTimeRepository.findById(1L).orElseThrow();
+        Theme theme = themeRepository.findById(1L).orElseThrow();
         LocalDate date = LocalDate.now().plusDays(1);
 
         ReservationRequest reservationRequest = new ReservationRequest(date, member.getId(), time.getId(), theme.getId());
@@ -131,11 +117,11 @@ class ReservationServiceTest {
     @Test
     @DisplayName("서로 다른 회원이 동일한 날짜/시간/테마에 예약 시도시 status가 PENDING 인지 확인")
     void saveDuplicateReservationPending() {
-        Member member1 = memberRepository.save(DEFAULT_MEMBER);
-        Member member2 = memberRepository.save(DEFAULT_ADMIN);
+        Member member1 = memberRepository.findById(1L).orElseThrow();
+        Member member2 = memberRepository.findById(2L).orElseThrow();
 
-        ReservationTime time = reservationTimeRepository.save(DEFAULT_TIME);
-        Theme theme = themeRepository.save(DEFAULT_THEME);
+        ReservationTime time = reservationTimeRepository.findById(1L).orElseThrow();
+        Theme theme = themeRepository.findById(1L).orElseThrow();
         LocalDate date = LocalDate.now().plusDays(1);
 
         ReservationRequest reservationRequestByMember1 = new ReservationRequest(date, member1.getId(), time.getId(),
@@ -151,9 +137,9 @@ class ReservationServiceTest {
     @Test
     @DisplayName("이미 지나간 시간에 예약 시도시 실패하는지 확인")
     void saveFailWhenPastTime() {
-        Member member = memberRepository.save(DEFAULT_MEMBER);
-        ReservationTime time = reservationTimeRepository.save(DEFAULT_TIME);
-        Theme theme = themeRepository.save(DEFAULT_THEME);
+        Member member = memberRepository.findById(1L).orElseThrow();
+        ReservationTime time = reservationTimeRepository.findById(1L).orElseThrow();
+        Theme theme = themeRepository.findById(1L).orElseThrow();
         LocalDate pastDate = LocalDate.now().minusDays(1);
 
         ReservationRequest reservationRequestWithPastDate = new ReservationRequest(

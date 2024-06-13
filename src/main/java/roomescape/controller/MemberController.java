@@ -1,5 +1,9 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,6 +21,7 @@ import roomescape.service.MemberService;
 import roomescape.service.TokenService;
 
 @RestController
+@Tag(name = "회원 API", description = "회원 관련 API 입니다.")
 public class MemberController {
 
     private final MemberService memberService;
@@ -28,6 +33,8 @@ public class MemberController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "로그인 API", description = "로그인 API 입니다.")
+    @ApiResponse(responseCode = "200", description = "로그인 성공")
     public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest) {
         long memberId = memberService.login(loginRequest);
 
@@ -46,12 +53,16 @@ public class MemberController {
     }
 
     @GetMapping("/login/check")
-    public ResponseEntity<MemberInfo> myInfo(@Auth long memberId) {
+    @Operation(summary = "로그인 확인 API", description = "로그인 상태를 확인합니다.")
+    @ApiResponse(responseCode = "200", description = "로그인 상태 확인")
+    public ResponseEntity<MemberInfo> myInfo(@Auth @Schema(description = "회원 ID") long memberId) {
         MemberInfo memberInfo = memberService.findByMemberId(memberId);
         return ResponseEntity.ok(memberInfo);
     }
 
     @GetMapping("/members")
+    @Operation(summary = "회원 목록 조회 API", description = "모든 회원 목록을 조회합니다.")
+    @ApiResponse(responseCode = "200", description = "회원 목록 조회 성공")
     public List<MemberInfo> allMembers() {
         return memberService.findAll();
     }

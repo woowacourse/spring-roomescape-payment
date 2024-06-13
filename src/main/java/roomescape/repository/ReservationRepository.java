@@ -10,7 +10,7 @@ import roomescape.domain.Reservation;
 import roomescape.domain.ReservationStatus;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
-import roomescape.dto.service.ReservationWithRank;
+import roomescape.dto.service.ReservationWithRankAndPayment;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
@@ -49,14 +49,16 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findAllByMemberId(long memberId);
 
     @Query("""
-            SELECT new roomescape.dto.service.ReservationWithRank(r1, COUNT(r2))
+            SELECT new roomescape.dto.service.ReservationWithRankAndPayment(r1, COUNT(r2), p)
             FROM Reservation r1
             LEFT JOIN Reservation r2
             ON r2.date = r1.date AND r2.time = r1.time AND r2.theme = r1.theme AND r2.id < r1.id
+            LEFT JOIN Payment p
+            ON r1.payment = p
             WHERE r1.reservationMember.id = :memberId
             GROUP BY r1
             """)
-    List<ReservationWithRank> findAllWithRankByMemberId(long memberId);
+    List<ReservationWithRankAndPayment> findAllWithRankAndPaymentByMemberId(long memberId);
 
     List<Reservation> findAllByStatus(ReservationStatus status);
 

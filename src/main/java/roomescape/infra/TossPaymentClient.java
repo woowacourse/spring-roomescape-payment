@@ -14,20 +14,21 @@ import roomescape.exception.RoomescapeException;
 public class TossPaymentClient implements PaymentClient {
 
     private static final String AUTHORIZATION_HEADER_KEY = "Authorization";
-    private static final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
     private static final String DELIMITER = ":";
-    private static final String AUTHORIZATION_HEADER_VALUE = "Basic "
-            + new String(Base64.getEncoder().encode((WIDGET_SECRET_KEY + DELIMITER).getBytes(StandardCharsets.UTF_8)));
 
     private final RestClient restClient;
+    private final String authorizationHeaderValue;
 
-    public TossPaymentClient(RestClient restClient) {
+    public TossPaymentClient(RestClient restClient, String widgetSecretKey) {
         this.restClient = restClient;
+        this.authorizationHeaderValue = "Basic "
+                + new String(Base64.getEncoder().encode((widgetSecretKey + DELIMITER).getBytes(StandardCharsets.UTF_8)));
+
     }
 
     public Payment requestPaymentApproval(PaymentRequest request) {
         TossPaymentResponse response = restClient.post()
-                .header(AUTHORIZATION_HEADER_KEY, AUTHORIZATION_HEADER_VALUE)
+                .header(AUTHORIZATION_HEADER_KEY, authorizationHeaderValue)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
                 .retrieve()
