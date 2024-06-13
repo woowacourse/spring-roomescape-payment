@@ -36,8 +36,7 @@ public class TossPaymentClient implements PaymentClient {
 
     @Override
     public PaymentConfirmResponse postPayment(final CreatePaymentRequest paymentRequest) {
-        final String secret =
-                "Basic " + Base64.getEncoder().encodeToString((tossPaymentSettings.getSecretKey() + tossPaymentSettings.getPassword()).getBytes());
+        final String secret = getSecretKey();
         final PaymentConfirmResponse confirmResponse = restClient.post()
                 .uri(tossPaymentSettings.getCreatePaymentApi())
                 .header(HttpHeaders.AUTHORIZATION, secret)
@@ -52,8 +51,7 @@ public class TossPaymentClient implements PaymentClient {
 
     @Override
     public void cancelPayment(final CancelPaymentRequest paymentRequest) {
-        final String secret =
-                "Basic " + Base64.getEncoder().encodeToString((tossPaymentSettings.getSecretKey() + tossPaymentSettings.getPassword()).getBytes());
+        final String secret = getSecretKey();
         restClient.post()
                 .uri(tossPaymentSettings.getCancelPaymentApi(), paymentRequest.paymentKey())
                 .header(HttpHeaders.AUTHORIZATION, secret)
@@ -61,7 +59,10 @@ public class TossPaymentClient implements PaymentClient {
                 .body(paymentRequest)
                 .retrieve()
                 .onStatus(errorHandler);
+    }
 
-        log.info("토스 결제 취소");
+    private String getSecretKey() {
+        return "Basic " + Base64.getEncoder()
+                .encodeToString((tossPaymentSettings.getSecretKey() + tossPaymentSettings.getPassword()).getBytes());
     }
 }
