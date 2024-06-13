@@ -55,7 +55,7 @@ class ReservationServiceTest extends IntegrationTestSupport {
         final long themeId = 4L;
         final long timeId = 1L;
         final LocalDate date = LocalDate.now().plusDays(1);
-        final CreateReservationRequest request = new CreateReservationRequest(memberId, themeId, date, timeId, null, null, null);
+        final CreateReservationRequest request = new CreateReservationRequest(memberId, themeId, date, timeId, "sample_payment_key", "sample_order_id", 1000L);
         final Reservation reservation = reservationService.addUserReservation(request);
 
         assertAll(
@@ -74,9 +74,9 @@ class ReservationServiceTest extends IntegrationTestSupport {
         final LocalDate date = LocalDate.now();
 
         final List<ReservationRankResponse> expected = List.of(
-                new ReservationRankResponse(5L, "가을", date.minusDays(7), LocalTime.of(15, 0), 1),
-                new ReservationRankResponse(6L, "가을", date.plusDays(3), LocalTime.of(18, 0), 1),
-                new ReservationRankResponse(8L, "가을", date.plusDays(4), LocalTime.of(18, 0), 2)
+                new ReservationRankResponse(5L, "가을", date.minusDays(7), LocalTime.of(15, 0), 1, "sample_payment_key_5", 1000L),
+                new ReservationRankResponse(6L, "가을", date.plusDays(3), LocalTime.of(18, 0), 1, "sample_payment_key_6", 1000L),
+                new ReservationRankResponse(8L, "가을", date.plusDays(4), LocalTime.of(18, 0), 2, null, null)
         );
 
         assertThat(reservationsByMember).isEqualTo(expected);
@@ -129,7 +129,7 @@ class ReservationServiceTest extends IntegrationTestSupport {
     void duplicateReservationInfo() {
         //given
         final LocalDate date = LocalDate.now().plusDays(10);
-        final CreateReservationRequest request = new CreateReservationRequest(3L, 2L, date, 1L, null, null, null);
+        final CreateReservationRequest request = new CreateReservationRequest(3L, 2L, date, 1L, "sample_payment_key", "sample_order_id", 1000L);
 
         //when && then
         reservationService.addUserReservation(request);
@@ -142,8 +142,8 @@ class ReservationServiceTest extends IntegrationTestSupport {
     void addReservation() {
         //given
         final LocalDate date = LocalDate.now().plusDays(10);
-        final CreateReservationRequest request1 = new CreateReservationRequest(3L, 2L, date, 1L, null, null, null);
-        final CreateReservationRequest request2 = new CreateReservationRequest(2L, 2L, date, 1L, null, null, null);
+        final CreateReservationRequest request1 = new CreateReservationRequest(3L, 2L, date, 1L, "sample_payment_key", "sample_order_id", 1000L);
+        final CreateReservationRequest request2 = new CreateReservationRequest(2L, 2L, date, 1L, "sample_payment_key", "sample_order_id", 1000L);
 
         //when && then
         reservationService.addUserReservation(request1);

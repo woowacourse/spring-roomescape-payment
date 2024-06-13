@@ -20,6 +20,8 @@ public class Reservation {
     private final ReservationTime time;
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private final Theme theme;
+    @OneToOne(mappedBy = "reservation", cascade = CascadeType.REMOVE)
+    private Payment payment;
 
     protected Reservation() {
         this.id = null;
