@@ -21,7 +21,7 @@ public class TossPaymentErrorHandler implements ErrorHandler {
         String responseBodyAsString = new String(responseBody, StandardCharsets.UTF_8);
         PaymentErrorMessageResponse result = objectMapper.readValue(responseBodyAsString, PaymentErrorMessageResponse.class);
 
-        if(response.getStatusCode().is5xxServerError()) {
+        if (response.getStatusCode().is5xxServerError()) {
             throw new PaymentServerException(result.message());
         }
         throw new RoomescapeException(result.message());

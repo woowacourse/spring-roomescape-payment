@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.v3.oas.annotations.Operation;
 import roomescape.controller.api.docs.AdminThemeApiDocs;
 import roomescape.controller.dto.request.CreateThemeRequest;
 import roomescape.controller.dto.response.ThemeResponse;
