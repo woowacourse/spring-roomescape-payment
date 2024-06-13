@@ -19,12 +19,16 @@ public class PaymentRestClient {
     private static final Encoder ENCODER = Base64.getEncoder();
     private static final String BASE64_DELIMITER = ":";
 
-    @Value("${secret.key.widget}")
-    private String widgetSecretKey;
+    private final String widgetSecretKey;
     private final RestClient restClient;
     private final PaymentErrorHandler paymentErrorHandler;
 
-    public PaymentRestClient(RestClient restClient, PaymentErrorHandler paymentErrorHandler) {
+    public PaymentRestClient(
+            @Value("${secret.key.widget}") String widgetSecretKey,
+            RestClient restClient,
+            PaymentErrorHandler paymentErrorHandler
+    ) {
+        this.widgetSecretKey = widgetSecretKey;
         this.restClient = restClient;
         this.paymentErrorHandler = paymentErrorHandler;
     }

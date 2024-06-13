@@ -17,8 +17,11 @@ public class TokenService {
 
     private static final String MEMBER_ID = "member_id";
 
-    @Value("${secret.key.jwt}")
-    private String secretKey;
+    private final String secretKey;
+
+    public TokenService(@Value("${secret.key.jwt}") String secretKey) {
+        this.secretKey = secretKey;
+    }
 
     public String createToken(long id, LocalDateTime createdAt, Duration tokenLifeTime) {
         LocalDateTime rawExpiredTime = createdAt.plus(tokenLifeTime);
