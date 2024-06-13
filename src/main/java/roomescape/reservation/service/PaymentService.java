@@ -57,7 +57,10 @@ public class PaymentService {
     }
 
     public void savePayment(PaymentResponse paymentResponse, Reservation reservation) {
-        paymentRepository.save(Payment.of(paymentResponse, reservation));
+        paymentRepository.save(Payment.of(paymentResponse.paymentKey(),
+                paymentResponse.orderId(),
+                paymentResponse.totalAmount(),
+                reservation));
     }
 
     private String parseErrorMessage(ClientHttpResponse response) throws IOException {
@@ -67,7 +70,7 @@ public class PaymentService {
         return jsonObject.get("message").toString().replace("\"", "");
     }
 
-    public Payment getPayment(Reservation reservation){
+    public Payment getPayment(Reservation reservation) {
         return paymentRepository.findByReservation(reservation);
     }
 }

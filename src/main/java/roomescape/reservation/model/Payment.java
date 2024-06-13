@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 
 import jakarta.persistence.*;
 
-import roomescape.reservation.dto.PaymentResponse;
-
 @Entity
 public class Payment {
     @Id
@@ -24,17 +22,35 @@ public class Payment {
     @OneToOne
     private Reservation reservation;
 
-    public static Payment of(PaymentResponse paymentResponse, Reservation reservation) {
-        return new Payment(paymentResponse, reservation);
+    public static Payment of(final String paymentKey,
+                             final String orderId,
+                             final BigDecimal amount,
+                             final Reservation reservation) {
+        checkRequiredData(paymentKey, orderId, amount, reservation);
+        return new Payment(paymentKey, orderId, amount, reservation);
+    }
+
+    private static void checkRequiredData(
+            final String paymentKey,
+            final String orderId,
+            final BigDecimal amount,
+            final Reservation reservation
+    ) {
+        if (paymentKey == null || orderId == null || amount == null || reservation == null) {
+            throw new IllegalArgumentException("시간, 테마, 회원 정보는 Null을 입력할 수 없습니다.");
+        }
     }
 
     protected Payment() {
     }
 
-    private Payment(PaymentResponse paymentResponse, Reservation reservation) {
-        this.paymentKey = paymentResponse.paymentKey();
-        this.orderId = paymentResponse.orderId();
-        this.amount = paymentResponse.totalAmount();
+    private Payment(String paymentKey,
+                    String orderId,
+                    BigDecimal amount,
+                    Reservation reservation) {
+        this.paymentKey = paymentKey;
+        this.orderId = orderId;
+        this.amount = amount;
         this.reservation = reservation;
     }
 
