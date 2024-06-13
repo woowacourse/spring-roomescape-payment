@@ -34,14 +34,14 @@ class AuthControllerTest extends IntegrationTest {
         Response response = RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .body(loginRequest)
-                .filter(document("/auth/login"))
+                .filter(document("auth/login"))
                 .when().post("/login")
                 .thenReturn();
 
         String cookie = String.valueOf(response.getDetailedCookie(CookieUtils.TOKEN_KEY));
         RestAssured.given(this.spec).log().all()
                 .cookie(cookie)
-                .filter(document("/auth/findMemberName"))
+                .filter(document("auth/findMemberName"))
                 .when().get("/login/member")
                 .then().log().all()
                 .statusCode(200);
@@ -56,7 +56,7 @@ class AuthControllerTest extends IntegrationTest {
         RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .body(loginRequest)
-                .filter(document("/auth/login/fail/invalid-email"))
+                .filter(document("auth/login/fail/invalid-email"))
                 .when().post("/login")
                 .then().log().all()
                 .statusCode(400);
@@ -71,7 +71,7 @@ class AuthControllerTest extends IntegrationTest {
         RestAssured.given(this.spec).log().all()
                 .contentType(ContentType.JSON)
                 .body(loginRequest)
-                .filter(document("/auth/login/fail/invalid-password"))
+                .filter(document("auth/login/fail/invalid-password"))
                 .when().post("/login")
                 .then().log().all()
                 .statusCode(400);
@@ -82,7 +82,7 @@ class AuthControllerTest extends IntegrationTest {
     void logout() {
         RestAssured.given(this.spec).log().all()
                 .cookie(CookieUtils.TOKEN_KEY, "cookieValue")
-                .filter(document("/auth/logout"))
+                .filter(document("auth/logout"))
                 .when()
                 .post("/logout")
                 .then().log().all()
