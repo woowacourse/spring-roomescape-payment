@@ -14,7 +14,7 @@ import roomescape.member.dto.MemberResponse;
 import roomescape.member.service.MemberService;
 
 @RestController
-public class MemberController {
+public class MemberController implements MemberControllerDocs {
 
     private final MemberService memberService;
 

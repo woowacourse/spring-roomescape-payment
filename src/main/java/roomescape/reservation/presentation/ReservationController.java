@@ -22,7 +22,7 @@ import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
 
 @RestController
-public class ReservationController {
+public class ReservationController implements ReservationControllerDocs {
 
     private final ReservationService reservationService;
 
