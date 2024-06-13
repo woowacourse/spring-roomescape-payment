@@ -50,6 +50,15 @@ public class WaitingReservationController {
 
     @PatchMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "예약 대기에서 예약 상태로 변경한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "No content"),
+            @ApiResponse(responseCode = "400", description = "예약 정보가 잘못된 경우 발생")
+    })
+    @Parameters({
+            @Parameter(name = "authInfo", description = "로그인한 유저의 정보", required = true),
+            @Parameter(name = "waitingReservationPaymentRequest", description = "예약 및 결제 정보 DTO, 예약 정보를 문자열로 받음", required = true)
+    })
     public ReservationResponse confirmReservation(@LoginUser AuthInfo authInfo,
                                                      @RequestBody @Valid WaitingReservationPaymentRequest waitingReservationPaymentRequest) {
         return waitingReservationService.confirmReservation(waitingReservationPaymentRequest, authInfo.getId());
