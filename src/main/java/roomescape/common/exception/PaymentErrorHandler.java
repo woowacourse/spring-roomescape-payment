@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
-import roomescape.payment.dto.resonse.PaymentErrorResponse;
+import roomescape.payment.service.dto.resonse.PaymentErrorResponse;
 
 public class PaymentErrorHandler implements ResponseErrorHandler {
 
@@ -23,8 +23,8 @@ public class PaymentErrorHandler implements ResponseErrorHandler {
     public void handleError(ClientHttpResponse response) throws IOException {
         PaymentErrorResponse errorResponse = objectMapper.readValue(response.getBody(), PaymentErrorResponse.class);
         log.error("토스 결제 중 에러 발생 : {}", errorResponse);
-        PaymentExceptionCode translatedExceptionCode = PaymentExceptionCode.from(errorResponse.code());
+        TossPaymentExceptionCode translatedExceptionCode = TossPaymentExceptionCode.from(errorResponse.code());
 
-        throw new PaymentException(translatedExceptionCode);
+        throw new TossPaymentException(translatedExceptionCode);
     }
 }

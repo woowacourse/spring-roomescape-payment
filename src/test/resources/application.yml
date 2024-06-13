@@ -2,11 +2,6 @@ server:
   port: 8081
 
 spring:
-  datasource:
-    url: jdbc:h2:mem:test
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
   sql:
     init:
       data-locations:
@@ -21,9 +16,9 @@ spring:
 
 security:
   jwt:
-    secret-key: eyJhbGciOiJIeyJzdWIilowafgfaoTazAGa
+    secret-key: TestSecretKeyTestSecretKeyTestSecretKeyTestSecretKeyTestSecretKey
     expiration-time: 36000000
 
 payment:
   base-url: https://api.tosspayments.com
-  secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  secret-key: testSecretKey

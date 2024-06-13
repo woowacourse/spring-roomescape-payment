@@ -3,7 +3,7 @@ package roomescape.reservation.controller.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import roomescape.member.dto.MemberResponse;
-import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.Waiting;
 
 public record WaitingResponse(
         long id,
@@ -13,13 +13,13 @@ public record WaitingResponse(
         TimeResponse time
 ) {
 
-    public static WaitingResponse toResponse(Reservation reservation) {
+    public static WaitingResponse toResponse(Waiting waiting) {
         return new WaitingResponse(
-                reservation.getId(),
-                MemberResponse.toResponse(reservation.getMember()),
-                reservation.getDate(),
-                ThemeResponse.toResponse(reservation.getTheme()),
-                TimeResponse.toResponse(reservation.getTime())
+                waiting.getId(),
+                MemberResponse.toResponse(waiting.getMember()),
+                waiting.getDate(),
+                ThemeResponse.toResponse(waiting.getTheme()),
+                TimeResponse.toResponse(waiting.getTime())
         );
     }
 }

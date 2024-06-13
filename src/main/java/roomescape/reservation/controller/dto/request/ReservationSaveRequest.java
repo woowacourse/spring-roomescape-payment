@@ -5,9 +5,8 @@ import java.time.LocalDate;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.Status;
 import roomescape.reservation.domain.Theme;
-import roomescape.reservation.service.dto.request.ReservationPaymentRequest;
+import roomescape.reservation.service.dto.request.ReservationPaymentSaveRequest;
 
 public record ReservationSaveRequest(
         @NotNull long memberId,
@@ -15,16 +14,8 @@ public record ReservationSaveRequest(
         @NotNull long themeId,
         @NotNull long timeId
 ) {
-    public static ReservationSaveRequest of(ReservationPaymentSaveRequest detail, long memberId) {
-        return new ReservationSaveRequest(
-                memberId,
-                detail.date(),
-                detail.themeId(),
-                detail.timeId()
-        );
-    }
 
-    public static ReservationSaveRequest from(ReservationPaymentRequest request) {
+    public static ReservationSaveRequest from(ReservationPaymentSaveRequest request) {
         return new ReservationSaveRequest(
                 request.memberId(),
                 request.date(),
@@ -34,6 +25,6 @@ public record ReservationSaveRequest(
     }
 
     public Reservation toReservation(Member member, Theme theme, ReservationTime reservationTime) {
-        return new Reservation(member, date, theme, reservationTime, Status.SUCCESS);
+        return new Reservation(member, date, theme, reservationTime);
     }
 }

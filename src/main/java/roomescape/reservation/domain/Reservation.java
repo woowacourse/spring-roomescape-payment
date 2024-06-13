@@ -2,19 +2,25 @@ package roomescape.reservation.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.member.domain.Member;
 
 @Entity
+@Table(uniqueConstraints = {
+        @UniqueConstraint(
+                name = "uniqueDateAndThemeAndTime",
+                columnNames = {"date", "theme_id", "time_id"}
+        )
+})
 public class Reservation {
 
     @Id
@@ -23,10 +29,6 @@ public class Reservation {
 
     @Column(nullable = false)
     private LocalDate date;
-
-    @Enumerated(value = EnumType.STRING)
-    @Column(nullable = false)
-    private Status status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
@@ -47,15 +49,13 @@ public class Reservation {
             Member member,
             LocalDate date,
             Theme theme,
-            ReservationTime reservationTime,
-            Status status
+            ReservationTime reservationTime
     ) {
         validateLastDate(date);
         this.member = member;
         this.date = date;
         this.theme = theme;
         this.reservationTime = reservationTime;
-        this.status = status;
     }
 
     public Reservation(
@@ -63,39 +63,19 @@ public class Reservation {
             Member member,
             LocalDate date,
             Theme theme,
-            ReservationTime reservationTime,
-            Status status
+            ReservationTime reservationTime
     ) {
         this.id = id;
         this.member = member;
         this.date = date;
         this.theme = theme;
         this.reservationTime = reservationTime;
-        this.status = status;
     }
 
     private void validateLastDate(LocalDate date) {
         if (date.isBefore(LocalDate.now())) {
             throw new IllegalArgumentException("지난 날짜는 예약할 수 없습니다.");
         }
-    }
-
-    public void updatePaymentPending() {
-        if (status.isSuccess()) {
-            throw new IllegalArgumentException("이미 확정된 예약입니다.");
-        }
-        if (status.isPaymentPending()) {
-            throw new IllegalArgumentException("이미 결제 대기된 예약입니다.");
-        }
-        status = Status.PAYMENT_PENDING;
-    }
-
-    public boolean isSuccessReservation() {
-        return status.isSuccess();
-    }
-
-    public boolean isWaitingReservation() {
-        return status.isWait();
     }
 
     public Long getId() {
@@ -124,13 +104,5 @@ public class Reservation {
 
     public LocalTime getStartAt() {
         return reservationTime.getStartAt();
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public String getStatusDisplayName() {
-        return status.getDisplayName();
     }
 }

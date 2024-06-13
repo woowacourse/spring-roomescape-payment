@@ -1,22 +1,38 @@
 package roomescape.common.config;
 
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
+
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.auth.domain.Role;
 import roomescape.auth.jwt.JwtTokenProvider;
+import roomescape.common.util.DatabaseCleaner;
+import roomescape.common.util.MemberJdbcUtil;
+import roomescape.common.util.PaymentJdbcUtil;
+import roomescape.common.util.ReservationJdbcUtil;
+import roomescape.common.util.ReservationTimeJdbcUtil;
+import roomescape.common.util.ThemeJdbcUtil;
+import roomescape.common.util.WaitingJdbcUtil;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberName;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@ExtendWith(RestDocumentationExtension.class)
 public class ControllerTest {
+
+    protected RequestSpecification spec;
 
     @LocalServerPort
     private int port;
@@ -28,11 +44,30 @@ public class ControllerTest {
     private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    protected MemberJdbcUtil memberJdbcUtil;
+
+    @Autowired
+    protected ReservationJdbcUtil reservationJdbcUtil;
+
+    @Autowired
+    protected WaitingJdbcUtil waitingJdbcUtil;
+
+    @Autowired
+    protected ReservationTimeJdbcUtil reservationTimeJdbcUtil;
+
+    @Autowired
+    protected ThemeJdbcUtil themeJdbcUtil;
+
+    @Autowired
+    protected PaymentJdbcUtil paymentJdbcUtil;
 
     @BeforeEach
-    void setPort() {
+    void setUp(RestDocumentationContextProvider restDocumentation) {
         RestAssured.port = port;
+
+        this.spec = new RequestSpecBuilder()
+                .addFilter(documentationConfiguration(restDocumentation))
+                .build();
     }
 
     @AfterEach
@@ -52,52 +87,5 @@ public class ControllerTest {
 
     protected String getToken(Member member) {
         return jwtTokenProvider.generateToken(member);
-    }
-
-    protected void saveMemberAsKaki() {
-        String sql = "insert into member (name, email, password, role) values ('카키', 'kaki@email.com', '1234', 'MEMBER')";
-
-        jdbcTemplate.update(sql);
-    }
-
-    protected void saveAdminMember() {
-        String sql = "insert into member (name, email, password, role) values ('어드민', 'admin@email.com', '1234', 'ADMIN')";
-
-        jdbcTemplate.update(sql);
-    }
-
-    protected void saveMember(Member member) {
-        String name = member.getName();
-        String email = member.getEmail();
-        String password = member.getPassword();
-        String role = member.getRole().name();
-
-        String sql = "insert into member (name, email, password, role) values (?, ?, ?, ?)";
-
-        jdbcTemplate.update(sql, name, email, password, role);
-    }
-
-    protected void saveThemeAsHorror() {
-        String sql = "insert into theme(name, description, thumbnail) values ('공포', '무서운 테마', 'https://a.com/a.jpg')";
-
-        jdbcTemplate.update(sql);
-    }
-
-    protected void saveReservationTimeAsTen() {
-        String sql = "insert into reservation_time (start_at) values ('10:00')";
-
-        jdbcTemplate.update(sql);
-    }
-
-    protected void saveSuccessReservationAsDateNow() {
-        String sql = "insert into reservation (member_id, date, theme_id, time_id, status) values (1, CURRENT_DATE, 1, 1, 'SUCCESS')";
-
-        jdbcTemplate.update(sql);
-    }
-
-    protected void saveWaitReservationAsDateNow() {
-        String sql = "insert into reservation (member_id, date, theme_id, time_id, status) values (1, CURRENT_DATE, 1, 1, 'WAIT')";
-
-        jdbcTemplate.update(sql);
     }
 }

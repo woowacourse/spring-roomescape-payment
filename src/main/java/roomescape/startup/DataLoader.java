@@ -1,7 +1,5 @@
 package roomescape.startup;
 
-import static roomescape.reservation.domain.Status.SUCCESS;
-import static roomescape.reservation.domain.Status.WAIT;
 import static roomescape.startup.DataFixture.ADMIN;
 import static roomescape.startup.DataFixture.MEMBER_BRE;
 import static roomescape.startup.DataFixture.MEMBER_BROWN;
@@ -47,12 +45,16 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
+import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.repository.ThemeRepository;
+import roomescape.reservation.repository.WaitingRepository;
 
 @Profile("!test")
 @Component
@@ -62,17 +64,23 @@ public class DataLoader implements ApplicationRunner {
     private final ThemeRepository themeRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ReservationRepository reservationRepository;
+    private final WaitingRepository waitingRepository;
+    private final PaymentRepository paymentRepository;
 
     public DataLoader(
             MemberRepository memberRepository,
             ThemeRepository themeRepository,
             ReservationTimeRepository reservationTimeRepository,
-            ReservationRepository reservationRepository
+            ReservationRepository reservationRepository,
+            WaitingRepository waitingRepository,
+            PaymentRepository paymentRepository
     ) {
         this.memberRepository = memberRepository;
         this.themeRepository = themeRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.reservationRepository = reservationRepository;
+        this.waitingRepository = waitingRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Override
@@ -119,24 +127,60 @@ public class DataLoader implements ApplicationRunner {
         ReservationTime time14_30 = reservationTimeRepository.save(TIME_14_30);
 
         // reservation
-        List<Reservation> reservations = List.of(
-                new Reservation(jojo, TODAY, horror, time10_00, SUCCESS),
-                new Reservation(solar, TODAY, horror, time10_00, WAIT),
-                new Reservation(brown, TODAY, sf, time12_00, SUCCESS),
-                new Reservation(jojo, TODAY, sf, time12_00, WAIT),
-                new Reservation(googoo, TOMORROW, zombie, time14_30, SUCCESS),
-                new Reservation(jojo, TOMORROW, zombie, time14_30, WAIT),
-                new Reservation(jojo, TODAY.plusDays(2), monkey, time11_00, SUCCESS),
-                new Reservation(jojo, TODAY.plusDays(5), nagayaSanda, time10_00, SUCCESS),
-                new Reservation(jojo, TODAY.plusDays(7), virus, time12_30, SUCCESS),
-                new Reservation(neo, TODAY.plusDays(3), virus, time11_30, SUCCESS),
-                new Reservation(bre, TODAY.plusDays(2), horrorThemePark, time14_30, SUCCESS),
-                new Reservation(pobi, TODAY.plusDays(2), horror, time14_30, SUCCESS),
-                new Reservation(tomi, TODAY.plusDays(3), titanic, time10_30, SUCCESS),
-                new Reservation(risa, TODAY.plusDays(4), artGallery, time14_00, SUCCESS),
-                new Reservation(solar, TODAY.plusDays(2), horror, time14_30, WAIT),
-                new Reservation(jojo, TODAY.plusDays(2), horror, time14_30, WAIT)
+        Reservation reservation_horror_jojo = reservationRepository.save(
+                new Reservation(jojo, TODAY, horror, time10_00));
+        Reservation reservation_sf_brown = reservationRepository.save(new Reservation(brown, TODAY, sf, time12_00));
+        Reservation reservation_zombie_googoo = reservationRepository.save(
+                new Reservation(googoo, TOMORROW, zombie, time14_30));
+        Reservation reservation_monkey_jojo = reservationRepository.save(
+                new Reservation(jojo, TODAY.plusDays(2), monkey, time11_00));
+        Reservation reservation_nagayaSanda_jojo = reservationRepository.save(
+                new Reservation(jojo, TODAY.plusDays(5), nagayaSanda, time10_00));
+        Reservation reservation_virus_jojo = reservationRepository.save(
+                new Reservation(jojo, TODAY.plusDays(7), virus, time12_30));
+        Reservation reservation_virus_neo = reservationRepository.save(
+                new Reservation(neo, TODAY.plusDays(3), virus, time11_30));
+        Reservation reservation_horrorThemePark_bre = reservationRepository.save(
+                new Reservation(bre, TODAY.plusDays(2), horrorThemePark, time14_30));
+        Reservation reservation_horror_pobi = reservationRepository.save(
+                new Reservation(pobi, TODAY.plusDays(2), horror, time14_30));
+        Reservation reservation_titanic_tomi = reservationRepository.save(
+                new Reservation(tomi, TODAY.plusDays(3), titanic, time10_30));
+        Reservation reservation_artGallery_risa = reservationRepository.save(
+                new Reservation(risa, TODAY.plusDays(4), artGallery, time14_00));
+
+        // waiting
+        Waiting waiting_horror_solar = waitingRepository.save(new Waiting(solar, TODAY, horror, time10_00));
+        Waiting waiting_sf_jojo = waitingRepository.save(new Waiting(jojo, TODAY, sf, time12_00));
+        Waiting waiting_zombie_pobi = waitingRepository.save(new Waiting(pobi, TOMORROW, zombie, time14_30));
+        Waiting waiting_zombie_jojo = waitingRepository.save(new Waiting(jojo, TOMORROW, zombie, time14_30));
+        Waiting waiting_horror_jojo = waitingRepository.save(new Waiting(jojo, TODAY.plusDays(2), horror, time14_30));
+
+        // payment
+        List<Payment> payments = List.of(
+                new Payment("5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1", "MC4wODU4ODQwMzg4NDk0", 10000L,
+                        reservation_horror_jojo),
+                new Payment("4EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1", "kC4wODU4ODQwMzg4NDk0", 11000L,
+                        reservation_sf_brown),
+                new Payment("3EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1", "1C4wODU4ODQwMzg4NDk0", 10500L,
+                        reservation_zombie_googoo),
+                new Payment("2EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1", "8C4wODU4ODQwMzg4NDk0", 10000L,
+                        reservation_monkey_jojo),
+                new Payment("1EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1", "dC4wODU4ODQwMzg4NDk0", 10000L,
+                        reservation_nagayaSanda_jojo),
+                new Payment("6EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1", "zC4wODU4ODQwMzg4NDk0", 12000L,
+                        reservation_virus_jojo),
+                new Payment("7EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1", "wC4wODU4ODQwMzg4NDk0", 12000L,
+                        reservation_virus_neo),
+                new Payment("8EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1", "oC4wODU4ODQwMzg4NDk0", 11000L,
+                        reservation_horrorThemePark_bre),
+                new Payment("9EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1", "aC4wODU4ODQwMzg4NDk0", 10000L,
+                        reservation_horror_pobi),
+                new Payment("0EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1", "2w4wODU4ODQwMzg4NDk0", 10500L,
+                        reservation_titanic_tomi),
+                new Payment("22nNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1", "Ad4wODU4ODQwMzg4NDk0", 10500L,
+                        reservation_artGallery_risa)
         );
-        reservationRepository.saveAll(reservations);
+        paymentRepository.saveAll(payments);
     }
 }

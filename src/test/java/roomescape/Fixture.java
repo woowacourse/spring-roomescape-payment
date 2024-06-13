@@ -2,12 +2,10 @@ package roomescape;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import roomescape.auth.domain.Role;
-import roomescape.auth.dto.LoginMember;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberName;
-import roomescape.payment.dto.resonse.PaymentConfirmResponse;
 import roomescape.reservation.domain.Description;
+import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.ThemeName;
@@ -39,19 +37,16 @@ public class Fixture {
 
     public static final Member MEMBER_KAKI = new Member(new MemberName(KAKI_NAME), KAKI_EMAIL, KAKI_PASSWORD);
     public static final Member MEMBER_JOJO = new Member(new MemberName(JOJO_NAME), JOJO_EMAIL, JOJO_PASSWORD);
-    public static final LoginMember LOGIN_JOJO = new LoginMember(1L, Role.MEMBER, JOJO_NAME, JOJO_EMAIL);
 
     public static final LocalDate TODAY = LocalDate.now();
     public static final LocalDate TOMORROW = TODAY.plusDays(1);
 
-    public static final PaymentConfirmResponse PAYMENT_CONFIRM_RESPONSE = new PaymentConfirmResponse(
-            "paymentKey",
-            "orderId",
-            1000,
-            "orderName",
-            "DONE",
-            "2024-02-13T12:17:57+09:00",
-            "2024-02-13T12:18:14+09:00"
+    public static final Reservation JOJO_RESERVATION = new Reservation(
+            1L,
+            MEMBER_JOJO,
+            TODAY,
+            HORROR_THEME,
+            RESERVATION_TIME_10_00
     );
 
     private Fixture() {

@@ -9,7 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.web.client.RestClient;
 import roomescape.common.exception.PaymentErrorHandler;
+import roomescape.payment.service.TossPaymentClient;
 
 @Configuration
 @EnableConfigurationProperties(PaymentProperties.class)
@@ -19,6 +21,11 @@ public class PaymentConfig {
 
     public PaymentConfig(PaymentProperties paymentProperties) {
         this.paymentProperties = paymentProperties;
+    }
+
+    @Bean
+    public TossPaymentClient tossPaymentClient(RestClient.Builder paymentRestClientBuilder) {
+        return new TossPaymentClient(paymentRestClientBuilder);
     }
 
     @Bean

@@ -8,8 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.ReservationWithRank;
-import roomescape.reservation.domain.Status;
+import roomescape.reservation.domain.ReservationWithPayment;
 import roomescape.reservation.domain.Theme;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
@@ -23,34 +22,19 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Long> findTimeIdsByDateAndThemeId(LocalDate date, Long themeId);
 
     @Query("""
-            select new roomescape.reservation.domain.ReservationWithRank(
-            r, (select count(*)
-                from Reservation r2
-                where r2.theme = r.theme
-                and r2.date = r.date
-                and r2.reservationTime = r.reservationTime
-                and r2.id < r.id))
+            select new roomescape.reservation.domain.ReservationWithPayment(r, p)
             from Reservation r
+            left join Payment p
+            on r.id = p.reservation.id
             where r.member.id = :memberId
             """)
-    List<ReservationWithRank> findReservationWithRanksByMemberId(Long memberId);
+    List<ReservationWithPayment> findReservationWithPaymentsByMemberId(Long memberId);
 
-    List<Reservation> findAllByMemberId(Long memberId);
-
-    List<Reservation> findAllByThemeIdAndMemberIdAndDateBetweenAndStatus(
+    List<Reservation> findAllByThemeIdAndMemberIdAndDateBetween(
             Long themeId,
             Long memberId,
             LocalDate dateFrom,
-            LocalDate dateTo,
-            Status status
-    );
-
-    List<Reservation> findAllByStatus(Status status);
-
-    List<Reservation> findAllByDateAndReservationTimeAndTheme(
-            LocalDate date,
-            ReservationTime time,
-            Theme theme
+            LocalDate dateTo
     );
 
     Optional<Reservation> findFirstByDateAndReservationTimeAndTheme(
@@ -64,12 +48,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             ReservationTime time,
             Theme theme,
             Member member
-    );
-
-    Optional<Reservation> findFirstByDateAndReservationTimeAndThemeAndStatus(
-            LocalDate date,
-            ReservationTime time,
-            Theme theme,
-            Status status
     );
 }

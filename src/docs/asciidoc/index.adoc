@@ -1,0 +1,19 @@
+= 방탈출 사용자 예약 기능
+:toc: left
+:toc-title: API 목록
+
+== 테마 목록 조회
+
+operation::theme/find-all[snippets="curl-request,http-request,request-cookies,http-response,response-fields"]
+
+== 예약 가능한 시간 목록 조회
+
+operation::reservation-time/find-available[snippets="curl-request,http-request,request-cookies,query-parameters,http-response,response-fields"]
+
+== 예약 생성
+
+operation::reservation/save[snippets="curl-request,http-request,request-cookies,request-fields,http-response,response-fields"]
+
+== 예약 대기 생성
+
+operation::waiting-reservation/save[snippets="curl-request,http-request,request-cookies,request-fields,http-response,response-fields"]
