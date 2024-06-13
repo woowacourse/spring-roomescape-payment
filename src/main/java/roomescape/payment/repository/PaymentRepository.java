@@ -15,7 +15,6 @@ public interface PaymentRepository extends Repository<Payment, Long> {
             """)
     Optional<Payment> findByReservationId(Long reservationId);
 
-    // TODO: 질문하기 -> TransactionRequiredException
     @Transactional
     void deleteByReservation_Id(Long reservationId);
 }
