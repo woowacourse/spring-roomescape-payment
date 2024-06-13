@@ -34,31 +34,31 @@ include::{snippets}/reservation/mine/http-response.adoc[]
 
 include::{snippets}/reservation/mine/response-fields.adoc[]
 
-=== 예약 생성
+==== 예약 생성
 
-==== curl
+===== curl
 
 include::{snippets}/reservation/create/curl-request.adoc[]
 
-==== request
+===== request
 
 include::{snippets}/reservation/create/http-request.adoc[]
 
 include::{snippets}/reservation/create/request-fields.adoc[]
 
-==== response
+===== response
 
 include::{snippets}/reservation/create/http-response.adoc[]
 
 include::{snippets}/reservation/create/response-fields.adoc[]
 
-=== 예약 취소
+==== 예약 취소
 
-==== curl
+===== curl
 
 include::{snippets}/reservation/cancel/curl-request.adoc[]
 
-==== request
+===== request
 
 include::{snippets}/reservation/cancel/http-request.adoc[]
 
@@ -66,7 +66,6 @@ include::{snippets}/reservation/cancel/query-parameters.adoc[]
 
 include::{snippets}/reservation/cancel/path-parameters.adoc[]
 
-==== response
+===== response
 
 include::{snippets}/reservation/cancel/http-response.adoc[]
-
