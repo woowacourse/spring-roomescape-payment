@@ -5,11 +5,11 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import java.util.Objects;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import org.springdoc.core.customizers.RouterOperationCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.bind.annotation.RequestMethod;
 
 @Configuration
 public class SwaggerConfig {
@@ -30,20 +30,12 @@ public class SwaggerConfig {
     }
 
     @Bean
-    public RouterOperationCustomizer reservationsRouterOperationCustomizer() {
+    public RouterOperationCustomizer routerOperationCustomizer() {
         return (routerOperation, handlerMethod) -> {
-            String path = routerOperation.getPath();
-            if (Objects.equals("/reservations", path) && RequestMethod.GET == routerOperation.getMethods()[0]) {
-                String[] params = routerOperation.getParams();
-                if (params.length != 0) {
-                    StringBuilder pathBuilder = new StringBuilder();
-                    pathBuilder.append(path + "?")
-                            .append(params[0] + "=1&")
-                            .append(params[1] + "=1&")
-                            .append(params[2] + "=2024-05-01&")
-                            .append(params[3] + "=2024-05-02");
-                    routerOperation.setPath(pathBuilder.toString());
-                }
+            if (routerOperation.getParams().length > 0) {
+                String params = Arrays.stream(routerOperation.getParams())
+                        .collect(Collectors.joining("&"));
+                routerOperation.setPath(routerOperation.getPath() + "?" + params);
             }
             return routerOperation;
         };
