@@ -31,7 +31,6 @@ import roomescape.dto.auth.TokenRequest;
 import roomescape.dto.auth.TokenResponse;
 import roomescape.dto.reservation.ReservationSaveRequest;
 import roomescape.dto.reservation.ReservationTimeSaveRequest;
-import roomescape.dto.reservation.ReservationWaitingSaveRequest;
 import roomescape.dto.theme.ThemeSaveRequest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -100,9 +99,10 @@ abstract class AcceptanceTest {
     }
 
     protected Long saveReservationWaiting(final Long timeId, final Long themeId) {
+        saveReservation(timeId, themeId, ADMIN_EMAIL);
         final String accessToken = getAccessToken(MEMBER_TENNY_EMAIL);
-        final ReservationWaitingSaveRequest request
-                = new ReservationWaitingSaveRequest(DATE_MAY_EIGHTH, timeId, themeId);
+        final ReservationSaveRequest request
+                = new ReservationSaveRequest(DATE_MAY_EIGHTH, timeId, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         final Integer id = RestAssured.given().log().all()
                 .cookie("token", accessToken)
@@ -128,8 +128,8 @@ abstract class AcceptanceTest {
                 .then().log().all()
                 .statusCode(201);
 
-        final ReservationWaitingSaveRequest waitingRequest
-                = new ReservationWaitingSaveRequest(DATE_MAY_EIGHTH, timeId, themeId);
+        final ReservationSaveRequest waitingRequest
+                = new ReservationSaveRequest(DATE_MAY_EIGHTH, timeId, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
         final Integer id = RestAssured.given().log().all()
                 .cookie("token", getAccessToken(MEMBER_TENNY_EMAIL))
                 .contentType(ContentType.JSON)

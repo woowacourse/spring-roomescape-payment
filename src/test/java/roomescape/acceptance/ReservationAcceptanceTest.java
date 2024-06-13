@@ -71,7 +71,7 @@ class ReservationAcceptanceTest extends AcceptanceTest {
         saveReservationTime();
         final Long themeId = saveTheme();
         final ReservationSaveRequest request
-                = new ReservationSaveRequest(DATE_MAY_EIGHTH, 0L, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
+                = new ReservationSaveRequest(DATE_MAY_EIGHTH, 10L, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         assertPostResponseWithToken(request, MEMBER_TENNY_EMAIL, "/reservations", 404);
     }
@@ -79,10 +79,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("존재하지 않는 테마로 예약 생성 시 404를 응답한다.")
     void respondBadRequestWhenNotExistingTheme() {
-        saveTheme();
-        final Long timeId = saveReservationTime();
         final ReservationSaveRequest request
-                = new ReservationSaveRequest(DATE_MAY_EIGHTH, timeId, 0L, PAYMENT_KEY, ORDER_ID, AMOUNT);
+                = new ReservationSaveRequest(DATE_MAY_EIGHTH, 1L, 100L, PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         assertPostResponseWithToken(request, MEMBER_TENNY_EMAIL, "/reservations", 404);
     }
@@ -128,20 +126,13 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("예약을 성공적으로 삭제하면 204를 응답한다.")
     void respondNoContentWhenDeleteReservation() {
-        final Long timeId = saveReservationTime();
-        final Long themeId = saveTheme();
-        final Long reservationId = saveReservation(timeId, themeId, MEMBER_TENNY_EMAIL);
-
-        assertDeleteResponse("/reservations/", reservationId, 204);
+        assertDeleteResponse("/reservations/", 1L, 204);
     }
 
     @Test
     @DisplayName("존재하지 않는 예약을 삭제하면 404를 응답한다.")
     void respondBadRequestWhenDeleteNotExistingReservation() {
-        final Long timeId = saveReservationTime();
-        final Long themeId = saveTheme();
-        saveReservation(timeId, themeId, MEMBER_TENNY_EMAIL);
-        final Long notExistingReservationTimeId = 0L;
+        final Long notExistingReservationTimeId = 10L;
 
         assertDeleteResponse("/reservations/", notExistingReservationTimeId, 404);
     }

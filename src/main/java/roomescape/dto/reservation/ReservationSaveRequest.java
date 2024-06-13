@@ -27,12 +27,10 @@ public record ReservationSaveRequest(
         Long themeId,
 
         @Schema(description = "결제 키", example = "payment_key_1234")
-        @Positive
         @NotNull
         String paymentKey,
 
         @Schema(description = "주문 ID", example = "order_id_1234")
-        @Positive
         @NotNull
         String orderId,
 
