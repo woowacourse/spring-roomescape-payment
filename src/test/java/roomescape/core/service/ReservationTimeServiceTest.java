@@ -13,6 +13,7 @@ import roomescape.core.domain.ReservationStatus;
 import roomescape.core.domain.Theme;
 import roomescape.core.dto.reservationtime.ReservationTimeRequest;
 import roomescape.core.dto.reservationtime.ReservationTimeResponse;
+import roomescape.core.exception.ExceptionMessage;
 import roomescape.core.repository.MemberRepository;
 import roomescape.core.repository.ReservationRepository;
 import roomescape.core.repository.ReservationTimeRepository;
@@ -71,7 +72,7 @@ class ReservationTimeServiceTest {
 
         assertThatThrownBy(() -> reservationTimeService.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(ReservationTimeService.DUPLICATED_TIME_EXCEPTION_MESSAGE);
+                .hasMessage(ExceptionMessage.DUPLICATED_TIME_EXCEPTION.getMessage());
     }
 
     @Test
@@ -108,7 +109,7 @@ class ReservationTimeServiceTest {
 
         assertThatThrownBy(() -> reservationTimeService.delete(1L))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(ReservationTimeService.RESERVATION_DELETE_EXCEPTION_MESSAGE);
+                .hasMessage(ExceptionMessage.BOOKED_TIME_DELETE_EXCEPTION.getMessage());
     }
 
     private Member getMember() {

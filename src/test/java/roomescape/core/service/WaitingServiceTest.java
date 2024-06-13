@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.core.dto.member.LoginMember;
 import roomescape.core.dto.waiting.WaitingRequest;
 import roomescape.core.dto.waiting.WaitingResponse;
+import roomescape.core.exception.ExceptionMessage;
 import roomescape.utils.DatabaseCleaner;
 import roomescape.utils.TestFixture;
 
@@ -56,7 +57,7 @@ class WaitingServiceTest {
 
         assertThatThrownBy(() -> waitingService.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(WaitingService.BOOKED_TIME_WAITING_EXCEPTION_MESSAGE);
+                .hasMessage(ExceptionMessage.BOOKED_TIME_WAITING_EXCEPTION.getMessage());
     }
 
     @Test
@@ -68,7 +69,7 @@ class WaitingServiceTest {
 
         assertThatThrownBy(() -> waitingService.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(WaitingService.WAITED_TIME_WAITING_EXCEPTION_MESSAGE);
+                .hasMessage(ExceptionMessage.WAITED_TIME_WAITING_EXCEPTION.getMessage());
     }
 
     @Test
@@ -103,7 +104,7 @@ class WaitingServiceTest {
 
         assertThatThrownBy(() -> waitingService.delete(waitingId, loginMember))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(WaitingService.WAITING_IS_NOT_YOURS_EXCEPTION_MESSAGE);
+                .hasMessage(ExceptionMessage.WAITING_IS_NOT_YOURS_EXCEPTION.getMessage());
     }
 
     @Test
@@ -116,6 +117,6 @@ class WaitingServiceTest {
 
         assertThatThrownBy(() -> waitingService.deleteByAdmin(waitingId, loginMember))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(WaitingService.ALLOWED_TO_ADMIN_ONLY_EXCEPTION_MESSAGE);
+                .hasMessage(ExceptionMessage.ALLOWED_TO_ADMIN_ONLY_EXCEPTION.getMessage());
     }
 }

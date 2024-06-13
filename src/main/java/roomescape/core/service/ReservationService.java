@@ -4,7 +4,7 @@ import static roomescape.core.exception.ExceptionMessage.ALREADY_BOOKED_TIME_EXC
 import static roomescape.core.exception.ExceptionMessage.MEMBER_NOT_FOUND_EXCEPTION;
 import static roomescape.core.exception.ExceptionMessage.RESERVATION_NOT_FOUND_EXCEPTION;
 import static roomescape.core.exception.ExceptionMessage.THEME_NOT_FOUND_EXCEPTION;
-import static roomescape.core.exception.ExceptionMessage.TOKEN_NOT_FOUND_EXCEPTION;
+import static roomescape.core.exception.ExceptionMessage.TIME_NOT_FOUND_EXCEPTION;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -83,7 +83,7 @@ public class ReservationService {
 
     private ReservationTime getReservationTimeById(final Long id) {
         return reservationTimeRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(TOKEN_NOT_FOUND_EXCEPTION.getMessage()));
+                .orElseThrow(() -> new IllegalArgumentException(TIME_NOT_FOUND_EXCEPTION.getMessage()));
     }
 
     private Theme getThemeById(final Long id) {

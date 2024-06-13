@@ -16,9 +16,9 @@ import roomescape.core.domain.ReservationTime;
 import roomescape.core.domain.Theme;
 import roomescape.core.dto.theme.ThemeRequest;
 import roomescape.core.dto.theme.ThemeResponse;
+import roomescape.core.exception.ExceptionMessage;
 import roomescape.core.repository.MemberRepository;
 import roomescape.core.repository.ReservationRepository;
-import roomescape.core.repository.ReservationTimeRepository;
 import roomescape.core.repository.ThemeRepository;
 import roomescape.utils.DatabaseCleaner;
 import roomescape.utils.TestFixture;
@@ -27,9 +27,6 @@ import roomescape.utils.TestFixture;
 class ThemeServiceTest {
     @Autowired
     private ThemeService themeService;
-
-    @Autowired
-    private ReservationTimeRepository reservationTimeRepository;
 
     @Autowired
     private ReservationRepository reservationRepository;
@@ -75,7 +72,7 @@ class ThemeServiceTest {
 
         assertThatThrownBy(() -> themeService.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(ThemeService.THEME_NAME_DUPLICATED_EXCEPTION_MESSAGE);
+                .hasMessage(ExceptionMessage.THEME_NAME_DUPLICATED_EXCEPTION.getMessage());
     }
 
     @Test
@@ -139,6 +136,6 @@ class ThemeServiceTest {
 
         assertThatThrownBy(() -> themeService.delete(themeId))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(ThemeService.BOOKED_THEME_DELETE_EXCEPTION_MESSAGE);
+                .hasMessage(ExceptionMessage.BOOKED_THEME_DELETE_EXCEPTION.getMessage());
     }
 }

@@ -15,6 +15,7 @@ import roomescape.core.domain.Waiting;
 import roomescape.core.dto.member.LoginMember;
 import roomescape.core.dto.reservation.ReservationRequest;
 import roomescape.core.dto.reservation.ReservationResponse;
+import roomescape.core.exception.ExceptionMessage;
 import roomescape.core.repository.MemberRepository;
 import roomescape.core.repository.ReservationTimeRepository;
 import roomescape.core.repository.ThemeRepository;
@@ -73,7 +74,7 @@ class ReservationServiceTest {
 
         assertThatThrownBy(() -> reservationService.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(ReservationService.MEMBER_NOT_EXISTS_EXCEPTION_MESSAGE);
+                .hasMessage(ExceptionMessage.MEMBER_NOT_FOUND_EXCEPTION.getMessage());
     }
 
     @Test
@@ -83,7 +84,7 @@ class ReservationServiceTest {
 
         assertThatThrownBy(() -> reservationService.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(ReservationService.TIME_NOT_EXISTS_EXCEPTION_MESSAGE);
+                .hasMessage(ExceptionMessage.TIME_NOT_FOUND_EXCEPTION.getMessage());
     }
 
     @Test
@@ -93,7 +94,7 @@ class ReservationServiceTest {
 
         assertThatThrownBy(() -> reservationService.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(ReservationService.THEME_NOT_EXISTS_EXCEPTION_MESSAGE);
+                .hasMessage(ExceptionMessage.THEME_NOT_FOUND_EXCEPTION.getMessage());
     }
 
     @Test
@@ -104,7 +105,7 @@ class ReservationServiceTest {
 
         assertThatThrownBy(() -> reservationService.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(ReservationService.ALREADY_BOOKED_TIME_EXCEPTION_MESSAGE);
+                .hasMessage(ExceptionMessage.ALREADY_BOOKED_TIME_EXCEPTION.getMessage());
     }
 
     @Test
@@ -155,7 +156,7 @@ class ReservationServiceTest {
 
         assertThatThrownBy(() -> reservationService.delete(0L, loginMember))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(ReservationService.RESERVATION_NOT_EXISTS_EXCEPTION_MESSAGE);
+                .hasMessage(ExceptionMessage.RESERVATION_NOT_FOUND_EXCEPTION.getMessage());
     }
 
     @Test
