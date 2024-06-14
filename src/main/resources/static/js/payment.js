@@ -29,7 +29,6 @@ function onReservationButtonClick(event, paymentWidget) {
         orderName: "테스트 방탈출 예약 결제 1건",
         amount: 1000,
     }).then(function (data) {
-        console.log(data);  //////
         let reservationId = new URLSearchParams(window.location.search).get('reservationId');
         data.reservationId = reservationId;
         console.debug(data);

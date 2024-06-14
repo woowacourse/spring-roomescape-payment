@@ -1,0 +1,47 @@
+== Time API
+
+=== 시간 등록
+
+==== Request
+
+include::{snippets}/reservation-time-rest-docs-test/save/http-request.adoc[]
+include::{snippets}/reservation-time-rest-docs-test/save/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-time-rest-docs-test/save/http-response.adoc[]
+include::{snippets}/reservation-time-rest-docs-test/save/response-fields.adoc[]
+
+=== 전체 시간 조회
+
+==== Request
+
+include::{snippets}/reservation-time-rest-docs-test/find-all/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-time-rest-docs-test/find-all/http-response.adoc[]
+include::{snippets}/reservation-time-rest-docs-test/find-all/response-fields.adoc[]
+
+=== 예약 가능 시간 조회 (날짜 및 테마 id 기준)
+
+==== Request
+
+include::{snippets}/reservation-time-rest-docs-test/find-by-theme-and-date/http-request.adoc[]
+include::{snippets}/reservation-time-rest-docs-test/find-by-theme-and-date/query-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-time-rest-docs-test/find-by-theme-and-date/http-response.adoc[]
+include::{snippets}/reservation-time-rest-docs-test/find-by-theme-and-date/response-fields.adoc[]
+
+=== 시간 삭제
+
+==== Request
+
+include::{snippets}/reservation-time-rest-docs-test/delete/http-request.adoc[]
+include::{snippets}/reservation-time-rest-docs-test/delete/path-parameters.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-time-rest-docs-test/delete/http-response.adoc[]

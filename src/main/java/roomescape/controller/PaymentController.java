@@ -22,7 +22,7 @@ public class PaymentController {
     
     @PostMapping
     public ResponseEntity<PaymentResponse> savePayment(@RequestBody PaymentRequest paymentRequest) {
-        PaymentResponse response = paymentService.savePaymentAndUpdateReservationStatus(paymentRequest);
+        PaymentResponse response = paymentService.savePayment(paymentRequest);
 
         return ResponseEntity.created(URI.create("/payments/" + response.id()))
                 .body(response);

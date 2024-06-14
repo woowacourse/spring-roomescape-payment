@@ -31,6 +31,13 @@ public class ThemeController {
         return themeService.findAll();
     }
 
+    @PostMapping
+    public ResponseEntity<ThemeResponse> save(@RequestBody ThemeRequest themeRequest) {
+        ThemeResponse saved = themeService.save(themeRequest);
+        return ResponseEntity.created(URI.create("/themes/" + saved.id()))
+                .body(saved);
+    }
+
     @GetMapping("/ranking")
     public List<ThemeResponse> findAndOrderByPopularity(
             @RequestParam LocalDate start,
@@ -38,13 +45,6 @@ public class ThemeController {
             @RequestParam int count
     ) {
         return themeService.findAndOrderByPopularity(start, end, count);
-    }
-
-    @PostMapping
-    public ResponseEntity<ThemeResponse> save(@RequestBody ThemeRequest themeRequest) {
-        ThemeResponse saved = themeService.save(themeRequest);
-        return ResponseEntity.created(URI.create("/themes/" + saved.id()))
-                .body(saved);
     }
 
     @DeleteMapping("/{id}")

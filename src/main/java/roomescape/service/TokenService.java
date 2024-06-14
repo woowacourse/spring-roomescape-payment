@@ -9,13 +9,19 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TokenService {
 
     private static final String MEMBER_ID = "member_id";
-    private static final String secretKey = "Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E=";
+
+    private final String secretKey;
+
+    public TokenService(@Value("${secret.key.jwt}") String secretKey) {
+        this.secretKey = secretKey;
+    }
 
     public String createToken(long id, LocalDateTime createdAt, Duration tokenLifeTime) {
         LocalDateTime rawExpiredTime = createdAt.plus(tokenLifeTime);

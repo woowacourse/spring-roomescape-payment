@@ -7,7 +7,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.exception.ExceptionType;
@@ -33,9 +32,6 @@ public class Reservation {
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
-
-    @OneToOne
-    private Payment payment;
 
     protected Reservation() {
     }
@@ -89,9 +85,8 @@ public class Reservation {
         return new ReservationBuilder();
     }
 
-    public void updateAsPaid(Payment payment) {
+    public void updateAsPaid() {
         this.status = ReservationStatus.RESERVED_PAID;
-        this.payment = payment;
     }
 
     public boolean isNotAuthor(Member member) {
@@ -136,9 +131,5 @@ public class Reservation {
 
     public ReservationStatus getStatus() {
         return status;
-    }
-
-    public Payment getPayment() {
-        return payment;
     }
 }

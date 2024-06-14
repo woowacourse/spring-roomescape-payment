@@ -1,0 +1,34 @@
+== Member API
+
+=== 로그인
+
+==== Request
+
+include::{snippets}/member-rest-docs-test/login/http-request.adoc[]
+include::{snippets}/member-rest-docs-test/login/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/member-rest-docs-test/login/http-response.adoc[]
+
+=== 로그인한 회원 정보 조회
+
+==== Request
+
+include::{snippets}/member-rest-docs-test/my-info/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/member-rest-docs-test/my-info/http-response.adoc[]
+include::{snippets}/member-rest-docs-test/my-info/response-fields.adoc[]
+
+=== 전체 회원 조회
+
+==== Request
+
+include::{snippets}/member-rest-docs-test/all-members/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/member-rest-docs-test/all-members/http-response.adoc[]
+include::{snippets}/member-rest-docs-test/all-members/response-fields.adoc[]

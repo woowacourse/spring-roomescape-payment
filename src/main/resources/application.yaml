@@ -12,3 +12,8 @@ spring:
     hibernate:
       ddl-auto: create-drop
     defer-datasource-initialization: true
+
+secret:
+  key:
+    jwt: "Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E="
+    widget: "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"

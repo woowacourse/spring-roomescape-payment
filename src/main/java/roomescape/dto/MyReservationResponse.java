@@ -1,23 +1,28 @@
 package roomescape.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import roomescape.dto.service.ReservationWithRank;
+import roomescape.dto.service.ReservationPaymentWithRankResponse;
 
 public record MyReservationResponse(
         long id,
         String theme,
         LocalDate date,
         LocalTime time,
-        String status
+        String status,
+        String paymentKey,
+        BigDecimal amount
 ) {
-    public static MyReservationResponse from(ReservationWithRank reservation) {
+    public static MyReservationResponse from(ReservationPaymentWithRankResponse response) {
         return new MyReservationResponse(
-                reservation.getId(),
-                reservation.getTheme().getName(),
-                reservation.getDate(),
-                reservation.getTime(),
-                reservation.getStatusMessage()
+                response.getId(),
+                response.getTheme().getName(),
+                response.getDate(),
+                response.getTime(),
+                response.getStatusMessage(),
+                response.getPaymentKey(),
+                response.getAmount()
         );
     }
 }

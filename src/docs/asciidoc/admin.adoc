@@ -1,0 +1,35 @@
+== Admin API
+
+=== 관리자 예약 등록
+
+==== Request
+
+include::{snippets}/admin-rest-docs-test/save-reservation/http-request.adoc[]
+include::{snippets}/admin-rest-docs-test/save-reservation/request-fields.adoc[]
+
+==== Response
+
+include::{snippets}/admin-rest-docs-test/save-reservation/http-response.adoc[]
+include::{snippets}/admin-rest-docs-test/save-reservation/response-fields.adoc[]
+
+=== 예약 검색
+
+==== Request
+
+include::{snippets}/admin-rest-docs-test/search/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/admin-rest-docs-test/search/http-response.adoc[]
+include::{snippets}/admin-rest-docs-test/search/response-fields.adoc[]
+
+=== 대기 예약 검색
+
+==== Request
+
+include::{snippets}/admin-rest-docs-test/find-all-pending-reservations/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/admin-rest-docs-test/find-all-pending-reservations/http-response.adoc[]
+include::{snippets}/admin-rest-docs-test/find-all-pending-reservations/response-fields.adoc[]

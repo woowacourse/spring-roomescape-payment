@@ -19,6 +19,7 @@ public enum ExceptionType {
     EMPTY_PAYMENT_KEY(BAD_REQUEST, "paymentKey는 필수값 입니다."),
     EMPTY_ORDER_ID(BAD_REQUEST, "orderId는 필수값 입니다."),
     EMPTY_AMOUNT(BAD_REQUEST, "amount는 필수값 입니다."),
+    EMPTY_RESERVATION(BAD_REQUEST, "reservation은 필수값 입니다."),
     INVALID_AMOUNT(BAD_REQUEST, "amount는 0이상의 정수여야 합니다."),
     NOT_URL_BASE_THUMBNAIL(BAD_REQUEST, "테마 썸네일이 url 형태가 아닙니다."),
     PAID_RESERVATION_DELETION(BAD_REQUEST, "이미 결제된 예약은 취소할 수 없습니다."),
