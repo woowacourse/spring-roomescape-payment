@@ -3,14 +3,13 @@ package roomescape.client.payment;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +27,7 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     private Reservation reservation;
 
     @Column(nullable = false)
@@ -63,7 +62,8 @@ public class Payment {
     public Payment() {
     }
 
-    public Payment(long id, Reservation reservation, String paymentKey, String type, String orderId, String orderName, String status,
+    public Payment(long id, Reservation reservation, String paymentKey, String type, String orderId, String orderName,
+                   String status,
                    String requestedAt, String approvedAt, BigDecimal totalAmount, String method, String cancels) {
         this.id = id;
         this.reservation = reservation;
