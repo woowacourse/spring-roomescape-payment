@@ -5,8 +5,8 @@ import java.util.Base64;
 
 public class BasicAuthEncoder {
 
-    public static String encode(String s) {
-        byte[] encoded = Base64.getEncoder().encode((s + ":").getBytes(StandardCharsets.UTF_8));
+    public static String encode(String id, String password) {
+        byte[] encoded = Base64.getEncoder().encode((id + ":" + password).getBytes(StandardCharsets.UTF_8));
         return "Basic " + new String(encoded);
     }
 }

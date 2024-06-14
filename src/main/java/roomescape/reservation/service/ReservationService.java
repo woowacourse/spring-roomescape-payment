@@ -35,7 +35,7 @@ public class ReservationService {
             final ThemeRepository themeRepository,
             final MemberRepository memberRepository,
             final WaitingRepository waitingRepository,
-            PaymentService paymentService) {
+            final PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
@@ -58,8 +58,6 @@ public class ReservationService {
     }
 
     public Reservation saveReservation(final SaveReservationRequest request) {
-        paymentService.requestTossPayment(request.toPaymentRequest());
-
         final ReservationTime reservationTime = reservationTimeRepository.findById(request.timeId())
                 .orElseThrow(() -> new NoSuchElementException("해당 id의 예약 시간이 존재하지 않습니다."));
         final Theme theme = themeRepository.findById(request.themeId())
@@ -71,6 +69,8 @@ public class ReservationService {
         validateReservationDateAndTime(reservation.getDate(), reservationTime);
         validateReservationDuplication(reservation);
 
+        Payment payment = paymentService.requestTossPayment(request.toPaymentRequest());
+        reservation.updatePayment(payment);
         return reservationRepository.save(reservation);
     }
 
@@ -100,20 +100,19 @@ public class ReservationService {
         //기존 예약의 멤버를 대기 1번 멤버로 바꿔줘야함.
         Reservation reservation = reservationRepository.findById(reservationId).get();
         Member firstCandidate = waitingRepository.findFirstMemberByReservationIdOrderByIdAsc(reservationId);
-        reservation.setMember(firstCandidate);
+        reservation.updateMember(firstCandidate);
         waitingRepository.deleteByMemberAndReservation(firstCandidate, reservation);
     }
 
     public List<MyReservationResponse> getMyReservations(final Long memberId) {
         List<WaitingWithRank> waitingsWithRank = waitingRepository.findWaitingsWithRank(memberId);
         List<MyReservationResponse> myWaitings = waitingsWithRank.stream()
-                .map(MyReservationResponse::from)
+                .map(MyReservationResponse::new)
                 .toList();
 
-        List<MyReservationResponse> myReservedReservations = reservationRepository.findAllByMemberId(memberId).stream()
-                .map(MyReservationResponse::from)
-                .toList();
-        List<MyReservationResponse> myReservations = new ArrayList<>(myReservedReservations);
+        List<MyReservationResponse> myReservationResponses = reservationRepository.findAllByMemberIdWithPayment(memberId);
+        List<MyReservationResponse> myReservations = new ArrayList<>(myReservationResponses);
+
         myReservations.addAll(myWaitings);
         return myReservations;
     }

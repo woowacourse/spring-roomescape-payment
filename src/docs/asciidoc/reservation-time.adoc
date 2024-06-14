@@ -1,0 +1,13 @@
+= 예약 시간 API 문서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+
+== 예약 시간 조회
+=== Request
+include::{snippets}/reservation-time-controller-test/get-reservation-times-test/http-request.adoc[]
+=== Response
+include::{snippets}/reservation-time-controller-test/get-reservation-times-test/http-response.adoc[]
+

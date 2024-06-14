@@ -1,0 +1,24 @@
+= 예약 API 문서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+
+== 예약 조회
+=== Request
+include::{snippets}/reservation-controller-test/get-reservations-test/http-request.adoc[]
+=== Response
+include::{snippets}/reservation-controller-test/get-reservations-test/http-response.adoc[]
+
+== 예약 생성
+=== Request
+include::{snippets}/reservation-controller-test/save-reservation-test/http-request.adoc[]
+include::{snippets}/reservation-controller-test/save-reservation-test/request-fields.adoc[]
+=== Response
+include::{snippets}/reservation-controller-test/save-reservation-test/http-response.adoc[]
+=== Response(wrong time)
+include::{snippets}/reservation-controller-test/save-reservation-with-no-exist-reservation-time/http-response.adoc[]
+=== Response(before now)
+include::{snippets}/reservation-controller-test/save-reservation-with-reservation-date-and-time-before-now/http-response.adoc[]
+
