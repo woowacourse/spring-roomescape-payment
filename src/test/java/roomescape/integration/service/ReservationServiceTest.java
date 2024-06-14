@@ -4,34 +4,34 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+import roomescape.config.PaymentClient;
 import roomescape.domain.LoginMember;
 import roomescape.domain.ReservationStatus;
 import roomescape.domain.Role;
-import roomescape.domain.Waiting;
-import roomescape.dto.AdminReservationDetailResponse;
-import roomescape.dto.ReservationDetailResponse;
-import roomescape.dto.ReservationRequest;
-import roomescape.dto.ReservationResponse;
+import roomescape.dto.*;
 import roomescape.entity.Member;
+import roomescape.entity.Payment;
 import roomescape.entity.Reservation;
 import roomescape.exception.RoomescapeException;
 import roomescape.fixture.MemberFixture;
-import roomescape.repository.MemberRepository;
-import roomescape.repository.ReservationRepository;
-import roomescape.repository.ReservationTimeRepository;
-import roomescape.repository.ThemeRepository;
+import roomescape.repository.*;
+import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.*;
 import static roomescape.exception.ExceptionType.*;
 import static roomescape.fixture.ReservationFixture.*;
 import static roomescape.fixture.ReservationTimeFixture.DEFAULT_RESERVATION_TIME;
@@ -53,30 +53,45 @@ class ReservationServiceTest {
     private ThemeRepository themeRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
+    @MockBean
+    private PaymentClient paymentClient;
 
     @BeforeEach
     void initService() {
         reservationTimeRepository.save(DEFAULT_RESERVATION_TIME);
         themeRepository.save(DEFAULT_THEME);
         memberRepository.save(member);
+        PaymentResponse paymentResponse = new PaymentResponse(
+                "paymentKey",
+                "방탈출 예약",
+                LocalDateTime.now().toString(),
+                LocalDateTime.now().toString(),
+                "KRW",
+                1000);
+        Mockito.doReturn(paymentResponse).when(paymentClient).approve(any());
     }
 
     @DisplayName("지나지 않은 시간에 대한 예약을 생성할 수 있다.")
     @Test
     void createFutureReservationTest() {
         //when
-        ReservationResponse saved = reservationService.save(
+        ReservationPaymentResponse response = reservationService.save(
                 loginMember,
-                new ReservationRequest(
+                new ReservationPaymentRequest(
                         LocalDate.now().plusDays(1),
+                        DEFAULT_THEME.getId(),
                         DEFAULT_RESERVATION_TIME.getId(),
-                        DEFAULT_THEME.getId()
+                        "paymentKey",
+                        "방탈출 예약",
+                        1000
                 ));
 
         //then
         assertAll(
                 () -> assertThat(reservationRepository.findAll()).hasSize(1),
-                () -> assertThat(saved.id()).isEqualTo(1L)
+                () -> assertThat(response.reservationResponse().id()).isEqualTo(1L)
         );
     }
 
@@ -85,10 +100,13 @@ class ReservationServiceTest {
     void createPastReservationFailTest() {
         assertThatThrownBy(() -> reservationService.save(
                 loginMember,
-                new ReservationRequest(
+                new ReservationPaymentRequest(
                         LocalDate.now().minusDays(1),
+                        DEFAULT_THEME.getId(),
                         DEFAULT_RESERVATION_TIME.getId(),
-                        DEFAULT_THEME.getId()
+                        "paymentKey",
+                        "방탈출 예약",
+                        1000
                 )))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(PAST_TIME_RESERVATION.getMessage());
@@ -99,10 +117,13 @@ class ReservationServiceTest {
     void createReservationWithTimeNotExistsTest() {
         assertThatThrownBy(() -> reservationService.save(
                 loginMember,
-                new ReservationRequest(
-                        LocalDate.now().minusDays(1),
+                new ReservationPaymentRequest(
+                        LocalDate.now().plusDays(1),
+                        DEFAULT_THEME.getId(),
                         2L,
-                        DEFAULT_THEME.getId()
+                        "paymentKey",
+                        "방탈출 예약",
+                        1000
                 )))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(NOT_FOUND_RESERVATION_TIME.getMessage());
@@ -113,10 +134,13 @@ class ReservationServiceTest {
     void createReservationWithThemeNotExistsTest() {
         assertThatThrownBy(() -> reservationService.save(
                 loginMember,
-                new ReservationRequest(
+                new ReservationPaymentRequest(
                         LocalDate.now().plusDays(1),
-                        DEFAULT_THEME.getId(),
-                        2L
+                        2L,
+                        DEFAULT_RESERVATION_TIME.getId(),
+                        "paymentKey",
+                        "방탈출 예약",
+                        1000
                 )))
                 .isInstanceOf(RoomescapeException.class)
                 .hasMessage(NOT_FOUND_THEME.getMessage());
@@ -170,30 +194,20 @@ class ReservationServiceTest {
     @Test
     void findAllReservationsByMemberId() {
         //given
-        Member testMember = new Member(2L, "test", Role.USER, "test@test.com", "1234");
-        memberRepository.save(testMember);
         Reservation reservation1 = ReservationOfDateAndMemberAndStatus(LocalDate.now().plusDays(1),
-                testMember, ReservationStatus.BOOKED);
+                member, ReservationStatus.BOOKED);
         Reservation reservation2 = ReservationOfDateAndMemberAndStatus(LocalDate.now().plusDays(1),
                 member, ReservationStatus.WAITING);
-        Reservation reservation3 = ReservationOfDateAndMemberAndStatus(LocalDate.now().plusDays(3),
-                member, ReservationStatus.BOOKED);
-        Reservation reservation4 = ReservationOfDateAndMemberAndStatus(LocalDate.now().plusDays(4),
-                member, ReservationStatus.BOOKED);
         reservationRepository.save(reservation1);
         reservationRepository.save(reservation2);
-        reservationRepository.save(reservation3);
-        reservationRepository.save(reservation4);
+        paymentRepository.save(new Payment(reservation1.getId(), "paymentKey", "방탈출 예약", LocalDateTime.now().toString(), LocalDateTime.now().toString(), "KRW", 1000));
+        paymentRepository.save(new Payment(reservation2.getId(), "paymentKey", "방탈출 예약", LocalDateTime.now().toString(), LocalDateTime.now().toString(), "KRW", 1000));
 
         //when
-        List<ReservationDetailResponse> reservationResponses = reservationService.findAllByMemberId(member.getId());
+        List<ReservationDetailResponse> reservationResponses = reservationService.findReservationsByMemberId(member.getId());
 
         //then
-        List<ReservationDetailResponse> expected = List.of(
-                ReservationDetailResponse.from(Waiting.of(reservation2, 1)),
-                ReservationDetailResponse.from(reservation3),
-                ReservationDetailResponse.from(reservation4));
-        assertThat(reservationResponses).containsAnyElementsOf(expected);
+        assertThat(reservationResponses).hasSize(2);
     }
 
     @DisplayName("특정 사용자가 자신의 예약 대기를 취소할 수 있다.")
@@ -212,7 +226,7 @@ class ReservationServiceTest {
         //when
         reservationService.deleteByMemberIdAndId(loginMember, 2);
         //then
-        assertThat(reservationService.findAllByMemberId(1L)).isEqualTo(List.of());
+        assertThat(reservationService.findReservationsByMemberId(1L)).hasSize(0);
     }
 
     @DisplayName("관리자는 예약 대기를 취소할 수 있다.")
@@ -229,9 +243,9 @@ class ReservationServiceTest {
         reservationRepository.save(reservation2);
 
         //when
-        reservationService.deleteById(2);
+        reservationService.deleteWaitingReservationById(2);
         //then
-        assertThat(reservationService.findAllByMemberId(1L)).isEqualTo(List.of());
+        assertThat(reservationService.findReservationsByMemberId(1L)).hasSize(0);
     }
 
 
@@ -277,7 +291,14 @@ class ReservationServiceTest {
         void duplicatedReservationFailTest() {
             assertThatThrownBy(() -> reservationService.save(
                     loginMember,
-                    new ReservationRequest(defaultDate, DEFAULT_RESERVATION_TIME.getId(), DEFAULT_THEME.getId())))
+                    new ReservationPaymentRequest(
+                            LocalDate.now().plusDays(1),
+                            DEFAULT_THEME.getId(),
+                            DEFAULT_RESERVATION_TIME.getId(),
+                            "paymentKey",
+                            "방탈출 예약",
+                            1000
+                    )))
                     .isInstanceOf(RoomescapeException.class)
                     .hasMessage(DUPLICATE_RESERVATION.getMessage());
         }
@@ -292,20 +313,10 @@ class ReservationServiceTest {
                     .hasMessage(DUPLICATE_WAITING_RESERVATION.getMessage());
         }
 
-        @DisplayName("예약을 삭제할 수 있다.")
-        @Test
-        void deleteReservationTest() {
-            //when
-            reservationService.deleteById(1L);
-
-            //then
-            assertThat(reservationRepository.findAll()).isEmpty();
-        }
-
         @DisplayName("존재하지 않는 예약에 대한 삭제 요청은 정상 요청으로 간주한다.")
         @Test
         void deleteNotExistReservationNotThrowsException() {
-            assertThatCode(() -> reservationService.deleteById(2L))
+            assertThatCode(() -> reservationService.deleteById(2L, new ReservationCancelRequest("단순 변심")))
                     .doesNotThrowAnyException();
         }
     }

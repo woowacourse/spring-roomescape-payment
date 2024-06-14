@@ -1,36 +1,24 @@
 package roomescape.service;
 
-import static roomescape.exception.ExceptionType.DUPLICATE_RESERVATION;
-import static roomescape.exception.ExceptionType.DUPLICATE_WAITING_RESERVATION;
-import static roomescape.exception.ExceptionType.NOT_FOUND_MEMBER_BY_ID;
-import static roomescape.exception.ExceptionType.NOT_FOUND_RESERVATION_TIME;
-import static roomescape.exception.ExceptionType.NOT_FOUND_THEME;
-import static roomescape.exception.ExceptionType.PAST_TIME_RESERVATION;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import roomescape.domain.LoginMember;
 import roomescape.domain.ReservationStatus;
 import roomescape.domain.Waiting;
-import roomescape.dto.AdminReservationDetailResponse;
-import roomescape.dto.AdminReservationRequest;
-import roomescape.dto.ReservationDetailResponse;
-import roomescape.dto.ReservationRequest;
-import roomescape.dto.ReservationResponse;
-import roomescape.entity.Member;
-import roomescape.entity.Reservation;
-import roomescape.entity.ReservationTime;
-import roomescape.entity.Theme;
+import roomescape.dto.*;
+import roomescape.entity.*;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static roomescape.exception.ExceptionType.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -39,22 +27,29 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentService paymentService;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
-                              MemberRepository memberRepository) {
+                              MemberRepository memberRepository,
+                              PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentService = paymentService;
     }
 
-    public ReservationResponse save(LoginMember loginMember, ReservationRequest request) {
-        validateDuplicatedReservation(request);
+    @Transactional
+    public ReservationPaymentResponse save(LoginMember loginMember, ReservationPaymentRequest request) {
+        ReservationRequest reservationRequest = ReservationRequest.from(request);
+        validateDuplicatedReservation(reservationRequest);
+        Reservation reservation = reservationRepository.save(getReservation(loginMember.getId(), reservationRequest, ReservationStatus.BOOKED));
 
-        Reservation reservation = getReservation(loginMember.getId(), request, ReservationStatus.BOOKED);
-        return ReservationResponse.from(reservationRepository.save(reservation));
+        PaymentRequest paymentRequest = PaymentRequest.from(request);
+        Payment payment = paymentService.pay(paymentRequest, reservation.getId());
+        return ReservationPaymentResponse.of(reservation, payment);
     }
 
     public ReservationResponse saveByAdmin(AdminReservationRequest adminReservationRequest) {
@@ -102,7 +97,7 @@ public class ReservationService {
     }
 
     public List<ReservationResponse> findAllReservations() {
-        List<Reservation> reservations = reservationRepository.findAllByStatus(ReservationStatus.BOOKED);
+        List<Reservation> reservations = reservationRepository.findAllByStatusNot(ReservationStatus.WAITING);
         return toReservationResponses(reservations);
     }
 
@@ -118,7 +113,13 @@ public class ReservationService {
     }
 
     @Transactional
-    public void deleteById(long reservationId) {
+    public void deleteById(long reservationId, ReservationCancelRequest request) {
+        paymentService.refundByReservationId(reservationId, request);
+        reservationRepository.deleteById(reservationId);
+    }
+
+    @Transactional
+    public void deleteWaitingReservationById(long reservationId) {
         reservationRepository.deleteById(reservationId);
     }
 
@@ -128,12 +129,21 @@ public class ReservationService {
     }
 
     @Transactional
-    public List<ReservationDetailResponse> findAllByMemberId(long memberId) {
+    public List<ReservationDetailResponse> findReservationsByMemberId(long memberId) {
         List<Reservation> waitingReservations = reservationRepository.findAllByMemberIdAndStatus(memberId, ReservationStatus.WAITING);
         List<Waiting> waitings = getWaitings(waitingReservations);
 
-        List<Reservation> bookedReservations = reservationRepository.findAllByMemberIdAndStatus(memberId, ReservationStatus.BOOKED);
-        return ReservationDetailResponse.of(bookedReservations, waitings);
+        List<Reservation> reservations = reservationRepository.findAllByMemberIdAndStatusNot(memberId, ReservationStatus.WAITING);
+        return toReservationDetailResponses(reservations, waitings);
+    }
+
+    private List<ReservationDetailResponse> toReservationDetailResponses(List<Reservation> bookedReservations, List<Waiting> waitings) {
+        return Stream.concat(bookedReservations.stream()
+                .map(reservation -> {
+                    Payment payment = paymentService.findByReservationId(reservation.getId());
+                    return ReservationDetailResponse.of(reservation, payment);
+                }), waitings.stream().map(ReservationDetailResponse::from)
+        ).toList();
     }
 
     @Transactional
