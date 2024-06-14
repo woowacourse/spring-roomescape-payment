@@ -1,6 +1,7 @@
 package roomescape.controller.reservation;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -58,7 +59,7 @@ public class ReservationController {
     @RoleAllowed
     @GetMapping("/reservations-mine")
     @Operation(summary = "[회원] 내 예약 정보 조회", description = "내 예약 정보를 조회한다.")
-    public ResponseEntity<ReservationMineListResponse> findMyReservation(@LoginMember Member member) {
+    public ResponseEntity<ReservationMineListResponse> findMyReservation(@Parameter(hidden = true) @LoginMember Member member) {
         ReservationMineListResponse response = reservationService.findMyReservation(member);
         return ResponseEntity.ok().body(response);
     }
@@ -67,7 +68,7 @@ public class ReservationController {
     @PostMapping("/reservations")
     @Operation(summary = "[회원] 예약 추가", description = "결제 및 예약을 수행한다.")
     public ResponseEntity<ReservationResponse> saveReservation(@RequestBody @Valid ReservationRequest request,
-                                                               @LoginMember Member member) {
+                                                               @Parameter(hidden = true) @LoginMember Member member) {
         ReservationSaveInput reservationSaveInput = request.toReservationSaveInput();
         PaymentConfirmInput paymentConfirmInput = request.toPaymentConfirmInput();
 
@@ -81,7 +82,7 @@ public class ReservationController {
     @Operation(summary = "[회원] 예약 결제", description = "결제 대기 상태의 예약을 결제한다.")
     public ResponseEntity<ReservationResponse> payReservation(@PathVariable Long reservationId,
                                                               @RequestBody @Valid ReservationPaymentRequest request,
-                                                              @LoginMember Member member) {
+                                                              @Parameter(hidden = true) @LoginMember Member member) {
         PaymentConfirmInput paymentConfirmInput = request.toPaymentConfirmInput();
 
         ReservationResponse response = reservationService.payReservation(
@@ -105,7 +106,7 @@ public class ReservationController {
     @Operation(summary = "[회원] 예약 취소", description = "예약을 취소하고 결제 금액을 환불한다.")
     public ResponseEntity<Void> cancelReservation(
             @PathVariable @NotNull(message = "reservationId 값이 null일 수 없습니다.") Long reservationId,
-            @LoginMember Member member) {
+            @Parameter(hidden = true) @LoginMember Member member) {
         reservationService.cancelReservation(reservationId, member);
         return ResponseEntity.noContent().build();
     }
@@ -115,7 +116,7 @@ public class ReservationController {
     @Operation(summary = "[회원] 예약 삭제", description = "취소 또는 결제 대기 상태의 예약 정보를 삭제한다.")
     public ResponseEntity<Void> deleteReservation(
             @PathVariable @NotNull(message = "reservationId 값이 null일 수 없습니다.") Long reservationId,
-            @LoginMember Member member) {
+            @Parameter(hidden = true) @LoginMember Member member) {
         reservationService.deleteReservation(reservationId, member);
         return ResponseEntity.noContent().build();
     }
