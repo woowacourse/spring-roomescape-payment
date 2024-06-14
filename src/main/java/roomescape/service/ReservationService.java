@@ -24,15 +24,14 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentService paymentService;
 
-    public ReservationService(ReservationRepository reservationRepository,
-                              ReservationTimeRepository reservationTimeRepository,
-                              ThemeRepository themeRepository,
-                              MemberRepository memberRepository) {
+    public ReservationService(final ReservationRepository reservationRepository, final ReservationTimeRepository reservationTimeRepository, final ThemeRepository themeRepository, final MemberRepository memberRepository, final PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentService = paymentService;
     }
 
     public List<Reservation> findAllReservations() {
@@ -52,7 +51,9 @@ public class ReservationService {
         Theme theme = getTheme(request.themeId());
         validateDuplicatedReservation(request.date(), reservationTime, theme);
         Reservation reservation = new Reservation(request.date(), reservationTime, theme, member);
-        return reservationRepository.save(reservation);
+        Reservation createdReservation = reservationRepository.save(reservation);
+        paymentService.confirmReservationPayments(request, createdReservation);
+        return createdReservation;
     }
 
     public Reservation addReservation(AdminReservationRequest request) {
@@ -61,7 +62,9 @@ public class ReservationService {
         Member member = getMember(request.memberId());
         validateDuplicatedReservation(request.date(), reservationTime, theme);
         Reservation reservation = new Reservation(request.date(), reservationTime, theme, member);
-        return reservationRepository.save(reservation);
+        Reservation createdReservation = reservationRepository.save(reservation);
+        paymentService.addAdminPayment(createdReservation);
+        return createdReservation;
     }
 
     private Member getMember(Long memberId) {

@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.model.Reservation;
 import roomescape.request.AdminReservationRequest;
 import roomescape.response.ReservationResponse;
-import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 
 import java.net.URI;
@@ -20,11 +19,9 @@ import java.util.List;
 public class AdminReservationController {
 
     private final ReservationService reservationService;
-    private final PaymentService paymentService;
 
-    public AdminReservationController(final ReservationService reservationService, final PaymentService paymentService) {
+    public AdminReservationController(final ReservationService reservationService) {
         this.reservationService = reservationService;
-        this.paymentService = paymentService;
     }
 
     @GetMapping("/admin/reservations")
@@ -42,7 +39,6 @@ public class AdminReservationController {
     @PostMapping("/admin/reservations")
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody AdminReservationRequest request) {
         Reservation reservation = reservationService.addReservation(request);
-        paymentService.addAdminPayment(reservation);
         ReservationResponse response = new ReservationResponse(reservation);
         return ResponseEntity.created(URI.create("/reservations/" + reservation.getId())).body(response);
     }

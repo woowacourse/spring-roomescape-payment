@@ -14,7 +14,6 @@ import roomescape.model.Reservation;
 import roomescape.request.ReservationRequest;
 import roomescape.response.MemberReservationResponse;
 import roomescape.response.ReservationResponse;
-import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 import roomescape.service.ReservationWaitingService;
 
@@ -26,14 +25,11 @@ public class ReservationController {
 
     private final ReservationService reservationService;
     private final ReservationWaitingService reservationWaitingService;
-    private final PaymentService paymentService;
 
     public ReservationController(ReservationService reservationService,
-                                 ReservationWaitingService reservationWaitingService,
-                                 PaymentService paymentService) {
+                                 ReservationWaitingService reservationWaitingService) {
         this.reservationService = reservationService;
         this.reservationWaitingService = reservationWaitingService;
-        this.paymentService = paymentService;
     }
 
     @GetMapping("/reservations")
@@ -56,7 +52,6 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody ReservationRequest request,
                                                                  @AuthenticationPrincipal Member member) {
         Reservation reservation = reservationService.addReservation(request, member);
-        paymentService.confirmReservationPayments(request, reservation);
         ReservationResponse reservationResponse = new ReservationResponse(reservation);
         return ResponseEntity.created(URI.create("/reservations/" + reservation.getId())).body(reservationResponse);
     }

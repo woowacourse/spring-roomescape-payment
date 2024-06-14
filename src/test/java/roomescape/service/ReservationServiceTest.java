@@ -2,7 +2,9 @@ package roomescape.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.BaseTest;
 import roomescape.exception.BadRequestException;
@@ -23,13 +25,20 @@ import java.util.List;
 
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 
 @Sql(scripts = {"/initialize_table.sql", "/test_data.sql"})
 class ReservationServiceTest extends BaseTest {
 
     private ReservationRepository reservationRepository;
     private MemberRepository memberRepository;
+
+    @InjectMocks
     private ReservationService reservationService;
+
+    @MockBean
+    private PaymentService paymentService;
 
     @Autowired
     public ReservationServiceTest(ReservationRepository reservationRepository, MemberRepository memberRepository,
@@ -59,6 +68,7 @@ class ReservationServiceTest extends BaseTest {
     @DisplayName("사용자가 예약 시간을 추가한다")
     @Test
     void should_add_reservation_times_when_give_member_request() {
+        doNothing().when(paymentService).confirmReservationPayments(any(ReservationRequest.class), any(Reservation.class));
         Member member = memberRepository.findById(2L).get();
         ReservationRequest request = ReservationRequestBuilder.builder().build();
 
