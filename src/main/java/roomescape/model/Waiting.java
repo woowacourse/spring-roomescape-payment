@@ -35,7 +35,7 @@ public class Waiting {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
     @ColumnDefault("false")
-    private Boolean deleted;
+    private Boolean deleted = false;
 
     protected Waiting() {
     }
@@ -47,7 +47,6 @@ public class Waiting {
         this.time = time;
         this.theme = theme;
         this.member = member;
-        this.deleted = false;
     }
 
     public Waiting(LocalDate date, ReservationTime time, Theme theme, Member member) {

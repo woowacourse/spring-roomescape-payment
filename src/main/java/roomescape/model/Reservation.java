@@ -34,7 +34,7 @@ public class Reservation {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
     @ColumnDefault("false")
-    private Boolean deleted;
+    private Boolean deleted = false;
 
     protected Reservation() {
     }
@@ -46,7 +46,6 @@ public class Reservation {
         this.time = time;
         this.theme = theme;
         this.member = member;
-        this.deleted = false;
     }
 
     public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member) {
