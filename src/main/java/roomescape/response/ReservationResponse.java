@@ -12,9 +12,6 @@ public class ReservationResponse {
     private ReservationTimeResponse time;
     private ReservationThemeResponse theme;
 
-    private ReservationResponse() {
-    }
-
     public ReservationResponse(Reservation reservation) {
         this.id = reservation.getId();
         this.name = reservation.getMember().getName();

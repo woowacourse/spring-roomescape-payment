@@ -11,9 +11,6 @@ public class MemberResponse {
     private String email;
     private String password;
 
-    private MemberResponse() {
-    }
-
     public MemberResponse(Member member) {
         this.id = member.getId();
         this.name = member.getName();

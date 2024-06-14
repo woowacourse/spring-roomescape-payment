@@ -9,9 +9,6 @@ public class ReservationThemeResponse {
     private String description;
     private String thumbnail;
 
-    private ReservationThemeResponse() {
-    }
-
     public ReservationThemeResponse(Long id, String name, String description, String thumbnail) {
         this.id = id;
         this.name = name;

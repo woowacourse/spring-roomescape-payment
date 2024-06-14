@@ -12,9 +12,6 @@ public class WaitingResponse {
     private ReservationTimeResponse time;
     private ReservationThemeResponse theme;
 
-    private WaitingResponse() {
-    }
-
     public WaitingResponse(Waiting waiting) {
         this.id = waiting.getId();
         this.name = waiting.getMember().getName();
