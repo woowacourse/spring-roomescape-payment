@@ -1,13 +1,16 @@
 package roomescape.service;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
+import roomescape.domain.payment.PaymentResponse;
 import roomescape.domain.reservation.*;
 import roomescape.domain.reservation.dto.ReservationReadOnly;
 import roomescape.domain.reservation.slot.ReservationSlot;
 import roomescape.exception.AuthorizationException;
+import roomescape.exception.PaymentException;
 import roomescape.exception.RoomEscapeBusinessException;
 import roomescape.infrastructure.PaymentClient;
 import roomescape.service.dto.*;
@@ -16,7 +19,6 @@ import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @Service
@@ -43,42 +45,10 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse saveReservation(ReservationRequest reservationRequest) {
-        Runnable paymentStrategy = () -> {};
-        return saveReservation(reservationRequest, paymentStrategy);
-    }
-
-    @Transactional
-    public ReservationResponse saveReservation(ReservationPaymentRequest reservationPaymentRequest) {
-        ReservationRequest reservationRequest = reservationPaymentRequest.toReservationRequest();
-        PaymentConfirmRequest paymentConfirmRequest = reservationPaymentRequest.toPaymentRequest();
-
-        Runnable paymentStrategy = () -> paymentClient.confirmPayment(paymentConfirmRequest);
-        return saveReservation(reservationRequest, paymentStrategy);
-    }
-
-    private ReservationResponse saveReservation(ReservationRequest reservationRequest, Runnable paymentStrategy) {
+    public ReservationResponse saveReservation(ReservationRequest reservationRequest) { // TODO: 중복 다시 제거
         Member member = findMemberById(reservationRequest.memberId());
         ReservationSlot slot = reservationSlotService.findSlot(reservationRequest.toSlotRequest());
-        return trySave(member, slot, () -> {
-            paymentStrategy.run();
-            Reservation savedReservation = reservationRepository.save(new Reservation(member, slot));
-            return ReservationResponse.createByReservation(savedReservation);
-        });
-    }
 
-    @Transactional
-    public ReservationResponse saveWaiting(WaitingSaveRequest waitingSaveRequest) {
-        Member member = findMemberById(waitingSaveRequest.memberId());
-        ReservationSlot slot = reservationSlotService.findSlot(waitingSaveRequest.toSlotRequest());
-        return trySave(member, slot, () -> {
-            throw new RoomEscapeBusinessException("해당 대기에 대한 예약이 존재하지 않습니다.");
-        });
-    }
-
-    private ReservationResponse trySave(Member member,
-                                        ReservationSlot slot,
-                                        Supplier<ReservationResponse> progressWhenReservationNotExist) {
         Optional<Reservation> optionalReservation = reservationRepository.findBySlot(slot);
         if (optionalReservation.isPresent()) {
             Reservation reservation = optionalReservation.get();
@@ -86,7 +56,47 @@ public class ReservationService {
             waitingRepository.save(waiting);
             return ReservationResponse.createByWaiting(waiting);
         }
-        return progressWhenReservationNotExist.get();
+        Reservation savedReservation = reservationRepository.save(new Reservation(member, slot));
+        return ReservationResponse.createByReservation(savedReservation);
+    }
+
+    @Transactional
+    public ReservationResponse saveReservation(ReservationPaymentRequest reservationPaymentRequest) {
+        ReservationRequest reservationRequest = reservationPaymentRequest.toReservationRequest();
+        PaymentConfirmRequest paymentConfirmRequest = reservationPaymentRequest.toPaymentRequest();
+
+        Member member = findMemberById(reservationRequest.memberId());
+        ReservationSlot slot = reservationSlotService.findSlot(reservationRequest.toSlotRequest());
+
+        Optional<Reservation> optionalReservation = reservationRepository.findBySlot(slot);
+        if (optionalReservation.isPresent()) {
+            Reservation reservation = optionalReservation.get();
+            Waiting waiting = reservation.addWaiting(member);
+            waitingRepository.save(waiting);
+            return ReservationResponse.createByWaiting(waiting);
+        }
+        PaymentResponse paymentResponse = paymentClient.confirmPayment(paymentConfirmRequest);
+        if (paymentResponse.isNotDone()) {
+            throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제를 실패하였습니다. 다시 시도해주세요.");
+        }
+        PaymentInfo paymentInfo = paymentResponse.toPaymentInfo();
+        Reservation savedReservation = reservationRepository.save(new Reservation(member, slot, paymentInfo));
+        return ReservationResponse.createByReservation(savedReservation);
+    }
+
+    @Transactional
+    public ReservationResponse saveWaiting(WaitingSaveRequest waitingSaveRequest) {
+        Member member = findMemberById(waitingSaveRequest.memberId());
+        ReservationSlot slot = reservationSlotService.findSlot(waitingSaveRequest.toSlotRequest());
+
+        Optional<Reservation> optionalReservation = reservationRepository.findBySlot(slot);
+        if (optionalReservation.isPresent()) {
+            Reservation reservation = optionalReservation.get();
+            Waiting waiting = reservation.addWaiting(member);
+            waitingRepository.save(waiting);
+            return ReservationResponse.createByWaiting(waiting);
+        }
+        throw new RoomEscapeBusinessException("해당 대기에 대한 예약이 존재하지 않습니다.");
     }
 
     @Transactional(readOnly = true)

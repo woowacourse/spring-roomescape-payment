@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.IntegrationTestSupport;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
+import roomescape.domain.reservation.PaymentInfo;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.slot.*;
@@ -94,7 +95,8 @@ class ThemeServiceTest extends IntegrationTestSupport {
         Theme theme = themeRepository.save(new Theme("이름", "설명", "썸네일"));
         Member member = memberRepository.save(Member.createUser("생강", "email@email.com", "1234"));
         ReservationSlot slot = new ReservationSlot(LocalDate.parse("2025-05-13"), time, theme);
-        reservationRepository.save(new Reservation(member, slot));
+        PaymentInfo paymentInfo = new PaymentInfo("paymentKey", "orderId", 1000);
+        reservationRepository.save(new Reservation(member, slot, paymentInfo));
 
         // when & then
         assertThatThrownBy(() -> themeService.deleteTheme(theme.getId()))
@@ -105,7 +107,7 @@ class ThemeServiceTest extends IntegrationTestSupport {
     @Test
     void getPopularTheme() {
         // given
-        PopularThemeRequest popularThemeRequest = new PopularThemeRequest(LocalDate.parse("2024-05-04"), LocalDate.parse("2024-05-10"), 2);
+        PopularThemeRequest popularThemeRequest = new PopularThemeRequest(LocalDate.parse("2024-06-04"), LocalDate.parse("2024-06-10"), 2);
 
         // when
         List<ThemeResponse> popularThemes = themeService.getPopularThemes(popularThemeRequest);

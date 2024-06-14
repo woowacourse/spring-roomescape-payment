@@ -27,8 +27,9 @@ class ReservationTest {
         ReservationTime time = new ReservationTime(LocalTime.parse("10:00"));
         Theme theme = new Theme("테마이름", "테마 상세", "테마 섬네일");
         ReservationSlot reservationSlot = new ReservationSlot(date, time, theme);
+        PaymentInfo paymentInfo = new PaymentInfo("paymentKey", "orderId", 1000);
 
-        Reservation reservation = new Reservation(1L, member, reservationSlot);
+        Reservation reservation = new Reservation(1L, member, reservationSlot, paymentInfo);
 
         // when // then
         assertThatThrownBy(() -> reservation.addWaiting(member))
@@ -47,8 +48,9 @@ class ReservationTest {
         ReservationTime time = new ReservationTime(LocalTime.parse("10:00"));
         Theme theme = new Theme("테마이름", "테마 상세", "테마 섬네일");
         ReservationSlot reservationSlot = new ReservationSlot(date, time, theme);
+        PaymentInfo paymentInfo = new PaymentInfo("paymentKey", "orderId", 1000);
 
-        Reservation reservation = new Reservation(1L, member, reservationSlot);
+        Reservation reservation = new Reservation(1L, member, reservationSlot, paymentInfo);
         reservation.addWaiting(member1);
 
         // when // then
@@ -69,8 +71,9 @@ class ReservationTest {
         ReservationTime time = new ReservationTime(LocalTime.parse("10:00"));
         Theme theme = new Theme("테마이름", "테마 상세", "테마 섬네일");
         ReservationSlot reservationSlot = new ReservationSlot(date, time, theme);
+        PaymentInfo paymentInfo = new PaymentInfo("paymentKey", "orderId", 1000);
 
-        Reservation reservation = new Reservation(1L, member, reservationSlot);
+        Reservation reservation = new Reservation(1L, member, reservationSlot, paymentInfo);
 
         // when
         Waiting waiting1 = reservation.addWaiting(member1);
@@ -94,8 +97,9 @@ class ReservationTest {
         ReservationTime time = new ReservationTime(LocalTime.parse("10:00"));
         Theme theme = new Theme("테마이름", "테마 상세", "테마 섬네일");
         ReservationSlot reservationSlot = new ReservationSlot(date, time, theme);
+        PaymentInfo paymentInfo = new PaymentInfo("paymentKey", "orderId", 1000);
 
-        Reservation reservation = new Reservation(1L, member, reservationSlot);
+        Reservation reservation = new Reservation(1L, member, reservationSlot, paymentInfo);
 
         // when // then
         assertThatThrownBy(reservation::approveWaiting)
@@ -115,8 +119,9 @@ class ReservationTest {
         ReservationTime time = new ReservationTime(LocalTime.parse("10:00"));
         Theme theme = new Theme("테마이름", "테마 상세", "테마 섬네일");
         ReservationSlot reservationSlot = new ReservationSlot(date, time, theme);
+        PaymentInfo paymentInfo = new PaymentInfo("paymentKey", "orderId", 1000);
 
-        Reservation reservation = new Reservation(1L, member, reservationSlot);
+        Reservation reservation = new Reservation(1L, member, reservationSlot, paymentInfo);
         reservation.addWaiting(member1);
         reservation.addWaiting(member2);
 

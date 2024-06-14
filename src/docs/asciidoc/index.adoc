@@ -1,0 +1,82 @@
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+
+== 1️⃣ 회원
+:domain: member
+:class-name: member-controller-test
+
+=== 조회
+operation::{class-name}/show-{domain}[snippets='request-cookies,response-fields,http-request,http-response']
+
+=== 저장
+operation::{class-name}/save-{domain}[snippets='request-fields,http-request,http-response']
+
+=== 삭제
+operation::{class-name}/delete-{domain}[snippets='request-cookies,http-request,http-response']
+
+== 2️⃣ 인증
+:domain: auth
+:class-name: login-controller-test
+
+=== 로그인
+operation::{class-name}/login[snippets='request-fields,http-request,http-response']
+
+=== 로그아웃
+operation::{class-name}/logout[snippets='request-cookies,http-request,http-response']
+
+=== 로그인 여부 확인
+operation::{class-name}/login-check[snippets='request-cookies,response-fields,http-request,http-response']
+
+== 3️⃣ 예약 시간
+:domain: reservation-time
+:class-name: reservation-time-controller-test
+
+=== 조회
+operation::{class-name}/show-{domain}[snippets='request-cookies,response-fields,http-request,http-response']
+
+=== 저장
+operation::{class-name}/save-{domain}[snippets='request-cookies,request-fields,response-fields,http-request,http-response']
+
+=== 삭제
+operation::{class-name}/delete-{domain}[snippets='request-cookies,http-request,http-response']
+
+== 4️⃣ 테마
+:domain: theme
+:class-name: theme-controller-test
+
+=== 조회
+operation::{class-name}/show-{domain}[snippets='request-cookies,response-fields,http-request,http-response']
+
+=== 저장
+operation::{class-name}/save-{domain}[snippets='request-cookies,request-fields,response-fields,http-request,http-response']
+
+=== 삭제
+operation::{class-name}/delete-{domain}[snippets='request-cookies,http-request,http-response']
+
+=== 인기 조회
+operation::{class-name}/show-popular-theme[snippets='response-fields,http-request,http-response']
+
+== 5️⃣ 예약
+:domain: reservation
+:class-name: reservation-controller-test
+
+=== 조회
+operation::{class-name}/show-{domain}[snippets='request-cookies,response-fields,http-request,http-response']
+
+=== 저장
+operation::{class-name}/save-{domain}[snippets='request-cookies,request-fields,response-fields,http-request,http-response']
+
+=== 삭제
+operation::{class-name}/delete-{domain}[snippets='request-cookies,http-request,http-response']
+
+=== 검색 (필터링)
+operation::admin-reservation-controller-test/find-reservation-by-filter[snippets='request-cookies,response-fields,http-request,http-response']
+
+== 6️⃣ 대기
+:domain: waiting
+:class-name: reservation-controller-test
+
+=== 조회
+operation::admin-reservation-controller-test/find-all-waiting[snippets='request-cookies,response-fields,http-request,http-response']

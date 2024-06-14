@@ -30,16 +30,24 @@ public class Reservation {
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Waiting> waitings = new ArrayList<>();
 
+    @Embedded
+    private PaymentInfo paymentInfo;
+
     private boolean isDeleted = false;
 
-    public Reservation(Member member, ReservationSlot slot) {
-        this(null, member, slot);
+    public Reservation(Member member, ReservationSlot slot, PaymentInfo paymentInfo) {
+        this(null, member, slot, paymentInfo);
     }
 
-    public Reservation(Long id, Member member, ReservationSlot slot) {
+    public Reservation(Member member, ReservationSlot slot) {
+        this(null, member, slot, null);
+    }
+
+    public Reservation(Long id, Member member, ReservationSlot slot, PaymentInfo paymentInfo) {
         this.id = id;
         this.member = member;
         this.slot = slot;
+        this.paymentInfo = paymentInfo;
     }
 
     protected Reservation() {
@@ -86,6 +94,10 @@ public class Reservation {
 
     public ReservationSlot getSlot() {
         return slot;
+    }
+
+    public PaymentInfo getPaymentInfo() {
+        return paymentInfo;
     }
 
     @Override

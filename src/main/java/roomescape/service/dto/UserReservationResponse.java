@@ -19,7 +19,9 @@ public record UserReservationResponse(
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm", timezone = "Asia/Seoul")
         LocalTime time,
         String status,
-        Long rank
+        Long rank,
+        String paymentKey,
+        Integer amount
 ) {
     public static Stream<UserReservationResponse> reservationsToResponseStream(List<Reservation> reservation) {
         return reservation.stream()
@@ -34,7 +36,9 @@ public record UserReservationResponse(
                 slot.getDate(),
                 slot.getTime().getStartAt(),
                 ReservationStatus.BOOKED.getValue(),
-                0L
+                0L,
+                reservation.getPaymentInfo().getPaymentKey(),
+                reservation.getPaymentInfo().getAmount()
         );
     }
 
@@ -52,7 +56,9 @@ public record UserReservationResponse(
                 slot.getDate(),
                 slot.getTime().getStartAt(),
                 ReservationStatus.WAIT.getValue(),
-                waitingRank.rank()
+                waitingRank.rank(),
+                null,
+                null
         );
     }
 
