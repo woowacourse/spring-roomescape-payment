@@ -16,6 +16,7 @@ public class ReservationMineResponse {
     private static final String PAYMENT_WAITING_MESSAGE = "결제 대기";
     private static final String WAITING_MESSAGE = "%d번째 예약대기";
     private static final String CANCELED_MESSAGE = "취소";
+    private static final String EMPTY_PAYMENT_KEY = "";
 
     private final Long reservationId;
     private final String theme;
@@ -42,7 +43,7 @@ public class ReservationMineResponse {
                 waitingWithRank.getWaiting().getReservation().getDate(),
                 waitingWithRank.getWaiting().getReservation().getTime().getStartAt(),
                 String.format(WAITING_MESSAGE, waitingWithRank.getRank()),
-                "",
+                EMPTY_PAYMENT_KEY,
                 waitingWithRank.getWaiting().getReservation().getTheme().getPrice()
         );
     }
@@ -67,7 +68,7 @@ public class ReservationMineResponse {
     }
 
     private static String getPaymentKey(Optional<Payment> reservationPayment) {
-        String paymentKey = "";
+        String paymentKey = EMPTY_PAYMENT_KEY;
         if (reservationPayment.isPresent()) {
             paymentKey = reservationPayment.get().getPaymentKey();
         }
