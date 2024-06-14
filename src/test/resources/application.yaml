@@ -7,9 +7,9 @@ spring:
 spring:
   datasource:
     # h2 서버 url
-    # url: jdbc:h2:mem:testtest;DATABASE_TO_LOWER=TRUE
+    url: jdbc:h2:mem:testtest;DATABASE_TO_LOWER=TRUE
     # h2 embedded url
-    url: jdbc:h2:~/testtest;AUTO_SERVER=TRUE;DATABASE_TO_LOWER=TRUE
+#    url: jdbc:h2:~/testtest;AUTO_SERVER=TRUE;DATABASE_TO_LOWER=TRUE
     username: sa
 
   jpa:
