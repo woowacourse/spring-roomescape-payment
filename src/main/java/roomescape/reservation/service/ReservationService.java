@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.member.service.MemberService;
+import roomescape.reservation.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
@@ -32,25 +33,28 @@ import roomescape.theme.domain.Theme;
 import roomescape.theme.service.ThemeService;
 
 @Service
+@Transactional
 public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ReservationTimeService reservationTimeService;
     private final MemberService memberService;
     private final ThemeService themeService;
+    private final PaymentService paymentService;
 
     public ReservationService(
             final ReservationRepository reservationRepository,
             final ReservationTimeRepository reservationTimeRepository,
             final ReservationTimeService reservationTimeService,
             final MemberService memberService,
-            final ThemeService themeService
+            final ThemeService themeService, PaymentService paymentService
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.reservationTimeService = reservationTimeService;
         this.memberService = memberService;
         this.themeService = themeService;
+        this.paymentService = paymentService;
     }
 
     public ReservationsResponse findAllReservations() {
@@ -121,7 +125,8 @@ public class ReservationService {
                     waitingReservation.getReservationTime(),
                     waitingReservation.getTheme(),
                     waitingReservation.getMember(),
-                    ReservationStatus.RESERVED
+                    ReservationStatus.RESERVED,
+                    waitingReservation.getPayment()
             ));
         }
 
@@ -134,6 +139,7 @@ public class ReservationService {
         final ReservationTime requestTime = reservationTimeService.findTimeById(request.timeId());
         final Theme requestTheme = themeService.findThemeById(request.themeId());
         final Member member = memberService.findMemberById(memberId);
+        final Payment payment = paymentService.save(request);
 
         validateDateAndTime(requestDate, requestTime, now);
 
@@ -142,7 +148,7 @@ public class ReservationService {
         );
         final ReservationStatus state = optional.isEmpty() ? ReservationStatus.RESERVED : ReservationStatus.WAITING;
         final Reservation saved = reservationRepository.save(
-                new Reservation(requestDate, requestTime, requestTheme, member, state));
+                new Reservation(requestDate, requestTime, requestTheme, member, state, payment));
         return ReservationResponse.from(saved);
     }
 

@@ -36,6 +36,10 @@ public class Reservation {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
+
     @Enumerated(value = EnumType.STRING)
     private ReservationStatus reservationStatus;
 
@@ -46,9 +50,10 @@ public class Reservation {
             final LocalDate date,
             final ReservationTime reservationTime,
             final Theme theme,
-            final Member member
+            final Member member,
+            final Payment payment
     ) {
-        this(null, date, reservationTime, theme, member, ReservationStatus.WAITING);
+        this(null, date, reservationTime, theme, member, ReservationStatus.WAITING, payment);
     }
 
     public Reservation(
@@ -56,9 +61,10 @@ public class Reservation {
             final ReservationTime reservationTime,
             final Theme theme,
             final Member member,
-            final ReservationStatus status
+            final ReservationStatus status,
+            final Payment payment
     ) {
-        this(null, date, reservationTime, theme, member, status);
+        this(null, date, reservationTime, theme, member, status, payment);
     }
 
     public Reservation(
@@ -67,7 +73,8 @@ public class Reservation {
             final ReservationTime reservationTime,
             final Theme theme,
             final Member member,
-            final ReservationStatus status
+            final ReservationStatus status,
+            final Payment payment
     ) {
         this.id = id;
         this.date = date;
@@ -75,6 +82,7 @@ public class Reservation {
         this.theme = theme;
         this.member = member;
         this.reservationStatus = status;
+        this.payment = payment;
         validateBlank();
     }
 
@@ -119,5 +127,13 @@ public class Reservation {
 
     public Member getMember() {
         return member;
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public ReservationStatus getReservationStatus() {
+        return reservationStatus;
     }
 }
