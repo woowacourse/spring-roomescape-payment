@@ -10,11 +10,12 @@ const membersOptions = [];
 
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('add-button').addEventListener('click', addInputRow);
-  document.getElementById('filter-form').addEventListener('submit', applyFilter);
+  document.getElementById('filter-form').addEventListener('submit',
+      applyFilter);
 
   requestRead(RESERVATION_API_ENDPOINT)
-      .then(render)
-      .catch(error => console.error('Error fetching reservations:', error));
+  .then(render)
+  .catch(error => console.error('Error fetching reservations:', error));
 
   fetchTimes();
   fetchThemes();
@@ -45,28 +46,28 @@ function render(data) {
 
 function fetchTimes() {
   requestRead(TIME_API_ENDPOINT)
-      .then(data => {
-        timesOptions.push(...data);
-      })
-      .catch(error => console.error('Error fetching time:', error));
+  .then(data => {
+    timesOptions.push(...data);
+  })
+  .catch(error => console.error('Error fetching time:', error));
 }
 
 function fetchThemes() {
   requestRead(THEME_API_ENDPOINT)
-      .then(data => {
-        themesOptions.push(...data);
-        populateSelect('theme', themesOptions, 'name');
-      })
-      .catch(error => console.error('Error fetching theme:', error));
+  .then(data => {
+    themesOptions.push(...data);
+    populateSelect('theme', themesOptions, 'name');
+  })
+  .catch(error => console.error('Error fetching theme:', error));
 }
 
 function fetchMembers() {
   requestRead(MEMBER_API_ENDPOINT)
-      .then(data => {
-        membersOptions.push(...data);
-        populateSelect('member', membersOptions, 'name');
-      })
-      .catch(error => console.error('Error fetching member:', error));
+  .then(data => {
+    membersOptions.push(...data);
+    populateSelect('member', membersOptions, 'name');
+  })
+  .catch(error => console.error('Error fetching member:', error));
 }
 
 function populateSelect(selectId, options, textProperty) {
@@ -109,18 +110,24 @@ function createActionButton(label, className, eventListener) {
 }
 
 function addInputRow() {
-  if (isEditing) return;  // 이미 편집 중인 경우 추가하지 않음
+  if (isEditing) {
+    return;
+  }  // 이미 편집 중인 경우 추가하지 않음
 
   const tableBody = document.getElementById('table-body');
   const row = tableBody.insertRow();
   isEditing = true;
 
   const dateInput = createInput('date');
-  const timeDropdown = createSelect(timesOptions, "시간 선택", 'time-select', 'startAt');
-  const themeDropdown = createSelect(themesOptions, "테마 선택", 'theme-select', 'name');
-  const memberDropdown = createSelect(membersOptions, "멤버 선택", 'member-select', 'name');
+  const timeDropdown = createSelect(timesOptions, "시간 선택", 'time-select',
+      'startAt');
+  const themeDropdown = createSelect(themesOptions, "테마 선택", 'theme-select',
+      'name');
+  const memberDropdown = createSelect(membersOptions, "멤버 선택", 'member-select',
+      'name');
 
-  const cellFieldsToCreate = ['', memberDropdown, themeDropdown, dateInput, timeDropdown];
+  const cellFieldsToCreate = ['', memberDropdown, themeDropdown, dateInput,
+    timeDropdown];
 
   cellFieldsToCreate.forEach((field, index) => {
     const cell = row.insertCell(index);
@@ -172,13 +179,13 @@ function saveRow(event) {
   };
 
   requestCreate(reservation)
-      .then(() => {
-        location.reload();
-      })
-      .catch(error => {
-        alert(error.message);
-        console.error("Error fetching available times:", error)
-      });
+  .then(() => {
+    location.reload();
+  })
+  .catch(error => {
+    alert(error.message);
+    console.error("Error fetching available times:", error)
+  });
   isEditing = false;  // isEditing 값을 false로 설정
 }
 
@@ -187,11 +194,12 @@ function deleteRow(event) {
   const reservationId = row.cells[0].textContent;
 
   requestDelete(reservationId)
-      .then(() => row.remove())
-      .catch(error => {
-        alert(error.message);
-        console.error("Error fetching available times:", error)
-      });}
+  .then(() => row.remove())
+  .catch(error => {
+    alert(error.message);
+    console.error("Error fetching available times:", error)
+  });
+}
 
 function applyFilter(event) {
   event.preventDefault();
@@ -202,10 +210,18 @@ function applyFilter(event) {
   const dateTo = document.getElementById('date-to').value;
 
   let uri = `${ADMIN_RESERVATION_API_ENDPOINT}/search?`;
-  if (themeId) uri += `themeId=${themeId}&`;
-  if (memberId) uri += `memberId=${memberId}&`;
-  if (dateFrom) uri += `dateFrom=${dateFrom}&`;
-  if (dateTo) uri += `dateTo=${dateTo}`;
+  if (themeId) {
+    uri += `themeId=${themeId}&`;
+  }
+  if (memberId) {
+    uri += `memberId=${memberId}&`;
+  }
+  if (dateFrom) {
+    uri += `dateFrom=${dateFrom}&`;
+  }
+  if (dateTo) {
+    uri += `dateTo=${dateTo}`;
+  }
 
   /*
   TODO: [6단계] 예약 검색 - 조건에 따른 예약 조회 API 호출
@@ -217,15 +233,17 @@ function applyFilter(event) {
       'Content-Type': 'application/json'
     },
   }).then(response => {
-    if (response.status === 200) return response.json();
-      return response.json().then(data => {
+    if (response.status === 200) {
+      return response.json();
+    }
+    return response.json().then(data => {
       throw new Error(data.message || 'Read failed');
     });
   }).then(render)
-      .catch(error => {
-          alert(error.message);
-          console.error("Error fetching available times:", error)
-      });
+  .catch(error => {
+    alert(error.message);
+    console.error("Error fetching available times:", error)
+  });
 }
 
 function requestCreate(reservation) {
@@ -236,10 +254,12 @@ function requestCreate(reservation) {
   };
 
   return fetch(ADMIN_RESERVATION_API_ENDPOINT, requestOptions)
-      .then(response => {
-        if (response.status === 201) return response.json();
-        throw new Error(data.message || 'Delete failed');
-      });
+  .then(response => {
+    if (response.status === 201) {
+      return response.json();
+    }
+    throw new Error(data.message || 'Delete failed');
+  });
 }
 
 function requestDelete(id) {
@@ -248,17 +268,21 @@ function requestDelete(id) {
   };
 
   return fetch(`${ADMIN_RESERVATION_API_ENDPOINT}/${id}`, requestOptions)
-      .then(response => {
-        if (response.status !== 204) return response.json().then(data => {
-          throw new Error(data.message || 'Delete failed');
-        });
+  .then(response => {
+    if (response.status !== 204) {
+      return response.json().then(data => {
+        throw new Error(data.message || 'Delete failed');
       });
+    }
+  });
 }
 
 function requestRead(endpoint) {
   return fetch(endpoint)
-      .then(response => {
-        if (response.status === 200) return response.json();
-        throw new Error('Read failed');
-      });
+  .then(response => {
+    if (response.status === 200) {
+      return response.json();
+    }
+    throw new Error('Read failed');
+  });
 }

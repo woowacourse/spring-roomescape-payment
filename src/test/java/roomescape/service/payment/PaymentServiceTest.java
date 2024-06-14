@@ -27,7 +27,7 @@ class PaymentServiceTest {
         PaymentRequest request = new PaymentRequest("testKey", "testOrderId", 1000L);
 
         // when
-        Payment payment = paymentService.approvePayment(request);
+        Payment payment = paymentService.approvePayment(request, null);
 
         //then
         Assertions.assertThat(payment.getId()).isNotZero();

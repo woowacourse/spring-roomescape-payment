@@ -1,10 +1,13 @@
 package roomescape.domain.payment;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.time.LocalDateTime;
+import jakarta.persistence.OneToOne;
+import roomescape.domain.reservation.Reservation;
 
 @Entity
 public class Payment {
@@ -15,35 +18,49 @@ public class Payment {
 
     private String paymentKey;
 
-    private Long amount;
+    private Long totalAmount;
 
-    private Boolean deleted;
+    private String requestedAt;
 
-    private LocalDateTime requestedAt;
+    private String approvedAt;
 
-    private LocalDateTime approvedAt;
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
 
-    public Payment() {
+    @OneToOne
+    private Reservation reservation;
+
+    protected Payment() {
     }
 
-    public Payment(String paymentKey, Long amount, Boolean deleted, LocalDateTime requestedAt, LocalDateTime approvedAt) {
+    public Payment(
+        String paymentKey,
+        Long totalAmount,
+        String requestedAt,
+        String approvedAt,
+        PaymentStatus status
+    ) {
         this.paymentKey = paymentKey;
-        this.amount = amount;
-        this.deleted = deleted;
+        this.totalAmount = totalAmount;
         this.requestedAt = requestedAt;
         this.approvedAt = approvedAt;
+        this.status = status;
     }
 
-    public static Payment createEmpty() {
-        return new Payment(null, 0L, null, null, null);
+    public void complete(Reservation reservation) {
+        this.reservation = reservation;
+    }
+
+    public void cancel() {
+        this.status = PaymentStatus.CANCELED;
     }
 
     public String getPaymentKey() {
         return paymentKey;
     }
 
-    public Long getAmount() {
-        return amount;
+    public Long getTotalAmount() {
+        return totalAmount;
     }
 
     public Long getId() {

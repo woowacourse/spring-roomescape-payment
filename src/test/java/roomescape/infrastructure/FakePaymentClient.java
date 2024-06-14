@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import roomescape.domain.dto.PaymentRequest;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentClient;
+import roomescape.domain.payment.PaymentStatus;
 import roomescape.exception.TossPaymentErrorCode;
 import roomescape.exception.TossPaymentException;
 
@@ -18,6 +19,17 @@ public class FakePaymentClient implements PaymentClient {
         if (request.paymentKey().equals("failPaymentKey")) {
             throw new TossPaymentException(TossPaymentErrorCode.INTERNAL_SERVER_ERROR);
         }
-        return new Payment(request.paymentKey(), request.amount(), false, LocalDateTime.now().minusSeconds(5), LocalDateTime.now());
+        return new Payment(
+            request.paymentKey(),
+            request.amount(),
+            LocalDateTime.now().minusSeconds(5).toString(),
+            LocalDateTime.now().toString(),
+            PaymentStatus.DONE
+        );
+    }
+
+    @Override
+    public void cancel(String paymentKey) {
+
     }
 }
