@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.RoomEscapeException;
 import roomescape.exception.model.WaitingExceptionCode;
 import roomescape.member.domain.Member;
@@ -18,6 +19,7 @@ import roomescape.waiting.repository.WaitingRepository;
 import roomescape.reservation.dto.RegistrationDto;
 
 @Tag(name = "예약 대기 서비스", description = "예약 대기 저장, 예약 대기 검색 등 예약 대기와 관련된 로직을 수행한다.")
+@Transactional
 @Service
 public class WaitingService {
 
