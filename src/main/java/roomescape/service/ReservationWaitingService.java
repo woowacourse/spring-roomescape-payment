@@ -36,7 +36,6 @@ public class ReservationWaitingService {
         this.paymentService = paymentService;
     }
 
-    @Transactional(readOnly = true)
     public List<MemberReservationResponse> getAllMemberReservationsAndWaiting(Member member) {
         List<Payment> payments = paymentRepository.findByMember(member);
         List<WaitingWithRank> waitingWithRanks = waitingRepository.findWaitingWithRankByMemberId(member.getId());

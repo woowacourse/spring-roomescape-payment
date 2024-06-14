@@ -1,7 +1,6 @@
 package roomescape.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.DuplicatedException;
 import roomescape.exception.NotFoundException;
 import roomescape.model.Member;
@@ -40,7 +39,6 @@ public class ReservationService {
         return reservationRepository.findAll();
     }
 
-    @Transactional(readOnly = true)
     public List<Reservation> filterReservation(Long themeId, Long memberId, LocalDate dateFrom, LocalDate dateTo) {
         Theme theme = themeRepository.findById(themeId)
                 .orElse(null);
@@ -49,7 +47,6 @@ public class ReservationService {
         return reservationRepository.findByConditions(theme, member, dateFrom, dateTo);
     }
 
-    @Transactional
     public Reservation addReservation(ReservationRequest request, Member member) {
         ReservationTime reservationTime = getReservationTime(request.timeId());
         Theme theme = getTheme(request.themeId());
@@ -58,7 +55,6 @@ public class ReservationService {
         return reservationRepository.save(reservation);
     }
 
-    @Transactional
     public Reservation addReservation(AdminReservationRequest request) {
         ReservationTime reservationTime = getReservationTime(request.timeId());
         Theme theme = getTheme(request.themeId());
@@ -90,7 +86,6 @@ public class ReservationService {
         }
     }
 
-    @Transactional
     public void deleteReservation(long id) {
         validateExistReservation(id);
         reservationRepository.deleteById(id);
@@ -103,7 +98,6 @@ public class ReservationService {
         }
     }
 
-    @Transactional(readOnly = true)
     public List<Reservation> findMemberReservations(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() ->
@@ -111,7 +105,6 @@ public class ReservationService {
         return reservationRepository.findAllByMember(member);
     }
 
-    @Transactional(readOnly = true)
     public Reservation findById(Long id) {
         return reservationRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("해당 id:[%s] 값으로 예약된 내역이 존재하지 않습니다.".formatted(id)));

@@ -2,11 +2,19 @@ package roomescape.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.request.WaitingRequest;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.NotFoundException;
-import roomescape.model.*;
-import roomescape.repository.*;
+import roomescape.model.Member;
+import roomescape.model.ReservationTime;
+import roomescape.model.Theme;
+import roomescape.model.Waiting;
+import roomescape.model.WaitingWithRank;
+import roomescape.repository.MemberRepository;
+import roomescape.repository.ReservationRepository;
+import roomescape.repository.ReservationTimeRepository;
+import roomescape.repository.ThemeRepository;
+import roomescape.repository.WaitingRepository;
+import roomescape.request.WaitingRequest;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -58,12 +66,10 @@ public class WaitingService {
         }
     }
 
-    @Transactional(readOnly = true)
     public boolean existsWaiting(Theme theme, LocalDate date, ReservationTime time) {
         return waitingRepository.existsWaitingByThemeAndDateAndTime(theme, date, time);
     }
 
-    @Transactional
     public void deleteWaiting(long id) {
         validateExistWaiting(id);
         waitingRepository.deleteById(id);
@@ -76,7 +82,6 @@ public class WaitingService {
         }
     }
 
-    @Transactional(readOnly = true)
     public List<WaitingWithRank> findMemberWaiting(Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() ->
@@ -84,12 +89,10 @@ public class WaitingService {
         return waitingRepository.findWaitingWithRankByMemberId(member.getId());
     }
 
-    @Transactional(readOnly = true)
     public List<Waiting> findAllWaiting() {
         return waitingRepository.findAll();
     }
 
-    @Transactional(readOnly = true)
     public Waiting findFirstWaitingByCondition(Theme theme, LocalDate date, ReservationTime time) {
         return waitingRepository.findFirstByThemeAndDateAndTime(theme, date, time)
                 .orElseThrow(() ->
