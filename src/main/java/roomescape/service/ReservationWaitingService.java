@@ -36,7 +36,7 @@ public class ReservationWaitingService {
         this.paymentService = paymentService;
     }
 
-    public List<MemberReservationResponse> getAllMemberReservationsAndWaiting(Member member) {
+    public List<MemberReservationResponse> getAllMemberReservationsAndWaiting(final Member member) {
         List<Payment> payments = paymentRepository.findByMember(member);
         List<WaitingWithRank> waitingWithRanks = waitingRepository.findWaitingWithRankByMemberId(member.getId());
 
@@ -52,7 +52,7 @@ public class ReservationWaitingService {
     }
 
     @Transactional
-    public void deleteReservation(Long id) {
+    public void deleteReservation(final Long id) {
         Reservation reservation = reservationRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("해당 id:[%s] 값으로 예약된 내역이 존재하지 않습니다.".formatted(id)));
         reservationRepository.deleteById(id);
@@ -65,7 +65,7 @@ public class ReservationWaitingService {
         }
     }
 
-    private void convertWaitingToReservation(Theme theme, LocalDate date, ReservationTime time) {
+    private void convertWaitingToReservation(final Theme theme, final LocalDate date, final ReservationTime time) {
         Waiting waiting = waitingRepository.findFirstByThemeAndDateAndTime(theme, date, time).orElseThrow(() ->
                 new NotFoundException("해당 테마:[%s], 날짜:[%s], 시간:[%s] 값으로 예약된 예약 대기 내역이 존재하지 않습니다.".formatted(theme.getName(), date, time.getStartAt())));
         final Reservation reservation = new Reservation(date, time, theme, waiting.getMember());

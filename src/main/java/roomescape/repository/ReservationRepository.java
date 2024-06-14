@@ -15,7 +15,7 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
 
     List<Reservation> findAll();
 
-    Reservation save(Reservation reservation);
+    Reservation save(final Reservation reservation);
 
     @Query("""
             SELECT r FROM Reservation r
@@ -24,21 +24,21 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
             AND (:dateFrom IS NULL OR r.date >= :dateFrom)
             AND (:dateTo IS NULL OR r.date <= :dateTo)
             """)
-    List<Reservation> findByConditions(Theme theme, Member member, LocalDate dateFrom,
-                                                         LocalDate dateTo);
+    List<Reservation> findByConditions(final Theme theme, final Member member, final LocalDate dateFrom,
+                                       final LocalDate dateTo);
 
-    void deleteById(long id);
+    void deleteById(final Long id);
 
-    boolean existsById(long id);
+    boolean existsById(final Long id);
 
-    boolean existsByTime(ReservationTime time);
+    boolean existsByTime(final ReservationTime time);
 
-    boolean existsByDateAndTimeAndTheme(LocalDate date, ReservationTime time, Theme theme);
+    boolean existsByDateAndTimeAndTheme(final LocalDate date, final ReservationTime time, final Theme theme);
 
-    List<Reservation> findAllByDateAndTheme(LocalDate date, Theme theme);
+    List<Reservation> findAllByDateAndTheme(final LocalDate date, final Theme theme);
 
-    List<Reservation> findAllByMember(Member member);
+    List<Reservation> findAllByMember(final Member member);
 
-    boolean existsReservationByThemeAndDateAndTimeAndMember(Theme theme, LocalDate date, ReservationTime time, Member member);
+    boolean existsReservationByThemeAndDateAndTimeAndMember(final Theme theme, final LocalDate date, final ReservationTime time, final Member member);
 
 }

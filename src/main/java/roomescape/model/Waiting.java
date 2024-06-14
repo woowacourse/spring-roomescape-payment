@@ -40,7 +40,7 @@ public class Waiting {
     protected Waiting() {
     }
 
-    public Waiting(Long id, LocalDate date, ReservationTime time, Theme theme, Member member) {
+    public Waiting(final Long id, final LocalDate date, final ReservationTime time, final Theme theme, final Member member) {
         validatePast(date, time);
         this.id = id;
         this.date = date;
@@ -49,11 +49,11 @@ public class Waiting {
         this.member = member;
     }
 
-    public Waiting(LocalDate date, ReservationTime time, Theme theme, Member member) {
+    public Waiting(final LocalDate date, final ReservationTime time, final Theme theme, final Member member) {
         this(null, date, time, theme, member);
     }
 
-    private void validatePast(LocalDate date, ReservationTime time) {
+    private void validatePast(final LocalDate date, final ReservationTime time) {
         if (date.isBefore(LocalDate.now()) || (date.isEqual(LocalDate.now()) && time.isBefore(LocalTime.now()))) {
             throw new BadRequestException("현재(%s) 이전 시간으로 예약 대기를 추가할 수 없습니다.".formatted(LocalDateTime.now()));
         }

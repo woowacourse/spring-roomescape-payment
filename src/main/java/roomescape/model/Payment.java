@@ -30,7 +30,7 @@ public class Payment {
         this.reservation = reservation;
     }
 
-    public Payment(PaymentResponse paymentResponse, Reservation reservation) {
+    public Payment(final PaymentResponse paymentResponse, final Reservation reservation) {
         this(null, paymentResponse.getPaymentKey(), paymentResponse.getTotalAmount(), reservation);
     }
 

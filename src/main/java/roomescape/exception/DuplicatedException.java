@@ -2,7 +2,7 @@ package roomescape.exception;
 
 public class DuplicatedException extends RuntimeException {
 
-    public DuplicatedException(String message) {
+    public DuplicatedException(final String message) {
         super("[ERROR] " + message);
     }
 }

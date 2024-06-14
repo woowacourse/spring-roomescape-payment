@@ -4,7 +4,7 @@ import io.jsonwebtoken.Claims;
 import roomescape.model.Member;
 
 public interface TokenProvider {
-    String createToken(Member member);
+    String createToken(final Member member);
 
-    Claims getPayload(String token);
+    Claims getPayload(final String token);
 }

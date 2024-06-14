@@ -10,16 +10,16 @@ import java.time.LocalTime;
 
 public class MemberReservationResponse {
 
-    private Long id;
-    private String theme;
-    private LocalDate date;
+    private final Long id;
+    private final String theme;
+    private final LocalDate date;
     @JsonFormat(pattern = "HH:mm")
-    private LocalTime time;
-    private String status;
-    private String paymentkey;
-    private Long amount;
+    private final LocalTime time;
+    private final String status;
+    private final String paymentkey;
+    private final Long amount;
 
-    public MemberReservationResponse(Payment payment) {
+    public MemberReservationResponse(final Payment payment) {
         Reservation reservation = payment.getReservation();
         this.id = reservation.getId();
         this.theme = reservation.getTheme().getName();
@@ -30,7 +30,7 @@ public class MemberReservationResponse {
         this.amount = payment.getAmount().longValue();
     }
 
-    public MemberReservationResponse(WaitingWithRank waitingWithRank) {
+    public MemberReservationResponse(final WaitingWithRank waitingWithRank) {
         this.id = waitingWithRank.getWaiting().getId();
         this.theme = waitingWithRank.getWaiting().getTheme().getName();
         this.date = waitingWithRank.getWaiting().getDate();

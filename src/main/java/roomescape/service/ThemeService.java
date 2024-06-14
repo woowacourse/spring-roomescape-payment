@@ -13,7 +13,7 @@ public class ThemeService {
 
     private final ThemeRepository themeRepository;
 
-    public ThemeService(ThemeRepository themeRepository) {
+    public ThemeService(final ThemeRepository themeRepository) {
         this.themeRepository = themeRepository;
     }
 
@@ -21,12 +21,12 @@ public class ThemeService {
         return themeRepository.findAll();
     }
 
-    public Theme addTheme(ThemeRequest themeRequest) {
+    public Theme addTheme(final ThemeRequest themeRequest) {
         Theme theme = new Theme(themeRequest.name(), themeRequest.description(), themeRequest.thumbnail());
         return themeRepository.save(theme);
     }
 
-    public void deleteTheme(long id) {
+    public void deleteTheme(final Long id) {
         themeRepository.deleteById(id);
     }
 

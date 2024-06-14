@@ -9,42 +9,42 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<String> handleNotFoundException(NotFoundException exception) {
+    public ResponseEntity<String> handleNotFoundException(final NotFoundException exception) {
         return ResponseEntity.badRequest().body(exception.getMessage());
     }
 
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<String> handleBadRequestException(BadRequestException exception) {
+    public ResponseEntity<String> handleBadRequestException(final BadRequestException exception) {
         return ResponseEntity.badRequest().body(exception.getMessage());
     }
 
     @ExceptionHandler(DuplicatedException.class)
-    public ResponseEntity<String> handleDuplicatedException(DuplicatedException exception) {
+    public ResponseEntity<String> handleDuplicatedException(final DuplicatedException exception) {
         return ResponseEntity.badRequest().body(exception.getMessage());
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<String> handleAuthenticationException(AuthenticationException exception) {
+    public ResponseEntity<String> handleAuthenticationException(final AuthenticationException exception) {
         return ResponseEntity.status(401).body(exception.getMessage());
     }
 
     @ExceptionHandler(AuthorizationException.class)
-    public ResponseEntity<String> handleAuthorizationException(AuthorizationException exception) {
+    public ResponseEntity<String> handleAuthorizationException(final AuthorizationException exception) {
         return ResponseEntity.status(403).body(exception.getMessage());
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<String> handleDataIntegrityViolationException(DataIntegrityViolationException exception) {
+    public ResponseEntity<String> handleDataIntegrityViolationException(final DataIntegrityViolationException exception) {
         return ResponseEntity.badRequest().body(exception.getMessage());
     }
 
     @ExceptionHandler(PaymentException.class)
-    public ResponseEntity<String> handlePaymentException(PaymentException exception) {
+    public ResponseEntity<String> handlePaymentException(final PaymentException exception) {
         return ResponseEntity.badRequest().body(exception.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleRunTimeException(Exception exception) {
+    public ResponseEntity<String> handleRunTimeException(final Exception exception) {
         exception.printStackTrace();
         return ResponseEntity.internalServerError().body("예상치 못한 오류가 발생했습니다.");
     }

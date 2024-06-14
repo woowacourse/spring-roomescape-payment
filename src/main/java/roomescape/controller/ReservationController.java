@@ -26,8 +26,8 @@ public class ReservationController {
     private final ReservationService reservationService;
     private final ReservationWaitingService reservationWaitingService;
 
-    public ReservationController(ReservationService reservationService,
-                                 ReservationWaitingService reservationWaitingService) {
+    public ReservationController(final ReservationService reservationService,
+                                 final ReservationWaitingService reservationWaitingService) {
         this.reservationService = reservationService;
         this.reservationWaitingService = reservationWaitingService;
     }
@@ -42,7 +42,7 @@ public class ReservationController {
     }
 
     @GetMapping("/reservations-mine")
-    public ResponseEntity<List<MemberReservationResponse>> getMemberReservations(@AuthenticationPrincipal Member member) {
+    public ResponseEntity<List<MemberReservationResponse>> getMemberReservations(@AuthenticationPrincipal final Member member) {
         List<MemberReservationResponse> responses = reservationWaitingService.getAllMemberReservationsAndWaiting(member);
         return ResponseEntity.ok(responses);
     }

@@ -23,7 +23,7 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    public void confirmReservationPayments(ReservationRequest request, Reservation reservation) {
+    public void confirmReservationPayments(final ReservationRequest request, final Reservation reservation) {
         validatePayments(request.amount());
         PaymentResponse paymentResponse = tossPaymentClient.confirm(new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()));
         paymentRepository.save(new Payment(paymentResponse, reservation));
@@ -33,7 +33,7 @@ public class PaymentService {
         paymentRepository.save(new Payment(ADMIN_PAYMENT, 0L, reservation));
     }
 
-    private void validatePayments(long amount) {
+    private void validatePayments(final Long amount) {
         if (RESERVATION_PRICE != amount) {
             throw new PaymentException("클라이언트의 지불 정보가 일치하지 않습니다. 금액 정보 : [%d]".formatted(amount));
         }

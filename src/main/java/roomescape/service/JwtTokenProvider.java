@@ -19,10 +19,10 @@ public class JwtTokenProvider implements TokenProvider {
     @Value("${security.jwt.token.secret-key}")
     private String secretKey;
     @Value("${security.jwt.token.expire-length}")
-    private long validityInMilliseconds;
+    private Long validityInMilliseconds;
 
     @Override
-    public String createToken(Member member) {
+    public String createToken(final Member member) {
         Map<String, ?> claims = createClaimsByMember(member);
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
@@ -36,7 +36,7 @@ public class JwtTokenProvider implements TokenProvider {
     }
 
     @Override
-    public Claims getPayload(String token) {
+    public Claims getPayload(final String token) {
         SecretKey key = getSecretKey();
         return Jwts.parser()
                 .verifyWith(key)
@@ -45,7 +45,7 @@ public class JwtTokenProvider implements TokenProvider {
                 .getPayload();
     }
 
-    private Map<String, Object> createClaimsByMember(Member member) {
+    private Map<String, Object> createClaimsByMember(final Member member) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", member.getRole().toString());
         return claims;

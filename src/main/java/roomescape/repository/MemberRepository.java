@@ -8,9 +8,9 @@ import java.util.Optional;
 
 public interface MemberRepository extends CrudRepository<Member, Long> {
 
-    Optional<Member> findByEmailAndPassword(String email, String password);
+    Optional<Member> findByEmailAndPassword(final String email, final String password);
 
-    Optional<Member> findById(Long id);
+    Optional<Member> findById(final Long id);
 
     List<Member> findAll();
 }

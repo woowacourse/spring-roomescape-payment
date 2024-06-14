@@ -1,6 +1,11 @@
 package roomescape.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import roomescape.exception.BadRequestException;
 
 import java.util.Objects;
@@ -20,7 +25,7 @@ public class Member {
     protected Member() {
     }
 
-    public Member(Long id, String name, Role role, String email, String password) {
+    public Member(final Long id, final String name, final Role role, final String email, final String password) {
         validateNullOrBlank(name, "name");
         this.id = id;
         this.name = name;
@@ -29,15 +34,15 @@ public class Member {
         this.password = password;
     }
 
-    public Member(String name, Role role, String email, String password) {
+    public Member(final String name, final Role role, final String email, final String password) {
         this(null, name, role, email, password);
     }
 
-    public Member(Long id, String name, Role role) {
+    public Member(final Long id, final String name, final Role role) {
         this(id, name, role, null, null);
     }
 
-    private void validateNullOrBlank(String value, String fieldName) {
+    private void validateNullOrBlank(final String value, final String fieldName) {
         if (value == null || value.isBlank()) {
             throw new BadRequestException(value, fieldName);
         }

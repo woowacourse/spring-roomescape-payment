@@ -11,9 +11,9 @@ import java.io.InputStream;
 
 public class BufferingClientHttpResponseWrapper implements ClientHttpResponse {
     private final ClientHttpResponse response;
-    private byte[] body;
+    private final byte[] body;
 
-    public BufferingClientHttpResponseWrapper(ClientHttpResponse response) throws IOException, IOException {
+    public BufferingClientHttpResponseWrapper(final ClientHttpResponse response) throws IOException, IOException {
         this.response = response;
         InputStream responseBodyStream = response.getBody();
         this.body = StreamUtils.copyToByteArray(responseBodyStream);

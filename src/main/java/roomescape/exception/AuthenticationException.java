@@ -11,7 +11,7 @@ public class AuthenticationException extends RuntimeException {
         super("[ERROR] 인증되지 않은 사용자입니다.");
     }
 
-    public AuthenticationException(String message) {
+    public AuthenticationException(final String message) {
         super("[ERROR] " + message);
     }
 }

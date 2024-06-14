@@ -44,7 +44,7 @@ class ReservationTimeServiceTest extends BaseTest {
     @DisplayName("아이디에 해당하는 예약 시간을 반환한다.")
     @Test
     void should_get_reservation_time() {
-        ReservationTime reservationTime = reservationTimeService.findReservationTime(2);
+        ReservationTime reservationTime = reservationTimeService.findReservationTime(2L);
 
         assertThat(reservationTime.getStartAt()).isEqualTo(LocalTime.of(11, 0));
     }
@@ -71,7 +71,7 @@ class ReservationTimeServiceTest extends BaseTest {
     @DisplayName("존재하지 않는 시간이면 예외를 발생시킨다.")
     @Test
     void should_throw_exception_when_not_exist_id() {
-        assertThatThrownBy(() -> reservationTimeService.deleteReservationTime(10000000))
+        assertThatThrownBy(() -> reservationTimeService.deleteReservationTime(10000000L))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("[ERROR] id(10000000)에 해당하는 예약 시간이 존재하지 않습니다.");
     }

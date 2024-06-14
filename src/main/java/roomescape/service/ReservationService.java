@@ -38,7 +38,7 @@ public class ReservationService {
         return reservationRepository.findAll();
     }
 
-    public List<Reservation> filterReservation(Long themeId, Long memberId, LocalDate dateFrom, LocalDate dateTo) {
+    public List<Reservation> filterReservation(final Long themeId, final Long memberId, final LocalDate dateFrom, final LocalDate dateTo) {
         Theme theme = themeRepository.findById(themeId)
                 .orElse(null);
         Member member = memberRepository.findById(memberId)
@@ -46,7 +46,7 @@ public class ReservationService {
         return reservationRepository.findByConditions(theme, member, dateFrom, dateTo);
     }
 
-    public Reservation addReservation(ReservationRequest request, Member member) {
+    public Reservation addReservation(final ReservationRequest request, final Member member) {
         ReservationTime reservationTime = getReservationTime(request.timeId());
         Theme theme = getTheme(request.themeId());
         validateDuplicatedReservation(request.date(), reservationTime, theme);
@@ -56,7 +56,7 @@ public class ReservationService {
         return createdReservation;
     }
 
-    public Reservation addReservation(AdminReservationRequest request) {
+    public Reservation addReservation(final AdminReservationRequest request) {
         ReservationTime reservationTime = getReservationTime(request.timeId());
         Theme theme = getTheme(request.themeId());
         Member member = getMember(request.memberId());
@@ -67,48 +67,48 @@ public class ReservationService {
         return createdReservation;
     }
 
-    private Member getMember(Long memberId) {
+    private Member getMember(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new NotFoundException("아이디가 %s인 사용자가 존재하지 않습니다.".formatted(memberId)));
     }
 
-    private Theme getTheme(Long themeId) {
+    private Theme getTheme(final Long themeId) {
         return themeRepository.findById(themeId)
                 .orElseThrow(() -> new NotFoundException("아이디가 %s인 테마가 존재하지 않습니다.".formatted(themeId)));
     }
 
-    private ReservationTime getReservationTime(Long timeId) {
+    private ReservationTime getReservationTime(final Long timeId) {
         return reservationTimeRepository.findById(timeId)
                 .orElseThrow(() -> new NotFoundException("아이디가 %s인 예약 시간이 존재하지 않습니다.".formatted(timeId)));
     }
 
-    private void validateDuplicatedReservation(LocalDate date, ReservationTime reservationTime, Theme theme) {
+    private void validateDuplicatedReservation(final LocalDate date, final ReservationTime reservationTime, final Theme theme) {
         boolean exists = reservationRepository.existsByDateAndTimeAndTheme(date, reservationTime, theme);
         if (exists) {
             throw new DuplicatedException("이미 해당 시간에 예약이 존재합니다.");
         }
     }
 
-    public void deleteReservation(long id) {
+    public void deleteReservation(final Long id) {
         validateExistReservation(id);
         reservationRepository.deleteById(id);
     }
 
-    private void validateExistReservation(long id) {
+    private void validateExistReservation(final Long id) {
         boolean exists = reservationRepository.existsById(id);
         if (!exists) {
             throw new NotFoundException("해당 id:[%s] 값으로 예약된 내역이 존재하지 않습니다.".formatted(id));
         }
     }
 
-    public List<Reservation> findMemberReservations(Long memberId) {
+    public List<Reservation> findMemberReservations(final Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() ->
                         new NotFoundException("해당 id:[%s] 값으로 예약된 내역이 존재하지 않습니다.".formatted(memberId)));
         return reservationRepository.findAllByMember(member);
     }
 
-    public Reservation findById(Long id) {
+    public Reservation findById(final Long id) {
         return reservationRepository.findById(id).orElseThrow(() ->
                 new NotFoundException("해당 id:[%s] 값으로 예약된 내역이 존재하지 않습니다.".formatted(id)));
     }

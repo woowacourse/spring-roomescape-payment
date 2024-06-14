@@ -67,7 +67,7 @@ class WaitingServiceTest extends BaseTest {
     @DisplayName("존재하지 않는 예약 대기를 삭제하면 예외가 발생한다.")
     @Test
     void should_throw_exception_when_not_exist_waiting() {
-        assertThatThrownBy(() -> waitingService.deleteWaiting(1000000))
+        assertThatThrownBy(() -> waitingService.deleteWaiting(1000000L))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("[ERROR] 해당 id:[1000000] 값으로 예약된 예약 대기 내역이 존재하지 않습니다.");
     }

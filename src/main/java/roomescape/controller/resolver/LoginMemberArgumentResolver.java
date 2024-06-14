@@ -15,19 +15,19 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
     private final AuthService authService;
     private final MemberService memberService;
 
-    public LoginMemberArgumentResolver(AuthService authService, MemberService memberService) {
+    public LoginMemberArgumentResolver(final AuthService authService, final MemberService memberService) {
         this.authService = authService;
         this.memberService = memberService;
     }
 
     @Override
-    public boolean supportsParameter(MethodParameter parameter) {
+    public boolean supportsParameter(final MethodParameter parameter) {
         return parameter.hasParameterAnnotation(AuthenticationPrincipal.class);
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-                                  NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+    public Object resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer,
+                                  final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory) throws Exception {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         Long memberId = authService.findMemberIdByCookie(request.getCookies());
         return memberService.findMemberById(memberId);

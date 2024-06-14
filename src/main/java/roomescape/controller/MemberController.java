@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.request.MemberLoginRequest;
-import roomescape.request.RegisterRequest;
 import roomescape.annotation.AuthenticationPrincipal;
 import roomescape.model.Member;
+import roomescape.request.MemberLoginRequest;
+import roomescape.request.RegisterRequest;
 import roomescape.response.MemberNameResponse;
 import roomescape.response.MemberResponse;
 import roomescape.service.AuthService;
@@ -26,13 +26,13 @@ public class MemberController {
     private final MemberService memberService;
     private final AuthService authService;
 
-    public MemberController(MemberService memberService, AuthService authService) {
+    public MemberController(final MemberService memberService, final AuthService authService) {
         this.memberService = memberService;
         this.authService = authService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody MemberLoginRequest request, HttpServletResponse response) {
+    public ResponseEntity<Void> login(@RequestBody final MemberLoginRequest request, final HttpServletResponse response) {
         Member member = memberService.findMemberByEmailAndPassword(request);
         Cookie cookie = authService.createCookieByMember(member);
         response.addCookie(cookie);
@@ -40,7 +40,7 @@ public class MemberController {
     }
 
     @GetMapping("/login/check")
-    public ResponseEntity<MemberNameResponse> login(@AuthenticationPrincipal Member member) {
+    public ResponseEntity<MemberNameResponse> login(@AuthenticationPrincipal final Member member) {
         return ResponseEntity.ok(new MemberNameResponse(member.getName()));
     }
 
@@ -54,13 +54,13 @@ public class MemberController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Void> logout(final HttpServletRequest request, final HttpServletResponse response) {
         response.addCookie(authService.expireCookie(request.getCookies()));
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/members")
-    public ResponseEntity<MemberResponse> registerMember(@RequestBody RegisterRequest registerRequest) {
+    public ResponseEntity<MemberResponse> registerMember(@RequestBody final RegisterRequest registerRequest) {
         Member member = memberService.register(registerRequest);
         MemberResponse response = new MemberResponse(member);
         return ResponseEntity.created(URI.create("/members/" + member.getId())).body(response);
