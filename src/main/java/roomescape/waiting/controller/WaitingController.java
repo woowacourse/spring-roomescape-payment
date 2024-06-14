@@ -1,5 +1,8 @@
 package roomescape.waiting.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -17,6 +20,7 @@ import roomescape.waiting.dto.WaitingCreateRequest;
 import roomescape.waiting.dto.WaitingResponse;
 import roomescape.waiting.service.WaitingService;
 
+@Tag(name = "대기 API")
 @RestController
 @RequestMapping("/waitings")
 public class WaitingController {
@@ -26,15 +30,17 @@ public class WaitingController {
         this.service = service;
     }
 
+    @Operation(summary = "전체 예약 대기 조회", description = "전체 예약 대기를 조회한다.")
     @GetMapping
     public List<WaitingResponse> findWaitings() {
         return service.findWaitings();
     }
 
+    @Operation(summary = "예약 대기 추가", description = "예약 대기를 추가한다.")
     @PostMapping
     public ResponseEntity<WaitingResponse> createWaiting(
             @RequestBody WaitingCreateRequest request,
-            LoggedInMember member) {
+            @Parameter(hidden = true) LoggedInMember member) {
         WaitingResponse response = service.createWaiting(request, member.id());
 
         URI location = URI.create("/waitings/" + response.id());
@@ -42,6 +48,7 @@ public class WaitingController {
                 .body(response);
     }
 
+    @Operation(summary = "예약 대기 삭제", description = "예약 대기를 삭제한다.")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteWaiting(@PathVariable Long id) {

@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import roomescape.advice.exception.RoomEscapeException;
 import roomescape.member.domain.Member;
 import roomescape.theme.domain.Theme;
 import roomescape.time.domain.ReservationTime;
@@ -26,7 +27,8 @@ class ReservationTest {
     void validateReservationTest_whenNameIsNull() {
         assertThatThrownBy(() ->
                 new Reservation(1L, null, date, time, theme, ReservationStatus.RESERVED))
-                .isInstanceOf(NullPointerException.class);
+                .isInstanceOf(RoomEscapeException.class)
+                .hasMessage("예약자는 null 일 수 없습니다.");
     }
 
     @DisplayName("날짜 비어있을 때 예외를 던진다.")
@@ -34,7 +36,8 @@ class ReservationTest {
     void validateReservationTest_whenDateIsNull() {
         assertThatThrownBy(() ->
                 new Reservation(1L, member, null, time, theme, ReservationStatus.RESERVED))
-                .isInstanceOf(NullPointerException.class);
+                .isInstanceOf(RoomEscapeException.class)
+                .hasMessage("예약 날짜는 null 일 수 없습니다.");
     }
 
     @DisplayName("시간 비어있을 때 예외를 던진다.")
@@ -42,7 +45,8 @@ class ReservationTest {
     void validateReservationTest_whenTimeIsNull() {
         assertThatThrownBy(() ->
                 new Reservation(1L, member, date, null, theme, ReservationStatus.RESERVED))
-                .isInstanceOf(NullPointerException.class);
+                .isInstanceOf(RoomEscapeException.class)
+                .hasMessage("예약 시간은 null 일 수 없습니다.");
     }
 
     @DisplayName("테마 비어있을 때 예외를 던진다.")
@@ -50,7 +54,8 @@ class ReservationTest {
     void validateReservationTest_whenThemeIsNull() {
         assertThatThrownBy(() ->
                 new Reservation(1L, member, date, time, null, ReservationStatus.RESERVED))
-                .isInstanceOf(NullPointerException.class);
+                .isInstanceOf(RoomEscapeException.class)
+                .hasMessage("예약 테마는 null 일 수 없습니다.");
     }
 
     @DisplayName("날짜를 통해 특정 시간대 이전임을 알 수 있다.")

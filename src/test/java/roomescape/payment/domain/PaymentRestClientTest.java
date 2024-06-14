@@ -58,15 +58,24 @@ class PaymentRestClientTest {
     void approvePaymentTest() throws JsonProcessingException {
         // given
         String request = objectMapper.writeValueAsString(PAYMENT_CREATE_REQUEST.createRestClientPaymentApproveRequest());
+        String response = """
+                {
+                  "paymentKey": "tgen_20240528211",
+                  "orderId": "MC40MTMwMTk0ODU0ODU4",
+                  "totalAmount": "1000",
+                  "approvedAt": "2024-02-13T12:18:14+09:00",
+                  "status": "DONE"
+                }
+                """;
 
         mockServer.expect(ExpectedCount.manyTimes(), requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(header("Authorization", "Basic " + paymentRestClient.getSecretKey()))
                 .andExpect(content().json(request))
-                .andRespond(withSuccess("{}", MediaType.APPLICATION_JSON));
+                .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
 
         // when & then
-        assertThatCode(() -> paymentRestClient.approvePayment(PAYMENT_CREATE_REQUEST))
+        assertThatCode(() -> paymentRestClient.approvePayment(PAYMENT_CREATE_REQUEST.createRestClientPaymentApproveRequest()))
                 .doesNotThrowAnyException();
     }
 
@@ -91,7 +100,7 @@ class PaymentRestClientTest {
                         .body(response));
 
         // when & then
-        assertThatThrownBy(() -> paymentRestClient.approvePayment(PAYMENT_CREATE_REQUEST))
+        assertThatThrownBy(() -> paymentRestClient.approvePayment(PAYMENT_CREATE_REQUEST.createRestClientPaymentApproveRequest()))
                 .isInstanceOf(RoomEscapeException.class)
                 .hasMessage("하루 결제 가능 금액을 초과했습니다.")
                 .extracting(exception -> ((RoomEscapeException) exception).getStatus())
@@ -115,7 +124,7 @@ class PaymentRestClientTest {
                         .body(response));
 
         // when & then
-        assertThatThrownBy(() -> paymentRestClient.approvePayment(PAYMENT_CREATE_REQUEST))
+        assertThatThrownBy(() -> paymentRestClient.approvePayment(PAYMENT_CREATE_REQUEST.createRestClientPaymentApproveRequest()))
                 .isInstanceOf(RoomEscapeException.class)
                 .hasMessage("서버에 문제가 발생해 결제가 실패했습니다. 관리자에게 문의해 주세요.")
                 .extracting(exception -> ((RoomEscapeException) exception).getStatus())
@@ -168,7 +177,7 @@ class PaymentRestClientTest {
                         .body(response));
 
         // when & then
-        assertThatThrownBy(() -> paymentRestClient.approvePayment(PAYMENT_CREATE_REQUEST))
+        assertThatThrownBy(() -> paymentRestClient.approvePayment(PAYMENT_CREATE_REQUEST.createRestClientPaymentApproveRequest()))
                 .isInstanceOf(RoomEscapeException.class)
                 .hasMessage("서버에 문제가 발생해 결제가 실패했습니다. 관리자에게 문의해 주세요.")
                 .extracting(exception -> ((RoomEscapeException) exception).getStatus())

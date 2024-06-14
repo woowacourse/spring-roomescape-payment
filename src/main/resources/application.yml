@@ -21,3 +21,10 @@ jwt:
 
 payment:
   secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+
+springdoc:
+  api-docs:
+    path: /api-docs
+
+  swagger-ui:
+    operations-sorter: method

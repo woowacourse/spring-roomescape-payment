@@ -8,6 +8,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.util.Objects;
+import java.util.Optional;
+import roomescape.advice.exception.ExceptionTitle;
+import roomescape.advice.exception.RoomEscapeException;
 
 @Entity
 @Table(name = "theme")
@@ -24,22 +27,16 @@ public class Theme {
     @Embedded
     private ThemeThumbnail thumbnail;
 
-    public Theme(Long id, String name, String description, String thumbnail) {
-        this(Objects.requireNonNull(id),
-                new ThemeName(name),
-                new ThemeDescription(description),
-                new ThemeThumbnail(thumbnail));
-    }
-
     public Theme(String name, String description, String thumbnail) {
-        this(null, new ThemeName(name), new ThemeDescription(description), new ThemeThumbnail(thumbnail));
+        this.name = new ThemeName(name);
+        this.description = new ThemeDescription(description);
+        this.thumbnail = new ThemeThumbnail(thumbnail);
     }
 
-    private Theme(Long id, ThemeName name, ThemeDescription description, ThemeThumbnail thumbnail) {
-        this.id = id;
-        this.name = Objects.requireNonNull(name);
-        this.description = Objects.requireNonNull(description);
-        this.thumbnail = Objects.requireNonNull(thumbnail);
+    public Theme(Long id, String name, String description, String thumbnail) {
+        this(name, description, thumbnail);
+        this.id = Optional.ofNullable(id).orElseThrow(
+                () -> new RoomEscapeException("테마 id는 null 일 수 없습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST));
     }
 
     protected Theme() {
@@ -83,10 +80,10 @@ public class Theme {
     @Override
     public String toString() {
         return "Theme{" +
-                "id=" + id +
-                ", name=" + name +
-                ", description=" + description +
-                ", thumbnail=" + thumbnail +
-                '}';
+               "id=" + id +
+               ", name=" + name +
+               ", description=" + description +
+               ", thumbnail=" + thumbnail +
+               '}';
     }
 }

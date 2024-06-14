@@ -10,6 +10,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.util.Objects;
+import java.util.Optional;
+import roomescape.advice.exception.ExceptionTitle;
+import roomescape.advice.exception.RoomEscapeException;
 
 @Entity
 @Table(name = "member")
@@ -29,23 +32,22 @@ public class Member {
     @Column(name = "role", nullable = false)
     private MemberRole role;
 
+    private Member(Long id, String name, String email, MemberRole role) {
+        this.id = Optional.ofNullable(id).orElseThrow(() ->
+                new RoomEscapeException("사용자 id는 null 일 수 없습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST));
+        this.name = new MemberName(name);
+        this.email = new MemberEmail(email);
+        this.role = Optional.ofNullable(role).orElseThrow(() ->
+                new RoomEscapeException("사용자 역할은 null 일 수 없습니다.", ExceptionTitle.ILLEGAL_USER_REQUEST));
+    }
+
     public Member(Long id, String name, String email, String password, MemberRole role) {
-        this.id = Objects.requireNonNull(id);
-        this.name = new MemberName(Objects.requireNonNull(name));
-        this.email = new MemberEmail(Objects.requireNonNull(email));
-        this.password = new MemberPassword(Objects.requireNonNull(password));
-        this.role = Objects.requireNonNull(role);
+        this(id, name, email, role);
+        this.password = new MemberPassword(password);
     }
 
     public Member(Long id, String name, String email) {
-        this(id, new MemberName(name), new MemberEmail(email), MemberRole.USER);
-    }
-
-    private Member(Long id, MemberName name, MemberEmail email, MemberRole role) {
-        this.id = Objects.requireNonNull(id);
-        this.name = Objects.requireNonNull(name);
-        this.email = Objects.requireNonNull(email);
-        this.role = Objects.requireNonNull(role);
+        this(id, name, email, MemberRole.USER);
     }
 
     protected Member() {

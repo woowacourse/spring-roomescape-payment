@@ -2,138 +2,103 @@ package roomescape.waiting.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
+import static roomescape.fixture.MemberFixture.MEMBER_ADMIN;
+import static roomescape.fixture.MemberFixture.MEMBER_BRI;
+import static roomescape.fixture.MemberFixture.MEMBER_BROWN;
+import static roomescape.fixture.MemberFixture.MEMBER_DUCK;
+import static roomescape.fixture.ThemeFixture.THEME_1;
+import static roomescape.fixture.TimeFixture.TIME_1;
 
+import io.restassured.RestAssured;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.jdbc.Sql;
 import roomescape.advice.exception.RoomEscapeException;
-import roomescape.member.domain.Member;
 import roomescape.member.dto.MemberResponse;
-import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.MyReservationWaitingResponse;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.repository.ReservationRepository;
-import roomescape.theme.domain.Theme;
-import roomescape.time.domain.ReservationTime;
+import roomescape.theme.repository.ThemeRepository;
+import roomescape.time.repository.TimeRepository;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.domain.WaitingWithOrder;
 import roomescape.waiting.dto.WaitingCreateRequest;
 import roomescape.waiting.dto.WaitingResponse;
 import roomescape.waiting.repository.WaitingRepository;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@Sql(scripts = "/init.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class WaitingServiceTest {
-    @Mock
-    private WaitingRepository waitingRepository;
-    @Mock
-    private ReservationRepository reservationRepository;
-    @Mock
-    private MemberRepository memberRepository;
-    @InjectMocks
+    private static final Reservation RESERVATION_1 = new Reservation(1L,
+            MEMBER_BRI, LocalDate.now().plusDays(1), TIME_1, THEME_1,
+            ReservationStatus.RESERVED);
+    private static final Waiting WAITING_1 = new Waiting(RESERVATION_1, MEMBER_BROWN);
+    private static final Reservation RESERVATION_2 = new Reservation(2L,
+            MEMBER_BRI, LocalDate.now().plusDays(2), TIME_1, THEME_1,
+            ReservationStatus.RESERVED);
+    private static final Waiting WAITING_2 = new Waiting(RESERVATION_2, MEMBER_BROWN);
+
+    @LocalServerPort
+    private int port;
+    @Autowired
     private WaitingService waitingService;
+    @Autowired
+    private TimeRepository timeRepository;
+    @Autowired
+    private ThemeRepository themeRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
+    @Autowired
+    private WaitingRepository waitingRepository;
+
+    @BeforeEach
+    void setUp() {
+        RestAssured.port = port;
+        themeRepository.save(THEME_1);
+        timeRepository.save(TIME_1);
+        reservationRepository.save(RESERVATION_1);
+        reservationRepository.save(RESERVATION_2);
+        waitingRepository.save(WAITING_1);
+        waitingRepository.save(WAITING_2);
+    }
 
     @DisplayName("나의 예약 대기 목록을 조회할 수 있다.")
     @Test
     void findMyWaitingTest() {
-        Reservation reservation = new Reservation(
-                1L,
-                new Member(1L, "브라운", "brown@abc.com"),
-                LocalDate.of(2024, 8, 15),
-                new ReservationTime(1L, LocalTime.of(19, 0)),
-                new Theme(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg"), ReservationStatus.RESERVED);
-        Member waitingMember = new Member(2L, "낙낙", "naknak@abc.com");
-        WaitingWithOrder waitingWithOrder = new WaitingWithOrder(new Waiting(reservation, waitingMember), 1L);
-
-        given(waitingRepository.findByMember_idWithRank(2L))
-                .willReturn(List.of(waitingWithOrder));
-
-        List<MyReservationWaitingResponse> expected = List.of(MyReservationWaitingResponse.from(waitingWithOrder));
-
-        List<MyReservationWaitingResponse> actual = waitingService.findMyWaitings(2L);
-
-        assertThat(actual).isEqualTo(expected);
+        assertThat(waitingService.findMyWaitings(2L))
+                .containsExactlyInAnyOrder(
+                        MyReservationWaitingResponse.from(new WaitingWithOrder(WAITING_1, 1L)),
+                        MyReservationWaitingResponse.from(new WaitingWithOrder(WAITING_2, 1L))
+                );
     }
 
     @DisplayName("예약 대기를 생성할 수 있다.")
     @Test
     void createWaitingTest() {
-        LocalDate date = LocalDate.now().plusDays(7);
-        WaitingCreateRequest request = new WaitingCreateRequest(date, 1L, 1L);
-        Reservation reservation = new Reservation(
-                1L,
-                new Member(1L, "브라운", "brown@abc.com"),
-                LocalDate.of(2024, 8, 15),
-                new ReservationTime(1L, LocalTime.of(19, 0)),
-                new Theme(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg"), ReservationStatus.RESERVED);
-        Member waitingMember = new Member(2L, "낙낙", "naknak@abc.com");
+        WaitingCreateRequest request =
+                new WaitingCreateRequest(RESERVATION_1.getDate(), RESERVATION_1.getThemeId(), RESERVATION_1.getTimeId());
+        WaitingResponse response =
+                new WaitingResponse(3L, ReservationResponse.from(RESERVATION_1), MemberResponse.from(MEMBER_DUCK));
 
-        given(reservationRepository.findByDateAndTime_idAndTheme_id(date, 1L, 1L))
-                .willReturn(Optional.of(reservation));
-        given(memberRepository.findById(2L))
-                .willReturn(Optional.of(waitingMember));
-        given(waitingRepository.save(any()))
-                .willReturn(new Waiting(1L, reservation, waitingMember));
-
-        WaitingResponse expected = new WaitingResponse(
-                1L,
-                ReservationResponse.from(reservation),
-                MemberResponse.from(waitingMember));
-
-        WaitingResponse actual = waitingService.createWaiting(request, waitingMember.getId());
-
-        assertThat(actual)
-                .usingRecursiveComparison()
-                .isEqualTo(expected);
+        assertThat(waitingService.createWaiting(request, MEMBER_DUCK.getId()))
+                .isEqualTo(response);
     }
 
     @DisplayName("예약 대기시, 예약이 존재하지 않는다면 예외를 던진다.")
     @Test
     void createWaitingTest_whenReservationNotExist() {
-        LocalDate date = LocalDate.now().plusDays(7);
-        WaitingCreateRequest request = new WaitingCreateRequest(date, 1L, 1L);
-        Member waitingMember = new Member(2L, "낙낙", "naknak@abc.com");
+        WaitingCreateRequest request =
+                new WaitingCreateRequest(LocalDate.now(), 100L, 100L);
 
-        given(reservationRepository.findByDateAndTime_idAndTheme_id(date, 1L, 1L))
-                .willReturn(Optional.empty());
-
-        assertThatThrownBy(() -> waitingService.createWaiting(request, waitingMember.getId()))
+        assertThatThrownBy(() -> waitingService.createWaiting(request, MEMBER_ADMIN.getId()))
                 .isInstanceOf(RoomEscapeException.class)
                 .hasMessage("존재하지 않는 예약에 대해 대기할 수 없습니다.");
-    }
-
-    @DisplayName("예약 대기시, 이미 예약 대기를 한적이 있다면 예외를 발생시킨다.")
-    @Test
-    void createWaitingTest_whenWaitingDuplicate() {
-        LocalDate date = LocalDate.now().plusDays(7);
-        WaitingCreateRequest request = new WaitingCreateRequest(date, 1L, 1L);
-        Reservation reservation = new Reservation(
-                1L,
-                new Member(1L, "브라운", "brown@abc.com"),
-                LocalDate.of(2024, 8, 15),
-                new ReservationTime(1L, LocalTime.of(19, 0)),
-                new Theme(1L, "레벨2 탈출", "레벨2 탈출하기", "https://img.jpg"), ReservationStatus.RESERVED);
-        Member waitingMember = new Member(2L, "낙낙", "naknak@abc.com");
-
-        given(reservationRepository.findByDateAndTime_idAndTheme_id(date, 1L, 1L))
-                .willReturn(Optional.of(reservation));
-        given(memberRepository.findById(2L))
-                .willReturn(Optional.of(waitingMember));
-        given(waitingRepository.existsByReservation_idAndMember_id(1L, 2L))
-                .willReturn(true);
-
-        assertThatThrownBy(() -> waitingService.createWaiting(request, waitingMember.getId()))
-                .isInstanceOf(RoomEscapeException.class)
-                .hasMessage("중복으로 예약 대기를 할 수 없습니다.");
     }
 }

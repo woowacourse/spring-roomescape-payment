@@ -1,6 +1,8 @@
 package roomescape.time.controller;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
@@ -20,6 +22,7 @@ import roomescape.time.dto.TimeCreateRequest;
 import roomescape.time.dto.TimeResponse;
 import roomescape.time.service.TimeService;
 
+@Tag(name = "예약 시간 API")
 @RestController
 @RequestMapping("/times")
 public class TimeController {
@@ -29,11 +32,13 @@ public class TimeController {
         this.service = service;
     }
 
+    @Operation(summary = "전체 예약 시간 조회", description = "전체 예약 시간을 조회한다.")
     @GetMapping
     public List<TimeResponse> findTimes() {
         return service.findTimes();
     }
 
+    @Operation(summary = "예약 가능 시간 조회", description = "예약 시간의 예약 여부를 조회한다.")
     @GetMapping("/available")
     public List<AvailableTimeResponse> findAvailableTimes(
             @RequestParam @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
@@ -41,6 +46,7 @@ public class TimeController {
         return service.findAvailableTimes(date, themeId);
     }
 
+    @Operation(summary = "예약 시간 추가", description = "예약 시간을 추가한다.")
     @PostMapping
     public ResponseEntity<TimeResponse> createTime(@RequestBody TimeCreateRequest request) {
         TimeResponse response = service.createTime(request);
@@ -51,6 +57,7 @@ public class TimeController {
                 .body(response);
     }
 
+    @Operation(summary = "예약 시간 삭제", description = "예약 시간을 삭제한다.")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTime(@PathVariable Long id) {
