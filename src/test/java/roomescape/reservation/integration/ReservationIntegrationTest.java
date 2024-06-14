@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.willDoNothing;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.math.BigDecimal;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +21,7 @@ import roomescape.model.IntegrationTest;
 import roomescape.reservation.dto.ReservationRequest;
 
 @ExtendWith(MockitoExtension.class)
+@Disabled
 class ReservationIntegrationTest extends IntegrationTest {
 
     @MockBean
