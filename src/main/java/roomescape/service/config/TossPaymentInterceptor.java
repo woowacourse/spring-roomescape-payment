@@ -38,11 +38,13 @@ public class TossPaymentInterceptor implements ClientHttpRequestInterceptor {
 
     private void logResponse(ClientHttpResponse response, URI uri) throws IOException {
         LOGGER.info("""
-            [RESPONSE]
-            Timestamp: {}
-            URI: {}
-            Status Code: {}
-            """, LocalDateTime.now(), uri, response.getStatusCode()
+                [RESPONSE]
+                Timestamp: {}
+                URI: {}
+                Status Code: {}
+                Response Body: {}
+                """, LocalDateTime.now(), uri, response.getStatusCode(),
+            new String(response.getBody().readAllBytes(), UTF_8)
         );
     }
 }

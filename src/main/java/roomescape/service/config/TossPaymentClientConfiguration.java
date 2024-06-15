@@ -9,6 +9,8 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.client.BufferingClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
@@ -20,13 +22,18 @@ public class TossPaymentClientConfiguration {
 
     @Bean
     public RestTemplate build(RestTemplateBuilder builder, TossPaymentConfigProperties properties) {
-        return builder
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(CONNECT_TIMEOUT_DURATION);
+        requestFactory.setReadTimeout(READ_TIMEOUT_DURATION);
+
+        RestTemplate template = builder
             .defaultHeader(HttpHeaders.AUTHORIZATION, encode(properties.getTestSecretKey()))
             .defaultHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
-            .setConnectTimeout(CONNECT_TIMEOUT_DURATION)
-            .setReadTimeout(READ_TIMEOUT_DURATION)
             .additionalInterceptors(new TossPaymentInterceptor())
             .build();
+
+        template.setRequestFactory(new BufferingClientHttpRequestFactory(requestFactory));
+        return template;
     }
 
     private String encode(String key) {
