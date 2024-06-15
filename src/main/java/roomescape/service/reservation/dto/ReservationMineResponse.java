@@ -76,14 +76,13 @@ public class ReservationMineResponse {
     }
 
     private static String getReservationStatus(Reservation reservation, Optional<Payment> reservationPayment) {
-        String message = PAYMENT_WAITING_MESSAGE;
-        if (reservationPayment.isPresent()) {
-            message = BOOKED_MESSAGE;
-            if (reservation.isCancelStatus()) {
-                message = CANCELED_MESSAGE;
-            }
+        if (reservationPayment.isEmpty()) {
+            return PAYMENT_WAITING_MESSAGE;
         }
-        return message;
+        if (reservation.isCancelStatus()) {
+            return CANCELED_MESSAGE;
+        }
+        return BOOKED_MESSAGE;
     }
 
     public LocalDateTime retrieveDateTime() {
