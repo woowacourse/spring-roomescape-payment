@@ -4,11 +4,8 @@ import jakarta.persistence.Embeddable;
 import roomescape.exception.theme.InvalidThemePriceRangeException;
 
 @Embeddable
-public class ThemePrice {
-    private int price;
-
-    protected ThemePrice() {
-    }
+public record ThemePrice(int price) {
+    private static final int MIN_PRICE = 0;
 
     public ThemePrice(int price) {
         this.price = price;
@@ -16,12 +13,8 @@ public class ThemePrice {
     }
 
     private void validatePriceRange(int price) {
-        if (price < 0) {
+        if (price < MIN_PRICE) {
             throw new InvalidThemePriceRangeException();
         }
-    }
-
-    public int getPrice() {
-        return price;
     }
 }

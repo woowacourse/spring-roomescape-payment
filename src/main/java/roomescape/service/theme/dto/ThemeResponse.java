@@ -19,7 +19,7 @@ public class ThemeResponse {
 
     public ThemeResponse(Theme theme) {
         this(theme.getId(),
-                theme.getName().getName(),
+                theme.getName().name(),
                 theme.getDescription(),
                 theme.getThumbnail(),
                 theme.getPrice()

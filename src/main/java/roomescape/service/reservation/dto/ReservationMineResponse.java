@@ -39,7 +39,7 @@ public class ReservationMineResponse {
     public static ReservationMineResponse fromReservationWaitingInfo(ReservationWaitingWithRank waitingWithRank) {
         return new ReservationMineResponse(
                 waitingWithRank.getWaiting().getReservation().getId(),
-                waitingWithRank.getWaiting().getReservation().getTheme().getName().getName(),
+                waitingWithRank.getWaiting().getReservation().getTheme().getName().name(),
                 waitingWithRank.getWaiting().getReservation().getDate(),
                 waitingWithRank.getWaiting().getReservation().getTime().getStartAt(),
                 String.format(WAITING_MESSAGE, waitingWithRank.getRank()),
@@ -50,7 +50,7 @@ public class ReservationMineResponse {
 
     public static ReservationMineResponse ofReservationPayment(Reservation reservation, Optional<Payment> reservationPayment) {
         return new ReservationMineResponse(reservation.getId(),
-                reservation.getTheme().getName().getName(),
+                reservation.getTheme().getName().name(),
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
                 getReservationStatus(reservation, reservationPayment),

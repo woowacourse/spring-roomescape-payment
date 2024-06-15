@@ -301,7 +301,7 @@ class ReservationIntegrationTest extends IntegrationTest {
             Member anotherMember = memberFixture.createUserMember("another@gmail.com");
 
             RestAssured.given().log().all()
-                    .cookies(cookieProvider.createUserCookies(anotherMember.getEmail().getAddress()))
+                    .cookies(cookieProvider.createUserCookies(anotherMember.getEmail().address()))
                     .when().delete("/reservations/" + reservation.getId() + "/cancel")
                     .then().log().all()
                     .statusCode(403);
@@ -372,7 +372,7 @@ class ReservationIntegrationTest extends IntegrationTest {
             Member anotherMember = memberFixture.createUserMember("another@gmail.com");
 
             RestAssured.given().log().all()
-                    .cookies(cookieProvider.createUserCookies(anotherMember.getEmail().getAddress()))
+                    .cookies(cookieProvider.createUserCookies(anotherMember.getEmail().address()))
                     .when().delete("/reservations/" + reservation.getId())
                     .then().log().all()
                     .statusCode(403);

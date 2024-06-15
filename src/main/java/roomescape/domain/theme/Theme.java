@@ -56,7 +56,7 @@ public class Theme {
     }
 
     public int getPrice() {
-        return price.getPrice();
+        return price.price();
     }
 
     @Override

@@ -5,9 +5,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import java.time.Clock;
-import java.util.Base64;
-import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import roomescape.domain.member.MemberEmail;
@@ -15,6 +12,10 @@ import roomescape.domain.member.MemberRole;
 import roomescape.exception.login.ExpiredTokenException;
 import roomescape.exception.login.InvalidTokenException;
 import roomescape.exception.member.InvalidMemberRoleException;
+
+import java.time.Clock;
+import java.util.Base64;
+import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
@@ -34,7 +35,7 @@ public class JwtTokenProvider {
 
     public String createToken(MemberEmail memberEmail, MemberRole memberRole) {
         return Jwts.builder()
-                .setSubject(memberEmail.getAddress())
+                .setSubject(memberEmail.address())
                 .claim(ROLE_CLAIM_NAME, memberRole.name())
                 .setExpiration(calculateExpiredAt())
                 .signWith(SignatureAlgorithm.HS256, secretKey)
