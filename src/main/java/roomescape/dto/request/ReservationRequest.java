@@ -18,8 +18,9 @@ public record ReservationRequest(Long memberId, LocalDate date, Long timeId, Lon
                 memberReservationRequest.timeId(), memberReservationRequest.themeId());
     }
 
+    // TODO: admin이 에약하면 paymentKey는 어떻게 저장할지?
     public Reservation toEntity(Member member, TimeSlot time, Theme theme) {
-        return new Reservation(null, member, date, time, theme, ReservationStatus.BOOKING);
+        return new Reservation(null, member, date, time, theme, ReservationStatus.BOOKING, "admin");
     }
 
     private void isValid(Long memberId, LocalDate date, Long timeId, Long themeId) {

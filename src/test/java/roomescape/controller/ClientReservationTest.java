@@ -30,7 +30,7 @@ class ClientReservationTest {
     TokenGenerator tokenGenerator;
 
     private static final String EMAIL = "test2DB@email.com";
-    private static final int RESERVATION_COUNT = 3;
+    private static final int RESERVATION_COUNT = 4;
     private static final int WAITING_COUNT = 4;
 
     @LocalServerPort

@@ -25,6 +25,7 @@ function render(data) {
         row.insertCell(2).textContent = time;
         row.insertCell(3).textContent = status;
 
+        // TODO : 결제 대기 상태이면 결제 버튼 및 결제 기능 필요
         if (status !== '예약') { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드, 상태 값은 변경 가능
             const cancelCell = row.insertCell(4);
             const cancelButton = document.createElement('button');
@@ -36,6 +37,8 @@ function render(data) {
             cancelCell.appendChild(cancelButton);
         } else { // 예약 완료 상태일 때
             row.insertCell(4).textContent = '';
+            row.insertCell(5).textContent = item.paymentKey;
+            row.insertCell(6).textContent = item.amount;
         }
     });
 }

@@ -118,17 +118,10 @@ public class ReservationService {
     }
 
     private void updateWaitingToReservation(final Reservation reservation) {
-
         Optional<Waiting> firstWaiting = waitingRepository
                 .findFirstByDateAndTimeAndTheme(reservation.getDate(), reservation.getTime(), reservation.getTheme());
 
-        firstWaiting.ifPresent(waiting -> {
-            Reservation newReservation = Reservation
-                    .createNewBooking(waiting.getMember(), reservation.getDate(), reservation.getTime(),
-                            reservation.getTheme());
-            waitingRepository.delete(waiting);
-            reservationRepository.save(newReservation);
-        });
+        firstWaiting.ifPresent(Waiting::toPending);
     }
 
     private void validate(LocalDate date, TimeSlot timeSlot, Theme theme, Member member) {

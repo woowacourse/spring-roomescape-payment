@@ -4,12 +4,17 @@ public enum ReservationStatus {
 
     BOOKING("예약"),
     WAITING("예약 대기"),
+    PENDING("결제 대기")
     ;
 
     private final String message;
 
     ReservationStatus(final String message) {
         this.message = message;
+    }
+
+    boolean isWaiting() {
+        return this == WAITING;
     }
 
     public String getMessage() {

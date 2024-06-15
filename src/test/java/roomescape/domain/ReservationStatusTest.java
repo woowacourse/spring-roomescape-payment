@@ -20,4 +20,14 @@ class ReservationStatusTest {
         //then
         assertThat(createdMessage).isEqualTo("2번째 예약 대기");
     }
+
+    @Test
+    @DisplayName("상태가 예약 대기인지 판단한다.")
+    void checkWaiting() {
+        assertAll(
+                () -> assertThat(ReservationStatus.WAITING.isWaiting()).isTrue(),
+                () -> assertThat(ReservationStatus.BOOKING.isWaiting()).isFalse(),
+                () -> assertThat(ReservationStatus.PENDING.isWaiting()).isFalse()
+        );
+    }
 }

@@ -20,18 +20,18 @@ public class Waiting {
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = false, name = "member_id")
     private Member member;
 
     @Column(nullable = false)
     private LocalDate date;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = false, name = "time_id")
     private TimeSlot time;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = false, name = "theme_id")
     private Theme theme;
 
     @Enumerated(value = EnumType.STRING)
@@ -47,6 +47,13 @@ public class Waiting {
         this.time = time;
         this.theme = theme;
         this.status = status;
+    }
+
+    public void toPending() {
+        if (!status.isWaiting()) {
+            throw new IllegalStateException("[ERROR] 결제 대기로 변경될 수 없습니다.");
+        }
+        status = ReservationStatus.PENDING;
     }
 
     public Long getId() {

@@ -23,7 +23,7 @@ public record MemberReservationRequest(
     }
 
     public Reservation toEntity(Member member, TimeSlot time, Theme theme) {
-        return new Reservation(null, member, date, time, theme, ReservationStatus.BOOKING);
+        return new Reservation(null, member, date, time, theme, ReservationStatus.BOOKING, paymentKey);
     }
 
     private void isValid(LocalDate date, Long timeId, Long themeId) {

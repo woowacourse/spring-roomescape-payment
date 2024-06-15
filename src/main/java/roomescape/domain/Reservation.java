@@ -20,37 +20,38 @@ public class Reservation {
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = false, name = "member_id")
     private Member member;
 
     @Column(nullable = false)
     private LocalDate date;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = false, name = "time_id")
     private TimeSlot time;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = false, name = "theme_id")
     private Theme theme;
 
     @Enumerated(value = EnumType.STRING)
     private ReservationStatus status;
 
+    @Column(nullable = false)
+    private String paymentKey;
+
     protected Reservation() {
     }
 
-    public Reservation(Long id, Member member, LocalDate date, TimeSlot time, Theme theme, ReservationStatus status) {
+    public Reservation(Long id, Member member, LocalDate date, TimeSlot time, Theme theme,
+                       ReservationStatus status, String paymentKey) {
         this.id = id;
         this.member = member;
         this.date = date;
         this.time = time;
         this.theme = theme;
         this.status = status;
-    }
-
-    public static Reservation createNewBooking(Member member, LocalDate date, TimeSlot time, Theme theme) {
-        return new Reservation(null, member, date, time, theme, ReservationStatus.BOOKING);
+        this.paymentKey = paymentKey;
     }
 
     public Long getId() {
@@ -75,5 +76,9 @@ public class Reservation {
 
     public ReservationStatus getStatus() {
         return status;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
     }
 }
