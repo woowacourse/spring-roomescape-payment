@@ -64,7 +64,7 @@ class ReservationEventHandlerTest {
 
     @DisplayName("이벤트가 발행되면 결제 대기중인 예약의 상태를 취소로 변경하고, 다음 대기 예약을 결제 대기 상태로 변경한다.")
     @Test
-    void pp() throws InterruptedException {
+    void update_reservation_status_on_payment_pending_event() throws InterruptedException {
         Member jazz = memberRepository.save(MEMBER_JAZZ.create());
         Member sun = memberRepository.save(MEMBER_SUN.create());
         Theme bed = themeRepository.save(THEME_BED.create());
@@ -77,7 +77,7 @@ class ReservationEventHandlerTest {
 
         eventHandler.handlePaymentPendingEvent(new PaymentPendingEvent(pending.getId()));
 
-        TimeUnit.SECONDS.sleep(2);
+        TimeUnit.MILLISECONDS.sleep(1500);
 
         Reservation updatedPending = reservationRepository.getReservationById(pending.getId());
         Reservation updatedWaiting = reservationRepository.getReservationById(waiting.getId());
