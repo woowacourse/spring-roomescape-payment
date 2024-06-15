@@ -2,8 +2,6 @@ package roomescape.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static roomescape.domain.reservation.Status.CANCELED;
 import static roomescape.domain.reservation.Status.PAYMENT_PENDING;
 import static roomescape.domain.reservation.Status.RESERVED;
 import static roomescape.domain.reservation.Status.WAITING;
@@ -74,7 +72,7 @@ class CancelServiceTest {
                 .isInstanceOf(NotFoundReservationException.class);
     }
 
-    @DisplayName("예약을 취소하고 다음 예약 대기가 존재할 시 예약 대기의 상태를 결제 대기 상태로 전환한다.")
+    @DisplayName("특정 예약과 동일한 조건의 다음 예약 대기가 존재할 시 예약 대기의 상태를 결제 대기 상태로 전환한다.")
     @Test
     void cancel_reservation_and_update_first_waiting_status_to_pending() {
         Member jazz = memberRepository.save(MEMBER_JAZZ.create());
@@ -82,19 +80,14 @@ class CancelServiceTest {
         Theme bed = themeRepository.save(THEME_BED.create());
         ReservationTime onePm = timeRepository.save(ONE_PM.create());
         LocalDate date = LocalDate.now().plusDays(1);
-        MemberInfo memberInfo = new MemberInfo(jazz.getId(), jazz.getName());
 
         Reservation reserved = reservationRepository.save(reservation(jazz, bed, date.toString(), onePm, RESERVED));
         reservationRepository.save(reservation(sun, bed, date.toString(), onePm, WAITING));
 
-        cancelService.cancelReservation(reserved.getId(), memberInfo);
+        cancelService.updateFirstWaitingToPending(reserved.getId());
 
-        Reservation canceledReservation = reservationRepository.getReservationById(1L);
         Reservation pendingReservation = reservationRepository.getReservationById(2L);
 
-        assertAll(
-                () -> assertThat(canceledReservation.getStatus()).isEqualTo(CANCELED),
-                () -> assertThat(pendingReservation.getStatus()).isEqualTo(PAYMENT_PENDING)
-        );
+        assertThat(pendingReservation.getStatus()).isEqualTo(PAYMENT_PENDING);
     }
 }

@@ -30,17 +30,18 @@ public class CancelService {
         cancelReservation(reservation);
     }
 
-    private void cancelReservation(Reservation reservation) {
-        reservation.cancel();
-        reservation.getPayment().ifPresent(payment -> paymentClient.cancel(payment, CancelReason.empty()));
-        updateFirstWaitingToPending(reservation);
-    }
-
-    private void updateFirstWaitingToPending(Reservation reservation) {
+    @Transactional
+    public void updateFirstWaitingToPending(Long reservationId) {
+        Reservation reservation = reservationRepository.getReservationById(reservationId);
         reservationRepository.findNextWaiting(reservation.getTheme(), reservation.getDate(), reservation.getTime())
                 .ifPresent(nextReservation -> {
                     nextReservation.toPending();
                     eventPublisher.publishPaymentPendingEvent(nextReservation);
                 });
+    }
+
+    private void cancelReservation(Reservation reservation) {
+        reservation.cancel();
+        reservation.getPayment().ifPresent(payment -> paymentClient.cancel(payment, CancelReason.empty()));
     }
 }
