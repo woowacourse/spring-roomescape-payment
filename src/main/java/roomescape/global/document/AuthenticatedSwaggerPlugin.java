@@ -9,6 +9,7 @@ import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.security.SecurityScheme.In;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.springdoc.core.customizers.OperationCustomizer;
@@ -23,26 +24,25 @@ import org.springframework.core.MethodParameter;
 public class AuthenticatedSwaggerPlugin implements OperationCustomizer {
     @Override
     public Operation customize(Operation operation, HandlerMethod handlerMethod) {
-        for (MethodParameter parameter : handlerMethod.getMethodParameters()) {
-            if (parameter.hasParameterAnnotation(Authenticated.class)) {
-                Parameter tokenParameter = new Parameter()
-                        .in(In.HEADER.toString())
-                        .name("token")
-                        .description("member login token")
-                        .required(true)
-                        .schema(new StringSchema());
-                operation.addParametersItem(tokenParameter);
-                operation.getParameters().removeIf(p -> p.getName().equals(parameter.getParameter().getName()));
-                Optional.ofNullable(operation.getRequestBody())
-                        .map(RequestBody::getContent)
-                        .map(content -> content.get("application/json"))
-                        .map(MediaType::getSchema)
-                        .map(Schema::getProperties)
-                        .ifPresent(properties -> properties.remove(parameter.getParameter().getName()));
-            }
-        }
+        Arrays.stream(handlerMethod.getMethodParameters())
+                .filter(parameter -> parameter.hasParameterAnnotation(Authenticated.class))
+                .forEach(parameter -> {
+                    Parameter tokenParameter = new Parameter()
+                            .in(In.HEADER.toString())
+                            .name("token")
+                            .description("member login token")
+                            .required(true)
+                            .schema(new StringSchema());
+                    operation.addParametersItem(tokenParameter);
+                    operation.getParameters().removeIf(p -> p.getName().equals(parameter.getParameter().getName()));
+                    Optional.ofNullable(operation.getRequestBody())
+                            .map(RequestBody::getContent)
+                            .map(content -> content.get("application/json"))
+                            .map(MediaType::getSchema)
+                            .map(Schema::getProperties)
+                            .ifPresent(properties -> properties.remove(parameter.getParameter().getName()));
+                });
         return operation;
     }
-
 }
 
