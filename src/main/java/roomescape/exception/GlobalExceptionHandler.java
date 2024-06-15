@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler extends AbstractExceptionHandler {
     @ExceptionHandler(RoomescapeException.class)
-    public ResponseEntity<String> roomescapeExceptionHandler(RoomescapeException exception) {
+    public ResponseEntity<RoomescapeExceptionResponse> roomescapeExceptionHandler(RoomescapeException exception) {
         logError(exception);
         return ResponseEntity.status(exception.getHttpStatus())
-                .body(exception.getMessage());
+                .body(exception.getRoomescapeExceptionResponse());
     }
 
     @ExceptionHandler(DateTimeParseException.class)

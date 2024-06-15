@@ -1,10 +1,13 @@
 package roomescape.dto.response.reservation;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.Status;
+import roomescape.domain.reservationwaiting.ReservationWaiting;
+import roomescape.domain.reservationwaiting.ReservationWaitingWithRank;
 
 public record MyReservationResponse(
         Long id,
@@ -12,19 +15,32 @@ public record MyReservationResponse(
         LocalDate date,
         @JsonFormat(pattern = "HH:mm")
         LocalTime time,
-        String status
+        String status,
+        String paymentKey,
+        BigDecimal amount
 ) {
-    public static MyReservationResponse of(Reservation reservation, long rank) {
+    public static MyReservationResponse from(Reservation reservation, Payment payment) {
         return new MyReservationResponse(
-                reservation.getId(), reservation.getTheme().getName(), reservation.getDate(),
-                reservation.getTime().getStartAt(), getWaitingOrder(reservation.getStatus(), rank)
+                reservation.getId(),
+                reservation.getTheme().getName(),
+                reservation.getDate(),
+                reservation.getTime().getStartAt(),
+                reservation.getStatus().getValue(),
+                payment.getPaymentKey(),
+                payment.getTotalAmount()
         );
     }
 
-    private static String getWaitingOrder(Status status, long rank) {
-        if (status == Status.WAITING) {
-            return rank + "번째 " + status.getValue();
-        }
-        return status.getValue();
+    public static MyReservationResponse from(ReservationWaitingWithRank reservationWaitingWithRank) {
+        ReservationWaiting reservationWaiting = reservationWaitingWithRank.getReservationWaiting();
+        return new MyReservationResponse(
+                reservationWaiting.getId(),
+                reservationWaiting.getTheme().getName(),
+                reservationWaiting.getDate(),
+                reservationWaiting.getTime().getStartAt(),
+                reservationWaitingWithRank.getRank() + 1 + "번째 예약 대기",
+                null,
+                null
+        );
     }
 }

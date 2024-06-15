@@ -13,7 +13,7 @@ import roomescape.dto.request.reservation.ReservationRequest;
 
 public class ReservationTestStep {
     public static Long postClientReservation(String token, String date, Long timeId, Long themeId, int expectedHttpCode) {
-        ReservationRequest reservationRequest = new ReservationRequest(LocalDate.parse(date), timeId, themeId, null, null,
+        ReservationRequest reservationRequest = new ReservationRequest(LocalDate.parse(date), timeId, themeId, "paymentKey", "orderId",
                 BigDecimal.valueOf(1000));
 
         Response response = RestAssured.given().log().all()

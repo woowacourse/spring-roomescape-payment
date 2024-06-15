@@ -17,62 +17,72 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.mockito.BDDMockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
 import roomescape.BasicAcceptanceTest;
+import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.request.reservation.ReservationRequest;
 import roomescape.dto.payment.PaymentRequest;
 import roomescape.exception.PaymentException;
 import roomescape.exception.PaymentExceptionResponse;
 
 class ReservationAcceptanceTest extends BasicAcceptanceTest {
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     private String clientToken;
     private String adminToken;
 
     @BeforeEach
     void SetUp() {
+        jdbcTemplate.update(
+                "INSERT INTO member (name, email, password, role) VALUES ('회원', 'member@wooteco.com', 'wootecoCrew6!', 'BASIC')");
+        jdbcTemplate.update(
+                "INSERT INTO member (name, email, password, role) VALUES ('운영자', 'admin@wooteco.com', 'wootecoCrew6!', 'ADMIN')");
+        jdbcTemplate.update("INSERT INTO reservation_time (start_at) VALUES ('10:00')");
+        jdbcTemplate.update("INSERT INTO reservation_time (start_at) VALUES ('11:00')");
+        jdbcTemplate.update("INSERT INTO theme (name, description, thumbnail, price) VALUES ('name1', 'description1', 'thumbnail1', 1000)");
+        jdbcTemplate.update("INSERT INTO theme (name, description, thumbnail, price) VALUES ('name2', 'description2', 'thumbnail2', 1000)");
         clientToken = LoginTokenProvider.login("member@wooteco.com", "wootecoCrew6!", 200);
         adminToken = LoginTokenProvider.login("admin@wooteco.com", "wootecoCrew6!", 200);
     }
 
     @TestFactory
-    @DisplayName("관리자 페이지에서 3개의 예약을 추가한다")
+    @DisplayName("관리자 페이지에서 2개의 예약을 추가한다")
     Stream<DynamicTest> adminReservationPostAndGetTest() {
         LocalDate tomorrow = LocalDate.now().plusDays(1);
 
         return Stream.of(
                 dynamicTest("관리자 페이지에서 예약을 추가한다", () -> ReservationTestStep.postAdminReservation(adminToken, tomorrow.toString(), 1L, 1L, 1L, 201)),
                 dynamicTest("관리자 페이지에서 예약을 추가한다", () -> ReservationTestStep.postAdminReservation(adminToken, tomorrow.toString(), 2L, 2L, 2L, 201)),
-                dynamicTest("관리자 페이지에서 예약을 추가한다", () -> ReservationTestStep.postAdminReservation(adminToken, tomorrow.toString(), 3L, 3L, 3L, 201)),
-                dynamicTest("모든 예약을 조회한다 (총 6개)", () -> ReservationTestStep.getReservations(200, 6))
+                dynamicTest("모든 예약을 조회한다 (총 2개)", () -> ReservationTestStep.getReservations(200, 2))
         );
     }
 
-    @TestFactory
     @DisplayName("관리자 페이지에서 조건에 맞는 예약을 검색한다")
-    Stream<DynamicTest> adminSearchReservation() {
+    @Test
+    void adminSearchReservation() {
+        jdbcTemplate.update("INSERT INTO reservation (date, member_id, time_id, theme_id, status) VALUES (CURRENT_DATE + INTERVAL '-1' DAY, 1, 1, 1, 'RESERVATION')");
+        jdbcTemplate.update("INSERT INTO reservation (date, member_id, time_id, theme_id, status) VALUES (CURRENT_DATE, 1, 1, 1, 'RESERVATION')");
+        jdbcTemplate.update("INSERT INTO reservation (date, member_id, time_id, theme_id, status) VALUES (CURRENT_DATE + INTERVAL '1' DAY , 2, 1, 1, 'RESERVATION')");
         LocalDate today = LocalDate.now();
         LocalDate yesterday = today.minusDays(1);
         LocalDate tomorrow = today.plusDays(1);
 
-        return Stream.of(
-                dynamicTest("관리자 페이지에서 예약을 추가한다", () -> ReservationTestStep.postAdminReservation(adminToken, tomorrow.toString(), 1L, 1L, 1L, 201)),
-                dynamicTest("관리자 페이지에서 예약을 추가한다", () -> ReservationTestStep.postAdminReservation(adminToken, tomorrow.toString(), 1L, 2L, 1L, 201)),
-                dynamicTest("관리자 페이지에서 예약을 추가한다", () -> ReservationTestStep.postAdminReservation(adminToken, tomorrow.toString(), 3L, 3L, 3L, 201)),
-                dynamicTest("날짜는 어제부터 내일까지, member_id는 1, theme_id는 1인 예약을 검색한다 (총 2개)", () -> adminSearch(adminToken, 1L, 1L, yesterday.toString(), tomorrow.toString(), 200, 2))
-        );
+        adminSearch(adminToken, 1L, 1L, yesterday.toString(), tomorrow.toString(), 200, 2);
     }
 
     @TestFactory
-    @DisplayName("사용자 페이지에서 3개의 예약을 추가한다")
+    @DisplayName("사용자 페이지에서 2개의 예약을 추가한다")
     Stream<DynamicTest> userReservationPostAndGetTest() {
+        jdbcTemplate.update("INSERT INTO reservation (date, member_id, time_id, theme_id, status) VALUES (CURRENT_DATE + INTERVAL '2' DAY , 2, 1, 1, 'RESERVATION')");
         LocalDate tomorrow = LocalDate.now().plusDays(1);
 
         return Stream.of(
                 dynamicTest("사용자 페이지에서 예약을 추가한다", () -> ReservationTestStep.postClientReservation(clientToken, tomorrow.toString(), 1L, 1L, 201)),
                 dynamicTest("사용자 페이지에서 예약을 추가한다", () -> ReservationTestStep.postClientReservation(clientToken, tomorrow.toString(), 2L, 2L, 201)),
-                dynamicTest("사용자 페이지에서 예약을 추가한다", () -> ReservationTestStep.postClientReservation(clientToken, tomorrow.toString(), 3L, 3L, 201)),
-                dynamicTest("모든 예약을 조회한다 (총 6개)", () -> ReservationTestStep.getReservations(200, 6)),
-                dynamicTest("자신의 예약을 조회한다 (총 3개)", () -> getMyReservations(clientToken, 200, 3))
+                dynamicTest("모든 예약을 조회한다 (총 3개)", () -> ReservationTestStep.getReservations(200, 3)),
+                dynamicTest("자신의 예약을 조회한다 (총 2개)", () -> getMyReservations(clientToken, 200, 2))
         );
     }
 
@@ -89,16 +99,18 @@ class ReservationAcceptanceTest extends BasicAcceptanceTest {
     @TestFactory
     @DisplayName("예약을 추가하고 삭제한다")
     Stream<DynamicTest> reservationPostAndDeleteTest() {
+        PaymentRequest paymentRequest = new PaymentRequest("orderId", BigDecimal.valueOf(1000), "paymentKey");
+        BDDMockito.given(paymentClient.requestPayment(paymentRequest))
+                .willReturn(new PaymentResponse("paymentKey", BigDecimal.valueOf(1000)));
         LocalDate tomorrow = LocalDate.now().plusDays(1);
         AtomicLong reservationId = new AtomicLong();
 
         return Stream.of(
-                dynamicTest("사용자 페이지에서 예약을 추가한다", () -> reservationId.set(ReservationTestStep.postClientReservation(
-                        clientToken, tomorrow.toString(), 1L, 1L, 201))),
+                dynamicTest("사용자 페이지에서 예약을 추가한다", () -> reservationId.set(ReservationTestStep.postClientReservation(clientToken, tomorrow.toString(), 1L, 1L, 201))),
                 dynamicTest("사용자 페이지에서 예약을 추가한다", () -> ReservationTestStep.postClientReservation(clientToken, tomorrow.toString(), 2L, 2L, 201)),
-                dynamicTest("모든 예약을 조회한다 (총 5개)", () -> ReservationTestStep.getReservations(200, 5)),
+                dynamicTest("모든 예약을 조회한다 (총 2개)", () -> ReservationTestStep.getReservations(200, 2)),
                 dynamicTest("예약을 삭제한다", () -> ReservationTestStep.deleteReservation(reservationId.longValue(), 204)),
-                dynamicTest("모든 예약을 조회한다 (총 4개)", () -> ReservationTestStep.getReservations(200, 4))
+                dynamicTest("모든 예약을 조회한다 (총 1개)", () -> ReservationTestStep.getReservations(200, 1))
         );
     }
 
@@ -106,16 +118,15 @@ class ReservationAcceptanceTest extends BasicAcceptanceTest {
     @Test
     void reservationPostWhenPaymentFail() {
         LocalDate tomorrow = LocalDate.now().plusDays(1);
-        ReservationRequest request = new ReservationRequest(tomorrow, 1L, 1L, null, null, BigDecimal.valueOf(1000));
-        PaymentRequest paymentRequest = new PaymentRequest(request.orderId(), request.amount(),
-                request.paymentKey());
+        ReservationRequest request = new ReservationRequest(tomorrow, 1L, 1L, "paymentKey", "orderId", BigDecimal.valueOf(1000));
+        PaymentRequest paymentRequest = new PaymentRequest(request.orderId(), request.amount(), request.paymentKey());
         BDDMockito.given(paymentClient.requestPayment(paymentRequest))
                 .willThrow(new PaymentException(
                         HttpStatus.BAD_REQUEST, new PaymentExceptionResponse("EXCEPTION", "exception")));
 
         ReservationTestStep.postClientReservation(
                 clientToken, tomorrow.toString(), 1L, 1L, 400);
-        ReservationTestStep.getReservations(200, 3);
+        ReservationTestStep.getReservations(200, 0);
     }
 
     private void adminSearch(String token, Long themeId, Long memberId, String dateFrom, String dateTo, int expectedHttpCode, int expectedReservationResponsesSize) {

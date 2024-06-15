@@ -23,13 +23,13 @@ public class MemberController {
     }
 
     @GetMapping
-    public ResponseEntity<List<MemberResponse>> members() {
+    public ResponseEntity<List<MemberResponse>> findMembers() {
         List<MemberResponse> memberResponses = memberService.findAll();
         return ResponseEntity.ok(memberResponses);
     }
 
     @PostMapping
-    public ResponseEntity<MemberResponse> save(@RequestBody @Valid MemberSignUpRequest memberSignUpRequest) {
+    public ResponseEntity<MemberResponse> saveMember(@RequestBody @Valid MemberSignUpRequest memberSignUpRequest) {
         MemberResponse memberResponse = memberService.save(memberSignUpRequest);
         return ResponseEntity.created(URI.create("/members/" + memberResponse.id()))
                 .body(memberResponse);

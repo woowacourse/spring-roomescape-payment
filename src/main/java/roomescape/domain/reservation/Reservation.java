@@ -9,10 +9,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.util.Objects;
 import org.springframework.http.HttpStatus;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.theme.Theme;
 import roomescape.exception.RoomescapeException;
 
@@ -30,16 +32,16 @@ public class Reservation {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Theme theme;
     @Enumerated(value = EnumType.STRING)
-    private Status status;
+    private ReservationStatus status;
 
     protected Reservation() {
     }
 
-    public Reservation(Member member, LocalDate date, ReservationTime time, Theme theme, Status status) {
+    public Reservation(Member member, LocalDate date, ReservationTime time, Theme theme, ReservationStatus status) {
         this(null, member, date, time, theme, status);
     }
 
-    public Reservation(Long id, Member member, LocalDate date, ReservationTime time, Theme theme, Status status) {
+    public Reservation(Long id, Member member, LocalDate date, ReservationTime time, Theme theme, ReservationStatus status) {
         if (date == null) {
             throw new RoomescapeException(HttpStatus.BAD_REQUEST, "예약 날짜는 필수입니다.");
         }
@@ -49,6 +51,16 @@ public class Reservation {
         this.time = time;
         this.theme = theme;
         this.status = status;
+    }
+
+    public void cancel() {
+        if (status.isNotCanceled()) {
+            status = ReservationStatus.CANCELED;
+        }
+    }
+
+    public boolean isPaid() {
+        return status.isReserved();
     }
 
     public Long getId() {
@@ -71,14 +83,8 @@ public class Reservation {
         return theme;
     }
 
-    public Status getStatus() {
+    public ReservationStatus getStatus() {
         return status;
-    }
-
-    public void changePaymentWaiting() {
-        if (status.isWaiting()) {
-            status = Status.PAYMENT_WAITING;
-        }
     }
 
     @Override

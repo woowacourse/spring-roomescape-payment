@@ -14,12 +14,11 @@ import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 import roomescape.client.PaymentClient;
 import roomescape.client.PaymentClientFactory;
-import roomescape.client.TossPaymentClientFactory;
 import roomescape.config.properties.PaymentClientProperties;
-import roomescape.config.properties.TossPaymentClientProperties;
+import roomescape.config.properties.PaymentClientProperty;
 
 @Configuration
-@EnableConfigurationProperties(TossPaymentClientProperties.class)
+@EnableConfigurationProperties(PaymentClientProperties.class)
 public class PaymentConfig {
     private final PaymentClientProperties properties;
 
@@ -28,29 +27,31 @@ public class PaymentConfig {
     }
 
     @Bean
-    public PaymentClientFactory paymentClientFactory() {
-        return new TossPaymentClientFactory(properties);
+    public PaymentClientProperty tossProperty() {
+        return properties.getProperty("toss");
     }
 
     @Bean
     public RestClientCustomizer restClientCustomizer() {
+        PaymentClientProperty property = tossProperty();
         return restClientBuilder -> restClientBuilder
-                .baseUrl(properties.getBaseUrl())
-                .requestFactory(createClientHttpRequestFactory());
+                .baseUrl(property.baseUrl())
+                .requestFactory(createClientHttpRequestFactory(property));
     }
 
     @Bean
     public PaymentClient paymentClient(RestClient.Builder restClientBuilder) {
-        RestClient restClient = paymentClientFactory().createPaymentClient(restClientBuilder);
+        RestClient restClient = new PaymentClientFactory(tossProperty())
+                .createPaymentClient(restClientBuilder);
         return HttpServiceProxyFactory
                 .builderFor(RestClientAdapter.create(restClient))
                 .build().createClient(PaymentClient.class);
     }
 
-    private ClientHttpRequestFactory createClientHttpRequestFactory() {
+    private ClientHttpRequestFactory createClientHttpRequestFactory(PaymentClientProperty property) {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(properties.getConnectionTimeoutSeconds()))
-                .withReadTimeout(Duration.ofSeconds(properties.getReadTimeoutSeconds()));
+                .withConnectTimeout(Duration.ofSeconds(property.connectionTimeoutSeconds()))
+                .withReadTimeout(Duration.ofSeconds(property.readTimeoutSeconds()));
         return ClientHttpRequestFactories.get(JdkClientHttpRequestFactory.class, settings);
     }
 }

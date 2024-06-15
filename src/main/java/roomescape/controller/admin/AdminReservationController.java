@@ -10,23 +10,26 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.service.ReservationService;
-import roomescape.domain.reservation.Status;
 import roomescape.dto.request.reservation.AdminReservationRequest;
 import roomescape.dto.request.reservation.ReservationCriteriaRequest;
 import roomescape.dto.response.reservation.ReservationResponse;
+import roomescape.service.ReservationWaitingService;
 
 @RestController
 @RequestMapping("/admin")
 public class AdminReservationController {
     private final ReservationService reservationService;
+    private final ReservationWaitingService reservationWaitingService;
 
-    public AdminReservationController(ReservationService reservationService) {
+    public AdminReservationController(ReservationService reservationService,
+                                      ReservationWaitingService reservationWaitingService) {
         this.reservationService = reservationService;
+        this.reservationWaitingService = reservationWaitingService;
     }
 
     @GetMapping("/waitings")
-    public ResponseEntity<List<ReservationResponse>> findAllByWaiting() {
-        List<ReservationResponse> responses = reservationService.findAllByStatus(Status.WAITING);
+    public ResponseEntity<List<ReservationResponse>> findAllWaitings() {
+        List<ReservationResponse> responses = reservationWaitingService.findAll();
         return ResponseEntity.ok(responses);
     }
 

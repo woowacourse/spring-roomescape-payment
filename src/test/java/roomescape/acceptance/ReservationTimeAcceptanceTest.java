@@ -10,21 +10,29 @@ import io.restassured.response.Response;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import roomescape.BasicAcceptanceTest;
 import roomescape.dto.response.reservation.AvailableTimeResponse;
 import roomescape.dto.request.reservation.ReservationTimeRequest;
 
 class ReservationTimeAcceptanceTest extends BasicAcceptanceTest {
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     private String adminToken;
 
     @BeforeEach
     void SetUp() {
+        jdbcTemplate.update(
+                "INSERT INTO member (name, email, password, role) VALUES ('회원', 'member@wooteco.com', 'wootecoCrew6!', 'BASIC')");
+        jdbcTemplate.update(
+                "INSERT INTO member (name, email, password, role) VALUES ('운영자', 'admin@wooteco.com', 'wootecoCrew6!', 'ADMIN')");
         adminToken = LoginTokenProvider.login("admin@wooteco.com", "wootecoCrew6!", 200);
     }
 
@@ -44,7 +52,7 @@ class ReservationTimeAcceptanceTest extends BasicAcceptanceTest {
                 dynamicTest("예약 시간을 추가한다 (09:00)", () -> postReservationTime(adminToken, "01:00", 201)),
                 dynamicTest("예약 시간을 추가한다 (10:00)", () -> postReservationTime(adminToken, "02:00", 201)),
                 dynamicTest("예약 시간을 추가한다 (11:00)", () -> postReservationTime(adminToken, "03:00", 201)),
-                dynamicTest("모든 예약 시간을 조회한다 (총 7개)", () -> getReservationTimes(200, 7))
+                dynamicTest("모든 예약 시간을 조회한다 (총 3개)", () -> getReservationTimes(200, 3))
         );
     }
 
@@ -52,26 +60,24 @@ class ReservationTimeAcceptanceTest extends BasicAcceptanceTest {
     @DisplayName("예약 시간을 추가하고 삭제한다")
     Stream<DynamicTest> reservationPostAndDeleteTest() {
         AtomicLong reservationTimeId = new AtomicLong();
-
         return Stream.of(
                 dynamicTest("예약 시간을 추가한다 (01:00)", () -> reservationTimeId.set(postReservationTime(adminToken, "01:00", 201))),
                 dynamicTest("예약 시간을 삭제한다 (01:00)", () -> deleteReservationTime(adminToken, reservationTimeId.longValue(), 204)),
                 dynamicTest("예약 시간을 추가한다 (01:00)", () -> postReservationTime(adminToken, "01:00", 201)),
-                dynamicTest("모든 예약 시간을 조회한다 (총 5개)", () -> getReservationTimes(200, 5))
+                dynamicTest("모든 예약 시간을 조회한다 (총 1개)", () -> getReservationTimes(200, 1))
         );
     }
 
-    @TestFactory
-    @DisplayName("예약이 가능한 시간을 구분하여 반환한다.")
-    Stream<DynamicTest> res() {
-        AtomicReference<String> token = new AtomicReference<>();
-        return Stream.of(
-                dynamicTest("모든 예약된 시간을 조회한다 (총 3개)", () -> getAvailableTimes(200, 3)),
-                dynamicTest("로그인을 한다", () -> token.set(
-                        LoginTokenProvider.login("member@wooteco.com", "wootecoCrew6!", 200))),
-                dynamicTest("예약을 추가한다", () -> ReservationTestStep.postClientReservation(token.get(), "2099-04-29", 4L, 1L, 201)),
-                dynamicTest("모든 예약된 시간을 조회한다 (총 4개)", () -> getAvailableTimes(200, 4))
-        );
+    @DisplayName("예약이 가능한 시간을 반환한다.")
+    @Test
+    void reservationAvailableTimes() {
+        jdbcTemplate.update("INSERT INTO reservation_time (start_at) VALUES ('10:00')");
+        jdbcTemplate.update("INSERT INTO reservation_time (start_at) VALUES ('11:00')");
+        jdbcTemplate.update("INSERT INTO theme (name, description, thumbnail, price) VALUES ('name1', 'description1', 'thumbnail1', 1000)");
+        jdbcTemplate.update("INSERT INTO theme (name, description, thumbnail, price) VALUES ('name2', 'description2', 'thumbnail2', 1000)");
+        jdbcTemplate.update("INSERT INTO reservation (date, member_id, time_id, theme_id, status) VALUES ('2099-04-29', 1, 1, 1, 'RESERVATION')");
+
+        getAvailableTimes(200, 1);
     }
 
     private Long postReservationTime(String token, String time, int expectedHttpCode) {

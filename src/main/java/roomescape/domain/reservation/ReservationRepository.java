@@ -2,43 +2,30 @@ package roomescape.domain.reservation;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.domain.dto.AvailableTimeDto;
 import roomescape.domain.theme.Theme;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
-    long countByTimeId(long timeId);
+    long countByTimeIdAndStatusIn(long timeId, List<ReservationStatus> status);
 
-    @Query("""
-            SELECT COUNT(r)
-            FROM Reservation r
-            WHERE r.theme.id = :themeId
-            AND r.date = :date
-            AND r.time.id = :timeId
-            AND r.id < :id
-            """)
-    long countByOrder(Long id, LocalDate date, long timeId, long themeId);
+    boolean existsByDateAndTimeIdAndThemeIdAndStatusIn(
+            LocalDate date, long timeId, long themeId, List<ReservationStatus> status);
 
-    @EntityGraph(attributePaths = {"member", "time", "theme"})
-    List<Reservation> findAllByStatus(Status status);
+    boolean existsByDateAndTimeIdAndThemeIdAndMemberIdAndStatusIn(
+            LocalDate date, long timeId, long themeId, long memberId, List<ReservationStatus> status);
 
-    Optional<Reservation> findFirstByDateAndTimeIdAndThemeIdAndStatus(LocalDate date, long timeId, long themeId, Status status);
-
-    boolean existsByDateAndTimeIdAndThemeId(LocalDate date, long timeId, long themeId);
-
-    boolean existsByDateAndTimeIdAndThemeIdAndStatus(LocalDate date, long timeId, long themeId, Status status);
-
-    boolean existsByDateAndTimeIdAndThemeIdAndMemberId(LocalDate date, long timeId, long themeId, long memberId);
-
-    @EntityGraph(attributePaths = {"time", "theme"})
-    List<Reservation> findAllByMemberIdOrderByDateAsc(Long memberId);
+    List<Reservation> findAllByMemberIdAndStatusIn(Long memberId, List<ReservationStatus> status);
 
     @Query("""
             select new roomescape.domain.dto.AvailableTimeDto(rt.id, rt.startAt,
-            (select count(r) > 0 from Reservation r where r.time.id = rt.id and r.date = :date and r.theme.id = :themeId))
+            (select count(r) > 0 
+                from Reservation r 
+                where r.time.id = rt.id 
+                and r.date = :date 
+                and r.theme.id = :themeId
+                and (r.status = 'RESERVATION' or r.status = 'PAYMENT_WAITING')))
             from ReservationTime rt
             """)
     List<AvailableTimeDto> findAvailableReservationTimes(LocalDate date, long themeId);
@@ -47,6 +34,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             select t from Theme t
             join Reservation r on r.theme.id = t.id
             and r.date between :startDate and :endDate
+            and (r.status = 'RESERVATION' or r.status = 'PAYMENT_WAITING')
             group by t.id, t.name, t.description, t.thumbnail
             order by count(r.id) desc
             """)
@@ -54,11 +42,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @Query("""
             select r from Reservation r
-            where r.theme.id = :themeId and
-            r.member.id = :memberId and
-            :dateFrom <= r.date and
-            r.date <= :dateTo and
-            r.status = roomescape.domain.reservation.Status.RESERVATION
+            where r.theme.id = :themeId
+            and r.member.id = :memberId 
+            and :dateFrom <= r.date
+            and r.date <= :dateTo 
+            and (r.status = 'RESERVATION' or r.status = 'PAYMENT_WAITING')
             """)
     List<Reservation> findByCriteria(Long themeId, Long memberId, LocalDate dateFrom, LocalDate dateTo);
+
+    List<Reservation> findAllByStatusIn(List<ReservationStatus> status);
 }

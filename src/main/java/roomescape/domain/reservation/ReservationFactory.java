@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import roomescape.domain.DomainService;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
+import roomescape.domain.reservationwaiting.ReservationWaiting;
+import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.RoomescapeException;
@@ -14,6 +16,7 @@ import roomescape.exception.RoomescapeException;
 @DomainService
 public class ReservationFactory {
     private final ReservationRepository reservationRepository;
+    private final ReservationWaitingRepository reservationWaitingRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
@@ -21,33 +24,37 @@ public class ReservationFactory {
 
     public ReservationFactory(
             ReservationRepository reservationRepository,
+            ReservationWaitingRepository reservationWaitingRepository,
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
             MemberRepository memberRepository,
             Clock clock
     ) {
         this.reservationRepository = reservationRepository;
+        this.reservationWaitingRepository = reservationWaitingRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.clock = clock;
     }
 
-    public Reservation createReservation(Long memberId, LocalDate date, Long timeId, Long themeId) {
+    public Reservation createReservation(Long memberId, LocalDate date, Long timeId, Long themeId, ReservationStatus status) {
         ReservationTime reservationTime = getReservationTime(timeId);
         LocalDateTime dateTime = LocalDateTime.of(date, reservationTime.getStartAt());
         validateRequestDateAfterCurrentTime(dateTime);
         validateUniqueReservation(date, timeId, themeId);
-        return new Reservation(getMember(memberId), date, reservationTime, getTheme(themeId), Status.RESERVATION);
+        validateAlreadyWaiting(date, timeId, themeId, memberId);
+        return new Reservation(getMember(memberId), date, reservationTime, getTheme(themeId), status);
     }
 
-    public Reservation createWaiting(Long memberId, LocalDate date, Long timeId, Long themeId) {
+    public ReservationWaiting createWaiting(Long memberId, LocalDate date, Long timeId, Long themeId) {
         ReservationTime reservationTime = getReservationTime(timeId);
         LocalDateTime dateTime = LocalDateTime.of(date, reservationTime.getStartAt());
         validateRequestDateAfterCurrentTime(dateTime);
         validateIsExistMyReservation(date, timeId, themeId, memberId);
         validateReservationNotExist(date, timeId, themeId);
-        return new Reservation(getMember(memberId), date, reservationTime, getTheme(themeId), Status.WAITING);
+        validateAlreadyWaiting(date, timeId, themeId, memberId);
+        return new ReservationWaiting(getMember(memberId), date, reservationTime, getTheme(themeId));
     }
 
     private ReservationTime getReservationTime(Long timeId) {
@@ -73,20 +80,29 @@ public class ReservationFactory {
     }
 
     private void validateUniqueReservation(LocalDate date, Long timeId, Long themeId) {
-        if (reservationRepository.existsByDateAndTimeIdAndThemeId(date, timeId, themeId)) {
+        if (reservationRepository.existsByDateAndTimeIdAndThemeIdAndStatusIn(date, timeId, themeId,
+                ReservationStatus.getActiveStatuses())) {
             throw new RoomescapeException(HttpStatus.BAD_REQUEST, "예약이 존재합니다.");
         }
     }
 
     private void validateReservationNotExist(LocalDate date, Long timeId, Long themeId) {
-        if (!reservationRepository.existsByDateAndTimeIdAndThemeId(date, timeId, themeId)) {
+        if (!reservationRepository.existsByDateAndTimeIdAndThemeIdAndStatusIn(date, timeId, themeId,
+                ReservationStatus.getActiveStatuses())) {
             throw new RoomescapeException(HttpStatus.BAD_REQUEST, "예약이 존재하지 않아서 예약 대기를 할 수 없습니다.");
         }
     }
 
     private void validateIsExistMyReservation(LocalDate date, Long timeId, Long themeId, Long memberId) {
-        if (reservationRepository.existsByDateAndTimeIdAndThemeIdAndMemberId(date, timeId, themeId, memberId)) {
+        if (reservationRepository.existsByDateAndTimeIdAndThemeIdAndMemberIdAndStatusIn(date, timeId, themeId, memberId,
+                ReservationStatus.getActiveStatuses())) {
             throw new RoomescapeException(HttpStatus.CONFLICT, "이미 예약을 했습니다.");
+        }
+    }
+
+    private void validateAlreadyWaiting(LocalDate date, long timeId, long themeId, long memberId) {
+        if (reservationWaitingRepository.existsByDateAndTimeIdAndThemeIdAndMemberId(date, timeId, themeId, memberId)) {
+            throw new RoomescapeException(HttpStatus.BAD_REQUEST, "이미 예약 대기 중입니다.");
         }
     }
 }
