@@ -7,29 +7,28 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/admin")
 @Controller
 public class AdminPageController {
-
     @GetMapping
     public String mainPage() {
-        return "/admin/index";
+        return "admin/index";
     }
 
     @GetMapping("/reservation")
     public String reservationPage() {
-        return "/admin/reservation-new";
+        return "admin/reservation-new";
     }
 
     @GetMapping("/time")
     public String timePage() {
-        return "/admin/time";
+        return "admin/time";
     }
 
     @GetMapping("/theme")
     public String themePage() {
-        return "/admin/theme";
+        return "admin/theme";
     }
 
     @GetMapping("/reservation/waiting")
     public String waitingReservationPage() {
-        return "/admin/waiting";
+        return "admin/waiting";
     }
 }

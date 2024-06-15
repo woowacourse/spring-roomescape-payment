@@ -18,7 +18,6 @@ import static roomescape.TestFixture.WOOTECO_THEME;
 import static roomescape.reservation.domain.ReservationStatus.BOOKING;
 
 class ReservationTest {
-
     @ParameterizedTest
     @MethodSource(value = "reservationDate")
     @DisplayName("예약자 날짜가 당일 혹은 이전인지 확인한다.")

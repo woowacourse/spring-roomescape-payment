@@ -22,7 +22,7 @@ import roomescape.auth.exception.AuthorizationException;
 import roomescape.global.dto.ErrorResponse;
 import roomescape.global.exception.NotFoundException;
 import roomescape.global.exception.ViolationException;
-import roomescape.payment.exception.PaymentServerException;
+import roomescape.payment.application.PaymentServerException;
 import roomescape.reservation.exception.DataNotConvertedException;
 
 import java.util.Objects;

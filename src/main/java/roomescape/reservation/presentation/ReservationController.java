@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.member.domain.Member;
+import roomescape.payment.application.PaymentService;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentProduct;
 import roomescape.reservation.application.BookingQueryService;
 import roomescape.reservation.application.ReservationManageService;
 import roomescape.reservation.application.ReservationTimeService;
@@ -28,6 +31,10 @@ import roomescape.reservation.dto.response.ReservationResponse;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static java.util.function.Function.identity;
 
 @RestController
 @RequestMapping("/reservations")
@@ -38,26 +45,29 @@ public class ReservationController {
     private final WaitingQueryService waitingQueryService;
     private final ReservationTimeService reservationTimeService;
     private final ThemeService themeService;
+    private final PaymentService paymentService;
 
     public ReservationController(BookingQueryService bookingQueryService,
                                  @Qualifier("waitingManageService") ReservationManageService waitingScheduler,
                                  @Qualifier("bookingManageService") ReservationManageService bookingScheduler,
                                  WaitingQueryService waitingQueryService,
                                  ReservationTimeService reservationTimeService,
-                                 ThemeService themeService) {
+                                 ThemeService themeService,
+                                 PaymentService paymentService) {
         this.bookingQueryService = bookingQueryService;
         this.waitingScheduler = waitingScheduler;
         this.bookingScheduler = bookingScheduler;
         this.waitingQueryService = waitingQueryService;
         this.reservationTimeService = reservationTimeService;
         this.themeService = themeService;
+        this.paymentService = paymentService;
     }
 
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody @Valid ReservationPayRequest request,
                                                                  Member loginMember) {
         Reservation newReservation = toNewReservation(request.reservationSaveRequest(), loginMember, ReservationStatus.BOOKING);
-        Reservation createdReservation = bookingScheduler.create(newReservation, request.paymentConfirmRequest());
+        Reservation createdReservation = bookingScheduler.create(newReservation, request.productPayRequest());
         Reservation scheduledReservation = bookingScheduler.scheduleRecentReservation(createdReservation);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ReservationResponse.from(scheduledReservation));
@@ -81,10 +91,7 @@ public class ReservationController {
 
     @GetMapping("/mine")
     public ResponseEntity<List<MyReservationResponse>> findMyReservations(Member loginMember) {
-        List<MyReservationResponse> myBookingResponses = bookingQueryService.findAllByMember(loginMember)
-                .stream()
-                .map(MyReservationResponse::from)
-                .toList();
+        List<MyReservationResponse> myBookingResponses = findMyBookingResponses(loginMember);
         List<MyReservationResponse> myWaitingResponses = waitingQueryService.findAllWithPreviousCountByMember(loginMember)
                 .stream()
                 .map(MyReservationResponse::from)
@@ -92,6 +99,20 @@ public class ReservationController {
         List<MyReservationResponse> myReservationResponses = new ArrayList<>(myBookingResponses);
         myReservationResponses.addAll(myWaitingResponses);
         return ResponseEntity.ok(myReservationResponses);
+    }
+
+    private List<MyReservationResponse> findMyBookingResponses(Member loginMember) {
+        List<Reservation> reservations = bookingQueryService.findAllByMember(loginMember);
+        List<PaymentProduct> paymentProducts = reservations.stream()
+                .map(it -> new PaymentProduct(it.getId()))
+                .toList();
+        List<Payment> payments = paymentService.findAllInPaymentProducts(paymentProducts);
+        Map<Long, Payment> paymentMap = payments.stream()
+                .collect(Collectors.toMap(Payment::getPaymentProductId, identity()));
+
+        return reservations.stream()
+                .map(it -> MyReservationResponse.from(it, paymentMap.getOrDefault(it.getId(), null)))
+                .toList();
     }
 
     @DeleteMapping("/{id}/waiting")

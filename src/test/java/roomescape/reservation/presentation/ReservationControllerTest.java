@@ -20,8 +20,8 @@ import roomescape.common.TestWebMvcConfiguration;
 import roomescape.global.config.WebMvcConfiguration;
 import roomescape.global.exception.NotFoundException;
 import roomescape.global.exception.ViolationException;
-import roomescape.payment.application.TossPaymentsClient;
-import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.application.PaymentService;
+import roomescape.payment.pg.TossPaymentsClient;
 import roomescape.reservation.application.BookingQueryService;
 import roomescape.reservation.application.ReservationManageService;
 import roomescape.reservation.application.ReservationTimeService;
@@ -34,7 +34,6 @@ import roomescape.reservation.domain.WaitingReservation;
 import roomescape.reservation.dto.request.ReservationPayRequest;
 import roomescape.reservation.dto.request.ReservationSaveRequest;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -52,6 +51,7 @@ import static roomescape.TestFixture.MIA_NAME;
 import static roomescape.TestFixture.MIA_RESERVATION;
 import static roomescape.TestFixture.MIA_RESERVATION_DATE;
 import static roomescape.TestFixture.MIA_RESERVATION_TIME;
+import static roomescape.TestFixture.PRODUCT_PAY_REQUEST;
 import static roomescape.TestFixture.TEST_ERROR_MESSAGE;
 import static roomescape.TestFixture.USER_MIA;
 import static roomescape.TestFixture.WOOTECO_THEME;
@@ -68,8 +68,6 @@ import static roomescape.reservation.domain.ReservationStatus.WAITING;
 )
 class ReservationControllerTest extends ControllerTest {
     private static final Cookie COOKIE = new Cookie("token", "token");
-    private static final PaymentConfirmRequest paymentConfirmRequest =
-            new PaymentConfirmRequest("key", "orderId", BigDecimal.valueOf(1000L), "none");
 
     @MockBean
     private BookingQueryService bookingQueryService;
@@ -94,12 +92,15 @@ class ReservationControllerTest extends ControllerTest {
     @MockBean
     private TossPaymentsClient tossPaymentsClient;
 
+    @MockBean
+    private PaymentService paymentService;
+
     @Test
     @DisplayName("예약 POST 요청 시 상태코드 201을 반환한다.")
     void createReservation() throws Exception {
         // given
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, 1L, 1L);
-        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PRODUCT_PAY_REQUEST());
         ReservationTime expectedTime = new ReservationTime(1L, MIA_RESERVATION_TIME);
         Theme expectedTheme = WOOTECO_THEME(1L);
         Reservation expectedReservation = MIA_RESERVATION(expectedTime, expectedTheme, USER_MIA(1L), BOOKING);
@@ -128,7 +129,7 @@ class ReservationControllerTest extends ControllerTest {
     @MethodSource(value = "invalidPostRequests")
     @DisplayName("예약 POST 요청 시 하나의 필드라도 없다면 상태코드 400을 반환한다.")
     void createReservationWithNullFieldRequest(ReservationSaveRequest reservationSaveRequest) throws Exception {
-        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PRODUCT_PAY_REQUEST());
 
         // when & then
         mockMvc.perform(post("/reservations")
@@ -177,7 +178,7 @@ class ReservationControllerTest extends ControllerTest {
         Long themeId = 1L;
         Long timeId = 1L;
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, themeId);
-        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PRODUCT_PAY_REQUEST());
 
         BDDMockito.given(themeService.findById(themeId))
                 .willReturn(WOOTECO_THEME(themeId));
@@ -204,7 +205,7 @@ class ReservationControllerTest extends ControllerTest {
         Long notExistingTimeId = 1L;
         Long themeId = 1L;
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, notExistingTimeId, themeId);
-        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PRODUCT_PAY_REQUEST());
 
         BDDMockito.given(themeService.findById(themeId))
                 .willReturn(WOOTECO_THEME(themeId));
@@ -229,7 +230,7 @@ class ReservationControllerTest extends ControllerTest {
         Long timeId = 1L;
         Long notExistingThemeId = 1L;
         ReservationSaveRequest reservationSaveRequest = new ReservationSaveRequest(MIA_RESERVATION_DATE, timeId, notExistingThemeId);
-        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
+        ReservationPayRequest request = new ReservationPayRequest(reservationSaveRequest, PRODUCT_PAY_REQUEST());
 
         BDDMockito.given(reservationTimeService.findById(timeId))
                 .willReturn(new ReservationTime(1L, MIA_RESERVATION_TIME));

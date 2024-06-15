@@ -14,7 +14,6 @@ import roomescape.global.exception.ViolationException;
 @Entity
 @Table(name = "member")
 public class Member {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

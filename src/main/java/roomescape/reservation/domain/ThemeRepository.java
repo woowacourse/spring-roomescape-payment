@@ -11,7 +11,6 @@ import java.util.List;
 
 @Transactional(readOnly = true)
 public interface ThemeRepository extends JpaRepository<Theme, Long> {
-
     @Query("""
             SELECT th FROM Theme th
             LEFT OUTER JOIN Reservation r

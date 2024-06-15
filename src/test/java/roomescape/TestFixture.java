@@ -3,11 +3,15 @@ package roomescape;
 import roomescape.member.domain.Email;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Name;
+import roomescape.payment.application.ProductPayRequest;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentProduct;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
@@ -58,6 +62,10 @@ public class TestFixture {
         return new Member(id, new Name(ADMIN_NAME), new Email(ADMIN_EMAIL), TEST_PASSWORD, ADMIN);
     }
 
+    public static Reservation MIA_RESERVATION(Long id, ReservationTime time, Theme theme, Member member, ReservationStatus status) {
+        return new Reservation(id, member, MIA_RESERVATION_DATE, time, theme, status);
+    }
+
     public static Reservation MIA_RESERVATION() {
         return MIA_RESERVATION(new ReservationTime(MIA_RESERVATION_TIME), WOOTECO_THEME(), USER_MIA(), BOOKING);
     }
@@ -89,5 +97,17 @@ public class TestFixture {
 
     public static Theme HORROR_THEME(Long id) {
         return new Theme(id, HORROR_THEME_NAME, HORROR_THEME_DESCRIPTION, THEME_THUMBNAIL);
+    }
+
+    public static ProductPayRequest PRODUCT_PAY_REQUEST() {
+        return new ProductPayRequest("key", "orderId", BigDecimal.valueOf(1000L), "none");
+    }
+
+    public static ProductPayRequest PRODUCT_PAY_REQUEST(String key, String orderId) {
+        return new ProductPayRequest(key, orderId, BigDecimal.valueOf(1000L), "none");
+    }
+
+    public static Payment SIMPLE_PAYMENT(String paymentKey, String orderId, PaymentProduct paymentProduct) {
+        return new Payment(paymentKey, orderId, BigDecimal.valueOf(1000L), paymentProduct);
     }
 }

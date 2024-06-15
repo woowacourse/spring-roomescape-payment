@@ -1,4 +1,4 @@
-package roomescape.payment.application;
+package roomescape.payment.pg;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.ClientHttpRequestFactories;

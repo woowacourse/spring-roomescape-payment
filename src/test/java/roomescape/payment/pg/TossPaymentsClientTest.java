@@ -1,4 +1,4 @@
-package roomescape.payment.application;
+package roomescape.payment.pg;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
@@ -9,16 +9,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import roomescape.global.exception.ViolationException;
-import roomescape.payment.dto.PaymentConfirmRequest;
-import roomescape.payment.dto.TossPaymentsErrorResponse;
-import roomescape.payment.exception.PaymentServerException;
-
-import java.math.BigDecimal;
+import roomescape.payment.application.PaymentServerException;
+import roomescape.payment.application.ProductPayRequest;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.anything;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
+import static roomescape.TestFixture.PRODUCT_PAY_REQUEST;
 
 @RestClientTest
 @Import(TossRestClientConfiguration.class)
@@ -29,7 +27,12 @@ class TossPaymentsClientTest {
 
     public TossPaymentsClientTest(@Qualifier(value = "tossRestClientBuilder") RestClient.Builder builder) {
         this.mockServer = MockRestServiceServer.bindTo(builder).build();
-        this.paymentsClient = new TossPaymentsClient(objectMapper, builder, "test");
+        this.paymentsClient = new TossPaymentsClient(
+                new TossPaymentsErrorHandler(objectMapper),
+                builder,
+                "test",
+                "test"
+        );
     }
 
     @Test
@@ -42,14 +45,10 @@ class TossPaymentsClientTest {
         mockServer.expect(anything())
                 .andRespond(withBadRequest().body(expectedBody));
 
-        PaymentConfirmRequest request = new PaymentConfirmRequest(
-                "paymentKey",
-                "orderId",
-                BigDecimal.valueOf(1000L),
-                "card"
-        );
+        ProductPayRequest productPayRequest = PRODUCT_PAY_REQUEST();
 
         // when & then
+        TossPaymentsConfirmRequest request = new TossPaymentsConfirmRequest(productPayRequest);
         assertThatThrownBy(() -> paymentsClient.confirm(request))
                 .isInstanceOf(ViolationException.class)
                 .hasMessage("잘못된 요청");
@@ -65,14 +64,10 @@ class TossPaymentsClientTest {
         mockServer.expect(anything())
                 .andRespond(withServerError().body(expectedBody));
 
-        PaymentConfirmRequest request = new PaymentConfirmRequest(
-                "paymentKey",
-                "orderId",
-                BigDecimal.valueOf(1000L),
-                "card"
-        );
+        ProductPayRequest productPayRequest = PRODUCT_PAY_REQUEST();
 
         // when & then
+        TossPaymentsConfirmRequest request = new TossPaymentsConfirmRequest(productPayRequest);
         assertThatThrownBy(() -> paymentsClient.confirm(request))
                 .isInstanceOf(PaymentServerException.class)
                 .hasMessage("내부 서버 오류");

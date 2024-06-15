@@ -14,6 +14,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
+import roomescape.TestFixture;
 import roomescape.auth.dto.request.LoginRequest;
 import roomescape.common.DatabaseCleaner;
 import roomescape.member.domain.Email;
@@ -21,7 +22,6 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Name;
 import roomescape.member.dto.request.MemberJoinRequest;
 import roomescape.member.dto.response.MemberResponse;
-import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.request.ReservationPayRequest;
 import roomescape.reservation.dto.request.ReservationSaveRequest;
@@ -31,7 +31,6 @@ import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.reservation.dto.response.ThemeResponse;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,12 +45,9 @@ import static roomescape.member.domain.Role.ADMIN;
 import static roomescape.member.domain.Role.USER;
 
 @ActiveProfiles(value = "test")
-@Import(TestClientConfiguration.class)
+@Import(TestPaymentConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class AcceptanceTest {
-    protected static final PaymentConfirmRequest paymentConfirmRequest =
-            new PaymentConfirmRequest("key", "orderId", BigDecimal.valueOf(1000L), "none");
-
     @LocalServerPort
     private int port;
 
@@ -111,7 +107,7 @@ public abstract class AcceptanceTest {
     }
 
     protected Long createTestBooking(ReservationSaveRequest reservationSaveRequest, Cookie cookie) {
-        ReservationPayRequest reservationPayRequest = new ReservationPayRequest(reservationSaveRequest, paymentConfirmRequest);
+        ReservationPayRequest reservationPayRequest = new ReservationPayRequest(reservationSaveRequest, TestFixture.PRODUCT_PAY_REQUEST());
         return RestAssured.given()
                 .contentType(ContentType.JSON)
                 .cookie(cookie)

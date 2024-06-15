@@ -30,7 +30,6 @@ import static roomescape.reservation.domain.ReservationStatus.BOOKING;
 import static roomescape.reservation.domain.ReservationStatus.WAITING;
 
 public class AdminReservationAcceptanceTest extends AcceptanceTest {
-
     @Test
     @DisplayName("관리자 권한으로 예약을 추가한다.")
     void createReservation() {

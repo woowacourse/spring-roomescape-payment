@@ -1,10 +1,10 @@
-package roomescape.payment.dto;
+package roomescape.payment.application;
 
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 
-public record PaymentConfirmRequest(
+public record ProductPayRequest(
         @NotNull(message = "결제 키는 비어있을 수 없습니다.")
         String paymentKey,
         @NotNull(message = "주문 Id는 비어있을 수 없습니다.")

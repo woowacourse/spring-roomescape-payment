@@ -3,8 +3,9 @@ package roomescape.reservation.application;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.ViolationException;
 import roomescape.member.domain.Member;
-import roomescape.payment.application.TossPaymentsClient;
-import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.application.PaymentService;
+import roomescape.payment.application.ProductPayRequest;
+import roomescape.payment.domain.PaymentProduct;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.ReservationStatus;
@@ -16,11 +17,11 @@ public abstract class ReservationManageService {
     protected static final int MAX_RESERVATION_NUMBER_IN_TIME_SLOT = 1;
 
     protected final ReservationRepository reservationRepository;
-    private final TossPaymentsClient paymentsClient;
+    private final PaymentService paymentService;
 
-    public ReservationManageService(ReservationRepository reservationRepository, TossPaymentsClient paymentsClient) {
+    public ReservationManageService(ReservationRepository reservationRepository, PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
-        this.paymentsClient = paymentsClient;
+        this.paymentService = paymentService;
     }
 
     abstract protected void correctReservationStatus(int bookingCount, Reservation reservation);
@@ -32,9 +33,9 @@ public abstract class ReservationManageService {
     abstract protected void validatePermissionForDeleting(Reservation reservation, Member agent);
 
     @Transactional
-    public Reservation create(Reservation reservation, PaymentConfirmRequest paymentConfirmRequest) {
+    public Reservation create(Reservation reservation, ProductPayRequest productPayRequest) {
         Reservation createdReservation = create(reservation);
-        paymentsClient.confirm(paymentConfirmRequest);
+        paymentService.pay(productPayRequest, new PaymentProduct(createdReservation.getId()));
         return createdReservation;
     }
 

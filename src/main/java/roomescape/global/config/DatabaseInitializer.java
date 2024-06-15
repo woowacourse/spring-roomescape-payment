@@ -44,7 +44,8 @@ public class DatabaseInitializer implements ApplicationRunner {
         ));
         memberRepository.saveAll(List.of(
                 new Member("어드민", "admin@admin.com", "1234", Role.ADMIN),
-                new Member("미아", "mia@mia.com", "1234", Role.USER)
+                new Member("미아", "mia@mia.com", "1234", Role.USER),
+                new Member("아톰", "atom@atom.com", "1234", Role.USER)
         ));
     }
 }
