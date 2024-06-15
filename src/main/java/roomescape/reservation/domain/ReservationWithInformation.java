@@ -4,19 +4,20 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Objects;
+import roomescape.payment.domain.Amount;
 
 public class ReservationWithInformation {
 
     private final Reservation reservation;
     private final int waitingNumber;
     private final String paymentKey;
-    private final BigDecimal amount;
+    private final Amount amount;
 
     public ReservationWithInformation(Reservation reservation, int waitingNumber, String paymentKey, BigDecimal amount) {
         this.reservation = reservation;
         this.waitingNumber = waitingNumber;
         this.paymentKey = paymentKey;
-        this.amount = amount;
+        this.amount = new Amount(amount);
     }
 
     public ReservationWithInformation(Reservation reservation, Long waitingNumber, String paymentKey, BigDecimal amount) {
@@ -52,7 +53,7 @@ public class ReservationWithInformation {
     }
 
     public BigDecimal getAmount() {
-        return amount;
+        return amount.getValue();
     }
 
     @Override

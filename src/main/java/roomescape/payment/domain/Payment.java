@@ -1,6 +1,7 @@
 package roomescape.payment.domain;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,14 +26,15 @@ public class Payment {
     @Column(nullable = false)
     private String paymentKey;
 
+    @Embedded
     @Column(nullable = false)
-    private BigDecimal amount;
+    private Amount amount;
 
     public Payment(Long id, Reservation reservation, String paymentKey, BigDecimal amount) {
         this.id = id;
         this.reservation = reservation;
         this.paymentKey = paymentKey;
-        this.amount = amount;
+        this.amount = new Amount(amount);
     }
 
     public Payment(Reservation reservation, String paymentKey, BigDecimal amount) {
@@ -55,7 +57,7 @@ public class Payment {
     }
 
     public BigDecimal getAmount() {
-        return amount;
+        return amount.getValue();
     }
 
     @Override

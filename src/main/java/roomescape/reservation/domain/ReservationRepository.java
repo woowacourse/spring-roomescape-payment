@@ -25,7 +25,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             r1,
             COUNT(*),
             COALESCE(p.paymentKey, ''),
-            COALESCE(p.amount, java.math.BigDecimal.ZERO)
+            COALESCE(p.amount.value, java.math.BigDecimal.ZERO)
         )
         FROM Reservation AS r1
         INNER JOIN Reservation AS r2
@@ -38,7 +38,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         LEFT JOIN Payment AS p ON r1.id = p.reservation.id
         WHERE r1.member.id = :memberId
             AND r1.id >= r2.id
-        GROUP BY r1, p.paymentKey, p.amount
+        GROUP BY r1, p.paymentKey, p.amount.value
     """)
     List<ReservationWithInformation> findByMemberIdWithInformation(@Param("memberId") Long memberId);
 
