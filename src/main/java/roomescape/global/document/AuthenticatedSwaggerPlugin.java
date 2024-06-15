@@ -20,7 +20,6 @@ import roomescape.auth.Authenticated;
 import org.springframework.core.MethodParameter;
 
 @Component
-@Order(1)
 public class AuthenticatedSwaggerPlugin implements OperationCustomizer {
     @Override
     public Operation customize(Operation operation, HandlerMethod handlerMethod) {
