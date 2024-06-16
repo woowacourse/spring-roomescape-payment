@@ -21,7 +21,7 @@ public class Theme {
     protected Theme() {
     }
 
-    public Theme(Long id, String name, String description, String thumbnail) {
+    public Theme(final Long id, final String name, final String description, final String thumbnail) {
         validateNullOrBlank(name, "name");
         validateNullOrBlank(description, "description");
         validateNullOrBlank(thumbnail, "thumbnail");
@@ -31,11 +31,11 @@ public class Theme {
         this.thumbnail = thumbnail;
     }
 
-    public Theme(String name, String description, String thumbnail) {
+    public Theme(final String name, final String description, final String thumbnail) {
         this(null, name, description, thumbnail);
     }
 
-    private void validateNullOrBlank(String value, String fieldName) {
+    private void validateNullOrBlank(final String value, final String fieldName) {
         if (value == null || value.isBlank()) {
             throw new BadRequestException(value, fieldName);
         }

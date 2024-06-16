@@ -3,15 +3,15 @@ package roomescape.service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
-import roomescape.controller.request.ReservationTimeRequest;
-import roomescape.controller.response.IsReservedTimeResponse;
+import roomescape.BaseTest;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.DuplicatedException;
 import roomescape.exception.NotFoundException;
 import roomescape.model.ReservationTime;
 import roomescape.repository.ReservationTimeRepository;
+import roomescape.request.ReservationTimeRequest;
+import roomescape.response.IsReservedTimeResponse;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -21,9 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Sql(scripts = {"/initialize_table.sql", "/test_data.sql"})
-class ReservationTimeServiceTest {
+class ReservationTimeServiceTest extends BaseTest {
 
     private ReservationTimeRepository reservationTimeRepository;
     private ReservationTimeService reservationTimeService;
@@ -45,7 +44,7 @@ class ReservationTimeServiceTest {
     @DisplayName("아이디에 해당하는 예약 시간을 반환한다.")
     @Test
     void should_get_reservation_time() {
-        ReservationTime reservationTime = reservationTimeService.findReservationTime(2);
+        ReservationTime reservationTime = reservationTimeService.findReservationTime(2L);
 
         assertThat(reservationTime.getStartAt()).isEqualTo(LocalTime.of(11, 0));
     }
@@ -72,7 +71,7 @@ class ReservationTimeServiceTest {
     @DisplayName("존재하지 않는 시간이면 예외를 발생시킨다.")
     @Test
     void should_throw_exception_when_not_exist_id() {
-        assertThatThrownBy(() -> reservationTimeService.deleteReservationTime(10000000))
+        assertThatThrownBy(() -> reservationTimeService.deleteReservationTime(10000000L))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("[ERROR] id(10000000)에 해당하는 예약 시간이 존재하지 않습니다.");
     }
@@ -82,7 +81,7 @@ class ReservationTimeServiceTest {
     void should_throw_exception_when_exist_reservation_using_time() {
         assertThatThrownBy(() -> reservationTimeService.deleteReservationTime(1L))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessage("[ERROR] 해당 시간에 예약이 존재하여 삭제할 수 없습니다.");
+                .hasMessage("해당 시간에 예약이 존재하여 삭제할 수 없습니다.");
     }
 
     @DisplayName("존재하는 시간을 추가하려 할 때 예외가 발생한다.")

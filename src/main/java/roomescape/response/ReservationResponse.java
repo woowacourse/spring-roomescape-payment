@@ -1,4 +1,4 @@
-package roomescape.controller.response;
+package roomescape.response;
 
 import roomescape.model.Reservation;
 
@@ -12,10 +12,7 @@ public class ReservationResponse {
     private ReservationTimeResponse time;
     private ReservationThemeResponse theme;
 
-    private ReservationResponse() {
-    }
-
-    public ReservationResponse(Reservation reservation) {
+    public ReservationResponse(final Reservation reservation) {
         this.id = reservation.getId();
         this.name = reservation.getMember().getName();
         this.date = reservation.getDate();

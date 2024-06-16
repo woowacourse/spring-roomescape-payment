@@ -1,20 +1,17 @@
-package roomescape.controller.response;
+package roomescape.response;
 
 import roomescape.model.Member;
 import roomescape.model.Role;
 
 public class MemberResponse {
 
-    private Long id;
-    private String name;
-    private Role role;
-    private String email;
-    private String password;
+    private final Long id;
+    private final String name;
+    private final Role role;
+    private final String email;
+    private final String password;
 
-    private MemberResponse() {
-    }
-
-    public MemberResponse(Member member) {
+    public MemberResponse(final Member member) {
         this.id = member.getId();
         this.name = member.getName();
         this.role = member.getRole();

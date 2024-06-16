@@ -14,20 +14,20 @@ public interface ReservationTimeRepository extends CrudRepository<ReservationTim
 
     List<ReservationTime> findAll();
 
-    Optional<ReservationTime> findById(long id);
+    Optional<ReservationTime> findById(final Long id);
 
-    ReservationTime save(ReservationTime reservationTime);
+    ReservationTime save(final ReservationTime reservationTime);
 
-    void deleteById(long id);
+    void deleteById(final Long id);
 
-    boolean existsById(long id);
+    boolean existsById(final Long id);
 
-    boolean existsByStartAt(LocalTime startAt);
+    boolean existsByStartAt(final LocalTime startAt);
 
     @Query("""
             SELECT r.time
             FROM Reservation r INNER JOIN ReservationTime t ON r.time.id = t.id
             WHERE r.date = :date AND r.theme.id = :themeId
             """)
-    List<ReservationTime> findAllReservedTimes(@Param("date") LocalDate date, @Param("themeId") Long themeId);
+    List<ReservationTime> findAllReservedTimes(@Param("date") final LocalDate date, @Param("themeId") final Long themeId);
 }

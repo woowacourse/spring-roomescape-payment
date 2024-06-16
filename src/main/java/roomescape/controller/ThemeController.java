@@ -1,10 +1,15 @@
 package roomescape.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import roomescape.controller.request.ThemeRequest;
-import roomescape.controller.response.ReservationThemeResponse;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 import roomescape.model.Theme;
+import roomescape.request.ThemeRequest;
+import roomescape.response.ReservationThemeResponse;
 import roomescape.service.ThemeService;
 
 import java.net.URI;
@@ -15,7 +20,7 @@ public class ThemeController {
 
     private final ThemeService themeService;
 
-    public ThemeController(ThemeService themeService) {
+    public ThemeController(final ThemeService themeService) {
         this.themeService = themeService;
     }
 
@@ -25,14 +30,14 @@ public class ThemeController {
     }
 
     @PostMapping("/themes")
-    public ResponseEntity<ReservationThemeResponse> addTheme(@RequestBody ThemeRequest themeRequest) {
+    public ResponseEntity<ReservationThemeResponse> addTheme(@RequestBody final ThemeRequest themeRequest) {
         Theme theme = themeService.addTheme(themeRequest);
         ReservationThemeResponse response = ReservationThemeResponse.of(theme);
         return ResponseEntity.created(URI.create("/themes/" + theme.getId())).body(response);
     }
 
     @DeleteMapping("/themes/{id}")
-    public ResponseEntity<Void> deleteTheme(@PathVariable(name = "id") long id) {
+    public ResponseEntity<Void> deleteTheme(@PathVariable(name = "id") final Long id) {
         themeService.deleteTheme(id);
         return ResponseEntity.noContent().build();
     }

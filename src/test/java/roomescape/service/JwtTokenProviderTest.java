@@ -5,14 +5,13 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import roomescape.BaseTest;
 import roomescape.model.Member;
 import roomescape.service.fixture.MemberBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class JwtTokenProviderTest {
+class JwtTokenProviderTest extends BaseTest {
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;

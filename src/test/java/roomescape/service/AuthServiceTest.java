@@ -4,6 +4,7 @@ import jakarta.servlet.http.Cookie;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import roomescape.BaseTest;
 import roomescape.exception.BadRequestException;
 import roomescape.model.Member;
 import roomescape.model.Role;
@@ -16,7 +17,7 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static roomescape.model.Role.ADMIN;
 import static roomescape.model.Role.MEMBER;
 
-class AuthServiceTest {
+class AuthServiceTest extends BaseTest {
 
     private FakeJwtTokenProvider jwtTokenProvider = new FakeJwtTokenProvider();
     private AuthService authService = new AuthService(jwtTokenProvider);
@@ -44,7 +45,7 @@ class AuthServiceTest {
 
         assertThatThrownBy(() -> authService.findMemberIdByCookie(cookies))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessage("[ERROR] 아이디가 token인 쿠키가 없습니다.");
+                .hasMessage("아이디가 token인 쿠키가 없습니다.");
     }
 
     @DisplayName("쿠키를 제공하면 쿠키 아이디가 있는지 확인하고 있다면 사용자 아이디를 반환한다.")

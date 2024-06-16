@@ -3,9 +3,8 @@ package roomescape.service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
-import roomescape.controller.request.WaitingRequest;
+import roomescape.BaseTest;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.NotFoundException;
 import roomescape.model.Member;
@@ -17,6 +16,7 @@ import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.repository.WaitingRepository;
+import roomescape.request.WaitingRequest;
 import roomescape.service.fixture.WaitingRequestBuilder;
 
 import java.time.LocalDate;
@@ -25,9 +25,8 @@ import java.util.List;
 import static java.time.LocalDate.now;
 import static org.assertj.core.api.Assertions.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Sql(scripts = {"/initialize_table.sql", "/test_data.sql"})
-class WaitingServiceTest {
+class WaitingServiceTest extends BaseTest {
 
     private ThemeRepository themeRepository;
     private ReservationTimeRepository reservationTimeRepository;
@@ -68,7 +67,7 @@ class WaitingServiceTest {
     @DisplayName("존재하지 않는 예약 대기를 삭제하면 예외가 발생한다.")
     @Test
     void should_throw_exception_when_not_exist_waiting() {
-        assertThatThrownBy(() -> waitingService.deleteWaiting(1000000))
+        assertThatThrownBy(() -> waitingService.deleteWaiting(1000000L))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("[ERROR] 해당 id:[1000000] 값으로 예약된 예약 대기 내역이 존재하지 않습니다.");
     }
@@ -88,7 +87,7 @@ class WaitingServiceTest {
 
         assertThatThrownBy(() -> waitingService.addWaiting(request, member))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("[ERROR] 현재(", ") 이전 시간으로 예약 대기를 추가할 수 없습니다.");
+                .hasMessageContaining("현재(", ") 이전 시간으로 예약 대기를 추가할 수 없습니다.");
     }
 
     @DisplayName("사용자가 예약한 예약 대기를 반환한다.")
@@ -109,7 +108,7 @@ class WaitingServiceTest {
 
         assertThatThrownBy(() -> waitingService.addWaiting(request, member))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessage("[ERROR] 현재 이름(썬)으로 예약 내역이 이미 존재합니다.");
+                .hasMessage("현재 이름(썬)으로 예약 내역이 이미 존재합니다.");
     }
 
     @DisplayName("이미 사용자가 예약 대기한 날짜, 테마, 시간에 예약 대기를 추가하는 경우 예외를 발생한다.")
@@ -120,7 +119,7 @@ class WaitingServiceTest {
 
         assertThatThrownBy(() -> waitingService.addWaiting(request, member))
                 .isInstanceOf(BadRequestException.class)
-                .hasMessage("[ERROR] 현재 이름(배키)으로 예약된 예약 대기 내역이 이미 존재합니다.");
+                .hasMessage("현재 이름(배키)으로 예약된 예약 대기 내역이 이미 존재합니다.");
     }
 
     @DisplayName("모든 예약 대기를 반환한다")

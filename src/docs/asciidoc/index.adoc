@@ -1,0 +1,906 @@
+:toc: left
+:toclevels: 2
+
+= API Documentation
+
+== 관리자 예약 기능
+
+=== `관리자 예약` 검색
+
+관리자가 예약을 검색합니다
+
+==== Request
+
+===== Cookies
+
+include::{snippets}/admin-reservations-success-get/request-cookies.adoc[]
+
+===== Fields
+
+N/A
+
+===== Query Parameters
+
+include::{snippets}/admin-reservations-success-get/query-parameters.adoc[]
+
+===== Path Parameters
+
+N/A
+
+===== Curl Request
+
+include::{snippets}/admin-reservations-success-get/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/admin-reservations-success-get/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+include::{snippets}/admin-reservations-success-get/response-fields.adoc[]
+
+===== Http Response
+
+include::{snippets}/admin-reservations-success-get/http-response.adoc[]
+
+=== `관리자 예약` 등록
+
+관리자가 예약을 등록 합니다
+
+예약을 등록하기 전 `테마` 와 `예약 시간` 을 등록해야 합니다
+
+==== Request
+
+===== Cookies
+
+include::{snippets}/admin-reservations-success-post/request-cookies.adoc[]
+
+===== Fields
+
+include::{snippets}/admin-reservations-success-post/request-fields.adoc[]
+
+===== Query Parameters
+
+N/A
+
+===== Path Parameters
+
+N/A
+
+===== Curl Request
+
+include::{snippets}/admin-reservations-success-post/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/admin-reservations-success-post/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+include::{snippets}/admin-reservations-success-post/response-fields.adoc[]
+
+===== Http Response
+
+include::{snippets}/admin-reservations-success-post/http-response.adoc[]
+
+== 테마 기능
+
+=== `테마` 조회
+
+테마를 조회합니다
+
+==== Request
+
+===== Cookies
+
+N/A
+
+===== Fields
+
+N/A
+
+===== Query Parameters
+
+N/A
+
+===== Path Parameters
+
+N/A
+
+===== Curl Request
+
+include::{snippets}/themes-success-get/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/themes-success-get/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+include::{snippets}/themes-success-get/response-fields.adoc[]
+
+===== Http Response
+
+include::{snippets}/themes-success-get/http-response.adoc[]
+
+=== `테마` 등록
+
+테마를 등록합니다
+
+==== Request
+
+===== Cookies
+
+N/A
+
+===== Fields
+
+include::{snippets}/themes-success-post/request-fields.adoc[]
+
+===== Query Parameters
+
+N/A
+
+===== Path Parameters
+
+N/A
+
+===== Curl Request
+
+include::{snippets}/themes-success-post/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/themes-success-post/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+include::{snippets}/themes-success-post/response-fields.adoc[]
+
+===== Http Response
+
+include::{snippets}/themes-success-post/http-response.adoc[]
+
+=== `테마` 삭제
+
+테마를 삭제합니다
+
+`예약 등록` 이 되어있는 테마가 있을 경우 삭제가 되지 않습니다
+
+==== Request
+
+===== Cookies
+
+N/A
+
+===== Fields
+
+N/A
+
+===== Query Parameters
+
+N/A
+
+===== Path Parameters
+
+include::{snippets}/themes-success-delete/path-parameters.adoc[]
+
+===== Curl Request
+
+include::{snippets}/themes-success-delete/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/themes-success-delete/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+N/A
+
+===== Http Response
+
+include::{snippets}/themes-success-delete/http-response.adoc[]
+
+=== 인기 `테마` 조회
+
+일주일 간 가장 많이 예약한 인기 테마를 조회합니다
+
+==== Request
+
+===== Cookies
+
+N/A
+
+===== Fields
+
+N/A
+
+===== Query Parameters
+
+N/A
+
+===== Path Parameters
+
+N/A
+
+===== Curl Request
+
+include::{snippets}/themes-top10-success-get/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/themes-top10-success-get/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+include::{snippets}/themes-top10-success-get/response-fields.adoc[]
+
+===== Http Response
+
+include::{snippets}/themes-top10-success-get/http-response.adoc[]
+
+== 시간 기능
+
+=== `시간` 조회
+
+예약 등록 시 사용하는 시간대를 조회합니다
+
+==== Request
+
+===== Cookies
+
+N/A
+
+===== Fields
+
+N/A
+
+===== Query Parameters
+
+N/A
+
+===== Path Parameters
+
+N/A
+
+===== Curl Request
+
+include::{snippets}/times-success-get/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/times-success-get/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+include::{snippets}/times-success-get/response-fields.adoc[]
+
+===== Http Response
+
+include::{snippets}/times-success-get/http-response.adoc[]
+
+=== `시간` 등록
+
+예약 등록 시 사용하는 시간대를 등록합니다
+
+==== Request
+
+===== Cookies
+
+N/A
+
+===== Fields
+
+include::{snippets}/times-success-post/request-fields.adoc[]
+
+===== Query Parameters
+
+N/A
+
+===== Path Parameters
+
+N/A
+
+===== Curl Request
+
+include::{snippets}/times-success-post/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/times-success-post/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+include::{snippets}/times-success-post/response-fields.adoc[]
+
+===== Http Response
+
+include::{snippets}/times-success-post/http-response.adoc[]
+
+=== `시간` 삭제
+
+예약 등록 시 사용하는 시간대를 등록합니다
+
+`예약 등록` 이 되어있는 시간대가 있을 경우 삭제가 되지 않습니다
+
+==== Request
+
+===== Cookies
+
+N/A
+
+===== Fields
+
+N/A
+
+===== Query Parameters
+
+N/A
+
+===== Path Parameters
+
+include::{snippets}/times-success-delete/path-parameters.adoc[]
+
+===== Curl Request
+
+include::{snippets}/times-success-delete/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/times-success-delete/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+N/A
+
+===== Http Response
+
+include::{snippets}/times-success-delete/http-response.adoc[]
+
+== 회원 기능
+
+=== `회원` 조회
+
+등록되어 있는 회원을 조회합니다
+
+==== Request
+
+===== Cookies
+
+N/A
+
+===== Fields
+
+N/A
+
+===== Query Parameters
+
+N/A
+
+===== Path Parameters
+
+N/A
+
+===== Curl Request
+
+include::{snippets}/members-success-get/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/members-success-get/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+include::{snippets}/members-success-get/response-fields.adoc[]
+
+===== Http Response
+
+include::{snippets}/members-success-get/http-response.adoc[]
+
+=== `회원` 등록
+
+신규 회원을 등록합니다
+
+==== Request
+
+===== Cookies
+
+N/A
+
+===== Fields
+
+include::{snippets}/members-success-post/request-fields.adoc[]
+
+===== Query Parameters
+
+N/A
+
+===== Path Parameters
+
+N/A
+
+===== Curl Request
+
+include::{snippets}/members-success-post/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/members-success-post/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+include::{snippets}/members-success-post/response-fields.adoc[]
+
+===== Http Response
+
+include::{snippets}/members-success-post/http-response.adoc[]
+
+=== `회원` 로그인
+
+등록한 회원 Id로 로그인합니다.
+
+==== Request
+
+===== Cookies
+
+N/A
+
+===== Fields
+
+include::{snippets}/login-success-post/request-fields.adoc[]
+
+===== Query Parameters
+
+N/A
+
+===== Path Parameters
+
+N/A
+
+===== Curl Request
+
+include::{snippets}/login-success-post/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/login-success-post/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+N/A
+
+===== Http Response
+
+include::{snippets}/login-success-post/http-response.adoc[]
+
+=== `회원` 로그인 확인
+
+등록한 회원 Id로 로그인 되었는지 확인합니다
+
+==== Request
+
+===== Cookies
+
+include::{snippets}/login-check-success-get/request-cookies.adoc[]
+
+===== Fields
+
+N/A
+
+===== Query Parameters
+
+N/A
+
+===== Path Parameters
+
+N/A
+
+===== Curl Request
+
+include::{snippets}/login-check-success-get/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/login-check-success-get/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+include::{snippets}/login-check-success-get/response-fields.adoc[]
+
+===== Http Response
+
+include::{snippets}/login-check-success-get/http-response.adoc[]
+
+=== `회원` 로그아웃
+
+현재 로그인한 회원을 로그아웃합니다
+
+요청 시 설정한 쿠키가 만료됩니다
+
+==== Request
+
+===== Cookies
+
+include::{snippets}/logout-success-post/request-cookies.adoc[]
+
+===== Fields
+
+N/A
+
+===== Query Parameters
+
+N/A
+
+===== Path Parameters
+
+N/A
+
+===== Curl Request
+
+include::{snippets}/logout-success-post/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/logout-success-post/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+N/A
+
+===== Http Response
+
+include::{snippets}/logout-success-post/http-response.adoc[]
+
+=== `회원 예약` 조회
+
+로그인 한 회원의 예약을 조회합니다
+
+==== Request
+
+===== Cookies
+
+include::{snippets}/reservations-mine-success-get/request-cookies.adoc[]
+
+===== Fields
+
+N/A
+
+===== Query Parameters
+
+N/A
+
+===== Path Parameters
+
+N/A
+
+===== Curl Request
+
+include::{snippets}/reservations-mine-success-get/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/reservations-mine-success-get/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+include::{snippets}/reservations-mine-success-get/response-fields.adoc[]
+
+===== Http Response
+
+include::{snippets}/reservations-mine-success-get/http-response.adoc[]
+
+== 회원 예약 기능
+
+=== `회원 예약` 등록
+
+로그인 한 회원의 예약을 등록합니다
+
+==== Request
+
+===== Cookies
+
+include::{snippets}/reservations-success-post/request-cookies.adoc[]
+
+===== Fields
+
+include::{snippets}/reservations-success-post/request-fields.adoc[]
+
+===== Query Parameters
+
+N/A
+
+===== Path Parameters
+
+N/A
+
+===== Curl Request
+
+include::{snippets}/reservations-success-post/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/reservations-success-post/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+include::{snippets}/reservations-success-post/response-fields.adoc[]
+
+===== Http Response
+
+include::{snippets}/reservations-success-post/http-response.adoc[]
+
+=== `회원 예약 대기` 삭제
+
+로그인 한 회원의 예약 대기를 삭제합니다
+
+==== Request
+
+===== Cookies
+
+N/A
+
+===== Fields
+
+N/A
+
+===== Query Parameters
+
+N/A
+
+===== Path Parameters
+
+include::{snippets}/reservations-success-delete/path-parameters.adoc[]
+
+===== Curl Request
+
+include::{snippets}/reservations-success-delete/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/reservations-success-delete/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+N/A
+
+===== Http Response
+
+include::{snippets}/reservations-success-delete/http-response.adoc[]
+
+== 예약 기능
+
+=== `예약` 조회
+
+전체 회원의 예약 목록을 조회합니다
+
+==== Request
+
+===== Cookies
+
+N/A
+
+===== Fields
+
+N/A
+
+===== Query Parameters
+
+N/A
+
+===== Path Parameters
+
+N/A
+
+===== Curl Request
+
+include::{snippets}/reservation-success-get/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/reservation-success-get/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+include::{snippets}/reservation-success-get/response-fields.adoc[]
+
+===== Http Response
+
+include::{snippets}/reservation-success-get/http-response.adoc[]
+
+=== `예약 가능 시간` 조회
+
+예약 가능한 시간을 조회합니다
+
+==== Request
+
+===== Cookies
+
+N/A
+
+===== Fields
+
+N/A
+
+===== Query Parameters
+
+include::{snippets}/times-reserved-success-get/query-parameters.adoc[]
+
+===== Path Parameters
+
+N/A
+
+===== Curl Request
+
+include::{snippets}/times-reserved-success-get/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/times-reserved-success-get/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+include::{snippets}/times-reserved-success-get/response-fields.adoc[]
+
+===== Http Response
+
+include::{snippets}/times-reserved-success-get/http-response.adoc[]
+
+== 예약 대기 기능
+
+=== `예약 대기` 조회
+
+로그인 한 회원의 예약 대기 목록을 조회합니다
+
+==== Request
+
+===== Cookies
+
+N/A
+
+===== Fields
+
+N/A
+
+===== Query Parameters
+
+N/A
+
+===== Path Parameters
+
+N/A
+
+===== Curl Request
+
+include::{snippets}/waitings-success-get/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/waitings-success-get/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+include::{snippets}/waitings-success-get/response-fields.adoc[]
+
+===== Http Response
+
+include::{snippets}/waitings-success-get/http-response.adoc[]
+
+=== `예약 대기` 등록
+
+로그인 한 회원의 예약 대기를 등록합니다
+
+==== Request
+
+===== Cookies
+
+include::{snippets}/waiting-success-post/request-cookies.adoc[]
+
+===== Fields
+
+include::{snippets}/waiting-success-post/request-fields.adoc[]
+
+===== Query Parameters
+
+N/A
+
+===== Path Parameters
+
+N/A
+
+===== Curl Request
+
+include::{snippets}/waiting-success-post/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/waiting-success-post/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+include::{snippets}/waiting-success-post/response-fields.adoc[]
+
+===== Http Response
+
+include::{snippets}/waiting-success-post/http-response.adoc[]
+
+=== `예약 대기` 삭제
+
+로그인 한 회원의 예약 대기를 삭제합니다
+
+==== Request
+
+===== Cookies
+
+N/A
+
+===== Fields
+
+N/A
+
+===== Query Parameters
+
+N/A
+
+===== Path Parameters
+
+include::{snippets}/waiting-success-delete/path-parameters.adoc[]
+
+===== Curl Request
+
+include::{snippets}/waiting-success-delete/curl-request.adoc[]
+
+===== Http Request
+
+include::{snippets}/waiting-success-delete/http-request.adoc[]
+
+==== Response
+
+===== Fields
+
+N/A
+
+===== Http Response
+
+include::{snippets}/waiting-success-delete/http-response.adoc[]

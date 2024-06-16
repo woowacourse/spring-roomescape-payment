@@ -63,7 +63,6 @@ class ReservationRepositoryTest {
     @Test
     void should_delete_reservation() {
         reservationRepository.deleteById(1L);
-
         assertThat(reservationRepository.count()).isEqualTo(1);
     }
 

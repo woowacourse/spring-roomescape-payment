@@ -2,7 +2,11 @@ package roomescape.repository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import roomescape.model.*;
+import roomescape.model.Member;
+import roomescape.model.ReservationTime;
+import roomescape.model.Theme;
+import roomescape.model.Waiting;
+import roomescape.model.WaitingWithRank;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -10,11 +14,11 @@ import java.util.Optional;
 
 public interface WaitingRepository extends CrudRepository<Waiting, Long> {
 
-    Waiting save(Waiting waiting);
+    Waiting save(final Waiting waiting);
 
-    void deleteById(long id);
+    void deleteById(final Long id);
 
-    boolean existsById(long id);
+    boolean existsById(final Long id);
 
     @Query("""
             SELECT new roomescape.model.WaitingWithRank(
@@ -28,13 +32,13 @@ public interface WaitingRepository extends CrudRepository<Waiting, Long> {
             WHERE w.member.id = :memberId
             GROUP BY w.id
             """)
-    List<WaitingWithRank> findWaitingWithRankByMemberId(Long memberId);
+    List<WaitingWithRank> findWaitingWithRankByMemberId(final Long memberId);
 
-    boolean existsWaitingByThemeAndDateAndTimeAndMember(Theme theme, LocalDate date, ReservationTime time, Member member);
+    boolean existsWaitingByThemeAndDateAndTimeAndMember(final Theme theme, final LocalDate date, final ReservationTime time, final Member member);
 
     List<Waiting> findAll();
 
-    boolean existsWaitingByThemeAndDateAndTime(Theme theme, LocalDate date, ReservationTime time);
+    boolean existsWaitingByThemeAndDateAndTime(final Theme theme, final LocalDate date, final ReservationTime time);
 
-    Optional<Waiting> findFirstByThemeAndDateAndTime(Theme theme, LocalDate date, ReservationTime time);
+    Optional<Waiting> findFirstByThemeAndDateAndTime(final Theme theme, final LocalDate date, final ReservationTime time);
 }

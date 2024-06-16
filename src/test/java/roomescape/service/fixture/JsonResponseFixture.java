@@ -1,0 +1,65 @@
+package roomescape.service.fixture;
+
+public class JsonResponseFixture {
+    public static String TOSS_API_CONFIRM_RESPONSE = """
+            {
+                "mId":"tgen_docs",
+                    "lastTransactionKey":"59DE045868F508A1BB1AFD8FE26CDC1D",
+                    "paymentKey":"tgen_20240604202416eHBf1",
+                    "orderId":"MOVINPOKEMC4zNTY1NzA5MjE4NjU0",
+                    "orderName":"어둠의 방탈출을 예약합니다.",
+                    "taxExemptionAmount":0,
+                    "status":"DONE",
+                    "requestedAt":"2024-06-04T20:24:16+09:00",
+                    "approvedAt":"2024-06-04T20:24:51+09:00",
+                    "useEscrow":false,
+                    "cultureExpense":false,
+                    "card":{
+                "issuerCode":"24",
+                        "acquirerCode":"21",
+                        "number":"53275080****233*",
+                        "installmentPlanMonths":0,
+                        "isInterestFree":false,
+                        "interestPayer":null,
+                        "approveNo":"00000000",
+                        "useCardPoint":false,
+                        "cardType":"신용",
+                        "ownerType":"개인",
+                        "acquireStatus":"READY",
+                        "amount":1999989
+            },
+                "virtualAccount":null,
+                    "transfer":null,
+                    "mobilePhone":null,
+                    "giftCertificate":null,
+                    "cashReceipt":null,
+                    "cashReceipts":null,
+                    "discount":null,
+                    "cancels":null,
+                    "secret":"ps_GePWvyJnrK2dpmORDyWLVgLzN97E",
+                    "type":"NORMAL",
+                    "easyPay":{
+                "provider":"토스페이",
+                        "amount":0,
+                        "discountAmount":10
+            },
+                "country":"KR",
+                    "failre":null,
+                    "isPartialCancelable":true,
+                    "receipt":{
+                "url":"https://dashboard.tosspayments.com/receipt/redirection?transactionId=tgen_20240604202416eHBf1&ref=PX"
+            },
+                "checkout":{
+                "url":"https://api.tosspayments.com/v1/payments/tgen_20240604202416eHBf1/checkout"
+            },
+                "currency":"KRW",
+                    "totalAmount":1999999,
+                    "balanceAmount":1999999,
+                    "suppliedAmount":1818181,
+                    "vat":181818,
+                    "taxFreeAmount":0,
+                    "method":"간편결제",
+                    "version":"2022-11-16"
+            }
+                        """;
+}

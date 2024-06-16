@@ -24,3 +24,8 @@ INSERT INTO waiting (date, time_id, theme_id, member_id)
 VALUES (CURRENT_DATE + 1, 1, 1, 2);
 INSERT INTO waiting (date, time_id, theme_id, member_id)
 VALUES (CURRENT_DATE + 1, 1, 2, 2);
+
+INSERT INTO payment (payment_key, amount, reservation_id)
+VALUES ('test', 1999999, 1);
+INSERT INTO payment (payment_key, amount, reservation_id)
+VALUES ('test2', 1999999, 2);

@@ -11,12 +11,12 @@ public class CheckRoleInterceptor implements HandlerInterceptor {
 
     private final AuthService authService;
 
-    public CheckRoleInterceptor(AuthService authService) {
+    public CheckRoleInterceptor(final AuthService authService) {
         this.authService = authService;
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+    public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler)
             throws Exception {
         Role role = authService.findRoleByCookie(request.getCookies());
         if (isAdmin(role)) {

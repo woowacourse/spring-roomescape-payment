@@ -1,4 +1,4 @@
-package roomescape.controller.response;
+package roomescape.response;
 
 import roomescape.model.Waiting;
 
@@ -6,16 +6,13 @@ import java.time.LocalDate;
 
 public class WaitingResponse {
 
-    private Long id;
-    private String name;
-    private LocalDate date;
-    private ReservationTimeResponse time;
-    private ReservationThemeResponse theme;
+    private final Long id;
+    private final String name;
+    private final LocalDate date;
+    private final ReservationTimeResponse time;
+    private final ReservationThemeResponse theme;
 
-    private WaitingResponse() {
-    }
-
-    public WaitingResponse(Waiting waiting) {
+    public WaitingResponse(final Waiting waiting) {
         this.id = waiting.getId();
         this.name = waiting.getMember().getName();
         this.date = waiting.getDate();

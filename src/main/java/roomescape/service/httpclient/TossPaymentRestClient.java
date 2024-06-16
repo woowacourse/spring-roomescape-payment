@@ -1,25 +1,26 @@
 package roomescape.service.httpclient;
 
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.controller.request.PaymentRequest;
+import roomescape.request.PaymentRequest;
+import roomescape.response.PaymentResponse;
 
 public class TossPaymentRestClient extends TossPaymentClient {
+
+    private final RestClient restClient;
 
     public TossPaymentRestClient(final RestClient restClient) {
         this.restClient = restClient;
     }
 
-    private final RestClient restClient;
-
     @Override
-    protected void request(final PaymentRequest paymentRequest) {
-        restClient.post()
+    protected PaymentResponse request(final PaymentRequest paymentRequest) {
+        return restClient.post()
                 .uri(CONFIRM_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(paymentRequest)
                 .retrieve()
-                .toBodilessEntity();
+                .toEntity(PaymentResponse.class)
+                .getBody();
     }
 }

@@ -13,11 +13,11 @@ public interface ThemeRepository extends CrudRepository<Theme, Long> {
 
     List<Theme> findAll();
 
-    Theme save(Theme theme); // save
+    Theme save(final Theme theme); // save
 
-    void deleteById(long id); // delete
+    void deleteById(final Long id); // delete
 
-    Optional<Theme> findById(long id);
+    Optional<Theme> findById(final Long id);
 
     @Query("""
             SELECT r.theme
@@ -28,6 +28,6 @@ public interface ThemeRepository extends CrudRepository<Theme, Long> {
             ORDER BY COUNT(th) DESC
             limit 10
             """)
-    List<Theme> findFirst10ByDateBetweenOrderByTheme(@Param("before") LocalDate before,
-                                                     @Param("after") LocalDate after);
+    List<Theme> findFirst10ByDateBetweenOrderByTheme(@Param("before") final LocalDate before,
+                                                     @Param("after") final LocalDate after);
 }

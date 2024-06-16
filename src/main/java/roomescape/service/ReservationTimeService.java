@@ -1,15 +1,14 @@
 package roomescape.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import roomescape.controller.request.ReservationTimeRequest;
-import roomescape.controller.response.IsReservedTimeResponse;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.DuplicatedException;
 import roomescape.exception.NotFoundException;
 import roomescape.model.ReservationTime;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
+import roomescape.request.ReservationTimeRequest;
+import roomescape.response.IsReservedTimeResponse;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -23,20 +22,18 @@ public class ReservationTimeService {
 
     private final ReservationRepository reservationRepository;
 
-    public ReservationTimeService(ReservationTimeRepository reservationTimeRepository,
-                                  ReservationRepository reservationRepository) {
+    public ReservationTimeService(final ReservationTimeRepository reservationTimeRepository,
+                                  final ReservationRepository reservationRepository) {
         this.reservationTimeRepository = reservationTimeRepository;
         this.reservationRepository = reservationRepository;
     }
 
 
-    @Transactional(readOnly = true)
     public List<ReservationTime> findAllReservationTimes() {
         return reservationTimeRepository.findAll();
     }
 
-    @Transactional
-    public ReservationTime addReservationTime(ReservationTimeRequest request) {
+    public ReservationTime addReservationTime(final ReservationTimeRequest request) {
         LocalTime startAt = request.startAt();
 
         validateExistTime(startAt);
@@ -45,21 +42,19 @@ public class ReservationTimeService {
         return reservationTimeRepository.save(reservationTime);
     }
 
-    private void validateExistTime(LocalTime startAt) {
+    private void validateExistTime(final LocalTime startAt) {
         boolean exists = reservationTimeRepository.existsByStartAt(startAt);
         if (exists) {
             throw new DuplicatedException("이미 존재하는 시간입니다.");
         }
     }
 
-    @Transactional(readOnly = true)
-    public ReservationTime findReservationTime(long id) {
+    public ReservationTime findReservationTime(final Long id) {
         return reservationTimeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("아이디가 %s인 예약 시간이 존재하지 않습니다.".formatted(id)));
     }
 
-    @Transactional(readOnly = true)
-    public List<IsReservedTimeResponse> getIsReservedTime(LocalDate date, long themeId) {
+    public List<IsReservedTimeResponse> getIsReservedTime(final LocalDate date, final Long themeId) {
         List<ReservationTime> allTimes = reservationTimeRepository.findAll();
         List<ReservationTime> bookedTimes = reservationTimeRepository.findAllReservedTimes(date, themeId);
 
@@ -70,15 +65,14 @@ public class ReservationTimeService {
         return concat(notBookedResponse, bookedResponse);
     }
 
-    @Transactional
-    public void deleteReservationTime(long id) {
+    public void deleteReservationTime(final Long id) {
         validateNotExistReservationTime(id);
         validateReservedTime(id);
 
         reservationTimeRepository.deleteById(id);
     }
 
-    private void validateReservedTime(long id) {
+    private void validateReservedTime(final Long id) {
         ReservationTime time = reservationTimeRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("아이디가 %s인 예약 시간이 존재하지 않습니다.".formatted(id)));
 
@@ -88,20 +82,20 @@ public class ReservationTimeService {
         }
     }
 
-    private void validateNotExistReservationTime(long id) {
+    private void validateNotExistReservationTime(final Long id) {
         boolean exists = reservationTimeRepository.existsById(id);
         if (!exists) {
             throw new NotFoundException("id(%s)에 해당하는 예약 시간이 존재하지 않습니다.".formatted(id));
         }
     }
 
-    private List<ReservationTime> filterNotBookedTimes(List<ReservationTime> times, List<ReservationTime> bookedTimes) {
+    private List<ReservationTime> filterNotBookedTimes(final List<ReservationTime> times, final List<ReservationTime> bookedTimes) {
         return times.stream()
                 .filter(time -> !bookedTimes.contains(time))
                 .toList();
     }
 
-    private List<IsReservedTimeResponse> mapToResponse(List<ReservationTime> times, boolean isBooked) {
+    private List<IsReservedTimeResponse> mapToResponse(final List<ReservationTime> times, final Boolean isBooked) {
         return times.stream()
                 .map(time -> new IsReservedTimeResponse(time.getId(), time.getStartAt(), isBooked))
                 .toList();
