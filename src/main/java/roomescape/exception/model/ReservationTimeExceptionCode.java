@@ -1,8 +1,10 @@
 package roomescape.exception.model;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import roomescape.exception.ExceptionCode;
 
+@Tag(name = "예약 시간 예외 코드", description = "예약 시간 관련 예외 코드 모음")
 public enum ReservationTimeExceptionCode implements ExceptionCode {
 
     FOUND_TIME_IS_NULL_EXCEPTION(HttpStatus.BAD_REQUEST, "존재하는 시간이 없습니다."),

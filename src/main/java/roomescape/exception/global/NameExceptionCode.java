@@ -1,8 +1,10 @@
 package roomescape.exception.global;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import roomescape.exception.ExceptionCode;
 
+@Tag(name = "이름 예외 코드", description = "이름과 관련된 예외 코드 모음")
 public enum NameExceptionCode implements ExceptionCode {
 
     NAME_LENGTH_IS_OVER_MAX_COUNT(HttpStatus.BAD_REQUEST, "이름의 길이가 최대 길이를 넘었습니다."),

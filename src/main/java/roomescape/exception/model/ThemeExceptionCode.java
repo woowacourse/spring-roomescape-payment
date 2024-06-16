@@ -1,8 +1,10 @@
 package roomescape.exception.model;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import roomescape.exception.ExceptionCode;
 
+@Tag(name = "테마 예외 코드", description = "테마 관련 예외 코드 모음")
 public enum ThemeExceptionCode implements ExceptionCode {
 
     USING_THEME_RESERVATION_EXIST(HttpStatus.BAD_REQUEST, "삭제하려는 테마의 예약이 아직 존재합니다."),

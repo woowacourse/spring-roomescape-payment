@@ -1,5 +1,6 @@
 package roomescape.reservationtime.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import roomescape.reservationtime.dto.ReservationTimeRequest;
 import roomescape.reservationtime.dto.ReservationTimeResponse;
 import roomescape.reservationtime.service.ReservationTimeService;
 
+@Tag(name = "예약 시간 컨트롤러", description = "사용자 요청에 따른 예약 시간 저장, 불러오기, 예약 시간 삭제")
 @RestController
 @RequestMapping("/times")
 public class ReservationTimeController {

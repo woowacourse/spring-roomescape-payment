@@ -1,5 +1,6 @@
 package roomescape.infra;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import roomescape.exception.PaymentConfirmException;
 import roomescape.exception.RoomEscapeException;
 import roomescape.exception.global.GlobalExceptionCode;
 
+@Tag(name = "글로벌 예외 핸들러", description = "해당 어플리케이션에서 발생하는 모든 예외를 다룬다.")
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 

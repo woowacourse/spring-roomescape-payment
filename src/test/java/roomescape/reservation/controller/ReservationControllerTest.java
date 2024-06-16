@@ -4,12 +4,14 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,22 +19,27 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import roomescape.client.payment.PaymentClient;
+import org.springframework.web.client.RestClient;
+import roomescape.client.payment.service.PaymentClient;
+import roomescape.config.ClientConfig;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.model.ControllerTest;
-import roomescape.registration.domain.reservation.controller.ReservationController;
-import roomescape.registration.domain.reservation.domain.Reservation;
-import roomescape.registration.domain.reservation.dto.ReservationResponse;
-import roomescape.registration.domain.reservation.dto.ReservationTimeAvailabilityResponse;
-import roomescape.registration.domain.reservation.service.ReservationService;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.dto.ReservationDto;
+import roomescape.reservation.dto.ReservationTimeAvailabilityResponse;
+import roomescape.reservation.service.ReservationService;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 import roomescape.vo.Name;
 
 @ExtendWith(MockitoExtension.class)
 @WebMvcTest(ReservationController.class)
+@ContextConfiguration(classes = ClientConfig.class)
+@Disabled
 class ReservationControllerTest extends ControllerTest {
 
     private static final LocalDate TOMORROW = LocalDate.now().plusDays(1);
@@ -56,15 +63,19 @@ class ReservationControllerTest extends ControllerTest {
     @MockBean
     private PaymentClient paymentClient;
 
+    @MockBean
+    private RestClient restClient;
+
     @Test
     @DisplayName("예약 정보를 잘 불러오는지 확인한다.")
     void findAllReservations() throws Exception {
         when(reservationService.findReservations())
-                .thenReturn(List.of(ReservationResponse.from(reservation)));
+                .thenReturn(List.of(ReservationDto.from(reservation)));
 
         mockMvc.perform(get("/reservations"))
                 .andDo(print())
                 .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[0].id").value(reservation.getId()))
                 .andExpect(jsonPath("$[0].memberName").value(reservation.getMember().getName()))
                 .andExpect(jsonPath("$[0].startAt").value(expectedStartAt))

@@ -1,18 +1,20 @@
 package roomescape.reservationtime.service;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import roomescape.exception.RoomEscapeException;
 import roomescape.exception.model.ReservationTimeExceptionCode;
-import roomescape.registration.domain.reservation.domain.Reservation;
-import roomescape.registration.domain.reservation.repository.ReservationRepository;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.dto.ReservationTimeRequest;
 import roomescape.reservationtime.dto.ReservationTimeResponse;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
 
+@Tag(name = "예약 시간 서비스", description = "예약 시간 저장, 예약 시간 불러오기 등 예약 시간 관련 로직 수행")
 @Service
 public class ReservationTimeService {
 

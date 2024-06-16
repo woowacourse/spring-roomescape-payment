@@ -7,9 +7,9 @@ spring:
 spring:
   datasource:
     # h2 서버 url
-    # url: jdbc:h2:mem:database;DATABASE_TO_LOWER=TRUE
+    url: jdbc:h2:mem:database;DATABASE_TO_LOWER=TRUE
     # h2 embedded url
-    url: jdbc:h2:~/test;AUTO_SERVER=TRUE;DATABASE_TO_LOWER=TRUE
+#    url: jdbc:h2:~/test;AUTO_SERVER=TRUE;DATABASE_TO_LOWER=TRUE
     username: sa
 
   jpa:
@@ -34,6 +34,16 @@ spring:
   sql:
     init:
       mode: always
+
+springdocs:
+  packages-to-scan: roomescape
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: /swagger-ui.html
+    disable-swagger-default-url: true
+    display-request-duration: true
+    operations-sorter: alpha
 
 jwt:
   secret-key: gotjrgoeh2rjtdmsqufakfdldkslqslekgoehrgkwlaktpdydkwhaejrlfdjdigkskqhspdyrhldwkdglekdghkdtmfjq=

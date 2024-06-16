@@ -23,14 +23,14 @@ import roomescape.exception.model.ReservationExceptionCode;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.repository.MemberRepository;
-import roomescape.registration.domain.reservation.domain.Reservation;
-import roomescape.registration.domain.reservation.dto.ReservationRequest;
-import roomescape.registration.domain.reservation.dto.ReservationResponse;
-import roomescape.registration.domain.reservation.repository.ReservationRepository;
-import roomescape.registration.domain.reservation.service.ReservationService;
-import roomescape.registration.domain.waiting.domain.Waiting;
-import roomescape.registration.domain.waiting.repository.WaitingRepository;
-import roomescape.registration.dto.RegistrationDto;
+import roomescape.client.payment.PaymentRepository;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.dto.ReservationDto;
+import roomescape.reservation.dto.ReservationRequest;
+import roomescape.reservation.repository.ReservationRepository;
+import roomescape.waiting.domain.Waiting;
+import roomescape.waiting.repository.WaitingRepository;
+import roomescape.reservation.dto.RegistrationDto;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
@@ -52,6 +52,7 @@ class ReservationServiceTest {
             new Theme(1L, new Name("pollaBang"), "폴라 방탈출", "thumbnail"),
             new Member(1L, new Name("polla"), "kyunellroll@gmail.com", "polla99", MemberRole.MEMBER)
     );
+
     private final Waiting waiting = new Waiting(
             1L,
             reservation,
@@ -77,6 +78,9 @@ class ReservationServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     @Test
     @DisplayName("예약을 추가한다.")
     void addReservation() {
@@ -87,14 +91,14 @@ class ReservationServiceTest {
                 reservation.getReservationTime().getId(), reservation.getTheme().getId(),
                 "paymentType", "paymentKey", "orderId", new BigDecimal("1000"));
 
-        ReservationResponse reservationResponse = reservationService
+        Reservation reservationResponse = reservationService
                 .addReservation(new RegistrationDto(
                         reservationRequest.date(),
                         reservationRequest.themeId(),
                         reservationRequest.timeId(),
                         reservation.getMember().getId()));
 
-        assertThat(reservationResponse.id()).isEqualTo(1);
+        assertThat(reservationResponse.getId()).isEqualTo(1);
     }
 
     @Test
@@ -105,9 +109,9 @@ class ReservationServiceTest {
         memberRepository.save(reservation.getMember());
         reservationRepository.save(reservation);
 
-        List<ReservationResponse> reservationResponses = reservationService.findReservations();
+        List<ReservationDto> reservationDto = reservationService.findReservations();
 
-        assertThat(reservationResponses).hasSize(1);
+        assertThat(reservationDto).hasSize(1);
     }
 
     @Test

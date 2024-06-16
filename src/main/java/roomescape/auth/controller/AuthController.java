@@ -1,5 +1,6 @@
 package roomescape.auth.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import roomescape.auth.service.AuthService;
 import roomescape.member.dto.MemberLoginCheckResponse;
 import roomescape.member.service.MemberService;
 
+@Tag(name = "auth 컨트롤러", description = "로그인한 사용자에게 쿠키를 부여하고 로그인 정보가 실제로 존재하는지 확인한다.")
 @RestController
 public class AuthController {
 

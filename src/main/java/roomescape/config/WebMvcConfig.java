@@ -1,6 +1,7 @@
 package roomescape.config;
 
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import roomescape.auth.resolver.TokenResolver;
 import roomescape.infra.MemberRoleInterceptor;
 import roomescape.member.service.MemberService;
 
+@Tag(name = "Spring Web MVC에 사용될 설정", description = "TokenResolver를 리졸버(요청을 특정 객체로 변환)로 등록하고 인터셉터(요청 가로채기)로 MemberRoleInterceptor를 추가한다.")
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 

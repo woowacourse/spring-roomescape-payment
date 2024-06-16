@@ -1,18 +1,20 @@
 package roomescape.theme.service;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import roomescape.exception.RoomEscapeException;
 import roomescape.exception.model.ThemeExceptionCode;
-import roomescape.registration.domain.reservation.domain.Reservation;
-import roomescape.registration.domain.reservation.repository.ReservationRepository;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.repository.ReservationRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.dto.ThemeRankResponse;
 import roomescape.theme.dto.ThemeRequest;
 import roomescape.theme.dto.ThemeResponse;
 import roomescape.theme.repository.ThemeRepository;
 
+@Tag(name = "테마 서비스", description = "테마 추가, 테마 삭제 등 테마 관련 로직 수행")
 @Service
 public class ThemeService {
 

@@ -1,5 +1,6 @@
 package roomescape.member.domain;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -13,6 +14,7 @@ import roomescape.exception.RoomEscapeException;
 import roomescape.exception.model.MemberExceptionCode;
 import roomescape.vo.Name;
 
+@Tag(name = "사용자 엔티티", description = "사용자가 갖고있어야 할 정보가 정의되어 있다. 사용자를 생성할 때 특정 정보는 예외처리를 진행한다.")
 @Entity
 public class Member {
 

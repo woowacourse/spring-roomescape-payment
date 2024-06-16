@@ -1,11 +1,13 @@
 package roomescape.vo;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.util.regex.Pattern;
 import roomescape.exception.RoomEscapeException;
 import roomescape.exception.global.NameExceptionCode;
 
+@Tag(name = "이름 객체", description = "테마 이름 또는 멤버 이름 등에 사용되는 값 객체")
 @Embeddable
 public class Name {
 

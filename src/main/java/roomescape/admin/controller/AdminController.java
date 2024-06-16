@@ -1,6 +1,5 @@
 package roomescape.admin.controller;
 
-import java.net.URI;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +16,11 @@ import roomescape.admin.dto.AdminReservationRequest;
 import roomescape.admin.dto.ReservationFilterRequest;
 import roomescape.auth.annotation.Auth;
 import roomescape.member.domain.MemberRole;
-import roomescape.registration.domain.reservation.dto.ReservationResponse;
-import roomescape.registration.domain.reservation.service.ReservationService;
-import roomescape.registration.domain.waiting.dto.WaitingResponse;
-import roomescape.registration.domain.waiting.service.WaitingService;
+import roomescape.reservation.dto.ReservationDto;
+import roomescape.reservation.dto.ReservationResponse;
+import roomescape.reservation.service.ReservationService;
+import roomescape.waiting.dto.WaitingResponse;
+import roomescape.waiting.service.WaitingService;
 
 @RestController
 @Auth(roles = MemberRole.ADMIN)
@@ -40,14 +40,19 @@ public class AdminController {
     public ResponseEntity<Void> reservationSave(@RequestBody AdminReservationRequest adminReservationRequest) {
         reservationService.addAdminReservation(adminReservationRequest);
 
-        return ResponseEntity.created(URI.create("/admin/reservations/" + adminReservationRequest.memberId()))
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
                 .build();
     }
 
     @GetMapping("/reservations")
     public List<ReservationResponse> reservationFilteredList(
             @ModelAttribute ReservationFilterRequest reservationFilterRequest) {
-        return reservationService.findFilteredReservations(reservationFilterRequest);
+        List<ReservationDto> reservationDto = reservationService.findFilteredReservations(reservationFilterRequest);
+
+        return reservationDto.stream()
+                .map(ReservationResponse::from)
+                .toList();
     }
 
     @GetMapping("/waitings")
