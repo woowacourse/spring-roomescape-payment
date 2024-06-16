@@ -21,6 +21,8 @@ import roomescape.reservation.dto.AdminReservationCreateRequest;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/init-test.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class AdminReservationControllerTest {
+    private static final int COUNT_OF_RESERVATION_WHERE_THEME_ID_1 = 3;
+
     @LocalServerPort
     private int port;
     @Autowired
@@ -36,8 +38,6 @@ class AdminReservationControllerTest {
     void findReservationTest() {
         Cookies cookies = makeAdminCookie();
         Map<String, String> parameters = Map.of("themeId", "1");
-        int expected = jdbcTemplate.queryForObject(
-                "SELECT count(1) from reservation WHERE theme_id = 1", Integer.class);
 
         int size = RestAssured.given().log().all()
                 .cookies(cookies)
@@ -47,7 +47,7 @@ class AdminReservationControllerTest {
                 .statusCode(200).extract()
                 .jsonPath().getInt("size()");
 
-        assertThat(size).isEqualTo(expected);
+        assertThat(size).isEqualTo(COUNT_OF_RESERVATION_WHERE_THEME_ID_1);
     }
 
     @DisplayName("예약을 DB에 추가할 수 있다.")

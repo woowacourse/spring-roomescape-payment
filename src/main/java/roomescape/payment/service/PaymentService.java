@@ -1,56 +1,67 @@
 package roomescape.payment.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestClient;
+import java.time.LocalDateTime;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import roomescape.exception.BadArgumentRequestException;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentStatus;
 import roomescape.payment.dto.PaymentConfirmRequest;
-import roomescape.payment.dto.PaymentErrorResponse;
-import roomescape.payment.exception.PaymentException;
-import roomescape.payment.exception.PaymentUnauthorizedException;
-import roomescape.payment.exception.RestClientTimeOutException;
+import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.dto.PaymentResponse;
+import roomescape.payment.repository.PaymentRepository;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.repository.ReservationRepository;
 
+@Service
 public class PaymentService {
-    private final RestClient restClient;
-    private final String authorizationKey;
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final PaymentClient paymentClient;
+    private final ReservationRepository reservationRepository;
+    private final PaymentRepository paymentRepository;
 
-    public PaymentService(RestClient restClient, String authorizationKey) {
-        this.restClient = restClient;
-        this.authorizationKey = authorizationKey;
+
+    public PaymentService(PaymentClient paymentClient,
+                          ReservationRepository reservationRepository,
+                          PaymentRepository paymentRepository) {
+        this.reservationRepository = reservationRepository;
+        this.paymentClient = paymentClient;
+        this.paymentRepository = paymentRepository;
     }
 
-    public void confirmPayment(PaymentConfirmRequest request) {
-        try {
-            restClient.post()
-                    .uri("/confirm")
-                    .header(HttpHeaders.AUTHORIZATION, authorizationKey)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(request)
-                    .retrieve()
-                    .toBodilessEntity();
-        } catch (HttpClientErrorException | HttpServerErrorException exception) {
-            log.error("PaymentService Confirm Response Error, paymentKey = {}, orderId = {}",
-                    request.paymentKey(), request.orderId(), exception);
-            handleClientException(exception);
-        } catch (ResourceAccessException exception) {
-            log.error("PaymentService Confirm Timeout Error, paymentKey = {}, orderId = {}",
-                    request.paymentKey(), request.orderId(), exception);
-            throw new RestClientTimeOutException(exception);
+    @Transactional
+    public PaymentResponse createPayment(PaymentRequest request, Long memberId) {
+        Reservation reservation = findReservationByReservationId(request.reservationId());
+        validatePaying(reservation, memberId);
+
+        paymentClient.confirmPayment(PaymentConfirmRequest.from(request));
+        Payment payment = savePayment(request, reservation);
+        return PaymentResponse.from(payment);
+    }
+
+    private Reservation findReservationByReservationId(Long reservationId) {
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new BadArgumentRequestException("해당 예약이 존재하지 않습니다."));
+    }
+
+    private void validatePaying(Reservation reservation, Long memberId) {
+        if (reservation.isBefore(LocalDateTime.now())) {
+            throw new BadArgumentRequestException("결제하기 위해서 해당 예약은 현재 시간 이후여야 합니다.");
+        }
+        if (isPaid(reservation)) {
+            throw new BadArgumentRequestException("해당 예약은 이미 결제 되었습니다.");
+        }
+        if (reservation.isDifferentMember(memberId)) {
+            throw new BadArgumentRequestException("예약한 회원과 동일한 회원이 결제해야 합니다.");
         }
     }
 
-    private void handleClientException(HttpStatusCodeException exception) {
-        if (exception.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-            throw new PaymentUnauthorizedException();
-        }
-        PaymentErrorResponse errorResponse = exception.getResponseBodyAs(PaymentErrorResponse.class);
-        throw new PaymentException(exception.getStatusCode(), errorResponse.message());
+    private boolean isPaid(Reservation reservation) {
+        return paymentRepository.findByScheduleAndMemberAndStatus(
+                reservation.getSchedule(), reservation.getMember(), PaymentStatus.PAID).isPresent();
+    }
+
+    private Payment savePayment(PaymentRequest request, Reservation reservation) {
+        Payment payment = request.createPayment(reservation.getMember(), reservation.getSchedule());
+        return paymentRepository.save(payment);
     }
 }

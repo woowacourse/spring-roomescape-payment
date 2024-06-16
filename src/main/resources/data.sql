@@ -19,16 +19,25 @@ VALUES ('브라운', 'brown@abc.com', 'USER', '1234');
 INSERT INTO member(name, email, role, password)
 VALUES ('오리', 'duck@abc.com', 'USER', '1234');
 
-INSERT INTO reservation (member_id, date, time_id, theme_id)
-VALUES (2, CURRENT_DATE - 1, 1, 1);
-INSERT INTO reservation (member_id, date, time_id, theme_id)
-VALUES (1, CURRENT_DATE - 2, 1, 1);
-INSERT INTO reservation (member_id, date, time_id, theme_id)
-VALUES (3, CURRENT_DATE - 2, 2, 2);
-INSERT INTO reservation (member_id, date, time_id, theme_id)
-VALUES (2, CURRENT_DATE + 1, 1, 2);
+INSERT INTO schedule (date, time_id, theme_id)
+VALUES (CURRENT_DATE - 1, 1, 1);
+INSERT INTO schedule (date, time_id, theme_id)
+VALUES (CURRENT_DATE - 2, 1, 1);
+INSERT INTO schedule (date, time_id, theme_id)
+VALUES (CURRENT_DATE - 2, 2, 2);
+INSERT INTO schedule (date, time_id, theme_id)
+VALUES (CURRENT_DATE + 1, 1, 2);
 
-INSERT INTO waiting (reservation_id, member_id, created_at)
+INSERT INTO reservation (member_id, schedule_id, status)
+VALUES (2, 1, 'ADMIN_RESERVE');
+INSERT INTO reservation (member_id, schedule_id, status)
+VALUES (1, 2, 'ADMIN_RESERVE');
+INSERT INTO reservation (member_id, schedule_id, status)
+VALUES (3, 3, 'ADMIN_RESERVE');
+INSERT INTO reservation (member_id, schedule_id, status)
+VALUES (2, 4, 'ADMIN_RESERVE');
+
+INSERT INTO waiting (schedule_id, member_id, created_at)
 VALUES (4, 3, '2024-05-20 12:10:00.000');
-INSERT INTO waiting (reservation_id, member_id, created_at)
+INSERT INTO waiting (schedule_id, member_id, created_at)
 VALUES (4, 4, '2024-05-20 12:20:00.000');

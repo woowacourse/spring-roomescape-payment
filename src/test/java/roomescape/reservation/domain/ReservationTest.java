@@ -55,7 +55,7 @@ class ReservationTest {
 
     @DisplayName("날짜를 통해 특정 시간대 이전임을 알 수 있다.")
     @Test
-    void isAfterTest_whenDateIsBefore() {
+    void isBeforeTest_whenDateIsBefore() {
         ReservationTime time = new ReservationTime(1L, LocalTime.of(9, 0));
         Reservation reservation = new Reservation(1L, member, LocalDate.of(2024, 4, 30), time, theme);
         LocalDateTime currentDateTime = LocalDateTime.of(2024, 5, 1, 10, 0);
@@ -65,7 +65,7 @@ class ReservationTest {
 
     @DisplayName("날짜를 통해 특정 시간대 이후임을 알 수 있다.")
     @Test
-    void isAfterTest_whenDateIsAfter() {
+    void isBeforeTest_whenDateIsAfter() {
         ReservationTime time = new ReservationTime(1L, LocalTime.of(9, 0));
         Reservation reservation = new Reservation(1L, member, LocalDate.of(2024, 4, 30), time, theme);
         LocalDateTime currentDateTime = LocalDateTime.of(2024, 4, 29, 10, 0);
@@ -75,11 +75,56 @@ class ReservationTest {
 
     @DisplayName("날짜가 같은 경우, 시간을 통해 판단한다.")
     @Test
-    void isAfterTest_whenDateIsEqualTimeIsBefore() {
+    void isBeforeTest_whenDateIsEqualTimeIsBefore() {
         ReservationTime time = new ReservationTime(1L, LocalTime.of(9, 0));
         Reservation reservation = new Reservation(1L, member, LocalDate.of(2024, 4, 30), time, theme);
         LocalDateTime currentDateTime = LocalDateTime.of(2024, 4, 30, 10, 0);
 
         assertThat(reservation.isBefore(currentDateTime)).isTrue();
+    }
+
+    @DisplayName("예약이 일반적으로 생성 될 때, 유저의 예약으로 생성된다.")
+    @Test
+    void isUserReservedTest() {
+        Reservation reservation = new Reservation(
+                1L, member, LocalDate.of(2024, 4, 30), time, theme);
+
+        boolean actual = reservation.isUserReserved();
+
+        assertThat(actual).isTrue();
+    }
+
+    @DisplayName("예약자가 서로 다른지 알 수 있다.")
+    @Test
+    void isDifferentMemberTest_whenDifferentMember() {
+        Reservation reservation = new Reservation(
+                1L, member, LocalDate.of(2024, 4, 30), time, theme);
+
+        boolean actual = reservation.isDifferentMember(2L);
+
+        assertThat(actual).isTrue();
+    }
+
+    @DisplayName("예약자가 서로 같은지 알 수 있다.")
+    @Test
+    void isDifferentMemberTest_whenSameMember() {
+        Reservation reservation = new Reservation(
+                1L, member, LocalDate.of(2024, 4, 30), time, theme);
+
+        boolean actual = reservation.isDifferentMember(1L);
+
+        assertThat(actual).isFalse();
+    }
+
+    @DisplayName("다른 멤버로 예약을 재확정할 수 있다.")
+    @Test
+    void confirmTest() {
+        Reservation reservation = new Reservation(
+                1L, member, LocalDate.of(2024, 4, 30), time, theme);
+        Member newMember = new Member(2L, "브리", "bri@abc.com");
+
+        reservation.confirm(newMember);
+
+        assertThat(reservation.getMember()).isEqualTo(newMember);
     }
 }

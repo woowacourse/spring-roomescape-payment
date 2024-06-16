@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>방탈출 어드민</title>
+    <title>방탈출 예약 페이지</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/toss-style.css">
+    <script src="https://js.tosspayments.com/v1/payment-widget"></script>
 </head>
 <body>
 
@@ -22,7 +24,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link" href="/">Reservation</a>
+                <a class="nav-link" href="/reservation">Reservation</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/login">Login</a>
@@ -43,27 +45,22 @@
     </div>
 </nav>
 
-<div class="content-container">
-    <h2 class="content-container-title">내 예약</h2>
-    <div class="table-container"/>
-    <table class="table">
-        <thead>
-        <tr>
-            <th>테마</th>
-            <th>날짜</th>
-            <th>시간</th>
-            <th>상태</th>
-            <th></th>
-            <th>paymentKey</th>
-            <th>결제 금액</th>
-        </tr>
-        </thead>
-        <tbody id="table-body">
-        </tbody>
-    </table>
+<div id="content-container" class="col-md-10 offset-md-1 p-5">
+    <h2 class="content-container-title">결제 페이지</h2>
+    <div class="wrapper w-100">
+        <div class="max-w-540 w-100">
+            <div id="payment-method" class="w-100"></div>
+            <div id="agreement" class="w-100"></div>
+            <div class="btn-wrapper w-100">
+                <button id="payment-button" class="btn primary w-100">예약하기</button>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script src="/js/user-scripts.js"></script>
-<script src="/js/reservation-mine.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="/js/payment.js"></script>
 </body>
 </html>

@@ -14,39 +14,34 @@ import org.springframework.web.client.RestClient;
 
 @Configuration
 public class PaymentRestClientConfiguration {
-    private static final String BASE_URL = "https://api.tosspayments.com/v1/payments";
-    private static final String AUTHORIZATION_PREFIX = "Basic ";
-    private static final String SECRET_KEY_SUFFIX = ":";
+    private final PaymentProperties properties;
 
-    private final PaymentProperties paymentProperties;
-
-    public PaymentRestClientConfiguration(PaymentProperties paymentProperties) {
-        this.paymentProperties = paymentProperties;
+    public PaymentRestClientConfiguration(PaymentProperties properties) {
+        this.properties = properties;
     }
 
     @Bean
-    public PaymentService paymentService() {
-        return new PaymentService(createRestClientBuilder(), initializeAuthorizationKey());
+    public PaymentClient paymentClient() {
+        return new PaymentClient(createRestClientBuilder(), initializeAuthorizationKey());
     }
 
     private RestClient createRestClientBuilder() {
         return RestClient.builder()
                 .requestFactory(clientFactory())
-                .baseUrl(BASE_URL)
+                .baseUrl(properties.getBaseUrl())
                 .build();
     }
 
     private ClientHttpRequestFactory clientFactory() {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
-                .withConnectTimeout(Duration.ofSeconds(paymentProperties.getConnectionTimeout()))
-                .withReadTimeout(Duration.ofSeconds(paymentProperties.getReadTimeout()));
+                .withConnectTimeout(Duration.ofSeconds(properties.getConnectionTimeout()))
+                .withReadTimeout(Duration.ofSeconds(properties.getReadTimeout()));
         return ClientHttpRequestFactories.get(SimpleClientHttpRequestFactory::new, settings);
     }
 
     private String initializeAuthorizationKey() {
         Encoder encoder = Base64.getEncoder();
-        String secretKey = paymentProperties.getSecretKey();
-        byte[] encodedSecretKey = encoder.encode((secretKey + SECRET_KEY_SUFFIX).getBytes(StandardCharsets.UTF_8));
-        return AUTHORIZATION_PREFIX + new String(encodedSecretKey);
+        byte[] encodedSecretKey = encoder.encode(properties.getSecretKey().getBytes(StandardCharsets.UTF_8));
+        return properties.getAuthorizationPrefix() + " " + new String(encodedSecretKey);
     }
 }

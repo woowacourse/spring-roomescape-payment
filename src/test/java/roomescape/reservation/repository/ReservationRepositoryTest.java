@@ -44,24 +44,26 @@ class ReservationRepositoryTest extends RepositoryTest {
 
     @DisplayName("날짜, 시간, 테마를 통해 예약을 조회할 수 있다.")
     @Test
-    void findByDateAndTimeIdAndThemeIdTest() {
+    void findByScheduleDateAndScheduleTimeIdAndScheduleThemeIdTest() {
         LocalDate date = LocalDate.of(2022, 5, 5);
         Long timeId = 2L;
         Long themeId = 1L;
 
-        Optional<Reservation> actual = reservationRepository.findByDateAndTimeIdAndThemeId(date, timeId, themeId);
+        Optional<Reservation> actual = reservationRepository.findByScheduleDateAndScheduleTimeIdAndScheduleThemeId(
+                date, timeId, themeId);
 
         assertThat(actual).isNotEmpty();
     }
 
     @DisplayName("날짜, 시간, 테마가 없다면 empty를 반환한다.")
     @Test
-    void findByDateAndTimeIdAndThemeIdTest_whenNotExistReservation() {
+    void findByScheduleDateAndScheduleTimeIdAndScheduleThemeIdTest_whenNotExistReservation() {
         LocalDate date = LocalDate.of(2022, 5, 5);
         Long timeId = 2L;
         Long themeId = 2L;
 
-        Optional<Reservation> actual = reservationRepository.findByDateAndTimeIdAndThemeId(date, timeId, themeId);
+        Optional<Reservation> actual = reservationRepository.findByScheduleDateAndScheduleTimeIdAndScheduleThemeId(
+                date, timeId, themeId);
 
         assertThat(actual).isEmpty();
     }

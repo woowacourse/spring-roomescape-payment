@@ -47,6 +47,10 @@ public class Member {
         return role.isAdmin();
     }
 
+    public boolean isDifferentId(Long otherId) {
+        return !this.id.equals(otherId);
+    }
+
     public Long getId() {
         return id;
     }
@@ -73,8 +77,8 @@ public class Member {
         }
         Member member = (Member) object;
         return Objects.equals(id, member.id)
-               && Objects.equals(name, member.name)
-               && Objects.equals(email, member.email);
+                && Objects.equals(name, member.name)
+                && Objects.equals(email, member.email);
     }
 
     @Override
