@@ -2,9 +2,9 @@ package roomescape.domain.reservation;
 
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static roomescape.fixture.MemberFixture.MEMBER_SUN;
-import static roomescape.fixture.ThemeFixture.THEME_BED;
-import static roomescape.fixture.TimeFixture.ONE_PM;
+import static roomescape.support.fixture.MemberFixture.MEMBER_SUN;
+import static roomescape.support.fixture.ThemeFixture.THEME_BED;
+import static roomescape.support.fixture.TimeFixture.ONE_PM;
 
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +19,7 @@ class ReservationTest {
 
     Member member = MEMBER_SUN.create();
     Theme theme = THEME_BED.create();
-    LocalDate date = LocalDate.now();
+    LocalDate date = LocalDate.now().plusDays(1);
     ReservationTime time = ONE_PM.create();
 
     @DisplayName("예약 상태를 PAYMENT_PENDING 으로 변경할 시 현재 상태가 CANCELED 라면 예외를 발생시킨다. ")
@@ -63,8 +63,8 @@ class ReservationTest {
     void throw_exception_when_changing_to_canceled_and_member_id_does_not_match() {
         Reservation reservation = new Reservation(member, theme, date, time, Status.CANCELED);
 
-        assertThatThrownBy(() -> reservation.cancel(2L))
-                .isInstanceOf(CancelReservationException.class);
+        assertThatThrownBy(() -> reservation.validateOwner(2L))
+                .isInstanceOf(AuthenticationFailureException.class);
     }
 
     @DisplayName("정상적으로 예약 상태를 CANCELED로 변경한다.")

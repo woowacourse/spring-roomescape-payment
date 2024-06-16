@@ -34,7 +34,7 @@ function render(data) {
         } else if (item.status === 'PAYMENT_PENDING') {
             status = '결제 대기';
         } else if (item.status === 'WAITING') {
-            status = `${item.rank}번째 예약대기`;
+            status = `${item.waitingRank - 1}번째 예약대기`;
         } else if (item.status === 'CANCELED') {
             status = '취소';
         } else {
@@ -42,14 +42,10 @@ function render(data) {
         }
 
         row.insertCell(0).textContent = item.reservationId;
-        row.insertCell(1).textContent = item.theme;
+        row.insertCell(1).textContent = item.themeName;
         row.insertCell(2).textContent = item.date;
         row.insertCell(3).textContent = item.time;
         row.insertCell(4).textContent = status;
-
-        /*
-        [3단계] 예약 대기 기능 - 예약 대기 취소 기능 구현 후 활성화
-         */
 
         if (item.status === 'PAYMENT_PENDING') { // 결제 대기 상태일 때 결제 버튼 추가하는 코드
             const actionCell = row.insertCell(5);
@@ -60,7 +56,7 @@ function render(data) {
                 showPaymentModal(item); // 결제 모달 창 띄우는 함수 호출
             };
             actionCell.appendChild(payButton);
-        } else if (item.status !== 'CANCELED') { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드
+        } else if (item.status === 'RESERVED') {
             const cancelCell = row.insertCell(5);
             const cancelButton = document.createElement('button');
             cancelButton.textContent = '취소';
@@ -69,9 +65,21 @@ function render(data) {
                 requestDeleteWaiting(item.reservationId).then(() => window.location.reload());
             };
             cancelCell.appendChild(cancelButton);
-        } else { // 예약 완료 상태일 때
+        } else if (item.status === 'WAITING') {
+            const cancelCell = row.insertCell(5);
+            const cancelButton = document.createElement('button');
+            cancelButton.textContent = '취소';
+            cancelButton.className = 'btn btn-danger';
+            cancelButton.onclick = function () {
+                requestDeleteWaiting(item.reservationId).then(() => window.location.reload());
+            };
+            cancelCell.appendChild(cancelButton);
+        } else {
             row.insertCell(5).textContent = '';
         }
+
+        row.insertCell(6).textContent = item.paymentKey ? item.paymentKey : '';
+        row.insertCell(7).textContent = item.amount ? item.amount : '';
     });
 }
 

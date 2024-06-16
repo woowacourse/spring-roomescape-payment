@@ -1,14 +1,12 @@
 package roomescape.infrastructure.event;
 
 import lombok.Getter;
-import org.springframework.context.ApplicationEvent;
 
 @Getter
-public class PaymentPendingEvent extends ApplicationEvent {
+public class PaymentPendingEvent {
     private final Long reservationId;
 
-    public PaymentPendingEvent(Object source, Long reservationId) {
-        super(source);
+    public PaymentPendingEvent(Long reservationId) {
         this.reservationId = reservationId;
     }
 }

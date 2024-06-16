@@ -1,10 +1,12 @@
 package roomescape.domain.payment;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,8 +19,9 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Embedded
     @Column(name = "amount", nullable = false)
-    private int amount;
+    private PaymentAmount amount;
 
     @Column(name = "payment_key", nullable = false)
     private String paymentKey;
@@ -32,11 +35,15 @@ public class Payment {
     @Column(name = "approved_at", nullable = false)
     private String approvedAt;
 
-    public Payment(int amount, String paymentKey, String orderId, String requestedAt, String approvedAt) {
+    public Payment(PaymentAmount amount, String paymentKey, String orderId, String requestedAt, String approvedAt) {
         this.amount = amount;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.requestedAt = requestedAt;
         this.approvedAt = approvedAt;
+    }
+
+    public Payment(BigDecimal amount, String paymentKey, String orderId, String requestedAt, String approvedAt) {
+        this(new PaymentAmount(amount), paymentKey, orderId, requestedAt, approvedAt);
     }
 }

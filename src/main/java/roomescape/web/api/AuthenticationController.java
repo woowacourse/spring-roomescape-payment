@@ -1,6 +1,7 @@
 package roomescape.web.api;
 
 import jakarta.validation.Valid;
+import java.net.URI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.application.MemberService;
 import roomescape.application.dto.request.member.LoginRequest;
 import roomescape.application.dto.request.member.MemberInfo;
+import roomescape.application.dto.request.member.SignupRequest;
 import roomescape.application.dto.response.member.MemberResponse;
 
 @RestController
@@ -20,6 +22,12 @@ public class AuthenticationController {
     private static final String TOKEN_COOKIE_KEY_NAME = "token";
 
     private final MemberService memberService;
+
+    @PostMapping("/signup")
+    public ResponseEntity<Void> signup(@RequestBody @Valid SignupRequest request) {
+        long createdId = memberService.signup(request);
+        return ResponseEntity.created(URI.create("/signup/" + createdId)).build();
+    }
 
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody @Valid LoginRequest request) {

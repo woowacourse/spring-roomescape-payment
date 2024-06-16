@@ -8,7 +8,7 @@ import roomescape.domain.event.CancelEventPublisher;
 import roomescape.domain.payment.CancelReason;
 import roomescape.domain.payment.PaymentClient;
 import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationRepository;
+import roomescape.infrastructure.repository.ReservationRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -19,25 +19,29 @@ public class CancelService {
 
     @Transactional
     public void cancelReservation(Long reservationId, MemberInfo memberInfo) {
-        Reservation reservation = reservationRepository.getReservation(reservationId);
-        reservation.cancel(memberInfo.id());
-        reservation.getPayment().ifPresent(payment -> paymentClient.cancel(payment, CancelReason.empty()));
-        updateFirstWaitingToPending(reservation);
+        Reservation reservation = reservationRepository.getReservationById(reservationId);
+        reservation.validateOwner(memberInfo.id());
+        cancelReservation(reservation);
     }
 
     @Transactional
     public void cancelReservationByAdmin(Long reservationId) {
-        Reservation reservation = reservationRepository.getReservation(reservationId);
-        reservation.cancel();
-        reservation.getPayment().ifPresent(payment -> paymentClient.cancel(payment, CancelReason.empty()));
-        updateFirstWaitingToPending(reservation);
+        Reservation reservation = reservationRepository.getReservationById(reservationId);
+        cancelReservation(reservation);
     }
 
-    private void updateFirstWaitingToPending(Reservation reservation) {
+    @Transactional
+    public void updateFirstWaitingToPending(Long reservationId) {
+        Reservation reservation = reservationRepository.getReservationById(reservationId);
         reservationRepository.findNextWaiting(reservation.getTheme(), reservation.getDate(), reservation.getTime())
                 .ifPresent(nextReservation -> {
                     nextReservation.toPending();
                     eventPublisher.publishPaymentPendingEvent(nextReservation);
                 });
+    }
+
+    private void cancelReservation(Reservation reservation) {
+        reservation.cancel();
+        reservation.getPayment().ifPresent(payment -> paymentClient.cancel(payment, CancelReason.empty()));
     }
 }

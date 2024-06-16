@@ -59,12 +59,14 @@ public class AdminReservationController {
     @DeleteMapping("/admin/waitings/{idWaiting}")
     public ResponseEntity<Void> cancelWaiting(@PathVariable("idWaiting") Long waitingId) {
         cancelService.cancelReservationByAdmin(waitingId);
+        cancelService.updateFirstWaitingToPending(waitingId);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/admin/reservations/{idReservation}")
     public ResponseEntity<Void> cancelReservation(@PathVariable("idReservation") Long reservationId) {
         cancelService.cancelReservationByAdmin(reservationId);
+        cancelService.updateFirstWaitingToPending(reservationId);
         return ResponseEntity.noContent().build();
     }
 }

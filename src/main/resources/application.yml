@@ -16,8 +16,9 @@ spring:
 payments:
   clients:
     toss:
+      baseUrl: https://api.tosspayments.com
       secretKey: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
       password: ":"
       connectionTimeoutSeconds: 3
       readTimeoutSeconds: 5
-payment-timeout: 60
+payment-timeout: 3600

@@ -14,7 +14,14 @@ public class DatabaseCleanupListener extends AbstractTestExecutionListener {
             """;
 
     @Override
-    public void beforeTestMethod(TestContext testContext) {
+    public void beforeTestClass(TestContext testContext) throws Exception {
+        JdbcTemplate jdbcTemplate = getJdbcTemplateBean(testContext);
+        List<String> queries = jdbcTemplate.queryForList(sql, String.class);
+        execute(queries, jdbcTemplate);
+    }
+
+    @Override
+    public void afterTestMethod(TestContext testContext) {
         JdbcTemplate jdbcTemplate = getJdbcTemplateBean(testContext);
         List<String> queries = jdbcTemplate.queryForList(sql, String.class);
         execute(queries, jdbcTemplate);

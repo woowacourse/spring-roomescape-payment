@@ -2,15 +2,13 @@ package roomescape.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static roomescape.domain.reservation.Status.CANCELED;
 import static roomescape.domain.reservation.Status.PAYMENT_PENDING;
 import static roomescape.domain.reservation.Status.RESERVED;
 import static roomescape.domain.reservation.Status.WAITING;
-import static roomescape.fixture.MemberFixture.MEMBER_JAZZ;
-import static roomescape.fixture.MemberFixture.MEMBER_SUN;
-import static roomescape.fixture.ThemeFixture.THEME_BED;
-import static roomescape.fixture.TimeFixture.ONE_PM;
+import static roomescape.support.fixture.MemberFixture.MEMBER_JAZZ;
+import static roomescape.support.fixture.MemberFixture.MEMBER_SUN;
+import static roomescape.support.fixture.ThemeFixture.THEME_BED;
+import static roomescape.support.fixture.TimeFixture.ONE_PM;
 
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
@@ -22,15 +20,15 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import roomescape.application.dto.request.member.MemberInfo;
 import roomescape.domain.member.Member;
-import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
 import roomescape.domain.reservationdetail.ReservationTime;
-import roomescape.domain.reservationdetail.ReservationTimeRepository;
 import roomescape.domain.reservationdetail.Theme;
-import roomescape.domain.reservationdetail.ThemeRepository;
 import roomescape.exception.reservation.NotFoundReservationException;
+import roomescape.infrastructure.repository.MemberRepository;
+import roomescape.infrastructure.repository.ReservationRepository;
+import roomescape.infrastructure.repository.ReservationTimeRepository;
+import roomescape.infrastructure.repository.ThemeRepository;
 import roomescape.support.DatabaseCleanupListener;
 
 @TestExecutionListeners(value = {
@@ -74,7 +72,7 @@ class CancelServiceTest {
                 .isInstanceOf(NotFoundReservationException.class);
     }
 
-    @DisplayName("예약을 취소하고 다음 예약 대기가 존재할 시 예약 대기의 상태를 결제 대기 상태로 전환한다.")
+    @DisplayName("특정 예약과 동일한 조건의 다음 예약 대기가 존재할 시 예약 대기의 상태를 결제 대기 상태로 전환한다.")
     @Test
     void cancel_reservation_and_update_first_waiting_status_to_pending() {
         Member jazz = memberRepository.save(MEMBER_JAZZ.create());
@@ -82,19 +80,14 @@ class CancelServiceTest {
         Theme bed = themeRepository.save(THEME_BED.create());
         ReservationTime onePm = timeRepository.save(ONE_PM.create());
         LocalDate date = LocalDate.now().plusDays(1);
-        MemberInfo memberInfo = new MemberInfo(jazz.getId(), jazz.getName());
 
         Reservation reserved = reservationRepository.save(reservation(jazz, bed, date.toString(), onePm, RESERVED));
-        Reservation waiting = reservationRepository.save(reservation(sun, bed, date.toString(), onePm, WAITING));
+        reservationRepository.save(reservation(sun, bed, date.toString(), onePm, WAITING));
 
-        cancelService.cancelReservation(reserved.getId(), memberInfo);
+        cancelService.updateFirstWaitingToPending(reserved.getId());
 
-        Reservation canceledReservation = reservationRepository.getReservation(1L);
-        Reservation pendingReservation = reservationRepository.getReservation(2L);
+        Reservation pendingReservation = reservationRepository.getReservationById(2L);
 
-        assertAll(
-                () -> assertThat(canceledReservation.getStatus()).isEqualTo(CANCELED),
-                () -> assertThat(pendingReservation.getStatus()).isEqualTo(PAYMENT_PENDING)
-        );
+        assertThat(pendingReservation.getStatus()).isEqualTo(PAYMENT_PENDING);
     }
 }

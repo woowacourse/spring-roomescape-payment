@@ -7,11 +7,11 @@ import static roomescape.domain.reservation.Status.CANCELED;
 import static roomescape.domain.reservation.Status.PAYMENT_PENDING;
 import static roomescape.domain.reservation.Status.RESERVED;
 import static roomescape.domain.reservation.Status.WAITING;
-import static roomescape.fixture.MemberFixture.MEMBER_JAZZ;
-import static roomescape.fixture.MemberFixture.MEMBER_SUN;
-import static roomescape.fixture.ThemeFixture.THEME_BED;
-import static roomescape.fixture.TimeFixture.ONE_PM;
-import static roomescape.fixture.TimeFixture.TWO_PM;
+import static roomescape.support.fixture.MemberFixture.MEMBER_JAZZ;
+import static roomescape.support.fixture.MemberFixture.MEMBER_SUN;
+import static roomescape.support.fixture.ThemeFixture.THEME_BED;
+import static roomescape.support.fixture.TimeFixture.ONE_PM;
+import static roomescape.support.fixture.TimeFixture.TWO_PM;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,21 +27,22 @@ import roomescape.application.dto.request.reservation.ReservationRequest;
 import roomescape.application.dto.request.reservation.UserReservationRequest;
 import roomescape.application.dto.response.reservation.ReservationResponse;
 import roomescape.domain.member.Member;
-import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
 import roomescape.domain.reservationdetail.ReservationTime;
-import roomescape.domain.reservationdetail.ReservationTimeRepository;
 import roomescape.domain.reservationdetail.Theme;
-import roomescape.domain.reservationdetail.ThemeRepository;
 import roomescape.exception.member.AuthenticationFailureException;
 import roomescape.exception.reservation.DuplicatedReservationException;
+import roomescape.exception.reservation.InvalidDateTimeReservationException;
 import roomescape.exception.reservation.NotFoundReservationException;
 import roomescape.exception.theme.NotFoundThemeException;
 import roomescape.exception.time.NotFoundReservationTimeException;
-import roomescape.fake.FakePayment;
+import roomescape.infrastructure.repository.MemberRepository;
+import roomescape.infrastructure.repository.ReservationRepository;
+import roomescape.infrastructure.repository.ReservationTimeRepository;
+import roomescape.infrastructure.repository.ThemeRepository;
 import roomescape.support.DatabaseCleanupListener;
+import roomescape.support.mock.FakePayment;
 
 @TestExecutionListeners(value = {
         DatabaseCleanupListener.class,
@@ -72,7 +73,7 @@ class ReservationServiceTest {
     @DisplayName("예약을 시도하는 회원이 존재하지 않으면 예외를 발생시킨다.")
     @Test
     void throw_exception_when_save_reservation_not_exists_member() {
-        Member jazz = memberRepository.save(MEMBER_JAZZ.create());
+        memberRepository.save(MEMBER_JAZZ.create());
         Theme bed = themeRepository.save(THEME_BED.create());
         ReservationTime onePm = timeRepository.save(ONE_PM.create());
         LocalDate date = LocalDate.now().plusDays(1);
@@ -88,7 +89,7 @@ class ReservationServiceTest {
     @Test
     void throw_exception_when_save_reservation_not_exists_theme() {
         Member jazz = memberRepository.save(MEMBER_JAZZ.create());
-        Theme bed = themeRepository.save(THEME_BED.create());
+        themeRepository.save(THEME_BED.create());
         ReservationTime onePm = timeRepository.save(ONE_PM.create());
         LocalDate date = LocalDate.now().plusDays(1);
 
@@ -104,7 +105,7 @@ class ReservationServiceTest {
     void throw_exception_when_save_reservation_not_exists_time() {
         Member jazz = memberRepository.save(MEMBER_JAZZ.create());
         Theme bed = themeRepository.save(THEME_BED.create());
-        ReservationTime onePm = timeRepository.save(ONE_PM.create());
+        timeRepository.save(ONE_PM.create());
         LocalDate date = LocalDate.now().plusDays(1);
 
         UserReservationRequest request = new UserReservationRequest(date, 2L, bed.getId(),
@@ -126,7 +127,7 @@ class ReservationServiceTest {
                 FakePayment.AMOUNT, FakePayment.ORDER_ID, FakePayment.PAYMENT_KEY);
 
         assertThatThrownBy(() -> reservationService.saveReservation(request, jazz.getId()))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(InvalidDateTimeReservationException.class);
     }
 
     @DisplayName("이미 해당 회원의 중복된 예약이 존재하면 예외를 발생시킨다.")
@@ -199,7 +200,7 @@ class ReservationServiceTest {
     @DisplayName("어드민이 예약을 시도하는 회원이 존재하지 않으면 예외를 발생시킨다.")
     @Test
     void throw_exception_when_save_reservation_not_exists_member_by_admin() {
-        Member jazz = memberRepository.save(MEMBER_JAZZ.create());
+        memberRepository.save(MEMBER_JAZZ.create());
         Theme bed = themeRepository.save(THEME_BED.create());
         ReservationTime onePm = timeRepository.save(ONE_PM.create());
         LocalDate date = LocalDate.now().plusDays(1);

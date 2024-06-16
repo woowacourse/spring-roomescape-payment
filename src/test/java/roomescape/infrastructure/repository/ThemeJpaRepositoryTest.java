@@ -3,15 +3,15 @@ package roomescape.infrastructure.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static roomescape.domain.reservation.Status.RESERVED;
 import static roomescape.domain.reservation.Status.WAITING;
-import static roomescape.fixture.MemberFixture.MEMBER_BRI;
-import static roomescape.fixture.MemberFixture.MEMBER_SOLAR;
-import static roomescape.fixture.MemberFixture.MEMBER_SUN;
-import static roomescape.fixture.ThemeFixture.THEME_BED;
-import static roomescape.fixture.ThemeFixture.THEME_DATABASE;
-import static roomescape.fixture.ThemeFixture.THEME_JAVA;
-import static roomescape.fixture.TimeFixture.ONE_PM;
-import static roomescape.fixture.TimeFixture.THREE_PM;
-import static roomescape.fixture.TimeFixture.TWO_PM;
+import static roomescape.support.fixture.MemberFixture.MEMBER_BRI;
+import static roomescape.support.fixture.MemberFixture.MEMBER_SOLAR;
+import static roomescape.support.fixture.MemberFixture.MEMBER_SUN;
+import static roomescape.support.fixture.ThemeFixture.THEME_BED;
+import static roomescape.support.fixture.ThemeFixture.THEME_DATABASE;
+import static roomescape.support.fixture.ThemeFixture.THEME_JAVA;
+import static roomescape.support.fixture.TimeFixture.ONE_PM;
+import static roomescape.support.fixture.TimeFixture.THREE_PM;
+import static roomescape.support.fixture.TimeFixture.TWO_PM;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -37,16 +37,16 @@ import roomescape.support.DatabaseCleanupListener;
 class ThemeJpaRepositoryTest {
 
     @Autowired
-    private ReservationJpaRepository reservationRepository;
+    private ReservationRepository reservationRepository;
 
     @Autowired
-    private ReservationTimeJpaRepository timeRepository;
+    private ReservationTimeRepository timeRepository;
 
     @Autowired
-    private ThemeJpaRepository themeRepository;
+    private ThemeRepository themeRepository;
 
     @Autowired
-    private MemberJpaRepository memberRepository;
+    private MemberRepository memberRepository;
 
     Reservation reservation(Member member, Theme theme, String date, ReservationTime time, Status status) {
         return new Reservation(member, theme, LocalDate.parse(date), time, status);
@@ -80,16 +80,21 @@ class ThemeJpaRepositoryTest {
     @DisplayName("특정 기간에 예약이 많은 순서대로 테마 정보 목록을 가져오는 쿼리 테스트")
     @Test
     void find_popular_themes() {
-        reservationRepository.save(reservation(bri, java, "2024-06-04", onePm, RESERVED));
-        reservationRepository.save(reservation(solar, java, "2024-06-04", onePm, WAITING));
-        reservationRepository.save(reservation(sun, database, "2024-06-06", twoPm, RESERVED));
-        reservationRepository.save(reservation(bri, database, "2024-06-07", twoPm, RESERVED));
-        reservationRepository.save(reservation(solar, database, "2024-06-03", twoPm, RESERVED));
-        reservationRepository.save(reservation(bri, java, "2024-06-11", threePm, RESERVED));
-        reservationRepository.save(reservation(sun, java, "2024-06-13", threePm, RESERVED));
-        reservationRepository.save(reservation(sun, bed, "2024-06-05", onePm, RESERVED));
+        String startDate = LocalDate.now().plusDays(1).toString();
+        String endDate = LocalDate.now().plusDays(4).toString();
+        String betweenDate = LocalDate.now().plusDays(2).toString();
+        String laterEnd = LocalDate.now().plusDays(5).toString();
 
-        List<Theme> themes = themeRepository.findPopularThemes("2024-06-03", "2024-06-08", 2);
+        reservationRepository.save(reservation(bri, java, startDate, onePm, RESERVED));
+        reservationRepository.save(reservation(solar, java, startDate, onePm, WAITING));
+        reservationRepository.save(reservation(sun, database, betweenDate, twoPm, RESERVED));
+        reservationRepository.save(reservation(bri, database, betweenDate, threePm, RESERVED));
+        reservationRepository.save(reservation(solar, database, endDate, twoPm, RESERVED));
+        reservationRepository.save(reservation(bri, java, laterEnd, threePm, RESERVED));
+        reservationRepository.save(reservation(sun, java, laterEnd, threePm, RESERVED));
+        reservationRepository.save(reservation(sun, bed, betweenDate, onePm, RESERVED));
+
+        List<Theme> themes = themeRepository.findPopularThemes(startDate, endDate, 2);
 
         assertThat(themes).containsExactly(database, java);
     }

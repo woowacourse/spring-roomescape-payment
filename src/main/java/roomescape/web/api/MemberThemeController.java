@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.application.policy.WeeklyRankingPolicy;
 import roomescape.application.ThemeService;
 import roomescape.application.dto.response.theme.ThemeResponse;
+import roomescape.application.policy.AllTimeRankingPolicy;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,7 +22,7 @@ public class MemberThemeController {
 
     @GetMapping("/themes/ranking")
     public ResponseEntity<List<ThemeResponse>> findAllPopularTheme() {
-        List<ThemeResponse> response = themeService.findAllPopularThemes(new WeeklyRankingPolicy());
+        List<ThemeResponse> response = themeService.findAllPopularThemes(new AllTimeRankingPolicy());
         return ResponseEntity.ok().body(response);
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.web.client.RestClient.Builder;
 import roomescape.domain.payment.PaymentClient;
 import roomescape.infrastructure.payment.PaymentProperties;
 import roomescape.infrastructure.payment.PaymentRestClientBuilder;
-import roomescape.infrastructure.payment.TossPaymentClient;
+import roomescape.infrastructure.payment.toss.TossPaymentClient;
 import roomescape.infrastructure.payment.toss.TossResponseErrorHandler;
 
 @Configuration

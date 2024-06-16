@@ -60,7 +60,7 @@ function fetchThemes() {
 }
 
 function fetchMembers() {
-    requestRead(MEMBER_API_ENDPOINT)
+    requestRead("/admin" + MEMBER_API_ENDPOINT)
         .then(data => {
             membersOptions.push(...data);
             populateSelect('member', membersOptions, 'name');
@@ -201,7 +201,12 @@ function applyFilter(event) {
     [6단계] 예약 검색 - 조건에 따른 예약 조회 API 호출
           요청 포맷에 맞게 설정
     */
-    fetch('/admin/reservations/search?' + new URLSearchParams({from: dateFrom, to: dateTo, memberId: memberId, themeId: themeId}), { // 예약 검색 API 호출
+    fetch('/admin/reservations/search?' + new URLSearchParams({
+        from: dateFrom,
+        to: dateTo,
+        memberId: memberId,
+        themeId: themeId
+    }), { // 예약 검색 API 호출
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'

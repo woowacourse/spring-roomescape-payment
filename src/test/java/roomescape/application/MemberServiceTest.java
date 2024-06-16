@@ -3,8 +3,8 @@ package roomescape.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static roomescape.fixture.MemberFixture.MEMBER_JAZZ;
-import static roomescape.fixture.MemberFixture.MEMBER_SUN;
+import static roomescape.support.fixture.MemberFixture.MEMBER_JAZZ;
+import static roomescape.support.fixture.MemberFixture.MEMBER_SUN;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,9 +17,9 @@ import roomescape.application.dto.request.member.LoginRequest;
 import roomescape.application.dto.request.member.SignupRequest;
 import roomescape.application.security.JwtProvider;
 import roomescape.domain.member.Member;
-import roomescape.domain.member.MemberRepository;
 import roomescape.exception.member.AuthenticationFailureException;
 import roomescape.exception.member.DuplicatedEmailException;
+import roomescape.infrastructure.repository.MemberRepository;
 import roomescape.support.DatabaseCleanupListener;
 
 @TestExecutionListeners(value = {

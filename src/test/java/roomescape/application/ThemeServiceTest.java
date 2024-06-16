@@ -5,16 +5,16 @@ import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static roomescape.domain.reservation.Status.RESERVED;
-import static roomescape.fixture.MemberFixture.MEMBER_BRI;
-import static roomescape.fixture.MemberFixture.MEMBER_JAZZ;
-import static roomescape.fixture.MemberFixture.MEMBER_SOLAR;
-import static roomescape.fixture.MemberFixture.MEMBER_SUN;
-import static roomescape.fixture.ThemeFixture.THEME_BED;
-import static roomescape.fixture.ThemeFixture.THEME_DATABASE;
-import static roomescape.fixture.ThemeFixture.THEME_JAVA;
-import static roomescape.fixture.TimeFixture.ONE_PM;
-import static roomescape.fixture.TimeFixture.THREE_PM;
-import static roomescape.fixture.TimeFixture.TWO_PM;
+import static roomescape.support.fixture.MemberFixture.MEMBER_BRI;
+import static roomescape.support.fixture.MemberFixture.MEMBER_JAZZ;
+import static roomescape.support.fixture.MemberFixture.MEMBER_SOLAR;
+import static roomescape.support.fixture.MemberFixture.MEMBER_SUN;
+import static roomescape.support.fixture.ThemeFixture.THEME_BED;
+import static roomescape.support.fixture.ThemeFixture.THEME_DATABASE;
+import static roomescape.support.fixture.ThemeFixture.THEME_JAVA;
+import static roomescape.support.fixture.TimeFixture.ONE_PM;
+import static roomescape.support.fixture.TimeFixture.THREE_PM;
+import static roomescape.support.fixture.TimeFixture.TWO_PM;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,17 +28,17 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import roomescape.application.dto.request.theme.ThemeRequest;
 import roomescape.application.dto.response.theme.ThemeResponse;
 import roomescape.domain.member.Member;
-import roomescape.domain.member.MemberRepository;
 import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.Status;
 import roomescape.domain.reservationdetail.ReservationTime;
-import roomescape.domain.reservationdetail.ReservationTimeRepository;
 import roomescape.domain.reservationdetail.Theme;
-import roomescape.domain.reservationdetail.ThemeRepository;
 import roomescape.exception.theme.ReservationReferencedThemeException;
-import roomescape.fake.FakeRankingPolicy;
+import roomescape.infrastructure.repository.MemberRepository;
+import roomescape.infrastructure.repository.ReservationRepository;
+import roomescape.infrastructure.repository.ReservationTimeRepository;
+import roomescape.infrastructure.repository.ThemeRepository;
 import roomescape.support.DatabaseCleanupListener;
+import roomescape.support.mock.FakeRankingPolicy;
 
 @TestExecutionListeners(value = {
         DatabaseCleanupListener.class,
@@ -93,12 +93,15 @@ class ThemeServiceTest {
         Theme bed = themeRepository.save(THEME_BED.create());
         Theme java = themeRepository.save(THEME_JAVA.create());
         Theme database = themeRepository.save(THEME_DATABASE.create());
+        String startDate = LocalDate.now().plusDays(1).toString();
+        String endDate = LocalDate.now().plusDays(4).toString();
+        String laterEnd = LocalDate.now().plusDays(5).toString();
 
-        reservationRepository.save(reservation(sun, bed, "2024-06-01", onePm, RESERVED));
-        reservationRepository.save(reservation(jazz, bed, "2024-06-01", twoPm, RESERVED));
-        reservationRepository.save(reservation(bri, bed, "2024-06-01", threePm, RESERVED));
-        reservationRepository.save(reservation(solar, database, "2024-06-02", threePm, RESERVED));
-        reservationRepository.save(reservation(jazz, java, "2024-06-06", threePm, RESERVED));
+        reservationRepository.save(reservation(sun, bed, startDate, onePm, RESERVED));
+        reservationRepository.save(reservation(jazz, bed, startDate, twoPm, RESERVED));
+        reservationRepository.save(reservation(bri, bed, startDate, threePm, RESERVED));
+        reservationRepository.save(reservation(solar, database, endDate, threePm, RESERVED));
+        reservationRepository.save(reservation(jazz, java, laterEnd, threePm, RESERVED));
 
         List<ThemeResponse> allPopularThemes = themeService.findAllPopularThemes(new FakeRankingPolicy());
 
@@ -112,7 +115,8 @@ class ThemeServiceTest {
         Theme bed = themeRepository.save(THEME_BED.create());
         ReservationTime onePm = timeRepository.save(ONE_PM.create());
         Member bri = memberRepository.save(MEMBER_BRI.create());
-        reservationRepository.save((reservation(bri, bed, "2024-06-01", onePm, RESERVED)));
+        LocalDate date = LocalDate.now().plusDays(1);
+        reservationRepository.save((reservation(bri, bed, date.toString(), onePm, RESERVED)));
 
         assertThatThrownBy(() -> themeService.deleteTheme(1L))
                 .isInstanceOf(ReservationReferencedThemeException.class);
@@ -121,7 +125,7 @@ class ThemeServiceTest {
     @DisplayName("테마를 정상적으로 삭제한다.")
     @Test
     void success_delete_theme() {
-        Theme bed = themeRepository.save(THEME_BED.create());
+        themeRepository.save(THEME_BED.create());
 
         assertThatNoException()
                 .isThrownBy(() -> themeService.deleteTheme(1L));

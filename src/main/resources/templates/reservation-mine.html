@@ -1,94 +1,97 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>방탈출 어드민</title>
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/toss-style.css">
-    <script src="https://js.tosspayments.com/v1/payment-widget"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>방탈출 어드민</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/toss-style.css">
+  <script src="https://js.tosspayments.com/v1/payment-widget"></script>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="/">
-        <img src="https://avatars.githubusercontent.com/u/141792611?s=200&v=4" alt="LOGO" style="height: 40px;">
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
+  <a class="navbar-brand" href="/">
+    <img src="https://avatars.githubusercontent.com/u/141792611?s=200&v=4" alt="LOGO" style="height: 40px;">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
 
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="/reservation">Reservation</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/login">Login</a>
-            </li>
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">
-                    <img class="profile-image" src="/image/default-profile.png" alt="Profile">
-                    <span id="profile-name">Profile</span> <!-- 프로필 이름을 넣을 span 추가 -->
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="/reservation-mine">My Reservation</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#" id="logout-btn">Logout</a>
-                </div>
-            </li>
-        </ul>
-    </div>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav ml-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="/reservation">Reservation</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/login">Login</a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+           aria-haspopup="true" aria-expanded="false">
+          <img class="profile-image" src="/image/default-profile.png" alt="Profile">
+          <span id="profile-name">Profile</span> <!-- 프로필 이름을 넣을 span 추가 -->
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="/reservation-mine">My Reservation</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="#" id="logout-btn">Logout</a>
+        </div>
+      </li>
+    </ul>
+  </div>
 </nav>
 
 <div class="content-container">
-    <h2 class="content-container-title">내 예약</h2>
+  <h2 class="content-container-title">내 예약</h2>
 
-    <div class="table-container"/>
-    <table class="table">
-        <thead>
-        <tr>
-            <th>예약번호</th>
-            <th>테마</th>
-            <th>날짜</th>
-            <th>시간</th>
-            <th>상태</th>
-            <th></th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody id="table-body">
-        </tbody>
-    </table>
+  <div class="table-container"/>
+  <table class="table">
+    <thead>
+    <tr>
+      <th>예약번호</th>
+      <th>테마</th>
+      <th>날짜</th>
+      <th>시간</th>
+      <th>상태</th>
+      <th>대기 취소</th>
+      <th>paymentKey</th>
+      <th>결제금액</th>
+      <th></th>
+      <th></th>
+    </tr>
+    </thead>
+    <tbody id="table-body">
+    </tbody>
+  </table>
 </div>
 
 <div class="modal fade" id="payment-modal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel"
      aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="paymentModalLabel">결제</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="payment-button">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="paymentModalLabel">결제</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="payment-button">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="wrapper w-100">
+          <div class="max-w-540 w-100">
+            <div id="payment-method" class="w-100"></div>
+            <div id="agreement" class="w-100"></div>
+            <div class="btn-wrapper w-100">
+              <button id="reserve-button" class="btn primary w-100">결제하기</button>
             </div>
-            <div class="modal-body">
-                <div class="wrapper w-100">
-                    <div class="max-w-540 w-100">
-                        <div id="payment-method" class="w-100"></div>
-                        <div id="agreement" class="w-100"></div>
-                        <div class="btn-wrapper w-100">
-                            <button id="reserve-button" class="btn primary w-100">결제하기</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <script src="/js/user-scripts.js"></script>
