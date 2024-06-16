@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.TossPaymentConfirmRequest;
 
 public record MemberReservationAddRequest(
         @NotNull(message = "예약 날짜는 필수 입니다.") LocalDate date,
@@ -15,7 +15,7 @@ public record MemberReservationAddRequest(
         @NotBlank String orderId,
         @NotNull @Positive BigDecimal amount) {
 
-    public PaymentConfirmRequest extractPaymentInformation() {
-        return new PaymentConfirmRequest(paymentKey, orderId, amount);
+    public TossPaymentConfirmRequest extractPaymentInformation() {
+        return new TossPaymentConfirmRequest(paymentKey, orderId, amount);
     }
 }

@@ -25,22 +25,25 @@ public class GlobalExceptionHandler {
         String errorMessage = fieldErrors.stream()
                 .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
                 .collect(Collectors.joining());
-
+        log.warn(errorMessage);
         return ResponseEntity.badRequest().body(new ErrorResponse(errorMessage));
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handle(AuthenticationException e) {
+        log.warn(e.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handle(AuthorizationException e) {
+        log.warn(e.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handle(IllegalRequestException e) {
+        log.warn(e.getMessage());
         return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
     }
 

@@ -5,9 +5,11 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 
-public record PaymentConfirmRequest(
-        @NotBlank String paymentKey,
-        @NotBlank String orderId,
-        @NotNull @Positive BigDecimal amount
-) {
+public interface PaymentConfirmRequest {
+    @NotBlank
+    String getOrderId();
+
+    @NotNull
+    @Positive
+    BigDecimal getAmount();
 }
