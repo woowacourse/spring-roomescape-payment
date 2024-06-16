@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ServerErrorException;
 import roomescape.global.exception.IllegalRequestException;
 import roomescape.member.service.MemberService;
 import roomescape.payment.domain.Payment;
@@ -77,15 +78,20 @@ public class ReservationService {
     @Transactional
     public ReservationResponse saveMemberReservation(Long memberId, MemberReservationAddRequest request) {
         paymentClient.requestConfirmPayment(request.extractPaymentInformation());
-        ReservationRequest reservationRequest = new ReservationRequest(
-                request.date(),
-                memberId,
-                request.timeId(),
-                request.themeId()
-        );
-        ReservationResponse reservationResponse = saveReservation(reservationRequest);
-        savePayment(reservationResponse, request);
-        return reservationResponse;
+        try {
+            ReservationRequest reservationRequest = new ReservationRequest(
+                    request.date(),
+                    memberId,
+                    request.timeId(),
+                    request.themeId()
+            );
+            ReservationResponse reservationResponse = saveReservation(reservationRequest);
+            savePayment(reservationResponse, request);
+            return reservationResponse;
+        } catch (Exception e) {
+            paymentClient.cancelPayment(request.paymentKey());
+            throw new IllegalArgumentException("예약 처리 중 오류가 발생했습니다: " + e.getMessage());
+        }
     }
 
     private void savePayment(ReservationResponse reservationResponse, MemberReservationAddRequest request) {
