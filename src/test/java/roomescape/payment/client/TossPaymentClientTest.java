@@ -1,27 +1,21 @@
 package roomescape.payment.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.time.OffsetDateTime;
-import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
+import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.payment.dto.request.PaymentCancelRequest;
 import roomescape.payment.dto.request.PaymentRequest;
 import roomescape.payment.dto.response.PaymentCancelResponse;
@@ -29,71 +23,71 @@ import roomescape.payment.dto.response.PaymentResponse;
 import roomescape.system.exception.ErrorType;
 import roomescape.system.exception.RoomEscapeException;
 
-@SpringBootTest
+@RestClientTest(TossPaymentClient.class)
 class TossPaymentClientTest {
-
-    @MockBean
-    private RestClient restClient;
-
-    @MockBean
-    private ClientHttpResponse clientHttpResponse;
 
     @Autowired
     private TossPaymentClient tossPaymentClient;
+
+    @Autowired
+    private MockRestServiceServer mockServer;
 
     @Test
     @DisplayName("결제를 승인한다.")
     void confirmPayment() {
         // given
-        PaymentRequest paymentRequest = new PaymentRequest("paymentKey", "orderId", 1000L, "paymentType");
-        PaymentResponse mockResponse = new PaymentResponse("paymentKey", "orderId", OffsetDateTime.now(), 1000L);
-
-        RestClient.RequestBodyUriSpec requestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
-        RestClient.RequestBodySpec requestBodySpec = mock(RestClient.RequestBodySpec.class);
-        RestClient.ResponseSpec responseSpec = mock(RestClient.ResponseSpec.class);
-
-        when(restClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri("/v1/payments/confirm")).thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
-        when(requestBodySpec.body(paymentRequest)).thenReturn(requestBodySpec);
-        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
-        when(responseSpec.body(PaymentResponse.class)).thenReturn(mockResponse);
+        mockServer.expect(requestTo("/v1/payments/confirm"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(SampleTossPaymentConst.paymentRequestJson))
+                .andRespond(withStatus(HttpStatus.OK)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(SampleTossPaymentConst.confirmJson));
 
         // when
+        PaymentRequest paymentRequest = SampleTossPaymentConst.paymentRequest;
         PaymentResponse paymentResponse = tossPaymentClient.confirmPayment(paymentRequest);
 
         // then
-        assertThat(paymentResponse).isNotNull();
-        assertThat(paymentResponse.paymentKey()).isEqualTo("paymentKey");
-        assertThat(paymentResponse.orderId()).isEqualTo("orderId");
+        assertThat(paymentResponse.paymentKey()).isEqualTo(paymentRequest.paymentKey());
+        assertThat(paymentResponse.orderId()).isEqualTo(paymentRequest.orderId());
     }
 
     @Test
-    @DisplayName("결제 승인 중 예외가 발생한다.")
-    void confirmPaymentWithError() throws IOException {
+    @DisplayName("결제를 취소한다.")
+    void cancelPayment() {
         // given
-        PaymentRequest paymentRequest = new PaymentRequest("paymentKey", "orderId", 1000L, "paymentType");
+        mockServer.expect(requestTo("/v1/payments/5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1/cancel"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(SampleTossPaymentConst.cancelRequestJson))
+                .andRespond(withStatus(HttpStatus.OK)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(SampleTossPaymentConst.cancelJson));
 
-        RestClient.RequestBodyUriSpec requestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
-        RestClient.RequestBodySpec requestBodySpec = mock(RestClient.RequestBodySpec.class);
-        RestClient.ResponseSpec responseSpec = mock(RestClient.ResponseSpec.class);
-        when(clientHttpResponse.getStatusCode()).thenReturn(HttpStatusCode.valueOf(400));
-        when(clientHttpResponse.getBody()).thenReturn(
-                new ByteArrayInputStream("{\"code\": \"ERROR_CODE\", \"message\": \"Error message\"}".getBytes()));
+        // when
+        PaymentCancelRequest cancelRequest = SampleTossPaymentConst.cancelRequest;
+        PaymentCancelResponse paymentCancelResponse = tossPaymentClient.cancelPayment(cancelRequest);
 
-        when(restClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri("/v1/payments/confirm")).thenReturn(requestBodySpec);
-        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
-        when(requestBodySpec.body(paymentRequest)).thenReturn(requestBodySpec);
-        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.onStatus(any(), any())).then(invocation -> {
-            invocation.getArgument(1, ErrorHandler.class).handle(null, clientHttpResponse);
-            return null;
-        });
+        // then
+        assertThat(paymentCancelResponse.cancelStatus()).isEqualTo("DONE");
+        assertThat(paymentCancelResponse.cancelReason()).isEqualTo(cancelRequest.cancelReason());
+    }
+
+    @Test
+    @DisplayName("결제 승인 중 400 에러가 발생한다.")
+    void confirmPaymentWithError() {
+        // given
+        mockServer.expect(requestTo("/v1/payments/confirm"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(SampleTossPaymentConst.paymentRequestJson))
+                .andRespond(withStatus(HttpStatus.BAD_REQUEST)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(SampleTossPaymentConst.tossPaymentErrorJson));
 
         // when & then
-        assertThatThrownBy(() -> tossPaymentClient.confirmPayment(paymentRequest))
+        assertThatThrownBy(() -> tossPaymentClient.confirmPayment(SampleTossPaymentConst.paymentRequest))
                 .isInstanceOf(RoomEscapeException.class)
                 .hasFieldOrPropertyWithValue("errorType", ErrorType.PAYMENT_ERROR)
                 .hasFieldOrPropertyWithValue("invalidValue",
@@ -102,62 +96,19 @@ class TossPaymentClientTest {
     }
 
     @Test
-    @DisplayName("결제를 취소한다.")
-    void cancelPayment() {
+    @DisplayName("결제 취소 중 500 에러가 발생한다.")
+    void cancelPaymentWithError() {
         // given
-        PaymentCancelRequest cancelRequest = new PaymentCancelRequest("paymentKey", 1000L, "cancelReason");
-        PaymentCancelResponse mockResponse = new PaymentCancelResponse("DONE", "고객 요청", 1000L, OffsetDateTime.now());
-
-        RestClient.RequestBodyUriSpec requestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
-        RestClient.RequestBodySpec requestBodySpec = mock(RestClient.RequestBodySpec.class);
-        RestClient.ResponseSpec responseSpec = mock(RestClient.ResponseSpec.class);
-
-        when(restClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri("/v1/payments/{paymentKey}/cancel", cancelRequest.paymentKey())).thenReturn(
-                requestBodySpec);
-        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
-        when(requestBodySpec.body(Map.of("cancelReason", cancelRequest.cancelReason()))).thenReturn(requestBodySpec);
-        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
-        when(responseSpec.body(PaymentCancelResponse.class)).thenReturn(mockResponse);
-
-        // when
-        PaymentCancelResponse cancelResponse = tossPaymentClient.cancelPayment(cancelRequest);
-
-        // then
-        assertThat(cancelResponse).isNotNull();
-        assertThat(cancelResponse.cancelStatus()).isEqualTo("DONE");
-        assertThat(cancelResponse.cancelReason()).isEqualTo("고객 요청");
-    }
-
-    @Test
-    @DisplayName("결제 취소 중 예외가 발생한다.")
-    void cancelPaymentWithError() throws IOException {
-        // given
-        PaymentCancelRequest cancelRequest = new PaymentCancelRequest("paymentKey", 1000L, "cancelReason");
-
-        RestClient.RequestBodyUriSpec requestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
-        RestClient.RequestBodySpec requestBodySpec = mock(RestClient.RequestBodySpec.class);
-        RestClient.ResponseSpec responseSpec = mock(RestClient.ResponseSpec.class);
-        when(clientHttpResponse.getStatusCode()).thenReturn(HttpStatusCode.valueOf(500));
-        when(clientHttpResponse.getBody()).thenReturn(
-                new ByteArrayInputStream("{\"code\": \"ERROR_CODE\", \"message\": \"Error message\"}".getBytes()));
-
-        when(restClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri("/v1/payments/{paymentKey}/cancel", cancelRequest.paymentKey())).thenReturn(
-                requestBodySpec);
-        when(requestBodySpec.contentType(MediaType.APPLICATION_JSON)).thenReturn(requestBodySpec);
-        when(requestBodySpec.body(Map.of("cancelReason", cancelRequest.cancelReason()))).thenReturn(requestBodySpec);
-        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
-
-        when(responseSpec.onStatus(any(), any())).then(invocation -> {
-            invocation.getArgument(1, ErrorHandler.class).handle(null, clientHttpResponse);
-            return null;
-        });
+        mockServer.expect(requestTo("/v1/payments/5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1/cancel"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(SampleTossPaymentConst.cancelRequestJson))
+                .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(SampleTossPaymentConst.tossPaymentErrorJson));
 
         // when & then
-        assertThatThrownBy(() -> tossPaymentClient.cancelPayment(cancelRequest))
+        assertThatThrownBy(() -> tossPaymentClient.cancelPayment(SampleTossPaymentConst.cancelRequest))
                 .isInstanceOf(RoomEscapeException.class)
                 .hasFieldOrPropertyWithValue("errorType", ErrorType.PAYMENT_SERVER_ERROR)
                 .hasFieldOrPropertyWithValue("invalidValue",

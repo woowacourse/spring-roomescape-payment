@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.request.PaymentCancelRequest;
 import roomescape.payment.dto.request.PaymentRequest;
@@ -18,14 +19,15 @@ import roomescape.payment.dto.response.TossPaymentErrorResponse;
 import roomescape.system.exception.ErrorType;
 import roomescape.system.exception.RoomEscapeException;
 
+@Component
 public class TossPaymentClient {
 
     private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.class);
 
     private final RestClient restClient;
 
-    public TossPaymentClient(RestClient restClient) {
-        this.restClient = restClient;
+    public TossPaymentClient(RestClient.Builder restClientBuilder) {
+        this.restClient = restClientBuilder.build();
     }
 
     public PaymentResponse confirmPayment(PaymentRequest paymentRequest) {

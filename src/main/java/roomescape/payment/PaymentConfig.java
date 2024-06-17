@@ -11,19 +11,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.client.PaymentProperties;
-import roomescape.payment.client.TossPaymentClient;
 
 @Configuration
 @EnableConfigurationProperties(PaymentProperties.class)
 public class PaymentConfig {
 
     @Bean
-    public TossPaymentClient tossPaymentClient(PaymentProperties paymentProperties) {
-        return new TossPaymentClient(restClient(paymentProperties));
-    }
-
-    @Bean
-    public RestClient restClient(PaymentProperties paymentProperties) {
+    public RestClient.Builder restClientBuilder(PaymentProperties paymentProperties) {
         ClientHttpRequestFactorySettings settings = ClientHttpRequestFactorySettings.DEFAULTS
                 .withReadTimeout(Duration.ofSeconds(paymentProperties.getReadTimeout()))
                 .withConnectTimeout(Duration.ofSeconds(paymentProperties.getConnectTimeout()));
@@ -31,8 +25,7 @@ public class PaymentConfig {
 
         return RestClient.builder().baseUrl("https://api.tosspayments.com")
                 .defaultHeader("Authorization", getAuthorizations(paymentProperties.getConfirmSecretKey()))
-                .requestFactory(requestFactory)
-                .build();
+                .requestFactory(requestFactory);
     }
 
     private String getAuthorizations(String secretKey) {
