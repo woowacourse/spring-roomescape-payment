@@ -1,0 +1,29 @@
+spring:
+  h2:
+    console:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:database
+  jpa:
+    hibernate.hbm2ddl.auto: create-drop
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+
+security:
+  jwt:
+    token:
+      expire-length: 3600000
+      secret-key: tecoroomescapememberwootecoroomescapememberwootecoroomescapemem
+
+payment:
+  secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  base-url: https://api.tosspayments.com
+  confirm-endpoint: /v1/payments/confirm
+  cancel-endpoint: /v1/payments/%s/cancel
+
+springdoc:
+  swagger-ui:
+    path: swagger-ui.html
