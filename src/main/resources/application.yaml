@@ -27,9 +27,9 @@ security:
         expire-length: 1800000 # 30 분
 
 payment:
-  widget:
-    confirm:
-      secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  confirm-secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  read-timeout: 3
+  connect-timeout: 30
 
 springdoc:
   swagger-ui:
