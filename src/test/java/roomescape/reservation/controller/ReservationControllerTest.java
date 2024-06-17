@@ -33,7 +33,7 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.domain.repository.MemberRepository;
-import roomescape.payment.client.PaymentClient;
+import roomescape.payment.client.TossPaymentClient;
 import roomescape.payment.domain.CanceledPayment;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.repository.CanceledPaymentRepository;
@@ -71,7 +71,7 @@ public class ReservationControllerTest {
     private CanceledPaymentRepository canceledPaymentRepository;
 
     @MockBean
-    private PaymentClient paymentClient;
+    private TossPaymentClient paymentClient;
 
     @LocalServerPort
     private int port;

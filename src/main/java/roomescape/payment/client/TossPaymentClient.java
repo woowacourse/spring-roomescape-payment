@@ -18,7 +18,7 @@ import roomescape.payment.dto.response.TossPaymentErrorResponse;
 import roomescape.system.exception.ErrorType;
 import roomescape.system.exception.RoomEscapeException;
 
-public class TossPaymentClient implements PaymentClient {
+public class TossPaymentClient {
 
     private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.class);
 

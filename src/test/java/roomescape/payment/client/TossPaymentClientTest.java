@@ -39,7 +39,7 @@ class TossPaymentClientTest {
     private ClientHttpResponse clientHttpResponse;
 
     @Autowired
-    private PaymentClient paymentClient;
+    private TossPaymentClient tossPaymentClient;
 
     @Test
     @DisplayName("결제를 승인한다.")
@@ -61,7 +61,7 @@ class TossPaymentClientTest {
         when(responseSpec.body(PaymentResponse.class)).thenReturn(mockResponse);
 
         // when
-        PaymentResponse paymentResponse = paymentClient.confirmPayment(paymentRequest);
+        PaymentResponse paymentResponse = tossPaymentClient.confirmPayment(paymentRequest);
 
         // then
         assertThat(paymentResponse).isNotNull();
@@ -93,7 +93,7 @@ class TossPaymentClientTest {
         });
 
         // when & then
-        assertThatThrownBy(() -> paymentClient.confirmPayment(paymentRequest))
+        assertThatThrownBy(() -> tossPaymentClient.confirmPayment(paymentRequest))
                 .isInstanceOf(RoomEscapeException.class)
                 .hasFieldOrPropertyWithValue("errorType", ErrorType.PAYMENT_ERROR)
                 .hasFieldOrPropertyWithValue("invalidValue",
@@ -122,7 +122,7 @@ class TossPaymentClientTest {
         when(responseSpec.body(PaymentCancelResponse.class)).thenReturn(mockResponse);
 
         // when
-        PaymentCancelResponse cancelResponse = paymentClient.cancelPayment(cancelRequest);
+        PaymentCancelResponse cancelResponse = tossPaymentClient.cancelPayment(cancelRequest);
 
         // then
         assertThat(cancelResponse).isNotNull();
@@ -157,7 +157,7 @@ class TossPaymentClientTest {
         });
 
         // when & then
-        assertThatThrownBy(() -> paymentClient.cancelPayment(cancelRequest))
+        assertThatThrownBy(() -> tossPaymentClient.cancelPayment(cancelRequest))
                 .isInstanceOf(RoomEscapeException.class)
                 .hasFieldOrPropertyWithValue("errorType", ErrorType.PAYMENT_SERVER_ERROR)
                 .hasFieldOrPropertyWithValue("invalidValue",

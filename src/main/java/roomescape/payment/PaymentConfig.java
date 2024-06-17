@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.client.PaymentClient;
 import roomescape.payment.client.PaymentProperties;
 import roomescape.payment.client.TossPaymentClient;
 
@@ -19,7 +18,7 @@ import roomescape.payment.client.TossPaymentClient;
 public class PaymentConfig {
 
     @Bean
-    public PaymentClient paymentClient(PaymentProperties paymentProperties) {
+    public TossPaymentClient tossPaymentClient(PaymentProperties paymentProperties) {
         return new TossPaymentClient(restClient(paymentProperties));
     }
 

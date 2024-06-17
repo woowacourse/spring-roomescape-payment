@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.payment.client.PaymentClient;
+import roomescape.payment.client.TossPaymentClient;
 import roomescape.payment.dto.request.PaymentCancelRequest;
 import roomescape.payment.dto.request.PaymentRequest;
 import roomescape.payment.dto.response.PaymentCancelResponse;
@@ -48,10 +48,10 @@ public class ReservationController {
 
     private final ReservationWithPaymentService reservationWithPaymentService;
     private final ReservationService reservationService;
-    private final PaymentClient paymentClient;
+    private final TossPaymentClient paymentClient;
 
     public ReservationController(ReservationWithPaymentService reservationWithPaymentService,
-                                 ReservationService reservationService, PaymentClient paymentClient) {
+                                 ReservationService reservationService, TossPaymentClient paymentClient) {
         this.reservationWithPaymentService = reservationWithPaymentService;
         this.reservationService = reservationService;
         this.paymentClient = paymentClient;
