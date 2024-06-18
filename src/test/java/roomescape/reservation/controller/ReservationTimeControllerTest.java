@@ -1,8 +1,14 @@
 package roomescape.reservation.controller;
 
+import static org.hamcrest.Matchers.is;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Map;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -11,26 +17,31 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.domain.repository.MemberRepository;
-
-import java.lang.reflect.Field;
-import java.util.Map;
-import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.is;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.domain.ReservationTime;
+import roomescape.reservation.domain.repository.ReservationRepository;
+import roomescape.reservation.domain.repository.ReservationTimeRepository;
+import roomescape.theme.domain.Theme;
+import roomescape.theme.domain.repository.ThemeRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
 public class ReservationTimeControllerTest {
 
     @Autowired
-    private ReservationTimeController reservationTimeController;
+    private ReservationTimeRepository reservationTimeRepository;
+
+    @Autowired
+    private ThemeRepository themeRepository;
+
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -130,21 +141,6 @@ public class ReservationTimeControllerTest {
                 .body("data.times.size()", is(0));
     }
 
-    @Test
-    @DisplayName("컨트롤러에는 JdbcTemplate를 사용한 DB관련 로직이 존재하지 않는다.")
-    void jdbcTemplateNotInjected() {
-        boolean isJdbcTemplateInjected = false;
-
-        for (Field field : reservationTimeController.getClass().getDeclaredFields()) {
-            if (field.getType().equals(JdbcTemplate.class)) {
-                isJdbcTemplateInjected = true;
-                break;
-            }
-        }
-
-        assertThat(isJdbcTemplateInjected).isFalse();
-    }
-
     @ParameterizedTest
     @MethodSource("validateRequestDataFormatSource")
     @DisplayName("예약 시간 생성 시, 시간 요청 데이터에 시간 포맷이 아닌 값이 입력되어오면 400 에러를 발생한다.")
@@ -200,7 +196,7 @@ public class ReservationTimeControllerTest {
         );
     }
 
-    private String getAdminAccessTokenCookieByLogin(final String email, final String password) {
+    private String getAdminAccessTokenCookieByLogin(String email, String password) {
         memberRepository.save(new Member("이름", email, password, Role.ADMIN));
 
         Map<String, String> loginParams = Map.of(
@@ -216,5 +212,35 @@ public class ReservationTimeControllerTest {
                 .then().log().all().extract().cookie("accessToken");
 
         return "accessToken=" + accessToken;
+    }
+
+
+    @Test
+    @DisplayName("특정 날짜의 특정 테마 예약 현황을 조회한다.")
+    void readReservationByDateAndThemeId() {
+        // given
+        LocalDate today = LocalDate.now();
+        ReservationTime reservationTime1 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(17, 0)));
+        ReservationTime reservationTime2 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(17, 30)));
+        ReservationTime reservationTime3 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(18, 30)));
+        Theme theme = themeRepository.save(new Theme("테마명1", "설명", "썸네일URL"));
+        Member member = memberRepository.save(new Member("name", "email@email.com", "password", Role.MEMBER));
+
+        reservationRepository.save(
+                new Reservation(today.plusDays(1), reservationTime1, theme, member, ReservationStatus.CONFIRMED));
+        reservationRepository.save(
+                new Reservation(today.plusDays(1), reservationTime2, theme, member, ReservationStatus.CONFIRMED));
+        reservationRepository.save(
+                new Reservation(today.plusDays(1), reservationTime3, theme, member, ReservationStatus.CONFIRMED));
+
+        // when & then
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .port(port)
+                .header("Cookie", getAdminAccessTokenCookieByLogin("a@a.a", "a"))
+                .when().get("/times/filter?date={date}&themeId={themeId}", today.plusDays(1).toString(), theme.getId())
+                .then().log().all()
+                .statusCode(200)
+                .body("data.reservationTimes.size()", is(3));
     }
 }

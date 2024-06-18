@@ -25,28 +25,24 @@ public class Member {
     @Enumerated(value = EnumType.STRING)
     private Role role;
 
-    public Member() {
+    protected Member() {
     }
 
     public Member(
-            final String name,
-            final String email,
-            final String password,
-            final Role role
+            String name,
+            String email,
+            String password,
+            Role role
     ) {
         this(null, name, email, password, role);
     }
 
-    public Member(final Long id, final Member member) {
-        this(id, member.name, member.email, member.password, member.role);
-    }
-
     public Member(
-            final Long id,
-            final String name,
-            final String email,
-            final String password,
-            final Role role
+            Long id,
+            String name,
+            String email,
+            String password,
+            Role role
     ) {
         this.id = id;
         this.name = name;

@@ -1,8 +1,14 @@
 package roomescape.theme.controller;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.is;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
+import java.time.LocalDate;
+import java.util.Map;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,13 +21,6 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.domain.repository.MemberRepository;
-
-import java.time.LocalDate;
-import java.util.Map;
-import java.util.stream.Stream;
-
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
@@ -118,12 +117,10 @@ class ThemeControllerTest {
     @DisplayName("예약 수 상위 10개 테마를 조회했을 때 내림차순으로 정렬된다. 만약 예약 수가 같다면, id 순으로 오름차순 정렬된다.")
     @Sql(scripts = {"/truncate.sql", "/reservationData.sql"}, executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
     void readTop10ThemesDescOrder() {
-        LocalDate today = LocalDate.now();
-
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .port(port)
-                .when().get("/themes/top?today=" + today)
+                .when().get("/themes/most-reserved-last-week?count=10")
                 .then().log().all()
                 .statusCode(200)
                 .body("data.themes.size()", is(10))

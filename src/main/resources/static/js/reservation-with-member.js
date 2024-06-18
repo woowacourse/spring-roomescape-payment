@@ -26,12 +26,14 @@ function render(data) {
 
     data.data.reservations.forEach(item => {
         const row = tableBody.insertRow();
+        const isPaid = item.status === 'CONFIRMED' ? '결제 완료' : '결제 대기';
 
         row.insertCell(0).textContent = item.id;              // 예약 id
         row.insertCell(1).textContent = item.member.name;     // 사용자 name
         row.insertCell(2).textContent = item.theme.name;      // 테마 name
         row.insertCell(3).textContent = item.date;            // date
         row.insertCell(4).textContent = item.time.startAt;    // 예약 시간 startAt
+        row.insertCell(5).textContent = isPaid;               // 결제
 
         const actionCell = row.insertCell(row.cells.length);
         actionCell.appendChild(createActionButton('삭제', 'btn-danger', deleteRow));
@@ -49,13 +51,6 @@ function fetchTimes() {
 function fetchThemes() {
     requestRead(THEME_API_ENDPOINT)
         .then(data => {
-            let mockTheme = {
-                "id": null,
-                "name": null,
-                "description": null,
-                "thumbnail": null
-            }
-            data.data.themes.unshift(mockTheme);
             themesOptions.push(...data.data.themes);
             populateSelect('theme', themesOptions, 'name');
         })
@@ -65,11 +60,6 @@ function fetchThemes() {
 function fetchMembers() {
     requestRead(MEMBER_API_ENDPOINT)
         .then(data => {
-            let mockMember = {
-                "id": null,
-                "name": null
-            }
-            data.data.members.unshift(mockMember);
             membersOptions.push(...data.data.members);
             populateSelect('member', membersOptions, 'name');
         })
@@ -204,7 +194,17 @@ function applyFilter(event) {
     const dateFrom = document.getElementById('date-from').value;
     const dateTo = document.getElementById('date-to').value;
 
-    fetch(`/reservations/search?themeId=${themeId}&memberId=${memberId}&dateFrom=${dateFrom}&dateTo=${dateTo}`, { // 예약 검색 API 호출
+    const queryParams = {
+        themeId : themeId,
+        memberId : memberId,
+        dateFrom : dateFrom,
+        dateTo : dateTo
+    }
+    const searchParams = new URLSearchParams(queryParams);
+    const endpoint = '/reservations/search';
+
+    const url = `${endpoint}?${searchParams.toString()}`;
+    fetch(url, { // 예약 검색 API 호출
         method: 'GET',
         headers: {
             'Content-Type': 'application/json'
@@ -223,7 +223,7 @@ function requestCreate(reservation) {
         body: JSON.stringify(reservation)
     };
 
-    return fetch('/reservations', requestOptions)
+    return fetch('/reservations/admin', requestOptions)
         .then(response => {
             if (response.status === 201) return response.json();
             throw new Error('Create failed');

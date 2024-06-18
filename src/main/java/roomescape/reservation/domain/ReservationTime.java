@@ -11,13 +11,14 @@ import roomescape.system.exception.RoomEscapeException;
 
 @Entity
 public class ReservationTime {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private LocalTime startAt;
 
-    public ReservationTime() {
+    protected ReservationTime() {
     }
 
     public ReservationTime(final LocalTime startAt) {

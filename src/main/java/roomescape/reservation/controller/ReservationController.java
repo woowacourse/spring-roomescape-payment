@@ -1,5 +1,13 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -14,98 +22,251 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.payment.PaymentRequest;
-import roomescape.payment.TossPaymentClient;
+import roomescape.payment.client.TossPaymentClient;
+import roomescape.payment.dto.request.PaymentCancelRequest;
+import roomescape.payment.dto.request.PaymentRequest;
+import roomescape.payment.dto.response.PaymentCancelResponse;
+import roomescape.payment.dto.response.PaymentResponse;
+import roomescape.reservation.dto.request.AdminReservationRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
-import roomescape.reservation.dto.request.ReservationSearchRequest;
+import roomescape.reservation.dto.request.WaitingRequest;
+import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
-import roomescape.reservation.dto.response.ReservationTimeInfosResponse;
 import roomescape.reservation.dto.response.ReservationsResponse;
-import roomescape.reservation.dto.response.WaitingWithRanksResponse;
 import roomescape.reservation.service.ReservationService;
+import roomescape.reservation.service.ReservationWithPaymentService;
 import roomescape.system.auth.annotation.Admin;
+import roomescape.system.auth.annotation.LoginRequired;
 import roomescape.system.auth.annotation.MemberId;
-import roomescape.system.dto.response.ApiResponse;
+import roomescape.system.dto.response.ErrorResponse;
+import roomescape.system.dto.response.RoomEscapeApiResponse;
+import roomescape.system.exception.RoomEscapeException;
 
 @RestController
+@Tag(name = "3. 예약 API", description = "예약 및 대기 정보를 추가 / 조회 / 삭제할 때 사용합니다.")
 public class ReservationController {
-    private final ReservationService reservationService;
-    private final TossPaymentClient tossPaymentClient;
 
-    public ReservationController(ReservationService reservationService, TossPaymentClient tossPaymentClient) {
+    private final ReservationWithPaymentService reservationWithPaymentService;
+    private final ReservationService reservationService;
+    private final TossPaymentClient paymentClient;
+
+    public ReservationController(ReservationWithPaymentService reservationWithPaymentService,
+                                 ReservationService reservationService, TossPaymentClient paymentClient) {
+        this.reservationWithPaymentService = reservationWithPaymentService;
         this.reservationService = reservationService;
-        this.tossPaymentClient = tossPaymentClient;
+        this.paymentClient = paymentClient;
     }
 
 
     @Admin
     @GetMapping("/reservations")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse<ReservationsResponse> getAllReservations() {
-        return ApiResponse.success(reservationService.findAllReservations());
+    @Operation(summary = "모든 예약 정보 조회", tags = "관리자 로그인이 필요한 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공", useReturnTypeSchema = true)
+    })
+    public RoomEscapeApiResponse<ReservationsResponse> getAllReservations() {
+        return RoomEscapeApiResponse.success(reservationService.findAllReservations());
     }
 
+    @LoginRequired
     @GetMapping("/reservations-mine")
-    public ApiResponse<WaitingWithRanksResponse> getMemberReservations(@MemberId final Long memberId) {
-        return ApiResponse.success(reservationService.findWaitingWithRankById(memberId));
-    }
-
-    @GetMapping("/reservations/themes/{themeId}/times")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse<ReservationTimeInfosResponse> getReservationTimeInfos(
-            @NotNull(message = "themeId는 null일 수 없습니다.") @PathVariable final Long themeId,
-            @NotNull(message = "날짜는 null일 수 없습니다.") @RequestParam final LocalDate date) {
-        return ApiResponse.success(reservationService.findReservationsByDateAndThemeId(date, themeId));
+    @Operation(summary = "자신의 예약 및 대기 조회", tags = "로그인이 필요한 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공", useReturnTypeSchema = true)
+    })
+    public RoomEscapeApiResponse<MyReservationsResponse> getMemberReservations(
+            @MemberId @Parameter(hidden = true) Long memberId) {
+        return RoomEscapeApiResponse.success(reservationService.findMemberReservations(memberId));
     }
 
     @Admin
     @GetMapping("/reservations/search")
     @ResponseStatus(HttpStatus.OK)
-    public ApiResponse<ReservationsResponse> getReservationBySearching(
-            ReservationSearchRequest request
+    @Operation(summary = "관리자의 예약 검색", description = "특정 조건에 해당되는 예약 검색", tags = "관리자 로그인이 필요한 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "400", description = "날짜 범위를 지정할 때, 종료 날짜는 시작 날짜 이전일 수 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public RoomEscapeApiResponse<ReservationsResponse> getReservationBySearching(
+            @RequestParam(required = false) @Parameter(description = "테마 ID") Long themeId,
+            @RequestParam(required = false) @Parameter(description = "회원 ID") Long memberId,
+            @RequestParam(required = false) @Parameter(description = "yyyy-MM-dd 형식으로 입력해주세요", example = "2024-06-10") LocalDate dateFrom,
+            @RequestParam(required = false) @Parameter(description = "yyyy-MM-dd 형식으로 입력해주세요", example = "2024-06-10") LocalDate dateTo
     ) {
-        return ApiResponse.success(
-                reservationService.findFilteredReservations(request)
-        );
+        return RoomEscapeApiResponse.success(
+                reservationService.findFilteredReservations(themeId, memberId, dateFrom, dateTo));
     }
 
     @Admin
-    @DeleteMapping("/reservations/{id}/")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ApiResponse<Void> removeReservation(
-            @MemberId final Long memberId,
-            @NotNull(message = "reservationId는 null일 수 없습니다.") @PathVariable("id") final Long reservationId,
-            @NotNull(message = "status는 null일 수 없습니다.") @RequestParam("status") final String status
-    ) {
-        reservationService.updateState(memberId, reservationId, status);
-
-        return ApiResponse.success();
-    }
-
-    @PostMapping("/reservations")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<ReservationResponse> saveReservation(
-            @Valid @RequestBody final ReservationRequest reservationRequest,
-            @MemberId final Long memberId,
-            final HttpServletResponse response
-    ) {
-        tossPaymentClient.confirmPayment(
-                new PaymentRequest(reservationRequest.paymentKey(), reservationRequest.orderId(),
-                        reservationRequest.amount(), reservationRequest.paymentType()));
-        final ReservationResponse reservationResponse = reservationService.addReservation(reservationRequest, memberId);
-
-        response.setHeader(HttpHeaders.LOCATION, "/reservations/" + reservationResponse.id());
-        return ApiResponse.success(reservationResponse);
-    }
-
     @DeleteMapping("/reservations/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ApiResponse<Void> removeReservation(
-            @MemberId final Long memberId,
-            @NotNull(message = "reservationId는 null 또는 공백일 수 없습니다.") @PathVariable("id") final Long reservationId
+    @Operation(summary = "관리자의 예약 취소", tags = "관리자 로그인이 필요한 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "성공"),
+            @ApiResponse(responseCode = "404", description = "예약 또는 결제 정보를 찾을 수 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
+    public RoomEscapeApiResponse<Void> removeReservation(
+            @MemberId @Parameter(hidden = true) Long memberId,
+            @NotNull(message = "reservationId는 null일 수 없습니다.") @PathVariable("id") @Parameter(description = "예약 ID") Long reservationId
     ) {
-        reservationService.removeReservationById(reservationId, memberId);
 
-        return ApiResponse.success();
+        if (reservationWithPaymentService.isNotPaidReservation(reservationId)) {
+            reservationService.removeReservationById(reservationId, memberId);
+            return RoomEscapeApiResponse.success();
+        }
+
+        PaymentCancelRequest paymentCancelRequest = reservationWithPaymentService.removeReservationWithPayment(
+                reservationId, memberId);
+
+        PaymentCancelResponse paymentCancelResponse = paymentClient.cancelPayment(paymentCancelRequest);
+
+        reservationWithPaymentService.updateCanceledTime(paymentCancelRequest.paymentKey(),
+                paymentCancelResponse.canceledAt());
+
+        return RoomEscapeApiResponse.success();
+    }
+
+    @LoginRequired
+    @PostMapping("/reservations")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "예약 추가", tags = "로그인이 필요한 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "성공", useReturnTypeSchema = true,
+                    headers = @Header(name = HttpHeaders.LOCATION, description = "생성된 예약 정보 URL", schema = @Schema(example = "/reservations/1")))
+    })
+    public RoomEscapeApiResponse<ReservationResponse> saveReservation(
+            @Valid @RequestBody ReservationRequest reservationRequest,
+            @MemberId @Parameter(hidden = true) Long memberId,
+            HttpServletResponse response
+    ) {
+        PaymentRequest paymentRequest = reservationRequest.getPaymentRequest();
+        PaymentResponse paymentResponse = paymentClient.confirmPayment(paymentRequest);
+
+        try {
+            ReservationResponse reservationResponse = reservationWithPaymentService.addReservationWithPayment(
+                    reservationRequest, paymentResponse, memberId);
+            return getCreatedReservationResponse(reservationResponse, response);
+        } catch (RoomEscapeException e) {
+            PaymentCancelRequest cancelRequest = new PaymentCancelRequest(paymentRequest.paymentKey(),
+                    paymentRequest.amount(), e.getMessage());
+
+            PaymentCancelResponse paymentCancelResponse = paymentClient.cancelPayment(cancelRequest);
+
+            reservationWithPaymentService.saveCanceledPayment(paymentCancelResponse, paymentResponse.approvedAt(),
+                    paymentRequest.paymentKey());
+            throw e;
+        }
+    }
+
+    @Admin
+    @PostMapping("/reservations/admin")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "관리자 예약 추가", tags = "관리자 로그인이 필요한 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "성공", useReturnTypeSchema = true,
+                    headers = @Header(name = HttpHeaders.LOCATION, description = "생성된 예약 정보 URL", schema = @Schema(example = "/reservations/1"))),
+            @ApiResponse(responseCode = "409", description = "예약이 이미 존재합니다.", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public RoomEscapeApiResponse<ReservationResponse> saveReservationByAdmin(
+            @Valid @RequestBody AdminReservationRequest adminReservationRequest,
+            HttpServletResponse response
+    ) {
+        ReservationResponse reservationResponse = reservationService.addReservationByAdmin(adminReservationRequest);
+        return getCreatedReservationResponse(reservationResponse, response);
+    }
+
+    @Admin
+    @GetMapping("/reservations/waiting")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "모든 예약 대기 조회", tags = "관리자 로그인이 필요한 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공", useReturnTypeSchema = true)
+    })
+    public RoomEscapeApiResponse<ReservationsResponse> getAllWaiting() {
+        return RoomEscapeApiResponse.success(reservationService.findAllWaiting());
+    }
+
+    @LoginRequired
+    @PostMapping("/reservations/waiting")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "예약 대기 신청", tags = "로그인이 필요한 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "성공", useReturnTypeSchema = true,
+                    headers = @Header(name = HttpHeaders.LOCATION, description = "생성된 예약 정보 URL", schema = @Schema(example = "/reservations/1")))
+    })
+    public RoomEscapeApiResponse<ReservationResponse> saveWaiting(
+            @Valid @RequestBody WaitingRequest waitingRequest,
+            @MemberId @Parameter(hidden = true) Long memberId,
+            HttpServletResponse response
+    ) {
+        ReservationResponse reservationResponse = reservationService.addWaiting(waitingRequest, memberId);
+        return getCreatedReservationResponse(reservationResponse, response);
+    }
+
+    @LoginRequired
+    @DeleteMapping("/reservations/waiting/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "예약 대기 취소", tags = "로그인이 필요한 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "성공"),
+            @ApiResponse(responseCode = "404", description = "회원의 예약 대기 정보를 찾을 수 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public RoomEscapeApiResponse<Void> deleteWaiting(
+            @MemberId @Parameter(hidden = true) Long memberId,
+            @NotNull(message = "reservationId는 null 또는 공백일 수 없습니다.") @PathVariable("id") @Parameter(description = "예약 ID") Long reservationId
+    ) {
+        reservationService.cancelWaiting(reservationId, memberId);
+        return RoomEscapeApiResponse.success();
+    }
+
+    @Admin
+    @PostMapping("/reservations/waiting/{id}/approve")
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(summary = "대기 중인 예약 승인", tags = "관리자 로그인이 필요한 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "404", description = "예약 대기 정보를 찾을 수 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "409", description = "확정된 예약이 존재하여 대기 중인 예약을 승인할 수 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public RoomEscapeApiResponse<Void> approveWaiting(
+            @MemberId @Parameter(hidden = true) Long memberId,
+            @NotNull(message = "reservationId는 null 또는 공백일 수 없습니다.") @PathVariable("id") @Parameter(description = "예약 ID") Long reservationId
+    ) {
+        reservationService.approveWaiting(reservationId, memberId);
+
+        return RoomEscapeApiResponse.success();
+    }
+
+    @Admin
+    @PostMapping("/reservations/waiting/{id}/deny")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "대기 중인 예약 거절", tags = "관리자 로그인이 필요한 API")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "대기 중인 예약 거절 성공"),
+            @ApiResponse(responseCode = "404", description = "예약 대기 정보를 찾을 수 없습니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public RoomEscapeApiResponse<Void> denyWaiting(
+            @MemberId @Parameter(hidden = true) Long memberId,
+            @NotNull(message = "reservationId는 null 또는 공백일 수 없습니다.") @PathVariable("id") @Parameter(description = "예약 ID") Long reservationId
+    ) {
+        reservationService.denyWaiting(reservationId, memberId);
+
+        return RoomEscapeApiResponse.success();
+    }
+
+    private RoomEscapeApiResponse<ReservationResponse> getCreatedReservationResponse(
+            ReservationResponse reservationResponse,
+            HttpServletResponse response
+    ) {
+        response.setHeader(HttpHeaders.LOCATION, "/reservations/" + reservationResponse.id());
+        return RoomEscapeApiResponse.success(reservationResponse);
     }
 }

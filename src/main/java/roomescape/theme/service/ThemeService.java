@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.system.exception.ErrorType;
 import roomescape.system.exception.RoomEscapeException;
 import roomescape.theme.domain.Theme;
@@ -13,19 +15,25 @@ import roomescape.theme.dto.ThemeResponse;
 import roomescape.theme.dto.ThemesResponse;
 
 @Service
+@Transactional
 public class ThemeService {
-    private final ThemeRepository themeRepository;
 
-    public ThemeService(final ThemeRepository themeRepository) {
+    private final ThemeRepository themeRepository;
+    private final ReservationRepository reservationRepository;
+
+    public ThemeService(ThemeRepository themeRepository, ReservationRepository reservationRepository) {
         this.themeRepository = themeRepository;
+        this.reservationRepository = reservationRepository;
     }
 
-    public Theme findThemeById(final Long id) {
+    @Transactional(readOnly = true)
+    public Theme findThemeById(Long id) {
         return themeRepository.findById(id)
                 .orElseThrow(() -> new RoomEscapeException(ErrorType.THEME_NOT_FOUND,
                         String.format("[themeId: %d]", id), HttpStatus.BAD_REQUEST));
     }
 
+    @Transactional(readOnly = true)
     public ThemesResponse findAllThemes() {
         List<ThemeResponse> response = themeRepository.findAll()
                 .stream()
@@ -35,13 +43,14 @@ public class ThemeService {
         return new ThemesResponse(response);
     }
 
-    public ThemesResponse getTop10Themes(final LocalDate today) {
+    @Transactional(readOnly = true)
+    public ThemesResponse getMostReservedThemesByCount(int count) {
+        LocalDate today = LocalDate.now();
         LocalDate startDate = today.minusDays(7);
         LocalDate endDate = today.minusDays(1);
-        int limit = 10;
 
         List<ThemeResponse> response = themeRepository.findTopNThemeBetweenStartDateAndEndDate(startDate, endDate,
-                        limit)
+                        count)
                 .stream()
                 .map(ThemeResponse::from)
                 .toList();
@@ -49,13 +58,25 @@ public class ThemeService {
         return new ThemesResponse(response);
     }
 
-    public ThemeResponse addTheme(final ThemeRequest request) {
+    public ThemeResponse addTheme(ThemeRequest request) {
+        validateIsSameThemeNameExist(request.name());
         Theme theme = themeRepository.save(new Theme(request.name(), request.description(), request.thumbnail()));
 
         return ThemeResponse.from(theme);
     }
 
-    public void removeThemeById(final Long id) {
+    private void validateIsSameThemeNameExist(String name) {
+        if (themeRepository.existsByName(name)) {
+            throw new RoomEscapeException(ErrorType.THEME_DUPLICATED,
+                    String.format("[name: %s]", name), HttpStatus.CONFLICT);
+        }
+    }
+
+    public void removeThemeById(Long id) {
+        if (themeRepository.isReservedTheme(id)) {
+            throw new RoomEscapeException(ErrorType.THEME_IS_USED_CONFLICT,
+                    String.format("[themeId: %d]", id), HttpStatus.CONFLICT);
+        }
         themeRepository.deleteById(id);
     }
 }

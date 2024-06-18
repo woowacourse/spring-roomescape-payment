@@ -16,37 +16,28 @@ import roomescape.system.exception.RoomEscapeException;
 
 @Component
 public class JwtHandler {
+
     @Value("${security.jwt.token.secret-key}")
     private String secretKey;
 
     @Value("${security.jwt.token.access.expire-length}")
     private long accessTokenExpireTime;
 
-    @Value("${security.jwt.token.refresh.expire-length}")
-    private long refreshTokenExpireTime;
+    public TokenDto createToken(Long memberId) {
+        Date date = new Date();
+        Date accessTokenExpiredAt = new Date(date.getTime() + accessTokenExpireTime);
 
-    public TokenDto createToken(final Long memberId) {
-        final Date date = new Date();
-        final Date accessTokenExpiredAt = new Date(date.getTime() + accessTokenExpireTime);
-        final Date refreshTokenExpiredAt = new Date(date.getTime() + refreshTokenExpireTime);
-
-        final String accessToken = Jwts.builder()
+        String accessToken = Jwts.builder()
                 .claim("memberId", memberId)
                 .setIssuedAt(date)
                 .setExpiration(accessTokenExpiredAt)
                 .signWith(SignatureAlgorithm.HS256, secretKey.getBytes())
                 .compact();
 
-        final String refreshToken = Jwts.builder()
-                .setIssuedAt(date)
-                .setExpiration(refreshTokenExpiredAt)
-                .signWith(SignatureAlgorithm.HS256, secretKey.getBytes())
-                .compact();
-
-        return new TokenDto(accessToken, refreshToken);
+        return new TokenDto(accessToken);
     }
 
-    public Long getMemberIdFromToken(final String token) {
+    public Long getMemberIdFromToken(String token) {
         validateToken(token);
 
         return Jwts.parser().setSigningKey(secretKey.getBytes()).parseClaimsJws(token)
@@ -54,24 +45,18 @@ public class JwtHandler {
                 .get("memberId", Long.class);
     }
 
-    public Long getMemberIdFromTokenWithNotValidate(final String token) {
-        return Jwts.parser().setSigningKey(secretKey.getBytes()).parseClaimsJws(token)
-                .getBody()
-                .get("memberId", Long.class);
-    }
-
-    public void validateToken(final String token) {
+    public void validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(secretKey.getBytes()).parseClaimsJws(token);
-        } catch (final ExpiredJwtException e) {
+        } catch (ExpiredJwtException e) {
             throw new RoomEscapeException(ErrorType.EXPIRED_TOKEN, HttpStatus.UNAUTHORIZED);
-        } catch (final UnsupportedJwtException e) {
+        } catch (UnsupportedJwtException e) {
             throw new RoomEscapeException(ErrorType.UNSUPPORTED_TOKEN, HttpStatus.UNAUTHORIZED);
-        } catch (final MalformedJwtException e) {
+        } catch (MalformedJwtException e) {
             throw new RoomEscapeException(ErrorType.MALFORMED_TOKEN, HttpStatus.UNAUTHORIZED);
-        } catch (final SignatureException e) {
+        } catch (SignatureException e) {
             throw new RoomEscapeException(ErrorType.INVALID_SIGNATURE_TOKEN, HttpStatus.UNAUTHORIZED);
-        } catch (final IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             throw new RoomEscapeException(ErrorType.ILLEGAL_TOKEN, HttpStatus.UNAUTHORIZED);
         }
     }

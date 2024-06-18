@@ -1,9 +1,9 @@
 spring:
   jpa:
-    show-sql: true
+    show-sql: false
     properties:
-      hibernate:
-        format_sql: true
+      #      hibernate:
+      #        format_sql: true
       ddl-auto: create-drop
     defer-datasource-initialization: true
 
@@ -25,10 +25,15 @@ security:
       secret-key: daijawligagaf@LIJ$@U)9nagnalkkgalijaddljfi
       access:
         expire-length: 1800000 # 30 분
-      refresh:
-        expire-length: 604800000 # 7일
 
 payment:
-  widget:
-    confirm:
-      secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  confirm-secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  read-timeout: 3
+  connect-timeout: 30
+
+springdoc:
+  swagger-ui:
+    operationsSorter: method
+    tagsSorter: alpha
+    doc-expansion: none
+  override-with-generic-response: false

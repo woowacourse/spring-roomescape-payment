@@ -6,5 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import roomescape.reservation.domain.ReservationTime;
 
 public interface ReservationTimeRepository extends JpaRepository<ReservationTime, Long> {
+
     List<ReservationTime> findByStartAt(LocalTime startAt);
 }

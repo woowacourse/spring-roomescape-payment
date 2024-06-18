@@ -17,39 +17,47 @@ import roomescape.system.exception.RoomEscapeException;
 
 @Component
 public class AdminInterceptor implements HandlerInterceptor {
+
     private static final String ACCESS_TOKEN_COOKIE_NAME = "accessToken";
     private final MemberService memberService;
     private final JwtHandler jwtHandler;
 
-    public AdminInterceptor(final MemberService memberService, final JwtHandler jwtHandler) {
+    public AdminInterceptor(MemberService memberService, JwtHandler jwtHandler) {
         this.memberService = memberService;
         this.jwtHandler = jwtHandler;
     }
 
     @Override
     public boolean preHandle(
-            final HttpServletRequest request,
-            final HttpServletResponse response,
-            final Object handler
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Object handler
     )
             throws Exception {
         if (isHandlerIrrelevantWithAdmin(handler)) {
             return true;
         }
 
-        final Cookie token = getToken(request);
-        final Long memberId = jwtHandler.getMemberIdFromToken(token.getValue());
-        final Member member = memberService.findMemberById(memberId);
+        Member member;
+        try {
+            Cookie token = getToken(request);
+            Long memberId = jwtHandler.getMemberIdFromToken(token.getValue());
+            member = memberService.findMemberById(memberId);
+        } catch (RoomEscapeException e) {
+            response.sendRedirect("/login");
+            throw e;
+        }
 
         if (member.isAdmin()) {
             return true;
+        } else {
+            response.sendRedirect("/login");
+            throw new RoomEscapeException(ErrorType.PERMISSION_DOES_NOT_EXIST,
+                    String.format("[memberId: %d, Role: %s]", member.getId(), member.getRole()), HttpStatus.FORBIDDEN);
         }
-
-        throw new RoomEscapeException(ErrorType.PERMISSION_DOES_NOT_EXIST,
-                String.format("[memberId: %d, Role: %s]", member.getId(), member.getRole()), HttpStatus.FORBIDDEN);
     }
 
-    private Cookie getToken(final HttpServletRequest request) {
+    private Cookie getToken(HttpServletRequest request) {
         validateCookieHeader(request);
 
         Cookie[] cookies = request.getCookies();
@@ -59,18 +67,18 @@ public class AdminInterceptor implements HandlerInterceptor {
                 .orElseThrow(() -> new RoomEscapeException(ErrorType.INVALID_TOKEN, HttpStatus.UNAUTHORIZED));
     }
 
-    private void validateCookieHeader(final HttpServletRequest request) {
-        final String cookieHeader = request.getHeader("Cookie");
+    private void validateCookieHeader(HttpServletRequest request) {
+        String cookieHeader = request.getHeader("Cookie");
         if (cookieHeader == null) {
             throw new RoomEscapeException(ErrorType.NOT_EXIST_COOKIE, HttpStatus.UNAUTHORIZED);
         }
     }
 
-    private boolean isHandlerIrrelevantWithAdmin(final Object handler) {
-        if (!(handler instanceof final HandlerMethod handlerMethod)) {
+    private boolean isHandlerIrrelevantWithAdmin(Object handler) {
+        if (!(handler instanceof HandlerMethod handlerMethod)) {
             return true;
         }
-        final Admin adminAnnotation = handlerMethod.getMethodAnnotation(Admin.class);
+        Admin adminAnnotation = handlerMethod.getMethodAnnotation(Admin.class);
         return adminAnnotation == null;
     }
 }

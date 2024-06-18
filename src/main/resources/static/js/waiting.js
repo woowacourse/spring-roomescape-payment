@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('/reservations/search?waiting=true') // 내 예약 목록 조회 API 호출
+    fetch('/reservations/waiting') // 내 예약 목록 조회 API 호출
         .then(response => {
             if (response.status === 200) return response.json();
             throw new Error('Read failed');
@@ -38,7 +38,7 @@ function approve(event) {
     const row = event.target.closest('tr');
     const id = row.cells[0].textContent;
 
-    const endpoint = `/reservations/${id}/?status=approve`
+    const endpoint = `/reservations/waiting/${id}/approve`
     return fetch(endpoint, {
         method: 'POST'
     }).then(response => {
@@ -51,7 +51,7 @@ function deny(event) {
     const row = event.target.closest('tr');
     const id = row.cells[0].textContent;
 
-    const endpoint = `/reservations/${id}/?status=decline`
+    const endpoint = `/reservations/waiting/${id}/deny`
     return fetch(endpoint, {
         method: 'POST'
     }).then(response => {

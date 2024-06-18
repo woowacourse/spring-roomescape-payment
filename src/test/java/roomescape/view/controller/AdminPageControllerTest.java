@@ -4,6 +4,8 @@ package roomescape.view.controller;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
+import java.util.Map;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +15,6 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.domain.repository.MemberRepository;
-
-import java.util.Map;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -42,7 +42,7 @@ class AdminPageControllerTest {
     }
 
     @Test
-    @DisplayName("관리자 권한이 없는 유저가 /admin 으로 GET 요청을 보내면 어드민 페이지와 200 OK 를 받는다.")
+    @DisplayName("관리자 권한이 없는 유저가 /admin 으로 GET 요청을 보내면 로그인 페이지로 리다이렉트 된다.")
     void getAdminPageHasNotRole() {
         // given
         String accessTokenCookie = getAccessTokenCookieByLogin("member@member.com", "12341234");
@@ -53,7 +53,8 @@ class AdminPageControllerTest {
                 .header(new Header("Cookie", accessTokenCookie))
                 .when().get("/admin")
                 .then().log().all()
-                .statusCode(403);
+                .statusCode(200)
+                .body(Matchers.containsString("<title>Login</title>"));
     }
 
     @Test
@@ -72,7 +73,7 @@ class AdminPageControllerTest {
     }
 
     @Test
-    @DisplayName("관리자 권한이 없는 유저가 /admin/reservation 으로 GET 요청을 보내면 어드민 예약 관리 페이지와 200 OK 를 받는다.")
+    @DisplayName("관리자 권한이 없는 유저가 /admin/reservation 으로 GET 요청을 보내면 로그인 페이지로 리다이렉트 된다.")
     void getAdminReservationPageHasNotRole() {
         // given
         String accessTokenCookie = getAccessTokenCookieByLogin("member@member.com", "12341234");
@@ -83,7 +84,8 @@ class AdminPageControllerTest {
                 .header(new Header("Cookie", accessTokenCookie))
                 .when().get("/admin/reservation")
                 .then().log().all()
-                .statusCode(403);
+                .statusCode(200)
+                .body(Matchers.containsString("<title>Login</title>"));
     }
 
     @Test
@@ -102,7 +104,7 @@ class AdminPageControllerTest {
     }
 
     @Test
-    @DisplayName("/admin/time 으로 GET 요청을 보내면 403 Forbidden 을 받는다.")
+    @DisplayName("관리자 권한이 없는 유저가 /admin/time 으로 GET 요청을 보내면 로그인 페이지로 리다이렉트 된다.")
     void getAdminTimePageHasNotRole() {
         // given
         String accessTokenCookie = getAccessTokenCookieByLogin("member@member.com", "12341234");
@@ -113,7 +115,8 @@ class AdminPageControllerTest {
                 .header(new Header("Cookie", accessTokenCookie))
                 .when().get("/admin/time")
                 .then().log().all()
-                .statusCode(403);
+                .statusCode(200)
+                .body(Matchers.containsString("<title>Login</title>"));
     }
 
     @Test
@@ -132,7 +135,7 @@ class AdminPageControllerTest {
     }
 
     @Test
-    @DisplayName("관리자 권한이 없는 유저가 /admin/theme 으로 GET 요청을 보내면 403 Forbidden 을 받는다.")
+    @DisplayName("관리자 권한이 없는 유저가 /admin/theme 으로 GET 요청을 보내면 로그인 페이지로 리다이렉트 된다.")
     void getAdminThemePageHasNotRole() {
         // given
         String accessTokenCookie = getAccessTokenCookieByLogin("member@member.com", "12341234");
@@ -143,10 +146,43 @@ class AdminPageControllerTest {
                 .header(new Header("Cookie", accessTokenCookie))
                 .when().get("/admin/theme")
                 .then().log().all()
-                .statusCode(403);
+                .statusCode(200)
+                .body(Matchers.containsString("<title>Login</title>"));
     }
 
-    private String getAdminAccessTokenCookieByLogin(final String email, final String password) {
+    @Test
+    @DisplayName("관리자 권한이 있는 유저가 /admin/waiting 으로 GET 요청을 보내면 어드민 대기 관리 페이지와 200 OK 를 받는다.")
+    void getAdminWatingPage() {
+        // given
+        String adminAccessTokenCookie = getAdminAccessTokenCookieByLogin("admin@email.com", "12341234");
+
+        // when & then
+        RestAssured.given().log().all()
+                .port(port)
+                .header(new Header("Cookie", adminAccessTokenCookie))
+                .when().get("/admin/waiting")
+                .then().log().all()
+                .statusCode(200);
+    }
+
+    @Test
+    @DisplayName("관리자 권한이 없는 유저가 /admin/waiting 으로 GET 요청을 보내면 로그인 페이지로 리다이렉트 된다.")
+    void getAdminWaitingPageHasNotRole() {
+        // given
+        String accessTokenCookie = getAccessTokenCookieByLogin("member@email.com", "member");
+
+        // when & then
+        RestAssured.given().log().all()
+                .port(port)
+                .header(new Header("Cookie", accessTokenCookie))
+                .when().get("/admin/waiting")
+                .then().log().all()
+                .statusCode(200)
+                .body(Matchers.containsString("<title>Login</title>"));
+    }
+
+
+    private String getAdminAccessTokenCookieByLogin(String email, String password) {
         memberRepository.save(new Member("이름", email, password, Role.ADMIN));
 
         Map<String, String> loginParams = Map.of(
@@ -164,7 +200,7 @@ class AdminPageControllerTest {
         return "accessToken=" + accessToken;
     }
 
-    private String getAccessTokenCookieByLogin(final String email, final String password) {
+    private String getAccessTokenCookieByLogin(String email, String password) {
         memberRepository.save(new Member("name", email, password, Role.MEMBER));
         Map<String, String> loginParams = Map.of(
                 "email", email,

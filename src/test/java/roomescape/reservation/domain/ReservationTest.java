@@ -22,7 +22,8 @@ public class ReservationTest {
                                            Member member) {
 
         // when & then
-        Assertions.assertThatThrownBy(() -> new Reservation(date, reservationTime, theme, member))
+        Assertions.assertThatThrownBy(
+                        () -> new Reservation(date, reservationTime, theme, member, ReservationStatus.CONFIRMED))
                 .isInstanceOf(RoomEscapeException.class);
     }
 

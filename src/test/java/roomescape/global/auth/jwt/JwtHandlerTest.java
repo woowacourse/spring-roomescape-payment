@@ -1,8 +1,13 @@
 package roomescape.global.auth.jwt;
 
+import static roomescape.system.exception.ErrorType.EXPIRED_TOKEN;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.restassured.RestAssured;
+import java.util.Date;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +18,6 @@ import org.springframework.test.context.jdbc.Sql;
 import roomescape.system.auth.jwt.JwtHandler;
 import roomescape.system.exception.ErrorType;
 import roomescape.system.exception.RoomEscapeException;
-
-import java.util.Date;
-
-import static roomescape.system.exception.ErrorType.EXPIRED_TOKEN;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/truncate.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -30,6 +31,11 @@ class JwtHandlerTest {
 
     @LocalServerPort
     private int port;
+
+    @BeforeEach
+    void setUp() {
+        RestAssured.port = port;
+    }
 
     @Test
     @DisplayName("토큰이 만료되면 401 Unauthorized 를 발생시킨다.")
