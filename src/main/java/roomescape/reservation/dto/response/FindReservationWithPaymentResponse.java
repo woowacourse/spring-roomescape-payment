@@ -1,6 +1,6 @@
 package roomescape.reservation.dto.response;
 
-import roomescape.reservation.model.Reservation;
+import roomescape.reservation.model.ReservationWithPayment;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -12,15 +12,15 @@ public record FindReservationWithPaymentResponse(Long id,
                                                  String status,
                                                  String paymentKey,
                                                  Long totalAmount) {
-    public static FindReservationWithPaymentResponse from(final Reservation reservation) {
+    public static FindReservationWithPaymentResponse from(final ReservationWithPayment reservationWithPayment) {
         return new FindReservationWithPaymentResponse(
-                reservation.getId(),
-                reservation.getTheme().getName(),
-                reservation.getDate(),
-                reservation.getReservationTime().getStartAt(),
+                reservationWithPayment.reservation().getId(),
+                reservationWithPayment.reservation().getTheme().getName(),
+                reservationWithPayment.reservation().getDate(),
+                reservationWithPayment.reservation().getReservationTime().getStartAt(),
                 "예약",
-                reservation.getPayment().getPaymentKey(),
-                reservation.getPayment().getTotalAmount()
+                reservationWithPayment.payment().getPaymentKey(),
+                reservationWithPayment.payment().getTotalAmount()
         );
     }
 }

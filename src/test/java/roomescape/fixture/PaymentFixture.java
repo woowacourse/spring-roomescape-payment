@@ -1,28 +1,15 @@
 package roomescape.fixture;
 
 import roomescape.payment.model.Payment;
-import roomescape.theme.model.Theme;
-
-import java.util.ArrayList;
-import java.util.List;
+import roomescape.reservation.model.Reservation;
 
 public class PaymentFixture {
 
     public static Payment getOne() {
-        return new Payment("abcde", "qwer", 1000L);
+        return new Payment(ReservationFixture.getOneWithId(1L), "abcde", "qwer", 1000L);
     }
 
-    public static List<Payment> get(int count) {
-        final List<Payment> payments = new ArrayList<>();
-
-        for (int i = 0; i < count; i++) {
-            payments.add(new Payment(
-                   "abcd",
-                    "qwer",
-                    Integer.toUnsignedLong(i))
-            );
-        }
-
-        return payments;
+    public static Payment getOneWithReservation(Reservation reservation) {
+        return new Payment(reservation, "abcde", "qwer", 1000L);
     }
 }

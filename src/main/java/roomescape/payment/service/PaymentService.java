@@ -5,6 +5,7 @@ import roomescape.payment.client.PaymentClient;
 import roomescape.payment.dto.request.ConfirmPaymentRequest;
 import roomescape.payment.model.Payment;
 import roomescape.payment.repository.PaymentRepository;
+import roomescape.reservation.model.Reservation;
 
 @Service
 public class PaymentService {
@@ -18,8 +19,9 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    public Payment confirm(ConfirmPaymentRequest confirmPaymentRequest) {
+    public Payment confirm(final Reservation reservation, final ConfirmPaymentRequest confirmPaymentRequest) {
         Payment payment = paymentClient.confirm(confirmPaymentRequest);
+        payment.assignReservation(reservation);
         return paymentRepository.save(payment);
     }
 }

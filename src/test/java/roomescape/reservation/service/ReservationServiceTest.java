@@ -1,12 +1,5 @@
 package roomescape.reservation.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.NoSuchElementException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +25,7 @@ import roomescape.reservation.dto.response.FindAvailableTimesResponse;
 import roomescape.reservation.dto.response.FindReservationResponse;
 import roomescape.reservation.dto.response.FindReservationWithPaymentResponse;
 import roomescape.reservation.model.Reservation;
+import roomescape.reservation.model.ReservationWithPayment;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservationtime.model.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
@@ -42,6 +36,14 @@ import roomescape.util.JpaRepositoryTest;
 import roomescape.waiting.model.Waiting;
 import roomescape.waiting.repository.WaitingRepository;
 import roomescape.waiting.service.WaitingService;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @JpaRepositoryTest
 @DatabaseIsolation
@@ -218,25 +220,23 @@ class ReservationServiceTest {
     @DisplayName("내 예약 목록 조회 성공")
     void getReservationsByMember() {
         // given
-        List<Member> members = MemberFixture.get(2).stream().map(memberRepository::save).toList();
+        Member member = memberRepository.save(MemberFixture.getOne());
         ReservationTime reservationTime = reservationTimeRepository.save(ReservationTimeFixture.getOne());
         Theme theme = themeRepository.save(ThemeFixture.getOne());
 
-        Member member = members.get(0);
-        Payment payment = paymentRepository.save(new Payment("paymentKey", "orderID", 1000L));
+        Reservation reservation1 = new Reservation(member, LocalDate.parse("9999-04-10"), reservationTime, theme);
+        Reservation savedReservation1 = reservationRepository.save(reservation1);
+        Payment payment1 = paymentRepository.save(new Payment(savedReservation1, "paymentKey", "orderID", 1000L));
 
-        Reservation reservation = new Reservation(member, LocalDate.parse("2025-04-10"), reservationTime, theme);
-        reservation.assignPayment(payment);
-        Reservation savedReservation = reservationRepository.save(reservation);
-
-        Reservation reservationByOtherMember = new Reservation(member, LocalDate.parse("2025-04-10"), reservationTime, theme);
-        reservation.assignPayment(payment);
-        Reservation savedReservationByOtherMember = reservationRepository.save(reservationByOtherMember);
+        Reservation reservation2 = new Reservation(member, LocalDate.parse("9999-04-11"), reservationTime, theme);
+        Reservation savedReservation2 = reservationRepository.save(reservation2);
+        Payment payment2 = paymentRepository.save(new Payment(savedReservation2, "paymentKey", "orderID", 1000L));
         AuthInfo authInfo = new AuthInfo(member.getId(), member.getName(), member.getRole());
 
         // when & then
         assertThat(reservationService.getReservations(authInfo))
-                .containsExactly(FindReservationWithPaymentResponse.from(reservation));
+                .containsExactly(FindReservationWithPaymentResponse.from(new ReservationWithPayment(savedReservation1, payment1)),
+                        FindReservationWithPaymentResponse.from(new ReservationWithPayment(savedReservation2, payment2)));
     }
 
     @Test

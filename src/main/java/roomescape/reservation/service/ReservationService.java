@@ -62,7 +62,6 @@ public class ReservationService {
         this.paymentService = paymentService;
     }
 
-    @Transactional
     public CreateReservationResponse createMyReservationWithPayment(final AuthInfo authInfo,
                                                                     final CreateMyReservationRequest createMyReservationRequest) {
         CreateReservationRequest createReservationRequest = CreateReservationRequest.of(authInfo.getMemberId(),
@@ -70,8 +69,7 @@ public class ReservationService {
         Reservation reservation = createReservation(createReservationRequest);
 
         try {
-            Payment payment = paymentService.confirm(ConfirmPaymentRequest.from(createReservationRequest));
-            reservation.assignPayment(payment);
+            paymentService.confirm(reservation, ConfirmPaymentRequest.from(createReservationRequest));
             return CreateReservationResponse.from(reservation);
         } catch (ClientException e) {
             reservationRepository.delete(reservation);
@@ -119,7 +117,7 @@ public class ReservationService {
     }
 
     public List<FindReservationWithPaymentResponse> getReservations(final AuthInfo authInfo) {
-        return reservationRepository.findAllByMemberId(authInfo.getMemberId()).stream()
+        return reservationRepository.findAllWithPaymentByMemberId(authInfo.getMemberId()).stream()
                 .map(FindReservationWithPaymentResponse::from)
                 .toList();
     }

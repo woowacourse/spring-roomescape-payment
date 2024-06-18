@@ -1,12 +1,14 @@
 package roomescape.reservation.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import roomescape.reservation.model.Reservation;
+import roomescape.reservation.model.ReservationWithPayment;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import roomescape.reservation.model.Reservation;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
@@ -43,11 +45,22 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             on r.reservationTime.id = rt.id
             join fetch Theme t
             on r.theme.id = t.id
-            join fetch Payment p 
-            on r.payment.id = p.id 
             where m.id = :memberId
             """)
     List<Reservation> findAllByMemberId(Long memberId);
+
+    @Query("""
+            select new roomescape.reservation.model.ReservationWithPayment(
+                r, p)
+                    from Reservation r
+                    join fetch r.member m
+                    join fetch r.reservationTime rt
+                    join fetch r.theme t
+                    left outer join fetch Payment p
+                    on p.reservation = r
+                    where m.id = :memberId
+            """)
+    List<ReservationWithPayment> findAllWithPaymentByMemberId(Long memberId);
 
     List<Reservation> findAllByDateAndThemeId(LocalDate date, Long themeId);
 

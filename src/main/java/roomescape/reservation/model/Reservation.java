@@ -8,16 +8,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import roomescape.common.model.BaseEntity;
+import roomescape.member.domain.Member;
+import roomescape.reservationtime.model.ReservationTime;
+import roomescape.theme.model.Theme;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
-
-import jakarta.persistence.OneToOne;
-import roomescape.common.model.BaseEntity;
-import roomescape.member.domain.Member;
-import roomescape.payment.model.Payment;
-import roomescape.reservationtime.model.ReservationTime;
-import roomescape.theme.model.Theme;
 
 @Entity
 public class Reservation extends BaseEntity {
@@ -40,9 +38,6 @@ public class Reservation extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private Theme theme;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    private Payment payment;
 
     public Reservation(final Member member, final LocalDate date, final ReservationTime reservationTime,
                        final Theme theme) {
@@ -140,10 +135,6 @@ public class Reservation extends BaseEntity {
         this.member = member;
     }
 
-    public void assignPayment(Payment payment) {
-        this.payment = payment;
-    }
-
     public Long getId() {
         return id;
     }
@@ -162,10 +153,6 @@ public class Reservation extends BaseEntity {
 
     public Theme getTheme() {
         return theme;
-    }
-
-    public Payment getPayment() {
-        return payment;
     }
 
     @Override

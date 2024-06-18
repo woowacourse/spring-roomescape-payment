@@ -4,13 +4,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.fixture.MemberFixture;
-import roomescape.fixture.PaymentFixture;
 import roomescape.fixture.ReservationTimeFixture;
 import roomescape.fixture.ThemeFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.payment.model.Payment;
-import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.model.Reservation;
 import roomescape.reservationtime.model.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
@@ -19,7 +16,6 @@ import roomescape.theme.repository.ThemeRepository;
 import roomescape.util.JpaRepositoryTest;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,8 +32,6 @@ class ReservationRepositoryTest {
     private ThemeRepository themeRepository;
     @Autowired
     private MemberRepository memberRepository;
-    @Autowired
-    private PaymentRepository paymentRepository;
 
     @Test
     @DisplayName("저장된 모든 예약을 조회한다.")
@@ -63,22 +57,14 @@ class ReservationRepositoryTest {
         Member member = memberRepository.save(MemberFixture.getOne());
         ReservationTime reservationTime = reservationTimeRepository.save(ReservationTimeFixture.getOne());
         Theme theme = themeRepository.save(ThemeFixture.getOne());
-        List<Payment> payments = PaymentFixture.get(3)
-                .stream()
-                .map(paymentRepository::save)
-                .toList();
-
 
         Reservation reservation1 = new Reservation(member, date, reservationTime, theme);
-        reservation1.assignPayment(payments.get(0));
         Reservation savedReservation1 = reservationRepository.save(reservation1);
 
         Reservation reservation2 = new Reservation(member, date.plusDays(1), reservationTime, theme);
-        reservation2.assignPayment(payments.get(1));
         Reservation savedReservation2 = reservationRepository.save(reservation2);
 
         Reservation reservation3 = new Reservation(member, date.plusDays(2), reservationTime, theme);
-        reservation3.assignPayment(payments.get(2));
         Reservation savedReservation3 = reservationRepository.save(reservation3);
 
         assertThat(reservationRepository.findAllByMemberId(member.getId()))
