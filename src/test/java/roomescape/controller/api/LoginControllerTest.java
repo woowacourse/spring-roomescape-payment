@@ -1,89 +1,93 @@
 package roomescape.controller.api;
 
-import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import org.junit.jupiter.api.BeforeEach;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.MockMvc;
 import roomescape.controller.dto.LoginRequest;
-import roomescape.domain.member.Member;
-import roomescape.domain.member.Role;
-import roomescape.repository.MemberRepository;
+import roomescape.global.argumentresolver.AuthenticationPrincipalArgumentResolver;
+import roomescape.global.auth.CheckRoleInterceptor;
+import roomescape.global.auth.CheckUserInterceptor;
+import roomescape.service.LoginService;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@AutoConfigureRestDocs
+@WebMvcTest(LoginController.class)
 class LoginControllerTest {
 
-    @LocalServerPort
-    int port;
+    @Autowired
+    private MockMvc mockMvc;
 
     @Autowired
-    private MemberRepository memberRepository;
+    private ObjectMapper objectMapper;
 
-    private static final String ID = "admin@a.com";
-    private static final String PASSWORD = "123a!";
+    @MockBean
+    private LoginService loginService;
 
-    @BeforeEach
-    void setUpData() {
-        RestAssured.port = port;
-        memberRepository.save(new Member("관리자", ID, PASSWORD, Role.ADMIN));
-    }
+    @MockBean
+    private AuthenticationPrincipalArgumentResolver argumentResolver;
 
-    @DisplayName("성공: 로그인 성공")
+    @MockBean
+    private CheckRoleInterceptor checkRoleInterceptor;
+
+    @MockBean
+    private CheckUserInterceptor checkUserInterceptor;
+
+    @DisplayName("로그인")
     @Test
-    void login_Success() {
-        LoginRequest request = new LoginRequest(ID, PASSWORD);
-        RestAssured.given().log().all()
-            .contentType(ContentType.JSON)
-            .body(request)
-            .when().post("/login")
-            .then().log().all()
-            .statusCode(200);
+    void login() throws Exception {
+        given(loginService.login(any(), any()))
+            .willReturn("test-token");
+
+        String request = objectMapper.writeValueAsString(new LoginRequest("tre@test.com", "123a!"));
+
+        mockMvc.perform(post("/login")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+            .andDo(print())
+            .andDo(document("login/login",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestFields(
+                    fieldWithPath("email").description("로그인 이메일"),
+                    fieldWithPath("password").description("로그인 비밀번호")
+                )
+            ))
+            .andExpect(status().isOk());
     }
 
-    @DisplayName("실패: 잘못된 이메일 혹은 잘못된 비밀번호")
-    @ParameterizedTest
-    @CsvSource(value = {"admin@a.com,123a!!", "admim@a.com,123a!"})
-    void login_WrongEmail_Or_WrongPassword(String email, String password) {
-        LoginRequest request = new LoginRequest(email, password);
-        RestAssured.given().log().all()
-            .contentType(ContentType.JSON)
-            .body(request)
-            .when().post("/login")
-            .then().log().all()
-            .statusCode(HttpStatus.UNAUTHORIZED.value());
-    }
-
-    @DisplayName("성공: 토큰을 이용해서 회원 정보를 가져올 수 있다.")
+    @DisplayName("로그인 확인")
     @Test
-    void checkLogin() {
-        LoginRequest request = new LoginRequest(ID, PASSWORD);
-        String token = RestAssured.given()
-            .contentType(ContentType.JSON)
-            .body(request)
-            .when().post("/login")
-            .then().log().all().extract().header(HttpHeaders.SET_COOKIE);
-
-        RestAssured.given().log().all()
-            .header(HttpHeaders.COOKIE, token)
-            .accept(MediaType.APPLICATION_JSON_VALUE)
-            .when().get("/login/check")
-            .then().log().all()
-            .statusCode(HttpStatus.OK.value())
-            .body("name", is("관리자"))
-            .body("role", is("ADMIN"));
+    void checkLogin() throws Exception {
+        mockMvc.perform(get("/login/check")
+                .cookie(new Cookie("token", "test-token")))
+            .andDo(print())
+            .andDo(document("login/check",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestCookies(
+                    cookieWithName("token").description("사용자의 JWT 토큰")
+                )))
+            .andExpect(status().isOk());
     }
 }

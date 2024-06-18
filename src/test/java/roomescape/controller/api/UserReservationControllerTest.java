@@ -1,282 +1,229 @@
 package roomescape.controller.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.any;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+import org.springframework.test.web.servlet.MockMvc;
+import roomescape.controller.dto.CreateReservationResponse;
 import roomescape.controller.dto.CreateUserReservationRequest;
 import roomescape.controller.dto.CreateUserReservationStandbyRequest;
-import roomescape.controller.dto.LoginRequest;
-import roomescape.domain.member.Member;
-import roomescape.domain.member.Role;
-import roomescape.global.exception.RoomescapeException;
-import roomescape.repository.MemberRepository;
-import roomescape.service.AdminReservationService;
-import roomescape.service.ReservationTimeService;
-import roomescape.service.ThemeService;
-import roomescape.service.TossPaymentService;
+import roomescape.controller.dto.FindMyReservationResponse;
+import roomescape.controller.dto.PayStandbyRequest;
+import roomescape.global.argumentresolver.AuthenticationPrincipalArgumentResolver;
+import roomescape.global.auth.CheckRoleInterceptor;
+import roomescape.global.auth.CheckUserInterceptor;
 import roomescape.service.UserReservationService;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@AutoConfigureRestDocs
+@WebMvcTest(UserReservationController.class)
 class UserReservationControllerTest {
 
-    @LocalServerPort
-    int port;
+    @Autowired
+    private MockMvc mockMvc;
 
     @Autowired
-    private MemberRepository memberRepository;
+    private ObjectMapper objectMapper;
 
-    @Autowired
-    private ThemeService themeService;
-
-    @Autowired
-    private ReservationTimeService reservationTimeService;
-
-    @Autowired
-    private AdminReservationService adminReservationService;
-
-    @Autowired
+    @MockBean
     private UserReservationService userReservationService;
 
     @MockBean
-    private TossPaymentService tossPaymentService;
+    private AuthenticationPrincipalArgumentResolver argumentResolver;
 
-    private static final Long USER_ID = 1L;
-    private static final Long ANOTHER_USER_ID = 2L;
+    @MockBean
+    private CheckRoleInterceptor checkRoleInterceptor;
 
-    private static final Long TIME_ID = 1L;
-    private static final Long THEME_ID = 1L;
-
-    private static final LocalDate DATE_FIRST = LocalDate.parse("2060-01-01");
-    private static final LocalDate DATE_SECOND = LocalDate.parse("2060-01-02");
-
-    private String userToken;
+    @MockBean
+    private CheckUserInterceptor checkUserInterceptor;
 
     @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-
-        reservationTimeService.save("10:00");
-        themeService.save("t1", "설명1", "https://test.com/test.jpg");
-        memberRepository.save(new Member("러너덕", "user@a.com", "123a!", Role.USER));
-        memberRepository.save(new Member("트레", "tre@a.com", "123a!", Role.USER));
-
-        LoginRequest user = new LoginRequest("user@a.com", "123a!");
-
-        userToken = RestAssured.given()
-            .contentType(ContentType.JSON)
-            .body(user)
-            .when().post("/login")
-            .then().extract().cookie("token");
+    void auth() {
+        given(checkUserInterceptor.preHandle(any(), any(), any()))
+            .willReturn(true);
     }
 
-    @DisplayName("성공: 예약 저장 -> 201")
+    @DisplayName("유저 예약 추가")
     @Test
-    void save() {
+    void save() throws Exception {
+        given(userReservationService.reserve(any(), any()))
+            .willReturn(new CreateReservationResponse(
+                1L, "트레", LocalDate.parse("2060-01-01"), LocalTime.parse("10:00"), "방탈출 테마"));
+
+        String request = objectMapper.writeValueAsString(
+            new CreateUserReservationRequest(
+                LocalDate.parse("2060-01-01"), 1L, 1L, "5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1",
+                "MC4wODU4ODQwMzg4NDk0", 10000));
+
+        mockMvc.perform(post("/reservations")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+            .andDo(print())
+            .andDo(document("reservations/save",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestFields(
+                    fieldWithPath("date").description("예약할 날짜"),
+                    fieldWithPath("themeId").description("테마 ID"),
+                    fieldWithPath("timeId").description("예약 시간 ID"),
+                    fieldWithPath("paymentKey").description("토스 API 결제 키 값"),
+                    fieldWithPath("orderId").description("토스 API 주문번호"),
+                    fieldWithPath("amount").description("결제 금액")
+                ),
+                responseFields(
+                    fieldWithPath("id").description("예약 ID"),
+                    fieldWithPath("memberName").description("예약을 요청한 회원명"),
+                    fieldWithPath("date").description("이용일"),
+                    fieldWithPath("time").description("이용 시간"),
+                    fieldWithPath("themeName").description("예약 테마명")
+                )
+            ))
+            .andExpect(status().isCreated());
+    }
+
+    @DisplayName("유저 예약대기 결제")
+    @Test
+    void payStandby() throws Exception {
+        given(userReservationService.payStandby(any(), any()))
+            .willReturn(new CreateReservationResponse(
+                1L, "트레", LocalDate.parse("2060-01-01"), LocalTime.parse("10:00"), "방탈출 테마"));
+
+        String request = objectMapper.writeValueAsString(new PayStandbyRequest(
+            1L, "5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1", "MC4wODU4ODQwMzg4NDk0", 1000));
+
+        mockMvc.perform(post("/reservations/pay")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+            .andDo(print())
+            .andDo(document("reservations/payStandby",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestFields(
+                    fieldWithPath("reservationId").description("예약할 날짜"),
+                    fieldWithPath("paymentKey").description("토스 API 결제 키 값"),
+                    fieldWithPath("orderId").description("토스 API 주문번호"),
+                    fieldWithPath("amount").description("결제 금액")
+                ),
+                responseFields(
+                    fieldWithPath("id").description("예약 ID"),
+                    fieldWithPath("memberName").description("예약을 요청한 회원명"),
+                    fieldWithPath("date").description("이용일"),
+                    fieldWithPath("time").description("이용 시간"),
+                    fieldWithPath("themeName").description("예약 테마명")
+                )
+            ))
+            .andExpect(status().isOk());
+    }
+
+    @DisplayName("유저 예약대기 추가")
+    @Test
+    void standby() throws Exception {
+        given(userReservationService.standby(any(), any(), any(), any()))
+            .willReturn(new CreateReservationResponse(
+                1L, "트레", LocalDate.parse("2060-01-01"), LocalTime.parse("10:00"), "방탈출 테마"));
+
+        String request = objectMapper.writeValueAsString(new CreateUserReservationStandbyRequest(
+            LocalDate.parse("2060-01-01"), 1L, 1L));
+
+        mockMvc.perform(post("/reservations/standby")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+            .andDo(print())
+            .andDo(document("reservations/standby",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestFields(
+                    fieldWithPath("date").description("예약대기할 날짜"),
+                    fieldWithPath("themeId").description("테마 ID"),
+                    fieldWithPath("timeId").description("시간 ID")
+                ),
+                responseFields(
+                    fieldWithPath("id").description("예약 ID"),
+                    fieldWithPath("memberName").description("예약대기를 요청한 회원명"),
+                    fieldWithPath("date").description("이용일"),
+                    fieldWithPath("time").description("이용 시간"),
+                    fieldWithPath("themeName").description("예약 테마명")
+                )))
+            .andExpect(status().isCreated());
+    }
+
+    @DisplayName("유저 예약대기 삭제")
+    @Test
+    void deleteStandby() throws Exception {
         doNothing()
-            .when(tossPaymentService)
-            .pay(any(String.class), any(Long.class), any(String.class));
+            .when(userReservationService)
+            .deleteStandby(any(), any());
 
-        CreateUserReservationRequest request = new CreateUserReservationRequest(
-            DATE_FIRST, THEME_ID, TIME_ID, "1", "1", 1000, "1");
-
-        RestAssured.given().log().all()
-            .contentType(ContentType.JSON)
-            .cookie("token", userToken)
-            .body(request)
-            .when().post("/reservations")
-            .then().log().all()
-            .statusCode(201)
-            .body("id", is(1))
-            .body("memberName", is("러너덕"))
-            .body("date", is("2060-01-01"))
-            .body("time", is("10:00"))
-            .body("themeName", is("t1"));
+        mockMvc.perform(delete("/reservations/standby/{id}", 1))
+            .andDo(print())
+            .andDo(document("reservations/deleteStandby",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                pathParameters(
+                    parameterWithName("id").description("삭제할 예약 ID")
+                )))
+            .andExpect(status().isNoContent());
     }
 
-    @DisplayName("실패: 결제 실패 시 예약이 추가되면 안 됨")
+    @DisplayName("유저 본인의 예약 조회")
     @Test
-    void save_PaymentApprovalFailed() {
-        doThrow(RoomescapeException.class)
-            .when(tossPaymentService)
-            .pay(any(String.class), any(Long.class), any(String.class));
+    void findMyReservations() throws Exception {
+        given(userReservationService.findMyReservationsWithRank(any()))
+            .willReturn(List.of(
+                new FindMyReservationResponse(
+                    1L, "루터회관 탈출하기", LocalDate.parse("2060-01-01"), LocalTime.parse("10:00"),
+                    "RESERVED", 0L, "tgen_202406081920558t506", 1000L, "간편결제"),
+                new FindMyReservationResponse(
+                    2L, "우리집 탈출하기", LocalDate.parse("2060-01-02"), LocalTime.parse("11:00"),
+                    "RESERVED", 0L, "tgen_202406081921365GeO6", 1000L, "간편결제"),
+                new FindMyReservationResponse(
+                    3L, "교도소 탈출하기", LocalDate.parse("2060-01-03"), LocalTime.parse("12:00"),
+                    "STANDBY", 2L, "tgen_20240608192207aaQt3", 1000L, "간편결제")
+            ));
 
-        CreateUserReservationRequest request = new CreateUserReservationRequest(
-            DATE_FIRST, THEME_ID, TIME_ID, "1", "1", 1000, "1");
-
-        assertAll(
-            () -> RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", userToken)
-                .body(request)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(400),
-            () -> assertThat(adminReservationService.findAllReserved()).hasSize(0),
-            () -> assertThat(adminReservationService.findAllStandby()).hasSize(0)
-        );
-    }
-
-    @DisplayName("성공: 예약대기 추가 -> 201")
-    @Test
-    void standby() {
-        userReservationService.reserve(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
-
-        CreateUserReservationStandbyRequest request = new CreateUserReservationStandbyRequest(
-            DATE_FIRST, THEME_ID, TIME_ID);
-
-        RestAssured.given().log().all()
-            .contentType(ContentType.JSON)
-            .cookie("token", userToken)
-            .body(request)
-            .when().post("/reservations/standby")
-            .then().log().all()
-            .statusCode(201)
-            .body("id", is(2))
-            .body("memberName", is("러너덕"))
-            .body("date", is("2060-01-01"))
-            .body("time", is("10:00"))
-            .body("themeName", is("t1"));
-    }
-
-    @DisplayName("성공: 예약대기 삭제 -> 204")
-    @Test
-    void deleteStandby() {
-        userReservationService.reserve(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
-        userReservationService.standby(USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
-
-        RestAssured.given().log().all()
-            .cookie("token", userToken)
-            .when().delete("/reservations/standby/2")
-            .then().log().all()
-            .statusCode(204);
-    }
-
-    @DisplayName("실패: 다른 사람의 예약대기 삭제 -> 400")
-    @Test
-    void deleteStandby_ReservedByOther() {
-        userReservationService.reserve(USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
-        userReservationService.standby(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
-
-        RestAssured.given().log().all()
-            .cookie("token", userToken)
-            .when().delete("/reservations/standby/2")
-            .then().log().all()
-            .statusCode(400)
-            .body("message", is("자신의 예약만 삭제할 수 있습니다."));
-    }
-
-    @DisplayName("실패: 존재하지 않는 time id 예약 -> 400")
-    @Test
-    void save_TimeIdNotFound() {
-        doNothing()
-            .when(tossPaymentService)
-            .pay(any(String.class), any(Long.class), any(String.class));
-
-        CreateUserReservationRequest request = new CreateUserReservationRequest(
-            DATE_FIRST, THEME_ID, 2L, "1", "1", 1000, "1");
-
-        RestAssured.given().log().all()
-            .cookie("token", userToken)
-            .contentType(ContentType.JSON)
-            .body(request)
-            .when().post("/reservations")
-            .then().log().all()
-            .statusCode(400)
-            .body("message", is("입력한 시간 ID에 해당하는 데이터가 존재하지 않습니다."));
-    }
-
-    @DisplayName("실패: 존재하지 않는 theme id 예약 -> 400")
-    @Test
-    void save_ThemeIdNotFound() {
-        doNothing()
-            .when(tossPaymentService)
-            .pay(any(String.class), any(Long.class), any(String.class));
-
-        CreateUserReservationRequest request = new CreateUserReservationRequest(
-            DATE_FIRST, 2L, TIME_ID, "1", "1", 1000, "1");
-
-        RestAssured.given().log().all()
-            .cookie("token", userToken)
-            .contentType(ContentType.JSON)
-            .body(request)
-            .when().post("/reservations")
-            .then().log().all()
-            .statusCode(400)
-            .body("message", is("입력한 테마 ID에 해당하는 데이터가 존재하지 않습니다."));
-    }
-
-    @DisplayName("실패: 중복 예약 -> 400")
-    @Test
-    void save_Duplication() {
-        doNothing()
-            .when(tossPaymentService)
-            .pay(any(String.class), any(Long.class), any(String.class));
-
-        userReservationService.reserve(ANOTHER_USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
-
-        CreateUserReservationRequest request
-            = new CreateUserReservationRequest(DATE_FIRST, THEME_ID, TIME_ID, "123", "123", 1000, "123");
-
-        RestAssured.given().log().all()
-            .cookie("token", userToken)
-            .contentType(ContentType.JSON)
-            .body(request)
-            .when().post("/reservations")
-            .then().log().all()
-            .statusCode(400)
-            .body("message", is("해당 시간에 예약이 이미 존재합니다."));
-    }
-
-    @DisplayName("실패: 과거 시간 예약 -> 400")
-    @Test
-    void save_PastTime() {
-        CreateUserReservationRequest request = new CreateUserReservationRequest(
-            LocalDate.now().minusDays(1), THEME_ID, TIME_ID, "1", "1", 1000, "1");
-
-        RestAssured.given().log().all()
-            .cookie("token", userToken)
-            .contentType(ContentType.JSON)
-            .body(request)
-            .when().post("/reservations")
-            .then().log().all()
-            .statusCode(400)
-            .body("message", is("[date](은)는 과거 날짜로는 예약할 수 없습니다."));
-    }
-
-    @DisplayName("성공: 나의 예약 목록 조회 -> 200")
-    @Test
-    void findMyReservations() {
-        userReservationService.reserve(USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
-        userReservationService.reserve(ANOTHER_USER_ID, DATE_SECOND, TIME_ID, THEME_ID);
-        userReservationService.standby(USER_ID, DATE_SECOND, TIME_ID, THEME_ID);
-
-        RestAssured.given().log().all()
-            .cookie("token", userToken)
-            .contentType(ContentType.JSON)
-            .when().get("/reservations/mine")
-            .then().log().all()
-            .statusCode(200)
-            .body("id", contains(1, 3))
-            .body("status", contains("RESERVED", "STANDBY"))
-            .body("rank", contains(0, 1));
+        mockMvc.perform(get("/reservations/mine"))
+            .andDo(print())
+            .andDo(document("reservations/findMyReservations",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                responseFields(
+                    fieldWithPath("[].id").description("예약 ID"),
+                    fieldWithPath("[].theme").description("테마 이름"),
+                    fieldWithPath("[].date").description("이용일"),
+                    fieldWithPath("[].time").description("이용 시간"),
+                    fieldWithPath("[].status").description("예약 상태"),
+                    fieldWithPath("[].rank").description("예약 대기번호"),
+                    fieldWithPath("[].paymentKey").description("토스 API 결제 키 값"),
+                    fieldWithPath("[].amount").description("결제 금액"),
+                    fieldWithPath("[].payMethod").description("결제 수단")
+                )
+            ))
+            .andExpect(status().isOk());
     }
 }

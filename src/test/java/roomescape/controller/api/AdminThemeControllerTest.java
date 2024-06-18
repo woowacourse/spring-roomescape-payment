@@ -1,149 +1,114 @@
 package roomescape.controller.api;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import java.time.LocalDate;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.test.web.servlet.MockMvc;
 import roomescape.controller.dto.CreateThemeRequest;
-import roomescape.controller.dto.LoginRequest;
-import roomescape.domain.member.Member;
-import roomescape.domain.member.Role;
-import roomescape.repository.MemberRepository;
-import roomescape.service.AdminReservationService;
-import roomescape.service.ReservationTimeService;
+import roomescape.controller.dto.CreateThemeResponse;
+import roomescape.global.argumentresolver.AuthenticationPrincipalArgumentResolver;
+import roomescape.global.auth.CheckRoleInterceptor;
+import roomescape.global.auth.CheckUserInterceptor;
 import roomescape.service.ThemeService;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@AutoConfigureRestDocs
+@WebMvcTest(AdminThemeController.class)
 class AdminThemeControllerTest {
 
-    @LocalServerPort
-    int port;
+    @Autowired
+    private MockMvc mockMvc;
 
     @Autowired
-    private MemberRepository memberRepository;
+    private ObjectMapper objectMapper;
 
-    @Autowired
+    @MockBean
     private ThemeService themeService;
 
-    @Autowired
-    private ReservationTimeService reservationTimeService;
+    @MockBean
+    private AuthenticationPrincipalArgumentResolver argumentResolver;
 
-    @Autowired
-    private AdminReservationService adminReservationService;
+    @MockBean
+    private CheckRoleInterceptor checkRoleInterceptor;
 
-    private String adminToken;
+    @MockBean
+    private CheckUserInterceptor checkUserInterceptor;
 
     @BeforeEach
-    void setUpToken() {
-        RestAssured.port = port;
-
-        memberRepository.save(new Member("관리자", "admin@a.com", "123a!", Role.ADMIN));
-
-        LoginRequest admin = new LoginRequest("admin@a.com", "123a!");
-
-        adminToken = RestAssured.given()
-            .contentType(ContentType.JSON)
-            .body(admin)
-            .when().post("/login")
-            .then().extract().cookie("token");
+    void setUp() {
+        given(checkRoleInterceptor.preHandle(any(), any(), any()))
+            .willReturn(true);
     }
 
-    @DisplayName("성공: 테마 생성 -> 201")
+    @DisplayName("어드민 테마 저장")
     @Test
-    void save() {
-        CreateThemeRequest request = new CreateThemeRequest("t1", "d1", "https://test.com/test.jpg");
+    void save() throws Exception {
+        given(themeService.save(any(), any(), any()))
+            .willReturn(new CreateThemeResponse(1L, "방탈출 테마명", "방탈출 테마 설명", "https://test.com/test.jpg"));
 
-        RestAssured.given().log().all()
-            .cookie("token", adminToken)
-            .contentType(ContentType.JSON)
-            .body(request)
-            .when().post("/admin/themes")
-            .then().log().all()
-            .statusCode(201)
-            .body("id", is(1))
-            .body("name", is("t1"))
-            .body("description", is("d1"))
-            .body("thumbnail", is("https://test.com/test.jpg"));
+        String request = objectMapper.writeValueAsString(
+            new CreateThemeRequest("테마명", "테마 설명", "https://test.com/test.jpg"));
+
+        mockMvc.perform(post("/admin/themes")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+            .andDo(print())
+            .andDo(document("admin/themes/save",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestFields(
+                    fieldWithPath("name").description("테마 이름"),
+                    fieldWithPath("description").description("테마 설명"),
+                    fieldWithPath("thumbnail").description("테마 썸네일 URL")
+                ),
+                responseFields(
+                    fieldWithPath("id").description("추가된 테마 ID"),
+                    fieldWithPath("name").description("추가된 테마 이름"),
+                    fieldWithPath("description").description("추가된 테마 설명"),
+                    fieldWithPath("thumbnail").description("추가된 테마 썸네일 URL")
+                )
+            ))
+            .andExpect(status().isCreated());
     }
 
-    @DisplayName("성공: 테마 삭제 -> 204")
+    @DisplayName("어드민 테마 삭제")
     @Test
-    void delete() {
-        themeService.save("t1", "d1", "https://test.com/test1.jpg");
-        themeService.save("t2", "d2", "https://test.com/test2.jpg");
-        themeService.save("t3", "d3", "https://test.com/test3.jpg");
+    void delete() throws Exception {
+        doNothing()
+            .when(themeService)
+            .delete(1L);
 
-        RestAssured.given().log().all()
-            .cookie("token", adminToken)
-            .when().delete("/admin/themes/2")
-            .then().log().all()
-            .statusCode(204);
-
-        RestAssured.given().log().all()
-            .cookie("token", adminToken)
-            .when().get("/themes")
-            .then().log().all()
-            .statusCode(200)
-            .body("id", contains(1, 3));
-    }
-
-    @DisplayName("실패: 잘못된 포맷으로 테마 생성 -> 400")
-    @Test
-    void save_IllegalTheme() {
-        CreateThemeRequest request = new CreateThemeRequest("theme4", "desc4", "hello.jpg");
-
-        RestAssured.given().log().all()
-            .cookie("token", adminToken)
-            .contentType(ContentType.JSON)
-            .body(request)
-            .when().post("/admin/themes")
-            .then().log().all()
-            .statusCode(400)
-            .body("message", containsString("올바른 URL 형식이 아닙니다."));
-    }
-
-    @DisplayName("실패: 중복 테마 추가 -> 400")
-    @Test
-    void save_Duplicate() {
-        themeService.save("t1", "d1", "https://test.com/test.jpg");
-
-        CreateThemeRequest request = new CreateThemeRequest("t1", "d2", "https://test2.com/test.jpg");
-
-        RestAssured.given().log().all()
-            .cookie("token", adminToken)
-            .contentType(ContentType.JSON)
-            .body(request)
-            .when().post("/admin/themes")
-            .then().log().all()
-            .statusCode(400)
-            .body("message", is("같은 이름의 테마가 이미 존재합니다."));
-    }
-
-    @DisplayName("실패: 예약에서 사용되는 테마 삭제 -> 400")
-    @Test
-    void delete_ReservationExists() {
-        reservationTimeService.save("10:00");
-        themeService.save("테마1", "설명1", "https://test.com/test.jpg");
-        adminReservationService.reserve(1L, LocalDate.parse("2060-01-01"), 1L, 1L);
-
-        RestAssured.given().log().all()
-            .cookie("token", adminToken)
-            .when().delete("/admin/themes/1")
-            .then().log().all()
-            .statusCode(400)
-            .body("message", is("해당 테마를 사용하는 예약이 존재하여 삭제할 수 없습니다."));
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/admin/themes/{id}", 1))
+            .andDo(print())
+            .andDo(document("admin/themes/delete",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                pathParameters(
+                    parameterWithName("id").description("삭제할 테마 ID")
+                )
+            ))
+            .andExpect(status().isNoContent());
     }
 }

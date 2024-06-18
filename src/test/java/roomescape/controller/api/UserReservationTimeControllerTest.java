@@ -1,80 +1,81 @@
 package roomescape.controller.api;
 
-import static org.hamcrest.Matchers.contains;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import java.time.LocalDate;
-import org.junit.jupiter.api.BeforeEach;
+import java.time.LocalTime;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
-import roomescape.controller.dto.LoginRequest;
-import roomescape.domain.member.Member;
-import roomescape.domain.member.Role;
-import roomescape.repository.MemberRepository;
-import roomescape.service.AdminReservationService;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.web.servlet.MockMvc;
+import roomescape.controller.dto.FindTimeAndAvailabilityResponse;
+import roomescape.global.argumentresolver.AuthenticationPrincipalArgumentResolver;
+import roomescape.global.auth.CheckRoleInterceptor;
+import roomescape.global.auth.CheckUserInterceptor;
 import roomescape.service.ReservationTimeService;
-import roomescape.service.ThemeService;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@AutoConfigureRestDocs
+@WebMvcTest(UserReservationTimeController.class)
 class UserReservationTimeControllerTest {
 
-    @LocalServerPort
-    int port;
-
     @Autowired
-    private MemberRepository memberRepository;
+    private MockMvc mockMvc;
 
-    @Autowired
-    private ThemeService themeService;
-
-    @Autowired
+    @MockBean
     private ReservationTimeService reservationTimeService;
 
-    @Autowired
-    private AdminReservationService adminReservationService;
+    @MockBean
+    private AuthenticationPrincipalArgumentResolver argumentResolver;
 
-    private String userToken;
+    @MockBean
+    private CheckRoleInterceptor checkRoleInterceptor;
 
-    @BeforeEach
-    void setUpToken() {
-        RestAssured.port = port;
+    @MockBean
+    private CheckUserInterceptor checkUserInterceptor;
 
-        memberRepository.save(new Member("러너덕", "user@a.com", "123a!", Role.USER));
-
-        LoginRequest user = new LoginRequest("user@a.com", "123a!");
-
-        userToken = RestAssured.given()
-            .contentType(ContentType.JSON)
-            .body(user)
-            .when().post("/login")
-            .then().extract().cookie("token");
-    }
-
-    @DisplayName("성공: 날짜, 테마 ID로부터 예약 시간 및 가능 여부 반환")
+    @DisplayName("유저 날짜 & 테마별 시간 목록 및 예약 가능 여부 조회")
     @Test
-    void findAllWithAvailability() {
-        reservationTimeService.save("10:00");
-        reservationTimeService.save("23:00");
-        themeService.save("t1", "d1", "https://test.com/test.jpg");
-        adminReservationService.reserve(1L, LocalDate.parse("2060-01-01"), 1L, 1L);
+    void findAllWithAvailability() throws Exception {
+        given(reservationTimeService.findAllWithBookAvailability(any(), any()))
+            .willReturn(List.of(
+                new FindTimeAndAvailabilityResponse(1L, LocalTime.parse("10:00"), true),
+                new FindTimeAndAvailabilityResponse(2L, LocalTime.parse("11:00"), false),
+                new FindTimeAndAvailabilityResponse(3L, LocalTime.parse("12:00"), false),
+                new FindTimeAndAvailabilityResponse(4L, LocalTime.parse("13:00"), true)
+            ));
 
-        RestAssured.given().log().all()
-            .cookie("token", userToken)
-            .queryParam("date", "2060-01-01")
-            .queryParam("id", 1L)
-            .when().get("/times/available")
-            .then().log().all()
-            .statusCode(200)
-            .body("id", contains(1, 2))
-            .body("startAt", contains("10:00", "23:00"))
-            .body("alreadyBooked", contains(true, false));
+        mockMvc.perform(get("/times/available")
+                .param("date", "2060-01-01")
+                .param("id", "1"))
+            .andDo(print())
+            .andDo(document("times/available",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                queryParameters(
+                    parameterWithName("date").description("이용일"),
+                    parameterWithName("id").description("테마 ID")
+                ),
+                responseFields(
+                    fieldWithPath("[].id").description("시간 ID"),
+                    fieldWithPath("[].startAt").description("이용 시간"),
+                    fieldWithPath("[].alreadyBooked").description("이미 예약되었는지 여부 (true인 경우 이미 예약되어 예약 불가)")
+                )
+            ))
+            .andExpect(status().isOk());
     }
 }

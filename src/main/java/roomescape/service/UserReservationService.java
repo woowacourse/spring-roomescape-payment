@@ -6,11 +6,15 @@ import static roomescape.domain.reservation.ReservationStatus.STANDBY;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.controller.dto.CreateReservationResponse;
+import roomescape.controller.dto.CreateUserReservationRequest;
 import roomescape.controller.dto.FindMyReservationResponse;
+import roomescape.controller.dto.PayStandbyRequest;
 import roomescape.domain.member.Member;
+import roomescape.domain.reservation.PaymentInfo;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
@@ -20,10 +24,14 @@ import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
-import roomescape.repository.dto.ReservationWithRank;
+import roomescape.repository.dto.MyReservationDto;
+import roomescape.service.dto.TossPaymentResponseDto;
 
 @Service
 public class UserReservationService {
+
+    private final TossPaymentService tossPaymentService;
+    private final PaymentInfoService paymentInfoService;
 
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -31,10 +39,15 @@ public class UserReservationService {
     private final MemberRepository memberRepository;
 
     public UserReservationService(
+        TossPaymentService tossPaymentService,
+        PaymentInfoService paymentInfoService,
         ReservationRepository reservationRepository,
         ReservationTimeRepository reservationTimeRepository,
-        ThemeRepository themeRepository, MemberRepository memberRepository) {
-
+        ThemeRepository themeRepository,
+        MemberRepository memberRepository
+    ) {
+        this.tossPaymentService = tossPaymentService;
+        this.paymentInfoService = paymentInfoService;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
@@ -42,31 +55,36 @@ public class UserReservationService {
     }
 
     @Transactional
-    public CreateReservationResponse reserve(Long memberId, LocalDate date, Long timeId, Long themeId) {
-        validateDuplication(date, timeId, themeId);
-        return save(memberId, date, timeId, themeId, RESERVED);
+    public CreateReservationResponse reserve(Long memberId, CreateUserReservationRequest request) {
+        validateDuplication(request.date(), request.timeId(), request.themeId());
+        TossPaymentResponseDto paymentInfo = tossPaymentService.pay(
+            request.orderId(), request.amount(), request.paymentKey());
+
+        Reservation reservation = save(memberId, request.date(), request.timeId(), request.themeId(), RESERVED);
+        paymentInfoService.save(paymentInfo, reservation);
+
+        return CreateReservationResponse.from(reservation);
     }
 
     @Transactional
     public CreateReservationResponse standby(Long memberId, LocalDate date, Long timeId, Long themeId) {
         validateAlreadyBookedByMember(memberId, date, timeId, themeId);
-        return save(memberId, date, timeId, themeId, STANDBY);
+        Reservation reservation = save(memberId, date, timeId, themeId, STANDBY);
+        return CreateReservationResponse.from(reservation);
     }
 
-    private CreateReservationResponse save(Long memberId, LocalDate date, Long timeId, Long themeId,
-        ReservationStatus status) {
+    private Reservation save(Long memberId, LocalDate date, Long timeId, Long themeId, ReservationStatus status) {
         Member member = memberRepository.findById(memberId)
             .orElseThrow(() -> new RoomescapeException("입력한 사용자 ID에 해당하는 데이터가 존재하지 않습니다."));
         ReservationTime time = reservationTimeRepository.findById(timeId)
             .orElseThrow(() -> new RoomescapeException("입력한 시간 ID에 해당하는 데이터가 존재하지 않습니다."));
         Theme theme = themeRepository.findById(themeId)
             .orElseThrow(() -> new RoomescapeException("입력한 테마 ID에 해당하는 데이터가 존재하지 않습니다."));
-        LocalDateTime createdAt = LocalDateTime.now();
 
-        Reservation reservation = new Reservation(member, date, createdAt, time, theme, status);
+        LocalDateTime createdAt = LocalDateTime.now();
         validatePastReservation(date, time);
 
-        return CreateReservationResponse.from(reservationRepository.save(reservation));
+        return reservationRepository.save(new Reservation(member, date, createdAt, time, theme, status));
     }
 
     private void validateDuplication(LocalDate date, Long timeId, Long themeId) {
@@ -106,24 +124,50 @@ public class UserReservationService {
         }
 
         reservationRepository.deleteById(reservation.getId());
-        approveNextWaiting(reservation);
-    }
-
-    private void approveNextWaiting(Reservation reservation) {
-        reservationRepository.findFirstByDateAndTimeIdAndThemeIdOrderByCreatedAtAsc(
-            reservation.getDate(),
-            reservation.getTime().getId(),
-            reservation.getTheme().getId()
-        ).ifPresent(Reservation::reserve);
     }
 
     @Transactional(readOnly = true)
     public List<FindMyReservationResponse> findMyReservationsWithRank(Long memberId) {
-        List<ReservationWithRank> reservations =
-            reservationRepository.findReservationsWithRankByMemberId(memberId);
+        List<MyReservationDto> data = reservationRepository.findReservationsWithRankByMemberId(memberId);
 
-        return reservations.stream()
-            .map(data -> FindMyReservationResponse.from(data.reservation(), data.rank()))
+        return data.stream()
+            .map(d -> FindMyReservationResponse.from(
+                d.reservation(),
+                d.rank(),
+                Optional.ofNullable(d.paymentInfo())
+                    .orElse(new PaymentInfo(null, null, null, d.reservation()))
+            ))
             .toList();
+    }
+
+    @Transactional
+    public CreateReservationResponse payStandby(PayStandbyRequest request, Member member) {
+        Reservation reservation = reservationRepository.findById(request.reservationId())
+            .orElseThrow(() -> new RoomescapeException("예약이 존재하지 않습니다."));
+        validateReservation(member, reservation);
+
+        TossPaymentResponseDto paymentInfo = tossPaymentService.pay(
+            request.orderId(), request.amount(), request.paymentKey());
+
+        paymentInfoService.save(paymentInfo, reservation);
+        reservation.reserve();
+        return CreateReservationResponse.from(reservation);
+    }
+
+    private void validateReservation(Member member, Reservation reservation) {
+        if (reservation.isReserved()) {
+            throw new RoomescapeException("이미 결제된 예약입니다.");
+        }
+        if (reservation.isNotReservedBy(member)) {
+            throw new RoomescapeException("자신의 예약만 결제할 수 있습니다.");
+        }
+        if (reservationRepository.countByTimeAndThemeAndDateAndCreatedAtBefore(
+            reservation.getTime(),
+            reservation.getTheme(),
+            reservation.getDate(),
+            reservation.getCreatedAt()) > 0
+        ) {
+            throw new RoomescapeException("결제대기 상태에서만 결제할 수 있습니다.");
+        }
     }
 }

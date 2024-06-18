@@ -1,6 +1,7 @@
 package roomescape.repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -10,7 +11,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
-import roomescape.repository.dto.ReservationWithRank;
+import roomescape.domain.reservation.ReservationTime;
+import roomescape.domain.theme.Theme;
+import roomescape.repository.dto.MyReservationDto;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
@@ -36,10 +39,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @EntityGraph(attributePaths = {"member", "theme", "time"}, type = EntityGraphType.FETCH)
     List<Reservation> findAllByStatusOrderByDateAscTimeStartAtAsc(ReservationStatus status);
 
-    Optional<Reservation> findFirstByDateAndTimeIdAndThemeIdOrderByCreatedAtAsc(LocalDate date, Long timeId, Long themeId);
+    long countByTimeAndThemeAndDateAndCreatedAtBefore(
+        ReservationTime time, Theme theme, LocalDate date, LocalDateTime createdAt);
 
     @Query("""
-        SELECT new roomescape.repository.dto.ReservationWithRank(
+        SELECT new roomescape.repository.dto.MyReservationDto(
             r, (
                 SELECT COUNT(r2)
                 FROM Reservation r2
@@ -47,13 +51,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                 AND r2.date = r.date
                 AND r2.time = r.time
                 AND r2.createdAt < r.createdAt
-            )
+            ), p
         )
-        FROM Reservation r
+        FROM Reservation r LEFT JOIN PaymentInfo p ON p.reservation.id = r.id
         WHERE r.member.id = :memberId
         ORDER BY
             r.date ASC,
             r.time.startAt ASC
         """)
-    List<ReservationWithRank> findReservationsWithRankByMemberId(Long memberId);
+    List<MyReservationDto> findReservationsWithRankByMemberId(Long memberId);
 }

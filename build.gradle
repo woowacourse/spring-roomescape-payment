@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '3.2.4'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'java'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
 }
 
 group = 'nextstep'
@@ -10,6 +11,14 @@ sourceCompatibility = '17'
 
 repositories {
     mavenCentral()
+}
+
+configurations {
+    asciidoctorExt
+
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 dependencies {
@@ -23,12 +32,38 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-impl:0.11.2'
     implementation 'io.jsonwebtoken:jjwt-gson:0.11.2'
 
+    implementation 'mysql:mysql-connector-java:8.0.32'
+
     runtimeOnly 'com.h2database:h2'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.rest-assured:rest-assured:5.3.1'
+
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+}
+
+ext {
+    snippetsDir = file('build/generated-snippets')
 }
 
 test {
     useJUnitPlatform()
+    outputs.dir snippetsDir
+}
+
+asciidoctor {
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+    dependsOn test
+}
+
+tasks.register('copyDocument', Copy) {
+    dependsOn asciidoctor
+    from file("build/docs/asciidoc")
+    into file("src/main/resources/static/docs")
+}
+
+bootJar {
+    dependsOn copyDocument
 }

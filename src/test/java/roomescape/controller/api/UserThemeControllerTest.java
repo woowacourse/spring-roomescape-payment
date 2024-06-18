@@ -1,119 +1,96 @@
 package roomescape.controller.api;
 
-import static org.hamcrest.Matchers.contains;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
-import roomescape.controller.dto.LoginRequest;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.test.web.servlet.MockMvc;
+import roomescape.controller.dto.FindThemeResponse;
+import roomescape.global.argumentresolver.AuthenticationPrincipalArgumentResolver;
+import roomescape.global.auth.CheckRoleInterceptor;
+import roomescape.global.auth.CheckUserInterceptor;
 import roomescape.service.ThemeService;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@AutoConfigureRestDocs
+@WebMvcTest(UserThemeController.class)
 class UserThemeControllerTest {
 
-    @LocalServerPort
-    int port;
-
     @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
     private ThemeService themeService;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    @MockBean
+    private AuthenticationPrincipalArgumentResolver argumentResolver;
 
-    private String userToken;
+    @MockBean
+    private CheckRoleInterceptor checkRoleInterceptor;
 
-    @BeforeEach
-    void setUpToken() {
-        RestAssured.port = port;
+    @MockBean
+    private CheckUserInterceptor checkUserInterceptor;
 
-        jdbcTemplate.update(
-            "INSERT INTO member(name, email, password, role) VALUES ('러너덕', 'user@a.com', '123a!', 'USER')");
+    @DisplayName("유저 전체 테마 조회")
+    @Test
+    void findAll() throws Exception {
+        given(themeService.findAll())
+            .willReturn(List.of(
+                new FindThemeResponse(1L, "루터회관 탈출하기", "테마 설명1", "https://test.com/test1.jpg"),
+                new FindThemeResponse(2L, "우리집 탈출하기", "테마 설명2", "https://test.com/test2.jpg"),
+                new FindThemeResponse(3L, "교도소 탈출하기", "테마 설명3", "https://test.com/test3.jpg")
+            ));
 
-        LoginRequest user = new LoginRequest("user@a.com", "123a!");
-
-        userToken = RestAssured.given()
-            .contentType(ContentType.JSON)
-            .body(user)
-            .when().post("/login")
-            .then().extract().cookie("token");
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/themes"))
+            .andDo(print())
+            .andDo(document("themes/findAll",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                responseFields(
+                    fieldWithPath("[].id").description("테마 ID"),
+                    fieldWithPath("[].name").description("테마 이름"),
+                    fieldWithPath("[].description").description("테마 설명"),
+                    fieldWithPath("[].thumbnail").description("썸네일 이미지 URL")
+                )
+            ))
+            .andExpect(status().isOk());
     }
 
-    @DisplayName("성공: 테마 조회 -> 200")
+    @DisplayName("유저 인기 테마 조회")
     @Test
-    void findAll() {
-        themeService.save("t1", "d1", "https://test.com/test1.jpg");
-        themeService.save("t2", "d2", "https://test.com/test2.jpg");
+    void findPopular() throws Exception {
+        given(themeService.findPopular())
+            .willReturn(List.of(
+                new FindThemeResponse(1L, "1위 테마", "테마 설명1", "https://test.com/test1.jpg"),
+                new FindThemeResponse(2L, "2위 테마", "테마 설명2", "https://test.com/test2.jpg"),
+                new FindThemeResponse(3L, "3위 테마", "테마 설명3", "https://test.com/test3.jpg")
+            ));
 
-        RestAssured.given().log().all()
-            .cookie("token", userToken)
-            .contentType(ContentType.JSON)
-            .when().get("/themes")
-            .then().log().all()
-            .statusCode(200)
-            .body("id", contains(1, 2))
-            .body("name", contains("t1", "t2"))
-            .body("description", contains("d1", "d2"));
-    }
-
-    @DisplayName("성공: 최근 일주일 내 상위 10개의 인기 테마 조회 -> 200")
-    @Test
-    void findPopular() {
-        // 테마3(5회) > 테마2(4회) > 테마4(3회) > 테마5(1회) > 테마1(0회) 순서로 나오는지 검증
-        // 테마1을 9일 전 예약으로 추가하여 경계값 테스트
-
-        jdbcTemplate.update("""
-            INSERT INTO theme(name, description, thumbnail)
-            VALUES ('테마1', 'd1', 'https://test.com/test1.jpg'),
-                   ('테마2', 'd2', 'https://test.com/test2.jpg'),
-                   ('테마3', 'd3', 'https://test.com/test3.jpg'),
-                   ('테마4', 'd4', 'https://test.com/test4.jpg'),
-                   ('테마5', 'd5', 'https://test.com/test5.jpg');
-                   
-            INSERT INTO reservation_time(start_at)
-            VALUES ('08:00'),
-                   ('09:00'),
-                   ('10:00'),
-                   ('11:00'),
-                   ('12:00');
-                   
-            INSERT INTO reservation(member_id, reserved_date, created_at, time_id, theme_id, status)
-            VALUES (1, TIMESTAMPADD(DAY, -1, CURRENT_DATE), '2024-01-01', 1, 3, 'RESERVED'),
-                   (1, TIMESTAMPADD(DAY, -1, CURRENT_DATE), '2024-01-01', 2, 3, 'RESERVED'),
-                   (1, TIMESTAMPADD(DAY, -1, CURRENT_DATE), '2024-01-01', 3, 3, 'RESERVED'),
-                   (1, TIMESTAMPADD(DAY, -1, CURRENT_DATE), '2024-01-01', 4, 3, 'RESERVED'),
-                   (1, TIMESTAMPADD(DAY, -1, CURRENT_DATE), '2024-01-01', 5, 3, 'RESERVED'),
-                   
-                   (1, TIMESTAMPADD(DAY, -6, CURRENT_DATE), '2024-01-01', 1, 2, 'RESERVED'),
-                   (1, TIMESTAMPADD(DAY, -6, CURRENT_DATE), '2024-01-01', 2, 2, 'RESERVED'),
-                   (1, TIMESTAMPADD(DAY, -6, CURRENT_DATE), '2024-01-01', 3, 2, 'RESERVED'),
-                   (1, TIMESTAMPADD(DAY, -6, CURRENT_DATE), '2024-01-01', 4, 2, 'RESERVED'),
-                   
-                   (1, TIMESTAMPADD(DAY, -7, CURRENT_DATE), '2024-01-01', 1, 4, 'RESERVED'),
-                   (1, TIMESTAMPADD(DAY, -7, CURRENT_DATE), '2024-01-01', 2, 4, 'RESERVED'),
-                   (1, TIMESTAMPADD(DAY, -7, CURRENT_DATE), '2024-01-01', 3, 4, 'RESERVED'),
-                   
-                   (1, TIMESTAMPADD(DAY, -8, CURRENT_DATE), '2024-01-01', 1, 5, 'RESERVED'),
-                   (1, TIMESTAMPADD(DAY, -8, CURRENT_DATE), '2024-01-01', 2, 5, 'RESERVED'),
-                   
-                   (1, TIMESTAMPADD(DAY, -9, CURRENT_DATE), '2024-01-01', 1, 1, 'RESERVED'),
-                   (1, TIMESTAMPADD(DAY, -9, CURRENT_DATE), '2024-01-01', 2, 1, 'RESERVED'),
-                   (1, TIMESTAMPADD(DAY, -9, CURRENT_DATE), '2024-01-01', 3, 1, 'RESERVED')
-            """);
-
-        RestAssured.given().log().all()
-            .when().get("/themes/trending")
-            .then().log().all()
-            .statusCode(200)
-            .body("id", contains(3, 2, 4, 5, 1));
+        mockMvc.perform(RestDocumentationRequestBuilders.get("/themes/trending"))
+            .andDo(print())
+            .andDo(document("themes/findPopular",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                responseFields(
+                    fieldWithPath("[].id").description("테마 ID"),
+                    fieldWithPath("[].name").description("테마 이름"),
+                    fieldWithPath("[].description").description("테마 설명"),
+                    fieldWithPath("[].thumbnail").description("썸네일 이미지 URL")
+                )
+            ))
+            .andExpect(status().isOk());
     }
 }

@@ -19,24 +19,53 @@ function render(data) {
     const date = item.date;
     const time = item.time;
     const rank = item.rank;
-    const status = item.status === 'RESERVED' ? '예약' : rank + '번째 예약대기';
+
+    let status;
+    if (item.status === 'RESERVED') {
+      status = '예약';
+    } else {
+      if (item.rank === 0) {
+        status = '결제대기';
+      } else {
+        status = rank + '번째 예약대기';
+      }
+    }
 
     row.insertCell(0).textContent = theme;
     row.insertCell(1).textContent = date;
     row.insertCell(2).textContent = time;
     row.insertCell(3).textContent = status;
+    row.insertCell(4).textContent = item.paymentKey;
+    row.insertCell(5).textContent = item.amount;
+    row.insertCell(6).textContent = item.payMethod;
+    row.insertCell(7).textContent = '';
+    row.insertCell(8).textContent = '';
 
-    if (status !== '예약') { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드, 상태 값은 변경 가능
-      const cancelCell = row.insertCell(4);
+    if (item.status === 'STANDBY') {
+      // 예약대기 상태
+      const cancelCell = row.insertCell(8);
       const cancelButton = document.createElement('button');
-      cancelButton.textContent = '취소';
+      cancelButton.textContent = '대기취소';
       cancelButton.className = 'btn btn-danger';
       cancelButton.onclick = function () {
         requestDeleteWaiting(item.id).then(() => window.location.reload());
       };
       cancelCell.appendChild(cancelButton);
-    } else { // 예약 완료 상태일 때
-      row.insertCell(4).textContent = '';
+    } else {
+      // 예약 완료 상태
+      row.insertCell(8).textContent = '';
+    }
+
+    if (item.status === 'STANDBY' && item.rank === 0) {
+      // 결제대기 상태
+      const paySell = row.insertCell(7);
+      const payButton = document.createElement('button');
+      payButton.textContent = '결제';
+      payButton.className = 'btn btn-primary';
+      payButton.onclick = function () {
+        window.open("payment?id=" + item.id, "결제 창", "width=900, height=600, location=no");
+      };
+      paySell.appendChild(payButton);
     }
   });
 }

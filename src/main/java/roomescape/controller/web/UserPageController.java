@@ -25,4 +25,9 @@ public class UserPageController {
     public String getMyReservationPage() {
         return "reservation-mine";
     }
+
+    @GetMapping("/payment")
+    public String getPaymentPopupPage() {
+        return "payment-popup";
+    }
 }

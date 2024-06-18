@@ -19,7 +19,6 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 import roomescape.global.exception.PaymentException;
 import roomescape.service.config.TossPaymentConfigProperties;
-import roomescape.service.util.TossPaymentErrorCodeUtils;
 
 @EnableConfigurationProperties(value = TossPaymentConfigProperties.class)
 @TestPropertySource("classpath:application.yml")
@@ -41,7 +40,7 @@ class TossPaymentServiceTest {
         @Autowired TossPaymentConfigProperties properties
     ) {
         this.restTemplate = builder.build();
-        this.paymentService = new TossPaymentService(properties, restTemplate, new TossPaymentErrorCodeUtils());
+        this.paymentService = new TossPaymentService(properties, restTemplate);
     }
 
     @BeforeEach

@@ -19,6 +19,9 @@ spring:
     url: jdbc:h2:mem:database
     username: sa
     password:
+  sql:
+    init:
+      encoding: utf-8
 
 security:
   jwt:
@@ -29,3 +32,7 @@ security:
 toss-payment:
   payment-approval-url: https://api.tosspayments.com/v1/payments/confirm
   test-secret-key: "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:"
+
+logging:
+  level:
+    root: debug

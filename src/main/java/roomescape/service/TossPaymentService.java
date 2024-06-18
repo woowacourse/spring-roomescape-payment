@@ -1,5 +1,7 @@
 package roomescape.service;
 
+import static roomescape.service.util.TossPaymentDisplayableErrorCode.NOT_DISPLAYABLE_ERROR;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.ResourceAccessException;
@@ -10,35 +12,30 @@ import roomescape.global.exception.PaymentException;
 import roomescape.service.config.TossPaymentConfigProperties;
 import roomescape.service.dto.TossPaymentRequestDto;
 import roomescape.service.dto.TossPaymentResponseDto;
-import roomescape.service.util.TossPaymentErrorCodeUtils;
+import roomescape.service.util.TossPaymentDisplayableErrorCode;
 
 @Service
 public class TossPaymentService {
 
     private final TossPaymentConfigProperties properties;
     private final RestTemplate restTemplate;
-    private final TossPaymentErrorCodeUtils errorCodeUtils;
 
-    public TossPaymentService(TossPaymentConfigProperties properties,
-        RestTemplate restTemplate,
-        TossPaymentErrorCodeUtils errorCodeUtils
-    ) {
+    public TossPaymentService(TossPaymentConfigProperties properties, RestTemplate restTemplate) {
         this.properties = properties;
         this.restTemplate = restTemplate;
-        this.errorCodeUtils = errorCodeUtils;
     }
 
     @Transactional
-    public void pay(String orderId, long amount, String paymentKey) {
+    public TossPaymentResponseDto pay(String orderId, long amount, String paymentKey) {
         try {
-            TossPaymentResponseDto responseDto = restTemplate.postForEntity(
+            return restTemplate.postForObject(
                 properties.getPaymentApprovalUrl(),
                 new TossPaymentRequestDto(orderId, amount, paymentKey),
                 TossPaymentResponseDto.class
-            ).getBody();
+            );
         } catch (RestClientResponseException e) {
             PaymentErrorMessageResponse response = e.getResponseBodyAs(PaymentErrorMessageResponse.class);
-            if (response == null || errorCodeUtils.isNotDisplayableErrorCode(response.code())) {
+            if (response == null || TossPaymentDisplayableErrorCode.from(response.code()) == NOT_DISPLAYABLE_ERROR) {
                 throw new PaymentException("결제가 승인되지 않았습니다. 같은 문제가 반복된다면 은행이나 카드사로 문의 바랍니다.");
             }
             throw new PaymentException(response.message());

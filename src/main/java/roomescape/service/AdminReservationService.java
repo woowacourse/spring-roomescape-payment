@@ -79,7 +79,6 @@ public class AdminReservationService {
             .orElseThrow(() -> new RoomescapeException("예약이 존재하지 않아 삭제할 수 없습니다."));
 
         reservationRepository.deleteById(reservation.getId());
-        approveNextWaiting(reservation);
     }
 
     @Transactional
@@ -87,15 +86,6 @@ public class AdminReservationService {
         Reservation reservation = reservationRepository.findByIdAndStatus(id, STANDBY)
             .orElseThrow(() -> new RoomescapeException("예약대기가 존재하지 않아 삭제할 수 없습니다."));
         reservationRepository.deleteById(reservation.getId());
-        approveNextWaiting(reservation);
-    }
-
-    private void approveNextWaiting(Reservation reservation) {
-        reservationRepository.findFirstByDateAndTimeIdAndThemeIdOrderByCreatedAtAsc(
-            reservation.getDate(),
-            reservation.getTime().getId(),
-            reservation.getTheme().getId()
-        ).ifPresent(Reservation::reserve);
     }
 
     @Transactional(readOnly = true)

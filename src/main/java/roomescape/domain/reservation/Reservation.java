@@ -1,5 +1,6 @@
 package roomescape.domain.reservation;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -54,6 +56,9 @@ public class Reservation {
     @Column(name = "status")
     private ReservationStatus status;
 
+    @OneToOne(mappedBy = "reservation", cascade = CascadeType.REMOVE)
+    private PaymentInfo paymentInfo;
+
     public Reservation(Member Member, LocalDate date, LocalDateTime createdAt, ReservationTime time, Theme theme,
         ReservationStatus status) {
         this(null, Member, date, createdAt, time, theme, status);
@@ -76,6 +81,10 @@ public class Reservation {
 
     public boolean isNotReservedBy(Member member) {
         return !this.member.getId().equals(member.getId());
+    }
+
+    public boolean isReserved() {
+        return this.status == ReservationStatus.RESERVED;
     }
 
     public void reserve() {
@@ -108,5 +117,9 @@ public class Reservation {
 
     public ReservationStatus getStatus() {
         return status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 }

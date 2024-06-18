@@ -1,0 +1,115 @@
+= REST Docs
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+== Reservation API (일반 사용자)
+
+=== 예약 저장
+
+operation::reservations/save[snippets='http-request,request-fields,http-response,response-fields']
+
+=== 예약대기 저장
+
+operation::reservations/standby[snippets='http-request,request-fields,http-response,response-fields']
+
+=== 본인의 예약 조회
+
+operation::reservations/findMyReservations[snippets='http-request,http-response,response-fields']
+
+=== 예약대기 결제
+
+operation::reservations/payStandby[snippets='http-request,request-fields,http-response,response-fields']
+
+=== 예약대기 삭제
+
+operation::reservations/deleteStandby[snippets='http-request,path-parameters,http-response']
+
+== Reservation API (어드민)
+
+=== 예약 추가
+
+operation::admin/reservations/save[snippets='http-request,request-fields,http-response,response-fields']
+
+=== 예약 필터링 조회
+
+operation::admin/reservations/find[snippets='http-request,query-parameters,http-response,response-fields']
+
+=== 예약 전체 조회
+
+operation::admin/reservations/findAll[snippets='http-request,http-response,response-fields']
+
+=== 예약대기 전체 조회
+
+operation::admin/reservations/findAllStandby[snippets='http-request,http-response,response-fields']
+
+=== 예약 삭제
+
+operation::admin/reservations/delete[snippets='http-request,path-parameters,http-response']
+
+=== 예약대기 삭제
+
+operation::admin/reservations/deleteStandby[snippets='http-request,path-parameters,http-response']
+
+== Reservation Time API (일반 사용자)
+
+=== 해당 날짜, 테마의 예약시간 및 예약 가능 여부 조회
+
+operation::times/available[snippets='http-request,query-parameters,http-response,response-fields']
+
+== Reservation Time API (어드민)
+
+=== 예약 시간 저장
+
+operation::admin/times/save[snippets='http-request,request-fields,http-response,response-fields']
+
+=== 예약 시간 전체 조회
+
+operation::admin/times/findAll[snippets='http-request,http-response,response-fields']
+
+=== 예약 시간 삭제
+
+operation::admin/times/delete[snippets='http-request,path-parameters,http-response']
+
+== Theme API (일반 사용자)
+
+=== 테마 전체 조회
+
+operation::themes/findAll[snippets='http-request,http-response,response-fields']
+
+=== 테마 조회 (인기)
+
+operation::themes/findPopular[snippets='http-request,http-response,response-fields']
+
+== Theme API (어드민)
+
+=== 테마 저장
+
+operation::admin/themes/save[snippets='http-request,request-fields,http-response,response-fields']
+
+=== 테마 삭제
+
+operation::admin/themes/delete[snippets='http-request,path-parameters,http-response']
+
+== Member API
+
+=== 멤버 전체 조회
+
+operation::members/findAll[snippets='http-request,http-response,response-fields']
+
+== Login API
+
+=== 로그인
+
+operation::login/login[snippets='http-request,request-fields,http-response']
+
+=== 토큰 정보로부터 이름, 역할 받아오기
+
+operation::login/check[snippets='http-request,http-response']
+
+=== 로그아웃
+
+operation::logout/logout[snippets='http-request,http-response']

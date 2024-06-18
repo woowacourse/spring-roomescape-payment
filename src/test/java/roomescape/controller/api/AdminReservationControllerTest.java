@@ -1,163 +1,241 @@
 package roomescape.controller.api;
 
-import static org.hamcrest.Matchers.contains;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
-import roomescape.controller.dto.LoginRequest;
-import roomescape.domain.member.Member;
-import roomescape.domain.member.Role;
-import roomescape.repository.MemberRepository;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.test.web.servlet.MockMvc;
+import roomescape.controller.dto.CreateReservationRequest;
+import roomescape.controller.dto.CreateReservationResponse;
+import roomescape.controller.dto.FindReservationResponse;
+import roomescape.controller.dto.FindReservationStandbyResponse;
+import roomescape.global.argumentresolver.AuthenticationPrincipalArgumentResolver;
+import roomescape.global.auth.CheckRoleInterceptor;
+import roomescape.global.auth.CheckUserInterceptor;
 import roomescape.service.AdminReservationService;
-import roomescape.service.ReservationTimeService;
-import roomescape.service.ThemeService;
-import roomescape.service.UserReservationService;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@AutoConfigureRestDocs
+@WebMvcTest(AdminReservationController.class)
 class AdminReservationControllerTest {
 
-    @LocalServerPort
-    int port;
+    @Autowired
+    private MockMvc mockMvc;
 
     @Autowired
-    private MemberRepository memberRepository;
+    private ObjectMapper objectMapper;
 
-    @Autowired
-    private ThemeService themeService;
-
-    @Autowired
-    private ReservationTimeService reservationTimeService;
-
-    @Autowired
+    @MockBean
     private AdminReservationService adminReservationService;
 
-    @Autowired
-    private UserReservationService userReservationService;
+    @MockBean
+    private AuthenticationPrincipalArgumentResolver argumentResolver;
 
-    private static final Long ADMIN_ID = 1L;
-    private static final Long USER_ID = 2L;
+    @MockBean
+    private CheckRoleInterceptor checkRoleInterceptor;
 
-    private static final Long TIME_ID = 1L;
-    private static final Long THEME_ID = 1L;
-
-    private static final LocalDate DATE_FIRST = LocalDate.parse("2060-01-01");
-    private static final LocalDate DATE_SECOND = LocalDate.parse("2060-01-02");
-
-    private String adminToken;
-    private String userToken;
+    @MockBean
+    private CheckUserInterceptor checkUserInterceptor;
 
     @BeforeEach
     void setUp() {
-        RestAssured.port = port;
-
-        reservationTimeService.save("10:00");
-        themeService.save("테마1", "설명1", "https://test.com/test.jpg");
-        memberRepository.save(new Member("관리자", "admin@a.com", "123a!", Role.ADMIN));
-        memberRepository.save(new Member("사용자", "user@a.com", "123a!", Role.USER));
-
-        LoginRequest admin = new LoginRequest("admin@a.com", "123a!");
-        LoginRequest user = new LoginRequest("user@a.com", "123a!");
-
-        adminToken = RestAssured.given()
-            .contentType(ContentType.JSON)
-            .body(admin)
-            .when().post("/login")
-            .then().extract().cookie("token");
-
-        userToken = RestAssured.given()
-            .contentType(ContentType.JSON)
-            .body(user)
-            .when().post("/login")
-            .then().extract().cookie("token");
+        given(checkRoleInterceptor.preHandle(any(), any(), any()))
+            .willReturn(true);
     }
 
-    @DisplayName("성공: 예약 삭제 가능, 다음 순위 예약대기는 자동 예약")
+    @DisplayName("어드민 예약 저장")
     @Test
-    void delete() {
-        userReservationService.reserve(ADMIN_ID, DATE_FIRST, TIME_ID, THEME_ID);
-        userReservationService.standby(USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
-        userReservationService.reserve(ADMIN_ID, DATE_SECOND, TIME_ID, THEME_ID);
-        userReservationService.standby(USER_ID, DATE_SECOND, TIME_ID, THEME_ID);
+    void save() throws Exception {
+        given(adminReservationService.reserve(any(), any(), any(), any()))
+            .willReturn(new CreateReservationResponse(
+                1L,
+                "트레",
+                LocalDate.parse("2060-01-01"),
+                LocalTime.parse("10:00"),
+                "테마"
+            ));
 
-        RestAssured.given().log().all()
-            .cookie("token", adminToken)
-            .when().delete("/admin/reservations/1")
-            .then().log().all()
-            .statusCode(204);
+        String request = objectMapper.writeValueAsString(
+            new CreateReservationRequest(1L, LocalDate.parse("2060-01-01"), 1L, 1L));
 
-        RestAssured.given().log().all()
-            .cookie("token", adminToken)
-            .when().get("/admin/reservations")
-            .then().log().all()
-            .statusCode(200)
-            .body("id", contains(2, 3));
-
-        RestAssured.given().log().all()
-            .cookie("token", adminToken)
-            .when().get("/admin/reservations/standby")
-            .then().log().all()
-            .statusCode(200)
-            .body("id", contains(4));
+        mockMvc.perform(post("/admin/reservations")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+            .andDo(print())
+            .andDo(document("admin/reservations/save",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestFields(
+                    fieldWithPath("memberId").description("회원 ID"),
+                    fieldWithPath("date").description("이용일"),
+                    fieldWithPath("timeId").description("예약 시간 ID"),
+                    fieldWithPath("themeId").description("테마 ID")
+                ),
+                responseFields(
+                    fieldWithPath("id").description("예약 ID"),
+                    fieldWithPath("memberName").description("예약을 요청한 회원명"),
+                    fieldWithPath("date").description("이용일"),
+                    fieldWithPath("time").description("이용 시간"),
+                    fieldWithPath("themeName").description("예약 테마명")
+                )
+            ))
+            .andExpect(status().isCreated());
     }
 
-    @DisplayName("실패: 일반 유저가 예약 삭제 -> 401")
+    @DisplayName("어드민 예약 삭제")
     @Test
-    void delete_ByUnauthorizedUser() {
-        RestAssured.given().log().all()
-            .cookie("token", userToken)
-            .when().delete("/admin/reservations/3")
-            .then().log().all()
-            .statusCode(401);
+    void delete() throws Exception {
+        doNothing()
+            .when(adminReservationService)
+            .deleteById(1L);
+
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/admin/reservations/{id}", 1L))
+            .andDo(print())
+            .andDo(document("admin/reservations/delete",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                pathParameters(
+                    parameterWithName("id").description("예약 ID")
+                )
+            ))
+            .andExpect(status().isNoContent());
     }
 
-    @DisplayName("성공: 전체 예약 조회 -> 200")
+    @DisplayName("어드민 전체 예약 조회")
     @Test
-    void findAll() {
-        adminReservationService.reserve(ADMIN_ID, DATE_FIRST, TIME_ID, THEME_ID);
-        adminReservationService.reserve(USER_ID, DATE_SECOND, TIME_ID, THEME_ID);
+    void findAll() throws Exception {
+        given(adminReservationService.findAllReserved())
+            .willReturn(List.of(
+                new FindReservationResponse(
+                    1L, "트레", LocalDate.parse("2060-01-01"), LocalTime.parse("10:00"), "우테코 탈출하기"),
+                new FindReservationResponse(
+                    2L, "호돌", LocalDate.parse("2060-01-02"), LocalTime.parse("11:00"), "루터회관 탈출하기")
+            ));
 
-        RestAssured.given().log().all()
-            .cookie("token", adminToken)
-            .when().get("/admin/reservations")
-            .then().log().all()
-            .statusCode(200)
-            .body("id", contains(1, 2));
+        mockMvc.perform(get("/admin/reservations"))
+            .andDo(print())
+            .andDo(document("admin/reservations/findAll",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                responseFields(
+                    fieldWithPath("[].id").description("예약 ID"),
+                    fieldWithPath("[].memberName").description("예약을 요청한 회원명"),
+                    fieldWithPath("[].date").description("이용일"),
+                    fieldWithPath("[].time").description("이용 시간"),
+                    fieldWithPath("[].themeName").description("예약 테마명")
+                )
+            ))
+            .andExpect(status().isOk());
     }
 
-    @DisplayName("실패: 일반 유저가 전체 예약 조회 -> 401")
+    @DisplayName("어드민 전체 예약대기 조회")
     @Test
-    void findAll_ByUnauthorizedUser() {
-        RestAssured.given().log().all()
-            .cookie("token", userToken)
-            .when().get("/admin/reservations")
-            .then().log().all()
-            .statusCode(401);
+    void findAllStandby() throws Exception {
+        given(adminReservationService.findAllStandby())
+            .willReturn(List.of(
+                new FindReservationStandbyResponse(
+                    3L, "트레", "공포의 방탈출", LocalDate.parse("2060-01-01"), LocalTime.parse("10:00")),
+                new FindReservationStandbyResponse(
+                    4L, "호돌", "신나는 방탈출", LocalDate.parse("2060-01-02"), LocalTime.parse("11:00"))
+            ));
+
+        mockMvc.perform(get("/admin/reservations/standby"))
+            .andDo(print())
+            .andDo(document("admin/reservations/findAllStandby",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                responseFields(
+                    fieldWithPath("[].id").description("예약 ID"),
+                    fieldWithPath("[].name").description("예약한 회원명"),
+                    fieldWithPath("[].theme").description("테마 이름"),
+                    fieldWithPath("[].date").description("이용일"),
+                    fieldWithPath("[].startAt").description("이용 시간")
+                )
+            ))
+            .andExpect(status().isOk());
     }
 
-    @DisplayName("성공: 전체 대기목록 조회 -> 200")
+    @DisplayName("어드민 예약대기 삭제")
     @Test
-    void findAllStandby() {
-        userReservationService.reserve(ADMIN_ID, DATE_FIRST, TIME_ID, THEME_ID);
-        userReservationService.standby(USER_ID, DATE_FIRST, TIME_ID, THEME_ID);
-        userReservationService.reserve(ADMIN_ID, DATE_SECOND, TIME_ID, THEME_ID);
-        userReservationService.standby(USER_ID, DATE_SECOND, TIME_ID, THEME_ID);
+    void deleteStandby() throws Exception {
+        doNothing()
+            .when(adminReservationService)
+            .deleteStandby(any());
 
-        RestAssured.given().log().all()
-            .cookie("token", adminToken)
-            .when().get("/admin/reservations/standby")
-            .then().log().all()
-            .statusCode(200)
-            .body("id", contains(2, 4));
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/admin/reservations/standby/{reservationId}", 1L))
+            .andDo(print())
+            .andDo(document("admin/reservations/deleteStandby",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                pathParameters(
+                    parameterWithName("reservationId").description("예약 ID")
+                )
+            ))
+            .andExpect(status().isNoContent());
+    }
+
+    @DisplayName("어드민 필터로 예약 조회")
+    @Test
+    void find() throws Exception {
+        given(adminReservationService.findAllByFilter(any(), any(), any(), any()))
+            .willReturn(List.of(
+                new FindReservationResponse(
+                    1L, "트레", LocalDate.parse("2060-01-01"), LocalTime.parse("10:00"), "우테코 탈출하기"),
+                new FindReservationResponse(
+                    2L, "트레", LocalDate.parse("2060-01-02"), LocalTime.parse("11:00"), "우테코 탈출하기"),
+                new FindReservationResponse(
+                    3L, "트레", LocalDate.parse("2060-01-03"), LocalTime.parse("12:00"), "우테코 탈출하기")
+            ));
+
+        mockMvc.perform(get("/admin/reservations/search")
+                .param("themeId", "1")
+                .param("memberId", "1")
+                .param("dateFrom", "2060-01-01")
+                .param("dateTo", "2060-01-03"))
+            .andDo(print())
+            .andDo(document("admin/reservations/find",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                queryParameters(
+                    parameterWithName("themeId").description("검색할 테마 ID"),
+                    parameterWithName("memberId").description("검색할 회원 ID"),
+                    parameterWithName("dateFrom").description("검색 날짜 시작일"),
+                    parameterWithName("dateTo").description("검색 날짜 종료일")
+                ),
+                responseFields(
+                    fieldWithPath("[].id").description("예약 ID"),
+                    fieldWithPath("[].memberName").description("예약한 회원명"),
+                    fieldWithPath("[].date").description("이용일"),
+                    fieldWithPath("[].time").description("이용 시간"),
+                    fieldWithPath("[].themeName").description("테마 이름")
+                )
+            ))
+            .andExpect(status().isOk());
     }
 }

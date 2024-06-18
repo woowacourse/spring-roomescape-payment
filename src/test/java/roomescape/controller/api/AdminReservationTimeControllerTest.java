@@ -1,163 +1,135 @@
 package roomescape.controller.api;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import java.time.LocalDate;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.test.web.servlet.MockMvc;
 import roomescape.controller.dto.CreateTimeRequest;
-import roomescape.controller.dto.LoginRequest;
-import roomescape.domain.member.Member;
-import roomescape.domain.member.Role;
-import roomescape.repository.MemberRepository;
-import roomescape.service.AdminReservationService;
+import roomescape.controller.dto.CreateTimeResponse;
+import roomescape.controller.dto.FindTimeResponse;
+import roomescape.global.argumentresolver.AuthenticationPrincipalArgumentResolver;
+import roomescape.global.auth.CheckRoleInterceptor;
+import roomescape.global.auth.CheckUserInterceptor;
 import roomescape.service.ReservationTimeService;
-import roomescape.service.ThemeService;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@Sql(scripts = "/truncate.sql", executionPhase = ExecutionPhase.AFTER_TEST_METHOD)
+@AutoConfigureRestDocs
+@WebMvcTest(AdminReservationTimeController.class)
 class AdminReservationTimeControllerTest {
 
-    @LocalServerPort
-    int port;
+    @Autowired
+    private MockMvc mockMvc;
 
     @Autowired
-    private MemberRepository memberRepository;
+    private ObjectMapper objectMapper;
 
-    @Autowired
-    private ThemeService themeService;
-
-    @Autowired
+    @MockBean
     private ReservationTimeService reservationTimeService;
 
-    @Autowired
-    private AdminReservationService adminReservationService;
+    @MockBean
+    private AuthenticationPrincipalArgumentResolver argumentResolver;
 
-    private String adminToken;
+    @MockBean
+    private CheckRoleInterceptor checkRoleInterceptor;
+
+    @MockBean
+    private CheckUserInterceptor checkUserInterceptor;
 
     @BeforeEach
-    void setUpToken() {
-        RestAssured.port = port;
-
-        memberRepository.save(new Member("관리자", "admin@a.com", "123a!", Role.ADMIN));
-
-        LoginRequest admin = new LoginRequest("admin@a.com", "123a!");
-
-        adminToken = RestAssured.given()
-            .contentType(ContentType.JSON)
-            .body(admin)
-            .when().post("/login")
-            .then().extract().cookie("token");
+    void setUp() {
+        given(checkRoleInterceptor.preHandle(any(), any(), any()))
+            .willReturn(true);
     }
 
-    @DisplayName("성공: 예약 시간 저장 -> 201")
+    @DisplayName("어드민 시간 저장")
     @Test
-    void save() {
-        RestAssured.given().log().all()
-            .cookie("token", adminToken)
-            .contentType(ContentType.JSON)
-            .body(new CreateTimeRequest("00:00"))
-            .when().post("/admin/times")
-            .then().log().all()
-            .statusCode(201)
-            .body("id", is(1))
-            .body("startAt", is("00:00"));
+    void save() throws Exception {
+        given(reservationTimeService.save(any()))
+            .willReturn(new CreateTimeResponse(1L, LocalTime.parse("10:00")));
+
+        String request = objectMapper.writeValueAsString(new CreateTimeRequest("10:00"));
+
+        mockMvc.perform(post("/admin/times")
+                .content(request)
+                .contentType(APPLICATION_JSON))
+            .andDo(print())
+            .andDo(document("admin/times/save",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                requestFields(
+                    fieldWithPath("startAt").description("추가하려는 시간")
+                ),
+                responseFields(
+                    fieldWithPath("id").description("추가된 시간 ID"),
+                    fieldWithPath("startAt").description("추가된 시간")
+                )
+            ))
+            .andExpect(status().isCreated());
     }
 
-    @DisplayName("성공: 예약 시간 삭제 -> 204")
+    @DisplayName("어드민 시간 삭제")
     @Test
-    void delete() {
-        reservationTimeService.save("10:00");
-        reservationTimeService.save("12:00");
-        reservationTimeService.save("14:00");
+    void delete() throws Exception {
+        doNothing()
+            .when(reservationTimeService)
+            .delete(1L);
 
-        RestAssured.given().log().all()
-            .cookie("token", adminToken)
-            .contentType(ContentType.JSON)
-            .when().delete("/admin/times/2")
-            .then().log().all()
-            .statusCode(204);
+        mockMvc.perform(RestDocumentationRequestBuilders.delete("/admin/times/{id}", 1L))
+            .andDo(print())
+            .andDo(document("admin/times/delete",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                pathParameters(
+                    parameterWithName("id").description("삭제할 시간 ID")
+                )
+            ))
+            .andExpect(status().isNoContent());
 
-        RestAssured.given().log().all()
-            .cookie("token", adminToken)
-            .contentType(ContentType.JSON)
-            .when().get("/admin/times")
-            .then().log().all()
-            .statusCode(200)
-            .body("id", contains(1, 3));
     }
 
-    @DisplayName("성공: 예약 시간 조회 -> 200")
+    @DisplayName("어드민 전체 시간 조회")
     @Test
-    void findAll() {
-        reservationTimeService.save("10:00");
-        reservationTimeService.save("23:00");
+    void findAll() throws Exception {
+        given(reservationTimeService.findAll())
+            .willReturn(List.of(
+                new FindTimeResponse(1L, LocalTime.parse("10:00")),
+                new FindTimeResponse(2L, LocalTime.parse("11:00"))
+            ));
 
-        RestAssured.given().log().all()
-            .cookie("token", adminToken)
-            .contentType(ContentType.JSON)
-            .when().get("/admin/times")
-            .then().log().all()
-            .statusCode(200)
-            .body("id", contains(1, 2))
-            .body("startAt", contains("10:00", "23:00"));
-    }
-
-    @DisplayName("실패: 잘못된 포맷의 예약 시간 저장 -> 400")
-    @Test
-    void save_IllegalTimeFormat() {
-        CreateTimeRequest request = new CreateTimeRequest("24:00");
-
-        RestAssured.given().log().all()
-            .cookie("token", adminToken)
-            .contentType(ContentType.JSON)
-            .body(request)
-            .when().post("/admin/times")
-            .then().log().all()
-            .statusCode(400)
-            .body("message", containsString("HH:mm 형식으로 입력해 주세요."));
-    }
-
-    @DisplayName("예약이 존재하는 시간 삭제 -> 400")
-    @Test
-    void delete_ReservationExists() {
-        reservationTimeService.save("10:00");
-        themeService.save("테마1", "설명1", "https://test.com/test.jpg");
-        adminReservationService.reserve(1L, LocalDate.parse("2060-01-01"), 1L, 1L);
-
-        RestAssured.given().log().all()
-            .cookie("token", adminToken)
-            .contentType(ContentType.JSON)
-            .when().delete("/admin/times/1")
-            .then().log().all()
-            .statusCode(400)
-            .body("message", is("해당 시간을 사용하는 예약이 존재하여 삭제할 수 없습니다."));
-    }
-
-    @DisplayName("실패: 이미 존재하는 시간을 저장 -> 400")
-    @Test
-    void save_Duplicate() {
-        reservationTimeService.save("10:00");
-
-        RestAssured.given().log().all()
-            .cookie("token", adminToken)
-            .contentType(ContentType.JSON)
-            .body(new CreateTimeRequest("10:00"))
-            .when().post("/admin/times")
-            .then().log().all()
-            .statusCode(400)
-            .body("message", is("이미 존재하는 시간은 추가할 수 없습니다."));
+        mockMvc.perform(get("/admin/times"))
+            .andDo(print())
+            .andDo(document("admin/times/findAll",
+                preprocessRequest(prettyPrint()),
+                preprocessResponse(prettyPrint()),
+                responseFields(
+                    fieldWithPath("[].id").description("시간 ID"),
+                    fieldWithPath("[].startAt").description("시간")
+                )
+            ))
+            .andExpect(status().isOk());
     }
 }
-
