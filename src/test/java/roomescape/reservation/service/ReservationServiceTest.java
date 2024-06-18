@@ -16,6 +16,7 @@ import roomescape.member.repository.MemberRepository;
 import roomescape.payment.FakePaymentClient;
 import roomescape.payment.client.PaymentProperties;
 import roomescape.payment.model.Payment;
+import roomescape.payment.model.PaymentStatus;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.CreateMyReservationRequest;
@@ -226,11 +227,11 @@ class ReservationServiceTest {
 
         Reservation reservation1 = new Reservation(member, LocalDate.parse("9999-04-10"), reservationTime, theme);
         Reservation savedReservation1 = reservationRepository.save(reservation1);
-        Payment payment1 = paymentRepository.save(new Payment(savedReservation1, "paymentKey", "orderID", 1000L));
+        Payment payment1 = paymentRepository.save(new Payment(savedReservation1, "paymentKey", "orderID", 1000L, PaymentStatus.SUCCESS));
 
         Reservation reservation2 = new Reservation(member, LocalDate.parse("9999-04-11"), reservationTime, theme);
         Reservation savedReservation2 = reservationRepository.save(reservation2);
-        Payment payment2 = paymentRepository.save(new Payment(savedReservation2, "paymentKey", "orderID", 1000L));
+        Payment payment2 = paymentRepository.save(new Payment(savedReservation2, "paymentKey", "orderID", 1000L, PaymentStatus.SUCCESS));
         AuthInfo authInfo = new AuthInfo(member.getId(), member.getName(), member.getRole());
 
         // when & then

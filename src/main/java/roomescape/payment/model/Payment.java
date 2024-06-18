@@ -1,6 +1,8 @@
 package roomescape.payment.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,11 +29,16 @@ public class Payment extends BaseEntity {
 
     private Long totalAmount;
 
-    public Payment(final Reservation reservation, final String paymentKey, final String orderId, final Long totalAmount) {
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
+
+    public Payment(final Reservation reservation, final String paymentKey, final String orderId,
+                   final Long totalAmount, final PaymentStatus status) {
         this.reservation = reservation;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.totalAmount = totalAmount;
+        this.status = status;
     }
 
     protected Payment() {
@@ -61,6 +68,10 @@ public class Payment extends BaseEntity {
         return totalAmount;
     }
 
+    public PaymentStatus getStatus() {
+        return status;
+    }
+
     @Override
     public boolean equals(Object object) {
         if (this == object) return true;
@@ -72,16 +83,5 @@ public class Payment extends BaseEntity {
     @Override
     public int hashCode() {
         return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return "Payment{" +
-               "id=" + id +
-               ", reservation=" + reservation +
-               ", paymentKey='" + paymentKey + '\'' +
-               ", orderId='" + orderId + '\'' +
-               ", totalAmount=" + totalAmount +
-               '}';
     }
 }

@@ -5,10 +5,10 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.common.exception.ClientException;
 import roomescape.common.exception.ForbiddenException;
+import roomescape.common.exception.PaymentException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.dto.request.ConfirmPaymentRequest;
-import roomescape.payment.model.Payment;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.CreateMyReservationRequest;
 import roomescape.reservation.dto.request.CreateReservationByAdminRequest;
@@ -71,7 +71,7 @@ public class ReservationService {
         try {
             paymentService.confirm(reservation, ConfirmPaymentRequest.from(createReservationRequest));
             return CreateReservationResponse.from(reservation);
-        } catch (ClientException e) {
+        } catch (ClientException | PaymentException e) {
             reservationRepository.delete(reservation);
             throw e;
         }

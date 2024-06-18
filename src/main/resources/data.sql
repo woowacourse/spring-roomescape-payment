@@ -41,18 +41,18 @@ INSERT INTO reservation (member_id, date, reservation_time_id, theme_id, created
 INSERT INTO reservation (member_id, date, reservation_time_id, theme_id, created_at, modified_at) values ( 2, '2024-11-03', 1, 4, current_timestamp, current_timestamp);
 INSERT INTO reservation (member_id, date, reservation_time_id, theme_id, created_at, modified_at) values ( 3, '2024-11-04', 2, 5, current_timestamp, current_timestamp);
 
-INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, created_at, modified_at) values (1, 'paymentKey1', 'orderId1', 1000, current_timestamp, current_timestamp);
-INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, created_at, modified_at) values (2, 'paymentKey2', 'orderId2', 2000, current_timestamp, current_timestamp);
-INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, created_at, modified_at) values (3, 'paymentKey3', 'orderId3', 3000, current_timestamp, current_timestamp);
-INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, created_at, modified_at) values (4, 'paymentKey4', 'orderId4', 4000, current_timestamp, current_timestamp);
-INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, created_at, modified_at) values (5, 'paymentKey5', 'orderId5', 5000, current_timestamp, current_timestamp);
-INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, created_at, modified_at) values (6, 'paymentKey6', 'orderId6', 6000, current_timestamp, current_timestamp);
-INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, created_at, modified_at) values (7, 'paymentKey7', 'orderId7', 7000, current_timestamp, current_timestamp);
-INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, created_at, modified_at) values (8, 'paymentKey8', 'orderId8', 8000, current_timestamp, current_timestamp);
-INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, created_at, modified_at) values (9, 'paymentKey9', 'orderId9', 9000, current_timestamp, current_timestamp);
-INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, created_at, modified_at) values (10, 'paymentKey10','orderId10', 10000, current_timestamp, current_timestamp);
-INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, created_at, modified_at) values (11, 'paymentKey11','orderId11', 11000, current_timestamp, current_timestamp);
-INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, created_at, modified_at) values (12, 'paymentKey12','orderId12', 12000, current_timestamp, current_timestamp);
+INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, status, created_at, modified_at) values (1, 'paymentKey1', 'orderId1', 1000, 'SUCCESS', current_timestamp, current_timestamp);
+INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, status, created_at, modified_at) values (2, 'paymentKey2', 'orderId2', 2000, 'SUCCESS', current_timestamp, current_timestamp);
+INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, status, created_at, modified_at) values (3, 'paymentKey3', 'orderId3', 3000, 'SUCCESS', current_timestamp, current_timestamp);
+INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, status, created_at, modified_at) values (4, 'paymentKey4', 'orderId4', 4000, 'SUCCESS', current_timestamp, current_timestamp);
+INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, status, created_at, modified_at) values (5, 'paymentKey5', 'orderId5', 5000, 'SUCCESS', current_timestamp, current_timestamp);
+INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, status, created_at, modified_at) values (6, 'paymentKey6', 'orderId6', 6000, 'SUCCESS', current_timestamp, current_timestamp);
+INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, status, created_at, modified_at) values (7, 'paymentKey7', 'orderId7', 7000, 'SUCCESS', current_timestamp, current_timestamp);
+INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, status, created_at, modified_at) values (8, 'paymentKey8', 'orderId8', 8000, 'SUCCESS', current_timestamp, current_timestamp);
+INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, status, created_at, modified_at) values (9, 'paymentKey9', 'orderId9', 9000, 'SUCCESS', current_timestamp, current_timestamp);
+INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, status, created_at, modified_at) values (10, 'paymentKey10','orderId10', 10000, 'SUCCESS', current_timestamp, current_timestamp);
+INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, status, created_at, modified_at) values (11, 'paymentKey11','orderId11', 11000, 'SUCCESS', current_timestamp, current_timestamp);
+INSERT INTO payment (reservation_id, payment_key, order_id, total_amount, status, created_at, modified_at) values (12, 'paymentKey12','orderId12', 12000, 'SUCCESS', current_timestamp, current_timestamp);
 
 INSERT INTO waiting (reservation_id, member_id, created_at, modified_at) VALUES (1, 1, current_timestamp, current_timestamp);
 INSERT INTO waiting (reservation_id, member_id, created_at, modified_at) VALUES (1, 2, current_timestamp, current_timestamp);
