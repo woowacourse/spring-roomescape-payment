@@ -8,10 +8,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.schedule.ReservationTime;
 import roomescape.domain.schedule.Schedule;
 import roomescape.domain.theme.Theme;
@@ -20,6 +22,7 @@ import roomescape.exception.UnauthorizedException;
 @Entity
 @Table(name = "reservation")
 public class Reservation {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,6 +36,9 @@ public class Reservation {
     @ManyToOne
     private Theme theme;
 
+    @OneToOne
+    private Payment payment;
+
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
@@ -44,6 +50,18 @@ public class Reservation {
         this.schedule = schedule;
         this.theme = theme;
         this.status = status;
+    }
+
+    public Reservation(Member member, Schedule schedule, Theme theme, Payment payment, ReservationStatus status) {
+        this.member = member;
+        this.schedule = schedule;
+        this.theme = theme;
+        this.payment = payment;
+        this.status = status;
+    }
+
+    public Reservation toPaid(Payment payment) {
+        return new Reservation(this.member, this.schedule, this.theme, payment, this.status);
     }
 
     public void checkCancelAuthority(long memberId) {
@@ -83,4 +101,9 @@ public class Reservation {
     public Schedule getSchedule() {
         return schedule;
     }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
 }

@@ -13,6 +13,8 @@ public record MemberReservationResponse(
         String theme,
         @DateFormatConstraint LocalDate date,
         @TimeFormatConstraint LocalTime time,
+        String paymentKey,
+        long amount,
         String status
 ) {
     public static MemberReservationResponse from(Reservation reservation) {
@@ -21,6 +23,8 @@ public record MemberReservationResponse(
                 reservation.getTheme().getName().getValue(),
                 reservation.getDate(),
                 reservation.getTime(),
+                reservation.getPayment().getPaymentKey(),
+                reservation.getPayment().getAmount(),
                 reservation.getStatus().getDescription()
         );
     }
@@ -32,6 +36,8 @@ public record MemberReservationResponse(
                 waiting.getTheme().getName().getValue(),
                 waiting.getScheduleDate(),
                 waiting.getSchedule().getTime(),
+                waiting.getPayment().getPaymentKey(),
+                waiting.getPayment().getAmount(),
                 waitingWithRank.rank() + "번째 예약대기"
         );
     }

@@ -14,6 +14,8 @@ import roomescape.Fixture;
 import roomescape.auth.TokenProvider;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
@@ -36,6 +38,8 @@ class ReservationWaitingServiceTest extends ServiceTestBase {
     private ReservationWaitingService reservationWaitingService;
     @Autowired
     private ReservationWaitingRepository reservationWaitingRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
     @Autowired
@@ -112,7 +116,8 @@ class ReservationWaitingServiceTest extends ServiceTestBase {
     void deleteById() {
         // given
         Schedule schedule = new Schedule(ReservationDate.of(Fixture.tomorrow), reservationTime);
-        ReservationWaiting waiting = new ReservationWaiting(member, theme, schedule);
+        Payment payment = paymentRepository.save(new Payment("ADMIN", "ADMIN", 0));
+        ReservationWaiting waiting = new ReservationWaiting(member, theme, schedule, payment);
         ReservationWaiting target = reservationWaitingRepository.save(waiting);
 
         // when

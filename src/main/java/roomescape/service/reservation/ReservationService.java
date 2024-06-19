@@ -6,6 +6,8 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
@@ -21,6 +23,7 @@ import roomescape.exception.InvalidMemberException;
 import roomescape.exception.InvalidReservationException;
 import roomescape.service.member.dto.MemberReservationResponse;
 import roomescape.service.payment.PaymentRestClient;
+import roomescape.service.payment.dto.PaymentResult;
 import roomescape.service.reservation.dto.AdminReservationRequest;
 import roomescape.service.reservation.dto.ReservationFilterRequest;
 import roomescape.service.reservation.dto.ReservationRequest;
@@ -34,35 +37,42 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final ReservationWaitingRepository reservationWaitingRepository;
     private final PaymentRestClient paymentRestClient;
+    private final PaymentRepository paymentRepository;
 
     public ReservationService(
             ReservationRepository reservationRepository,
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
             MemberRepository memberRepository,
-            ReservationWaitingRepository reservationWaitingRepository, PaymentRestClient paymentRestClient) {
+            ReservationWaitingRepository reservationWaitingRepository, PaymentRestClient paymentRestClient,
+            PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.reservationWaitingRepository = reservationWaitingRepository;
         this.paymentRestClient = paymentRestClient;
+        this.paymentRepository = paymentRepository;
     }
 
     public ReservationResponse create(AdminReservationRequest adminReservationRequest) {
         ReservationRequest reservationRequest = ReservationRequest.fromAdminRequest(adminReservationRequest);
         Reservation reservation = generateValidReservation(reservationRequest, adminReservationRequest.memberId());
-        Reservation savedReservation = reservationRepository.save(reservation);
+        Payment adminPayment = Payment.byAdmin();
+        paymentRepository.save(adminPayment);
+        Reservation savedReservation = reservationRepository.save(reservation.toPaid(adminPayment));
 
-        return new ReservationResponse(savedReservation);
+        return new ReservationResponse(savedReservation, adminPayment);
     }
 
     public ReservationResponse create(ReservationRequest reservationRequest, long memberId) {
         Reservation reservation = generateValidReservation(reservationRequest, memberId);
-        paymentRestClient.confirm(reservationRequest);
-        Reservation savedReservation = reservationRepository.save(reservation);
+        PaymentResult paymentResult = paymentRestClient.confirm(reservationRequest);
+        Payment userPayment = new Payment(paymentResult.orderId(), paymentResult.paymentKey(), paymentResult.totalAmount());
+        paymentRepository.save(userPayment);
+        Reservation savedReservation = reservationRepository.save(reservation.toPaid(userPayment));
 
-        return new ReservationResponse(savedReservation);
+        return new ReservationResponse(savedReservation, userPayment);
     }
 
     private Reservation generateValidReservation(ReservationRequest reservationRequest, long memberId) {
@@ -134,8 +144,16 @@ public class ReservationService {
 
     public void deleteById(long reservationId, long memberId) {
         reservationRepository.findById(reservationId)
-                .ifPresent(reservation -> reservation.checkCancelAuthority(memberId));
+                .ifPresent(reservation -> {
+                    reservation.checkCancelAuthority(memberId);
+                    cancelAndRefund(reservationId, reservation);
+                });
+    }
+
+    private void cancelAndRefund(long reservationId, Reservation reservation) {
+        paymentRestClient.cancel(reservation.getPayment());
         deleteById(reservationId);
+        paymentRepository.delete(reservation.getPayment());
     }
 
     public List<ReservationResponse> findByCondition(ReservationFilterRequest reservationFilterRequest) {
