@@ -1,7 +1,6 @@
 package roomescape.controller.login;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -45,7 +44,7 @@ public class LoginController {
     @RoleAllowed
     @GetMapping("/login/check")
     @Operation(summary = "[회원] 로그인 검증", description = "JWT 토큰을 통해 로그인 여부를 검사한다.")
-    public ResponseEntity<LoginCheckResponse> loginCheck(@Parameter(hidden = true) @LoginMember Member member) {
+    public ResponseEntity<LoginCheckResponse> loginCheck(@LoginMember Member member) {
         LoginCheckResponse response = loginService.loginCheck(member);
         return ResponseEntity.ok().body(response);
     }

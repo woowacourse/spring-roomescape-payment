@@ -5,8 +5,10 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springdoc.core.utils.SpringDocUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import roomescape.config.auth.LoginMember;
 
 @Configuration
 public class SwaggerConfig {
@@ -15,6 +17,8 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI openAPI() {
+        SpringDocUtils.getConfig().addAnnotationsToIgnore(LoginMember.class);
+
         return new OpenAPI()
                 .addSecurityItem(new SecurityRequirement()
                         .addList(SECURITY_SCHEME_NAME))
