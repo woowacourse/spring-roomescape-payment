@@ -8,8 +8,7 @@ public record MemberPassword(String password) {
     private static final int MIN_LENGTH = 8;
     private static final int MAX_LENGTH = 16;
 
-    public MemberPassword(String password) {
-        this.password = password;
+    public MemberPassword {
         validate(password);
     }
 

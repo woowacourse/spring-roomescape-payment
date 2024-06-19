@@ -9,11 +9,11 @@ import java.util.regex.Pattern;
 
 @Embeddable
 public record MemberEmail(
-        @Column(name = "email", unique = true) String address) {
+        @Column(name = "email", unique = true) String address
+) {
     private static final Pattern ADDRESS_PATTERN = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
 
-    public MemberEmail(String address) {
-        this.address = address;
+    public MemberEmail {
         validate(address);
     }
 

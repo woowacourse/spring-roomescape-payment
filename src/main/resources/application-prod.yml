@@ -16,7 +16,7 @@ spring:
   sql:
     init:
       schema-locations: classpath:sql/schema.sql
-      mode: always
+      mode: never
 
 security:
   jwt:

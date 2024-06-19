@@ -8,8 +8,7 @@ public record MemberName(String name) {
     private static final int MIN_LENGTH = 2;
     private static final int MAX_LENGTH = 5;
 
-    public MemberName(String name) {
-        this.name = name;
+    public MemberName {
         validate(name);
     }
 

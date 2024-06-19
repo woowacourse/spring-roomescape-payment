@@ -7,8 +7,7 @@ import roomescape.exception.theme.InvalidThemeNameLengthException;
 public record ThemeName(String name) {
     private static final int MAX_LENGTH = 16;
 
-    public ThemeName(String name) {
-        this.name = name;
+    public ThemeName {
         validate(name);
     }
 

@@ -7,8 +7,7 @@ import roomescape.exception.theme.InvalidThemePriceRangeException;
 public record ThemePrice(int price) {
     private static final int MIN_PRICE = 0;
 
-    public ThemePrice(int price) {
-        this.price = price;
+    public ThemePrice {
         validatePriceRange(price);
     }
 
