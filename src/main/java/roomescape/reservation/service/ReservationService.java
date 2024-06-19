@@ -2,10 +2,15 @@ package roomescape.reservation.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ServerErrorException;
 import roomescape.global.exception.IllegalRequestException;
 import roomescape.member.service.MemberService;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentRepository;
+import roomescape.payment.service.PaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.domain.ReservationRepository;
@@ -25,15 +30,18 @@ public class ReservationService {
     private final ReservationTimeService reservationTimeService;
     private final ThemeService themeService;
     private final ReservationRepository reservationRepository;
+    private final PaymentRepository paymentRepository;
     private final PaymentClient paymentClient;
 
     public ReservationService(MemberService memberService, ReservationTimeService reservationTimeService,
                               ThemeService themeService, ReservationRepository reservationRepository,
+                              PaymentRepository paymentRepository,
                               PaymentClient paymentClient) {
         this.memberService = memberService;
         this.reservationTimeService = reservationTimeService;
         this.themeService = themeService;
         this.reservationRepository = reservationRepository;
+        this.paymentRepository = paymentRepository;
         this.paymentClient = paymentClient;
     }
 
@@ -53,8 +61,8 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<MemberReservationResponse> findMemberReservationWithWaitingStatus(Long memberId) {
-        return reservationRepository.findByMemberIdWithWaitingStatus(memberId).stream()
+    public List<MemberReservationResponse> findMemberReservationWithInformation(Long memberId) {
+        return reservationRepository.findByMemberIdWithInformation(memberId).stream()
                 .map(MemberReservationResponse::new)
                 .toList();
     }
@@ -70,13 +78,26 @@ public class ReservationService {
     @Transactional
     public ReservationResponse saveMemberReservation(Long memberId, MemberReservationAddRequest request) {
         paymentClient.requestConfirmPayment(request.extractPaymentInformation());
-        ReservationRequest reservationRequest = new ReservationRequest(
-                request.date(),
-                memberId,
-                request.timeId(),
-                request.themeId()
-        );
-        return saveReservation(reservationRequest);
+        try {
+            ReservationRequest reservationRequest = new ReservationRequest(
+                    request.date(),
+                    memberId,
+                    request.timeId(),
+                    request.themeId()
+            );
+            ReservationResponse reservationResponse = saveReservation(reservationRequest);
+            savePayment(reservationResponse, request);
+            return reservationResponse;
+        } catch (Exception e) {
+            paymentClient.cancelPayment(request.paymentKey());
+            throw new IllegalArgumentException("예약 처리 중 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    private void savePayment(ReservationResponse reservationResponse, MemberReservationAddRequest request) {
+        Reservation reservation = reservationRepository.findById(reservationResponse.id())
+                .orElseThrow(() -> new IllegalRequestException("예약 번호가 존재하지 않습니다: " + reservationResponse.id()));
+        paymentRepository.save(new Payment(reservation, request.paymentKey(), request.amount()));
     }
 
     @Transactional
@@ -108,6 +129,11 @@ public class ReservationService {
 
     @Transactional
     public void removeReservation(long id) {
+        Optional<Payment> payment = paymentRepository.findByReservationId(id);
+        if (payment.isPresent()) {
+            paymentClient.cancelPayment(payment.get().getPaymentKey());
+            paymentRepository.deleteById(payment.get().getId());
+        }
         reservationRepository.deleteById(id);
     }
 }

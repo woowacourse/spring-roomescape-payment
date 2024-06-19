@@ -19,8 +19,11 @@ import static roomescape.reservation.fixture.ReservationFixture.SAVED_RESERVATIO
 import static roomescape.theme.fixture.ThemeFixture.THEME_1;
 import static roomescape.time.fixture.ReservationTimeFixture.RESERVATION_TIME_10_00_ID_1;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,10 +41,12 @@ import roomescape.global.exception.IllegalRequestException;
 import roomescape.global.exception.InternalServerException;
 import roomescape.member.fixture.MemberFixture;
 import roomescape.member.service.MemberService;
-import roomescape.reservation.config.PaymentConfig;
+import roomescape.payment.config.PaymentConfig;
+import roomescape.payment.domain.PaymentRepository;
+import roomescape.payment.service.TossPaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
-import roomescape.reservation.domain.ReservationWithWaiting;
+import roomescape.reservation.domain.ReservationWithInformation;
 import roomescape.reservation.dto.MemberReservationResponse;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.theme.service.ThemeService;
@@ -66,6 +71,9 @@ class ReservationServiceTest {
     @Mock
     private ReservationRepository reservationRepository;
 
+    @Mock
+    private PaymentRepository paymentRepository;
+
     @Autowired
     private TossPaymentClient paymentClient;
 
@@ -75,7 +83,7 @@ class ReservationServiceTest {
     @BeforeEach
     void setData() {
         this.reservationService = new ReservationService(memberService, reservationTimeService,
-                themeService, reservationRepository, paymentClient);
+                themeService, reservationRepository, paymentRepository, paymentClient);
     }
 
     @DisplayName("전체 예약을 조회하고 응답 형태로 반환할 수 있다")
@@ -91,11 +99,11 @@ class ReservationServiceTest {
     @DisplayName("특정 유저의 예약 목록을 읽는 요청을 처리할 수 있다")
     @Test
     void should_return_response_when_my_reservations_requested_all() {
-        when(reservationRepository.findByMemberIdWithWaitingStatus(1L))
-                .thenReturn(List.of(new ReservationWithWaiting(MEMBER_ID_1_RESERVATION, 0)));
+        when(reservationRepository.findByMemberIdWithInformation(1L))
+                .thenReturn(List.of(new ReservationWithInformation(MEMBER_ID_1_RESERVATION, 0, "PAYMENT_KEY", new BigDecimal("1000"))));
 
-        assertThat(reservationService.findMemberReservationWithWaitingStatus(1L))
-                .containsExactly(new MemberReservationResponse(new ReservationWithWaiting(MEMBER_ID_1_RESERVATION, 0)));
+        assertThat(reservationService.findMemberReservationWithInformation(1L))
+                .containsExactly(new MemberReservationResponse(new ReservationWithInformation(MEMBER_ID_1_RESERVATION, 0, "PAYMENT_KEY", new BigDecimal("1000"))));
     }
 
     @DisplayName("예약을 추가하고 응답을 반환할 수 있다")
@@ -111,7 +119,7 @@ class ReservationServiceTest {
         assertThat(savedReservation).isEqualTo(new ReservationResponse(MEMBER_ID_1_RESERVATION));
     }
 
-    @DisplayName("현재보다 이전날짜로 예약 시 예외가 발생한다")
+    @DisplayName("현재보다 이전 날짜로 예약 시 예외가 발생한다")
     @Test
     void should_throw_exception_when_request_with_past_date() {
         when(memberService.findById(any(Long.class))).thenReturn(MemberFixture.MEMBER_ID_1);
@@ -139,7 +147,9 @@ class ReservationServiceTest {
         mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST)
-                        .contentType(MediaType.APPLICATION_JSON));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body("{ \"error\": \"Bad Request\" }")); // 여기에 원하는 JSON 본문을 추가
+
 
         assertThatThrownBy(
                 () -> reservationService.saveMemberReservation(1L, RESERVATION_ADD_REQUEST_WITH_INVALID_PAYMENTS))
@@ -165,6 +175,7 @@ class ReservationServiceTest {
         mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andRespond(withStatus(HttpStatus.OK));
         when(reservationRepository.save(any(Reservation.class))).thenReturn(SAVED_RESERVATION_1);
+        when(reservationRepository.findById(any(Long.class))).thenReturn(Optional.of(SAVED_RESERVATION_1));
 
         reservationService.saveMemberReservation(1L, RESERVATION_ADD_REQUEST_WITH_VALID_PAYMENTS);
 

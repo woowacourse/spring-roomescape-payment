@@ -36,3 +36,13 @@ CREATE TABLE member
     role     VARCHAR(255) NOT NULL
 );
 
+CREATE TABLE payment
+(
+    id       BIGINT       NOT NULL AUTO_INCREMENT,
+    reservation_id BIGINT NOT NULL,
+    payment_key    VARCHAR(255) NOT NULL,
+    amount DECIMAL NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (reservation_id) REFERENCES reservation (id)
+);
+
