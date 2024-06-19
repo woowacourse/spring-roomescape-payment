@@ -5,10 +5,11 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.common.exception.ClientException;
 import roomescape.common.exception.ForbiddenException;
+import roomescape.common.exception.PaymentException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.payment.client.PaymentClient;
 import roomescape.payment.dto.request.ConfirmPaymentRequest;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.CreateMyReservationRequest;
 import roomescape.reservation.dto.request.CreateReservationByAdminRequest;
 import roomescape.reservation.dto.request.CreateReservationRequest;
@@ -16,6 +17,7 @@ import roomescape.reservation.dto.response.CreateReservationResponse;
 import roomescape.reservation.dto.response.FindAdminReservationResponse;
 import roomescape.reservation.dto.response.FindAvailableTimesResponse;
 import roomescape.reservation.dto.response.FindReservationResponse;
+import roomescape.reservation.dto.response.FindReservationWithPaymentResponse;
 import roomescape.reservation.model.Reservation;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservationtime.model.ReservationTime;
@@ -41,7 +43,7 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
 
-    private final PaymentClient paymentClient;
+    private final PaymentService paymentService;
 
     public ReservationService(final WaitingService waitingService,
                               final ReservationRepository reservationRepository,
@@ -49,14 +51,15 @@ public class ReservationService {
                               final ThemeRepository themeRepository,
                               final MemberRepository memberRepository,
                               final WaitingRepository waitingRepository,
-                              final PaymentClient paymentClient) {
+                              final PaymentService paymentService
+    ) {
         this.waitingService = waitingService;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
-        this.paymentClient = paymentClient;
+        this.paymentService = paymentService;
     }
 
     public CreateReservationResponse createMyReservationWithPayment(final AuthInfo authInfo,
@@ -66,12 +69,12 @@ public class ReservationService {
         Reservation reservation = createReservation(createReservationRequest);
 
         try {
-            paymentClient.confirm(ConfirmPaymentRequest.from(createReservationRequest));
-        } catch (ClientException e) {
+            paymentService.confirm(reservation, ConfirmPaymentRequest.from(createReservationRequest));
+            return CreateReservationResponse.from(reservation);
+        } catch (ClientException | PaymentException e) {
             reservationRepository.delete(reservation);
             throw e;
         }
-        return CreateReservationResponse.from(reservation);
     }
 
     public CreateReservationResponse createReservationByAdmin(final CreateReservationByAdminRequest createReservationByAdminRequest) {
@@ -113,9 +116,9 @@ public class ReservationService {
         return FindReservationResponse.from(reservation);
     }
 
-    public List<FindReservationResponse> getReservations(final AuthInfo authInfo) {
-        return reservationRepository.findAllByMemberId(authInfo.getMemberId()).stream()
-                .map(FindReservationResponse::from)
+    public List<FindReservationWithPaymentResponse> getReservations(final AuthInfo authInfo) {
+        return reservationRepository.findAllWithPaymentByMemberId(authInfo.getMemberId()).stream()
+                .map(FindReservationWithPaymentResponse::from)
                 .toList();
     }
 

@@ -1,19 +1,12 @@
 package roomescape.reservation.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.NoSuchElementException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Import;
 import roomescape.auth.domain.AuthInfo;
-import roomescape.common.PaymentClientConfiguration;
+import roomescape.common.config.PaymentClientConfig;
 import roomescape.common.exception.ForbiddenException;
 import roomescape.fixture.MemberFixture;
 import roomescape.fixture.ReservationTimeFixture;
@@ -22,12 +15,18 @@ import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.FakePaymentClient;
 import roomescape.payment.client.PaymentProperties;
+import roomescape.payment.model.Payment;
+import roomescape.payment.model.PaymentStatus;
+import roomescape.payment.repository.PaymentRepository;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.CreateMyReservationRequest;
 import roomescape.reservation.dto.response.CreateReservationResponse;
 import roomescape.reservation.dto.response.FindAdminReservationResponse;
 import roomescape.reservation.dto.response.FindAvailableTimesResponse;
 import roomescape.reservation.dto.response.FindReservationResponse;
+import roomescape.reservation.dto.response.FindReservationWithPaymentResponse;
 import roomescape.reservation.model.Reservation;
+import roomescape.reservation.model.ReservationWithPayment;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservationtime.model.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
@@ -39,12 +38,21 @@ import roomescape.waiting.model.Waiting;
 import roomescape.waiting.repository.WaitingRepository;
 import roomescape.waiting.service.WaitingService;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 @JpaRepositoryTest
 @DatabaseIsolation
 @Import({ReservationService.class,
         WaitingService.class,
         FakePaymentClient.class,
-        PaymentClientConfiguration.class})
+        PaymentService.class,
+        PaymentClientConfig.class})
 @EnableConfigurationProperties({PaymentProperties.class})
 class ReservationServiceTest {
 
@@ -55,6 +63,7 @@ class ReservationServiceTest {
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
     private final ReservationRepository reservationRepository;
+    private final PaymentRepository paymentRepository;
 
     @Autowired
     ReservationServiceTest(final ReservationService reservationService,
@@ -62,13 +71,14 @@ class ReservationServiceTest {
                            final ReservationTimeRepository reservationTimeRepository,
                            final ThemeRepository themeRepository,
                            final MemberRepository memberRepository,
-                           final WaitingRepository waitingRepository) {
+                           final WaitingRepository waitingRepository, PaymentRepository paymentRepository) {
         this.reservationService = reservationService;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Test
@@ -211,21 +221,23 @@ class ReservationServiceTest {
     @DisplayName("내 예약 목록 조회 성공")
     void getReservationsByMember() {
         // given
-        List<Member> members = MemberFixture.get(2).stream().map(memberRepository::save).toList();
+        Member member = memberRepository.save(MemberFixture.getOne());
         ReservationTime reservationTime = reservationTimeRepository.save(ReservationTimeFixture.getOne());
         Theme theme = themeRepository.save(ThemeFixture.getOne());
 
-        Member member = members.get(0);
-        Reservation reservation = reservationRepository.save(
-                new Reservation(member, LocalDate.parse("2025-04-10"), reservationTime, theme));
-        Reservation reservationByOtherMember = reservationRepository.save(
-                new Reservation(members.get(1), LocalDate.parse("2025-04-10"), reservationTime, theme));
+        Reservation reservation1 = new Reservation(member, LocalDate.parse("9999-04-10"), reservationTime, theme);
+        Reservation savedReservation1 = reservationRepository.save(reservation1);
+        Payment payment1 = paymentRepository.save(new Payment(savedReservation1, "paymentKey", "orderID", 1000L, PaymentStatus.SUCCESS));
 
+        Reservation reservation2 = new Reservation(member, LocalDate.parse("9999-04-11"), reservationTime, theme);
+        Reservation savedReservation2 = reservationRepository.save(reservation2);
+        Payment payment2 = paymentRepository.save(new Payment(savedReservation2, "paymentKey", "orderID", 1000L, PaymentStatus.SUCCESS));
         AuthInfo authInfo = new AuthInfo(member.getId(), member.getName(), member.getRole());
 
         // when & then
         assertThat(reservationService.getReservations(authInfo))
-                .containsExactly(FindReservationResponse.from(reservation));
+                .containsExactly(FindReservationWithPaymentResponse.from(new ReservationWithPayment(savedReservation1, payment1)),
+                        FindReservationWithPaymentResponse.from(new ReservationWithPayment(savedReservation2, payment2)));
     }
 
     @Test

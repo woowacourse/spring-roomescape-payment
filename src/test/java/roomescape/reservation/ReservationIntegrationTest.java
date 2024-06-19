@@ -1,16 +1,7 @@
 package roomescape.reservation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +12,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import roomescape.auth.dto.request.LoginRequest;
 import roomescape.fixture.MemberFixture;
+import roomescape.fixture.PaymentFixture;
 import roomescape.fixture.ReservationFixture;
 import roomescape.fixture.ReservationTimeFixture;
 import roomescape.fixture.ThemeFixture;
@@ -29,10 +21,14 @@ import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.FakePaymentClient;
 import roomescape.payment.client.PaymentClient;
+import roomescape.payment.model.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.dto.request.CreateMyReservationRequest;
 import roomescape.reservation.dto.response.FindAvailableTimesResponse;
 import roomescape.reservation.dto.response.FindReservationResponse;
+import roomescape.reservation.dto.response.FindReservationWithPaymentResponse;
 import roomescape.reservation.model.Reservation;
+import roomescape.reservation.model.ReservationWithPayment;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservationtime.model.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
@@ -41,6 +37,16 @@ import roomescape.theme.repository.ThemeRepository;
 import roomescape.util.IntegrationTest;
 import roomescape.waiting.model.Waiting;
 import roomescape.waiting.repository.WaitingRepository;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @IntegrationTest
 @Import(FakePaymentClient.class)
@@ -52,6 +58,7 @@ class ReservationIntegrationTest {
     private final ReservationRepository reservationRepository;
     private final WaitingRepository waitingRepository;
     private final PaymentClient paymentClient;
+    private final PaymentRepository paymentRepository;
 
     @Autowired
     ReservationIntegrationTest(final MemberRepository memberRepository,
@@ -59,13 +66,15 @@ class ReservationIntegrationTest {
                                final ThemeRepository themeRepository,
                                final ReservationRepository reservationRepository,
                                final WaitingRepository waitingRepository,
-                               final PaymentClient paymentClient) {
+                               final PaymentClient paymentClient,
+                               final PaymentRepository paymentRepository) {
         this.memberRepository = memberRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.reservationRepository = reservationRepository;
         this.waitingRepository = waitingRepository;
         this.paymentClient = paymentClient;
+        this.paymentRepository = paymentRepository;
     }
 
     @LocalServerPort
@@ -465,6 +474,7 @@ class ReservationIntegrationTest {
         Member member2 = memberRepository.save(new Member("로키", Role.USER, "qwer@naver.com", "hihi"));
         ReservationTime reservationTime = reservationTimeRepository.save(ReservationTimeFixture.getOne());
         List<Theme> themes = ThemeFixture.get(3).stream().map(themeRepository::save).toList();
+
         Reservation reservation1 = reservationRepository.save(
                 ReservationFixture.getOneWithMemberTimeTheme(member1, reservationTime, themes.get(0)));
         Reservation reservation2 = reservationRepository.save(
@@ -472,7 +482,14 @@ class ReservationIntegrationTest {
         Reservation reservation3 = reservationRepository.save(
                 ReservationFixture.getOneWithMemberTimeTheme(member2, reservationTime, themes.get(2)));
 
-        List<FindReservationResponse> findReservationResponses = RestAssured.given().log().all()
+        Payment payment1 = PaymentFixture.getOneWithReservation(reservation1);
+        Payment payment2 = PaymentFixture.getOneWithReservation(reservation2);
+        Payment payment3 = PaymentFixture.getOneWithReservation(reservation3);
+        paymentRepository.save(payment1);
+        paymentRepository.save(payment2);
+        paymentRepository.save(payment3);
+
+        List<FindReservationWithPaymentResponse> findReservationWithPaymentResponses = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", getTokenByLogin(member1))
                 .when().get("/members/reservations")
@@ -480,11 +497,11 @@ class ReservationIntegrationTest {
 
                 .statusCode(200)
                 .extract().jsonPath()
-                .getList(".", FindReservationResponse.class);
+                .getList(".", FindReservationWithPaymentResponse.class);
 
-        assertThat(findReservationResponses.containsAll(List.of(
-                FindReservationResponse.from(reservation1),
-                FindReservationResponse.from(reservation2))
+        assertThat(findReservationWithPaymentResponses.containsAll(List.of(
+                FindReservationWithPaymentResponse.from(new ReservationWithPayment(reservation1, payment1)),
+                FindReservationWithPaymentResponse.from(new ReservationWithPayment(reservation2, payment2)))
         ));
     }
 }

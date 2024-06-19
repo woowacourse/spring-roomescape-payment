@@ -1,10 +1,5 @@
 package roomescape.reservation.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.time.LocalDate;
-import java.util.NoSuchElementException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +14,12 @@ import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.model.Theme;
 import roomescape.theme.repository.ThemeRepository;
 import roomescape.util.JpaRepositoryTest;
+
+import java.time.LocalDate;
+import java.util.NoSuchElementException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @JpaRepositoryTest
 class ReservationRepositoryTest {
@@ -56,15 +57,18 @@ class ReservationRepositoryTest {
         Member member = memberRepository.save(MemberFixture.getOne());
         ReservationTime reservationTime = reservationTimeRepository.save(ReservationTimeFixture.getOne());
         Theme theme = themeRepository.save(ThemeFixture.getOne());
-        Reservation reservation1 = reservationRepository.save(
-                new Reservation(member, date, reservationTime, theme));
-        Reservation reservation2 = reservationRepository.save(
-                new Reservation(member, date.plusDays(1), reservationTime, theme));
-        Reservation reservation3 = reservationRepository.save(
-                new Reservation(member, date.plusDays(2), reservationTime, theme));
+
+        Reservation reservation1 = new Reservation(member, date, reservationTime, theme);
+        Reservation savedReservation1 = reservationRepository.save(reservation1);
+
+        Reservation reservation2 = new Reservation(member, date.plusDays(1), reservationTime, theme);
+        Reservation savedReservation2 = reservationRepository.save(reservation2);
+
+        Reservation reservation3 = new Reservation(member, date.plusDays(2), reservationTime, theme);
+        Reservation savedReservation3 = reservationRepository.save(reservation3);
 
         assertThat(reservationRepository.findAllByMemberId(member.getId()))
-                .containsExactlyInAnyOrder(reservation1, reservation2, reservation3);
+                .containsExactlyInAnyOrder(savedReservation1, savedReservation2, reservation3);
     }
 
     @Test
@@ -140,8 +144,8 @@ class ReservationRepositoryTest {
         Theme theme = themeRepository.save(ThemeFixture.getOne());
 
         assertThatThrownBy(() -> reservationRepository.getByDateAndReservationTimeIdAndThemeId(startDate,
-                        reservationTime.getId(),
-                        theme.getId()))
+                reservationTime.getId(),
+                theme.getId()))
                 .isInstanceOf(NoSuchElementException.class)
                 .hasMessage("2024-11-11의 time: 1, theme: 1의 예약이 존재하지 않습니다.");
     }
