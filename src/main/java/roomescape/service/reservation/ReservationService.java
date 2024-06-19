@@ -96,7 +96,8 @@ public class ReservationService {
                             Optional<Payment> payment = payments.stream()
                                     .filter(p -> p.getReservation().equals(reservation))
                                     .findAny();
-                            return ReservationMineResponse.ofReservationPayment(reservation, payment);
+                            return payment.map(value -> ReservationMineResponse.ofPaidReservation(reservation, value))
+                                    .orElseGet(() -> ReservationMineResponse.fromBeforePaidReservation(reservation));
                         }),
                         reservationWaitingWithRanks.stream().map(ReservationMineResponse::fromReservationWaitingInfo)
                 )

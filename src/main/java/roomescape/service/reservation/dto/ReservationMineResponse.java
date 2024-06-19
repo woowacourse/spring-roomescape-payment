@@ -9,7 +9,6 @@ import roomescape.domain.reservationwaiting.ReservationWaitingWithRank;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Optional;
 
 public class ReservationMineResponse {
     private static final String BOOKED_MESSAGE = "예약";
@@ -48,41 +47,31 @@ public class ReservationMineResponse {
         );
     }
 
-    public static ReservationMineResponse ofReservationPayment(Reservation reservation, Optional<Payment> reservationPayment) {
+    public static ReservationMineResponse ofPaidReservation(Reservation reservation, Payment reservationPayment) {
+        String reservationStatusMessage = BOOKED_MESSAGE;
+        if (reservation.isCancelStatus()) {
+            reservationStatusMessage = CANCELED_MESSAGE;
+        }
+
         return new ReservationMineResponse(reservation.getId(),
                 reservation.getTheme().getName().name(),
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
-                getReservationStatus(reservation, reservationPayment),
-                getPaymentKey(reservationPayment),
-                getAmount(reservationPayment)
+                reservationStatusMessage,
+                reservationPayment.getPaymentKey(),
+                reservationPayment.getAmount()
         );
     }
 
-    private static Integer getAmount(Optional<Payment> reservationPayment) {
-        int amount = 0;
-        if (reservationPayment.isPresent()) {
-            amount = reservationPayment.get().getAmount();
-        }
-        return amount;
-    }
-
-    private static String getPaymentKey(Optional<Payment> reservationPayment) {
-        String paymentKey = EMPTY_PAYMENT_KEY;
-        if (reservationPayment.isPresent()) {
-            paymentKey = reservationPayment.get().getPaymentKey();
-        }
-        return paymentKey;
-    }
-
-    private static String getReservationStatus(Reservation reservation, Optional<Payment> reservationPayment) {
-        if (reservationPayment.isEmpty()) {
-            return PAYMENT_WAITING_MESSAGE;
-        }
-        if (reservation.isCancelStatus()) {
-            return CANCELED_MESSAGE;
-        }
-        return BOOKED_MESSAGE;
+    public static ReservationMineResponse fromBeforePaidReservation(Reservation reservation) {
+        return new ReservationMineResponse(reservation.getId(),
+                reservation.getTheme().getName().name(),
+                reservation.getDate(),
+                reservation.getTime().getStartAt(),
+                PAYMENT_WAITING_MESSAGE,
+                EMPTY_PAYMENT_KEY,
+                reservation.getTheme().getPrice()
+        );
     }
 
     public LocalDateTime retrieveDateTime() {
