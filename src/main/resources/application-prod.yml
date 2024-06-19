@@ -11,8 +11,7 @@ spring:
       hibernate:
         show_sql: false
         format_sql: false
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
   sql:
     init:
       schema-locations: classpath:sql/schema.sql
