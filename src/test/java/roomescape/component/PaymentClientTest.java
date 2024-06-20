@@ -60,7 +60,7 @@ class PaymentClientTest {
     @Test
     @DisplayName("결제 승인에 성공한다.")
     void confirm() throws JsonProcessingException {
-        var request = new PaymentConfirmRequest("paymentKey", "orderId", 1000L, 1L);
+        var request = new PaymentConfirmRequest("paymentKey", "orderId", 1000L);
         var response = new PaymentConfirmResponse("paymentKey", "orderId", 1000L);
         var responseString = objectMapper.writeValueAsString(response);
 
@@ -78,7 +78,7 @@ class PaymentClientTest {
     @EnumSource(TossPaymentErrorCode.class)
     @DisplayName("결제 승인 오류 시 예외가 발생한다.")
     void confirmException(TossPaymentErrorCode errorCode) throws IOException {
-        var request = new PaymentConfirmRequest("paymentKey", "orderId", 1000L, 1L);
+        var request = new PaymentConfirmRequest("paymentKey", "orderId", 1000L);
         var response = objectMapper.writeValueAsString(
                 new TossPaymentErrorResponse(errorCode.name(), errorCode.message()));
 

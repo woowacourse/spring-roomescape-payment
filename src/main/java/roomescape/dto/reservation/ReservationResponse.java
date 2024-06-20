@@ -14,11 +14,10 @@ public record ReservationResponse(
         ReservedThemeResponse theme,
         ReservationStatus status
 ) {
-
-    public static ReservationResponse from(final Reservation reservation) {
-        return new ReservationResponse(
+    public ReservationResponse(final Reservation reservation) {
+        this(
                 reservation.getId(),
-                reservation.getMemberName(),
+                reservation.getMember().getNameString(),
                 reservation.getDate(),
                 ReservationTimeResponse.from(reservation.getTime()),
                 ReservedThemeResponse.from(reservation.getTheme()),

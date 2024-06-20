@@ -21,7 +21,7 @@ import io.restassured.path.json.JsonPath;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.dto.reservation.AdminReservationSaveRequest;
 import roomescape.dto.reservation.ReservationResponse;
-import roomescape.dto.reservation.ReservationSaveRequest;
+import roomescape.dto.reservation.ReservationWithPaymentRequest;
 
 class ReservationAcceptanceTest extends AcceptanceTest {
 
@@ -30,8 +30,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     void respondCreatedWhenCreateReservation() {
         final Long timeId = saveReservationTime();
         final Long themeId = saveTheme();
-        final ReservationSaveRequest request
-                = new ReservationSaveRequest(DATE_MAY_EIGHTH, timeId, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
+        final ReservationWithPaymentRequest request
+                = new ReservationWithPaymentRequest(DATE_MAY_EIGHTH, timeId, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         final ReservationResponse response = assertPostResponseWithToken(
                 request, MEMBER_TENNY_EMAIL, "/reservations", 201)
@@ -70,8 +70,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     void respondBadRequestWhenNotExistingReservationTime() {
         saveReservationTime();
         final Long themeId = saveTheme();
-        final ReservationSaveRequest request
-                = new ReservationSaveRequest(DATE_MAY_EIGHTH, 10L, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
+        final ReservationWithPaymentRequest request
+                = new ReservationWithPaymentRequest(DATE_MAY_EIGHTH, 10L, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         assertPostResponseWithToken(request, MEMBER_TENNY_EMAIL, "/reservations", 404);
     }
@@ -79,8 +79,8 @@ class ReservationAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("존재하지 않는 테마로 예약 생성 시 404를 응답한다.")
     void respondBadRequestWhenNotExistingTheme() {
-        final ReservationSaveRequest request
-                = new ReservationSaveRequest(DATE_MAY_EIGHTH, 1L, 100L, PAYMENT_KEY, ORDER_ID, AMOUNT);
+        final ReservationWithPaymentRequest request
+                = new ReservationWithPaymentRequest(DATE_MAY_EIGHTH, 1L, 100L, PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         assertPostResponseWithToken(request, MEMBER_TENNY_EMAIL, "/reservations", 404);
     }

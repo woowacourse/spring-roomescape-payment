@@ -31,9 +31,9 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.theme.Theme;
-import roomescape.dto.reservation.ReservationDto;
 import roomescape.dto.reservation.ReservationResponse;
-import roomescape.dto.reservation.ReservationSaveRequest;
+import roomescape.dto.reservation.ReservationWaitingRequest;
+import roomescape.dto.reservation.ReservationWithPaymentRequest;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
@@ -73,8 +73,9 @@ class WaitingServiceTest {
                 .theme(theme)
                 .status(ReservationStatus.PENDING)
                 .build();
-        final ReservationSaveRequest request = new ReservationSaveRequest(date, 1L, 1L, PAYMENT_KEY, ORDER_ID, AMOUNT);
-        final ReservationDto reservationDto = ReservationDto.of(request, 1L);
+        final ReservationWithPaymentRequest request = new ReservationWithPaymentRequest(date, 1L, 1L, PAYMENT_KEY,
+                ORDER_ID, AMOUNT);
+        final ReservationWaitingRequest reservationDto = new ReservationWaitingRequest(request, 1L);
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(reservationTimeRepository.findById(1L)).willReturn(Optional.of(time));
         given(themeRepository.findById(1L)).willReturn(Optional.of(theme));
@@ -111,8 +112,9 @@ class WaitingServiceTest {
                 .theme(theme)
                 .status(ReservationStatus.PENDING)
                 .build();
-        final ReservationSaveRequest request = new ReservationSaveRequest(date, 1L, 1L, PAYMENT_KEY, ORDER_ID, AMOUNT);
-        final ReservationDto reservationDto = ReservationDto.of(request, 1L);
+        final ReservationWithPaymentRequest request = new ReservationWithPaymentRequest(date, 1L, 1L, PAYMENT_KEY,
+                ORDER_ID, AMOUNT);
+        final ReservationWaitingRequest reservationDto = new ReservationWaitingRequest(request, 1L);
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(reservationTimeRepository.findById(1L)).willReturn(Optional.of(time));
         given(themeRepository.findById(1L)).willReturn(Optional.of(theme));
@@ -139,8 +141,9 @@ class WaitingServiceTest {
                 .theme(theme)
                 .status(ReservationStatus.PENDING)
                 .build();
-        final ReservationSaveRequest request = new ReservationSaveRequest(date, 1L, 1L, PAYMENT_KEY, ORDER_ID, AMOUNT);
-        final ReservationDto reservationDto = ReservationDto.of(request, 1L);
+        final ReservationWithPaymentRequest request = new ReservationWithPaymentRequest(date, 1L, 1L, PAYMENT_KEY,
+                ORDER_ID, AMOUNT);
+        final ReservationWaitingRequest reservationDto = new ReservationWaitingRequest(request, 1L);
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(reservationTimeRepository.findById(1L)).willReturn(Optional.of(time));
         given(themeRepository.findById(1L)).willReturn(Optional.of(theme));
@@ -171,8 +174,9 @@ class WaitingServiceTest {
                 .theme(theme)
                 .status(ReservationStatus.PENDING)
                 .build();
-        final ReservationSaveRequest request = new ReservationSaveRequest(date, 1L, 1L, PAYMENT_KEY, ORDER_ID, AMOUNT);
-        final ReservationDto reservationDto = ReservationDto.of(request, 1L);
+        final ReservationWithPaymentRequest request = new ReservationWithPaymentRequest(date, 1L, 1L, PAYMENT_KEY,
+                ORDER_ID, AMOUNT);
+        final ReservationWaitingRequest reservationDto = new ReservationWaitingRequest(request, 1L);
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(reservationTimeRepository.findById(1L)).willReturn(Optional.of(time));
         given(themeRepository.findById(1L)).willReturn(Optional.of(theme));

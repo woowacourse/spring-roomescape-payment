@@ -19,7 +19,7 @@ import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.dto.reservation.ReservationResponse;
-import roomescape.dto.reservation.ReservationSaveRequest;
+import roomescape.dto.reservation.ReservationWithPaymentRequest;
 
 public class WaitingAcceptanceTest extends AcceptanceTest {
 
@@ -29,8 +29,8 @@ public class WaitingAcceptanceTest extends AcceptanceTest {
         final Long timeId = saveReservationTime();
         final Long themeId = saveTheme();
         saveReservation(timeId, themeId, MEMBER_MIA_EMAIL);
-        final ReservationSaveRequest request
-                = new ReservationSaveRequest(DATE_MAY_EIGHTH, timeId, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
+        final ReservationWithPaymentRequest request
+                = new ReservationWithPaymentRequest(DATE_MAY_EIGHTH, timeId, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         final ReservationResponse response = assertPostResponseWithToken(request, MEMBER_TENNY_EMAIL, "/waitings", 201)
                 .extract().as(ReservationResponse.class);

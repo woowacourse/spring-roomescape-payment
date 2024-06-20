@@ -29,8 +29,8 @@ import roomescape.component.TossPaymentClient;
 import roomescape.dto.auth.TokenRequest;
 import roomescape.dto.auth.TokenResponse;
 import roomescape.dto.payment.PaymentConfirmResponse;
-import roomescape.dto.reservation.ReservationSaveRequest;
 import roomescape.dto.reservation.ReservationTimeSaveRequest;
+import roomescape.dto.reservation.ReservationWithPaymentRequest;
 import roomescape.dto.theme.ThemeSaveRequest;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -83,8 +83,8 @@ abstract class AcceptanceTest {
 
     protected Long saveReservation(final Long timeId, final Long themeId, final String email) {
         final String accessToken = getAccessToken(email);
-        final ReservationSaveRequest request
-                = new ReservationSaveRequest(DATE_MAY_EIGHTH, timeId, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
+        final ReservationWithPaymentRequest request
+                = new ReservationWithPaymentRequest(DATE_MAY_EIGHTH, timeId, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         final Integer id = RestAssured.given().log().all()
                 .cookie("token", accessToken)
@@ -102,8 +102,8 @@ abstract class AcceptanceTest {
     protected Long saveReservationWaiting(final Long timeId, final Long themeId) {
         saveReservation(timeId, themeId, ADMIN_EMAIL);
         final String accessToken = getAccessToken(MEMBER_TENNY_EMAIL);
-        final ReservationSaveRequest request
-                = new ReservationSaveRequest(DATE_MAY_EIGHTH, timeId, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
+        final ReservationWithPaymentRequest request
+                = new ReservationWithPaymentRequest(DATE_MAY_EIGHTH, timeId, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         final Integer id = RestAssured.given().log().all()
                 .cookie("token", accessToken)
@@ -119,8 +119,8 @@ abstract class AcceptanceTest {
     }
 
     protected Long saveReservationAndWaiting(final Long timeId, final Long themeId) {
-        final ReservationSaveRequest reservationRequest
-                = new ReservationSaveRequest(DATE_MAY_EIGHTH, timeId, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
+        final ReservationWithPaymentRequest reservationRequest
+                = new ReservationWithPaymentRequest(DATE_MAY_EIGHTH, timeId, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
         RestAssured.given().log().all()
                 .cookie("token", getAccessToken(ADMIN_EMAIL))
                 .contentType(ContentType.JSON)
@@ -129,8 +129,8 @@ abstract class AcceptanceTest {
                 .then().log().all()
                 .statusCode(201);
 
-        final ReservationSaveRequest waitingRequest
-                = new ReservationSaveRequest(DATE_MAY_EIGHTH, timeId, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
+        final ReservationWithPaymentRequest waitingRequest
+                = new ReservationWithPaymentRequest(DATE_MAY_EIGHTH, timeId, themeId, PAYMENT_KEY, ORDER_ID, AMOUNT);
         final Integer id = RestAssured.given().log().all()
                 .cookie("token", getAccessToken(MEMBER_TENNY_EMAIL))
                 .contentType(ContentType.JSON)

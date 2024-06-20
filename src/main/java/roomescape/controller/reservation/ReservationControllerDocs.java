@@ -18,7 +18,7 @@ import roomescape.dto.ErrorResponse;
 import roomescape.dto.auth.LoginMember;
 import roomescape.dto.reservation.MyReservationWithRankResponse;
 import roomescape.dto.reservation.ReservationResponse;
-import roomescape.dto.reservation.ReservationSaveRequest;
+import roomescape.dto.reservation.ReservationWithPaymentRequest;
 
 @Tag(name = "방탈출 예약")
 public interface ReservationControllerDocs {
@@ -37,7 +37,7 @@ public interface ReservationControllerDocs {
     )
     ResponseEntity<ReservationResponse> createReservation(
             @Parameter(hidden = true) LoginMember loginMember,
-            @Valid ReservationSaveRequest request
+            @Valid ReservationWithPaymentRequest request
     );
 
     @Operation(summary = "예약 전체 조회")

@@ -95,9 +95,7 @@ class ReservationRepositoryTest {
     @DisplayName("동일 시간대의 예약 건수를 조회한다.")
     void countByDateAndTime() {
         // when
-        final int actual = reservationRepository.countByDateAndTimeIdAndThemeId(
-                DATE_MAY_EIGHTH, reservationTime.getId(), theme.getId()
-        );
+        final int actual = reservationRepository.countByDateAndTimeAndTheme(DATE_MAY_EIGHTH, reservationTime, theme);
 
         // then
         assertThat(actual).isEqualTo(1);

@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Positive;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(name = "예약 요청")
-public record ReservationSaveRequest(
+public record ReservationWithPaymentRequest(
 
         @Schema(description = "예약 날짜", example = "2024-06-01")
         @Future

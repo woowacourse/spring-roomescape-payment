@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import roomescape.dto.ErrorResponse;
 import roomescape.dto.auth.LoginMember;
 import roomescape.dto.reservation.ReservationResponse;
-import roomescape.dto.reservation.ReservationSaveRequest;
+import roomescape.dto.reservation.ReservationWithPaymentRequest;
 
 @Tag(name = "방탈출 예약 대기")
 public interface WaitingControllerDocs {
@@ -27,6 +27,6 @@ public interface WaitingControllerDocs {
     )
     ResponseEntity<ReservationResponse> createReservationWaiting(
             @Parameter(hidden = true) LoginMember loginMember,
-            @Valid ReservationSaveRequest request
+            @Valid ReservationWithPaymentRequest request
     );
 }

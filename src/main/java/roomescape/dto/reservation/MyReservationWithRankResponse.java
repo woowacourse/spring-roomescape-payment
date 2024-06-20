@@ -3,31 +3,30 @@ package roomescape.dto.reservation;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 
 public class MyReservationWithRankResponse {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
 
-    private Long reservationId;
-    private String theme;
-    private LocalDate date;
-    private String time;
-    private String status;
-    private Long rank;
-    private String paymentKey;
-    private Long amount;
+    private final Long reservationId;
+    private final String theme;
+    private final LocalDate date;
+    private final String time;
+    private final String status;
+    private final Long rank;
+    private final String paymentKey;
+    private final Long amount;
 
-    public MyReservationWithRankResponse(final Reservation reservation, final Long rank, final Payment payment) {
+    public MyReservationWithRankResponse(final Reservation reservation, final Long rank) {
         this.reservationId = reservation.getId();
-        this.theme = reservation.getThemeName();
+        this.theme = reservation.getTheme().getName();
         this.date = reservation.getDate();
         this.time = reservation.getTime().getStartAt().format(FORMATTER);
         this.status = reservation.getStatus().value();
         this.rank = rank;
-        this.paymentKey = payment.getPaymentKey();
-        this.amount = payment.getAmount();
+        this.paymentKey = reservation.getPayment().getPaymentKey();
+        this.amount = reservation.getPayment().getAmount();
     }
 
     public Long getReservationId() {

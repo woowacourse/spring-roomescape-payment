@@ -48,11 +48,11 @@ import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.theme.Theme;
 import roomescape.dto.auth.LoginMember;
 import roomescape.dto.reservation.MyReservationWithRankResponse;
-import roomescape.dto.reservation.ReservationDto;
 import roomescape.dto.reservation.ReservationFilterParam;
 import roomescape.dto.reservation.ReservationResponse;
-import roomescape.dto.reservation.ReservationSaveRequest;
 import roomescape.dto.reservation.ReservationTimeResponse;
+import roomescape.dto.reservation.ReservationWaitingRequest;
+import roomescape.dto.reservation.ReservationWithPaymentRequest;
 import roomescape.dto.theme.ReservedThemeResponse;
 import roomescape.exception.RoomescapeException;
 import roomescape.fixture.TestFixture;
@@ -98,8 +98,8 @@ class ReservationServiceTest {
                 .theme(theme)
                 .status(ReservationStatus.RESERVED)
                 .build();
-        final ReservationSaveRequest request = new ReservationSaveRequest(date, 1L, 1L, PAYMENT_KEY, ORDER_ID, AMOUNT);
-        final ReservationDto reservationDto = ReservationDto.of(request, 1L);
+        final ReservationWithPaymentRequest request = new ReservationWithPaymentRequest(date, 1L, 1L, PAYMENT_KEY,
+                ORDER_ID, AMOUNT);
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(reservationTimeRepository.findById(1L)).willReturn(Optional.of(time));
         given(themeRepository.findById(1L)).willReturn(Optional.of(theme));
@@ -114,7 +114,7 @@ class ReservationServiceTest {
                         .build());
 
         // when
-        final ReservationResponse response = reservationService.createReservation(reservationDto);
+        final ReservationResponse response = reservationService.createReservation(request, member.getId());
 
         // then
         assertThat(response).isNotNull();
@@ -125,10 +125,10 @@ class ReservationServiceTest {
     @DisplayName("이전 날짜 혹은 당일 예약을 할 경우 예외가 발생한다.")
     void throwExceptionWhenCreateReservationAtInvalidDate(final int days) {
         final LocalDate date = LocalDate.now().minusDays(days);
-        final ReservationSaveRequest request = new ReservationSaveRequest(date, 1L, 1L, PAYMENT_KEY, ORDER_ID, AMOUNT);
-        final ReservationDto reservationDto = ReservationDto.of(request, 1L);
+        final ReservationWithPaymentRequest request = new ReservationWithPaymentRequest(date, 1L, 1L, PAYMENT_KEY,
+                ORDER_ID, AMOUNT);
 
-        assertThatThrownBy(() -> reservationService.createReservation(reservationDto))
+        assertThatThrownBy(() -> reservationService.createReservation(request, 1L))
                 .isInstanceOf(RoomescapeException.class);
     }
 
@@ -140,17 +140,18 @@ class ReservationServiceTest {
         final LocalDate date = DATE_MAY_EIGHTH;
         final ReservationTime time = RESERVATION_TIME_SIX(1L);
         final Theme theme = THEME_HORROR(1L);
-        final ReservationSaveRequest request = new ReservationSaveRequest(DATE_MAY_EIGHTH, time.getId(), theme.getId(),
+        final ReservationWithPaymentRequest request = new ReservationWithPaymentRequest(DATE_MAY_EIGHTH, time.getId(),
+                theme.getId(),
                 PAYMENT_KEY, ORDER_ID, AMOUNT);
-        final ReservationDto reservationDto = ReservationDto.of(request, member.getId());
+        final ReservationWaitingRequest reservationDto = new ReservationWaitingRequest(request, member.getId());
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(reservationTimeRepository.findById(1L)).willReturn(Optional.of(time));
         given(themeRepository.findById(1L)).willReturn(Optional.of(theme));
-        given(reservationRepository.countByDateAndTimeIdAndThemeId(date, time.getId(), theme.getId()))
+        given(reservationRepository.countByDateAndTimeAndTheme(date, time, theme))
                 .willReturn(1);
 
         // when & then
-        assertThatThrownBy(() -> reservationService.createReservation(reservationDto))
+        assertThatThrownBy(() -> reservationService.createReservation(request, member.getId()))
                 .isInstanceOf(RoomescapeException.class);
     }
 
