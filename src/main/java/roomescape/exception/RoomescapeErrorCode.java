@@ -15,7 +15,7 @@ public enum RoomescapeErrorCode implements ErrorCodeWithHttpStatusCode {
     WAITING_FOR_NO_RESERVATION(HttpStatus.BAD_REQUEST, "예약이 없는 건에는 예약 대기를 할 수 없습니다."),
     WAITING_FOR_MY_RESERVATION(HttpStatus.BAD_REQUEST, "이미 예약한 건에는 예약 대기를 할 수 없습니다."),
     WAITING_DUPLICATED(HttpStatus.BAD_REQUEST, "중복된 예약 대기를 할 수 없습니다."),
-    INVALID_DATE(HttpStatus.BAD_REQUEST, "이전 날짜 혹은 당일은 예약할 수 없습니다."),
+    INVALID_DATETIME(HttpStatus.BAD_REQUEST, "지난 시간에 예약할 수 없습니다."),
     RESERVATION_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "해당 시간에 예약이 찼습니다."),
     EMPTY_NAME(HttpStatus.BAD_REQUEST, "예약자 이름은 비어있을 수 없습니다."),
     EMPTY_TIME(HttpStatus.BAD_REQUEST, "예약 시간이 비어 있습니다."),
