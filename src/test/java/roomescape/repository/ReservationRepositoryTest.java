@@ -50,14 +50,26 @@ class ReservationRepositoryTest {
         member = memberRepository.save(MEMBER_MIA());
         reservationTime = reservationTimeRepository.save(RESERVATION_TIME_SIX());
         theme = themeRepository.save(THEME_HORROR());
-        reservation = reservationRepository.save(new Reservation(member, DATE_MAY_EIGHTH, reservationTime, theme, ReservationStatus.RESERVED));
+        reservation = reservationRepository.save(Reservation.builder()
+                .member(member)
+                .date(DATE_MAY_EIGHTH)
+                .time(reservationTime)
+                .theme(theme)
+                .status(ReservationStatus.RESERVED)
+                .build());
     }
 
     @Test
     @DisplayName("예약을 저장한다.")
     void save() {
         // given
-        final Reservation reservation = new Reservation(member, DATE_MAY_NINTH, reservationTime, theme, ReservationStatus.RESERVED);
+        final Reservation reservation = Reservation.builder()
+                .member(member)
+                .date(DATE_MAY_NINTH)
+                .time(reservationTime)
+                .theme(theme)
+                .status(ReservationStatus.RESERVED)
+                .build();
 
         // when
         final Reservation actual = reservationRepository.save(reservation);
@@ -153,17 +165,24 @@ class ReservationRepositoryTest {
     @DisplayName("특정 사용자의 예약 목록 및 대기 목록을 조회한다.")
     void findByReservationsMemberId() {
         final Long memberId = member.getId();
-        reservationRepository.save(new Reservation(member, DATE_MAY_EIGHTH, reservationTime, theme, ReservationStatus.WAITING));
+        final var reservation = Reservation.builder()
+                .member(member)
+                .date(DATE_MAY_EIGHTH)
+                .time(reservationTime)
+                .theme(theme)
+                .status(ReservationStatus.PENDING)
+                .build();
+        reservationRepository.save(reservation);
 
         final List<Reservation> actual = reservationRepository.findByMemberId(memberId);
 
         assertAll(
                 () -> assertThat(actual).hasSize(2),
                 () -> assertThat(actual.get(0).getStatus()).isEqualTo(ReservationStatus.RESERVED),
-                () -> assertThat(actual.get(1).getStatus()).isEqualTo(ReservationStatus.WAITING)
+                () -> assertThat(actual.get(1).getStatus()).isEqualTo(ReservationStatus.PENDING)
         );
     }
-    
+
     @ParameterizedTest
     @EnumSource(ReservationStatus.class)
     @DisplayName("예약 상태에 따른 예약 목록을 조회한다.")

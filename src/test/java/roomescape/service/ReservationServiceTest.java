@@ -91,15 +91,27 @@ class ReservationServiceTest {
         final LocalDate date = DATE_MAY_EIGHTH;
         final ReservationTime time = RESERVATION_TIME_SIX(1L);
         final Theme theme = THEME_HORROR(1L);
-        final Reservation reservation = new Reservation(member, date, time, theme, ReservationStatus.RESERVED);
+        final Reservation reservation = Reservation.builder()
+                .member(member)
+                .date(date)
+                .time(time)
+                .theme(theme)
+                .status(ReservationStatus.RESERVED)
+                .build();
         final ReservationSaveRequest request = new ReservationSaveRequest(date, 1L, 1L, PAYMENT_KEY, ORDER_ID, AMOUNT);
         final ReservationDto reservationDto = ReservationDto.of(request, 1L);
         given(memberRepository.findById(1L)).willReturn(Optional.of(member));
         given(reservationTimeRepository.findById(1L)).willReturn(Optional.of(time));
         given(themeRepository.findById(1L)).willReturn(Optional.of(theme));
         given(reservationRepository.save(reservation))
-                .willReturn(new Reservation(1L, reservation.getMember(), reservation.getDate(),
-                        reservation.getTime(), reservation.getTheme(), ReservationStatus.RESERVED));
+                .willReturn(Reservation.builder()
+                        .id(1L)
+                        .member(member)
+                        .date(date)
+                        .time(time)
+                        .theme(theme)
+                        .status(ReservationStatus.RESERVED)
+                        .build());
 
         // when
         final ReservationResponse response = reservationService.createReservation(reservationDto);
@@ -146,10 +158,22 @@ class ReservationServiceTest {
     @DisplayName("모든 예약 목록을 조회한다.")
     void findAllReservations() {
         // given
-        final Reservation reservation1 = new Reservation(TestFixture.MEMBER_TENNY(), DATE_MAY_EIGHTH,
-                RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.RESERVED);
-        final Reservation reservation2 = new Reservation(ADMIN(), DATE_MAY_EIGHTH,
-                RESERVATION_TIME_SEVEN(), THEME_DETECTIVE(), ReservationStatus.RESERVED);
+        final Reservation reservation1 = Reservation.builder()
+                .id(1L)
+                .member(MEMBER_TENNY())
+                .date(DATE_MAY_EIGHTH)
+                .time(RESERVATION_TIME_SIX())
+                .theme(THEME_HORROR())
+                .status(ReservationStatus.RESERVED)
+                .build();
+        final Reservation reservation2 = Reservation.builder()
+                .id(1L)
+                .member(ADMIN())
+                .date(DATE_MAY_EIGHTH)
+                .time(RESERVATION_TIME_SEVEN())
+                .theme(THEME_DETECTIVE())
+                .status(ReservationStatus.RESERVED)
+                .build();
         given(reservationRepository.findAll())
                 .willReturn(List.of(reservation1, reservation2));
 
@@ -176,10 +200,20 @@ class ReservationServiceTest {
     @DisplayName("검색 조건에 따른 예약 목록을 조회한다.")
     void findAllByFilterParameter() {
         // given
-        final Reservation reservation1 = new Reservation(TestFixture.MEMBER_TENNY(), DATE_MAY_EIGHTH,
-                RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.RESERVED);
-        final Reservation reservation2 = new Reservation(TestFixture.MEMBER_TENNY(), DATE_MAY_NINTH,
-                RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.RESERVED);
+        final Reservation reservation1 = Reservation.builder()
+                .member(MEMBER_TENNY())
+                .date(DATE_MAY_EIGHTH)
+                .time(RESERVATION_TIME_SIX())
+                .theme(THEME_HORROR())
+                .status(ReservationStatus.RESERVED)
+                .build();
+        final Reservation reservation2 = Reservation.builder()
+                .member(MEMBER_TENNY())
+                .date(DATE_MAY_NINTH)
+                .time(RESERVATION_TIME_SIX())
+                .theme(THEME_HORROR())
+                .status(ReservationStatus.RESERVED)
+                .build();
         final ReservationFilterParam reservationFilterParam
                 = new ReservationFilterParam(1L, 1L,
                 LocalDate.parse("2034-05-08"), LocalDate.parse("2034-05-28"));
@@ -234,14 +268,39 @@ class ReservationServiceTest {
     void findMyReservations() {
         // given
         final LoginMember loginMember = new LoginMember(1L, MEMBER_TENNY_NAME, MEMBER_TENNY_EMAIL, Role.MEMBER);
-        final Reservation memberReservation = new Reservation(1L, MEMBER_TENNY(), DATE_MAY_EIGHTH,
-                RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.RESERVED);
-        final Reservation reservation = new Reservation(2L, ADMIN(), DATE_MAY_NINTH,
-                RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.RESERVED);
-        final Reservation waiting = new Reservation(3L, MEMBER_MIA(), DATE_MAY_NINTH,
-                RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.WAITING);
-        final Reservation memberWaiting = new Reservation(4L, MEMBER_TENNY(), DATE_MAY_NINTH,
-                RESERVATION_TIME_SIX(), THEME_HORROR(), ReservationStatus.WAITING);
+        final Reservation memberReservation = Reservation.builder()
+                .id(1L)
+                .member(MEMBER_TENNY())
+                .date(DATE_MAY_EIGHTH)
+                .time(RESERVATION_TIME_SIX())
+                .theme(THEME_HORROR())
+                .status(ReservationStatus.RESERVED)
+                .build();
+        final Reservation reservation = Reservation.builder()
+                .id(2L)
+                .member(ADMIN())
+                .date(DATE_MAY_NINTH)
+                .time(RESERVATION_TIME_SIX())
+                .theme(THEME_HORROR())
+                .status(ReservationStatus.RESERVED)
+                .build();
+        final Reservation waiting = Reservation.builder()
+                .id(3L)
+                .member(MEMBER_MIA())
+                .date(DATE_MAY_NINTH)
+                .time(RESERVATION_TIME_SIX())
+                .theme(THEME_HORROR())
+                .status(ReservationStatus.PENDING)
+                .build();
+        final Reservation memberWaiting = Reservation.builder()
+                .id(4L)
+                .member(MEMBER_TENNY())
+                .date(DATE_MAY_NINTH)
+                .time(RESERVATION_TIME_SIX())
+                .theme(THEME_HORROR())
+                .status(ReservationStatus.PENDING)
+                .build();
+
         given(reservationRepository.findByMemberId(loginMember.id()))
                 .willReturn(List.of(memberReservation, memberWaiting));
         given(reservationRepository.findAll())
@@ -260,7 +319,7 @@ class ReservationServiceTest {
                 () -> assertThat(actual).hasSize(2),
                 () -> assertThat(actual.get(0).getStatus()).isEqualTo(ReservationStatus.RESERVED.value()),
                 () -> assertThat(actual.get(0).getRank()).isEqualTo(1L),
-                () -> assertThat(actual.get(1).getStatus()).isEqualTo(ReservationStatus.WAITING.value()),
+                () -> assertThat(actual.get(1).getStatus()).isEqualTo(ReservationStatus.PENDING.value()),
                 () -> assertThat(actual.get(1).getRank()).isEqualTo(2L)
         );
     }

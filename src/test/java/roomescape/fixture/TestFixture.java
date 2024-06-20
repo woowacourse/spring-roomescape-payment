@@ -18,24 +18,58 @@ public class TestFixture {
 
     public static final List<Member> MEMBERS = List.of(
             new Member(1L, new Name("제우스"), "zeus@woowa.com", "1q2w3e4r", Role.ADMIN),
-            new Member(2L, new Name("냥인"), "cutehuman@woowa.com", "password", Role.MEMBER)
+            new Member(2L, new Name("냥인"), "cutehuman@woowa.com", "password", Role.MEMBER),
+            new Member(3L, new Name("산초"), "sancho@woowa.com", "password", Role.MEMBER),
+            new Member(4L, new Name("호티"), "hotea@woowa.com", "password", Role.MEMBER)
     );
 
     public static final List<ReservationTime> TIMES = List.of(
             new ReservationTime(1L, "10:00"),
-            new ReservationTime(2L, "22:00")
+            new ReservationTime(2L, "11:00"),
+            new ReservationTime(3L, "12:00"),
+            new ReservationTime(4L, "13:00")
     );
 
     public static final List<Theme> THEMES = List.of(
             new Theme(1L, "테마1", "테마설명1", "thumbnail_1.jpg"),
-            new Theme(2L, "테마2", "테마설명2", "thumbnail_2.jpg")
+            new Theme(2L, "테마2", "테마설명2", "thumbnail_2.jpg"),
+            new Theme(3L, "테마3", "테마설명3", "thumbnail_3.jpg"),
+            new Theme(4L, "테마4", "테마설명4", "thumbnail_4.jpg")
     );
 
     public static final List<Reservation> RESERVATIONS = List.of(
-            new Reservation(1L, memberFixture(1), LocalDate.parse("2024-06-01"), timeFixture(1), themeFixture(1),
-                    ReservationStatus.RESERVED),
-            new Reservation(2L, memberFixture(2), LocalDate.parse("2024-06-01"), timeFixture(2), themeFixture(2),
-                    ReservationStatus.WAITING)
+            Reservation.builder()
+                    .id(1L)
+                    .member(memberFixture(1))
+                    .date(LocalDate.parse("2025-06-01"))
+                    .time(timeFixture(1))
+                    .theme(themeFixture(1))
+                    .status(ReservationStatus.RESERVED)
+                    .build(),
+            Reservation.builder()
+                    .id(2L)
+                    .member(memberFixture(2))
+                    .date(LocalDate.parse("2025-06-02"))
+                    .time(timeFixture(2))
+                    .theme(themeFixture(2))
+                    .status(ReservationStatus.PENDING)
+                    .build(),
+            Reservation.builder()
+                    .id(3L)
+                    .member(memberFixture(3))
+                    .date(LocalDate.parse("2025-06-03"))
+                    .time(timeFixture(3))
+                    .theme(themeFixture(3))
+                    .status(ReservationStatus.RESERVED)
+                    .build(),
+            Reservation.builder()
+                    .id(4L)
+                    .member(memberFixture(4))
+                    .date(LocalDate.parse("2025-06-04"))
+                    .time(timeFixture(4))
+                    .theme(themeFixture(4))
+                    .status(ReservationStatus.PENDING)
+                    .build()
     );
 
     public static final String ADMIN_NAME = "냥인";

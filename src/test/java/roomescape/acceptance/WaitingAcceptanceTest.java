@@ -37,7 +37,7 @@ public class WaitingAcceptanceTest extends AcceptanceTest {
 
         assertAll(() -> {
             assertThat(response.name()).isEqualTo(MEMBER_TENNY_NAME);
-            assertThat(response.status()).isEqualTo(ReservationStatus.WAITING);
+            assertThat(response.status()).isEqualTo(ReservationStatus.PENDING);
         });
     }
 
@@ -54,7 +54,7 @@ public class WaitingAcceptanceTest extends AcceptanceTest {
 
         assertAll(() -> {
             assertThat(jsonPath.getString("name[0]")).isEqualTo(MEMBER_TENNY_NAME);
-            assertThat(jsonPath.getString("status[0]")).isEqualTo(ReservationStatus.WAITING.name());
+            assertThat(jsonPath.getString("status[0]")).isEqualTo(ReservationStatus.PENDING.name());
         });
     }
 
