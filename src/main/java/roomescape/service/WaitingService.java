@@ -2,7 +2,7 @@ package roomescape.service;
 
 import static roomescape.exception.RoomescapeErrorCode.MEMBER_NOT_FOUND;
 import static roomescape.exception.RoomescapeErrorCode.RESERVATION_ALREADY_EXISTS;
-import static roomescape.exception.RoomescapeErrorCode.RESERVATION_NOT_FOUND;
+import static roomescape.exception.RoomescapeErrorCode.RESERVATION_TIME_NOT_FOUND;
 import static roomescape.exception.RoomescapeErrorCode.THEME_NOT_FOUND;
 import static roomescape.exception.RoomescapeErrorCode.WAITING_DUPLICATED;
 import static roomescape.exception.RoomescapeErrorCode.WAITING_FOR_MY_RESERVATION;
@@ -19,8 +19,8 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.theme.Theme;
-import roomescape.dto.reservation.ReservationDto;
 import roomescape.dto.reservation.ReservationResponse;
+import roomescape.dto.reservation.ReservationWaitingRequest;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
@@ -48,19 +48,19 @@ public class WaitingService {
         this.themeRepository = themeRepository;
     }
 
-    public ReservationResponse createReservationWaiting(final ReservationDto reservationDto) {
-        final Member member = memberRepository.findById(reservationDto.memberId())
-                .orElseThrow(() -> new RoomescapeException(MEMBER_NOT_FOUND));
-        final ReservationTime time = reservationTimeRepository.findById(reservationDto.timeId())
-                .orElseThrow(() -> new RoomescapeException(RESERVATION_NOT_FOUND));
-        final Theme theme = themeRepository.findById(reservationDto.themeId())
-                .orElseThrow(() -> new RoomescapeException(THEME_NOT_FOUND));
-
-        final Reservation waiting = reservationDto.toModel(member, time, theme, ReservationStatus.WAITING);
+    public ReservationResponse createReservationWaiting(final ReservationWaitingRequest request) {
+        final Reservation waiting = Reservation.builder()
+                .member(getMemberById(request.memberId()))
+                .date(request.date())
+                .time(getTimeById(request.timeId()))
+                .theme(getThemeById(request.themeId()))
+                .status(ReservationStatus.PENDING)
+                .build();
+        waiting.validateDateTime();
         validateExistReservation(waiting);
         validateAlreadyReserved(waiting);
         validateDuplicatedWaiting(waiting);
-        return ReservationResponse.from(reservationRepository.save(waiting));
+        return new ReservationResponse(reservationRepository.save(waiting));
     }
 
     private void validateExistReservation(final Reservation waiting) {
@@ -82,7 +82,7 @@ public class WaitingService {
 
     private void validateDuplicatedWaiting(final Reservation waiting) {
         final boolean exists = reservationRepository.existsByThemeAndDateAndTimeAndStatusAndMember(
-                waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.WAITING,
+                waiting.getTheme(), waiting.getDate(), waiting.getTime(), ReservationStatus.PENDING,
                 waiting.getMember());
         if (exists) {
             throw new RoomescapeException(WAITING_DUPLICATED);
@@ -90,9 +90,9 @@ public class WaitingService {
     }
 
     public List<ReservationResponse> findReservationWaitings() {
-        final List<Reservation> waitings = reservationRepository.findByStatus(ReservationStatus.WAITING);
+        final List<Reservation> waitings = reservationRepository.findByStatus(ReservationStatus.PENDING);
         return waitings.stream()
-                .map(ReservationResponse::from)
+                .map(ReservationResponse::new)
                 .toList();
     }
 
@@ -100,7 +100,7 @@ public class WaitingService {
         final Reservation waiting = reservationRepository.findById(waitingId)
                 .orElseThrow(() -> new RoomescapeException(WAITING_NOT_FOUND));
         validateIsApprovable(waiting);
-        waiting.toReserved();
+        waiting.reserve();
     }
 
     private void validateIsApprovable(final Reservation waiting) {
@@ -117,5 +117,18 @@ public class WaitingService {
             throw new RoomescapeException(WAITING_NOT_FOUND);
         }
         reservationRepository.deleteById(id);
+    }
+
+    public Member getMemberById(final Long id) {
+        return memberRepository.findById(id).orElseThrow(() -> new RoomescapeException(MEMBER_NOT_FOUND));
+    }
+
+    private ReservationTime getTimeById(final Long id) {
+        return reservationTimeRepository.findById(id)
+                .orElseThrow(() -> new RoomescapeException(RESERVATION_TIME_NOT_FOUND));
+    }
+
+    private Theme getThemeById(final Long id) {
+        return themeRepository.findById(id).orElseThrow(() -> new RoomescapeException(THEME_NOT_FOUND));
     }
 }
