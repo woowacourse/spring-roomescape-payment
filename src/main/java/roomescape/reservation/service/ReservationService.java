@@ -157,7 +157,7 @@ public class ReservationService {
                 .orElseThrow(() -> new BadRequestException("해당 ID에 대응되는 사용자 예약이 없습니다."));
         Member member = memberRepository.findById(authInfo.getId())
                 .orElseThrow(() -> new BadRequestException("해당 유저를 찾을 수 없습니다."));
-        if (!member.isAdmin() && !reservation.isBookedBy(member)) {
+        if (member.isNotAdmin() && reservation.isNotBookedBy(member)) {
             throw new ForbiddenException("예약자가 아닙니다.");
         }
         reservationRepository.deleteById(reservationId);

@@ -71,6 +71,10 @@ public class Reservation {
         return this.member.equals(member);
     }
 
+    public boolean isNotBookedBy(Member member) {
+        return !this.isBookedBy(member);
+    }
+
     public void pendingReservation() {
         this.status = ReservationStatus.PENDING;
     }
