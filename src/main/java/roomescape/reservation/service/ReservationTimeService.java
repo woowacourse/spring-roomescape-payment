@@ -40,6 +40,11 @@ public class ReservationTimeService {
         return ReservationTimeResponse.from(reservationTimeRepository.save(reservationTime));
     }
 
+    public ReservationTime findReservationTime(Long id) {
+        return reservationTimeRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("해당 ID에 대응되는 예약 시간이 없습니다."));
+    }
+
     @Transactional(readOnly = true)
     public List<ReservationTimeResponse> findAll() {
         return reservationTimeRepository.findAll()

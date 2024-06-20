@@ -41,7 +41,7 @@ class MemberServiceTest extends ServiceTest {
         Member member = memberRepository.save(memberClover);
 
         //when
-        Member foundMember = memberService.findById(member.getId());
+        Member foundMember = memberService.findMember(member.getId());
 
         //then
         assertThat(member).isEqualTo(foundMember);

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import roomescape.reservation.controller.dto.AdminReservationRequest;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.domain.ReservationStatus;
-import roomescape.reservation.service.ReservationService;
+import roomescape.reservation.service.ReservationRegister;
 import roomescape.reservation.service.WaitingReservationService;
 
 import java.net.URI;
@@ -25,12 +25,12 @@ import java.util.List;
 @Tag(name = "Admin Reservation API", description = "어드민 예약 관련 API입니다.")
 public class AdminReservationController {
 
-    private final ReservationService reservationService;
+    private final ReservationRegister reservationRegister;
     private final WaitingReservationService waitingReservationService;
 
-    public AdminReservationController(ReservationService reservationService,
+    public AdminReservationController(ReservationRegister reservationRegister,
                                       WaitingReservationService waitingReservationService) {
-        this.reservationService = reservationService;
+        this.reservationRegister = reservationRegister;
         this.waitingReservationService = waitingReservationService;
     }
 
@@ -43,7 +43,7 @@ public class AdminReservationController {
     @Parameter(name = "adminReservationRequest", description = "예약 정보 DTO", required = true)
     public ResponseEntity<ReservationResponse> create(
             @RequestBody @Valid AdminReservationRequest adminReservationRequest) {
-        ReservationResponse reservationResponse = reservationService
+        ReservationResponse reservationResponse = reservationRegister
                 .createReservation(adminReservationRequest.toReservationRequest(), adminReservationRequest.memberId(), ReservationStatus.BOOKED);
         return ResponseEntity.created(URI.create("/admin/reservations/" + reservationResponse.reservationId()))
                 .body(reservationResponse);
@@ -55,7 +55,7 @@ public class AdminReservationController {
     @ApiResponse(responseCode = "204", description = "Deleted")
     @Parameter(name = "id", description = "예약 id", required = true)
     public void delete(@PathVariable("id") @Min(1) long reservationId) {
-        reservationService.delete(reservationId);
+        reservationRegister.deleteReservationSlot(reservationId);
     }
 
     @GetMapping("/waiting")

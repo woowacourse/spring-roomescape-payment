@@ -5,32 +5,15 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static roomescape.fixture.MemberFixture.*;
 
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import roomescape.auth.controller.dto.SignUpRequest;
-import roomescape.auth.domain.AuthInfo;
 import roomescape.auth.service.TokenProvider;
-import roomescape.fixture.MemberFixture;
-import roomescape.member.controller.dto.MemberResponse;
 import roomescape.member.service.MemberService;
-import roomescape.reservation.controller.dto.ReservationResponse;
-import roomescape.reservation.controller.dto.ReservationTimeRequest;
-import roomescape.reservation.controller.dto.ReservationTimeResponse;
-import roomescape.reservation.controller.dto.ThemeRequest;
-import roomescape.reservation.controller.dto.ThemeResponse;
-import roomescape.reservation.service.ReservationService;
+import roomescape.reservation.service.ReservationRegister;
 import roomescape.reservation.service.ReservationTimeService;
 import roomescape.reservation.service.ThemeService;
 import roomescape.util.ControllerTest;
@@ -38,7 +21,7 @@ import roomescape.util.ControllerTest;
 @DisplayName("관리자 페이지 테스트")
 class AdminControllerTest extends ControllerTest {
     @Autowired
-    ReservationService reservationService;
+    ReservationRegister reservationRegister;
 
     @Autowired
     ReservationTimeService reservationTimeService;

@@ -11,6 +11,8 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.domain.repository.MemberRepository;
 
+import javax.sound.midi.MetaMessage;
+
 @Service
 public class MemberService {
 
@@ -28,15 +30,15 @@ public class MemberService {
                 .toList();
     }
 
+    public Member findMember(Long id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("해당 유저를 찾을 수 없습니다."));
+    }
+
     public MemberResponse create(SignUpRequest signUpRequest) {
         String encodedPassword = passwordEncoder.encode(signUpRequest.password());
         Member member = memberRepository.save(
                 new Member(signUpRequest.name(), signUpRequest.email(), encodedPassword, Role.USER));
         return new MemberResponse(member.getId(), member.getName());
-    }
-
-    public Member findById(Long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new BadRequestException("해당 유저를 찾을 수 없습니다."));
     }
 }

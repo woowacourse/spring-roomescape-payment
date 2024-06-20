@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import roomescape.auth.domain.AuthInfo;
 import roomescape.global.annotation.LoginUser;
 import roomescape.reservation.controller.dto.*;
-import roomescape.reservation.service.ReservationService;
+import roomescape.reservation.service.ReservationRegister;
 import roomescape.reservation.service.WaitingReservationService;
 
 import java.net.URI;
@@ -25,12 +25,12 @@ import java.util.List;
 @Tag(name = "Reservation API", description = "예약 관련 API 입니다.")
 public class ReservationController {
 
-    private final ReservationService reservationService;
+    private final ReservationRegister reservationRegister;
     private final WaitingReservationService waitingReservationService;
 
-    public ReservationController(ReservationService reservationService,
+    public ReservationController(ReservationRegister reservationRegister,
                                  WaitingReservationService waitingReservationService) {
-        this.reservationService = reservationService;
+        this.reservationRegister = reservationRegister;
         this.waitingReservationService = waitingReservationService;
     }
 
@@ -55,7 +55,7 @@ public class ReservationController {
             @RequestParam(value = "dateFrom", required = false) LocalDate startDate,
             @RequestParam(value = "dateTo", required = false) LocalDate endDate
     ) {
-        return reservationService.findReservations(
+        return reservationRegister.findReservations(
                 new ReservationQueryRequest(themeId, memberId, startDate, endDate));
     }
 
@@ -71,7 +71,7 @@ public class ReservationController {
     })
     public ResponseEntity<ReservationResponse> create(@LoginUser AuthInfo authInfo,
                                                       @RequestBody @Valid ReservationPaymentRequest reservationPaymentRequest) {
-        ReservationResponse response = reservationService.reserve(reservationPaymentRequest, authInfo.getId());
+        ReservationResponse response = reservationRegister.reserve(reservationPaymentRequest, authInfo.getId());
 
         return ResponseEntity.created(URI.create("/reservations/" + response.reservationId())).body(response);
     }
@@ -98,7 +98,7 @@ public class ReservationController {
     @ApiResponse(responseCode = "200", description = "OK")
     @Parameter(name = "authInfo", description = "로그인한 유저의 정보", required = true)
     public List<ReservationViewResponse> getMyReservations(@LoginUser AuthInfo authInfo) {
-        List<ReservationWithStatus> reservationWithStatuses = reservationService.findReservations(authInfo);
+        List<ReservationWithStatus> reservationWithStatuses = reservationRegister.findReservations(authInfo);
         return waitingReservationService.convertReservationsWithStatusToViewResponses(reservationWithStatuses);
     }
 }

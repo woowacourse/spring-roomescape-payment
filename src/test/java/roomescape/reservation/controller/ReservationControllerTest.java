@@ -15,7 +15,7 @@ import roomescape.payment.infra.PaymentClient;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.reservation.controller.dto.*;
 import roomescape.reservation.domain.ReservationStatus;
-import roomescape.reservation.service.ReservationService;
+import roomescape.reservation.service.ReservationRegister;
 import roomescape.reservation.service.ReservationTimeService;
 import roomescape.reservation.service.ThemeService;
 import roomescape.util.ControllerTest;
@@ -36,7 +36,7 @@ import static roomescape.fixture.MemberFixture.getMemberClover;
 @DisplayName("예약 API 통합 테스트")
 class ReservationControllerTest extends ControllerTest {
     @Autowired
-    ReservationService reservationService;
+    ReservationRegister reservationRegister;
 
     @Autowired
     ReservationTimeService reservationTimeService;
@@ -107,7 +107,7 @@ class ReservationControllerTest extends ControllerTest {
                 new ReservationTimeRequest("11:00"));
         ThemeResponse themeResponse = themeService.create(new ThemeRequest("name", "description", "thumbnail"));
 
-        ReservationResponse reservationResponse = reservationService.createReservation(
+        ReservationResponse reservationResponse = reservationRegister.createReservation(
                 new ReservationRequest(
                         LocalDate.now().plusDays(10).toString(),
                         reservationTimeResponse.id(),

@@ -22,7 +22,6 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    @Transactional
     public Payment purchase(PaymentRequest paymentRequest, Long amount) {
         PaymentResponse paymentResponse = paymentClient.confirm(paymentRequest);
 

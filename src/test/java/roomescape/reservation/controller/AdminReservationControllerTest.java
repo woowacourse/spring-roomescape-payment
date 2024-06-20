@@ -12,7 +12,7 @@ import roomescape.auth.service.TokenProvider;
 import roomescape.member.controller.dto.MemberResponse;
 import roomescape.member.service.MemberService;
 import roomescape.reservation.controller.dto.*;
-import roomescape.reservation.service.ReservationService;
+import roomescape.reservation.service.ReservationRegister;
 import roomescape.reservation.service.ReservationTimeService;
 import roomescape.reservation.service.ThemeService;
 import roomescape.util.ControllerTest;
@@ -30,7 +30,7 @@ import static roomescape.fixture.MemberFixture.getMemberChoco;
 class AdminReservationControllerTest extends ControllerTest {
 
     @Autowired
-    ReservationService reservationService;
+    ReservationRegister reservationRegister;
 
     @Autowired
     ReservationTimeService reservationTimeService;

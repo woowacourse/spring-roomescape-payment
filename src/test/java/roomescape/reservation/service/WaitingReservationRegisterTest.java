@@ -33,10 +33,10 @@ import static roomescape.fixture.ReservationSlotFixture.getNextDayReservationSlo
 import static roomescape.fixture.ThemeFixture.getTheme1;
 
 @DisplayName("예약 대기 로직 테스트")
-class WaitingReservationServiceTest extends ServiceTest {
+class WaitingReservationRegisterTest extends ServiceTest {
 
     @Autowired
-    ReservationService reservationService;
+    ReservationRegister reservationRegister;
     @Autowired
     WaitingReservationService waitingReservationService;
     @Autowired
@@ -82,7 +82,7 @@ class WaitingReservationServiceTest extends ServiceTest {
         waitingReservationService.deleteReservation(AuthInfo.of(bookedReservation.getMember()), bookedReservation.getId());
         ReservationSlot reservationSlot = bookedReservation.getReservationSlot();
 
-        List<ReservationWithStatus> myReservations = reservationService.findReservations(AuthInfo.of(MemberFixture.getMemberAdmin()));
+        List<ReservationWithStatus> myReservations = reservationRegister.findReservations(AuthInfo.of(MemberFixture.getMemberAdmin()));
         ReservationWithStatus nextReservationWithStatus = myReservations.stream()
                 .filter(myReservationWithStatus -> myReservationWithStatus.themeName().equals(reservationSlot.getTheme().getName()))
                 .filter(myReservationWithStatus -> myReservationWithStatus.time().equals(reservationSlot.getTime().getStartAt()))
