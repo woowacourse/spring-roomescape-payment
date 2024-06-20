@@ -2,48 +2,79 @@ package roomescape.domain.reservation;
 
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Objects;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.theme.Theme;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Embedded
     private ReservationInfo info;
-
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "member_id")
     private Member member;
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus status;
+
+    public static Reservation fromDifferentMember(Reservation reservation, Member member) {
+        return new Reservation(reservation.info, member, ReservationStatus.PAYMENT_WAITING);
+    }
 
     protected Reservation() {
     }
 
-    public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member) {
-        this(null, new ReservationInfo(date, time, theme), member);
+    public Reservation(ReservationInfo info, Member member, ReservationStatus reservationStatus) {
+        this(null, info, member, reservationStatus);
     }
 
-    public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member) {
-        this(id, new ReservationInfo(date, time, theme), member);
+    public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member, ReservationStatus status) {
+        this(null, new ReservationInfo(date, time, theme), member, status);
     }
 
-    public Reservation(Long id, ReservationInfo info, Member member) {
+    public Reservation(Long id, LocalDate date, ReservationTime time, Theme theme, Member member, ReservationStatus status) {
+        this(id, new ReservationInfo(date, time, theme), member, status);
+    }
+
+    public Reservation(Long id, ReservationInfo info, Member member, ReservationStatus status) {
         this.id = id;
         this.info = info;
         this.member = member;
+        this.status = status;
     }
 
-    public void updateMember(Member member) {
-        this.member = member;
+    public void cancel() {
+        this.status = ReservationStatus.CANCELED;
+    }
+
+    public boolean isPaymentWaitingStatus() {
+        return this.status == ReservationStatus.PAYMENT_WAITING;
+    }
+
+    public boolean isBookedStatus() {
+        return this.status == ReservationStatus.BOOKED;
+    }
+
+    public boolean isCancelStatus() {
+        return this.status == ReservationStatus.CANCELED;
+    }
+
+    public void changeStatusToBooked() {
+        this.status = ReservationStatus.BOOKED;
     }
 
     public boolean isPast(LocalDateTime now) {
@@ -54,8 +85,8 @@ public class Reservation {
         return member.equals(otherMember);
     }
 
-    public boolean isNotOwnedBy(long otherMemberId) {
-        return member.isDifferentId(otherMemberId);
+    public boolean isNotOwnedBy(Member otherMember) {
+        return member.isDifferent(otherMember);
     }
 
     public Long getId() {

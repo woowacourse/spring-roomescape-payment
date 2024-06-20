@@ -17,6 +17,15 @@ public class CookieProvider {
                 .extract().detailedCookies();
     }
 
+    public Cookies createUserCookies(String email) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(new LoginRequest(email, "1234567890"))
+                .when().post("/login")
+                .then().log().all()
+                .extract().detailedCookies();
+    }
+
     public Cookies createAdminCookies() {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

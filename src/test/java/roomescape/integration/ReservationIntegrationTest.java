@@ -12,7 +12,12 @@ import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.theme.Theme;
 import roomescape.exception.payment.PaymentConfirmErrorCode;
 import roomescape.exception.payment.PaymentConfirmException;
+import roomescape.service.payment.PaymentStatus;
+import roomescape.service.payment.dto.PaymentCancelOutput;
+import roomescape.service.payment.dto.PaymentConfirmInput;
+import roomescape.service.payment.dto.PaymentConfirmOutput;
 
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -90,6 +95,7 @@ class ReservationIntegrationTest extends IntegrationTest {
             Theme theme = themeFixture.createFirstTheme();
             Member member = memberFixture.createUserMember();
             Reservation reservation = reservationFixture.createFutureReservation(time, theme, member);
+            paymentFixture.createPayment(reservation);
             waitingFixture.createWaiting(reservation, member);
 
             RestAssured.given().log().all()
@@ -124,7 +130,9 @@ class ReservationIntegrationTest extends IntegrationTest {
         @Test
         void 결제_성공_시_예약을_추가할_수_있다() {
             params.put("date", "2000-04-07");
-            paymentClient.confirmPayment(any());
+            given(paymentClient.confirmPayment(any())).willReturn(
+                    new PaymentConfirmOutput("paymentKey", "orderId", "orderName",
+                            1000, ZonedDateTime.now(), ZonedDateTime.now(), PaymentStatus.DONE));
 
             RestAssured.given().log().all()
                     .cookies(cookieProvider.createUserCookies())
@@ -249,8 +257,8 @@ class ReservationIntegrationTest extends IntegrationTest {
     }
 
     @Nested
-    @DisplayName("예약 삭제 API")
-    class DeleteReservation {
+    @DisplayName("예약 취소 API")
+    class CancelReservation {
         Member member;
         Reservation reservation;
 
@@ -260,38 +268,114 @@ class ReservationIntegrationTest extends IntegrationTest {
             Theme theme = themeFixture.createFirstTheme();
             member = memberFixture.createUserMember();
             reservation = reservationFixture.createFutureReservation(time, theme, member);
+            paymentFixture.createPayment(reservation);
             memberFixture.createAdminMember();
         }
 
         @Test
-        void 예약_id와_예약자_id로_예약을_삭제할_수_있다() {
+        void 예약_id로_예약을_취소할_수_있다() {
+            given(paymentClient.cancelPayment(any()))
+                    .willReturn(new PaymentCancelOutput(
+                            "paymentKey", "orderId", "orderName", PaymentStatus.CANCELED, ZonedDateTime.now(), ZonedDateTime.now()));
+
             RestAssured.given().log().all()
                     .cookies(cookieProvider.createAdminCookies())
-                    .when().delete("/reservations/" + reservation.getId() + "?memberId=" + member.getId())
+                    .when().delete("/reservations/" + reservation.getId() + "/cancel")
                     .then().log().all()
                     .statusCode(204);
         }
 
         @Test
-        void 존재하지_않는_예약_id로_예약을_삭제할_수_없다() {
+        void 존재하지_않는_예약_id로_예약을_취소할_수_없다() {
             long wrongReservationId = 10L;
 
             RestAssured.given().log().all()
                     .cookies(cookieProvider.createAdminCookies())
-                    .when().delete("/reservations/" + wrongReservationId + "?memberId=" + member.getId())
+                    .when().delete("/reservations/" + wrongReservationId + "/cancel")
                     .then().log().all()
                     .statusCode(404);
         }
 
         @Test
-        void 예약자가_아닌_사용자_id로_예약을_삭제할_수_없다() {
-            long wrongMemberId = 10L;
+        void 예약자가_아닌_사용자는_예약을_취소할_수_없다() {
+            Member anotherMember = memberFixture.createUserMember("another@gmail.com");
 
             RestAssured.given().log().all()
-                    .cookies(cookieProvider.createAdminCookies())
-                    .when().delete("/reservations/" + reservation.getId() + "?memberId=" + wrongMemberId)
+                    .cookies(cookieProvider.createUserCookies(anotherMember.getEmail().address()))
+                    .when().delete("/reservations/" + reservation.getId() + "/cancel")
                     .then().log().all()
-                    .statusCode(400);
+                    .statusCode(403);
+        }
+    }
+
+    @Nested
+    @DisplayName("예약 결제 API")
+    class PayReservation {
+        Member member;
+        Reservation reservation;
+
+        @BeforeEach
+        void setUp() {
+            ReservationTime time = timeFixture.createFutureTime();
+            Theme theme = themeFixture.createFirstTheme();
+            member = memberFixture.createUserMember();
+            reservation = reservationFixture.createPaymentWaitingReservation(time, theme, member);
+        }
+
+        @Test
+        void 결제_대기중인_예약을_결제하면_예약상태로_변경되고_결제정보가_추가된다() {
+            given(paymentClient.confirmPayment(any())).willReturn(
+                    new PaymentConfirmOutput("paymentKey", "orderId", "orderName",
+                            1000, ZonedDateTime.now(), ZonedDateTime.now(), PaymentStatus.DONE));
+
+            PaymentConfirmInput paymentConfirmInput = new PaymentConfirmInput("orderId", 1000, "paymentKey");
+
+            RestAssured.given().log().all()
+                    .cookies(cookieProvider.createUserCookies())
+                    .when()
+                    .body(paymentConfirmInput)
+                    .contentType(ContentType.JSON)
+                    .post("/reservations/" + reservation.getId() + "/payment")
+                    .then().log().all()
+                    .statusCode(200)
+                    .body("id", is(reservation.getId().intValue()));
+            ;
+        }
+    }
+
+    @Nested
+    @DisplayName("결제대기 예약 삭제 API")
+    class DeletePaymentWaitingReservation {
+        Member member;
+        Reservation reservation;
+
+        @BeforeEach
+        void setUp() {
+            ReservationTime time = timeFixture.createFutureTime();
+            Theme theme = themeFixture.createFirstTheme();
+            member = memberFixture.createUserMember();
+            reservation = reservationFixture.createPaymentWaitingReservation(time, theme, member);
+            memberFixture.createAdminMember();
+        }
+
+        @Test
+        void 예약_id로_결제_대기_예약을_삭제할_수_있다() {
+            RestAssured.given().log().all()
+                    .cookies(cookieProvider.createAdminCookies())
+                    .when().delete("/reservations/" + reservation.getId())
+                    .then().log().all()
+                    .statusCode(204);
+        }
+
+        @Test
+        void 예약자가_아닌_사용자는_예약을_삭제할_수_없다() {
+            Member anotherMember = memberFixture.createUserMember("another@gmail.com");
+
+            RestAssured.given().log().all()
+                    .cookies(cookieProvider.createUserCookies(anotherMember.getEmail().address()))
+                    .when().delete("/reservations/" + reservation.getId())
+                    .then().log().all()
+                    .statusCode(403);
         }
     }
 }

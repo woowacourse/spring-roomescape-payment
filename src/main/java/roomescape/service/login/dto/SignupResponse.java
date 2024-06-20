@@ -17,7 +17,7 @@ public class SignupResponse {
     }
 
     public SignupResponse(Member member) {
-        this(member.getId(), member.getName().getName(), member.getEmail().getAddress(), member.getRole());
+        this(member.getId(), member.getName().name(), member.getEmail().address(), member.getRole());
     }
 
     public Long getId() {

@@ -53,10 +53,35 @@ function renderTheme(data) {
     const themeSlots = document.getElementById('theme-slots');
     themeSlots.innerHTML = '';
     data.themes.forEach(theme => {
-        const name = theme.name
-        const themeId = theme.id
-        themeSlots.appendChild(createSlot('theme', name, themeId));
+        const name = theme.name;
+        const themeId = theme.id;
+        const price = theme.price; // 쉼표로 구분된 가격
+        themeSlots.appendChild(createThemeSlot('theme', name, themeId, price));
     });
+}
+
+function createThemeSlot(type, name, id, price, booked) {
+    const div = document.createElement('div');
+    div.className = type + '-slot cursor-pointer bg-light border rounded p-3 mb-2 d-flex justify-content-between align-items-center';
+    div.setAttribute('data-' + type + '-id', id);
+    div.setAttribute('data-' + type + '-price', price);
+
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = name;
+
+    const priceSpan = document.createElement('span');
+    priceSpan.textContent = `${price} 원`;
+    priceSpan.className = 'text-right';
+    priceSpan.style.color = 'gray'
+
+    div.appendChild(nameSpan);
+    div.appendChild(priceSpan);
+
+    if (type === 'time') {
+        div.setAttribute('data-time-booked', booked);
+    }
+
+    return div;
 }
 
 function createSlot(type, text, id, booked) {
@@ -158,8 +183,8 @@ function checkDateAndThemeAndTime() {
 function onReservationButtonClick(event, paymentWidget) {
     const selectedDate = document.getElementById("datepicker").value;
     const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
+    const selectedThemePrice = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-price');
     const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
-
     if (selectedDate && selectedThemeId && selectedTimeId) {
         const reservationData = {
             date: selectedDate,
@@ -173,10 +198,17 @@ function onReservationButtonClick(event, paymentWidget) {
         // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
         // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
         const orderIdPrefix = "ROOMESCAPE";
+        // Payment Amount 변경
+        paymentWidget.renderPaymentMethods(
+            "#payment-method",
+            {value: selectedThemePrice},
+            {variantKey: "DEFAULT"}
+        );
+
         paymentWidget.requestPayment({
             orderId: orderIdPrefix + generateRandomString(),
             orderName: "테스트 방탈출 예약 결제 1건",
-            amount: 1000,
+            amount: parseInt(selectedThemePrice)
         }).then(function (data) {
             console.debug(data);
             fetchReservationPayment(data, reservationData);

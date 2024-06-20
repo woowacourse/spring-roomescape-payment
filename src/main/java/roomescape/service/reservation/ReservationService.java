@@ -3,8 +3,11 @@ package roomescape.service.reservation;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.reservationtime.ReservationTimeRepository;
 import roomescape.domain.reservationwaiting.ReservationWaiting;
@@ -14,8 +17,9 @@ import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.reservation.DuplicatedReservationException;
 import roomescape.exception.reservation.InvalidDateTimeReservationException;
-import roomescape.exception.reservation.InvalidReservationMemberException;
-import roomescape.service.payment.PaymentClient;
+import roomescape.exception.reservation.NonRemovableStatusReservationException;
+import roomescape.exception.reservation.ReservationAuthorityNotExistException;
+import roomescape.service.payment.PaymentService;
 import roomescape.service.payment.dto.PaymentConfirmInput;
 import roomescape.service.reservation.dto.ReservationListResponse;
 import roomescape.service.reservation.dto.ReservationMineListResponse;
@@ -28,6 +32,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.springframework.data.jpa.domain.Specification.where;
@@ -35,6 +40,7 @@ import static roomescape.domain.reservation.ReservationRepository.Specs.hasEndDa
 import static roomescape.domain.reservation.ReservationRepository.Specs.hasMemberId;
 import static roomescape.domain.reservation.ReservationRepository.Specs.hasStartDate;
 import static roomescape.domain.reservation.ReservationRepository.Specs.hasThemeId;
+import static roomescape.domain.reservation.ReservationRepository.Specs.notStatus;
 
 @Service
 @Transactional
@@ -43,20 +49,23 @@ public class ReservationService {
     private final ReservationWaitingRepository reservationWaitingRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
-    private final PaymentClient paymentClient;
+    private final PaymentService paymentService;
+    private final PaymentRepository paymentRepository;
     private final Clock clock;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationWaitingRepository reservationWaitingRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
-                              PaymentClient paymentClient,
+                              PaymentService paymentService,
+                              PaymentRepository paymentRepository,
                               Clock clock) {
         this.reservationRepository = reservationRepository;
         this.reservationWaitingRepository = reservationWaitingRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
-        this.paymentClient = paymentClient;
+        this.paymentService = paymentService;
+        this.paymentRepository = paymentRepository;
         this.clock = clock;
     }
 
@@ -68,6 +77,7 @@ public class ReservationService {
                         .and(hasThemeId(themeId))
                         .and(hasStartDate(dateFrom))
                         .and(hasEndDate(dateTo))
+                        .and(notStatus(ReservationStatus.CANCELED))
         );
         return new ReservationListResponse(reservations.stream()
                 .map(ReservationResponse::new)
@@ -77,12 +87,19 @@ public class ReservationService {
     @Transactional(readOnly = true)
     public ReservationMineListResponse findMyReservation(Member member) {
         List<Reservation> reservations = reservationRepository.findByMemberId(member.getId());
+        List<Payment> payments = paymentRepository.findByReservationIn(reservations);
         List<ReservationWaitingWithRank> reservationWaitingWithRanks
                 = reservationWaitingRepository.findAllWaitingWithRankByMemberId(member.getId());
 
         List<ReservationMineResponse> myReservations = Stream.concat(
-                        reservations.stream().map(ReservationMineResponse::new),
-                        reservationWaitingWithRanks.stream().map(ReservationMineResponse::new)
+                        reservations.stream().map(reservation -> {
+                            Optional<Payment> payment = payments.stream()
+                                    .filter(p -> p.getReservation().equals(reservation))
+                                    .findAny();
+                            return payment.map(value -> ReservationMineResponse.ofPaidReservation(reservation, value))
+                                    .orElseGet(() -> ReservationMineResponse.fromBeforePaidReservation(reservation));
+                        }),
+                        reservationWaitingWithRanks.stream().map(ReservationMineResponse::fromReservationWaitingInfo)
                 )
                 .sorted(Comparator.comparing(ReservationMineResponse::retrieveDateTime))
                 .toList();
@@ -92,7 +109,7 @@ public class ReservationService {
     public ReservationResponse saveReservationWithPayment(
             ReservationSaveInput reservationSaveInput, PaymentConfirmInput paymentConfirmInput, Member member) {
         Reservation savedReservation = saveReservation(reservationSaveInput, member);
-        paymentClient.confirmPayment(paymentConfirmInput);
+        paymentService.confirmPayment(paymentConfirmInput, savedReservation);
 
         return new ReservationResponse(savedReservation);
     }
@@ -112,6 +129,17 @@ public class ReservationService {
         return reservationRepository.save(reservation);
     }
 
+    public ReservationResponse payReservation(
+            Long reservationId, PaymentConfirmInput paymentConfirmInput, Member member) {
+        Reservation reservation = reservationRepository.findByIdAndMember(reservationId, member)
+                .orElseThrow(ReservationAuthorityNotExistException::new);
+        reservation.changeStatusToBooked();
+
+        paymentService.confirmPayment(paymentConfirmInput, reservation);
+
+        return new ReservationResponse(reservation);
+    }
+
     private void validateDuplicateReservation(Reservation reservation) {
         if (reservationRepository.existsByInfo(reservation.getInfo())) {
             throw new DuplicatedReservationException();
@@ -124,24 +152,50 @@ public class ReservationService {
         }
     }
 
-    public void deleteReservation(long reservationId, long memberId) {
+    public void cancelReservation(long reservationId, Member member) {
         Reservation reservation = reservationRepository.getReservationById(reservationId);
-        validateReservationMember(reservation, memberId);
+        validateReservationAuthority(reservation, member);
 
         reservationWaitingRepository.findFirstByReservation(reservation).ifPresentOrElse(
-                waiting -> upgradeWaitingToReservationAndDeleteWaiting(reservation, waiting),
-                () -> reservationRepository.delete(reservation)
+                waiting -> updateWaitingToReservationAndDeleteWaiting(reservation, waiting),
+                reservation::cancel
         );
+        paymentService.cancelReservationPayment(reservation);
     }
 
-    private void validateReservationMember(Reservation reservation, long memberId) {
-        if (reservation.isNotOwnedBy(memberId)) {
-            throw new InvalidReservationMemberException();
+    public void deleteReservation(long reservationId, Member member) {
+        Reservation reservation = reservationRepository.getReservationById(reservationId);
+        validateReservationStatusForDelete(reservation);
+        validateReservationAuthority(reservation, member);
+
+        if (!reservation.isPaymentWaitingStatus()) {
+            paymentService.deleteReservationPayment(reservation);
+        }
+        reservationRepository.delete(reservation);
+    }
+
+    private void validateReservationStatusForDelete(Reservation reservation) {
+        if (reservation.isCancelStatus() || reservation.isPaymentWaitingStatus()) {
+            return;
+        }
+        throw new NonRemovableStatusReservationException();
+    }
+
+    private void validateReservationAuthority(Reservation reservation, Member member) {
+        if (member.isAdmin()) {
+            return;
+        }
+        if (reservation.isNotOwnedBy(member)) {
+            throw new ReservationAuthorityNotExistException();
         }
     }
 
-    private void upgradeWaitingToReservationAndDeleteWaiting(Reservation reservation, ReservationWaiting waiting) {
-        reservation.updateMember(waiting.getMember());
+    private void updateWaitingToReservationAndDeleteWaiting(Reservation reservation, ReservationWaiting waiting) {
+        reservation.cancel();
+
+        Reservation newMemberReservation = Reservation.fromDifferentMember(reservation, waiting.getMember());
+        reservationRepository.save(newMemberReservation);
+
         reservationWaitingRepository.delete(waiting);
     }
 }

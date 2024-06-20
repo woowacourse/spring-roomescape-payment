@@ -1,9 +1,5 @@
 package roomescape.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,6 +15,11 @@ import roomescape.service.theme.dto.ThemeListResponse;
 import roomescape.service.theme.dto.ThemeRequest;
 import roomescape.service.theme.dto.ThemeResponse;
 
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 class ThemeServiceTest extends ServiceTest {
     @Autowired
     private ThemeService themeService;
@@ -32,8 +33,8 @@ class ThemeServiceTest extends ServiceTest {
 
             ThemeListResponse response = themeService.findAllTheme();
 
-            assertThat(response.getThemes().size())
-                    .isEqualTo(1);
+            assertThat(response.getThemes())
+                    .hasSize(1);
         }
     }
 
@@ -59,7 +60,7 @@ class ThemeServiceTest extends ServiceTest {
     class SaveTheme {
         @Test
         void 테마를_추가할_수_있다() {
-            ThemeRequest request = new ThemeRequest("레벨3", "내용이다.", "https://naver.com");
+            ThemeRequest request = new ThemeRequest("레벨3", "내용이다.", "https://naver.com", 1000);
 
             ThemeResponse response = themeService.saveTheme(request);
 

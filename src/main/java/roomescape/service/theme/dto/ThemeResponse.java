@@ -7,19 +7,22 @@ public class ThemeResponse {
     private final String name;
     private final String description;
     private final String thumbnail;
+    private final int price;
 
-    public ThemeResponse(Long id, String name, String description, String thumbnail) {
+    public ThemeResponse(Long id, String name, String description, String thumbnail, int price) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.thumbnail = thumbnail;
+        this.price = price;
     }
 
     public ThemeResponse(Theme theme) {
         this(theme.getId(),
-                theme.getName().getName(),
+                theme.getName().name(),
                 theme.getDescription(),
-                theme.getThumbnail()
+                theme.getThumbnail(),
+                theme.getPrice()
         );
     }
 
@@ -37,5 +40,9 @@ public class ThemeResponse {
 
     public String getThumbnail() {
         return thumbnail;
+    }
+
+    public int getPrice() {
+        return price;
     }
 }

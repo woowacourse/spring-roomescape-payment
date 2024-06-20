@@ -1,11 +1,5 @@
 package roomescape.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -24,6 +18,13 @@ import roomescape.service.reservationtime.dto.ReservationTimeListResponse;
 import roomescape.service.reservationtime.dto.ReservationTimeRequest;
 import roomescape.service.reservationtime.dto.ReservationTimeResponse;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 class ReservationTimeServiceTest extends ServiceTest {
     @Autowired
     private ReservationTimeService reservationTimeService;
@@ -37,8 +38,8 @@ class ReservationTimeServiceTest extends ServiceTest {
 
             ReservationTimeListResponse response = reservationTimeService.findAllReservationTime();
 
-            assertThat(response.getTimes().size())
-                    .isEqualTo(1);
+            assertThat(response.getTimes())
+                    .hasSize(1);
         }
     }
 

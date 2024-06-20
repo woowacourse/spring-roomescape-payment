@@ -12,7 +12,7 @@ public class LoginCheckResponse {
     }
 
     public LoginCheckResponse(Member member) {
-        this(member.getName().getName());
+        this(member.getName().name());
     }
 
     public String getName() {

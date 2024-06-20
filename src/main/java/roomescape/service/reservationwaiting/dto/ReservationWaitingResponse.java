@@ -2,9 +2,10 @@ package roomescape.service.reservationwaiting.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
+import roomescape.domain.reservationwaiting.ReservationWaiting;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
-import roomescape.domain.reservationwaiting.ReservationWaiting;
 
 public class ReservationWaitingResponse {
     private final Long id;
@@ -26,8 +27,8 @@ public class ReservationWaitingResponse {
 
     public ReservationWaitingResponse(ReservationWaiting waiting) {
         this(waiting.getId(),
-                waiting.getMember().getName().getName(),
-                waiting.getReservation().getTheme().getName().getName(),
+                waiting.getMember().getName().name(),
+                waiting.getReservation().getTheme().getName().name(),
                 waiting.getReservation().getDate(),
                 waiting.getReservation().getTime().getStartAt(),
                 waiting.getReservation().getId()

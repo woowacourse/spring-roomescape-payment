@@ -1,3 +1,7 @@
+# ERD
+
+<img width="1183" alt="image" src="https://github.com/woowacourse/spring-roomescape-payment/assets/84304802/6de95d67-f13e-4b18-b2d5-dc0e27bf515a">
+
 # 기능 명세
 
 ## 1단계 - 에약 시 결제 단계 추가
@@ -318,7 +322,7 @@ Content-Type: application/json
 Request
 
 ```
-DELETE /reservations/1?memberId=1
+DELETE /reservations/1
 Cookie: token=hello.example.token
 ```
 

@@ -14,7 +14,7 @@ public class MemberResponse {
     }
 
     public MemberResponse(Member member) {
-        this(member.getId(), member.getName().getName(), member.getEmail().getAddress());
+        this(member.getId(), member.getName().name(), member.getEmail().address());
     }
 
     public Long getId() {

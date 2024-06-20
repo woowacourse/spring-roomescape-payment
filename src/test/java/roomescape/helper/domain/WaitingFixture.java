@@ -1,12 +1,13 @@
 package roomescape.helper.domain;
 
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservationwaiting.ReservationWaiting;
 import roomescape.domain.reservationwaiting.ReservationWaitingRepository;
+
+import java.util.List;
 
 @Component
 public class WaitingFixture {
@@ -20,5 +21,9 @@ public class WaitingFixture {
 
     public List<ReservationWaiting> findAllWaiting() {
         return reservationWaitingRepository.findAll();
+    }
+
+    public ReservationWaiting getById(Long id) {
+        return reservationWaitingRepository.getReservationWaitingById(id);
     }
 }

@@ -1,5 +1,7 @@
 package roomescape.controller.theme;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import roomescape.service.theme.dto.ThemeResponse;
 
 import java.net.URI;
 
+@Tag(name = "Theme")
 @RestController
 public class ThemeController {
     private final ThemeService themeService;
@@ -27,12 +30,14 @@ public class ThemeController {
     }
 
     @GetMapping("/themes")
+    @Operation(summary = "전체 테마 조회", description = "전체 테마 정보를 조회한다.")
     public ResponseEntity<ThemeListResponse> findAllTheme() {
         ThemeListResponse response = themeService.findAllTheme();
         return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("/themes/popular")
+    @Operation(summary = "인기 테마 조회", description = "TOP10 인기 테마를 조회한다.")
     public ResponseEntity<ThemeListResponse> findAllPopularTheme() {
         ThemeListResponse response = themeService.findAllPopularTheme();
         return ResponseEntity.ok().body(response);
@@ -40,6 +45,7 @@ public class ThemeController {
 
     @RoleAllowed(MemberRole.ADMIN)
     @PostMapping("/themes")
+    @Operation(summary = "[관리자] 테마 추가", description = "테마를 추가한다.")
     public ResponseEntity<ThemeResponse> saveTheme(@RequestBody @Valid ThemeRequest request) {
         ThemeResponse response = themeService.saveTheme(request);
         return ResponseEntity.created(URI.create("/themes/" + response.getId())).body(response);
@@ -47,6 +53,7 @@ public class ThemeController {
 
     @RoleAllowed(MemberRole.ADMIN)
     @DeleteMapping("/themes/{themeId}")
+    @Operation(summary = "[관리자] 테마 삭제", description = "테마를 삭제한다.")
     public ResponseEntity<Void> deleteTheme(
             @PathVariable @NotNull(message = "themeId 값이 null일 수 없습니다.") Long themeId) {
         themeService.deleteTheme(themeId);

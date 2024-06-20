@@ -1,14 +1,16 @@
 package roomescape.domain.reservationwaiting;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.util.Objects;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.Reservation;
+
+import java.util.Objects;
 
 @Entity
 public class ReservationWaiting {
@@ -16,11 +18,11 @@ public class ReservationWaiting {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn()
     private Reservation reservation;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Member member;
 
     protected ReservationWaiting() {

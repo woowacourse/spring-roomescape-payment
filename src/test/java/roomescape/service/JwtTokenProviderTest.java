@@ -1,13 +1,8 @@
 package roomescape.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
-import java.util.Base64;
-import java.util.Date;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,6 +16,12 @@ import roomescape.domain.member.MemberRole;
 import roomescape.exception.login.ExpiredTokenException;
 import roomescape.exception.login.InvalidTokenException;
 import roomescape.service.login.JwtTokenProvider;
+
+import java.util.Base64;
+import java.util.Date;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class JwtTokenProviderTest extends ServiceTest {
     private static final String ROLE_CLAIM_NAME = "role";
@@ -72,7 +73,7 @@ class JwtTokenProviderTest extends ServiceTest {
             String wrongRole = "WRONG_USER";
 
             String invalidToken = Jwts.builder()
-                    .setSubject(email.getAddress())
+                    .setSubject(email.address())
                     .claim(ROLE_CLAIM_NAME, wrongRole)
                     .setExpiration(expiredAt)
                     .signWith(SignatureAlgorithm.HS256, secretKey)
@@ -87,7 +88,7 @@ class JwtTokenProviderTest extends ServiceTest {
             Date alreadyExpiredAt = new Date(now.getTime() - validityInMilliseconds);
 
             String expiredToken = Jwts.builder()
-                    .setSubject(email.getAddress())
+                    .setSubject(email.address())
                     .claim(ROLE_CLAIM_NAME, role.name())
                     .setExpiration(alreadyExpiredAt)
                     .signWith(SignatureAlgorithm.HS256, secretKey)
@@ -102,7 +103,7 @@ class JwtTokenProviderTest extends ServiceTest {
             String invalidSecretKey = "wrongSecretKey";
 
             String invalidToken = Jwts.builder()
-                    .setSubject(email.getAddress())
+                    .setSubject(email.address())
                     .claim(ROLE_CLAIM_NAME, role.name())
                     .setExpiration(expiredAt)
                     .signWith(SignatureAlgorithm.HS256, invalidSecretKey)

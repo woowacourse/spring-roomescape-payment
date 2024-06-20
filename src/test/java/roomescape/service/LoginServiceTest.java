@@ -1,9 +1,5 @@
 package roomescape.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,6 +17,10 @@ import roomescape.service.login.dto.LoginRequest;
 import roomescape.service.login.dto.SignupRequest;
 import roomescape.service.login.dto.SignupResponse;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 class LoginServiceTest extends ServiceTest {
     @Autowired
     private LoginService loginService;
@@ -37,8 +37,8 @@ class LoginServiceTest extends ServiceTest {
         @BeforeEach
         void setUp() {
             Member member = memberFixture.createUserMember();
-            email = member.getEmail().getAddress();
-            password = member.getPassword().getPassword();
+            email = member.getEmail().address();
+            password = member.getPassword().password();
         }
 
         @Test
@@ -133,7 +133,7 @@ class LoginServiceTest extends ServiceTest {
         @Test
         void 이미_존재하는_이메일로_회원가입시_예외가_발생한다() {
             Member member = memberFixture.createUserMember();
-            String duplicatedEmail = member.getEmail().getAddress();
+            String duplicatedEmail = member.getEmail().address();
             SignupRequest request = new SignupRequest(duplicatedEmail, password, name);
 
             assertThatThrownBy(() -> loginService.signup(request))

@@ -1,23 +1,26 @@
 package roomescape.domain.reservation;
 
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import roomescape.domain.reservationtime.ReservationTime;
+import roomescape.domain.theme.Theme;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import roomescape.domain.reservationtime.ReservationTime;
-import roomescape.domain.theme.Theme;
 
 @Embeddable
 public class ReservationInfo {
     private LocalDate date;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "reservation_time_id")
     private ReservationTime time;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "theme_id")
     private Theme theme;
 
     protected ReservationInfo() {
