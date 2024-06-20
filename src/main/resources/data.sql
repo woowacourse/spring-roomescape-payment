@@ -61,29 +61,38 @@ VALUES ('타칸', 'dev.tacan@gmail.com', '$2a$10$xFQbps5IJ6r9h69yhgYFe.hrbU59NA6
 
 
 -- 결제 추가
--- INSERT INTO payment(order_id, total_amount, method, request_at, approved_at)
--- VALUES ()
+INSERT INTO payment(order_id, payment_key, total_amount, payment_method, requested_at, approved_at)
+VALUES ('MC4wODU4ODQwMzg4NDk0', '5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1', 1000, '카드', CURRENT_TIME(), CURRENT_TIME()),
+       ('MC4xMjM0NTY3ODkwMTIz', 'QzN8UJkLmZvL9y7p2w3gVp7dXzxM5bNw4RKM2kX0sAw1a5e3', 1000, '카드', CURRENT_TIME(), CURRENT_TIME()),
+       ('MC4xNjc1NDIzMDg3OTU2', '7FrCZSKjvBlQ8mK6xW5pQr2tXnWYkV4j1LOPu3LmjWb0s7y9', 1000, '카드', CURRENT_TIME(), CURRENT_TIME()),
+       ('MC4wNzg0MTIzOTY4NzU0', '2GkLPmJs7QdY9xW6rV5hNz8bXpMB4kT3wEJo6vV0yAsX5c1w', 1000, '카드', CURRENT_TIME(), CURRENT_TIME()),
+       ('MC4xMDc4NTYzNzI4MTkz', '8FrLZSKjvQlW5mX6xW5pQr4tXpKYkV2j3NOMu7LmjTb0w9e3', 1000, '카드', CURRENT_TIME(), CURRENT_TIME()),
+       ('MC4xNjE1Mjc4MzQ2NzA5', '9GnNKTJm8QlY5xW6rV3hNz9bXpLB2kT3wEJo7vY0yPsX4c1v', 1000, '카드', CURRENT_TIME(), CURRENT_TIME()),
+       ('MC4xMjU0NzY4OTQzMTc1', '4KnPLmJs9QdY6xW5rV8hNz7bXpMB3kT2wEJo5vV0yAsX2c1w', 1000, '카드', CURRENT_TIME(), CURRENT_TIME()),
+       ('MC4xODU3NjQzMjE1Njk4', '6MnNKTJm9QlY7xW4rV2hNz6bXpLB1kT3wEJo8vY0yPsX3c2v', 1000, '카드', CURRENT_TIME(), CURRENT_TIME());
+
 
 -- 예약 추가
-INSERT INTO reservation(member_id, reservation_slot_id, created_at, status)
-VALUES (1, 1, CURRENT_TIME(), 'BOOKED');
-INSERT INTO reservation(member_id, reservation_slot_id, created_at, status)
-VALUES (1, 3, CURRENT_TIME(), 'BOOKED');
-INSERT INTO reservation(member_id, reservation_slot_id, created_at, status)
-VALUES (1, 7, CURRENT_TIME(), 'BOOKED');
-INSERT INTO reservation(member_id, reservation_slot_id, created_at, status)
-VALUES (2, 2, CURRENT_TIME(), 'BOOKED');
-INSERT INTO reservation(member_id, reservation_slot_id, created_at, status)
-VALUES (2, 4, CURRENT_TIME(), 'BOOKED');
-INSERT INTO reservation(member_id, reservation_slot_id, created_at, status)
-VALUES (2, 8, CURRENT_TIME(), 'BOOKED');
+INSERT INTO reservation(member_id, reservation_slot_id, payment_id, created_at, status)
+VALUES (1, 1, 1, CURRENT_TIME(), 'BOOKED');
+INSERT INTO reservation(member_id, reservation_slot_id, payment_id, created_at, status)
+VALUES (1, 3, 2, CURRENT_TIME(), 'BOOKED');
+INSERT INTO reservation(member_id, reservation_slot_id, payment_id, created_at, status)
+VALUES (1, 7, 3, CURRENT_TIME(), 'BOOKED');
+INSERT INTO reservation(member_id, reservation_slot_id, payment_id, created_at, status)
+VALUES (2, 2, 4, CURRENT_TIME(), 'BOOKED');
+INSERT INTO reservation(member_id, reservation_slot_id, payment_id, created_at, status)
+VALUES (2, 4, 5, CURRENT_TIME(), 'BOOKED');
+INSERT INTO reservation(member_id, reservation_slot_id, payment_id, created_at, status)
+VALUES (2, 8, 6, CURRENT_TIME(), 'BOOKED');
+INSERT INTO reservation(member_id, reservation_slot_id, payment_id, created_at, status)
+VALUES (3, 5, 7, CURRENT_TIME(), 'BOOKED');
+INSERT INTO reservation(member_id, reservation_slot_id, payment_id, created_at, status)
+VALUES (3, 6, 8, CURRENT_TIME(), 'BOOKED');
 INSERT INTO reservation(member_id, reservation_slot_id, created_at, status)
 VALUES (5, 3, DATEADD(HOUR, 1, CURRENT_TIME()), 'WAITING');
-INSERT INTO reservation(member_id, reservation_slot_id, created_at, status)
-VALUES (3, 5, CURRENT_TIME(), 'BOOKED');
-INSERT INTO reservation(member_id, reservation_slot_id, created_at, status)
-VALUES (3, 6, CURRENT_TIME(), 'BOOKED');
 INSERT INTO reservation(member_id, reservation_slot_id, created_at, status)
 VALUES (2, 7, DATEADD(HOUR, 1, CURRENT_TIME()), 'WAITING');
 INSERT INTO reservation(member_id, reservation_slot_id, created_at, status)
 VALUES (5, 7, DATEADD(HOUR, 2, CURRENT_TIME()), 'WAITING');
+
