@@ -60,7 +60,7 @@ public class ReservationBuilder {
         Objects.requireNonNull(date, "date is required");
         Objects.requireNonNull(time, "time is required");
         Objects.requireNonNull(theme, "theme is required");
-        Objects.requireNonNull(status, "status is required");
+        status = Objects.requireNonNullElse(status, ReservationStatus.PENDING);
         return new Reservation(id, member, date, time, theme, status, payment);
     }
 }
