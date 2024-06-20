@@ -6,7 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import static roomescape.exception.RoomescapeErrorCode.RESERVATION_NOT_FOUND;
-import static roomescape.fixture.TestFixture.reservationFixture;
+import static roomescape.fixture.ReservationFixture.reservationFixture;
 
 import java.util.Optional;
 

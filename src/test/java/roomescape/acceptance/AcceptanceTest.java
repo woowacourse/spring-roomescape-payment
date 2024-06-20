@@ -14,7 +14,6 @@ import static roomescape.fixture.TestFixture.START_AT_SIX;
 import static roomescape.fixture.TestFixture.THEME_HORROR_DESCRIPTION;
 import static roomescape.fixture.TestFixture.THEME_HORROR_NAME;
 import static roomescape.fixture.TestFixture.THEME_HORROR_THUMBNAIL;
-import static roomescape.fixture.TestFixture.paymentConfirmResponseFixture;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,6 +28,7 @@ import io.restassured.response.ValidatableResponse;
 import roomescape.component.TossPaymentClient;
 import roomescape.dto.auth.TokenRequest;
 import roomescape.dto.auth.TokenResponse;
+import roomescape.dto.payment.PaymentConfirmResponse;
 import roomescape.dto.reservation.ReservationSaveRequest;
 import roomescape.dto.reservation.ReservationTimeSaveRequest;
 import roomescape.dto.theme.ThemeSaveRequest;
@@ -46,7 +46,8 @@ abstract class AcceptanceTest {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        when(paymentClient.confirm(any())).thenReturn(paymentConfirmResponseFixture());
+        when(paymentClient.confirm(any()))
+                .thenReturn(new PaymentConfirmResponse("paymentKey", "orderId", 1000));
     }
 
     protected Long saveReservationTime() {

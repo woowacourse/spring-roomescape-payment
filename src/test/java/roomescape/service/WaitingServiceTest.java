@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
+import static roomescape.fixture.ReservationFixture.reservationFixture;
 import static roomescape.fixture.TestFixture.AMOUNT;
 import static roomescape.fixture.TestFixture.DATE_MAY_EIGHTH;
 import static roomescape.fixture.TestFixture.MEMBER_TENNY;
@@ -13,7 +14,6 @@ import static roomescape.fixture.TestFixture.ORDER_ID;
 import static roomescape.fixture.TestFixture.PAYMENT_KEY;
 import static roomescape.fixture.TestFixture.RESERVATION_TIME_SIX;
 import static roomescape.fixture.TestFixture.THEME_HORROR;
-import static roomescape.fixture.TestFixture.reservationFixture;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 
+import static roomescape.fixture.PaymentFixture.paymentFixture;
 import static roomescape.fixture.TestFixture.ADMIN;
 import static roomescape.fixture.TestFixture.ADMIN_NAME;
 import static roomescape.fixture.TestFixture.AMOUNT;
@@ -41,7 +42,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
-import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
@@ -275,6 +275,7 @@ class ReservationServiceTest {
                 .time(RESERVATION_TIME_SIX())
                 .theme(THEME_HORROR())
                 .status(ReservationStatus.RESERVED)
+                .payment(paymentFixture(1))
                 .build();
         final Reservation reservation = Reservation.builder()
                 .id(2L)
@@ -283,6 +284,7 @@ class ReservationServiceTest {
                 .time(RESERVATION_TIME_SIX())
                 .theme(THEME_HORROR())
                 .status(ReservationStatus.RESERVED)
+                .payment(paymentFixture(2))
                 .build();
         final Reservation waiting = Reservation.builder()
                 .id(3L)
@@ -291,6 +293,7 @@ class ReservationServiceTest {
                 .time(RESERVATION_TIME_SIX())
                 .theme(THEME_HORROR())
                 .status(ReservationStatus.PENDING)
+                .payment(paymentFixture(3))
                 .build();
         final Reservation memberWaiting = Reservation.builder()
                 .id(4L)
@@ -299,16 +302,13 @@ class ReservationServiceTest {
                 .time(RESERVATION_TIME_SIX())
                 .theme(THEME_HORROR())
                 .status(ReservationStatus.PENDING)
+                .payment(paymentFixture(4))
                 .build();
 
         given(reservationRepository.findByMemberId(loginMember.id()))
                 .willReturn(List.of(memberReservation, memberWaiting));
         given(reservationRepository.findAll())
                 .willReturn(List.of(memberReservation, reservation, waiting, memberWaiting));
-        given(paymentRepository.findByReservationId(1L))
-                .willReturn(Optional.of(new Payment(1L, reservation, "paymentKey", "orderId", 1000L)));
-        given(paymentRepository.findByReservationId(4L))
-                .willReturn(Optional.of(new Payment(1L, reservation, "paymentKey", "orderId", 1000L)));
 
         // when
         final List<MyReservationWithRankResponse> actual = reservationService.findMyReservationsAndWaitings(
