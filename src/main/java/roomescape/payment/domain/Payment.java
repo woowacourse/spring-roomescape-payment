@@ -25,16 +25,19 @@ public class Payment {
 
     private LocalDateTime approvedAt;
 
+    private String status;
+
     public Payment() {
     }
 
-    public Payment(String orderId, String paymentKey, Long totalAmount, String method, LocalDateTime requestedAt, LocalDateTime approvedAt) {
+    public Payment(String orderId, String paymentKey, Long totalAmount, String method, LocalDateTime requestedAt, LocalDateTime approvedAt, String status) {
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.totalAmount = totalAmount;
         this.method = method;
         this.requestedAt = requestedAt;
         this.approvedAt = approvedAt;
+        this.status = status;
     }
 
     public Payment(String orderId,
@@ -42,13 +45,13 @@ public class Payment {
                    Long totalAmount,
                    String method,
                    String requestedAt,
-                   String approvedAt) {
+                   String approvedAt, String status) {
         this(orderId,
                 paymentKey,
                 totalAmount,
                 method,
                 LocalDateTime.parse(requestedAt, DateTimeFormatter.ISO_DATE_TIME),
-                LocalDateTime.parse(approvedAt, DateTimeFormatter.ISO_DATE_TIME));
+                LocalDateTime.parse(approvedAt, DateTimeFormatter.ISO_DATE_TIME), status);
     }
 
     public Long getId() {

@@ -68,7 +68,8 @@ class ReservationServiceTest extends ServiceTest {
                 1000L,
                 "test",
                 LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
-                LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                "DONE"
         );
 
         BDDMockito.doReturn(paymentResponse)

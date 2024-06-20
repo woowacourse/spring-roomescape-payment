@@ -35,7 +35,8 @@ public class PaymentService {
                 paymentResponse.totalAmount(),
                 paymentResponse.method(),
                 paymentResponse.requestedAt(),
-                paymentResponse.approvedAt()
+                paymentResponse.approvedAt(),
+                paymentResponse.status()
         );
         return paymentRepository.save(payment);
     }

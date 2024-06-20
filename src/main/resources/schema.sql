@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS payment
     payment_method          VARCHAR(255)    NOT NULL,
     requested_at    DATETIME    NOT NULL,
     approved_at     DATETIME    NOT NULL,
+    status          VARCHAR(255)    NOT NULL,
     PRIMARY KEY (id)
 );
 
