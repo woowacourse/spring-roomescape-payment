@@ -5,6 +5,7 @@ import static roomescape.exception.RoomescapeErrorCode.INVALID_DATETIME;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Objects;
+import java.util.Optional;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -108,6 +109,10 @@ public class Reservation {
         return time;
     }
 
+    public LocalTime getStartAt() {
+        return time.getStartAt();
+    }
+
     public Theme getTheme() {
         return theme;
     }
@@ -118,6 +123,18 @@ public class Reservation {
 
     public Payment getPayment() {
         return payment;
+    }
+
+    public Optional<String> getPaymentKey() {
+        return Optional.ofNullable(payment.getPaymentKey());
+    }
+
+    public Optional<String> getOrderId() {
+        return Optional.ofNullable(payment.getOrderId());
+    }
+
+    public Optional<Long> getPaymentAmount() {
+        return Optional.ofNullable(payment.getAmount());
     }
 
     @Override
@@ -132,5 +149,18 @@ public class Reservation {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Reservation{" +
+                "id=" + id +
+                ", member=" + member +
+                ", date=" + date +
+                ", time=" + time +
+                ", theme=" + theme +
+                ", status=" + status +
+                ", payment=" + payment +
+                '}';
     }
 }

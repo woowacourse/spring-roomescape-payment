@@ -17,8 +17,6 @@ public class TestFixture {
     public static final String MEMBER_TENNY_EMAIL = "tenny@email.com";
     public static final String MEMBER_MIA_NAME = "미아";
     public static final String MEMBER_MIA_EMAIL = "mia@email.com";
-    public static final String MEMBER_BROWN_NAME = "브라운";
-    public static final String MEMBER_BROWN_EMAIL = "brown@email.com";
     public static final String MEMBER_PASSWORD = "1234";
 
     public static final LocalDate DATE_MAY_EIGHTH = LocalDate.parse("2034-05-08");
@@ -62,10 +60,6 @@ public class TestFixture {
 
     public static Member MEMBER_MIA() {
         return new Member(new Name(MEMBER_MIA_NAME), MEMBER_MIA_EMAIL, MEMBER_PASSWORD, Role.MEMBER);
-    }
-
-    public static Member MEMBER_BROWN() {
-        return new Member(new Name(MEMBER_BROWN_NAME), MEMBER_BROWN_EMAIL, MEMBER_PASSWORD, Role.MEMBER);
     }
 
     public static ReservationTime RESERVATION_TIME_SIX() {

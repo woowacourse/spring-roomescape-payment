@@ -13,7 +13,8 @@ public class TimeFixture {
             new ReservationTime(4L, "13:00")
     );
 
-    public static ReservationTime timeFixture(int id) {
-        return TIMES.get(id - 1);
+    public static ReservationTime timeFixture(long id) {
+        assert id <= TIMES.size();
+        return TIMES.get((int) (id - 1));
     }
 }

@@ -1,6 +1,7 @@
 package roomescape.service;
 
 import static roomescape.exception.RoomescapeErrorCode.MEMBER_NOT_FOUND;
+import static roomescape.exception.RoomescapeErrorCode.PAYMENT_NOT_FOUND;
 import static roomescape.exception.RoomescapeErrorCode.RESERVATION_ALREADY_EXISTS;
 import static roomescape.exception.RoomescapeErrorCode.RESERVATION_NOT_FOUND;
 import static roomescape.exception.RoomescapeErrorCode.RESERVATION_TIME_NOT_FOUND;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationTime;
@@ -25,6 +27,7 @@ import roomescape.dto.reservation.ReservationResponse;
 import roomescape.dto.reservation.ReservationWithPaymentRequest;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -40,17 +43,20 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
+    private final PaymentRepository paymentRepository;
 
     public ReservationService(
             final ReservationRepository reservationRepository,
             final MemberRepository memberRepository,
             final ReservationTimeRepository reservationTimeRepository,
-            final ThemeRepository themeRepository
+            final ThemeRepository themeRepository,
+            final PaymentRepository paymentRepository
     ) {
         this.reservationRepository = reservationRepository;
         this.memberRepository = memberRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     public ReservationResponse createReservation(final AdminReservationSaveRequest request) {
@@ -66,12 +72,14 @@ public class ReservationService {
     }
 
     public ReservationResponse createReservation(final ReservationWithPaymentRequest request, final long memberId) {
+        final Payment payment = getPaymentByPaymentKey(request.paymentKey());
         final Reservation reservation = Reservation.builder()
                 .member(getMemberById(memberId))
                 .date(request.date())
                 .time(getTimeById(request.timeId()))
                 .theme(getThemeById(request.themeId()))
                 .status(ReservationStatus.RESERVED)
+                .payment(payment)
                 .build();
         validateDuplicatedReservation(reservation);
         reservation.validateDateTime();
@@ -144,5 +152,10 @@ public class ReservationService {
 
     private Theme getThemeById(final Long id) {
         return themeRepository.findById(id).orElseThrow(() -> new RoomescapeException(THEME_NOT_FOUND));
+    }
+
+    private Payment getPaymentByPaymentKey(final String paymentKey) {
+        return paymentRepository.findByPaymentKey(paymentKey)
+                .orElseThrow(() -> new RoomescapeException(PAYMENT_NOT_FOUND));
     }
 }

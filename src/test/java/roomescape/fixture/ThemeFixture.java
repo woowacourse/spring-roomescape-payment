@@ -13,7 +13,8 @@ public class ThemeFixture {
             new Theme(4L, "테마4", "테마설명4", "thumbnail_4.jpg")
     );
 
-    public static Theme themeFixture(int id) {
-        return THEMES.get(id - 1);
+    public static Theme themeFixture(long id) {
+        assert id <= THEMES.size();
+        return THEMES.get((int) (id - 1));
     }
 }

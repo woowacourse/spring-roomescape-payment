@@ -15,7 +15,8 @@ public class MemberFixture {
             new Member(4L, new Name("호티"), "hotea@woowa.com", "password", Role.MEMBER)
     );
 
-    public static Member memberFixture(int id) {
-        return MEMBERS.get(id - 1);
+    public static Member memberFixture(long id) {
+        assert id <= MEMBERS.size();
+        return MEMBERS.get((int) (id - 1));
     }
 }
