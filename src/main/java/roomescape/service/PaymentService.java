@@ -3,6 +3,7 @@ package roomescape.service;
 import static roomescape.exception.RoomescapeErrorCode.INTERNAL_SERVER_ERROR;
 import static roomescape.exception.RoomescapeErrorCode.PAYMENT_NOT_FOUND;
 import static roomescape.exception.RoomescapeErrorCode.REQUEST_TIMEOUT;
+import static roomescape.exception.RoomescapeErrorCode.RESERVATION_NOT_FOUND;
 
 import java.util.Objects;
 
@@ -75,6 +76,6 @@ public class PaymentService {
 
     private Reservation getReservationByPayment(final Payment payment) {
         return reservationRepository.findByPayment(payment)
-                .orElseThrow(() -> new RoomescapeException(PAYMENT_NOT_FOUND));
+                .orElseThrow(() -> new RoomescapeException(RESERVATION_NOT_FOUND));
     }
 }
