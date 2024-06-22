@@ -1,7 +1,7 @@
 package roomescape.domain.member;
 
-import static roomescape.exception.RoomescapeExceptionCode.EMPTY_NAME;
-import static roomescape.exception.RoomescapeExceptionCode.INVALID_NAME_FORMAT;
+import static roomescape.exception.RoomescapeErrorCode.EMPTY_NAME;
+import static roomescape.exception.RoomescapeErrorCode.INVALID_NAME_FORMAT;
 
 import java.util.Objects;
 import java.util.regex.Matcher;
@@ -52,5 +52,12 @@ public class Name {
     @Override
     public int hashCode() {
         return Objects.hash(name);
+    }
+
+    @Override
+    public String toString() {
+        return "Name{" +
+                "name='" + name + '\'' +
+                '}';
     }
 }

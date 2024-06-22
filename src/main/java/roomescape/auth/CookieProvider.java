@@ -1,6 +1,6 @@
 package roomescape.auth;
 
-import static roomescape.exception.RoomescapeExceptionCode.UNAUTHORIZED;
+import static roomescape.exception.RoomescapeErrorCode.UNAUTHORIZED;
 
 import java.util.Arrays;
 import java.util.Objects;

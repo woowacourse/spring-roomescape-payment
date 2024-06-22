@@ -1,6 +1,6 @@
 package roomescape.domain.member;
 
-import static roomescape.exception.RoomescapeExceptionCode.UNAUTHORIZED;
+import static roomescape.exception.RoomescapeErrorCode.UNAUTHORIZED;
 
 import java.util.Objects;
 
@@ -101,5 +101,16 @@ public class Member {
     @Override
     public int hashCode() {
         return Objects.hash(id, name, email, password);
+    }
+
+    @Override
+    public String toString() {
+        return "Member{" +
+                "id=" + id +
+                ", name=" + name +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", role=" + role +
+                '}';
     }
 }

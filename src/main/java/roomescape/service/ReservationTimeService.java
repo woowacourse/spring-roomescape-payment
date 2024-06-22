@@ -1,7 +1,7 @@
 package roomescape.service;
 
-import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_ALREADY_EXISTS;
-import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_TIME_NOT_FOUND;
+import static roomescape.exception.RoomescapeErrorCode.RESERVATION_ALREADY_EXISTS;
+import static roomescape.exception.RoomescapeErrorCode.RESERVATION_TIME_NOT_FOUND;
 
 import java.util.List;
 import java.util.Set;

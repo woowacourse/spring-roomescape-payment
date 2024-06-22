@@ -15,16 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.controller.auth.AuthenticationPrincipal;
 import roomescape.dto.auth.LoginMember;
 import roomescape.dto.payment.PaymentConfirmRequest;
+import roomescape.dto.payment.PaymentResponse;
 import roomescape.dto.reservation.MyReservationWithRankResponse;
-import roomescape.dto.reservation.ReservationDto;
 import roomescape.dto.reservation.ReservationResponse;
-import roomescape.dto.reservation.ReservationSaveRequest;
+import roomescape.dto.reservation.ReservationWithPaymentRequest;
 import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 
 @RequestMapping("/reservations")
 @RestController
-public class ReservationController {
+public class ReservationController implements ReservationControllerDocs {
 
     private final ReservationService reservationService;
     private final PaymentService paymentService;
@@ -37,12 +37,12 @@ public class ReservationController {
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(
             @AuthenticationPrincipal final LoginMember loginMember,
-            @RequestBody final ReservationSaveRequest request) {
-        final ReservationDto reservationDto = ReservationDto.of(request, loginMember.id());
-        final ReservationResponse reservationResponse = reservationService.createReservation(reservationDto);
-        final PaymentConfirmRequest paymentConfirmRequest = new PaymentConfirmRequest(request, reservationResponse.id());
-        paymentService.confirm(paymentConfirmRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(reservationResponse);
+            @RequestBody final ReservationWithPaymentRequest request
+    ) {
+        final PaymentResponse savedPayment = paymentService.createPayment(request);
+        final ReservationResponse savedReservation = reservationService.createReservation(request, loginMember.id());
+        paymentService.confirm(new PaymentConfirmRequest(savedPayment));
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedReservation);
     }
 
     @GetMapping
@@ -58,7 +58,8 @@ public class ReservationController {
 
     @GetMapping("/mine")
     public ResponseEntity<List<MyReservationWithRankResponse>> findMyReservationsAndWaitings(
-            @AuthenticationPrincipal final LoginMember loginMember) {
+            @AuthenticationPrincipal final LoginMember loginMember
+    ) {
         return ResponseEntity.ok(reservationService.findMyReservationsAndWaitings(loginMember));
     }
 }

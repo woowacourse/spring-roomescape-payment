@@ -2,11 +2,11 @@ package roomescape.service;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_NOT_FOUND;
-import static roomescape.fixture.TestFixture.reservationFixture;
+import static roomescape.exception.RoomescapeErrorCode.PAYMENT_NOT_FOUND;
+import static roomescape.fixture.PaymentFixture.paymentFixture;
+import static roomescape.fixture.ReservationFixture.reservationFixture;
 
 import java.util.Optional;
 
@@ -43,11 +43,16 @@ class PaymentServiceTest {
     @Test
     @DisplayName("결제 승인 요청에 성공한다. ")
     void confirmSuccess() {
-        var request = new PaymentConfirmRequest("expectedKey", "expectedId", 1000L, 1L);
-        var response = new PaymentConfirmResponse("expectedKey", "expectedId", 1000L);
+        var request = new PaymentConfirmRequest("payment-key-1", "order-id-1", 1000L);
+        var response = new PaymentConfirmResponse("payment-key-1", "order-id-1", 1000L);
+        var payment = paymentFixture(1L);
 
-        when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservationFixture(1)));
-        when(paymentClient.confirm(any())).thenReturn(response);
+        when(paymentRepository.findByPaymentKey("payment-key-1"))
+                .thenReturn(Optional.of(payment));
+        when(reservationRepository.findByPayment(payment))
+                .thenReturn(Optional.of(reservationFixture(1L)));
+        when(paymentClient.confirm(request))
+                .thenReturn(response);
 
         assertDoesNotThrow(() -> paymentService.confirm(request));
     }
@@ -55,10 +60,10 @@ class PaymentServiceTest {
     @Test
     @DisplayName("존재하지 않는 예약에 대한 결제 승인 요청을 할 경우 예외가 발생한다.")
     void confirmReservationNotExistsFailure() {
-        var request = new PaymentConfirmRequest("expectedKey", "expectedId", 1000L, 1L);
+        var request = new PaymentConfirmRequest("expectedKey", "expectedId", 1000L);
 
         assertThatThrownBy(() -> paymentService.confirm(request))
                 .isInstanceOf(RoomescapeException.class)
-                .hasMessage(RESERVATION_NOT_FOUND.message());
+                .hasMessage(PAYMENT_NOT_FOUND.message());
     }
 }

@@ -1,8 +1,9 @@
 package roomescape.service;
 
-import static roomescape.exception.RoomescapeExceptionCode.INTERNAL_SERVER_ERROR;
-import static roomescape.exception.RoomescapeExceptionCode.REQUEST_TIMEOUT;
-import static roomescape.exception.RoomescapeExceptionCode.RESERVATION_NOT_FOUND;
+import static roomescape.exception.RoomescapeErrorCode.INTERNAL_SERVER_ERROR;
+import static roomescape.exception.RoomescapeErrorCode.PAYMENT_NOT_FOUND;
+import static roomescape.exception.RoomescapeErrorCode.REQUEST_TIMEOUT;
+import static roomescape.exception.RoomescapeErrorCode.RESERVATION_NOT_FOUND;
 
 import java.util.Objects;
 
@@ -14,6 +15,8 @@ import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.dto.payment.PaymentConfirmRequest;
 import roomescape.dto.payment.PaymentConfirmResponse;
+import roomescape.dto.payment.PaymentResponse;
+import roomescape.dto.reservation.ReservationWithPaymentRequest;
 import roomescape.exception.RoomescapeException;
 import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
@@ -35,19 +38,28 @@ public class PaymentService {
         this.reservationRepository = reservationRepository;
     }
 
+    public PaymentResponse createPayment(final ReservationWithPaymentRequest request) {
+        Payment payment = new Payment(request.paymentKey(), request.orderId(), request.amount());
+        Payment saved = paymentRepository.save(payment);
+        return PaymentResponse.from(saved);
+    }
+
     public void confirm(final PaymentConfirmRequest request) {
-        final Reservation reservation = getReservation(request.reservationId());
-        final Payment payment = request.toPayment(reservation);
+        final Payment payment = getPaymentByPaymentKey(request.paymentKey());
+        final Reservation reservation = getReservationByPayment(payment);
         try {
             PaymentConfirmResponse response = paymentClient.confirm(request);
-            validateResponse(payment, response);
+            validateConfirmResponse(payment, response);
+            payment.confirm();
+            reservation.pay(payment);
+            paymentRepository.save(payment);
+            reservationRepository.save(reservation);
         } catch (ResourceAccessException e) {
             throw new RoomescapeException(REQUEST_TIMEOUT);
         }
-        paymentRepository.save(payment);
     }
 
-    private void validateResponse(final Payment payment, final PaymentConfirmResponse response) {
+    private void validateConfirmResponse(final Payment payment, final PaymentConfirmResponse response) {
         if (Objects.equals(payment.getPaymentKey(), response.paymentKey())
                 && Objects.equals(payment.getOrderId(), response.orderId())
                 && Objects.equals(payment.getAmount(), response.totalAmount())
@@ -57,8 +69,13 @@ public class PaymentService {
         throw new RoomescapeException(INTERNAL_SERVER_ERROR);
     }
 
-    private Reservation getReservation(final long reservationId) {
-        return reservationRepository.findById(reservationId)
+    private Payment getPaymentByPaymentKey(final String paymentKey) {
+        return paymentRepository.findByPaymentKey(paymentKey)
+                .orElseThrow(() -> new RoomescapeException(PAYMENT_NOT_FOUND));
+    }
+
+    private Reservation getReservationByPayment(final Payment payment) {
+        return reservationRepository.findByPayment(payment)
                 .orElseThrow(() -> new RoomescapeException(RESERVATION_NOT_FOUND));
     }
 }

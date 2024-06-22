@@ -1,6 +1,6 @@
 package roomescape.service;
 
-import static roomescape.exception.RoomescapeExceptionCode.MEMBER_NOT_FOUND;
+import static roomescape.exception.RoomescapeErrorCode.MEMBER_NOT_FOUND;
 
 import java.util.List;
 

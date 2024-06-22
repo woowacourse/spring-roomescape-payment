@@ -2,12 +2,11 @@ package roomescape.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import static roomescape.fixture.TestFixture.MEMBER_BROWN;
+import static roomescape.fixture.MemberFixture.memberFixture;
 
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,21 +22,14 @@ class MemberRepositoryTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    private Member member;
-
-    @BeforeEach
-    void setUp() {
-        member = memberRepository.save(MEMBER_BROWN());
-    }
-
     @Test
     @DisplayName("사용자를 저장한다.")
     void saveMember() {
         // given
-        final Member member = new Member(new Name("미르"), "mir@email.com", "1234", Role.MEMBER);
+        Member member = new Member(new Name("미르"), "mir@email.com", "1234", Role.MEMBER);
 
         // when
-        final Member savedMember = memberRepository.save(member);
+        Member savedMember = memberRepository.save(member);
 
         // then
         assertThat(savedMember.getId()).isNotNull();
@@ -46,11 +38,12 @@ class MemberRepositoryTest {
     @Test
     @DisplayName("Id에 해당하는 사용자를 조회한다.")
     void findMemberById() {
-        // when
-        final Optional<Member> actual = memberRepository.findById(member.getId());
+        Member member = new Member(new Name("미르"), "mir@email.com", "1234", Role.MEMBER);
+        Member saved = memberRepository.save(member);
 
-        // then
-        assertThat(actual).hasValue(member);
+        var actual = memberRepository.findById(member.getId());
+
+        assertThat(actual).hasValue(saved);
     }
 
     @Test
@@ -69,11 +62,15 @@ class MemberRepositoryTest {
     @Test
     @DisplayName("email에 해당하는 사용자를 조회한다.")
     void findMemberByEmail() {
+        Member member = new Member(new Name("미르"), "mir@email.com", "1234", Role.MEMBER);
+
+        Member saved = memberRepository.save(member);
+
         // when
         final Optional<Member> actual = memberRepository.findByEmail(member.getEmail());
 
         // then
-        assertThat(actual).hasValue(member);
+        assertThat(actual).hasValue(saved);
     }
 
     @Test
@@ -92,10 +89,11 @@ class MemberRepositoryTest {
     @Test
     @DisplayName("사용자 전체 목록을 조회한다.")
     void findAllMembers() {
-        // when
-        final List<Member> actual = memberRepository.findAll();
+        memberRepository.save(memberFixture(2L));
+        memberRepository.save(memberFixture(3L));
+        memberRepository.save(memberFixture(4L));
 
-        // then
-        assertThat(actual).hasSize(4);
+        final List<Member> actual = memberRepository.findAll();
+        assertThat(actual).hasSize(3);
     }
 }

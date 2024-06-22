@@ -2,8 +2,7 @@ package roomescape.acceptance;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import static roomescape.fixture.TestFixture.MEMBER_TENNY_EMAIL;
-import static roomescape.fixture.TestFixture.MEMBER_TENNY_NAME;
+import static roomescape.fixture.MemberFixture.memberFixture;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +16,8 @@ public class AuthAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("로그인을 하여 얻은 accessToken으로 사용자의 정보를 받아온다.")
     void tokenLoginAndFindMemberInfo() {
-        final String accessToken = getAccessToken(MEMBER_TENNY_EMAIL);
+        saveMember(memberFixture(1L));
+        final String accessToken = accessToken(1L);
 
         final MemberResponse response = RestAssured
                 .given().log().all()
@@ -28,13 +28,14 @@ public class AuthAcceptanceTest extends AcceptanceTest {
                 .statusCode(200)
                 .extract().as(MemberResponse.class);
 
-        assertThat(response.name()).isEqualTo(MEMBER_TENNY_NAME);
+        assertThat(response.name()).isEqualTo("제우스");
     }
 
     @Test
     @DisplayName("로그아웃에 성공하면 200을 응답한다.")
     void respondOkWhenLogout() {
-        final String accessToken = getAccessToken(MEMBER_TENNY_EMAIL);
+        saveMember(memberFixture(1L));
+        final String accessToken = accessToken(1L);
 
         RestAssured.given().log().all()
                 .cookie("token", accessToken)

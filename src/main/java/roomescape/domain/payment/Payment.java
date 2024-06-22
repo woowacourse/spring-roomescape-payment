@@ -2,17 +2,13 @@ package roomescape.domain.payment;
 
 import java.util.Objects;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
-
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
-import roomescape.domain.reservation.Reservation;
 
 @Entity
 public class Payment {
@@ -21,43 +17,45 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Reservation reservation;
-
+    @Column(nullable = false, unique = true)
     private String paymentKey;
 
+    @Column(nullable = false, unique = true)
     private String orderId;
 
+    @Column(nullable = false)
     private Long amount;
+
+    @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
+    private PaymentStatus status;
 
     protected Payment() {
     }
 
-    public Payment(final Reservation reservation, final String paymentKey, final String orderId, final Long amount) {
-        this(null, reservation, paymentKey, orderId, amount);
+    public Payment(final String paymentKey, final String orderId, final Long amount) {
+        this(null, paymentKey, orderId, amount);
     }
 
     public Payment(
             final Long id,
-            final Reservation reservation,
             final String paymentKey,
             final String orderId,
             final Long amount
     ) {
         this.id = id;
-        this.reservation = reservation;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
+        this.status = PaymentStatus.PENDING;
+    }
+
+    public void confirm() {
+        status = PaymentStatus.CONFIRMED;
     }
 
     public Long getId() {
         return id;
-    }
-
-    public Reservation getReservation() {
-        return reservation;
     }
 
     public String getPaymentKey() {
@@ -72,6 +70,10 @@ public class Payment {
         return amount;
     }
 
+    public PaymentStatus getStatus() {
+        return status;
+    }
+
     @Override
     public boolean equals(Object object) {
         if (this == object) {
@@ -79,7 +81,6 @@ public class Payment {
         }
         return object instanceof Payment other
                 && Objects.equals(getId(), other.getId())
-                && Objects.equals(getReservation(), other.getReservation())
                 && Objects.equals(getPaymentKey(), other.getPaymentKey())
                 && Objects.equals(getOrderId(), other.getOrderId())
                 && Objects.equals(getAmount(), other.getAmount());
@@ -87,14 +88,13 @@ public class Payment {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, reservation, paymentKey, orderId, amount);
+        return Objects.hash(id, paymentKey, orderId, amount);
     }
 
     @Override
     public String toString() {
         return "Payment{" +
                 "id=" + id +
-                ", reservation=" + reservation +
                 ", paymentKey='" + paymentKey + '\'' +
                 ", orderId='" + orderId + '\'' +
                 ", amount=" + amount +

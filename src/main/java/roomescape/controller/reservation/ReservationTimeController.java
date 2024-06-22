@@ -30,7 +30,9 @@ public class ReservationTimeController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationTimeResponse> createReservationTime(@RequestBody final ReservationTimeSaveRequest request) {
+    public ResponseEntity<ReservationTimeResponse> createReservationTime(
+            @RequestBody final ReservationTimeSaveRequest request
+    ) {
         final ReservationTime reservationTime = request.toModel();
         return ResponseEntity.status(HttpStatus.CREATED).body(reservationTimeService.create(reservationTime));
     }
@@ -48,7 +50,8 @@ public class ReservationTimeController {
 
     @GetMapping("/available")
     public ResponseEntity<List<AvailableReservationTimeResponse>> findAvailableReservationTimes(
-            @ModelAttribute final AvailableReservationTimeSearch availableReservationTimeSearch) {
+            @ModelAttribute final AvailableReservationTimeSearch availableReservationTimeSearch
+    ) {
         return ResponseEntity.ok(reservationTimeService.findAvailableReservationTimes(availableReservationTimeSearch));
     }
 }

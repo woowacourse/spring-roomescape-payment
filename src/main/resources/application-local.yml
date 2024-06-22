@@ -1,4 +1,7 @@
 spring:
+  config:
+    activate:
+      on-profile: local
   datasource:
     url: jdbc:h2:mem:database
   h2:
@@ -8,11 +11,8 @@ spring:
   jpa:
     defer-datasource-initialization: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     show-sql: true
-  sql:
-    init:
-      mode: never
 
 roomescape:
   payment:
@@ -26,8 +26,14 @@ roomescape:
 
 payment:
   toss:
-    base-uri: http://localhost
+    base-uri: https://api.tosspayments.com/v1/payments
     confirm-uri: *confirm-uri
     connect-timeout: *connect-timeout
     read-timeout: *read-timeout
-    secret: test
+    secret: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json

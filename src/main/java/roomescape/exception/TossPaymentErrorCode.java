@@ -2,7 +2,7 @@ package roomescape.exception;
 
 import static java.util.stream.Collectors.toMap;
 
-import static roomescape.exception.RoomescapeExceptionCode.INTERNAL_SERVER_ERROR;
+import static roomescape.exception.RoomescapeErrorCode.INTERNAL_SERVER_ERROR;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatusCode;
 
 import roomescape.dto.payment.TossPaymentErrorResponse;
 
-public enum TossPaymentErrorCode implements RoomescapeErrorCode {
+public enum TossPaymentErrorCode implements ErrorCodeWithHttpStatusCode {
 
     ALREADY_PROCESSED_PAYMENT(HttpStatus.BAD_REQUEST, "이미 처리된 결제 입니다."),
     PROVIDER_ERROR(HttpStatus.BAD_REQUEST, "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요."),

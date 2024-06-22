@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import roomescape.dto.reservation.AdminReservationSaveRequest;
-import roomescape.dto.reservation.ReservationDto;
 import roomescape.dto.reservation.ReservationFilterParam;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.service.ReservationService;
@@ -28,14 +27,16 @@ public class AdminReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponse> createReservation(@RequestBody final AdminReservationSaveRequest request) {
-        final ReservationDto reservationDto = ReservationDto.of(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.createReservation(reservationDto));
+    public ResponseEntity<ReservationResponse> createReservation(
+            @RequestBody final AdminReservationSaveRequest request
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.createReservation(request));
     }
 
     @GetMapping
-    public ResponseEntity<List<ReservationResponse>> findReservations (
-            @ModelAttribute final ReservationFilterParam reservationFilterParam) {
+    public ResponseEntity<List<ReservationResponse>> findReservations(
+            @ModelAttribute final ReservationFilterParam reservationFilterParam
+    ) {
         return ResponseEntity.ok(reservationService.findAllBy(reservationFilterParam));
     }
 }
