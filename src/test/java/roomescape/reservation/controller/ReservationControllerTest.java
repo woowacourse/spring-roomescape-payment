@@ -11,19 +11,23 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import roomescape.auth.controller.dto.SignUpRequest;
 import roomescape.auth.service.TokenProvider;
 import roomescape.member.service.MemberService;
-import roomescape.payment.application.PaymentClient;
+import roomescape.payment.infra.PaymentClient;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.reservation.controller.dto.*;
-import roomescape.reservation.service.ReservationService;
+import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.service.ReservationRegister;
 import roomescape.reservation.service.ReservationTimeService;
 import roomescape.reservation.service.ThemeService;
 import roomescape.util.ControllerTest;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static org.mockito.ArgumentMatchers.any;
 import static roomescape.fixture.MemberFixture.getMemberChoco;
@@ -32,7 +36,7 @@ import static roomescape.fixture.MemberFixture.getMemberClover;
 @DisplayName("예약 API 통합 테스트")
 class ReservationControllerTest extends ControllerTest {
     @Autowired
-    ReservationService reservationService;
+    ReservationRegister reservationRegister;
 
     @Autowired
     ReservationTimeService reservationTimeService;
@@ -60,17 +64,18 @@ class ReservationControllerTest extends ControllerTest {
     @Test
     void create() {
         //given
-        BDDMockito.doReturn(new PaymentResponse("test", "test", 1000L, "test", "test", "test"))
+        PaymentResponse paymentResponse = new PaymentResponse(
+                "test",
+                "test",
+                1000L,
+                "test",
+                LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                "DONE"
+                );
+        BDDMockito.doReturn(paymentResponse)
                 .when(paymentClient)
                 .confirm(any());
-
-//        given(paymentClient.confirm(any(PaymentRequest.class)))
-//                .willReturn(new PaymentResponse("test", "test", 1000L, "test", "test", "test"));
-
-/*
-        Mockito.when(paymentClient.confirm(any()))
-                .thenReturn(new PaymentResponse("test", "test", 1000L, "test", "test", "test"));
-*/
 
         ReservationTimeResponse reservationTimeResponse = reservationTimeService.create(
                 new ReservationTimeRequest("10:00"));
@@ -102,12 +107,12 @@ class ReservationControllerTest extends ControllerTest {
                 new ReservationTimeRequest("11:00"));
         ThemeResponse themeResponse = themeService.create(new ThemeRequest("name", "description", "thumbnail"));
 
-        ReservationResponse reservationResponse = reservationService.createReservation(
+        ReservationResponse reservationResponse = reservationRegister.createReservation(
                 new ReservationRequest(
                         LocalDate.now().plusDays(10).toString(),
                         reservationTimeResponse.id(),
                         themeResponse.id()),
-                getMemberChoco().getId()
+                getMemberChoco().getId(), ReservationStatus.BOOKED
         );
 
         return Stream.of(
@@ -204,6 +209,64 @@ class ReservationControllerTest extends ControllerTest {
                 .cookie("token", token)
                 .when().get("/reservations/mine")
                 .then().log().all()
-                .statusCode(200);
+                .statusCode(200)
+                .body("size()", is(1));
     }
+
+    @DisplayName("예약 추가 시, 내 예약 개수가 늘어난다")
+    @Test
+    void reservationAndGetMyReservation() {
+        //given
+        RestAssured.given().log().all()
+                .cookie("token", token)
+                .when().get("/reservations/mine")
+                .then().log().all()
+                .statusCode(200)
+                .body("size()", is(1));
+
+        //when
+        PaymentResponse paymentResponse = new PaymentResponse(
+                "test",
+                "test",
+                1000L,
+                "test",
+                LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                "DONE"
+        );
+        BDDMockito.doReturn(paymentResponse)
+                .when(paymentClient)
+                .confirm(any());
+
+        ReservationTimeResponse reservationTimeResponse = reservationTimeService.create(
+                new ReservationTimeRequest("10:00"));
+        ThemeResponse themeResponse = themeService.create(new ThemeRequest("name", "description", "thumbnail"));
+
+        Map<String, Object> reservation = new HashMap<>();
+        reservation.put("date", "2099-08-05");
+        reservation.put("timeId", reservationTimeResponse.id());
+        reservation.put("themeId", themeResponse.id());
+        reservation.put("paymentKey", "test");
+        reservation.put("orderId", "test");
+        reservation.put("amount", 1000L);
+        reservation.put("paymentType", "test");
+
+        //when & then
+        RestAssured.given().log().all()
+                .cookie("token", token)
+                .contentType(ContentType.JSON)
+                .body(reservation)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(201);
+
+        //then
+        RestAssured.given().log().all()
+                .cookie("token", token)
+                .when().get("/reservations/mine")
+                .then().log().all()
+                .statusCode(200)
+                .body("size()", is(2));
+    }
+
 }

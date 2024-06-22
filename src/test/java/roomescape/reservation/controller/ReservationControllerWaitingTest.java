@@ -10,13 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import roomescape.auth.service.TokenProvider;
 import roomescape.fixture.ReservationFixture;
-import roomescape.payment.application.PaymentClient;
+import roomescape.payment.infra.PaymentClient;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.reservation.controller.dto.ReservationPaymentRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationSlot;
 import roomescape.util.ControllerTest;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -35,13 +36,22 @@ class ReservationControllerWaitingTest extends ControllerTest {
     @BeforeEach
     void beforeEach() {
         token = tokenProvider.createAccessToken(getMemberTacan().getEmail());
-        BDDMockito.doReturn(new PaymentResponse("test", "test", 1000L, "test", "test", "test"))
+        PaymentResponse paymentResponse = new PaymentResponse(
+                "test",
+                "test",
+                1000L,
+                "test",
+                LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                "DONE"
+        );
+        BDDMockito.doReturn(paymentResponse)
                 .when(paymentClient)
                 .confirm(any());
     }
 
     @Test
-    @DisplayName("예약이 존재하는 경우에도 사용자가 다르면 예약이 된다")
+    @DisplayName("예약이 대기를 하는 경우 예약이 된다")
     void waiting() {
         //given
         Reservation bookedReservation = ReservationFixture.getBookedReservation();
@@ -62,7 +72,7 @@ class ReservationControllerWaitingTest extends ControllerTest {
                 .cookie("token", token)
                 .contentType(ContentType.JSON)
                 .body(reservationPaymentRequest)
-                .when().post("/reservations")
+                .when().post("/reservations/waiting")
                 .then().log().all()
                 .statusCode(201);
     }
@@ -89,7 +99,7 @@ class ReservationControllerWaitingTest extends ControllerTest {
                 .cookie("token", token)
                 .contentType(ContentType.JSON)
                 .body(reservationPaymentRequest)
-                .when().post("/reservations")
+                .when().post("/reservations/waiting")
                 .then().log().all()
                 .statusCode(201)
                 .extract()

@@ -108,7 +108,7 @@ class ReservationTimeServiceTest extends ServiceTest {
 
         //when & then
         assertThatThrownBy(() -> reservationTimeService.create(reservationTimeRequest))
-                .isInstanceOf(ForbiddenException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @DisplayName("예약 가능한 시간 조회에 성공한다.")

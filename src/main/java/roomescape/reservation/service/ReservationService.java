@@ -7,127 +7,139 @@ import roomescape.auth.domain.AuthInfo;
 import roomescape.exception.custom.BadRequestException;
 import roomescape.exception.custom.ForbiddenException;
 import roomescape.member.domain.Member;
-import roomescape.member.domain.repository.MemberRepository;
-import roomescape.payment.application.PaymentClient;
-import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResponse;
-import roomescape.reservation.controller.dto.*;
+import roomescape.member.service.MemberService;
+import roomescape.payment.domain.Payment;
+import roomescape.reservation.controller.dto.ReservationRequest;
 import roomescape.reservation.domain.*;
 import roomescape.reservation.domain.repository.ReservationRepository;
-import roomescape.reservation.domain.repository.ReservationSlotRepository;
-import roomescape.reservation.domain.repository.ReservationTimeRepository;
-import roomescape.reservation.domain.repository.ThemeRepository;
-import roomescape.reservation.domain.specification.ReservationSpecification;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
-import java.util.Objects;
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class ReservationService {
 
-    private final MemberRepository memberRepository;
-    private final ReservationTimeRepository reservationTimeRepository;
-    private final ThemeRepository themeRepository;
-    private final ReservationSlotRepository reservationSlotRepository;
+    private final MemberService memberService;
+    private final ReservationTimeService reservationTimeService;
+    private final ThemeService themeService;
+    private final ReservationSlotService reservationSlotService;
     private final ReservationRepository reservationRepository;
-    private final PaymentClient paymentClient;
 
-    public ReservationService(MemberRepository memberRepository,
-                              ReservationTimeRepository reservationTimeRepository,
-                              ThemeRepository themeRepository,
-                              ReservationSlotRepository reservationSlotRepository,
-                              ReservationRepository reservationRepository, PaymentClient paymentClient) {
-        this.memberRepository = memberRepository;
-        this.reservationTimeRepository = reservationTimeRepository;
-        this.themeRepository = themeRepository;
-        this.reservationSlotRepository = reservationSlotRepository;
+    public ReservationService(MemberService memberService,
+                              ReservationTimeService reservationTimeService,
+                              ThemeService themeService,
+                              ReservationSlotService reservationSlotService,
+                              ReservationRepository reservationRepository) {
+        this.memberService = memberService;
+        this.reservationTimeService = reservationTimeService;
+        this.themeService = themeService;
+        this.reservationSlotService = reservationSlotService;
         this.reservationRepository = reservationRepository;
-        this.paymentClient = paymentClient;
     }
 
-    @Transactional(readOnly = true)
-    public List<ReservationResponse> findReservations(ReservationQueryRequest request) {
-        Specification<Reservation> spec = Specification
-                .where(ReservationSpecification.greaterThanOrEqualToStartDate(request.getStartDate()))
-                .and(ReservationSpecification.lessThanOrEqualToEndDate(request.getEndDate()))
-                .and(ReservationSpecification.equalMemberId(request.getMemberId()))
-                .and(ReservationSpecification.equalThemeId(request.getThemeId()));
-        return reservationRepository.findAll(spec)
-                .stream()
-                .map(ReservationResponse::from)
-                .toList();
+    public List<Reservation> findReservationsByMemberId(Long memberId) {
+        Member member = memberService.findMember(memberId);
+        return reservationRepository.findAllByMember(member);
     }
 
-    @Transactional(readOnly = true)
-    public List<ReservationWithStatus> findReservations(AuthInfo authInfo) {
-        Member member = memberRepository.findById(authInfo.getId())
-                .orElseThrow(() -> new BadRequestException("해당 유저를 찾을 수 없습니다."));
-        return reservationRepository.findAllByMember(member)
-                .stream()
-                .map(ReservationWithStatus::from)
-                .toList();
+    public List<Reservation> findReservations(Specification<Reservation> spec) {
+        return reservationRepository.findAll(spec);
     }
 
-    public ReservationResponse createReservation(ReservationRequest reservationRequest, Long memberId) {
+    public List<Reservation> findReservations(ReservationStatus status) {
+        return reservationRepository.findAllByStatus(status);
+    }
+
+    public Reservation findReservation(Long reservationId) {
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new BadRequestException("해당 ID에 대응되는 사용자 예약이 없습니다."));
+    }
+
+    public Reservation findReservation(LocalDate date, String themeName, LocalTime time, Long memberId) {
+        return reservationRepository.findByDateAndTimeAndThemeNameAndMemberId(
+                date, themeName, time, memberId);
+    }
+
+    public boolean hasSameReservation(LocalDate date, Long themeId, Long timeId) {
+        return reservationRepository.existsByDateAndTimeIdAndThemeId(date, themeId, timeId);
+    }
+
+    public boolean hasSameReservation(ReservationSlot reservationSlot, Member member) {
+        return reservationRepository.existsByReservationSlotAndMember(reservationSlot, member);
+    }
+
+    @Transactional
+    public Reservation createReservationWithPayment(ReservationRequest reservationRequest, Long memberId, ReservationStatus reservationStatus, Payment payment) {
         LocalDate date = LocalDate.parse(reservationRequest.date());
-        ReservationTime reservationTime = reservationTimeRepository.findById(reservationRequest.timeId())
-                .orElseThrow(() -> new BadRequestException("해당 ID에 대응되는 예약 시간이 없습니다."));
-        Theme theme = themeRepository.findById(reservationRequest.themeId())
-                .orElseThrow(() -> new BadRequestException("해당 ID에 대응되는 테마가 없습니다."));
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new BadRequestException("해당 유저를 찾을 수 없습니다."));
-        ReservationSlot reservationSlot = reservationSlotRepository.findByDateAndTimeAndTheme(date, reservationTime, theme)
-                .orElseGet(() -> reservationSlotRepository.save(new ReservationSlot(date, reservationTime, theme)));
-        ReservationStatus reservationStatus = ReservationStatus.BOOKED;
+        ReservationTime reservationTime = reservationTimeService.findReservationTime(reservationRequest.timeId());
+        Theme theme = themeService.findTheme(reservationRequest.themeId());
+        Member member = memberService.findMember(memberId);
+        ReservationSlot reservationSlot = reservationSlotService.findReservationSlot(date, reservationTime, theme);
 
         validateReservation(reservationSlot, member);
 
-        if (reservationRepository.existsByReservationSlot(reservationSlot)) {
-            reservationStatus = ReservationStatus.WAITING;
-        }
+        return reservationRepository.save(new Reservation(member, reservationSlot, reservationStatus, payment));
+    }
 
-        Reservation reservation = reservationRepository.save(
-                new Reservation(member, reservationSlot, reservationStatus));
-        return ReservationResponse.from(reservation.getId(), reservationSlot, member);
+    @Transactional
+    public Reservation createReservation(ReservationRequest reservationRequest, Long memberId, ReservationStatus reservationStatus) {
+        LocalDate date = LocalDate.parse(reservationRequest.date());
+        ReservationTime reservationTime = reservationTimeService.findReservationTime(reservationRequest.timeId());
+        Theme theme = themeService.findTheme(reservationRequest.themeId());
+        Member member = memberService.findMember(memberId);
+        ReservationSlot reservationSlot = reservationSlotService.findReservationSlot(date, reservationTime, theme);
+
+        validateReservation(reservationSlot, member);
+
+        return reservationRepository.save(new Reservation(member, reservationSlot, reservationStatus));
     }
 
     private void validateReservation(ReservationSlot reservationSlot, Member member) {
         if (reservationSlot.isPast()) {
             throw new BadRequestException("올바르지 않는 데이터 요청입니다.");
         }
-        if (reservationRepository.existsByReservationSlotAndMember(reservationSlot, member)) {
-            throw new ForbiddenException("중복된 예약입니다.");
+        if (hasSameReservation(reservationSlot, member)) {
+            throw new BadRequestException("중복된 예약입니다.");
         }
     }
 
-    public void deleteReservation(AuthInfo authInfo, long reservationId) {
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new BadRequestException("해당 ID에 대응되는 사용자 예약이 없습니다."));
-        Member member = memberRepository.findById(authInfo.getId())
-                .orElseThrow(() -> new BadRequestException("해당 유저를 찾을 수 없습니다."));
-        if (!member.isAdmin() && !reservation.isBookedBy(member)) {
+    @Transactional
+    public void updateWaitingOrder(ReservationSlot reservationSlot) {
+        reservationRepository.findFirstByReservationSlotOrderByCreatedAt(reservationSlot)
+                .ifPresent(Reservation::pendingReservation);
+    }
+
+    @Transactional
+    public Reservation payReservation(LocalDate date, String themeName, LocalTime time, Long memberId, Payment payment) {
+        Reservation reservation = findReservation(date, themeName, time, memberId);
+        reservation.payReservation(payment);
+        return reservation;
+    }
+
+    @Transactional
+    public void deleteReservation(AuthInfo authInfo, Long reservationId) {
+        Reservation reservation = findReservation(reservationId);
+        Member member = memberService.findMember(authInfo.getId());
+        if (member.isNotAdmin() && reservation.isNotBookedBy(member)) {
             throw new ForbiddenException("예약자가 아닙니다.");
         }
-        reservationRepository.deleteById(reservationId);
+        deleteReservation(reservation.getId());
     }
 
-    public void delete(long reservationId) {
-        reservationRepository.deleteByReservationSlot_Id(reservationId);
-        reservationSlotRepository.deleteById(reservationId);
+    @Transactional
+    public void deleteReservation(Long id) {
+        reservationRepository.deleteById(id);
     }
 
-    public ReservationResponse reserve(ReservationPaymentRequest reservationPaymentRequest, Long memberId) {
-        ReservationRequest reservationRequest = new ReservationRequest(reservationPaymentRequest.date(), reservationPaymentRequest.timeId(), reservationPaymentRequest.themeId());
-        ReservationResponse reservationResponse = createReservation(reservationRequest, memberId);
-        PaymentRequest paymentRequest = new PaymentRequest(reservationPaymentRequest);
-        PaymentResponse paymentResponse = paymentClient.confirm(paymentRequest);
+    @Transactional
+    public void deleteReservationSlot(Long reservationSlotId) {
+        reservationRepository.deleteByReservationSlot_Id(reservationSlotId);
+        reservationSlotService.deleteById(reservationSlotId);
+    }
 
-        if (!Objects.equals(paymentResponse.totalAmount(), reservationResponse.amount())) {
-            throw new BadRequestException("결제 금액이 잘못되었습니다.");
-        }
-
-        return reservationResponse;
+    public int findMyWaitingOrder(Long id) {
+        return reservationRepository.findMyWaitingOrder(id);
     }
 }

@@ -6,6 +6,7 @@ public record PaymentResponse(
         Long totalAmount,
         String method,
         String requestedAt,
-        String approvedAt
+        String approvedAt,
+        String status
 ) {
 }

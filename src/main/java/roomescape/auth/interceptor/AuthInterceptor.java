@@ -21,7 +21,7 @@ public abstract class AuthInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         try {
             AuthInfo authInfo = authService.fetchByToken(requestHandler.extract(request));
-            if (!isAuthorized(authInfo)) {
+            if (isNotAuthorized(authInfo)) {
                 throw new UnauthorizedException("유효하지 않는 토큰입니다.");
             }
         } catch (NullPointerException e) {
@@ -31,5 +31,9 @@ public abstract class AuthInterceptor implements HandlerInterceptor {
     }
 
     protected abstract boolean isAuthorized(AuthInfo authInfo);
+
+    protected boolean isNotAuthorized(AuthInfo authInfo) {
+        return !this.isAuthorized(authInfo);
+    }
 
 }

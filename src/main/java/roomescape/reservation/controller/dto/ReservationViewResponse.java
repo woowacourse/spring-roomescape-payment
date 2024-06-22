@@ -10,17 +10,10 @@ public record ReservationViewResponse(
         String themeName,
         LocalDate date,
         LocalTime time,
-        String status
+        String status,
+        String paymentKey,
+        Long totalAmount
 ) {
-    public static ReservationViewResponse from(Reservation reservation) {
-        ReservationSlot reservationSlot = reservation.getReservationSlot();
-        return new ReservationViewResponse(
-                reservation.getId(),
-                reservationSlot.getTheme().getName(),
-                reservationSlot.getDate(),
-                reservationSlot.getTime().getStartAt(),
-                reservation.getStatus().getStatus());
-    }
 
     public static ReservationViewResponse from(ReservationWithStatus reservationWithStatus) {
         return new ReservationViewResponse(
@@ -28,7 +21,9 @@ public record ReservationViewResponse(
                 reservationWithStatus.themeName(),
                 reservationWithStatus.date(),
                 reservationWithStatus.time(),
-                reservationWithStatus.status().getStatus()
+                reservationWithStatus.status().getStatus(),
+                reservationWithStatus.paymentKey(),
+                reservationWithStatus.totalAmount()
         );
     }
 
@@ -38,7 +33,9 @@ public record ReservationViewResponse(
                 reservationWithStatus.themeName(),
                 reservationWithStatus.date(),
                 reservationWithStatus.time(),
-                waitingCount + "번째 " + reservationWithStatus.status().getStatus()
+                waitingCount + "번째 " + reservationWithStatus.getStatus(),
+                reservationWithStatus.paymentKey(),
+                reservationWithStatus.totalAmount()
         );
     }
 }

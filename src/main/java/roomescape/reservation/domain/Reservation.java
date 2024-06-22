@@ -7,6 +7,7 @@ import java.util.Objects;
 
 import org.hibernate.annotations.CreationTimestamp;
 import roomescape.member.domain.Member;
+import roomescape.payment.domain.Payment;
 
 @Entity
 public class Reservation {
@@ -19,6 +20,9 @@ public class Reservation {
 
     @ManyToOne
     private Member member;
+
+    @OneToOne
+    private Payment payment;
 
     @ManyToOne
     private ReservationSlot reservationSlot;
@@ -53,11 +57,30 @@ public class Reservation {
         this.status = ReservationStatus.BOOKED;
     }
 
+    public Reservation(Member member,
+                       ReservationSlot reservationSlot,
+                       ReservationStatus reservationStatus,
+                       Payment payment) {
+        this.member = member;
+        this.reservationSlot = reservationSlot;
+        this.status = reservationStatus;
+        this.payment = payment;
+    }
+
     public boolean isBookedBy(Member member) {
         return this.member.equals(member);
     }
 
-    public void bookReservation() {
+    public boolean isNotBookedBy(Member member) {
+        return !this.isBookedBy(member);
+    }
+
+    public void pendingReservation() {
+        this.status = ReservationStatus.PENDING;
+    }
+
+    public void payReservation(Payment payment) {
+        this.payment = payment;
         this.status = ReservationStatus.BOOKED;
     }
 
@@ -79,6 +102,10 @@ public class Reservation {
 
     public Long getAmount() {
         return AMOUNT;
+    }
+
+    public Payment getPayment() {
+        return payment;
     }
 
     @Override

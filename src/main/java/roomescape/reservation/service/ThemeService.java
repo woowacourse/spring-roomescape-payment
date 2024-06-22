@@ -27,6 +27,11 @@ public class ThemeService {
                 .toList();
     }
 
+    public Theme findTheme(Long id) {
+        return themeRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("해당 ID에 대응되는 테마가 없습니다."));
+    }
+
     public ThemeResponse create(ThemeRequest themeRequest) {
         Theme theme = new Theme(themeRequest.name(), themeRequest.description(), themeRequest.thumbnail());
         return ThemeResponse.from(themeRepository.save(theme));

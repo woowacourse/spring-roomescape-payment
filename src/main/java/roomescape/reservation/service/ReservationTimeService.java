@@ -33,11 +33,16 @@ public class ReservationTimeService {
     public ReservationTimeResponse create(ReservationTimeRequest reservationTimeRequest) {
         LocalTime time = LocalTime.parse(reservationTimeRequest.startAt());
         if (reservationTimeRepository.existsByStartAt(time)) {
-            throw new ForbiddenException("중복된 예약 시간입니다.");
+            throw new BadRequestException("중복된 예약 시간입니다.");
         }
 
         ReservationTime reservationTime = new ReservationTime(time);
         return ReservationTimeResponse.from(reservationTimeRepository.save(reservationTime));
+    }
+
+    public ReservationTime findReservationTime(Long id) {
+        return reservationTimeRepository.findById(id)
+                .orElseThrow(() -> new BadRequestException("해당 ID에 대응되는 예약 시간이 없습니다."));
     }
 
     @Transactional(readOnly = true)
