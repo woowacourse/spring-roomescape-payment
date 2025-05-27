@@ -12,6 +12,7 @@ import roomescape.auth.dto.LoginMember;
 import roomescape.exception.ReservationException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.reservation.client.TossPaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.AdminReservationRequest;
@@ -31,6 +32,7 @@ import roomescape.theme.repository.ThemeRepository;
 public class ReservationService {
 
     private final Clock clock;
+    private final TossPaymentClient paymentClient;
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
@@ -51,6 +53,10 @@ public class ReservationService {
     public ReservationResponse saveReservation(final ReservationRequest request, final LoginMember loginMember) {
         final ReservationTime reservationTime = reservationTimeRepository.getById(request.timeId());
         final Theme theme = themeRepository.getById(request.themeId());
+
+        paymentClient.approvePayment(
+                new PaymentApprovalRequest(request.paymentKey(), request.orderId(), request.amount()));
+
         if (reservationRepository.existsByDateAndTimeAndTheme(request.date(), reservationTime, theme)) {
             return new ReservationResponse(waitingReservation(request.date(), reservationTime, theme, loginMember));
         }
