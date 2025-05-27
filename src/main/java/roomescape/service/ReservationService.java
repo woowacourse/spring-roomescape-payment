@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
-import roomescape.domain.PaymentHistory;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
@@ -95,9 +94,7 @@ public class ReservationService {
     }
 
     public ReservationResponse addReservation(long memberId, ReservationCreationContent reservationCreationContent,
-                                              PaymentHistoryCreationContent paymentHistoryCreationContent) {
-        PaymentHistory paymentHistory = paymentHistoryService.pay(memberId, paymentHistoryCreationContent);
-
+            PaymentHistoryCreationContent paymentHistoryCreationContent) {
         Member member = getMemberById(memberId);
         Theme theme = getThemeById(reservationCreationContent.themeId());
         ReservationTime time = getReservationTimeById(reservationCreationContent.timeId());
@@ -109,6 +106,7 @@ public class ReservationService {
         validatePastReservationCreation(reservation);
 
         Reservation savedReservation = reservationRepository.save(reservation);
+        paymentHistoryService.pay(savedReservation, paymentHistoryCreationContent);
         return new ReservationResponse(savedReservation);
     }
 

@@ -23,6 +23,10 @@ public class PaymentHistory extends AuditedEntity {
     @Column(nullable = false)
     private String paymentType;
 
+    protected PaymentHistory() {
+
+    }
+
     public PaymentHistory(Long id, Reservation reservation, String orderId, String paymentKey, String paymentType) {
         this.id = id;
         this.reservation = reservation;
@@ -31,7 +35,12 @@ public class PaymentHistory extends AuditedEntity {
         this.paymentType = paymentType;
     }
 
-    public PaymentHistory() {
-
+    public static PaymentHistory createWithoutId(
+            Reservation reservation,
+            String orderId,
+            String paymentKey,
+            String paymentType
+    ) {
+        return new PaymentHistory(null, reservation, orderId, paymentKey, paymentType);
     }
 }
