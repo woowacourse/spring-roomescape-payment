@@ -6,10 +6,12 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
+import roomescape.domain.PaymentHistory;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.domain.Waiting;
+import roomescape.dto.business.PaymentHistoryCreationContent;
 import roomescape.dto.business.ReservationCreationContent;
 import roomescape.dto.business.WaitingWithRank;
 import roomescape.dto.response.ReservationResponse;
@@ -31,17 +33,19 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentHistoryService paymentHistoryService;
 
     public ReservationService(
-            ReservationRepository reservationRepository,
-            ReservationTimeRepository reservationTimeRepository,
-            ThemeRepository themeRepository, MemberRepository memberRepository, WaitingRepository waitingRepository
+            ReservationRepository reservationRepository, ReservationTimeRepository reservationTimeRepository,
+            ThemeRepository themeRepository, MemberRepository memberRepository, WaitingRepository waitingRepository,
+            PaymentHistoryService paymentHistoryService
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentHistoryService = paymentHistoryService;
     }
 
     public List<ReservationResponse> findAllReservations() {
@@ -84,6 +88,24 @@ public class ReservationService {
                 request.date(), time, theme, member);
 
         validateDuplicateReservation(theme, request.date(), time);
+        validatePastReservationCreation(reservation);
+
+        Reservation savedReservation = reservationRepository.save(reservation);
+        return new ReservationResponse(savedReservation);
+    }
+
+    public ReservationResponse addReservation(long memberId, ReservationCreationContent reservationCreationContent,
+                                              PaymentHistoryCreationContent paymentHistoryCreationContent) {
+        PaymentHistory paymentHistory = paymentHistoryService.pay(memberId, paymentHistoryCreationContent);
+
+        Member member = getMemberById(memberId);
+        Theme theme = getThemeById(reservationCreationContent.themeId());
+        ReservationTime time = getReservationTimeById(reservationCreationContent.timeId());
+
+        Reservation reservation = Reservation.createWithoutId(
+                reservationCreationContent.date(), time, theme, member);
+
+        validateDuplicateReservation(theme, reservationCreationContent.date(), time);
         validatePastReservationCreation(reservation);
 
         Reservation savedReservation = reservationRepository.save(reservation);

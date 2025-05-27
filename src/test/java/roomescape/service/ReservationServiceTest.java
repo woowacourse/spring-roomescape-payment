@@ -31,6 +31,7 @@ import roomescape.dto.response.WaitingWithRankResponse;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.NotFoundException;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentHistoryRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -51,21 +52,25 @@ class ReservationServiceTest {
     private MemberRepository memberRepository;
     @Autowired
     private WaitingRepository waitingRepository;
+    @Autowired
+    private PaymentHistoryRepository paymentHistoryRepository;
 
     private ReservationService reservationService;
-
     private ReservationTime reservationTime;
     private Theme theme;
     private Member member;
+    private PaymentHistoryService paymentHistoryService;
 
     @BeforeEach
     void setup() {
+        paymentHistoryService = new PaymentHistoryService(paymentHistoryRepository);
         reservationService = new ReservationService(
                 reservationRepository,
                 reservationTimeRepository,
                 themeRepository,
                 memberRepository,
-                waitingRepository);
+                waitingRepository,
+                paymentHistoryService);
 
         reservationTime = entityManager.persist(
                 ReservationTime.createWithoutId(LocalTime.of(10, 0)));
