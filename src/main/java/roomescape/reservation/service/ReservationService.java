@@ -6,6 +6,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.InvalidArgumentException;
+import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.dto.PaymentResponse;
+import roomescape.payment.service.PaymentService;
+import roomescape.reservation.controller.request.ReservePaymentRequest;
 import roomescape.reservation.controller.response.MyReservationResponse;
 import roomescape.reservation.controller.response.ReservationResponse;
 import roomescape.reservation.domain.Reservation;
@@ -24,7 +28,7 @@ public class ReservationService {
     private final ReservationManager reservationManager;
     private final WaitingQueryService waitingQueryService;
     private final ReservedQueryService reservedQueryService;
-
+    private final PaymentService paymentService;
 
     @Transactional
     public ReservationResponse reserve(ReserveCommand reserveCommand) {
@@ -40,6 +44,22 @@ public class ReservationService {
         Reservation waiting = reservationManager.waiting(reserveCommand);
 
         return ReservationResponse.from(waiting);
+    }
+
+    // ReservePaymentRequest 리팩토링
+
+    @Transactional
+    public ReservationResponse reserve(ReservePaymentRequest request, Long memberId) {
+        ReserveCommand reserveCommand = ReserveCommand.byPayment(request, memberId);
+        Reservation reserved = reservationManager.reserved(reserveCommand);
+
+        PaymentRequest paymentRequest = new PaymentRequest(request.paymentKey(), request.orderId(), request.amount());
+        PaymentResponse paymentResponse = paymentService.confirmPayment(paymentRequest);
+
+        System.out.println(paymentResponse);
+
+        return ReservationResponse.from(reserved);
+
     }
 
     private void validateAvailableWaiting(ReserveCommand reserveCommand) {

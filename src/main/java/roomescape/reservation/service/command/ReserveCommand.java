@@ -3,6 +3,7 @@ package roomescape.reservation.service.command;
 import java.time.LocalDate;
 import roomescape.reservation.controller.request.ReserveByAdminRequest;
 import roomescape.reservation.controller.request.ReserveByUserRequest;
+import roomescape.reservation.controller.request.ReservePaymentRequest;
 
 public record ReserveCommand(
         LocalDate date,
@@ -27,4 +28,14 @@ public record ReserveCommand(
                 memberId
         );
     }
+
+    public static ReserveCommand byPayment(ReservePaymentRequest request, Long memberId) {
+        return new ReserveCommand(
+                request.date(),
+                request.themeId(),
+                request.timeId(),
+                memberId
+        );
+    }
+
 }

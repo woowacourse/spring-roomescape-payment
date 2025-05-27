@@ -17,7 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.web.resolver.Authenticated;
 import roomescape.global.response.ApiResponse;
-import roomescape.reservation.controller.request.ReserveByUserRequest;
+import roomescape.payment.dto.PaymentRequest;
+import roomescape.reservation.controller.request.ReservePaymentRequest;
 import roomescape.reservation.controller.response.MyReservationResponse;
 import roomescape.reservation.controller.response.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
@@ -34,11 +35,11 @@ public class ReservationApiController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<ReservationResponse>> createReservation(
-            @RequestBody @Valid ReserveByUserRequest request,
+            @RequestBody @Valid ReservePaymentRequest request,
             @Authenticated Long memberId
     ) {
         ReservationResponse response = reservationService.reserve(
-                ReserveCommand.byUser(request, memberId)
+                request, memberId
         );
 
         return ResponseEntity
