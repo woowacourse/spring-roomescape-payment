@@ -125,4 +125,13 @@ public class GlobalExceptionHandler {
         problemDetail.setDetail(String.join("예상치 못한 예외 발생헸습니다."));
         return ResponseEntity.internalServerError().body(problemDetail);
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ProblemDetail> otherExceptionHandler(Exception exception) {
+        System.out.println("exception = " + exception);
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        problemDetail.setTitle("예상치 못한 에러입니다.");
+        problemDetail.setDetail(String.join("예상치 못한 예외 발생헸습니다."));
+        return ResponseEntity.internalServerError().body(problemDetail);
+    }
 }
