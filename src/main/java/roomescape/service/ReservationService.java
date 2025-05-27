@@ -3,20 +3,17 @@ package roomescape.service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
-import roomescape.domain.Member;
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Theme;
-import roomescape.domain.Waiting;
-import roomescape.domain.WaitingWithRank;
+import roomescape.domain.*;
 import roomescape.domain.repository.MemberRepository;
 import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ThemeRepository;
 import roomescape.domain.repository.WaitingRepository;
+import roomescape.dto.PaymentRequest;
 import roomescape.dto.request.ReservationCondition;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationWithStatusResponse;
@@ -35,16 +32,20 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentClientService paymentClientService;
 
-    public ReservationService(final ReservationRepository reservationRepository,
-                              final ReservationTimeRepository reservationTimeRepository,
-                              final ThemeRepository themeRepository,
-                              final MemberRepository memberRepository, final WaitingRepository waitingRepository) {
+    public ReservationService(ReservationRepository reservationRepository,
+                              ReservationTimeRepository reservationTimeRepository,
+                              ThemeRepository themeRepository,
+                              MemberRepository memberRepository,
+                              WaitingRepository waitingRepository,
+                              PaymentClientService paymentClientService) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentClientService = paymentClientService;
     }
 
     @Transactional(readOnly = true)
@@ -78,8 +79,6 @@ public class ReservationService {
 
     public ReservationResponse createReservation(Long memberId, Long timeId, Long themeId, LocalDate date) {
 
-        // 결제가 성공했는지 실패했는지?
-
         ReservationTime reservationTime = reservationTimeRepository.findById(timeId)
                 .orElseThrow(ReservationTimeNotFoundException::new);
         Theme theme = themeRepository.findById(themeId).orElseThrow(ThemeNotFoundException::new);
@@ -94,6 +93,24 @@ public class ReservationService {
         return ReservationResponse.from(savedReservation);
     }
 
+    public ReservationResponse createReservationForMember(Long memberId, Long timeId, Long themeId, LocalDate date, PaymentRequest paymentRequest) {
+
+        // 결제가 성공했는지 실패했는지?
+        PaymentInfo paymentInfo = paymentClientService.postPaymentInfo(paymentRequest);
+    
+        ReservationTime reservationTime = reservationTimeRepository.findById(timeId)
+                .orElseThrow(ReservationTimeNotFoundException::new);
+        Theme theme = themeRepository.findById(themeId).orElseThrow(ThemeNotFoundException::new);
+        Member member = memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
+
+        Reservation reservation = Reservation.createWithoutId(member, date, reservationTime, theme);
+
+        reservation.validateDateTime();
+        validateDuplicate(date, reservationTime, theme);
+
+        Reservation savedReservation = reservationRepository.save(reservation);
+        return ReservationResponse.from(savedReservation);
+    }
 
 
     private void validateDuplicate(LocalDate date, ReservationTime time, Theme theme) {

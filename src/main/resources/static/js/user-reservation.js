@@ -245,7 +245,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
         paymentType: paymentData.paymentType,
     }
 
-    const reservationURL = "/reservations";
+    const reservationURL = "/api/reservations";
     fetch(reservationURL, {
         method: "POST",
         headers: {
