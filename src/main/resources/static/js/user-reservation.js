@@ -188,8 +188,9 @@ function onReservationButtonClick(event, paymentWidget) {
         fetchReservationPayment(data, reservationData);
     }).catch(function (error) {
         // TOSS 에러 처리: 에러 목록을 확인하세요
+        alert(error.code + " :" + error.message + "/ orderId : " + error.orderId);
         // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
-        alert(error.code + " :" + error.message + "/ orderId : " + err.orderId);
+
     });
     } else {
         alert("Please select a date, theme, and time before making a reservation.");
@@ -221,10 +222,10 @@ async function fetchReservationPayment(paymentData, reservationData) {
         },
         body: JSON.stringify(reservationPaymentRequest),
     }).then(response => {
-        if (!response.ok) {
+        if (!response.status === 201) {
             return response.json().then(errorBody => {
                 console.error("예약 결제 실패 : " + JSON.stringify(errorBody));
-                window.alert("예약 결제 실패 메시지");
+                window.alert(errorBody);
             });
         } else {
             response.json().then(successBody => {

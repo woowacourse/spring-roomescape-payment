@@ -6,11 +6,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClient;
 import roomescape.common.argumentResolver.Login;
 import roomescape.common.exceptionHandler.dto.ExceptionResponse;
 import roomescape.member.dto.request.LoginMember;
+import roomescape.reservation.dto.request.PaymentConfirmRequest;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
@@ -22,12 +27,15 @@ import roomescape.reservation.service.ReservationService;
 public class ReservationController {
 
     public static final String RESERVATION_BASE_URL = "/reservations";
+    public static final String BASE_URL = "https://api.tosspayments.com";
     private static final String SLASH = "/";
 
     private final ReservationService reservationService;
+    private final RestClient restClient;
 
-    public ReservationController(final ReservationService reservationService) {
+    public ReservationController(ReservationService reservationService, RestTemplateBuilder restTemplateBuilder) {
         this.reservationService = reservationService;
+        this.restClient = RestClient.builder().baseUrl(BASE_URL).build();
     }
 
     @GetMapping
@@ -40,6 +48,16 @@ public class ReservationController {
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody final ReservationRequest request,
                                                                  @Login final LoginMember loginMember) {
+        PaymentConfirmRequest confirmRequest = new PaymentConfirmRequest(request.orderId(), request.amount(), request.paymentKey());
+        restClient.post()
+                .uri("/v1/payments/confirm")
+                .body(confirmRequest)
+                .retrieve()
+                .onStatus(status -> status.is4xxClientError(), (res, req) -> {
+                    throw new IllegalArgumentException(res.toString());
+                })
+                .toBodilessEntity();
+
         ReservationResponse response = reservationService.createReservation(request, loginMember.id());
         URI locationUri = URI.create(RESERVATION_BASE_URL + SLASH + response.id());
         return ResponseEntity.created(locationUri).body(response);
