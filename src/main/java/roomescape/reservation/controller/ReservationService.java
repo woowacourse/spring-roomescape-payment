@@ -9,6 +9,7 @@ import roomescape.reservation.controller.dto.AdminCreateReservationRequest;
 import roomescape.reservation.controller.dto.CreateReservationRequest;
 import roomescape.reservation.controller.dto.MyReservationResponse;
 import roomescape.reservation.controller.dto.ReservationResponse;
+import roomescape.reservation.domain.PaymentInfo;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.service.ReservationCommandService;
 import roomescape.reservation.service.ReservationQueryService;
@@ -40,6 +41,21 @@ public class ReservationService {
 
     public ReservationResponse createReservation(final CreateReservationRequest request, final Long memberId) {
         return createReservation(request.timeId(), request.themeId(), request.date(), memberId);
+    }
+
+    public ReservationResponse createReservationWithPayment(
+            final CreateReservationRequest request,
+            final Long memberId
+    ) {
+        ReservationSchedule schedule = scheduleQueryService.getSchedule(
+                request.timeId(),
+                request.themeId(),
+                new ReservationDate(request.date())
+        );
+        Member member = memberQueryService.getById(memberId);
+        PaymentInfo paymentInfo = request.toPaymentInfo();
+        Reservation reservation = reservationCommandService.createReservationWithPayment(schedule, member, paymentInfo);
+        return ReservationResponse.from(reservation);
     }
 
     private ReservationResponse createReservation(Long timeId, Long themeId, LocalDate date, Long memberId) {

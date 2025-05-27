@@ -1,5 +1,6 @@
 package roomescape.reservation.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -33,7 +34,30 @@ public class Reservation {
     @JoinColumn(name = "schedule_id")
     private ReservationSchedule schedule;
 
+    @Column(name = "order_id")
+    private String orderId;
+
+    @Column(name = "amount")
+    private Long amount;
+
+    @Column(name = "payment_key")
+    private String paymentKey;
+
     protected Reservation() {
+    }
+
+    public Reservation(
+            final Long id,
+            final Member member,
+            final ReservationSchedule schedule,
+            final String orderId,
+            final Long amount
+    ) {
+        this.id = id;
+        this.member = Objects.requireNonNull(member);
+        this.schedule = Objects.requireNonNull(schedule);
+        this.orderId = Objects.requireNonNull(orderId);
+        this.amount = Objects.requireNonNull(amount);
     }
 
     public Reservation(
@@ -72,5 +96,17 @@ public class Reservation {
 
     public Member getMember() {
         return member;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public Long getAmount() {
+        return amount;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
     }
 }
