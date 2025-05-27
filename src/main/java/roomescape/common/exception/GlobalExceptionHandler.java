@@ -39,4 +39,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleAccessDenied(final AccessDeniedException e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
     }
+
+    @ExceptionHandler(TossPaymentException.class)
+    public ResponseEntity<String> handleTossPaymentException(final TossPaymentException e) {
+        return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+    }
 }
