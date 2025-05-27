@@ -13,6 +13,7 @@ import roomescape.application.reservation.command.CreateReservationService;
 import roomescape.application.reservation.query.ReservationQueryService;
 import roomescape.application.reservation.query.dto.ReservationResult;
 import roomescape.presentation.api.reservation.request.CreateReservationRequest;
+import roomescape.presentation.api.reservation.request.CreateReservationWithPaymentRequest;
 import roomescape.presentation.api.reservation.response.ReservationResponse;
 import roomescape.presentation.support.methodresolver.AuthInfo;
 import roomescape.presentation.support.methodresolver.AuthPrincipal;
@@ -35,8 +36,8 @@ public class ReservationController {
     @PostMapping
     public ResponseEntity<Void> createReservation(
             @AuthPrincipal AuthInfo authInfo,
-            @Valid @RequestBody CreateReservationRequest createReservationRequest) {
-        Long id = createReservationService.reserve(createReservationRequest.toCreateCommand(authInfo.memberId()));
+            @Valid @RequestBody CreateReservationWithPaymentRequest createReservationWithPaymentRequest) {
+        Long id = createReservationService.reserve(createReservationWithPaymentRequest.toCreateCommand(authInfo.memberId()));
         return ResponseEntity.created(URI.create(RESERVATIONS_URL.formatted(id)))
                 .build();
     }
