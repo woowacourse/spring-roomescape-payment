@@ -96,7 +96,7 @@ function checkDateAndTheme() {
 }
 
 function fetchAvailableTimes(date, themeId) {
-    fetch( `/times/available?date=${date}&themeId=${themeId}`, { // 예약 가능 시간 조회 API endpoint
+    fetch(`/times/available?date=${date}&themeId=${themeId}`, { // 예약 가능 시간 조회 API endpoint
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -163,7 +163,7 @@ function onReservationButtonClick(event, paymentWidget) {
         const reservationData = {
             date: selectedDate,
             themeId: selectedThemeId,
-            timeId: selectedTimeId,
+            timeId: selectedTimeId
         };
 
         const generateRandomString = () =>
@@ -226,6 +226,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
             response.json().then(successBody => {
                 console.log("예약 결제 성공 : " + JSON.stringify(successBody));
                 fetchReservation(reservationData);
+                alert("예약 결제 성공")
                 window.location.reload();
             });
         }
@@ -258,7 +259,6 @@ async function fetchReservation(reservationData) {
         } else {
             response.json().then(successBody => {
                 console.log("예약 생성 성공 : " + JSON.stringify(successBody));
-                window.location.reload();
             });
         }
     }).catch(error => {
