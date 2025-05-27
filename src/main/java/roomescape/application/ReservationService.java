@@ -2,6 +2,7 @@ package roomescape.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.application.dto.PaymentProcessRequest;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationDate;
@@ -15,6 +16,7 @@ import roomescape.infrastructure.repository.ReservationRepository;
 import roomescape.presentation.dto.request.AdminReservationCreateRequest;
 import roomescape.presentation.dto.request.LoginMember;
 import roomescape.presentation.dto.request.ReservationCreateRequest;
+import roomescape.presentation.dto.request.ReservationWithPaymentRequest;
 import roomescape.presentation.dto.response.MyReservationResponse;
 import roomescape.presentation.dto.response.ReservationResponse;
 
@@ -32,19 +34,23 @@ public class ReservationService {
     private final MemberService memberService;
     private final CurrentTimeService currentTimeService;
     private final WaitingService waitingService;
+    private final PaymentService paymentService;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeService reservationTimeService,
                               ThemeService themeService,
                               MemberService memberService,
                               CurrentTimeService currentTimeService,
-                              WaitingService waitingService) {
+                              WaitingService waitingService,
+                              PaymentService paymentService
+    ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeService = reservationTimeService;
         this.themeService = themeService;
         this.memberService = memberService;
         this.currentTimeService = currentTimeService;
         this.waitingService = waitingService;
+        this.paymentService = paymentService;
     }
 
     public List<ReservationResponse> getReservations() {
@@ -56,6 +62,18 @@ public class ReservationService {
     @Transactional
     public ReservationResponse createMemberReservation(ReservationCreateRequest request, LoginMember loginMember) {
         Member member = memberService.findMemberByEmail(loginMember.email());
+        Reservation created = createReservation(request.date(), request.timeId(), request.themeId(), member);
+
+        return ReservationResponse.from(created);
+    }
+
+    @Transactional
+    public ReservationResponse createMemberReservation(ReservationWithPaymentRequest request, LoginMember loginMember) {
+        Member member = memberService.findMemberByEmail(loginMember.email());
+
+        PaymentProcessRequest paymentProcessRequest = PaymentProcessRequest.of(request);
+        paymentService.process(paymentProcessRequest);
+
         Reservation created = createReservation(request.date(), request.timeId(), request.themeId(), member);
 
         return ReservationResponse.from(created);
