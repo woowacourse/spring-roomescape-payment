@@ -56,8 +56,6 @@ public class ReservationService {
         PaymentRequest paymentRequest = new PaymentRequest(request.paymentKey(), request.orderId(), request.amount());
         PaymentResponse paymentResponse = paymentService.confirmPayment(paymentRequest);
 
-        System.out.println(paymentResponse);
-
         return ReservationResponse.from(reserved);
 
     }

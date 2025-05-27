@@ -13,7 +13,7 @@ import roomescape.waiting.exception.InAlreadyWaitingException;
 public class WaitingExceptionHandler {
 
     @ExceptionHandler(InAlreadyWaitingException.class)
-    public ResponseEntity<ApiResponse<Void>> handleInAlreadyWaitingException(InAlreadyWaitingException e) {
+    public ResponseEntity<ApiResponse<Void>> handleInAlreadyWaitingException() {
         return ResponseEntity
                 .status(CONFLICT)
                 .body(ApiResponse.fail(IN_ALREADY_WAITING));
