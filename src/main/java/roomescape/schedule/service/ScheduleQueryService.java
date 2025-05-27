@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.schedule.domain.ReservationDate;
 import roomescape.schedule.domain.ReservationSchedule;
 import roomescape.schedule.repository.ReservationScheduleRepository;
+import roomescape.theme.domain.DateRange;
 
 @Service
 @Transactional(readOnly = true)
@@ -24,8 +25,9 @@ public class ScheduleQueryService {
                 timeId, themeId, date.date()).orElseThrow(() -> new NoSuchElementException("존재하지 않는 예약 일정입니다."));
     }
 
-    public Set<LocalDate> existingScheduledDates(LocalDate start, LocalDate end) {
-        return reservationScheduleRepository.findSchedulesBetweenDates(start, end).stream()
+    public Set<LocalDate> existingScheduledDates(DateRange dateRange) {
+        return reservationScheduleRepository.findSchedulesBetweenDates(dateRange.getStartDate(), dateRange.getEndDate())
+                .stream()
                 .map(ReservationSchedule::getDate)
                 .collect(Collectors.toSet());
     }

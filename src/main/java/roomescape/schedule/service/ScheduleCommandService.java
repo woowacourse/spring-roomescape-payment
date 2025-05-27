@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.schedule.domain.ReservationDate;
 import roomescape.schedule.domain.ReservationSchedule;
 import roomescape.schedule.repository.ReservationScheduleRepository;
+import roomescape.theme.domain.DateRange;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.service.ThemeQueryService;
 import roomescape.time.domain.ReservationTime;
@@ -24,21 +25,21 @@ public class ScheduleCommandService {
     private final ReservationScheduleRepository reservationScheduleRepository;
     private final ScheduleQueryService scheduleQueryService;
     private final ThemeQueryService themeQueryService;
-    private final Clock clock;
     private final TimeQueryService timeQueryService;
+    private final Clock clock;
 
     public ScheduleCommandService(
             final ReservationScheduleRepository reservationScheduleRepository,
             final ScheduleQueryService scheduleQueryService,
             final ThemeQueryService themeQueryService,
-            final Clock clock,
-            final TimeQueryService timeQueryService
+            final TimeQueryService timeQueryService,
+            final Clock clock
     ) {
         this.reservationScheduleRepository = reservationScheduleRepository;
         this.scheduleQueryService = scheduleQueryService;
         this.themeQueryService = themeQueryService;
-        this.clock = clock;
         this.timeQueryService = timeQueryService;
+        this.clock = clock;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -49,24 +50,18 @@ public class ScheduleCommandService {
     @Scheduled(cron = "0 0 0 * * *")
     @Transactional
     public void createSchedule() {
-        LocalDate start = LocalDate.now(clock);
-        LocalDate end = start.plusMonths(2);
-        Set<LocalDate> scheduledDates = scheduleQueryService.existingScheduledDates(start, end);
-        List<ReservationSchedule> newSchedules = generateNewSchedules(scheduledDates, start, end);
+        DateRange nextTwoMonthsRange = DateRange.createNextTwoMonthsRange(clock);
+        Set<LocalDate> scheduledDates = scheduleQueryService.existingScheduledDates(nextTwoMonthsRange);
+        List<ReservationSchedule> newSchedules = generateNewSchedules(scheduledDates, nextTwoMonthsRange);
         reservationScheduleRepository.saveAll(newSchedules);
     }
 
 
-    private List<ReservationSchedule> generateNewSchedules(
-            final Set<LocalDate> scheduledDates,
-            final LocalDate start,
-            final LocalDate end
-    ) {
+    private List<ReservationSchedule> generateNewSchedules(final Set<LocalDate> scheduledDates, final DateRange range) {
         List<ReservationTime> times = timeQueryService.findAll();
         List<Theme> themes = themeQueryService.findAll();
-
-        return start.datesUntil(end)
-                .filter(date -> !scheduledDates.contains(date))
+        Set<LocalDate> nonContainsSchedule = range.differenceTo(scheduledDates);
+        return nonContainsSchedule.stream()
                 .flatMap(date -> themeTimeCombinations(date, times, themes).stream())
                 .toList();
     }
