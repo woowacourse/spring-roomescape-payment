@@ -11,12 +11,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import roomescape.payment.presentation.dto.PaymentRequest;
 
 @RestControllerAdvice
 public class ExceptionController {
 
     private static final String PREFIX = "[ERROR] ";
     private static final Logger log = LoggerFactory.getLogger(ExceptionController.class);
+
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<String> handlePaymentException(PaymentException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(PREFIX + e.getMessage());
+    }
 
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<String> handleJwtException(JwtException e) {

@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
+import roomescape.payment.application.service.PaymentService;
+import roomescape.payment.presentation.dto.PaymentRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
@@ -20,12 +22,13 @@ import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.domain.repository.ThemeRepository;
 import roomescape.reservation.domain.repository.WaitingRepository;
 import roomescape.reservation.presentation.dto.AdminReservationRequest;
-import roomescape.reservation.presentation.dto.ReservationRequest;
 import roomescape.reservation.presentation.dto.ReservationResponse;
 import roomescape.reservation.presentation.dto.UserReservationsResponse;
 
 @Service
 public class ReservationService {
+
+    private final PaymentService paymentService;
 
     private final WaitingRepository waitingRepository;
     private final ReservationRepository reservationRepository;
@@ -33,11 +36,12 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
 
-    public ReservationService(final WaitingRepository waitingRepository,
+    public ReservationService(final PaymentService paymentService, final WaitingRepository waitingRepository,
                               final ReservationRepository reservationRepository,
                               final ReservationTimeRepository reservationTimeRepository,
                               final ThemeRepository themeRepository,
                               final MemberRepository memberRepository) {
+        this.paymentService = paymentService;
         this.waitingRepository = waitingRepository;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
@@ -46,14 +50,19 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse createUserReservation(final ReservationRequest reservationRequest, final Long memberId) {
+    public ReservationResponse createUserReservationAndPayment(final PaymentRequest paymentRequest, final Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchElementException("유저 정보를 찾을 수 없습니다."));
 
+        paymentService.approve(paymentRequest);
+        return createUserReservation(paymentRequest, member);
+    }
+
+    private ReservationResponse createUserReservation(final PaymentRequest paymentRequest, final Member member) {
         return createReservation(
-                reservationRequest.getTimeId(),
-                reservationRequest.getThemeId(),
-                reservationRequest.getDate(),
+                paymentRequest.getTimeId(),
+                paymentRequest.getThemeId(),
+                paymentRequest.getDate(),
                 member
         );
     }

@@ -17,6 +17,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import roomescape.global.auth.Auth;
 import roomescape.member.domain.Role;
 import roomescape.member.presentation.resolver.LoginMember;
+import roomescape.payment.presentation.dto.PaymentRequest;
 import roomescape.reservation.application.service.ReservationService;
 import roomescape.reservation.presentation.dto.ReservationRequest;
 import roomescape.reservation.presentation.dto.ReservationResponse;
@@ -35,10 +36,10 @@ public class ReservationController {
     @Auth(Role.USER)
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(
-            final @RequestBody @Valid ReservationRequest reservationRequest,
+            final @RequestBody @Valid PaymentRequest paymentRequest,
             final @LoginMember Long memberId
     ) {
-        ReservationResponse reservation = reservationService.createUserReservation(reservationRequest, memberId);
+        ReservationResponse reservation = reservationService.createUserReservationAndPayment(paymentRequest, memberId);
 
         return ResponseEntity.created(createUri(reservation.getId()))
                 .body(reservation);
