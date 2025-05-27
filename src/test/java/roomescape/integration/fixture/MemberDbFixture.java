@@ -1,0 +1,49 @@
+package roomescape.integration.fixture;
+
+import static roomescape.integration.fixture.MemberEmailFixture.이메일_leehyeonsu48888지메일;
+import static roomescape.integration.fixture.MemberEmailFixture.이메일_leehyeonsu4888지메일;
+import static roomescape.integration.fixture.MemberNameFixture.한스;
+import static roomescape.integration.fixture.MemberPasswordFixture.비밀번호_gustn111느낌표두개;
+
+import org.springframework.stereotype.Component;
+import roomescape.member.domain.Member;
+import roomescape.member.domain.MemberEmail;
+import roomescape.member.domain.MemberEncodedPassword;
+import roomescape.member.domain.MemberName;
+import roomescape.member.domain.MemberRole;
+import roomescape.member.repository.MemberRepository;
+
+@Component
+public class MemberDbFixture {
+
+    private final MemberRepository memberRepository;
+
+    public MemberDbFixture(final MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
+    }
+
+    public Member 한스_leehyeonsu4888_지메일_일반_멤버() {
+        return createMember(한스, 이메일_leehyeonsu4888지메일, 비밀번호_gustn111느낌표두개, MemberRole.MEMBER);
+    }
+
+    public Member leehyeonsu4888_지메일_gustn111느낌표두개() {
+        return createMember(한스, 이메일_leehyeonsu4888지메일, 비밀번호_gustn111느낌표두개, MemberRole.MEMBER);
+    }
+
+    public Member leehyeonsu48888_지메일_gustn111느낌표두개_멤버() {
+        return createMember(한스, 이메일_leehyeonsu48888지메일, 비밀번호_gustn111느낌표두개, MemberRole.MEMBER);
+    }
+
+    public Member leehyeonsu48888_지메일_gustn111느낌표두개_어드민() {
+        return createMember(한스, 이메일_leehyeonsu48888지메일, 비밀번호_gustn111느낌표두개, MemberRole.ADMIN);
+    }
+
+    public Member createMember(
+            final MemberName name,
+            final MemberEmail email,
+            final MemberEncodedPassword password,
+            final MemberRole role
+    ) {
+        return memberRepository.save(new Member(null, name, email, password, role));
+    }
+}
