@@ -212,14 +212,19 @@ async function fetchReservationPayment(paymentData, reservationData) {
         - 내 서버 URL에 맞게 reservationURL 변경
         - 예약 결제 실패 시, 사용자가 실패 사유를 알 수 있도록 alert 에서 에러 메시지 수정
     */
+
+    const tossPaymentRequest = {
+        paymentKey: paymentData.paymentKey,
+        orderId: paymentData.orderId,
+        amount: paymentData.amount,
+        paymentType: paymentData.paymentType
+    }
+
     const reservationPaymentRequest = {
         date: reservationData.date,
         themeId: reservationData.themeId,
         timeId: reservationData.timeId,
-        paymentKey: paymentData.paymentKey,
-        orderId: paymentData.orderId,
-        amount: paymentData.amount,
-        paymentType: paymentData.paymentType,
+        tossPaymentRequest: tossPaymentRequest
     }
 
     const reservationURL = "/reservations";
