@@ -9,9 +9,9 @@ import roomescape.global.exception.custom.NotFoundException;
 import roomescape.global.exception.custom.UnauthorizedException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.reservation.client.PaymentsConfirmRequest;
-import roomescape.reservation.client.PaymentsConfirmResponse;
 import roomescape.reservation.client.TossPaymentsClient;
+import roomescape.reservation.client.dto.PaymentsConfirmRequest;
+import roomescape.reservation.client.dto.PaymentsConfirmResponse;
 import roomescape.reservation.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.CreateReservationWithMemberRequest;
@@ -56,12 +56,7 @@ public class ReservationCommandService {
                                                                final LoginMember loginMember) {
         final Member member = memberRepository.findById(loginMember.id())
                 .orElseThrow(() -> new UnauthorizedException("예약자를 찾을 수 없습니다."));
-        final PaymentsConfirmRequest paymentsConfirmRequest = new PaymentsConfirmRequest(request);
-        final PaymentsConfirmResponse paymentsConfirmResponse = tossPaymentsClient.confirmPayments(
-                paymentsConfirmRequest);
-        final Payment payment = new Payment(paymentsConfirmResponse.paymentKey(),
-                paymentsConfirmResponse.totalAmount());
-        paymentRepository.save(payment);
+        final Payment payment = confirmAndSavePayment(request);
         final Reservation reservation = convertToReservation(
                 request.themeId(),
                 request.timeId(),
@@ -99,6 +94,15 @@ public class ReservationCommandService {
                 .orElseThrow(() -> new NotFoundException("예약을 찾을 수 없습니다."));
         reservation.updateMember(waiting.getMember());
         waitingRepository.delete(waiting);
+    }
+
+    private Payment confirmAndSavePayment(CreateReservationWithPaymentRequest request) {
+        final PaymentsConfirmRequest paymentsConfirmRequest = new PaymentsConfirmRequest(request);
+        final PaymentsConfirmResponse paymentsConfirmResponse = tossPaymentsClient.confirmPayments(
+                paymentsConfirmRequest);
+        final Payment payment = new Payment(paymentsConfirmResponse.paymentKey(),
+                paymentsConfirmResponse.totalAmount());
+        return paymentRepository.save(payment);
     }
 
     private Reservation convertToReservation(

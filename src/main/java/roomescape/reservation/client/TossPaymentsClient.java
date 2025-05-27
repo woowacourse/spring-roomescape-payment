@@ -1,31 +1,48 @@
 package roomescape.reservation.client;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 import java.util.Base64;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestClient;
+import roomescape.global.exception.custom.TossPaymentsException;
+import roomescape.reservation.client.dto.PaymentsConfirmRequest;
+import roomescape.reservation.client.dto.PaymentsConfirmResponse;
+import roomescape.reservation.client.dto.TossErrorResponse;
 
 public class TossPaymentsClient {
 
-    private String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+    private final String secretKey;
     private final RestClient restClient;
 
-    public TossPaymentsClient(RestClient restClient) {
+    public TossPaymentsClient(final RestClient restClient, final String secretKey) {
         this.restClient = restClient;
+        this.secretKey = secretKey;
     }
 
     public PaymentsConfirmResponse confirmPayments(final PaymentsConfirmRequest request) {
-        PaymentsConfirmResponse response = restClient.post()
+        return restClient.post()
                 .uri("/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", getBasicAuthorizationValue())
                 .body(request)
                 .retrieve()
+                .onStatus(HttpStatusCode::isError, (req, res) -> handlerTossPaymentsException(res))
                 .body(PaymentsConfirmResponse.class);
-
-        return response;
     }
 
     private String getBasicAuthorizationValue() {
-        return "Basic " + Base64.getEncoder().encodeToString((SECRET_KEY + ":").getBytes());
+        return "Basic " + Base64.getEncoder().encodeToString((secretKey + ":").getBytes());
+    }
+
+    private void handlerTossPaymentsException(ClientHttpResponse res) throws IOException {
+        final ObjectMapper objectMapper = new ObjectMapper().configure(
+                DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        final TossErrorResponse errorResponse = objectMapper.readValue(res.getBody(),
+                TossErrorResponse.class);
+        throw new TossPaymentsException(res.getStatusCode(), errorResponse.message());
     }
 }
