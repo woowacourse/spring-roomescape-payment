@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.request.ReservationRequest;
 import roomescape.dto.response.ReservationResponse;
+import roomescape.service.payment.PaymentService;
 import roomescape.service.reservation.ReservationService;
 
 @RequiredArgsConstructor
@@ -23,6 +24,8 @@ import roomescape.service.reservation.ReservationService;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final PaymentService paymentService;
+
 
     @GetMapping()
     public ResponseEntity<List<ReservationResponse>> reservationList() {
@@ -37,8 +40,13 @@ public class ReservationController {
                 request.themeId(),
                 request.timeId()
         );
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                reservationService.addReservation(createReservationRequest));
+        // 결제 코드
+        paymentService.approvePayment(request.paymentKey(), request.orderId(), request.amount());
+
+        // 예약 추가
+        final ReservationResponse response = reservationService.addReservation(createReservationRequest);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/{id}")
