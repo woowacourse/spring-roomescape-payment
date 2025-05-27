@@ -17,6 +17,7 @@ import roomescape.member.presentation.dto.MemberResponse;
 import roomescape.member.presentation.dto.MyReservationResponse;
 import roomescape.reservation.domain.*;
 import roomescape.reservation.exception.ReservationException;
+import roomescape.reservation.presentation.dto.PaymentRequest;
 import roomescape.reservation.presentation.dto.ReservationRequest;
 import roomescape.reservation.presentation.dto.ReservationResponse;
 import roomescape.reservation.presentation.dto.WaitingResponse;
@@ -39,6 +40,7 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentService paymentService;
 
     public ReservationService(
         final DateTime dateTime,
@@ -46,7 +48,8 @@ public class ReservationService {
         final ReservationTimeRepository reservationTimeRepository,
         final ThemeRepository themeRepository,
         final MemberRepository memberRepository,
-        final WaitingRepository waitingRepository
+        final WaitingRepository waitingRepository,
+        final PaymentService paymentService
     ) {
         this.dateTime = dateTime;
         this.reservationRepository = reservationRepository;
@@ -54,6 +57,7 @@ public class ReservationService {
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentService = paymentService;
     }
 
     @Transactional
@@ -70,6 +74,10 @@ public class ReservationService {
 
         Reservation reservation = Reservation.createWithoutId(request.date(), time, theme, member, Status.RESERVED);
         validateCanReserveDateTime(reservation, dateTime.now());
+
+        PaymentRequest paymentRequest = new PaymentRequest(request.paymentKey(), request.orderId(), request.amount());
+        paymentService.requestPayment(paymentRequest);
+
         reservation = reservationRepository.save(reservation);
 
         return ReservationResponse.from(reservation);
