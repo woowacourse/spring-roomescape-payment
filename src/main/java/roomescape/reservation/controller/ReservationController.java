@@ -13,11 +13,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClient.Builder;
+import org.springframework.web.client.RestClient.ResponseSpec;
 import roomescape.common.utils.UriFactory;
 import roomescape.member.auth.LoginMember;
 import roomescape.member.auth.vo.MemberInfo;
 import roomescape.reservation.controller.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.controller.dto.CreateReservationWebRequest;
+import roomescape.reservation.controller.dto.CreateReservationWithPaymentWebRequest;
 import roomescape.reservation.controller.dto.ReservationWaitWebResponse;
 import roomescape.reservation.controller.dto.ReservationWebResponse;
 import roomescape.reservation.controller.dto.ReservationWithStatusResponse;
@@ -45,11 +49,30 @@ public class ReservationController {
 
     @PostMapping
     public ResponseEntity<ReservationWebResponse> create(
-            @RequestBody final CreateReservationWebRequest createReservationWebRequest,
-            @LoginMember MemberInfo memberInfo
+            @RequestBody final CreateReservationWithPaymentWebRequest request,
+            @LoginMember final MemberInfo memberInfo
     ) {
+        final RestClient restClient = RestClient.builder()
+                .baseUrl("https://api.tosspayments.com/v1/payments/confirm")
+                .build();
+
+        restClient.post()
+                .body(new TossPaymentConfirmRequest(
+                        request.paymentKey(),
+                        request.orderId(),
+                        request.amount()
+                ))
+                .retrieve()
+                .onStatus(status -> status.value() != 200,
+                        (req, res) ->
+                        {
+                            throw new IllegalStateException();
+                        });
+
         final ReservationWebResponse reservationWebResponse = reservationService.create(
-                createReservationWebRequest,
+                new CreateReservationWebRequest(
+                        request.date(), request.timeId(), request.themeId()
+                ),
                 memberInfo
         );
         final URI location = UriFactory.buildPath("/reservations", String.valueOf(reservationWebResponse.id()));
