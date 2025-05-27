@@ -18,6 +18,7 @@ import roomescape.reservation.dto.CreateReservationResponse;
 import roomescape.reservation.dto.CreateWaitingRequest;
 import roomescape.reservation.dto.CreateWaitingResponse;
 import roomescape.reservation.dto.ReservationMineResponse;
+import roomescape.reservation.service.PaymentService;
 import roomescape.reservation.service.reservation.ReservationService;
 import roomescape.reservation.service.waiting.ReservationWaitingService;
 
@@ -28,10 +29,16 @@ public class ReservationServiceFacade {
     private final ReservationService reservationService;
     private final ReservationWaitingService reservationWaitingService;
     private final MemberService memberService;
+    private final PaymentService paymentService;
 
     @Transactional
     public CreateReservationResponse saveReservation(final CreateReservationRequest request,
                                                      final LoginMember loginMember) {
+        final String paymentKey = request.tossPaymentRequest().paymentKey();
+        final String orderId = request.tossPaymentRequest().orderId();
+        final int amount = request.tossPaymentRequest().amount();
+        paymentService.processPayment(paymentKey, orderId, amount);
+
         final Member member = memberService.findMemberByEmail(loginMember.email());
         final LocalDate date = request.date();
         final Long timeId = request.timeId();
