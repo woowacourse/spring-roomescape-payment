@@ -1,18 +1,8 @@
 package roomescape.controller.api;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Base64;
-import java.util.List;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClient;
 import roomescape.controller.annotation.AdminMember;
 import roomescape.controller.annotation.CurrentMember;
@@ -20,11 +10,12 @@ import roomescape.dto.auth.LoginInfo;
 import roomescape.dto.reservation.MemberReservationCreateRequestDto;
 import roomescape.dto.reservation.MyReservationResponseDto;
 import roomescape.dto.reservation.ReservationResponseDto;
-import roomescape.exception.PaymentConfirmClientException;
-import roomescape.exception.PaymentConfirmServerException;
 import roomescape.service.command.ReservationCommandService;
 import roomescape.service.dto.ReservationCreateDto;
 import roomescape.service.query.ReservationQueryService;
+
+import java.util.Base64;
+import java.util.List;
 
 @RestController
 @RequestMapping("/reservations")
@@ -64,7 +55,6 @@ public class ReservationController {
             @CurrentMember LoginInfo loginInfo,
             @RequestBody final MemberReservationCreateRequestDto requestDto
     ) {
-        ObjectMapper objectMapper = new ObjectMapper();
         restClient.post()
                 .uri("https://api.tosspayments.com/v1/payments/confirm")
                 .header("Authorization", "Basic " +
@@ -72,17 +62,8 @@ public class ReservationController {
                 .body(requestDto.extractTossPaymentDto())
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
-                    JsonNode root = objectMapper.readTree(res.getBody());
-                    String message = root.path("message").asText();
-                    throw new PaymentConfirmClientException(message);
-                })
-                .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
-                    JsonNode root = objectMapper.readTree(res.getBody());
-                    String message = root.path("message").asText();
-                    throw new PaymentConfirmServerException(message);
-                })
                 .toBodilessEntity();
+
         ReservationCreateDto reservationCreateDto = new ReservationCreateDto(
                 requestDto.date(), requestDto.timeId(), requestDto.themeId(), loginInfo.id());
         return reservationCommandService.bookReservation(reservationCreateDto);

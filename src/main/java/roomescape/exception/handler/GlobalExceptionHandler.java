@@ -6,10 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import roomescape.exception.AccessDeniedException;
-import roomescape.exception.BadRequestException;
-import roomescape.exception.NotFoundException;
-import roomescape.exception.UnauthorizationException;
+import roomescape.exception.*;
 import roomescape.exception.dto.ErrorResponse;
 
 @RestControllerAdvice
@@ -54,6 +51,26 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(
                 ex.getMessage(),
                 HttpStatus.FORBIDDEN
+        );
+    }
+
+    @ExceptionHandler(PaymentConfirmClientException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handlePaymentConfirmClientException(PaymentConfirmClientException ex) {
+        log.error(ex.getMessage());
+        return new ErrorResponse(
+                ex.getMessage(),
+                HttpStatus.FORBIDDEN
+        );
+    }
+
+    @ExceptionHandler(PaymentConfirmServerException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handlePaymentConfirmServerException(PaymentConfirmServerException ex) {
+        log.error(ex.getMessage());
+        return new ErrorResponse(
+                "결제가 실패했습니다. 잠시 후 다시 시도해주세요.",
+                HttpStatus.INTERNAL_SERVER_ERROR
         );
     }
 
