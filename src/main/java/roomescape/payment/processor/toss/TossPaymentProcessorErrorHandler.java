@@ -1,5 +1,6 @@
-package roomescape.common;
+package roomescape.payment.processor.toss;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
@@ -8,8 +9,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
+import roomescape.common.exception.TossPaymentException;
 
-public class RestClientResponseErrorHandler implements ResponseErrorHandler {
+public class TossPaymentProcessorErrorHandler implements ResponseErrorHandler {
+
+    private final ObjectMapper objectMapper;
+
+    public TossPaymentProcessorErrorHandler(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @Override
     public boolean hasError(final ClientHttpResponse response) throws IOException {
@@ -19,9 +27,7 @@ public class RestClientResponseErrorHandler implements ResponseErrorHandler {
 
     @Override
     public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
-        if (response.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
-            throw new RuntimeException(Arrays.toString(response.getBody().readAllBytes()));
-        }
-        throw new RuntimeException(Arrays.toString(response.getBody().readAllBytes()));
+        TossPaymentConfirmError error = objectMapper.readValue(response.getBody(), TossPaymentConfirmError.class);
+        throw new TossPaymentException(response.getStatusCode(), error.message());
     }
 }

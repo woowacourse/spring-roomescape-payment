@@ -1,27 +1,31 @@
 package roomescape.payment.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
-import roomescape.common.RestClientResponseErrorHandler;
+import roomescape.payment.processor.toss.TossPaymentProcessorErrorHandler;
 import roomescape.payment.processor.toss.TossPaymentProcessor;
 
 @Configuration
 public class RestClientConfig {
 
+    private final ObjectMapper objectMapper;
     private final String secretKey;
 
     public RestClientConfig(
-        @Value("${payment.toss.secret-key}") String secretKey
+        @Value("${payment.toss.secret-key}") String secretKey,
+        ObjectMapper objectMapper
     ) {
+        this.objectMapper = objectMapper;
         this.secretKey = secretKey;
     }
 
     @Bean
     public TossPaymentProcessor tossPaymentProcessor() {
         RestClient restClient = RestClient.builder()
-            .defaultStatusHandler(new RestClientResponseErrorHandler())
+            .defaultStatusHandler(new TossPaymentProcessorErrorHandler(objectMapper))
             .build();
 
         return new TossPaymentProcessor(secretKey, restClient);
