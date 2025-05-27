@@ -8,5 +8,5 @@ public record AdminReservationRequest(
         @NotNull Long timeId,
         @NotNull Long themeId,
         @NotNull Long memberId
-) implements ReservationRequest {
+) {
 }

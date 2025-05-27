@@ -29,3 +29,7 @@ security:
       secret-key: s8R$kQz3nZ!L5pT7c@J#xM9vB1&uD6hE
       access:
         expire-length: 600000 # 10 분
+
+payment:
+  toss:
+    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6

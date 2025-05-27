@@ -14,7 +14,6 @@ import roomescape.member.domain.repository.MemberRepository;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.MemberReservationRequest;
 import roomescape.reservation.application.dto.MemberWaitingRequest;
-import roomescape.reservation.application.dto.ReservationRequest;
 import roomescape.reservation.application.dto.ReservationResponse;
 import roomescape.reservation.application.dto.WaitingResponse;
 import roomescape.reservation.domain.Reservation;
@@ -23,6 +22,9 @@ import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.domain.repository.WaitingRepository;
+import roomescape.reservation.infrastructure.PaymentClient;
+import roomescape.reservation.infrastructure.dto.PaymentRequest;
+import roomescape.reservation.infrastructure.dto.PaymentResponse;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.repository.ThemeRepository;
 
@@ -36,18 +38,39 @@ public class ReservationCommandService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentClient paymentClient;
 
     public ReservationResponse addMemberReservation(
             final MemberReservationRequest request,
             final Long memberId
     ) {
-        return createReservation(request, memberId);
+        final ReservationTime time = getReservationTime(request.timeId());
+        final Theme theme = getTheme(request.themeId());
+        final Member member = getMember(memberId);
+
+        validateHasTimeConflict(request.date(), time, theme);
+        validatePastDateTime(request.date(), time.getStartAt());
+
+        final PaymentRequest paymentRequest = new PaymentRequest(request.amount(), request.orderId(),
+                request.paymentKey());
+        PaymentResponse paymentResponse = paymentClient.pay(paymentRequest);
+
+        final Reservation reservation = new Reservation(request.date(), time, theme, member);
+        return ReservationResponse.from(reservationRepository.save(reservation));
     }
 
     public ReservationResponse addAdminReservation(
             final AdminReservationRequest request
     ) {
-        return createReservation(request, request.memberId());
+        final ReservationTime time = getReservationTime(request.timeId());
+        final Theme theme = getTheme(request.themeId());
+        final Member member = getMember(request.memberId());
+
+        validateHasTimeConflict(request.date(), time, theme);
+        validatePastDateTime(request.date(), time.getStartAt());
+
+        final Reservation reservation = new Reservation(request.date(), time, theme, member);
+        return ReservationResponse.from(reservationRepository.save(reservation));
     }
 
     public WaitingResponse addMemberWaiting(final MemberWaitingRequest request, final Long memberId) {
@@ -88,21 +111,6 @@ public class ReservationCommandService {
         waiting.accept();
         reservationRepository.save(
                 new Reservation(waiting.getDate(), waiting.getTime(), waiting.getTheme(), waiting.getMember()));
-    }
-
-    private ReservationResponse createReservation(
-            final ReservationRequest request,
-            final Long memberId
-    ) {
-        final ReservationTime time = getReservationTime(request.timeId());
-        final Theme theme = getTheme(request.themeId());
-        final Member member = getMember(memberId);
-
-        validateHasTimeConflict(request.date(), time, theme);
-        validatePastDateTime(request.date(), time.getStartAt());
-
-        final Reservation reservation = new Reservation(request.date(), time, theme, member);
-        return ReservationResponse.from(reservationRepository.save(reservation));
     }
 
     private void validatePastDateTime(final LocalDate date, final LocalTime time) {

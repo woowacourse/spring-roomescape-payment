@@ -170,13 +170,10 @@ function onReservationButtonClick(event, paymentWidget) {
 
         const generateRandomString = () =>
             window.btoa(Math.random()).slice(0, 20);
-        /*
-        TODO: [1단계]
-              - orderIdPrefix 를 자신만의 prefix로 변경
-        */
+
         // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
         // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
-        const orderIdPrefix = "WTEST";
+        const orderIdPrefix = "WEB-RESV-";
         paymentWidget.requestPayment({
             orderId: orderIdPrefix + generateRandomString(),
             orderName: "테스트 방탈출 예약 결제 1건",
@@ -203,12 +200,7 @@ function requestRead(endpoint) {
 }
 
 async function fetchReservationPayment(paymentData, reservationData) {
-    /*
-    TODO: [1단계]
-        - 자신의 예약 API request에 맞게 reservationPaymentRequest 필드명 수정
-        - 내 서버 URL에 맞게 reservationURL 변경
-        - 예약 결제 실패 시, 사용자가 실패 사유를 알 수 있도록 alert 에서 에러 메시지 수정
-    */
+
     const reservationPaymentRequest = {
         date: reservationData.date,
         themeId: reservationData.themeId,
@@ -230,7 +222,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
         if (!response.ok) {
             return response.json().then(errorBody => {
                 console.error("예약 결제 실패 : " + JSON.stringify(errorBody));
-                window.alert("예약 결제 실패 메시지");
+                window.alert(errorBody.message);
             });
         } else {
             response.json().then(successBody => {
