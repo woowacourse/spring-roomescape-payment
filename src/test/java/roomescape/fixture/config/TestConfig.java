@@ -1,0 +1,160 @@
+package roomescape.fixture.config;
+
+
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import roomescape.member.application.MemberService;
+import roomescape.member.domain.MemberRepository;
+import roomescape.member.infrastructure.JpaMemberRepository;
+import roomescape.member.infrastructure.MemberRepositoryImpl;
+import roomescape.reservation.application.AdminReservationService;
+import roomescape.reservation.application.AdminWaitingService;
+import roomescape.reservation.application.ReservationService;
+import roomescape.reservation.application.ReservationTimeService;
+import roomescape.reservation.application.WaitingService;
+import roomescape.reservation.domain.repository.ReservationRepository;
+import roomescape.reservation.domain.repository.ReservationTimeRepository;
+import roomescape.reservation.domain.repository.WaitingRepository;
+import roomescape.reservation.infrastructure.JpaReservationRepository;
+import roomescape.reservation.infrastructure.JpaReservationTimeRepository;
+import roomescape.reservation.infrastructure.JpaWaitingRepository;
+import roomescape.reservation.infrastructure.ReservationRepositoryImpl;
+import roomescape.reservation.infrastructure.ReservationTimeRepositoryImpl;
+import roomescape.reservation.infrastructure.WaitingRepositoryImpl;
+import roomescape.theme.application.ThemeService;
+import roomescape.theme.domain.ThemeRepository;
+import roomescape.theme.infrastructure.JpaThemeRepository;
+import roomescape.theme.infrastructure.ThemeRepositoryImpl;
+
+@TestConfiguration
+public class TestConfig {
+
+    @Bean
+    public ReservationTimeRepository reservationTimeRepository(
+            final JpaReservationTimeRepository jpaReservationTimeRepository
+    ) {
+        return new ReservationTimeRepositoryImpl(jpaReservationTimeRepository);
+    }
+
+    @Bean
+    public ThemeRepositoryImpl themeRepositoryImpl(
+            final JpaThemeRepository jpaThemeRepository
+    ) {
+        return new ThemeRepositoryImpl(jpaThemeRepository);
+    }
+
+    @Bean
+    public ThemeRepository themeRepository(
+            final JpaThemeRepository jpaThemeRepository
+    ) {
+        return new ThemeRepositoryImpl(jpaThemeRepository);
+    }
+
+    @Bean
+    public MemberRepository memberRepository(
+            final JpaMemberRepository jpaMemberRepository
+    ) {
+        return new MemberRepositoryImpl(jpaMemberRepository);
+    }
+
+    @Bean
+    public ReservationRepository reservationRepository(
+            final JpaReservationRepository jpaReservationRepository
+    ) {
+        return new ReservationRepositoryImpl(jpaReservationRepository);
+    }
+
+    @Bean
+    public WaitingRepository waitingRepository(
+            final JpaWaitingRepository jpaWaitingRepository
+    ) {
+        return new WaitingRepositoryImpl(jpaWaitingRepository);
+    }
+
+    @Bean
+    public ReservationTimeService reservationTimeService(
+            final ReservationTimeRepository reservationTimeRepository
+    ) {
+        return new ReservationTimeService(reservationTimeRepository);
+    }
+
+    @Bean
+    public ThemeService themeService(
+            final ThemeRepository themeRepository
+    ) {
+        return new ThemeService(themeRepository);
+    }
+
+    @Bean
+    public MemberService memberService(
+            final MemberRepository memberRepository
+    ) {
+        return new MemberService(memberRepository);
+    }
+
+    @Bean
+    public AdminReservationService adminReservationService(
+            final ReservationTimeRepository reservationTimeRepository,
+            final ThemeRepository themeRepository,
+            final MemberRepository memberRepository,
+            final ReservationRepository reservationRepository,
+            final WaitingRepository waitingRepository
+    ) {
+        return new AdminReservationService(
+                reservationTimeRepository,
+                themeRepository,
+                memberRepository,
+                reservationRepository,
+                waitingRepository
+        );
+    }
+
+    @Bean
+    public AdminWaitingService adminWaitingService(
+            final ReservationTimeRepository reservationTimeRepository,
+            final ThemeRepository themeRepository,
+            final MemberRepository memberRepository,
+            final ReservationRepository reservationRepository,
+            final WaitingRepository waitingRepository
+    ) {
+        return new AdminWaitingService(
+                reservationTimeRepository,
+                themeRepository,
+                memberRepository,
+                reservationRepository,
+                waitingRepository
+        );
+    }
+
+    @Bean
+    public ReservationService reservationService(
+            final ReservationTimeRepository reservationTimeRepository,
+            final ThemeRepository themeRepository,
+            final MemberRepository memberRepository,
+            final ReservationRepository reservationRepository
+    ) {
+        return new ReservationService(
+                reservationTimeRepository,
+                themeRepository,
+                memberRepository,
+                reservationRepository
+        );
+    }
+
+    @Bean
+    public WaitingService waitingService(
+            final ReservationTimeRepository reservationTimeRepository,
+            final ThemeRepository themeRepository,
+            final MemberRepository memberRepository,
+            final ReservationRepository reservationRepository,
+            final WaitingRepository waitingRepository
+    ) {
+        return new WaitingService(
+                reservationTimeRepository,
+                themeRepository,
+                memberRepository,
+                reservationRepository,
+                waitingRepository
+        );
+    }
+}
