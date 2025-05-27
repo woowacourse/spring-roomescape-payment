@@ -2,8 +2,6 @@ package roomescape.reservation.domain;
 
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.util.Objects;
 
@@ -11,16 +9,25 @@ import java.util.Objects;
 public class Payment {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Embedded
     private PaymentKey paymentKey;
 
     @Embedded
     private Amount amount;
 
-    protected Payment(){
+    public Payment(final String paymentKey, final Long amount) {
+        this.paymentKey = new PaymentKey(paymentKey);
+        this.amount = new Amount(amount);
+    }
+
+    protected Payment() {
+    }
+
+    public PaymentKey getPaymentKey() {
+        return paymentKey;
+    }
+
+    public Amount getAmount() {
+        return amount;
     }
 
     @Override
@@ -28,11 +35,11 @@ public class Payment {
         if (!(o instanceof Payment payment)) {
             return false;
         }
-        return Objects.equals(id, payment.id);
+        return Objects.equals(paymentKey, payment.paymentKey);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return Objects.hashCode(paymentKey);
     }
 }

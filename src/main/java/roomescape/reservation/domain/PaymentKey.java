@@ -8,7 +8,11 @@ public class PaymentKey {
 
     private String paymentKey;
 
-    protected PaymentKey(){
+    public PaymentKey(String paymentKey) {
+        this.paymentKey = paymentKey;
+    }
+
+    protected PaymentKey() {
     }
 
     public String getValue() {

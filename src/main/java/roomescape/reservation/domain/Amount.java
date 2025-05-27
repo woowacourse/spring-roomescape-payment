@@ -8,10 +8,14 @@ public class Amount {
 
     private long amount;
 
-    protected Amount(){
+    public Amount(long amount) {
+        this.amount = amount;
     }
 
-    public long getValue(){
+    protected Amount() {
+    }
+
+    public long getValue() {
         return amount;
     }
 

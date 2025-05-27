@@ -5,6 +5,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
@@ -36,6 +37,7 @@ public class Reservation {
     private Theme theme;
 
     @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_key")
     private Payment payment;
 
     public Reservation(final Long id, final Member member, final LocalDate date, final ReservationTime time,
@@ -47,9 +49,29 @@ public class Reservation {
         this.theme = theme;
     }
 
+    public Reservation(final Long id, final Member member, final LocalDate date, final ReservationTime time,
+                       final Theme theme, final Payment payment) {
+        this.id = id;
+        this.date = date;
+        this.time = time;
+        this.member = member;
+        this.theme = theme;
+        this.payment = payment;
+    }
+
+
     public static Reservation register(final Member member, final LocalDate date,
                                        final ReservationTime time, final Theme theme) {
         Reservation reservation = new Reservation(null, member, date, time, theme);
+        if (reservation.isBefore(LocalDateTime.now())) {
+            throw new BadRequestException("지나간 날짜와 시간은 예약 불가합니다.");
+        }
+        return reservation;
+    }
+
+    public static Reservation register(final Member member, final LocalDate date, final ReservationTime time,
+                                       final Theme theme, final Payment payment) {
+        Reservation reservation = new Reservation(null, member, date, time, theme, payment);
         if (reservation.isBefore(LocalDateTime.now())) {
             throw new BadRequestException("지나간 날짜와 시간은 예약 불가합니다.");
         }
