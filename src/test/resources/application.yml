@@ -21,9 +21,6 @@ spring:
   sql:
     init:
       mode: never
-  profiles:
-    active: test
-
 security:
   jwt:
     token:
@@ -33,8 +30,3 @@ logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
-
-payment:
-  toss:
-    auth-token: Basic bitamokoliwonbitamokoliwon
-    base-url: https://api.tosspayments.com
