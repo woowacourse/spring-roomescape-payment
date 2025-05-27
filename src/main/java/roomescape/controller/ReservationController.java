@@ -54,6 +54,7 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> addReservations(
             @RequestBody @Valid CreateReservationRequest request,
             LoginMemberRequest loginMemberRequest) {
+
         ReservationResponse response = reservationService.addReservation(request, loginMemberRequest);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
