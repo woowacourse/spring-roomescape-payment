@@ -10,3 +10,4 @@
     - [시간 API](docs/api/time.md)
     - [테마 API](docs/api/theme.md)
     - [인증 API](docs/api/auth.md)
+    - [대기 API](docs/api/waiting.md)

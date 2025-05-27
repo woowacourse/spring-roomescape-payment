@@ -10,9 +10,12 @@ content-type: application/json
 cookie: token={member-access-token}
 
 {
-    "date": "2024-03-01",
-    "themeId": 1,
-    "timeId": 1
+    "date":"2024-03-01",
+    "themeId":1,
+    "timeId":1,
+    "paymentKey":"tgen_20240513184816ZSAZ9",
+    "orderId":"MC4wNDYzMzA0OTc2MDgy",
+    "amount":1000
 }
 ```
 
@@ -43,6 +46,16 @@ Content-Type: application/json
     }
 }
 ```
+
+### 시나리오
+
+- 예약 생성에 성공하면 201을 반환한다.
+- 인증 정보가 올바르지 않을 경우 401을 반환한다.
+- 이미 예약이 존재하는 경우 400을 반환한다.
+- 지나간 시간/날짜에 예약 생성 할 경우 400을 반환한다.
+- 예약 요청 형식이 잘못됐을 경우 400을 반환한다.
+- 결제 실패 시 예약이 생성되지 않는다. 
+- 예약 실패 시 결제 실패 사유를 반환한다.
 
 ## 어드민 예약 생성 API
 
