@@ -172,9 +172,10 @@ function onReservationButtonClick(event, paymentWidget) {
         TODO: [1단계]
               - orderIdPrefix 를 자신만의 prefix로 변경
         */
+        // 결제 요청 (결제하기 누를때)
         // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
         // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
-        const orderIdPrefix = "WTEST";
+        const orderIdPrefix = "ROOMESCAPE_ORDER_";
         paymentWidget.requestPayment({
             orderId: orderIdPrefix + generateRandomString(),
             orderName: "테스트 방탈출 예약 결제 1건",
@@ -199,23 +200,22 @@ async function fetchReservationPayment(paymentData, reservationData) {
         - 내 서버 URL에 맞게 reservationURL 변경
         - 예약 결제 실패 시, 사용자가 실패 사유를 알 수 있도록 alert 에서 에러 메시지 수정
     */
-    const reservationPaymentRequest = {
-        date: reservationData.date,
-        themeId: reservationData.themeId,
-        timeId: reservationData.timeId,
+    // 결제 요청 완료 후 suceessUrl
+    const paymentRequest = {
         paymentKey: paymentData.paymentKey,
         orderId: paymentData.orderId,
         amount: paymentData.amount,
         paymentType: paymentData.paymentType,
     }
 
-    const reservationURL = "/reservations";
+    // TODO : 결제 승인 api
+    const reservationURL = "/payments/approve";
     fetch(reservationURL, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(reservationPaymentRequest),
+        body: JSON.stringify(paymentRequest),
     }).then(response => {
         if (!response.ok) {
             return response.json().then(errorBody => {
@@ -225,6 +225,39 @@ async function fetchReservationPayment(paymentData, reservationData) {
         } else {
             response.json().then(successBody => {
                 console.log("예약 결제 성공 : " + JSON.stringify(successBody));
+                fetchReservation(reservationData);
+                window.location.reload();
+            });
+        }
+    }).catch(error => {
+        console.error(error.message);
+    });
+}
+
+async function fetchReservation(reservationData) {
+    const reservationRequest = {
+        date: reservationData.date,
+        themeId: reservationData.themeId,
+        timeId: reservationData.timeId
+    }
+
+    // 예약 생성 api
+    const reservationURL = "/reservations";
+    fetch(reservationURL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(reservationRequest),
+    }).then(response => {
+        if (!response.ok) {
+            return response.json().then(errorBody => {
+                console.error("예약 생성 실패 : " + JSON.stringify(errorBody));
+                window.alert("예약 생성 실패 메시지");
+            });
+        } else {
+            response.json().then(successBody => {
+                console.log("예약 생성 성공 : " + JSON.stringify(successBody));
                 window.location.reload();
             });
         }
