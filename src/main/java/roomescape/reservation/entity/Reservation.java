@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import roomescape.member.entity.Member;
+import roomescape.member.entity.RoleType;
 
 @Entity
 @Getter

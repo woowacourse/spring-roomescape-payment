@@ -12,6 +12,7 @@ import roomescape.global.error.exception.ConflictException;
 import roomescape.global.error.exception.NotFoundException;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.reservation.PaymentRestClient;
 import roomescape.reservation.dto.request.ReservationAdminCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationReadFilteredRequest;
@@ -20,9 +21,11 @@ import roomescape.reservation.dto.response.ReservationByMemberResponse;
 import roomescape.reservation.dto.response.ReservationCreateResponse;
 import roomescape.reservation.dto.response.ReservationReadFilteredResponse;
 import roomescape.reservation.dto.response.ReservationReadResponse;
+import roomescape.reservation.entity.Payment;
 import roomescape.reservation.entity.Reservation;
 import roomescape.reservation.entity.ReservationSlot;
 import roomescape.reservation.entity.ReservationTime;
+import roomescape.reservation.repository.PaymentRepository;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationSlotRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
@@ -37,6 +40,7 @@ import roomescape.waiting.service.WaitingService;
 public class ReservationService {
 
     private final WaitingService waitingService;
+    private final PaymentService paymentService;
 
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -45,11 +49,14 @@ public class ReservationService {
     private final ReservationSlotRepository reservationSlotRepository;
 
     public ReservationCreateResponse createReservation(Long memberId, ReservationCreateRequest request) {
+
+        paymentService.create(request.toPayment());
         Reservation saved = create(memberId, request.timeId(), request.themeId(), request.date());
         return ReservationCreateResponse.from(saved);
     }
 
     public ReservationAdminCreateResponse createReservationByAdmin(ReservationAdminCreateRequest request) {
+
         Reservation saved = create(request.memberId(), request.timeId(), request.themeId(), request.date());
         return ReservationAdminCreateResponse.from(saved);
     }
