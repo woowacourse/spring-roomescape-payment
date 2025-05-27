@@ -17,6 +17,8 @@ import java.time.LocalTime;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Schedule {
 
+    private static final int AMOUNT = 1000;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
@@ -44,5 +46,9 @@ public class Schedule {
             return true;
         }
         return false;
+    }
+
+    public boolean isAmountEqualTo(final Long amount) {
+        return AMOUNT == amount;
     }
 }
