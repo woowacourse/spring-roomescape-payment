@@ -231,6 +231,7 @@ function onReservationButtonClick(event, paymentWidget) {
 }
 
 async function fetchReservationPayment(paymentData, reservationData) {
+    console.log(paymentData)
     /*
     TODO: [1단계]
         - 자신의 예약 API request에 맞게 reservationPaymentRequest 필드명 수정
@@ -247,7 +248,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
         paymentType: paymentData.paymentType,
     }
 
-    const reservationURL = "/reservations";
+    const reservationURL = "/reservations/v2";
     fetch(reservationURL, {
         method: "POST",
         headers: {
@@ -263,7 +264,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
         } else {
             response.json().then(successBody => {
                 console.log("예약 결제 성공 : " + JSON.stringify(successBody));
-                window.location.reload();
+                // window.location.reload();
             });
         }
     }).catch(error => {
