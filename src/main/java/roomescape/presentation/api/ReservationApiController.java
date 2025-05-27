@@ -36,8 +36,8 @@ public class ReservationApiController {
     @AuthRequired
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody @Valid ReservationRequest request,
                                                                  LoginInfo loginInfo) {
-        ReservationDto reservationDto = reservationService.addAndGet(request.date(), request.timeId(),
-                request.themeId(), loginInfo.id(), request.reservationStatus());
+        ReservationDto reservationDto = reservationService.addAndGetWithoutPayment(request.date(), request.timeId(),
+                request.themeId(), loginInfo.id(), request.reservationStatus(), request.paymentKey(), request.orderId(), request.amount());
         ReservationResponse response = ReservationResponse.from(reservationDto);
         return ResponseEntity.created(URI.create("/reservations")).body(response);
     }
@@ -47,9 +47,8 @@ public class ReservationApiController {
     @Role(UserRole.ADMIN)
     public ResponseEntity<ReservationResponse> adminCreateReservation(
             @RequestBody @Valid AdminReservationRequest request) {
-        ReservationDto reservationDto = reservationService.addAndGet(request.date(), request.timeId(),
-                request.themeId(), request.userId(),
-                ReservationStatus.RESERVED);
+        ReservationDto reservationDto = reservationService.addAndGetWithoutPayment(request.date(), request.timeId(),
+                request.themeId(), request.userId(), ReservationStatus.RESERVED);
         ReservationResponse response = ReservationResponse.from(reservationDto);
         return ResponseEntity.created(URI.create("/reservations")).body(response);
     }

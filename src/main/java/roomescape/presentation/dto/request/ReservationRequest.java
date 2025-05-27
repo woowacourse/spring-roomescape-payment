@@ -10,6 +10,11 @@ public record ReservationRequest(
         @NotNull @FutureOrPresent LocalDate date,
         @NotBlank String timeId,
         @NotBlank String themeId,
-        @NotNull ReservationStatus reservationStatus
+        @NotNull ReservationStatus reservationStatus,
+        String paymentKey,
+        String orderId,
+        Long amount,
+        String paymentType
+
 ) {
 }
