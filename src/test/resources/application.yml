@@ -33,3 +33,7 @@ security:
     token:
       secret-key: "Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E="
       expire-length: 3600000
+
+payment:
+  toss:
+    secret-key: "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"
