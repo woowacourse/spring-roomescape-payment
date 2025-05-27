@@ -1,4 +1,4 @@
-package roomescape.reservation.service;
+package roomescape.external.toss;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -14,16 +14,17 @@ import roomescape.global.converter.JsonStringToObject;
 import roomescape.global.dto.ExternalApiErrorResponse;
 import roomescape.global.exception.ExternalApiException;
 import roomescape.reservation.domain.PaymentInfo;
+import roomescape.reservation.service.PaymentService;
 
 @Service
-public class PaymentServiceImpl implements PaymentService {
+public class TossPaymentService implements PaymentService {
 
     public static final String TOSS_PAYMENTS_CONFIRM_URL = "https://api.tosspayments.com/v1/payments/confirm";
     private final RestClient restClient;
     private final JsonStringToObject jsonStringToObject;
     private final String tossSecretKey;
 
-    public PaymentServiceImpl(
+    public TossPaymentService(
             final RestClient restClient,
             final JsonStringToObject jsonStringToObject,
             @Value("${api.toss.secret-key}") String tossSecretKey
