@@ -169,7 +169,7 @@ function onReservationButtonClick(event, paymentWidget) {
         const generateRandomString = () =>
             window.btoa(Math.random()).slice(0, 20);
         /*
-        TODO: [1단계]
+        TODO: [1단계](완료)
               - orderIdPrefix 를 자신만의 prefix로 변경
         */
         // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
@@ -220,7 +220,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
         if (!response.ok) {
             return response.json().then(errorBody => {
                 console.error("예약 결제 실패 : " + JSON.stringify(errorBody));
-                window.alert("예약 결제 실패 메시지");
+                window.alert("예약 결제 실패 : " + errorBody.message);
             });
         } else {
             response.json().then(successBody => {

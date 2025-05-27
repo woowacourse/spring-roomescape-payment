@@ -33,7 +33,10 @@ public class AdminReservationController {
             new ReservationRequest(
                 request.date(),
                 request.timeId(),
-                request.themeId()
+                request.themeId(),
+                request.paymentKey(),
+                request.orderId(),
+                request.amount()
             ), request.memberId());
 
         return ResponseEntity.created(URI.create("/admin/reservation")).body(response);
