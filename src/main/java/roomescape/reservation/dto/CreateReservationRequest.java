@@ -5,7 +5,7 @@ import java.time.LocalDate;
 public record CreateReservationRequest(
         LocalDate date,
         Long themeId,
-        Long timeId
+        Long timeId,
+        TossPaymentRequest tossPaymentRequest
 ) {
-
 }
