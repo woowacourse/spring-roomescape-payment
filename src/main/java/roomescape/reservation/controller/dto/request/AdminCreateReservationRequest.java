@@ -2,7 +2,7 @@ package roomescape.reservation.controller.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
-import roomescape.reservation.application.dto.request.CreateReservationServiceRequest;
+import roomescape.reservation.application.dto.request.AdminCreateReservationServiceRequest;
 
 public record AdminCreateReservationRequest(
         @NotNull(message = "예약자를 필수로 입력해야 합니다.")
@@ -15,7 +15,7 @@ public record AdminCreateReservationRequest(
         Long themeId
 ) {
 
-    public CreateReservationServiceRequest toServiceRequest() {
-        return new CreateReservationServiceRequest(memberId, date, timeId, themeId);
+    public AdminCreateReservationServiceRequest toServiceRequest() {
+        return new AdminCreateReservationServiceRequest(memberId, date, timeId, themeId);
     }
 }

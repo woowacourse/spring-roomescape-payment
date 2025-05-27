@@ -1,13 +1,19 @@
 package roomescape.reservation.application.dto.request;
 
 import java.time.LocalDate;
+import lombok.Builder;
+import roomescape.reservation.model.vo.PaymentInfo;
 import roomescape.reservation.model.vo.Schedule;
 
-public record  CreateReservationServiceRequest(
+@Builder
+public record CreateReservationServiceRequest(
         Long memberId,
         LocalDate date,
         Long timeId,
-        Long themeId
+        Long themeId,
+        String paymentKey,
+        String orderId,
+        Long amount
 ) {
 
     public Schedule toSchedule() {
@@ -15,6 +21,14 @@ public record  CreateReservationServiceRequest(
                 .date(date)
                 .timeId(timeId)
                 .themeId(themeId)
+                .build();
+    }
+
+    public PaymentInfo toPaymentInfo() {
+        return PaymentInfo.builder()
+                .paymentKey(paymentKey)
+                .orderId(orderId)
+                .amount(amount)
                 .build();
     }
 }

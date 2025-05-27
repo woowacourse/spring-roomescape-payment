@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.reservation.application.dto.request.AdminCreateReservationServiceRequest;
 import roomescape.reservation.application.dto.request.ReservationSearchServiceRequest;
 import roomescape.reservation.application.dto.response.ReservationServiceResponse;
 import roomescape.reservation.model.entity.Reservation;
@@ -18,6 +19,11 @@ public class AdminReservationService {
 
     private final ReservationRepository reservationRepository;
     private final ReservationOperation reservationOperation;
+
+    public ReservationServiceResponse create(final AdminCreateReservationServiceRequest request) {
+        Reservation savedReservation = reservationOperation.reserve(request.toSchedule(), request.memberId());
+        return ReservationServiceResponse.from(savedReservation);
+    }
 
     public List<ReservationServiceResponse> getAllByStatuses(List<ReservationStatus> statuses) {
         List<Reservation> reservations = reservationRepository.getAllByStatuses(statuses);

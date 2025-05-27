@@ -48,7 +48,11 @@ class UserCreateReservationRequestTest {
         Long timeId = "null".equals(timeIdStr) ? null : Long.valueOf(timeIdStr);
         Long themeId = "null".equals(themeIdStr) ? null : Long.valueOf(themeIdStr);
 
-        UserCreateReservationRequest request = new UserCreateReservationRequest(date, timeId, themeId);
+        String paymentKey = "paymentKey";
+        String orderId = "id";
+        Long amount = 1234L;
+        UserCreateReservationRequest request = new UserCreateReservationRequest(date, timeId, themeId, paymentKey,
+                orderId, amount);
 
         Set<ConstraintViolation<UserCreateReservationRequest>> violations = validator.validate(request);
 
@@ -59,10 +63,16 @@ class UserCreateReservationRequestTest {
     @Test
     void validCreateFutureReservationRequest() {
         //given
+        String paymentKey = "paymentKey";
+        String orderId = "id";
+        Long amount = 1234L;
         UserCreateReservationRequest request = new UserCreateReservationRequest(
                 LocalDate.now().plusDays(1),
                 1L,
-                1L
+                1L,
+                paymentKey,
+                orderId,
+                amount
         );
 
         //when

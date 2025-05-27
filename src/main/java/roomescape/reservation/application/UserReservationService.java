@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.payment.model.PaymentClient;
 import roomescape.reservation.application.dto.request.CreateReservationServiceRequest;
 import roomescape.reservation.application.dto.response.ReservationServiceResponse;
 import roomescape.reservation.application.dto.response.UserReservationServiceResponse;
@@ -24,9 +25,11 @@ public class UserReservationService {
     private final ReservationRepository reservationRepository;
     private final ReservationWaitingRepository reservationWaitingRepository;
     private final ReservationOperation reservationOperation;
+    private final PaymentClient paymentClient;
 
     @Transactional
     public ReservationServiceResponse create(CreateReservationServiceRequest request) {
+        paymentClient.requestApprove(request.toPaymentInfo());
         Reservation savedReservation = reservationOperation.reserve(request.toSchedule(), request.memberId());
         return ReservationServiceResponse.from(savedReservation);
     }

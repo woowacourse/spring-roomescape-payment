@@ -1,6 +1,8 @@
 package roomescape.application;
 
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static roomescape.reservation.model.entity.vo.ReservationStatus.CONFIRMED;
 
 import java.time.LocalDate;
@@ -10,11 +12,15 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.ReservationTestFixture;
 import roomescape.member.model.Member;
 import roomescape.member.model.MemberRepository;
 import roomescape.member.model.Role;
+import roomescape.payment.infrastructure.client.PaymentRestClient;
 import roomescape.reservation.application.UserReservationService;
 import roomescape.reservation.application.dto.request.CreateReservationServiceRequest;
 import roomescape.reservation.application.dto.response.ReservationServiceResponse;
@@ -27,6 +33,7 @@ import roomescape.reservation.model.repository.ReservationThemeRepository;
 import roomescape.reservation.model.repository.ReservationTimeRepository;
 import roomescape.support.IntegrationTestSupport;
 
+@ExtendWith(MockitoExtension.class)
 class UserReservationServiceTest extends IntegrationTestSupport {
 
     @Autowired
@@ -44,27 +51,32 @@ class UserReservationServiceTest extends IntegrationTestSupport {
     @Autowired
     private MemberRepository memberRepository;
 
+    @MockitoBean
+    private PaymentRestClient paymentRestClient;
+
     @BeforeEach
     void setUp() {
         ReservationTime reservationTime = ReservationTime.builder()
-            .startAt(LocalTime.parse("10:00"))
-            .build();
+                .startAt(LocalTime.parse("10:00"))
+                .build();
 
         ReservationTheme theme = ReservationTheme.builder()
-            .name("이름")
-            .description("설명")
-            .thumbnail("썸네일")
-            .build();
+                .name("이름")
+                .description("설명")
+                .thumbnail("썸네일")
+                .build();
 
         Member member = Member.builder()
-            .name("어드민")
-            .email("admin@naver.com")
-            .password("1234")
-            .role(Role.ADMIN)
-            .build();
+                .name("어드민")
+                .email("admin@naver.com")
+                .password("1234")
+                .role(Role.ADMIN)
+                .build();
         reservationTimeRepository.save(reservationTime);
         reservationThemeRepository.save(theme);
         memberRepository.save(member);
+        
+        doNothing().when(paymentRestClient).requestApprove(any());
     }
 
     @DisplayName("요청된 예약 정보로 예약을 진행할 수 있다")
@@ -75,7 +87,8 @@ class UserReservationServiceTest extends IntegrationTestSupport {
         Long timeId = 1L;
         Long themeId = 1L;
         Long memberId = 1L;
-        CreateReservationServiceRequest request = new CreateReservationServiceRequest(memberId, date, timeId, themeId);
+        CreateReservationServiceRequest request = new CreateReservationServiceRequest(memberId, date, timeId, themeId,
+                null, null, null);
 
         // when
         ReservationServiceResponse response = userReservationService.create(request);
@@ -98,7 +111,8 @@ class UserReservationServiceTest extends IntegrationTestSupport {
         Long timeId = 1L;
         Long themeId = 1L;
         Long memberId = 1L;
-        CreateReservationServiceRequest request = new CreateReservationServiceRequest( memberId, date, timeId, themeId);
+        CreateReservationServiceRequest request = new CreateReservationServiceRequest(memberId, date, timeId, themeId,
+                null, null, null);
 
         // when & then
         Assertions.assertThatThrownBy(() -> userReservationService.create(request))
@@ -112,14 +126,15 @@ class UserReservationServiceTest extends IntegrationTestSupport {
         LocalDate date = LocalDate.now().minusDays(10);
         ReservationTime reservationTime = ReservationTestFixture.getReservationTimeFixture();
         ReservationTheme reservationTheme = ReservationTestFixture.getReservationThemeFixture();
-        Reservation reservation = ReservationTestFixture.createConfirmedReservation(date, reservationTime, reservationTheme);
+        Reservation reservation = ReservationTestFixture.createConfirmedReservation(date, reservationTime,
+                reservationTheme);
 
         reservationTimeRepository.save(reservationTime);
         reservationThemeRepository.save(reservationTheme);
         reservationRepository.save(reservation);
         Long memberId = 1L;
         CreateReservationServiceRequest request = new CreateReservationServiceRequest(
-            memberId, date, reservationTime.getId(), reservationTheme.getId());
+                memberId, date, reservationTime.getId(), reservationTheme.getId(), null, null, null);
 
         // when & then
         Assertions.assertThatThrownBy(() -> userReservationService.create(request))
