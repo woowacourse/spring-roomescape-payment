@@ -11,6 +11,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.business.dto.PaymentApproveDto;
 import roomescape.business.dto.ReservationDto;
 import roomescape.business.model.entity.Reservation;
 import roomescape.business.model.entity.ReservationTime;
@@ -24,6 +25,8 @@ import roomescape.business.model.vo.Id;
 import roomescape.business.model.vo.ReservationStatus;
 import roomescape.exception.business.DuplicatedException;
 import roomescape.exception.business.NotFoundException;
+import roomescape.infrastructure.payment.PaymentApproveResponseDto;
+import roomescape.infrastructure.payment.TossPaymentClient;
 import roomescape.presentation.dto.response.ReservationResponse;
 import roomescape.business.dto.ReservationWithAheadDto;
 
@@ -38,14 +41,13 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
 
-    public ReservationDto addAndGet(final LocalDate date, final String timeIdValue, final String themeIdValue,
-                                    final String userIdValue, final ReservationStatus reservationStatus) {
-        User user = userRepository.findById(Id.create(userIdValue))
-                .orElseThrow(() -> new NotFoundException(USER_NOT_EXIST));
-        ReservationTime reservationTime = reservationTimeRepository.findById(Id.create(timeIdValue))
-                .orElseThrow(() -> new NotFoundException(RESERVATION_NOT_EXIST));
-        Theme theme = themeRepository.findById(Id.create(themeIdValue))
-                .orElseThrow(() -> new NotFoundException(THEME_NOT_EXIST));
+    private final TossPaymentClient paymentClient;
+
+    public ReservationDto addAndGetWithoutPayment(final LocalDate date, final String timeIdValue, final String themeIdValue,
+                                                  final String userIdValue, final ReservationStatus reservationStatus, final String paymentKey, final String orderId, final Long amount) {
+        User user = getUser(userIdValue);
+        ReservationTime reservationTime = getReservationTime(timeIdValue);
+        Theme theme = getTheme(themeIdValue);
 
         if (reservationStatus == ReservationStatus.RESERVED && reservationRepository.isDuplicateDateAndTimeAndTheme(date,
                 reservationTime.startTimeValue(), theme.getId())) {
@@ -53,9 +55,47 @@ public class ReservationService {
         }
 
         Reservation reservation = Reservation.create(user, date, reservationTime, theme, reservationStatus, LocalDateTime.now());
+        if (reservationStatus == ReservationStatus.RESERVED) {
+            PaymentApproveResponseDto paymentApproveResponse = paymentClient.approvePayment(
+                    new PaymentApproveDto(paymentKey, orderId, amount));
+        }
         reservationRepository.save(reservation);
         waitingService.updateWaitingReservations(reservation);
         return ReservationDto.fromEntity(reservation);
+    }
+
+    public ReservationDto addAndGetWithoutPayment(final LocalDate date, final String timeIdValue, final String themeIdValue,
+                                    final String userIdValue, final ReservationStatus reservationStatus) {
+        User user = getUser(userIdValue);
+        ReservationTime reservationTime = getReservationTime(timeIdValue);
+        Theme theme = getTheme(themeIdValue);
+
+        if (reservationStatus == ReservationStatus.RESERVED && reservationRepository.isDuplicateDateAndTimeAndTheme(date,
+                reservationTime.startTimeValue(), theme.getId())) {
+            throw new DuplicatedException(RESERVATION_DUPLICATED);
+        }
+        Reservation reservation = Reservation.create(user, date, reservationTime, theme, reservationStatus, LocalDateTime.now());
+        reservationRepository.save(reservation);
+        waitingService.updateWaitingReservations(reservation);
+        return ReservationDto.fromEntity(reservation);
+    }
+
+    private Theme getTheme(String themeIdValue) {
+        Theme theme = themeRepository.findById(Id.create(themeIdValue))
+                .orElseThrow(() -> new NotFoundException(THEME_NOT_EXIST));
+        return theme;
+    }
+
+    private ReservationTime getReservationTime(String timeIdValue) {
+        ReservationTime reservationTime = reservationTimeRepository.findById(Id.create(timeIdValue))
+                .orElseThrow(() -> new NotFoundException(RESERVATION_NOT_EXIST));
+        return reservationTime;
+    }
+
+    private User getUser(String userIdValue) {
+        User user = userRepository.findById(Id.create(userIdValue))
+                .orElseThrow(() -> new NotFoundException(USER_NOT_EXIST));
+        return user;
     }
 
     @Transactional(readOnly = true)

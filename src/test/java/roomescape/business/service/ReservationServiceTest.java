@@ -83,7 +83,7 @@ class ReservationServiceTest {
         doNothing().when(waitingService).updateWaitingReservations(any(Reservation.class));
 
         // when
-        ReservationDto result = sut.addAndGet(date, timeIdValue, themeIdValue, userIdValue, ReservationStatus.RESERVED);
+        ReservationDto result = sut.addAndGetWithoutPayment(date, timeIdValue, themeIdValue, userIdValue, ReservationStatus.RESERVED);
 
         // then
         assertThat(result).isNotNull();
@@ -106,7 +106,7 @@ class ReservationServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // when, then
-        assertThatThrownBy(() -> sut.addAndGet(date, timeId, themeId, userIdValue, ReservationStatus.RESERVED))
+        assertThatThrownBy(() -> sut.addAndGetWithoutPayment(date, timeId, themeId, userIdValue, ReservationStatus.RESERVED))
                 .isInstanceOf(NotFoundException.class);
 
         verify(userRepository).findById(userId);
@@ -129,7 +129,7 @@ class ReservationServiceTest {
         when(reservationTimeRepository.findById(Id.create(timeId))).thenReturn(Optional.empty());
 
         // when, then
-        assertThatThrownBy(() -> sut.addAndGet(date, timeId, themeId, userId, ReservationStatus.RESERVED))
+        assertThatThrownBy(() -> sut.addAndGetWithoutPayment(date, timeId, themeId, userId, ReservationStatus.RESERVED))
                 .isInstanceOf(NotFoundException.class);
 
         verify(userRepository).findById(Id.create(userId));
@@ -157,7 +157,7 @@ class ReservationServiceTest {
         when(themeRepository.findById(themeId)).thenReturn(Optional.empty());
 
         // when, then
-        assertThatThrownBy(() -> sut.addAndGet(date, timeIdValue, themeIdValue, userIdValue, ReservationStatus.RESERVED))
+        assertThatThrownBy(() -> sut.addAndGetWithoutPayment(date, timeIdValue, themeIdValue, userIdValue, ReservationStatus.RESERVED))
                 .isInstanceOf(NotFoundException.class);
 
         verify(userRepository).findById(userId);
@@ -188,7 +188,7 @@ class ReservationServiceTest {
                 .thenReturn(true);
 
         // when, then
-        assertThatThrownBy(() -> sut.addAndGet(date, timeIdValue, themeIdValue, userIdValue, ReservationStatus.RESERVED))
+        assertThatThrownBy(() -> sut.addAndGetWithoutPayment(date, timeIdValue, themeIdValue, userIdValue, ReservationStatus.RESERVED))
                 .isInstanceOf(DuplicatedException.class);
 
         verify(userRepository).findById(userId);
