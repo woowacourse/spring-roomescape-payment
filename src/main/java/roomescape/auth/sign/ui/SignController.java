@@ -40,7 +40,6 @@ public class SignController {
     public ResponseEntity<UserSessionResponse> create(@RequestBody final SignUpWebRequest request) {
         final UserSessionResponse response = signFacade.signUp(request);
 
-        // TODO add UserController
         final URI location = UriFactory.buildPath("/users", String.valueOf(response.userId()));
         return ResponseEntity.created(location)
                 .body(response);
