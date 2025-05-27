@@ -1,8 +1,8 @@
-package roomescape.reservation.service;
+package roomescape.payment.processor.toss;
 
 public record TossPaymentConfirmRequest(
-        String orderId,
         int amount,
+        String orderId,
         String paymentKey
 ) {
 }
