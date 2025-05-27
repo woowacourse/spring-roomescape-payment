@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import roomescape.exception.custom.ForbiddenException;
+import roomescape.exception.custom.PaymentException;
 import roomescape.exception.custom.UnauthorizedException;
 import roomescape.exception.dto.ErrorResponse;
 
@@ -37,6 +38,14 @@ public class GlobalExceptionHandler {
         ErrorResponse response = ErrorResponse.from(e.getMessage());
 
         return ResponseEntity.status(FORBIDDEN)
+                .body(response);
+    }
+
+    @ExceptionHandler(exception = PaymentException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentException(PaymentException e) {
+        ErrorResponse response = ErrorResponse.from(e.getMessage());
+
+        return ResponseEntity.status(e.getStatusCode())
                 .body(response);
     }
 
