@@ -17,8 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.Rollback;
+import roomescape.config.payment.TestPaymentConfig;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
@@ -26,6 +28,7 @@ import roomescape.domain.Role;
 import roomescape.domain.Theme;
 import roomescape.domain.Waiting;
 import roomescape.dto.business.AccessTokenContent;
+import roomescape.dto.business.PaymentResult;
 import roomescape.dto.request.AdminReservationRequest;
 import roomescape.dto.request.ReservationCreationRequest;
 import roomescape.repository.MemberRepository;
@@ -34,9 +37,11 @@ import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.repository.WaitingRepository;
 import roomescape.utility.JwtTokenProvider;
+import roomescape.utility.PayClientStub;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Rollback(value = false)
+@Import(value = {TestPaymentConfig.class})
 class ReservationApiTest {
 
     @LocalServerPort
@@ -54,6 +59,9 @@ class ReservationApiTest {
     private WaitingRepository waitingRepository;
     @Autowired
     private JwtTokenProvider tokenProvider;
+    @Autowired
+    private PayClientStub payClientStub;
+
 
     @AfterEach
     void setup() {
@@ -174,6 +182,8 @@ class ReservationApiTest {
     @Test
     void canAddReservation() {
         // given
+        payClientStub.setPaymentResult(new PaymentResult("asfqwe123", "setqerwe123", "NORMAL"));
+
         Member member = memberRepository.save(
                 Member.createWithoutId(Role.GENERAL, "회원1", "member1@email.com", "qwer1234!"));
         ReservationTime time = timeRepository.save(
@@ -185,7 +195,8 @@ class ReservationApiTest {
                 new AccessTokenContent(member.getId(), member.getRole(), member.getName()));
 
         ReservationCreationRequest creationContent =
-                new ReservationCreationRequest(theme.getId(), NEXT_DAY, time.getId());
+                new ReservationCreationRequest(theme.getId(), NEXT_DAY, time.getId(),
+                        "asfqwe123!", "setqerwe123!", "NORMAL", 10000);
 
         // when & then
         RestAssured

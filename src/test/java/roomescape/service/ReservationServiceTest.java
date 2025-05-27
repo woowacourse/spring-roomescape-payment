@@ -36,6 +36,7 @@ import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.repository.WaitingRepository;
+import roomescape.utility.PaymentClient;
 
 @DataJpaTest
 class ReservationServiceTest {
@@ -60,10 +61,11 @@ class ReservationServiceTest {
     private Theme theme;
     private Member member;
     private PaymentHistoryService paymentHistoryService;
+    private PaymentClient paymentClient;
 
     @BeforeEach
     void setup() {
-        paymentHistoryService = new PaymentHistoryService(paymentHistoryRepository);
+        paymentHistoryService = new PaymentHistoryService(paymentHistoryRepository, paymentClient);
         reservationService = new ReservationService(
                 reservationRepository,
                 reservationTimeRepository,
