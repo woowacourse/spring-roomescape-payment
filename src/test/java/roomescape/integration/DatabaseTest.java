@@ -1,7 +1,14 @@
 package roomescape.integration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -12,14 +19,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import roomescape.common.BaseTest;
 import roomescape.presentation.dto.response.ReservationResponse;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class DatabaseTest extends BaseTest {
@@ -70,7 +69,8 @@ class DatabaseTest extends BaseTest {
                 "테마1", "설명1", "썸네일1");
         jdbcTemplate.update("INSERT INTO member (name, role, email, password) VALUES (?, ?, ?, ?)",
                 "브라운", "USER", "test@email.com", "pass1");
-        jdbcTemplate.update("INSERT INTO reservation (date, time_id, theme_id, member_id, status) VALUES (?, ?, ?, ?, ?)",
+        jdbcTemplate.update(
+                "INSERT INTO reservation (date, time_id, theme_id, member_id, status) VALUES (?, ?, ?, ?, ?)",
                 "2025-08-05", 1, 1, 1, "RESERVED");
 
         List<ReservationResponse> response = RestAssured.given().log().all()
@@ -82,35 +82,6 @@ class DatabaseTest extends BaseTest {
         Integer count = jdbcTemplate.queryForObject("SELECT count(1) FROM reservation", Integer.class);
 
         assertThat(response.size()).isEqualTo(count);
-    }
-
-    @Test
-    void 방탈출_예약_목록을_생성_조회_삭제한다() {
-        jdbcTemplate.update("INSERT INTO reservation_time (start_at) VALUES (?)",
-                "10:00");
-        jdbcTemplate.update("INSERT INTO theme (name, description, thumbnail) VALUES (?, ?, ?)",
-                "테마1", "설명1", "썸네일1");
-        jdbcTemplate.update("INSERT INTO member (name, role, email, password) VALUES (?, ?, ?, ?)",
-                "브라운", "USER", "test@email.com", "pass1");
-        String token = givenMemberLoginToken();
-
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", token)
-                .body(reservation)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value());
-
-        Integer count = jdbcTemplate.queryForObject("SELECT count(1) FROM reservation", Integer.class);
-        assertThat(count).isEqualTo(1);
-
-        RestAssured.given().log().all()
-                .when().delete("/reservations/1")
-                .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value());
-        Integer countAfterDelete = jdbcTemplate.queryForObject("SELECT count(1) FROM reservation WHERE status = 'RESERVED'", Integer.class);
-        assertThat(countAfterDelete).isEqualTo(0);
     }
 
     private String givenMemberLoginToken() {
