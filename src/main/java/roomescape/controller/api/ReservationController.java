@@ -2,12 +2,14 @@ package roomescape.controller.api;
 
 import java.util.List;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestClient;
 import roomescape.controller.annotation.AdminMember;
 import roomescape.controller.annotation.CurrentMember;
 import roomescape.dto.auth.LoginInfo;
@@ -24,11 +26,14 @@ public class ReservationController {
 
     private final ReservationQueryService reservationQueryService;
     private final ReservationCommandService reservationCommandService;
+    private final RestClient restClient;
 
     public ReservationController(ReservationQueryService reservationQueryService,
-                                 ReservationCommandService reservationCommandService) {
+                                 ReservationCommandService reservationCommandService,
+                                 RestClient restClient) {
         this.reservationQueryService = reservationQueryService;
         this.reservationCommandService = reservationCommandService;
+        this.restClient = restClient;
     }
 
     @GetMapping
@@ -53,6 +58,12 @@ public class ReservationController {
             @CurrentMember LoginInfo loginInfo,
             @RequestBody final MemberReservationCreateRequestDto requestDto
     ) {
+        restClient.post()
+                .uri("https://api.tosspayments.com/v1/payments/confirm")
+                .body(requestDto.extractTossPaymentDto())
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .body();
         ReservationCreateDto reservationCreateDto = new ReservationCreateDto(
                 requestDto.date(), requestDto.timeId(), requestDto.themeId(), loginInfo.id());
         return reservationCommandService.bookReservation(reservationCreateDto);
