@@ -21,7 +21,7 @@ public class ExceptionController {
 
     @ExceptionHandler(PaymentException.class)
     public ResponseEntity<String> handlePaymentException(PaymentException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(PREFIX + e.getMessage());
+        return ResponseEntity.status(e.getCode()).body(PREFIX + e.getMessage());
     }
 
     @ExceptionHandler(JwtException.class)
