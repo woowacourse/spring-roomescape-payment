@@ -27,6 +27,9 @@ public enum ErrorCode {
     USER_NAME_CONTAINS_NUMBER("유저 이름에 숫자는 포함될 수 없습니다."),
     EMAIL_DUPLICATED("중복된 이메일입니다."),
     EMAIL_FORMAT_INVALID("이메일 형식이어야 합니다."),
+
+    // 결제
+    PAYMENT_NOT_APPROVED("결제 승인이 거부되었습니다.")
     ;
 
     private final String message;
