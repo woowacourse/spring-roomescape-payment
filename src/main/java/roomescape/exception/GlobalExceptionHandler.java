@@ -15,6 +15,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(e.getStatus()).body(body);
     }
 
+    @ExceptionHandler(value = PaymentException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentException(PaymentException e) {
+        ErrorResponse body = new ErrorResponse(e.getMessage());
+        return ResponseEntity.status(e.getStatus()).body(body);
+    }
+
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         ErrorResponse body = new ErrorResponse(e.getBindingResult().getAllErrors().getFirst().getDefaultMessage());
