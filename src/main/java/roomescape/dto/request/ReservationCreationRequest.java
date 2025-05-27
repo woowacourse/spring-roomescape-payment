@@ -11,7 +11,19 @@ public record ReservationCreationRequest(
         LocalDate date,
 
         @NotNull(message = "예약시간ID는 빈 값을 허용하지 않습니다.")
-        Long timeId
+        Long timeId,
+
+        @NotNull(message = "주문ID는 빈 값을 허용하지 않습니다.")
+        String orderId,
+
+        @NotNull(message = "결제 키는 빈 값을 허용하지 않습니다.")
+        String paymentKey,
+
+        @NotNull(message = "결제 유형은 빈 값을 허용하지 않습니다.")
+        String paymentType,
+
+        @NotNull(message = "결제 금액은 빈 값을 허용하지 않습니다.")
+        Integer amount
 ) {
 
 }

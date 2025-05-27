@@ -18,6 +18,7 @@ import roomescape.config.annotation.Authority;
 import roomescape.config.annotation.RequiredAccessToken;
 import roomescape.domain.Role;
 import roomescape.dto.business.AccessTokenContent;
+import roomescape.dto.business.PaymentHistoryCreationContent;
 import roomescape.dto.business.ReservationCreationContent;
 import roomescape.dto.request.AdminReservationRequest;
 import roomescape.dto.request.ReservationCreationRequest;
@@ -80,8 +81,10 @@ public class ReservationController {
             @RequiredAccessToken AccessTokenContent accessTokenContent
     ) {
         ReservationCreationContent creationContent = new ReservationCreationContent(request);
+        PaymentHistoryCreationContent paymentHistoryCreationContent = new PaymentHistoryCreationContent(request);
+
         ReservationResponse reservationResponse = reservationService.addReservation(accessTokenContent.id(),
-                creationContent);
+                creationContent, paymentHistoryCreationContent);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(URI.create("/reservation/" + reservationResponse.id()))
                 .body(reservationResponse);

@@ -23,5 +23,3 @@ public record ReservationCreationContent(
         this(waiting.getTheme().getId(), waiting.getDate(), waiting.getTime().getId());
     }
 }
-
-
