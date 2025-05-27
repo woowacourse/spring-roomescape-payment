@@ -1,0 +1,154 @@
+package roomescape.entity;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import roomescape.domain.ReservationWithRank;
+import roomescape.exception.custom.InvalidReservationException;
+import roomescape.global.ReservationStatus;
+import roomescape.global.Role;
+
+@Entity
+public class Member {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "member_id")
+    private Long id;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
+    @OneToMany(mappedBy = "member",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private List<Reservation> reservations = new ArrayList<>();
+
+    protected Member() {
+    }
+
+    public Member(Long id, String name, String email, String password, Role role) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+
+    public Member(String name, String email, String password, Role role) {
+        this(null, name, email, password, role);
+    }
+
+    public List<ReservationWithRank> calculateReservationRanks(List<Reservation> allReservations) {
+        return reservations.stream()
+                .map(reservation -> {
+                    long rank = reservation.calculateWaitRank(allReservations);
+                    return new ReservationWithRank(reservation, rank);
+                })
+                .toList();
+    }
+
+    public Reservation reserve(LocalDate date, ReservationTime time, Theme theme, ReservationStatus status) {
+        Reservation reservation = new Reservation(this, date, time, theme, status);
+
+        validateDuplicateReservation(reservation);
+        validatePastDateTime(reservation);
+
+        this.reservations.add(reservation);
+        return reservation;
+    }
+
+    public void waitToReserve(LocalDate date, ReservationTime time, Theme theme) {
+        Reservation waitReservation = reservations.stream()
+                .filter(reservation -> reservation.getDate().equals(date)
+                        && reservation.getReservationTime().getId().equals(time.getId())
+                        && reservation.getTheme().getId().equals(theme.getId())
+                        && reservation.getStatus() == ReservationStatus.WAIT)
+                .findFirst()
+                .orElseThrow(() -> new InvalidReservationException("대기중인 예약이 없습니다"));
+
+        waitReservation.setStatus(ReservationStatus.RESERVED);
+    }
+
+    private void validateDuplicateReservation(Reservation target) {
+        boolean exist = reservations.stream()
+                .anyMatch(reservation ->
+                        reservation.getReservationTime().equals(target.getReservationTime())
+                                && reservation.getTheme().equals(target.getTheme())
+                                && reservation.getMember().equals(target.getMember())
+                                && reservation.getDate().equals(target.getDate()));
+        if (exist) {
+            throw new InvalidReservationException("중복된 예약신청입니다");
+        }
+    }
+
+    private void validatePastDateTime(Reservation reservation) {
+        reservation.isBefore(LocalDateTime.now());
+    }
+
+
+    public void removeReservation(Reservation reservation) {
+        reservations.remove(reservation);
+        reservation.setMember(null);
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public List<Reservation> getReservations() {
+        return Collections.unmodifiableList(reservations);
+    }
+
+
+    @Override
+    public boolean equals(final Object o) {
+        if (!(o instanceof Member member)) {
+            return false;
+        }
+        return Objects.equals(getId(), member.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId());
+    }
+}
