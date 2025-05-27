@@ -1,5 +1,6 @@
 package roomescape.controller.api;
 
+import java.util.Base64;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -60,10 +61,12 @@ public class ReservationController {
     ) {
         restClient.post()
                 .uri("https://api.tosspayments.com/v1/payments/confirm")
+                .header("Authorization", "Basic " +
+                        Base64.getEncoder().encodeToString("test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6".getBytes()))
                 .body(requestDto.extractTossPaymentDto())
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .body();
+                .toBodilessEntity();
         ReservationCreateDto reservationCreateDto = new ReservationCreateDto(
                 requestDto.date(), requestDto.timeId(), requestDto.themeId(), loginInfo.id());
         return reservationCommandService.bookReservation(reservationCreateDto);
