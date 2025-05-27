@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
@@ -76,6 +77,9 @@ public class ReservationService {
     }
 
     public ReservationResponse createReservation(Long memberId, Long timeId, Long themeId, LocalDate date) {
+
+        // 결제가 성공했는지 실패했는지?
+
         ReservationTime reservationTime = reservationTimeRepository.findById(timeId)
                 .orElseThrow(ReservationTimeNotFoundException::new);
         Theme theme = themeRepository.findById(themeId).orElseThrow(ThemeNotFoundException::new);
@@ -89,6 +93,8 @@ public class ReservationService {
         Reservation savedReservation = reservationRepository.save(reservation);
         return ReservationResponse.from(savedReservation);
     }
+
+
 
     private void validateDuplicate(LocalDate date, ReservationTime time, Theme theme) {
         if (reservationRepository.findByDateAndReservationTimeAndTheme(date, time, theme).isPresent()) {
