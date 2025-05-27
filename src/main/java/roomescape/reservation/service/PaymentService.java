@@ -17,8 +17,8 @@ public class PaymentService {
     private final RestClient restClient;
 
     public PaymentService() {
-        this.restClient = RestClient.builder().baseUrl("https://api.tosspayments.com")
-                .defaultHeader("Authorization", "Basic " + encodeSecretKey())
+        this.restClient = RestClient.builder()
+                .baseUrl("https://api.tosspayments.com")
                 .build();
     }
 
@@ -26,12 +26,16 @@ public class PaymentService {
         return restClient.post()
                 .uri("/v1/payments/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Basic " + encodeSecretKey())
                 .body(paymentRequest)
                 .retrieve()
                 .body(PaymentResponse.class);
     }
 
     private String encodeSecretKey() {
+        if (secretKey == null) {
+            throw new IllegalStateException("Secret key is not properly injected");
+        }
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
         return new String(encodedBytes);
