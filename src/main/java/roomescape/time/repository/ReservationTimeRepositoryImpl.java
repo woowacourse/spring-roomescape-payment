@@ -1,0 +1,53 @@
+package roomescape.time.repository;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.stereotype.Repository;
+import roomescape.time.domain.ReservationTime;
+
+@Repository
+public class ReservationTimeRepositoryImpl implements ReservationTimeRepository {
+
+    private final ReservationTimeJpaRepository reservationTimeJpaRepository;
+
+    public ReservationTimeRepositoryImpl(final ReservationTimeJpaRepository reservationTimeJpaRepository) {
+        this.reservationTimeJpaRepository = reservationTimeJpaRepository;
+    }
+
+    @Override
+    public Optional<ReservationTime> findById(final Long id) {
+        return reservationTimeJpaRepository.findById(id);
+    }
+
+    @Override
+    public List<ReservationTime> findAll() {
+        return reservationTimeJpaRepository.findAll();
+    }
+
+    @Override
+    public ReservationTime save(final ReservationTime reservationTime) {
+        return reservationTimeJpaRepository.save(reservationTime);
+    }
+
+    @Override
+    public void deleteById(final long id) {
+        reservationTimeJpaRepository.deleteById(id);
+    }
+
+    @Override
+    public boolean existsByStartAt(final LocalTime startAt) {
+        return reservationTimeJpaRepository.existsByStartAt(startAt);
+    }
+
+    @Override
+    public boolean existsById(final long id) {
+        return reservationTimeJpaRepository.existsById(id);
+    }
+
+    @Override
+    public List<ReservationTime> findAvailableTimesByDateAndThemeId(final LocalDate date, final Long themeId) {
+        return reservationTimeJpaRepository.findAvailableTimesByDateAndThemeId(date, themeId);
+    }
+}
