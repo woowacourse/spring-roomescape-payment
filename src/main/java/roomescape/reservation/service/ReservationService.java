@@ -57,7 +57,6 @@ public class ReservationService {
         PaymentResponse paymentResponse = paymentService.confirmPayment(paymentRequest);
 
         return ReservationResponse.from(reserved);
-
     }
 
     private void validateAvailableWaiting(ReserveCommand reserveCommand) {

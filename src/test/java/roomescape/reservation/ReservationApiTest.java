@@ -1,5 +1,13 @@
 package roomescape.reservation;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
@@ -12,13 +20,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.auth.stub.StubTokenProvider;
 import roomescape.common.CleanUp;
 import roomescape.config.AuthServiceTestConfig;
 import roomescape.fixture.db.MemberDbFixture;
 import roomescape.fixture.db.ReservationDateTimeDbFixture;
 import roomescape.fixture.db.ThemeDbFixture;
+import roomescape.payment.dto.PaymentResponse;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.controller.exception.ReservationExceptionHandler;
+import roomescape.reservation.controller.request.ReservePaymentRequest;
 import roomescape.reservation.domain.ReservationDateTime;
 
 @Import({AuthServiceTestConfig.class, ReservationExceptionHandler.class})
@@ -29,6 +41,9 @@ class ReservationApiTest {
     private int port;
 
     @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
     private CleanUp cleanUp;
 
     @Autowired
@@ -37,8 +52,8 @@ class ReservationApiTest {
     @Autowired
     private ReservationDateTimeDbFixture reservationDateTimeDbFixture;
 
-    @Autowired
-    private MemberDbFixture memberDbFixture;
+    @MockitoBean
+    private PaymentService paymentService;
 
     @BeforeEach
     void setUp() {
@@ -48,26 +63,33 @@ class ReservationApiTest {
     }
 
     @Test
-    void 방탈출_예약을_생성한다() {
-        Long memberId = memberDbFixture.유저1_생성().getId();
+    void 방탈출_예약을_생성한다() throws JsonProcessingException {
         Long themeId = themeDbFixture.공포().getId();
         ReservationDateTime reservationDateTime = reservationDateTimeDbFixture.내일_열시();
         Long timeId = reservationDateTime.getReservationTime().getId();
-        String dateTime = formatDateTime(reservationDateTime.getDate());
 
-        HashMap<String, Object> request = new HashMap<>();
-        request.put("memberId", memberId);
-        request.put("themeId", themeId);
-        request.put("timeId", timeId);
-        request.put("date", dateTime);
+        given(paymentService.confirmPayment(any()))
+                .willReturn(mock(PaymentResponse.class));
+
+        ReservePaymentRequest request = ReservePaymentRequest.builder()
+                .date(reservationDateTime.getDate())
+                .timeId(timeId)
+                .themeId(themeId)
+                .paymentKey("paymentKey")
+                .orderId("orderId")
+                .amount(10000L)
+                .paymentType("NORMAL")
+                .build();
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", StubTokenProvider.USER_STUB_TOKEN)
-                .body(request)
+                .body(objectMapper.writeValueAsString(request))
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(201);
+
+        verify(paymentService, times(1)).confirmPayment(any());
     }
 
     @Test
@@ -100,23 +122,25 @@ class ReservationApiTest {
     }
 
     @Test
-    void 과거_시간으로_예약을_하면_예외를_반환한다() {
-        Long memberId = memberDbFixture.유저1_생성().getId();
+    void 과거_시간으로_예약을_하면_예외를_반환한다() throws JsonProcessingException {
         Long themeId = themeDbFixture.공포().getId();
         ReservationDateTime reservationDateTime = reservationDateTimeDbFixture._7일전_열시();
         Long timeId = reservationDateTime.getReservationTime().getId();
-        String dateTime = formatDateTime(reservationDateTime.getDate());
 
-        HashMap<String, Object> request = new HashMap<>();
-        request.put("memberId", memberId);
-        request.put("themeId", themeId);
-        request.put("timeId", timeId);
-        request.put("date", dateTime);
+        ReservePaymentRequest request = ReservePaymentRequest.builder()
+                .date(reservationDateTime.getDate())
+                .timeId(timeId)
+                .themeId(themeId)
+                .paymentKey("paymentKey")
+                .orderId("orderId")
+                .amount(10000L)
+                .paymentType("NORMAL")
+                .build();
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", StubTokenProvider.USER_STUB_TOKEN)
-                .body(request)
+                .body(objectMapper.writeValueAsString(request))
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(422);
