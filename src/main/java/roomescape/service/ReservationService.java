@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.ReservationWithRank;
+import roomescape.dto.request.AddReservationRequest;
 import roomescape.dto.request.AdminCreateReservationRequest;
 import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.request.CreateWaitReservationRequest;
@@ -47,7 +48,7 @@ public class ReservationService {
         this.themeRepository = themeRepository;
     }
 
-    public ReservationResponse addReservation(CreateReservationRequest request, LoginMemberRequest loginMemberRequest) {
+    public ReservationResponse addReservation(AddReservationRequest request, LoginMemberRequest loginMemberRequest) {
         Reservation reservation = createReservation(loginMemberRequest.id(), request.themeId(), request.date(),
                 request.timeId(), ReservationStatus.RESERVED);
         return ReservationResponse.from(reservation);

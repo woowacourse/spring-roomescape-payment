@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import roomescape.dto.request.ConfirmPaymentRequest;
 import roomescape.dto.response.ConfirmPaymentResponse;
+import roomescape.dto.response.PaymentErrorResponse;
 import roomescape.exception.custom.PaymentException;
 import roomescape.exception.dto.ErrorResponse;
 
@@ -32,9 +33,9 @@ public class PaymentService {
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, ((request, response) -> {
                     ObjectMapper objectMapper = new ObjectMapper();
-                    ErrorResponse errorResponse = objectMapper.readValue(response.getBody().readAllBytes(),
-                            ErrorResponse.class);
-                    throw new PaymentException(response.getStatusCode(), errorResponse.message());
+                    PaymentErrorResponse paymentErrorResponse = objectMapper.readValue(response.getBody().readAllBytes(),
+                            PaymentErrorResponse.class);
+                    throw new PaymentException(response.getStatusCode(), paymentErrorResponse.message());
                 }))
                 .toEntity(ConfirmPaymentResponse.class)
                 .getBody();
