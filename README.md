@@ -2,7 +2,7 @@
 
 ## 1단계 - 예약 시 결제단계 추가
 
-- [ ] 클라이언트 코드를 수정한다. [1단계 클라이언트 커밋](https://github.com/woowacourse/spring-roomescape-member/commit/b7348d5bde416124e9a9e849a7e52cfb2dc2b1b8)
+- [x] 클라이언트 코드를 수정한다. [1단계 클라이언트 커밋](https://github.com/woowacourse/spring-roomescape-member/commit/b7348d5bde416124e9a9e849a7e52cfb2dc2b1b8)
 - [ ] 사용자는 날짜, 테마, 시간을 선택하고 결제한다.
 - [ ] 결제 기능은 외부 결제 서비스를 이용한다.
 - [ ] 결제 승인 API 호출에 실패 한 경우 예외를 응답을 제공한다.
