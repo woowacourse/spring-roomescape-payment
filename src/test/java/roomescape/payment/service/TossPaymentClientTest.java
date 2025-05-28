@@ -26,16 +26,17 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
-import roomescape.payment.config.TestPaymentConfig;
+import roomescape.payment.config.TestTossPaymentConfig;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.exception.PaymentProcessException;
 import roomescape.payment.exception.PaymentServerException;
-import roomescape.payment.interceptor.PaymentResponseInterceptor;
+import roomescape.payment.exception.PaymentTemporaryException;
+import roomescape.payment.interceptor.TossPaymentResponseInterceptor;
 
-@RestClientTest(PaymentClient.class)
-@Import({TestPaymentConfig.class, PaymentResponseInterceptor.class})
-class PaymentClientTest {
+@RestClientTest(TossPaymentClient.class)
+@Import({TestTossPaymentConfig.class, TossPaymentResponseInterceptor.class})
+class TossPaymentClientTest {
 
     private static final String PAYMENT_URL = "https://api.tosspayments.com/v1/payments";
 
@@ -46,13 +47,13 @@ class PaymentClientTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private TestPaymentConfig testPaymentConfig;
+    private TestTossPaymentConfig testTossPaymentConfig;
 
-    private PaymentClient paymentClient;
+    private TossPaymentClient tossPaymentClient;
 
     @BeforeEach
     void setUp() {
-        RestClient.Builder builder = testPaymentConfig.restClientBuilder();
+        RestClient.Builder builder = testTossPaymentConfig.restClientBuilder();
         mockServer = MockRestServiceServer.bindTo(builder).build();
 
         HttpServiceProxyFactory factory = HttpServiceProxyFactory
@@ -60,7 +61,7 @@ class PaymentClientTest {
                 .exchangeAdapter(RestClientAdapter.create(builder.build()))
                 .build();
 
-        paymentClient = factory.createClient(PaymentClient.class);
+        tossPaymentClient = factory.createClient(TossPaymentClient.class);
     }
 
     @Test
@@ -78,7 +79,7 @@ class PaymentClientTest {
                 .andExpect(content().json(json))
                 .andRespond(withSuccess(objectMapper.writeValueAsString(paymentResponse), MediaType.APPLICATION_JSON));
 
-        PaymentResponse result = paymentClient.getPaymentConfirm(request);
+        PaymentResponse result = tossPaymentClient.getPaymentConfirm(request);
 
         Assertions.assertThat(result.orderId()).isEqualTo(orderId);
     }
@@ -101,7 +102,7 @@ class PaymentClientTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .body("{\"message\":\"결제 키와 주문 ID는 필수입니다.\"}"));
 
-        assertThatThrownBy(() -> paymentClient.getPaymentConfirm(request))
+        assertThatThrownBy(() -> tossPaymentClient.getPaymentConfirm(request))
                 .isInstanceOf(PaymentProcessException.class)
                 .hasMessage(expectedMessage);
     }
@@ -132,7 +133,7 @@ class PaymentClientTest {
                         }
                 );
 
-        assertThatThrownBy(() -> paymentClient.getPaymentConfirm(request))
+        assertThatThrownBy(() -> tossPaymentClient.getPaymentConfirm(request))
                 .isInstanceOf(PaymentProcessException.class)
                 .hasMessage("결제 서비스에 연결할 수 없습니다.");
     }
@@ -161,7 +162,32 @@ class PaymentClientTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .body("{\"code\":\"" + code + "\"}"));
 
-        assertThatThrownBy(() -> paymentClient.getPaymentConfirm(request))
+        assertThatThrownBy(() -> tossPaymentClient.getPaymentConfirm(request))
                 .isInstanceOf(PaymentServerException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "PROVIDER_ERROR",
+            "FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING",
+            "FAILED_INTERNAL_SYSTEM_PROCESSING"
+    })
+    void 일시적인_오류가_발생하면_예외를_반환한다(String code) throws JsonProcessingException {
+        String paymentKey = "paymentKey";
+        String orderId = "orderId";
+        Long amount = 10000L;
+
+        PaymentRequest request = new PaymentRequest(paymentKey, orderId, amount);
+        String json = objectMapper.writeValueAsString(request);
+
+        mockServer.expect(requestTo(PAYMENT_URL + "/confirm"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(content().json(json))
+                .andRespond(withBadRequest()
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .body("{\"code\":\"" + code + "\"}"));
+
+        assertThatThrownBy(() -> tossPaymentClient.getPaymentConfirm(request))
+                .isInstanceOf(PaymentTemporaryException.class);
     }
 }
