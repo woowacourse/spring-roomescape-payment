@@ -5,16 +5,15 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.springframework.web.client.RestClient;
-import roomescape.global.exception.PaymentException;
-import roomescape.payment.application.dto.PaymentErrorResponse;
-import roomescape.payment.application.dto.TossPaymentRequest;
+import roomescape.payment.infrastructure.dto.TossPaymentErrorResponse;
+import roomescape.payment.infrastructure.dto.TossPaymentRequest;
 import roomescape.payment.application.service.PaymentClient;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.presentation.dto.PaymentRequest;
 
 public class TossPaymentClient implements PaymentClient {
 
-    private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+    private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6    ++++";
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -40,8 +39,8 @@ public class TossPaymentClient implements PaymentClient {
                         status -> status.value() != 200,
                         (req, res) -> {
                                 InputStream body = res.getBody();
-                                PaymentErrorResponse errorResponse = objectMapper.readValue(body, PaymentErrorResponse.class);
-                                throw new PaymentException(errorResponse, res.getStatusCode());
+                                TossPaymentErrorResponse errorResponse = objectMapper.readValue(body, TossPaymentErrorResponse.class);
+                                throw new PaymentException(errorResponse, res.getStatusCode(), tossPaymentRequest.getOrderId());
                         }
                 )
                 .body(Payment.class);

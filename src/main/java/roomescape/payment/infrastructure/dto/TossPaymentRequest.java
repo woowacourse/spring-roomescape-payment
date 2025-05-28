@@ -1,4 +1,4 @@
-package roomescape.payment.application.dto;
+package roomescape.payment.infrastructure.dto;
 
 public class TossPaymentRequest {
 

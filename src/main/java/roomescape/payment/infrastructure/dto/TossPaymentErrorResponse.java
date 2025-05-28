@@ -1,14 +1,14 @@
-package roomescape.payment.application.dto;
+package roomescape.payment.infrastructure.dto;
 
-public class PaymentErrorResponse {
+public class TossPaymentErrorResponse {
     private String code;
     private String message;
     private String data;
 
-    public PaymentErrorResponse() {
+    public TossPaymentErrorResponse() {
     }
 
-    public PaymentErrorResponse(final String code, final String message, final String data) {
+    public TossPaymentErrorResponse(final String code, final String message, final String data) {
         this.code = code;
         this.message = message;
         this.data = data;
