@@ -10,7 +10,7 @@ public class PaymentService {
 
     private final TossPaymentProcessor tossPaymentProcessor;
 
-    public PaymentService(TossPaymentProcessor tossPaymentProcessor) {
+    public PaymentService(final TossPaymentProcessor tossPaymentProcessor) {
         this.tossPaymentProcessor = tossPaymentProcessor;
     }
 
