@@ -8,6 +8,10 @@ public record PaymentConfirmRequest(
         String orderId
 ) {
     public static PaymentConfirmRequest from(PaymentInfo info) {
-        return new PaymentConfirmRequest(info.paymentKey(), info.totalAmount(), info.orderId());
+        return new PaymentConfirmRequest(
+                info.paymentKey().paymentKey(),
+                info.totalAmount().amount(),
+                info.orderId().orderId()
+        );
     }
 }

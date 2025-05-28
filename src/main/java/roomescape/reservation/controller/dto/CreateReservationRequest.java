@@ -3,7 +3,10 @@ package roomescape.reservation.controller.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import roomescape.reservation.domain.Amount;
+import roomescape.reservation.domain.OrderId;
 import roomescape.reservation.domain.PaymentInfo;
+import roomescape.reservation.domain.PaymentKey;
 
 public record CreateReservationRequest(
         @NotNull LocalDate date,
@@ -14,6 +17,10 @@ public record CreateReservationRequest(
         @NotBlank String paymentKey
 ) {
     public PaymentInfo toPaymentInfo() {
-        return new PaymentInfo(orderId, amount, paymentKey);
+        return new PaymentInfo(
+                new OrderId(orderId),
+                new Amount(amount),
+                new PaymentKey(paymentKey)
+        );
     }
 }
