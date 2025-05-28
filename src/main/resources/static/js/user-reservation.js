@@ -206,7 +206,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
         - 예약 결제 실패 시, 사용자가 실패 사유를 알 수 있도록 alert 에서 에러 메시지 수정
     */
     const reservationPaymentRequest = {
-        reservastion: {
+        reservation: {
             date: reservationData.date,
             themeId: reservationData.themeId,
             timeId: reservationData.timeId
@@ -235,6 +235,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
         } else {
             response.json().then(successBody => {
                 console.log("예약 결제 성공 : " + JSON.stringify(successBody));
+                alert("예약 결제 성공!!")
                 window.location.reload();
             });
         }
@@ -255,10 +256,7 @@ function onWaitButtonClick() {
             themeId: selectedThemeId
         };
 
-        /*
-        TODO: [3단계] 예약 대기 생성 요청 API 호출
-         */
-        fetch('/reservations', {
+        fetch('/waiting', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
