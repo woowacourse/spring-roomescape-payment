@@ -12,6 +12,7 @@ import roomescape.global.error.exception.ConflictException;
 import roomescape.global.error.exception.NotFoundException;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.ReservationAdminCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationFindFilteredRequest;
@@ -35,6 +36,7 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentService paymentService;
 
     @Transactional
     public ReservationResponse createReservation(Long memberId, ReservationCreateRequest request) {
@@ -49,7 +51,14 @@ public class ReservationService {
         validateDateTime(newReservation);
         validateDuplicated(newReservation);
 
+        Long paymentId = paymentService.confirmPayment(
+                request.paymentKey(),
+                request.orderId(),
+                request.amount()
+        );
+
         Reservation reservation = reservationRepository.save(newReservation);
+
         return ReservationResponse.from(reservation);
     }
 
