@@ -1,10 +1,7 @@
 package roomescape.reservation.controller;
 
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.Base64;
-import java.util.Base64.Encoder;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestClient;
 import roomescape.common.utils.UriFactory;
 import roomescape.member.auth.LoginMember;
 import roomescape.member.auth.vo.MemberInfo;
+import roomescape.payment.PaymentService;
 import roomescape.reservation.controller.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.controller.dto.CreateReservationWebRequest;
 import roomescape.reservation.controller.dto.CreateReservationWithPaymentWebRequest;
@@ -33,9 +30,8 @@ import roomescape.reservation.service.ReservationService;
 @RequestMapping("/reservations")
 public class ReservationController {
 
-    private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
-
     private final ReservationService reservationService;
+    private final PaymentService paymentService;
 
     @GetMapping("/mine")
     public List<ReservationWithStatusResponse> getAllWithReservationWait(@LoginMember MemberInfo memberInfo) {
@@ -55,38 +51,16 @@ public class ReservationController {
             @RequestBody final CreateReservationWithPaymentWebRequest request,
             @LoginMember final MemberInfo memberInfo
     ) {
-        Encoder encoder = Base64.getEncoder();
-        byte[] encoded = encoder.encode((SECRET_KEY + ":").getBytes(StandardCharsets.UTF_8));
-        String authorization = "Basic " + new String(encoded);
-
-        final RestClient restClient = RestClient.builder()
-                .baseUrl("https://api.tosspayments.com/v1/payments/confirm")
-                .build();
-
-        final TossPaymentConfirmResponse body = restClient.post()
-                .header("Authorization", authorization)
-                .header("Content-Type", "application/json")
-                .body(new TossPaymentConfirmRequest(
-                        request.paymentKey(),
-                        request.orderId(),
-                        request.amount()
-                ))
-                .retrieve()
-                .onStatus(status -> status.value() != 200,
-                        (req, res) ->
-                        {
-                            System.out.println(res.getStatusText());
-                            throw new IllegalStateException();
-                        })
-                .body(TossPaymentConfirmResponse.class);
+        // TODO : paymentId 등 결제정보를 예약 저장시 db에 저장할지 고려
+        paymentService.confirm(request.toPaymentConfirmRequest());
 
         final ReservationWebResponse reservationWebResponse = reservationService.create(
-                new CreateReservationWebRequest(
-                        request.date(), request.timeId(), request.themeId()
-                ),
+                request.toCreateReservationWebRequest(),
                 memberInfo
         );
+
         final URI location = UriFactory.buildPath("/reservations", String.valueOf(reservationWebResponse.id()));
+
         return ResponseEntity.created(location)
                 .body(reservationWebResponse);
     }
