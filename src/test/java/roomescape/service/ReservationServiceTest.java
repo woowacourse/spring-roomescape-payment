@@ -22,6 +22,7 @@ import roomescape.domain.ReservationTime;
 import roomescape.domain.Role;
 import roomescape.domain.Theme;
 import roomescape.domain.Waiting;
+import roomescape.dto.business.PaymentHistoryCreationContent;
 import roomescape.dto.business.ReservationCreationContent;
 import roomescape.dto.response.MemberProfileResponse;
 import roomescape.dto.response.ReservationResponse;
@@ -30,13 +31,14 @@ import roomescape.dto.response.ThemeResponse;
 import roomescape.dto.response.WaitingWithRankResponse;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.NotFoundException;
+import roomescape.exception.PaymentException;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.PaymentHistoryRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.repository.WaitingRepository;
-import roomescape.utility.PaymentClient;
+import roomescape.utility.PaymentClientStub;
 
 @DataJpaTest
 class ReservationServiceTest {
@@ -61,10 +63,11 @@ class ReservationServiceTest {
     private Theme theme;
     private Member member;
     private PaymentService paymentService;
-    private PaymentClient paymentClient;
+    private PaymentClientStub paymentClient;
 
     @BeforeEach
     void setup() {
+        paymentClient = new PaymentClientStub();
         paymentService = new PaymentService(paymentHistoryRepository, paymentClient);
         reservationService = new ReservationService(
                 reservationRepository,
@@ -328,6 +331,26 @@ class ReservationServiceTest {
             assertThatThrownBy(() -> reservationService.addReservation(member.getId(), creationContent))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage("ID에 해당하는 예약 시간을 찾을 수 없습니다.");
+        }
+
+        @DisplayName("결제 실패시 예약이 실패한다.")
+        @Test
+        void rollbackWhenPaymentFail() {
+            // given
+            paymentClient.setErrorCase("에러");
+
+            ReservationCreationContent reservationCreationContent =
+                    new ReservationCreationContent(theme.getId(), NEXT_DAY, reservationTime.getId());
+            PaymentHistoryCreationContent paymentHistoryCreationContent =
+                    new PaymentHistoryCreationContent("312313", "12312re", "NORMAL", 1000);
+
+            // when & then
+            assertAll(
+                    () -> assertThatThrownBy(() -> reservationService.addReservation(
+                            member.getId(), reservationCreationContent, paymentHistoryCreationContent))
+                            .isInstanceOf(PaymentException.class),
+                    () -> assertThat(reservationRepository.findAll()).hasSize(0)
+            );
         }
     }
 
