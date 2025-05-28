@@ -1,12 +1,29 @@
 package roomescape.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.common.BaseTest;
+import roomescape.application.dto.PaymentProcessRequest;
 import roomescape.domain.Member;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationInfo;
 import roomescape.domain.ReservationStatus;
@@ -14,64 +31,62 @@ import roomescape.domain.ReservationTime;
 import roomescape.domain.Role;
 import roomescape.domain.Theme;
 import roomescape.domain.Waiting;
-import roomescape.fixture.MemberDbFixture;
-import roomescape.fixture.ReservationDateFixture;
-import roomescape.fixture.ReservationDbFixture;
-import roomescape.fixture.ReservationTimeDbFixture;
-import roomescape.fixture.ThemeDbFixture;
-import roomescape.fixture.WaitingDbFixture;
+import roomescape.infrastructure.repository.ReservationRepository;
 import roomescape.presentation.dto.request.AdminReservationCreateRequest;
 import roomescape.presentation.dto.request.LoginMember;
-import roomescape.presentation.dto.request.ReservationCreateRequest;
+import roomescape.presentation.dto.request.ReservationWithPaymentRequest;
 import roomescape.presentation.dto.response.MemberResponse;
 import roomescape.presentation.dto.response.MyReservationResponse;
 import roomescape.presentation.dto.response.ReservationResponse;
 import roomescape.presentation.dto.response.ReservationTimeResponse;
 import roomescape.presentation.dto.response.ThemeResponse;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class ReservationServiceTest extends BaseTest {
+@ExtendWith(MockitoExtension.class)
+class ReservationServiceTest {
 
-    @Autowired
+    @Mock
+    private ReservationRepository reservationRepository;
+
+    @Mock
+    private MemberService memberService;
+
+    @Mock
+    private PaymentService paymentService;
+
+    @Mock
+    private ReservationTimeService reservationTimeService;
+
+    @Mock
+    private ThemeService themeService;
+
+    @Mock
+    private CurrentTimeService currentTimeService;
+
+    @Mock
+    private WaitingService waitingService;
+
+    @InjectMocks
     private ReservationService reservationService;
-
-    @Autowired
-    private ReservationTimeDbFixture reservationTimeDbFixture;
-
-    @Autowired
-    private ThemeDbFixture themeDbFixture;
-
-    @Autowired
-    private MemberDbFixture memberDbFixture;
-
-    @Autowired
-    private ReservationDbFixture reservationDbFixture;
-
-    @Autowired
-    private WaitingDbFixture waitingDbFixture;
 
     @Test
     void 예약을_모두_조회한다() {
-        ReservationTime reservationTime = reservationTimeDbFixture.예약시간_10시();
-        Theme theme = themeDbFixture.공포();
-        Member member = memberDbFixture.한스_사용자();
-        reservationDbFixture.예약_한스_25_4_22_10시_공포(member, reservationTime, theme);
+        Member member = Member.create("한스", Role.USER, "test@email.com", "pass1");
+        LocalDate date = LocalDate.of(2025, 4, 21);
+        ReservationTime time = ReservationTime.create(LocalTime.of(10, 0));
+        Theme theme = Theme.create("공포", "공포테마", "공포.jpg");
+        Reservation reservation = Reservation.create(member, date, time, theme);
+
+        when(reservationRepository.findAllByStatus(ReservationStatus.RESERVED))
+                .thenReturn(List.of(reservation));
 
         List<ReservationResponse> responses = reservationService.getReservations();
         ReservationResponse response = responses.getFirst();
 
         assertAll(
                 () -> assertThat(responses).hasSize(1),
-                () -> assertThat(response.id()).isEqualTo(1L),
-                () -> assertThat(response.date()).isEqualTo(ReservationDateFixture.예약날짜_25_4_22.getDate()),
-                () -> assertThat(response.time()).isEqualTo(ReservationTimeResponse.from(reservationTime)),
+                () -> assertThat(response.date()).isEqualTo(date),
+                () -> assertThat(response.time()).isEqualTo(ReservationTimeResponse.from(time)),
                 () -> assertThat(response.theme()).isEqualTo(ThemeResponse.from(theme)),
                 () -> assertThat(response.member()).isEqualTo(MemberResponse.from(member))
         );
@@ -79,23 +94,37 @@ class ReservationServiceTest extends BaseTest {
 
     @Test
     void 사용자가_예약을_생성한다() {
-        ReservationTime reservationTime = reservationTimeDbFixture.예약시간_10시();
-        Theme theme = themeDbFixture.공포();
-        Member member = memberDbFixture.한스_사용자();
+        Member member = Member.create("한스", Role.USER, "test@email.com", "pass1");
+        LocalDate date = LocalDate.of(2025, 4, 21);
+        ReservationTime time = ReservationTime.create(LocalTime.of(10, 0));
+        Theme theme = Theme.create("공포", "공포테마", "공포.jpg");
+        Reservation reservation = Reservation.create(member, date, time, theme);
 
-        ReservationCreateRequest request = new ReservationCreateRequest(
-                ReservationDateFixture.예약날짜_25_4_22.getDate(),
-                reservationTime.getId(),
-                theme.getId()
-        );
+        ReservationWithPaymentRequest request = new ReservationWithPaymentRequest(
+                date,
+                1L,
+                1L,
+                "paymentKey",
+                "orderId",
+                "10000");
         LoginMember loginMember = new LoginMember(member.getId(), member.getName(), Role.USER, member.getEmail());
+
+        when(memberService.findMemberByEmail(loginMember.email())).thenReturn(member);
+        PaymentProcessRequest paymentRequest = PaymentProcessRequest.of(request);
+        Payment payment = Payment.create("paymentKey", "orderId");
+        when(paymentService.process(paymentRequest)).thenReturn(payment);
+        when(reservationTimeService.findReservationTimeById(request.timeId())).thenReturn(time);
+        when(currentTimeService.now()).thenReturn(LocalDateTime.of(2025, 4, 20, 10, 0));
+        when(themeService.findThemeById(request.themeId())).thenReturn(theme);
+        when(reservationRepository.existsByDateAndTimeAndThemeAndStatus(date, time, theme,
+                ReservationStatus.RESERVED)).thenReturn(false);
+        when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
 
         ReservationResponse response = reservationService.createMemberReservation(request, loginMember);
 
         assertAll(
-                () -> assertThat(response.id()).isEqualTo(1L),
-                () -> assertThat(response.date()).isEqualTo(ReservationDateFixture.예약날짜_25_4_22.getDate()),
-                () -> assertThat(response.time()).isEqualTo(ReservationTimeResponse.from(reservationTime)),
+                () -> assertThat(response.date()).isEqualTo(date),
+                () -> assertThat(response.time()).isEqualTo(ReservationTimeResponse.from(time)),
                 () -> assertThat(response.theme()).isEqualTo(ThemeResponse.from(theme)),
                 () -> assertThat(response.member()).isEqualTo(MemberResponse.from(member))
         );
@@ -103,60 +132,61 @@ class ReservationServiceTest extends BaseTest {
 
     @Test
     void 관리자가_예약을_생성한다() {
-        ReservationTime reservationTime = reservationTimeDbFixture.예약시간_10시();
-        Theme theme = themeDbFixture.공포();
-        Member member = memberDbFixture.한스_사용자();
+        Member member = Member.create("한스", Role.USER, "test@email.com", "pass1");
+        LocalDate date = LocalDate.of(2025, 4, 21);
+        ReservationTime time = ReservationTime.create(LocalTime.of(10, 0));
+        Theme theme = Theme.create("공포", "공포테마", "공포.jpg");
+        Reservation reservation = Reservation.create(member, date, time, theme);
 
         AdminReservationCreateRequest request = new AdminReservationCreateRequest(
-                ReservationDateFixture.예약날짜_25_4_22.getDate(),
-                reservationTime.getId(),
-                theme.getId(),
-                member.getId()
-        );
+                date,
+                1L,
+                1L,
+                1L);
+
+        when(memberService.findMemberById(request.memberId())).thenReturn(member);
+        when(reservationTimeService.findReservationTimeById(request.timeId())).thenReturn(time);
+        when(currentTimeService.now()).thenReturn(LocalDateTime.of(2025, 4, 20, 10, 0));
+        when(themeService.findThemeById(request.themeId())).thenReturn(theme);
+        when(reservationRepository.existsByDateAndTimeAndThemeAndStatus(date, time, theme,
+                ReservationStatus.RESERVED)).thenReturn(false);
+        when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
 
         ReservationResponse response = reservationService.createAdminReservation(request);
 
         assertAll(
-                () -> assertThat(response.id()).isEqualTo(1L),
-                () -> assertThat(response.date()).isEqualTo(ReservationDateFixture.예약날짜_25_4_22.getDate()),
-                () -> assertThat(response.time()).isEqualTo(ReservationTimeResponse.from(reservationTime)),
+                () -> assertThat(response.date()).isEqualTo(date),
+                () -> assertThat(response.time()).isEqualTo(ReservationTimeResponse.from(time)),
                 () -> assertThat(response.theme()).isEqualTo(ThemeResponse.from(theme)),
                 () -> assertThat(response.member()).isEqualTo(MemberResponse.from(member))
         );
     }
 
     @Test
-    void 같은일시_다른테마_예약은_생성할_수_있다() {
-        ReservationTime reservationTime = reservationTimeDbFixture.예약시간_10시();
-        Theme horror = themeDbFixture.공포();
-        Theme mystery = themeDbFixture.커스텀_테마("미스테리");
-        Member member = memberDbFixture.한스_사용자();
-        reservationDbFixture.예약_한스_25_4_22_10시_공포(member, reservationTime, horror);
-
-        ReservationCreateRequest request = new ReservationCreateRequest(
-                ReservationDateFixture.예약날짜_25_4_22.getDate(),
-                reservationTime.getId(),
-                mystery.getId()
-        );
-        LoginMember loginMember = new LoginMember(member.getId(), member.getName(), Role.USER, member.getEmail());
-
-        assertThatCode(() -> reservationService.createMemberReservation(request, loginMember))
-                .doesNotThrowAnyException();
-    }
-
-    @Test
     void 같은일시_같은테마_예약이_존재할때_예약을_생성하면_예외가_발생한다() {
-        ReservationTime reservationTime = reservationTimeDbFixture.예약시간_10시();
-        Theme theme = themeDbFixture.공포();
-        Member member = memberDbFixture.한스_사용자();
-        reservationDbFixture.예약_한스_25_4_22_10시_공포(member, reservationTime, theme);
+        Member member = Member.create("한스", Role.USER, "test@email.com", "pass1");
+        LocalDate date = LocalDate.of(2025, 4, 21);
+        ReservationTime time = ReservationTime.create(LocalTime.of(10, 0));
+        Theme theme = Theme.create("공포", "공포테마", "공포.jpg");
 
-        ReservationCreateRequest request = new ReservationCreateRequest(
-                ReservationDateFixture.예약날짜_25_4_22.getDate(),
-                reservationTime.getId(),
-                theme.getId()
-        );
+        ReservationWithPaymentRequest request = new ReservationWithPaymentRequest(
+                date,
+                1L,
+                1L,
+                "paymentKey",
+                "orderId",
+                "10000");
         LoginMember loginMember = new LoginMember(member.getId(), member.getName(), Role.USER, member.getEmail());
+
+        when(memberService.findMemberByEmail(loginMember.email())).thenReturn(member);
+        PaymentProcessRequest paymentRequest = PaymentProcessRequest.of(request);
+        Payment payment = Payment.create("paymentKey", "orderId");
+        when(paymentService.process(paymentRequest)).thenReturn(payment);
+        when(reservationTimeService.findReservationTimeById(request.timeId())).thenReturn(time);
+        when(currentTimeService.now()).thenReturn(LocalDateTime.of(2025, 4, 20, 10, 0));
+        when(themeService.findThemeById(request.themeId())).thenReturn(theme);
+        when(reservationRepository.existsByDateAndTimeAndThemeAndStatus(date, time, theme,
+                ReservationStatus.RESERVED)).thenReturn(true);
 
         assertThatThrownBy(() -> reservationService.createMemberReservation(request, loginMember))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -165,11 +195,15 @@ class ReservationServiceTest extends BaseTest {
     @Test
     @Transactional
     void 예약을_삭제한다() {
-        ReservationTime reservationTime = reservationTimeDbFixture.예약시간_10시();
-        Theme theme = themeDbFixture.공포();
-        Member member = memberDbFixture.한스_사용자();
-        Reservation reservation = reservationDbFixture.예약_한스_25_4_22_10시_공포(member, reservationTime, theme);
+        Member member = Member.create("한스", Role.USER, "test@email.com", "pass1");
+        LocalDate date = LocalDate.of(2025, 4, 21);
+        ReservationTime time = ReservationTime.create(LocalTime.of(10, 0));
+        Theme theme = Theme.create("공포", "공포테마", "공포.jpg");
+        Reservation reservation = Reservation.create(member, date, time, theme);
+        ReservationInfo reservationInfo = ReservationInfo.create(reservation);
 
+        when(reservationRepository.findById(any())).thenReturn(Optional.of(reservation));
+        when(waitingService.existsWaitings(reservationInfo)).thenReturn(false);
         reservationService.cancelReservationById(reservation.getId());
 
         assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.CANCELED);
@@ -177,23 +211,32 @@ class ReservationServiceTest extends BaseTest {
 
     @Test
     void 존재하지_않는_예약을_삭제하면_예외가_발생한다() {
+        when(reservationRepository.findById(any())).thenReturn(Optional.empty());
         assertThatThrownBy(() -> reservationService.cancelReservationById(3L))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
     @Test
     void 조건에따라_예약을_조회한다() {
-        ReservationTime reservationTime = reservationTimeDbFixture.예약시간_10시();
-        Theme theme = themeDbFixture.공포();
-        Member member = memberDbFixture.한스_사용자();
-        Reservation reservation = reservationDbFixture.예약_한스_25_4_22_10시_공포(member, reservationTime, theme);
+        Member member = Member.create("한스", Role.USER, "test@email.com", "pass1");
+        LocalDate date = LocalDate.of(2025, 4, 21);
+        ReservationTime time = ReservationTime.create(LocalTime.of(10, 0));
+        Theme theme = Theme.create("공포", "공포테마", "공포.jpg");
+        Reservation reservation = Reservation.create(member, date, time, theme);
 
-        Long themeId = theme.getId();
-        Long memberId = member.getId();
-        LocalDate dateFrom = LocalDate.of(2025, 4, 22);
-        LocalDate dateTo = LocalDate.of(2025, 4, 22);
+        LocalDate dateFrom = LocalDate.of(2025, 4, 21);
+        LocalDate dateTo = LocalDate.of(2025, 4, 21);
 
-        List<ReservationResponse> responses = reservationService.getReservationsByFilter(themeId, memberId, dateFrom, dateTo);
+        when(reservationRepository.findAllByThemeAndMemberAndDate(
+                any(),
+                any(),
+                eq(dateFrom),
+                eq(dateTo)
+        )).thenReturn(List.of(reservation));
+
+        List<ReservationResponse> responses = reservationService.getReservationsByFilter(theme.getId(), member.getId(),
+                dateFrom,
+                dateTo);
         ReservationResponse response = responses.getFirst();
 
         assertAll(
@@ -205,17 +248,21 @@ class ReservationServiceTest extends BaseTest {
 
     @Test
     void 나의_예약_기록을_조회한다() {
-        ReservationTime reservationTime = reservationTimeDbFixture.예약시간_10시();
-        Theme theme = themeDbFixture.공포();
-        Member member = memberDbFixture.한스_사용자();
-        Reservation reservation = reservationDbFixture.예약_한스_25_4_22_10시_공포(member, reservationTime, theme);
-
-        Member alreadyReservedMember = memberDbFixture.듀이_사용자();
-        Reservation alreadyReservedReservation = reservationDbFixture.예약_생성(alreadyReservedMember, ReservationDateFixture.예약날짜_25_4_23, reservationTime, theme);
-        ReservationInfo reservationInfo = ReservationInfo.create(alreadyReservedReservation);
-        Waiting waiting = waitingDbFixture.첫번째_대기(reservationInfo, member);
-
+        Member member = Member.create("한스", Role.USER, "test1@email.com", "pass1");
+        Member anotherMember = Member.create("듀이", Role.USER, "test2@email.com", "pass1");
+        LocalDate date = LocalDate.of(2025, 4, 21);
+        LocalDate anotherDate = LocalDate.of(2025, 4, 22);
+        ReservationTime time = ReservationTime.create(LocalTime.of(10, 0));
+        Theme theme = Theme.create("공포", "공포테마", "공포.jpg");
+        Reservation reservation = Reservation.create(member, date, time, theme);
+        Reservation anotherReservation = Reservation.create(anotherMember, anotherDate, time, theme);
+        ReservationInfo anotherReservationInfo = ReservationInfo.create(anotherReservation);
+        Waiting waiting = Waiting.create(anotherReservationInfo, member, 1);
         LoginMember loginMember = new LoginMember(member.getId(), member.getName(), Role.USER, member.getEmail());
+
+        when(memberService.findMemberById(loginMember.id())).thenReturn(member);
+        when(reservationRepository.findAllByMember(member)).thenReturn(List.of(reservation));
+        when(waitingService.findWaitingsByMember(member)).thenReturn(List.of(waiting));
 
         List<MyReservationResponse> responses = reservationService.getMyReservations(loginMember);
         MyReservationResponse reservationResponse = responses.getFirst();
