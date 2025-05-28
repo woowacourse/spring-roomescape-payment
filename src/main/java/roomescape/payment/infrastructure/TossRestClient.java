@@ -13,7 +13,7 @@ import roomescape.payment.dto.TossPaymentResponse;
 @Slf4j
 public class TossRestClient {
 
-    private static final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6!!!!!!!";
+    private static final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
     private static final String AUTH_HEADER_VALUE = "Basic " +
             Base64.getEncoder().encodeToString((WIDGET_SECRET_KEY + ":").getBytes(StandardCharsets.UTF_8));
 
