@@ -1,4 +1,4 @@
-package roomescape.reservation.infrastructure;
+package roomescape.payment.infrastructure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -10,11 +10,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.reservation.application.PaymentClient;
-import roomescape.reservation.application.dto.PaymentRequest;
-import roomescape.reservation.application.dto.PaymentResponse;
-import roomescape.reservation.infrastructure.dto.TossErrorResponse;
-import roomescape.reservation.infrastructure.dto.TossPaymentRequest;
+import roomescape.payment.application.PaymentClient;
+import roomescape.payment.application.dto.PaymentRequest;
+import roomescape.payment.application.dto.PaymentResponse;
+import roomescape.payment.infrastructure.dto.TossErrorResponse;
+import roomescape.payment.infrastructure.dto.TossPaymentRequest;
 
 @RequiredArgsConstructor
 @Component

@@ -171,13 +171,19 @@ function onReservationButtonClick(event, paymentWidget) {
         const generateRandomString = () =>
             window.btoa(Math.random()).slice(0, 20);
 
-        // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
-        // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
         const orderIdPrefix = "WEB-RESV-";
-        paymentWidget.requestPayment({
+        let paymentData = {
             orderId: orderIdPrefix + generateRandomString(),
             orderName: "테스트 방탈출 예약 결제 1건",
-            amount: 1000,
+            amount: 1000
+        };
+
+        fetchPaymentData(paymentData);
+
+        // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
+        // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
+        paymentWidget.requestPayment({
+            ...paymentData,
         }).then(function (data) {
             console.debug(data);
             fetchReservationPayment(data, reservationData);
@@ -197,6 +203,31 @@ function requestRead(endpoint) {
             if (response.status === 200) return response.json();
             throw new Error('Read failed');
         });
+}
+
+async function fetchPaymentData(paymentData) {
+    const paymentURL = "/payments";
+    fetch(paymentURL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(paymentData),
+    }).then(response => {
+        if (!response.ok) {
+            return response.json().then(errorBody => {
+                console.error("결제 정보 저장 실패 : " + JSON.stringify(errorBody));
+                window.alert(errorBody.message);
+            });
+        } else {
+            response.json().then(successBody => {
+                console.log("결제 정보 저장 성공 : " + JSON.stringify(successBody));
+                window.location.reload();
+            });
+        }
+    }).catch(error => {
+        console.error(error.message);
+    });
 }
 
 async function fetchReservationPayment(paymentData, reservationData) {

@@ -1,5 +1,6 @@
 package roomescape.reservation.ui;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.login.application.dto.LoginCheckRequest;
+import roomescape.payment.application.dto.PaymentDataRequest;
 import roomescape.reservation.application.ReservationCommandService;
 import roomescape.reservation.application.ReservationQueryService;
 import roomescape.reservation.application.dto.AvailableReservationTimeResponse;
@@ -53,10 +55,11 @@ public class UserReservationController {
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> add(
             @Valid @RequestBody final MemberReservationRequest request,
-            final LoginCheckRequest loginCheckRequest
+            final LoginCheckRequest loginCheckRequest,
+            final HttpSession session
     ) {
         final ReservationResponse reservationResponse = reservationCommandService.addMemberReservation(request,
-                loginCheckRequest.id());
+                loginCheckRequest.id(), (PaymentDataRequest) session.getAttribute("paymentData"));
         return new ResponseEntity<>(reservationResponse, HttpStatus.CREATED);
     }
 

@@ -1,4 +1,4 @@
-package roomescape.reservation.infrastructure.dto;
+package roomescape.payment.infrastructure.dto;
 
 public record TossErrorResponse(
         String code,

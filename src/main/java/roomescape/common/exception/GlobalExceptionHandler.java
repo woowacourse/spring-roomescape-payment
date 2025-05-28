@@ -11,7 +11,7 @@ import roomescape.common.exception.impl.ConflictException;
 import roomescape.common.exception.impl.ForbiddenException;
 import roomescape.common.exception.impl.NotFoundException;
 import roomescape.common.exception.impl.UnauthorizedException;
-import roomescape.reservation.infrastructure.TossPaymentException;
+import roomescape.payment.infrastructure.TossPaymentException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

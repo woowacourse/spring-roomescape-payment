@@ -1,6 +1,6 @@
-package roomescape.reservation.infrastructure.dto;
+package roomescape.payment.infrastructure.dto;
 
-import roomescape.reservation.application.dto.PaymentRequest;
+import roomescape.payment.application.dto.PaymentRequest;
 
 public record TossPaymentRequest(
         Long amount,

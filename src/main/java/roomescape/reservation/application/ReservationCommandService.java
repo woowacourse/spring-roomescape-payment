@@ -3,7 +3,7 @@ package roomescape.reservation.application;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.impl.BadRequestException;
@@ -11,11 +11,11 @@ import roomescape.common.exception.impl.ConflictException;
 import roomescape.common.exception.impl.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
+import roomescape.payment.application.PaymentService;
+import roomescape.payment.application.dto.PaymentDataRequest;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.MemberReservationRequest;
 import roomescape.reservation.application.dto.MemberWaitingRequest;
-import roomescape.reservation.application.dto.PaymentRequest;
-import roomescape.reservation.application.dto.PaymentResponse;
 import roomescape.reservation.application.dto.ReservationResponse;
 import roomescape.reservation.application.dto.WaitingResponse;
 import roomescape.reservation.domain.Reservation;
@@ -29,7 +29,7 @@ import roomescape.theme.domain.repository.ThemeRepository;
 
 @Service
 @Transactional
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ReservationCommandService {
 
     private final ReservationRepository reservationRepository;
@@ -37,11 +37,12 @@ public class ReservationCommandService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
-    private final PaymentClient paymentClient;
+    private final PaymentService paymentService;
 
     public ReservationResponse addMemberReservation(
             final MemberReservationRequest request,
-            final Long memberId
+            final Long memberId,
+            final PaymentDataRequest paymentDataRequest
     ) {
         final ReservationTime time = getReservationTime(request.timeId());
         final Theme theme = getTheme(request.themeId());
@@ -50,11 +51,9 @@ public class ReservationCommandService {
         validateHasTimeConflict(request.date(), time, theme);
         validatePastDateTime(request.date(), time.getStartAt());
 
-        final PaymentRequest paymentRequest = new PaymentRequest(request.amount(), request.orderId(),
-                request.paymentKey());
-        PaymentResponse paymentResponse = paymentClient.pay(paymentRequest);
-
         final Reservation reservation = new Reservation(request.date(), time, theme, member);
+
+        paymentService.createOrder(paymentDataRequest, request);
         return ReservationResponse.from(reservationRepository.save(reservation));
     }
 

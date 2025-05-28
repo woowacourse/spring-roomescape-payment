@@ -1,5 +1,6 @@
 package roomescape.login.application;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.common.exception.impl.BadRequestException;
 import roomescape.common.exception.impl.NotFoundException;
@@ -14,15 +15,11 @@ import roomescape.member.domain.Password;
 import roomescape.member.domain.repository.MemberRepository;
 
 @Service
+@RequiredArgsConstructor
 public class LoginService {
 
     private final MemberRepository memberRepository;
     private final JwtHandler jwtHandler;
-
-    public LoginService(final MemberRepository memberRepository, final JwtHandler jwtHandler) {
-        this.memberRepository = memberRepository;
-        this.jwtHandler = jwtHandler;
-    }
 
     public Token login(final LoginRequest loginRequest) {
         final Member member = memberRepository.findByEmailAndPassword(new Email(loginRequest.email()),

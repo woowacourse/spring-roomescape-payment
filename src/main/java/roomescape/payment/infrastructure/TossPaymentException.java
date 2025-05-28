@@ -1,4 +1,4 @@
-package roomescape.reservation.infrastructure;
+package roomescape.payment.infrastructure;
 
 public class TossPaymentException extends RuntimeException {
 
