@@ -1,6 +1,7 @@
 package roomescape.global.exception;
 
 import io.jsonwebtoken.JwtException;
+import java.net.SocketTimeoutException;
 import java.time.DateTimeException;
 import java.time.format.DateTimeParseException;
 import java.util.NoSuchElementException;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.ResourceAccessException;
 import roomescape.payment.infrastructure.PaymentException;
 import roomescape.payment.presentation.dto.PaymentErrorResponse;
 
@@ -26,6 +28,15 @@ public class ExceptionController {
                 e.getCode().toString(),
                 e.getMessage(),
                 e.getOrderId()
+        ));
+    }
+
+    @ExceptionHandler(ResourceAccessException.class)
+    public ResponseEntity<PaymentErrorResponse> handleResourceAccessException(ResourceAccessException e) {
+        return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).body(new PaymentErrorResponse(
+                HttpStatus.GATEWAY_TIMEOUT.toString(),
+                e.getMessage(),
+                null
         ));
     }
 

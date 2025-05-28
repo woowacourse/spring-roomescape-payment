@@ -17,7 +17,7 @@ public class ClientConfig {
         factory.setReadTimeout(10_000);
 
         return new TossPaymentClient(RestClient.builder()
-                .requestFactory(new HttpComponentsClientHttpRequestFactory())
+                .requestFactory(factory)
                 .baseUrl("https://api.tosspayments.com/v1").build());
     }
 }
