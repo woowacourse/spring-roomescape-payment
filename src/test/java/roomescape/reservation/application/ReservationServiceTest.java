@@ -3,11 +3,14 @@ package roomescape.reservation.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
@@ -17,6 +20,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.member.exception.MemberNotFoundException;
 import roomescape.member.infrastructure.MemberRepositoryAdapter;
+import roomescape.payment.application.FakePaymentApprovalService;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.AdminReservationSearchRequest;
 import roomescape.reservation.application.dto.MyReservationResponse;
@@ -41,6 +45,7 @@ import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.domain.WaitingRepository;
 import roomescape.waiting.infrastructure.WaitingRepositoryAdapter;
 
+@ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
 @DataJpaTest
 @Import({
@@ -49,25 +54,25 @@ import roomescape.waiting.infrastructure.WaitingRepositoryAdapter;
         MemberRepositoryAdapter.class,
         ReservationTimeRepositoryAdapter.class,
         ThemeRepositoryAdapter.class,
-        WaitingRepositoryAdapter.class
+        WaitingRepositoryAdapter.class,
+        FakePaymentApprovalService.class
 })
 class ReservationServiceTest {
 
+    private final String paymentKey = "test-key";
+    private final String orderId = "test-order-id";
+    private final BigDecimal amount = BigDecimal.valueOf(1000L);
+
     @Autowired
     private ReservationService reservationService;
-
     @Autowired
     private ReservationRepository reservationRepository;
-
     @Autowired
     private MemberRepository memberRepository;
-
     @Autowired
     private ReservationTimeRepository timeRepository;
-
     @Autowired
     private ThemeRepository themeRepository;
-
     @Autowired
     private WaitingRepository waitingRepository;
 
@@ -179,10 +184,10 @@ class ReservationServiceTest {
         Long themeId = 1L;
 
         // 사용자 예약 요청 객체 생성
-        UserReservationRequest request = new UserReservationRequest(date, timeId, themeId);
+        UserReservationRequest request = new UserReservationRequest(date, timeId, themeId, paymentKey, orderId, amount);
 
         // when & then
-        assertThatThrownBy(() -> reservationService.createByUser(memberId, request))
+        assertThatThrownBy(() -> reservationService.createByUser(memberId, request, amount))
                 .isInstanceOf(MemberNotFoundException.class);
     }
 
@@ -203,10 +208,10 @@ class ReservationServiceTest {
         Long themeId = 1L;
 
         // 사용자 예약 요청 객체 생성
-        UserReservationRequest request = new UserReservationRequest(date, timeId, themeId);
+        UserReservationRequest request = new UserReservationRequest(date, timeId, themeId, paymentKey, orderId, amount);
 
         // when & then
-        assertThatThrownBy(() -> reservationService.createByUser(memberId, request))
+        assertThatThrownBy(() -> reservationService.createByUser(memberId, request, amount))
                 .isInstanceOf(TimeNotFoundException.class);
     }
 
@@ -230,10 +235,10 @@ class ReservationServiceTest {
         Long themeId = 1L;
 
         // 사용자 예약 요청 객체 생성
-        UserReservationRequest request = new UserReservationRequest(date, timeId, themeId);
+        UserReservationRequest request = new UserReservationRequest(date, timeId, themeId, paymentKey, orderId, amount);
 
         // when & then
-        assertThatThrownBy(() -> reservationService.createByUser(memberId, request))
+        assertThatThrownBy(() -> reservationService.createByUser(memberId, request, amount))
                 .isInstanceOf(ReservationInPastException.class);
     }
 
@@ -257,10 +262,10 @@ class ReservationServiceTest {
         Long themeId = 999L;
 
         // 사용자 예약 요청 객체 생성
-        UserReservationRequest request = new UserReservationRequest(date, timeId, themeId);
+        UserReservationRequest request = new UserReservationRequest(date, timeId, themeId, paymentKey, orderId, amount);
 
         // when & then
-        assertThatThrownBy(() -> reservationService.createByUser(memberId, request))
+        assertThatThrownBy(() -> reservationService.createByUser(memberId, request, amount))
                 .isInstanceOf(ThemeNotFoundException.class);
     }
 
@@ -292,10 +297,10 @@ class ReservationServiceTest {
         reservationRepository.save(reservation);
 
         // 동일한 날짜, 시간, 테마로 사용자 예약 요청 객체 생성
-        UserReservationRequest request = new UserReservationRequest(date, timeId, themeId);
+        UserReservationRequest request = new UserReservationRequest(date, timeId, themeId, paymentKey, orderId, amount);
 
         // when & then
-        assertThatThrownBy(() -> reservationService.createByUser(memberId, request))
+        assertThatThrownBy(() -> reservationService.createByUser(memberId, request, amount))
                 .isInstanceOf(ReservationAlreadyExistsException.class);
     }
 
@@ -321,10 +326,10 @@ class ReservationServiceTest {
         // 내일 날짜로 예약 날짜 설정
         LocalDate date = LocalDate.now().plusDays(1);
         // 사용자 예약 요청 객체 생성
-        UserReservationRequest request = new UserReservationRequest(date, timeId, themeId);
+        UserReservationRequest request = new UserReservationRequest(date, timeId, themeId, paymentKey, orderId, amount);
 
         // when
-        ReservationResponse response = reservationService.createByUser(memberId, request);
+        ReservationResponse response = reservationService.createByUser(memberId, request, amount);
 
         // then
         assertThat(response).isNotNull();
