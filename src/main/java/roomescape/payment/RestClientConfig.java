@@ -8,7 +8,7 @@ import org.springframework.web.client.RestClient;
 @Configuration
 public class RestClientConfig {
 
-    private static final String TEST_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:";
+    private final String TEST_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:";
 
     @Bean
     public PaymentRestClient getPaymentRestClient() {
@@ -16,6 +16,7 @@ public class RestClientConfig {
                 .baseUrl("https://api.tosspayments.com")
                 .defaultHeader("Authorization", getEncodedKey())
                 .defaultHeader("Content-Type", "application/json")
+                .defaultStatusHandler(new PaymentErrorHandler())
                 .build());
     }
 
