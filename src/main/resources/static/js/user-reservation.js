@@ -43,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
     document.getElementById('wait-button').addEventListener('click', onWaitButtonClick);
+
     function onReservationButtonClickWithPaymentWidget(event) {
         onReservationButtonClick(event, paymentWidget);
     }
@@ -235,7 +236,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
         },
         body: JSON.stringify(reservationPaymentRequest),
     }).then(response => {
-        if (!response.ok) {
+        if (response.status !== 201) {
             return response.json().then(errorBody => {
                 console.error("예약 결제 실패 : " + JSON.stringify(errorBody));
                 window.alert("예약 결제 실패 메시지");
