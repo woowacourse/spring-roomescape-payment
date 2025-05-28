@@ -32,7 +32,7 @@ import roomescape.waiting.entity.Waiting;
 import roomescape.waiting.repository.WaitingRepository;
 import roomescape.waiting.service.WaitingService;
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class WaitingIntegrationTest {
 

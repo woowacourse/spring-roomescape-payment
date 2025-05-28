@@ -28,7 +28,7 @@ import roomescape.theme.dto.response.ThemeCreateResponse;
 import roomescape.theme.entity.Theme;
 import roomescape.theme.service.ThemeService;
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class ThemeIntegrationTest {
 

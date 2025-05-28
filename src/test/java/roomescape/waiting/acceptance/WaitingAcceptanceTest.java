@@ -2,6 +2,7 @@ package roomescape.waiting.acceptance;
 
 import static org.hamcrest.core.Is.is;
 
+import io.restassured.RestAssured;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,6 +10,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.helper.TestHelper;
@@ -27,7 +30,7 @@ import roomescape.waiting.dto.request.WaitingCreateRequest;
 import roomescape.waiting.entity.Waiting;
 import roomescape.waiting.repository.WaitingRepository;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class WaitingAcceptanceTest {
 
@@ -38,6 +41,9 @@ public class WaitingAcceptanceTest {
     private static final String DEFAULT_ADMIN_EMAIL = "admin@email.com";
     private static final String DEFAULT_ADMIN_PASSWORD = "admin";
     private static final String DEFAULT_ADMIN_NAME = "어드민";
+
+    @LocalServerPort
+    private int port;
 
     @Autowired
     private ReservationRepository reservationRepository;
@@ -64,6 +70,7 @@ public class WaitingAcceptanceTest {
 
     @BeforeEach
     void init() {
+        RestAssured.port = port;
         date = createTomorrow();
         theme = createDefaultTheme();
         time = createDefaultReservationTime();

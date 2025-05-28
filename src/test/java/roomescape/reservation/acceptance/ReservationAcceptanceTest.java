@@ -2,7 +2,10 @@ package roomescape.reservation.acceptance;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 
+import io.restassured.RestAssured;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,8 +14,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
+import roomescape.helper.TestConfig;
 import roomescape.helper.TestHelper;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
@@ -21,16 +27,21 @@ import roomescape.reservation.dto.request.ReservationAdminCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.entity.ReservationTime;
 import roomescape.reservation.repository.ReservationTimeRepository;
+import roomescape.reservation.service.PaymentService;
 import roomescape.theme.entity.Theme;
 import roomescape.theme.repository.ThemeRepository;
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Import(TestConfig.class)
 class ReservationAcceptanceTest {
 
     private static final String DEFAULT_EMAIL = "miso@email.com";
     private static final String DEFAULT_PASSWORD = "miso";
     private static final String DEFAULT_NAME = "미소";
+
+    @LocalServerPort
+    private int port;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -41,8 +52,12 @@ class ReservationAcceptanceTest {
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
 
+    @Autowired
+    private PaymentService paymentService;
+
     @BeforeEach
-    void setUp() {
+    public void setUp() {
+        RestAssured.port = port;
         Member member = new Member(DEFAULT_NAME, DEFAULT_EMAIL, DEFAULT_PASSWORD, RoleType.ADMIN);
         memberRepository.save(member);
         Theme theme = new Theme("테마", "설명", "썸네일");
@@ -59,7 +74,11 @@ class ReservationAcceptanceTest {
         var reservationRequest = new ReservationCreateRequest(
                 LocalDate.now().plusDays(1),
                 1L,
-                1L
+                1L,
+                "paymentKey",
+                "orderId",
+                1000L,
+                "NORMAL"
         );
 
         // when & then
@@ -69,6 +88,8 @@ class ReservationAcceptanceTest {
                 .body("date", equalTo(LocalDate.now().plusDays(1).toString()))
                 .body("startAt", equalTo("10:00:00"))
                 .body("themeName", equalTo("테마"));
+
+        verify(paymentService).create(any());
     }
 
     @Test
@@ -79,7 +100,11 @@ class ReservationAcceptanceTest {
         var reservationRequest = new ReservationCreateRequest(
                 LocalDate.now().plusDays(1),
                 1L,
-                1L
+                1L,
+                "paymentKey",
+                "orderId",
+                1000L,
+                "NORMAL"
         );
         TestHelper.postWithToken("/reservations", reservationRequest, token);
 
@@ -98,7 +123,11 @@ class ReservationAcceptanceTest {
         var reservationRequest = new ReservationCreateRequest(
                 LocalDate.now().plusDays(1),
                 1L,
-                1L
+                1L,
+                "paymentKey",
+                "orderId",
+                1000L,
+                "NORMAL"
         );
         TestHelper.postWithToken("/reservations", reservationRequest, token);
 
@@ -122,7 +151,11 @@ class ReservationAcceptanceTest {
         var reservationRequest = new ReservationCreateRequest(
                 LocalDate.now().plusDays(1),
                 1L,
-                1L
+                1L,
+                "paymentKey",
+                "orderId",
+                1000L,
+                "NORMAL"
         );
 
         TestHelper.postWithToken("/reservations", reservationRequest, token);
@@ -146,7 +179,11 @@ class ReservationAcceptanceTest {
         var reservationRequest = new ReservationCreateRequest(
                 LocalDate.now().plusDays(1),
                 1L,
-                1L
+                1L,
+                "paymentKey",
+                "orderId",
+                1000L,
+                "NORMAL"
         );
         TestHelper.postWithToken("/reservations", reservationRequest, token);
         String url = String.format("/reservations/filtered?themeId=%d&memberId=%d&dateFrom=%s&dateTo=%s",
@@ -172,7 +209,11 @@ class ReservationAcceptanceTest {
         var reservationRequest = new ReservationCreateRequest(
                 LocalDate.now().plusDays(1),
                 1L,
-                1L
+                1L,
+                "paymentKey",
+                "orderId",
+                1000L,
+                "NORMAL"
         );
 
         TestHelper.postWithToken("/reservations", reservationRequest, token);

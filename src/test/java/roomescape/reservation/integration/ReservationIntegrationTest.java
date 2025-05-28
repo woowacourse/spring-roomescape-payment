@@ -3,6 +3,9 @@ package roomescape.reservation.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -11,10 +14,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.global.auth.dto.LoginMember;
 import roomescape.global.error.exception.BadRequestException;
 import roomescape.global.error.exception.ConflictException;
+import roomescape.helper.TestConfig;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
@@ -27,14 +32,16 @@ import roomescape.reservation.entity.ReservationTime;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationSlotRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
+import roomescape.reservation.service.PaymentService;
 import roomescape.reservation.service.ReservationService;
 import roomescape.theme.entity.Theme;
 import roomescape.theme.repository.ThemeRepository;
 import roomescape.waiting.entity.Waiting;
 import roomescape.waiting.repository.WaitingRepository;
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Import(TestConfig.class)
 class ReservationIntegrationTest {
 
     @Autowired
@@ -58,6 +65,9 @@ class ReservationIntegrationTest {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    private PaymentService paymentService;
+
     @Test
     @DisplayName("예약을 생성한다.")
     void createReservation() {
@@ -66,7 +76,16 @@ class ReservationIntegrationTest {
         var theme = themeRepository.save(new Theme("테마", "설명", "썸네일"));
         var time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
         var date = LocalDate.now().plusDays(1);
-        var request = new ReservationCreateRequest(date, time.getId(), theme.getId());
+        var request = new ReservationCreateRequest(
+                date,
+                time.getId(),
+                theme.getId(),
+                "paymentKey",
+                "orderId",
+                1000L,
+                "NORMAL"
+        );
+        doNothing().when(paymentService).create(any());
 
         // when
         var response = reservationService.createReservation(member.getId(), request);
@@ -77,6 +96,8 @@ class ReservationIntegrationTest {
                 () -> assertThat(response.startAt()).isEqualTo(time.getStartAt()),
                 () -> assertThat(response.themeName()).isEqualTo(theme.getName())
         );
+
+        verify(paymentService).create(any());
     }
 
     @Test
@@ -108,7 +129,15 @@ class ReservationIntegrationTest {
         var theme = themeRepository.save(new Theme("테마", "설명", "썸네일"));
         var time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
         var date = LocalDate.now().minusDays(1);
-        var request = new ReservationCreateRequest(date, time.getId(), theme.getId());
+        var request = new ReservationCreateRequest(
+                date,
+                time.getId(),
+                theme.getId(),
+                "paymentKey",
+                "orderId",
+                1000L,
+                "NORMAL"
+        );
 
         // when & then
         assertThatThrownBy(() -> reservationService.createReservation(member.getId(), request))
@@ -124,7 +153,15 @@ class ReservationIntegrationTest {
         var theme = themeRepository.save(new Theme("테마", "설명", "썸네일"));
         var time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
         var date = LocalDate.now().plusDays(1);
-        var request = new ReservationCreateRequest(date, time.getId(), theme.getId());
+        var request = new ReservationCreateRequest(
+                date,
+                time.getId(),
+                theme.getId(),
+                "paymentKey",
+                "orderId",
+                1000L,
+                "NORMAL"
+        );
         reservationService.createReservation(member.getId(), request);
 
         // when & then
@@ -141,7 +178,15 @@ class ReservationIntegrationTest {
         var theme = themeRepository.save(new Theme("테마", "설명", "썸네일"));
         var time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
         var date = LocalDate.now().plusDays(1);
-        var request = new ReservationCreateRequest(date, time.getId(), theme.getId());
+        var request = new ReservationCreateRequest(
+                date,
+                time.getId(),
+                theme.getId(),
+                "paymentKey",
+                "orderId",
+                1000L,
+                "NORMAL"
+        );
         reservationService.createReservation(member.getId(), request);
 
         // when
@@ -167,7 +212,15 @@ class ReservationIntegrationTest {
         var theme = themeRepository.save(new Theme("테마", "설명", "썸네일"));
         var time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
         var date = LocalDate.now().plusDays(1);
-        var request = new ReservationCreateRequest(date, time.getId(), theme.getId());
+        var request = new ReservationCreateRequest(
+                date,
+                time.getId(),
+                theme.getId(),
+                "paymentKey",
+                "orderId",
+                1000L,
+                "NORMAL"
+        );
         reservationService.createReservation(member.getId(), request);
 
         var filterRequest = new ReservationReadFilteredRequest(
@@ -200,7 +253,15 @@ class ReservationIntegrationTest {
         var theme = themeRepository.save(new Theme("테마", "설명", "썸네일"));
         var time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
         var date = LocalDate.now().plusDays(1);
-        var request = new ReservationCreateRequest(date, time.getId(), theme.getId());
+        var request = new ReservationCreateRequest(
+                date,
+                time.getId(),
+                theme.getId(),
+                "paymentKey",
+                "orderId",
+                1000L,
+                "NORMAL"
+        );
         var response = reservationService.createReservation(member.getId(), request);
 
         // when
@@ -244,7 +305,15 @@ class ReservationIntegrationTest {
         var time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
         var theme = themeRepository.save(new Theme("테마1", "테마1 설명", "테마1 썸네일"));
         var date = LocalDate.now().plusDays(1);
-        var request = new ReservationCreateRequest(date, time.getId(), theme.getId());
+        var request = new ReservationCreateRequest(
+                date,
+                time.getId(),
+                theme.getId(),
+                "paymentKey",
+                "orderId",
+                1000L,
+                "NORMAL"
+        );
         reservationService.createReservation(member.getId(), request);
 
         var loginMember = new LoginMember(member.getId(), member.getName(), member.getRole());

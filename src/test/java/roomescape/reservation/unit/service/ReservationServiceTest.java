@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,6 +36,7 @@ import roomescape.reservation.entity.ReservationTime;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationSlotRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
+import roomescape.reservation.service.PaymentService;
 import roomescape.reservation.service.ReservationService;
 import roomescape.theme.entity.Theme;
 import roomescape.theme.repository.ThemeRepository;
@@ -63,6 +65,9 @@ class ReservationServiceTest {
 
     @Mock
     private ReservationSlotRepository reservationSlotRepository;
+
+    @Mock
+    private PaymentService paymentService;
 
     private LocalDate date;
     private Theme theme;
@@ -96,12 +101,17 @@ class ReservationServiceTest {
         when(reservationSlotRepository.findByDateAndTimeIdAndThemeId(any(), any(), anyLong()))
                 .thenReturn(Optional.of(reservationSlot));
         when(reservationRepository.save(any(Reservation.class)))
-                .thenReturn(new Reservation(anyLong(), reservationSlot, member));
+                .thenReturn(new Reservation(1L, reservationSlot, member));
+        doNothing().when(paymentService).create(any());
 
         var request = new ReservationCreateRequest(
                 date,
                 time.getId(),
-                theme.getId()
+                theme.getId(),
+                "paymentKey",
+                "orderId",
+                1000L,
+                "NORMAL"
         );
 
         // when
@@ -115,6 +125,7 @@ class ReservationServiceTest {
         );
 
         verify(reservationRepository).save(any(Reservation.class));
+        verify(paymentService).create(any());
     }
 
     @Test
@@ -170,7 +181,11 @@ class ReservationServiceTest {
         var request = new ReservationCreateRequest(
                 yesterday,
                 time.getId(),
-                theme.getId()
+                theme.getId(),
+                "paymentKey",
+                "orderId",
+                1000L,
+                "NORMAL"
         );
 
         // when & then
@@ -196,7 +211,15 @@ class ReservationServiceTest {
         when(reservationRepository.existsByReservationSlot(any(ReservationSlot.class)))
                 .thenReturn(true);
 
-        var request = new ReservationCreateRequest(date, time.getId(), theme.getId());
+        var request = new ReservationCreateRequest(
+                date,
+                time.getId(),
+                theme.getId(),
+                "paymentKey",
+                "orderId",
+                1000L,
+                "NORMAL"
+        );
 
         // when & then
         assertThatThrownBy(() -> reservationService.createReservation(member.getId(), request))
