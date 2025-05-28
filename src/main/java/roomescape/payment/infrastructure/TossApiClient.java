@@ -4,6 +4,7 @@ import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
@@ -14,6 +15,7 @@ import roomescape.payment.exception.TossPaymentServerException;
 import roomescape.payment.exception.TossServerErrorCode;
 import roomescape.reservation.dto.response.FailureResponse;
 
+@Component
 public class TossApiClient {
 
     private static final String SECRET_KEY_SUFFIX = ":";
@@ -23,10 +25,10 @@ public class TossApiClient {
     private final RestClient restClient;
     private final String secretKey;
 
-    public TossApiClient(final RestClient restClient, @Value("${toss.secret-key}") final String key) {
+    public TossApiClient(final RestClient.Builder builder, @Value("${toss.secret-key}") final String key) {
         String totalSecretKey = key + SECRET_KEY_SUFFIX;
         secretKey = Base64.getEncoder().encodeToString(totalSecretKey.getBytes());
-        this.restClient = restClient;
+        this.restClient = builder.build();
     }
 
     public PaymentResponse authPayment(final String paymentKey, final String orderId,
