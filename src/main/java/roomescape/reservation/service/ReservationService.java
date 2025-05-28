@@ -6,10 +6,15 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.admin.domain.dto.SearchReservationRequestDto;
+import roomescape.payment.Payment;
+import roomescape.payment.PaymentRequestDto;
+import roomescape.payment.domain.dto.PaymentResponseDto;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.dto.ReservationInfo;
 import roomescape.reservation.domain.dto.ReservationRequestDto;
 import roomescape.reservation.domain.dto.ReservationResponseDto;
+import roomescape.reservation.domain.dto.ReservationWithPaymentDto;
 import roomescape.reservation.exception.DuplicateReservationException;
 import roomescape.reservation.exception.InvalidReservationTimeException;
 import roomescape.reservation.exception.NotFoundReservationException;
@@ -31,14 +36,16 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentService paymentService;
 
     public ReservationService(ReservationRepository repository,
                               ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository,
-                              WaitingRepository waitingRepository) {
+                              WaitingRepository waitingRepository, PaymentService paymentService) {
         this.repository = repository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentService = paymentService;
     }
 
     public List<ReservationResponseDto> findAll() {
@@ -54,6 +61,26 @@ public class ReservationService {
         validateDuplicateDateTime(reservation);
         Reservation savedReservation = repository.save(reservation);
         return convertReservationResponseDto(savedReservation);
+    }
+
+    @Transactional
+    public ReservationResponseDto addWithPayment(ReservationWithPaymentDto requestDto, User user) {
+        ReservationRequestDto reservationRequestDto = convertReservationRequestDto(requestDto);
+        Reservation reservation = convertReservation(reservationRequestDto, user);
+        validateDuplicateDateTime(reservation);
+        PaymentRequestDto paymentRequestDto = convertPaymentRequestDto(requestDto);
+//        Payment payment = convertPayment(paymentRequestDto);
+        paymentService.approve(paymentRequestDto);
+        Reservation savedReservation = repository.save(reservation);
+        return convertReservationResponseDto(savedReservation);
+    }
+
+    private ReservationRequestDto convertReservationRequestDto(ReservationWithPaymentDto requestDto) {
+        return ReservationRequestDto.ofReservationWithPaymentDto(requestDto);
+    }
+
+    private PaymentRequestDto convertPaymentRequestDto(ReservationWithPaymentDto requestDto) {
+        return PaymentRequestDto.ofReservationWithPaymentDto(requestDto);
     }
 
     @Transactional

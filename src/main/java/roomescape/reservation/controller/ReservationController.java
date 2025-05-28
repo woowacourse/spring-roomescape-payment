@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.reservation.domain.dto.ReservationInfo;
-import roomescape.reservation.domain.dto.ReservationRequestDto;
 import roomescape.reservation.domain.dto.ReservationResponseDto;
+import roomescape.reservation.domain.dto.ReservationWithPaymentDto;
 import roomescape.reservation.service.ReservationService;
 import roomescape.user.domain.User;
 
@@ -33,9 +33,9 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponseDto> add(@RequestBody ReservationRequestDto requestDto,
-                                                      User user) {
-        ReservationResponseDto resDto = service.add(requestDto, user);
+    public ResponseEntity<ReservationResponseDto> addWithPayment(@RequestBody ReservationWithPaymentDto requestDto,
+                                                                 User user) {
+        ReservationResponseDto resDto = service.addWithPayment(requestDto, user);
         return ResponseEntity.status(HttpStatus.CREATED).body(resDto);
     }
 

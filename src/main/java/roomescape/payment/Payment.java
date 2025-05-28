@@ -1,15 +1,33 @@
 package roomescape.payment;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import roomescape.payment.domain.PaymentType;
+
+@Entity
 public class Payment {
 
-    private final String paymentKey;
-    private final String orderId;
-    private final int amount;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String paymentKey;
+    private String orderId;
+    private int amount;
 
-    public Payment(String paymentKey, String orderId, int amount) {
+    @Enumerated
+    private PaymentType paymentType;
+
+    protected Payment () {
+    }
+
+    public Payment(String paymentKey, String orderId, int amount, PaymentType paymentType) {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
+        this.paymentType = paymentType;
     }
 
     public String getPaymentKey() {
@@ -22,5 +40,9 @@ public class Payment {
 
     public int getAmount() {
         return amount;
+    }
+
+    public PaymentType getPaymentType() {
+        return paymentType;
     }
 }

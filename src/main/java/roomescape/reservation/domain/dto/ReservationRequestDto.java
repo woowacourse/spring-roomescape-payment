@@ -10,13 +10,18 @@ import java.time.LocalDate;
 
 public record ReservationRequestDto(LocalDate date,
                                     Long timeId,
-                                    Long themeId,
-                                    String paymentKey,
-                                    String orderId,
-                                    int amount) {
+                                    Long themeId) {
 
     public Reservation toEntity(ReservationTime reservationTime, Theme theme, User user) {
         return Reservation.of(date, ReservationStatus.BOOKED, reservationTime, theme, user);
+    }
+
+    public static ReservationRequestDto ofReservationWithPaymentDto(ReservationWithPaymentDto reservationWithPaymentDto) {
+        return new ReservationRequestDto(
+                reservationWithPaymentDto.date(),
+                reservationWithPaymentDto.timeId(),
+                reservationWithPaymentDto.themeId()
+        );
     }
 }
 

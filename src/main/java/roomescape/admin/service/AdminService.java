@@ -53,6 +53,7 @@ public class AdminService {
     }
 
     private static ReservationRequestDto convertAdminReservationRequestDtoToReservationRequestDto(
+            // TODO 2025. 5. 28. 16:59: dto 필드 추가로 인한 컴파일 오류 수정 필요
             AdminReservationRequestDto adminReservationRequestDto) {
         return new ReservationRequestDto(adminReservationRequestDto.date(),
                 adminReservationRequestDto.timeId(),
