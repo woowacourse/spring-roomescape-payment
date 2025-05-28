@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import roomescape.application.exception.AuthException;
+import roomescape.application.exception.PaymentException;
 import roomescape.domain.exception.PastReservationException;
 import roomescape.presentation.dto.response.ErrorResponse;
 
@@ -67,6 +68,13 @@ public class GlobalExceptionHandler {
         String message = e.getMessage();
         ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST, message);
         return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentException(PaymentException e) {
+        String message = e.getMessage();
+        ErrorResponse errorResponse = ErrorResponse.of(e.getStatus(), message);
+        return ResponseEntity.status(e.getStatus()).body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)

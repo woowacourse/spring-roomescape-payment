@@ -2,6 +2,7 @@ package roomescape.infrastructure.thirdparty;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 import roomescape.application.dto.PaymentProcessRequest;
 import roomescape.domain.Payment;
@@ -20,13 +21,13 @@ public class PaymentRestClient {
         this.restClient = restClient;
     }
 
-    public Payment getPayment(PaymentProcessRequest request) {
+    public ResponseEntity<String> getPaymentResponse(PaymentProcessRequest request) {
         return restClient.post()
                 .header("Authorization", makeEncodedPaymentKey())
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
                 .retrieve()
-                .body(Payment.class);
+                .toEntity(String.class);
     }
 
     private String makeEncodedPaymentKey() {
