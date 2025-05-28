@@ -4,6 +4,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
@@ -11,8 +12,8 @@ import org.springframework.web.client.RestClient;
 @Configuration
 public class PaymentClientConfig {
 
-    // TODO: 배포시 환경 변수로 변경하기
-    private final static String tossSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6a";
+    @Value("${toss.confirm.secret-key}")
+    private String tossSecretKey;
 
     @Bean
     public RestClient tossPaymentClient() {
