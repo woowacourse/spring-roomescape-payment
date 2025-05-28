@@ -28,7 +28,7 @@ public class PaymentConfirmTest {
                 () -> restClient.post()
                         .uri("https://api.tosspayments.com/v1/payments/confirm")
                         .header("Authorization", "Basic " +
-                                Base64.getEncoder().encodeToString("test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6".getBytes()))
+                                Base64.getEncoder().encodeToString("test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:".getBytes()))
                         .header("TossPayments-Test-Code", "INVALID_API_KEY")
                         .retrieve()
                         .toBodilessEntity()
