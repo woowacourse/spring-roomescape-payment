@@ -21,3 +21,7 @@ spring:
 
 jwt:
   secret: L4zOrR7V+N4SKMflnqvz/OVSL0vQO3zMkVnWmgQZ/Ko=
+
+payment:
+  secret:
+    key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6

@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.exception.DuplicateException;
+import roomescape.payment.dto.PaymentResponse;
+import roomescape.payment.resolver.PaymentResolver;
 import roomescape.reservation.application.dto.AvailableReservationTimeServiceRequest;
 import roomescape.reservation.application.dto.CreateReservationServiceRequest;
 import roomescape.reservation.application.dto.MyReservationsResponse;
@@ -40,6 +42,8 @@ public class ReservationFacadeImpl implements ReservationFacade {
     private final WaitingReservationQueryService waitingReservationQueryService;
     private final ReservationViewQueryService reservationViewQueryService;
     private final UserQueryService userQueryService;
+
+    private final PaymentResolver paymentResolver;
 
     @Override
     public List<ReservationResponse> getAll() {
@@ -90,6 +94,14 @@ public class ReservationFacadeImpl implements ReservationFacade {
     public ReservationResponse create(final CreateReservationWithUserIdWebRequest request) {
         final User user = userQueryService.getById(request.userId());
 
+        // 결제 성공
+        PaymentResponse response = paymentResolver.execute(
+                request.paymentKey(),
+                request.amount(),
+                request.orderId(),
+                request.paymentType() // todo. 필요없는 요청값?
+        );
+        
         final Reservation reservation = reservationCommandService.create(
                 request.toServiceRequest());
 
