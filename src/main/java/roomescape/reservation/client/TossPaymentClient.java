@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.reservation.service.PaymentApprovalRequest;
 
 @Component
-public class TossPaymentClient {
+public class TossPaymentClient implements PaymentClient {
 
     private static final String AUTH_HEADER_NAME = "Authorization";
 
@@ -27,6 +27,7 @@ public class TossPaymentClient {
         this.errorHandler = errorHandler;
     }
 
+    @Override
     public ResponseEntity<Void> approvePayment(PaymentApprovalRequest request) {
         return restClient.post().uri("https://api.tosspayments.com/v1/payments/confirm")
                 .contentType(MediaType.APPLICATION_JSON)

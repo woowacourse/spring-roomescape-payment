@@ -12,7 +12,7 @@ import roomescape.auth.dto.LoginMember;
 import roomescape.exception.ReservationException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.reservation.client.TossPaymentClient;
+import roomescape.reservation.client.PaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.AdminReservationRequest;
@@ -32,8 +32,7 @@ import roomescape.theme.repository.ThemeRepository;
 public class ReservationService {
 
     private final Clock clock;
-    // TODO : 인터페이스 분리
-    private final TossPaymentClient paymentClient;
+    private final PaymentClient paymentClient;
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
