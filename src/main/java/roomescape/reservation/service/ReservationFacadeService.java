@@ -50,8 +50,18 @@ public class ReservationFacadeService {
         ).collect(Collectors.toList());
     }
 
+    public ReservationResponse createForAdmin(final LocalDate date, final Long timeId, final Long themeId,
+                                              final Long memberId) {
+        if (!reservationService.isReservationExists(date, timeId, themeId)) {
+            return createReservation(date, timeId, themeId, memberId);
+        }
+        return createWaiting(date, timeId, themeId, memberId);
+    }
+
     public ReservationResponse create(final LocalDate date, final Long timeId, final Long themeId,
-                                      final Long memberId) {
+                                      final Long memberId, final String paymentKey, final String orderId,
+                                      final Integer amount, final String paymentType) {
+
         if (!reservationService.isReservationExists(date, timeId, themeId)) {
             return createReservation(date, timeId, themeId, memberId);
         }

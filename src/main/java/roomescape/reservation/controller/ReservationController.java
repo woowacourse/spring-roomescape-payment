@@ -15,7 +15,9 @@ import roomescape.global.auth.annotation.RequireRole;
 import roomescape.global.auth.dto.UserInfo;
 import roomescape.member.domain.MemberRole;
 import roomescape.reservation.dto.request.AdminReservationCreateRequest;
+import roomescape.reservation.dto.request.PaymentRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
+import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.service.ReservationFacadeService;
@@ -49,9 +51,11 @@ public class ReservationController {
             @RequestBody ReservationCreateRequest request,
             UserInfo userInfo
     ) {
-        ReservationResponse dto = reservationFacadeService.create(request.date(), request.timeId(),
-                request.themeId(),
-                userInfo.id());
+        ReservationRequest reservation = request.reservation();
+        PaymentRequest payment = request.payment();
+        ReservationResponse dto = reservationFacadeService.create(reservation.date(), reservation.timeId(),
+                reservation.themeId(), userInfo.id(), payment.paymentKey(), payment.orderId(), payment.amount(),
+                payment.paymentType());
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
@@ -60,7 +64,7 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> createReservation(
             @RequestBody AdminReservationCreateRequest request
     ) {
-        ReservationResponse dto = reservationFacadeService.create(request.date(), request.timeId(),
+        ReservationResponse dto = reservationFacadeService.createForAdmin(request.date(), request.timeId(),
                 request.themeId(),
                 request.memberId());
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
