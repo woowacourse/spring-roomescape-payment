@@ -21,7 +21,7 @@ public class TossRestClient {
     private final RestClient restClient;
 
     public TossPaymentResponse confirm(TossPaymentRequest tossPaymentRequest) {
-        final TossPaymentResponse authorization = restClient.post()
+        return restClient.post()
                 .uri("/v1/payments/confirm")
                 .header("Authorization", AUTH_HEADER_VALUE)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -29,8 +29,5 @@ public class TossRestClient {
                 .body(tossPaymentRequest)
                 .retrieve()
                 .body(TossPaymentResponse.class);
-
-        log.info("Confirmed payment: {}", authorization);
-        return authorization;
     }
 }
