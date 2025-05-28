@@ -16,6 +16,11 @@ import roomescape.exception.PaymentClientException;
 @Component
 public class PaymentErrorHandler implements ResponseErrorHandler {
 
+    /**
+     * TODO
+     * 비타: TEST 400대 에러만 잘 잡는지
+     * 리원: 리스폰스에서 message만 잘 가져오는가
+     */
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
         return response.getStatusCode().is4xxClientError();
@@ -24,6 +29,9 @@ public class PaymentErrorHandler implements ResponseErrorHandler {
     @Override
     public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
         String responseBody = new String(response.getBody().readAllBytes());
+        if (responseBody.isBlank()) {
+            throw new PaymentClientException();
+        }
         try {
             ObjectMapper mapper = new ObjectMapper();
             Response errorResponse = mapper.readValue(responseBody, Response.class);
