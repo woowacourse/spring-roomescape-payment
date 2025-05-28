@@ -7,6 +7,7 @@ import java.util.Base64;
 import java.util.Map;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.RestClient;
+import roomescape.dto.business.PaymentExceptionContent;
 import roomescape.dto.business.PaymentResult;
 import roomescape.exception.PaymentException;
 
@@ -27,16 +28,12 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public PaymentResult pay(String paymentKey, String orderId, int amount) {
+    public PaymentResult pay(String paymentKey, String orderId, long amount) {
         Map<String, Object> requestBody = Map.of(
                 "paymentKey", paymentKey,
                 "orderId", orderId,
                 "amount", amount
         );
-
-        record PaymentExceptionContent(String code, String message) {
-
-        }
 
         return restClient.post()
                 .uri(PAYMENT_CONFIRM_URL)
@@ -46,7 +43,7 @@ public class TossPaymentClient implements PaymentClient {
                 .onStatus(HttpStatusCode::isError, ((request, response) -> {
                     PaymentExceptionContent paymentExceptionContent = statusParser.readValue(response.getBody(),
                             PaymentExceptionContent.class);
-                    throw new PaymentException(paymentExceptionContent.message);
+                    throw new PaymentException(paymentExceptionContent.message());
                 }))
                 .body(PaymentResult.class);
     }
@@ -56,3 +53,4 @@ public class TossPaymentClient implements PaymentClient {
                 .encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
     }
 }
+

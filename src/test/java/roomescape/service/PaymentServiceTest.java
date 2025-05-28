@@ -2,17 +2,10 @@ package roomescape.service;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import roomescape.domain.Member;
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Role;
-import roomescape.domain.Theme;
 import roomescape.dto.business.PaymentHistoryCreationContent;
 import roomescape.exception.PaymentException;
 import roomescape.repository.PaymentHistoryRepository;
@@ -34,17 +27,9 @@ class PaymentServiceTest {
     void paymentFailThenReturnErrorMessage() {
         paymentClientStub.setErrorCase(ALREADY_PROCESSED_PAYMENT);
         PaymentService paymentService = new PaymentService(paymentHistoryRepository, paymentClientStub);
-
-        ReservationTime reservationTime = testEntityManager.persist(
-                ReservationTime.createWithoutId(LocalTime.of(23, 59)));
-        Theme theme = testEntityManager.persist(Theme.createWithoutId("asdf", "asdf", "asdf"));
-        Member member = testEntityManager.persist(
-                Member.createWithoutId(Role.GENERAL, "asdf", "asdf@naver.com", "qwer1234!"));
-        Reservation reservation = testEntityManager.persist(
-                Reservation.createWithoutIdAndPayment(LocalDate.now().plusDays(2L), reservationTime, theme, member));
         PaymentHistoryCreationContent paymentHistoryCreationContent = new PaymentHistoryCreationContent("asdf", "asdf",
                 "asdf", 1000);
-        assertThatThrownBy(() -> paymentService.pay(reservation, paymentHistoryCreationContent)).isInstanceOf(
+        assertThatThrownBy(() -> paymentService.pay(paymentHistoryCreationContent)).isInstanceOf(
                         PaymentException.class)
                 .hasMessage(ALREADY_PROCESSED_PAYMENT);
     }

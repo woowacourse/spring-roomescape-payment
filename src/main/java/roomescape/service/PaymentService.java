@@ -2,7 +2,6 @@ package roomescape.service;
 
 import org.springframework.stereotype.Service;
 import roomescape.domain.PaymentHistory;
-import roomescape.domain.Reservation;
 import roomescape.dto.business.PaymentHistoryCreationContent;
 import roomescape.dto.business.PaymentResult;
 import roomescape.repository.PaymentHistoryRepository;
@@ -19,10 +18,10 @@ public class PaymentService {
         this.paymentClient = paymentClient;
     }
 
-    public PaymentHistory pay(Reservation reservation, PaymentHistoryCreationContent content) {
+    public PaymentHistory pay(PaymentHistoryCreationContent content) {
         PaymentResult paymentResult = requestPay(content);
-        PaymentHistory paymentHistory = PaymentHistory.createWithoutId(
-                reservation, paymentResult.orderId(), paymentResult.paymentKey(), content.paymentType());
+        PaymentHistory paymentHistory = PaymentHistory.createWithoutId(paymentResult.orderId(),
+                paymentResult.paymentKey(), content.paymentType());
         return paymentHistoryRepository.save(paymentHistory);
     }
 
