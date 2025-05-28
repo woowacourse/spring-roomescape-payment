@@ -26,7 +26,7 @@ public class TossPaymentProcessor {
                 .uri(uri)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Basic " + secretKey)
-                .body(new TossPaymentConfirmRequest(request.amount(), request.orderId(), request.paymentKey()))
+                .body(request)
                 .retrieve()
                 .body(TossPaymentConfirmResponse.class);
     }
