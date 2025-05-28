@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.dto.request.AddReservationRequest;
 import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.request.CreateWaitReservationRequest;
 import roomescape.dto.request.LoginMemberRequest;
@@ -92,7 +93,7 @@ class ReservationServiceTest {
     @Test
     void 예약을_추가한다() {
         //given
-        CreateReservationRequest request = new CreateReservationRequest(LocalDate.now().plusDays(1),
+        AddReservationRequest request = new AddReservationRequest(LocalDate.now().plusDays(1),
                 time.getId(), theme.getId());
 
         when(memberRepository.findFetchById(any(Long.class)))
@@ -148,7 +149,7 @@ class ReservationServiceTest {
 
         //when & then
         assertThatThrownBy(() -> reservationService.addReservation(
-                new CreateReservationRequest(targetDate, time.getId(), theme.getId()), loginMemberRequest))
+                new AddReservationRequest(targetDate, time.getId(), theme.getId()), loginMemberRequest))
                 .isInstanceOf(InvalidReservationException.class);
     }
 
@@ -166,7 +167,7 @@ class ReservationServiceTest {
         Reservation reservation2 = new Reservation(2L, new Member(2L, "test2", "test2@email.com", "1234", Role.USER),
                 LocalDate.now(), time, theme, ReservationStatus.RESERVED);
 
-        CreateReservationRequest request = new CreateReservationRequest(date, time.getId(), theme.getId());
+        AddReservationRequest request = new AddReservationRequest(date, time.getId(), theme.getId());
 
         reservationService.addReservation(request, loginMemberRequest);
 

@@ -15,10 +15,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import roomescape.controller.ReservationController;
+import roomescape.dto.request.CreateReservationRequest;
 import roomescape.entity.Member;
 import roomescape.global.Role;
 import roomescape.jwt.JwtTokenProvider;
 import roomescape.repository.MemberRepository;
+import roomescape.service.PaymentService;
+import roomescape.service.ReservationService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,6 +31,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class AvailableReservationTimeTest {
+
+    ReservationController reservationController;
+
+    @MockitoBean
+    PaymentService paymentService;
+
+    @Autowired
+    ReservationService reservationService;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -39,11 +52,12 @@ class AvailableReservationTimeTest {
     void setUp() {
         Member member = memberRepository.save(new Member("어드민", "test_admin@test.com", "test", Role.ADMIN));
         token = jwtTokenProvider.createTokenByMember(member);
+        reservationController = new ReservationController(reservationService, paymentService);
     }
 
     @Test
     void 예약_가능한_시간을_확인할_수_있다() {
-        String todayDateString = LocalDate.now().plusDays(1).toString();
+        LocalDate todayDate = LocalDate.now().plusDays(1);
 
         Map<String, String> timeParam = Map.of(
                 "startAt", "20:00"
@@ -97,10 +111,8 @@ class AvailableReservationTimeTest {
                 .statusCode(201)
                 .extract().jsonPath().getLong("id");
 
-        Map<String, Object> reservation = Map.of(
-                "date", todayDateString,
-                "timeId", timeId,
-                "themeId", themeId
+        CreateReservationRequest reservation = new CreateReservationRequest(
+                todayDate, timeId, themeId, "paymentKey", "orderId", 1000, "paymentType"
         );
 
         RestAssured.given().log().all()
@@ -113,7 +125,7 @@ class AvailableReservationTimeTest {
 
         Response response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .when().get("/times/available?date=" + todayDateString + "&themeId=" + themeId)
+                .when().get("/times/available?date=" + todayDate + "&themeId=" + themeId)
                 .then().log().all()
                 .statusCode(200)
                 .extract().response();

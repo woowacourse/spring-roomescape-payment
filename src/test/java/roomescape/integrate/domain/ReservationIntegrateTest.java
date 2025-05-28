@@ -11,17 +11,31 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
+import org.springframework.test.web.client.MockRestServiceServer;
+import roomescape.config.ClientConfiguration;
+import roomescape.controller.ReservationController;
+import roomescape.dto.request.AddReservationRequest;
+import roomescape.dto.request.ConfirmPaymentRequest;
 import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.request.CreateReservationTimeRequest;
 import roomescape.dto.request.CreateThemeRequest;
 import roomescape.dto.request.LoginMemberRequest;
+import roomescape.dto.response.ConfirmPaymentResponse;
 import roomescape.dto.response.MyReservationResponse;
 import roomescape.dto.response.ThemeResponse;
 import roomescape.entity.Member;
@@ -33,16 +47,27 @@ import roomescape.jwt.JwtTokenProvider;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.service.AuthService;
+import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 import roomescape.service.ReservationTimeService;
 import roomescape.service.ThemeService;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class ReservationIntegrateTest {
+
+    ReservationController reservationController;
+
+    @MockitoBean
+    PaymentService paymentService;
 
     @Autowired
     ReservationService reservationService;
@@ -67,10 +92,14 @@ class ReservationIntegrateTest {
 
     String token;
 
+    LoginMemberRequest loginMemberRequest;
+
     @BeforeEach
     void setUp() {
         Member member = memberRepository.save(new Member("어드민", "test_admin@test.com", "test", Role.ADMIN));
         token = jwtTokenProvider.createTokenByMember(member);
+        loginMemberRequest = authService.getLoginMemberByToken(token);
+        reservationController = new ReservationController(reservationService, paymentService);
     }
 
     @Test
@@ -83,17 +112,20 @@ class ReservationIntegrateTest {
         CreateThemeRequest themeRequest = new CreateThemeRequest("테마", "설명", "썸네일");
         Theme theme = themeService.addTheme(themeRequest);
 
-        Map<String, Object> reservationParam = Map.of(
-                "date", LocalDate.now().plusDays(1).toString(),
-                "timeId", reservationTime.getId(),
-                "themeId", theme.getId()
+
+        CreateReservationRequest reservation = new CreateReservationRequest(
+                LocalDate.now().plusDays(1), reservationTime.getId(), theme.getId(), "paymentKey", "orderId", 1000, "paymentType"
         );
 
-        // when & then
+        // when
+        when(paymentService.confirmPayment(any())).thenReturn(new ConfirmPaymentResponse(
+                "paymentKey", "orderId", 1000
+        ));
+        // then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
-                .body(reservationParam)
+                .body(reservation)
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(201);
@@ -110,8 +142,9 @@ class ReservationIntegrateTest {
         Theme theme = themeService.addTheme(themeRequest);
 
         LocalDate tomorrow = LocalDate.now().plusDays(1);
-        CreateReservationRequest reservationRequest = new CreateReservationRequest(
+        AddReservationRequest reservationRequest = new AddReservationRequest(
                 tomorrow, reservationTime.getId(), theme.getId());
+
 
         LoginMemberRequest loginMemberRequest = authService.getLoginMemberByToken(token);
         reservationService.addReservation(reservationRequest, loginMemberRequest);

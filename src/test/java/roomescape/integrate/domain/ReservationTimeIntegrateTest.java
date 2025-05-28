@@ -8,19 +8,33 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import roomescape.config.ClientConfiguration;
+import roomescape.controller.ReservationController;
 import roomescape.entity.Member;
 import roomescape.global.Role;
 import roomescape.jwt.JwtTokenProvider;
 import roomescape.repository.MemberRepository;
+import roomescape.service.PaymentService;
+import roomescape.service.ReservationService;
 
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class ReservationTimeIntegrateTest {
+
+    ReservationController reservationController;
+
+    @MockitoBean
+    PaymentService paymentService;
+
+    @Autowired
+    ReservationService reservationService;
 
     @Autowired
     MemberRepository memberRepository;
@@ -34,6 +48,7 @@ class ReservationTimeIntegrateTest {
     void setUp() {
         Member member = memberRepository.save(new Member("어드민", "test_admin@test.com", "test", Role.ADMIN));
         token = jwtTokenProvider.createTokenByMember(member);
+        reservationController = new ReservationController(reservationService, paymentService);
     }
 
     @Test
