@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import roomescape.global.error.dto.ErrorResponse;
 import roomescape.global.error.exception.BadRequestException;
 import roomescape.global.error.exception.ConflictException;
 import roomescape.global.error.exception.ForbiddenException;
@@ -21,53 +22,53 @@ import roomescape.global.error.exception.UnauthorizedException;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleException(RuntimeException e) {
+    public ResponseEntity<ErrorResponse> handleException(RuntimeException e) {
         log.error("RuntimeException : {}", e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<String> handleNotFoundException(NotFoundException e) {
+    public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException e) {
         log.error("NotFoundException : {}", e);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<String> handleBadRequestException(BadRequestException e) {
+    public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException e) {
         log.error("BadRequestException : {}", e);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<String> handleConflictException(ConflictException e) {
+    public ResponseEntity<ErrorResponse> handleConflictException(ConflictException e) {
         log.error("ConflictException : {}", e);
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<String> handleUnauthorizedException(UnauthorizedException e) {
+    public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException e) {
         log.error("UnauthorizedException : {}", e);
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<String> handleForbiddenException(ForbiddenException e) {
+    public ResponseEntity<ErrorResponse> handleForbiddenException(ForbiddenException e) {
         log.error("ForbiddenException : {}", e);
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(ServerException.class)
-    public ResponseEntity<String> handleServerException(ServerException e) {
+    public ResponseEntity<ErrorResponse> handleServerException(ServerException e) {
         log.error("ServerException : {}", e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    protected ResponseEntity<String> handleValidationException(MethodArgumentNotValidException e) {
+    protected ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException e) {
         log.error("ValidationException : {}", e);
         String errorMessage = e.getBindingResult().getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.joining(" / "));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(errorMessage));
     }
 }
