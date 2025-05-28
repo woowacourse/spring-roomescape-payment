@@ -1,4 +1,4 @@
-package roomescape.reservation.client.dto;
+package roomescape.client.dto;
 
 import roomescape.reservation.dto.CreateReservationWithPaymentRequest;
 
@@ -6,7 +6,7 @@ public record PaymentsConfirmRequest(String paymentKey,
                                      String orderId,
                                      long amount) {
 
-    public PaymentsConfirmRequest(CreateReservationWithPaymentRequest request) {
+    public PaymentsConfirmRequest(final CreateReservationWithPaymentRequest request) {
         this(request.paymentKey(), request.orderId(), request.amount());
     }
 }

@@ -3,21 +3,19 @@ package roomescape.reservation.service;
 import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.client.dto.PaymentsConfirmRequest;
 import roomescape.global.auth.LoginMember;
 import roomescape.global.exception.custom.BadRequestException;
 import roomescape.global.exception.custom.NotFoundException;
 import roomescape.global.exception.custom.UnauthorizedException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.reservation.client.TossPaymentsClient;
-import roomescape.reservation.client.dto.PaymentsConfirmRequest;
-import roomescape.reservation.client.dto.PaymentsConfirmResponse;
-import roomescape.reservation.domain.Payment;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.CreateReservationWithMemberRequest;
 import roomescape.reservation.dto.CreateReservationWithPaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
-import roomescape.reservation.repository.PaymentRepository;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
@@ -34,21 +32,19 @@ public class ReservationCommandService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
-    private final PaymentRepository paymentRepository;
-    private final TossPaymentsClient tossPaymentsClient;
+    private final PaymentService paymentService;
 
     public ReservationCommandService(ReservationRepository reservationRepository,
                                      ReservationTimeRepository reservationTimeRepository,
                                      ThemeRepository themeRepository,
                                      MemberRepository memberRepository, WaitingRepository waitingRepository,
-                                     PaymentRepository paymentRepository, TossPaymentsClient tossPaymentsClient) {
+                                     PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
-        this.paymentRepository = paymentRepository;
-        this.tossPaymentsClient = tossPaymentsClient;
+        this.paymentService = paymentService;
     }
 
     @Transactional
@@ -56,7 +52,7 @@ public class ReservationCommandService {
                                                                final LoginMember loginMember) {
         final Member member = memberRepository.findById(loginMember.id())
                 .orElseThrow(() -> new UnauthorizedException("예약자를 찾을 수 없습니다."));
-        final Payment payment = confirmAndSavePayment(request);
+        final Payment payment = paymentService.confirmAndSavePayment(new PaymentsConfirmRequest(request));
         final Reservation reservation = convertToReservation(
                 request.themeId(),
                 request.timeId(),
@@ -94,15 +90,6 @@ public class ReservationCommandService {
                 .orElseThrow(() -> new NotFoundException("예약을 찾을 수 없습니다."));
         reservation.updateMember(waiting.getMember());
         waitingRepository.delete(waiting);
-    }
-
-    private Payment confirmAndSavePayment(CreateReservationWithPaymentRequest request) {
-        final PaymentsConfirmRequest paymentsConfirmRequest = new PaymentsConfirmRequest(request);
-        final PaymentsConfirmResponse paymentsConfirmResponse = tossPaymentsClient.confirmPayments(
-                paymentsConfirmRequest);
-        final Payment payment = new Payment(paymentsConfirmResponse.paymentKey(),
-                paymentsConfirmResponse.totalAmount());
-        return paymentRepository.save(payment);
     }
 
     private Reservation convertToReservation(

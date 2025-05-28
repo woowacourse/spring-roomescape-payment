@@ -14,6 +14,7 @@ import java.time.LocalTime;
 import java.util.Objects;
 import roomescape.global.exception.custom.BadRequestException;
 import roomescape.member.domain.Member;
+import roomescape.payment.domain.Payment;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeName;
 import roomescape.time.domain.ReservationTime;

@@ -1,4 +1,4 @@
-package roomescape.reservation.client.dto;
+package roomescape.client.dto;
 
 public record PaymentsConfirmResponse(String paymentKey,
                                       long totalAmount) {

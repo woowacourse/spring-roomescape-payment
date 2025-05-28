@@ -1,4 +1,4 @@
-package roomescape.reservation.domain;
+package roomescape.payment.domain;
 
 import jakarta.persistence.Embeddable;
 import java.util.Objects;

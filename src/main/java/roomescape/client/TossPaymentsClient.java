@@ -1,4 +1,4 @@
-package roomescape.reservation.client;
+package roomescape.client;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,10 +8,10 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestClient;
+import roomescape.client.dto.PaymentsConfirmRequest;
+import roomescape.client.dto.PaymentsConfirmResponse;
+import roomescape.client.dto.TossErrorResponse;
 import roomescape.global.exception.custom.TossPaymentsException;
-import roomescape.reservation.client.dto.PaymentsConfirmRequest;
-import roomescape.reservation.client.dto.PaymentsConfirmResponse;
-import roomescape.reservation.client.dto.TossErrorResponse;
 
 public class TossPaymentsClient {
 
