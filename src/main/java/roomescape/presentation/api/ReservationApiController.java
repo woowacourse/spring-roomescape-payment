@@ -17,6 +17,7 @@ import roomescape.auth.AuthRequired;
 import roomescape.auth.LoginInfo;
 import roomescape.auth.Role;
 import roomescape.business.dto.ReservationDto;
+import roomescape.business.dto.ReservationWithAheadDto;
 import roomescape.business.model.vo.ReservationStatus;
 import roomescape.business.model.vo.UserRole;
 import roomescape.business.service.ReservationService;
@@ -24,7 +25,6 @@ import roomescape.presentation.dto.request.AdminReservationRequest;
 import roomescape.presentation.dto.request.ReservationRequest;
 import roomescape.presentation.dto.response.ReservationMineResponse;
 import roomescape.presentation.dto.response.ReservationResponse;
-import roomescape.business.dto.ReservationWithAheadDto;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,8 +36,9 @@ public class ReservationApiController {
     @AuthRequired
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody @Valid ReservationRequest request,
                                                                  LoginInfo loginInfo) {
-        ReservationDto reservationDto = reservationService.addAndGetWithoutPayment(request.date(), request.timeId(),
-                request.themeId(), loginInfo.id(), request.reservationStatus(), request.paymentKey(), request.orderId(), request.amount());
+        ReservationDto reservationDto = reservationService.addAndGet(request.date(), request.timeId(),
+                request.themeId(), loginInfo.id(), request.reservationStatus(), request.paymentKey(), request.orderId(),
+                request.amount());
         ReservationResponse response = ReservationResponse.from(reservationDto);
         return ResponseEntity.created(URI.create("/reservations")).body(response);
     }

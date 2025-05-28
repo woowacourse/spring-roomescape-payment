@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.business.dto.PaymentApproveDto;
 import roomescape.business.dto.ReservationDto;
+import roomescape.business.dto.ReservationWithAheadDto;
 import roomescape.business.model.entity.Reservation;
 import roomescape.business.model.entity.ReservationTime;
 import roomescape.business.model.entity.Theme;
@@ -25,10 +26,8 @@ import roomescape.business.model.vo.Id;
 import roomescape.business.model.vo.ReservationStatus;
 import roomescape.exception.business.DuplicatedException;
 import roomescape.exception.business.NotFoundException;
-import roomescape.infrastructure.payment.PaymentApproveResponseDto;
 import roomescape.infrastructure.payment.TossPaymentClient;
 import roomescape.presentation.dto.response.ReservationResponse;
-import roomescape.business.dto.ReservationWithAheadDto;
 
 @Service
 @RequiredArgsConstructor
@@ -43,38 +42,43 @@ public class ReservationService {
 
     private final TossPaymentClient paymentClient;
 
-    public ReservationDto addAndGetWithoutPayment(final LocalDate date, final String timeIdValue, final String themeIdValue,
-                                                  final String userIdValue, final ReservationStatus reservationStatus, final String paymentKey, final String orderId, final Long amount) {
+    public ReservationDto addAndGet(final LocalDate date, final String timeIdValue,
+                                    final String themeIdValue,
+                                    final String userIdValue, final ReservationStatus reservationStatus,
+                                    final String paymentKey, final String orderId, final Long amount) {
         User user = getUser(userIdValue);
         ReservationTime reservationTime = getReservationTime(timeIdValue);
         Theme theme = getTheme(themeIdValue);
 
-        if (reservationStatus == ReservationStatus.RESERVED && reservationRepository.isDuplicateDateAndTimeAndTheme(date,
-                reservationTime.startTimeValue(), theme.getId())) {
+        if (reservationStatus == ReservationStatus.RESERVED &&
+                reservationRepository.isDuplicateDateAndTimeAndTheme(date, reservationTime.startTimeValue(),
+                        theme.getId())) {
             throw new DuplicatedException(RESERVATION_DUPLICATED);
         }
-
-        Reservation reservation = Reservation.create(user, date, reservationTime, theme, reservationStatus, LocalDateTime.now());
+        Reservation reservation = Reservation.create(user, date, reservationTime, theme, reservationStatus,
+                LocalDateTime.now());
         if (reservationStatus == ReservationStatus.RESERVED) {
-            PaymentApproveResponseDto paymentApproveResponse = paymentClient.approvePayment(
-                    new PaymentApproveDto(paymentKey, orderId, amount));
+            paymentClient.approvePayment(new PaymentApproveDto(paymentKey, orderId, amount));
         }
         reservationRepository.save(reservation);
         waitingService.updateWaitingReservations(reservation);
         return ReservationDto.fromEntity(reservation);
     }
 
-    public ReservationDto addAndGetWithoutPayment(final LocalDate date, final String timeIdValue, final String themeIdValue,
-                                    final String userIdValue, final ReservationStatus reservationStatus) {
+    public ReservationDto addAndGetWithoutPayment(final LocalDate date, final String timeIdValue,
+                                                  final String themeIdValue,
+                                                  final String userIdValue, final ReservationStatus reservationStatus) {
         User user = getUser(userIdValue);
         ReservationTime reservationTime = getReservationTime(timeIdValue);
         Theme theme = getTheme(themeIdValue);
 
-        if (reservationStatus == ReservationStatus.RESERVED && reservationRepository.isDuplicateDateAndTimeAndTheme(date,
+        if (reservationStatus == ReservationStatus.RESERVED && reservationRepository.isDuplicateDateAndTimeAndTheme(
+                date,
                 reservationTime.startTimeValue(), theme.getId())) {
             throw new DuplicatedException(RESERVATION_DUPLICATED);
         }
-        Reservation reservation = Reservation.create(user, date, reservationTime, theme, reservationStatus, LocalDateTime.now());
+        Reservation reservation = Reservation.create(user, date, reservationTime, theme, reservationStatus,
+                LocalDateTime.now());
         reservationRepository.save(reservation);
         waitingService.updateWaitingReservations(reservation);
         return ReservationDto.fromEntity(reservation);
