@@ -2,8 +2,8 @@ package roomescape.payment.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.Payment;
-import roomescape.payment.PaymentRequestDto;
+import roomescape.payment.domain.TossPayment;
+import roomescape.payment.domain.dto.PaymentRequestDto;
 import roomescape.payment.domain.dto.PaymentResponseDto;
 import roomescape.payment.exception.InvalidPaymentException;
 
@@ -17,19 +17,19 @@ public class PaymentService {
     }
 
     public PaymentResponseDto approve(PaymentRequestDto paymentRequestDto) {
-        Payment payment = restClient.post()
+        TossPayment payment = restClient.post()
                 .uri("/v1/payments/confirm")
                 .body(paymentRequestDto)
                 .retrieve()
                 .onStatus(status -> status.value() == 404, (req, res) -> {
                     throw new InvalidPaymentException();
                 })
-                .body(Payment.class);
+                .body(TossPayment.class);
 
         return convertPaymentResponseDto(payment);
     }
 
-    private static PaymentResponseDto convertPaymentResponseDto(Payment payment) {
+    private static PaymentResponseDto convertPaymentResponseDto(TossPayment payment) {
         return PaymentResponseDto.of(payment);
     }
 }

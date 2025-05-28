@@ -1,4 +1,4 @@
-package roomescape.payment;
+package roomescape.payment.domain.dto;
 
 import roomescape.reservation.domain.dto.ReservationWithPaymentDto;
 
@@ -9,7 +9,7 @@ public record PaymentRequestDto(String paymentKey, String orderId, int amount, S
                 requestDto.paymentKey(),
                 requestDto.orderId(),
                 requestDto.amount(),
-                requestDto.paymentTypeText()
+                requestDto.paymentType()
         );
     }
 }

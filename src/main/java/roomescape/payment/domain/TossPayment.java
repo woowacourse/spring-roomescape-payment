@@ -1,14 +1,14 @@
-package roomescape.payment;
+package roomescape.payment.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import roomescape.payment.domain.PaymentType;
 
 @Entity
-public class Payment {
+public class TossPayment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,13 +17,13 @@ public class Payment {
     private String orderId;
     private int amount;
 
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
 
-    protected Payment () {
+    protected TossPayment() {
     }
 
-    public Payment(String paymentKey, String orderId, int amount, PaymentType paymentType) {
+    public TossPayment(String paymentKey, String orderId, int amount, PaymentType paymentType) {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;

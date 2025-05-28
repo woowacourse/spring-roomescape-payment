@@ -1,10 +1,10 @@
 package roomescape.payment.domain.dto;
 
-import roomescape.payment.Payment;
+import roomescape.payment.domain.TossPayment;
 
 public record PaymentResponseDto() {
 
-    public static PaymentResponseDto of(Payment payment) {
+    public static PaymentResponseDto of(TossPayment payment) {
         return new PaymentResponseDto();
     }
 }
