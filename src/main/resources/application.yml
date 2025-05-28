@@ -14,3 +14,7 @@ spring:
     hibernate:
       ddl-auto: create
     defer-datasource-initialization: true
+toss:
+  payments:
+    base-url: https://api.tosspayments.com
+    widget-secret-key: test_sk_nRQoOaPz8LK6ZxMR2BZNry47BMw6

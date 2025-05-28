@@ -109,11 +109,14 @@ class MissionStepTest {
                 .statusCode(201)
                 .body("id", greaterThan(0));
 
-        Map<String, String> params = Map.of(
+        Map<String, Object> params = Map.of(
                 "memberId", "1",
                 "date", LocalDate.now().plusDays(1).toString(),
                 "themeId", "1",
-                "timeId", "1"
+                "timeId", "1",
+                "amount", 10000,
+                "orderId", "1234",
+                "paymentKey", "12345678"
         );
 
         RestAssured.given().log().all()
@@ -176,7 +179,8 @@ class MissionStepTest {
 
         jdbcTemplate.update("INSERT INTO reservation_item(date, theme_id, time_id) VALUES (?, ?, ?)",
                 "2023-08-05", 1, 1);
-        jdbcTemplate.update("INSERT INTO reservation (member_id, reservation_item_id, reservation_status) VALUES (?, ?, ?)",
+        jdbcTemplate.update(
+                "INSERT INTO reservation (member_id, reservation_item_id, reservation_status) VALUES (?, ?, ?)",
                 "1", 1, "ACCEPTED");
 
         List<ReservationResponse> reservations = RestAssured.given().log().all()
@@ -207,11 +211,14 @@ class MissionStepTest {
                 .statusCode(201)
                 .body("id", greaterThan(0));
 
-        Map<String, String> params = Map.of(
+        Map<String, Object> params = Map.of(
                 "memberId", "1",
                 "date", LocalDate.now().plusDays(1).toString(),
                 "themeId", "1",
-                "timeId", "1"
+                "timeId", "1",
+                "amount", 10000,
+                "orderId", "1234",
+                "paymentKey", "12345678"
         );
 
         RestAssured.given().log().all()
@@ -276,11 +283,14 @@ class MissionStepTest {
                 .statusCode(201)
                 .body("id", greaterThan(0));
 
-        Map<String, String> params = Map.of(
+        Map<String, Object> params = Map.of(
                 "memberId", "1",
                 "date", LocalDate.now().plusDays(1).toString(),
                 "themeId", "1",
-                "timeId", "1"
+                "timeId", "1",
+                "amount", 10000,
+                "orderId", "1234",
+                "paymentKey", "12345678"
         );
 
         RestAssured.given().log().all()

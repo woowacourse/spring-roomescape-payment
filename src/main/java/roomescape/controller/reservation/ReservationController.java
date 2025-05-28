@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.request.ReservationRequest;
 import roomescape.dto.response.ReservationResponse;
-import roomescape.service.payment.PaymentService;
 import roomescape.service.reservation.ReservationService;
+import roomescape.service.reservation.ReservingService;
 
 @RequiredArgsConstructor
 @RequestMapping("/reservations")
@@ -24,7 +24,7 @@ import roomescape.service.reservation.ReservationService;
 public class ReservationController {
 
     private final ReservationService reservationService;
-    private final PaymentService paymentService;
+    private final ReservingService reservingService;
 
 
     @GetMapping()
@@ -33,24 +33,24 @@ public class ReservationController {
     }
 
     @PostMapping()
-    public ResponseEntity<ReservationResponse> addReservation(@RequestBody @Valid final ReservationRequest request, final Long memberId) {
-        final CreateReservationRequest createReservationRequest = new CreateReservationRequest(
-                memberId,
+    public ResponseEntity<ReservationResponse> addReservation(@RequestBody @Valid final ReservationRequest request,
+                                                              final Long memberId) {
+        final ReservationResponse response = reservingService.reserve(
                 request.date(),
                 request.themeId(),
-                request.timeId()
+                request.timeId(),
+                request.paymentKey(),
+                request.orderId(),
+                request.amount(),
+                memberId
         );
-        // 결제 코드
-//        paymentService.approvePayment(request.paymentKey(), request.orderId(), request.amount());
-
-        // 예약 추가
-        final ReservationResponse response = reservationService.addReservation(createReservationRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/pending")
-    public ResponseEntity<ReservationResponse> addPendingReservation(@RequestBody @Valid final ReservationRequest request, final Long memberId) {
+    public ResponseEntity<ReservationResponse> addPendingReservation(
+            @RequestBody @Valid final ReservationRequest request, final Long memberId) {
         final CreateReservationRequest createReservationRequest = new CreateReservationRequest(
                 memberId,
                 request.date(),
