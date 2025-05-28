@@ -2,14 +2,10 @@ package roomescape.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestClient;
 import roomescape.domain.PaymentInfo;
 import roomescape.dto.PaymentRequest;
-import roomescape.exception.PaymentErrorResponse;
 import roomescape.exception.PaymentException;
-
-import java.io.IOException;
 
 public class PaymentClientService {
     private final RestClient restClient;

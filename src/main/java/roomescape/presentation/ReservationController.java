@@ -32,7 +32,8 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> createNewReservation(
             @Authenticated Long memberId,
             @Valid @RequestBody ReservationCreateRequest request) {
-        PaymentRequest paymentRequest = new PaymentRequest(request.amount(), request.paymentKey() ,request.orderId());
+        PaymentRequest paymentRequest = new PaymentRequest(request.amount(), request.paymentKey(), request.orderId());
+
         ReservationResponse reservationResponse = reservationService.createReservationForMember(
                 memberId, request.timeId(), request.themeId(), request.date(), paymentRequest
         );

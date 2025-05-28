@@ -1,10 +1,12 @@
 package roomescape.exception;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.ResourceAccessException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -19,6 +21,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handlePaymentException(PaymentException e) {
         ErrorResponse body = new ErrorResponse(e.getMessage());
         return ResponseEntity.status(e.getStatus()).body(body);
+    }
+
+    @ExceptionHandler(value = ResourceAccessException.class)
+    public ResponseEntity<ErrorResponse> handleSocketException(ResourceAccessException e) {
+        ErrorResponse body = new ErrorResponse("연결에 실패했습니다.");
+        return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).body(body);
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
