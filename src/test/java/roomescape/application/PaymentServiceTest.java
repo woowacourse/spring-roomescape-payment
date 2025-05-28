@@ -13,7 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.application.dto.PaymentProcessRequest;
-import roomescape.config.PaymentRestClient;
+import roomescape.infrastructure.thirdparty.PaymentRestClient;
 import roomescape.domain.Payment;
 import roomescape.infrastructure.repository.PaymentRepository;
 
