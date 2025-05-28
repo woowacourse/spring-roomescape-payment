@@ -14,6 +14,8 @@ import roomescape.member.domain.repository.MemberRepository;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.MemberReservationRequest;
 import roomescape.reservation.application.dto.MemberWaitingRequest;
+import roomescape.reservation.application.dto.PaymentRequest;
+import roomescape.reservation.application.dto.PaymentResponse;
 import roomescape.reservation.application.dto.ReservationResponse;
 import roomescape.reservation.application.dto.WaitingResponse;
 import roomescape.reservation.domain.Reservation;
@@ -22,9 +24,6 @@ import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.domain.repository.WaitingRepository;
-import roomescape.reservation.infrastructure.PaymentClient;
-import roomescape.reservation.infrastructure.dto.PaymentRequest;
-import roomescape.reservation.infrastructure.dto.PaymentResponse;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.repository.ThemeRepository;
 
@@ -126,7 +125,7 @@ public class ReservationCommandService {
             final ReservationTime time
     ) {
         if (reservationRepository.existsByDateAndTimeAndThemeAndMember(request.date(), time, theme, member) ||
-            waitingRepository.existsByDateAndTimeAndThemeAndMember(request.date(), time, theme, member)
+                waitingRepository.existsByDateAndTimeAndThemeAndMember(request.date(), time, theme, member)
         ) {
             throw new ConflictException("이미 예약 확정 및 대기 건수가 있습니다.");
         }

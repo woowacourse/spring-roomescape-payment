@@ -10,8 +10,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.reservation.infrastructure.dto.PaymentRequest;
-import roomescape.reservation.infrastructure.dto.PaymentResponse;
+import roomescape.reservation.application.PaymentClient;
+import roomescape.reservation.application.dto.PaymentRequest;
+import roomescape.reservation.application.dto.PaymentResponse;
 import roomescape.reservation.infrastructure.dto.TossErrorResponse;
 import roomescape.reservation.infrastructure.dto.TossPaymentRequest;
 

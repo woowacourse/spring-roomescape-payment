@@ -1,5 +1,7 @@
 package roomescape.reservation.infrastructure.dto;
 
+import roomescape.reservation.application.dto.PaymentRequest;
+
 public record TossPaymentRequest(
         Long amount,
         String orderId,
