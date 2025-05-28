@@ -10,9 +10,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.PaymentRestClient;
+import roomescape.payment.RestClientConfig;
+import roomescape.payment.dto.TossPaymentRequest;
+import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.MyPageReservationResponse;
-import roomescape.reservation.dto.ReservationRecipe;
+import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.theme.domain.ReservationTheme;
@@ -32,20 +36,22 @@ public class ReservationService {
     private final ReservationWaitingRepository reservationWaitingRepository;
     private final MemberRepository memberRepository;
     private final EntityManager entityManager;
+    private final RestClientConfig restClientConfig;
 
     @Transactional
-    public ReservationResponse addReservation(final ReservationRecipe recipe) {
-        long timeId = recipe.timeId();
-        final long themeId = recipe.themeId();
-        final LocalDate date = recipe.date();
+    public ReservationResponse addReservation(final long memberId, final ReservationPaymentRequest request) {
+        long timeId = request.timeId();
+        final long themeId = request.themeId();
+        final LocalDate date = request.date();
         validateDuplicateReservation(date, timeId, themeId);
-        final Member member = memberRepository.findById(recipe.memberId())
+        final Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 사용자 입니다."));
         final ReservationTime time = reservationTimeRepository.findById(timeId)
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 예약 시간 입니다."));
         final ReservationTheme theme = reservationThemeRepository.findById(themeId)
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 테마 입니다."));
         final Reservation reservation = new Reservation(member, date, time, theme);
+        approvePayment(request);
         Reservation saved = reservationRepository.save(reservation);
         return ReservationResponse.fromV2(saved);
     }
@@ -95,6 +101,12 @@ public class ReservationService {
                     convertWaitingToReservation(reservation);
                 }
         );
+    }
+
+    private void approvePayment(final ReservationPaymentRequest request) {
+        PaymentRestClient restClient = restClientConfig.getPaymentRestClient();
+        TossPaymentResponse tossPaymentResponse = restClient.requestPaymentApprove(
+                new TossPaymentRequest(request.orderId(), request.paymentKey(), request.amount()));
     }
 
     private void convertWaitingToReservation(final Reservation reservation) {

@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.payment.RestClientConfig;
 import roomescape.reservation.dto.MyPageReservationResponse;
+import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.dto.ReservationRecipe;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
@@ -33,10 +35,9 @@ public class ReservationController {
     }
 
     @PostMapping("/reservations")
-    public ResponseEntity<ReservationResponse> addReservation(@RequestBody @Valid final ReservationRequest request,
+    public ResponseEntity<ReservationResponse> addReservation(@RequestBody @Valid final ReservationPaymentRequest request,
                                                               final Long memberId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.addReservation(
-                new ReservationRecipe(memberId, request.date(), request.themeId(), request.timeId())));
+        return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.addReservation(memberId, request));
     }
 
     @DeleteMapping("/reservations/{id}")
@@ -45,12 +46,12 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PostMapping("/admin/reservations")
-    public ResponseEntity<ReservationResponse> addReservationForAdmin(
-            @RequestBody @Valid final ReservationRecipe recipe) {
-        ReservationResponse response = reservationService.addReservation(recipe);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
+//    @PostMapping("/admin/reservations")
+//    public ResponseEntity<ReservationResponse> addReservationForAdmin(
+//            @RequestBody @Valid final ReservationRecipe recipe) {
+//        ReservationResponse response = reservationService.addReservation(recipe);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+//    }
 
     @GetMapping("/admin/reservations")
     public ResponseEntity<List<ReservationResponse>> getReservationsByFilterForAdmin(
