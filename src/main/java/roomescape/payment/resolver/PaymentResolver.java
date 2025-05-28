@@ -28,7 +28,7 @@ public class PaymentResolver {
         } catch (RestClientResponseException e) {
             exceptionable(e, request.paymentKey());
         }
-        throw new RuntimeException("[ERROR] 결제 과정 중 에러가 발생했습니다.");
+        throw new RuntimeException("결제 과정 중 에러가 발생했습니다.");
     }
 
     private void exceptionable(final RestClientResponseException e, final String paymentKey) {
@@ -38,11 +38,11 @@ public class PaymentResolver {
             String errorMessage = jsonNode.get("message").asText();
 
             if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {  // todo: 예외 처리 커스텀 추가?
-                throw new RuntimeException("[ERROR] 결제 확인에 실패했습니다. " + errorMessage + " - 결제 키: " + paymentKey);
+                throw new RuntimeException("결제 확인에 실패했습니다. " + errorMessage + " - 결제 키: " + paymentKey);
             }
             throw new PaymentApiException(responseBody, errorMessage, e.getStatusCode());
         } catch (JsonProcessingException parseException) {
-            throw new RuntimeException("[ERROR] 파싱에 실패했습니다." + e.getMessage());
+            throw new RuntimeException("파싱에 실패했습니다." + e.getMessage());
         }
     }
 }
