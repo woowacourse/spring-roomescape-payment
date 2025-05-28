@@ -18,11 +18,11 @@ public class Payment {
 
     private long amount;
 
-    public Payment(String orderId, Long amount) {
+    public Payment(String orderId, long amount) {
         this(null, orderId, amount);
     }
 
-    public Payment(Long id, String orderId, Long amount) {
+    public Payment(Long id, String orderId, long amount) {
         this.id = id;
         this.orderId = orderId;
         this.amount = amount;
