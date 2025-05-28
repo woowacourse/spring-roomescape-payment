@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PaymentApproveException.class)
     public ResponseEntity<ErrorResponse> handle(PaymentApproveException e) {
-        logger.warn("Handled AuthorizationException: {}", e.getMessage());
+        logger.warn("Handled PaymentApproveException: {}", e.getMessage());
         return ErrorResponse.securedResponse(HttpStatus.FORBIDDEN, e.getMessage()).toResponseEntity();
     }
 
