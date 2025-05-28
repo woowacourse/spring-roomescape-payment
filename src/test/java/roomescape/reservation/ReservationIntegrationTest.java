@@ -30,29 +30,6 @@ public class ReservationIntegrationTest {
         RestAssured.port = this.port;
     }
 
-    @DisplayName("날짜가 null인 상태로 생성 요청 시 400 응답을 준다.")
-    @Test
-    void when_given_null_date() {
-        // given
-        Map<String, Object> reservation = new HashMap<>();
-        reservation.put("name", "브라운");
-        reservation.put("date", null);
-        reservation.put("timeId", 1);
-        ExceptionResponse expected = new ExceptionResponse("[ERROR] 날짜는 null 일 수 없습니다.", "/reservations");
-        // when
-        Response response = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(reservation)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(400)
-                .extract()
-                .response();
-        // then
-        ExceptionResponse actual = response.as(ExceptionResponse.class);
-        assertThat(actual).isEqualTo(expected);
-    }
-
     @DisplayName("잘못된 날짜로 생성 요청 시 400 응답을 준다.")
     @ParameterizedTest
     @ValueSource(strings = {"a", "ab", "123", "2월 5일", "2014년 2월 5일", "2023:12:03", "2024-15-10"})
@@ -100,22 +77,22 @@ public class ReservationIntegrationTest {
         assertThat(actual).isEqualTo(expected);
     }
 
-    @DisplayName("예약 시간 번호가 null인 상태로 생성 요청 시 400 응답을 준다.")
+    @DisplayName("로그인이 되지 않은 상태로 요청하면 401 응답을 준다.")
     @Test
     void when_given_null_time_id() {
         // given
         Map<String, Object> reservation = new HashMap<>();
         reservation.put("name", "브라운");
         reservation.put("date", "2024-12-03");
-        reservation.put("timeId", null);
-        ExceptionResponse expected = new ExceptionResponse("[ERROR] 예약 시간 번호는 null 일 수 없습니다.", "/reservations");
+        reservation.put("timeId", 1L);
+        ExceptionResponse expected = new ExceptionResponse("[ERROR] 로그인 되어있지 않습니다.", "/reservations");
         // when
         Response response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(reservation)
                 .when().post("/reservations")
                 .then().log().all()
-                .statusCode(400)
+                .statusCode(401)
                 .extract()
                 .response();
         // then

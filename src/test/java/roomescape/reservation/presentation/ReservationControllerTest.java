@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,13 +19,16 @@ import roomescape.common.config.TossPaymentClientConfig;
 import roomescape.common.exception.PaymentException;
 import roomescape.member.dto.request.LoginMember;
 import roomescape.member.service.LoginService;
+import roomescape.payment.client.TossPaymentTestConfig;
 import roomescape.payment.client.dto.request.TossPaymentConfirmRequest;
 import roomescape.payment.client.TossPaymentClient;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.service.ReservationService;
 
 import org.junit.jupiter.api.Test;
 
 @WebMvcTest(ReservationController.class)
+@Import(TossPaymentTestConfig.class)
 class ReservationControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -36,16 +40,16 @@ class ReservationControllerTest {
     private ReservationService reservationService;
 
     @MockitoBean
-    private TossPaymentClient paymentService;
+    private TossPaymentClient tossPaymentClient;
 
     @MockitoBean
     private LoginService loginService;
 
     @MockitoBean
-    private ReservationConfig reservationConfig;
+    private PaymentService paymentService;
 
     @MockitoBean
-    private TossPaymentClientConfig tossPaymentClientConfig;
+    private ReservationConfig reservationConfig;
 
     @Test
     void 결제_승인_실패시_예외가_발생한다() throws Exception {
@@ -58,7 +62,7 @@ class ReservationControllerTest {
         LoginMember loginMember = new LoginMember(1L, "포라");
 
         // when
-        when(paymentService.confirmPayment(request))
+        when(tossPaymentClient.confirmPayment(request))
                 .thenThrow(new PaymentException("결제 실패!"));
         String jsonContent = objectMapper.writeValueAsString(request);
 
@@ -70,6 +74,4 @@ class ReservationControllerTest {
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().string(containsString("결제 실패!")));
     }
-
-
 }
