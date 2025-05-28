@@ -25,9 +25,13 @@ public class ReservationIntegrationTest {
         Map<String, Object> reservation = new HashMap<>();
         reservation.put("name", "브라운");
         reservation.put("date", null);
-        reservation.put("timeId", 1);
+        reservation.put("themeId", 1L);
+        reservation.put("timeId", 1L);
+        reservation.put("paymentKey", "paymentKey");
+        reservation.put("orderId", "orderId");
+        reservation.put("amount", 1000);
 
-        ExceptionResponse expected = new ExceptionResponse(400, "[ERROR] 날짜는 null 일 수 없습니다.", "/reservations");
+        ExceptionResponse expected = new ExceptionResponse(400, "날짜는 null 일 수 없습니다.", "/reservations");
 
         Response response = RestAssured.given().log().all()
             .cookie("token", extractTokenOfAdminLoginMember())
@@ -102,7 +106,7 @@ public class ReservationIntegrationTest {
         reservation.put("orderId", "orderId");
         reservation.put("amount", 1000);
 
-        ExceptionResponse expected = new ExceptionResponse(400, "[ERROR] 예약 시간 번호는 null 일 수 없습니다.", "/reservations");
+        ExceptionResponse expected = new ExceptionResponse(400, "예약 시간 번호는 null 일 수 없습니다.", "/reservations");
 
         Response response = RestAssured.given().log().all()
                 .cookie("token", extractTokenOfAdminLoginMember())

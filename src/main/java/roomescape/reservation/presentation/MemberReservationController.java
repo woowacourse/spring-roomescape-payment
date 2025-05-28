@@ -4,10 +4,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.validation.Valid;
 import org.apache.catalina.connector.Response;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import roomescape.auth.login.presentation.dto.LoginMemberInfo;
 import roomescape.auth.login.presentation.dto.annotation.LoginMember;
@@ -64,6 +67,19 @@ public class MemberReservationController {
         ExceptionResponse exceptionResponse = new ExceptionResponse(
             400, "[ERROR] 요청 날짜 형식이 맞지 않습니다.", request.getRequestURI()
         );
+        return ResponseEntity.badRequest().body(exceptionResponse);
+    }
+
+    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    public ResponseEntity<ExceptionResponse> checkNull(final MethodArgumentNotValidException e, final HttpServletRequest request) {
+        String message = Optional.ofNullable(e.getBindingResult().getFieldError())
+            .map(FieldError::getDefaultMessage)
+            .orElse("유효하지 않은 요청입니다.");
+
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+            400, message, request.getRequestURI()
+        );
+
         return ResponseEntity.badRequest().body(exceptionResponse);
     }
 }
