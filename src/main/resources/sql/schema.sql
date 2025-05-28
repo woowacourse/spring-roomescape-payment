@@ -50,3 +50,13 @@ CREATE TABLE IF NOT EXISTS waiting
     FOREIGN KEY (member_id) REFERENCES member (id)
 );
 
+CREATE TABLE IF NOT EXISTS payment
+(
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    order_id VARCHAR(255) NOT NULL UNIQUE,
+    payment_key VARCHAR(255) NOT NULL UNIQUE,
+    amount BIGINT NOT NULL,
+    reservation_id BIGINT,
+    PRIMARY KEY (id),
+    FOREIGN KEY (reservation_id) REFERENCES reservation (id)
+);
