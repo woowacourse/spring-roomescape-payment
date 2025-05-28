@@ -13,15 +13,18 @@ import roomescape.payment.interceptor.PaymentResponseInterceptor;
 import roomescape.payment.service.PaymentClient;
 
 @Configuration
-public class PaymentConfig {
+public class TossPaymentConfig {
 
     private static final String COLON = ":";
     private static final int CONNECT_TIMEOUT_MS = 3000;
+    private static final String PAYMENT_URL = "https://api.tosspayments.com/v1/payments";
+    private static final String AUTHORIZATION_HEADER_PREFIX = "Authorization";
+    private static final String BASIC_AUTHENTICATION_PREFIX = "Basic ";
 
     private final ObjectMapper objectMapper;
     private final String token;
 
-    public PaymentConfig(ObjectMapper objectMapper, @Value("${payment.token}") String token) {
+    public TossPaymentConfig(ObjectMapper objectMapper, @Value("${payment.token}") String token) {
         this.objectMapper = objectMapper;
         this.token = token;
     }
@@ -32,10 +35,10 @@ public class PaymentConfig {
         requestFactory.setConnectTimeout(CONNECT_TIMEOUT_MS);
 
         RestClient client = RestClient.builder()
-                .baseUrl("https://api.tosspayments.com/v1/payments")
+                .baseUrl(PAYMENT_URL)
                 .requestInterceptor(new PaymentResponseInterceptor(objectMapper))
                 .requestFactory(requestFactory)
-                .defaultHeader("Authorization", "Basic " + Base64.getEncoder()
+                .defaultHeader(AUTHORIZATION_HEADER_PREFIX, BASIC_AUTHENTICATION_PREFIX + Base64.getEncoder()
                         .encodeToString(((token + COLON).getBytes())))
                 .build();
 
