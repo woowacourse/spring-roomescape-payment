@@ -28,7 +28,7 @@ import roomescape.fixture.db.MemberDbFixture;
 import roomescape.fixture.db.ReservationDateTimeDbFixture;
 import roomescape.fixture.db.ThemeDbFixture;
 import roomescape.payment.dto.PaymentResponse;
-import roomescape.payment.service.PaymentService;
+import roomescape.payment.service.TossPaymentService;
 import roomescape.reservation.controller.exception.ReservationExceptionHandler;
 import roomescape.reservation.controller.request.ReservePaymentRequest;
 import roomescape.reservation.domain.ReservationDateTime;
@@ -56,7 +56,7 @@ class ReservationApiTest {
     private ReservationDateTimeDbFixture reservationDateTimeDbFixture;
 
     @MockitoBean
-    private PaymentService paymentService;
+    private TossPaymentService tossPaymentService;
 
     @BeforeEach
     void setUp() {
@@ -71,7 +71,7 @@ class ReservationApiTest {
         ReservationDateTime reservationDateTime = reservationDateTimeDbFixture.내일_열시();
         Long timeId = reservationDateTime.getReservationTime().getId();
 
-        given(paymentService.confirmPayment(any()))
+        given(tossPaymentService.confirmPayment(any()))
                 .willReturn(mock(PaymentResponse.class));
 
         ReservePaymentRequest request = ReservePaymentRequest.builder()
@@ -92,7 +92,7 @@ class ReservationApiTest {
                 .then().log().all()
                 .statusCode(201);
 
-        verify(paymentService, times(1)).confirmPayment(any());
+        verify(tossPaymentService, times(1)).confirmPayment(any());
     }
 
     @Test
