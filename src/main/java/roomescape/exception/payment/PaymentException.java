@@ -13,6 +13,11 @@ public class PaymentException extends RuntimeException {
     private final HttpStatus status;
     private final String message;
 
+    public PaymentException(final HttpStatusCode statusCode, final String message) {
+        this.status = HttpStatus.valueOf(statusCode.value());
+        this.message = message;
+    }
+
     public PaymentException(final HttpStatusCode statusCode, final String code, final String message) {
         this.status = HttpStatus.valueOf(statusCode.value());
         this.message = resolvePaymentErrorMessage(code, message);

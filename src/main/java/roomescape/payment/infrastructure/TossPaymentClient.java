@@ -1,10 +1,13 @@
 package roomescape.payment.infrastructure;
 
+import static org.springframework.http.HttpStatus.GATEWAY_TIMEOUT;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
 import java.util.Base64;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.payment.PaymentException;
 import roomescape.payment.domain.PaymentClient;
@@ -27,23 +30,27 @@ public class TossPaymentClient implements PaymentClient {
         final ApproveTossPaymentRequest request = ApproveTossPaymentRequest.from(paymentInfo);
         final String encodedSecretKey = getEncodedSecretKey();
 
-        restClient.post()
-                .uri(CONFIRM_URL)
-                .header("Authorization", encodedSecretKey)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(request)
-                .retrieve()
-                .onStatus((status) -> status.value() != HttpStatus.OK.value(), (req, res) -> {
-                    InputStream body = res.getBody();
-                    TossPaymentErrorResponse errorResponse
-                            = objectMapper.readValue(body, TossPaymentErrorResponse.class);
-                    throw new PaymentException(
-                            res.getStatusCode(),
-                            errorResponse.code(),
-                            errorResponse.message()
-                    );
-                })
-                .toBodilessEntity();
+        try {
+            restClient.post()
+                    .uri(CONFIRM_URL)
+                    .header("Authorization", encodedSecretKey)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .retrieve()
+                    .onStatus((status) -> status.value() != HttpStatus.OK.value(), (req, res) -> {
+                        InputStream body = res.getBody();
+                        TossPaymentErrorResponse errorResponse
+                                = objectMapper.readValue(body, TossPaymentErrorResponse.class);
+                        throw new PaymentException(
+                                res.getStatusCode(),
+                                errorResponse.code(),
+                                errorResponse.message()
+                        );
+                    })
+                    .toBodilessEntity();
+        } catch (ResourceAccessException e) {
+            throw new PaymentException(GATEWAY_TIMEOUT, "결제 API가 응답하지 않습니다.");
+        }
     }
 
     private String getEncodedSecretKey() {
