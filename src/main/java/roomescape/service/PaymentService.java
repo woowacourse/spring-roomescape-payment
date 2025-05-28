@@ -26,7 +26,7 @@ public class PaymentService {
         String authorizations = getAuthorizationToken();
 
         return restClient.post()
-                .uri("/v1/payment/confirm")
+                .uri("/v1/payments/confirm")
                 .header("Authorization", authorizations)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(paymentRequest)
