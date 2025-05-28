@@ -31,6 +31,12 @@ public class ExceptionHandlerAdvice {
                 .body(new ErrorResponse("PAYMENT_CLIENT_ERROR", e.getMessage()));
     }
 
+    @ExceptionHandler(PaymentBadRequestException.class)
+    public ResponseEntity<PaymentBadRequestException> handlePaymentBadRequestException(PaymentBadRequestException exception) {
+        return ResponseEntity.badRequest()
+                .body(exception);
+    }
+
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEntityNotFoundException(final EntityNotFoundException e) {
         return ResponseEntity
