@@ -73,7 +73,7 @@ public class ReservationService {
         validateCanReserveDateTime(reservation, dateTime.now());
 
         PaymentRequest paymentRequest = new PaymentRequest(request.paymentKey(), request.orderId(), request.amount());
-        paymentService.requestPayment(paymentRequest);
+        paymentService.confirmPayment(paymentRequest);
 
         reservation = reservationRepository.save(reservation);
 
