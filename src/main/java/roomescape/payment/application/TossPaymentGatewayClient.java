@@ -1,6 +1,9 @@
 package roomescape.payment.application;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -20,14 +23,15 @@ public class TossPaymentGatewayClient {
     public TossPaymentGatewayClient() {
         this.restClient = RestClient.builder()
             .baseUrl(BASE_URL)
-            .defaultHeader("Authorization", encodeSecretKey("test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"))
-            .defaultHeader("Content-Type", "application/json")
+            .defaultHeader(AUTHORIZATION, encodeSecretKey("test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"))
+            .defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
             .build();
     }
 
     private String encodeSecretKey(final String secretKey) {
         final String raw = secretKey + ":";
-        final String encoded = Base64.getEncoder().encodeToString(raw.getBytes(StandardCharsets.UTF_8));
+        final String encoded = Base64.getEncoder()
+            .encodeToString(raw.getBytes(StandardCharsets.UTF_8));
         return "Basic " + encoded;
     }
 
