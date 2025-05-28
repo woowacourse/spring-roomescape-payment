@@ -1,5 +1,6 @@
 package roomescape.common.exception;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,14 +11,13 @@ import roomescape.common.exception.impl.BadRequestException;
 import roomescape.common.exception.impl.ConflictException;
 import roomescape.common.exception.impl.ForbiddenException;
 import roomescape.common.exception.impl.NotFoundException;
-import roomescape.common.exception.impl.SeverErrorException;
+import roomescape.common.exception.impl.TossV1RequestException;
 import roomescape.common.exception.impl.UnauthorizedException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(
-        GlobalExceptionHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handle(final Exception e) {
@@ -25,10 +25,10 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("서버 내부에 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(SeverErrorException.class)
-    public ResponseEntity<String> handle(final SeverErrorException e) {
-        log.error(e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    @ExceptionHandler(TossV1RequestException.class)
+    public ResponseEntity<String> handle(final TossV1RequestException e) {
+        log.error("toss api exception : " + "code : " + e.getCode() + ", message :" + e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), e.getStatus());
     }
 
     @ExceptionHandler(BadRequestException.class)

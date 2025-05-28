@@ -9,12 +9,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestClient;
-import roomescape.common.exception.impl.BadRequestException;
-import roomescape.common.exception.impl.SeverErrorException;
+import roomescape.common.exception.impl.TossV1RequestException;
 import roomescape.payment.application.dto.TossConfirmRequest;
 import roomescape.payment.application.dto.TossConfirmResponse;
 import roomescape.payment.application.dto.TossErrorResponse;
@@ -31,7 +31,7 @@ public class TossPaymentGatewayClient {
     public TossPaymentGatewayClient(final ObjectMapper objectMapper) {
         this.restClient = RestClient.builder()
             .baseUrl(BASE_URL)
-            .defaultHeader(AUTHORIZATION, encodeSecretKey("test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"))
+            .defaultHeader(AUTHORIZATION, encodeSecretKey("test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw"))
             .defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
             .build();
         this.objectMapper = objectMapper;
@@ -52,11 +52,11 @@ public class TossPaymentGatewayClient {
             .retrieve()
             .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
                 TossErrorResponse error = deserializeError(res.getBody());
-                throw new BadRequestException(error.message());
+                throw new TossV1RequestException(HttpStatus.BAD_REQUEST, error.code(), error.message());
             })
             .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
                 TossErrorResponse error = deserializeError(res.getBody());
-                throw new SeverErrorException(error.message());
+                throw new TossV1RequestException(HttpStatus.INTERNAL_SERVER_ERROR, error.code(), error.message());
             })
             .body(TossConfirmResponse.class);
     }
