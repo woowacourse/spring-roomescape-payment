@@ -5,6 +5,7 @@ import java.net.URI;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 
+import jakarta.validation.Valid;
 import org.apache.catalina.connector.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +29,7 @@ public class MemberReservationController {
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> createReservation(
-        @RequestBody final ReservationRequest request,
+        @Valid @RequestBody final ReservationRequest request,
         @LoginMember final LoginMemberInfo memberInfo)
     {
         ReservationResponse response = reservationService.createReservation(request, memberInfo.id());

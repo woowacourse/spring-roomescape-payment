@@ -2,6 +2,7 @@ package roomescape.reservation;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +30,7 @@ public class ReservationIntegrationTest {
         ExceptionResponse expected = new ExceptionResponse(400, "[ERROR] 날짜는 null 일 수 없습니다.", "/reservations");
 
         Response response = RestAssured.given().log().all()
+            .cookie("token", extractTokenOfAdminLoginMember())
                 .contentType(ContentType.JSON)
                 .body(reservation)
                 .when().post("/reservations")
@@ -94,11 +96,16 @@ public class ReservationIntegrationTest {
         Map<String, Object> reservation = new HashMap<>();
         reservation.put("name", "브라운");
         reservation.put("date", "2024-12-03");
+        reservation.put("themeId", 1L);
         reservation.put("timeId", null);
+        reservation.put("paymentKey", "paymentKey");
+        reservation.put("orderId", "orderId");
+        reservation.put("amount", 1000);
 
         ExceptionResponse expected = new ExceptionResponse(400, "[ERROR] 예약 시간 번호는 null 일 수 없습니다.", "/reservations");
 
         Response response = RestAssured.given().log().all()
+                .cookie("token", extractTokenOfAdminLoginMember())
                 .contentType(ContentType.JSON)
                 .body(reservation)
                 .when().post("/reservations")
@@ -118,5 +125,26 @@ public class ReservationIntegrationTest {
                 .when().delete("/reservations/10")
                 .then().log().all()
                 .statusCode(400);
+    }
+
+    private String extractTokenOfAdminLoginMember() {
+        final Map<String, String> loginParams = new HashMap<>();
+        loginParams.put("email", "member1@email.com");
+        loginParams.put("password", "password");
+
+        final ExtractableResponse<Response> response = RestAssured.given().log().all()
+            .contentType(ContentType.JSON)
+            .body(loginParams)
+            .when().post("/login")
+            .then().log().all()
+            .statusCode(200)
+            .extract();
+
+        String token = response.cookie("token");
+        if (token == null) {
+            throw new IllegalStateException("로그인 응답에서 토큰 쿠키를 찾을 수 없습니다.");
+        }
+
+        return token;
     }
 }

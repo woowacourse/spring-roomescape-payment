@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.web.client.RestClient;
 import roomescape.auth.login.presentation.dto.LoginMemberInfo;
 import roomescape.common.util.time.DateTime;
 import roomescape.member.domain.MemberRepository;
@@ -263,8 +264,13 @@ class ReservationServiceTest {
         }
 
         @Bean
+        public RestClient restClient() {
+            return RestClient.builder().baseUrl("https://api.tosspayments.com").build();
+        }
+
+        @Bean
         public PaymentClient paymentClient() {
-            return new TossPaymentClient();
+            return new TossPaymentClient("test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6", restClient());
         }
 
         @Bean

@@ -14,14 +14,14 @@ import roomescape.reservation.presentation.dto.PaymentResponse;
 @Component
 public class TossPaymentClient implements PaymentClient {
 
-    @Value("${payment.toss.secret-key}")
     private String secretKey;
     private final RestClient restClient;
 
-    public TossPaymentClient() {
-        this.restClient = RestClient.builder()
-                .baseUrl("https://api.tosspayments.com")
-                .build();
+    public TossPaymentClient(
+        @Value("payment.toss.secret-key")String secretKey,
+        RestClient restClient) {
+        this.secretKey = secretKey;
+        this.restClient = restClient;
     }
 
     @Override
