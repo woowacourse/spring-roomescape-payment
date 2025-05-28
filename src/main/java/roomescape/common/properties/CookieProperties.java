@@ -1,4 +1,4 @@
-package roomescape.common.config;
+package roomescape.common.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

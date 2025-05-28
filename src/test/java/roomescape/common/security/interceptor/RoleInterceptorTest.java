@@ -11,7 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
-import roomescape.common.config.JwtProperties;
+import roomescape.common.properties.JwtProperties;
 import roomescape.common.security.dto.request.MemberInfo;
 import roomescape.common.security.exception.ForbiddenException;
 import roomescape.common.security.exception.UnAuthorizedException;

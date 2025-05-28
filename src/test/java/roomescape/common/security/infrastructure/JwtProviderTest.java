@@ -6,7 +6,7 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import roomescape.common.config.JwtProperties;
+import roomescape.common.properties.JwtProperties;
 import roomescape.common.security.dto.request.MemberInfo;
 import roomescape.common.security.exception.UnAuthorizedException;
 import roomescape.member.domain.MemberRole;

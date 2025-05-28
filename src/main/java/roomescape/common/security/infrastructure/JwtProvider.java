@@ -11,7 +11,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
-import roomescape.common.config.JwtProperties;
+import roomescape.common.properties.JwtProperties;
 import roomescape.common.security.dto.request.MemberInfo;
 import roomescape.common.security.exception.UnAuthorizedException;
 import roomescape.member.domain.MemberRole;

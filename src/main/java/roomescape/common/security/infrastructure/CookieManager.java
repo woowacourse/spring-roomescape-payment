@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
-import roomescape.common.config.CookieProperties;
+import roomescape.common.properties.CookieProperties;
 
 @Component
 @EnableConfigurationProperties(CookieProperties.class)

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseCookie;
 import org.springframework.mock.web.MockHttpServletResponse;
-import roomescape.common.config.CookieProperties;
+import roomescape.common.properties.CookieProperties;
 
 class CookieManagerTest {
 
