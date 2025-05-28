@@ -1,9 +1,8 @@
-package roomescape.order.dto;
+package roomescape.payment.dto;
 
 public record PaymentConfirmRequest(
         String orderId,
         Long amount,
         String paymentKey
 ) {
-
 }

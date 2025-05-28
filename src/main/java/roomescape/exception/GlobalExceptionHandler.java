@@ -9,11 +9,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import roomescape.exception.custom.reason.payment.PaymentException;
 import roomescape.exception.custom.status.CustomException;
 
 import java.util.stream.Collectors;
-
-import static roomescape.order.PaymentClient.PaymentException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {

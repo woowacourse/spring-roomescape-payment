@@ -14,8 +14,8 @@ import roomescape.member.Member;
 import roomescape.member.MemberService;
 import roomescape.order.Order;
 import roomescape.order.OrderReader;
-import roomescape.order.PaymentClient;
-import roomescape.order.dto.PaymentConfirmRequest;
+import roomescape.payment.PaymentClient;
+import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.schedule.Schedule;
 import roomescape.schedule.ScheduleService;
 
