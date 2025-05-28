@@ -1,5 +1,6 @@
 package roomescape.service.command;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -7,6 +8,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -64,10 +67,11 @@ public class ReservationTimeCommandServiceTest {
         LocalTime startAt = LocalTime.of(14, 0);
         ReservationTimeCreateRequestDto requestDto = new ReservationTimeCreateRequestDto(startAt);
 
-        when(reservationTimeRepository.save(any(ReservationTime.class))).thenThrow(new IllegalStateException("중복된 시간입니다."));
+        when(reservationTimeRepository.existsByStartAt(any(LocalTime.class))).thenReturn(true);
 
         // when & then
-        assertThrows(DuplicateContentException.class, () -> reservationTimeCommandService.createReservationTime(requestDto));
+        assertThatThrownBy(() -> reservationTimeCommandService.createReservationTime(requestDto))
+                .isInstanceOf(DuplicateContentException.class);
     }
 
     @DisplayName("예약 시간 삭제 성공 테스트")
@@ -93,6 +97,7 @@ public class ReservationTimeCommandServiceTest {
         Long timeId = 1L;
 
         when(reservationRepository.existsByTimeId(timeId)).thenReturn(true);
+        when(reservationTimeRepository.existsById(any(Long.class))).thenReturn(true);
 
         // when & then
         assertThrows(IllegalStateException.class, () -> reservationTimeCommandService.deleteReservationTimeById(timeId));

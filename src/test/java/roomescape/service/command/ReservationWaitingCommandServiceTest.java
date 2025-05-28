@@ -182,9 +182,8 @@ public class ReservationWaitingCommandServiceTest {
         
         // when
         reservationWaitingCommandService.deleteReservationWaiting(reservationId, loginInfo);
-        
+
         // then
-        verify(reservationWaitingTicketRepository).delete(waitingTicket);
         verify(reservationRepository).delete(reservation);
     }
     

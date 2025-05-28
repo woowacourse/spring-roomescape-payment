@@ -100,7 +100,6 @@ class ReservationTimeControllerTest {
     }
 
     @Nested
-    @Disabled
     @DisplayName("예약시간 삭제")
     class DeleteReservationTimeTest {
 
@@ -111,6 +110,7 @@ class ReservationTimeControllerTest {
             ReservationTimeCreateRequestDto requestTime = new ReservationTimeCreateRequestDto(reservationTime);
 
             RestAssured.given().log().all()
+                    .cookie("token", loginToken)
                     .contentType(ContentType.JSON)
                     .body(requestTime)
                     .when().post("/times")
@@ -118,21 +118,24 @@ class ReservationTimeControllerTest {
                     .statusCode(201);
 
             RestAssured.given().log().all()
-                    .when().delete("/times/1")
+                    .cookie("token", loginToken)
+                    .when().delete("/times/2")
                     .then().log().all()
                     .statusCode(204);
 
             RestAssured.given().log().all()
+                    .cookie("token", loginToken)
                     .when().get("/times")
                     .then().log().all()
                     .statusCode(200)
-                    .body("size()", is(0));
+                    .body("size()", is(1));
         }
 
         @DisplayName("존재하지 않는 Id의 Time 을 삭제할 수 없다")
         @Test
         void invalidTimeIdTest() {
             RestAssured.given().log().all()
+                    .cookie("token", loginToken)
                     .when().delete("/times/5")
                     .then().log().all()
                     .statusCode(404);
