@@ -2,6 +2,9 @@ package roomescape.reservation.acceptance;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -13,10 +16,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.helper.TestHelper;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.ReservationAdminCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.entity.ReservationTime;
@@ -41,8 +46,14 @@ class ReservationAcceptanceTest {
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
 
+    @MockitoBean
+    private PaymentService paymentService;
+
     @BeforeEach
     void setUp() {
+        paymentService = mock(PaymentService.class);
+        when(paymentService.confirmPayment(any(), any(), any()))
+                .thenReturn(123L);
         Member member = new Member(DEFAULT_NAME, DEFAULT_EMAIL, DEFAULT_PASSWORD, RoleType.ADMIN);
         memberRepository.save(member);
         Theme theme = new Theme("테마", "설명", "썸네일");
@@ -59,7 +70,11 @@ class ReservationAcceptanceTest {
         var reservationRequest = new ReservationCreateRequest(
                 LocalDate.now().plusDays(1),
                 1L,
-                1L
+                1L,
+                "any",
+                "1",
+                100L,
+                "any"
         );
 
         // when & then
@@ -79,7 +94,11 @@ class ReservationAcceptanceTest {
         var reservationRequest = new ReservationCreateRequest(
                 LocalDate.now().plusDays(1),
                 1L,
-                1L
+                1L,
+                "any",
+                "1",
+                100L,
+                "any"
         );
         TestHelper.postWithToken("/reservations", reservationRequest, token);
 
@@ -98,7 +117,11 @@ class ReservationAcceptanceTest {
         var reservationRequest = new ReservationCreateRequest(
                 LocalDate.now().plusDays(1),
                 1L,
-                1L
+                1L,
+                "any",
+                "1",
+                100L,
+                "any"
         );
         TestHelper.postWithToken("/reservations", reservationRequest, token);
 
@@ -122,7 +145,11 @@ class ReservationAcceptanceTest {
         var reservationRequest = new ReservationCreateRequest(
                 LocalDate.now().plusDays(1),
                 1L,
-                1L
+                1L,
+                "any",
+                "1",
+                100L,
+                "any"
         );
 
         TestHelper.postWithToken("/reservations", reservationRequest, token);
@@ -146,7 +173,11 @@ class ReservationAcceptanceTest {
         var reservationRequest = new ReservationCreateRequest(
                 LocalDate.now().plusDays(1),
                 1L,
-                1L
+                1L,
+                "any",
+                "1",
+                100L,
+                "any"
         );
         TestHelper.postWithToken("/reservations", reservationRequest, token);
         String url = String.format("/admin/reservations/filtered?themeId=%d&memberId=%d&dateFrom=%s&dateTo=%s",
@@ -172,7 +203,11 @@ class ReservationAcceptanceTest {
         var reservationRequest = new ReservationCreateRequest(
                 LocalDate.now().plusDays(1),
                 1L,
-                1L
+                1L,
+                "any",
+                "1",
+                100L,
+                "any"
         );
 
         TestHelper.postWithToken("/reservations", reservationRequest, token);

@@ -3,12 +3,15 @@ package roomescape.reservation.unit.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import roomescape.global.error.exception.BadRequestException;
@@ -16,6 +19,7 @@ import roomescape.global.error.exception.ConflictException;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.ReservationAdminCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationFindFilteredRequest;
@@ -49,14 +53,20 @@ class ReservationServiceTest {
     @Autowired
     private WaitingRepository waitingRepository;
 
+    @Mock
+    private PaymentService paymentService;
+
     @BeforeEach
     void setUp() {
+        given(paymentService.confirmPayment(any(), any(), any()))
+                .willReturn(123L);
         reservationService = new ReservationService(
                 reservationRepository,
                 reservationTimeRepository,
                 themeRepository,
                 memberRepository,
-                waitingRepository
+                waitingRepository,
+                paymentService
         );
     }
 
@@ -70,7 +80,11 @@ class ReservationServiceTest {
         var request = new ReservationCreateRequest(
                 LocalDate.now().plusDays(1),
                 time.getId(),
-                theme.getId()
+                theme.getId(),
+                "any",
+                "1",
+                100L,
+                "any"
         );
 
         // when
@@ -119,7 +133,11 @@ class ReservationServiceTest {
         var request = new ReservationCreateRequest(
                 LocalDate.now().minusDays(1),
                 time.getId(),
-                theme.getId()
+                theme.getId(),
+                "any",
+                "1",
+                100L,
+                "any"
         );
 
         // when & then
@@ -136,7 +154,15 @@ class ReservationServiceTest {
         var time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
         var theme = themeRepository.save(new Theme("테마1", "테마1 설명", "테마1 썸네일"));
         var date = LocalDate.now().plusDays(1);
-        var request = new ReservationCreateRequest(date, time.getId(), theme.getId());
+        var request = new ReservationCreateRequest(
+                date,
+                time.getId(),
+                theme.getId(),
+                "any",
+                "1",
+                100L,
+                "any"
+        );
         reservationService.createReservation(member.getId(), request);
 
         // when & then
@@ -153,7 +179,15 @@ class ReservationServiceTest {
         var time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
         var theme = themeRepository.save(new Theme("테마1", "테마1 설명", "테마1 썸네일"));
         var date = LocalDate.now().plusDays(1);
-        var request = new ReservationCreateRequest(date, time.getId(), theme.getId());
+        var request = new ReservationCreateRequest(
+                date,
+                time.getId(),
+                theme.getId(),
+                "any",
+                "1",
+                100L,
+                "any"
+        );
         reservationService.createReservation(member.getId(), request);
 
         // when
@@ -177,7 +211,14 @@ class ReservationServiceTest {
         var time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
         var theme = themeRepository.save(new Theme("테마1", "테마1 설명", "테마1 썸네일"));
         var date = LocalDate.now().plusDays(1);
-        var request = new ReservationCreateRequest(date, time.getId(), theme.getId());
+        var request = new ReservationCreateRequest(
+                date,
+                time.getId(),
+                theme.getId(),
+                "any",
+                "1",
+                100L,
+                "any");
         reservationService.createReservation(member.getId(), request);
 
         var filterRequest = new ReservationFindFilteredRequest(
@@ -213,7 +254,16 @@ class ReservationServiceTest {
         var waiting = new Waiting(date, time, theme1, member);
         reservationRepository.save(new Reservation(date, time, theme1, otherMember));
         waitingRepository.save(waiting);
-        var request = new ReservationCreateRequest(date, time.getId(), theme2.getId());
+        var request = new ReservationCreateRequest(
+                date,
+                time.getId(),
+                theme2.getId(),
+                "any",
+                "1",
+                100L,
+                "any"
+
+        );
         reservationService.createReservation(member.getId(), request);
 
         // when
