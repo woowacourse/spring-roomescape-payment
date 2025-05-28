@@ -1,6 +1,5 @@
 package roomescape.exception;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -10,9 +9,18 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import lombok.extern.slf4j.Slf4j;
+
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(PaymentClientException.class)
+    public ResponseEntity<Object> handlePaymentClientException(final Exception e, final WebRequest request) {
+        final ProblemDetail body = super.createProblemDetail(e, HttpStatus.BAD_REQUEST, e.getMessage(), null,
+                null, request);
+        return super.handleExceptionInternal(e, body, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
 
     @ExceptionHandler({ReservationException.class, IllegalArgumentException.class})
     public ResponseEntity<Object> handleBadRequestException(final Exception e, final WebRequest request) {
