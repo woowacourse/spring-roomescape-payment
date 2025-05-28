@@ -25,4 +25,5 @@ jwt:
   secret-key: secretsecretsecretsecretsecretsecret
   expire-time: 31536000000
 
-
+payment:
+  token: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
