@@ -2,19 +2,22 @@ package roomescape.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.HashSet;
-import java.util.Set;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.PaymentConfirmClientException;
 import roomescape.exception.PaymentConfirmServerException;
 
+import java.util.Set;
+
 @Configuration
 public class RestClientConfiguration {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private static final Set<String> INVISIBLE_CLIENT_ERROR_CODE = Set.of(
             "INVALID_API_KEY",
@@ -26,7 +29,12 @@ public class RestClientConfiguration {
 
     @Bean
     public RestClient restClient() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(200);
+        factory.setReadTimeout(30000);
+
         return RestClient.builder()
+                .requestFactory(factory)
                 .defaultStatusHandler(HttpStatusCode::is4xxClientError, (req, res) -> {
                     JsonNode root = objectMapper.readTree(res.getBody());
                     String message = root.path("message").asText();
@@ -43,5 +51,4 @@ public class RestClientConfiguration {
                 })
                 .build();
     }
-
 }

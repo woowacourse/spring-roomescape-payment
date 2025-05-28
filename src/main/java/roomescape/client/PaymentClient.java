@@ -11,7 +11,7 @@ import java.util.Base64;
 public class PaymentClient {
 
     private static final String PAYMENT_CONFIRM_URL = "https://api.tosspayments.com/v1/payments/confirm";
-    private static final String PAYMENT_CONFIRM_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+    private static final String PAYMENT_CONFIRM_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:";
     private static final String AUTHORIZATION = "Authorization";
     private static final String BASIC = "Basic ";
 
