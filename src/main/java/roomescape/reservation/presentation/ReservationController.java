@@ -24,8 +24,7 @@ import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.request.TossPaymentConfirmRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
-import roomescape.reservation.dto.response.TossPaymentResponse;
-import roomescape.reservation.service.PaymentService;
+import roomescape.payment.client.PaymentClient;
 import roomescape.reservation.service.ReservationService;
 
 @RestController
@@ -36,9 +35,9 @@ public class ReservationController {
     private static final String SLASH = "/";
 
     private final ReservationService reservationService;
-    private final PaymentService paymentService;
+    private final PaymentClient paymentService;
 
-    public ReservationController(ReservationService reservationService, PaymentService paymentService) {
+    public ReservationController(ReservationService reservationService, PaymentClient paymentService) {
         this.reservationService = reservationService;
         this.paymentService = paymentService;
     }
@@ -62,7 +61,7 @@ public class ReservationController {
                 request.paymentKey()
         );
 
-        TossPaymentResponse tossPaymentResponse = paymentService.confirmPayment(confirmRequest);
+        paymentService.confirmPayment(confirmRequest);
 
         ReservationResponse response = reservationService.createReservation(request, loginMember.id());
         URI locationUri = URI.create(RESERVATION_BASE_URL + SLASH + response.id());

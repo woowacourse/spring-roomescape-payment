@@ -10,12 +10,12 @@ import org.springframework.web.client.RestClient;
 public class TossPaymentClientConfig {
     @Bean
     public RestClient tossRestClient() {
-        String secretKey = "test_sk_MY_SECRET_KEY";
-        String encodedAuth = Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
+        String secretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+        String encodedAuth = "Basic " + Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
 
         return RestClient.builder()
                 .baseUrl("https://api.tosspayments.com/v1")
-                .defaultHeader("Authorization", "Basic " + encodedAuth)
+                .defaultHeader("Authorization", encodedAuth)
                 .defaultHeader("Content-Type", "application/json")
                 .build();
     }
