@@ -10,6 +10,22 @@
 
 [Quick Start](#quick-start) 섹션으로 이동하여 애플리케이션을 실행하고 기능을 체험할 수 있습니다.
 
+## 추가된 화면 및 기능
+
+### 예약 과정에 결제 기능 추가
+
+![reservation_page](images/reservation_page.png)
+
+![reservation_payment](images/reservation_toss_payment.png)
+
+![success_reserve](images/success_reserve.png)
+
+- 예약 과정에서 결제 기능이 추가되었습니다.
+- 결제창 UI가 추가되어 사용자가 결제할 수 있도록 합니다.
+- 결제 승인 API를 호출하여 결제를 처리합니다.
+- 결제 실패 시 에러 핸들링이 구현되어, 결제 실패 사유를 안내합니다.
+- 결제 승인 후 예약이 완료되며, 예약 목록에 추가됩니다.
+
 ## 요구사항 (변경 사항)
 
 - 결제 기능 구현
