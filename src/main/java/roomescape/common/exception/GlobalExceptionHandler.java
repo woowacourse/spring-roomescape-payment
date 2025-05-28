@@ -15,6 +15,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errorResponse);
     }
 
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentException(final PaymentException e,
+                                                                final HttpServletRequest request) {
+        final ErrorResponse errorResponse = new ErrorResponse(
+                e.getStatusCode().value(), e.getPaymentError().code(), e.getPaymentError().message(),
+                request.getMethod(), request.getRequestURI()
+        );
+
+        return ResponseEntity.status(e.getStatusCode()).body(errorResponse);
+    }
+
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(final CustomException e,
                                                                final HttpServletRequest request) {

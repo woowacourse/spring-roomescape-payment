@@ -1,9 +1,8 @@
 package roomescape.reservation.controller;
 
-public record TossPaymentConfirmResponse(
+public record PaymentConfirmRequest(
         String paymentKey,
         String orderId,
-        int totalAmount,
-        String status
+        int amount
 ) {
 }
