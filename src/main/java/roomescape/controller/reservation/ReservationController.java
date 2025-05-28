@@ -41,12 +41,24 @@ public class ReservationController {
                 request.timeId()
         );
         // 결제 코드
-        paymentService.approvePayment(request.paymentKey(), request.orderId(), request.amount());
+//        paymentService.approvePayment(request.paymentKey(), request.orderId(), request.amount());
 
         // 예약 추가
         final ReservationResponse response = reservationService.addReservation(createReservationRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/pending")
+    public ResponseEntity<ReservationResponse> addPendingReservation(@RequestBody @Valid final ReservationRequest request, final Long memberId) {
+        final CreateReservationRequest createReservationRequest = new CreateReservationRequest(
+                memberId,
+                request.date(),
+                request.themeId(),
+                request.timeId()
+        );
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(reservationService.addPendingReservation(createReservationRequest));
     }
 
     @DeleteMapping("/{id}")

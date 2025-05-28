@@ -97,7 +97,7 @@ class ReservationTimeServiceTest {
         reservationTimeService.addReservationTime(reservationTimeRequest);
 
         // when
-        List<ReservationTimeResponse> reservationTimes = reservationTimeService.findReservationTimes();
+        List<ReservationTimeResponse> reservationTimes = reservationTimeService.findReservationTimesInfo();
 
 
         // then

@@ -25,7 +25,7 @@ public class ReservationTimeController {
 
     @GetMapping()
     public ResponseEntity<List<ReservationTimeResponse>> reservationTimeList() {
-        return ResponseEntity.status(HttpStatus.OK).body(reservationTimeService.findReservationTimes());
+        return ResponseEntity.status(HttpStatus.OK).body(reservationTimeService.findReservationTimesInfo());
     }
 
     @PostMapping()

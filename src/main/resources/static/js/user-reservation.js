@@ -80,7 +80,7 @@ function checkDateAndTheme() {
 }
 
 function fetchAvailableTimes(date, themeId) {
-  fetch('/times', {
+  fetch(`/themes/${themeId}/available-times?date=${date}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -89,7 +89,7 @@ function fetchAvailableTimes(date, themeId) {
     if (response.status === 200) return response.json();
     throw new Error('Read failed');
   }).then(renderAvailableTimes)
-  .catch(error => console.error("Error fetching available times:", error));
+      .catch(error => console.error("Error fetching available times:", error));
 }
 
 function renderAvailableTimes(times) {
@@ -107,7 +107,7 @@ function renderAvailableTimes(times) {
   times.forEach(time => {
     const startAt = time.startAt;
     const timeId = time.id;
-    const alreadyBooked = false;
+    const alreadyBooked = time.isBooked;
 
     const div = createSlot('time', startAt, timeId, alreadyBooked);
     timeSlots.appendChild(div);
@@ -192,7 +192,7 @@ function onWaitButtonClick() {
     /*
     TODO: [3단계] 예약 대기 생성 요청 API 호출
      */
-    fetch('/reservations', {
+    fetch('/reservations/pending', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

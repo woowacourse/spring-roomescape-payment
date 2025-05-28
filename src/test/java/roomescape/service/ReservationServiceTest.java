@@ -378,7 +378,7 @@ class ReservationServiceTest {
         );
 
         // when
-        final ReservationResponse reservation = reservationService.addReservation(createReservationRequest);
+        final ReservationResponse reservation = reservationService.addPendingReservation(createReservationRequest);
 
         // then
         assertThat(reservation.status()).isEqualTo(ReservationStatus.PENDING.description);
@@ -396,7 +396,7 @@ class ReservationServiceTest {
         );
 
         ReservationResponse acceptedReservation = reservationService.addReservation(acceptedRequest);
-        ReservationResponse pendingReservation = reservationService.addReservation(pendingRequest);
+        ReservationResponse pendingReservation = reservationService.addPendingReservation(pendingRequest);
 
         int initialReservationCount = reservationService.getAllReservations().size();
 
@@ -424,7 +424,7 @@ class ReservationServiceTest {
         );
 
         ReservationResponse acceptedReservation = reservationService.addReservation(acceptedRequest);
-        ReservationResponse pendingReservation = reservationService.addReservation(pendingRequest);
+        ReservationResponse pendingReservation = reservationService.addPendingReservation(pendingRequest);
 
         int initialReservationCount = reservationService.getAllReservations().size();
 
@@ -503,10 +503,10 @@ class ReservationServiceTest {
         ReservationResponse accepted = reservationService.addReservation(
                 new CreateReservationRequest(memberId1, testDate, themeId1, timeId)
         );
-        ReservationResponse pending = reservationService.addReservation(
+        ReservationResponse pending = reservationService.addPendingReservation(
                 new CreateReservationRequest(memberId2, testDate, themeId1, timeId)
         );
-        ReservationResponse pending2 = reservationService.addReservation(
+        ReservationResponse pending2 = reservationService.addPendingReservation(
                 new CreateReservationRequest(memberId3, testDate, themeId1, timeId)
         );
 
@@ -548,10 +548,10 @@ class ReservationServiceTest {
         ReservationResponse acceptedTheme2Reservation = reservationService.addReservation(
                 new CreateReservationRequest(memberId1, testDate, themeId2, timeId)
         );
-        ReservationResponse pendingTheme1Reservation = reservationService.addReservation(
+        ReservationResponse pendingTheme1Reservation = reservationService.addPendingReservation(
                 new CreateReservationRequest(memberId2, testDate, themeId1, timeId)
         );
-        ReservationResponse pendingTheme2Reservation = reservationService.addReservation(
+        ReservationResponse pendingTheme2Reservation = reservationService.addPendingReservation(
                 new CreateReservationRequest(memberId2, testDate, themeId2, timeId)
         );
 
@@ -587,7 +587,7 @@ class ReservationServiceTest {
                 new CreateReservationRequest(memberId1, testDate, themeId1, timeId)
         );
 
-        ReservationResponse pendingReservation = reservationService.addReservation(
+        ReservationResponse pendingReservation = reservationService.addPendingReservation(
                 new CreateReservationRequest(memberId2, testDate, themeId1, timeId)
         );
 
@@ -618,13 +618,13 @@ class ReservationServiceTest {
 
         reservationService.addReservation(new CreateReservationRequest(memberId1, testDate, themeId1, timeId));
 
-        ReservationResponse pending1Reservation = reservationService.addReservation(
+        ReservationResponse pending1Reservation = reservationService.addPendingReservation(
                 new CreateReservationRequest(memberId2, testDate, themeId1, timeId)
         );
-        ReservationResponse pending2Reservation = reservationService.addReservation(
+        ReservationResponse pending2Reservation = reservationService.addPendingReservation(
                 new CreateReservationRequest(memberId3, testDate, themeId1, timeId)
         );
-        ReservationResponse pending3Reservation = reservationService.addReservation(
+        ReservationResponse pending3Reservation = reservationService.addPendingReservation(
                 new CreateReservationRequest(memberId4, testDate, themeId1, timeId)
         );
 
