@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.application.reservation.command.CreateReservationService;
 import roomescape.application.reservation.query.ReservationQueryService;
 import roomescape.application.reservation.query.dto.ReservationResult;
-import roomescape.presentation.api.reservation.request.CreateReservationRequest;
 import roomescape.presentation.api.reservation.request.CreateReservationWithPaymentRequest;
 import roomescape.presentation.api.reservation.response.ReservationResponse;
 import roomescape.presentation.support.methodresolver.AuthInfo;
@@ -37,9 +36,9 @@ public class ReservationController {
     public ResponseEntity<Void> createReservation(
             @AuthPrincipal AuthInfo authInfo,
             @Valid @RequestBody CreateReservationWithPaymentRequest createReservationWithPaymentRequest) {
-        Long id = createReservationService.reserve(createReservationWithPaymentRequest.toCreateCommand(authInfo.memberId()));
-        return ResponseEntity.created(URI.create(RESERVATIONS_URL.formatted(id)))
-                .build();
+        Long memberId = authInfo.memberId();
+        Long id = createReservationService.reserve(createReservationWithPaymentRequest.toCreateCommand(memberId));
+        return ResponseEntity.created(URI.create(RESERVATIONS_URL.formatted(id))).build();
     }
 
     @GetMapping

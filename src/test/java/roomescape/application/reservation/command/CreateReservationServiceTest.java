@@ -117,7 +117,9 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
                 amount,
                 "NORMAL"
         );
-        doThrow(new PaymentException("toss payment server 예외")).when(tossPaymentClient).approve(command.getPaymentCommand());
+        doThrow(new PaymentException("toss payment server 예외"))
+                .when(tossPaymentClient)
+                .approve(command.getPaymentCommand());
         when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(new Payment(orderId, amount)));
 
         // when
@@ -146,7 +148,9 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
                 amount,
                 "NORMAL"
         );
-        doThrow(new PaymentException("toss payment server 예외")).when(tossPaymentClient).approve(command.getPaymentCommand());
+        doThrow(new PaymentException("toss payment server 예외"))
+                .when(tossPaymentClient)
+                .approve(command.getPaymentCommand());
         when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(new Payment(orderId, invalidAmount)));
 
         // when
@@ -174,7 +178,9 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
                 amount,
                 "NORMAL"
         );
-        doThrow(new PaymentException("toss payment server 예외")).when(tossPaymentClient).approve(command.getPaymentCommand());
+        doThrow(new PaymentException("toss payment server 예외"))
+                .when(tossPaymentClient)
+                .approve(command.getPaymentCommand());
         when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.empty());
 
         // when
