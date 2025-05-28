@@ -36,9 +36,7 @@ class PaymentServiceTest {
 
         // when
         final TossPaymentConfirmResponse actual = paymentService.processPayment(
-                request.paymentKey(),
-                request.orderId(),
-                request.amount()
+                request.amount(), request.orderId(), request.paymentKey()
         );
 
         // then

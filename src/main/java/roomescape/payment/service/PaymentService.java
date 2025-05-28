@@ -15,9 +15,9 @@ public class PaymentService {
     }
 
     public TossPaymentConfirmResponse processPayment(
-            final String paymentKey,
+            final int amount,
             final String orderId,
-            final int amount
+            final String paymentKey
     ) {
         return tossPaymentProcessor.processPayment(new TossPaymentConfirmRequest(amount, orderId, paymentKey));
     }

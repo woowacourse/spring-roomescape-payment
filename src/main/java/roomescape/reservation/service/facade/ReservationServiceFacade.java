@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.member.domain.Member;
 import roomescape.member.service.MemberService;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.dto.AvailableReservationTimeRequest;
@@ -18,7 +19,6 @@ import roomescape.reservation.dto.CreateReservationResponse;
 import roomescape.reservation.dto.CreateWaitingRequest;
 import roomescape.reservation.dto.CreateWaitingResponse;
 import roomescape.reservation.dto.ReservationMineResponse;
-import roomescape.payment.service.PaymentService;
 import roomescape.reservation.service.reservation.ReservationService;
 import roomescape.reservation.service.waiting.ReservationWaitingService;
 
@@ -34,10 +34,10 @@ public class ReservationServiceFacade {
     @Transactional
     public CreateReservationResponse saveReservation(final CreateReservationRequest request,
                                                      final LoginMember loginMember) {
-        final String paymentKey = request.tossPaymentRequest().paymentKey();
-        final String orderId = request.tossPaymentRequest().orderId();
         final int amount = request.tossPaymentRequest().amount();
-        paymentService.processPayment(paymentKey, orderId, amount);
+        final String orderId = request.tossPaymentRequest().orderId();
+        final String paymentKey = request.tossPaymentRequest().paymentKey();
+        paymentService.processPayment(amount, orderId, paymentKey);
 
         final Member member = memberService.findMemberByEmail(loginMember.email());
         final LocalDate date = request.date();
