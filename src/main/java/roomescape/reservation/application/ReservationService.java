@@ -12,6 +12,8 @@ import roomescape.common.exception.impl.ConflictException;
 import roomescape.common.exception.impl.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
+import roomescape.payment.application.PaymentService;
+import roomescape.payment.application.dto.PaymentRequest;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.AvailableReservationTimeResponse;
 import roomescape.reservation.application.dto.MemberReservationRequest;
@@ -34,18 +36,21 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentService paymentService;
 
     public ReservationService(
         final ReservationRepository reservationRepository,
         final ReservationTimeRepository reservationTimeRepository,
         final ThemeRepository themeRepository,
         final MemberRepository memberRepository,
-        final WaitingRepository waitingRepository) {
+        final WaitingRepository waitingRepository,
+        final PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentService = paymentService;
     }
 
     public List<ReservationResponse> findAll() {
@@ -58,6 +63,9 @@ public class ReservationService {
     @Transactional
     public ReservationResponse addMemberReservation(final MemberReservationRequest request,
         final Long memberId) {
+        paymentService.addPayment(
+            new PaymentRequest(request.date(), request.timeId(), request.themeId(),
+                request.paymentKey(), request.orderId(), request.amount()), memberId);
         return addReservation(request.timeId(), request.themeId(), memberId, request.date());
     }
 
