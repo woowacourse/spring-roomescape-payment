@@ -46,14 +46,12 @@ public class ReservationService {
     private final ReservationSlotRepository reservationSlotRepository;
 
     public ReservationCreateResponse createReservation(Long memberId, ReservationCreateRequest request) {
-
-        paymentService.create(request.toPayment());
         Reservation saved = create(memberId, request.timeId(), request.themeId(), request.date());
+        paymentService.create(request.toPayment());
         return ReservationCreateResponse.from(saved);
     }
 
     public ReservationAdminCreateResponse createReservationByAdmin(ReservationAdminCreateRequest request) {
-
         Reservation saved = create(request.memberId(), request.timeId(), request.themeId(), request.date());
         return ReservationAdminCreateResponse.from(saved);
     }
