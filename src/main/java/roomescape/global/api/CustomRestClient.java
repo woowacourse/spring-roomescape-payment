@@ -6,45 +6,46 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
-import roomescape.global.converter.JsonStringToObject;
+import roomescape.global.converter.CustomResponseMapper;
 import roomescape.global.dto.ExternalApiErrorResponse;
 import roomescape.global.exception.ExternalApiException;
 
 @Component
 public class CustomRestClient {
-    private final JsonStringToObject jsonStringToObject;
+    private final CustomResponseMapper customResponseMapper;
+    private final CustomRequestMapper customRequestMapper;
     private final RestClient restClient;
-    private final CustomRequestMapper mapper;
 
     public CustomRestClient(
-            final JsonStringToObject jsonStringToObject,
-            final RestClient restClient,
-            final CustomRequestMapper mapper
+            final CustomResponseMapper customResponseMapper,
+            final CustomRequestMapper customRequestMapper,
+            final RestClient restClient
     ) {
-        this.jsonStringToObject = jsonStringToObject;
+        this.customResponseMapper = customResponseMapper;
+        this.customRequestMapper = customRequestMapper;
         this.restClient = restClient;
-        this.mapper = mapper;
     }
 
-     /*
-    TODO
-        예외 추상화 고민 ????
-     */
-
-    public <T> T post(CustomRequestUri customRequestUri, AuthToken authToken, Object body, Class<T> responseType) {
+    public <T> T post(
+            CustomRequestUri customRequestUri,
+            AuthToken authToken,
+            Object body,
+            Class<T> responseType,
+            Class errorResponseType
+            ) {
         try {
             return restClient.post()
                     .uri(customRequestUri.getUriPath())
                     .header(HttpHeaders.AUTHORIZATION, authToken.generateToken())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(mapper.convertMap(body))
+                    .body(customRequestMapper.convertMap(body))
                     .retrieve()
                     .body(responseType);
         } catch (RestClientResponseException e) {
             String responseBody = e.getResponseBodyAsString();
             throw new ExternalApiException(new ExternalApiErrorResponse(
                     HttpStatus.valueOf(e.getStatusCode().value()),
-                    jsonStringToObject.convertTossApiErrorResponse(responseBody).message()
+                    customResponseMapper.convertJsonToErrorResponse(responseBody, errorResponseType).getMessage()
             ));
         }
     }

@@ -15,7 +15,7 @@ public class TossAuthToken extends AuthToken {
     }
 
     @Override
-    String generateToken() {
+    public String generateToken() {
         return String.format("basic %s", getToken());
     }
 }

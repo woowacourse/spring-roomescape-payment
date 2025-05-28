@@ -16,7 +16,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(ClockConfig.class)
+@Import(GlobalConfig.class)
 public class RestAssuredTestBase {
 
     @Autowired

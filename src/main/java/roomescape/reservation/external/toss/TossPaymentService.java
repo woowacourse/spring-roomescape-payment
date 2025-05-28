@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import roomescape.global.api.CustomRequestUri;
 import roomescape.global.api.CustomRestClient;
+import roomescape.global.api.TossApiErrorResponse;
 import roomescape.global.api.TossAuthToken;
 import roomescape.reservation.domain.PaymentInfo;
 import roomescape.reservation.service.PaymentService;
@@ -29,6 +30,12 @@ public class TossPaymentService implements PaymentService {
     public PaymentInfo paymentReservation(final PaymentConfirmRequest request) {
         CustomRequestUri customRequestUri = new CustomRequestUri(confirmUri);
         TossAuthToken tossAuthToken = new TossAuthToken(tossSecretKey);
-        return customRestClient.post(customRequestUri, tossAuthToken, request, PaymentInfo.class);
+        return customRestClient.post(
+                customRequestUri,
+                tossAuthToken,
+                request,
+                PaymentInfo.class,
+                TossApiErrorResponse.class
+        );
     }
 }
