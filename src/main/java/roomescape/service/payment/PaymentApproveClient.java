@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,12 @@ public class PaymentApproveClient {
 
     private final RestClient restClient;
     private final String widgetSecretKey;
+
+    private final List<String> sensitiveErrorCodes = List.of(
+            "INVALID_API_KEY",
+            "UNAPPROVED_ORDER_ID",
+            "UNAUTHORIZED_KEY",
+            "INCORRECT_BASIC_AUTH_FORMAT");
 
     public PaymentApproveClient(
             RestClient.Builder restClientBuilder,
@@ -43,10 +50,18 @@ public class PaymentApproveClient {
                 .retrieve()
                 .onStatus(status -> status != HttpStatus.OK,
                         (req, resp) -> {
+                            final String code = extractMessage(resp, "code");
+                            if (isSensitiveError(code)) {
+                                throw new IllegalStateException("[ERROR] 결제 승인 중 예외가 발생하였습니다.");
+                            }
                             final String errMessage = extractMessage(resp, "message");
                             throw new IllegalStateException("[ERROR] " + errMessage);
                         }
                 ).body(PaymentSuccessResponse.class);
+    }
+
+    private boolean isSensitiveError(String code) {
+        return sensitiveErrorCodes.contains(code);
     }
 
     private String getAuthorizations() {
