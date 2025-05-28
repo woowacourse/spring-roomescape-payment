@@ -1,5 +1,5 @@
 const THEME_API_ENDPOINT = '/themes';
-let paymentAmount = 10000;
+let paymentAmount = 20_000;
 
 document.addEventListener('DOMContentLoaded', () => {
   requestRead(THEME_API_ENDPOINT)
@@ -138,8 +138,10 @@ function checkDateAndThemeAndTime() {
   const selectedTimeElement = document.querySelector('.time-slot.active');
   const reserveButton = document.getElementById("reserve-button");
   const waitButton = document.getElementById("wait-button");
+  const priceElement = document.getElementById('price');
 
   if (selectedDate && selectedThemeElement && selectedTimeElement) {
+    priceElement.textContent = `결제 금액: ${paymentAmount.toLocaleString()}원`;
     if (selectedTimeElement.getAttribute('data-time-booked') === 'true') {
       // 선택된 시간이 이미 예약된 경우
       reserveButton.classList.add("disabled");
@@ -177,7 +179,7 @@ function onReservationButtonClick(event, paymentWidget) {
     paymentWidget.requestPayment({
       orderId: orderIdPrefix + generateRandomString(),
       orderName: "방탈출 예약 결제 1건",
-      amount: paymentAmount, // TODO 수정
+      amount: paymentAmount,
     }).then(function (data) {
       console.debug(data);
       fetchReservationPayment(data, reservationData);
