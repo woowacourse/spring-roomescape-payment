@@ -190,18 +190,39 @@ function onReservationButtonClick(event, paymentWidget) {
         */
         // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
         // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
+
         const orderIdPrefix = "WTEST";
-        paymentWidget.requestPayment({
-            orderId: orderIdPrefix + generateRandomString(),
-            orderName: "테스트 방탈출 예약 결제 1건",
-            amount: 1000,
+        const orderId = orderIdPrefix + generateRandomString();
+        const amount = 1000;
+
+        // 1, 결제 요청 전 임시 저장 API 호출
+        fetch('/pre-payments', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                orderId: orderId,
+                amount: amount
+            }),
+        }).then(response => {
+            if (!response.success) throw new Error("실패");
+            return response.json();
+        }).then(() => {
+            // 2. TOSS 결제 요청
+            return paymentWidget.requestPayment({
+                orderId: orderId,
+                orderName: "테스트 방탈출 예약 결제 1건",
+                amount: amount,
+            });
         }).then(function (data) {
             console.debug(data);
+            // 3. 결제 후 최종 예약 저장
             fetchReservationPayment(data, reservationData);
         }).catch(function (error) {
             // TOSS 에러 처리: 에러 목록을 확인하세요
             // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
-            alert(error.code + " :" + error.message + "/ orderId : " + err.orderId);
+            alert(error.code + " :" + error.message + "/ orderId : " + (error.orderId || orderId));
         });
     } else {
         alert("Please select a date, theme, and time before making a reservation.");
@@ -241,7 +262,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
         } else {
             response.json().then(successBody => {
                 console.log("예약 결제 성공 : " + JSON.stringify(successBody));
-                window.location.reload();
+                //window.location.reload();
             });
         }
     }).catch(error => {
