@@ -1,14 +1,16 @@
 package roomescape.reservation.service;
 
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+
+import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import roomescape.reservation.exception.PaymentRequestException;
+import roomescape.reservation.exception.RequestPaymentErrorHandler;
 import roomescape.reservation.presentation.dto.PaymentRequest;
 import roomescape.reservation.presentation.dto.PaymentResponse;
 
@@ -32,10 +34,7 @@ public class PaymentService {
                 .header("Authorization", "Basic " + encodeSecretKey())
                 .body(paymentRequest)
                 .retrieve()
-                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
-                    (request, response) -> {
-                        throw new PaymentRequestException(response.getStatusCode() + "");
-                })
+                .onStatus(new RequestPaymentErrorHandler(new ObjectMapper()))
                 .body(PaymentResponse.class);
     }
 
