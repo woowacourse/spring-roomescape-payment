@@ -1,5 +1,6 @@
 package roomescape.global.exception;
 
+import java.net.SocketTimeoutException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import roomescape.global.exception.custom.BadRequestException;
 import roomescape.global.exception.custom.ForbiddenException;
@@ -98,6 +100,18 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleIllegalArgumentException(final IllegalArgumentException e) {
         return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler(ResourceAccessException.class)
+    public ResponseEntity<ErrorResponse> handleSocketTimeoutException(final ResourceAccessException e) {
+        Throwable cause = e.getCause();
+        while (cause != null) {
+            if (cause instanceof SocketTimeoutException) {
+                return ResponseEntity.internalServerError().body(new ErrorResponse("시간이 초과되었습니다. 다시 시도해 주세요."));
+            }
+            cause = cause.getCause();
+        }
+        return ResponseEntity.internalServerError().body(new ErrorResponse("알 수 없는 에러가 발생했습니다."));
     }
 
     @ExceptionHandler(RuntimeException.class)

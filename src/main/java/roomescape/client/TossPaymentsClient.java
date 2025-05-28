@@ -3,7 +3,6 @@ package roomescape.client;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.util.Base64;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
@@ -15,27 +14,20 @@ import roomescape.global.exception.custom.TossPaymentsException;
 
 public class TossPaymentsClient {
 
-    private final String secretKey;
     private final RestClient restClient;
 
-    public TossPaymentsClient(final RestClient restClient, final String secretKey) {
+    public TossPaymentsClient(final RestClient restClient) {
         this.restClient = restClient;
-        this.secretKey = secretKey;
     }
 
     public PaymentsConfirmResponse confirmPayments(final PaymentsConfirmRequest request) {
         return restClient.post()
                 .uri("/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", getBasicAuthorizationValue())
                 .body(request)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (req, res) -> handlerTossPaymentsException(res))
                 .body(PaymentsConfirmResponse.class);
-    }
-
-    private String getBasicAuthorizationValue() {
-        return "Basic " + Base64.getEncoder().encodeToString((secretKey + ":").getBytes());
     }
 
     private void handlerTossPaymentsException(ClientHttpResponse res) throws IOException {
