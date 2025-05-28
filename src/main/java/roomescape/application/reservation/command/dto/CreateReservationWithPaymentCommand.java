@@ -1,6 +1,7 @@
 package roomescape.application.reservation.command.dto;
 
 import java.time.LocalDate;
+import roomescape.application.payment.dto.PaymentCommand;
 
 public record CreateReservationWithPaymentCommand(
         LocalDate date,
