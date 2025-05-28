@@ -1,22 +1,23 @@
 package roomescape.config;
 
+import java.time.Duration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
 @Configuration
 public class ClientConfiguration {
     @Bean
-    public RestClient initializeRestClient() {
+    public RestClient initializeRestClient(RestClient.Builder builder) {
 
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setConnectTimeout(5_000);
-        factory.setReadTimeout(10_000);
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(Duration.ofSeconds(5));
+        requestFactory.setReadTimeout(Duration.ofSeconds(10));
 
-        return RestClient.builder()
+        return builder
                 .baseUrl("https://api.tosspayments.com")
-                .requestFactory(factory)
+                .requestFactory(requestFactory)
                 .build();
     }
 }
