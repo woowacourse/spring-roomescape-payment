@@ -94,11 +94,6 @@ public class ReservationService {
 
         reservationRepository.deleteById(id);
 
-
-        Payment payment = paymentRepository.findByReservationId(id)
-                .orElseThrow();
-        payment.cancel();
-
         List<Waiting> waitings = waitingRepository.findByDateAndThemeIdAndTimeIdOrderByCreatedAtAsc(
                 reservation.getDate(),
                 reservation.getThemeId(),
