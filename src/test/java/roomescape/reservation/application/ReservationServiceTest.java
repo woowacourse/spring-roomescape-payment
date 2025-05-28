@@ -1,8 +1,13 @@
 package roomescape.reservation.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static roomescape.fixture.domain.MemberFixture.notSavedMember1;
 import static roomescape.fixture.domain.MemberFixture.notSavedMember2;
+import static roomescape.fixture.domain.PaymentFixture.AMOUNT;
+import static roomescape.fixture.domain.PaymentFixture.ORDER_ID;
+import static roomescape.fixture.domain.PaymentFixture.PAYMENT_KEY;
 import static roomescape.fixture.domain.ReservationTimeFixture.notSavedReservationTime1;
 import static roomescape.fixture.domain.ReservationTimeFixture.notSavedReservationTime2;
 import static roomescape.fixture.domain.ThemeFixture.notSavedTheme1;
@@ -12,6 +17,7 @@ import static roomescape.reservation.domain.ReservationStatus.BOOKED;
 import java.time.LocalDate;
 import java.util.List;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator.ReplaceUnderscores;
@@ -19,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.auth.domain.MemberAuthInfo;
 import roomescape.exception.auth.AuthorizationException;
 import roomescape.exception.resource.AlreadyExistException;
@@ -26,13 +33,15 @@ import roomescape.exception.resource.ResourceNotFoundException;
 import roomescape.fixture.config.TestConfig;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
+import roomescape.payment.domain.PaymentClient;
+import roomescape.payment.domain.PaymentInfo;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationSlot;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.ui.dto.request.AvailableReservationTimeRequest;
-import roomescape.reservation.ui.dto.request.CreateBookedReservationRequest;
+import roomescape.reservation.ui.dto.request.CreateBookedReservationWithPaymentRequest;
 import roomescape.reservation.ui.dto.response.AvailableReservationTimeResponse;
 import roomescape.reservation.ui.dto.response.ReservationResponse.ForMember;
 import roomescape.theme.domain.Theme;
@@ -46,18 +55,23 @@ class ReservationServiceTest {
 
     @Autowired
     private ReservationService reservationService;
-
     @Autowired
     private ThemeRepository themeRepository;
-
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
-
     @Autowired
     private MemberRepository memberRepository;
-
     @Autowired
     private ReservationRepository reservationRepository;
+    @MockitoBean
+    private PaymentClient paymentClient;
+
+    @BeforeEach
+    void setUp() {
+        doNothing()
+                .when(paymentClient)
+                .approvePayment(any(PaymentInfo.class));
+    }
 
     @Test
     void 예약을_추가한다() {
@@ -67,8 +81,9 @@ class ReservationServiceTest {
         final Long themeId = themeRepository.save(notSavedTheme1()).getId();
         final Member member = memberRepository.save(notSavedMember1());
 
-        final CreateBookedReservationRequest.ForMember request =
-                new CreateBookedReservationRequest.ForMember(date, timeId, themeId);
+        final CreateBookedReservationWithPaymentRequest request =
+                new CreateBookedReservationWithPaymentRequest(date, timeId, themeId,
+                        PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         // when & then
         Assertions.assertThatCode(() -> reservationService.create(request, member.getId()))
@@ -83,8 +98,9 @@ class ReservationServiceTest {
         final Long themeId = themeRepository.save(notSavedTheme1()).getId();
         final Member member = memberRepository.save(notSavedMember1());
 
-        final CreateBookedReservationRequest.ForMember request =
-                new CreateBookedReservationRequest.ForMember(date, timeId, themeId);
+        final CreateBookedReservationWithPaymentRequest request =
+                new CreateBookedReservationWithPaymentRequest(date, timeId, themeId,
+                        PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         // when & then
         Assertions.assertThatThrownBy(() -> reservationService.create(request, member.getId()))
@@ -99,8 +115,9 @@ class ReservationServiceTest {
         final Theme theme = themeRepository.save(notSavedTheme1());
         final Member member = memberRepository.save(notSavedMember1());
 
-        final CreateBookedReservationRequest.ForMember request =
-                new CreateBookedReservationRequest.ForMember(date, time.getId(), theme.getId());
+        final CreateBookedReservationWithPaymentRequest request =
+                new CreateBookedReservationWithPaymentRequest(date, time.getId(), theme.getId(),
+                        PAYMENT_KEY, ORDER_ID, AMOUNT);
         final MemberAuthInfo memberAuthInfo =
                 new MemberAuthInfo(member.getId(), member.getRole());
 

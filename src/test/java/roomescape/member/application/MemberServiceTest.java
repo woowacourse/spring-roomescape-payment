@@ -3,6 +3,7 @@ package roomescape.member.application;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static roomescape.fixture.domain.MemberFixture.notSavedMember1;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -13,7 +14,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import roomescape.exception.resource.ResourceNotFoundException;
 import roomescape.fixture.config.TestConfig;
-import roomescape.fixture.domain.MemberFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.member.ui.dto.MemberResponse;
@@ -34,9 +34,9 @@ class MemberServiceTest {
     void 회원을_추가한다() {
         // given
         final SignUpRequest request = new SignUpRequest(
-                MemberFixture.notSavedMember1().getEmail(),
-                MemberFixture.notSavedMember1().getPassword(),
-                MemberFixture.notSavedMember1().getName()
+                notSavedMember1().getEmail(),
+                notSavedMember1().getPassword(),
+                notSavedMember1().getName()
         );
 
         // when
@@ -53,7 +53,7 @@ class MemberServiceTest {
     @Test
     void 회원을_삭제한다() {
         // given
-        final Member member = MemberFixture.notSavedMember1();
+        final Member member = notSavedMember1();
         final Member savedMember = memberRepository.save(member);
 
         // when

@@ -14,14 +14,4 @@ public record CreateBookedReservationRequest(
         Long memberId
 ) {
 
-    public record ForMember(
-            @NotNull
-            LocalDate date,
-            @NotNull
-            Long timeId,
-            @NotNull
-            Long themeId
-    ) {
-
-    }
 }

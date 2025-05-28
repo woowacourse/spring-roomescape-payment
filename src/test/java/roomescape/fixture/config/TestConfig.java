@@ -3,10 +3,14 @@ package roomescape.fixture.config;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.web.client.RestClient;
 import roomescape.member.application.MemberService;
 import roomescape.member.domain.MemberRepository;
 import roomescape.member.infrastructure.JpaMemberRepository;
 import roomescape.member.infrastructure.MemberRepositoryImpl;
+import roomescape.payment.domain.PaymentClient;
+import roomescape.payment.domain.PaymentDomainService;
+import roomescape.payment.infrastructure.TossPaymentClient;
 import roomescape.reservation.application.AdminReservationService;
 import roomescape.reservation.application.AdminWaitingService;
 import roomescape.reservation.application.ReservationService;
@@ -131,13 +135,15 @@ public class TestConfig {
             final ReservationTimeRepository reservationTimeRepository,
             final ThemeRepository themeRepository,
             final MemberRepository memberRepository,
-            final ReservationRepository reservationRepository
+            final ReservationRepository reservationRepository,
+            final PaymentDomainService paymentDomainService
     ) {
         return new ReservationService(
                 reservationTimeRepository,
                 themeRepository,
                 memberRepository,
-                reservationRepository
+                reservationRepository,
+                paymentDomainService
         );
     }
 
@@ -155,6 +161,20 @@ public class TestConfig {
                 memberRepository,
                 reservationRepository,
                 waitingRepository
+        );
+    }
+
+    @Bean
+    public PaymentDomainService paymentDomainService(
+            final PaymentClient paymentClient
+    ) {
+        return new PaymentDomainService(paymentClient);
+    }
+
+    @Bean
+    public PaymentClient paymentClient() {
+        return new TossPaymentClient(
+                RestClient.builder().build()
         );
     }
 }

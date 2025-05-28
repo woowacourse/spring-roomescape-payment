@@ -2,6 +2,11 @@ package roomescape.reservation.ui;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static roomescape.fixture.domain.PaymentFixture.AMOUNT;
+import static roomescape.fixture.domain.PaymentFixture.ORDER_ID;
+import static roomescape.fixture.domain.PaymentFixture.PAYMENT_KEY;
 import static roomescape.fixture.ui.LoginApiFixture.adminLoginAndGetCookies;
 import static roomescape.fixture.ui.LoginApiFixture.memberLoginAndGetCookies;
 import static roomescape.fixture.ui.MemberApiFixture.signUpMembers;
@@ -23,12 +28,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.auth.ui.dto.LoginRequest;
 import roomescape.fixture.ui.LoginApiFixture;
 import roomescape.member.ui.dto.MemberResponse;
 import roomescape.member.ui.dto.SignUpRequest;
+import roomescape.payment.domain.PaymentClient;
+import roomescape.payment.domain.PaymentInfo;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.ui.dto.request.CreateBookedReservationRequest;
+import roomescape.reservation.ui.dto.request.CreateBookedReservationWithPaymentRequest;
 import roomescape.reservation.ui.dto.response.ReservationStatusResponse;
 import roomescape.reservation.ui.dto.response.ReservationTimeResponse;
 import roomescape.theme.ui.dto.ThemeResponse;
@@ -44,8 +53,15 @@ class AdminReservationRestControllerTest {
     private List<ThemeResponse> createThemeResponses;
     private List<MemberResponse> createMemberResponses;
 
+    @MockitoBean
+    private PaymentClient paymentClient;
+
     @BeforeEach
     void setUp() {
+        doNothing()
+                .when(paymentClient)
+                .approvePayment(any(PaymentInfo.class));
+
         final Map<String, String> adminCookies = adminLoginAndGetCookies();
         // 관리자 권한으로 예약 시간 추가 (3개)
         createReservationTimeResponses = createReservationTimes(adminCookies, 3);
@@ -100,13 +116,13 @@ class AdminReservationRestControllerTest {
         final Map<String, String> memberCookies = memberLoginAndGetCookies(
                 new LoginRequest(signUpRequest.email(), signUpRequest.password()));
         final Map<String, String> adminCookies = adminLoginAndGetCookies();
-        final CreateBookedReservationRequest createBookedReservationRequest = bookedReservationRequest1();
+        final CreateBookedReservationWithPaymentRequest request = bookedReservationWithPaymentRequest();
 
         // member 예약 추가
         final Integer reservationId = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookies(memberCookies)
-                .body(createBookedReservationRequest)
+                .body(request)
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
@@ -197,6 +213,16 @@ class AdminReservationRestControllerTest {
                         .getList(".", ReservationStatusResponse.class);
 
         assertThat(responses).hasSize(ReservationStatus.values().length);
+    }
+
+    private CreateBookedReservationWithPaymentRequest bookedReservationWithPaymentRequest() {
+        final Long timeId = createReservationTimeResponses.get(0).id();
+        final Long themeId = createThemeResponses.get(0).id();
+
+        return new CreateBookedReservationWithPaymentRequest(
+                date, timeId, themeId,
+                PAYMENT_KEY, ORDER_ID, AMOUNT
+        );
     }
 
     private CreateBookedReservationRequest bookedReservationRequest1() {
