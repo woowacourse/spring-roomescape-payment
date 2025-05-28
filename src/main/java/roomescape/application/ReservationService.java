@@ -60,14 +60,6 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse createMemberReservation(ReservationCreateRequest request, LoginMember loginMember) {
-        Member member = memberService.findMemberByEmail(loginMember.email());
-        Reservation created = createReservation(request.date(), request.timeId(), request.themeId(), member);
-
-        return ReservationResponse.from(created);
-    }
-
-    @Transactional
     public ReservationResponse createMemberReservation(ReservationWithPaymentRequest request, LoginMember loginMember) {
         Member member = memberService.findMemberByEmail(loginMember.email());
 
