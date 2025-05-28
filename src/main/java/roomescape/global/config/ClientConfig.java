@@ -14,12 +14,18 @@ public class ClientConfig {
     private final PaymentResponseErrorHandler paymentResponseErrorHandler;
 
     @Bean
-    public PaymentRestClient paymentRestClient() {
-        return new PaymentRestClient(
-                RestClient.builder()
-                        .baseUrl("https://api.tosspayments.com/v1/payments")
-                        .build(),
-                paymentResponseErrorHandler
-        );
+    public RestClient restClient() {
+        return RestClient.builder()
+                .baseUrl("https://api.tosspayments.com/v1/payments")
+                .build();
     }
+//    @Bean
+//    public PaymentRestClient paymentRestClient() {
+//        return new PaymentRestClient(
+//                RestClient.builder()
+//                        .baseUrl("https://api.tosspayments.com/v1/payments")
+//                        .build(),
+//                paymentResponseErrorHandler
+//        );
+//    }
 }

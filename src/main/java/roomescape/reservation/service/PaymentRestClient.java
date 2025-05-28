@@ -2,27 +2,34 @@ package roomescape.reservation.service;
 
 import java.util.Base64;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.reservation.dto.response.PaymentApproveResponse;
 import roomescape.reservation.entity.Payment;
 import roomescape.reservation.error.handler.PaymentResponseErrorHandler;
 
+@Component
 @RequiredArgsConstructor
 public class PaymentRestClient {
-
-    private static final String TEST_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:";
-    private static final String ENCODED_KEY = Base64.getEncoder().encodeToString(TEST_SECRET_KEY.getBytes());
 
     private final RestClient restClient;
     private final PaymentResponseErrorHandler paymentResponseErrorHandler;
 
+    @Value("${toss.secret-key}")
+    private String testKey;
+
     public void approve(Payment payment) {
         restClient.post()
                 .uri("/confirm")
-                .header("Authorization", "Basic " + ENCODED_KEY)
+                .header("Authorization", "Basic " + getEncodedKey())
                 .body(payment)
                 .retrieve()
                 .onStatus(paymentResponseErrorHandler)
                 .body(PaymentApproveResponse.class);
+    }
+
+    private String getEncodedKey() {
+        return Base64.getEncoder().encodeToString(testKey.getBytes());
     }
 }
