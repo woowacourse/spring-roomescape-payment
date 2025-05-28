@@ -18,8 +18,8 @@ import roomescape.common.config.TossPaymentClientConfig;
 import roomescape.common.exception.PaymentException;
 import roomescape.member.dto.request.LoginMember;
 import roomescape.member.service.LoginService;
-import roomescape.reservation.dto.request.TossPaymentConfirmRequest;
-import roomescape.payment.client.PaymentClient;
+import roomescape.payment.client.dto.request.TossPaymentConfirmRequest;
+import roomescape.payment.client.TossPaymentClient;
 import roomescape.reservation.service.ReservationService;
 
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ class ReservationControllerTest {
     private ReservationService reservationService;
 
     @MockitoBean
-    private PaymentClient paymentService;
+    private TossPaymentClient paymentService;
 
     @MockitoBean
     private LoginService loginService;

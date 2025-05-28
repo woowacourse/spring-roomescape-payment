@@ -19,12 +19,15 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.common.argumentResolver.Login;
 import roomescape.common.exceptionHandler.dto.ExceptionResponse;
 import roomescape.member.dto.request.LoginMember;
+import roomescape.payment.client.dto.response.TossPaymentResponse;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
-import roomescape.reservation.dto.request.TossPaymentConfirmRequest;
+import roomescape.payment.client.dto.request.TossPaymentConfirmRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
-import roomescape.payment.client.PaymentClient;
+import roomescape.payment.client.TossPaymentClient;
 import roomescape.reservation.service.ReservationService;
 
 @RestController
@@ -35,10 +38,12 @@ public class ReservationController {
     private static final String SLASH = "/";
 
     private final ReservationService reservationService;
-    private final PaymentClient paymentService;
+    private final TossPaymentClient tossPaymentClient;
+    private final PaymentService paymentService;
 
-    public ReservationController(ReservationService reservationService, PaymentClient paymentService) {
+    public ReservationController(ReservationService reservationService, TossPaymentClient tossPaymentClient, PaymentService paymentService) {
         this.reservationService = reservationService;
+        this.tossPaymentClient = tossPaymentClient;
         this.paymentService = paymentService;
     }
 
@@ -61,9 +66,10 @@ public class ReservationController {
                 request.paymentKey()
         );
 
-        paymentService.confirmPayment(confirmRequest);
-
+        TossPaymentResponse tossPaymentResponse = tossPaymentClient.confirmPayment(confirmRequest);
         ReservationResponse response = reservationService.createReservation(request, loginMember.id());
+        Payment payment = paymentService.save(tossPaymentResponse, response.id());
+
         URI locationUri = URI.create(RESERVATION_BASE_URL + SLASH + response.id());
         return ResponseEntity.created(locationUri).body(response);
     }

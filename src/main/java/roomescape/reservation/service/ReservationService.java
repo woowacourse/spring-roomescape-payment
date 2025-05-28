@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import roomescape.common.util.DateTime;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
@@ -30,14 +32,16 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentRepository paymentRepository;
 
-    public ReservationService(DateTime dateTime, ReservationRepository reservationRepository, ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository, MemberRepository memberRepository, WaitingRepository waitingRepository) {
+    public ReservationService(DateTime dateTime, ReservationRepository reservationRepository, ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository, MemberRepository memberRepository, WaitingRepository waitingRepository, PaymentRepository paymentRepository) {
         this.dateTime = dateTime;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     public ReservationResponse createReservation(final ReservationRequest request, final Long memberId) {
@@ -85,6 +89,11 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
 
         reservationRepository.deleteById(id);
+
+
+        Payment payment = paymentRepository.findByReservationId(id)
+                .orElseThrow();
+        payment.cancel();
 
         List<Waiting> waitings = waitingRepository.findByDateAndThemeIdAndTimeIdOrderByCreatedAtAsc(
                 reservation.getDate(),
