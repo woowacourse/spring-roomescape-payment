@@ -6,20 +6,26 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestClient;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import roomescape.common.argumentResolver.Login;
 import roomescape.common.exceptionHandler.dto.ExceptionResponse;
 import roomescape.member.dto.request.LoginMember;
-import roomescape.reservation.dto.request.PaymentConfirmRequest;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
+import roomescape.reservation.dto.request.TossPaymentConfirmRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
+import roomescape.reservation.dto.response.TossPaymentResponse;
+import roomescape.reservation.service.PaymentService;
 import roomescape.reservation.service.ReservationService;
 
 @RestController
@@ -27,15 +33,14 @@ import roomescape.reservation.service.ReservationService;
 public class ReservationController {
 
     public static final String RESERVATION_BASE_URL = "/reservations";
-    public static final String BASE_URL = "https://api.tosspayments.com";
     private static final String SLASH = "/";
 
     private final ReservationService reservationService;
-    private final RestClient restClient;
+    private final PaymentService paymentService;
 
-    public ReservationController(ReservationService reservationService, RestTemplateBuilder restTemplateBuilder) {
+    public ReservationController(ReservationService reservationService, PaymentService paymentService) {
         this.reservationService = reservationService;
-        this.restClient = RestClient.builder().baseUrl(BASE_URL).build();
+        this.paymentService = paymentService;
     }
 
     @GetMapping
@@ -46,17 +51,18 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponse> createReservation(@RequestBody final ReservationRequest request,
-                                                                 @Login final LoginMember loginMember) {
-        PaymentConfirmRequest confirmRequest = new PaymentConfirmRequest(request.orderId(), request.amount(), request.paymentKey());
-        restClient.post()
-                .uri("/v1/payments/confirm")
-                .body(confirmRequest)
-                .retrieve()
-                .onStatus(status -> status.is4xxClientError(), (res, req) -> {
-                    throw new IllegalArgumentException(res.toString());
-                })
-                .toBodilessEntity();
+    public ResponseEntity<ReservationResponse> createReservation(
+            @RequestBody final ReservationRequest request,
+            @Login final LoginMember loginMember
+    ) {
+
+        TossPaymentConfirmRequest confirmRequest = new TossPaymentConfirmRequest(
+                request.orderId(),
+                request.amount(),
+                request.paymentKey()
+        );
+
+        TossPaymentResponse tossPaymentResponse = paymentService.confirmPayment(confirmRequest);
 
         ReservationResponse response = reservationService.createReservation(request, loginMember.id());
         URI locationUri = URI.create(RESERVATION_BASE_URL + SLASH + response.id());
@@ -76,6 +82,7 @@ public class ReservationController {
         );
         return ResponseEntity.badRequest().body(exceptionResponse);
     }
+
     // TODO : URL
     @GetMapping("/mine")
     public ResponseEntity<List<MyReservationResponse>> getMyReservations(@Login LoginMember loginMember) {

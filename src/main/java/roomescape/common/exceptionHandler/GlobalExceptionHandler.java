@@ -7,6 +7,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import roomescape.common.exception.LoginException;
+import roomescape.common.exception.PaymentException;
 import roomescape.common.exceptionHandler.dto.ExceptionResponse;
 
 @ControllerAdvice
@@ -57,11 +58,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(exceptionResponse);
     }
 
-    @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<ExceptionResponse> unknownException(final HttpServletRequest request) {
-        ExceptionResponse exceptionResponse = new ExceptionResponse(
-                EXCEPTION_PREFIX + "예상치 못한 서버 오류입니다. 서버에 문의해주세요.", request.getRequestURI()
-        );
-        return ResponseEntity.internalServerError().body(exceptionResponse);
+    //    @ExceptionHandler(value = Exception.class)
+//    public ResponseEntity<ExceptionResponse> unknownException(final HttpServletRequest request) {
+//        ExceptionResponse exceptionResponse = new ExceptionResponse(
+//                EXCEPTION_PREFIX + "예상치 못한 서버 오류입니다. 서버에 문의해주세요.", request.getRequestURI()
+//        );
+//        return ResponseEntity.internalServerError().body(exceptionResponse);
+//    }
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<String> handlePaymentException(PaymentException e) {
+        if (e.getMessage().contains("키")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(e.getMessage());
     }
 }
