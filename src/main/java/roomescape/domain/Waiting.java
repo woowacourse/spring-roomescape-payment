@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -31,22 +32,33 @@ public class Waiting extends AuditedEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private Member member;
+    @OneToOne(fetch = FetchType.LAZY)
+    private PaymentHistory paymentHistory;
 
     protected Waiting() {
 
     }
 
-    public Waiting(Long id, LocalDate date, Theme theme, ReservationTime time, Member member) {
+    public Waiting(
+            Long id, LocalDate date, Theme theme, ReservationTime time,
+            Member member, PaymentHistory paymentHistory) {
         validate(date, theme, time, member);
         this.id = id;
         this.date = date;
         this.theme = theme;
         this.time = time;
         this.member = member;
+        this.paymentHistory = paymentHistory;
     }
 
-    public static Waiting createWithoutId(LocalDate date, Theme theme, ReservationTime time, Member member) {
-        return new Waiting(null, date, theme, time, member);
+    public static Waiting createWithoutIdWithoutPayment(LocalDate date, Theme theme,
+            ReservationTime time, Member member) {
+        return new Waiting(null, date, theme, time, member, null);
+    }
+
+    public static Waiting createWithoutId(LocalDate date, Theme theme, ReservationTime time,
+            Member member, PaymentHistory paymentHistory) {
+        return new Waiting(null, date, theme, time, member, paymentHistory);
     }
 
     public boolean isPastWaiting() {

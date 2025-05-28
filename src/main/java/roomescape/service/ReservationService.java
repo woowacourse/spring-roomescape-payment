@@ -83,7 +83,7 @@ public class ReservationService {
         Theme theme = getThemeById(request.themeId());
         ReservationTime time = getReservationTimeById(request.timeId());
 
-        Reservation reservation = Reservation.createWithoutId(
+        Reservation reservation = Reservation.createWithoutIdAndPayment(
                 request.date(), time, theme, member);
 
         validateDuplicateReservation(theme, request.date(), time);
@@ -94,12 +94,12 @@ public class ReservationService {
     }
 
     public ReservationResponse addReservation(long memberId, ReservationCreationContent reservationCreationContent,
-                                              PaymentHistoryCreationContent paymentHistoryCreationContent) {
+            PaymentHistoryCreationContent paymentHistoryCreationContent) {
         Member member = getMemberById(memberId);
         Theme theme = getThemeById(reservationCreationContent.themeId());
         ReservationTime time = getReservationTimeById(reservationCreationContent.timeId());
 
-        Reservation reservation = Reservation.createWithoutId(
+        Reservation reservation = Reservation.createWithoutIdAndPayment(
                 reservationCreationContent.date(), time, theme, member);
 
         validateDuplicateReservation(theme, reservationCreationContent.date(), time);

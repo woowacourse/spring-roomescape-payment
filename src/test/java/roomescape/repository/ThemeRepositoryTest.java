@@ -55,19 +55,19 @@ class ThemeRepositoryTest {
             Theme thirdTheme = entityManager.persist(
                     Theme.createWithoutId("테마2", "테마 설명", "thumbnail.jpg"));
 
-            entityManager.persist(Reservation.createWithoutId(
+            entityManager.persist(Reservation.createWithoutIdAndPayment(
                     YESTERDAY, reservationTime, firstTheme, member));
-            entityManager.persist(Reservation.createWithoutId(
+            entityManager.persist(Reservation.createWithoutIdAndPayment(
                     TODAY, reservationTime, firstTheme, member));
-            entityManager.persist(Reservation.createWithoutId(
+            entityManager.persist(Reservation.createWithoutIdAndPayment(
                     NEXT_DAY, reservationTime, firstTheme, member));
 
-            entityManager.persist(Reservation.createWithoutId(
+            entityManager.persist(Reservation.createWithoutIdAndPayment(
                     YESTERDAY, reservationTime, secondTheme, member));
-            entityManager.persist(Reservation.createWithoutId(
+            entityManager.persist(Reservation.createWithoutIdAndPayment(
                     TODAY, reservationTime, secondTheme, member));
 
-            entityManager.persist(Reservation.createWithoutId(
+            entityManager.persist(Reservation.createWithoutIdAndPayment(
                     YESTERDAY, reservationTime, thirdTheme, member));
 
             // when
@@ -86,9 +86,9 @@ class ThemeRepositoryTest {
             Theme secondTheme = entityManager.persist(
                     Theme.createWithoutId("테마2", "테마 설명", "thumbnail.jpg"));
 
-            entityManager.persist(Reservation.createWithoutId(
+            entityManager.persist(Reservation.createWithoutIdAndPayment(
                     TODAY, reservationTime, firstTheme, member));
-            entityManager.persist(Reservation.createWithoutId(
+            entityManager.persist(Reservation.createWithoutIdAndPayment(
                     NEXT_DAY, reservationTime, secondTheme, member));
 
             // when

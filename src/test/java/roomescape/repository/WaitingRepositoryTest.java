@@ -103,7 +103,8 @@ class WaitingRepositoryTest {
                     Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
             Member member = entityManager.persist(
                     Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "qwer1234!"));
-            Waiting waiting = entityManager.persist(Waiting.createWithoutId(NEXT_DAY, theme, time, member));
+            Waiting waiting = entityManager.persist(
+                    Waiting.createWithoutIdWithoutPayment(NEXT_DAY, theme, time, member));
 
             entityManager.flush();
 
@@ -129,8 +130,10 @@ class WaitingRepositoryTest {
                 Member.createWithoutId(Role.GENERAL, "회원", "member1@test.com", "qwer1234!"));
         Member secondMember = entityManager.persist(
                 Member.createWithoutId(Role.GENERAL, "회원", "member2@test.com", "qwer1234!"));
-        Waiting firstWaiting = entityManager.persist(Waiting.createWithoutId(NEXT_DAY, theme, time, firstMember));
-        Waiting secondWaiting = entityManager.persist(Waiting.createWithoutId(NEXT_DAY, theme, time, secondMember));
+        Waiting firstWaiting = entityManager.persist(
+                Waiting.createWithoutIdWithoutPayment(NEXT_DAY, theme, time, firstMember));
+        Waiting secondWaiting = entityManager.persist(
+                Waiting.createWithoutIdWithoutPayment(NEXT_DAY, theme, time, secondMember));
 
         // when
         Optional<Waiting> findWaiting = waitingRepository.findFirstWaiting(theme.getId(), NEXT_DAY, time.getId());

@@ -68,7 +68,7 @@ class WaitingServiceTest {
                     Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
             Member member = entityManager.persist(
                     Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "qwer1234!"));
-            Reservation reservation = entityManager.persist(Reservation.createWithoutId(
+            Reservation reservation = entityManager.persist(Reservation.createWithoutIdAndPayment(
                     NEXT_DAY, time, theme, member));
 
             entityManager.flush();
@@ -100,7 +100,7 @@ class WaitingServiceTest {
                     Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
             Member member = entityManager.persist(
                     Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "qwer1234!"));
-            Reservation reservation = entityManager.persist(Reservation.createWithoutId(
+            Reservation reservation = entityManager.persist(Reservation.createWithoutIdAndPayment(
                     NEXT_DAY, time, theme, member));
 
             entityManager.flush();
@@ -125,7 +125,7 @@ class WaitingServiceTest {
                     Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
             Member member = entityManager.persist(
                     Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "qwer1234!"));
-            Reservation reservation = entityManager.persist(Reservation.createWithoutId(
+            Reservation reservation = entityManager.persist(Reservation.createWithoutIdAndPayment(
                     NEXT_DAY, time, theme, member));
 
             entityManager.flush();
@@ -149,7 +149,7 @@ class WaitingServiceTest {
                     Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
             Member member = entityManager.persist(
                     Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "qwer1234!"));
-            Reservation reservation = entityManager.persist(Reservation.createWithoutId(
+            Reservation reservation = entityManager.persist(Reservation.createWithoutIdAndPayment(
                     NEXT_DAY, time, theme, member));
 
             entityManager.flush();
@@ -173,7 +173,7 @@ class WaitingServiceTest {
                     Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
             Member member = entityManager.persist(
                     Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "qwer1234!"));
-            Reservation reservation = entityManager.persist(Reservation.createWithoutId(
+            Reservation reservation = entityManager.persist(Reservation.createWithoutIdAndPayment(
                     YESTERDAY, time, theme, member));
 
             entityManager.flush();
@@ -197,9 +197,10 @@ class WaitingServiceTest {
                     Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
             Member member = entityManager.persist(
                     Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "qwer1234!"));
-            Reservation reservation = entityManager.persist(Reservation.createWithoutId(
+            Reservation reservation = entityManager.persist(Reservation.createWithoutIdAndPayment(
                     NEXT_DAY, time, theme, member));
-            Waiting waiting = entityManager.persist(Waiting.createWithoutId(NEXT_DAY, theme, time, member));
+            Waiting waiting = entityManager.persist(
+                    Waiting.createWithoutIdWithoutPayment(NEXT_DAY, theme, time, member));
 
             entityManager.flush();
 
@@ -249,9 +250,10 @@ class WaitingServiceTest {
                     Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
             Member member = entityManager.persist(
                     Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "qwer1234!"));
-            Reservation reservation = entityManager.persist(Reservation.createWithoutId(
+            Reservation reservation = entityManager.persist(Reservation.createWithoutIdAndPayment(
                     NEXT_DAY, time, theme, member));
-            Waiting waiting = entityManager.persist(Waiting.createWithoutId(NEXT_DAY, theme, time, member));
+            Waiting waiting = entityManager.persist(
+                    Waiting.createWithoutIdWithoutPayment(NEXT_DAY, theme, time, member));
 
             // when
             waitingService.deleteWaitingById(waiting.getId());
@@ -270,7 +272,7 @@ class WaitingServiceTest {
                     Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
             Member member = entityManager.persist(
                     Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "qwer1234!"));
-            Reservation reservation = entityManager.persist(Reservation.createWithoutId(
+            Reservation reservation = entityManager.persist(Reservation.createWithoutIdAndPayment(
                     NEXT_DAY, time, theme, member));
 
             // when & then

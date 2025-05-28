@@ -79,9 +79,9 @@ class ReservationApiTest {
         Theme theme = themeRepository.save(
                 Theme.createWithoutId("테마", "설명", "섬네일"));
 
-        reservationRepository.save(Reservation.createWithoutId(YESTERDAY, time, theme, member));
-        reservationRepository.save(Reservation.createWithoutId(TODAY, time, theme, member));
-        reservationRepository.save(Reservation.createWithoutId(NEXT_DAY, time, theme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPayment(YESTERDAY, time, theme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPayment(TODAY, time, theme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPayment(NEXT_DAY, time, theme, member));
 
         AccessTokenContent tokenContent = new AccessTokenContent(admin.getId(), admin.getRole(), admin.getName());
         String accessToken = tokenProvider.createAccessToken(tokenContent);
@@ -111,9 +111,9 @@ class ReservationApiTest {
         Theme theme = themeRepository.save(
                 Theme.createWithoutId("테마", "설명", "섬네일"));
 
-        reservationRepository.save(Reservation.createWithoutId(YESTERDAY, time, theme, member));
-        reservationRepository.save(Reservation.createWithoutId(TODAY, time, theme, member));
-        reservationRepository.save(Reservation.createWithoutId(NEXT_DAY, time, theme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPayment(YESTERDAY, time, theme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPayment(TODAY, time, theme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPayment(NEXT_DAY, time, theme, member));
 
         Map<String, Object> params = new HashMap<>();
         params.put("memberId", member.getId());
@@ -150,11 +150,11 @@ class ReservationApiTest {
         Theme theme = themeRepository.save(
                 Theme.createWithoutId("테마", "설명", "섬네일"));
 
-        reservationRepository.save(Reservation.createWithoutId(YESTERDAY, time, theme, member));
-        reservationRepository.save(Reservation.createWithoutId(TODAY, time, theme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPayment(YESTERDAY, time, theme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPayment(TODAY, time, theme, member));
 
-        reservationRepository.save(Reservation.createWithoutId(NEXT_DAY, time, theme, otherMember));
-        waitingRepository.save(Waiting.createWithoutId(NEXT_DAY, theme, time, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPayment(NEXT_DAY, time, theme, otherMember));
+        waitingRepository.save(Waiting.createWithoutIdWithoutPayment(NEXT_DAY, theme, time, member));
 
         String accessToken = tokenProvider.createAccessToken(
                 new AccessTokenContent(member.getId(), member.getRole(), member.getName()));
@@ -247,7 +247,7 @@ class ReservationApiTest {
                 Theme.createWithoutId("테마", "설명", "섬네일"));
 
         Reservation reservation = reservationRepository.save(
-                Reservation.createWithoutId(YESTERDAY, time, theme, member));
+                Reservation.createWithoutIdAndPayment(YESTERDAY, time, theme, member));
 
         String accessToken = tokenProvider.createAccessToken(
                 new AccessTokenContent(admin.getId(), admin.getRole(), admin.getName()));

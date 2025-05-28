@@ -41,7 +41,7 @@ class PaymentServiceTest {
         Member member = testEntityManager.persist(
                 Member.createWithoutId(Role.GENERAL, "asdf", "asdf@naver.com", "qwer1234!"));
         Reservation reservation = testEntityManager.persist(
-                Reservation.createWithoutId(LocalDate.now().plusDays(2L), reservationTime, theme, member));
+                Reservation.createWithoutIdAndPayment(LocalDate.now().plusDays(2L), reservationTime, theme, member));
         PaymentHistoryCreationContent paymentHistoryCreationContent = new PaymentHistoryCreationContent("asdf", "asdf",
                 "asdf", 1000);
         assertThatThrownBy(() -> paymentService.pay(reservation, paymentHistoryCreationContent)).isInstanceOf(

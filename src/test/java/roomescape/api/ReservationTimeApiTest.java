@@ -85,7 +85,7 @@ class ReservationTimeApiTest {
         ReservationTime bookedTime = timeRepository.save(ReservationTime.createWithoutId(LocalTime.of(10, 0)));
         ReservationTime notBookedTime = timeRepository.save(ReservationTime.createWithoutId(LocalTime.of(11, 0)));
 
-        reservationRepository.save(Reservation.createWithoutId(NEXT_DAY, bookedTime, theme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPayment(NEXT_DAY, bookedTime, theme, member));
 
         Map<String, Object> params = new HashMap<>();
         params.put("themeId", theme.getId());

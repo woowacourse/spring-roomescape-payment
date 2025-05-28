@@ -89,14 +89,14 @@ class ThemeApiTest {
         Theme thirdTheme = themeRepository.save(
                 Theme.createWithoutId("테마3", "설명", "섬네일"));
 
-        reservationRepository.save(Reservation.createWithoutId(YESTERDAY, time, firstTheme, member));
-        reservationRepository.save(Reservation.createWithoutId(TODAY, time, firstTheme, member));
-        reservationRepository.save(Reservation.createWithoutId(NEXT_DAY, time, firstTheme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPayment(YESTERDAY, time, firstTheme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPayment(TODAY, time, firstTheme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPayment(NEXT_DAY, time, firstTheme, member));
 
-        reservationRepository.save(Reservation.createWithoutId(YESTERDAY, time, secendTheme, member));
-        reservationRepository.save(Reservation.createWithoutId(TODAY, time, secendTheme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPayment(YESTERDAY, time, secendTheme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPayment(TODAY, time, secendTheme, member));
 
-        reservationRepository.save(Reservation.createWithoutId(YESTERDAY, time, thirdTheme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPayment(YESTERDAY, time, thirdTheme, member));
 
         // when & then
         RestAssured

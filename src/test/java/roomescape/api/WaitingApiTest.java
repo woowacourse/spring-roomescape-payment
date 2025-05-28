@@ -72,13 +72,13 @@ class WaitingApiTest {
         Theme theme = themeRepository.save(
                 Theme.createWithoutId("테마", "설명", "섬네일"));
 
-        reservationRepository.save(Reservation.createWithoutId(YESTERDAY, time, theme, member));
-        reservationRepository.save(Reservation.createWithoutId(TODAY, time, theme, member));
-        reservationRepository.save(Reservation.createWithoutId(NEXT_DAY, time, theme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPayment(YESTERDAY, time, theme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPayment(TODAY, time, theme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPayment(NEXT_DAY, time, theme, member));
 
-        waitingRepository.save(Waiting.createWithoutId(YESTERDAY, theme, time, member));
-        waitingRepository.save(Waiting.createWithoutId(TODAY, theme, time, member));
-        waitingRepository.save(Waiting.createWithoutId(NEXT_DAY, theme, time, member));
+        waitingRepository.save(Waiting.createWithoutIdWithoutPayment(YESTERDAY, theme, time, member));
+        waitingRepository.save(Waiting.createWithoutIdWithoutPayment(TODAY, theme, time, member));
+        waitingRepository.save(Waiting.createWithoutIdWithoutPayment(NEXT_DAY, theme, time, member));
 
         AccessTokenContent tokenContent = new AccessTokenContent(admin.getId(), admin.getRole(), admin.getName());
         String accessToken = tokenProvider.createAccessToken(tokenContent);
@@ -106,7 +106,7 @@ class WaitingApiTest {
         Theme theme = themeRepository.save(
                 Theme.createWithoutId("테마", "설명", "섬네일"));
         Reservation reservation = reservationRepository.save(
-                Reservation.createWithoutId(NEXT_DAY, time, theme, member));
+                Reservation.createWithoutIdAndPayment(NEXT_DAY, time, theme, member));
 
         AccessTokenContent tokenContent = new AccessTokenContent(member.getId(), member.getRole(), member.getName());
         String accessToken = tokenProvider.createAccessToken(tokenContent);
@@ -138,8 +138,8 @@ class WaitingApiTest {
         Theme theme = themeRepository.save(
                 Theme.createWithoutId("테마", "설명", "섬네일"));
         Reservation reservation = reservationRepository.save(
-                Reservation.createWithoutId(NEXT_DAY, time, theme, member));
-        Waiting waiting = waitingRepository.save(Waiting.createWithoutId(NEXT_DAY, theme, time, member));
+                Reservation.createWithoutIdAndPayment(NEXT_DAY, time, theme, member));
+        Waiting waiting = waitingRepository.save(Waiting.createWithoutIdWithoutPayment(NEXT_DAY, theme, time, member));
 
         AccessTokenContent tokenContent = new AccessTokenContent(member.getId(), member.getRole(), member.getName());
         String accessToken = tokenProvider.createAccessToken(tokenContent);

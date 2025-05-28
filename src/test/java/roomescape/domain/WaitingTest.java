@@ -27,7 +27,7 @@ class WaitingTest {
             Member member = new Member(1L, Role.GENERAL, "회웜", "test@email.com", "qwer1234!");
 
             // when & then
-            assertThatThrownBy(() -> Waiting.createWithoutId(nullDate, theme, time, member))
+            assertThatThrownBy(() -> Waiting.createWithoutIdWithoutPayment(nullDate, theme, time, member))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("비어있는 날짜로 대기를 생성할 수 없습니다.");
         }
@@ -42,7 +42,7 @@ class WaitingTest {
             Member member = new Member(1L, Role.GENERAL, "회웜", "test@email.com", "qwer1234!");
 
             // when & then
-            assertThatThrownBy(() -> Waiting.createWithoutId(date, nullTheme, time, member))
+            assertThatThrownBy(() -> Waiting.createWithoutIdWithoutPayment(date, nullTheme, time, member))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("비어있는 테마로 대기를 생성할 수 없습니다.");
         }
@@ -57,7 +57,7 @@ class WaitingTest {
             Member member = new Member(1L, Role.GENERAL, "회웜", "test@email.com", "qwer1234!");
 
             // when & then
-            assertThatThrownBy(() -> Waiting.createWithoutId(date, theme, nullTime, member))
+            assertThatThrownBy(() -> Waiting.createWithoutIdWithoutPayment(date, theme, nullTime, member))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("비어있는 시간으로 대기를 생성할 수 없습니다.");
         }
@@ -72,7 +72,7 @@ class WaitingTest {
             Member member = null;
 
             // when & then
-            assertThatThrownBy(() -> Waiting.createWithoutId(date, theme, time, member))
+            assertThatThrownBy(() -> Waiting.createWithoutIdWithoutPayment(date, theme, time, member))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("비어있는 회원으로 대기를 생성할 수 없습니다.");
         }
@@ -89,7 +89,7 @@ class WaitingTest {
             Theme theme = new Theme(1L, "테마", "설명", "섬네일");
             ReservationTime time = new ReservationTime(1L, LocalTime.now().minusSeconds(1));
             Member member = new Member(1L, Role.GENERAL, "회원", "test@email.com", "qwer1234!");
-            Waiting pastWaiting = Waiting.createWithoutId(TODAY, theme, time, member);
+            Waiting pastWaiting = Waiting.createWithoutIdWithoutPayment(TODAY, theme, time, member);
 
             // when
             boolean isPast = pastWaiting.isPastWaiting();
@@ -105,7 +105,7 @@ class WaitingTest {
             Theme theme = new Theme(1L, "테마", "설명", "섬네일");
             ReservationTime time = new ReservationTime(1L, LocalTime.now().plusSeconds(1));
             Member member = new Member(1L, Role.GENERAL, "회원", "test@email.com", "qwer1234!");
-            Waiting pastWaiting = Waiting.createWithoutId(TODAY, theme, time, member);
+            Waiting pastWaiting = Waiting.createWithoutIdWithoutPayment(TODAY, theme, time, member);
 
             // when
             boolean isPast = pastWaiting.isPastWaiting();

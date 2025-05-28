@@ -50,7 +50,7 @@ public class WaitingService {
         Theme theme = getThemeById(content.themeId());
         ReservationTime time = getTimeById(content.timeId());
         Member member = getMemberById(content.memberId());
-        Waiting waiting = Waiting.createWithoutId(content.date(), theme, time, member);
+        Waiting waiting = Waiting.createWithoutIdWithoutPayment(content.date(), theme, time, member);
 
         validateEmptyReservation(waiting);
         validatePastWaitingCreation(waiting);

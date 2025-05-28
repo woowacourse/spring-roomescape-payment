@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -31,6 +32,8 @@ public class Reservation extends AuditedEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private Member member;
+    @OneToOne(fetch = FetchType.LAZY)
+    private PaymentHistory paymentHistory;
 
     protected Reservation() {
     }
@@ -44,13 +47,32 @@ public class Reservation extends AuditedEntity {
         this.reservationTime = time;
         this.theme = theme;
         this.member = member;
+        this.paymentHistory = null;
     }
 
-    public static Reservation createWithoutId(
-            LocalDate date, ReservationTime time,
-            Theme theme, Member member
+    public Reservation(
+            Long id, LocalDate date, ReservationTime time, Theme theme, Member member, PaymentHistory paymentHistory
     ) {
-        return new Reservation(null, date, time, theme, member);
+        validate(date, time, theme, member);
+        this.id = id;
+        this.date = date;
+        this.reservationTime = time;
+        this.theme = theme;
+        this.member = member;
+        this.paymentHistory = paymentHistory;
+    }
+
+    public static Reservation createWithoutIdAndPayment(
+            LocalDate date, ReservationTime time, Theme theme, Member member
+    ) {
+        return new Reservation(null, date, time, theme, member, null);
+    }
+
+    public static Reservation createWithoutIdAndPayment(
+            LocalDate date, ReservationTime time,
+            Theme theme, Member member, PaymentHistory paymentHistory
+    ) {
+        return new Reservation(null, date, time, theme, member, paymentHistory);
     }
 
     public boolean isPastDateTime() {
