@@ -71,10 +71,10 @@ public class ReservationService {
     public ReservationResponse createMemberReservation(ReservationWithPaymentRequest request, LoginMember loginMember) {
         Member member = memberService.findMemberByEmail(loginMember.email());
 
+        Reservation created = createReservation(request.date(), request.timeId(), request.themeId(), member);
+
         PaymentProcessRequest paymentProcessRequest = PaymentProcessRequest.of(request);
         paymentService.process(paymentProcessRequest);
-
-        Reservation created = createReservation(request.date(), request.timeId(), request.themeId(), member);
 
         return ReservationResponse.from(created);
     }

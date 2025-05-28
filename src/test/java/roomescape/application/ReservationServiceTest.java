@@ -179,9 +179,6 @@ class ReservationServiceTest {
         LoginMember loginMember = new LoginMember(member.getId(), member.getName(), Role.USER, member.getEmail());
 
         when(memberService.findMemberByEmail(loginMember.email())).thenReturn(member);
-        PaymentProcessRequest paymentRequest = PaymentProcessRequest.of(request);
-        Payment payment = Payment.create("paymentKey", "orderId");
-        when(paymentService.process(paymentRequest)).thenReturn(payment);
         when(reservationTimeService.findReservationTimeById(request.timeId())).thenReturn(time);
         when(currentTimeService.now()).thenReturn(LocalDateTime.of(2025, 4, 20, 10, 0));
         when(themeService.findThemeById(request.themeId())).thenReturn(theme);
