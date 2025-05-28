@@ -62,13 +62,13 @@ public class Reservation extends AuditedEntity {
         this.paymentHistory = paymentHistory;
     }
 
-    public static Reservation createWithoutIdAndPayment(
+    public static Reservation createWithoutIdAndPaymentHistory(
             LocalDate date, ReservationTime time, Theme theme, Member member
     ) {
         return new Reservation(null, date, time, theme, member, null);
     }
 
-    public static Reservation createWithoutIdAndPayment(
+    public static Reservation createWithoutId(
             LocalDate date, ReservationTime time,
             Theme theme, Member member, PaymentHistory paymentHistory
     ) {

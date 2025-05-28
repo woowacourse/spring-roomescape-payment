@@ -92,19 +92,19 @@ class ThemeServiceTest {
             Theme thirdTheme = entityManager.persist(
                     Theme.createWithoutId("테마2", "테마 설명", "thumbnail.jpg"));
 
-            entityManager.persist(Reservation.createWithoutIdAndPayment(
+            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
                     YESTERDAY, reservationTime, firstTheme, member));
-            entityManager.persist(Reservation.createWithoutIdAndPayment(
+            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
                     TODAY, reservationTime, firstTheme, member));
-            entityManager.persist(Reservation.createWithoutIdAndPayment(
+            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
                     NEXT_DAY, reservationTime, firstTheme, member));
 
-            entityManager.persist(Reservation.createWithoutIdAndPayment(
+            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
                     YESTERDAY, reservationTime, secondTheme, member));
-            entityManager.persist(Reservation.createWithoutIdAndPayment(
+            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
                     TODAY, reservationTime, secondTheme, member));
 
-            entityManager.persist(Reservation.createWithoutIdAndPayment(
+            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
                     YESTERDAY, reservationTime, thirdTheme, member));
 
             entityManager.flush();
@@ -131,9 +131,9 @@ class ThemeServiceTest {
             Theme secondTheme = entityManager.persist(
                     Theme.createWithoutId("테마2", "테마 설명", "thumbnail.jpg"));
 
-            entityManager.persist(Reservation.createWithoutIdAndPayment(
+            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
                     TODAY, reservationTime, firstTheme, member));
-            entityManager.persist(Reservation.createWithoutIdAndPayment(
+            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
                     NEXT_DAY, reservationTime, secondTheme, member));
 
             entityManager.flush();
@@ -218,7 +218,7 @@ class ThemeServiceTest {
             Theme theme = entityManager.persist(
                     Theme.createWithoutId("테마1", "테마 설명", "thumbnail.jpg"));
 
-            Reservation reservation = entityManager.persist(Reservation.createWithoutIdAndPayment(
+            Reservation reservation = entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
                     TODAY, reservationTime, theme, member));
 
             entityManager.flush();

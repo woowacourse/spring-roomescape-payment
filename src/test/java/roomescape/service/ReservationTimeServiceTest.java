@@ -81,9 +81,9 @@ class ReservationTimeServiceTest {
         ReservationTime timeAt11 = entityManager.persist(ReservationTime.createWithoutId(LocalTime.of(11, 0)));
         ReservationTime timeAt12 = entityManager.persist(ReservationTime.createWithoutId(LocalTime.of(12, 0)));
 
-        entityManager.persist(Reservation.createWithoutIdAndPayment(
+        entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
                 TODAY, timeAt10, theme, member));
-        entityManager.persist(Reservation.createWithoutIdAndPayment(
+        entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
                 TODAY, timeAt11, theme, member));
 
         entityManager.flush();
@@ -173,7 +173,7 @@ class ReservationTimeServiceTest {
 
             ReservationTime time = entityManager.persist(ReservationTime.createWithoutId(LocalTime.of(10, 0)));
 
-            entityManager.persist(Reservation.createWithoutIdAndPayment(
+            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
                     TODAY, time, theme, member));
 
             entityManager.flush();

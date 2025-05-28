@@ -4,9 +4,11 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
+import roomescape.domain.PaymentHistory;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.domain.Waiting;
+import roomescape.dto.business.PaymentHistoryCreationContent;
 import roomescape.dto.business.WaitingCreationContent;
 import roomescape.dto.response.WaitingResponse;
 import roomescape.exception.BadRequestException;
@@ -26,18 +28,22 @@ public class WaitingService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
+    private final PaymentService paymentService;
 
     public WaitingService(
             WaitingRepository waitingRepository,
             ThemeRepository themeRepository,
             ReservationTimeRepository reservationTimeRepository,
-            MemberRepository memberRepository, ReservationRepository reservationRepository
+            MemberRepository memberRepository,
+            ReservationRepository reservationRepository,
+            PaymentService paymentService
     ) {
         this.waitingRepository = waitingRepository;
         this.themeRepository = themeRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.memberRepository = memberRepository;
         this.reservationRepository = reservationRepository;
+        this.paymentService = paymentService;
     }
 
     public List<WaitingResponse> findAllWaiting() {
@@ -46,11 +52,15 @@ public class WaitingService {
                 .toList();
     }
 
-    public WaitingResponse addWaiting(WaitingCreationContent content) {
+    @Transactional
+    public WaitingResponse addWaiting(WaitingCreationContent content,
+                                      PaymentHistoryCreationContent paymentHistoryCreationContent) {
         Theme theme = getThemeById(content.themeId());
         ReservationTime time = getTimeById(content.timeId());
         Member member = getMemberById(content.memberId());
-        Waiting waiting = Waiting.createWithoutIdWithoutPayment(content.date(), theme, time, member);
+
+        PaymentHistory paymentHistory = paymentService.pay(paymentHistoryCreationContent);
+        Waiting waiting = Waiting.createWithoutId(content.date(), theme, time, member, paymentHistory);
 
         validateEmptyReservation(waiting);
         validatePastWaitingCreation(waiting);

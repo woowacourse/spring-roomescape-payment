@@ -85,7 +85,7 @@ class ReservationTimeApiTest {
         ReservationTime bookedTime = timeRepository.save(ReservationTime.createWithoutId(LocalTime.of(10, 0)));
         ReservationTime notBookedTime = timeRepository.save(ReservationTime.createWithoutId(LocalTime.of(11, 0)));
 
-        reservationRepository.save(Reservation.createWithoutIdAndPayment(NEXT_DAY, bookedTime, theme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPaymentHistory(NEXT_DAY, bookedTime, theme, member));
 
         Map<String, Object> params = new HashMap<>();
         params.put("themeId", theme.getId());
@@ -133,7 +133,6 @@ class ReservationTimeApiTest {
     @Test
     void canDeleteReservationTime() {
         // given
-
 
         Member admin = memberRepository.save(
                 Member.createWithoutId(Role.ADMIN, "관리자", "admin@email.com", "qwer1234!"));

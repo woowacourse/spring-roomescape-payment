@@ -23,7 +23,7 @@ import roomescape.domain.Role;
 import roomescape.domain.Theme;
 import roomescape.domain.Waiting;
 import roomescape.dto.business.AccessTokenContent;
-import roomescape.dto.business.WaitingCreationContent;
+import roomescape.dto.request.WaitingCreationRequest;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
@@ -72,9 +72,9 @@ class WaitingApiTest {
         Theme theme = themeRepository.save(
                 Theme.createWithoutId("테마", "설명", "섬네일"));
 
-        reservationRepository.save(Reservation.createWithoutIdAndPayment(YESTERDAY, time, theme, member));
-        reservationRepository.save(Reservation.createWithoutIdAndPayment(TODAY, time, theme, member));
-        reservationRepository.save(Reservation.createWithoutIdAndPayment(NEXT_DAY, time, theme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPaymentHistory(YESTERDAY, time, theme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPaymentHistory(TODAY, time, theme, member));
+        reservationRepository.save(Reservation.createWithoutIdAndPaymentHistory(NEXT_DAY, time, theme, member));
 
         waitingRepository.save(Waiting.createWithoutIdWithoutPayment(YESTERDAY, theme, time, member));
         waitingRepository.save(Waiting.createWithoutIdWithoutPayment(TODAY, theme, time, member));
@@ -106,13 +106,14 @@ class WaitingApiTest {
         Theme theme = themeRepository.save(
                 Theme.createWithoutId("테마", "설명", "섬네일"));
         Reservation reservation = reservationRepository.save(
-                Reservation.createWithoutIdAndPayment(NEXT_DAY, time, theme, member));
+                Reservation.createWithoutIdAndPaymentHistory(NEXT_DAY, time, theme, member));
 
         AccessTokenContent tokenContent = new AccessTokenContent(member.getId(), member.getRole(), member.getName());
         String accessToken = tokenProvider.createAccessToken(tokenContent);
 
-        WaitingCreationContent creationContent =
-                new WaitingCreationContent(NEXT_DAY, theme.getId(), time.getId(), member.getId());
+        WaitingCreationRequest waitingCreationRequest =
+                new WaitingCreationRequest(theme.getId(), NEXT_DAY, time.getId(), "asdfasdf", "asdfasdf", "asdfasdf",
+                        1000);
 
         // when & then
         RestAssured
@@ -120,7 +121,7 @@ class WaitingApiTest {
                 .contentType(ContentType.JSON)
                 .port(port)
                 .cookie("access", accessToken)
-                .body(creationContent)
+                .body(waitingCreationRequest)
                 .when().post("/waiting")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value());
@@ -137,8 +138,8 @@ class WaitingApiTest {
                 ReservationTime.createWithoutId(LocalTime.of(10, 0)));
         Theme theme = themeRepository.save(
                 Theme.createWithoutId("테마", "설명", "섬네일"));
-        Reservation reservation = reservationRepository.save(
-                Reservation.createWithoutIdAndPayment(NEXT_DAY, time, theme, member));
+        reservationRepository.save(
+                Reservation.createWithoutIdAndPaymentHistory(NEXT_DAY, time, theme, member));
         Waiting waiting = waitingRepository.save(Waiting.createWithoutIdWithoutPayment(NEXT_DAY, theme, time, member));
 
         AccessTokenContent tokenContent = new AccessTokenContent(member.getId(), member.getRole(), member.getName());

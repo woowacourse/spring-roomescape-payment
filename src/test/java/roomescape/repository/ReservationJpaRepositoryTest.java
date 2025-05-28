@@ -53,9 +53,9 @@ public class ReservationJpaRepositoryTest {
             // given
             Member otherMember = entityManager.persist(
                     Member.createWithoutId(Role.GENERAL, "다른회원", "otherMember@test.com", "password123!"));
-            entityManager.persist(Reservation.createWithoutIdAndPayment(
+            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
                     TODAY, reservationTime, theme, member));
-            entityManager.persist(Reservation.createWithoutIdAndPayment(
+            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
                     TODAY, reservationTime, theme, otherMember));
             entityManager.flush();
 
@@ -76,9 +76,9 @@ public class ReservationJpaRepositoryTest {
             // given
             Theme otherTheme = entityManager.persist(
                     Theme.createWithoutId("다른테마", "설명", "thumbnail.jpg"));
-            entityManager.persist(Reservation.createWithoutIdAndPayment(
+            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
                     TODAY, reservationTime, theme, member));
-            entityManager.persist(Reservation.createWithoutIdAndPayment(
+            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
                     TODAY, reservationTime, otherTheme, member));
             entityManager.flush();
 
@@ -98,11 +98,11 @@ public class ReservationJpaRepositoryTest {
         void canFindReservationsByDateFilter() {
             // given
             entityManager.persist(
-                    Reservation.createWithoutIdAndPayment(YESTERDAY, reservationTime, theme, member));
+                    Reservation.createWithoutIdAndPaymentHistory(YESTERDAY, reservationTime, theme, member));
             entityManager.persist(
-                    Reservation.createWithoutIdAndPayment(TODAY, reservationTime, theme, member));
+                    Reservation.createWithoutIdAndPaymentHistory(TODAY, reservationTime, theme, member));
             entityManager.persist(
-                    Reservation.createWithoutIdAndPayment(NEXT_DAY, reservationTime, theme, member));
+                    Reservation.createWithoutIdAndPaymentHistory(NEXT_DAY, reservationTime, theme, member));
             entityManager.flush();
 
             // when

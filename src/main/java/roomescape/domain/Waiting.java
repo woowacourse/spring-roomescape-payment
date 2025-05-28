@@ -52,12 +52,12 @@ public class Waiting extends AuditedEntity {
     }
 
     public static Waiting createWithoutIdWithoutPayment(LocalDate date, Theme theme,
-            ReservationTime time, Member member) {
+                                                        ReservationTime time, Member member) {
         return new Waiting(null, date, theme, time, member, null);
     }
 
     public static Waiting createWithoutId(LocalDate date, Theme theme, ReservationTime time,
-            Member member, PaymentHistory paymentHistory) {
+                                          Member member, PaymentHistory paymentHistory) {
         return new Waiting(null, date, theme, time, member, paymentHistory);
     }
 

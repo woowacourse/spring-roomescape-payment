@@ -15,6 +15,7 @@ import roomescape.config.annotation.Authority;
 import roomescape.config.annotation.RequiredAccessToken;
 import roomescape.domain.Role;
 import roomescape.dto.business.AccessTokenContent;
+import roomescape.dto.business.PaymentHistoryCreationContent;
 import roomescape.dto.business.WaitingCreationContent;
 import roomescape.dto.request.WaitingCreationRequest;
 import roomescape.dto.response.WaitingResponse;
@@ -44,7 +45,9 @@ public class WaitingController {
     ) {
         WaitingCreationContent creationContent =
                 new WaitingCreationContent(request.date(), request.themeId(), request.timeId(), token.id());
-        WaitingResponse waitingResponse = waitingService.addWaiting(creationContent);
+        PaymentHistoryCreationContent paymentHistoryCreationContent = new PaymentHistoryCreationContent(request);
+
+        WaitingResponse waitingResponse = waitingService.addWaiting(creationContent, paymentHistoryCreationContent);
         return ResponseEntity.created(URI.create("/waiting/" + waitingResponse.id())).body(waitingResponse);
     }
 
