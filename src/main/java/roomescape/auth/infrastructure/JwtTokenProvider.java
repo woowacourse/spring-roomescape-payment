@@ -20,10 +20,9 @@ import roomescape.auth.domain.AuthTokenProvider;
 @Component
 public class JwtTokenProvider implements AuthTokenProvider {
 
+    private final SecretKey secretKey;
     @Value("${security.jwt.access-token.validity-in-milliseconds}")
     private long validityInMilliseconds;
-
-    private final SecretKey secretKey;
 
     public JwtTokenProvider(@Value("${security.jwt.access-token.secret-key}") final String secretKeyValue) {
         this.secretKey = Keys.hmacShaKeyFor(secretKeyValue.getBytes(StandardCharsets.UTF_8));
@@ -107,8 +106,7 @@ public class JwtTokenProvider implements AuthTokenProvider {
         } catch (UnsupportedJwtException e) {
             // 지원하지 않는 암호화 방식을 사용한 경우 ("alg" 필드로 검증)
             return false;
-        }
-        catch (SignatureException e) {
+        } catch (SignatureException e) {
             // 서명이 올바르지 않은 경우(올바른 SecretKey로 서명되지 않은 경우)
             return false;
         } catch (JwtException e) {
