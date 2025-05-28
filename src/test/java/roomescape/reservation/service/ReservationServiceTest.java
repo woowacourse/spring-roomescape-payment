@@ -32,6 +32,7 @@ import roomescape.reservation.dto.response.BookedReservationTimeResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.reservation.dto.response.ThemeResponse;
+import roomescape.reservation.payment.repository.PaymentRepository;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.repository.ThemeRepository;
@@ -54,6 +55,8 @@ class ReservationServiceTest {
     private MemberRepository memberRepository;
     @Autowired
     private WaitingRepository waitingRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
     @Autowired
     private ReservationService reservationService;
 

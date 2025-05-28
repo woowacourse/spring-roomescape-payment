@@ -35,6 +35,9 @@ import roomescape.reservation.dto.response.BookedReservationTimeResponse;
 import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
+import roomescape.reservation.payment.dto.request.PaymentRequest;
+import roomescape.reservation.payment.repository.PaymentRepository;
+import roomescape.reservation.payment.service.PaymentService;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.repository.ThemeRepository;
@@ -43,24 +46,30 @@ import roomescape.reservation.repository.WaitingRepository;
 @Service
 public class ReservationService {
 
+    private final PaymentService paymentService;
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentRepository paymentRepository;
 
     public ReservationService(
+            final PaymentService paymentService,
             final ReservationRepository reservationRepository,
             final ReservationTimeRepository reservationTimeRepository,
             final ThemeRepository themeRepository,
             final MemberRepository memberRepository,
-            final WaitingRepository waitingRepository
+            final WaitingRepository waitingRepository,
+            final PaymentRepository paymentRepository
     ) {
+        this.paymentService = paymentService;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     public List<ReservationResponse> getAll() {
@@ -110,6 +119,23 @@ public class ReservationService {
 
         Reservation savedReservation = reservationRepository.save(reservation);
 
+        return ReservationResponse.from(savedReservation);
+    }
+
+    @Transactional
+    public ReservationResponse create(final ReservationCreateRequest request, final PaymentRequest paymentRequest) {
+        if (isAlreadyBooked(request)) {
+            throw new AlreadyInUseException("이미 예약이 존재합니다.");
+        }
+        if (hasAlreadyWaiting(request)) {
+            throw new AlreadyInUseException("예약 대기가 존재해 예약을 생성할 수 없습니다.");
+        }
+
+        Reservation reservation = getReservation(request, request.loginMember());
+        validateDateTime(LocalDateTime.now(), reservation.getDate(), reservation.getTime().getStartAt());
+        paymentService.confirm(paymentRequest);
+
+        Reservation savedReservation = reservationRepository.save(reservation);
         return ReservationResponse.from(savedReservation);
     }
 

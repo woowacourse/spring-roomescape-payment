@@ -32,14 +32,14 @@ public class Payment {
     }
 
     public Payment(
-            final PaymentId paymentId,
+            final Long id,
             final String paymentKey,
             final String orderId,
             final Long amount,
             final Reservation reservation
     ) {
         validateNotNull(paymentKey, orderId, amount, reservation);
-        this.paymentId = paymentId;
+        this.paymentId = new PaymentId(id);
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
