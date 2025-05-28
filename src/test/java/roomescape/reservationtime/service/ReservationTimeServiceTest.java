@@ -127,7 +127,7 @@ class ReservationTimeServiceTest {
     void deleteReservationTime_shouldThrowException_WhenReservationExists() {
         ReservationTimeResponse reservationTimeResponse = reservationTimeService.create(
                 new ReservationTimeCreateRequest(LocalTime.now()));
-        reservationFacadeService.create(futureDate, reservationTimeResponse.id(), theme.getId(), member.getId()
+        reservationFacadeService.createForAdmin(futureDate, reservationTimeResponse.id(), theme.getId(), member.getId()
         );
         assertThatThrownBy(() -> reservationTimeService.delete(reservationTimeResponse.id()))
                 .isInstanceOf(ReservationTimeInUseException.class)
@@ -141,7 +141,7 @@ class ReservationTimeServiceTest {
         reservationTimeService.create(new ReservationTimeCreateRequest(LocalTime.of(11, 0)));
         reservationTimeService.create(new ReservationTimeCreateRequest(LocalTime.of(12, 0)));
 
-        reservationFacadeService.create(futureDate, reservationTimeResponse.id(), theme.getId(), member.getId()
+        reservationFacadeService.createForAdmin(futureDate, reservationTimeResponse.id(), theme.getId(), member.getId()
         );
         List<AvailableReservationTimeResponse> availableReservationTimes = reservationTimeService.getAvailableReservationTimes(
                 futureDate, theme.getId());
