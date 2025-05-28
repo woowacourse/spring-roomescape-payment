@@ -13,11 +13,12 @@ public class PaymentService {
     private final PaymentProvider paymentProvider;
 
     public void pay(final String paymentKey, final String orderId, final long amount) {
-        var paymentRequest = new PaymentRequest(paymentKey, orderId, amount);
-        var paymentDetails = paymentProvider.confirm(paymentRequest);
+        var request = new PaymentRequest(paymentKey, orderId, amount);
+
+        var paymentDetails = paymentProvider.confirm(request);
         if (paymentDetails.isFailed()) {
-            String message = paymentDetails.message();
-            throw new PaymentException(message);
+            var status = paymentDetails.status();
+            throw new PaymentException(status.message());
         }
     }
 }

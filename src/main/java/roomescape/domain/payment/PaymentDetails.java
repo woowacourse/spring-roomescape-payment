@@ -12,4 +12,8 @@ public record PaymentDetails(
     public PaymentDetails(final PaymentStatus status) {
         this(null, status);
     }
+
+    public boolean isFailed() {
+        return status.isFailed();
+    }
 }
