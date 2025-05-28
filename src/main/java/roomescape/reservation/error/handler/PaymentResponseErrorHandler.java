@@ -1,4 +1,4 @@
-package roomescape.reservation.exception;
+package roomescape.reservation.error.handler;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,7 +9,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
-import roomescape.reservation.PaymentErrorResponse;
+import roomescape.reservation.dto.response.PaymentErrorResponse;
+import roomescape.reservation.error.exception.PaymentClientException;
+import roomescape.reservation.error.exception.PaymentServerException;
 
 @Component
 public class PaymentResponseErrorHandler implements ResponseErrorHandler {

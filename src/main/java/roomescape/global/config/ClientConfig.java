@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
-import roomescape.reservation.PaymentRestClient;
-import roomescape.reservation.exception.PaymentResponseErrorHandler;
+import roomescape.reservation.service.PaymentRestClient;
+import roomescape.reservation.error.handler.PaymentResponseErrorHandler;
 
 @Configuration
 @RequiredArgsConstructor

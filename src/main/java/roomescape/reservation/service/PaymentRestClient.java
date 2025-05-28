@@ -1,11 +1,11 @@
-package roomescape.reservation;
+package roomescape.reservation.service;
 
 import java.util.Base64;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.client.RestClient;
 import roomescape.reservation.dto.response.PaymentApproveResponse;
 import roomescape.reservation.entity.Payment;
-import roomescape.reservation.exception.PaymentResponseErrorHandler;
+import roomescape.reservation.error.handler.PaymentResponseErrorHandler;
 
 @RequiredArgsConstructor
 public class PaymentRestClient {
