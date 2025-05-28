@@ -32,6 +32,7 @@ import roomescape.theme.repository.ThemeRepository;
 public class ReservationService {
 
     private final Clock clock;
+    // TODO : 인터페이스 분리
     private final TossPaymentClient paymentClient;
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
