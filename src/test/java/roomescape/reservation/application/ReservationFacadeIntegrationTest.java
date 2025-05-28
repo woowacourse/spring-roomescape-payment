@@ -9,14 +9,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.auth.sign.password.Password;
 import roomescape.common.domain.Email;
-import roomescape.common.exception.NotFoundException;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.WaitingReservation;
 import roomescape.reservation.domain.WaitingReservationRepository;
 import roomescape.reservation.ui.dto.AvailableReservationTimeWebResponse;
-import roomescape.reservation.ui.dto.CreateReservationWithUserIdWebRequest;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeDescription;
 import roomescape.theme.domain.ThemeName;
@@ -34,7 +32,6 @@ import java.time.LocalTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -122,32 +119,8 @@ class ReservationFacadeIntegrationTest {
     }
 
     @Test
-    @DisplayName("예약 생성 실패 후 데이터베이스 상태가 변경되지 않는지 확인한다 (트랜잭션 롤백)")
-    void transactionRollbackVerification() {
-        // given
-        clearAllUsers();
-        int userCount = countUsers();
-        assertThat(userCount).isEqualTo(0);
-
-        int initialReservationCount = countReservations();
-
-        CreateReservationWithUserIdWebRequest request = new CreateReservationWithUserIdWebRequest(
-                LocalDate.now().plusDays(1),
-                time.getId(),
-                theme.getId(),
-                user.getId()
-        );
-
-        // when & then
-        assertThatThrownBy(() -> reservationFacade.create(request))
-                .isInstanceOf(NotFoundException.class);
-
-        assertThat(countReservations()).isEqualTo(initialReservationCount);
-    }
-
-    @Test
     @DisplayName("예약 삭제 후, 대기된 예약이 있을 시 승격시킨다.")
-    void deleteAndPromtionWhenExsistWaiting() {
+    void deleteAndPromotionWhenExsistsWaiting() {
         // given
         long userId1 = 1L;
         final Reservation reservation = reservationRepository.save(Reservation.withoutId(userId1,

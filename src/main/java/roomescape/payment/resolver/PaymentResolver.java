@@ -37,7 +37,7 @@ public class PaymentResolver {
             JsonNode jsonNode = MAPPER.readTree(responseBody);
             String errorMessage = jsonNode.get("message").asText();
 
-            if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {  // todo: 예외 처리 개선
+            if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {  // todo: 예외 처리 커스텀 추가?
                 throw new RuntimeException("[ERROR] 결제 확인에 실패했습니다. " + errorMessage + " - 결제 키: " + paymentKey);
             }
             throw new PaymentApiException(responseBody, errorMessage, e.getStatusCode());
