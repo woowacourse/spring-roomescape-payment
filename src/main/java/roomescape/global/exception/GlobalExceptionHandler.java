@@ -12,6 +12,7 @@ import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -67,6 +68,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ExceptionResponse handleMissingServletRequestParameterException(MissingServletRequestParameterException e) {
+        log.warn("경고", e);
         String exceptionMessage = "필수 정보(파라미터)가 누락되었습니다";
         return new ExceptionResponse(BAD_REQUEST.value(), exceptionMessage, LocalDateTime.now());
     }
@@ -74,36 +76,53 @@ public class GlobalExceptionHandler {
     @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(IllegalArgumentException.class)
     public ExceptionResponse handleIllegalArgumentException(IllegalArgumentException e) {
+        log.warn("경고", e);
         return new ExceptionResponse(BAD_REQUEST.value(), e.getMessage(), LocalDateTime.now());
     }
 
     @ResponseStatus(UNPROCESSABLE_ENTITY)
     @ExceptionHandler(BusinessRuleViolationException.class)
     public ExceptionResponse handleBusinessRuleViolationException(BusinessRuleViolationException e) {
+        log.warn("경고", e);
         return new ExceptionResponse(UNPROCESSABLE_ENTITY.value(), e.getMessage(), LocalDateTime.now());
     }
 
     @ResponseStatus(NOT_FOUND)
     @ExceptionHandler(ResourceNotFoundException.class)
     public ExceptionResponse handleResourceNotFoundException(ResourceNotFoundException e) {
+        log.warn("경고", e);
         return new ExceptionResponse(NOT_FOUND.value(), e.getMessage(), LocalDateTime.now());
     }
 
     @ResponseStatus(CONFLICT)
     @ExceptionHandler(ResourceInUseException.class)
     public ExceptionResponse handleResourceInUseException(ResourceInUseException e) {
+        log.warn("경고", e);
         return new ExceptionResponse(CONFLICT.value(), e.getMessage(), LocalDateTime.now());
     }
 
     @ResponseStatus(UNAUTHORIZED)
     @ExceptionHandler(AuthenticationException.class)
     public ExceptionResponse handleAuthenticationException(AuthenticationException e) {
+        log.warn("경고", e);
         return new ExceptionResponse(UNAUTHORIZED.value(), e.getMessage(), LocalDateTime.now());
     }
 
     @ResponseStatus(FORBIDDEN)
     @ExceptionHandler(AuthorizationException.class)
     public ExceptionResponse handleAuthorizationException(AuthorizationException e) {
+        log.warn("경고", e);
         return new ExceptionResponse(FORBIDDEN.value(), e.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(ClientFailException.class)
+    public ResponseEntity<ExceptionResponse> handleClientFailException(ClientFailException e) {
+        log.warn("경고", e);
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+                e.getStatusCode(),
+                e.getMessage(),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(e.getStatusCode()).body(exceptionResponse);
     }
 }

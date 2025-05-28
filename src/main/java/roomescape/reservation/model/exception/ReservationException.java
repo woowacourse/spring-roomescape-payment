@@ -1,7 +1,7 @@
 package roomescape.reservation.model.exception;
 
 // TODO : 추상화 수준 낮추기
-sealed public class ReservationException extends RuntimeException {
+public class ReservationException extends RuntimeException {
 
     public ReservationException(String message) {
         super(message);
