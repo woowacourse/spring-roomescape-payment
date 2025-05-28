@@ -13,14 +13,7 @@ import org.springframework.context.annotation.Import;
 import roomescape.auth.stub.StubTokenProvider;
 import roomescape.common.CleanUp;
 import roomescape.config.AuthServiceTestConfig;
-import roomescape.fixture.db.MemberDbFixture;
-import roomescape.fixture.db.ReservationDateTimeDbFixture;
-import roomescape.fixture.db.ThemeDbFixture;
-import roomescape.member.domain.Member;
-import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationDateTime;
-import roomescape.reservation.repository.ReservationRepository;
-import roomescape.theme.domain.Theme;
+import roomescape.fixture.db.ReservationDbFixture;
 
 @Import(AuthServiceTestConfig.class)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -33,16 +26,7 @@ public class ReservationAdminApiTest {
     private CleanUp cleanUp;
 
     @Autowired
-    private ReservationRepository reservationRepository;
-
-    @Autowired
-    private ThemeDbFixture themeDbFixture;
-
-    @Autowired
-    private ReservationDateTimeDbFixture reservationDateTimeDbFixture;
-
-    @Autowired
-    private MemberDbFixture memberDbFixture;
+    private ReservationDbFixture reservationDbFixture;
 
     @BeforeEach
     void setUp() {
@@ -52,11 +36,7 @@ public class ReservationAdminApiTest {
 
     @Test
     void 어드민은_전체_에약을_조회할_수_있다() {
-        Member member1 = memberDbFixture.유저1_생성();
-        Theme theme = themeDbFixture.공포();
-        ReservationDateTime dateTime = reservationDateTimeDbFixture.내일_열시();
-
-        reservationRepository.save(Reservation.reserve(member1, dateTime, theme));
+        reservationDbFixture.reserve();
 
         RestAssured.given().log().all()
                 .cookie("token", StubTokenProvider.ADMIN_STUB_TOKEN)
@@ -78,11 +58,7 @@ public class ReservationAdminApiTest {
 
     @Test
     void 방탈출_예약_페이지를_삭제한다() {
-        Member member1 = memberDbFixture.유저1_생성();
-        Theme theme = themeDbFixture.공포();
-        ReservationDateTime dateTime = reservationDateTimeDbFixture.내일_열시();
-
-        Long id = reservationRepository.save(Reservation.reserve(member1, dateTime, theme)).getId();
+        Long id = reservationDbFixture.reserve().getId();
 
         RestAssured.given().log().all()
                 .cookie("token", StubTokenProvider.ADMIN_STUB_TOKEN)

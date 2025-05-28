@@ -50,6 +50,9 @@ class ReservationApiTest {
     private ThemeDbFixture themeDbFixture;
 
     @Autowired
+    private MemberDbFixture memberDbFixture;
+
+    @Autowired
     private ReservationDateTimeDbFixture reservationDateTimeDbFixture;
 
     @MockitoBean
@@ -58,8 +61,8 @@ class ReservationApiTest {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-
         cleanUp.all();
+        memberDbFixture.유저1_생성();
     }
 
     @Test
