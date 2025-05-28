@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import roomescape.application.dto.PaymentProcessRequest;
@@ -44,11 +45,12 @@ public class PaymentService {
 
         String message = jsonNode.get("message").asText();
 
-        if (paymentResponse.getStatusCode().is4xxClientError()) {
-            throw new PaymentException(message, HttpStatus.BAD_REQUEST);
+        if (paymentResponse.getStatusCode() == HttpStatusCode.valueOf(401) ||
+            paymentResponse.getStatusCode().is5xxServerError()) {
+            throw new PaymentException("알 수 없는 문제가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        throw new PaymentException(message, HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new PaymentException(message, HttpStatus.BAD_REQUEST);
     }
 
     private JsonNode getJsonNode(String body) {
