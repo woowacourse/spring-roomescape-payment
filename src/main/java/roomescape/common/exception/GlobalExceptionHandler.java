@@ -19,8 +19,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handlePaymentException(final PaymentException e,
                                                                 final HttpServletRequest request) {
         final ErrorResponse errorResponse = new ErrorResponse(
-                e.getStatusCode().value(), e.getPaymentError().code(), e.getPaymentError().message(),
-                request.getMethod(), request.getRequestURI()
+                e.getStatusCode().value(), e.getCode(), e.getMessage(), request.getMethod(), request.getRequestURI()
         );
 
         return ResponseEntity.status(e.getStatusCode()).body(errorResponse);
