@@ -11,7 +11,6 @@ import roomescape.dto.request.ConfirmPaymentRequest;
 import roomescape.dto.response.ConfirmPaymentResponse;
 import roomescape.dto.response.PaymentErrorResponse;
 import roomescape.exception.custom.PaymentException;
-import roomescape.exception.dto.ErrorResponse;
 
 @Service
 public class PaymentService {
@@ -33,7 +32,8 @@ public class PaymentService {
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, ((request, response) -> {
                     ObjectMapper objectMapper = new ObjectMapper();
-                    PaymentErrorResponse paymentErrorResponse = objectMapper.readValue(response.getBody().readAllBytes(),
+                    PaymentErrorResponse paymentErrorResponse = objectMapper.readValue(
+                            response.getBody().readAllBytes(),
                             PaymentErrorResponse.class);
                     throw new PaymentException(response.getStatusCode(), paymentErrorResponse.message());
                 }))
