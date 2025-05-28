@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import roomescape.ReservationTestFixture;
 import roomescape.auth.dto.AuthenticatedMember;
@@ -27,6 +28,14 @@ class AuthControllerTest extends IntegrationTestSupport {
     String name = "웨이드";
     String email = "wade@naver.com";
     String password = "1234";
+
+    @LocalServerPort
+    int port;
+
+    @BeforeEach
+    void setup() {
+        RestAssured.port = port;
+    }
 
     @BeforeEach
     void setUp() {

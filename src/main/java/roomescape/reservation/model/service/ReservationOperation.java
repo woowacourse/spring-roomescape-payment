@@ -36,14 +36,15 @@ public class ReservationOperation {
     }
 
     @Transactional
-    public void cancel(Reservation reservation) {
+    public void cancel(Long reservationId) {
+        Reservation reservation = reservationRepository.getById(reservationId);
         reservation.changeToCancel();
         reservationWaitingRepository.findFirstPendingBySchedule(reservation.getSchedule())
                 .ifPresent(reservationWaiting -> {
-            reservationWaiting.changeToAccept();
-            Reservation newReservation = Reservation.confirmedFromWaiting(reservationWaiting);
-            reservationRepository.save(newReservation);
-        });
+                    reservationWaiting.changeToAccept();
+                    Reservation newReservation = Reservation.confirmedFromWaiting(reservationWaiting);
+                    reservationRepository.save(newReservation);
+                });
     }
 
     private ReservationDetails createReservationDetails(Schedule schedule, Long memberId) {

@@ -12,7 +12,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import roomescape.member.model.Member;
 import roomescape.member.model.MemberRepository;
 import roomescape.reservation.model.entity.ReservationTheme;
@@ -23,10 +22,9 @@ import roomescape.reservation.model.repository.ReservationThemeRepository;
 import roomescape.reservation.model.repository.ReservationTimeRepository;
 import roomescape.reservation.model.repository.ReservationWaitingRepository;
 import roomescape.reservation.model.vo.Schedule;
-import roomescape.support.RepositoryTestSupport;
+import roomescape.support.ServiceTestSupport;
 
-@Import(ReservationWaitingValidator.class)
-class ReservationWaitingValidatorTest extends RepositoryTestSupport {
+class ReservationWaitingValidatorTest extends ServiceTestSupport {
 
     @Autowired
     private ReservationWaitingValidator reservationWaitingValidator;

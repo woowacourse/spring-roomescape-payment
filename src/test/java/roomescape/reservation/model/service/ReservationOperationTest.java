@@ -11,6 +11,7 @@ import static roomescape.ReservationTestFixture.getUserFixture;
 import static roomescape.reservation.model.entity.vo.ReservationStatus.CONFIRMED;
 import static roomescape.reservation.model.entity.vo.ReservationWaitingStatus.ACCEPTED;
 
+import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +20,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Import;
 import roomescape.member.model.Member;
 import roomescape.member.model.MemberRepository;
 import roomescape.reservation.model.entity.Reservation;
@@ -33,10 +33,9 @@ import roomescape.reservation.model.repository.ReservationThemeRepository;
 import roomescape.reservation.model.repository.ReservationTimeRepository;
 import roomescape.reservation.model.repository.ReservationWaitingRepository;
 import roomescape.reservation.model.vo.Schedule;
-import roomescape.support.RepositoryTestSupport;
+import roomescape.support.ServiceTestSupport;
 
-@Import({ReservationOperation.class, ReservationValidator.class})
-class ReservationOperationTest extends RepositoryTestSupport {
+class ReservationOperationTest extends ServiceTestSupport {
 
     @Autowired
     private ReservationOperation reservationOperation;
@@ -55,6 +54,9 @@ class ReservationOperationTest extends RepositoryTestSupport {
 
     @Autowired
     private ReservationWaitingRepository reservationWaitingRepository;
+
+    @Autowired
+    private EntityManager entityManager;
 
     private Member savedMember;
     private ReservationTime savedTime;
@@ -79,7 +81,7 @@ class ReservationOperationTest extends RepositoryTestSupport {
         Reservation result = reservationOperation.reserve(schedule, savedMember.getId());
 
         // then
-        SoftAssertions.assertSoftly(softly ->{
+        SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(result.getDate()).isEqualTo(testDate);
             softly.assertThat(result.getTime()).isEqualTo(savedTime);
             softly.assertThat(result.getTheme()).isEqualTo(savedTheme);
@@ -110,7 +112,7 @@ class ReservationOperationTest extends RepositoryTestSupport {
         Reservation savedReservation = reservationRepository.save(reservation);
 
         // when
-        reservationOperation.cancel(savedReservation);
+        reservationOperation.cancel(savedReservation.getId());
 
         // then
         Reservation updatedReservation = reservationRepository.findById(savedReservation.getId()).get();
@@ -129,7 +131,7 @@ class ReservationOperationTest extends RepositoryTestSupport {
         reservationWaitingRepository.save(waiting);
 
         // when
-        reservationOperation.cancel(savedReservation);
+        reservationOperation.cancel(savedReservation.getId());
 
         // then
         Optional<Reservation> newReservation = reservationRepository.getAllByStatuses(List.of(CONFIRMED)).stream()
@@ -150,7 +152,7 @@ class ReservationOperationTest extends RepositoryTestSupport {
         ReservationWaiting firstWaiting = reservationWaitingRepository.save(waiting);
 
         // when
-        reservationOperation.cancel(savedReservation);
+        reservationOperation.cancel(savedReservation.getId());
 
         // then
         ReservationWaiting reservationWaiting = reservationWaitingRepository.getById(firstWaiting.getId());
@@ -167,7 +169,7 @@ class ReservationOperationTest extends RepositoryTestSupport {
         List<Reservation> beforeReservations = reservationRepository.getAllByStatuses(List.of(CONFIRMED));
 
         // when
-        reservationOperation.cancel(savedReservation);
+        reservationOperation.cancel(savedReservation.getId());
 
         // then
         List<Reservation> afterReservations = reservationRepository.getAllByStatuses(List.of(CONFIRMED));

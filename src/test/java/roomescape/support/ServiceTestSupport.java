@@ -7,10 +7,10 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.NONE)
 @ActiveProfiles("test")
 @Import(DataInitializer.class)
-public abstract class IntegrationTestSupport {
+public abstract class ServiceTestSupport {
 
     @Autowired
     private DataInitializer dataInitializer;

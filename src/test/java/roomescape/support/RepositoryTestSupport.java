@@ -28,12 +28,15 @@ public abstract class RepositoryTestSupport {
     @TestConfiguration
     @ComponentScan(
             basePackages = "roomescape",
-            includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class)
+            includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class),
+            useDefaultFilters = false
     )
+
     static class TestConfig {
         @Bean
         public DataInitializer dataInitializer() {
             return new DataInitializer();
         }
     }
+
 }
