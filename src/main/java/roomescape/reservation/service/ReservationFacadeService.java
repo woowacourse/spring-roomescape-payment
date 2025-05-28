@@ -67,7 +67,7 @@ public class ReservationFacadeService {
                                       final Long memberId, final String paymentKey, final String orderId,
                                       final Integer amount, final String paymentType) {
 
-        if (reservationService.isReservationExists(date, timeId, themeId)) {
+        if (!reservationService.isReservationExists(date, timeId, themeId)) {
             paymentService.payment(paymentKey, orderId, amount, paymentType);
             return createReservation(date, timeId, themeId, memberId);
         }
