@@ -10,13 +10,15 @@ import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 
+import jakarta.transaction.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.exception.ReservationException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.reservation.BaseTest;
+import roomescape.reservation.client.PaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Status;
 import roomescape.reservation.dto.ReservationRequest;
@@ -27,9 +29,9 @@ import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
 
-@DataJpaTest
 @Sql("/data.sql")
-class ReservationServiceIntegrationTest {
+@Transactional
+class ReservationServiceIntegrationTest extends BaseTest {
 
     private ReservationService reservationService;
 
@@ -47,24 +49,34 @@ class ReservationServiceIntegrationTest {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    private PaymentClient paymentClient;
+
     private Member member;
     private Theme theme;
     private ReservationTime time;
+    private String paymentKey;
+    private String orderId;
+    private Long amount;
 
     @BeforeEach
     void setUp() {
-        reservationService = new ReservationService(clock, reservationRepository, reservationTimeRepository,
-                themeRepository, memberRepository);
+        reservationService = new ReservationService(clock, paymentClient, reservationRepository,
+                reservationTimeRepository, themeRepository, memberRepository);
         member = memberRepository.save(Member.withDefaultRole("홍길동", "hong@example.com", "password"));
         theme = themeRepository.save(Theme.of("테마명", "테마 설명", "thumbnail.jpg"));
         time = reservationTimeRepository.save(ReservationTime.from(LocalTime.of(13, 0)));
+        paymentKey = null;
+        orderId = null;
+        amount = null;
     }
 
     @Test
     void 예약_생성_성공() {
         // given
         LocalDate date = LocalDate.now().plusDays(1);
-        ReservationRequest request = new ReservationRequest(date, time.getId(), theme.getId());
+        ReservationRequest request = new ReservationRequest(date, theme.getId(), time.getId(), paymentKey, orderId,
+                amount);
         LoginMember loginMember = new LoginMember(member.getId(), member.getName(), member.getEmail(),
                 member.getRole());
 
@@ -85,7 +97,8 @@ class ReservationServiceIntegrationTest {
     void 예약_시간_검증_실패() {
         // given
         LocalDate date = LocalDate.now().minusDays(1);
-        ReservationRequest request = new ReservationRequest(date, time.getId(), theme.getId());
+        ReservationRequest request = new ReservationRequest(date, theme.getId(), time.getId(), paymentKey, orderId,
+                amount);
         LoginMember loginMember = new LoginMember(member.getId(), member.getName(), member.getEmail(),
                 member.getRole());
 
@@ -101,8 +114,10 @@ class ReservationServiceIntegrationTest {
     void 대기_목록_관리_성공() {
         // given
         LocalDate date = LocalDate.now().plusDays(1);
-        ReservationRequest waitingRequest1 = new ReservationRequest(date, time.getId(), theme.getId());
-        ReservationRequest waitingRequest2 = new ReservationRequest(date, time.getId(), theme.getId());
+        ReservationRequest waitingRequest1 = new ReservationRequest(date, theme.getId(), time.getId(), paymentKey,
+                orderId, amount);
+        ReservationRequest waitingRequest2 = new ReservationRequest(date, theme.getId(), time.getId(), paymentKey,
+                orderId, amount);
         Member member2 = Member.withDefaultRole("member", "mem2@naver.com", "1234");
         memberRepository.save(member2);
         LoginMember loginMember = new LoginMember(member.getId(), member.getName(), member.getEmail(),

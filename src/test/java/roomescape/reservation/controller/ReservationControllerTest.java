@@ -8,6 +8,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,11 +20,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
 import roomescape.auth.infrastructure.jwt.JwtTokenProvider;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.reservation.BaseTest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservationtime.domain.ReservationTime;
@@ -33,7 +38,7 @@ import roomescape.theme.repository.ThemeRepository;
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @AutoConfigureMockMvc
-class ReservationControllerTest {
+class ReservationControllerTest extends BaseTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -70,11 +75,15 @@ class ReservationControllerTest {
     void 예약_생성_성공() throws Exception {
         // given
         LocalDate date = LocalDate.now().plusDays(1);
-        LocalDateTime currentDateTime = LocalDateTime.now();
-        String content = String.format("{\"date\": \"%s\",\"timeId\": %d,\"themeId\": %d,\"isWaiting\": false}",
-                date.toString(),
-                time.getId(),
-                theme.getId());
+
+        Map<String, String> params = new HashMap<>();
+        params.put("date", date.toString());
+        params.put("timeId", "1");
+        params.put("themeId", "1");
+        params.put("paymentKey", "aaa");
+        params.put("orderId", "aaa");
+        params.put("amount", "1000");
+        String content = new ObjectMapper().writeValueAsString(params);
 
         // when & then
         mockMvc.perform(post("/reservations")
@@ -164,10 +173,15 @@ class ReservationControllerTest {
     void 인증_실패() throws Exception {
         // given
         LocalDate date = LocalDate.now().plusDays(1);
-        String content = String.format("{\"date\": \"%s\",\"timeId\": %d,\"themeId\": %d,\"isWaiting\": false}",
-                date.toString(),
-                time.getId(),
-                theme.getId());
+
+        Map<String, String> params = new HashMap<>();
+        params.put("date", date.toString());
+        params.put("timeId", "1");
+        params.put("themeId", "1");
+        params.put("paymentKey", "aaa");
+        params.put("orderId", "aaa");
+        params.put("amount", "1000");
+        String content = new ObjectMapper().writeValueAsString(params);
 
         // when & then
         mockMvc.perform(post("/reservations")

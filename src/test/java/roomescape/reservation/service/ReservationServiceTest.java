@@ -1,7 +1,10 @@
 package roomescape.reservation.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
 import static roomescape.constant.TestData.RESERVATION_COUNT;
 
 import java.time.Clock;
@@ -14,14 +17,17 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 
+import jakarta.transaction.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.exception.NotFoundException;
+import roomescape.exception.PaymentClientException;
 import roomescape.exception.ReservationException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.reservation.BaseTest;
+import roomescape.reservation.client.PaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Status;
 import roomescape.reservation.dto.MyReservationResponse;
@@ -34,9 +40,12 @@ import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
 
-@DataJpaTest
 @Sql("/data.sql")
-class ReservationServiceTest {
+@Transactional
+class ReservationServiceTest extends BaseTest {
+
+    // @Autowired
+    // private MockRestServiceServer server;
 
     @Autowired
     private ReservationRepository reservationRepository;
@@ -50,28 +59,29 @@ class ReservationServiceTest {
     @Autowired
     private MemberRepository memberRepo;
 
+    @Autowired
+    private PaymentClient paymentClient;
+
     private Clock clock = Clock.systemDefaultZone();
-
     private ReservationService service;
-
     private ReservationTime time1;
-
     private Theme theme1;
-
     private Member member;
-
     private Reservation r1;
+    private String paymentKey;
+    private String orderId;
+    private Long amount;
 
     @BeforeEach
     void setUp() {
-        service = new ReservationService(clock, reservationRepository, timeRepo, themeRepo, memberRepo);
+        service = new ReservationService(clock, paymentClient, reservationRepository, timeRepo, themeRepo, memberRepo);
         time1 = ReservationTime.from(LocalTime.of(14, 0));
-
         theme1 = Theme.of("테마1", "설명1", "썸네일1");
-
         member = Member.withDefaultRole("member", "mem@naver.com", "1234");
-
         r1 = Reservation.of(LocalDate.of(2999, 5, 11), time1, theme1, member, LocalDateTime.now(clock));
+        paymentKey = null;
+        orderId = null;
+        amount = null;
     }
 
     @Test
@@ -90,7 +100,8 @@ class ReservationServiceTest {
         timeRepo.save(time1);
         themeRepo.save(theme1);
         memberRepo.save(member);
-        ReservationRequest request = new ReservationRequest(LocalDate.of(2000, 10, 8), time1.getId(), theme1.getId());
+        ReservationRequest request = new ReservationRequest(LocalDate.of(2000, 10, 8), theme1.getId(), time1.getId(),
+                paymentKey, orderId, amount);
         final LoginMember loginMember = new LoginMember(member.getId(), member.getName(), member.getEmail(),
                 member.getRole());
 
@@ -110,7 +121,8 @@ class ReservationServiceTest {
         final LoginMember loginMember = new LoginMember(member.getId(), member.getName(), member.getEmail(),
                 member.getRole());
 
-        ReservationRequest req = new ReservationRequest(LocalDate.of(2999, 4, 21), time1.getId(), theme1.getId());
+        ReservationRequest req = new ReservationRequest(LocalDate.of(2999, 4, 21), theme1.getId(), time1.getId(),
+                paymentKey, orderId, amount);
 
         // when
         ReservationResponse result = service.saveReservation(req, loginMember);
@@ -133,6 +145,29 @@ class ReservationServiceTest {
                                     .getStartAt())
                     .isEqualTo(time1.getStartAt());
         });
+    }
+
+    @Test
+    void 결제_승인_실패_시_예약이_생성되지_않는다() {
+        // given
+        server.reset();
+        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andRespond(withBadRequest());
+
+        timeRepo.save(time1);
+        themeRepo.save(theme1);
+        memberRepo.save(member);
+        final LoginMember loginMember = new LoginMember(member.getId(), member.getName(), member.getEmail(),
+                member.getRole());
+
+        ReservationRequest req = new ReservationRequest(LocalDate.of(2999, 4, 21), theme1.getId(), time1.getId(),
+                paymentKey, orderId, amount);
+
+        // when then
+        assertThatCode(() -> service.saveReservation(req, loginMember))
+                .isInstanceOf(PaymentClientException.class);
+
+        assertThat(reservationRepository.findAll()).hasSize(RESERVATION_COUNT + 0);
     }
 
     @Test
@@ -207,7 +242,8 @@ class ReservationServiceTest {
         timeRepo.save(time1);
         themeRepo.save(theme1);
         LocalDate date = LocalDate.now().plusDays(1);
-        ReservationRequest request = new ReservationRequest(date, time1.getId(), theme1.getId());
+        ReservationRequest request = new ReservationRequest(date, theme1.getId(), time1.getId(),
+                paymentKey, orderId, amount);
         LoginMember loginMember = new LoginMember(member.getId(), member.getName(), member.getEmail(),
                 member.getRole());
 
@@ -231,7 +267,8 @@ class ReservationServiceTest {
         timeRepo.save(time1);
         themeRepo.save(theme1);
         LocalDate date = LocalDate.now().minusDays(1);
-        ReservationRequest request = new ReservationRequest(date, time1.getId(), theme1.getId());
+        ReservationRequest request = new ReservationRequest(LocalDate.of(2000, 10, 8), theme1.getId(), time1.getId(),
+                paymentKey, orderId, amount);
         LoginMember loginMember = new LoginMember(member.getId(), member.getName(), member.getEmail(),
                 member.getRole());
 
@@ -250,8 +287,10 @@ class ReservationServiceTest {
         timeRepo.save(time1);
         themeRepo.save(theme1);
         LocalDate date = LocalDate.now().plusDays(1);
-        ReservationRequest waitingRequest1 = new ReservationRequest(date, time1.getId(), theme1.getId());
-        ReservationRequest waitingRequest2 = new ReservationRequest(date, time1.getId(), theme1.getId());
+        ReservationRequest waitingRequest1 = new ReservationRequest(date, theme1.getId(), time1.getId(),
+                paymentKey, orderId, amount);
+        ReservationRequest waitingRequest2 = new ReservationRequest(date, theme1.getId(), time1.getId(),
+                paymentKey, orderId, amount);
         Member member2 = Member.withDefaultRole("member", "mem2@naver.com", "1234");
         memberRepo.save(member2);
         LoginMember loginMember = new LoginMember(member.getId(), member.getName(), member.getEmail(),

@@ -18,13 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.repository.MemberRepository;
+import roomescape.reservation.BaseTest;
 import roomescape.reservation.controller.ReservationController;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.ReservationResponse;
@@ -35,8 +35,8 @@ import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-class MissionStepTest {
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+class MissionStepTest extends BaseTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -134,7 +134,9 @@ class MissionStepTest {
         themeRepository.save(Theme.of("name", "desc", "thumb"));
         params.put("timeId", "1");
         params.put("themeId", "1");
-        params.put("isWaiting", "false");
+        params.put("paymentKey", "aaa");
+        params.put("orderId", "aaa");
+        params.put("amount", "1000");
         Map<String, String> adminUser = Map.of("email", "admin@naver.com", "password", "1234");
         String token = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -244,8 +246,18 @@ class MissionStepTest {
         params.put("date", "2999-08-05");
         params.put("timeId", "1");
         params.put("themeId", "1");
-        params.put("isWaiting", "false");
+        params.put("paymentKey", "aaa");
+        params.put("orderId", "aaa");
+        params.put("amount", "1000");
 
+        /**
+         *         @NotNull @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
+         *         @NotNull Long themeId,
+         *         @NotNull Long timeId,
+         *         @NotNull String paymentKey,
+         *         @NotNull String orderId,
+         *         @NotNull Long amount
+         */
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(params)
@@ -301,7 +313,18 @@ class MissionStepTest {
         reservation.put("date", "2999-08-05");
         reservation.put("timeId", 1);
         reservation.put("themeId", "1");
-        reservation.put("isWaiting", "false");
+        reservation.put("paymentKey", "aaa");
+        reservation.put("orderId", "aaa");
+        reservation.put("amount", 1000);
+
+        /**
+         *         @NotNull @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
+         *         @NotNull Long themeId,
+         *         @NotNull Long timeId,
+         *         @NotNull String paymentKey,
+         *         @NotNull String orderId,
+         *         @NotNull Long amount
+         */
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
