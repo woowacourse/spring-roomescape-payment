@@ -20,6 +20,7 @@ public class PaymentService {
         this.reservationRepository = reservationRepository;
     }
 
+    @Transactional
     public Payment save(TossPaymentResponse response, long reservationId) {
         Reservation byId = reservationRepository.findById(reservationId)
                 .orElseThrow();
@@ -28,6 +29,7 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
 
+    @Transactional
     public void delete(long paymentId) {
         Payment payment = paymentRepository.findById(paymentId)
                 .orElseThrow();

@@ -1,10 +1,7 @@
 package roomescape.reservation.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -20,15 +17,15 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
 
     private LocalDate date;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private ReservationTime time;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Theme theme;
 
     protected Reservation() {

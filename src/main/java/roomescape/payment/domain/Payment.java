@@ -21,7 +21,7 @@ public class Payment {
 
     private PaymentStatus status;
 
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @OneToOne(cascade = CascadeType.REMOVE , fetch = FetchType.LAZY)
     private Reservation reservation;
 
     public Payment(String orderId, LocalDateTime paymentDateTime, Long amount, PaymentStatus status, Reservation reservation) {
