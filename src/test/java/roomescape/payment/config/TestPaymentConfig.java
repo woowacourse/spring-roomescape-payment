@@ -5,6 +5,7 @@ import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
@@ -34,13 +35,12 @@ public class TestPaymentConfig {
     }
 
     @Bean
-    public PaymentClient paymentClient(RestClient.Builder builder) {
+    public PaymentClient paymentClient() {
         HttpServiceProxyFactory factory = HttpServiceProxyFactory
                 .builder()
-                .exchangeAdapter(RestClientAdapter.create(builder.build()))
+                .exchangeAdapter(RestClientAdapter.create(restClientBuilder().build()))
                 .build();
 
         return factory.createClient(PaymentClient.class);
     }
-
 }

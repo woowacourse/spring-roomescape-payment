@@ -5,6 +5,7 @@ import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
@@ -15,6 +16,7 @@ import roomescape.payment.service.PaymentClient;
 public class PaymentConfig {
 
     private static final String COLON = ":";
+    private static final int CONNECT_TIMEOUT_MS = 3000;
 
     private final ObjectMapper objectMapper;
     private final String token;
@@ -26,9 +28,13 @@ public class PaymentConfig {
 
     @Bean
     public PaymentClient paymentClient() {
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(CONNECT_TIMEOUT_MS);
+
         RestClient client = RestClient.builder()
                 .baseUrl("https://api.tosspayments.com/v1/payments")
                 .requestInterceptor(new PaymentResponseInterceptor(objectMapper))
+                .requestFactory(requestFactory)
                 .defaultHeader("Authorization", "Basic " + Base64.getEncoder()
                         .encodeToString(((token + COLON).getBytes())))
                 .build();

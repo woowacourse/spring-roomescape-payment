@@ -22,13 +22,14 @@ public class PaymentResponseInterceptor implements ClientHttpRequestInterceptor 
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
             throws IOException {
         ClientHttpResponse response = execution.execute(request, body);
-        PaymentErrorResponse paymentErrorResponse = getPaymentErrorResponse(response);
 
         if (response.getStatusCode().is4xxClientError()) {
+            PaymentErrorResponse paymentErrorResponse = getPaymentErrorResponse(response);
             throw new PaymentProcessException(paymentErrorResponse.message());
         }
 
         if (response.getStatusCode().is5xxServerError()) {
+            PaymentErrorResponse paymentErrorResponse = getPaymentErrorResponse(response);
             throw new PaymentServerException(paymentErrorResponse.message());
         }
 
