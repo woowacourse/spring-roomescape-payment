@@ -43,8 +43,7 @@ public class PaymentServiceTest {
     @Test
     void 결제를_진행한다() throws JsonProcessingException {
         PaymentProcessRequest paymentProcessRequest = new PaymentProcessRequest("test", "test", "1000");
-        Payment payment = new Payment(null, "test", "test");
-        Payment savedPayment = new Payment(1L, "test", "test");
+        Payment payment = Payment.create("test", "test");
         String paymentString = """
                 {
                     "paymentKey": "test",
@@ -57,10 +56,10 @@ public class PaymentServiceTest {
 
         when(objectMapper.readTree(paymentString)).thenReturn(jsonNode);
         when(paymentRestClient.getPaymentResponse(paymentProcessRequest)).thenReturn(responseEntity);
-        when(paymentRepository.save(payment)).thenReturn(savedPayment);
+        when(paymentRepository.save(payment)).thenReturn(payment);
 
         Payment resultPayment = paymentService.process(paymentProcessRequest);
-        assertThat(resultPayment).isEqualTo(savedPayment);
+        assertThat(resultPayment.getPaymentKey()).isEqualTo(payment.getPaymentKey());
         verify(paymentRestClient, times(1)).getPaymentResponse(paymentProcessRequest);
     }
 
