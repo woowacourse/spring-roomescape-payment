@@ -1,5 +1,6 @@
 package roomescape.payment.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -8,17 +9,26 @@ import org.springframework.web.client.RestClient;
 import roomescape.payment.resolver.PaymentResolver;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Configuration
 public class ClientConfig {
 
+    @Value("${payment.secret.key}")
+    private String secretKey;
+
     @Bean
-    public PaymentResolver todoRestClient() {
+    public PaymentResolver getPaymentResolver() {
+        Base64.Encoder encoder = Base64.getEncoder();
+        byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
+        String authorizations = "Basic " + new String(encodedBytes);
+
         return new PaymentResolver(
                 RestClient.builder()
                         .baseUrl("https://api.tosspayments.com")
                         .defaultHeader("Content-Type", "application/json")
-                        .requestInterceptor(loggingInterceptor()) // 인터셉터 추가
+                        .defaultHeader("Authorization", authorizations)
+                        .requestInterceptor(loggingInterceptor())
                         .build()
         );
     }

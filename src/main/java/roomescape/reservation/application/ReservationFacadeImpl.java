@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.exception.DuplicateException;
+import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.resolver.PaymentResolver;
 import roomescape.reservation.application.dto.AvailableReservationTimeServiceRequest;
@@ -93,17 +94,15 @@ public class ReservationFacadeImpl implements ReservationFacade {
     @Transactional
     public ReservationResponse create(final CreateReservationWithUserIdWebRequest request) {
         final User user = userQueryService.getById(request.userId());
-
-        // 결제 성공
-        PaymentResponse response = paymentResolver.execute(
-                request.paymentKey(),
-                request.amount(),
-                request.orderId(),
-                request.paymentType() // todo. 필요없는 요청값?
-        );
-        
         final Reservation reservation = reservationCommandService.create(
-                request.toServiceRequest());
+                request.toServiceRequest()); // todo. paymentKey를 저장하기?
+
+        PaymentResponse response = paymentResolver.execute(
+                new PaymentRequest(request.paymentKey(),
+                        request.amount(),
+                        request.orderId(),
+                        request.paymentType())
+        );
 
         return ReservationResponse.from(reservation, user);
     }

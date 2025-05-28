@@ -1,37 +1,48 @@
 package roomescape.payment.resolver;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+import roomescape.payment.exception.PaymentApiException;
 
 @RequiredArgsConstructor
 public class PaymentResolver {
 
+    private static final ObjectMapper MAPPER = new ObjectMapper();
     private final RestClient restClient;
 
-    @Value("${payment.secret.key}")
-    private String secretKey;
+    public PaymentResponse execute(final PaymentRequest request) {
 
-    public PaymentResponse execute(final String paymentKey,
-                                   final int amount,
-                                   final String orderId,
-                                   final String paymentType) {
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
-        String authorizations = "Basic " + new String(encodedBytes);
-        return restClient.post()
-                .uri("/v1/payments/confirm")
-                .header("Authorization", authorizations)
-                .body(new PaymentRequest(paymentKey, amount, orderId, paymentType))
-                .retrieve()
-//                .onStatus(status -> status.value() == 404, (req, res) -> {
-//                    throw new IllegalArgumentException();
-//                })
-                .body(PaymentResponse.class);
+        try {
+            return restClient.post()
+                    .uri("/v1/payments/confirm")
+                    .body(request)
+                    .retrieve()
+                    .body(PaymentResponse.class);
+        } catch (RestClientResponseException e) {
+            exceptionable(e, request.paymentKey());
+        }
+        throw new RuntimeException("[ERROR] 결제 과정 중 에러가 발생했습니다.");
+    }
+
+    private void exceptionable(final RestClientResponseException e, final String paymentKey) {
+        try {
+            String responseBody = e.getResponseBodyAsString();
+            JsonNode jsonNode = MAPPER.readTree(responseBody);
+            String errorMessage = jsonNode.get("message").asText();
+
+            if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {  // todo: 예외 처리 개선
+                throw new RuntimeException("[ERROR] 결제 확인에 실패했습니다. " + errorMessage + " - 결제 키: " + paymentKey);
+            }
+            throw new PaymentApiException(responseBody, errorMessage, e.getStatusCode());
+        } catch (JsonProcessingException parseException) {
+            throw new RuntimeException("[ERROR] 파싱에 실패했습니다." + e.getMessage());
+        }
     }
 }
