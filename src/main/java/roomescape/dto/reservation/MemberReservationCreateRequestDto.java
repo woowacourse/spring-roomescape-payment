@@ -10,7 +10,6 @@ public record MemberReservationCreateRequestDto
          String paymentKey,
          String orderId,
          Long amount
-//         TossPaymentConfirmRequestDto
 ) {
     public TossPaymentConfirmRequestDto extractTossPaymentDto() {
         return new TossPaymentConfirmRequestDto(paymentKey, orderId, amount);

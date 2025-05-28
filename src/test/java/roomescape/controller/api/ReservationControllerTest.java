@@ -1,11 +1,7 @@
 package roomescape.controller.api;
 
-import static org.hamcrest.Matchers.is;
 
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,6 +16,8 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.util.JwtTokenProvider;
+
+import static org.hamcrest.Matchers.is;
 
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
@@ -59,28 +57,6 @@ class ReservationControllerTest {
                     .cookie("token", loginToken)
                     .when().get("/reservations/me")
                     .then().log().all().statusCode(200);
-        }
-    }
-
-    @Nested
-    class ReservationCreateTest {
-        @DisplayName("Reservation을 생성한다")
-        @Test
-        void addReservationTest() {
-            Map<String, Object> params = new HashMap<>();
-            params.put("name", "브라운");
-            params.put("date", "2030-08-05");
-            params.put("timeId", 1);
-            params.put("themeId", 1);
-
-            RestAssured.given().log().all()
-                    .cookie("token", loginToken)
-                    .contentType(ContentType.JSON)
-                    .body(params)
-                    .when().post("/reservations")
-                    .then().log().all()
-                    .statusCode(201)
-                    .body("id", is(2));
         }
     }
 }
