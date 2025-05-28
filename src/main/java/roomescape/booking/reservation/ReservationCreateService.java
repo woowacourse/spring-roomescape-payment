@@ -1,10 +1,8 @@
 package roomescape.booking.reservation;
 
 import lombok.AllArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClient;
 import roomescape.auth.dto.LoginMember;
 import roomescape.booking.reservation.dto.AdminReservationRequest;
 import roomescape.booking.reservation.dto.ReservationPaymentRequest;
@@ -16,10 +14,10 @@ import roomescape.member.Member;
 import roomescape.member.MemberService;
 import roomescape.order.Order;
 import roomescape.order.OrderReader;
+import roomescape.order.PaymentClient;
+import roomescape.order.dto.PaymentConfirmRequest;
 import roomescape.schedule.Schedule;
 import roomescape.schedule.ScheduleService;
-
-import java.util.Base64;
 
 @Service
 @AllArgsConstructor
@@ -29,7 +27,7 @@ public class ReservationCreateService {
     private final ScheduleService scheduleService;
     private final MemberService memberService;
     private final OrderReader orderReader;
-    private final RestClient restClient;
+    private final PaymentClient paymentClient;
 
     @Transactional
     public ReservationResponse create(final ReservationRequest request, final LoginMember loginMember) {
@@ -67,20 +65,8 @@ public class ReservationCreateService {
         final Schedule schedule = scheduleService.getByDateAndTimeIdAndThemeId(request.date(), request.timeId(), request.themeId());
         order.pay(request.amount(), member, schedule);
 
-        String testWidgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:";
-        String encodedKey = Base64.getEncoder().encodeToString(testWidgetSecretKey.getBytes());
-
-        try {
-            ResponseEntity<Void> response = restClient.post()
-                    .uri("https://api.tosspayments.com/v1/payments/confirm")
-                    .header("Authorization", "Basic " + encodedKey)
-                    .body(new PaymentRequests(request.orderId(), request.amount(), request.paymentKey()))
-                    .retrieve()
-                    .toBodilessEntity();
-            System.out.println(response.getStatusCode());
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-        }
+        PaymentConfirmRequest paymentRequest = new PaymentConfirmRequest(request.orderId(), request.amount(), request.paymentKey());
+        paymentClient.confirm(paymentRequest);
 
         validatePast(schedule);
         validateDuplication(schedule);
@@ -97,13 +83,5 @@ public class ReservationCreateService {
         final Member member = memberService.getById(request.memberId());
         final Reservation savedReservation = saveReservation(schedule, member);
         return ReservationResponse.from(savedReservation);
-    }
-
-    private record PaymentRequests(
-            String orderId,
-            Long amount,
-            String paymentKey
-    ) {
-
     }
 }
