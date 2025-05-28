@@ -6,6 +6,8 @@ import roomescape.common.exception.impl.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.payment.application.dto.PaymentRequest;
+import roomescape.payment.application.dto.TossConfirmRequest;
+import roomescape.payment.application.dto.TossConfirmResponse;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentGateway;
 import roomescape.payment.domain.PaymentInfo;
@@ -23,15 +25,18 @@ public class PaymentService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final TossPaymentGatewayClient tossPaymentGatewayClient;
 
     public PaymentService(final PaymentRepository paymentRepository,
         final ReservationTimeRepository reservationTimeRepository,
         final ThemeRepository themeRepository,
-        final MemberRepository memberRepository) {
+        final MemberRepository memberRepository,
+        final TossPaymentGatewayClient tossPaymentGatewayClient) {
         this.paymentRepository = paymentRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.tossPaymentGatewayClient = tossPaymentGatewayClient;
     }
 
     @Transactional
@@ -39,11 +44,13 @@ public class PaymentService {
         final PaymentRequest request,
         final Long memberId
     ) {
+        TossConfirmResponse response = tossPaymentGatewayClient.processPaymentConfirm(
+        new TossConfirmRequest(request.paymentKey(), request.orderId(), request.amount()));
         ReservationTime reservationTime = getReservationTime(request.timeId());
         Member member = getMember(memberId);
         Theme theme = getTheme(request.themeId());
         Payment payment = new Payment(member, reservationTime, theme, request.date(),
-            new PaymentInfo(request.paymentKey(), request.orderId(), request.amount()),
+            new PaymentInfo(response.paymentKey(), response.orderId(), response.easyPay().amount()),
             PaymentGateway.TOSS_PAYMENTS);
         return paymentRepository.save(payment);
     }
