@@ -2,33 +2,48 @@ package roomescape.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+
+import java.awt.image.DataBufferByte;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.auth.Role;
-import roomescape.domain.Member;
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Theme;
-import roomescape.domain.Waiting;
+import roomescape.domain.*;
 import roomescape.domain.repository.MemberRepository;
 import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ThemeRepository;
 import roomescape.domain.repository.WaitingRepository;
 import roomescape.infrastructure.JwtTokenProvider;
+import roomescape.presentation.PaymentClientController;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class ReservationApiTest {
+
+    @LocalServerPort
+    int port;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -48,6 +63,14 @@ public class ReservationApiTest {
     @Autowired
     private JwtTokenProvider tokenProvider;
 
+    @MockitoBean
+    private PaymentClientController paymentClientController;
+
+    @BeforeEach
+    void setUpRestAssuredPort() {
+        RestAssured.port = port;
+    }
+
     @Test
     void 사용자가_예약을_추가한다() {
         Member savedMember = memberRepository.save(
@@ -60,6 +83,12 @@ public class ReservationApiTest {
         reservation.put("date", "2026-08-05");
         reservation.put("timeId", time.getId());
         reservation.put("themeId", theme.getId());
+        reservation.put("paymentKey", "1");
+        reservation.put("orderId", "1");
+        reservation.put("amount", 1000);
+
+        PaymentInfo paymentInfo = new PaymentInfo("1", 1000);
+        BDDMockito.given(paymentClientController.postPaymentInfo(any())).willReturn(paymentInfo);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

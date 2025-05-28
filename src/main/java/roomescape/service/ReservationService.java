@@ -36,20 +36,17 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
-    private final PaymentClientController paymentClientController;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
                               MemberRepository memberRepository,
-                              WaitingRepository waitingRepository,
-                              PaymentClientController paymentClientController) {
+                              WaitingRepository waitingRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
-        this.paymentClientController = paymentClientController;
     }
 
     @Transactional(readOnly = true)
