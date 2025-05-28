@@ -13,6 +13,12 @@ public class ExceptionHandlerAdvice {
         return ResponseEntity.badRequest().build();
     }
 
+    @ExceptionHandler(PaymentBadRequestException.class)
+    public ResponseEntity<PaymentBadRequestException> handlePaymentBadRequestException(PaymentBadRequestException exception) {
+        return ResponseEntity.badRequest()
+                .body(exception);
+    }
+
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Void> handleEntityNotFoundException() {
         return ResponseEntity.notFound().build();
