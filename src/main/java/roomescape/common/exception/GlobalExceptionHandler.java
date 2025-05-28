@@ -10,6 +10,7 @@ import roomescape.common.exception.impl.BadRequestException;
 import roomescape.common.exception.impl.ConflictException;
 import roomescape.common.exception.impl.ForbiddenException;
 import roomescape.common.exception.impl.NotFoundException;
+import roomescape.common.exception.impl.SeverErrorException;
 import roomescape.common.exception.impl.UnauthorizedException;
 
 @RestControllerAdvice
@@ -22,6 +23,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handle(final Exception e) {
         log.error("Unexpected error occured", e);
         return new ResponseEntity<>("서버 내부에 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(SeverErrorException.class)
+    public ResponseEntity<String> handle(final SeverErrorException e) {
+        log.error(e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(BadRequestException.class)

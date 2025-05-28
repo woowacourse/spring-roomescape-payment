@@ -225,9 +225,9 @@ async function fetchReservationPayment(paymentData, reservationData) {
         body: JSON.stringify(reservationPaymentRequest),
     }).then(response => {
         if (!response.ok) {
-            return response.json().then(errorBody => {
+            return response.text().then(errorBody => {
                 console.error("예약 결제 실패 : " + JSON.stringify(errorBody));
-                window.alert("예약 결제 실패 메시지");
+                window.alert(JSON.stringify(errorBody));
             });
         } else {
             response.json().then(successBody => {
