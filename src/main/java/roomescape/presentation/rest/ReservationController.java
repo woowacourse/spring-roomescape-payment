@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.application.PaymentService;
 import roomescape.application.ReservationService;
 import roomescape.domain.auth.AuthenticationInfo;
 import roomescape.domain.reservation.ReservationSearchFilter;
@@ -28,7 +29,8 @@ import roomescape.presentation.response.ReservationResponse;
 @AllArgsConstructor
 public class ReservationController {
 
-    private final ReservationService service;
+    private final ReservationService reservationService;
+    private final PaymentService paymentService;
 
     @PostMapping
     @ResponseStatus(CREATED)
@@ -36,7 +38,8 @@ public class ReservationController {
             final AuthenticationInfo authenticationInfo,
             @RequestBody @Valid final CreateReservationRequest request
     ) {
-        var reservation = service.reserve(authenticationInfo.id(), request.date(), request.timeId(), request.themeId());
+        paymentService.pay(request.paymentKey(), request.orderId(), request.amount());
+        var reservation = reservationService.reserve(authenticationInfo.id(), request.date(), request.timeId(), request.themeId());
         return ReservationResponse.from(reservation);
     }
 
@@ -46,7 +49,7 @@ public class ReservationController {
             final AuthenticationInfo authenticationInfo,
             @RequestBody @Valid final CreateReservationRequest request
     ) {
-        var reservation = service.waitFor(authenticationInfo.id(), request.date(), request.timeId(), request.themeId());
+        var reservation = reservationService.waitFor(authenticationInfo.id(), request.date(), request.timeId(), request.themeId());
         return ReservationResponse.from(reservation);
     }
 
@@ -58,7 +61,7 @@ public class ReservationController {
             @RequestParam(name = "dateTo", required = false) final LocalDate dateTo
     ) {
         var searchFilter = new ReservationSearchFilter(themeId, userId, dateFrom, dateTo);
-        var reservations = service.findAllReservations(searchFilter);
+        var reservations = reservationService.findAllReservations(searchFilter);
         return ReservationResponse.from(reservations);
     }
 
@@ -71,7 +74,7 @@ public class ReservationController {
         if (!authenticationInfo.isAdmin()) {
             throw new AuthorizationException("관리자에게만 허용된 작업입니다.");
         }
-        service.removeById(id);
+        reservationService.removeById(id);
     }
 
     @DeleteMapping("/wait/{id}")
@@ -81,6 +84,6 @@ public class ReservationController {
         @PathVariable("id") final long reservationId
     ) {
         var userId = authenticationInfo.id();
-        service.cancelWaiting(userId, reservationId);
+        reservationService.cancelWaiting(userId, reservationId);
     }
 }

@@ -20,6 +20,7 @@ import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import roomescape.application.PaymentService;
 import roomescape.application.ReservationService;
 import roomescape.domain.auth.AuthenticationInfo;
 import roomescape.domain.user.UserRole;
@@ -32,8 +33,9 @@ class ReservationControllerTest {
     private final long userId = 99L;
 
     private final ReservationService reservationService = Mockito.mock(ReservationService.class);
+    private final PaymentService paymentService = Mockito.mock(PaymentService.class);
     private final MockMvc mockMvc = MockMvcBuilders
-        .standaloneSetup(new ReservationController(reservationService))
+        .standaloneSetup(new ReservationController(reservationService, paymentService))
         .setCustomArgumentResolvers(new StubAuthenticationInfoArgumentResolver(new AuthenticationInfo(userId, UserRole.USER)))
         .setControllerAdvice(new GlobalExceptionHandler())
         .build();

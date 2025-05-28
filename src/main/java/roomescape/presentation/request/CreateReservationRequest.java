@@ -13,7 +13,16 @@ public record CreateReservationRequest(
     Long timeId,
 
     @NotNull
-    Long themeId
+    Long themeId,
+
+    @NotNull
+    String paymentKey,
+
+    @NotNull
+    String orderId,
+
+    @NotNull
+    Long amount
 ) {
 
 }
