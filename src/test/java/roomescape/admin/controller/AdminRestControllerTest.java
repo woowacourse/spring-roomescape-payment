@@ -10,9 +10,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
+import roomescape.payment.processor.toss.TossPaymentConfirmRequest;
+import roomescape.payment.processor.toss.TossPaymentConfirmResponse;
+import roomescape.payment.processor.toss.TossPaymentProcessor;
+import roomescape.reservation.dto.TossPaymentRequest;
 
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -20,6 +26,9 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 class AdminRestControllerTest {
 
     private String adminToken;
+
+    @MockitoBean
+    private TossPaymentProcessor tossPaymentProcessor;
 
     @BeforeEach
     void setUp() {
@@ -99,7 +108,20 @@ class AdminRestControllerTest {
                 .body(Map.of("email", "yebink@email.com", "password", "1234"))
                 .when().post("/login").getCookie("token");
 
-        final Map<String, String> reservationParams = createReservationRequestJsonMap("2026-04-15", "1", "1");
+        final TossPaymentRequest tossPaymentRequest = new TossPaymentRequest("paymentKey", "orderId", 10000);
+        final TossPaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(
+            tossPaymentRequest.amount(),
+            tossPaymentRequest.orderId(),
+            tossPaymentRequest.paymentKey()
+        );
+        final Map<String, Object> reservationParams = createReservationRequestJsonMap(
+            "2026-04-15",
+            "1",
+            "1",
+            tossPaymentRequest
+        );
+
+        setTossPaymentConfirm(tossPaymentConfirmRequest, null);
         final Map<String, String> waitingParams = createWaitingRequestJsonMap("2026-04-15", "1", "1");
 
         RestAssured.given().log().all()
@@ -139,14 +161,25 @@ class AdminRestControllerTest {
     }
 
 
-    private Map<String, String> createReservationRequestJsonMap(
-            final String date,
-            final String themeId,
-            final String timeId) {
+    private Map<String, Object> createReservationRequestJsonMap(
+        final String date,
+        final String themeId,
+        final String timeId,
+        final TossPaymentRequest request) {
         return Map.of(
-                "date", date,
-                "themeId", themeId,
-                "timeId", timeId
+            "date", date,
+            "themeId", themeId,
+            "timeId", timeId,
+            "tossPaymentRequest", Map.of(
+                "paymentKey", request.paymentKey(),
+                "orderId", request.orderId(),
+                "amount", request.amount()
+            )
         );
+    }
+
+    private void setTossPaymentConfirm(TossPaymentConfirmRequest request, TossPaymentConfirmResponse response) {
+        when(tossPaymentProcessor.processPayment(request))
+            .thenReturn(response);
     }
 }
