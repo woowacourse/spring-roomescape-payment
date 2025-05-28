@@ -12,8 +12,10 @@ import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.PaymentRestClient;
 import roomescape.payment.RestClientConfig;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.MyPageReservationResponse;
 import roomescape.reservation.dto.ReservationPaymentRequest;
@@ -34,6 +36,7 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ReservationThemeRepository reservationThemeRepository;
     private final ReservationWaitingRepository reservationWaitingRepository;
+    private final PaymentRepository paymentRepository;
     private final MemberRepository memberRepository;
     private final EntityManager entityManager;
     private final RestClientConfig restClientConfig;
@@ -51,8 +54,10 @@ public class ReservationService {
         final ReservationTheme theme = reservationThemeRepository.findById(themeId)
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 테마 입니다."));
         final Reservation reservation = new Reservation(member, date, time, theme);
-        approvePayment(request);
+        TossPaymentResponse paymentResponse = approvePayment(request);
         Reservation saved = reservationRepository.save(reservation);
+        paymentRepository.save(new Payment(saved, paymentResponse.orderId(), paymentResponse.paymentKey(),
+                paymentResponse.totalAmount(), paymentResponse.type()));
         return ReservationResponse.fromV2(saved);
     }
 
@@ -103,9 +108,9 @@ public class ReservationService {
         );
     }
 
-    private void approvePayment(final ReservationPaymentRequest request) {
+    private TossPaymentResponse approvePayment(final ReservationPaymentRequest request) {
         PaymentRestClient restClient = restClientConfig.getPaymentRestClient();
-        TossPaymentResponse tossPaymentResponse = restClient.requestPaymentApprove(
+        return restClient.requestPaymentApprove(
                 new TossPaymentRequest(request.orderId(), request.paymentKey(), request.amount()));
     }
 
