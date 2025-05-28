@@ -3,17 +3,20 @@ package roomescape.service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClient;
-import roomescape.domain.*;
+import roomescape.domain.Member;
+import roomescape.domain.PaymentInfo;
+import roomescape.domain.Reservation;
+import roomescape.domain.ReservationTime;
+import roomescape.domain.Theme;
+import roomescape.domain.Waiting;
+import roomescape.domain.WaitingWithRank;
 import roomescape.domain.repository.MemberRepository;
 import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ThemeRepository;
 import roomescape.domain.repository.WaitingRepository;
-import roomescape.dto.PaymentRequest;
 import roomescape.dto.request.ReservationCondition;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationWithStatusResponse;
@@ -22,6 +25,7 @@ import roomescape.exception.MemberNotFoundException;
 import roomescape.exception.ReservationNotFoundException;
 import roomescape.exception.ReservationTimeNotFoundException;
 import roomescape.exception.ThemeNotFoundException;
+import roomescape.presentation.PaymentClientController;
 
 @Service
 @Transactional
@@ -32,20 +36,20 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
-    private final PaymentClientService paymentClientService;
+    private final PaymentClientController paymentClientController;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeRepository reservationTimeRepository,
                               ThemeRepository themeRepository,
                               MemberRepository memberRepository,
                               WaitingRepository waitingRepository,
-                              PaymentClientService paymentClientService) {
+                              PaymentClientController paymentClientController) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
-        this.paymentClientService = paymentClientService;
+        this.paymentClientController = paymentClientController;
     }
 
     @Transactional(readOnly = true)
@@ -93,11 +97,12 @@ public class ReservationService {
         return ReservationResponse.from(savedReservation);
     }
 
-    public ReservationResponse createReservationForMember(Long memberId, Long timeId, Long themeId, LocalDate date, PaymentRequest paymentRequest) {
+    public ReservationResponse createReservationForMember(Long memberId,
+                                                          Long timeId,
+                                                          Long themeId,
+                                                          LocalDate date,
+                                                          PaymentInfo paymentInfo) {
 
-        // 결제가 성공했는지 실패했는지?
-        PaymentInfo paymentInfo = paymentClientService.postPaymentInfo(paymentRequest);
-    
         ReservationTime reservationTime = reservationTimeRepository.findById(timeId)
                 .orElseThrow(ReservationTimeNotFoundException::new);
         Theme theme = themeRepository.findById(themeId).orElseThrow(ThemeNotFoundException::new);

@@ -1,4 +1,4 @@
-package roomescape.service;
+package roomescape.presentation;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,10 +7,10 @@ import roomescape.domain.PaymentInfo;
 import roomescape.dto.PaymentRequest;
 import roomescape.exception.PaymentException;
 
-public class PaymentClientService {
+public class PaymentClientController {
     private final RestClient restClient;
 
-    public PaymentClientService(final RestClient restClient) {
+    public PaymentClientController(final RestClient restClient) {
         this.restClient = restClient;
     }
 

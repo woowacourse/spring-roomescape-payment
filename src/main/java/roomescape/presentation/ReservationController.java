@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.Authenticated;
+import roomescape.domain.PaymentInfo;
 import roomescape.dto.PaymentRequest;
 import roomescape.dto.request.ReservationCreateRequest;
 import roomescape.dto.response.ReservationResponse;
@@ -23,9 +24,12 @@ import roomescape.service.ReservationService;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final PaymentClientController paymentClientController;
 
-    public ReservationController(ReservationService reservationService) {
+    public ReservationController(final ReservationService reservationService,
+                                 final PaymentClientController paymentClientController) {
         this.reservationService = reservationService;
+        this.paymentClientController = paymentClientController;
     }
 
     @PostMapping
@@ -33,10 +37,12 @@ public class ReservationController {
             @Authenticated Long memberId,
             @Valid @RequestBody ReservationCreateRequest request) {
         PaymentRequest paymentRequest = new PaymentRequest(request.amount(), request.paymentKey(), request.orderId());
+        PaymentInfo paymentInfo = paymentClientController.postPaymentInfo(paymentRequest);
 
         ReservationResponse reservationResponse = reservationService.createReservationForMember(
-                memberId, request.timeId(), request.themeId(), request.date(), paymentRequest
+                memberId, request.timeId(), request.themeId(), request.date(), paymentInfo
         );
+
         return ResponseEntity
                 .created(URI.create("/reservations/" + reservationResponse.id()))
                 .body(reservationResponse);
