@@ -4,7 +4,10 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
-import roomescape.exception.PaymentException;
+import roomescape.domain.payment.PaymentStatus;
+import roomescape.domain.payment.PaymentStatusCode;
+import roomescape.exception.PaymentFailedException;
+import roomescape.exception.PaymentInternalException;
 
 @Service
 @AllArgsConstructor
@@ -17,8 +20,14 @@ public class PaymentService {
 
         var paymentDetails = paymentProvider.confirm(request);
         if (paymentDetails.isFailed()) {
-            var status = paymentDetails.status();
-            throw new PaymentException(status.message());
+            throwPaymentException(paymentDetails.status());
         }
+    }
+
+    private static void throwPaymentException(final PaymentStatus status) {
+        if (PaymentStatusCode.FAILED_PAYMENT.equals(status.code())) {
+            throw new PaymentFailedException(status.message());
+        }
+        throw new PaymentInternalException(status.message());
     }
 }
