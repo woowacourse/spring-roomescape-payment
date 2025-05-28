@@ -213,21 +213,20 @@ async function fetchReservationPayment(paymentData, reservationData) {
     fetch(reservationURL, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "application/json"
         },
         body: JSON.stringify(paymentRequest),
-    }).then(response => {
+    }).then(async response => {
         if (!response.ok) {
-            return response.json().then(errorBody => {
-                console.error("예약 결제 실패 : " + JSON.stringify(errorBody));
-                window.alert("예약 결제 실패 메시지");
+            return response.json().then(async errorBody => {
+                let errorMessage = JSON.stringify(errorBody.message);
+                console.error("예약 결제 실패 : " + errorMessage);
+                window.alert(errorMessage);
             });
         } else {
-            response.json().then(successBody => {
+             response.json().then(successBody => {
                 console.log("예약 결제 성공 : " + JSON.stringify(successBody));
                 fetchReservation(reservationData);
-                alert("예약 결제 성공")
-                window.location.reload();
             });
         }
     }).catch(error => {
@@ -259,6 +258,8 @@ async function fetchReservation(reservationData) {
         } else {
             response.json().then(successBody => {
                 console.log("예약 생성 성공 : " + JSON.stringify(successBody));
+                window.alert("예약이 생성되었습니다.");
+                window.location.reload();
             });
         }
     }).catch(error => {

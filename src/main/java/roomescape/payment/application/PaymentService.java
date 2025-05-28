@@ -3,6 +3,7 @@ package roomescape.payment.application;
 import java.util.Base64;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import roomescape.payment.exception.handler.PaymentApproveExceptionHandler;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
 import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
 
@@ -16,9 +17,11 @@ public class PaymentService {
     private static final String COLON = ":";
 
     private final RestClient restClient;
+    private final PaymentApproveExceptionHandler paymentApproveExceptionHandler;
 
-    public PaymentService(final RestClient restClient) {
+    public PaymentService(final RestClient restClient, final PaymentApproveExceptionHandler paymentApproveExceptionHandler) {
         this.restClient = restClient;
+        this.paymentApproveExceptionHandler = paymentApproveExceptionHandler;
     }
 
     public PaymentApproveResponse approvePayment(final PaymentApproveRequest paymentApproveRequest) {
@@ -27,6 +30,7 @@ public class PaymentService {
                 .header(AUTHORIZATION, BASIC + toBase64(SECRET_KEY + COLON))
                 .body(paymentApproveRequest)
                 .retrieve()
+                .onStatus(paymentApproveExceptionHandler)
                 .body(PaymentApproveResponse.class);
     }
 
