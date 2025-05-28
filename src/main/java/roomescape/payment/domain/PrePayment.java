@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+//TODO: 세션으로 바꾸기  (2025-05-28, 수, 17:12)
 @Entity
 @Getter
 @NoArgsConstructor
