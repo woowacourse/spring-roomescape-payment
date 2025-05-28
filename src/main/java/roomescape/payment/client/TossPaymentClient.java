@@ -6,17 +6,17 @@ import java.nio.charset.StandardCharsets;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.common.exception.PaymentException;
-import roomescape.reservation.dto.request.TossPaymentConfirmRequest;
-import roomescape.reservation.dto.response.TossErrorResponse;
-import roomescape.reservation.dto.response.TossPaymentResponse;
+import roomescape.payment.client.dto.request.TossPaymentConfirmRequest;
+import roomescape.payment.client.dto.response.TossErrorResponse;
+import roomescape.payment.client.dto.response.TossPaymentResponse;
 
 @Component
-public class PaymentClient {
+public class TossPaymentClient {
 
     private final RestClient tossRestClient;
     private final ObjectMapper objectMapper;
 
-    public PaymentClient(RestClient tossRestClient, ObjectMapper objectMapper) {
+    public TossPaymentClient(RestClient tossRestClient, ObjectMapper objectMapper) {
         this.tossRestClient = tossRestClient;
         this.objectMapper = objectMapper;
     }
