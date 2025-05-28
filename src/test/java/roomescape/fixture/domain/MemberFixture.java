@@ -9,7 +9,7 @@ public class MemberFixture {
     private MemberFixture() {
     }
 
-    public static List<Member> notSavedMembers(int exclusiveIdx) {
+    public static List<Member> notSavedMembers(int count) {
         final List<Member> NOT_SAVED_MEMBERS = List.of(
                 Member.of("헤일러", "he@iler.com", "비밀번호", AuthRole.MEMBER),
                 Member.of("머피", "mu@ffy.com", "비밀번호", AuthRole.MEMBER),
@@ -21,11 +21,11 @@ public class MemberFixture {
                 Member.of("회원2", "member2@member2.com", "비밀번호", AuthRole.MEMBER)
         );
 
-        if (NOT_SAVED_MEMBERS.size() < exclusiveIdx) {
+        if (NOT_SAVED_MEMBERS.size() < count) {
             throw new IllegalStateException("회원 픽스처의 개수는 최대 " + NOT_SAVED_MEMBERS.size() + "개만 가능합니다.");
         }
 
-        return NOT_SAVED_MEMBERS.subList(0, exclusiveIdx);
+        return NOT_SAVED_MEMBERS.subList(0, count);
     }
 
     public static Member notSavedMember1() {
