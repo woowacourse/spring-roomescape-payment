@@ -23,6 +23,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 
+//TODO: PaymentClient fake 객체로 변경하기
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class DataSourceTest {
 
@@ -142,25 +143,6 @@ public class DataSourceTest {
         assertThat(countAfterDelete).isEqualTo(0);
     }
 
-    @DisplayName("time과 reservation 연결 테스트")
-    @Test
-    void 팔단계() {
-        // given
-        givenCreateTheme();
-        givenCreateReservationTime();
-        givenCreateMember();
-        givenCreateSchedule();
-        final Cookie cookie = givenAuthCookie();
-        givenCreateReservation(cookie);
-
-        // when & then
-        RestAssured.given().port(port).log().all()
-                .when().get("/reservations")
-                .then().log().all()
-                .statusCode(200)
-                .body("size()", is(1));
-    }
-
     private void givenCreateReservationTime() {
         RestAssured.given().port(port).log().all()
                 .contentType(ContentType.JSON)
@@ -214,5 +196,24 @@ public class DataSourceTest {
                 .when().post("/login")
                 .then()
                 .extract().detailedCookie("token");
+    }
+
+    @DisplayName("time과 reservation 연결 테스트")
+    @Test
+    void 팔단계() {
+        // given
+        givenCreateTheme();
+        givenCreateReservationTime();
+        givenCreateMember();
+        givenCreateSchedule();
+        final Cookie cookie = givenAuthCookie();
+        givenCreateReservation(cookie);
+
+        // when & then
+        RestAssured.given().port(port).log().all()
+                .when().get("/reservations")
+                .then().log().all()
+                .statusCode(200)
+                .body("size()", is(1));
     }
 }

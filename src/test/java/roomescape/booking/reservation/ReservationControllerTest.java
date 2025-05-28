@@ -16,6 +16,7 @@ import roomescape.auth.JwtProvider;
 import roomescape.auth.TokenBody;
 import roomescape.auth.dto.LoginMember;
 import roomescape.booking.BookingService;
+import roomescape.booking.reservation.dto.ReservationPaymentRequest;
 import roomescape.booking.reservation.dto.ReservationRequest;
 import roomescape.booking.reservation.dto.ReservationResponse;
 import roomescape.member.MemberRole;
@@ -102,7 +103,7 @@ class ReservationControllerTest {
         ScheduleResponse scheduleResponse = new ScheduleResponse(1L, LocalDate.now(), timeResponse, themeResponse);
         ReservationResponse response = new ReservationResponse(1L, scheduleResponse, memberResponse);
 
-        given(reservationCreateService.create(any(ReservationRequest.class), any(LoginMember.class)))
+        given(reservationCreateService.create(any(ReservationPaymentRequest.class), any(LoginMember.class)))
                 .willReturn(response);
 
         // when & then

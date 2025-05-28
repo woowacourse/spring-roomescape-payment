@@ -9,7 +9,6 @@ import roomescape.auth.AuthenticationPrincipal;
 import roomescape.auth.dto.LoginMember;
 import roomescape.booking.BookingService;
 import roomescape.booking.reservation.dto.ReservationPaymentRequest;
-import roomescape.booking.reservation.dto.ReservationRequest;
 import roomescape.booking.reservation.dto.ReservationResponse;
 
 import java.util.List;
@@ -25,19 +24,10 @@ public class ReservationController {
 
     @PostMapping
     public ResponseEntity<ReservationResponse> create(
-            @RequestBody @Valid final ReservationRequest request,
-            @AuthenticationPrincipal final LoginMember member
-    ) {
-        final ReservationResponse response = reservationCreateService.create(request, member);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
-    @PostMapping("/v2")
-    public ResponseEntity<ReservationResponse> createV2(
             @RequestBody @Valid final ReservationPaymentRequest request,
             @AuthenticationPrincipal final LoginMember member
     ) {
-        final ReservationResponse response = reservationCreateService.createV2(request, member);
+        final ReservationResponse response = reservationCreateService.create(request, member);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

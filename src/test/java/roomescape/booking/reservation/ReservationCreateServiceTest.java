@@ -10,7 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.auth.dto.LoginMember;
 import roomescape.booking.reservation.dto.AdminReservationRequest;
-import roomescape.booking.reservation.dto.ReservationRequest;
+import roomescape.booking.reservation.dto.ReservationPaymentRequest;
 import roomescape.booking.reservation.dto.ReservationResponse;
 import roomescape.exception.custom.reason.reservation.ReservationConflictException;
 import roomescape.member.Member;
@@ -45,7 +45,7 @@ public class ReservationCreateServiceTest {
     @DisplayName("예약 생성")
     class Create {
 
-        private ReservationRequest request;
+        private ReservationPaymentRequest request;
         private LoginMember loginMember;
         private Member member;
         private Schedule schedule;
@@ -53,7 +53,14 @@ public class ReservationCreateServiceTest {
 
         @BeforeEach
         void setUp() {
-            request = new ReservationRequest(LocalDate.now().plusDays(1), 1L, 1L);
+            request = new ReservationPaymentRequest(
+                    LocalDate.now().plusDays(1),
+                    1L,
+                    1L,
+                    "dummyKey",
+                    "dummyOrderId",
+                    1000L,
+                    "simple");
             loginMember = new LoginMember("boogie", "asd@email.com", MemberRole.MEMBER);
             ReservationTime reservationTime = reservationTimeWithId(request.timeId(), new ReservationTime(LocalTime.of(12, 40)));
             Theme theme = themeWithId(request.themeId(), new Theme("야당", "야당당", "123"));

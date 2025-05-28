@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.booking.reservation.dto.AdminReservationRequest;
 import roomescape.booking.reservation.dto.ReservationPaymentRequest;
-import roomescape.booking.reservation.dto.ReservationRequest;
 import roomescape.booking.reservation.dto.ReservationResponse;
 import roomescape.exception.custom.reason.reservation.ReservationConflictException;
 import roomescape.exception.custom.reason.reservation.ReservationPastDateException;
@@ -30,36 +29,7 @@ public class ReservationCreateService {
     private final PaymentClient paymentClient;
 
     @Transactional
-    public ReservationResponse create(final ReservationRequest request, final LoginMember loginMember) {
-        final Schedule schedule = scheduleService.getByDateAndTimeIdAndThemeId(request.date(), request.timeId(), request.themeId());
-        validatePast(schedule);
-        validateDuplication(schedule);
-
-        final Member member = memberService.getByEmail(loginMember.email());
-        final Reservation savedReservation = saveReservation(schedule, member);
-        return ReservationResponse.from(savedReservation);
-    }
-
-    private Reservation saveReservation(final Schedule schedule, final Member member) {
-        final Reservation notSavedReservation = new Reservation(member, schedule);
-        final Reservation savedReservation = reservationRepository.save(notSavedReservation);
-        return savedReservation;
-    }
-
-    private void validatePast(final Schedule schedule) {
-        if (schedule.isPast()) {
-            throw new ReservationPastDateException();
-        }
-    }
-
-    private void validateDuplication(final Schedule schedule) {
-        if (reservationRepository.existsBySchedule(schedule)) {
-            throw new ReservationConflictException();
-        }
-    }
-
-    @Transactional
-    public ReservationResponse createV2(final ReservationPaymentRequest request, final LoginMember loginMember) {
+    public ReservationResponse create(final ReservationPaymentRequest request, final LoginMember loginMember) {
         final Order order = orderReader.getById(request.orderId());
         final Member member = memberService.getByEmail(loginMember.email());
         final Schedule schedule = scheduleService.getByDateAndTimeIdAndThemeId(request.date(), request.timeId(), request.themeId());
@@ -72,6 +42,23 @@ public class ReservationCreateService {
         validateDuplication(schedule);
         final Reservation savedReservation = saveReservation(schedule, member);
         return ReservationResponse.from(savedReservation);
+    }
+
+    private Reservation saveReservation(final Schedule schedule, final Member member) {
+        final Reservation notSavedReservation = new Reservation(member, schedule, ReservationPaymentStatus.SUCCESS);
+        return reservationRepository.save(notSavedReservation);
+    }
+
+    private void validatePast(final Schedule schedule) {
+        if (schedule.isPast()) {
+            throw new ReservationPastDateException();
+        }
+    }
+
+    private void validateDuplication(final Schedule schedule) {
+        if (reservationRepository.existsBySchedule(schedule)) {
+            throw new ReservationConflictException();
+        }
     }
 
     @Transactional

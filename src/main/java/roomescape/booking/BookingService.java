@@ -1,11 +1,13 @@
 package roomescape.booking;
 
+import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.booking.dto.BookingResponse;
 import roomescape.booking.reservation.Reservation;
+import roomescape.booking.reservation.ReservationPaymentStatus;
 import roomescape.booking.reservation.ReservationService;
 import roomescape.booking.waiting.Waiting;
 import roomescape.booking.waiting.WaitingService;
@@ -20,6 +22,7 @@ public class BookingService {
 
     private final ReservationService reservationService;
     private final WaitingService waitingService;
+    private final EntityManager entityManager;
 
     @Transactional(readOnly = true)
     public List<BookingResponse> readAllByMember(final LoginMember loginMember) {
@@ -48,7 +51,7 @@ public class BookingService {
 
     private void changeFirstWaitingToReservation(final Waiting firstWaiting) {
         waitingService.delete(firstWaiting);
-        Reservation reservation = new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule());
+        Reservation reservation = new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), ReservationPaymentStatus.WAITING);
         reservationService.create(reservation);
     }
 }
