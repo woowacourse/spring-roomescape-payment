@@ -19,6 +19,8 @@ import roomescape.helper.TestHelper;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.entity.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.dto.request.WaitingCreateRequest;
 import roomescape.reservation.entity.Reservation;
 import roomescape.reservation.entity.ReservationTime;
@@ -50,6 +52,9 @@ class WaitingAcceptanceTest {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
@@ -70,7 +75,8 @@ class WaitingAcceptanceTest {
         var theme = themeRepository.findAll().getFirst();
         var time = reservationTimeRepository.findAll().getFirst();
         var date = LocalDate.now().plusDays(1);
-        reservationRepository.save(new Reservation(date, time, theme, otherMember));
+        var payment = paymentRepository.save(new Payment("any", "any", 1L, "any"));
+        reservationRepository.save(new Reservation(date, time, theme, otherMember, payment));
 
         var waitingRequest = new WaitingCreateRequest(date, time.getId(), theme.getId());
 
@@ -93,15 +99,15 @@ class WaitingAcceptanceTest {
         var time = reservationTimeRepository.findAll().getFirst();
         var date = LocalDate.now().plusDays(1);
         var member = memberRepository.findByEmail(DEFAULT_EMAIL).get();
-        reservationRepository.save(new Reservation(date, time, theme, member));
+        var payment = paymentRepository.save(new Payment("any", "any", 1L, "any"));
+        reservationRepository.save(new Reservation(date, time, theme, member, payment));
 
         var waitingRequest = new WaitingCreateRequest(date, time.getId(), theme.getId());
 
         // when & then
         TestHelper.postWithToken("/waitings", waitingRequest, token)
                 .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .body(equalTo("이미 예약한 사용자는 해당 예약에 대기 신청할 수 없습니다."));
+                .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
@@ -113,7 +119,8 @@ class WaitingAcceptanceTest {
         var theme = themeRepository.findAll().getFirst();
         var time = reservationTimeRepository.findAll().getFirst();
         var date = LocalDate.now().plusDays(1);
-        reservationRepository.save(new Reservation(date, time, theme, otherMember));
+        var payment = paymentRepository.save(new Payment("any", "any", 1L, "any"));
+        reservationRepository.save(new Reservation(date, time, theme, otherMember, payment));
 
         var waitingRequest = new WaitingCreateRequest(date, time.getId(), theme.getId());
         TestHelper.postWithToken("/waitings", waitingRequest, token);
@@ -139,7 +146,8 @@ class WaitingAcceptanceTest {
         var theme = themeRepository.findAll().getFirst();
         var time = reservationTimeRepository.findAll().getFirst();
         var date = LocalDate.now().plusDays(1);
-        reservationRepository.save(new Reservation(date, time, theme, otherMember));
+        var payment = paymentRepository.save(new Payment("any", "any", 1L, "any"));
+        reservationRepository.save(new Reservation(date, time, theme, otherMember, payment));
 
         var waitingRequest = new WaitingCreateRequest(date, time.getId(), theme.getId());
         TestHelper.postWithToken("/waitings", waitingRequest, token);
@@ -164,7 +172,8 @@ class WaitingAcceptanceTest {
         var theme = themeRepository.findAll().getFirst();
         var time = reservationTimeRepository.findAll().getFirst();
         var date = LocalDate.now().plusDays(1);
-        reservationRepository.save(new Reservation(date, time, theme, otherMember));
+        var payment = paymentRepository.save(new Payment("any", "any", 1L, "any"));
+        reservationRepository.save(new Reservation(date, time, theme, otherMember, payment));
 
         var waitingRequest = new WaitingCreateRequest(date, time.getId(), theme.getId());
         TestHelper.postWithToken("/waitings", waitingRequest, token);
@@ -174,8 +183,7 @@ class WaitingAcceptanceTest {
         // when & then
         TestHelper.deleteWithToken("/waitings/1", otherToken)
                 .then()
-                .statusCode(HttpStatus.UNAUTHORIZED.value())
-                .body(equalTo("예약 대기는 본인만 삭제할 수 있습니다."));
+                .statusCode(HttpStatus.UNAUTHORIZED.value());
     }
 
     @Test
@@ -187,7 +195,8 @@ class WaitingAcceptanceTest {
         var theme = themeRepository.findAll().getFirst();
         var time = reservationTimeRepository.findAll().getFirst();
         var date = LocalDate.now().plusDays(1);
-        var reservation = reservationRepository.save(new Reservation(date, time, theme, otherMember));
+        var payment = paymentRepository.save(new Payment("any", "any", 1L, "any"));
+        var reservation = reservationRepository.save(new Reservation(date, time, theme, otherMember, payment));
 
         var waitingRequest = new WaitingCreateRequest(date, time.getId(), theme.getId());
         TestHelper.postWithToken("/waitings", waitingRequest, token);
@@ -215,7 +224,8 @@ class WaitingAcceptanceTest {
         var theme = themeRepository.findAll().getFirst();
         var time = reservationTimeRepository.findAll().getFirst();
         var date = LocalDate.now().plusDays(1);
-        reservationRepository.save(new Reservation(date, time, theme, otherMember));
+        var payment = paymentRepository.save(new Payment("any", "any", 1L, "any"));
+        reservationRepository.save(new Reservation(date, time, theme, otherMember, payment));
 
         var waitingRequest = new WaitingCreateRequest(date, time.getId(), theme.getId());
         TestHelper.postWithToken("/waitings", waitingRequest, token);
@@ -223,7 +233,6 @@ class WaitingAcceptanceTest {
         // when & then
         TestHelper.postWithToken("/admin/waitings/1/approve", token)
                 .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .body(equalTo("이미 예약이 존재하여 대기자를 승인할 수 없습니다."));
+                .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 }

@@ -15,6 +15,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
+import roomescape.payment.entity.Payment;
 import roomescape.reservation.entity.Reservation;
 import roomescape.reservation.entity.ReservationTime;
 import roomescape.reservation.repository.ReservationRepository;
@@ -38,11 +39,15 @@ class ReservationRepositoryTest {
         var theme = new Theme("테마1", "설명1", "썸네일1");
         var member = new Member("미소", "miso@email.com", "miso", RoleType.USER);
         var date = LocalDate.now().plusDays(1);
-        var reservation1 = new Reservation(date, reservationTime, theme, member);
-        var reservation2 = new Reservation(LocalDate.now().minusDays(5), reservationTime, theme, member);
+        var payment1 = new Payment("any", "any", 1L, "any");
+        var payment2 = new Payment("any", "any", 1L, "any");
+        var reservation1 = new Reservation(date, reservationTime, theme, member, payment1);
+        var reservation2 = new Reservation(LocalDate.now().minusDays(5), reservationTime, theme, member, payment2);
         entityManager.persist(reservationTime);
         entityManager.persist(theme);
         entityManager.persist(member);
+        entityManager.persist(payment1);
+        entityManager.persist(payment2);
         entityManager.persist(reservation1);
         entityManager.persist(reservation2);
 

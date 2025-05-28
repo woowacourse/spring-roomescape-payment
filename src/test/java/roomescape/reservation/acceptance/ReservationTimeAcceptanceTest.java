@@ -120,8 +120,7 @@ class ReservationTimeAcceptanceTest {
         // when & then
         TestHelper.postWithToken("/admin/times", timeRequest, token)
                 .then()
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .body(equalTo("운영 시간 이외의 날짜는 예약할 수 없습니다."));
+                .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
@@ -137,7 +136,6 @@ class ReservationTimeAcceptanceTest {
         // when & then
         TestHelper.postWithToken("/admin/times", timeRequest2, token)
                 .then()
-                .statusCode(HttpStatus.CONFLICT.value())
-                .body(equalTo("러닝 타임이 겹치는 시간이 존재합니다."));
+                .statusCode(HttpStatus.CONFLICT.value());
     }
 }

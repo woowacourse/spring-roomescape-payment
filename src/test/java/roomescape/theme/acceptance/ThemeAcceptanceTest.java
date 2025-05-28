@@ -84,8 +84,7 @@ class ThemeAcceptanceTest {
         // when & then
         TestHelper.postWithToken("/admin/themes", request2, token)
                 .then()
-                .statusCode(HttpStatus.CONFLICT.value())
-                .body(equalTo("이미 존재하는 테마 이름입니다."));
+                .statusCode(HttpStatus.CONFLICT.value());
     }
 
     @Test

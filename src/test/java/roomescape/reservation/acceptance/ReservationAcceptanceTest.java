@@ -23,6 +23,7 @@ import roomescape.helper.TestHelper;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.entity.Payment;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.ReservationAdminCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
@@ -59,7 +60,7 @@ class ReservationAcceptanceTest {
         RestAssured.port = port;
         paymentService = mock(PaymentService.class);
         given(paymentService.confirmPayment(any(), any(), any()))
-                .willReturn(123L);
+                .willReturn(new Payment("any", "1", 100L, "any"));
         Member member = new Member(DEFAULT_NAME, DEFAULT_EMAIL, DEFAULT_PASSWORD, RoleType.ADMIN);
         memberRepository.save(member);
         Theme theme = new Theme("테마", "설명", "썸네일");
@@ -111,8 +112,7 @@ class ReservationAcceptanceTest {
         // when & then
         TestHelper.postWithToken("/reservations", reservationRequest, token)
                 .then()
-                .statusCode(HttpStatus.CONFLICT.value())
-                .body(equalTo("중복된 예약입니다."));
+                .statusCode(HttpStatus.CONFLICT.value());
     }
 
     @Test

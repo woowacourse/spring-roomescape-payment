@@ -16,6 +16,8 @@ import roomescape.global.error.exception.ConflictException;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.entity.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.dto.request.ReservationTimeCreateRequest;
 import roomescape.reservation.entity.Reservation;
 import roomescape.reservation.entity.ReservationTime;
@@ -41,6 +43,9 @@ class ReservationTimeServiceTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @BeforeEach
     void setUp() {
@@ -155,7 +160,8 @@ class ReservationTimeServiceTest {
         var member = memberRepository.save(new Member("미소", "miso@email.com", "1234", RoleType.USER));
 
         var time = new ReservationTime(response.id(), startAt);
-        var reservation = new Reservation(LocalDate.now(), time, theme, member);
+        var payment = paymentRepository.save(new Payment("any", "any", 1L, "any"));
+        var reservation = new Reservation(LocalDate.now(), time, theme, member, payment);
         reservationRepository.save(reservation);
 
         // when & then

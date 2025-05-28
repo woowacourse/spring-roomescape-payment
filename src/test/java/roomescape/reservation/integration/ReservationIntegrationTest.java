@@ -22,6 +22,7 @@ import roomescape.global.error.exception.ConflictException;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.entity.Payment;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.ReservationAdminCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
@@ -55,7 +56,7 @@ class ReservationIntegrationTest {
     void setUp() {
         paymentService = mock(PaymentService.class);
         given(paymentService.confirmPayment(any(), any(), any()))
-                .willReturn(123L);
+                .willReturn(new Payment("any", "1", 100L, "any"));
     }
 
     @Test

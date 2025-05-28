@@ -19,6 +19,8 @@ import roomescape.global.error.exception.ConflictException;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.entity.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.ReservationAdminCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
@@ -53,13 +55,17 @@ class ReservationServiceTest {
     @Autowired
     private WaitingRepository waitingRepository;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     @Mock
     private PaymentService paymentService;
 
     @BeforeEach
     void setUp() {
+        Payment payment = paymentRepository.save(new Payment("any", "1", 100L, "any"));
         given(paymentService.confirmPayment(any(), any(), any()))
-                .willReturn(123L);
+                .willReturn(payment);
         reservationService = new ReservationService(
                 reservationRepository,
                 reservationTimeRepository,
@@ -218,7 +224,8 @@ class ReservationServiceTest {
                 "any",
                 "1",
                 100L,
-                "any");
+                "any"
+        );
         reservationService.createReservation(member.getId(), request);
 
         var filterRequest = new ReservationFindFilteredRequest(
@@ -252,7 +259,8 @@ class ReservationServiceTest {
         var date = LocalDate.now().plusDays(1);
         var otherMember = memberRepository.save(new Member("크루", "other@email.com", "1234", RoleType.USER));
         var waiting = new Waiting(date, time, theme1, member);
-        reservationRepository.save(new Reservation(date, time, theme1, otherMember));
+        var payment = paymentRepository.save(new Payment("any", "1", 100L, "any"));
+        reservationRepository.save(new Reservation(date, time, theme1, otherMember, payment));
         waitingRepository.save(waiting);
         var request = new ReservationCreateRequest(
                 date,
@@ -290,7 +298,8 @@ class ReservationServiceTest {
         var theme = themeRepository.save(new Theme("테마1", "테마1 설명", "테마1 썸네일"));
         var date = LocalDate.now().plusDays(1);
         var otherMember = memberRepository.save(new Member("크루", "other@email.com", "1234", RoleType.USER));
-        var reservation = reservationRepository.save(new Reservation(date, time, theme, otherMember));
+        var payment = new Payment("any", "any", 1L, "any");
+        var reservation = reservationRepository.save(new Reservation(date, time, theme, otherMember, payment));
         var waiting = new Waiting(date, time, theme, member);
         waitingRepository.save(waiting);
 

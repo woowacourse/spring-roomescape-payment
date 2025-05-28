@@ -17,7 +17,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final RestClient restClient;
 
-    public Long confirmPayment(String paymentKey, String orderId, Long amount) {
+    public Payment confirmPayment(String paymentKey, String orderId, Long amount) {
         PaymentConfirmResponse response = restClient.post()
                 .body(new PaymentConfirmRequest(paymentKey, orderId, amount))
                 .retrieve()
@@ -31,7 +31,6 @@ public class PaymentService {
                 response.totalAmount(),
                 response.type()
         );
-        paymentRepository.save(payment);
-        return payment.getId();
+        return paymentRepository.save(payment);
     }
 }

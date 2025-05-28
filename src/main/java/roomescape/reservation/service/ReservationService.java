@@ -12,6 +12,7 @@ import roomescape.global.error.exception.ConflictException;
 import roomescape.global.error.exception.NotFoundException;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.entity.Payment;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.ReservationAdminCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
@@ -47,19 +48,18 @@ public class ReservationService {
         Theme theme = themeRepository.findById(request.themeId())
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 테마 입니다."));
 
-        Reservation newReservation = new Reservation(request.date(), time, theme, member);
-        validateDateTime(newReservation);
-        validateDuplicated(newReservation);
-
-        Long paymentId = paymentService.confirmPayment(
+        Payment payment = paymentService.confirmPayment(
                 request.paymentKey(),
                 request.orderId(),
                 request.amount()
         );
 
-        Reservation reservation = reservationRepository.save(newReservation);
+        Reservation newReservation = new Reservation(request.date(), time, theme, member, payment);
+        validateDateTime(newReservation);
+        validateDuplicated(newReservation);
+        Reservation saved = reservationRepository.save(newReservation);
 
-        return ReservationResponse.from(reservation);
+        return ReservationResponse.from(saved);
     }
 
     @Transactional
@@ -71,7 +71,7 @@ public class ReservationService {
         Theme theme = themeRepository.findById(request.themeId())
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 테마 입니다."));
 
-        Reservation newReservation = new Reservation(request.date(), time, theme, member);
+        Reservation newReservation = new Reservation(request.date(), time, theme, member, null);
         validateDateTime(newReservation);
         validateDuplicated(newReservation);
 
@@ -158,7 +158,9 @@ public class ReservationService {
                 nextWaiting.getDate(),
                 nextWaiting.getTime(),
                 nextWaiting.getTheme(),
-                nextWaiting.getMember()
+                nextWaiting.getMember(),
+                // TODO: 이후 대기 결제 요구사항 및 프론트 코드가 요구된다면 변경 예정
+                null
         );
         reservationRepository.save(newReservation);
         waitingRepository.delete(nextWaiting);

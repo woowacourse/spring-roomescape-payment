@@ -16,6 +16,8 @@ import roomescape.global.error.exception.UnauthorizedException;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.entity.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.dto.request.WaitingCreateRequest;
 import roomescape.reservation.entity.Reservation;
 import roomescape.reservation.entity.ReservationTime;
@@ -46,6 +48,9 @@ class WaitingServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     @BeforeEach
     void setUp() {
         waitingService = new WaitingService(
@@ -66,7 +71,8 @@ class WaitingServiceTest {
         var theme = themeRepository.save(new Theme("테마1", "설명1", "사진1"));
         var date = LocalDate.now().plusDays(1);
         var otherMember = memberRepository.save(new Member("크루", "other@email.com", "1234", RoleType.USER));
-        reservationRepository.save(new Reservation(date, time, theme, otherMember));
+        var payment = paymentRepository.save(new Payment("any", "any", 1L, "any"));
+        reservationRepository.save(new Reservation(date, time, theme, otherMember, payment));
         var request = new WaitingCreateRequest(date, time.getId(), theme.getId());
 
         // when
@@ -90,7 +96,8 @@ class WaitingServiceTest {
         var theme = themeRepository.save(new Theme("테마1", "설명1", "사진1"));
         var date = LocalDate.now().minusDays(1);
         var otherMember = memberRepository.save(new Member("크루", "other@email.com", "1234", RoleType.USER));
-        reservationRepository.save(new Reservation(date, time, theme, otherMember));
+        var payment = paymentRepository.save(new Payment("any", "any", 1L, "any"));
+        reservationRepository.save(new Reservation(date, time, theme, otherMember, payment));
         var request = new WaitingCreateRequest(date, time.getId(), theme.getId());
 
         // when & then
@@ -108,7 +115,8 @@ class WaitingServiceTest {
         var theme = themeRepository.save(new Theme("테마1", "설명1", "사진1"));
         var date = LocalDate.now().plusDays(1);
         var otherMember = memberRepository.save(new Member("크루", "other@email.com", "1234", RoleType.USER));
-        reservationRepository.save(new Reservation(date, time, theme, otherMember));
+        var payment = paymentRepository.save(new Payment("any", "any", 1L, "any"));
+        reservationRepository.save(new Reservation(date, time, theme, otherMember, payment));
         var request = new WaitingCreateRequest(date, time.getId(), theme.getId());
         waitingService.createWaiting(member.getId(), request);
 
@@ -127,7 +135,8 @@ class WaitingServiceTest {
         var theme = themeRepository.save(new Theme("테마1", "설명1", "사진1"));
         var date = LocalDate.now().plusDays(1);
         var otherMember = memberRepository.save(new Member("크루", "other@email.com", "1234", RoleType.USER));
-        reservationRepository.save(new Reservation(date, time, theme, otherMember));
+        var payment = paymentRepository.save(new Payment("any", "any", 1L, "any"));
+        reservationRepository.save(new Reservation(date, time, theme, otherMember, payment));
         var request = new WaitingCreateRequest(date, time.getId(), theme.getId());
         waitingService.createWaiting(member.getId(), request);
 
@@ -153,7 +162,8 @@ class WaitingServiceTest {
         var theme = themeRepository.save(new Theme("테마1", "설명1", "사진1"));
         var date = LocalDate.now().plusDays(1);
         var otherMember = memberRepository.save(new Member("크루", "other@email.com", "1234", RoleType.USER));
-        reservationRepository.save(new Reservation(date, time, theme, otherMember));
+        var payment = paymentRepository.save(new Payment("any", "any", 1L, "any"));
+        reservationRepository.save(new Reservation(date, time, theme, otherMember, payment));
         var request = new WaitingCreateRequest(date, time.getId(), theme.getId());
         var response = waitingService.createWaiting(member.getId(), request);
 
@@ -173,7 +183,8 @@ class WaitingServiceTest {
         var theme = themeRepository.save(new Theme("테마1", "설명1", "사진1"));
         var date = LocalDate.now().plusDays(1);
         var otherMember = memberRepository.save(new Member("크루", "other@email.com", "1234", RoleType.USER));
-        reservationRepository.save(new Reservation(date, time, theme, otherMember));
+        var payment = paymentRepository.save(new Payment("any", "any", 1L, "any"));
+        reservationRepository.save(new Reservation(date, time, theme, otherMember, payment));
         var request = new WaitingCreateRequest(date, time.getId(), theme.getId());
         var response = waitingService.createWaiting(member.getId(), request);
 
@@ -192,7 +203,8 @@ class WaitingServiceTest {
         var theme = themeRepository.save(new Theme("테마1", "설명1", "사진1"));
         var date = LocalDate.now().plusDays(1);
         var otherMember = memberRepository.save(new Member("크루", "other@email.com", "1234", RoleType.USER));
-        var reservation = reservationRepository.save(new Reservation(date, time, theme, otherMember));
+        var payment = paymentRepository.save(new Payment("any", "any", 1L, "any"));
+        var reservation = reservationRepository.save(new Reservation(date, time, theme, otherMember, payment));
         var request = new WaitingCreateRequest(date, time.getId(), theme.getId());
         var response = waitingService.createWaiting(member.getId(), request);
 
@@ -215,7 +227,8 @@ class WaitingServiceTest {
         var time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
         var theme = themeRepository.save(new Theme("테마1", "설명1", "사진1"));
         var date = LocalDate.now().plusDays(1);
-        reservationRepository.save(new Reservation(date, time, theme, member));
+        var payment = paymentRepository.save(new Payment("any", "any", 1L, "any"));
+        reservationRepository.save(new Reservation(date, time, theme, member, payment));
         var request = new WaitingCreateRequest(date, time.getId(), theme.getId());
 
         // when & then
@@ -233,7 +246,8 @@ class WaitingServiceTest {
         var theme = themeRepository.save(new Theme("테마1", "설명1", "사진1"));
         var date = LocalDate.now().plusDays(1);
         var otherMember = memberRepository.save(new Member("크루", "other@email.com", "1234", RoleType.USER));
-        reservationRepository.save(new Reservation(date, time, theme, otherMember));
+        var payment = paymentRepository.save(new Payment("any", "any", 1L, "any"));
+        reservationRepository.save(new Reservation(date, time, theme, otherMember, payment));
         var request = new WaitingCreateRequest(date, time.getId(), theme.getId());
         var response = waitingService.createWaiting(member.getId(), request);
 
@@ -252,7 +266,8 @@ class WaitingServiceTest {
         var theme = themeRepository.save(new Theme("테마1", "설명1", "사진1"));
         var date = LocalDate.now().plusDays(1);
         var otherMember = memberRepository.save(new Member("크루", "other@email.com", "1234", RoleType.USER));
-        reservationRepository.save(new Reservation(date, time, theme, otherMember));
+        var payment = paymentRepository.save(new Payment("any", "any", 1L, "any"));
+        reservationRepository.save(new Reservation(date, time, theme, otherMember, payment));
         var request = new WaitingCreateRequest(date, time.getId(), theme.getId());
         var waiting = waitingService.createWaiting(member.getId(), request);
 

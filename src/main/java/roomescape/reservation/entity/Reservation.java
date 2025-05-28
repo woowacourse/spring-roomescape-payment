@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -15,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import roomescape.member.entity.Member;
+import roomescape.payment.entity.Payment;
 import roomescape.theme.entity.Theme;
 
 @Entity
@@ -42,8 +44,12 @@ public class Reservation {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member) {
-        this(null, date, time, theme, member);
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id")
+    private Payment payment;
+
+    public Reservation(LocalDate date, ReservationTime time, Theme theme, Member member, Payment payment) {
+        this(null, date, time, theme, member, payment);
     }
 
     public boolean isOwnedBy(Long memberId) {

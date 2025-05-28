@@ -17,6 +17,8 @@ import roomescape.global.error.exception.ConflictException;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.entity.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.dto.request.ReservationTimeCreateRequest;
 import roomescape.reservation.entity.Reservation;
 import roomescape.reservation.entity.ReservationTime;
@@ -44,6 +46,9 @@ class ReservationTimeIntegrationTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Test
     @DisplayName("예약 시간을 생성한다.")
@@ -113,8 +118,8 @@ class ReservationTimeIntegrationTest {
         var theme = themeRepository.save(new Theme("테마", "설명", "썸네일"));
         var time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
         var date = LocalDate.of(2024, 3, 20);
-        var reservation = new Reservation(date, time, theme, member);
-        reservationRepository.save(reservation);
+        var payment = paymentRepository.save(new Payment("any", "any", 1L, "any"));
+        reservationRepository.save(new Reservation(date, time, theme, member, payment));
 
         // when
         var responses = reservationTimeService.getAvailableTimes(date, theme.getId());
@@ -152,8 +157,8 @@ class ReservationTimeIntegrationTest {
         var theme = themeRepository.save(new Theme("테마", "설명", "썸네일"));
         var time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
         var date = LocalDate.of(2024, 3, 20);
-        var reservation = new Reservation(date, time, theme, member);
-        reservationRepository.save(reservation);
+        var payment = paymentRepository.save(new Payment("any", "any", 1L, "any"));
+        reservationRepository.save(new Reservation(date, time, theme, member, payment));
 
         // when & then
         assertThatThrownBy(() -> reservationTimeService.deleteTime(time.getId()))

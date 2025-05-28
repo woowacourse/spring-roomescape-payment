@@ -60,7 +60,9 @@ public class WaitingService {
                 waiting.getDate(),
                 waiting.getTime(),
                 waiting.getTheme(),
-                waiting.getMember()
+                waiting.getMember(),
+                // TODO: 이후 대기 결제 요구사항 및 프론트 코드가 요구된다면 변경 예정
+                null
         );
         reservationRepository.save(reservation);
         waitingRepository.delete(waiting);
