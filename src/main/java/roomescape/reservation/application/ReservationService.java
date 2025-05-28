@@ -14,13 +14,15 @@ import roomescape.exception.auth.AuthorizationException;
 import roomescape.exception.resource.AlreadyExistException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
+import roomescape.payment.domain.PaymentDomainService;
+import roomescape.payment.domain.PaymentInfo;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationSlot;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.ui.dto.request.AvailableReservationTimeRequest;
-import roomescape.reservation.ui.dto.request.CreateBookedReservationRequest;
+import roomescape.reservation.ui.dto.request.CreateBookedReservationWithPaymentRequest;
 import roomescape.reservation.ui.dto.response.AvailableReservationTimeResponse;
 import roomescape.reservation.ui.dto.response.ReservationResponse;
 import roomescape.theme.domain.Theme;
@@ -34,12 +36,21 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
+    private final PaymentDomainService paymentDomainService;
 
     @Transactional
     public ReservationResponse create(
-            final CreateBookedReservationRequest.ForMember request,
+            final CreateBookedReservationWithPaymentRequest request,
             final Long memberId
     ) {
+        paymentDomainService.approvePayment(
+                new PaymentInfo(
+                        request.paymentKey(),
+                        request.orderId(),
+                        request.amount()
+                )
+        );
+
         final ReservationTime time = getReservationTime(request.date(), request.timeId());
         final Theme theme = themeRepository.getById(request.themeId());
         final Member member = memberRepository.getById(memberId);

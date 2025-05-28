@@ -2,12 +2,14 @@ package roomescape.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import roomescape.exception.auth.AuthTokenNotFoundException;
 import roomescape.exception.auth.AuthenticationException;
 import roomescape.exception.auth.AuthorizationException;
+import roomescape.exception.payment.PaymentException;
 import roomescape.exception.resource.AlreadyExistException;
 import roomescape.exception.resource.InCorrectResultSizeException;
 import roomescape.exception.resource.ResourceNotFoundException;
@@ -15,6 +17,14 @@ import roomescape.exception.resource.ResourceNotFoundException;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<Object> handlePaymentException(final PaymentException e) {
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(e.getStatus(), "유효성 검증에 실패했습니다.");
+
+        return ResponseEntity.status(e.getStatus())
+                .body(problemDetail);
+    }
 
     @ExceptionHandler(InCorrectResultSizeException.class)
     public ResponseEntity<Void> handleInCorrectResultSizeException(final InCorrectResultSizeException e) {
