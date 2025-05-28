@@ -37,10 +37,22 @@ function render(data) {
 function approve(event) {
     const row = event.target.closest('tr');
     const id = row.cells[0].textContent;
+    const selectedThemePrice = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-price');
+
+    const generateRandomString = () =>
+        window.btoa(Math.random()).slice(0, 20);
+
+    const orderIdPrefix = "WEB-RESV-";
+    const waitingPaymentData = {
+        orderId: orderIdPrefix + generateRandomString(),
+        orderName: "테스트 방탈출 예약 결제 1건",
+        amount: selectedThemePrice
+    }
 
     const endpoint = '/admin/waitings/accept/' + id;
     return fetch(endpoint, {
-        method: 'PUT'
+        method: 'PUT',
+        body: JSON.stringify({waitingPaymentData})
     }).then(response => {
         if (response.status === 200) return;
         throw new Error('Approve failed');

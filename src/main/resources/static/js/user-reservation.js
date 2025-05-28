@@ -16,14 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // ------  결제위젯 초기화 ------
     // @docs https://docs.tosspayments.com/reference/widget-sdk#sdk-설치-및-초기화
     // @docs https://docs.tosspayments.com/reference/widget-sdk#renderpaymentmethods선택자-결제-금액-옵션
-    // const paymentAmount = 1000;
     const widgetClientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
     const paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS);
-    // paymentWidget.renderPaymentMethods(
-    //     "#payment-method",
-    //     {value: paymentAmount},
-    //     {variantKey: "DEFAULT"}
-    // );
+
 
     document.getElementById('theme-slots').addEventListener('click', event => {
         if (event.target.classList.contains('theme-slot')) {
@@ -31,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
             event.target.classList.add('active');
             checkDateAndTheme();
 
-            // ✅ 여기에 가격 기반 위젯 렌더링 추가
             const selectedThemePrice = parseInt(event.target.getAttribute('data-theme-price'));
             paymentWidget.renderPaymentMethods(
                 "#payment-method",
@@ -66,7 +60,7 @@ function renderTheme(themes) {
         const price = theme.price;
 
         const div = createSlot('theme', name, themeId, price);
-        div.setAttribute('data-theme-price', price); // ✅ 요거 추가
+        div.setAttribute('data-theme-price', price);
         themeSlots.appendChild(div);
     });
 }
@@ -185,7 +179,7 @@ function onReservationButtonClick(event, paymentWidget) {
             window.btoa(Math.random()).slice(0, 20);
 
         const orderIdPrefix = "WEB-RESV-";
-        let paymentData = {
+        const paymentData = {
             orderId: orderIdPrefix + generateRandomString(),
             orderName: "테스트 방탈출 예약 결제 1건",
             amount: selectedThemePrice

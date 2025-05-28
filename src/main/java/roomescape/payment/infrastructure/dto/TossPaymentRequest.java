@@ -1,9 +1,10 @@
 package roomescape.payment.infrastructure.dto;
 
+import java.math.BigDecimal;
 import roomescape.payment.application.dto.PaymentRequest;
 
 public record TossPaymentRequest(
-        Long amount,
+        BigDecimal amount,
         String orderId,
         String paymentKey
 ) {

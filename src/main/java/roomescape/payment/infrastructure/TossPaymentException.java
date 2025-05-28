@@ -1,6 +1,8 @@
 package roomescape.payment.infrastructure;
 
-public class TossPaymentException extends RuntimeException {
+import roomescape.payment.application.PaymentException;
+
+public class TossPaymentException extends PaymentException {
 
     private final String code;
 

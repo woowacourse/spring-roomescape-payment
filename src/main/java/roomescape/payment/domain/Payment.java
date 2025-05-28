@@ -1,10 +1,13 @@
 package roomescape.payment.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import roomescape.reservation.domain.Reservation;
@@ -22,21 +25,46 @@ public class Payment {
 
     private String paymentKey;
 
-    private Long amount;
+    private BigDecimal amount;
 
     @ManyToOne
     private Reservation reservation;
 
-    public Payment(final Long id, final String orderId, final String paymentKey, final Long amount,
-                   final Reservation reservation) {
+    @Enumerated(value = EnumType.STRING)
+    private PaymentStatus status;
+
+    private Payment(final Long id, final String orderId, final String paymentKey, final BigDecimal amount,
+                    final Reservation reservation, final PaymentStatus status) {
         this.id = id;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.amount = amount;
         this.reservation = reservation;
+        this.status = status;
     }
 
-    public Payment(final String orderId, final String paymentKey, final Long amount, final Reservation reservation) {
-        this(null, orderId, paymentKey, amount, reservation);
+    public static Payment pending(
+            final String orderId,
+            final String paymentKey,
+            final BigDecimal amount,
+            final Reservation reservation
+    ) {
+        return new Payment(null, orderId, paymentKey, amount, reservation, PaymentStatus.PENDING);
+    }
+
+    public static Payment await(
+            final String orderId,
+            final BigDecimal amount,
+            final Reservation reservation
+    ) {
+        return new Payment(null, orderId, null, amount, reservation, PaymentStatus.AWAIT);
+    }
+
+    public void success() {
+        this.status = PaymentStatus.SUCCESS;
+    }
+
+    public void fail() {
+        this.status = PaymentStatus.FAILED;
     }
 }

@@ -1,6 +1,7 @@
 package roomescape.reservation.application.dto;
 
 import jakarta.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record MemberReservationRequest(
@@ -9,7 +10,7 @@ public record MemberReservationRequest(
         @NotNull Long themeId,
         @NotNull String paymentKey,
         @NotNull String orderId,
-        @NotNull Long amount,
+        @NotNull BigDecimal amount,
         @NotNull String paymentType
 ) {
 }

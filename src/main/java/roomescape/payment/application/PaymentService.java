@@ -26,18 +26,30 @@ public class PaymentService {
         validatePaymentData(request, paymentDataRequest);
         final PaymentRequest paymentRequest = new PaymentRequest(
                 request.amount(), request.orderId(), request.paymentKey());
-        final PaymentResponse paymentResponse = paymentClient.requestPayment(paymentRequest);
-        final Payment payment = new Payment(
-                paymentResponse.orderId(),
-                paymentResponse.paymentKey(),
-                paymentResponse.totalAmount(),
+        final Payment payment = Payment.pending(
+                request.orderId(),
+                request.paymentKey(),
+                request.amount(),
                 reservation
         );
         paymentRepository.save(payment);
+        try {
+            final PaymentResponse paymentResponse = paymentClient.requestPayment(paymentRequest);
+            payment.success();
+        } catch (PaymentException e) {
+            payment.fail();
+        }
     }
 
-    private void validatePaymentData(final MemberReservationRequest request,
-                                     final PaymentDataRequest paymentDataRequest) {
+    public void await(final PaymentDataRequest request, final Reservation reservation) {
+        final Payment payment = Payment.await(request.orderId(), request.amount(), reservation);
+        paymentRepository.save(payment);
+    }
+
+    private void validatePaymentData(
+            final MemberReservationRequest request,
+            final PaymentDataRequest paymentDataRequest
+    ) {
         if (!paymentDataRequest.orderId().equals(request.orderId())) {
             throw new BadRequestException("결제 주문번호가 일치하지 않습니다.");
         }
