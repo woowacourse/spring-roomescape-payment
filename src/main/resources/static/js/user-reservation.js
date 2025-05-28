@@ -206,7 +206,7 @@ function onReservationButtonClick(event, paymentWidget) {
                 amount: amount
             }),
         }).then(response => {
-            if (!response.success) throw new Error("실패");
+            if (!response.ok) throw new Error("실패");
             return response.json();
         }).then(() => {
             // 2. TOSS 결제 요청

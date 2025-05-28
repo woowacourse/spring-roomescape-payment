@@ -1,5 +1,6 @@
 package roomescape.reservation.application;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -10,6 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.member.exception.MemberNotFoundException;
+import roomescape.payment.application.PaymentApprovalService;
+import roomescape.payment.domain.PrePayment;
+import roomescape.payment.domain.PrePaymentRepository;
+import roomescape.payment.exception.InvalidPaymentAmountException;
+import roomescape.payment.exception.PaymentNotFoundException;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.AdminReservationSearchRequest;
 import roomescape.reservation.application.dto.MyReservationResponse;
@@ -43,7 +49,8 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
     private final ApplicationEventPublisher eventPublisher;
-
+    private final PrePaymentRepository prePaymentRepository;
+    private final PaymentApprovalService paymentApprovalService;
 
     public List<MyReservationResponse> findAllByMemberId(Long memberId) {
         List<Reservation> reservations = reservationRepository.findAllByMemberId(memberId);
@@ -71,9 +78,21 @@ public class ReservationService {
         return ReservationResponse.from(reservationRepository.findFiltered(memberId, themeId, from, to));
     }
 
+    //TODO: 변수명 고민  (2025-05-28, 수, 14:27)
     @Transactional
     public ReservationResponse createByUser(Long memberId, UserReservationRequest request) {
-        return create(memberId, request.date(), request.timeId(), request.themeId());
+        String orderId = request.orderId();
+        BigDecimal amount = request.amount();
+        PrePayment byOrderId = prePaymentRepository.findByOrderId(orderId).orElseThrow(PaymentNotFoundException::new);
+        if (!byOrderId.isSameAmount(amount)) {
+            throw new InvalidPaymentAmountException();
+        }
+
+        ReservationResponse response = create(memberId, request.date(), request.timeId(), request.themeId());
+
+        paymentApprovalService.approvePayment(orderId, amount, request.paymentKey());
+
+        return response;
     }
 
     @Transactional

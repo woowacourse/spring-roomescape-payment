@@ -32,6 +32,8 @@ public class PrePayment {
 
     //TODO: 네이밍 고민  (2025-05-28, 수, 11:55)
     public boolean isSameAmount(BigDecimal amount) {
-        return this.amount.equals(amount);
+        System.out.println("임시: " + this.amount);
+        System.out.println("진짜:" + amount);
+        return this.amount.compareTo(amount) == 0;
     }
 }
