@@ -8,12 +8,12 @@ import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.domain.WaitingWithRank;
 
 public record MyReservation(
-        Long id,
-        String theme,
-        LocalDate date,
-        @JsonFormat(pattern = "HH:mm")
-        LocalTime time,
-        String status
+    Long id,
+    String theme,
+    LocalDate date,
+    @JsonFormat(pattern = "HH:mm")
+    LocalTime time,
+    String status
 ) {
 
     static final String RESERVED_STATUS = "예약";
@@ -21,10 +21,10 @@ public record MyReservation(
 
     public static MyReservation from(Reservation reservation) {
         return new MyReservation(
-                reservation.getId(),
-                reservation.getThemeName(),
-                reservation.getDate(),
-                reservation.getStartAt(),
+            reservation.getId(),
+            reservation.getThemeName(),
+            reservation.getDate(),
+            reservation.getStartAt(),
             RESERVED_STATUS
         );
     }

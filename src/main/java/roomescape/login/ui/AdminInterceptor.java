@@ -17,16 +17,17 @@ public class AdminInterceptor implements HandlerInterceptor {
     private final JwtHandler jwtHandler;
     private final TokenCookieService tokenCookieService;
 
-    public AdminInterceptor(final JwtHandler jwtHandler, final TokenCookieService tokenCookieService) {
+    public AdminInterceptor(final JwtHandler jwtHandler,
+        final TokenCookieService tokenCookieService) {
         this.jwtHandler = jwtHandler;
         this.tokenCookieService = tokenCookieService;
     }
 
     @Override
     public boolean preHandle(
-            final HttpServletRequest request,
-            final HttpServletResponse response,
-            final Object handler
+        final HttpServletRequest request,
+        final HttpServletResponse response,
+        final Object handler
     ) {
         if (request.getCookies() == null) {
             throw new UnauthorizedException("로그인이 필요합니다.");

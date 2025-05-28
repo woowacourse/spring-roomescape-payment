@@ -32,7 +32,7 @@ class MemberServiceTest {
 
         // when & then
         assertThat(memberService.findById(id)).isEqualTo(
-                new MemberResponse(1L, "엠제이")
+            new MemberResponse(1L, "엠제이")
         );
 
     }

@@ -34,52 +34,52 @@ class AdminReservationApiTest {
         final LoginRequest request = new LoginRequest(email, password);
 
         token = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(request)
-                .when().post("/login")
-                .then().log().all()
-                .statusCode(200)
-                .extract()
-                .header(HttpHeaders.SET_COOKIE)
-                .split(";")[0]
-                .split(TokenCookieService.COOKIE_TOKEN_KEY + "=")[1];
+            .contentType(ContentType.JSON)
+            .body(request)
+            .when().post("/login")
+            .then().log().all()
+            .statusCode(200)
+            .extract()
+            .header(HttpHeaders.SET_COOKIE)
+            .split(";")[0]
+            .split(TokenCookieService.COOKIE_TOKEN_KEY + "=")[1];
     }
 
     @Test
     void 어드민_페이지로_접근할_수_있다() {
         RestAssured.given().log().all()
-                .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
-                .when().get("/admin")
-                .then().log().all()
-                .statusCode(200);
+            .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
+            .when().get("/admin")
+            .then().log().all()
+            .statusCode(200);
     }
 
     @Test
     void 어드민이_예약_관리_페이지에_접근한다() {
         RestAssured.given().log().all()
-                .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
-                .when().get("/admin/reservation")
-                .then().log().all()
-                .statusCode(200);
+            .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
+            .when().get("/admin/reservation")
+            .then().log().all()
+            .statusCode(200);
     }
 
     @Test
     void 모든_예약_정보를_반환한다() {
         RestAssured.given().log().all()
-                .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
-                .when().get("/admin/reservations")
-                .then().log().all()
-                .statusCode(200)
-                .body("size()", is(6));
+            .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
+            .when().get("/admin/reservations")
+            .then().log().all()
+            .statusCode(200)
+            .body("size()", is(6));
     }
 
     @Test
     void 존재하지_않는_예약을_삭제할_경우_NOT_FOUND_반환() {
         RestAssured.given().log().all()
-                .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
-                .when().delete("/admin/reservations/7")
-                .then().log().all()
-                .statusCode(404);
+            .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
+            .when().delete("/admin/reservations/7")
+            .then().log().all()
+            .statusCode(404);
     }
 
 

@@ -16,6 +16,7 @@ public record WaitingInfoResponse(
     @JsonFormat(pattern = "HH:mm")
     LocalTime startAt
 ) {
+
     public static WaitingInfoResponse from(Waiting waiting) {
         return new WaitingInfoResponse(
             waiting.getId(),

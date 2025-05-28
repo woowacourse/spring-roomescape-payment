@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
 import java.util.List;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +16,8 @@ import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.repository.ThemeRepository;
 import roomescape.waiting.domain.Waiting;
-import roomescape.waiting.domain.repository.WaitingRepository;
 import roomescape.waiting.domain.WaitingWithRank;
+import roomescape.waiting.domain.repository.WaitingRepository;
 
 @ActiveProfiles("test")
 @DataJpaTest
@@ -44,7 +43,8 @@ public class WaitingRepositoryTest {
         Member member2 = memberRepository.findById(2L).orElseThrow();
         Member member3 = memberRepository.findById(3L).orElseThrow();
         Theme theme = themeRepository.findById(3L).orElseThrow(); // 다른 테마 사용
-        ReservationTime reservationTime = reservationTimeRepository.findById(3L).orElseThrow(); // 다른 예약 시간 사용
+        ReservationTime reservationTime = reservationTimeRepository.findById(3L)
+            .orElseThrow(); // 다른 예약 시간 사용
         LocalDate date = LocalDate.now().plusDays(15); // 더 먼 미래 날짜 사용
 
         // 같은 테마, 같은 시간, 같은 날짜에 대기 등록 (순서대로 member1, member2, member3)
@@ -53,8 +53,10 @@ public class WaitingRepositoryTest {
         waitingRepository.save(new Waiting(member3, reservationTime, theme, date));
 
         // when
-        List<WaitingWithRank> waitingsByMember1 = waitingRepository.findWaitingsWithRankByMemberId(member1.getId());
-        List<WaitingWithRank> waitingsByMember2 = waitingRepository.findWaitingsWithRankByMemberId(member2.getId());
+        List<WaitingWithRank> waitingsByMember1 = waitingRepository.findWaitingsWithRankByMemberId(
+            member1.getId());
+        List<WaitingWithRank> waitingsByMember2 = waitingRepository.findWaitingsWithRankByMemberId(
+            member2.getId());
         List<WaitingWithRank> waitingsByMember3 = waitingRepository.findWaitingsWithRankByMemberId(
             member3.getId());
 

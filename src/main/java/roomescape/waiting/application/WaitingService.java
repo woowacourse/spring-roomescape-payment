@@ -9,16 +9,16 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.reservation.application.dto.MemberReservationRequest;
 import roomescape.reservation.application.dto.MyReservation;
-import roomescape.waiting.application.dto.WaitingIdResponse;
 import roomescape.reservation.domain.ReservationTime;
-import roomescape.waiting.domain.Waiting;
-import roomescape.waiting.domain.WaitingWithRank;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
-import roomescape.waiting.application.dto.WaitingInfoResponse;
-import roomescape.waiting.domain.repository.WaitingRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.repository.ThemeRepository;
+import roomescape.waiting.application.dto.WaitingIdResponse;
+import roomescape.waiting.application.dto.WaitingInfoResponse;
+import roomescape.waiting.domain.Waiting;
+import roomescape.waiting.domain.WaitingWithRank;
+import roomescape.waiting.domain.repository.WaitingRepository;
 
 @Service
 @Transactional(readOnly = true)

@@ -51,18 +51,20 @@ public class ReservationService {
     public List<ReservationResponse> findAll() {
         final List<Reservation> reservations = reservationRepository.findAll();
         return reservations.stream()
-                .map(ReservationResponse::of)
-                .toList();
+            .map(ReservationResponse::of)
+            .toList();
     }
 
     @Transactional
-    public ReservationResponse addMemberReservation(final MemberReservationRequest request, final Long memberId) {
+    public ReservationResponse addMemberReservation(final MemberReservationRequest request,
+        final Long memberId) {
         return addReservation(request.timeId(), request.themeId(), memberId, request.date());
     }
 
     @Transactional
     public ReservationResponse addAdminReservation(final AdminReservationRequest request) {
-        return addReservation(request.timeId(), request.themeId(), request.memberId(), request.date());
+        return addReservation(request.timeId(), request.themeId(), request.memberId(),
+            request.date());
     }
 
     @Transactional
@@ -87,43 +89,47 @@ public class ReservationService {
         });
     }
 
-    public List<AvailableReservationTimeResponse> findAvailableReservationTime(final Long themeId, final String date) {
+    public List<AvailableReservationTimeResponse> findAvailableReservationTime(final Long themeId,
+        final String date) {
         final List<ReservationTime> reservationTimes = reservationTimeRepository.findAll();
         final Theme selectedTheme = getTheme(themeId);
         final List<Reservation> bookedReservations = reservationRepository.findByDateAndThemeId(
-                LocalDate.parse(date),
-                themeId);
-        return getAvailableReservationTimeResponses(reservationTimes, bookedReservations, selectedTheme);
+            LocalDate.parse(date),
+            themeId);
+        return getAvailableReservationTimeResponses(reservationTimes, bookedReservations,
+            selectedTheme);
     }
 
     public List<ReservationResponse> findReservationByThemeIdAndMemberIdInDuration(
-            final long themeId,
-            final long memberId,
-            final LocalDate start,
-            final LocalDate end
+        final long themeId,
+        final long memberId,
+        final LocalDate start,
+        final LocalDate end
     ) {
         final List<Reservation> reservations = reservationRepository
-                .findByThemeIdAndMemberIdAndDateBetween(themeId, memberId, start, end);
+            .findByThemeIdAndMemberIdAndDateBetween(themeId, memberId, start, end);
         return reservations.stream()
-                .map(ReservationResponse::of)
-                .toList();
+            .map(ReservationResponse::of)
+            .toList();
     }
 
     public List<MyReservation> findByMemberId(final Long memberId) {
         final List<Reservation> reservations = reservationRepository.findByMemberId(memberId);
         return reservations.stream()
-                .map(MyReservation::from)
-                .toList();
+            .map(MyReservation::from)
+            .toList();
     }
 
-    private ReservationResponse addReservation(final Long timeId, final Long themeId, final Long memberId,
-                                               final LocalDate date) {
+    private ReservationResponse addReservation(final Long timeId, final Long themeId,
+        final Long memberId,
+        final LocalDate date) {
         final ReservationTime reservationTime = getReservationTime(timeId);
         final Theme theme = getTheme(themeId);
         final Member member = getMember(memberId);
 
-        final List<Reservation> sameTimeReservations = reservationRepository.findByDateAndThemeId(date,
-                themeId);
+        final List<Reservation> sameTimeReservations = reservationRepository.findByDateAndThemeId(
+            date,
+            themeId);
 
         validateIsBooked(sameTimeReservations, reservationTime, theme);
         validatePastDateTime(date, reservationTime.getStartAt());
@@ -133,10 +139,11 @@ public class ReservationService {
         return ReservationResponse.of(saved);
     }
 
-    private void validateIsBooked(final List<Reservation> sameTimeReservations, final ReservationTime reservationTime,
-                                  final Theme theme) {
+    private void validateIsBooked(final List<Reservation> sameTimeReservations,
+        final ReservationTime reservationTime,
+        final Theme theme) {
         final boolean isBooked = sameTimeReservations.stream()
-                .anyMatch(reservation -> reservation.hasConflictWith(reservationTime, theme));
+            .anyMatch(reservation -> reservation.hasConflictWith(reservationTime, theme));
         if (isBooked) {
             throw new ConflictException("해당 테마 이용시간이 겹칩니다.");
         }
@@ -151,16 +158,17 @@ public class ReservationService {
     }
 
     private List<AvailableReservationTimeResponse> getAvailableReservationTimeResponses(
-            final List<ReservationTime> reservationTimes,
-            final List<Reservation> bookedReservations,
-            final Theme selectedTheme
+        final List<ReservationTime> reservationTimes,
+        final List<Reservation> bookedReservations,
+        final Theme selectedTheme
     ) {
         final List<AvailableReservationTimeResponse> responses = new ArrayList<>();
         for (final ReservationTime reservationTime : reservationTimes) {
             final boolean isBooked = bookedReservations.stream()
-                    .anyMatch(reservation -> reservation.hasConflictWith(reservationTime, selectedTheme));
+                .anyMatch(
+                    reservation -> reservation.hasConflictWith(reservationTime, selectedTheme));
             final AvailableReservationTimeResponse response = AvailableReservationTimeResponse
-                    .from(reservationTime, isBooked);
+                .from(reservationTime, isBooked);
             responses.add(response);
         }
         return responses;
@@ -173,16 +181,16 @@ public class ReservationService {
 
     private ReservationTime getReservationTime(final Long timeId) {
         return reservationTimeRepository.findById(timeId)
-                .orElseThrow(() -> new NotFoundException("선택한 예약 시간이 존재하지 않습니다."));
+            .orElseThrow(() -> new NotFoundException("선택한 예약 시간이 존재하지 않습니다."));
     }
 
     private Theme getTheme(final Long themeId) {
         return themeRepository.findById(themeId)
-                .orElseThrow(() -> new NotFoundException("선택한 테마가 존재하지 않습니다."));
+            .orElseThrow(() -> new NotFoundException("선택한 테마가 존재하지 않습니다."));
     }
 
     private Member getMember(final Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new NotFoundException("선택한 멤버가 존재하지 않습니다."));
+            .orElseThrow(() -> new NotFoundException("선택한 멤버가 존재하지 않습니다."));
     }
 }

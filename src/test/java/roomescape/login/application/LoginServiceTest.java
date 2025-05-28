@@ -37,12 +37,12 @@ class LoginServiceTest {
 
         // then
         assertAll(
-                () -> assertThat(token).isNotNull(),
-                () -> assertThat(accessToken).isNotEmpty(),
-                () -> assertThat(claims).containsKey(JwtHandler.CLAIM_ID_KEY),
-                () -> assertThat(claims).containsKey(JwtHandler.CLAIM_ROLE_KEY),
-                () -> assertThat(claims.get(JwtHandler.CLAIM_ID_KEY)).isEqualTo("1"),
-                () -> assertThat(claims.get(JwtHandler.CLAIM_ROLE_KEY)).isEqualTo("MEMBER")
+            () -> assertThat(token).isNotNull(),
+            () -> assertThat(accessToken).isNotEmpty(),
+            () -> assertThat(claims).containsKey(JwtHandler.CLAIM_ID_KEY),
+            () -> assertThat(claims).containsKey(JwtHandler.CLAIM_ROLE_KEY),
+            () -> assertThat(claims.get(JwtHandler.CLAIM_ID_KEY)).isEqualTo("1"),
+            () -> assertThat(claims.get(JwtHandler.CLAIM_ROLE_KEY)).isEqualTo("MEMBER")
         );
     }
 
@@ -53,8 +53,8 @@ class LoginServiceTest {
 
         // when & then
         assertThatThrownBy(() -> loginService.login(loginRequest))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage("회원 정보가 존재하지 않습니다.");
+            .isInstanceOf(NotFoundException.class)
+            .hasMessage("회원 정보가 존재하지 않습니다.");
     }
 
 }

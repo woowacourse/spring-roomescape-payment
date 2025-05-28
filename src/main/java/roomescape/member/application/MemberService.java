@@ -21,12 +21,12 @@ public class MemberService {
     public List<MemberResponse> findAll() {
         final List<Member> members = memberRepository.findAll();
         return members.stream()
-                .map(MemberResponse::of)
-                .toList();
+            .map(MemberResponse::of)
+            .toList();
     }
 
     public MemberResponse findById(final Long id) {
         return MemberResponse.of(memberRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("해당하는 사용자가 없습니다.")));
+            .orElseThrow(() -> new NotFoundException("해당하는 사용자가 없습니다.")));
     }
 }

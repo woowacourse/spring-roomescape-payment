@@ -15,7 +15,8 @@ import roomescape.common.exception.impl.UnauthorizedException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(
+        GlobalExceptionHandler.class);
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handle(final Exception e) {

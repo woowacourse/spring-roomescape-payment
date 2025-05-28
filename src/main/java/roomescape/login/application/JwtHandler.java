@@ -31,12 +31,12 @@ public class JwtHandler {
         final Date accessTokenExpiredAt = new Date(date.getTime() + accessTokenExpireTime);
 
         final String accessToken = Jwts.builder()
-                .claim(CLAIM_ID_KEY, member.getId())
-                .claim(CLAIM_ROLE_KEY, member.getRole().toString())
-                .setIssuedAt(date)
-                .setExpiration(accessTokenExpiredAt)
-                .signWith(SignatureAlgorithm.HS256, secretKey)
-                .compact();
+            .claim(CLAIM_ID_KEY, member.getId())
+            .claim(CLAIM_ROLE_KEY, member.getRole().toString())
+            .setIssuedAt(date)
+            .setExpiration(accessTokenExpiredAt)
+            .signWith(SignatureAlgorithm.HS256, secretKey)
+            .compact();
 
         return new Token(accessToken);
     }
@@ -45,23 +45,23 @@ public class JwtHandler {
         final Claims claims = parseJwt(token);
 
         return Map.of(
-                CLAIM_ID_KEY, claims.get(CLAIM_ID_KEY).toString(),
-                CLAIM_ROLE_KEY, claims.get(CLAIM_ROLE_KEY).toString()
+            CLAIM_ID_KEY, claims.get(CLAIM_ID_KEY).toString(),
+            CLAIM_ROLE_KEY, claims.get(CLAIM_ROLE_KEY).toString()
         );
     }
 
     public String decode(final String token, final String key) {
         return parseJwt(token)
-                .get(key)
-                .toString();
+            .get(key)
+            .toString();
     }
 
     private Claims parseJwt(final String token) {
         try {
             return Jwts.parser()
-                    .setSigningKey(secretKey)
-                    .parseClaimsJws(token)
-                    .getBody();
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody();
         } catch (final ExpiredJwtException e) {
             throw new UnauthorizedException("로그인 정보가 만료되었습니다.");
         } catch (final UnsupportedJwtException | MalformedJwtException | SignatureException e) {

@@ -58,8 +58,8 @@ class ThemeServiceTest {
 
         // when & then
         assertThatThrownBy(() -> themeService.deleteById(id))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage("이 테마의 예약이 존재합니다.");
+            .isInstanceOf(BadRequestException.class)
+            .hasMessage("이 테마의 예약이 존재합니다.");
     }
 
     @Test
@@ -68,8 +68,8 @@ class ThemeServiceTest {
 
         // when & then
         assertThat(themeService.sortByRank())
-                .extracting(ThemeResponse::id)
-                .containsExactly(2L, 1L, 3L);
+            .extracting(ThemeResponse::id)
+            .containsExactly(2L, 1L, 3L);
 
     }
 }

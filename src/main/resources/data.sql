@@ -56,8 +56,6 @@ VALUES (DATEADD('DAY', -2, CURRENT_DATE), 2, 6, 3, 2);
 
 
 
-
-
 INSERT INTO reservation (date, time_id, theme_id, member_id)
 VALUES (DATEADD('DAY', -4, CURRENT_DATE), 2, 2, 1);
 INSERT INTO reservation (date, time_id, theme_id, member_id)
@@ -72,4 +70,3 @@ VALUES (DATEADD('DAY', -3, CURRENT_DATE), 4, 3, 3);
 
 INSERT INTO reservation (date, time_id, theme_id, member_id)
 VALUES (DATEADD('DAY', -3, CURRENT_DATE), 1, 2, 1);
-

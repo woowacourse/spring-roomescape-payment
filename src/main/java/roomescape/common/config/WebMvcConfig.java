@@ -14,8 +14,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private final HandlerInterceptor adminInterceptor;
 
     public WebMvcConfig(
-            final HandlerMethodArgumentResolver memberArgumentResolver,
-            final HandlerInterceptor adminInterceptor
+        final HandlerMethodArgumentResolver memberArgumentResolver,
+        final HandlerInterceptor adminInterceptor
     ) {
         this.memberArgumentResolver = memberArgumentResolver;
         this.adminInterceptor = adminInterceptor;
@@ -24,7 +24,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(final InterceptorRegistry registry) {
         registry.addInterceptor(adminInterceptor)
-                .addPathPatterns("/admin/**");
+            .addPathPatterns("/admin/**");
     }
 
     @Override

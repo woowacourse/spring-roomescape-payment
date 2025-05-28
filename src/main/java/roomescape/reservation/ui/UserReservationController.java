@@ -30,11 +30,12 @@ public class UserReservationController {
 
     @PostMapping
     public ResponseEntity<ReservationResponse> add(
-            @Valid @RequestBody final MemberReservationRequest request,
-            final LoginCheckRequest loginCheckRequest
+        @Valid @RequestBody final MemberReservationRequest request,
+        final LoginCheckRequest loginCheckRequest
     ) {
-        final ReservationResponse reservationResponse = reservationService.addMemberReservation(request,
-                loginCheckRequest.id());
+        final ReservationResponse reservationResponse = reservationService.addMemberReservation(
+            request,
+            loginCheckRequest.id());
         return new ResponseEntity<>(reservationResponse, HttpStatus.CREATED);
     }
 
@@ -46,8 +47,8 @@ public class UserReservationController {
 
     @GetMapping("/themes/{themeId}/times")
     public ResponseEntity<List<AvailableReservationTimeResponse>> findAvailableReservationTime(
-            @PathVariable final Long themeId,
-            @RequestParam final String date) {
+        @PathVariable final Long themeId,
+        @RequestParam final String date) {
         return ResponseEntity.ok(reservationService.findAvailableReservationTime(themeId, date));
     }
 }

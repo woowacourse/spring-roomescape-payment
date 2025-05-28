@@ -19,7 +19,8 @@ public class MemberArgumentResolver implements HandlerMethodArgumentResolver {
     private final JwtHandler jwtHandler;
     private final TokenCookieService tokenCookieService;
 
-    public MemberArgumentResolver(final JwtHandler jwtHandler, final TokenCookieService tokenCookieService) {
+    public MemberArgumentResolver(final JwtHandler jwtHandler,
+        final TokenCookieService tokenCookieService) {
         this.jwtHandler = jwtHandler;
         this.tokenCookieService = tokenCookieService;
     }
@@ -31,10 +32,10 @@ public class MemberArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public Object resolveArgument(
-            final MethodParameter parameter,
-            final ModelAndViewContainer mavContainer,
-            final NativeWebRequest webRequest,
-            final WebDataBinderFactory binderFactory
+        final MethodParameter parameter,
+        final ModelAndViewContainer mavContainer,
+        final NativeWebRequest webRequest,
+        final WebDataBinderFactory binderFactory
     ) {
         final HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
         if (request == null || request.getCookies() == null) {

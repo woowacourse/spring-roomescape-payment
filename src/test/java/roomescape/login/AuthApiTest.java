@@ -23,19 +23,18 @@ import roomescape.login.application.dto.LoginRequest;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class AuthApiTest {
 
+    private final JwtHandler jwtHandler;
     @LocalServerPort
     private int port;
-
-    private final JwtHandler jwtHandler;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
 
     @Autowired
     public AuthApiTest(final JwtHandler jwtHandler) {
         this.jwtHandler = jwtHandler;
+    }
+
+    @BeforeEach
+    void setUp() {
+        RestAssured.port = port;
     }
 
     @Test
@@ -48,15 +47,15 @@ public class AuthApiTest {
 
         // when
         final String token = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(request)
-                .when().post("/login")
-                .then().log().all()
-                .statusCode(200)
-                .extract()
-                .header(HttpHeaders.SET_COOKIE)
-                .split(";")[0]
-                .split(TokenCookieService.COOKIE_TOKEN_KEY + "=")[1];
+            .contentType(ContentType.JSON)
+            .body(request)
+            .when().post("/login")
+            .then().log().all()
+            .statusCode(200)
+            .extract()
+            .header(HttpHeaders.SET_COOKIE)
+            .split(";")[0]
+            .split(TokenCookieService.COOKIE_TOKEN_KEY + "=")[1];
 
         final String actual = jwtHandler.decode(token, JwtHandler.CLAIM_ID_KEY);
 
@@ -74,13 +73,13 @@ public class AuthApiTest {
 
         // when
         final String message = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(request)
-                .when().post("/login")
-                .then().log().all()
-                .statusCode(404)
-                .extract()
-                .asString();
+            .contentType(ContentType.JSON)
+            .body(request)
+            .when().post("/login")
+            .then().log().all()
+            .statusCode(404)
+            .extract()
+            .asString();
 
         // then
         assertThat(message).isEqualTo("회원 정보가 존재하지 않습니다.");
@@ -96,23 +95,23 @@ public class AuthApiTest {
 
         // when
         final String token = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(request)
-                .when().post("/login")
-                .then().log().all()
-                .statusCode(200)
-                .extract()
-                .header(HttpHeaders.SET_COOKIE)
-                .split(";")[0]
-                .split(TokenCookieService.COOKIE_TOKEN_KEY + "=")[1];
+            .contentType(ContentType.JSON)
+            .body(request)
+            .when().post("/login")
+            .then().log().all()
+            .statusCode(200)
+            .extract()
+            .header(HttpHeaders.SET_COOKIE)
+            .split(";")[0]
+            .split(TokenCookieService.COOKIE_TOKEN_KEY + "=")[1];
 
         final String actual = RestAssured.given().log().all()
-                .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
-                .when().get("/login/check")
-                .then().log().all()
-                .statusCode(200)
-                .extract()
-                .jsonPath().get("name");
+            .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
+            .when().get("/login/check")
+            .then().log().all()
+            .statusCode(200)
+            .extract()
+            .jsonPath().get("name");
 
         // then
         assertThat(actual).isEqualTo("엠제이");

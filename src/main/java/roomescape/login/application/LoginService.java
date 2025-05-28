@@ -27,16 +27,17 @@ public class LoginService {
     }
 
     public Token login(final LoginRequest loginRequest) {
-        final Member member = memberRepository.findByEmailAndPassword(new Email(loginRequest.email()),
-                        new Password(loginRequest.password()))
-                .orElseThrow(() -> new NotFoundException("회원 정보가 존재하지 않습니다."));
+        final Member member = memberRepository.findByEmailAndPassword(
+                new Email(loginRequest.email()),
+                new Password(loginRequest.password()))
+            .orElseThrow(() -> new NotFoundException("회원 정보가 존재하지 않습니다."));
 
         return jwtHandler.createToken(member);
     }
 
     public LoginCheckResponse checkLogin(final LoginCheckRequest request) {
         final Member member = memberRepository.findById(request.id())
-                .orElseThrow(() -> new NotFoundException("회원 정보가 존재하지 않습니다."));
+            .orElseThrow(() -> new NotFoundException("회원 정보가 존재하지 않습니다."));
 
         return LoginCheckResponse.from(member);
     }
@@ -55,4 +56,3 @@ public class LoginService {
         }
     }
 }
-

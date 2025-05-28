@@ -34,22 +34,22 @@ public class AdminReservationController {
 
     @PostMapping
     public ResponseEntity<ReservationResponse> add(
-            @Valid @RequestBody final AdminReservationRequest request
+        @Valid @RequestBody final AdminReservationRequest request
     ) {
         final ReservationResponse response = reservationService.addAdminReservation(request);
         return ResponseEntity.created(URI.create("/admin/reservations/" + response.id()))
-                .body(response);
+            .body(response);
     }
 
     @GetMapping("/search")
     public ResponseEntity<List<ReservationResponse>> getFilteredReservations(
-            @RequestParam(name = "themeId") final long themeId,
-            @RequestParam(name = "memberId") final long memberId,
-            @RequestParam(name = "dateFrom") final LocalDate start,
-            @RequestParam(name = "dateTo") final LocalDate end
+        @RequestParam(name = "themeId") final long themeId,
+        @RequestParam(name = "memberId") final long memberId,
+        @RequestParam(name = "dateFrom") final LocalDate start,
+        @RequestParam(name = "dateTo") final LocalDate end
     ) {
         final List<ReservationResponse> reservationResponses = reservationService.findReservationByThemeIdAndMemberIdInDuration(
-                themeId, memberId, start, end);
+            themeId, memberId, start, end);
         return ResponseEntity.ok(reservationResponses);
     }
 

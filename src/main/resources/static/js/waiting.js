@@ -5,7 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
    */
   fetch('/admin/waitings') // 내 예약 목록 조회 API 호출
   .then(response => {
-    if (response.status === 200) return response.json();
+    if (response.status === 200) {
+      return response.json();
+    }
     throw new Error('Read failed');
   })
   .then(render)
@@ -42,7 +44,7 @@ function render(data) {
           예약 대기 승인/거절 버튼이 필요한 경우 활성화하여 사용
      */
     // actionCell.appendChild(createActionButton('승인', 'btn-primary', approve));
-     actionCell.appendChild(createActionButton('거절', 'btn-danger', deny));
+    actionCell.appendChild(createActionButton('거절', 'btn-danger', deny));
   });
 }
 
@@ -58,7 +60,9 @@ function approve(event) {
   return fetch(endpoint, {
     method: ''
   }).then(response => {
-    if (response.status === 200) return;
+    if (response.status === 200) {
+      return;
+    }
     throw new Error('Delete failed');
   }).then(() => location.reload());
 }
@@ -75,7 +79,9 @@ function deny(event) {
   return fetch(endpoint, {
     method: 'DELETE'
   }).then(response => {
-    if (response.status === 204) return;
+    if (response.status === 204) {
+      return;
+    }
     throw new Error('Delete failed');
   }).then(() => location.reload());
 }

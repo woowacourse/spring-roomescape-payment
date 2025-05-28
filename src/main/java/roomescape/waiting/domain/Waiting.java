@@ -32,7 +32,8 @@ public class Waiting {
 
     private LocalDate date;
 
-    protected Waiting() {}
+    protected Waiting() {
+    }
 
     public Waiting(
         final Long id,

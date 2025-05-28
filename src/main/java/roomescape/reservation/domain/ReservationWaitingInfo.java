@@ -27,7 +27,8 @@ public class ReservationWaitingInfo {
 
     private LocalDate date;
 
-    public ReservationWaitingInfo() {}
+    public ReservationWaitingInfo() {
+    }
 
     public ReservationWaitingInfo(
         Long id, Theme theme,

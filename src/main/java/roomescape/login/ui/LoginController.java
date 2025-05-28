@@ -25,7 +25,8 @@ public class LoginController {
     @Value("${security.jwt.token.access.expire-length}")
     private long expiration;
 
-    public LoginController(final LoginService loginService, final TokenCookieService tokenCookieService) {
+    public LoginController(final LoginService loginService,
+        final TokenCookieService tokenCookieService) {
         this.loginService = loginService;
         this.tokenCookieService = tokenCookieService;
     }
@@ -36,8 +37,8 @@ public class LoginController {
         final String cookie = tokenCookieService.createTokenCookie(token.accessToken(), expiration);
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie)
-                .build();
+            .header(HttpHeaders.SET_COOKIE, cookie)
+            .build();
     }
 
     @GetMapping("/login/check")
@@ -51,12 +52,13 @@ public class LoginController {
         final String cookie = tokenCookieService.createTokenCookie("", 0);
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie)
-                .build();
+            .header(HttpHeaders.SET_COOKIE, cookie)
+            .build();
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<LoginCheckResponse> signup(@Valid @RequestBody final SignupRequest request) {
+    public ResponseEntity<LoginCheckResponse> signup(
+        @Valid @RequestBody final SignupRequest request) {
         final LoginCheckResponse loginCheckResponse = loginService.signup(request);
         return ResponseEntity.ok(loginCheckResponse);
     }

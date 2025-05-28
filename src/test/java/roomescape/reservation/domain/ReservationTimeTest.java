@@ -21,10 +21,10 @@ class ReservationTimeTest {
 
         // when & then
         assertAll(
-                () -> assertThat(reservationTime.hasConflict(duration, eight)).isFalse(),
-                () -> assertThat(reservationTime.hasConflict(duration, nine)).isTrue(),
-                () -> assertThat(reservationTime.hasConflict(duration, eleven)).isTrue(),
-                () -> assertThat(reservationTime.hasConflict(duration, twelve)).isFalse()
+            () -> assertThat(reservationTime.hasConflict(duration, eight)).isFalse(),
+            () -> assertThat(reservationTime.hasConflict(duration, nine)).isTrue(),
+            () -> assertThat(reservationTime.hasConflict(duration, eleven)).isTrue(),
+            () -> assertThat(reservationTime.hasConflict(duration, twelve)).isFalse()
         );
     }
 }

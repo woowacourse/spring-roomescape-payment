@@ -18,7 +18,7 @@ public class ReservationTimeService {
     private final ReservationTimeRepository reservationTimeRepository;
 
     public ReservationTimeService(final ReservationRepository reservationRepository,
-                                  final ReservationTimeRepository reservationTimeRepository) {
+        final ReservationTimeRepository reservationTimeRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
     }
@@ -26,8 +26,8 @@ public class ReservationTimeService {
     public List<ReservationTimeResponse> findAll() {
         final List<ReservationTime> times = reservationTimeRepository.findAll();
         return times.stream()
-                .map(ReservationTimeResponse::of)
-                .toList();
+            .map(ReservationTimeResponse::of)
+            .toList();
     }
 
     @Transactional
@@ -36,7 +36,8 @@ public class ReservationTimeService {
             throw new BadRequestException("동일한 시간이 이미 존재합니다.");
         }
         final ReservationTime reservationTime = new ReservationTime(requestDto.startAt());
-        final ReservationTime savedReservationTime = reservationTimeRepository.save(reservationTime);
+        final ReservationTime savedReservationTime = reservationTimeRepository.save(
+            reservationTime);
         return ReservationTimeResponse.of(savedReservationTime);
     }
 

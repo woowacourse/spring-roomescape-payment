@@ -17,7 +17,8 @@ public class ThemeService {
     private final ReservationRepository reservationRepository;
     private final ThemeRepository themeRepository;
 
-    public ThemeService(final ReservationRepository reservationRepository, final ThemeRepository themeRepository) {
+    public ThemeService(final ReservationRepository reservationRepository,
+        final ThemeRepository themeRepository) {
         this.reservationRepository = reservationRepository;
         this.themeRepository = themeRepository;
     }
@@ -25,8 +26,8 @@ public class ThemeService {
     public List<ThemeResponse> findAll() {
         final List<Theme> themes = themeRepository.findAll();
         return themes.stream()
-                .map(ThemeResponse::of)
-                .toList();
+            .map(ThemeResponse::of)
+            .toList();
     }
 
     @Transactional
@@ -34,7 +35,8 @@ public class ThemeService {
         if (themeRepository.existsByName(requestDto.name())) {
             throw new BadRequestException("동일한 이름의 테마가 이미 존재합니다.");
         }
-        final Theme theme = new Theme(requestDto.name(), requestDto.description(), requestDto.thumbnail());
+        final Theme theme = new Theme(requestDto.name(), requestDto.description(),
+            requestDto.thumbnail());
         final Theme savedTheme = themeRepository.save(theme);
         return ThemeResponse.of(savedTheme);
     }
@@ -50,7 +52,7 @@ public class ThemeService {
     public List<ThemeResponse> sortByRank() {
         final List<Theme> themes = themeRepository.findByRank();
         return themes.stream()
-                .map(ThemeResponse::of)
-                .toList();
+            .map(ThemeResponse::of)
+            .toList();
     }
 }

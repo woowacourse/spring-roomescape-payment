@@ -32,7 +32,8 @@ public class Member {
 
     }
 
-    public Member(final Long id, final MemberName name, final Email email, final Password password, final Role role) {
+    public Member(final Long id, final MemberName name, final Email email, final Password password,
+        final Role role) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -40,7 +41,8 @@ public class Member {
         this.role = role;
     }
 
-    public Member(final Long id, final String name, final String email, final String password, final Role role) {
+    public Member(final Long id, final String name, final String email, final String password,
+        final Role role) {
         this(id, new MemberName(name), new Email(email), new Password(password), role);
     }
 

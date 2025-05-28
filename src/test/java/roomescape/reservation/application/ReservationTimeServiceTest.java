@@ -36,7 +36,8 @@ class ReservationTimeServiceTest {
         final ReservationTimeRequest request = new ReservationTimeRequest(LocalTime.of(22, 0));
 
         // when & then
-        assertThat(reservationTimeService.add(request)).isEqualTo(new ReservationTimeResponse(7L, LocalTime.of(22, 0)));
+        assertThat(reservationTimeService.add(request)).isEqualTo(
+            new ReservationTimeResponse(7L, LocalTime.of(22, 0)));
     }
 
     @Test
@@ -59,7 +60,7 @@ class ReservationTimeServiceTest {
 
         // when & then
         assertThatThrownBy(() -> reservationTimeService.deleteById(id))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage("이 시간의 예약이 존재합니다.");
+            .isInstanceOf(BadRequestException.class)
+            .hasMessage("이 시간의 예약이 존재합니다.");
     }
 }

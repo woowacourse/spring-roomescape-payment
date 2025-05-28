@@ -33,20 +33,20 @@ public class ReservationTimeApiTest {
         final ReservationTimeRequest request = new ReservationTimeRequest(LocalTime.of(23, 0));
 
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(request)
-                .when().post("/times")
-                .then().log().all()
-                .statusCode(201);
+            .contentType(ContentType.JSON)
+            .body(request)
+            .when().post("/times")
+            .then().log().all()
+            .statusCode(201);
     }
 
     @Test
     void 모든_시간을_조회한다() {
         RestAssured.given().log().all()
-                .when().get("/times")
-                .then().log().all()
-                .statusCode(200)
-                .body("size()", is(6));
+            .when().get("/times")
+            .then().log().all()
+            .statusCode(200)
+            .body("size()", is(6));
     }
 
     @Test
@@ -54,19 +54,19 @@ public class ReservationTimeApiTest {
         final ReservationTimeRequest request = new ReservationTimeRequest(null);
 
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(request)
-                .when().post("/times")
-                .then().log().all()
-                .statusCode(400);
+            .contentType(ContentType.JSON)
+            .body(request)
+            .when().post("/times")
+            .then().log().all()
+            .statusCode(400);
     }
 
     @Test
     void 예약이_존재할_때_예약시간을_제거하면_에러를_반환한다() {
         RestAssured.given().log().all()
-                .when().delete("/times/1")
-                .then().log().all()
-                .statusCode(400)
-                .body(equalTo("이 시간의 예약이 존재합니다."));
+            .when().delete("/times/1")
+            .then().log().all()
+            .statusCode(400)
+            .body(equalTo("이 시간의 예약이 존재합니다."));
     }
 }
