@@ -14,8 +14,6 @@ public interface JpaReservationRepository extends JpaRepository<Reservation, Lon
 
     boolean existsByReservationSlot(ReservationSlot reservationSlot);
 
-    boolean existsByReservationSlotAndMember(ReservationSlot reservationSlot, Member member);
-
     Optional<Reservation> findByReservationSlot(ReservationSlot reservationSlot);
 
     @Query("""
