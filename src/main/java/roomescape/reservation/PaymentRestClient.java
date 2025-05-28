@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.client.RestClient;
 import roomescape.reservation.dto.response.PaymentApproveResponse;
 import roomescape.reservation.entity.Payment;
+import roomescape.reservation.exception.PaymentResponseErrorHandler;
 
 @RequiredArgsConstructor
 public class PaymentRestClient {
@@ -13,13 +14,15 @@ public class PaymentRestClient {
     private static final String ENCODED_KEY = Base64.getEncoder().encodeToString(TEST_SECRET_KEY.getBytes());
 
     private final RestClient restClient;
+    private final PaymentResponseErrorHandler paymentResponseErrorHandler;
 
-    public PaymentApproveResponse approve(Payment payment) {
-        return restClient.post()
+    public void approve(Payment payment) {
+        restClient.post()
                 .uri("/confirm")
                 .header("Authorization", "Basic " + ENCODED_KEY)
                 .body(payment)
                 .retrieve()
+                .onStatus(paymentResponseErrorHandler)
                 .body(PaymentApproveResponse.class);
     }
 }
