@@ -52,15 +52,15 @@ VALUES ('2025-05-10', 2, 2, 1);
 INSERT INTO reservation (date, time_id, theme_id, member_id)
 VALUES ('2025-05-13', 2, 2, 1);
 INSERT INTO reservation (date, time_id, theme_id, member_id)
-VALUES ('2025-05-14', 1, 1, 1);
+VALUES ('2025-05-26', 1, 1, 1);
 INSERT INTO reservation (date, time_id, theme_id, member_id)
-VALUES ('2025-05-15', 2, 1, 1);
+VALUES ('2025-05-27', 2, 1, 1);
 INSERT INTO reservation (date, time_id, theme_id, member_id)
-VALUES ('2026-05-16', 2, 5, 1);
+VALUES ('2025-05-25', 2, 5, 1);
 
 INSERT INTO waiting (date, time_id, theme_id, member_id)
-VALUES ('2026-05-16', 2, 5, 1);
+VALUES ('2026-05-25', 2, 5, 1);
 INSERT INTO waiting (date, time_id, theme_id, member_id)
-VALUES ('2026-05-16', 2, 5, 1);
+VALUES ('2026-05-26', 2, 5, 1);
 INSERT INTO waiting (date, time_id, theme_id, member_id)
-VALUES ('2026-05-16', 2, 5, 1);
+VALUES ('2026-05-27', 2, 5, 1);
