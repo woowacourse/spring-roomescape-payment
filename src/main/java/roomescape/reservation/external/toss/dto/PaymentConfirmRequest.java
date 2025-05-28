@@ -1,4 +1,4 @@
-package roomescape.reservation.external.toss;
+package roomescape.reservation.external.toss.dto;
 
 import roomescape.reservation.domain.PaymentInfo;
 

@@ -11,5 +11,5 @@ public abstract class AuthToken {
         return token;
     }
 
-    abstract String generateToken();
+    public abstract String generateToken();
 }

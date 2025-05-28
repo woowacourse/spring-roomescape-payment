@@ -1,4 +1,6 @@
-package roomescape.global.api;
+package roomescape.reservation.external.toss.dto;
+
+import roomescape.global.api.ExternalApiErrorResponse;
 
 public class TossApiErrorResponse implements ExternalApiErrorResponse {
     private final String message;

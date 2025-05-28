@@ -7,21 +7,21 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.PaymentInfo;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.external.toss.PaymentConfirmRequest;
+import roomescape.reservation.external.toss.dto.PaymentConfirmRequest;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.schedule.domain.ReservationSchedule;
 
 @Service
 public class ReservationCommandService {
     private final ReservationRepository reservationRepository;
-    private final PaymentService paymentService;
+    private final PaymentApiClient paymentApiClient;
 
     public ReservationCommandService(
             final ReservationRepository reservationRepository,
-            final PaymentService paymentService
+            final PaymentApiClient paymentApiClient
     ) {
         this.reservationRepository = reservationRepository;
-        this.paymentService = paymentService;
+        this.paymentApiClient = paymentApiClient;
     }
 
     public void deleteReservationById(final Long id) {
@@ -45,7 +45,7 @@ public class ReservationCommandService {
         if (reservationRepository.findByScheduleId(schedule.getId()).isPresent()) {
             throw new NoSuchElementException("이미 해당 일정에 예약이 존재합니다.");
         }
-        PaymentInfo confirmPaymentInfo = paymentService.paymentReservation(PaymentConfirmRequest.from(paymentInfo));
+        PaymentInfo confirmPaymentInfo = paymentApiClient.paymentReservation(PaymentConfirmRequest.from(paymentInfo));
         return reservationRepository.save(new Reservation(
                 null,
                 member,

@@ -1,7 +1,8 @@
-package roomescape.global.api;
+package roomescape.reservation.external.toss;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import roomescape.global.api.AuthToken;
 
 public class TossAuthToken extends AuthToken {
 

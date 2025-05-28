@@ -1,9 +1,9 @@
 package roomescape.reservation.service;
 
 import roomescape.reservation.domain.PaymentInfo;
-import roomescape.reservation.external.toss.PaymentConfirmRequest;
+import roomescape.reservation.external.toss.dto.PaymentConfirmRequest;
 
-public interface PaymentService {
+public interface PaymentApiClient {
 
     PaymentInfo paymentReservation(PaymentConfirmRequest request);
 }

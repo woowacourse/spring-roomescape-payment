@@ -4,10 +4,10 @@ import roomescape.reservation.domain.Amount;
 import roomescape.reservation.domain.OrderId;
 import roomescape.reservation.domain.PaymentInfo;
 import roomescape.reservation.domain.PaymentKey;
-import roomescape.reservation.external.toss.PaymentConfirmRequest;
-import roomescape.reservation.service.PaymentService;
+import roomescape.reservation.external.toss.dto.PaymentConfirmRequest;
+import roomescape.reservation.service.PaymentApiClient;
 
-public class FakePaymentService implements PaymentService {
+public class FakePaymentApiClient implements PaymentApiClient {
 
     @Override
     public PaymentInfo paymentReservation(final PaymentConfirmRequest request) {

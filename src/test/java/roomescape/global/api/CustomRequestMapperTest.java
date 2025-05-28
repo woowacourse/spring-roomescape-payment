@@ -1,17 +1,13 @@
 package roomescape.global.api;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.cassandra.CassandraProperties.Request;
 import org.springframework.boot.test.context.SpringBootTest;
-import roomescape.reservation.external.toss.PaymentConfirmRequest;
 
 @SpringBootTest
 class CustomRequestMapperTest {
