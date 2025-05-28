@@ -16,20 +16,28 @@ document.addEventListener('DOMContentLoaded', () => {
     // ------  결제위젯 초기화 ------
     // @docs https://docs.tosspayments.com/reference/widget-sdk#sdk-설치-및-초기화
     // @docs https://docs.tosspayments.com/reference/widget-sdk#renderpaymentmethods선택자-결제-금액-옵션
-    const paymentAmount = 1000;
+    // const paymentAmount = 1000;
     const widgetClientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
     const paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS);
-    paymentWidget.renderPaymentMethods(
-        "#payment-method",
-        {value: paymentAmount},
-        {variantKey: "DEFAULT"}
-    );
+    // paymentWidget.renderPaymentMethods(
+    //     "#payment-method",
+    //     {value: paymentAmount},
+    //     {variantKey: "DEFAULT"}
+    // );
 
     document.getElementById('theme-slots').addEventListener('click', event => {
         if (event.target.classList.contains('theme-slot')) {
             document.querySelectorAll('.theme-slot').forEach(slot => slot.classList.remove('active'));
             event.target.classList.add('active');
             checkDateAndTheme();
+
+            // ✅ 여기에 가격 기반 위젯 렌더링 추가
+            const selectedThemePrice = parseInt(event.target.getAttribute('data-theme-price'));
+            paymentWidget.renderPaymentMethods(
+                "#payment-method",
+                {value: selectedThemePrice},
+                {variantKey: "DEFAULT"}
+            );
         }
     });
 
@@ -55,15 +63,19 @@ function renderTheme(themes) {
     themes.forEach(theme => {
         const name = theme.name;
         const themeId = theme.id;
+        const price = theme.price;
 
-        themeSlots.appendChild(createSlot('theme', name, themeId));
+        const div = createSlot('theme', name, themeId, price);
+        div.setAttribute('data-theme-price', price); // ✅ 요거 추가
+        themeSlots.appendChild(div);
     });
 }
 
-function createSlot(type, text, id, booked) {
+function createSlot(type, text, id, booked, price) {
     const div = document.createElement('div');
     div.className = type + '-slot cursor-pointer bg-light border rounded p-3 mb-2';
     div.textContent = text;
+    div.price = price;
     div.setAttribute('data-' + type + '-id', id);
     if (type === 'time') {
         div.setAttribute('data-time-booked', booked);
@@ -158,6 +170,7 @@ function checkDateAndThemeAndTime() {
 function onReservationButtonClick(event, paymentWidget) {
     const selectedDate = document.getElementById("datepicker").value;
     const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
+    const selectedThemePrice = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-price');
     const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
 
     if (selectedDate && selectedThemeId && selectedTimeId) {
@@ -175,7 +188,7 @@ function onReservationButtonClick(event, paymentWidget) {
         let paymentData = {
             orderId: orderIdPrefix + generateRandomString(),
             orderName: "테스트 방탈출 예약 결제 1건",
-            amount: 1000
+            amount: selectedThemePrice
         };
 
         fetchPaymentData(paymentData);

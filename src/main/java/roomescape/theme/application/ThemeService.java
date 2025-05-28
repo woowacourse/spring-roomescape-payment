@@ -33,7 +33,8 @@ public class ThemeService {
         if (themeRepository.existsByName(requestDto.name())) {
             throw new BadRequestException("동일한 이름의 테마가 이미 존재합니다.");
         }
-        final Theme theme = new Theme(requestDto.name(), requestDto.description(), requestDto.thumbnail());
+        final Theme theme = new Theme(requestDto.name(), requestDto.description(), requestDto.thumbnail(),
+                requestDto.price());
         final Theme savedTheme = themeRepository.save(theme);
         return ThemeResponse.from(savedTheme);
     }

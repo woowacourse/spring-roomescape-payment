@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import java.math.BigDecimal;
 import java.time.Duration;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -24,16 +25,19 @@ public class Theme {
     private String name;
     private String description;
     private String thumbnail;
+    private BigDecimal price;
 
-    public Theme(final Long id, final String name, final String description, final String thumbnail) {
+    public Theme(final Long id, final String name, final String description, final String thumbnail,
+                 final BigDecimal price) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.thumbnail = thumbnail;
+        this.price = price;
     }
 
-    public Theme(final String name, final String description, final String thumbnail) {
-        this(null, name, description, thumbnail);
+    public Theme(final String name, final String description, final String thumbnail, final BigDecimal price) {
+        this(null, name, description, thumbnail, price);
     }
 
     public Duration getDuration() {
