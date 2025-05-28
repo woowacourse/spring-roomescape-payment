@@ -33,11 +33,6 @@ import roomescape.reservationtime.dto.AvailableReservationTimeResponse;
 @Validated
 public class ReservationController {
 
-    /** 비타 - 클라이언트는 커서다.
-     * TODO
-     * 3. 비타 - 결제 승인 API 에러 핸들링
-     */
-
     private final ReservationService reservationService;
 
     @GetMapping
