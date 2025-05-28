@@ -1,16 +1,9 @@
 package roomescape.service.payment;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import roomescape.dto.response.PaymentSuccessResponse;
@@ -20,12 +13,6 @@ public class PaymentApproveClient {
 
     private final RestClient restClient;
     private final String widgetSecretKey;
-
-    private final List<String> sensitiveErrorCodes = List.of(
-            "INVALID_API_KEY",
-            "UNAPPROVED_ORDER_ID",
-            "UNAUTHORIZED_KEY",
-            "INCORRECT_BASIC_AUTH_FORMAT");
 
     public PaymentApproveClient(
             RestClient.Builder restClientBuilder,
@@ -48,32 +35,13 @@ public class PaymentApproveClient {
                 .header("Authorization", authorizations)
                 .body(requestBody)
                 .retrieve()
-                .onStatus(status -> status != HttpStatus.OK,
-                        (req, resp) -> {
-                            final String code = extractMessage(resp, "code");
-                            if (isSensitiveError(code)) {
-                                throw new IllegalStateException("[ERROR] 결제 승인 중 예외가 발생하였습니다.");
-                            }
-                            final String errMessage = extractMessage(resp, "message");
-                            throw new IllegalStateException("[ERROR] " + errMessage);
-                        }
-                ).body(PaymentSuccessResponse.class);
-    }
-
-    private boolean isSensitiveError(String code) {
-        return sensitiveErrorCodes.contains(code);
+                .onStatus(new PaymentApproveErrorHandler())
+                .body(PaymentSuccessResponse.class);
     }
 
     private String getAuthorizations() {
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
         return "Basic " + new String(encodedBytes);
-    }
-
-    public String extractMessage(ClientHttpResponse response, String key) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        InputStream inputStream = response.getBody();
-        JsonNode jsonNode = objectMapper.readTree(inputStream);
-        return jsonNode.get(key).asText();
     }
 }
