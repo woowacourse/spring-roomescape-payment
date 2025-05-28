@@ -1,5 +1,7 @@
 package roomescape.reservation.ui;
 
+import static roomescape.payment.ui.PaymentController.PAYMENT_DATA;
+
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
@@ -58,8 +60,9 @@ public class UserReservationController {
             final LoginCheckRequest loginCheckRequest,
             final HttpSession session
     ) {
-        final ReservationResponse reservationResponse = reservationCommandService.addMemberReservation(request,
-                loginCheckRequest.id(), (PaymentDataRequest) session.getAttribute("paymentData"));
+        final PaymentDataRequest paymentData = (PaymentDataRequest) session.getAttribute(PAYMENT_DATA);
+        final ReservationResponse reservationResponse = reservationCommandService.addMemberReservation(
+                request, loginCheckRequest.id(), paymentData);
         return new ResponseEntity<>(reservationResponse, HttpStatus.CREATED);
     }
 

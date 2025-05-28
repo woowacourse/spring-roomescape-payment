@@ -25,7 +25,7 @@ public class TossPaymentClient implements PaymentClient {
     @Value("${payment.toss.secret-key}")
     private String secretKey;
 
-    public PaymentResponse pay(final PaymentRequest request) {
+    public PaymentResponse requestPayment(final PaymentRequest request) {
         String encodedKey = Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
 
         return restClient.post()

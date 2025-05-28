@@ -11,6 +11,8 @@ import roomescape.payment.application.dto.PaymentDataRequest;
 @RestController
 public class PaymentController {
 
+    public static final String PAYMENT_DATA = "paymentData";
+    
     private final PaymentService paymentService;
 
     public PaymentController(final PaymentService paymentService) {
@@ -19,7 +21,7 @@ public class PaymentController {
 
     @PostMapping("/payments")
     public ResponseEntity<Void> savePaymentData(@RequestBody final PaymentDataRequest request, HttpSession session) {
-        session.setAttribute("paymentData", request);
+        session.setAttribute(PAYMENT_DATA, request);
         return ResponseEntity.ok().build();
     }
 }

@@ -5,5 +5,5 @@ import roomescape.payment.application.dto.PaymentResponse;
 
 public interface PaymentClient {
 
-    PaymentResponse pay(PaymentRequest request);
+    PaymentResponse requestPayment(PaymentRequest request);
 }

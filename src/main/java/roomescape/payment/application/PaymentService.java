@@ -6,19 +6,34 @@ import roomescape.common.exception.impl.BadRequestException;
 import roomescape.payment.application.dto.PaymentDataRequest;
 import roomescape.payment.application.dto.PaymentRequest;
 import roomescape.payment.application.dto.PaymentResponse;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.reservation.application.dto.MemberReservationRequest;
+import roomescape.reservation.domain.Reservation;
 
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
 
     private final PaymentClient paymentClient;
+    private final PaymentRepository paymentRepository;
 
-    public void createOrder(PaymentDataRequest paymentDataRequest, MemberReservationRequest request) {
-        final PaymentRequest paymentRequest = new PaymentRequest(request.amount(), request.orderId(),
-                request.paymentKey());
+    public void pay(
+            final PaymentDataRequest paymentDataRequest,
+            final MemberReservationRequest request,
+            final Reservation reservation
+    ) {
         validatePaymentData(request, paymentDataRequest);
-        PaymentResponse paymentResponse = paymentClient.pay(paymentRequest);
+        final PaymentRequest paymentRequest = new PaymentRequest(
+                request.amount(), request.orderId(), request.paymentKey());
+        final PaymentResponse paymentResponse = paymentClient.requestPayment(paymentRequest);
+        final Payment payment = new Payment(
+                paymentResponse.orderId(),
+                paymentResponse.paymentKey(),
+                paymentResponse.totalAmount(),
+                reservation
+        );
+        paymentRepository.save(payment);
     }
 
     private void validatePaymentData(final MemberReservationRequest request,
