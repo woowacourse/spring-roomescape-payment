@@ -4,12 +4,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClient;
+import roomescape.client.PaymentClient;
 import roomescape.controller.annotation.AdminMember;
 import roomescape.controller.annotation.CurrentMember;
 import roomescape.dto.auth.LoginInfo;
 import roomescape.dto.reservation.MemberReservationCreateRequestDto;
 import roomescape.dto.reservation.MyReservationResponseDto;
 import roomescape.dto.reservation.ReservationResponseDto;
+import roomescape.dto.reservation.TossPaymentConfirmRequestDto;
 import roomescape.service.command.ReservationCommandService;
 import roomescape.service.dto.ReservationCreateDto;
 import roomescape.service.query.ReservationQueryService;
@@ -23,14 +25,14 @@ public class ReservationController {
 
     private final ReservationQueryService reservationQueryService;
     private final ReservationCommandService reservationCommandService;
-    private final RestClient restClient;
+    private final PaymentClient paymentClient;
 
     public ReservationController(ReservationQueryService reservationQueryService,
                                  ReservationCommandService reservationCommandService,
-                                 RestClient restClient) {
+                                 PaymentClient paymentClient) {
         this.reservationQueryService = reservationQueryService;
         this.reservationCommandService = reservationCommandService;
-        this.restClient = restClient;
+        this.paymentClient = paymentClient;
     }
 
     @GetMapping
@@ -55,14 +57,7 @@ public class ReservationController {
             @CurrentMember LoginInfo loginInfo,
             @RequestBody final MemberReservationCreateRequestDto requestDto
     ) {
-        restClient.post()
-                .uri("https://api.tosspayments.com/v1/payments/confirm")
-                .header("Authorization", "Basic " +
-                        Base64.getEncoder().encodeToString("test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6".getBytes()))
-                .body(requestDto.extractTossPaymentDto())
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .toBodilessEntity();
+        paymentClient.confirmPayment(requestDto.extractTossPaymentDto());
 
         ReservationCreateDto reservationCreateDto = new ReservationCreateDto(
                 requestDto.date(), requestDto.timeId(), requestDto.themeId(), loginInfo.id());
