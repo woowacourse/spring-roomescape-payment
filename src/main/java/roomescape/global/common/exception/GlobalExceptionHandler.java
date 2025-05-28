@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import roomescape.global.auth.exception.ForbiddenException;
 import roomescape.global.auth.exception.UnAuthorizedException;
 import roomescape.member.exception.MemberDuplicatedException;
+import roomescape.payment.exception.TossPaymentClientException;
 import roomescape.reservationtime.exception.ReservationTimeInUseException;
 
 @RestControllerAdvice
@@ -51,5 +52,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<String> handleForbiddenException(ForbiddenException e) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+    }
+
+    @ExceptionHandler(TossPaymentClientException.class)
+    public ResponseEntity<String> handleTossPaymentException(TossPaymentClientException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 }
