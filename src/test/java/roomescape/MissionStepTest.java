@@ -2,6 +2,8 @@ package roomescape;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
@@ -13,10 +15,12 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
@@ -25,8 +29,9 @@ import roomescape.global.auth.dto.CheckLoginResponse;
 import roomescape.global.auth.dto.LoginRequest;
 import roomescape.member.dto.request.SignupRequest;
 import roomescape.member.dto.response.MemberResponse;
+import roomescape.payment.dto.response.PaymentResponse;
+import roomescape.payment.infrastructure.TossApiClient;
 import roomescape.reservation.controller.ReservationController;
-import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.fixture.TestFixture;
@@ -37,6 +42,22 @@ import roomescape.reservation.fixture.TestFixture;
         "spring.sql.init.data-locations=classpath:test-data.sql"
 })
 public class MissionStepTest {
+
+    @MockBean
+    private TossApiClient tossApiClient;
+
+    @BeforeEach
+    void setUp() {
+        PaymentResponse mockResponse = new PaymentResponse(
+                "test_payment_key",
+                "test_order_id",
+                "CARD",
+                50000,
+                "DONE",
+                "2025-05-28T20:48:23+09:00"
+        );
+        when(tossApiClient.authPayment(any(), any(), any(), any())).thenReturn(mockResponse);
+    }
 
     private static final String USER_EMAIL = "user@gmail.com";
     private static final String ADMIN_EMAIL = "admin@gmail.com";
@@ -409,12 +430,13 @@ public class MissionStepTest {
 
             assertThat(responses.size()).isEqualTo(1);
         }
+
         @Test
         void step3_createWaiting() {
             createReservationTime();
             createTheme("추리");
-            createUserReservation(1L);   //  RESERVED
-            createUserReservation(1L);   // WAITING
+            createUserReservation(1L);   // RESERVED
+            createUserWaiting(1L);   // WAITING
 
             RestAssured.given().log().all()
                     .cookie(TOKEN, USER_TOKEN)
@@ -429,7 +451,7 @@ public class MissionStepTest {
             createReservationTime();
             createTheme("추리");
             createUserReservation(1L);   // RESERVED
-            createUserReservation(1L);   // WAITING
+            createUserWaiting(1L);   // WAITING
 
             RestAssured.given().log().all()
                     .cookie(TOKEN, USER_TOKEN)
@@ -444,7 +466,7 @@ public class MissionStepTest {
             createReservationTime();
             createTheme("추리");
             createUserReservation(1L);   // RESERVED
-            createUserReservation(1L);   // WAITING
+            createUserWaiting(1L);   // WAITING
 
             Long waitingId = RestAssured.given().log().all()
                     .cookie(TOKEN, USER_TOKEN)
@@ -469,8 +491,7 @@ public class MissionStepTest {
             createReservationTime();
             createTheme("추리");
             createUserReservation(1L);
-            createUserReservation(1L);
-
+            createUserWaiting(1L);
 
             RestAssured.given().log().all()
                     .cookie(TOKEN, loginAndGetAuthToken(ADMIN_EMAIL, PASSWORD))
@@ -479,12 +500,13 @@ public class MissionStepTest {
                     .statusCode(200)
                     .body("size()", is(1));
         }
+
         @Test
         void step4_cancelReservation_promotesWaiting() {
             createReservationTime();
             createTheme("추리");
             createUserReservation(1L);
-            createUserReservation(1L);
+            createUserWaiting(1L);
 
             String adminToken = loginAndGetAuthToken(ADMIN_EMAIL, PASSWORD);
 
@@ -493,7 +515,8 @@ public class MissionStepTest {
                     .when().get("/reservations")
                     .then().log().all()
                     .statusCode(200)
-                    .extract().as(new TypeRef<List<ReservationResponse>>() {});
+                    .extract().as(new TypeRef<List<ReservationResponse>>() {
+                    });
             assertThat(before).hasSize(1);
             Long reservedId = before.get(0).id();
 
@@ -508,7 +531,8 @@ public class MissionStepTest {
                     .when().get("/reservations")
                     .then().log().all()
                     .statusCode(200)
-                    .extract().as(new TypeRef<List<ReservationResponse>>() {});
+                    .extract().as(new TypeRef<List<ReservationResponse>>() {
+                    });
             assertThat(after).hasSize(1);
 
             RestAssured.given().log().all()
@@ -539,13 +563,39 @@ public class MissionStepTest {
         reservation.put("date", futureDate);
         reservation.put("timeId", 1);
         reservation.put("themeId", themeId);
-        reservation.put("status", ReservationStatus.RESERVED);
+
+        Map<String, Object> payment = new HashMap<>();
+        payment.put("paymentKey", "test_payment_key");
+        payment.put("orderId", "test_order_id");
+        payment.put("amount", 50000);
+        payment.put("paymentType", "CARD");
+
+        Map<String, Object> request = new HashMap<>();
+        request.put("reservation", reservation);
+        request.put("payment", payment);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .body(reservation)
+                .body(request)
                 .cookie(TOKEN, authToken)
                 .when().post("/reservations")
+                .then().log().all()
+                .statusCode(201);
+    }
+
+    private void createUserWaiting(final Long themeId) {
+        String authToken = loginAndGetAuthToken(USER_EMAIL, PASSWORD);
+
+        Map<String, Object> waiting = new HashMap<>();
+        waiting.put("date", futureDate);
+        waiting.put("timeId", 1);
+        waiting.put("themeId", themeId);
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .body(waiting)
+                .cookie(TOKEN, authToken)
+                .when().post("/waiting")
                 .then().log().all()
                 .statusCode(201);
     }

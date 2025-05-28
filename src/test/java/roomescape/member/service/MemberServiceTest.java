@@ -39,7 +39,7 @@ public class MemberServiceTest {
     }
 
     @Test
-    void signUpTest() {
+    void signup_shouldCreateNewMember_whenValidRequest() {
         SignUpResponse response = memberService.signup(new SignupRequest("userr@gmail.com", "password", "userr"));
 
         Optional<Member> optionalMember = memberRepository.findById(response.id());
@@ -47,7 +47,7 @@ public class MemberServiceTest {
     }
 
     @Test
-    void findAllUsersTest() {
+    void findAllUsers_shouldReturnAllUsers_whenUsersExist() {
         memberService.signup(new SignupRequest("user1@gmail.com", "password", "user1"));
         memberService.signup(new SignupRequest("user2@gmail.com", "password", "user2"));
         memberService.signup(new SignupRequest("user3@gmail.com", "password", "user3"));

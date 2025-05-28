@@ -2,12 +2,11 @@ package roomescape.reservation.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,27 +15,20 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 import roomescape.config.TestConfig;
 import roomescape.global.auth.dto.UserInfo;
-import roomescape.global.auth.service.MyPasswordEncoder;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.repository.MemberRepository;
-import roomescape.member.service.MemberService;
+import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationInfo;
-import roomescape.reservation.domain.ReservationStatus;
-import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.dto.response.ReservationResponse;
-import roomescape.reservation.dto.response.WaitingWithRank;
-import roomescape.reservation.exception.WaitingNotFoundException;
+import roomescape.reservation.exception.ReservationNotFoundException;
 import roomescape.reservation.fixture.TestFixture;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.WaitingRepository;
 import roomescape.reservationtime.domain.ReservationTime;
-import roomescape.reservationtime.exception.ReservationTimeNotFoundException;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
-import roomescape.reservationtime.service.ReservationTimeService;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
-import roomescape.theme.service.ThemeService;
 
 @DataJpaTest
 @Import(TestConfig.class)
@@ -46,21 +38,12 @@ import roomescape.theme.service.ThemeService;
 class ReservationServiceTest {
 
     private static final LocalDate futureDate = TestFixture.makeFutureDate();
-    private static final LocalDateTime afterOneHour = TestFixture.makeTimeAfterOneHour();
-
-    private ReservationTime time;
-    private Theme theme;
-    private Member member;
-
-    private ReservationService reservationService;
-    private ReservationFacadeService reservationFacadeService;
-    private MemberService memberService;
-    private ThemeService themeService;
-    private ReservationTimeService reservationTimeService;
-    private WaitingService waitingService;
 
     @Autowired
     private ReservationRepository reservationRepository;
+
+    @Autowired
+    private WaitingRepository waitingRepository;
 
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
@@ -71,20 +54,14 @@ class ReservationServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    @Autowired
-    private WaitingRepository waitingRepository;
+    private ReservationService reservationService;
+    private ReservationTime time;
+    private Theme theme;
+    private Member member;
 
     @BeforeEach
     void setUp() {
         reservationService = new ReservationService(reservationRepository);
-
-        reservationFacadeService = new ReservationFacadeService(reservationService,
-                new WaitingService(waitingRepository),
-                new MemberService(memberRepository, new MyPasswordEncoder()),
-                new ThemeService(themeRepository, reservationRepository),
-                new ReservationTimeService(reservationTimeRepository, reservationRepository));
-
-        waitingService = new WaitingService(waitingRepository);
 
         ReservationTime time2 = ReservationTime.withUnassignedId(LocalTime.of(9, 0));
         time = reservationTimeRepository.save(time2);
@@ -93,141 +70,86 @@ class ReservationServiceTest {
     }
 
     @Test
-    void createReservation_shouldReturnResponseWhenSuccessful() {
-        ReservationResponse response = reservationFacadeService.createForAdmin(futureDate, time.getId(), theme.getId(),
-                member.getId()
-        );
-
-        Assertions.assertAll(
-                () -> assertThat(response.member().name()).isEqualTo("Mint"),
-                () -> assertThat(response.date()).isEqualTo(futureDate),
-                () -> assertThat(response.time().startAt()).isEqualTo(LocalTime.of(9, 0))
-        );
-    }
-
-    @Test
-    void getReservations_shouldReturnAllCreatedReservations() {
-        Long timeId2 = reservationTimeRepository.save(ReservationTime.withUnassignedId(LocalTime.of(10, 0))).getId();
-        reservationFacadeService.createForAdmin(futureDate, time.getId(), theme.getId(), member.getId());
-        reservationFacadeService.createForAdmin(futureDate, timeId2, theme.getId(), member.getId());
+    void findReservations_shouldReturnAllReservations() {
+        ReservationInfo info = new ReservationInfo(futureDate, time, theme);
+        Reservation reservation = Reservation.createUpcomingReservationWithUnassignedId(member, info);
+        reservationRepository.save(reservation);
 
         List<ReservationResponse> result = reservationService.findReservations(null, null, null, null);
-        assertThat(result).hasSize(2);
+        assertThat(result).hasSize(1);
     }
 
     @Test
-    void deleteReservation_shouldRemoveSuccessfully() {
-        ReservationResponse response = reservationFacadeService.createForAdmin(futureDate, time.getId(), theme.getId(),
-                member.getId()
-        );
-        reservationService.delete(response.id());
-
-        List<ReservationResponse> result = reservationService.findReservations(theme.getId(), member.getId(),
-                futureDate,
-                futureDate.plusDays(1));
-        assertThat(result).isEmpty();
-    }
-
-    @Test
-    void createReservation_shouldThrowException_WhenTimeIdNotFound() {
-        assertThatThrownBy(
-                () -> reservationFacadeService.createForAdmin(futureDate, 999L, theme.getId(), member.getId()))
-                .isInstanceOf(ReservationTimeNotFoundException.class)
-                .hasMessageContaining("요청한 id와 일치하는 예약 시간 정보가 없습니다.");
-    }
-
-    @Test
-    void createWaiting_shouldReturnWaitingResponseWhenReservationExists() {
-        ReservationResponse reservation = reservationFacadeService.createForAdmin(futureDate, time.getId(),
-                theme.getId(),
-                member.getId());
-        ReservationResponse waiting = reservationFacadeService.createForAdmin(futureDate, time.getId(), theme.getId(),
-                member.getId());
-
-        Assertions.assertAll(
-                () -> assertThat(reservation.reservedStatus()).isEqualTo(ReservationStatus.RESERVED.getName()),
-                () -> assertThat(waiting.reservedStatus()).isEqualTo(ReservationStatus.WAITING.getName())
-        );
-    }
-
-    @Test
-    void deleteReservation_shouldPromoteFirstWaiting() {
-        ReservationResponse reserved = reservationFacadeService.createForAdmin(futureDate, time.getId(), theme.getId(),
-                member.getId());
-        ReservationResponse waiting = reservationFacadeService.createForAdmin(futureDate, time.getId(), theme.getId(),
-                member.getId());
-        assertThat(waiting.reservedStatus()).isEqualTo(ReservationStatus.WAITING.getName());
-
-        reservationFacadeService.deleteReservation(reserved.id());
-
-        List<ReservationResponse> all = reservationService.findReservations(theme.getId(), member.getId(),
-                futureDate, futureDate.plusDays(1));
-        assertThat(all).hasSize(1)
-                .extracting(ReservationResponse::reservedStatus)
-                .containsExactly(ReservationStatus.RESERVED.getName());
-    }
-
-    @Test
-    void findWaitings_shouldReturnAllWaitingAsReservationResponse() {
-
-        reservationFacadeService.createForAdmin(futureDate, time.getId(), theme.getId(), member.getId());
-        reservationFacadeService.createForAdmin(futureDate, time.getId(), theme.getId(), member.getId());
-        reservationFacadeService.createForAdmin(futureDate, time.getId(), theme.getId(), member.getId());
-
-        List<ReservationResponse> waitings = waitingService.findWaitings();
-        assertThat(waitings).hasSize(2)
-                .allSatisfy(response -> assertThat(response.reservedStatus())
-                        .isEqualTo(ReservationStatus.WAITING.getName()));
-    }
-
-    @Test
-    void findMyWaitingsWithRank_shouldReturnCorrectRanks() {
-
-        reservationFacadeService.createForAdmin(futureDate, time.getId(), theme.getId(), member.getId());
-        reservationFacadeService.createForAdmin(futureDate, time.getId(), theme.getId(), member.getId());
-        reservationFacadeService.createForAdmin(futureDate, time.getId(), theme.getId(), member.getId());
-
-        List<WaitingWithRank> waiting = waitingService.findMyWaitingsWithRank(
-                new UserInfo(member.getId(), MemberRole.USER));
-        assertThat(waiting).hasSize(2);
-    }
-
-    @Test
-    void findMaxOrderByDateAndTimeAndTheme_shouldReflectHighestTurn() {
-        reservationFacadeService.createForAdmin(futureDate, time.getId(), theme.getId(), member.getId());
-        reservationFacadeService.createForAdmin(futureDate, time.getId(), theme.getId(), member.getId());
-
-        int max1 = waitingService.findMaxOrderByDateAndTimeAndTheme(futureDate, time.getId(), theme.getId());
-        assertThat(max1).isEqualTo(1);
-
-        reservationFacadeService.createForAdmin(futureDate, time.getId(), theme.getId(), member.getId());
-        int max2 = waitingService.findMaxOrderByDateAndTimeAndTheme(futureDate, time.getId(), theme.getId());
-        assertThat(max2).isEqualTo(2);
-    }
-
-    @Test
-    void isWaitingExists_shouldReturnTrueWhenExists() {
-        reservationFacadeService.createForAdmin(futureDate, time.getId(), theme.getId(), member.getId());
-        reservationFacadeService.createForAdmin(futureDate, time.getId(), theme.getId(), member.getId());
-
-        boolean exists = waitingService.isWaitingExists(new ReservationInfo(futureDate, time, theme));
-        assertThat(exists).isTrue();
-    }
-
-    @Test
-    void findFirstWaitingOfInfo_shouldReturnEarliestOrThrow() {
-        reservationFacadeService.createForAdmin(futureDate, time.getId(), theme.getId(), member.getId());
-        reservationFacadeService.createForAdmin(futureDate, time.getId(), theme.getId(), member.getId());
-
+    void findReservations_shouldFilterByThemeId() {
         ReservationInfo info = new ReservationInfo(futureDate, time, theme);
+        Reservation reservation = Reservation.createUpcomingReservationWithUnassignedId(member, info);
+        reservationRepository.save(reservation);
 
-        Waiting first = waitingService.findFirstWaitingOfInfo(info);
-        assertThat(first.getTurn()).isEqualTo(1);
-
-        ReservationInfo notExist = new ReservationInfo(futureDate.plusDays(1), time, theme);
-        assertThatThrownBy(() -> waitingService.findFirstWaitingOfInfo(notExist))
-                .isInstanceOf(WaitingNotFoundException.class)
-                .hasMessageContaining("요청한 id와 일치하는 대기 정보가 없습니다.");
+        List<ReservationResponse> result = reservationService.findReservations(theme.getId(), null, null, null);
+        assertThat(result).hasSize(1);
     }
 
+    @Test
+    void findReservations_shouldFilterByMemberId() {
+        ReservationInfo info = new ReservationInfo(futureDate, time, theme);
+        Reservation reservation = Reservation.createUpcomingReservationWithUnassignedId(member, info);
+        reservationRepository.save(reservation);
+
+        List<ReservationResponse> result = reservationService.findReservations(null, member.getId(), null, null);
+        assertThat(result).hasSize(1);
+    }
+
+    @Test
+    void findReservations_shouldFilterByDateRange() {
+        ReservationInfo info = new ReservationInfo(futureDate, time, theme);
+        Reservation reservation = Reservation.createUpcomingReservationWithUnassignedId(member, info);
+        reservationRepository.save(reservation);
+
+        List<ReservationResponse> result = reservationService.findReservations(
+                null, null, futureDate, futureDate.plusDays(1));
+        assertThat(result).hasSize(1);
+    }
+
+    @Test
+    void findMyReservations_shouldReturnMemberReservations() {
+        ReservationInfo info = new ReservationInfo(futureDate, time, theme);
+        Reservation reservation = Reservation.createUpcomingReservationWithUnassignedId(member, info);
+        reservationRepository.save(reservation);
+
+        List<Reservation> result = reservationService.findMyReservations(
+                new UserInfo(member.getId(), MemberRole.USER));
+        assertThat(result).hasSize(1);
+    }
+
+    @Test
+    void findById_shouldReturnReservation() {
+        ReservationInfo info = new ReservationInfo(futureDate, time, theme);
+        Reservation reservation = Reservation.createUpcomingReservationWithUnassignedId(member, info);
+        reservation = reservationRepository.save(reservation);
+
+        Reservation found = reservationService.findById(reservation.getId());
+        assertAll(
+                () -> assertThat(found).isNotNull(),
+                () -> assertThat(found.getDate()).isEqualTo(futureDate),
+                () -> assertThat(found.getTime().getStartAt()).isEqualTo(LocalTime.of(9, 0)),
+                () -> assertThat(found.getTheme().getName()).isEqualTo("추리")
+        );
+    }
+
+    @Test
+    void findById_shouldThrowException_whenReservationNotFound() {
+        assertThatThrownBy(() -> reservationService.findById(999L))
+                .isInstanceOf(ReservationNotFoundException.class)
+                .hasMessageContaining("요청한 id와 일치하는 예약 정보가 없습니다.");
+    }
+
+    @Test
+    void delete_shouldRemoveReservation() {
+        ReservationInfo info = new ReservationInfo(futureDate, time, theme);
+        Reservation reservation = Reservation.createUpcomingReservationWithUnassignedId(member, info);
+        reservation = reservationRepository.save(reservation);
+
+        reservationService.delete(reservation.getId());
+        assertThat(reservationRepository.findAll()).isEmpty();
+    }
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import roomescape.global.auth.dto.UserInfo;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.exception.ReservationAlreadyExistsException;
 import roomescape.reservation.exception.ReservationNotFoundException;
@@ -41,18 +42,16 @@ public class ReservationService {
         reservationRepository.deleteById(id);
     }
 
-    public void checkIfReservationExists(final LocalDate date, final Long timeId, final Long themeId) {
-        boolean exists = isReservationExists(date, timeId, themeId);
+    public void checkIfReservationExists(final ReservationRequest request) {
+        boolean exists = isReservationExists(request);
         if (exists) {
             throw new ReservationAlreadyExistsException("해당 시간에 이미 예약이 존재합니다.");
         }
     }
 
-    public boolean isReservationExists(final LocalDate date, final Long timeId, final Long themeId) {
-        if (reservationRepository.existsByInfoDateAndInfoTimeIdAndInfoThemeId(date, timeId, themeId)) {
-            return true;
-        }
-        return false;
+    public boolean isReservationExists(ReservationRequest request) {
+        return reservationRepository.existsByInfoDateAndInfoTimeIdAndInfoThemeId(request.date(), request.timeId(),
+                request.themeId());
     }
 
     public List<Reservation> findMyReservations(final UserInfo userInfo) {
@@ -68,3 +67,4 @@ public class ReservationService {
                 .orElseThrow(() -> new ReservationNotFoundException("요청한 id와 일치하는 예약 정보가 없습니다."));
     }
 }
+

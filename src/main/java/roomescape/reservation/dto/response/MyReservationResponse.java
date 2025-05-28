@@ -10,10 +10,11 @@ public record MyReservationResponse(Long reservationId,
                                     String reservedStatus) {
 
     public static MyReservationResponse from(final WaitingWithRank waitingWithRank) {
-        return new MyReservationResponse(waitingWithRank.getWaiting().getId(), waitingWithRank.getWaiting().getInfo().getTheme().getName(),
+        return new MyReservationResponse(waitingWithRank.getWaiting().getId(),
+                waitingWithRank.getWaiting().getInfo().getTheme().getName(),
                 waitingWithRank.getWaiting().getInfo().getDate().toString(),
                 waitingWithRank.getWaiting().getInfo().getTime().getStartAt().toString(),
-                waitingWithRank.getRank() + "번쩨 " + ReservationStatus.WAITING.getName());
+                waitingWithRank.getRank() + "번째 " + ReservationStatus.WAITING.getName());
     }
 
 

@@ -36,7 +36,7 @@ class MemberRepositoryTest {
     }
 
     @Test
-    void findByIdTest() {
+    void findById_shouldReturnMember_whenMemberExists() {
         Member newMember = new Member("NewC", "newc@example.com", "passC", MemberRole.USER);
         Member saved = memberRepository.save(newMember);
 
@@ -48,14 +48,14 @@ class MemberRepositoryTest {
     }
 
     @Test
-    void existsByEmailIfNoMember() {
+    void existsByEmail_shouldReturnTrue_whenEmailExists() {
         assertThat(memberRepository.existsByEmail(userMember.getEmail())).isTrue();
         assertThat(memberRepository.existsByEmail(adminMember.getEmail())).isTrue();
         assertThat(memberRepository.existsByEmail("unknown@example.com")).isFalse();
     }
 
     @Test
-    void findByMemberRole() {
+    void findByMemberRole_shouldReturnMembers_whenRoleMatches() {
         List<Member> users = memberRepository.findByMemberRole(MemberRole.USER);
         assertThat(users)
                 .hasSize(1)
@@ -70,7 +70,7 @@ class MemberRepositoryTest {
     }
 
     @Test
-    void findByIdEmptyTest() {
+    void findById_shouldReturnEmpty_whenMemberNotFound() {
         Optional<Member> missing = memberRepository.findById(999L);
         assertThat(missing).isEmpty();
     }

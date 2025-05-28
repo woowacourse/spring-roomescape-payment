@@ -50,8 +50,7 @@ public class WaitingController {
             @RequestBody ReservationRequest request,
             UserInfo userInfo
     ) {
-        ReservationResponse dto = reservationFacadeService.createWaiting(request.date(), request.timeId(),
-                request.themeId(), userInfo.id());
+        ReservationResponse dto = reservationFacadeService.createWaiting(request, userInfo.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 }

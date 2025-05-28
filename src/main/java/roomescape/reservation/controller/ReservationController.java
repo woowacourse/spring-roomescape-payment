@@ -14,10 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.global.auth.annotation.RequireRole;
 import roomescape.global.auth.dto.UserInfo;
 import roomescape.member.domain.MemberRole;
-import roomescape.reservation.dto.request.AdminReservationCreateRequest;
-import roomescape.reservation.dto.request.PaymentRequest;
+import roomescape.reservation.dto.request.AdminReservationRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
-import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.service.ReservationFacadeService;
@@ -51,21 +49,17 @@ public class ReservationController {
             @RequestBody ReservationCreateRequest request,
             UserInfo userInfo
     ) {
-        ReservationRequest reservation = request.reservation();
-        PaymentRequest payment = request.payment();
-        ReservationResponse dto = reservationFacadeService.create(reservation.date(), reservation.timeId(),
-                reservation.themeId(), userInfo.id(), payment.paymentKey(), payment.orderId(), payment.amount(),
-                payment.paymentType());
+
+        ReservationResponse dto = reservationFacadeService.create(request, userInfo.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
     @RequireRole(MemberRole.ADMIN)
     @PostMapping("/admin/reservations")
     public ResponseEntity<ReservationResponse> createReservation(
-            @RequestBody AdminReservationCreateRequest request
+            @RequestBody AdminReservationRequest request
     ) {
-        ReservationResponse dto = reservationFacadeService.createForAdmin(request.date(), request.timeId(),
-                request.themeId(),
+        ReservationResponse dto = reservationFacadeService.createForAdmin(request.getReservationRequest(),
                 request.memberId());
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }

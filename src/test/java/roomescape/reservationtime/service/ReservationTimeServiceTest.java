@@ -9,6 +9,7 @@ import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
@@ -18,6 +19,8 @@ import roomescape.global.auth.service.MyPasswordEncoder;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.member.service.MemberService;
+import roomescape.payment.service.PaymentService;
+import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.fixture.TestFixture;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.WaitingRepository;
@@ -65,6 +68,9 @@ class ReservationTimeServiceTest {
     @Autowired
     private WaitingRepository waitingRepository;
 
+    @Mock
+    private PaymentService paymentService;
+
     @BeforeEach
     void setUp() {
         reservationTimeService = new ReservationTimeService(reservationTimeRepository,
@@ -76,7 +82,8 @@ class ReservationTimeServiceTest {
                 new WaitingService(waitingRepository),
                 new MemberService(memberRepository, new MyPasswordEncoder()),
                 new ThemeService(themeRepository, reservationRepository),
-                new ReservationTimeService(reservationTimeRepository, reservationRepository)
+                new ReservationTimeService(reservationTimeRepository, reservationRepository),
+                paymentService
         );
     }
 
@@ -127,7 +134,8 @@ class ReservationTimeServiceTest {
     void deleteReservationTime_shouldThrowException_WhenReservationExists() {
         ReservationTimeResponse reservationTimeResponse = reservationTimeService.create(
                 new ReservationTimeCreateRequest(LocalTime.now()));
-        reservationFacadeService.createForAdmin(futureDate, reservationTimeResponse.id(), theme.getId(), member.getId()
+        ReservationRequest request = new ReservationRequest(futureDate, reservationTimeResponse.id(), theme.getId());
+        reservationFacadeService.createForAdmin(request, member.getId()
         );
         assertThatThrownBy(() -> reservationTimeService.delete(reservationTimeResponse.id()))
                 .isInstanceOf(ReservationTimeInUseException.class)
@@ -140,9 +148,9 @@ class ReservationTimeServiceTest {
                 new ReservationTimeCreateRequest(LocalTime.of(10, 0)));
         reservationTimeService.create(new ReservationTimeCreateRequest(LocalTime.of(11, 0)));
         reservationTimeService.create(new ReservationTimeCreateRequest(LocalTime.of(12, 0)));
+        ReservationRequest request = new ReservationRequest(futureDate, reservationTimeResponse.id(), theme.getId());
+        reservationFacadeService.createForAdmin(request, member.getId());
 
-        reservationFacadeService.createForAdmin(futureDate, reservationTimeResponse.id(), theme.getId(), member.getId()
-        );
         List<AvailableReservationTimeResponse> availableReservationTimes = reservationTimeService.getAvailableReservationTimes(
                 futureDate, theme.getId());
 

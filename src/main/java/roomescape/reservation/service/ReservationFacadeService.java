@@ -1,6 +1,5 @@
 package roomescape.reservation.service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,6 +12,8 @@ import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationInfo;
 import roomescape.reservation.domain.Waiting;
+import roomescape.reservation.dto.request.ReservationCreateRequest;
+import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.WaitingWithRank;
@@ -55,55 +56,46 @@ public class ReservationFacadeService {
         ).collect(Collectors.toList());
     }
 
-    public ReservationResponse createForAdmin(final LocalDate date, final Long timeId, final Long themeId,
+    public ReservationResponse createForAdmin(final ReservationRequest request,
                                               final Long memberId) {
-        if (reservationService.isReservationExists(date, timeId, themeId)) {
-            return createReservation(date, timeId, themeId, memberId);
+        if (!reservationService.isReservationExists(request)) {
+            return createReservation(request, memberId);
         }
-        return createWaiting(date, timeId, themeId, memberId);
+        return createWaiting(request, memberId);
     }
 
-    public ReservationResponse create(final LocalDate date, final Long timeId, final Long themeId,
-                                      final Long memberId, final String paymentKey, final String orderId,
-                                      final Integer amount, final String paymentType) {
+    public ReservationResponse create(final ReservationCreateRequest request, final Long memberId) {
 
-        if (!reservationService.isReservationExists(date, timeId, themeId)) {
-            paymentService.payment(paymentKey, orderId, amount, paymentType);
-            return createReservation(date, timeId, themeId, memberId);
+        if (!reservationService.isReservationExists(request.reservation())) {
+            paymentService.payment(request.getPaymentKey(), request.getOrderId(), request.getAmount(),
+                    request.getPaymentKey());
+            return createReservation(request.reservation(), memberId);
         }
         throw new ReservationAlreadyExistsException("이미 예약이 존재합니다.");
     }
 
-    private ReservationResponse createReservation(final LocalDate date, final Long timeId, final Long themeId,
-                                                  final Long memberId) {
-        reservationService.checkIfReservationExists(date, timeId, themeId);
-        ReservationTime time = reservationTimeService.findReservationTime(timeId);
-        Theme theme = themeService.findTheme(themeId);
+    private ReservationResponse createReservation(final ReservationRequest request, final Long memberId) {
+        reservationService.checkIfReservationExists(request);
+        ReservationTime time = reservationTimeService.findReservationTime(request.timeId());
+        Theme theme = themeService.findTheme(request.themeId());
         Member member = memberService.findUserByMemberId(memberId);
-        ReservationInfo reservationInfo = new ReservationInfo(date, time, theme);
+        ReservationInfo reservationInfo = new ReservationInfo(request.date(), time, theme);
         Reservation newReservation = reservationService.save(
                 Reservation.createUpcomingReservationWithUnassignedId(member, reservationInfo)
         );
         return ReservationResponse.of(newReservation);
     }
 
-    public ReservationResponse createWaiting(final LocalDate date, final Long timeId, final Long themeId,
-                                             final Long memberId) {
-        validateAlreadyExistReservation(date, timeId, themeId);
-        ReservationTime time = reservationTimeService.findReservationTime(timeId);
-        Theme theme = themeService.findTheme(themeId);
+    public ReservationResponse createWaiting(final ReservationRequest request, final Long memberId) {
+        ReservationTime time = reservationTimeService.findReservationTime(request.timeId());
+        Theme theme = themeService.findTheme(request.themeId());
         Member member = memberService.findUserByMemberId(memberId);
-        int turn = waitingService.findMaxOrderByDateAndTimeAndTheme(date, timeId, themeId);
-        ReservationInfo reservationInfo = new ReservationInfo(date, time, theme);
+        int turn = waitingService.findMaxOrderByDateAndTimeAndTheme(request.date(), request.timeId(),
+                request.themeId());
+        ReservationInfo reservationInfo = new ReservationInfo(request.date(), time, theme);
         Waiting newWaiting = waitingService.save(
                 Waiting.createUpcomingReservationWithUnassignedId(member, turn + 1, reservationInfo));
         return ReservationResponse.of(newWaiting);
-    }
-
-    private void validateAlreadyExistReservation(final LocalDate date, final Long timeId, final Long themeId) {
-        if (reservationService.isReservationExists(date, timeId, themeId)) {
-            throw new ReservationAlreadyExistsException("이미 예약이 존재합니다.");
-        }
     }
 
     public void deleteReservation(final Long reservationId) {
@@ -117,12 +109,7 @@ public class ReservationFacadeService {
             return;
         }
         Waiting waiting = waitingService.findFirstWaitingOfInfo(info);
-        createReservation(
-                waiting.getDate(),
-                waiting.getTimeId(),
-                waiting.getThemeId(),
-                waiting.getMemberId()
-        );
+        createReservation(ReservationRequest.from(info), waiting.getMemberId());
         waitingService.delete(waiting.getId());
     }
 

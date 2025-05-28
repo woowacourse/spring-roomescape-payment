@@ -87,7 +87,7 @@ Content-Type: application/json
 POST /reservations HTTP/1.1
 content-type: application/json
 cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIn0.cwnHsltFeEtOzMHs2Q5-ItawgvBZ140OyWecppNlLoI
-host: localhost:8080
+host: localhost: 8080
 
 {
 "date": "2024-03-01",
@@ -111,10 +111,10 @@ Content-Type: application/json
 "startAt": "10:00"
 },
 "theme": {
-  "id" : 1,
-  "name": "추리",
-  "description": "추리 with mint",
-  "thumbnail" : "thumbnail.png"
+"id" : 1,
+"name": "추리",
+"description": "추리 with mint",
+"thumbnail": "thumbnail.png"
 }
 }
 ```
@@ -127,7 +127,7 @@ Content-Type: application/json
 POST /admin/reservations HTTP/1.1
 content-type: application/json
 cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6ImFkbWluIiwicm9sZSI6IkFETUlOIn0.cwnHsltFeEtOzMHs2Q5-ItawgvBZ140OyWecppNlLoI
-host: localhost:8080
+host: localhost: 8080
 
 {
 "date": "2024-03-01",
@@ -152,10 +152,10 @@ Content-Type: application/json
 "startAt": "10:00"
 },
 "theme": {
-  "id" : 1,
-  "name": "추리",
-  "description": "추리 with mint",
-  "thumbnail" : "thumbnail.png"
+"id" : 1,
+"name": "추리",
+"description": "추리 with mint",
+"thumbnail": "thumbnail.png"
 }
 }
 ```
@@ -289,7 +289,7 @@ Content-Type: application/json
 - 메서드 : GET
 - 요청 URL : /reservations?themeId={themeId}&memberId={memberId}&dateFrom={dateFrom}&dateTo={dateTo}
 - 설명 : 예약들을 조견별로 필터링한다.
-  - 각 파라미터는 선택이다.
+    - 각 파라미터는 선택이다.
 
 ```json
 GET /reservations?themeId={themeId}&memberId={memberId}&dateFrom={dateFrom}&dateTo={dateTo} HTTP/1.1
@@ -632,40 +632,134 @@ Transfer-Encoding: chunked
 ```
 
 ## 예약 목록 조회 기능
-### 요청 
+
+### 요청
+
 ```json
 GET /reservations-mine HTTP/1.1
 cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBRE1JTiJ9.vcK93ONRQYPFCxT5KleSM6b7cl1FE-neSLKaFyslsZM
-host: localhost:8080
+host: localhost: 8080
 ```
 
 ### 응답
+
 ```json
-HTTP/1.1 200 
+HTTP/1.1 200
 Content-Type: application/json
 
 [
-    {
-        "reservationId": 1,
-        "theme": "테마1",
-        "date": "2024-03-01",
-        "time": "10:00",
-        "status": "예약"
-    },
-    {
-        "reservationId": 2,
-        "theme": "테마2",
-        "date": "2024-03-01",
-        "time": "12:00",
-        "status": "예약"
-    },
-    {
-        "reservationId": 3,
-        "theme": "테마3",
-        "date": "2024-03-01",
-        "time": "14:00",
-        "status": "예약"
-    }
+{
+"reservationId": 1,
+"theme": "테마1",
+"date": "2024-03-01",
+"time": "10:00",
+"reservedStatus": "예약"
+},
+{
+"reservationId": 2,
+"theme": "테마2",
+"date": "2024-03-01",
+"time": "12:00",
+"reservedStatus": "예약"
+},
+{
+"reservationId": 3,
+"theme": "테마3",
+"date": "2024-03-01",
+"time": "14:00",
+"reservedStatus": "예약"
+},
+{
+"reservationId": 4,
+"theme": "테마4",
+"date": "2024-03-01",
+"time": "16:00",
+"reservedStatus": "1번째 예약대기"
+}
+]
+```
+
+## 예약 대기 추가
+
+### 요청
+
+```json
+POST /waitings HTTP/1.1
+content-type: application/json
+cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBRE1JTiJ9.vcK93ONRQYPFCxT5KleSM6b7cl1FE-neSLKaFyslsZM
+host: localhost: 8080
+
+{
+"date": "2024-03-01",
+"themeId": 1,
+"timeId": 1
+}
+```
+
+### 응답
+
+```json
+HTTP/1.1 201
+Content-Type: application/json
+
+{
+"id": 1,
+"theme": "테마1",
+"date": "2024-03-01",
+"time": "10:00",
+"reservedStatus": "1번째 예약대기"
+}
+```
+
+## 예약 대기 취소
+
+### 요청
+
+```json
+DELETE /waitings/{
+  id
+} HTTP/1.1
+cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBRE1JTiJ9.vcK93ONRQYPFCxT5KleSM6b7cl1FE-neSLKaFyslsZM
+host: localhost: 8080
+```
+
+### 응답
+
+```json
+HTTP/1.1 204
+```
+
+## 예약 대기 목록 조회
+
+### 요청
+
+```json
+GET /waitings HTTP/1.1
+cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBRE1JTiJ9.vcK93ONRQYPFCxT5KleSM6b7cl1FE-neSLKaFyslsZM
+host: localhost: 8080
+```
+
+### 응답
+
+```json
+HTTP/1.1 200
+Content-Type: application/json
+
+[
+{
+"id": 1,
+"theme": "테마1",
+"date": "2024-03-01",
+"time": "10:00",
+"reservedStatus": "1번째 예약대기"
+},
+{
+"id": 2,
+"theme": "테마2",
+"date": "2024-03-01",
+"time": "12:00",
+"reservedStatus": "2번째 예약대기"
+}
 ]
 ```
 

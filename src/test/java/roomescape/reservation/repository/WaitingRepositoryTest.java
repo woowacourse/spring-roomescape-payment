@@ -54,39 +54,77 @@ class WaitingRepositoryTest {
         member = memberRepository.save(TestFixture.makeMember());
         time = reservationTimeRepository.save(ReservationTime.withUnassignedId(LocalTime.of(10, 0)));
         theme = themeRepository.save(TestFixture.makeTheme(1L));
-        Waiting w1 = new Waiting(member, new ReservationInfo(futureDate, time, theme), 1);
-        waitingRepository.save(w1);
     }
 
     @Test
-    void existsByDateAndTimeIdAndThemeId() {
+    void existsByDateAndTimeIdAndThemeId_shouldReturnTrue_whenWaitingExists() {
+        Waiting waiting = new Waiting(member, new ReservationInfo(futureDate, time, theme), 1);
+        waitingRepository.save(waiting);
+
         boolean exists = waitingRepository.existsByDateAndTimeIdAndThemeId(futureDate, time.getId(), theme.getId());
+
         assertThat(exists).isTrue();
     }
 
     @Test
-    void findMaxOrderByDateAndTimeAndTheme() {
-        waitingRepository.save(new Waiting(member, new ReservationInfo(futureDate, time, theme), 2));
-        int newTurn = waitingRepository.findMaxOrderByDateAndTimeAndTheme(futureDate, time.getId(), theme.getId());
-        assertThat(newTurn).isEqualTo(2);
+    void existsByDateAndTimeIdAndThemeId_shouldReturnFalse_whenNoWaiting() {
+        boolean exists = waitingRepository.existsByDateAndTimeIdAndThemeId(futureDate, time.getId(), theme.getId());
+
+        assertThat(exists).isFalse();
     }
 
     @Test
-    void findWaitingsWithRankByMemberId() {
-        waitingRepository.save(new Waiting(member, new ReservationInfo(futureDate, time, theme), 2));
+    void findMaxOrderByDateAndTimeAndTheme_shouldReturnMaxOrder_whenWaitingsExist() {
+        Waiting w1 = new Waiting(member, new ReservationInfo(futureDate, time, theme), 1);
+        waitingRepository.save(w1);
+        Waiting w2 = new Waiting(member, new ReservationInfo(futureDate, time, theme), 2);
+        waitingRepository.save(w2);
 
+        int maxTurn = waitingRepository.findMaxOrderByDateAndTimeAndTheme(futureDate, time.getId(), theme.getId());
+
+        assertThat(maxTurn).isEqualTo(2);
+    }
+
+    @Test
+    void findMaxOrderByDateAndTimeAndTheme_shouldReturnZero_whenNoWaitings() {
+        int maxTurn = waitingRepository.findMaxOrderByDateAndTimeAndTheme(futureDate, time.getId(), theme.getId());
+
+        assertThat(maxTurn).isZero();
+    }
+
+    @Test
+    void findWaitingsWithRankByMemberId_shouldReturnWaitingsWithRank_whenWaitingsExist() {
+        Waiting w1 = new Waiting(member, new ReservationInfo(futureDate, time, theme), 1);
+        waitingRepository.save(w1);
+        Waiting w2 = new Waiting(member, new ReservationInfo(futureDate, time, theme), 2);
+        waitingRepository.save(w2);
+
+        // when
         List<WaitingWithRank> ranks = waitingRepository.findWaitingsWithRankByMemberId(member.getId());
+
+        // then
         assertThat(ranks).hasSize(2);
     }
 
     @Test
-    void findFirstByInfoDateAndInfoTimeAndInfoThemeOrderByTurnAsc() {
-        waitingRepository.save(new Waiting(member, new ReservationInfo(futureDate, time, theme), 2));
+    void findWaitingsWithRankByMemberId_shouldReturnEmptyList_whenNoWaitings() {
+        List<WaitingWithRank> ranks = waitingRepository.findWaitingsWithRankByMemberId(member.getId());
+
+        assertThat(ranks).isEmpty();
+    }
+
+    @Test
+    void findFirstByInfoDateAndInfoTimeAndInfoThemeOrderByTurnAsc_shouldReturnFirstWaiting_whenWaitingsExist() {
+        // given
+        Waiting w1 = new Waiting(member, new ReservationInfo(futureDate, time, theme), 1);
+        waitingRepository.save(w1);
+        Waiting w2 = new Waiting(member, new ReservationInfo(futureDate, time, theme), 2);
+        waitingRepository.save(w2);
 
         Optional<Waiting> first = waitingRepository.findFirstByInfoDateAndInfoTimeAndInfoThemeOrderByTurnAsc(futureDate,
                 time, theme);
 
+        assertThat(first).isPresent();
         assertThat(first.get().getTurn()).isEqualTo(1);
-
     }
 }

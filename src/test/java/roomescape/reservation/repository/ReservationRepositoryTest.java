@@ -60,7 +60,7 @@ class ReservationRepositoryTest {
     }
 
     @Test
-    void findFilteredReservations() {
+    void findByInfoThemeIdAndMemberIdAndInfoDateBetween_shouldReturnFilteredReservations() {
         Theme theme2 = themeRepository.save(Theme.of("논리", "셜록 논리 게임 with Vector", "image.png"));
 
         ReservationTime reservationTime2 = ReservationTime.withUnassignedId(LocalTime.of(11, 0));
@@ -77,21 +77,21 @@ class ReservationRepositoryTest {
     }
 
     @Test
-    void existsByTimeId() {
+    void existsByTimeId_shouldReturnTrue() {
         boolean existsByTimeId = reservationRepository.existsByTimeId(reservationTime.getId());
 
         assertThat(existsByTimeId).isTrue();
     }
 
     @Test
-    void existsByThemeId() {
+    void existsByThemeId_shouldReturnTrue() {
         boolean existsByThemeId = reservationRepository.existsByThemeId(theme.getId());
 
         assertThat(existsByThemeId).isTrue();
     }
 
     @Test
-    void existsByDateAndTimeIdAndThemeId() {
+    void existsByInfoDateAndInfoTimeIdAndInfoThemeId_shouldReturnTrue() {
         boolean existsByDateAndTimeIdAndThemeId = reservationRepository.existsByInfoDateAndInfoTimeIdAndInfoThemeId(futureDate,
                 reservationTime.getId(),
                 theme.getId())
@@ -101,7 +101,7 @@ class ReservationRepositoryTest {
     }
 
     @Test
-    void findAvailableTimesByDateAndThemeId() {
+    void findBookedTimesByDateAndThemeId_shouldReturnBookedTimes() {
         ReservationTime reservationTime2 = reservationTimeRepository.save(
                 ReservationTime.withUnassignedId(LocalTime.of(11, 0)));
         ReservationTime reservationTime3 = reservationTimeRepository.save(
@@ -110,7 +110,7 @@ class ReservationRepositoryTest {
         reservationRepository.save(
                 new Reservation(member, new ReservationInfo(futureDate, reservationTime2, theme)));
         reservationRepository.save(
-                new Reservation(member, new ReservationInfo( futureDate, reservationTime3, theme)));
+                new Reservation(member, new ReservationInfo(futureDate, reservationTime3, theme)));
 
         List<AvailableReservationTimeResponse> bookedTimesByDateAndThemeId = reservationRepository.findBookedTimesByDateAndThemeId(
                 futureDate, theme.getId());

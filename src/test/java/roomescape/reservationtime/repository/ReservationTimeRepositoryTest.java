@@ -22,7 +22,7 @@ class ReservationTimeRepositoryTest {
     private ReservationTimeRepository reservationTimeRepository;
 
     @Test
-    void existsByStartAt() {
+    void existsByStartAt_shouldReturnTrue_whenTimeExists() {
         ReservationTime reservationTime = TestFixture.makeReservationTime(1L);
         reservationTimeRepository.save(reservationTime);
 
