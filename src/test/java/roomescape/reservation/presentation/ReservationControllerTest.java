@@ -19,7 +19,7 @@ import roomescape.common.exception.PaymentException;
 import roomescape.member.dto.request.LoginMember;
 import roomescape.member.service.LoginService;
 import roomescape.reservation.dto.request.TossPaymentConfirmRequest;
-import roomescape.reservation.service.PaymentService;
+import roomescape.payment.client.PaymentClient;
 import roomescape.reservation.service.ReservationService;
 
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ class ReservationControllerTest {
     private ReservationService reservationService;
 
     @MockitoBean
-    private PaymentService paymentService;
+    private PaymentClient paymentService;
 
     @MockitoBean
     private LoginService loginService;
@@ -70,4 +70,6 @@ class ReservationControllerTest {
                 .andExpect(status().isInternalServerError())
                 .andExpect(content().string(containsString("결제 실패!")));
     }
+
+
 }
