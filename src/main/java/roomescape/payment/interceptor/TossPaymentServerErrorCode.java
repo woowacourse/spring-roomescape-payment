@@ -4,7 +4,7 @@ import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public enum TossPaymentServerError {
+public enum TossPaymentServerErrorCode {
 
     INVALID_API_KEY("INVALID_API_KEY"),
     NOT_FOUND_TERMINAL_ID("NOT_FOUND_TERMINAL_ID"),
