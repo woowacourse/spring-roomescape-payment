@@ -53,6 +53,11 @@ public class ReservationService {
         return reservationTimeRepository.findAllAvailable(date, themeId);
     }
 
+    public Reservation findById(final Long reservationId) {
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 예약입니다."));
+    }
+
     @Transactional
     public ReservationResponse saveReservation(final ReservationRequest request, final LoginMember loginMember) {
         final ReservationTime reservationTime = findReservationTimeById(request.timeId());

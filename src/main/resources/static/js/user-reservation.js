@@ -211,8 +211,9 @@ async function fetchReservationPayment(paymentData, reservationData) {
         paymentType: paymentData.paymentType,
     }
 
-    const reservationURL = "/reservations";
-    fetch(reservationURL, {
+    const paymentConfirmURL = "/payments/confirm/tossPay";
+    const paymentURL = "/payments"
+    fetch(paymentConfirmURL, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -227,6 +228,26 @@ async function fetchReservationPayment(paymentData, reservationData) {
         } else {
             response.json().then(successBody => {
                 console.log("예약 결제 성공 : " + JSON.stringify(successBody));
+
+                // 예약 + 결제 저장하기
+                fetch(paymentURL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(reservationPaymentRequest),
+                }).then(response => {
+                  if(response.status !== 201) {
+                      return response.json().then(errorBody => {
+                          console.error("예약 실패 : " + JSON.stringify(errorBody));
+                          window.alert("예약 실패 메시지");
+                      });
+                  }else {
+                      response.json().then(successBody => {
+                          console.log("예약 성공 : " + JSON.stringify(successBody));
+                      });
+                  }
+                })
                 window.location.reload();
             });
         }
