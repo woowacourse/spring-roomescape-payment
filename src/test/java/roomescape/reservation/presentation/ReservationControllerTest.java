@@ -14,14 +14,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.DatabaseCleaner;
+import roomescape.TestConfig;
 import roomescape.member.presentation.fixture.MemberFixture;
 import roomescape.reservation.presentation.dto.ReservationRequest;
 import roomescape.reservation.presentation.fixture.ReservationFixture;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@Import(TestConfig.class)
 class ReservationControllerTest {
     private final DatabaseCleaner databaseCleaner;
     private final ReservationFixture reservationFixture = new ReservationFixture();
@@ -56,8 +59,15 @@ class ReservationControllerTest {
                 cookies
         );
 
-        final ReservationRequest reservation = reservationFixture.createReservationRequest(LocalDate.of(2025, 8, 5), 1L,
-                1L);
+        final ReservationRequest reservation = reservationFixture.createReservationRequest(
+                LocalDate.of(2025, 8, 5),
+                1L,
+                1L,
+                "test",
+                "testOrderId",
+                1000,
+                "NORMAL"
+        );
 
         // when - then
         RestAssured.given().log().all()
@@ -83,8 +93,15 @@ class ReservationControllerTest {
                 cookies
         );
 
-        final ReservationRequest reservation = reservationFixture.createReservationRequest(LocalDate.of(2023, 8, 5), 1L,
-                1L);
+        final ReservationRequest reservation = reservationFixture.createReservationRequest(
+                LocalDate.of(2024, 8, 5),
+                1L,
+                1L,
+                "test",
+                "testOrderId",
+                1000,
+                "NORMAL"
+        );
 
         // when - then
         RestAssured.given().log().all()
@@ -110,8 +127,15 @@ class ReservationControllerTest {
                 cookies
         );
 
-        final ReservationRequest reservation = reservationFixture.createReservationRequest(LocalDate.of(2025, 8, 5), 1L,
-                1L);
+        final ReservationRequest reservation = reservationFixture.createReservationRequest(
+                LocalDate.of(2025, 8, 5),
+                1L,
+                1L,
+                "test",
+                "testOrderId",
+                1000,
+                "NORMAL"
+        );
 
         // when
         RestAssured.given().log().all()
@@ -144,8 +168,15 @@ class ReservationControllerTest {
                 cookies
         );
 
-        final ReservationRequest reservation = reservationFixture.createReservationRequest(LocalDate.of(2025, 8, 5), 1L,
-                1L);
+        final ReservationRequest reservation = reservationFixture.createReservationRequest(
+                LocalDate.of(2025, 8, 5),
+                1L,
+                1L,
+                "test",
+                "testOrderId",
+                1000,
+                "NORMAL"
+        );
 
         // when - then
         RestAssured.given().log().all()
@@ -164,8 +195,15 @@ class ReservationControllerTest {
         final Map<String, String> cookies = memberFixture.loginAdmin();
         reservationFixture.createReservationTime(LocalTime.of(10, 30), cookies);
 
-        final ReservationRequest reservation = reservationFixture.createReservationRequest(LocalDate.of(2025, 8, 5), 1L,
-                1L);
+        final ReservationRequest reservation = reservationFixture.createReservationRequest(
+                LocalDate.of(2025, 8, 5),
+                1L,
+                1L,
+                "test",
+                "testOrderId",
+                1000,
+                "NORMAL"
+        );
 
         // when - then
         RestAssured.given().log().all()
@@ -191,7 +229,16 @@ class ReservationControllerTest {
                 cookies
         );
 
-        reservationFixture.createReservation(LocalDate.of(2025, 8, 5), 1L, 1L, cookies);
+        reservationFixture.createReservation(
+                LocalDate.of(2025, 8, 5),
+                1L,
+                1L,
+                "test",
+                "testOrderId",
+                1000,
+                "NORMAL",
+                cookies
+        );
 
         // when
         RestAssured.given().log().all()
@@ -225,7 +272,16 @@ class ReservationControllerTest {
                 cookies
         );
 
-        reservationFixture.createReservation(LocalDate.of(2025, 8, 5), 1L, 1L, cookies);
+        reservationFixture.createReservation(
+                LocalDate.of(2025, 8, 5),
+                1L,
+                1L,
+                "test",
+                "testOrderId",
+                1000,
+                "NORMAL",
+                cookies
+        );
 
         // when-then
         RestAssured.given().log().all()
@@ -252,8 +308,27 @@ class ReservationControllerTest {
                 adminCookies
         );
 
-        reservationFixture.createReservation(LocalDate.of(2025, 8, 5), 1L, 1L, adminCookies);
-        reservationFixture.createReservation(LocalDate.of(2025, 8, 12), 1L, 1L, userCookies);
+        reservationFixture.createReservation(
+                LocalDate.of(2025, 8, 5),
+                1L,
+                1L,
+                "test",
+                "testOrderId",
+                1000,
+                "NORMAL",
+                adminCookies
+        );
+
+        reservationFixture.createReservation(
+                LocalDate.of(2025, 8, 5),
+                1L,
+                1L,
+                "test",
+                "testOrderId",
+                1000,
+                "NORMAL",
+                userCookies
+        );
 
         reservationFixture.createWaiting(LocalDate.of(2025, 8, 12), 1L, 1L, adminCookies);
 

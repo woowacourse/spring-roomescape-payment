@@ -14,13 +14,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.DatabaseCleaner;
+import roomescape.TestConfig;
 import roomescape.member.presentation.fixture.MemberFixture;
 import roomescape.reservation.presentation.fixture.ReservationFixture;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@Import(TestConfig.class)
 public class AdminWaitingControllerTest {
 
     private final DatabaseCleaner databaseCleaner;
@@ -57,7 +60,17 @@ public class AdminWaitingControllerTest {
                 adminCookies
         );
 
-        reservationFixture.createReservation(LocalDate.of(2025, 8, 5), 1L, 1L, adminCookies);
+        reservationFixture.createReservation(
+                LocalDate.of(2025, 8, 5),
+                1L,
+                1L,
+                "test",
+                "testOrderId",
+                1000,
+                "NORMAL",
+                adminCookies
+        );
+
         reservationFixture.createWaiting(LocalDate.of(2025, 8, 5), 1L, 1L, userCookies);
 
         // when - then
@@ -85,7 +98,17 @@ public class AdminWaitingControllerTest {
                 adminCookies
         );
 
-        reservationFixture.createReservation(LocalDate.of(2025, 8, 5), 1L, 1L, adminCookies);
+        reservationFixture.createReservation(
+                LocalDate.of(2025, 8, 5),
+                1L,
+                1L,
+                "test",
+                "testOrderId",
+                1000,
+                "NORMAL",
+                adminCookies
+        );
+
         reservationFixture.createWaiting(LocalDate.of(2025, 8, 5), 1L, 1L, userCookies);
 
         // when
@@ -112,7 +135,17 @@ public class AdminWaitingControllerTest {
                 adminCookies
         );
 
-        reservationFixture.createReservation(LocalDate.of(2025, 8, 5), 1L, 1L, adminCookies);
+        reservationFixture.createReservation(
+                LocalDate.of(2025, 8, 5),
+                1L,
+                1L,
+                "test",
+                "testOrderId",
+                1000,
+                "NORMAL",
+                adminCookies
+        );
+
         reservationFixture.createWaiting(LocalDate.of(2025, 8, 5), 1L, 1L, userCookies);
 
         // when

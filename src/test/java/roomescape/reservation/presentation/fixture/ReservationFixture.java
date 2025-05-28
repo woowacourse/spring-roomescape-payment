@@ -5,8 +5,8 @@ import io.restassured.http.ContentType;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Map;
-import roomescape.reservation.presentation.dto.AdminReservationRequest;
 import roomescape.reservation.presentation.dto.ReservationRequest;
+import roomescape.reservation.presentation.dto.AdminReservationRequest;
 import roomescape.reservation.presentation.dto.ReservationTimeRequest;
 import roomescape.reservation.presentation.dto.ThemeRequest;
 import roomescape.reservation.presentation.dto.WaitingRequest;
@@ -18,8 +18,8 @@ public class ReservationFixture {
         return new AdminReservationRequest(date, themeId, timeId, memberId);
     }
 
-    public ReservationRequest createReservationRequest(LocalDate date, Long themeId, Long timeId) {
-        return new ReservationRequest(date, themeId, timeId);
+    public ReservationRequest createReservationRequest(LocalDate date, Long themeId, Long timeId, String paymentKey, String orderId, Integer amount, String paymentType){
+        return new ReservationRequest(date, themeId, timeId, paymentKey, orderId, amount, paymentType);
     }
 
     public ReservationTimeRequest createReservationTimeRequest(LocalTime startAt) {
@@ -43,8 +43,8 @@ public class ReservationFixture {
                 .when().post("/reservations/waiting");
     }
 
-    public void createReservation(LocalDate date, Long themeId, Long timeId, Map<String, String> cookies) {
-        final ReservationRequest reservationRequest = createReservationRequest(date, themeId, timeId);
+    public void createReservation(LocalDate date, Long themeId, Long timeId, String paymentKey, String orderId, Integer amount, String paymentType, Map<String, String> cookies) {
+        final ReservationRequest reservationRequest = createReservationRequest(date, themeId, timeId, paymentKey, orderId, amount, paymentType);
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookies(cookies)

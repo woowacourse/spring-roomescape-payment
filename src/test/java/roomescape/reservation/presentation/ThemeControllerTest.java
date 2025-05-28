@@ -14,14 +14,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.DatabaseCleaner;
+import roomescape.TestConfig;
 import roomescape.member.presentation.fixture.MemberFixture;
 import roomescape.reservation.presentation.dto.ThemeRequest;
 import roomescape.reservation.presentation.fixture.ReservationFixture;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@Import(TestConfig.class)
 class ThemeControllerTest {
     private final DatabaseCleaner databaseCleaner;
     private final ReservationFixture reservationFixture = new ReservationFixture();
@@ -120,7 +123,16 @@ class ThemeControllerTest {
                 cookies
         );
 
-        reservationFixture.createReservation(LocalDate.of(2025, 8, 5), 1L, 1L, cookies);
+        reservationFixture.createReservation(
+                LocalDate.of(2025, 8, 5),
+                1L,
+                1L,
+                "test",
+                "testOrderId",
+                1000,
+                "NORMAL",
+                cookies
+        );
 
         // when - then
         RestAssured.given().log().all()
@@ -151,7 +163,16 @@ class ThemeControllerTest {
                 cookies
         );
 
-        reservationFixture.createReservation(LocalDate.of(2025, 8, 5), 1L, 1L, cookies);
+        reservationFixture.createReservation(
+                LocalDate.of(2025, 8, 5),
+                1L,
+                1L,
+                "test",
+                "testOrderId",
+                1000,
+                "NORMAL",
+                cookies
+        );
 
         // when - then
         RestAssured.given().log().all()
