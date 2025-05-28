@@ -1,0 +1,51 @@
+package roomescape.service;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import roomescape.domain.Member;
+import roomescape.domain.Reservation;
+import roomescape.domain.ReservationTime;
+import roomescape.domain.Role;
+import roomescape.domain.Theme;
+import roomescape.dto.business.PaymentHistoryCreationContent;
+import roomescape.exception.PaymentException;
+import roomescape.repository.PaymentHistoryRepository;
+import roomescape.utility.PaymentClientStub;
+
+@DataJpaTest
+class PaymentServiceTest {
+
+    private static final String ALREADY_PROCESSED_PAYMENT = "이미 처리된 결제 입니다.";
+    @Autowired
+    private TestEntityManager testEntityManager;
+
+    @Autowired
+    private PaymentHistoryRepository paymentHistoryRepository;
+
+    private final PaymentClientStub paymentClientStub = new PaymentClientStub();
+
+    @Test
+    void paymentFailThenReturnErrorMessage() {
+        paymentClientStub.setErrorCase(ALREADY_PROCESSED_PAYMENT);
+        PaymentService paymentService = new PaymentService(paymentHistoryRepository, paymentClientStub);
+
+        ReservationTime reservationTime = testEntityManager.persist(
+                ReservationTime.createWithoutId(LocalTime.of(23, 59)));
+        Theme theme = testEntityManager.persist(Theme.createWithoutId("asdf", "asdf", "asdf"));
+        Member member = testEntityManager.persist(
+                Member.createWithoutId(Role.GENERAL, "asdf", "asdf@naver.com", "qwer1234!"));
+        Reservation reservation = testEntityManager.persist(
+                Reservation.createWithoutId(LocalDate.now().plusDays(2L), reservationTime, theme, member));
+        PaymentHistoryCreationContent paymentHistoryCreationContent = new PaymentHistoryCreationContent("asdf", "asdf",
+                "asdf", 1000);
+        assertThatThrownBy(() -> paymentService.pay(reservation, paymentHistoryCreationContent)).isInstanceOf(
+                        PaymentException.class)
+                .hasMessage(ALREADY_PROCESSED_PAYMENT);
+    }
+}

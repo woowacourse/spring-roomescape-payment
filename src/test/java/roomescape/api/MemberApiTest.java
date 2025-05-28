@@ -12,7 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.Rollback;
 import roomescape.domain.Member;
 import roomescape.domain.Role;
 import roomescape.dto.business.AccessTokenContent;
@@ -20,7 +19,6 @@ import roomescape.repository.MemberRepository;
 import roomescape.utility.JwtTokenProvider;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@Rollback(value = false)
 class MemberApiTest {
 
     @LocalServerPort

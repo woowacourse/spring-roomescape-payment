@@ -1,10 +1,14 @@
 package roomescape.utility;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Map;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.RestClient;
 import roomescape.dto.business.PaymentResult;
+import roomescape.exception.PaymentException;
 
 public class TossPaymentClient implements PaymentClient {
 
@@ -12,6 +16,7 @@ public class TossPaymentClient implements PaymentClient {
 
     private final RestClient restClient;
     private final String secretKey;
+    private final ObjectMapper statusParser = new ObjectMapper();
 
     public TossPaymentClient(
             RestClient restClient,
@@ -23,10 +28,26 @@ public class TossPaymentClient implements PaymentClient {
 
     @Override
     public PaymentResult pay(String paymentKey, String orderId, int amount) {
-        return restClient.get()
+        Map<String, Object> requestBody = Map.of(
+                "paymentKey", paymentKey,
+                "orderId", orderId,
+                "amount", amount
+        );
+
+        record PaymentExceptionContent(String code, String message) {
+
+        }
+
+        return restClient.post()
                 .uri(PAYMENT_CONFIRM_URL)
+                .body(requestBody)
                 .header("Authorization", createAuthHeaderConcise())
                 .retrieve()
+                .onStatus(HttpStatusCode::isError, ((request, response) -> {
+                    PaymentExceptionContent paymentExceptionContent = statusParser.readValue(response.getBody(),
+                            PaymentExceptionContent.class);
+                    throw new PaymentException(paymentExceptionContent.message);
+                }))
                 .body(PaymentResult.class);
     }
 

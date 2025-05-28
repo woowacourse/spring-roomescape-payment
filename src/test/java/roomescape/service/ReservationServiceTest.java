@@ -60,19 +60,19 @@ class ReservationServiceTest {
     private ReservationTime reservationTime;
     private Theme theme;
     private Member member;
-    private PaymentHistoryService paymentHistoryService;
+    private PaymentService paymentService;
     private PaymentClient paymentClient;
 
     @BeforeEach
     void setup() {
-        paymentHistoryService = new PaymentHistoryService(paymentHistoryRepository, paymentClient);
+        paymentService = new PaymentService(paymentHistoryRepository, paymentClient);
         reservationService = new ReservationService(
                 reservationRepository,
                 reservationTimeRepository,
                 themeRepository,
                 memberRepository,
                 waitingRepository,
-                paymentHistoryService);
+                paymentService);
 
         reservationTime = entityManager.persist(
                 ReservationTime.createWithoutId(LocalTime.of(10, 0)));

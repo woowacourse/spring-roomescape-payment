@@ -32,19 +32,19 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
-    private final PaymentHistoryService paymentHistoryService;
+    private final PaymentService paymentService;
 
     public ReservationService(
             ReservationRepository reservationRepository, ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository, MemberRepository memberRepository, WaitingRepository waitingRepository,
-            PaymentHistoryService paymentHistoryService
+            PaymentService paymentService
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
-        this.paymentHistoryService = paymentHistoryService;
+        this.paymentService = paymentService;
     }
 
     public List<ReservationResponse> findAllReservations() {
@@ -94,7 +94,7 @@ public class ReservationService {
     }
 
     public ReservationResponse addReservation(long memberId, ReservationCreationContent reservationCreationContent,
-            PaymentHistoryCreationContent paymentHistoryCreationContent) {
+                                              PaymentHistoryCreationContent paymentHistoryCreationContent) {
         Member member = getMemberById(memberId);
         Theme theme = getThemeById(reservationCreationContent.themeId());
         ReservationTime time = getReservationTimeById(reservationCreationContent.timeId());
@@ -106,7 +106,7 @@ public class ReservationService {
         validatePastReservationCreation(reservation);
 
         Reservation savedReservation = reservationRepository.save(reservation);
-        paymentHistoryService.pay(savedReservation, paymentHistoryCreationContent);
+        paymentService.pay(savedReservation, paymentHistoryCreationContent);
         return new ReservationResponse(savedReservation);
     }
 
