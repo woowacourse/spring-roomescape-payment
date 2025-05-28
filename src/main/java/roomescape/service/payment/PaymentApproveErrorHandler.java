@@ -12,6 +12,8 @@ import org.springframework.web.client.ResponseErrorHandler;
 
 public class PaymentApproveErrorHandler implements ResponseErrorHandler {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     private final List<String> sensitiveErrorCodes = List.of(
             "INVALID_API_KEY",
             "UNAPPROVED_ORDER_ID",
@@ -38,7 +40,6 @@ public class PaymentApproveErrorHandler implements ResponseErrorHandler {
     }
 
     private String extractMessage(ClientHttpResponse response, String key) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
         InputStream inputStream = response.getBody();
         JsonNode jsonNode = objectMapper.readTree(inputStream);
         return jsonNode.get(key).asText();

@@ -6,21 +6,28 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestClient;
 import roomescape.dto.response.PaymentSuccessResponse;
+import roomescape.service.payment.MyClientHttpRequestFactory;
 import roomescape.service.payment.PaymentApproveClient;
+import roomescape.service.payment.PaymentApproveErrorHandler;
 
-@RestClientTest(PaymentApproveClient.class)
 class PaymentApproveClientTest {
 
-    @Autowired
-    private PaymentApproveClient paymentApproveClient;
+    private final RestClient.Builder testBuilder = RestClient.builder()
+            .baseUrl("https://api.tosspayments.com")
+            .defaultStatusHandler(new PaymentApproveErrorHandler());
 
-    @Autowired
-    private MockRestServiceServer mockServer;
+    private final MockRestServiceServer mockServer = MockRestServiceServer.bindTo(testBuilder).build();
+
+    private final PaymentApproveClient paymentApproveClient = new PaymentApproveClient(
+            new MyClientHttpRequestFactory(),
+            testBuilder,
+            "https://api.tosspayments.com",
+            "1234"
+    );
 
     @Test
     @DisplayName("외부 API를 통하여 결제 승인을 요청한다.")

@@ -4,6 +4,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import roomescape.dto.response.PaymentSuccessResponse;
@@ -15,11 +17,15 @@ public class PaymentApproveClient {
     private final String widgetSecretKey;
 
     public PaymentApproveClient(
+            ClientHttpRequestFactory factory,
             RestClient.Builder restClientBuilder,
             @Value("${toss.payments.base-url}") String baseUrl,
             @Value("${toss.payments.widget-secret-key}") String widgetSecretKey
     ) {
-        this.restClient = restClientBuilder.baseUrl(baseUrl).build();
+        this.restClient = restClientBuilder
+                .requestFactory(factory)
+                .baseUrl(baseUrl)
+                .build();
         this.widgetSecretKey = widgetSecretKey;
     }
 
@@ -31,11 +37,13 @@ public class PaymentApproveClient {
                 "paymentKey", paymentKey
         );
 
+        final PaymentApproveErrorHandler errorHandler = new PaymentApproveErrorHandler();
         return restClient.post().uri("/v1/payments/confirm")
                 .header("Authorization", authorizations)
+                .accept(MediaType.APPLICATION_JSON)
                 .body(requestBody)
                 .retrieve()
-                .onStatus(new PaymentApproveErrorHandler())
+                .onStatus(errorHandler)
                 .body(PaymentSuccessResponse.class);
     }
 
