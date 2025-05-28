@@ -76,7 +76,6 @@
             }
             ```
 
-
 ### Member
 
 - [Admin - 멤버 전체 조회]
@@ -122,7 +121,6 @@
                   "timestamp": "2025-05-19T14:01:50.079277"
                 }
                 ```
-
 
 ### Reservation
 
@@ -251,8 +249,10 @@
                     ```
 
 - [User - 예약 생성]
+-
+- toss의 결제승인 API를 호출합니다.
     - request
-        - method & path: `[POST] /admin/reservations`
+        - method & path: `[POST] /reservations`
         - body
 
             ```json
@@ -260,7 +260,10 @@
             {
               "date": "2025-06-01",
               "timeId": 3,
-              "themeId": 5
+              "themeId": 5,
+              "paymentKey": "12345abcde",
+              "orderId": "12345abcde",
+              "amount": 1000
             }
             
             ```
@@ -315,7 +318,7 @@
                 	}
                 ]
                 ```
-              
+
 **[ReservationTheme]**
 
 - [Admin - 테마 생성]
@@ -422,7 +425,6 @@
                 	}
                 ]
                 ```
-
 
 **[ReservationTime]**
 
@@ -553,7 +555,7 @@
     - response
         - 정상 처리된 경우
             - status code: `201 Created`
-            
+
         - 예외 처리
             - 유효성 검증 실패 (예: 필수 값 누락)
                 - status code: `400 Bad Request`
