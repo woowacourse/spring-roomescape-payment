@@ -1,14 +1,15 @@
 package roomescape.domain.payment;
 
 public record PaymentDetails(
-        PaymentConfirmation paymentConfirmation,
-        String code,
-        String message
+        PaymentConfirmation confirmation,
+        PaymentStatus status
 ) {
 
-    private static final String SUCCESS_CODE = "success";
+    public PaymentDetails(final PaymentConfirmation confirmation) {
+        this(confirmation, PaymentStatus.succeed());
+    }
 
-    public boolean isFailed() {
-        return !SUCCESS_CODE.equals(code);
+    public PaymentDetails(final PaymentStatus status) {
+        this(null, status);
     }
 }
