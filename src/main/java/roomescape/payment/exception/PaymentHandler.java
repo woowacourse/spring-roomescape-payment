@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -30,12 +31,18 @@ public class PaymentHandler extends ResponseEntityExceptionHandler {
     {
         final String rawBody = e.getResponseBodyAsString();
         String messageOnly;
+        TossErrorResponse response = null;
         try {
-            final TossErrorResponse resp = OBJECT_MAPPER.readValue(rawBody, TossErrorResponse.class);
-            messageOnly = resp.message();
+            response = OBJECT_MAPPER.readValue(rawBody, TossErrorResponse.class);
+            messageOnly = response.message();
         } catch (JsonProcessingException ex) {
             log.warn("JSON 파싱 실패: 원본 바디 반환", ex);
             messageOnly = rawBody;
+        }
+
+        if (response == null || response.isPaymentError()) {
+            log.error(messageOnly, e.getStatusCode());
+            return buildResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR, "결제 관련 내부 오류가 발생했습니다.", request);
         }
         return buildResponseEntity(e, e.getStatusCode(), messageOnly, request);
     }
