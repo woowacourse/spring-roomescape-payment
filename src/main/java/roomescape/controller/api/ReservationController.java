@@ -12,8 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.dto.auth.CurrentMember;
 import roomescape.dto.auth.LoginInfo;
-import roomescape.dto.reservation.MemberReservationCreateRequest;
+import roomescape.dto.payment.PaymentConfirmRequest;
+import roomescape.dto.reservation.ReservationPaymentRequest;
 import roomescape.dto.reservation.ReservationResponse;
+import roomescape.service.ReservationPaymentService;
 import roomescape.service.ReservationService;
 import roomescape.dto.reservation.ReservationCreateRequest;
 
@@ -22,9 +24,12 @@ import roomescape.dto.reservation.ReservationCreateRequest;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final ReservationPaymentService reservationPaymentService;
 
-    public ReservationController(ReservationService reservationService) {
+    public ReservationController(ReservationService reservationService,
+                                 ReservationPaymentService reservationPaymentService) {
         this.reservationService = reservationService;
+        this.reservationPaymentService = reservationPaymentService;
     }
 
     @GetMapping
@@ -34,13 +39,21 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponse> addReservation(@CurrentMember LoginInfo loginInfo,
-                                                              @RequestBody final MemberReservationCreateRequest request) {
-        ReservationCreateRequest reservationCreateRequest = new ReservationCreateRequest(request.date(), request.themeId(),
+    public ResponseEntity<String> addReservation(@CurrentMember LoginInfo loginInfo,
+                                                 @RequestBody final ReservationPaymentRequest request) {
+        ReservationCreateRequest reservationCreateRequest = new ReservationCreateRequest(request.date(),
+                request.themeId(),
                 request.timeId(),
                 loginInfo.id());
-        ReservationResponse response = reservationService.createReservation(reservationCreateRequest);
-        return ResponseEntity.created(URI.create("reservations/" + response.id())).body(response);
+
+        PaymentConfirmRequest paymentConfirmRequest = new PaymentConfirmRequest(request.orderId(), request.amount(),
+                request.paymentKey(), request.paymentType());
+
+        ReservationResponse response = reservationPaymentService.confirmPaymentAndAddReservation(
+                reservationCreateRequest,
+                paymentConfirmRequest);
+
+        return ResponseEntity.created(URI.create("reservations/" + response.id())).body("성공했습니다.");
     }
 
     @DeleteMapping("/{id}")
