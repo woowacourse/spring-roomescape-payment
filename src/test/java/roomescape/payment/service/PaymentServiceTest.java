@@ -75,6 +75,7 @@ class PaymentServiceTest {
     @Test
     @DisplayName("결제 승인 API를 호출해서 400 예외가 터진다.")
     void confirmPayment_ThrowsBadRequestException() {
+        // given
         when(restClient.post())
                 .thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.body(any(PaymentConfirmRequest.class)))
@@ -86,6 +87,7 @@ class PaymentServiceTest {
         when(responseSpec.body(PaymentConfirmResponse.class))
                 .thenThrow(new BadRequestException("API 오류"));
 
+        // when & then
         assertThatThrownBy(() -> paymentService.confirmPayment("key", "order", 100L))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("API 오류");
@@ -94,6 +96,7 @@ class PaymentServiceTest {
     @Test
     @DisplayName("결제 승인 API를 호출해서 500 예외가 터진다.")
     void confirmPayment_ThrowsInternalServerError() {
+        // given
         when(restClient.post())
                 .thenReturn(requestBodyUriSpec);
         when(requestBodyUriSpec.body(any(PaymentConfirmRequest.class)))
@@ -105,6 +108,7 @@ class PaymentServiceTest {
         when(responseSpec.body(PaymentConfirmResponse.class))
                 .thenThrow(new BadRequestException("API 오류"));
 
+        // when & then
         assertThatThrownBy(() -> paymentService.confirmPayment("key", "order", 100L))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("API 오류");
