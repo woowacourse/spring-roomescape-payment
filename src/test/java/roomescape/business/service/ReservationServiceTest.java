@@ -21,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import roomescape.business.dto.PaymentApproveDto;
 import roomescape.business.dto.ReservationDto;
 import roomescape.business.dto.ReservationTimeDto;
 import roomescape.business.dto.ThemeDto;
@@ -38,6 +39,7 @@ import roomescape.business.model.vo.ReservationDate;
 import roomescape.business.model.vo.ReservationStatus;
 import roomescape.exception.business.DuplicatedException;
 import roomescape.exception.business.NotFoundException;
+import roomescape.infrastructure.payment.TossPaymentClient;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationServiceTest {
@@ -57,42 +59,11 @@ class ReservationServiceTest {
     @Mock
     private WaitingService waitingService;
 
+    @Mock
+    private TossPaymentClient paymentClient;
+
     @InjectMocks
     private ReservationService sut;
-
-    @Test
-    void 사용자_ID로_예약을_추가하고_반환한다() {
-        // given
-        LocalDate date = LocalDate.now().plusDays(1);
-        String timeIdValue = "time-id";
-        String themeIdValue = "theme-id";
-        String userIdValue = "user-id";
-        Id timeId = Id.create(timeIdValue);
-        Id themeId = Id.create(themeIdValue);
-        Id userId = Id.create(userIdValue);
-
-        User user = User.restore(userIdValue, "USER", "Test User", "test@example.com", "password");
-        ReservationTime reservationTime = ReservationTime.restore(timeIdValue, LocalTime.of(10, 0));
-        Theme theme = Theme.restore(themeIdValue, "Test Theme", "Description", "thumbnail.jpg");
-
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(reservationTimeRepository.findById(timeId)).thenReturn(Optional.of(reservationTime));
-        when(themeRepository.findById(themeId)).thenReturn(Optional.of(theme));
-        when(reservationRepository.isDuplicateDateAndTimeAndTheme(eq(date), eq(LocalTime.of(10, 0)), eq(theme.getId())))
-                .thenReturn(false);
-        doNothing().when(waitingService).updateWaitingReservations(any(Reservation.class));
-
-        // when
-        ReservationDto result = sut.addAndGetWithoutPayment(date, timeIdValue, themeIdValue, userIdValue, ReservationStatus.RESERVED);
-
-        // then
-        assertThat(result).isNotNull();
-        verify(userRepository).findById(userId);
-        verify(reservationTimeRepository).findById(timeId);
-        verify(themeRepository).findById(themeId);
-        verify(reservationRepository).isDuplicateDateAndTimeAndTheme(eq(date), any(LocalTime.class), eq(theme.getId()));
-        verify(reservationRepository).save(any(Reservation.class));
-    }
 
     @Test
     void 존재하지_않는_사용자_ID로_예약_시_예외가_발생한다() {
@@ -106,7 +77,8 @@ class ReservationServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // when, then
-        assertThatThrownBy(() -> sut.addAndGetWithoutPayment(date, timeId, themeId, userIdValue, ReservationStatus.RESERVED))
+        assertThatThrownBy(
+                () -> sut.addAndGetWithoutPayment(date, timeId, themeId, userIdValue, ReservationStatus.RESERVED))
                 .isInstanceOf(NotFoundException.class);
 
         verify(userRepository).findById(userId);
@@ -157,7 +129,8 @@ class ReservationServiceTest {
         when(themeRepository.findById(themeId)).thenReturn(Optional.empty());
 
         // when, then
-        assertThatThrownBy(() -> sut.addAndGetWithoutPayment(date, timeIdValue, themeIdValue, userIdValue, ReservationStatus.RESERVED))
+        assertThatThrownBy(() -> sut.addAndGetWithoutPayment(date, timeIdValue, themeIdValue, userIdValue,
+                ReservationStatus.RESERVED))
                 .isInstanceOf(NotFoundException.class);
 
         verify(userRepository).findById(userId);
@@ -188,7 +161,8 @@ class ReservationServiceTest {
                 .thenReturn(true);
 
         // when, then
-        assertThatThrownBy(() -> sut.addAndGetWithoutPayment(date, timeIdValue, themeIdValue, userIdValue, ReservationStatus.RESERVED))
+        assertThatThrownBy(() -> sut.addAndGetWithoutPayment(date, timeIdValue, themeIdValue, userIdValue,
+                ReservationStatus.RESERVED))
                 .isInstanceOf(DuplicatedException.class);
 
         verify(userRepository).findById(userId);
@@ -219,7 +193,8 @@ class ReservationServiceTest {
         List<Reservation> reservationData = Arrays.asList(
                 Reservation.restore("reservation-id-1", user1, dateFrom, time1, theme1, ReservationStatus.RESERVED,
                         LocalDateTime.now()),
-                Reservation.restore("reservation-id-2", user2, dateFrom.plusDays(1), time2, theme2, ReservationStatus.RESERVED,
+                Reservation.restore("reservation-id-2", user2, dateFrom.plusDays(1), time2, theme2,
+                        ReservationStatus.RESERVED,
                         LocalDateTime.now())
         );
         List<ReservationDto> expectedReservations = Arrays.asList(
@@ -231,7 +206,8 @@ class ReservationServiceTest {
                         ThemeDto.fromEntity(theme2), ReservationStatus.RESERVED)
         );
 
-        when(reservationRepository.findAllReservationWithFilter(themeId, userId, dateFrom, dateTo, ReservationStatus.RESERVED))
+        when(reservationRepository.findAllReservationWithFilter(themeId, userId, dateFrom, dateTo,
+                ReservationStatus.RESERVED))
                 .thenReturn(reservationData);
 
         // when
@@ -239,7 +215,8 @@ class ReservationServiceTest {
 
         // then
         assertThat(result).isEqualTo(expectedReservations);
-        verify(reservationRepository).findAllReservationWithFilter(themeId, userId, dateFrom, dateTo, ReservationStatus.RESERVED);
+        verify(reservationRepository).findAllReservationWithFilter(themeId, userId, dateFrom, dateTo,
+                ReservationStatus.RESERVED);
     }
 
     @Test
@@ -261,4 +238,73 @@ class ReservationServiceTest {
         verify(reservationRepository).deleteById(reservation.getId());
     }
 
+    @Test
+    void 결제승인_요청을_보내고_예약을_생성한다() {
+        // given
+        LocalDate date = LocalDate.now().plusDays(1);
+        String timeIdValue = "time-id";
+        String themeIdValue = "theme-id";
+        String userIdValue = "user-id";
+        Id timeId = Id.create(timeIdValue);
+        Id themeId = Id.create(themeIdValue);
+        Id userId = Id.create(userIdValue);
+
+        User user = User.restore(userIdValue, "USER", "Test User", "test@example.com", "password");
+        ReservationTime reservationTime = ReservationTime.restore(timeIdValue, LocalTime.of(10, 0));
+        Theme theme = Theme.restore(themeIdValue, "Test Theme", "Description", "thumbnail.jpg");
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(reservationTimeRepository.findById(timeId)).thenReturn(Optional.of(reservationTime));
+        when(themeRepository.findById(themeId)).thenReturn(Optional.of(theme));
+        when(reservationRepository.isDuplicateDateAndTimeAndTheme(eq(date), eq(LocalTime.of(10, 0)), eq(theme.getId())))
+                .thenReturn(false);
+        doNothing().when(waitingService).updateWaitingReservations(any(Reservation.class));
+        doNothing().when(paymentClient).approvePayment(any(PaymentApproveDto.class));
+
+        // when
+        ReservationDto result = sut.addAndGet(date, timeIdValue, themeIdValue, userIdValue,
+                ReservationStatus.RESERVED, "paymentKey", "orderId", 1000L);
+
+        // then
+        assertThat(result).isNotNull();
+        verify(paymentClient).approvePayment(any(PaymentApproveDto.class));
+        verify(userRepository).findById(userId);
+        verify(reservationTimeRepository).findById(timeId);
+        verify(themeRepository).findById(themeId);
+        verify(reservationRepository).isDuplicateDateAndTimeAndTheme(eq(date), any(LocalTime.class), eq(theme.getId()));
+        verify(reservationRepository).save(any(Reservation.class));
+    }
+
+    @Test
+    void 대기는_결제없이_생성한다() {
+        // given
+        LocalDate date = LocalDate.now().plusDays(1);
+        String timeIdValue = "time-id";
+        String themeIdValue = "theme-id";
+        String userIdValue = "user-id";
+        Id timeId = Id.create(timeIdValue);
+        Id themeId = Id.create(themeIdValue);
+        Id userId = Id.create(userIdValue);
+
+        User user = User.restore(userIdValue, "USER", "Test User", "test@example.com", "password");
+        ReservationTime reservationTime = ReservationTime.restore(timeIdValue, LocalTime.of(10, 0));
+        Theme theme = Theme.restore(themeIdValue, "Test Theme", "Description", "thumbnail.jpg");
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(reservationTimeRepository.findById(timeId)).thenReturn(Optional.of(reservationTime));
+        when(themeRepository.findById(themeId)).thenReturn(Optional.of(theme));
+        doNothing().when(waitingService).updateWaitingReservations(any(Reservation.class));
+
+        // when
+        ReservationDto result = sut.addAndGet(date, timeIdValue, themeIdValue, userIdValue,
+                ReservationStatus.WAITING, "paymentKey", "orderId", 1000L);
+
+        // then
+        assertThat(result).isNotNull();
+        verify(userRepository).findById(userId);
+        verify(reservationTimeRepository).findById(timeId);
+        verify(themeRepository).findById(themeId);
+        verifyNoInteractions(paymentClient);
+        verify(reservationRepository).save(any(Reservation.class));
+    }
 }
