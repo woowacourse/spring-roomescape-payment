@@ -1,4 +1,4 @@
-package roomescape.payment.infrastructure;
+package roomescape.payment.infrastructure.toss;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
@@ -8,10 +8,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import roomescape.payment.application.PaymentApprovalService;
-import roomescape.payment.infrastructure.client.TossRestClient;
-import roomescape.payment.infrastructure.exception.TossErrorResponse;
-import roomescape.payment.infrastructure.exception.TossInternalException;
-import roomescape.payment.infrastructure.exception.TossPaymentApprovalFailedException;
+import roomescape.payment.infrastructure.toss.client.TossRestClient;
+import roomescape.payment.infrastructure.toss.exception.TossErrorResponse;
+import roomescape.payment.infrastructure.toss.exception.TossInternalException;
+import roomescape.payment.infrastructure.toss.exception.TossPaymentApprovalFailedException;
 
 //TODO: 에러 핸들링 하기!!  (2025-05-28, 수, 15:5)
 @Component

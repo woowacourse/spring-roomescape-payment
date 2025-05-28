@@ -12,10 +12,8 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.member.exception.MemberNotFoundException;
 import roomescape.payment.application.PaymentApprovalService;
-import roomescape.payment.domain.PrePayment;
-import roomescape.payment.domain.PrePaymentRepository;
 import roomescape.payment.exception.InvalidPaymentAmountException;
-import roomescape.payment.exception.PaymentNotFoundException;
+import roomescape.payment.exception.PaymentSessionExpiredException;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.AdminReservationSearchRequest;
 import roomescape.reservation.application.dto.MyReservationResponse;
@@ -49,7 +47,6 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
     private final ApplicationEventPublisher eventPublisher;
-    private final PrePaymentRepository prePaymentRepository;
     private final PaymentApprovalService paymentApprovalService;
 
     public List<MyReservationResponse> findAllByMemberId(Long memberId) {
@@ -78,13 +75,14 @@ public class ReservationService {
         return ReservationResponse.from(reservationRepository.findFiltered(memberId, themeId, from, to));
     }
 
-    //TODO: 변수명 고민  (2025-05-28, 수, 14:27)
     @Transactional
-    public ReservationResponse createByUser(Long memberId, UserReservationRequest request) {
+    public ReservationResponse createByUser(Long memberId, UserReservationRequest request, BigDecimal originAmount) {
+        if (originAmount == null) {
+            throw new PaymentSessionExpiredException();
+        }
         String orderId = request.orderId();
         BigDecimal amount = request.amount();
-        PrePayment byOrderId = prePaymentRepository.findByOrderId(orderId).orElseThrow(PaymentNotFoundException::new);
-        if (!byOrderId.isSameAmount(amount)) {
+        if (originAmount.compareTo(amount) != 0) {
             throw new InvalidPaymentAmountException();
         }
 

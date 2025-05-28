@@ -9,7 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import roomescape.common.response.ApiResponse;
-import roomescape.payment.infrastructure.exception.TossException;
+import roomescape.payment.infrastructure.toss.exception.TossException;
 
 @Slf4j
 @ControllerAdvice

@@ -1,4 +1,4 @@
-package roomescape.payment.infrastructure.client;
+package roomescape.payment.infrastructure.toss.client;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

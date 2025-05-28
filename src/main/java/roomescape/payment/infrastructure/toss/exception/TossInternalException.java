@@ -1,4 +1,4 @@
-package roomescape.payment.infrastructure.exception;
+package roomescape.payment.infrastructure.toss.exception;
 
 import org.springframework.http.HttpStatus;
 

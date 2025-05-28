@@ -196,7 +196,7 @@ function onReservationButtonClick(event, paymentWidget) {
         const amount = 1000;
 
         // 1, 결제 요청 전 임시 저장 API 호출
-        fetch('/pre-payments', {
+        fetch('/prepay', {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
