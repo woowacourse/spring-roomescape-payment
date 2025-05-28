@@ -23,17 +23,20 @@ public class PaymentResponseInterceptor implements ClientHttpRequestInterceptor 
             throws IOException {
         ClientHttpResponse response = execution.execute(request, body);
 
-        if (response.getStatusCode().is4xxClientError()) {
-            PaymentErrorResponse paymentErrorResponse = getPaymentErrorResponse(response);
-            throw new PaymentProcessException(paymentErrorResponse.message());
-        }
-
-        if (response.getStatusCode().is5xxServerError()) {
-            PaymentErrorResponse paymentErrorResponse = getPaymentErrorResponse(response);
-            throw new PaymentServerException(paymentErrorResponse.message());
+        if (response.getStatusCode().isError()) {
+            PaymentErrorResponse errorResponse = getPaymentErrorResponse(response);
+            throwPaymentErrorResponseByErrorCode(errorResponse);
         }
 
         return response;
+    }
+
+    private void throwPaymentErrorResponseByErrorCode(PaymentErrorResponse errorResponse) {
+        if (TossPaymentServerError.isServerError(errorResponse.code())) {
+            throw new PaymentServerException("결제가 제대로 수행되지 못했습니다.");
+        }
+
+        throw new PaymentProcessException(errorResponse.message());
     }
 
     private PaymentErrorResponse getPaymentErrorResponse(ClientHttpResponse response) throws IOException {
