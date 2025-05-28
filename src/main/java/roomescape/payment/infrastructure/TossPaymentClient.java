@@ -9,11 +9,11 @@ import roomescape.payment.infrastructure.dto.TossPaymentErrorResponse;
 import roomescape.payment.infrastructure.dto.TossPaymentRequest;
 import roomescape.payment.application.service.PaymentClient;
 import roomescape.payment.domain.Payment;
-import roomescape.payment.presentation.dto.PaymentRequest;
+import roomescape.reservation.presentation.dto.ReservationRequest;
 
 public class TossPaymentClient implements PaymentClient {
 
-    private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6    ++++";
+    private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -23,11 +23,11 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public Payment approve(PaymentRequest paymentRequest) {
+    public Payment approve(ReservationRequest reservationRequest) {
         TossPaymentRequest tossPaymentRequest = new TossPaymentRequest(
-                paymentRequest.getAmount(),
-                paymentRequest.getOrderId(),
-                paymentRequest.getPaymentKey()
+                reservationRequest.getAmount(),
+                reservationRequest.getOrderId(),
+                reservationRequest.getPaymentKey()
         );
 
         return restClient.post()

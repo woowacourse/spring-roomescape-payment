@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.payment.application.service.PaymentService;
-import roomescape.payment.presentation.dto.PaymentRequest;
+import roomescape.reservation.presentation.dto.ReservationRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
@@ -50,19 +50,19 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse createUserReservationAndPayment(final PaymentRequest paymentRequest, final Long memberId) {
+    public ReservationResponse createUserReservationAndPayment(final ReservationRequest reservationRequest, final Long memberId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchElementException("유저 정보를 찾을 수 없습니다."));
 
-        paymentService.approve(paymentRequest);
-        return createUserReservation(paymentRequest, member);
+        paymentService.approve(reservationRequest);
+        return createUserReservation(reservationRequest, member);
     }
 
-    private ReservationResponse createUserReservation(final PaymentRequest paymentRequest, final Member member) {
+    private ReservationResponse createUserReservation(final ReservationRequest reservationRequest, final Member member) {
         return createReservation(
-                paymentRequest.getTimeId(),
-                paymentRequest.getThemeId(),
-                paymentRequest.getDate(),
+                reservationRequest.getTimeId(),
+                reservationRequest.getThemeId(),
+                reservationRequest.getDate(),
                 member
         );
     }
