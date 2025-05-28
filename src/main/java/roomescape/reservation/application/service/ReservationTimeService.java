@@ -13,6 +13,7 @@ import roomescape.reservation.presentation.dto.ReservationTimeResponse;
 
 @Service
 public class ReservationTimeService {
+
     private final ReservationTimeRepository reservationTimeRepository;
     private final ReservationRepository reservationRepository;
 

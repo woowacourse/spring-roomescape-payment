@@ -15,9 +15,9 @@ import roomescape.payment.presentation.dto.PaymentRequest;
 public class TossPaymentClient implements PaymentClient {
 
     private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
-    private final RestClient restClient;
 
-    ObjectMapper objectMapper = new ObjectMapper();
+    private final RestClient restClient;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public TossPaymentClient(final RestClient restClient) {
         this.restClient = restClient;
@@ -33,7 +33,7 @@ public class TossPaymentClient implements PaymentClient {
 
         return restClient.post()
                 .uri("/payments/confirm")
-                .header("Authorization", encodeSecretKey(SECRET_KEY))
+                .header("Authorization", encodeSecretKey())
                 .body(tossPaymentRequest)
                 .retrieve()
                 .onStatus(
@@ -47,8 +47,8 @@ public class TossPaymentClient implements PaymentClient {
                 .body(Payment.class);
     }
 
-    public static String encodeSecretKey(String secretKey) {
-        String credentials = secretKey + ":";
+    private static String encodeSecretKey() {
+        String credentials = TossPaymentClient.SECRET_KEY + ":";
         String base64Credentials = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
         return "Basic " + base64Credentials;
     }

@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatusCode;
 import roomescape.payment.application.dto.PaymentErrorResponse;
 
 public class PaymentException extends RuntimeException {
+
     private final HttpStatus code;
     private final String message;
     private final String data;
