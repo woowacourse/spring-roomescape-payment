@@ -10,9 +10,12 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
+import roomescape.payment.PaymentClient;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -20,6 +23,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
 
 //TODO: PaymentClient fake 객체로 변경하기
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -31,6 +35,7 @@ public class ReservationApiTest {
     private static final Map<String, String> MEMBER_BODY = new HashMap<>();
     private static final Map<String, Object> AUTH_BODY = new HashMap<>();
     private static final Map<String, Object> SCHEDULE_BODY = new HashMap<>();
+    private static final Map<String, Object> ORDER_BODY = new HashMap<>();
 
     private final JdbcTemplate jdbcTemplate;
     private final int port;
@@ -43,6 +48,14 @@ public class ReservationApiTest {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public PaymentClient paymentClient() {
+            return mock(PaymentClient.class);
+        }
+    }
+
     @BeforeAll
     static void initParams() {
         SCHEDULE_BODY.put("date", LocalDate.of(2026, 12, 1));
@@ -52,6 +65,10 @@ public class ReservationApiTest {
         RESERVATION_BODY.put("date", LocalDate.of(2026, 12, 1));
         RESERVATION_BODY.put("timeId", 1L);
         RESERVATION_BODY.put("themeId", 1L);
+        RESERVATION_BODY.put("paymentKey", "asjdflkajsdlfkaj");
+        RESERVATION_BODY.put("orderId", "SURFMAY_abc");
+        RESERVATION_BODY.put("amount", "1000");
+        RESERVATION_BODY.put("paymentType", "NORMAL");
 
         TIME_BODY.put("startAt", "10:00");
 
@@ -65,10 +82,17 @@ public class ReservationApiTest {
 
         AUTH_BODY.put("email", "asd@email.com");
         AUTH_BODY.put("password", "pass");
+
+        ORDER_BODY.put("id", "SURFMAY_abc");
+        ORDER_BODY.put("amount", "1000");
+        ORDER_BODY.put("date", "2026-12-01");
+        ORDER_BODY.put("timeId", "1");
+        ORDER_BODY.put("themeId", "1");
     }
 
     @BeforeEach
     void setUp() {
+        jdbcTemplate.update("DELETE FROM orders");
         jdbcTemplate.update("DELETE FROM reservation");
         jdbcTemplate.update("DELETE FROM schedule");
         jdbcTemplate.update("DELETE FROM reservation_time");
@@ -136,6 +160,16 @@ public class ReservationApiTest {
                 .extract().detailedCookie("token");
     }
 
+    private void givenOrder(final Cookie cookie) {
+        RestAssured.given().port(port)
+                .contentType(ContentType.JSON)
+                .body(ORDER_BODY)
+                .cookie(cookie)
+                .when().post("/orders")
+                .then().log().all()
+                .statusCode(200);
+    }
+
     @Nested
     @DisplayName("예약 생성")
     class Post {
@@ -145,7 +179,11 @@ public class ReservationApiTest {
                     Arguments.of(Map.of(
                             "date", "2026-12-01",
                             "timeId", 1L,
-                            "themeId", 1L
+                            "themeId", 1L,
+                            "orderId", "SURFMAY_abc",
+                            "amount", 1000L,
+                            "paymentKey", "asjdflkajsdlfkaj",
+                            "paymentType", "NORMAL"
                     ), HttpStatus.CREATED),
 
                     Arguments.of(Map.of(
@@ -185,6 +223,7 @@ public class ReservationApiTest {
             givenCreateReservationTime();
             givenCreateTheme();
             givenCreateSchedule();
+            givenOrder(cookie);
 
             // when & then
             RestAssured.given().port(port)
@@ -203,6 +242,9 @@ public class ReservationApiTest {
             givenCreateMember();
             final Cookie cookie = givenAuthCookie();
             givenCreateTheme();
+            givenCreateReservationTime();
+            givenCreateSchedule();
+            givenOrder(cookie);
 
             Map<String, Object> reservation = new HashMap<>(RESERVATION_BODY);
             reservation.put("timeId", 2L);
@@ -224,6 +266,9 @@ public class ReservationApiTest {
             givenCreateMember();
             final Cookie cookie = givenAuthCookie();
             givenCreateReservationTime();
+            givenCreateTheme();
+            givenCreateSchedule();
+            givenOrder(cookie);
 
             Map<String, Object> reservation = new HashMap<>(RESERVATION_BODY);
             reservation.put("themeId", 2L);
@@ -253,6 +298,7 @@ public class ReservationApiTest {
             givenCreateReservationTime();
             givenCreateTheme();
             givenCreateSchedule();
+            givenOrder(cookie);
             givenCreateReservation(cookie);
 
             // when & then
@@ -289,6 +335,7 @@ public class ReservationApiTest {
             givenCreateReservationTime();
             givenCreateTheme();
             givenCreateSchedule();
+            givenOrder(cookie);
             givenCreateReservation(cookie);
 
             // when & then

@@ -17,7 +17,6 @@ import roomescape.auth.TokenBody;
 import roomescape.auth.dto.LoginMember;
 import roomescape.booking.BookingService;
 import roomescape.booking.reservation.dto.ReservationPaymentRequest;
-import roomescape.booking.reservation.dto.ReservationRequest;
 import roomescape.booking.reservation.dto.ReservationResponse;
 import roomescape.member.MemberRole;
 import roomescape.member.dto.MemberResponse;
@@ -84,7 +83,7 @@ class ReservationControllerTest {
     @DisplayName("예약 생성 요청에 성공할 경우 201을 응답한다")
     void create() throws Exception {
         // given
-        ReservationRequest request = new ReservationRequest(LocalDate.now(), 1L, 1L);
+        ReservationPaymentRequest request = new ReservationPaymentRequest(LocalDate.now(), 1L, 1L, "awdawdaw", "adawdaw", 1000L, "NORMAL");
         LoginMember loginMember = new LoginMember("사용자", "user@example.com", MemberRole.MEMBER);
 
         Map<String, Object> memberClaims = new HashMap<>();
@@ -122,7 +121,7 @@ class ReservationControllerTest {
     @DisplayName("인증되지 않은 사용자의 예약 생성 요청은 401을 응답한다")
     void createUnauthorized() throws Exception {
         // given
-        ReservationRequest request = new ReservationRequest(LocalDate.now(), 1L, 1L);
+        ReservationPaymentRequest request = new ReservationPaymentRequest(LocalDate.now(), 1L, 1L, "awdawdaw", "adawdaw", 1000L, "NORMAL");
         given(jwtProvider.isValidToken(any())).willReturn(false);
 
         // when & then

@@ -16,6 +16,10 @@ import roomescape.exception.custom.reason.reservation.ReservationConflictExcepti
 import roomescape.member.Member;
 import roomescape.member.MemberRole;
 import roomescape.member.MemberService;
+import roomescape.order.Order;
+import roomescape.order.OrderReader;
+import roomescape.order.PaymentStatus;
+import roomescape.payment.PaymentClient;
 import roomescape.reservationtime.ReservationTime;
 import roomescape.schedule.Schedule;
 import roomescape.schedule.ScheduleService;
@@ -38,6 +42,10 @@ public class ReservationCreateServiceTest {
     private ScheduleService scheduleService;
     @Mock
     private MemberService memberService;
+    @Mock
+    private OrderReader orderReader;
+    @Mock
+    private PaymentClient paymentClient;
     @InjectMocks
     private ReservationCreateService reservationCreateService;
 
@@ -73,6 +81,8 @@ public class ReservationCreateServiceTest {
         @Test
         void create() {
             // given
+            given(orderReader.getById(request.orderId()))
+                    .willReturn(new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule));
             given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(), schedule.getTheme().getId()))
                     .willReturn(schedule);
             given(memberService.getByEmail(loginMember.email()))
@@ -94,8 +104,14 @@ public class ReservationCreateServiceTest {
         @Test
         void create3() {
             // given
+            given(orderReader.getById(request.orderId()))
+                    .willReturn(new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule));
             given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(), schedule.getTheme().getId()))
                     .willReturn(schedule);
+            given(memberService.getByEmail(loginMember.email()))
+                    .willReturn(member);
+            given(reservationRepository.existsBySchedule(schedule))
+                    .willReturn(false);
             given(reservationRepository.existsBySchedule(schedule))
                     .willReturn(true);
 

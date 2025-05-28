@@ -10,9 +10,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import roomescape.booking.reservation.dto.ReservationResponse;
+import roomescape.payment.PaymentClient;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -22,6 +25,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
 
 //TODO: PaymentClient fake 객체로 변경하기
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -33,9 +37,13 @@ public class DataSourceTest {
     private static final Map<String, String> SCHEDULE_BODY = new HashMap<>();
     private static final Map<String, String> MEMBER_BODY = new HashMap<>();
     private static final Map<String, Object> AUTH_BODY = new HashMap<>();
+    private static final Map<String, Object> ORDER_BODY = new HashMap<>();
 
     private final JdbcTemplate jdbcTemplate;
     private final int port;
+
+    @Autowired
+    private PaymentClient paymentClient;
 
     public DataSourceTest(
             @Autowired final JdbcTemplate jdbcTemplate,
@@ -45,11 +53,23 @@ public class DataSourceTest {
         this.port = port;
     }
 
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public PaymentClient paymentClient() {
+            return mock(PaymentClient.class);
+        }
+    }
+
     @BeforeAll
     static void beforeAll() {
         RESERVATION_BODY.put("date", "2026-08-05");
         RESERVATION_BODY.put("timeId", "1");
         RESERVATION_BODY.put("themeId", "1");
+        RESERVATION_BODY.put("paymentKey", "asjdflkajsdlfkaj");
+        RESERVATION_BODY.put("orderId", "SURFMAY_abc");
+        RESERVATION_BODY.put("amount", "1000");
+        RESERVATION_BODY.put("paymentType", "NORMAL");
 
         TIME_BODY.put("startAt", "10:00");
 
@@ -67,10 +87,17 @@ public class DataSourceTest {
 
         AUTH_BODY.put("email", "asd@email.com");
         AUTH_BODY.put("password", "pass");
+
+        ORDER_BODY.put("id", "SURFMAY_abc");
+        ORDER_BODY.put("amount", "1000");
+        ORDER_BODY.put("date", "2026-08-05");
+        ORDER_BODY.put("timeId", "1");
+        ORDER_BODY.put("themeId", "1");
     }
 
     @BeforeEach
     void setUp() {
+        jdbcTemplate.update("DELETE FROM ORDERS");
         jdbcTemplate.update("DELETE FROM RESERVATION");
         jdbcTemplate.update("DELETE FROM SCHEDULE");
         jdbcTemplate.update("DELETE FROM RESERVATION_TIME");
@@ -127,6 +154,7 @@ public class DataSourceTest {
         givenCreateSchedule();
         givenCreateMember();
         final Cookie cookie = givenAuthCookie();
+        givenOrder(cookie);
         givenCreateReservation(cookie);
 
         // then
@@ -198,6 +226,16 @@ public class DataSourceTest {
                 .extract().detailedCookie("token");
     }
 
+    private void givenOrder(final Cookie cookie) {
+        RestAssured.given().port(port)
+                .contentType(ContentType.JSON)
+                .body(ORDER_BODY)
+                .cookie(cookie)
+                .when().post("/orders")
+                .then().log().all()
+                .statusCode(200);
+    }
+
     @DisplayName("time과 reservation 연결 테스트")
     @Test
     void 팔단계() {
@@ -207,6 +245,7 @@ public class DataSourceTest {
         givenCreateMember();
         givenCreateSchedule();
         final Cookie cookie = givenAuthCookie();
+        givenOrder(cookie);
         givenCreateReservation(cookie);
 
         // when & then
