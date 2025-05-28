@@ -28,7 +28,7 @@ public class TossPaymentClient {
                 "paymentKey", paymentApproveDto.paymentKey(),
                 "amount", paymentApproveDto.amount()
         );
-        String secretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6하하";
+        String secretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
         String encodedString = Base64.getEncoder().encodeToString((secretKey + ":").getBytes());
         return restClient.post()
                 .uri("/v1/payments/confirm")
