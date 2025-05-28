@@ -22,17 +22,17 @@ import static org.springframework.web.client.RestClient.RequestBodyUriSpec;
 import static org.springframework.web.client.RestClient.ResponseSpec;
 
 @ExtendWith(MockitoExtension.class)
-class PaymentResolverTest {
+class PaymentClientTest {
 
     @Mock
     private RestClient restClient;
 
     @InjectMocks
-    private PaymentResolver paymentResolver;
+    private PaymentClient paymentClient;
 
     @Test
     @DisplayName("정상 결제 응답 반환한다")
-    void execute() {
+    void confirmPayment() {
         // given
         PaymentRequest request = new PaymentRequest("paymentKey123", 1000, "orderId123", "paymentType");
         PaymentResponse expectedResponse = new PaymentResponse("success", 1000, "orderId123", "paymentKey123");
@@ -47,7 +47,7 @@ class PaymentResolverTest {
         when(bodySpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.body(PaymentResponse.class)).thenReturn(expectedResponse);
 
-        PaymentResponse result = paymentResolver.execute(request);
+        PaymentResponse result = paymentClient.confirmPayment(request);
 
         // then
         assertThat(result).isEqualTo(expectedResponse);
@@ -55,7 +55,7 @@ class PaymentResolverTest {
 
     @Test
     @DisplayName("UNAUTHORIZED 예외 발생 시 RuntimeException를 던진다")
-    void execute_throwsRuntimeException_whenUnauthorized() {
+    void confirmPayment_throwsRuntimeException_whenUnauthorized() {
         // Given
         PaymentRequest request = new PaymentRequest("invalidKey", 1000, "orderId123", "paymentType");
         String errorResponse = "{\"message\":\"인증 실패\"}";
@@ -80,7 +80,7 @@ class PaymentResolverTest {
         when(responseSpec.body(PaymentResponse.class)).thenThrow(exception);
 
         // When & Then
-        assertThatThrownBy(() -> paymentResolver.execute(request))
+        assertThatThrownBy(() -> paymentClient.confirmPayment(request))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("결제 확인에 실패했습니다.")
                 .hasMessageContaining("인증 실패")
@@ -89,7 +89,7 @@ class PaymentResolverTest {
 
     @Test
     @DisplayName("기타 API 예외 발생 시, PaymentApiException 을 던진다")
-    void execute_throwsPaymentApiException_whenOtherError() {
+    void confirmPayment_throwsPaymentApiException_whenOtherError() {
         // Given
         PaymentRequest request = new PaymentRequest("paymentKey123", 1000, "orderId123", "paymentType");
         String errorResponse = "{ \"code\":\"BAD_REQUEST\", \"message\":\"잘못된 요청\"}";
@@ -114,7 +114,7 @@ class PaymentResolverTest {
         when(responseSpec.body(PaymentResponse.class)).thenThrow(exception);
 
         // When & Then
-        assertThatThrownBy(() -> paymentResolver.execute(request))
+        assertThatThrownBy(() -> paymentClient.confirmPayment(request))
                 .isInstanceOf(PaymentApiException.class)
                 .hasMessageContaining("결제 Api가 실패하였습니다.")
                 .hasMessageContaining("잘못된 요청")
@@ -123,7 +123,7 @@ class PaymentResolverTest {
 
     @Test
     @DisplayName("JSON 파싱 실패 시 RuntimeException 던진다")
-    void execute_throwsRuntimeException_whenJsonParsingFails() {
+    void confirmPayment_throwsRuntimeException_whenJsonParsingFails() {
         // Given
         PaymentRequest request = new PaymentRequest("paymentKey123", 1000, "orderId123", "paymentType");
         String invalidJsonResponse = "invalid json";
@@ -148,7 +148,7 @@ class PaymentResolverTest {
         when(responseSpec.body(PaymentResponse.class)).thenThrow(exception);
 
         // When & Then
-        assertThatThrownBy(() -> paymentResolver.execute(request))
+        assertThatThrownBy(() -> paymentClient.confirmPayment(request))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("파싱에 실패했습니다.");
     }

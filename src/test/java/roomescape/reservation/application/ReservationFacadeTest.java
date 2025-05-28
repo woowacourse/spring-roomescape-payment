@@ -10,7 +10,7 @@ import roomescape.auth.sign.password.Password;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.domain.Email;
 import roomescape.common.exception.NotFoundException;
-import roomescape.payment.resolver.PaymentResolver;
+import roomescape.payment.resolver.PaymentClient;
 import roomescape.reservation.application.dto.MyReservationsResponse;
 import roomescape.reservation.application.service.ReservationCommandService;
 import roomescape.reservation.application.service.ReservationQueryService;
@@ -69,7 +69,7 @@ class ReservationFacadeTest {
     private ReservationCommandService reservationCommandService;
 
     @Mock
-    private PaymentResolver paymentResolver;
+    private PaymentClient paymentClient;
 
     @Mock
     private UserQueryService userQueryService;
@@ -202,7 +202,7 @@ class ReservationFacadeTest {
         Reservation reservation = createReservation(1L);
         given(userQueryService.getById(any())).willReturn(createUser(1L));
         given(reservationCommandService.create(any())).willReturn(reservation);
-        given(paymentResolver.execute(any())).willReturn(null);
+        given(paymentClient.confirmPayment(any())).willReturn(null);
         //when
         ReservationResponse result = reservationFacade.create(request);
 

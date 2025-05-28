@@ -12,12 +12,12 @@ import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.exception.PaymentApiException;
 
 @RequiredArgsConstructor
-public class PaymentResolver {
+public class PaymentClient {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private final RestClient restClient;
 
-    public PaymentResponse execute(final PaymentRequest request) {
+    public PaymentResponse confirmPayment(final PaymentRequest request) {
 
         try {
             return restClient.post()

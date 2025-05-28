@@ -7,7 +7,7 @@ import roomescape.common.domain.DomainTerm;
 import roomescape.common.exception.DuplicateException;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
-import roomescape.payment.resolver.PaymentResolver;
+import roomescape.payment.resolver.PaymentClient;
 import roomescape.reservation.application.dto.AvailableReservationTimeServiceRequest;
 import roomescape.reservation.application.dto.CreateReservationServiceRequest;
 import roomescape.reservation.application.dto.MyReservationsResponse;
@@ -44,7 +44,7 @@ public class ReservationFacadeImpl implements ReservationFacade {
     private final ReservationViewQueryService reservationViewQueryService;
     private final UserQueryService userQueryService;
 
-    private final PaymentResolver paymentResolver;
+    private final PaymentClient paymentClient;
 
     @Override
     public List<ReservationResponse> getAll() {
@@ -97,7 +97,7 @@ public class ReservationFacadeImpl implements ReservationFacade {
         final Reservation reservation = reservationCommandService.create(
                 request.toServiceRequest()); // todo. paymentKey를 저장하기?
 
-        PaymentResponse response = paymentResolver.execute(
+        PaymentResponse response = paymentClient.confirmPayment(
                 new PaymentRequest(request.paymentKey(),
                         request.amount(),
                         request.orderId(),

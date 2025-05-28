@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.resolver.PaymentResolver;
+import roomescape.payment.resolver.PaymentClient;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -18,12 +18,12 @@ public class ClientConfig {
     private String secretKey;
 
     @Bean
-    public PaymentResolver getPaymentResolver() {
+    public PaymentClient getPaymentResolver() {
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
         String authorizations = "Basic " + new String(encodedBytes);
 
-        return new PaymentResolver(
+        return new PaymentClient(
                 RestClient.builder()
                         .baseUrl("https://api.tosspayments.com")
                         .defaultHeader("Content-Type", "application/json")
