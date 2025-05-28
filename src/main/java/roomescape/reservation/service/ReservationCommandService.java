@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.PaymentInfo;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.external.toss.PaymentConfirmRequest;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.schedule.domain.ReservationSchedule;
 
@@ -44,13 +45,14 @@ public class ReservationCommandService {
         if (reservationRepository.findByScheduleId(schedule.getId()).isPresent()) {
             throw new NoSuchElementException("이미 해당 일정에 예약이 존재합니다.");
         }
-        PaymentInfo confirmPaymentInfo = paymentService.paymentReservation(paymentInfo);
+        PaymentInfo confirmPaymentInfo = paymentService.paymentReservation(PaymentConfirmRequest.from(paymentInfo));
         return reservationRepository.save(new Reservation(
                 null,
                 member,
                 schedule,
                 confirmPaymentInfo.orderId(),
-                confirmPaymentInfo.totalAmount()
+                confirmPaymentInfo.totalAmount(),
+                confirmPaymentInfo.paymentKey()
         ));
     }
 

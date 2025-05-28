@@ -51,15 +51,18 @@ public class Reservation {
             final Member member,
             final ReservationSchedule schedule,
             final String orderId,
-            final Long amount
+            final Long amount,
+            final String paymentKey
     ) {
         this.id = id;
         this.member = Objects.requireNonNull(member);
         this.schedule = Objects.requireNonNull(schedule);
         this.orderId = Objects.requireNonNull(orderId);
         this.amount = Objects.requireNonNull(amount);
+        this.paymentKey = Objects.requireNonNull(paymentKey);
     }
 
+    // TODO: 미사용 생성자 제거
     public Reservation(
             final Long id,
             final Member member,
