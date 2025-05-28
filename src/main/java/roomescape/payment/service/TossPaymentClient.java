@@ -7,7 +7,7 @@ import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.dto.PaymentRequest;
 
 @HttpExchange
-public interface PaymentClient {
+public interface TossPaymentClient {
 
     @PostExchange("/confirm")
     PaymentResponse getPaymentConfirm(@RequestBody PaymentRequest paymentRequest);

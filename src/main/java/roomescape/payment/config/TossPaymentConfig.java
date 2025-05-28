@@ -9,8 +9,8 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
-import roomescape.payment.interceptor.PaymentResponseInterceptor;
-import roomescape.payment.service.PaymentClient;
+import roomescape.payment.interceptor.TossPaymentResponseInterceptor;
+import roomescape.payment.service.TossPaymentClient;
 
 @Configuration
 public class TossPaymentConfig {
@@ -30,13 +30,13 @@ public class TossPaymentConfig {
     }
 
     @Bean
-    public PaymentClient paymentClient() {
+    public TossPaymentClient paymentClient() {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(CONNECT_TIMEOUT_MS);
 
         RestClient client = RestClient.builder()
                 .baseUrl(PAYMENT_URL)
-                .requestInterceptor(new PaymentResponseInterceptor(objectMapper))
+                .requestInterceptor(new TossPaymentResponseInterceptor(objectMapper))
                 .requestFactory(requestFactory)
                 .defaultHeader(AUTHORIZATION_HEADER_PREFIX, BASIC_AUTHENTICATION_PREFIX + Base64.getEncoder()
                         .encodeToString(((token + COLON).getBytes())))
@@ -47,6 +47,6 @@ public class TossPaymentConfig {
                 .exchangeAdapter(RestClientAdapter.create(client))
                 .build();
 
-        return factory.createClient(PaymentClient.class);
+        return factory.createClient(TossPaymentClient.class);
     }
 }
