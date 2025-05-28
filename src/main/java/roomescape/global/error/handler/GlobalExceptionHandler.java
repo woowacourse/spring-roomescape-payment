@@ -13,6 +13,7 @@ import roomescape.global.error.exception.BadRequestException;
 import roomescape.global.error.exception.ConflictException;
 import roomescape.global.error.exception.ForbiddenException;
 import roomescape.global.error.exception.NotFoundException;
+import roomescape.global.error.exception.ServerException;
 import roomescape.global.error.exception.UnauthorizedException;
 
 @Slf4j
@@ -26,33 +27,39 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<String> notFound(NotFoundException e) {
+    public ResponseEntity<String> handleNotFoundException(NotFoundException e) {
         log.error("NotFoundException : {}", e);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<String> badRequest(BadRequestException e) {
+    public ResponseEntity<String> handleBadRequestException(BadRequestException e) {
         log.error("BadRequestException : {}", e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
     @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<String> conflict(ConflictException e) {
+    public ResponseEntity<String> handleConflictException(ConflictException e) {
         log.error("ConflictException : {}", e);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
     @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<String> unauthorized(UnauthorizedException e) {
+    public ResponseEntity<String> handleUnauthorizedException(UnauthorizedException e) {
         log.error("UnauthorizedException : {}", e);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 
     @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<String> forbidden(ForbiddenException e) {
+    public ResponseEntity<String> handleForbiddenException(ForbiddenException e) {
         log.error("ForbiddenException : {}", e);
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+    }
+
+    @ExceptionHandler(ServerException.class)
+    public ResponseEntity<String> handleServerException(ServerException e) {
+        log.error("ServerException : {}", e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
