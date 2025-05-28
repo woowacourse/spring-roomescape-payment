@@ -158,7 +158,7 @@ function checkDateAndThemeAndTime() {
   }
 }
 
-function onReservationButtonClick(event, paymentWidget) {
+async function onReservationButtonClick(event, paymentWidget) {
   const selectedDate = document.getElementById("datepicker").value;
   const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
   const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
@@ -173,11 +173,15 @@ function onReservationButtonClick(event, paymentWidget) {
     const generateRandomString = () =>
         window.btoa(Math.random()).slice(0, 20);
 
-    // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
-    // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
-    const orderIdPrefix = "ORDER_ID";
+    const orderIdPrefix = "ORDER_ID_";
+    const orderId = orderIdPrefix + generateRandomString();
+
+    // 결제 위젯 호출 전 무결성 검증을 위한 결제 정보 저장
+    const success = await fetchPreRequestPaymentData(orderId, paymentAmount);
+    if (!success) return;
+
     paymentWidget.requestPayment({
-      orderId: orderIdPrefix + generateRandomString(),
+      orderId: orderId,
       orderName: "방탈출 예약 결제 1건",
       amount: paymentAmount,
     }).then(function (data) {
@@ -241,13 +245,33 @@ function onWaitButtonClick() {
   }
 }
 
+async function fetchPreRequestPaymentData(orderId, amount) {
+  const paymentValidationURL = "/payments";
+  const paymentValidationRequest = {
+    orderId: orderId,
+    amount: amount
+  }
+  try {
+    const paymentValidationResponse = await fetch(paymentValidationURL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(paymentValidationRequest),
+    });
+    if (paymentValidationResponse.status !== 201) {
+      const errorBody = await paymentValidationResponse.json();
+      window.alert(errorBody.message);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error(error.message);
+    return false;
+  }
+}
+
 async function fetchReservationPayment(paymentData, reservationData) {
-  /*
-  TODO: [1단계]
-      - 자신의 예약 API request에 맞게 reservationPaymentRequest 필드명 수정
-      - 내 서버 URL에 맞게 reservationURL 변경
-      - 예약 결제 실패 시, 사용자가 실패 사유를 알 수 있도록 alert 에서 에러 메시지 수정
-  */
   const reservationPaymentRequest = {
     date: reservationData.date,
     themeId: reservationData.themeId,

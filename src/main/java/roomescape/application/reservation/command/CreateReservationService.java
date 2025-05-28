@@ -10,6 +10,8 @@ import roomescape.application.reservation.command.dto.CreateReservationCommand;
 import roomescape.application.reservation.command.dto.CreateReservationWithPaymentCommand;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.repository.MemberRepository;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.repository.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.reservation.Theme;
@@ -17,6 +19,7 @@ import roomescape.domain.reservation.repository.ReservationRepository;
 import roomescape.domain.reservation.repository.ReservationTimeRepository;
 import roomescape.domain.reservation.repository.ThemeRepository;
 import roomescape.infrastructure.error.exception.MemberException;
+import roomescape.infrastructure.error.exception.PaymentException;
 import roomescape.infrastructure.error.exception.ReservationException;
 import roomescape.infrastructure.error.exception.ReservationTimeException;
 import roomescape.infrastructure.error.exception.ThemeException;
@@ -30,6 +33,7 @@ public class CreateReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final TossPaymentClient tossPaymentClient;
+    private final PaymentRepository paymentRepository;
     private final Clock clock;
 
     public CreateReservationService(ReservationRepository reservationRepository,
@@ -37,12 +41,14 @@ public class CreateReservationService {
                                     ThemeRepository themeRepository,
                                     MemberRepository memberRepository,
                                     TossPaymentClient tossPaymentClient,
+                                    PaymentRepository paymentRepository,
                                     Clock clock) {
         this.reservationTimeRepository = reservationTimeRepository;
         this.reservationRepository = reservationRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.tossPaymentClient = tossPaymentClient;
+        this.paymentRepository = paymentRepository;
         this.clock = clock;
     }
 
@@ -58,8 +64,14 @@ public class CreateReservationService {
     }
 
     public Long reserve(CreateReservationWithPaymentCommand command) {
-        tossPaymentClient.approve(command.getPaymentCommand());
+        approvePayment(command);
         return reserve(command.toCreateWithoutPaymentCommand());
+    }
+
+    private void approvePayment(CreateReservationWithPaymentCommand command) {
+        Payment payment = getPayment(command);
+        payment.validateApprovalAmount(command.amount());
+        tossPaymentClient.approve(command.getPaymentCommand());
     }
 
     private Member getMember(Long memberId) {
@@ -75,6 +87,11 @@ public class CreateReservationService {
     private Theme getTheme(Long themeId) {
         return themeRepository.findById(themeId)
                 .orElseThrow(() -> new ThemeException("존재하지 않는 테마입니다."));
+    }
+
+    private Payment getPayment(CreateReservationWithPaymentCommand command) {
+        return paymentRepository.findByOrderId(command.orderId())
+                .orElseThrow(() -> new PaymentException("존재하지 않는 결제입니다."));
     }
 
     private void validateDuplicateReservation(LocalDate date, ReservationTime time, Theme theme) {

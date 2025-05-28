@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -21,6 +22,8 @@ import roomescape.domain.member.Email;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRole;
 import roomescape.domain.member.repository.MemberRepository;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.repository.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.reservation.Theme;
@@ -47,7 +50,10 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    @Mock()
+    @Mock
+    private PaymentRepository paymentRepository;
+
+    @Mock
     private TossPaymentClient tossPaymentClient;
 
     private CreateReservationService createReservationService;
@@ -60,6 +66,7 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
                 themeRepository,
                 memberRepository,
                 tossPaymentClient,
+                paymentRepository,
                 clock
         );
     }
@@ -70,17 +77,20 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
         Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
         Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
         ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        String orderId = "orderId";
+        long amount = 10_000L;
         CreateReservationWithPaymentCommand command = new CreateReservationWithPaymentCommand(
                 LocalDate.now(clock).plusDays(1),
                 time.getId(),
                 theme.getId(),
                 member.getId(),
                 "paymentKey",
-                "orderId",
-                10_000L,
+                orderId,
+                amount,
                 "NORMAL"
         );
         doNothing().when(tossPaymentClient).approve(command.getPaymentCommand());
+        when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(new Payment(orderId, amount)));
 
         // when
         Long id = createReservationService.reserve(command);
@@ -95,23 +105,83 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
         Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
         Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
         ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        String orderId = "orderId";
+        long amount = 10_000L;
         CreateReservationWithPaymentCommand command = new CreateReservationWithPaymentCommand(
                 LocalDate.now(clock).plusDays(1),
                 time.getId(),
                 theme.getId(),
                 member.getId(),
                 "paymentKey",
-                "orderId",
-                10_000L,
+                orderId,
+                amount,
                 "NORMAL"
         );
         doThrow(new PaymentException("toss payment server 예외")).when(tossPaymentClient).approve(command.getPaymentCommand());
+        when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(new Payment(orderId, amount)));
 
         // when
         // then
         assertThatCode(() -> createReservationService.reserve(command))
                 .isInstanceOf(PaymentException.class)
                 .hasMessage("toss payment server 예외");
+    }
+
+    @Test
+    void 주문한_금액과_승인할_결제_요청의_금액이_다르면_예약할_수_없다() {
+        // given
+        Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
+        Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
+        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        String orderId = "orderId";
+        long amount = 10_000L;
+        long invalidAmount = amount + 1;
+        CreateReservationWithPaymentCommand command = new CreateReservationWithPaymentCommand(
+                LocalDate.now(clock).plusDays(1),
+                time.getId(),
+                theme.getId(),
+                member.getId(),
+                "paymentKey",
+                orderId,
+                amount,
+                "NORMAL"
+        );
+        doThrow(new PaymentException("toss payment server 예외")).when(tossPaymentClient).approve(command.getPaymentCommand());
+        when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(new Payment(orderId, invalidAmount)));
+
+        // when
+        // then
+        assertThatCode(() -> createReservationService.reserve(command))
+                .isInstanceOf(PaymentException.class)
+                .hasMessage("요청 금액과 승인 금액이 일치하지 않습니다. 현재 결제 금액: 10001, 요청 금액: 10000");
+    }
+
+    @Test
+    void 승인할_결제가_존재하지_않으먄_예약할_수_없다() {
+        // given
+        Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
+        Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
+        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        String orderId = "orderId";
+        long amount = 10_000L;
+        CreateReservationWithPaymentCommand command = new CreateReservationWithPaymentCommand(
+                LocalDate.now(clock).plusDays(1),
+                time.getId(),
+                theme.getId(),
+                member.getId(),
+                "paymentKey",
+                orderId,
+                amount,
+                "NORMAL"
+        );
+        doThrow(new PaymentException("toss payment server 예외")).when(tossPaymentClient).approve(command.getPaymentCommand());
+        when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.empty());
+
+        // when
+        // then
+        assertThatCode(() -> createReservationService.reserve(command))
+                .isInstanceOf(PaymentException.class)
+                .hasMessage("존재하지 않는 결제입니다.");
     }
 
     @Test

@@ -18,6 +18,7 @@ import roomescape.infrastructure.error.exception.ForbiddenException;
 import roomescape.infrastructure.error.exception.JwtExtractException;
 import roomescape.infrastructure.error.exception.LoginAuthException;
 import roomescape.infrastructure.error.exception.MemberException;
+import roomescape.infrastructure.error.exception.PaymentException;
 import roomescape.infrastructure.error.exception.ReservationException;
 import roomescape.infrastructure.error.exception.ReservationTimeException;
 import roomescape.infrastructure.error.exception.ThemeException;
@@ -62,6 +63,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(WaitingException.class)
     public ResponseEntity<ApiFailResponse> handleWaitingException(WaitingException e) {
         log.error("WaitingException", e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiFailResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<ApiFailResponse> handlePaymentException(PaymentException e) {
+        log.error("PaymentException", e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiFailResponse(e.getMessage()));
     }
 
