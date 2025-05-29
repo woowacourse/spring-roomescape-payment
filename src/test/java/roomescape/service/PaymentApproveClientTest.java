@@ -1,5 +1,6 @@
 package roomescape.service;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.jsonResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
@@ -11,7 +12,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.client.RestClientException;
 import org.wiremock.spring.EnableWireMock;
 import org.wiremock.spring.InjectWireMock;
 import roomescape.dto.response.PaymentSuccessResponse;
@@ -92,6 +95,24 @@ class PaymentApproveClientTest {
         ))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("결제 승인 중 예외가 발생하였습니다.");
+    }
+
+    @Test
+    @DisplayName("타임아웃 테스트 추가")
+    void timeoutTest() {
+        // given
+        wireMock.stubFor(post("/v1/payments/confirm")
+                .willReturn(aResponse()
+                        .withStatus(HttpStatus.GATEWAY_TIMEOUT.value())
+                        .withFixedDelay(30000)));
+
+        // when, then
+        assertThatThrownBy(() -> paymentApproveClient.approvePayment(
+                "5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1",
+                "a4CWyWY5m89PNh7xJwhk1",
+                1000
+        ))
+                .isInstanceOf(RestClientException.class);
     }
 
     private String successResponse() {
