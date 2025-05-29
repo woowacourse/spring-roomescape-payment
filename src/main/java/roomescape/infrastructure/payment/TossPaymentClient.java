@@ -4,12 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestClient;
 import roomescape.business.dto.PaymentApproveDto;
 import roomescape.exception.PaymentApproveException;
 
+@Component
 public class TossPaymentClient {
 
     private final RestClient restClient;
@@ -19,7 +22,7 @@ public class TossPaymentClient {
     public TossPaymentClient(
             RestClient restClient,
             ObjectMapper objectMapper,
-            String secretKey) {
+            @Value("${payment.secret-key}") String secretKey) {
         this.restClient = restClient;
         this.objectMapper = objectMapper;
         this.secretKey = secretKey;
