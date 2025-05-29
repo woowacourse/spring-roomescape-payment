@@ -38,7 +38,7 @@ public class PaymentHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(e, e.getStatusCode(), response.get().message(), request);
     }
 
-    private Optional<TossErrorResponse> extractResponse(String rawBody) {
+    private Optional<TossErrorResponse> extractResponse(final String rawBody) {
         try {
             return Optional.of(OBJECT_MAPPER.readValue(rawBody, TossErrorResponse.class));
         } catch (JsonProcessingException ex) {

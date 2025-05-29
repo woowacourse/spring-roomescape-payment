@@ -22,7 +22,7 @@ public class TossRestClient {
 
     private final RestClient restClient;
 
-    public TossPaymentResponse confirm(TossPaymentRequest tossPaymentRequest) {
+    public TossPaymentResponse confirm(final TossPaymentRequest tossPaymentRequest) {
         try {
             return restClient.post()
                     .uri("/v1/payments/confirm")

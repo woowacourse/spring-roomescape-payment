@@ -16,7 +16,7 @@ public class RestClientConfig {
     private int readTimeout;
 
     @Bean
-    public TossRestClient tossRestClient(Builder restClientBuilder, RestClientProperties restClientProperties) {
+    public TossRestClient tossRestClient(final Builder restClientBuilder, final RestClientProperties restClientProperties) {
         connectTimeout = restClientProperties.getConnectTimeout();
         connectionRequestTimeout = restClientProperties.getConnectionRequestTimeout();
         readTimeout = restClientProperties.getReadTimeout();
