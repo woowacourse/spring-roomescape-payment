@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.custom.reason.payment.PaymentException;
@@ -13,7 +12,6 @@ import roomescape.payment.dto.PaymentConfirmRequest;
 import java.util.Base64;
 
 @Slf4j
-@Component
 @AllArgsConstructor
 public class TossPaymentClient implements PaymentClient {
 

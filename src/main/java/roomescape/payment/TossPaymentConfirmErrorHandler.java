@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
 import roomescape.exception.custom.reason.payment.PaymentException;
 import roomescape.payment.dto.TossErrorResponse;
@@ -14,7 +13,6 @@ import java.io.IOException;
 import java.net.URI;
 
 @Slf4j
-@Component
 public class TossPaymentConfirmErrorHandler implements ResponseErrorHandler {
 
     @Override
