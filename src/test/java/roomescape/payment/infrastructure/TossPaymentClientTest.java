@@ -7,43 +7,42 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.SocketTimeoutException;
-import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.web.client.RestClient;
+import roomescape.payment.TestRestClientConfig;
 import roomescape.payment.application.dto.PaymentRequest;
 import roomescape.payment.application.dto.PaymentResponse;
 
+@SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Import(TestRestClientConfig.class)
 class TossPaymentClientTest {
 
+    @Autowired
     private MockWebServer mockWebServer;
+
+    @Autowired
+    private RestClient restClient;
+
     private TossPaymentClient tossPaymentClient;
 
     @BeforeEach
-    void setUp() throws IOException {
-        mockWebServer = new MockWebServer();
-        mockWebServer.start();
-
-        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(Duration.ofSeconds(3));
-        requestFactory.setReadTimeout(Duration.ofSeconds(3));
-
-        RestClient restClient = RestClient.builder()
-                .baseUrl(mockWebServer.url("/8081").toString())
-                .requestFactory(requestFactory)
-                .build();
-
+    void setUp() {
         tossPaymentClient = new TossPaymentClient(restClient);
     }
 
     @AfterEach
     void tearDown() throws IOException {
-        mockWebServer.shutdown();
+        mockWebServer.shutdown(); // destroyMethod 있으니까 없어도 됨
     }
 
     @Test
