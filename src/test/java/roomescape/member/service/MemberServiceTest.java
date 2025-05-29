@@ -27,7 +27,7 @@ class MemberServiceTest {
     }
 
     @Test
-    void save() {
+    void 회원가입_정상_동작_확인() {
         // given
         MemberRequest request = new MemberRequest("hong@example.com", "password", "홍길동");
 
@@ -46,7 +46,7 @@ class MemberServiceTest {
     }
 
     @Test
-    void findAll() {
+    void 모든_멤버_조회() {
         // given
         Member member1 = Member.builder()
                 .name("철수")
