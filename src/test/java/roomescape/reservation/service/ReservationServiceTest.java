@@ -1,9 +1,5 @@
 package roomescape.reservation.service;
 
-import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,12 +28,15 @@ import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.fixture.WaitingFixture;
 import roomescape.waiting.repository.WaitingRepository;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
+
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 class ReservationServiceTest {
 
-    @Autowired
-    private ReservationService service;
     @Autowired
     private ReservationRepository reservationRepository;
     @Autowired
@@ -52,6 +51,7 @@ class ReservationServiceTest {
     private ReservationTime savedReservationTime;
     private Theme savedTheme;
     private User savedUser;
+
     @Autowired
     private ReservationService reservationService;
 
@@ -60,6 +60,7 @@ class ReservationServiceTest {
         savedReservationTime = reservationTimeRepository.save(ReservationTimeFixture.create(LocalTime.of(14, 14)));
         savedTheme = themeRepository.save(new Theme("name1", "dd", "tt"));
         savedUser = userRepository.save(UserFixture.create(Role.ROLE_MEMBER, "n1", "e1", "p1"));
+        reservationRepository.deleteAll();
     }
 
     private Reservation createDefaultReservationByBookedStatus(LocalDate date) {
@@ -106,7 +107,7 @@ class ReservationServiceTest {
                     duplicateReservationTimeId, savedTheme.getId());
 
             Assertions.assertThatThrownBy(
-                    () -> service.add(requestDto, savedUser)
+                    () -> reservationService.add(requestDto, savedUser)
             ).isInstanceOf(ConflictException.class);
         }
 
@@ -129,7 +130,7 @@ class ReservationServiceTest {
                     savedTheme.getId());
 
             Assertions.assertThatCode(
-                    () -> service.add(requestDto, savedUser)
+                    () -> reservationService.add(requestDto, savedUser)
             ).doesNotThrowAnyException();
         }
     }
