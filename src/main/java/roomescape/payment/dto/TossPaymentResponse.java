@@ -15,4 +15,3 @@ public record TossPaymentResponse(
     private record EasyPay(String provider, Long amount, Long discountAmount) {
     }
 }
-
