@@ -1,5 +1,6 @@
 package roomescape.unit.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,7 @@ class PaymentServiceTest {
 
     MockRestServiceServer mockServer = MockRestServiceServer.bindTo(testBuilder).build();
 
-    PaymentService paymentService = new PaymentService(testBuilder.build());
+    PaymentService paymentService = new PaymentService(testBuilder.build(), new ObjectMapper());
 
     @BeforeEach
     void setUp() {

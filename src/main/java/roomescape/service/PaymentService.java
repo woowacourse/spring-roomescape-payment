@@ -16,9 +16,11 @@ import roomescape.exception.custom.PaymentException;
 public class PaymentService {
 
     private final RestClient restClient;
+    private final ObjectMapper objectMapper;
 
-    public PaymentService(RestClient restClient) {
+    public PaymentService(RestClient restClient, ObjectMapper objectMapper) {
         this.restClient = restClient;
+        this.objectMapper = objectMapper;
     }
 
     public ConfirmPaymentResponse confirmPayment(ConfirmPaymentRequest paymentRequest) {
@@ -31,7 +33,6 @@ public class PaymentService {
                 .body(paymentRequest)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, ((request, response) -> {
-                    ObjectMapper objectMapper = new ObjectMapper();
                     PaymentErrorResponse paymentErrorResponse = objectMapper.readValue(
                             response.getBody().readAllBytes(),
                             PaymentErrorResponse.class);
