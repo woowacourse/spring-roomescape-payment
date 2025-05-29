@@ -1,5 +1,6 @@
 package roomescape.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -11,6 +12,8 @@ import roomescape.service.PaymentClientService;
 
 @Configuration
 public class RestClientConfiguration {
+    @Value("${toss.base-url}")
+    private String baseUrl;
 
     @Bean
     public RestClient.Builder restClientBuilder() {
@@ -20,7 +23,7 @@ public class RestClientConfiguration {
 
         return RestClient.builder()
                 .requestFactory(clientFactory)
-                .baseUrl("https://api.tosspayments.com/v1");
+                .baseUrl(baseUrl);
     }
 
     @Bean
