@@ -21,7 +21,7 @@ public class RestClientConfig {
     }
 
     @Bean
-    public RestClient restClient() {
+    public RestClient tossPayRestClient() {
         String basicAuthValue = encodeBasicAuth(secretKey);
 
         return RestClient.builder()

@@ -1,8 +1,5 @@
 package roomescape.reservation.service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.admin.domain.dto.SearchReservationRequestDto;
@@ -25,6 +22,10 @@ import roomescape.theme.repository.ThemeRepository;
 import roomescape.user.domain.User;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.repository.WaitingRepository;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -67,7 +68,6 @@ public class ReservationService {
         Reservation reservation = convertReservation(reservationRequestDto, user);
         validateDuplicateDateTime(reservation);
         PaymentRequestDto paymentRequestDto = convertPaymentRequestDto(requestDto);
-//        Payment payment = convertPayment(paymentRequestDto);
         paymentService.approve(paymentRequestDto);
         Reservation savedReservation = repository.save(reservation);
         return convertReservationResponseDto(savedReservation);
