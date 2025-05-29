@@ -1,4 +1,4 @@
-package roomescape.payment.controller.excpetion;
+package roomescape.payment.controller.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
