@@ -28,7 +28,7 @@ public interface JpaReservationRepository extends ListCrudRepository<Reservation
               FROM Reservation r
               WHERE r.info.time.id = :timeId)
             """)
-    boolean existsByTimeId(@Param("timeId")Long timeId);
+    boolean existsByTimeId(@Param("timeId") Long timeId);
 
     @Query("""
             SELECT EXISTS (

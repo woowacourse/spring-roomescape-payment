@@ -16,7 +16,8 @@ public class AuthService {
     private final JpaMemberRepository memberRepository;
     private final MyPasswordEncoder myPasswordEncoder;
 
-    public AuthService(final JwtProvider jwtProvider, final roomescape.member.repository.JpaMemberRepository memberRepository,
+    public AuthService(final JwtProvider jwtProvider,
+                       final roomescape.member.repository.JpaMemberRepository memberRepository,
                        final MyPasswordEncoder myPasswordEncoder) {
         this.jwtProvider = jwtProvider;
         this.memberRepository = memberRepository;
