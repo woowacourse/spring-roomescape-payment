@@ -17,7 +17,7 @@ import roomescape.payment.exception.PaymentApiException;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class PaymentClientMockServerTest {
+class PaymentClientMockWebServerTest {
 
     private MockWebServer mockWebServer;
     private PaymentClient paymentClient;
