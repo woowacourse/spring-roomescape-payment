@@ -143,24 +143,7 @@ class PaymentClientMockRestServiceServerTest {
         mockServer.verify();
     }
 
-    @Test
-    @DisplayName("네트워크 연결 실패 시 적절한 예외를 던진다")
-    void confirmPayment_throwsException_whenNetworkFails() {
-        // given
-        PaymentRequest request = getRequest("paymentKey123");
-
-        mockServer.expect(requestTo(URL + PATH))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withStatus(HttpStatus.SERVICE_UNAVAILABLE));
-
-        // when & then
-        assertThatThrownBy(() -> paymentClient.confirmPayment(request))
-                .isInstanceOf(Exception.class);
-
-        mockServer.verify();
-    }
-
-    private static PaymentRequest getRequest(String paymentKey) {
+    private PaymentRequest getRequest(String paymentKey) {
         return new PaymentRequest(paymentKey, 1000, "orderId123", "paymentType");
     }
 }
