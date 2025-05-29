@@ -99,6 +99,7 @@ class ReservationTimeControllerTest {
         String tokenValue = getAdminLoginTokenValue();
 
         Map<String, Object> reservationParams = Map.of(
+                "memberId",1L,
                 "date", LocalDate.now().plusDays(1L),
                 "timeId", timeId,
                 "themeId", themeId
@@ -108,7 +109,7 @@ class ReservationTimeControllerTest {
                 .cookie("token", tokenValue)
                 .contentType(ContentType.JSON)
                 .body(reservationParams)
-                .when().post("/reservations")
+                .when().post("/admin/reservations")
                 .then().extract().path("id");
     }
 
