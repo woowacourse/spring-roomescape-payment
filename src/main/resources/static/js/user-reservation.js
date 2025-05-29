@@ -256,7 +256,13 @@ function onWaitButtonClick() {
         })
             .then(response => {
                 if (!response.ok) throw new Error('Reservation waiting failed');
-                return response.json();
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json();
+                } else {
+                    // JSON이 아니면 빈 객체 반환
+                    return {};
+                }
             })
             .then(data => {
                 alert('Reservation waiting successful!');
