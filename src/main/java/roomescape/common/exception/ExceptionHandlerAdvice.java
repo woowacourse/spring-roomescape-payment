@@ -5,6 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+// TODO: CustomException 일반화하기
+// TODO: 예외 응답 객체 만들기
 @ControllerAdvice
 public class ExceptionHandlerAdvice {
 

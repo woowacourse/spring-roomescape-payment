@@ -17,7 +17,6 @@ public class TossPaymentService {
             "INVALID_AUTHORIZE_AUTH"
     );
     private static final String AUTHORIZATION_TYPE = "Basic";
-
     @Value("${api.toss.secret-key}")
     private String secretKey;
 
@@ -27,6 +26,7 @@ public class TossPaymentService {
         this.restClient = restClient;
     }
 
+    // TODO: 결제 실패시 환불
     public ConfirmPaymentResponse postConfirmPayment(ConfirmPaymentRequest paymentRequest) {
         ConfirmPaymentResponse paymentResponse = restClient.post()
                 .uri("/confirm")
