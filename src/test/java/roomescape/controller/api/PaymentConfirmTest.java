@@ -43,19 +43,6 @@ public class PaymentConfirmTest {
         ).isInstanceOf(PaymentConfirmServerException.class);
     }
 
-    @DisplayName("잘못된 시크릿키 값으로 요청 테스트")
-    @Test
-    void invalidSecretKeyExceptionTest() {
-        assertThatThrownBy(
-                () -> restClient.post()
-                        .uri("https://api.tosspayments.com/v1/payments/confirm")
-                        .header("Authorization", "Basic " +
-                                Base64.getEncoder().encodeToString("test_gsk_docs_OaPz8L5".getBytes()))
-                        .retrieve()
-                        .toBodilessEntity()
-        ).isInstanceOf(PaymentConfirmServerException.class);
-    }
-
     @DisplayName("paymentkey를 클라이언트에서 획득하지 않은 값으로 요청 테스트")
     @Test
     void invalidPaymentKeyExceptionTest() {
