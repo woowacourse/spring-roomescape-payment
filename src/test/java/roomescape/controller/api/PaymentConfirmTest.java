@@ -1,5 +1,6 @@
 package roomescape.controller.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +12,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.client.PaymentClient;
 import roomescape.config.RestClientConfiguration;
 import roomescape.dto.reservation.TossPaymentConfirmRequestDto;
+import roomescape.exception.PaymentConfirmClientException;
 import roomescape.exception.PaymentConfirmServerException;
 
 import java.util.Base64;
@@ -18,7 +20,7 @@ import java.util.Base64;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {RestClientConfiguration.class, PaymentClient.class})
+@ContextConfiguration(classes = {RestClientConfiguration.class, PaymentClient.class, ObjectMapper.class})
 public class PaymentConfirmTest {
 
     @Autowired
@@ -61,6 +63,6 @@ public class PaymentConfirmTest {
                 () -> paymentClient.confirmPayment(new TossPaymentConfirmRequestDto(
                         "wrongPaymentKey", "orderId", 1000L
                 ))
-        ).isInstanceOf(PaymentConfirmServerException.class);
+        ).isInstanceOf(PaymentConfirmClientException.class);
     }
 }

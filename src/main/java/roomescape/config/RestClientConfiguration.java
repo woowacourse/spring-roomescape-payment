@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.PaymentConfirmClientException;
@@ -27,9 +28,20 @@ public class RestClientConfiguration {
             "INCORRECT_BASIC_AUTH_FORMAT"
     );
 
+//    @Autowired
+//    HttpComponentsClientHttpRequestFactory factory;
+//
+//    @Bean
+//    public HttpComponentsClientHttpRequestFactory factory() {
+//        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+//       factory.setConnectTimeout(10000);
+//       factory.setReadTimeout(30000);
+//        return factory;
+//    }
+
     @Bean
     public RestClient restClient() {
-        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
         factory.setConnectTimeout(200);
         factory.setReadTimeout(30000);
 

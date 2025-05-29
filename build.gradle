@@ -28,6 +28,8 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-impl:0.12.6'
     implementation 'io.jsonwebtoken:jjwt-gson:0.12.6'
 
+    implementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
+
     runtimeOnly 'com.h2database:h2'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
