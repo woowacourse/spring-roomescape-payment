@@ -1,5 +1,6 @@
 package roomescape.common.config;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,8 +19,8 @@ public class PaymentClientConfig {
     }
 
     @Bean
-    public RestClient restClient() {
-        return RestClient.builder()
+    public RestClient restClient(RestClient.Builder restClientBuilder) {
+        return restClientBuilder
                 .baseUrl(paymentClientProperties.getBaseUrl())
                 .build();
     }
