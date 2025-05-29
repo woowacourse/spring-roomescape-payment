@@ -44,7 +44,7 @@ public class Waiting {
 
     private void validateRank(long rank) {
         if (rank <= 0) {
-            throw new IllegalArgumentException("[ERROR] 순위는 0 이상이어야 합니다.");
+            throw new IllegalArgumentException("[ERROR] 순위는 0을 초과해야 합니다.");
         }
     }
 
