@@ -44,10 +44,10 @@ public class Theme {
             column = @Column(name = Fields.thumbnail))
     private ThemeThumbnail thumbnail;
 
-    private Theme(final Long id,
-                  final ThemeName name,
-                  final ThemeDescription description,
-                  final ThemeThumbnail thumbnail) {
+    public Theme(final Long id,
+                 final ThemeName name,
+                 final ThemeDescription description,
+                 final ThemeThumbnail thumbnail) {
         validate(id);
         validate(name, description, thumbnail);
         this.id = id;
@@ -65,16 +65,9 @@ public class Theme {
         this.thumbnail = thumbnail;
     }
 
-    public static Theme withId(final Long id,
-                               final ThemeName name,
-                               final ThemeDescription description,
-                               final ThemeThumbnail thumbnail) {
-        return new Theme(id, name, description, thumbnail);
-    }
-
-    public static Theme withoutId(final ThemeName name,
-                                  final ThemeDescription description,
-                                  final ThemeThumbnail thumbnail) {
+    public static Theme of(final ThemeName name,
+                           final ThemeDescription description,
+                           final ThemeThumbnail thumbnail) {
         return new Theme(name, description, thumbnail);
     }
 

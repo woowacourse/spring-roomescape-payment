@@ -48,10 +48,10 @@ public class Reservation {
     @ManyToOne
     private Theme theme;
 
-    public Reservation(final Long userId,
-                       final ReservationDate date,
-                       final ReservationTime time,
-                       final Theme theme
+    private Reservation(final Long userId,
+                        final ReservationDate date,
+                        final ReservationTime time,
+                        final Theme theme
     ) {
         validate(userId, date, time, theme);
         this.userId = userId;
@@ -75,18 +75,10 @@ public class Reservation {
         this.theme = theme;
     }
 
-    public static Reservation withId(final Long id,
-                                     final Long userId,
-                                     final ReservationDate date,
-                                     final ReservationTime time,
-                                     final Theme theme) {
-        return new Reservation(id, userId, date, time, theme);
-    }
-
-    public static Reservation withoutId(final Long userId,
-                                        final ReservationDate date,
-                                        final ReservationTime time,
-                                        final Theme theme) {
+    public static Reservation of(final Long userId,
+                                 final ReservationDate date,
+                                 final ReservationTime time,
+                                 final Theme theme) {
         return new Reservation(userId, date, time, theme);
     }
 
