@@ -1,37 +1,40 @@
 package roomescape.service;
 
-import java.util.Base64;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.dto.payment.PaymentConfirmRequest;
 import roomescape.dto.payment.PaymentConfirmResponse;
 import roomescape.dto.reservation.ReservationCreateRequest;
 import roomescape.dto.reservation.ReservationResponse;
+import roomescape.util.AuthorizationHeaderProvider;
 
 @Service
 public class ReservationPaymentService {
+    @Value("toss.secret-key")
+    private String secretKey;
+
     private ReservationService reservationService;
     private PaymentClientService paymentClientService;
     private PaymentService paymentService;
+    private AuthorizationHeaderProvider authorizationHeaderProvider;
 
     public ReservationPaymentService(ReservationService reservationService, PaymentClientService paymentClientService,
-                                     PaymentService paymentService) {
+                                     PaymentService paymentService,
+                                     AuthorizationHeaderProvider authorizationHeaderProvider) {
         this.reservationService = reservationService;
         this.paymentClientService = paymentClientService;
         this.paymentService = paymentService;
+        this.authorizationHeaderProvider = authorizationHeaderProvider;
     }
 
+    @Transactional
     public ReservationResponse confirmPaymentAndAddReservation(ReservationCreateRequest reservationRequest,
                                                                PaymentConfirmRequest paymentRequest) {
         ReservationResponse reservation = reservationService.createReservation(reservationRequest);
-        String secretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6" + ":";
-        String encodedString = "Basic " + Base64.getEncoder().encodeToString(secretKey.getBytes());
-        try {
-            PaymentConfirmResponse paymentConfirm = paymentClientService.confirm(encodedString, paymentRequest);
-            paymentService.createPayment(paymentConfirm, reservation.id());
-        } catch (Exception exception) {
-            reservationService.deleteReservation(reservation.id());
-            throw exception;
-        }
+        String providedAuthorization = authorizationHeaderProvider.provide(secretKey);
+        PaymentConfirmResponse paymentConfirm = paymentClientService.confirm(providedAuthorization, paymentRequest);
+        paymentService.createPayment(paymentConfirm, reservation.id());
         return reservation;
     }
 }
