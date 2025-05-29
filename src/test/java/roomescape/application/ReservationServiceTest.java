@@ -21,7 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.application.dto.PaymentProcessRequest;
+import roomescape.presentation.dto.request.PaymentProcessRequest;
 import roomescape.domain.Member;
 import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
@@ -110,7 +110,7 @@ class ReservationServiceTest {
         LoginMember loginMember = new LoginMember(member.getId(), member.getName(), Role.USER, member.getEmail());
 
         when(memberService.findMemberByEmail(loginMember.email())).thenReturn(member);
-        PaymentProcessRequest paymentRequest = PaymentProcessRequest.of(request);
+        PaymentProcessRequest paymentRequest = request.toPaymentProcessRequest();
         Payment payment = Payment.create("paymentKey", "orderId");
         when(paymentService.process(paymentRequest)).thenReturn(payment);
         when(reservationTimeService.findReservationTimeById(request.timeId())).thenReturn(time);
@@ -120,7 +120,7 @@ class ReservationServiceTest {
                 ReservationStatus.RESERVED)).thenReturn(false);
         when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
 
-        ReservationResponse response = reservationService.createMemberReservation(request, loginMember);
+        ReservationResponse response = reservationService.createMemberReservation(request, paymentRequest, loginMember);
 
         assertAll(
                 () -> assertThat(response.date()).isEqualTo(date),
@@ -185,7 +185,7 @@ class ReservationServiceTest {
         when(reservationRepository.existsByDateAndTimeAndThemeAndStatus(date, time, theme,
                 ReservationStatus.RESERVED)).thenReturn(true);
 
-        assertThatThrownBy(() -> reservationService.createMemberReservation(request, loginMember))
+        assertThatThrownBy(() -> reservationService.createMemberReservation(request, request.toPaymentProcessRequest(), loginMember))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

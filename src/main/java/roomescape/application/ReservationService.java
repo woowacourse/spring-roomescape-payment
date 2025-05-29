@@ -2,7 +2,7 @@ package roomescape.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.application.dto.PaymentProcessRequest;
+import roomescape.presentation.dto.request.PaymentProcessRequest;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationDate;
@@ -15,7 +15,6 @@ import roomescape.domain.Waiting;
 import roomescape.infrastructure.repository.ReservationRepository;
 import roomescape.presentation.dto.request.AdminReservationCreateRequest;
 import roomescape.presentation.dto.request.LoginMember;
-import roomescape.presentation.dto.request.ReservationCreateRequest;
 import roomescape.presentation.dto.request.ReservationWithPaymentRequest;
 import roomescape.presentation.dto.response.MyReservationResponse;
 import roomescape.presentation.dto.response.ReservationResponse;
@@ -60,12 +59,13 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse createMemberReservation(ReservationWithPaymentRequest request, LoginMember loginMember) {
+    public ReservationResponse createMemberReservation(ReservationWithPaymentRequest request,
+                                                       PaymentProcessRequest paymentProcessRequest,
+                                                       LoginMember loginMember
+    ) {
         Member member = memberService.findMemberByEmail(loginMember.email());
 
         Reservation created = createReservation(request.date(), request.timeId(), request.themeId(), member);
-
-        PaymentProcessRequest paymentProcessRequest = PaymentProcessRequest.of(request);
         paymentService.process(paymentProcessRequest);
 
         return ReservationResponse.from(created);

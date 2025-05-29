@@ -7,12 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import roomescape.application.dto.PaymentProcessRequest;
+import roomescape.presentation.dto.request.PaymentProcessRequest;
 import roomescape.application.exception.PaymentException;
 import roomescape.infrastructure.thirdparty.PaymentRestClient;
 import roomescape.domain.Payment;
 import roomescape.infrastructure.repository.PaymentRepository;
-import roomescape.presentation.dto.response.ErrorResponse;
 
 @Service
 public class PaymentService {

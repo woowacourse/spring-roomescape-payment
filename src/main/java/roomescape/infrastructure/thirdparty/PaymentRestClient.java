@@ -4,8 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
-import roomescape.application.dto.PaymentProcessRequest;
-import roomescape.domain.Payment;
+import roomescape.presentation.dto.request.PaymentProcessRequest;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;

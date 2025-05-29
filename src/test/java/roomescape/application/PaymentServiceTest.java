@@ -18,7 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import roomescape.application.dto.PaymentProcessRequest;
+import roomescape.presentation.dto.request.PaymentProcessRequest;
 import roomescape.application.exception.PaymentException;
 import roomescape.domain.Payment;
 import roomescape.infrastructure.repository.PaymentRepository;

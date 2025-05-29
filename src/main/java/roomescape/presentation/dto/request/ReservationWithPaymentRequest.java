@@ -23,4 +23,8 @@ public record ReservationWithPaymentRequest(
         @NotNull(message = "결제 금액은 필수입니다.")
         String amount
 ) {
+
+        public PaymentProcessRequest toPaymentProcessRequest() {
+                return new PaymentProcessRequest(paymentKey, orderId, amount);
+        }
 }

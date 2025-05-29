@@ -14,6 +14,7 @@ import roomescape.application.ReservationService;
 import roomescape.application.WaitingService;
 import roomescape.presentation.AuthenticationPrincipal;
 import roomescape.presentation.dto.request.LoginMember;
+import roomescape.presentation.dto.request.PaymentProcessRequest;
 import roomescape.presentation.dto.request.ReservationCreateRequest;
 import roomescape.presentation.dto.request.ReservationWithPaymentRequest;
 import roomescape.presentation.dto.response.ReservationResponse;
@@ -47,7 +48,8 @@ public class ReservationController {
             @RequestBody @Valid ReservationWithPaymentRequest request,
             @AuthenticationPrincipal LoginMember loginMember
     ) {
-        ReservationResponse response = reservationService.createMemberReservation(request, loginMember);
+        PaymentProcessRequest paymentRequest = request.toPaymentProcessRequest();
+        ReservationResponse response = reservationService.createMemberReservation(request, paymentRequest, loginMember);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
