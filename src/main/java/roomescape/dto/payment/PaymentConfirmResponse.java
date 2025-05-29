@@ -1,4 +1,8 @@
 package roomescape.dto.payment;
 
-public record PaymentConfirmResponse(String orderId, String paymentKey, Long totalAmount, String status) {
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+
+public record PaymentConfirmResponse(@NotEmpty String orderId, @NotEmpty String paymentKey, @NotNull Long totalAmount,
+                                     @NotEmpty String status) {
 }
