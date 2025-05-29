@@ -8,22 +8,23 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient.Builder;
 
 @Configuration
-@EnableConfigurationProperties(RestClientProperties.class)
+@EnableConfigurationProperties({RestClientProperties.class, TossPaymentProperties.class})
 public class RestClientConfig {
 
     private int connectTimeout;
     private int connectionRequestTimeout;
     private int readTimeout;
 
+
     @Bean
-    public TossRestClient tossRestClient(final Builder restClientBuilder, final RestClientProperties restClientProperties) {
+    public TossRestClient tossRestClient(final Builder restClientBuilder, final RestClientProperties restClientProperties, final TossPaymentProperties tossPaymentProperties) {
         connectTimeout = restClientProperties.getConnectTimeout();
         connectionRequestTimeout = restClientProperties.getConnectionRequestTimeout();
         readTimeout = restClientProperties.getReadTimeout();
         return new TossRestClient(restClientBuilder
                 .baseUrl(restClientProperties.getBaseUrl())
                 .requestFactory(clientHttpRequestFactory())
-                .build());
+                .build(), tossPaymentProperties.getWidgetSecretKey());
     }
 
     private ClientHttpRequestFactory clientHttpRequestFactory() {
