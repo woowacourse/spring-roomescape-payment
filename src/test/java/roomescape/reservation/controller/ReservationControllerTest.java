@@ -4,10 +4,15 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import roomescape.payment.service.ReservationPaymentClient;
+import roomescape.payment.service.dto.ConfirmPaymentRequest;
+import roomescape.payment.service.dto.ConfirmPaymentResponse;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -20,6 +25,9 @@ import static org.hamcrest.Matchers.is;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 class ReservationControllerTest {
+
+    @MockitoBean
+    private ReservationPaymentClient mockReservationPaymentClient = Mockito.mock(ReservationPaymentClient.class);
 
     @DisplayName("어드민 페이지로 접근할 수 있다.")
     @Test
@@ -48,6 +56,11 @@ class ReservationControllerTest {
     @DisplayName("모든 예약 정보를 반환한다.")
     @Test
     void test3() {
+        ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
+        ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
+        Mockito.when(mockReservationPaymentClient.postConfirmPayment(paymentRequest)).thenReturn(paymentResponse);
+
+
         addReservationTime("10:00");
         addTheme();
         String tokenValue = getAdminLoginTokenValue();
@@ -58,7 +71,10 @@ class ReservationControllerTest {
                 .body(Map.of(
                         "date", LocalDate.now().plusDays(1L),
                         "timeId", 1,
-                        "themeId", 1
+                        "themeId", 1,
+                        "paymentKey", paymentRequest.paymentKey(),
+                        "orderId", paymentRequest.orderId(),
+                        "amount", paymentRequest.amount()
                 ))
                 .when().post("/reservations")
                 .then();
@@ -74,13 +90,20 @@ class ReservationControllerTest {
     @DisplayName("예약 정보를 추가한다.")
     @Test
     void test4() {
+        ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
+        ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
+        Mockito.when(mockReservationPaymentClient.postConfirmPayment(paymentRequest)).thenReturn(paymentResponse);
+
         int timeId = addReservationTime("10:00");
         int themeId = addTheme();
         String tokenValue = getAdminLoginTokenValue();
         Map<String, Object> reservationParams = Map.of(
                 "date", LocalDate.now().plusDays(1L),
                 "timeId", timeId,
-                "themeId", themeId
+                "themeId", themeId,
+                "paymentKey", paymentRequest.paymentKey(),
+                "orderId", paymentRequest.orderId(),
+                "amount", paymentRequest.amount()
         );
 
         RestAssured.given().log().all()
@@ -89,18 +112,25 @@ class ReservationControllerTest {
                 .body(reservationParams)
                 .when().post("/reservations")
                 .then().log().all()
-                .statusCode(201);
+                .statusCode(200);
     }
 
     @DisplayName("존재하지 않는 예약 시간 ID 를 추가하면 예외를 반환한다.")
     @Test
     void test5() {
+        ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
+        ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
+        Mockito.when(mockReservationPaymentClient.postConfirmPayment(paymentRequest)).thenReturn(paymentResponse);
+
         String tokenValue = getAdminLoginTokenValue();
         int themeId = addTheme();
         Map<String, Object> reservationParams = Map.of(
                 "date", LocalDate.now().plusDays(1L),
                 "timeId", 0,
-                "themeId", themeId
+                "themeId", themeId,
+                "paymentKey", paymentRequest.paymentKey(),
+                "orderId", paymentRequest.orderId(),
+                "amount", paymentRequest.amount()
         );
 
         RestAssured.given().log().all()
@@ -115,12 +145,19 @@ class ReservationControllerTest {
     @DisplayName("존재하지 않는 테마 ID 를 추가하면 예외를 반환한다.")
     @Test
     void notExistThemeId() {
+        ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
+        ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
+        Mockito.when(mockReservationPaymentClient.postConfirmPayment(paymentRequest)).thenReturn(paymentResponse);
+
         String tokenValue = getAdminLoginTokenValue();
         int timeId = addReservationTime("10:00");
         Map<String, Object> reservationParams = Map.of(
                 "date", LocalDate.now().plusDays(1L),
                 "timeId", timeId,
-                "themeId", 0
+                "themeId", 0,
+                "paymentKey", paymentRequest.paymentKey(),
+                "orderId", paymentRequest.orderId(),
+                "amount", paymentRequest.amount()
         );
 
         RestAssured.given().log().all()
@@ -135,13 +172,20 @@ class ReservationControllerTest {
     @DisplayName("예약을 삭제한다.")
     @Test
     void test6() {
+        ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
+        ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
+        Mockito.when(mockReservationPaymentClient.postConfirmPayment(paymentRequest)).thenReturn(paymentResponse);
+
         int timeId = addReservationTime("10:00");
         int themeId = addTheme();
         String tokenValue = getAdminLoginTokenValue();
         Map<String, Object> reservationParams = Map.of(
                 "date", LocalDate.now().plusDays(1L),
                 "timeId", timeId,
-                "themeId", themeId
+                "themeId", themeId,
+                "paymentKey", paymentRequest.paymentKey(),
+                "orderId", paymentRequest.orderId(),
+                "amount", paymentRequest.amount()
         );
 
         int reservationId = RestAssured.given()
@@ -173,6 +217,10 @@ class ReservationControllerTest {
     @DisplayName("예약 가능한 시간을 반환한다")
     @Test
     void test9() {
+        ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
+        ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
+        Mockito.when(mockReservationPaymentClient.postConfirmPayment(paymentRequest)).thenReturn(paymentResponse);
+
         int timeId1 = addReservationTime("10:00");
         int timeId2 = addReservationTime("11:00");
         int themeId = addTheme();
@@ -181,7 +229,10 @@ class ReservationControllerTest {
         Map<String, Object> reservationParams = Map.of(
                 "date", day,
                 "timeId", timeId1,
-                "themeId", themeId
+                "themeId", themeId,
+                "paymentKey", paymentRequest.paymentKey(),
+                "orderId", paymentRequest.orderId(),
+                "amount", paymentRequest.amount()
         );
 
         RestAssured.given()
