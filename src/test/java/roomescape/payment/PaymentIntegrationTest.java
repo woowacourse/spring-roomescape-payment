@@ -9,8 +9,11 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
@@ -21,12 +24,15 @@ import roomescape.payment.exception.TossPaymentServerException;
 import roomescape.payment.infrastructure.TossApiClient;
 import roomescape.reservation.fixture.TestFixture;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
 })
 public class PaymentIntegrationTest {
+
+    @LocalServerPort
+    private int port;
 
     @MockitoBean
     private TossApiClient tossApiClient;
@@ -36,6 +42,11 @@ public class PaymentIntegrationTest {
     private static final String PASSWORD = "password";
     private static final String futureDate = TestFixture.makeFutureDate().toString();
     private static final String TOKEN = "token";
+
+    @BeforeEach
+    void setUp() {
+        RestAssured.port = port;
+    }
 
     @Test
     void tossPaymentClientException() {
