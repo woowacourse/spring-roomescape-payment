@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -35,6 +36,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final ReservationRepository reservationRepository;
     private final RestClient restClient;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${toss.payment.secret-key}")
     private String secretKey;
@@ -48,13 +50,12 @@ public class PaymentService {
         this.reservationRepository = reservationRepository;
         this.restClient = builder.baseUrl(PAYMENTS_CONFIRM_ENDPOINT)
                 .build();
+        this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     public void confirm(final PaymentRequest request) {
         String secretKeyWithColon = secretKey + ":";
         byte[] secretKeyBytes = secretKeyWithColon.getBytes(StandardCharsets.UTF_8);
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         restClient.post()
                 .uri(PAYMENTS_CONFIRM_ENDPOINT)
@@ -62,20 +63,22 @@ public class PaymentService {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)
                 .retrieve()
-                .onStatus(HttpStatusCode::isError, (req, res) -> {
-                    try (InputStream is = res.getBody()) {
-                        TossPaymentErrorResponse errorResponse =
-                                objectMapper.readValue(is, TossPaymentErrorResponse.class);
-                        String errorCode = errorResponse.code();
-                        if (InternalServerErrorCode.contains(errorCode)) {
-                            throw new PaymentServerException(errorResponse.message());
-                        }
-                        throw new PaymentBadRequestException(errorResponse.message());
-                    } catch (IOException e) {
-                        throw new RuntimeException("결제 에러 응답 파싱 실패", e);
-                    }
-                })
+                .onStatus(HttpStatusCode::isError, (req, res) -> handleError(res))
                 .toBodilessEntity();
+    }
+
+    private void handleError(final ClientHttpResponse res) {
+        try (InputStream is = res.getBody()) {
+            TossPaymentErrorResponse errorResponse = objectMapper.readValue(is, TossPaymentErrorResponse.class);
+
+            String errorCode = errorResponse.code();
+            if (InternalServerErrorCode.contains(errorCode)) {
+                throw new PaymentServerException(errorResponse.message());
+            }
+            throw new PaymentBadRequestException(errorResponse.message());
+        } catch (IOException e) {
+            throw new RuntimeException("결제 에러 응답 파싱 실패", e);
+        }
     }
 
     public void savePayment(final Long reservationId, final PaymentRequest paymentRequest) {
