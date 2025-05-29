@@ -2,6 +2,7 @@ package roomescape.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -12,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.application.request.PaymentInfo;
+import roomescape.application.response.PaymentResponse;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
 import roomescape.exception.PaymentException;
@@ -35,21 +37,19 @@ class PaymentServiceTest {
     void savePayment_Success() {
         // given
         PaymentInfo paymentInfo = new PaymentInfo("test_payment_key", "test_order_id", 1000);
-        Payment payment = Payment.register(
-                "test_payment_key",
-                "test_order_id",
-                "테스트 결제",
-                1000
-        );
+        PaymentResponse response = new PaymentResponse("test_payment_key", "test_order_id", "테스트 결제", 1000);
 
-        when(paymentClient.confirmPayment(paymentInfo)).thenReturn(payment);
-        when(paymentRepository.save(any(Payment.class))).thenReturn(payment);
+        when(paymentClient.confirmPayment(paymentInfo)).thenReturn(response);
+        when(paymentRepository.save(any(Payment.class))).thenReturn(
+                Payment.register(response.paymentKey(), response.orderId(), response.orderName(), response.amount()));
 
         // when
         Payment savedPayment = paymentService.savePayment(paymentInfo);
 
         // then
-        assertThat(savedPayment).isEqualTo(payment);
+        assertAll(() -> assertThat(savedPayment.paymentKey()).isEqualTo(paymentInfo.paymentKey()),
+                () -> assertThat(savedPayment.orderId()).isEqualTo(paymentInfo.orderId()),
+                () -> assertThat(savedPayment.amount()).isEqualTo(paymentInfo.amount()));
     }
 
     @Test
@@ -62,8 +62,7 @@ class PaymentServiceTest {
         when(paymentClient.confirmPayment(paymentInfo)).thenThrow(expectedException);
 
         // when & then
-        assertThatThrownBy(() -> paymentService.savePayment(paymentInfo))
-                .isInstanceOf(PaymentException.class)
+        assertThatThrownBy(() -> paymentService.savePayment(paymentInfo)).isInstanceOf(PaymentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", PaymentErrorCode.REJECT_CARD_PAYMENT)
                 .hasMessageContaining("한도초과 혹은 잔액부족");
     }

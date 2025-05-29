@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.application.PaymentService;
 import roomescape.application.ReservationService;
-import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationSearchFilter;
 import roomescape.domain.user.User;
@@ -29,22 +27,17 @@ import roomescape.presentation.response.ReservationResponse;
 public class ReservationController {
 
     private final ReservationService reservationService;
-    private final PaymentService paymentService;
 
-    public ReservationController(final ReservationService reservationService, final PaymentService paymentService) {
+    public ReservationController(final ReservationService reservationService) {
         this.reservationService = reservationService;
-        this.paymentService = paymentService;
     }
 
     @PostMapping("/reservations")
     @ResponseStatus(CREATED)
-    public ReservationResponse createReservationWithUserPrivileges(
-            @Authenticated final User user, @RequestBody @Valid final CreateReservationRequest request
-    ) {
-        Payment payment = paymentService.savePayment(request.toPaymentInfo());
-
-        Reservation reservation = reservationService.saveReservation(
-                user.id(), request.date(), request.timeId(), request.themeId());
+    public ReservationResponse createReservationWithUserPrivileges(@Authenticated final User user,
+                                                                   @RequestBody @Valid final CreateReservationRequest request) {
+        Reservation reservation = reservationService.saveReservationWithPurchase(user.id(), request.date(),
+                request.timeId(), request.themeId(), request.toPaymentInfo());
 
         return ReservationResponse.fromReservation(reservation);
     }
@@ -52,10 +45,9 @@ public class ReservationController {
     @PostMapping("/admin/reservations")
     @ResponseStatus(CREATED)
     public ReservationResponse createReservationWithAdminPrivileges(
-            @RequestBody @Valid final CreateReservationAdminRequest request
-    ) {
-        Reservation reservation = reservationService.saveReservation(
-                request.userId(), request.date(), request.timeId(), request.themeId());
+            @RequestBody @Valid final CreateReservationAdminRequest request) {
+        Reservation reservation = reservationService.saveReservationWithoutPurchase(request.userId(), request.date(),
+                request.timeId(), request.themeId());
 
         return ReservationResponse.fromReservation(reservation);
     }
@@ -65,8 +57,7 @@ public class ReservationController {
             @RequestParam(name = "themeId", required = false) final Long themeId,
             @RequestParam(name = "userId", required = false) final Long userId,
             @RequestParam(name = "dateFrom", required = false) final LocalDate dateFrom,
-            @RequestParam(name = "dateTo", required = false) final LocalDate dateTo
-    ) {
+            @RequestParam(name = "dateTo", required = false) final LocalDate dateTo) {
         ReservationSearchFilter searchFilter = new ReservationSearchFilter(themeId, userId, dateFrom, dateTo);
         List<Reservation> reservations = reservationService.findReservationsByFilter(searchFilter);
 
@@ -75,9 +66,7 @@ public class ReservationController {
 
     @DeleteMapping("/reservations/{id}")
     @ResponseStatus(NO_CONTENT)
-    public void deleteReservationById(
-            @PathVariable("id") final long id
-    ) {
+    public void deleteReservationById(@PathVariable("id") final long id) {
         reservationService.removeById(id);
     }
 }

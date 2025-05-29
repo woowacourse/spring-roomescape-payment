@@ -35,7 +35,7 @@ class ReservationServiceTest {
         var tomorrow = LocalDate.now().plusDays(1);
 
         // when
-        Reservation reserved = service.saveReservation(2L, tomorrow, 2L, 2L);
+        Reservation reserved = service.saveReservationWithoutPurchase(2L, tomorrow, 2L, 2L);
 
         // then
         var reservations = reservationRepository.findAll();
@@ -49,8 +49,7 @@ class ReservationServiceTest {
         var tomorrow = LocalDate.now().plusDays(1);
 
         // when & then
-        assertThatCode(() -> service.saveReservation(2L, tomorrow, 2L, 2L))
-                .doesNotThrowAnyException();
+        assertThatCode(() -> service.saveReservationWithoutPurchase(2L, tomorrow, 2L, 2L)).doesNotThrowAnyException();
     }
 
     @Test
@@ -60,9 +59,8 @@ class ReservationServiceTest {
         var yesterday = LocalDate.now().minusDays(1);
 
         // when & then
-        assertThatThrownBy(() -> service.saveReservation(2L, yesterday, 2L, 2L))
-                .isInstanceOf(BusinessRuleViolationException.class)
-                .hasMessage("이전 날짜로 예약할 수 없습니다.");
+        assertThatThrownBy(() -> service.saveReservationWithoutPurchase(2L, yesterday, 2L, 2L)).isInstanceOf(
+                BusinessRuleViolationException.class).hasMessage("이전 날짜로 예약할 수 없습니다.");
     }
 
     @Test
@@ -76,8 +74,8 @@ class ReservationServiceTest {
 
         // when & then
         assertThatThrownBy(
-                () -> service.saveReservation(reservedUserId, reservedDate, reservedTimeSlotId, reservedThemeId))
-                .isInstanceOf(AlreadyExistedException.class)
+                () -> service.saveReservationWithoutPurchase(reservedUserId, reservedDate, reservedTimeSlotId,
+                        reservedThemeId)).isInstanceOf(AlreadyExistedException.class)
                 .hasMessage("이미 예약된 날짜, 시간, 테마에 대한 예약은 불가능합니다.");
     }
 
@@ -85,8 +83,7 @@ class ReservationServiceTest {
     @DisplayName("검색 필터로 예약을 조회할 수 있다.")
     void findReservationsByFilter() {
         // given
-        var filter =
-                new ReservationSearchFilter(1L, 2L, LocalDate.parse("2025-05-05"), LocalDate.parse("2025-05-06"));
+        var filter = new ReservationSearchFilter(1L, 2L, LocalDate.parse("2025-05-05"), LocalDate.parse("2025-05-06"));
 
         // when & then
         assertThat(service.findReservationsByFilter(filter)).hasSize(2);

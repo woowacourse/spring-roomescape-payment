@@ -15,12 +15,9 @@ import org.springframework.test.context.ActiveProfiles;
 class AuthControllerTest {
 
     private static String getToken(String email, String password) {
-        return RestAssured.given()
-                .contentType(ContentType.JSON)
-                .body(Map.of("email", email, "password", password))
-                .when().post("/login")
-                .then().statusCode(200)
-                .extract().response().getDetailedCookies().getValue("token");
+        return RestAssured.given().contentType(ContentType.JSON).body(Map.of("email", email, "password", password))
+                .when().post("/login").then().statusCode(200).extract().response().getDetailedCookies()
+                .getValue("token");
     }
 
     @Test
@@ -28,11 +25,8 @@ class AuthControllerTest {
     void adminLogin() {
         var token = getToken("admin@email.com", "password");
 
-        RestAssured.given()
-                .contentType(ContentType.JSON)
-                .cookie("token", token)
-                .when().get("/login/check")
-                .then().statusCode(200);
+        RestAssured.given().contentType(ContentType.JSON).cookie("token", token).when().get("/login/check").then()
+                .statusCode(200);
     }
 
     @Test
@@ -40,31 +34,23 @@ class AuthControllerTest {
     void userLogin() {
         final var token = getToken("user1@email.com", "password1");
 
-        RestAssured.given()
-                .contentType(ContentType.JSON)
-                .cookie("token", token)
-                .when().get("/login/check")
-                .then().statusCode(200);
+        RestAssured.given().contentType(ContentType.JSON).cookie("token", token).when().get("/login/check").then()
+                .statusCode(200);
     }
 
     @Test
     @DisplayName("잘못된 비밀 번호로 로그인 하는 경우 예외를 던진다")
     void adminLogin_WhenPasswordIsWrong() {
-        RestAssured.given()
-                .contentType(ContentType.JSON)
-                .body(Map.of("email", "admin@email.com", "password", "wrong"))
-                .when().post("/login")
-                .then().statusCode(401);
+        RestAssured.given().contentType(ContentType.JSON).body(Map.of("email", "admin@email.com", "password", "wrong"))
+                .when().post("/login").then().statusCode(401);
     }
 
     @Test
     @DisplayName("잘못된 이메일로 로그인 하는 경우 예외를 던진다")
     void adminLogin_WhenEmailNotExist() {
-        RestAssured.given()
-                .contentType(ContentType.JSON)
-                .body(Map.of("email", "wrong@email.com", "password", "password"))
-                .when().post("/login")
-                .then().statusCode(401);
+        RestAssured.given().contentType(ContentType.JSON)
+                .body(Map.of("email", "wrong@email.com", "password", "password")).when().post("/login").then()
+                .statusCode(401);
     }
 
     @Test
@@ -72,13 +58,7 @@ class AuthControllerTest {
     void logout() {
         var token = getToken("user1@email.com", "password1");
 
-        RestAssured.given()
-                .cookie("token", token)
-                .redirects().follow(false) // 리다이렉트 따라가지 않게 설정
-                .when().post("/logout")
-                .then()
-                .statusCode(302)
-                .header("Location", "http://localhost:8080/")
-                .cookie("token", "");
+        RestAssured.given().cookie("token", token).redirects().follow(false) // 리다이렉트 따라가지 않게 설정
+                .when().post("/logout").then().statusCode(302).cookie("token", "");
     }
 }

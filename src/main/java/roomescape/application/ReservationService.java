@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
+import roomescape.application.request.PaymentInfo;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationSearchFilter;
@@ -27,31 +28,41 @@ public class ReservationService {
     private final TimeSlotRepository timeSlotRepository;
     private final ThemeRepository themeRepository;
     private final UserRepository userRepository;
+    private final PaymentService paymentService;
 
-    public ReservationService(
-            final ReservationRepository reservationRepository,
-            final WaitingRepository waitingRepository,
-            final TimeSlotRepository timeSlotRepository,
-            final ThemeRepository themeRepository,
-            final UserRepository userRepository
-    ) {
+    public ReservationService(final ReservationRepository reservationRepository,
+                              final WaitingRepository waitingRepository, final TimeSlotRepository timeSlotRepository,
+                              final ThemeRepository themeRepository, final UserRepository userRepository,
+                              final PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
         this.waitingRepository = waitingRepository;
         this.timeSlotRepository = timeSlotRepository;
         this.themeRepository = themeRepository;
         this.userRepository = userRepository;
+        this.paymentService = paymentService;
     }
 
-    public Reservation saveReservation(final long userId, final LocalDate date, final long timeId, final long themeId) {
+    public Reservation saveReservationWithPurchase(final long userId, final LocalDate date, final long timeId,
+                                                   final long themeId, final PaymentInfo paymentInfo) {
+        Reservation reservation = registerReservation(userId, date, timeId, themeId);
+        paymentService.savePayment(paymentInfo);
 
+        return reservation;
+    }
+
+    public Reservation saveReservationWithoutPurchase(final long userId, final LocalDate date, final long timeId,
+                                                      final long themeId) {
+        return registerReservation(userId, date, timeId, themeId);
+    }
+
+    private Reservation registerReservation(final long userId, final LocalDate date, final long timeId,
+                                            final long themeId) {
         User user = getUserById(userId);
         TimeSlot timeSlot = getTimeSlotById(timeId);
         Theme theme = getThemeById(themeId);
         validateDuplicateReservation(date, timeSlot, theme);
 
-        Reservation reservation = Reservation.register(user, date, timeSlot, theme);
-
-        return reservationRepository.save(reservation);
+        return reservationRepository.save(Reservation.register(user, date, timeSlot, theme));
     }
 
     public List<Reservation> findReservationsByFilter(ReservationSearchFilter filter) {
@@ -68,8 +79,8 @@ public class ReservationService {
     }
 
     private void validateDuplicateReservation(final LocalDate date, final TimeSlot timeSlot, final Theme theme) {
-        Optional<Reservation> reservation =
-                reservationRepository.findByDateAndTimeSlotIdAndThemeId(date, timeSlot.id(), theme.id());
+        Optional<Reservation> reservation = reservationRepository.findByDateAndTimeSlotIdAndThemeId(date, timeSlot.id(),
+                theme.id());
 
         if (reservation.isPresent()) {
             throw new AlreadyExistedException("이미 예약된 날짜, 시간, 테마에 대한 예약은 불가능합니다.");
@@ -77,26 +88,20 @@ public class ReservationService {
     }
 
     private User getUserById(final long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 사용자입니다."));
+        return userRepository.findById(userId).orElseThrow(() -> new NotFoundException("존재하지 않는 사용자입니다."));
     }
 
     private TimeSlot getTimeSlotById(final long timeId) {
-        return timeSlotRepository.findById(timeId)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 타임 슬롯입니다."));
+        return timeSlotRepository.findById(timeId).orElseThrow(() -> new NotFoundException("존재하지 않는 타임 슬롯입니다."));
     }
 
     private Theme getThemeById(final long themeId) {
-        return themeRepository.findById(themeId)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 테마입니다."));
+        return themeRepository.findById(themeId).orElseThrow(() -> new NotFoundException("존재하지 않는 테마입니다."));
     }
 
     private void approveNextWaitingIfExists(Reservation reservation) {
-        Optional<Waiting> nextWaitingOpt =
-                waitingRepository.findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(
-                        reservation.date(),
-                        reservation.timeSlot().id(),
-                        reservation.theme().id());
+        Optional<Waiting> nextWaitingOpt = waitingRepository.findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(
+                reservation.date(), reservation.timeSlot().id(), reservation.theme().id());
 
         nextWaitingOpt.ifPresent(nextWaiting -> {
             Reservation approvedReservation = Reservation.fromWaiting(nextWaiting);
