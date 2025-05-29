@@ -1,6 +1,7 @@
 package roomescape.reservation.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.service.dto.LoginMember;
 import roomescape.common.exception.DuplicatedException;
 import roomescape.common.exception.EntityNotFoundException;
@@ -49,11 +50,9 @@ public class CreateReservationService {
     }
 
     public ReservationResponse create(final ReservationCreateRequest request) {
-        if (isAlreadyBooked(request)) {
-            throw new DuplicatedException("중복되는 예약이 존재합니다.");
-        }
+        Reservation reservation = convertRequestToReservation(request);
 
-        Reservation reservation = createReservation(request);
+        validateDuplicated(reservation);
         validateReservationDateTime(reservation);
 
         Reservation savedReservation = reservationRepository.save(reservation);
@@ -61,13 +60,17 @@ public class CreateReservationService {
         return ReservationResponse.from(savedReservation);
     }
 
-    private boolean isAlreadyBooked(final ReservationCreateRequest request) {
-        return reservationRepository.existsByDateAndTimeIdAndThemeId(
-                request.date(), request.timeId(), request.themeId()
-        );
+    private void validateDuplicated(Reservation reservation) {
+        if (isAlreadyBooked(reservation)) {
+            throw new DuplicatedException("중복되는 예약이 존재합니다.");
+        }
     }
 
-    private Reservation createReservation(final ReservationCreateRequest request) {
+    private boolean isAlreadyBooked(Reservation reservation) {
+        return reservationRepository.existsByReservationInformation(reservation.getReservationInformation());
+    }
+
+    private Reservation convertRequestToReservation(final ReservationCreateRequest request) {
         ReservationTime reservationTime = getReservationTime(request);
         Theme theme = getTheme(request);
         LoginMember loginMember = request.loginMember();
@@ -95,6 +98,7 @@ public class CreateReservationService {
         }
     }
 
+    @Transactional
     public ReservationResponse createWithPayment(ReservationWithPaymentRequest request, LoginMember loginMember) {
         ReservationCreateRequest reservationCreateRequest = new ReservationCreateRequest(
                 request.date(),

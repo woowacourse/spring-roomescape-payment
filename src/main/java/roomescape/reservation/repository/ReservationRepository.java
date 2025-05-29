@@ -3,6 +3,7 @@ package roomescape.reservation.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.reservation.domain.Reservation;
+import roomescape.waiting.domain.ReservationInformation;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -34,15 +35,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             LocalDate dateTo
     );
 
-    @Query("""
-    SELECT EXISTS (
-        SELECT 1 FROM Reservation r
-        WHERE r.reservationInformation.date = :date
-          AND r.reservationInformation.time.id = :timeId
-          AND r.reservationInformation.theme.id = :themeId
-    )
-    """)
-    boolean existsByDateAndTimeIdAndThemeId(LocalDate date, Long timeId, Long themeId);
+    boolean existsByReservationInformation(ReservationInformation reservationInformation);
 
     @Query("""
     SELECT EXISTS (
