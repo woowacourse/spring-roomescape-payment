@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
@@ -18,8 +19,10 @@ import roomescape.common.exception.impl.TossConfirmException;
 import roomescape.payment.application.dto.TossConfirmRequest;
 import roomescape.payment.application.dto.TossConfirmResponse;
 import roomescape.payment.application.dto.TossErrorResponse;
+import roomescape.payment.config.TossPaymentProperties;
 
 @Component
+@EnableConfigurationProperties(TossPaymentProperties.class)
 public class TossPaymentGatewayClient {
 
     private static final String BASE_URL = "https://api.tosspayments.com";
@@ -28,11 +31,14 @@ public class TossPaymentGatewayClient {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    public TossPaymentGatewayClient(final RestClient.Builder restClientBuilder,
-        final ObjectMapper objectMapper) {
+    public TossPaymentGatewayClient(
+        final RestClient.Builder restClientBuilder,
+        final ObjectMapper objectMapper,
+        final TossPaymentProperties properties
+    ) {
         this.restClient = restClientBuilder
             .baseUrl(BASE_URL)
-            .defaultHeader(AUTHORIZATION, encodeSecretKey("test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"))
+            .defaultHeader(AUTHORIZATION, encodeSecretKey(properties.getSecretKey()))
             .defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
             .build();
         this.objectMapper = objectMapper;
