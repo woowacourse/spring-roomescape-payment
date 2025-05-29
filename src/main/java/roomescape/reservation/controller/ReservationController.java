@@ -68,8 +68,7 @@ public class ReservationController {
                         loginMember
                 );
         PaymentRequest paymentRequest = new PaymentRequest(request.paymentKey(), request.orderId(), request.amount());
-        ReservationResponse response = reservationService.create(createRequest,
-                paymentRequest);
+        ReservationResponse response = reservationService.create(createRequest, paymentRequest);
         paymentService.savePayment(response.id(), paymentRequest);
 
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))

@@ -1,6 +1,7 @@
 package roomescape.reservation.controller;
 
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -8,17 +9,24 @@ import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import roomescape.reservation.payment.dto.request.PaymentRequest;
+import roomescape.reservation.payment.service.PaymentService;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class ReservationTimeControllerTest {
+
+    @MockitoBean
+    private PaymentService paymentService;
 
     @DisplayName("예약 시간을 추가한다.")
     @Test
@@ -102,8 +110,14 @@ class ReservationTimeControllerTest {
         Map<String, Object> reservationParams = Map.of(
                 "date", LocalDate.now().plusDays(1L),
                 "timeId", timeId,
-                "themeId", themeId
+                "themeId", themeId,
+                "paymentKey", "paymentKey",
+                "orderId", "orderId",
+                "amount", 1_000L
         );
+
+        doNothing().when(paymentService)
+                .confirm(any(PaymentRequest.class));
 
         return RestAssured.given().log().all()
                 .cookie("token", tokenValue)

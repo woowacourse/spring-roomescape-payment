@@ -42,11 +42,12 @@ public class PaymentService {
     public PaymentService(
             final PaymentRepository paymentRepository,
             final ReservationRepository reservationRepository,
-            final RestClient restClient
+            final RestClient.Builder builder
     ) {
         this.paymentRepository = paymentRepository;
         this.reservationRepository = reservationRepository;
-        this.restClient = restClient;
+        this.restClient = builder.baseUrl(PAYMENTS_CONFIRM_ENDPOINT)
+                .build();
     }
 
     public void confirm(final PaymentRequest request) {
@@ -74,7 +75,7 @@ public class PaymentService {
                         throw new RuntimeException("결제 에러 응답 파싱 실패", e);
                     }
                 })
-                .body(Payment.class);
+                .toBodilessEntity();
     }
 
     public void savePayment(final Long reservationId, final PaymentRequest paymentRequest) {

@@ -10,12 +10,17 @@ import java.time.LocalTime;
 import java.util.List;
 
 import org.assertj.core.api.SoftAssertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpMethod;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.test.web.client.match.MockRestRequestMatchers;
+import org.springframework.test.web.client.response.MockRestResponseCreators;
+import org.springframework.web.client.RestClient;
 
 import roomescape.auth.dto.LoginMember;
 import roomescape.common.exception.AlreadyInUseException;
@@ -32,7 +37,9 @@ import roomescape.reservation.dto.response.BookedReservationTimeResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.reservation.dto.response.ThemeResponse;
+import roomescape.reservation.payment.dto.request.PaymentRequest;
 import roomescape.reservation.payment.repository.PaymentRepository;
+import roomescape.reservation.payment.service.PaymentService;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.repository.ThemeRepository;
@@ -40,11 +47,14 @@ import roomescape.reservation.repository.WaitingRepository;
 
 @ActiveProfiles("test")
 @DataJpaTest
-@Import(ReservationService.class)
 class ReservationServiceTest {
 
     private final LocalDateTime now = LocalDateTime.now();
 
+    private final RestClient.Builder testBuilder = RestClient.builder()
+            .baseUrl("https://api.tosspayments.com");
+
+    private MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
     @Autowired
     private ReservationRepository reservationRepository;
     @Autowired
@@ -57,8 +67,16 @@ class ReservationServiceTest {
     private WaitingRepository waitingRepository;
     @Autowired
     private PaymentRepository paymentRepository;
-    @Autowired
+    private PaymentService paymentService;
     private ReservationService reservationService;
+
+    @BeforeEach
+    void setUp() {
+        paymentService = new PaymentService(paymentRepository, reservationRepository, testBuilder);
+        reservationService = new ReservationService(
+                paymentService, reservationRepository, reservationTimeRepository,
+                themeRepository, memberRepository, waitingRepository);
+    }
 
     @DisplayName("모든 예약 정보를 가져온다")
     @Test
@@ -112,6 +130,43 @@ class ReservationServiceTest {
         // then
         SoftAssertions softAssertions = new SoftAssertions();
 
+        softAssertions.assertThat(result.member().name()).isEqualTo("포스티");
+        softAssertions.assertThat(result.date()).isEqualTo(date);
+        softAssertions.assertThat(result.time()).isEqualTo(new ReservationTimeResponse(timeId, time));
+        softAssertions.assertThat(result.theme())
+                .isEqualTo(new ThemeResponse(themeId, savedTheme.getName(), savedTheme.getDescription(),
+                        savedTheme.getThumbnail()));
+
+        softAssertions.assertAll();
+    }
+
+    @DisplayName("결제 예약을 추가한다.")
+    @Test
+    void createReservationWithPayment() {
+        // given
+        Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
+        Long themeId = savedTheme.getId();
+
+        LocalTime time = LocalTime.of(8, 0);
+        ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(time));
+        Long timeId = savedTime.getId();
+        Member savedMember = memberRepository.save(new Member("포스티", "test@test.com", "12341234", Role.MEMBER));
+
+        LocalDate date = nextDay();
+
+        ReservationCreateRequest requestDto =
+                new ReservationCreateRequest(date, timeId, themeId, LoginMember.of(savedMember));
+        PaymentRequest paymentRequest = new PaymentRequest("paymentKey", "orderId", 1_000L);
+
+        server.expect(MockRestRequestMatchers.requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
+                .andRespond(MockRestResponseCreators.withSuccess());
+
+        // when
+        ReservationResponse result = reservationService.create(requestDto, paymentRequest);
+
+        // then
+        SoftAssertions softAssertions = new SoftAssertions();
         softAssertions.assertThat(result.member().name()).isEqualTo("포스티");
         softAssertions.assertThat(result.date()).isEqualTo(date);
         softAssertions.assertThat(result.time()).isEqualTo(new ReservationTimeResponse(timeId, time));

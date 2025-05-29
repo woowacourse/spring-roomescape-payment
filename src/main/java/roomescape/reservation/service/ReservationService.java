@@ -36,7 +36,6 @@ import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.reservation.payment.dto.request.PaymentRequest;
-import roomescape.reservation.payment.repository.PaymentRepository;
 import roomescape.reservation.payment.service.PaymentService;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
@@ -52,7 +51,6 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
-    private final PaymentRepository paymentRepository;
 
     public ReservationService(
             final PaymentService paymentService,
@@ -60,8 +58,7 @@ public class ReservationService {
             final ReservationTimeRepository reservationTimeRepository,
             final ThemeRepository themeRepository,
             final MemberRepository memberRepository,
-            final WaitingRepository waitingRepository,
-            final PaymentRepository paymentRepository
+            final WaitingRepository waitingRepository
     ) {
         this.paymentService = paymentService;
         this.reservationRepository = reservationRepository;
@@ -69,7 +66,6 @@ public class ReservationService {
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
-        this.paymentRepository = paymentRepository;
     }
 
     public List<ReservationResponse> getAll() {
