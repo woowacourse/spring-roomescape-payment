@@ -3,6 +3,7 @@ package roomescape.presentation.rest;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -25,6 +26,8 @@ import roomescape.application.ReservationService;
 import roomescape.domain.auth.AuthenticationInfo;
 import roomescape.domain.user.UserRole;
 import roomescape.exception.NotFoundException;
+import roomescape.exception.PaymentFailedException;
+import roomescape.exception.PaymentInternalException;
 import roomescape.presentation.GlobalExceptionHandler;
 import roomescape.presentation.StubAuthenticationInfoArgumentResolver;
 
@@ -43,6 +46,9 @@ class ReservationControllerTest {
     @Test
     @DisplayName("예약 추가 요청시, id를 포함한 예약 내용과 CREATED를 응답한다.")
     void reserve() throws Exception {
+        Mockito.doNothing()
+                .when(paymentService).pay(anyString(), anyString(), anyLong());
+
         Mockito.when(reservationService.reserve(anyLong(), any(), anyLong(), anyLong()))
             .thenReturn(anyReservationWithNewId());
 
@@ -52,7 +58,10 @@ class ReservationControllerTest {
                     {
                         "date": "3000-03-17",
                         "timeId": "1",
-                        "themeId": "1"
+                        "themeId": "1",
+                        "paymentKey": "a",
+                        "orderId": "1",
+                        "amount": 1000
                     }
                     """))
             .andExpect(jsonPath("$..['id','user','date','time','theme']").exists())
@@ -60,8 +69,80 @@ class ReservationControllerTest {
     }
 
     @Test
+    @DisplayName("결제 승인 실패 시 예약이 생성되지 않는다.")
+    void cannotReserveWhenPaymentFailed() throws Exception {
+        Mockito.doThrow(new RuntimeException("결제 실패"))
+                .when(paymentService).pay(anyString(), anyString(), anyLong());
+
+        mockMvc.perform(post("/reservations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                        "date": "3000-03-17",
+                        "timeId": "1",
+                        "themeId": "1",
+                        "paymentKey": "a",
+                        "orderId": "1",
+                        "amount": 1000
+                    }
+                    """))
+            .andExpect(status().isInternalServerError());
+
+        Mockito.verify(reservationService, never()).reserve(anyLong(), any(), anyLong(), anyLong());
+    }
+
+    @Test
+    @DisplayName("잘못된 요청으로 결제 승인 실패 시 BAD REQUEST를 응답한다.")
+    void cannotReserveWhenBadRequest() throws Exception {
+        Mockito.doThrow(new PaymentFailedException("결제에 실패했습니다."))
+                .when(paymentService).pay(anyString(), anyString(), anyLong());
+
+        mockMvc.perform(post("/reservations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                        "date": "3000-03-17",
+                        "timeId": "1",
+                        "themeId": "1",
+                        "paymentKey": "a",
+                        "orderId": "1",
+                        "amount": 1000
+                    }
+                    """))
+            .andExpect(status().isBadRequest());
+
+        Mockito.verify(reservationService, never()).reserve(anyLong(), any(), anyLong(), anyLong());
+    }
+
+    @Test
+    @DisplayName("서버 내부 오류로 결제 승인 실패 시 INTERNAL SERVER ERROR를 응답한다.")
+    void cannotReserveWhenInternalServerError() throws Exception {
+        Mockito.doThrow(new PaymentInternalException("결제에 실패했습니다."))
+                .when(paymentService).pay(anyString(), anyString(), anyLong());
+
+        mockMvc.perform(post("/reservations")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                        "date": "3000-03-17",
+                        "timeId": "1",
+                        "themeId": "1",
+                        "paymentKey": "a",
+                        "orderId": "1",
+                        "amount": 1000
+                    }
+                    """))
+            .andExpect(status().isInternalServerError());
+
+        Mockito.verify(reservationService, never()).reserve(anyLong(), any(), anyLong(), anyLong());
+    }
+
+    @Test
     @DisplayName("예약 대기 요청시, id를 포함한 예약 내용과 CREATED를 응답한다.")
     void waitFor() throws Exception {
+        Mockito.doNothing()
+                .when(paymentService).pay(anyString(), anyString(), anyLong());
+
         Mockito.when(reservationService.waitFor(anyLong(), any(), anyLong(), anyLong()))
             .thenReturn(anyReservationWithNewId());
 
@@ -71,7 +152,10 @@ class ReservationControllerTest {
                     {
                         "date": "3000-03-17",
                         "timeId": "1",
-                        "themeId": "1"
+                        "themeId": "1",
+                        "paymentKey": "a",
+                        "orderId": "1",
+                        "amount": 1000
                     }
                     """))
             .andExpect(jsonPath("$..['id','user','date','time','theme']").exists())
