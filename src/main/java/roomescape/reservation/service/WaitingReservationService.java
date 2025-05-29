@@ -25,7 +25,7 @@ public class WaitingReservationService {
     private final RoomEscapeInformationRepository roomEscapeInformationRepository;
 
     @Transactional
-    public WaitingReservationResponse save(final WaitingReservationRequest request, final LoginMember loginMember) {
+    public WaitingReservationResponse registerWaitingReservation(final WaitingReservationRequest request, final LoginMember loginMember) {
         final Member member = memberRepository.findById(loginMember.id())
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 멤버입니다."));
         final RoomEscapeInformation roomEscapeInformation = roomEscapeInformationRepository.findByDateAndTimeIdAndThemeId(

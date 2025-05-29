@@ -97,7 +97,7 @@ class ReservationServiceTest {
 
         // when
         // then
-        assertThatThrownBy(() -> service.saveReservation(request, loginMember))
+        assertThatThrownBy(() -> service.resisterReservation(request, loginMember))
                 .isInstanceOf(ReservationException.class)
                 .hasMessage("예약은 현재 시간 이후로 가능합니다.");
     }
@@ -114,7 +114,7 @@ class ReservationServiceTest {
         ReservationRequest req = new ReservationRequest(LocalDate.of(2999, 4, 21), time.getId(), theme.getId());
 
         // when
-        ReservationResponse result = service.saveReservation(req, loginMember);
+        ReservationResponse result = service.resisterReservation(req, loginMember);
 
         // then
         SoftAssertions.assertSoftly(soft -> {

@@ -18,7 +18,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public void save(final MemberRequest memberRequest) {
+    public void signup(final MemberRequest memberRequest) {
         if (memberRepository.existsByEmail(memberRequest.email())) {
             throw new IllegalArgumentException("이미 가입된 이메일입니다. email=" + memberRequest.email());
         }

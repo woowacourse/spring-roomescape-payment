@@ -53,7 +53,7 @@ public class ReservationController {
             @Valid @RequestBody final ReservationRequest request,
             final LoginMember member
     ) {
-        return reservationService.saveReservation(request, member);
+        return reservationService.resisterReservation(request, member);
     }
 
     @DeleteMapping("/{id}")

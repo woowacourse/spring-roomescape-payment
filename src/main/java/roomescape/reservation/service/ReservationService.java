@@ -59,7 +59,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse saveReservation(final ReservationRequest request, final LoginMember loginMember) {
+    public ReservationResponse resisterReservation(final ReservationRequest request, final LoginMember loginMember) {
         final ReservationTime reservationTime = findReservationTimeById(request.timeId());
         final Theme theme = findThemeById(request.themeId());
         final Member member = findMemberById(loginMember.id());

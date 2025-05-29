@@ -29,6 +29,6 @@ public class MemberController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void signup(@RequestBody @Valid MemberRequest request) {
-        memberService.save(request);
+        memberService.signup(request);
     }
 }

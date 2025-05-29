@@ -30,7 +30,7 @@ public class WaitingReservationController {
     @ResponseStatus(HttpStatus.CREATED)
     public WaitingReservationResponse saveWaitingReservation(@Valid @RequestBody final WaitingReservationRequest request,
                                            final LoginMember member) {
-        return waitingReservationService.save(request, member);
+        return waitingReservationService.registerWaitingReservation(request, member);
     }
 
     @DeleteMapping("{id}")

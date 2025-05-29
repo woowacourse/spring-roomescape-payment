@@ -32,7 +32,7 @@ class MemberServiceTest {
         MemberRequest request = new MemberRequest("hong@example.com", "password", "홍길동");
 
         // when
-        memberService.save(request);
+        memberService.signup(request);
 
         // then
         final Member saved = memberRepository.findByEmailAndPassword(request.email(),

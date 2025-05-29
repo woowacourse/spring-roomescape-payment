@@ -19,11 +19,11 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final ReservationService reservationService;
 
-    public void save(final ReservationPaymentRequest request, final LoginMember loginMember) {
+    public void savePayment(final ReservationPaymentRequest request, final LoginMember loginMember) {
         log.debug("ReservationPaymentRequest: {}", request);
         log.debug("LoginMember: {}", loginMember);
 
-        final ReservationResponse reservationResponse = reservationService.saveReservation(request.toReservationRequest(), loginMember);
+        final ReservationResponse reservationResponse = reservationService.resisterReservation(request.toReservationRequest(), loginMember);
         final Reservation reservation = reservationService.findById(reservationResponse.id());
         log.debug("Reservation ID: {}", reservation.getId());
 
