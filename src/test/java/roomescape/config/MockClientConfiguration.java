@@ -7,7 +7,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 
 @Configuration
-public class MockClient {
+public class MockClientConfiguration {
 
     private MockRestServiceServer mockRestServiceServer;
 
