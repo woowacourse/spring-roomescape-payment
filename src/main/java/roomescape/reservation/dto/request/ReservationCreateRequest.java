@@ -28,4 +28,8 @@ public record ReservationCreateRequest(ReservationRequest reservation, PaymentRe
         return payment().amount();
     }
 
+    public String getPaymentType() {
+        return payment.paymentType();
+    }
+
 }
