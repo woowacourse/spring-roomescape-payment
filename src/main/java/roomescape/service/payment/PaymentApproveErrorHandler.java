@@ -2,12 +2,13 @@ package roomescape.service.payment;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.client.ResponseErrorHandler;
 
 public class PaymentApproveErrorHandler implements ResponseErrorHandler {
@@ -27,11 +28,13 @@ public class PaymentApproveErrorHandler implements ResponseErrorHandler {
 
     @Override
     public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
-        final String code = extractMessage(response, "code");
+        byte[] bodyBytes = StreamUtils.copyToByteArray(response.getBody());
+        JsonNode jsonNode = objectMapper.readTree(new ByteArrayInputStream(bodyBytes));
+        final String code = extractMessage(jsonNode, "code");
         if (isSensitiveError(code)) {
             throw new IllegalStateException("[ERROR] 결제 승인 중 예외가 발생하였습니다.");
         }
-        final String errMessage = extractMessage(response, "message");
+        final String errMessage = extractMessage(jsonNode, "message");
         throw new IllegalStateException("[ERROR] " + errMessage);
     }
 
@@ -39,9 +42,7 @@ public class PaymentApproveErrorHandler implements ResponseErrorHandler {
         return sensitiveErrorCodes.contains(code);
     }
 
-    private String extractMessage(ClientHttpResponse response, String key) throws IOException {
-        InputStream inputStream = response.getBody();
-        JsonNode jsonNode = objectMapper.readTree(inputStream);
+    private String extractMessage(JsonNode jsonNode, String key) {
         return jsonNode.get(key).asText();
     }
 }

@@ -23,6 +23,7 @@ public class PaymentApproveClient {
         this.restClient = RestClient.builder()
                 .baseUrl(baseUrl)
                 .requestFactory(requestFactory)
+                .defaultStatusHandler(new PaymentApproveErrorHandler())
                 .build();
         this.widgetSecretKey = widgetSecretKey;
     }
@@ -35,13 +36,11 @@ public class PaymentApproveClient {
                 "paymentKey", paymentKey
         );
 
-        final PaymentApproveErrorHandler errorHandler = new PaymentApproveErrorHandler();
         return restClient.post().uri("/v1/payments/confirm")
                 .header("Authorization", authorizations)
                 .accept(MediaType.APPLICATION_JSON)
                 .body(requestBody)
                 .retrieve()
-                .onStatus(errorHandler)
                 .body(PaymentSuccessResponse.class);
     }
 
