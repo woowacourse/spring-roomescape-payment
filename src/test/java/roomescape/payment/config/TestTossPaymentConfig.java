@@ -6,10 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.support.RestClientAdapter;
-import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 import roomescape.payment.interceptor.TossPaymentResponseInterceptor;
-import roomescape.payment.service.TossPaymentClient;
 
 @TestConfiguration
 public class TestTossPaymentConfig {
@@ -18,6 +15,9 @@ public class TestTossPaymentConfig {
 
     private final ObjectMapper objectMapper;
     private final String token;
+
+    @Value("${payment.connection-timeout}")
+    private int connectTimeoutMs;
 
     public TestTossPaymentConfig(ObjectMapper objectMapper, @Value("${payment.token}") String token) {
         this.objectMapper = objectMapper;

@@ -11,7 +11,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -107,9 +106,9 @@ class TossPaymentClientTest {
                 .hasMessage(expectedMessage);
     }
 
-    @Disabled("타임 아웃 테스트")
+    //    @Disabled("타임 아웃 테스트")
     @Test
-    void 결제_서비스에_3초_이상_걸릴_경우_예외_반환() throws JsonProcessingException {
+    void 결제_서비스에_타임아웃이_발생한_경우_예외_반환() throws JsonProcessingException {
         String paymentKey = "paymentKey";
         String orderId = "orderId";
         Long amount = 10000L;
