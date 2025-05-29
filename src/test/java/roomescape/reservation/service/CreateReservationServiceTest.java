@@ -12,9 +12,9 @@ import org.springframework.test.context.ActiveProfiles;
 import roomescape.auth.service.dto.LoginMember;
 import roomescape.common.exception.DuplicatedException;
 import roomescape.common.exception.EntityNotFoundException;
-import roomescape.config.ClientConfig;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
+import roomescape.payment.service.TossPaymentService;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.service.dto.request.ReservationCreateRequest;
 import roomescape.reservation.service.dto.response.ReservationResponse;
@@ -31,7 +31,7 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @ActiveProfiles("test")
 @DataJpaTest
-@Import({CreateReservationService.class, ClientConfig.class})
+@Import({CreateReservationService.class, TossPaymentService.class})
 class CreateReservationServiceTest {
 
     private final LocalDateTime now = LocalDateTime.now();

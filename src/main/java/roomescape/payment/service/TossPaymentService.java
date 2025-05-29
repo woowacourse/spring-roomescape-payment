@@ -1,8 +1,10 @@
 package roomescape.payment.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import roomescape.common.exception.PaymentClientException;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.service.dto.ConfirmPaymentRequest;
 import roomescape.payment.service.dto.ConfirmPaymentResponse;
 import roomescape.payment.service.dto.PaymentFailure;
@@ -10,6 +12,7 @@ import roomescape.payment.service.dto.PaymentFailure;
 import java.util.Base64;
 import java.util.List;
 
+@Service
 public class TossPaymentService {
     private static final List<String> IGNORE_CODES = List.of(
             "INCORRECT_BASIC_AUTH_FORMAT",
@@ -21,9 +24,14 @@ public class TossPaymentService {
     private String secretKey;
 
     private final RestClient restClient;
+    private final PaymentRepository paymentRepository;
 
-    public TossPaymentService(RestClient restClient) {
-        this.restClient = restClient;
+    public TossPaymentService(
+            @Value("${api.toss.url}") String baseUrl,
+            PaymentRepository paymentRepository
+    ) {
+        this.restClient = RestClient.builder().baseUrl(baseUrl).build();
+        this.paymentRepository = paymentRepository;
     }
 
     // TODO: 결제 실패시 환불
@@ -34,7 +42,10 @@ public class TossPaymentService {
                 .body(paymentRequest)
                 .retrieve()
                 .body(ConfirmPaymentResponse.class);
+
         handlePaymentResponse(paymentResponse);
+
+        paymentRepository.save(paymentResponse.toEntity());
         return paymentResponse;
     }
 

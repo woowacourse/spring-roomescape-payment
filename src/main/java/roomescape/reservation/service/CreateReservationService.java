@@ -7,11 +7,8 @@ import roomescape.common.exception.DuplicatedException;
 import roomescape.common.exception.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.payment.domain.Payment;
-import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.service.TossPaymentService;
 import roomescape.payment.service.dto.ConfirmPaymentRequest;
-import roomescape.payment.service.dto.ConfirmPaymentResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.repository.ReservationRepository;
@@ -30,7 +27,6 @@ public class CreateReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
-    private final PaymentRepository paymentRepository;
     private final TossPaymentService tossPaymentService;
 
     public CreateReservationService(
@@ -38,14 +34,12 @@ public class CreateReservationService {
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
             MemberRepository memberRepository,
-            PaymentRepository paymentRepository,
             TossPaymentService tossPaymentService
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
-        this.paymentRepository = paymentRepository;
         this.tossPaymentService = tossPaymentService;
     }
 
@@ -100,17 +94,10 @@ public class CreateReservationService {
 
     @Transactional
     public ReservationResponse createWithPayment(ReservationWithPaymentRequest request, LoginMember loginMember) {
-        ReservationCreateRequest reservationCreateRequest = new ReservationCreateRequest(
-                request.date(),
-                request.timeId(),
-                request.themeId(),
-                loginMember
-        );
-        ReservationResponse reservationResponse = create(reservationCreateRequest);
+        ReservationCreateRequest reservationCreateRequest = ReservationCreateRequest.from(request, loginMember);
 
-        ConfirmPaymentResponse paymentResponse = tossPaymentService.postConfirmPayment(ConfirmPaymentRequest.from(request));
-        Payment payment = new Payment(paymentResponse.paymentKey(), paymentResponse.totalAmount());
-        paymentRepository.save(payment);
+        ReservationResponse reservationResponse = create(reservationCreateRequest);
+        tossPaymentService.postConfirmPayment(ConfirmPaymentRequest.from(request));
 
         return reservationResponse;
     }

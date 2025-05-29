@@ -17,4 +17,8 @@ public record ReservationCreateRequest(
     public static ReservationCreateRequest from(final ReservationRequest request, final LoginMember loginMember) {
         return new ReservationCreateRequest(request.date(), request.timeId(), request.themeId(), loginMember);
     }
+
+    public static ReservationCreateRequest from(final ReservationWithPaymentRequest request, final LoginMember loginMember) {
+        return new ReservationCreateRequest(request.date(), request.timeId(), request.themeId(), loginMember);
+    }
 }
