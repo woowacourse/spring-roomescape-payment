@@ -23,13 +23,14 @@ public class PaymentApiTest {
             @Value("${toss_payment_secret_key}") String secretKey,
             @Value("${toss_order_id}") String orderId,
             @Value("${toss_order_payment_key}") String paymentKey,
-            @Value("${toss_order_amount}") long amount
+            @Value("${toss_order_amount}") long amount,
+            @Value("${toss_confirm_url") String confirmServerUrl
     ) {
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.amount = amount;
         RestClient realRestClient = RestClient.builder().baseUrl(paymentUrl).build();
-        this.realPaymentClient = new TossPaymentClient(realRestClient, secretKey);
+        this.realPaymentClient = new TossPaymentClient(realRestClient, secretKey, confirmServerUrl);
     }
 
 

@@ -17,21 +17,24 @@ class PaymentApiTest {
     private final String secretKey;
     private final String paymentUrl;
     private final TossPaymentClient realPaymentClient;
+    private final String confirmServerUrl;
 
     public PaymentApiTest(
             @Value("${toss_payment_url}") String paymentUrl,
-            @Value("${toss_payment_secret_key}") String secretKey
+            @Value("${toss_payment_secret_key}") String secretKey,
+            @Value("${toss_confirm_url") String confirmServerUrl
     ) {
         this.paymentUrl = paymentUrl;
         this.secretKey = secretKey;
+        this.confirmServerUrl = confirmServerUrl;
         RestClient realRestClient = RestClient.builder().baseUrl(paymentUrl).build();
-        realPaymentClient = new TossPaymentClient(realRestClient, secretKey);
+        realPaymentClient = new TossPaymentClient(realRestClient, secretKey, confirmServerUrl);
     }
 
     @Test
     void connectionError() {
         RestClient invalidRestClient = RestClient.builder().baseUrl(paymentUrl + "asdf").build();
-        PaymentClient invalidPaymentClient = new TossPaymentClient(invalidRestClient, secretKey);
+        PaymentClient invalidPaymentClient = new TossPaymentClient(invalidRestClient, secretKey, confirmServerUrl);
         assertThatThrownBy(() -> invalidPaymentClient.pay("asdf", "asdf", 1234))
                 .isInstanceOf(ResourceAccessException.class);
     }
