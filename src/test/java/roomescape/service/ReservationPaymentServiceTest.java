@@ -80,7 +80,6 @@ class ReservationPaymentServiceTest {
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(400)
                 .setHeader("Content-Type", "application/json")
-                .setBodyDelay(10, TimeUnit.SECONDS)
                 .setBody(errorResponse));
 
         Theme theme = Theme.createWithoutId("테마1", "테마1 설명", "thumbnail1.jpg");
