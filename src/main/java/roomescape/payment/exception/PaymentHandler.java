@@ -47,6 +47,12 @@ public class PaymentHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(e, e.getStatusCode(), messageOnly, request);
     }
 
+    @ExceptionHandler(PaymentTimeoutException.class)
+    public ResponseEntity<Object> handleTimeout(final PaymentTimeoutException e, final WebRequest request) {
+        log.error(e.getMessage(), e);
+        return buildResponseEntity(e, HttpStatus.GATEWAY_TIMEOUT, e.getMessage(), request);
+    }
+
     private ResponseEntity<Object> buildResponseEntity(
             final Exception e,
             final HttpStatusCode status,
