@@ -27,12 +27,12 @@ public class PaymentClient {
                     .retrieve()
                     .body(PaymentResponse.class);
         } catch (RestClientResponseException e) {
-            exceptionable(e, request.paymentKey());
+            resolveException(e, request.paymentKey());
         }
         throw new RuntimeException("결제 과정 중 에러가 발생했습니다.");
     }
 
-    private void exceptionable(final RestClientResponseException e, final String paymentKey) {
+    private void resolveException(final RestClientResponseException e, final String paymentKey) {
         try {
             String responseBody = e.getResponseBodyAsString();
             JsonNode jsonNode = MAPPER.readTree(responseBody);

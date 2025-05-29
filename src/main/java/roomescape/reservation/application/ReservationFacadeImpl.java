@@ -7,7 +7,6 @@ import roomescape.common.domain.DomainTerm;
 import roomescape.common.exception.DuplicateException;
 import roomescape.payment.client.PaymentClient;
 import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResponse;
 import roomescape.reservation.application.dto.AvailableReservationTimeServiceRequest;
 import roomescape.reservation.application.dto.CreateReservationServiceRequest;
 import roomescape.reservation.application.dto.MyReservationsResponse;
@@ -94,9 +93,9 @@ public class ReservationFacadeImpl implements ReservationFacade {
     public ReservationResponse create(final CreateReservationWithUserIdWebRequest request) {
         final User user = userQueryService.getById(request.userId());
         final Reservation reservation = reservationCommandService.create(
-                request.toServiceRequest()); // todo. paymentKey를 저장하기?
+                request.toServiceRequest());
 
-        PaymentResponse response = paymentClient.confirmPayment(
+        paymentClient.confirmPayment(
                 new PaymentRequest(request.paymentKey(),
                         request.amount(),
                         request.orderId(),
@@ -162,8 +161,8 @@ public class ReservationFacadeImpl implements ReservationFacade {
     }
 
     private void promotionWaiting(final Long id, final Long waitingId) {
-        waitingReservationCommandService.delete(waitingId);
         final Long userId = waitingReservationQueryService.findUserIdById(waitingId);
+        waitingReservationCommandService.delete(waitingId);
         reservationCommandService.updateUserId(id, userId);
     }
 }

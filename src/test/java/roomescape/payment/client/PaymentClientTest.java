@@ -35,7 +35,7 @@ class PaymentClientTest {
     void confirmPayment() {
         // given
         PaymentRequest request = new PaymentRequest("paymentKey123", 1000, "orderId123", "paymentType");
-        PaymentResponse expectedResponse = new PaymentResponse("success", 1000, "orderId123", "paymentKey123");
+        PaymentResponse expectedResponse = new PaymentResponse("paymentKey123", 1000, "orderId123", "DONE");
 
         RequestBodyUriSpec uriSpec = mock(RequestBodyUriSpec.class);
         RequestBodySpec bodySpec = mock(RequestBodySpec.class);
