@@ -1,12 +1,10 @@
-package roomescape.reservation.exception;
+package roomescape.payment.exception;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
-import org.springframework.web.client.RestClient;
 
 import java.io.IOException;
 import java.net.URI;

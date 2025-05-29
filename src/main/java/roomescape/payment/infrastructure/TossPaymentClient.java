@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.reservation.exception.RequestPaymentErrorHandler;
+import roomescape.payment.exception.RequestPaymentErrorHandler;
 import roomescape.payment.domain.PaymentClient;
 import roomescape.reservation.presentation.dto.PaymentRequest;
 import roomescape.payment.infrastructure.dto.PaymentResponse;
