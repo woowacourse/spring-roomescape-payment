@@ -7,18 +7,17 @@ import java.util.List;
 import java.util.Optional;
 
 import jakarta.validation.Valid;
-import org.apache.catalina.connector.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
-import roomescape.auth.login.presentation.dto.LoginMemberInfo;
-import roomescape.auth.login.presentation.dto.annotation.LoginMember;
-import roomescape.common.exception.handler.dto.ExceptionResponse;
-import roomescape.member.presentation.dto.MyReservationResponse;
-import roomescape.reservation.presentation.dto.ReservationRequest;
-import roomescape.reservation.presentation.dto.ReservationResponse;
-import roomescape.reservation.presentation.dto.WaitingResponse;
+import roomescape.auth.dto.LoginMemberInfo;
+import roomescape.auth.annotation.LoginMember;
+import roomescape.common.dto.ExceptionResponse;
+import roomescape.member.dto.MyReservationResponse;
+import roomescape.reservation.dto.ReservationRequest;
+import roomescape.reservation.dto.ReservationResponse;
+import roomescape.reservation.dto.WaitingResponse;
 import roomescape.reservation.service.ReservationService;
 
 @RestController

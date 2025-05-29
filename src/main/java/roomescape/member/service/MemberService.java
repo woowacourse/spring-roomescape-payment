@@ -8,8 +8,8 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.member.exception.EmailException;
 import roomescape.member.exception.MemberNotFound;
-import roomescape.member.presentation.dto.MemberRequest;
-import roomescape.member.presentation.dto.MemberResponse;
+import roomescape.member.dto.MemberRequest;
+import roomescape.member.dto.MemberResponse;
 
 @Service
 @Transactional(readOnly = true)

@@ -5,8 +5,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.exception.RequestPaymentErrorHandler;
 import roomescape.payment.domain.PaymentClient;
-import roomescape.reservation.presentation.dto.PaymentRequest;
-import roomescape.payment.infrastructure.dto.PaymentResponse;
+import roomescape.reservation.dto.PaymentRequest;
+import roomescape.payment.dto.PaymentResponse;
 
 public class TossPaymentClient implements PaymentClient {
 

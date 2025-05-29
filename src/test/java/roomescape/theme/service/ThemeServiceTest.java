@@ -16,8 +16,8 @@ import roomescape.reservation.infrastructure.JpaReservationRepositoryAdapter;
 import roomescape.theme.domain.ThemeRepository;
 import roomescape.theme.exception.ThemeException;
 import roomescape.theme.infrastructure.JpaThemeRepository;
-import roomescape.theme.infrastructure.JpaThemeRepositoryAdaptor;
-import roomescape.theme.presentation.dto.PopularThemeResponse;
+import roomescape.theme.infrastructure.JpaThemeRepositoryAdapter;
+import roomescape.theme.dto.PopularThemeResponse;
 import roomescape.theme.service.ThemeServiceTest.ThemeConfig;
 
 @DataJpaTest
@@ -54,7 +54,7 @@ class ThemeServiceTest {
 
         @Bean
         public ThemeRepository themeRepository(JpaThemeRepository jpaThemeRepository) {
-            return new JpaThemeRepositoryAdaptor(jpaThemeRepository);
+            return new JpaThemeRepositoryAdapter(jpaThemeRepository);
         }
 
         @Bean

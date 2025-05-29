@@ -8,8 +8,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import roomescape.auth.login.presentation.dto.LoginRequest;
-import roomescape.auth.login.service.LoginService;
+import roomescape.auth.dto.LoginRequest;
+import roomescape.auth.presentation.AdminLoginController;
+import roomescape.auth.presentation.MemberLoginController;
+import roomescape.auth.service.LoginService;
 import roomescape.auth.token.JwtTokenManager;
 
 import static org.mockito.ArgumentMatchers.any;

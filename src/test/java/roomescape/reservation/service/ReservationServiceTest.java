@@ -19,12 +19,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.client.RestClient;
-import roomescape.auth.login.presentation.dto.LoginMemberInfo;
+import roomescape.auth.dto.LoginMemberInfo;
 import roomescape.common.util.time.DateTime;
 import roomescape.member.domain.MemberRepository;
 import roomescape.member.infrastructure.JpaMemberRepository;
 import roomescape.member.infrastructure.JpaMemberRepositoryAdapter;
-import roomescape.member.presentation.dto.MyReservationResponse;
+import roomescape.member.dto.MyReservationResponse;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.WaitingRepository;
@@ -35,16 +35,16 @@ import roomescape.reservation.infrastructure.JpaWaitingRepository;
 import roomescape.reservation.infrastructure.JpaWaitingRepositoryAdapter;
 import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.infrastructure.TossPaymentClient;
-import roomescape.reservation.presentation.dto.ReservationRequest;
-import roomescape.reservation.presentation.dto.ReservationResponse;
-import roomescape.reservation.presentation.dto.WaitingResponse;
+import roomescape.reservation.dto.ReservationRequest;
+import roomescape.reservation.dto.ReservationResponse;
+import roomescape.reservation.dto.WaitingResponse;
 import roomescape.reservation.service.ReservationServiceTest.ReservationConfig;
 import roomescape.reservationTime.domain.ReservationTimeRepository;
 import roomescape.reservationTime.infrastructure.JpaReservationTimeRepository;
-import roomescape.reservationTime.infrastructure.JpaReservationTimeRepositoryAdaptor;
+import roomescape.reservationTime.infrastructure.JpaReservationTimeRepositoryAdapter;
 import roomescape.theme.domain.ThemeRepository;
 import roomescape.theme.infrastructure.JpaThemeRepository;
-import roomescape.theme.infrastructure.JpaThemeRepositoryAdaptor;
+import roomescape.theme.infrastructure.JpaThemeRepositoryAdapter;
 
 @DataJpaTest
 @Import(ReservationConfig.class)
@@ -246,12 +246,12 @@ class ReservationServiceTest {
 
         @Bean
         public ReservationTimeRepository reservationTimeRepository(JpaReservationTimeRepository jpaReservationTimeRepository) {
-            return new JpaReservationTimeRepositoryAdaptor(jpaReservationTimeRepository);
+            return new JpaReservationTimeRepositoryAdapter(jpaReservationTimeRepository);
         }
 
         @Bean
         public ThemeRepository themeRepository(JpaThemeRepository jpaThemeRepository) {
-            return new JpaThemeRepositoryAdaptor(jpaThemeRepository);
+            return new JpaThemeRepositoryAdapter(jpaThemeRepository);
         }
 
         @Bean

@@ -4,12 +4,12 @@ import java.net.URI;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import roomescape.auth.login.presentation.dto.LoginAdminInfo;
-import roomescape.auth.login.presentation.dto.SearchCondition;
-import roomescape.auth.login.presentation.dto.annotation.LoginAdmin;
-import roomescape.reservation.presentation.dto.AdminReservationRequest;
-import roomescape.reservation.presentation.dto.ReservationRequest;
-import roomescape.reservation.presentation.dto.ReservationResponse;
+import roomescape.auth.dto.LoginAdminInfo;
+import roomescape.auth.dto.SearchCondition;
+import roomescape.auth.annotation.LoginAdmin;
+import roomescape.reservation.dto.AdminReservationRequest;
+import roomescape.reservation.dto.ReservationRequest;
+import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
 
 @RestController

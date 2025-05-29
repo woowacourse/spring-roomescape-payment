@@ -9,9 +9,9 @@ import roomescape.reservation.domain.ReservationRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeRepository;
 import roomescape.theme.exception.ThemeException;
-import roomescape.theme.presentation.dto.PopularThemeResponse;
-import roomescape.theme.presentation.dto.ThemeRequest;
-import roomescape.theme.presentation.dto.ThemeResponse;
+import roomescape.theme.dto.PopularThemeResponse;
+import roomescape.theme.dto.ThemeRequest;
+import roomescape.theme.dto.ThemeResponse;
 
 @Service
 @Transactional(readOnly = true)

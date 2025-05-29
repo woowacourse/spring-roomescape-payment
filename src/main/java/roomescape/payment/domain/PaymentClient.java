@@ -1,7 +1,7 @@
 package roomescape.payment.domain;
 
-import roomescape.reservation.presentation.dto.PaymentRequest;
-import roomescape.payment.infrastructure.dto.PaymentResponse;
+import roomescape.reservation.dto.PaymentRequest;
+import roomescape.payment.dto.PaymentResponse;
 
 public interface PaymentClient {
 

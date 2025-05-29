@@ -12,7 +12,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.exception.PaymentRequestException;
 import roomescape.payment.exception.RequestPaymentErrorHandler;
-import roomescape.reservation.presentation.dto.PaymentRequest;
+import roomescape.reservation.dto.PaymentRequest;
 
 
 import static org.assertj.core.api.Assertions.assertThatCode;

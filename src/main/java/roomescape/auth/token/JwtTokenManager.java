@@ -10,7 +10,7 @@ import java.util.Date;
 import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import roomescape.auth.token.exception.JwtExtractException;
+import roomescape.auth.exception.JwtExtractException;
 
 import static io.jsonwebtoken.Jwts.SIG.*;
 

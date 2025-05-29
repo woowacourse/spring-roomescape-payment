@@ -1,7 +1,7 @@
 package roomescape.reservation.infrastructure;
 
 import org.springframework.stereotype.Repository;
-import roomescape.reservation.infrastructure.dto.WaitingWithRank;
+import roomescape.reservation.dto.WaitingWithRank;
 import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.domain.WaitingRepository;
 

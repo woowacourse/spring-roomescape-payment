@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.common.exception.handler.dto.ExceptionResponse;
-import roomescape.reservationTime.presentation.dto.ReservationTimeRequest;
-import roomescape.reservationTime.presentation.dto.ReservationTimeResponse;
-import roomescape.reservationTime.presentation.dto.TimeConditionRequest;
-import roomescape.reservationTime.presentation.dto.TimeConditionResponse;
+import roomescape.common.dto.ExceptionResponse;
+import roomescape.reservationTime.dto.ReservationTimeRequest;
+import roomescape.reservationTime.dto.ReservationTimeResponse;
+import roomescape.reservationTime.dto.TimeConditionRequest;
+import roomescape.reservationTime.dto.TimeConditionResponse;
 import roomescape.reservationTime.service.ReservationTimeService;
 
 @RestController

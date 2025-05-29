@@ -16,9 +16,9 @@ import roomescape.reservation.infrastructure.JpaReservationRepositoryAdapter;
 import roomescape.reservationTime.domain.ReservationTimeRepository;
 import roomescape.reservationTime.exception.ReservationTimeException;
 import roomescape.reservationTime.infrastructure.JpaReservationTimeRepository;
-import roomescape.reservationTime.infrastructure.JpaReservationTimeRepositoryAdaptor;
-import roomescape.reservationTime.presentation.dto.TimeConditionRequest;
-import roomescape.reservationTime.presentation.dto.TimeConditionResponse;
+import roomescape.reservationTime.infrastructure.JpaReservationTimeRepositoryAdapter;
+import roomescape.reservationTime.dto.TimeConditionRequest;
+import roomescape.reservationTime.dto.TimeConditionResponse;
 import roomescape.reservationTime.service.ReservationTimeServiceTest.ReservationTimeConfig;
 
 @DataJpaTest
@@ -61,7 +61,7 @@ class ReservationTimeServiceTest {
         @Bean
         public ReservationTimeRepository reservationTimeRepository(
             JpaReservationTimeRepository jpaReservationTimeRepository) {
-            return new JpaReservationTimeRepositoryAdaptor(jpaReservationTimeRepository);
+            return new JpaReservationTimeRepositoryAdapter(jpaReservationTimeRepository);
         }
 
         @Bean
