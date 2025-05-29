@@ -28,15 +28,15 @@ public class ReservationTimeController {
 
     @GetMapping
     public ResponseEntity<List<ReservationTimeResponse>> getAll() {
-        final List<ReservationTimeResponse> reservationTimeResponses = reservationTimeFacade.getAll();
+        List<ReservationTimeResponse> reservationTimeResponses = reservationTimeFacade.getAll();
         return ResponseEntity.ok(reservationTimeResponses);
     }
 
     @PostMapping
     public ResponseEntity<ReservationTimeResponse> create(
             @RequestBody final CreateReservationTimeWebRequest createReservationTimeWebRequest) {
-        final ReservationTimeResponse reservationTimeResponse = reservationTimeFacade.create(createReservationTimeWebRequest);
-        final URI location = UriFactory.buildPath(BASE_PATH, String.valueOf(reservationTimeResponse.id()));
+        ReservationTimeResponse reservationTimeResponse = reservationTimeFacade.create(createReservationTimeWebRequest);
+        URI location = UriFactory.buildPath(BASE_PATH, String.valueOf(reservationTimeResponse.id()));
         return ResponseEntity.created(location)
                 .body(reservationTimeResponse);
     }

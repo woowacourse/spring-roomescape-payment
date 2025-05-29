@@ -40,7 +40,7 @@ public class ReservationTime {
         this.id = id;
         this.startAt = startAt;
     }
-    
+
     public static ReservationTime from(final LocalTime startAt) {
         return new ReservationTime(startAt);
     }

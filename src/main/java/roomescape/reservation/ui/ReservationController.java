@@ -42,7 +42,7 @@ public class ReservationController {
     public ResponseEntity<List<AvailableReservationTimeWebResponse>> getAvailable(
             @RequestParam final LocalDate date,
             @RequestParam final Long themeId) {
-        final List<AvailableReservationTimeWebResponse> reservations = reservationFacade.getAvailable(date, themeId);
+        List<AvailableReservationTimeWebResponse> reservations = reservationFacade.getAvailable(date, themeId);
         return ResponseEntity.ok(reservations);
     }
 
@@ -50,9 +50,9 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> create(
             @RequestBody final CreateReservationWebRequest request,
             @UserSession final Session session) {
-        final ReservationResponse reservationResponse = reservationFacade.create(
+        ReservationResponse reservationResponse = reservationFacade.create(
                 request.toRequestWithUserId(session.userId()));
-        final URI location = UriFactory.buildPath(BASE_PATH, String.valueOf(reservationResponse.reservationId()));
+        URI location = UriFactory.buildPath(BASE_PATH, String.valueOf(reservationResponse.reservationId()));
         return ResponseEntity.created(location)
                 .body(reservationResponse);
     }

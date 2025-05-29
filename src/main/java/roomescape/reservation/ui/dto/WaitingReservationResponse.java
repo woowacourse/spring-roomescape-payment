@@ -48,8 +48,8 @@ public record WaitingReservationResponse(Long id,
 
         return domains.stream()
                 .map(reservation -> {
-                    final Long userId = reservation.getUserId();
-                    final User user = userMap.get(userId);
+                    Long userId = reservation.getUserId();
+                    User user = userMap.get(userId);
                     return WaitingReservationResponse.from(reservation, user);
                 })
                 .toList();
