@@ -17,10 +17,6 @@ public class Password {
     @Column(name = "password", nullable = false)
     private String value;
 
-    public static Password createForLoginMember() {
-        return new Password(null);
-    }
-
     public static Password createForMember(@NonNull final String password) {
         return new Password(password);
     }

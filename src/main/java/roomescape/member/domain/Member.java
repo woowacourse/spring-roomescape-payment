@@ -13,7 +13,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import roomescape.auth.dto.LoginMember;
 
 @Getter
 @Entity
@@ -30,7 +29,7 @@ public class Member {
     @Column(nullable = false)
     private String email;
 
-    @Column(name = "password", nullable = false)
+    @Column(nullable = false)
     @Embedded
     private Password password;
 
@@ -50,15 +49,6 @@ public class Member {
         this.email = email;
         this.password = password;
         this.role = role;
-    }
-
-    public static Member from(final LoginMember loginMember) {
-        return Member.builder()
-                .name(loginMember.name())
-                .email(loginMember.email())
-                .password(Password.createForLoginMember())
-                .role(loginMember.role())
-                .build();
     }
 
     public boolean matchesPassword(final String password) {
