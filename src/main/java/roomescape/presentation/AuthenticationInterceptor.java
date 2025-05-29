@@ -23,12 +23,18 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             HttpServletResponse response,
             Object handler
     ) {
+        String uri = request.getRequestURI();
         String token = JwtTokenExtractor.extract(request);
 
         Role role = authService.findRoleByToken(token);
-        if (role != Role.ADMIN) {
+        if (uri.startsWith("/admin") && role != Role.ADMIN) {
             throw new AuthException("[ERROR] 권한이 필요합니다.", HttpStatus.FORBIDDEN);
         }
+
+        if (uri.equals("/reservation-mine") && !Role.hasRole(role)) {
+            throw new AuthException("[ERROR] 로그인이 필요합니다.", HttpStatus.UNAUTHORIZED);
+        }
+
         return true;
     }
 }

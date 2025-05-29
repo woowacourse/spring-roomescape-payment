@@ -161,7 +161,11 @@ class PageTest extends BaseTest {
 
     @Test
     void 사용자_내예약목록_페이지를_응답한다() {
+        givenCreatedMember();
+        String token = givenMemberLoginToken();
+
         RestAssured.given().log().all()
+                .cookie("token", token)
                 .when().get("/reservation-mine")
                 .then().log().all()
                 .statusCode(HttpStatus.OK.value());
