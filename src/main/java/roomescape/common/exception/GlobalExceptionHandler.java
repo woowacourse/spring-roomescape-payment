@@ -27,7 +27,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TossConfirmException.class)
     public ResponseEntity<String> handle(final TossConfirmException e) {
-        log.error("toss api exception : " + "code : " + e.getCode() + ", message :" + e.getMessage());
+        log.error(
+            "toss api exception : " + "code : " + e.getCode() + ", message :" + e.getMessage());
         return new ResponseEntity<>(e.getMessage(), e.getStatus());
     }
 

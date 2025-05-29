@@ -2,7 +2,7 @@ package roomescape.common.exception.impl;
 
 import org.springframework.http.HttpStatus;
 
-public class TossConfirmException extends RuntimeException{
+public class TossConfirmException extends RuntimeException {
 
     private final HttpStatus status;
     private final String code;

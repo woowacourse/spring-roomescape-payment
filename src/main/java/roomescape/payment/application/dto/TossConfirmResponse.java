@@ -5,8 +5,10 @@ public record TossConfirmResponse(
     String orderId, // amount <- 요청
     EasyPayInfo easyPay
 ) {
+
     public record EasyPayInfo(
         Long amount
     ) {
+
     }
 }

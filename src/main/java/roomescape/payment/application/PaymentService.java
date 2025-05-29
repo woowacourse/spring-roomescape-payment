@@ -45,7 +45,7 @@ public class PaymentService {
         final Long memberId
     ) {
         TossConfirmResponse response = tossPaymentGatewayClient.processPaymentConfirm(
-        new TossConfirmRequest(request.paymentKey(), request.orderId(), request.amount()));
+            new TossConfirmRequest(request.paymentKey(), request.orderId(), request.amount()));
         ReservationTime reservationTime = getReservationTime(request.timeId());
         Member member = getMember(memberId);
         Theme theme = getTheme(request.themeId());

@@ -106,7 +106,7 @@ public class MemberReservationApiTest {
     void 과거날짜로_예약을_하면_에러를_반환한다() {
         when(paymentService.addPayment(any(), anyLong()))
             .thenReturn(mock(Payment.class));
-        
+
         final MemberReservationRequest request = createRequest(LocalDate.now().minusDays(10), 1L,
             1L);
 

@@ -60,12 +60,12 @@ class PaymentServiceTest {
             () -> assertThat(payment.getId()).isNotNull(),
             () -> assertThat(payment.getPaymentInfo().equals(paymentInfo))
         );
-}
+    }
 
-private MemberReservationRequest createRequest(LocalDate now, Long timeId, Long themeId,
-    PaymentInfo paymentInfo) {
-    return new MemberReservationRequest(now, timeId, themeId, paymentInfo.getPaymentKey(),
-        paymentInfo.getOrderId(), paymentInfo.getAmount());
+    private MemberReservationRequest createRequest(LocalDate now, Long timeId, Long themeId,
+        PaymentInfo paymentInfo) {
+        return new MemberReservationRequest(now, timeId, themeId, paymentInfo.getPaymentKey(),
+            paymentInfo.getOrderId(), paymentInfo.getAmount());
     }
 }
 

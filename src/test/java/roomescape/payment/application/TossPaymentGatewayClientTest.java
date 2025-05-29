@@ -94,7 +94,8 @@ class TossPaymentGatewayClientTest {
             });
     }
 
-    private DefaultResponseCreator withJsonError(final HttpStatus status, final TossErrorResponse error) throws Exception {
+    private DefaultResponseCreator withJsonError(final HttpStatus status,
+        final TossErrorResponse error) throws Exception {
         return withStatus(status)
             .contentType(MediaType.APPLICATION_JSON)
             .body(objectMapper.writeValueAsString(error), StandardCharsets.UTF_8);
