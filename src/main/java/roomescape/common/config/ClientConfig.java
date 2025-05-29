@@ -16,6 +16,7 @@ public class ClientConfig {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(Duration.ofSeconds(3));
         requestFactory.setReadTimeout(Duration.ofSeconds(3));
+
         return RestClient.builder()
                 .baseUrl(TOSS_PAYMENT_BASE_URL)
                 .requestFactory(requestFactory)
