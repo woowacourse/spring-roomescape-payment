@@ -12,6 +12,7 @@ import org.springframework.test.context.ActiveProfiles;
 import roomescape.auth.service.dto.LoginMember;
 import roomescape.common.exception.DuplicatedException;
 import roomescape.common.exception.EntityNotFoundException;
+import roomescape.config.ClientConfig;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.reservation.domain.ReservationTime;
@@ -30,7 +31,7 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @ActiveProfiles("test")
 @DataJpaTest
-@Import(CreateReservationService.class)
+@Import({CreateReservationService.class, ClientConfig.class})
 class CreateReservationServiceTest {
 
     private final LocalDateTime now = LocalDateTime.now();
@@ -51,7 +52,7 @@ class CreateReservationServiceTest {
         entityManager.persist(member);
     }
 
-    @DisplayName("예약을 추가한다.")
+    @DisplayName("어드민 관할 예약을 추가한다.")
     @Test
     void test3() {
         // given
