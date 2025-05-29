@@ -1,21 +1,22 @@
 package roomescape.service;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.jsonResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.client.RestClientException;
 import org.wiremock.spring.EnableWireMock;
 import org.wiremock.spring.InjectWireMock;
 import roomescape.dto.response.PaymentSuccessResponse;
 import roomescape.service.payment.PaymentApproveClient;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.jsonResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @EnableWireMock
@@ -92,6 +93,21 @@ class PaymentApproveClientTest {
         ))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("결제 승인 중 예외가 발생하였습니다.");
+    }
+
+    @Test
+    @DisplayName("외부 API를 통해 결제 승인을 요청했지만 타임아웃 됨")
+    void approveFailureTimeoutTest() {
+        // given
+        wireMock.stubFor(post("/v1/payments/confirm")
+                .willReturn(aResponse().withFixedDelay(10000)));
+
+        // when, then
+        assertThatThrownBy(() -> paymentApproveClient.approvePayment(
+                "5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1",
+                "a4CWyWY5m89PNh7xJwhk1",
+                1000
+        )).isInstanceOf(RestClientException.class);
     }
 
     private String successResponse() {
