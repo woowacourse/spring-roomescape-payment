@@ -1,5 +1,10 @@
 package roomescape.reservation.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,12 +31,6 @@ import roomescape.user.domain.User;
 import roomescape.user.domain.UserName;
 import roomescape.user.domain.UserRepository;
 import roomescape.user.domain.UserRole;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -120,7 +119,7 @@ class ReservationFacadeIntegrationTest {
 
     @Test
     @DisplayName("예약 삭제 후, 대기된 예약이 있을 시 승격시킨다.")
-    void deleteAndPromotionWhenExsistsWaiting() {
+    void deleteAndPromotionWhenExistsWaiting() {
         // given
         long userId1 = 1L;
         final Reservation reservation = reservationRepository.save(Reservation.withoutId(userId1,
@@ -129,12 +128,13 @@ class ReservationFacadeIntegrationTest {
                 theme
         ));
         long userId2 = 2L;
-        final WaitingReservation waitingReservation = waitingReservationRepository.save(WaitingReservation.withoutId(userId2,
-                1,
-                ReservationDate.from(LocalDate.now().plusDays(1)),
-                time,
-                theme
-        ));
+        final WaitingReservation waitingReservation = waitingReservationRepository.save(
+                WaitingReservation.withoutId(userId2,
+                        1,
+                        ReservationDate.from(LocalDate.now().plusDays(1)),
+                        time,
+                        theme
+                ));
         //when
         reservationFacade.delete(reservation.getId());
         //then

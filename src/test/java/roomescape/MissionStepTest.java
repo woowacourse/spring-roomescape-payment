@@ -1,8 +1,17 @@
 package roomescape;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.restassured.RestAssured;
+import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,16 +39,6 @@ import roomescape.user.domain.User;
 import roomescape.user.domain.UserName;
 import roomescape.user.domain.UserRepository;
 import roomescape.user.domain.UserRole;
-
-import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.is;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -119,74 +118,6 @@ public class MissionStepTest {
                 .statusCode(200)
                 .body("size()", is(0));
     }
-
-//    @Test
-//    @DisplayName("3단계: localhost:8080/reservations 에 POST 요청 시 예약이 추가되고, DELETE 요청 시 각각 예약이 취소된다")
-//    void third() {
-//        // given
-//        final ReservationTime time = reservationTimeRepository.save(
-//                ReservationTime.withoutId(
-//                        LocalTime.now())
-//        );
-//
-//        final Theme theme = themeRepository.save(
-//                Theme.withoutId(
-//                        ThemeName.from("공포 제목"),
-//                        ThemeDescription.from("공포 설명"),
-//                        ThemeThumbnail.from("gongpo.com/image/1")
-//                )
-//        );
-//
-//        final User user = userRepository.save(
-//                User.withoutId(
-//                        UserName.from("강산"),
-//                        Email.from("email@email.com"),
-//                        Password.fromEncoded("1234"),
-//                        UserRole.ADMIN));
-//
-//        final CreateReservationWithUserIdWebRequest request = new CreateReservationWithUserIdWebRequest(
-//                LocalDate.now().plusDays(1),
-//                time.getId(),
-//                theme.getId(),
-//                user.getId()
-//        );
-//
-//        final Claims claims = Jwts.claims()
-//                .add(Session.Fields.userId, user.getId())
-//                .add(Session.Fields.name, user.getName().getValue())
-//                .add(Session.Fields.role, user.getRole().name())
-//                .build();
-//
-//        // when
-//        // then
-//        RestAssured.given().log().all()
-//                .cookie(TokenType.ACCESS.getDescription(), jwtManager.generate(claims, TokenType.ACCESS).getValue())
-//                .contentType(ContentType.JSON)
-//                .body(request)
-//                .when().post("/reservations")
-//                .then().log().all()
-//                .statusCode(201)
-//                .body("user.id", is(user.getId().intValue()));
-//
-//        RestAssured.given().log().all()
-//                .cookie(TokenType.ACCESS.getDescription(), jwtManager.generate(claims, TokenType.ACCESS).getValue())
-//                .when().get("/admin/reservations")
-//                .then().log().all()
-//                .statusCode(200)
-//                .body("size()", is(1));
-//
-//        RestAssured.given().log().all()
-//                .when().delete("/reservations/1")
-//                .then().log().all()
-//                .statusCode(204);
-//
-//        RestAssured.given().log().all()
-//                .cookie(TokenType.ACCESS.getDescription(), jwtManager.generate(claims, TokenType.ACCESS).getValue())
-//                .when().get("/admin/reservations")
-//                .then().log().all()
-//                .statusCode(200)
-//                .body("size()", is(0));
-//    }
 
     @Test
     @DisplayName("JdbcTemplate로 DataSource객체에 접근할 수 있다" +
