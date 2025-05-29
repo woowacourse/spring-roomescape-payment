@@ -16,6 +16,7 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 import roomescape.application.payment.dto.PaymentCommand;
 import roomescape.infrastructure.error.exception.PaymentException;
 
@@ -48,14 +49,19 @@ public class TossPaymentClient {
     }
 
     public void approve(PaymentCommand command) {
-        restClient.post()
-                .uri(CONFIRM_URI)
-                .header(HttpHeaders.AUTHORIZATION, createAuthorizationHeader())
-                .body(command)
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, this::handle4xxError)
-                .onStatus(HttpStatusCode::is5xxServerError, this::handle5xxError)
-                .toBodilessEntity();
+        try {
+            restClient.post()
+                    .uri(CONFIRM_URI)
+                    .header(HttpHeaders.AUTHORIZATION, createAuthorizationHeader())
+                    .body(command)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, this::handle4xxError)
+                    .onStatus(HttpStatusCode::is5xxServerError, this::handle5xxError)
+                    .toBodilessEntity();
+        } catch (RestClientException e) {
+            log.warn("토스 페이먼트 결제 승인 API 호출 실패", e);
+            throw new PaymentException("토스 결제 승인 요청에 실패했습니다. 관리자에게 문의하세요.");
+        }
     }
 
     private String createAuthorizationHeader() {
