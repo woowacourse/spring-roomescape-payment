@@ -24,7 +24,7 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping("/confirm/tossPay")
-    public TossPaymentResponse confirmPayment(@RequestBody @Valid ReservationPaymentRequest request) {
+    public TossPaymentResponse confirmPayment(@RequestBody @Valid final ReservationPaymentRequest request) {
         final TossPaymentRequest tossPaymentRequest = new TossPaymentRequest(
                 request.paymentKey(),
                 request.orderId(),
@@ -35,7 +35,7 @@ public class PaymentController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void savePayment(@RequestBody @Valid ReservationPaymentRequest request, LoginMember loginMember) {
+    public void savePayment(@RequestBody @Valid final ReservationPaymentRequest request, final LoginMember loginMember) {
         paymentService.savePayment(request, loginMember);
     }
 }

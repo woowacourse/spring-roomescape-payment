@@ -12,7 +12,7 @@ public record TossPaymentResponse(
         EasyPay easyPay
 
 ) {
-    private record EasyPay(String provider, Long amount, Long discountAmount){
+    private record EasyPay(String provider, Long amount, Long discountAmount) {
     }
 }
 

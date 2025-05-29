@@ -2,6 +2,7 @@ package roomescape.payment.exception;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -29,22 +30,21 @@ public class PaymentHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(HttpClientErrorException.class)
     public ResponseEntity<Object> handleBadRequestException(final HttpClientErrorException e, final WebRequest request)
     {
-        final String rawBody = e.getResponseBodyAsString();
-        String messageOnly;
-        TossErrorResponse response = null;
-        try {
-            response = OBJECT_MAPPER.readValue(rawBody, TossErrorResponse.class);
-            messageOnly = response.message();
-        } catch (JsonProcessingException ex) {
-            log.warn("JSON 파싱 실패: 원본 바디 반환", ex);
-            messageOnly = rawBody;
-        }
-
-        if (response == null || response.isPaymentError()) {
-            log.error(messageOnly, e.getStatusCode());
+        final Optional<TossErrorResponse> response = extractResponse(e.getResponseBodyAsString());
+        if (response.isEmpty() || response.get().isPaymentError()) {
+            log.error(response.get().message(), e.getStatusCode());
             return buildResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR, "결제 관련 내부 오류가 발생했습니다.", request);
         }
-        return buildResponseEntity(e, e.getStatusCode(), messageOnly, request);
+        return buildResponseEntity(e, e.getStatusCode(), response.get().message(), request);
+    }
+
+    private Optional<TossErrorResponse> extractResponse(String rawBody) {
+        try {
+            return Optional.of(OBJECT_MAPPER.readValue(rawBody, TossErrorResponse.class));
+        } catch (JsonProcessingException ex) {
+            log.warn("JSON 파싱 실패: 원본 바디 반환", ex);
+        }
+        return Optional.empty();
     }
 
     @ExceptionHandler(PaymentTimeoutException.class)

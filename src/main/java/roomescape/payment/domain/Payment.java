@@ -18,20 +18,21 @@ import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
-    Member member;
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private Member member;
 
+    @JoinColumn(nullable = false)
     @OneToOne(optional = false, fetch = FetchType.LAZY)
-    Reservation reservation;
+    private Reservation reservation;
 
     @Column(nullable = false)
     private String paymentKey;
