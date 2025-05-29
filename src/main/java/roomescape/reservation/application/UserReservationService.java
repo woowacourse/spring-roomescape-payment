@@ -29,7 +29,7 @@ public class UserReservationService {
 
     @Transactional
     public ReservationServiceResponse create(CreateReservationServiceRequest request) {
-        paymentClient.requestApprove(request.toPaymentInfo());
+        paymentClient.requestConfirm(request.toPaymentInfo());
         Reservation savedReservation = reservationOperation.reserve(request.toSchedule(), request.memberId());
         return ReservationServiceResponse.from(savedReservation);
     }
