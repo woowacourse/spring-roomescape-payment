@@ -46,7 +46,7 @@ public class PaymentService {
 
         if (paymentResponse.getStatusCode() == HttpStatusCode.valueOf(401) ||
             paymentResponse.getStatusCode().is5xxServerError()) {
-            throw new PaymentException("알 수 없는 문제가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new PaymentException(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         throw new PaymentException(message, HttpStatus.BAD_REQUEST);

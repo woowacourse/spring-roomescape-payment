@@ -73,7 +73,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PaymentException.class)
     public ResponseEntity<ErrorResponse> handlePaymentException(PaymentException e) {
         String message = e.getMessage();
-        ErrorResponse errorResponse = ErrorResponse.of(e.getStatus(), message);
+        HttpStatus status = e.getStatus();
+        if (status.is5xxServerError()) {
+            handleAllExceptions(e);
+        }
+        ErrorResponse errorResponse = ErrorResponse.of(status, message);
         return ResponseEntity.status(e.getStatus()).body(errorResponse);
     }
 
