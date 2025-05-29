@@ -71,11 +71,9 @@ public class TossPaymentClient {
             final String message = node.path("message").asText("토스 결제 실패 관리자에게 문의하세요.");
             log.warn("결제 승인 실패 - code: {}, message: {}", code, message);
             throw new PaymentException(message);
-        } catch (final JsonProcessingException e) {
-            log.warn("토스 페이먼트 응답 형식 에러", e);
-            throw new PaymentException("토스 결제 실패 관리자에게 문의하세요.");
         } catch (final IOException e) {
-            throw new RuntimeException(e);
+            log.warn("토스 페이먼트 응답 파싱 에러", e);
+            throw new PaymentException("토스 결제 실패 관리자에게 문의하세요.");
         }
     }
 
