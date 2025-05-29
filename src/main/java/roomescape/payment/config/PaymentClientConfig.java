@@ -1,5 +1,6 @@
 package roomescape.payment.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,7 @@ import roomescape.payment.client.PaymentClient;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+@Slf4j
 @Configuration
 public class PaymentClientConfig {
 
@@ -35,19 +37,14 @@ public class PaymentClientConfig {
 
     private ClientHttpRequestInterceptor loggingInterceptor() {
         return (request, body, execution) -> {
-            System.out.println("=== RestClient 요청 정보 ===");
-            System.out.println("HTTP Method: " + request.getMethod());
-            System.out.println("URI: " + request.getURI());
-            System.out.println("Headers: " + request.getHeaders());
-            System.out.println("Body: " + new String(body, StandardCharsets.UTF_8));
-            System.out.println("========================");
+            log.info("Payment API 요청: {} {} | Body: {}",
+                    request.getMethod(),
+                    request.getURI(),
+                    new String(body, StandardCharsets.UTF_8));
 
             ClientHttpResponse response = execution.execute(request, body);
 
-            System.out.println("=== RestClient 응답 정보 ===");
-            System.out.println("Status Code: " + response.getStatusCode());
-            System.out.println("Response Headers: " + response.getHeaders());
-            System.out.println("=========================");
+            log.info("Payment API 응답: {}", response.getStatusCode());
 
             return response;
         };
