@@ -1,8 +1,10 @@
 package roomescape.payment;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.Base64.Encoder;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.Builder;
@@ -20,7 +22,12 @@ public class PaymentService {
     private final RestClient restClient;
 
     public PaymentService(final Builder restClientBuilder) {
+        final SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(1500);
+        requestFactory.setReadTimeout(1500);
+
         restClient = restClientBuilder
+                .requestFactory(requestFactory)
                 .defaultStatusHandler(new PaymentErrorHandler())
                 .defaultHeader("Authorization", getAuthorization())
                 .defaultHeader("Content-Type", "application/json")
