@@ -25,6 +25,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
@@ -39,7 +41,7 @@ import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
 import roomescape.reservationslot.presentation.dto.response.MyReservationResponse;
 import roomescape.reservationslot.presentation.dto.response.ReservationResponse;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
@@ -49,10 +51,14 @@ public class RegularTest {
     @MockitoBean
     private PaymentClient paymentClient;
 
+    @LocalServerPort
+    private int port;
+
     private String REGULAR_TOKEN;
 
     @BeforeEach
     void setUp() {
+        RestAssured.port = port;
         REGULAR_TOKEN = loginAndGetAuthToken(REGULAR_EMAIL, PASSWORD);
     }
 
