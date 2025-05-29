@@ -9,11 +9,11 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.request.TossPaymentRequest;
+import roomescape.payment.dto.response.FailureResponse;
 import roomescape.payment.dto.response.PaymentResponse;
 import roomescape.payment.exception.TossPaymentClientException;
 import roomescape.payment.exception.TossPaymentServerException;
 import roomescape.payment.exception.TossServerErrorCode;
-import roomescape.reservation.dto.response.FailureResponse;
 
 @Component
 public class TossApiClient {
