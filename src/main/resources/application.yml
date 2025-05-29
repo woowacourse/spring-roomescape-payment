@@ -23,6 +23,11 @@ spring:
       ddl-auto: create-drop
     defer-datasource-initialization: true
 
+  http:
+    client:
+      connect-timeout: 2000
+      read-timeout: 5000
+
 security:
   jwt:
     token:
