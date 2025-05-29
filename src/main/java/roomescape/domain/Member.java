@@ -52,6 +52,6 @@ public class Member {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return id != null ? Objects.hashCode(id) : Objects.hashCode(email);
     }
 }
