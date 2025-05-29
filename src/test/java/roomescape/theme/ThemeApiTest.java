@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.is;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +30,7 @@ public class ThemeApiTest {
 
     @Test
     void 테마를_추가한다() {
-        final ThemeRequest request = new ThemeRequest("배트맨", "", "");
+        final ThemeRequest request = new ThemeRequest("배트맨", "", "", BigDecimal.ZERO);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -50,7 +51,7 @@ public class ThemeApiTest {
 
     @Test
     void 이름은_null값을_받을_수_없다() {
-        final ThemeRequest request = new ThemeRequest(null, "", "");
+        final ThemeRequest request = new ThemeRequest(null, "", "", BigDecimal.ZERO);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,16 +33,17 @@ class ThemeServiceTest {
     @Test
     void 테마를_생성한다() {
         // given
-        final ThemeRequest request = new ThemeRequest("아이언맨", "", "");
+        final ThemeRequest request = new ThemeRequest("아이언맨", "", "", BigDecimal.valueOf(1000));
 
         // when & then
-        assertThat(themeService.add(request)).isEqualTo(new ThemeResponse(4L, "아이언맨", "", ""));
+        assertThat(themeService.add(request)).isEqualTo(
+                new ThemeResponse(4L, "아이언맨", "", "", BigDecimal.valueOf(1000)));
     }
 
     @Test
     void id로_테마를_삭제한다() {
         // given
-        final ThemeRequest request = new ThemeRequest("아이언맨", "", "");
+        final ThemeRequest request = new ThemeRequest("아이언맨", "", "", BigDecimal.valueOf(1000));
         themeService.add(request);
 
         // when

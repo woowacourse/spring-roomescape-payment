@@ -53,7 +53,7 @@ public class ReservationCommandService {
 
         final Reservation reservation = new Reservation(request.date(), time, theme, member);
 
-        paymentService.pay(paymentDataRequest, request, reservation);
+        paymentService.pay(paymentDataRequest, request.toPaymentConfirmRequest(), reservation);
         return ReservationResponse.from(reservationRepository.save(reservation));
     }
 

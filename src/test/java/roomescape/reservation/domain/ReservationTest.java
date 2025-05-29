@@ -3,6 +3,7 @@ package roomescape.reservation.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,7 @@ class ReservationTest {
         final ReservationTime eleven = new ReservationTime(4L, LocalTime.of(11, 0));
         final ReservationTime twelve = new ReservationTime(5L, LocalTime.of(12, 0));
 
-        final Theme theme = new Theme(1L, "인터스텔라", "설명1", "썸네일1");
+        final Theme theme = new Theme(1L, "인터스텔라", "설명1", "썸네일1", BigDecimal.valueOf(1000));
         final Reservation reservation = new Reservation(1L, LocalDate.of(2025, 1, 1), ten, theme,
                 Member.ofMember("엠제이", "", ""));
 

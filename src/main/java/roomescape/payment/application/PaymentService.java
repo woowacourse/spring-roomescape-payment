@@ -3,12 +3,12 @@ package roomescape.payment.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.common.exception.impl.BadRequestException;
+import roomescape.payment.application.dto.PaymentConfirmRequest;
 import roomescape.payment.application.dto.PaymentDataRequest;
 import roomescape.payment.application.dto.PaymentRequest;
 import roomescape.payment.application.dto.PaymentResponse;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.repository.PaymentRepository;
-import roomescape.reservation.application.dto.MemberReservationRequest;
 import roomescape.reservation.domain.Reservation;
 
 @Service
@@ -18,9 +18,9 @@ public class PaymentService {
     private final PaymentClient paymentClient;
     private final PaymentRepository paymentRepository;
 
-    public void pay(
+    public Payment pay(
             final PaymentDataRequest paymentDataRequest,
-            final MemberReservationRequest request,
+            final PaymentConfirmRequest request,
             final Reservation reservation
     ) {
         validatePaymentData(request, paymentDataRequest);
@@ -39,15 +39,16 @@ public class PaymentService {
         } catch (PaymentException e) {
             payment.fail();
         }
+        return payment;
     }
 
-    public void await(final PaymentDataRequest request, final Reservation reservation) {
+    public Payment await(final PaymentDataRequest request, final Reservation reservation) {
         final Payment payment = Payment.await(request.orderId(), request.amount(), reservation);
-        paymentRepository.save(payment);
+        return paymentRepository.save(payment);
     }
 
     private void validatePaymentData(
-            final MemberReservationRequest request,
+            final PaymentConfirmRequest request,
             final PaymentDataRequest paymentDataRequest
     ) {
         if (!paymentDataRequest.orderId().equals(request.orderId())) {

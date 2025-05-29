@@ -5,12 +5,14 @@ import static org.hamcrest.Matchers.is;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
@@ -22,6 +24,7 @@ import roomescape.reservation.application.dto.MemberReservationRequest;
 @ActiveProfiles("test")
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@Import(ReservationTestConfig.class)
 public class MemberReservationApiTest {
 
     @LocalServerPort
@@ -54,7 +57,11 @@ public class MemberReservationApiTest {
         final MemberReservationRequest request = new MemberReservationRequest(
                 LocalDate.now().plusDays(1),
                 1L,
-                1L
+                1L,
+                "dummy",
+                "dummy",
+                BigDecimal.valueOf(1000),
+                "NORMAL"
         );
 
         RestAssured.given().log().all()
@@ -68,7 +75,14 @@ public class MemberReservationApiTest {
 
     @Test
     void 예약날짜는_null을_받을_수_없다() {
-        final MemberReservationRequest request = new MemberReservationRequest(null, 1L, 1L);
+        final MemberReservationRequest request = new MemberReservationRequest(
+                null,
+                1L,
+                1L,
+                "dummy",
+                "dummy",
+                BigDecimal.valueOf(1000),
+                "NORMAL");
 
         RestAssured.given().log().all()
                 .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
@@ -82,7 +96,15 @@ public class MemberReservationApiTest {
 
     @Test
     void 예약_시간_id는_null을_받을_수_없다() {
-        final MemberReservationRequest request = new MemberReservationRequest(LocalDate.now().plusDays(1), null, 1L);
+        final MemberReservationRequest request = new MemberReservationRequest(
+                LocalDate.now().plusDays(1),
+                null,
+                1L,
+                "dummy",
+                "dummy",
+                BigDecimal.valueOf(1000),
+                "NORMAL"
+        );
 
         RestAssured.given().log().all()
                 .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
@@ -98,7 +120,11 @@ public class MemberReservationApiTest {
         final MemberReservationRequest request = new MemberReservationRequest(
                 LocalDate.now().minusDays(10),
                 1L,
-                1L
+                1L,
+                "dummy",
+                "dummy",
+                BigDecimal.valueOf(1000),
+                "NORMAL"
         );
 
         RestAssured.given().log().all()
@@ -124,7 +150,13 @@ public class MemberReservationApiTest {
 
     @Test
     void 테마_id가_null이면_에러를_반환한다() {
-        final MemberReservationRequest request = new MemberReservationRequest(LocalDate.now().plusDays(1), 1L, null);
+        final MemberReservationRequest request = new MemberReservationRequest(LocalDate.now().plusDays(1),
+                1L,
+                null,
+                "dummy",
+                "dummy",
+                BigDecimal.valueOf(1000),
+                "NORMAL");
 
         RestAssured.given().log().all()
                 .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
