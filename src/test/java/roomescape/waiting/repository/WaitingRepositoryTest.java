@@ -1,28 +1,21 @@
 package roomescape.waiting.repository;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.fixture.ReservationFixture;
 import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservation.service.ReservationService;
-import roomescape.reservationtime.ReservationTimeTestDataConfig;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.fixture.ReservationTimeFixture;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
-import roomescape.theme.ThemeTestDataConfig;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
-import roomescape.user.MemberTestDataConfig;
 import roomescape.user.domain.Role;
 import roomescape.user.domain.User;
 import roomescape.user.fixture.UserFixture;
@@ -30,16 +23,13 @@ import roomescape.user.repository.UserRepository;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.domain.WaitingWithRank;
 import roomescape.waiting.fixture.WaitingFixture;
-import roomescape.waiting.service.WaitingService;
 
-@DataJpaTest
-@Import({
-        WaitingService.class,
-        ReservationService.class,
-        MemberTestDataConfig.class,
-        ReservationTimeTestDataConfig.class,
-        ThemeTestDataConfig.class
-})
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class WaitingRepositoryTest {
 
     @Autowired

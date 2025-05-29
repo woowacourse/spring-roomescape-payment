@@ -1,19 +1,13 @@
 package roomescape.reservationtime.service;
 
-import static org.assertj.core.api.SoftAssertions.assertSoftly;
-import static roomescape.reservationtime.ReservationTimeTestDataConfig.TIME_FIELD;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 import roomescape.global.exception.NotFoundException;
 import roomescape.reservation.domain.dto.ReservationRequestDto;
 import roomescape.reservation.service.ReservationService;
@@ -30,12 +24,16 @@ import roomescape.user.domain.User;
 import roomescape.user.fixture.UserFixture;
 import roomescape.user.repository.UserRepository;
 
-@DataJpaTest
-@Import({
-        ReservationTimeService.class,
-        ReservationService.class,
-        ReservationTimeTestDataConfig.class,
-})
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static roomescape.reservationtime.ReservationTimeTestDataConfig.TIME_FIELD;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        classes = {ReservationTimeTestDataConfig.class})
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ReservationTimeServiceTest {
 
     @Autowired
