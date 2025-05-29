@@ -19,7 +19,7 @@ public class PaymentErrorHandler implements ResponseErrorHandler {
     /**
      * TODO
      * 비타: TEST 400대 에러만 잘 잡는지
-     * 리원: 리스폰스에서 message만 잘 가져오는가
+     * 리원: 리스폰스에서 message만 잘 가져오는가`
      */
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
