@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestClient;
-import roomescape.common.exception.impl.TossV1RequestException;
+import roomescape.common.exception.impl.TossConfirmException;
 import roomescape.payment.application.dto.TossConfirmRequest;
 import roomescape.payment.application.dto.TossConfirmResponse;
 import roomescape.payment.application.dto.TossErrorResponse;
@@ -52,11 +52,11 @@ public class TossPaymentGatewayClient {
             .retrieve()
             .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
                 TossErrorResponse error = deserializeError(res.getBody());
-                throw new TossV1RequestException(HttpStatus.BAD_REQUEST, error.code(), error.message());
+                throw new TossConfirmException(HttpStatus.BAD_REQUEST, error.code(), error.message());
             })
             .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
                 TossErrorResponse error = deserializeError(res.getBody());
-                throw new TossV1RequestException(HttpStatus.INTERNAL_SERVER_ERROR, error.code(), error.message());
+                throw new TossConfirmException(HttpStatus.INTERNAL_SERVER_ERROR, error.code(), error.message());
             })
             .body(TossConfirmResponse.class);
     }

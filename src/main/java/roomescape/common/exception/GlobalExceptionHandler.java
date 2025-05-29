@@ -11,7 +11,7 @@ import roomescape.common.exception.impl.BadRequestException;
 import roomescape.common.exception.impl.ConflictException;
 import roomescape.common.exception.impl.ForbiddenException;
 import roomescape.common.exception.impl.NotFoundException;
-import roomescape.common.exception.impl.TossV1RequestException;
+import roomescape.common.exception.impl.TossConfirmException;
 import roomescape.common.exception.impl.UnauthorizedException;
 
 @RestControllerAdvice
@@ -25,8 +25,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("서버 내부에 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(TossV1RequestException.class)
-    public ResponseEntity<String> handle(final TossV1RequestException e) {
+    @ExceptionHandler(TossConfirmException.class)
+    public ResponseEntity<String> handle(final TossConfirmException e) {
         log.error("toss api exception : " + "code : " + e.getCode() + ", message :" + e.getMessage());
         return new ResponseEntity<>(e.getMessage(), e.getStatus());
     }
