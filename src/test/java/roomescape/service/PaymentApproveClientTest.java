@@ -1,41 +1,35 @@
 package roomescape.service;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.RestClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.wiremock.spring.EnableWireMock;
+import org.wiremock.spring.InjectWireMock;
 import roomescape.dto.response.PaymentSuccessResponse;
-import roomescape.service.payment.MyClientHttpRequestFactory;
 import roomescape.service.payment.PaymentApproveClient;
-import roomescape.service.payment.PaymentApproveErrorHandler;
 
+@SpringBootTest
+@EnableWireMock
 class PaymentApproveClientTest {
 
-    private final RestClient.Builder testBuilder = RestClient.builder()
-            .baseUrl("https://api.tosspayments.com")
-            .defaultStatusHandler(new PaymentApproveErrorHandler());
+    @Autowired
+    private PaymentApproveClient paymentApproveClient;
 
-    private final MockRestServiceServer mockServer = MockRestServiceServer.bindTo(testBuilder).build();
-
-    private final PaymentApproveClient paymentApproveClient = new PaymentApproveClient(
-            new MyClientHttpRequestFactory(),
-            testBuilder,
-            "https://api.tosspayments.com",
-            "1234"
-    );
+    @InjectWireMock
+    WireMockServer wireMock;
 
     @Test
     @DisplayName("외부 API를 통하여 결제 승인을 요청한다.")
     void approveTest() {
         // given
-        final String successResponse = successResponse();
-        mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
-                .andRespond(withSuccess(successResponse, MediaType.APPLICATION_JSON));
+        wireMock.stubFor(post("/v1/payments/confirm")
+                .willReturn(okJson(successResponse())));
 
         // when
         final PaymentSuccessResponse response = paymentApproveClient.approvePayment(
@@ -46,7 +40,6 @@ class PaymentApproveClientTest {
 
         // then
         assertThat(response.paymentKey()).isEqualTo("5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1");
-        mockServer.verify();
     }
 
     private String successResponse() {
@@ -111,8 +104,6 @@ class PaymentApproveClientTest {
                   "method": "카드",
                   "version": "2022-11-16"
                 }
-                
                 """;
     }
-
 }

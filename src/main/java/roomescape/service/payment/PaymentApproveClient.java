@@ -5,7 +5,6 @@ import java.util.Base64;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import roomescape.dto.response.PaymentSuccessResponse;
@@ -17,14 +16,13 @@ public class PaymentApproveClient {
     private final String widgetSecretKey;
 
     public PaymentApproveClient(
-            ClientHttpRequestFactory factory,
-            RestClient.Builder restClientBuilder,
             @Value("${toss.payments.base-url}") String baseUrl,
-            @Value("${toss.payments.widget-secret-key}") String widgetSecretKey
+            @Value("${toss.payments.widget-secret-key}") String widgetSecretKey,
+            MyClientHttpRequestFactory requestFactory
     ) {
-        this.restClient = restClientBuilder
-                .requestFactory(factory)
+        this.restClient = RestClient.builder()
                 .baseUrl(baseUrl)
+                .requestFactory(requestFactory)
                 .build();
         this.widgetSecretKey = widgetSecretKey;
     }
