@@ -44,9 +44,6 @@ import roomescape.theme.repository.ThemeRepository;
 @Transactional
 class ReservationServiceTest extends BaseTest {
 
-    // @Autowired
-    // private MockRestServiceServer server;
-
     @Autowired
     private ReservationRepository reservationRepository;
 
