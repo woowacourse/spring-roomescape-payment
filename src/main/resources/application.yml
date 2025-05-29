@@ -26,6 +26,9 @@ security:
 rest-client:
   toss-payment:
     base-url: https://api.tosspayments.com
+    connect-timeout: 5000
+    connection-request-timeout: 2000
+    read-timeout: 5000
 logging:
   level:
     org.hibernate.SQL: debug

@@ -34,3 +34,6 @@ logging:
 rest-client:
   toss-payment:
     base-url: http://localhost:8089
+    connect-timeout: 5000
+    connection-request-timeout: 2000
+    read-timeout: 5000
