@@ -10,6 +10,7 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -27,7 +28,7 @@ public class JwtTokenProvider implements TokenProvider {
     private final Duration validity;
 
     public JwtTokenProvider(final JwtProperties jwtProperties) {
-        this.key = Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes());
+        this.key = Keys.hmacShaKeyFor(jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8));
         this.jwtParser = Jwts.parser()
                 .verifyWith(key)
                 .build();
