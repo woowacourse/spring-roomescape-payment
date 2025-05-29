@@ -6,31 +6,20 @@ import io.restassured.response.Response;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
-import org.springframework.test.web.client.MockRestServiceServer;
-import roomescape.config.ClientConfiguration;
-import roomescape.controller.ReservationController;
 import roomescape.dto.request.AddReservationRequest;
-import roomescape.dto.request.ConfirmPaymentRequest;
 import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.request.CreateReservationTimeRequest;
 import roomescape.dto.request.CreateThemeRequest;
@@ -55,16 +44,14 @@ import roomescape.service.ThemeService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class ReservationIntegrateTest {
 
-    ReservationController reservationController;
+    @LocalServerPort
+    int port;
 
     @MockitoBean
     PaymentService paymentService;
@@ -96,10 +83,10 @@ class ReservationIntegrateTest {
 
     @BeforeEach
     void setUp() {
+        RestAssured.port = port;
         Member member = memberRepository.save(new Member("어드민", "test_admin@test.com", "test", Role.ADMIN));
         token = jwtTokenProvider.createTokenByMember(member);
         loginMemberRequest = authService.getLoginMemberByToken(token);
-        reservationController = new ReservationController(reservationService, paymentService);
     }
 
     @Test
@@ -112,9 +99,9 @@ class ReservationIntegrateTest {
         CreateThemeRequest themeRequest = new CreateThemeRequest("테마", "설명", "썸네일");
         Theme theme = themeService.addTheme(themeRequest);
 
-
         CreateReservationRequest reservation = new CreateReservationRequest(
-                LocalDate.now().plusDays(1), reservationTime.getId(), theme.getId(), "paymentKey", "orderId", 1000, "paymentType"
+                LocalDate.now().plusDays(1), reservationTime.getId(), theme.getId(), "paymentKey", "orderId", 1000,
+                "paymentType"
         );
 
         // when
@@ -144,7 +131,6 @@ class ReservationIntegrateTest {
         LocalDate tomorrow = LocalDate.now().plusDays(1);
         AddReservationRequest reservationRequest = new AddReservationRequest(
                 tomorrow, reservationTime.getId(), theme.getId());
-
 
         LoginMemberRequest loginMemberRequest = authService.getLoginMemberByToken(token);
         reservationService.addReservation(reservationRequest, loginMemberRequest);

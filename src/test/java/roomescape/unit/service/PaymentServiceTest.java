@@ -1,13 +1,12 @@
 package roomescape.unit.service;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
-import roomescape.config.ClientConfiguration;
+import org.springframework.web.client.RestClient;
 import roomescape.dto.request.ConfirmPaymentRequest;
 import roomescape.dto.response.ConfirmPaymentResponse;
 import roomescape.exception.custom.PaymentException;
@@ -19,16 +18,21 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withResourceNotFound;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-@RestClientTest(value = {ClientConfiguration.class, PaymentService.class})
 class PaymentServiceTest {
 
     public static final String API_URL = "https://api.tosspayments.com/v1/payments/confirm";
 
-    @Autowired
-    private PaymentService paymentService;
+    private final RestClient.Builder testBuilder = RestClient.builder()
+            .baseUrl("https://api.tosspayments.com");
 
-    @Autowired
-    private MockRestServiceServer mockServer;
+    MockRestServiceServer mockServer = MockRestServiceServer.bindTo(testBuilder).build();
+
+    PaymentService paymentService = new PaymentService(testBuilder.build());
+
+    @BeforeEach
+    void setUp() {
+        mockServer.reset();
+    }
 
     @Test
     void 결제_api를_기반으로_결제를_승인한다() {

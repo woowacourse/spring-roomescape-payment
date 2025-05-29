@@ -13,32 +13,33 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import roomescape.controller.ReservationController;
-import roomescape.dto.request.CreateReservationRequest;
+import roomescape.dto.request.AddReservationRequest;
+import roomescape.dto.request.LoginMemberRequest;
 import roomescape.entity.Member;
 import roomescape.global.Role;
 import roomescape.jwt.JwtTokenProvider;
 import roomescape.repository.MemberRepository;
-import roomescape.service.PaymentService;
+import roomescape.service.AuthService;
 import roomescape.service.ReservationService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class AvailableReservationTimeTest {
 
-    ReservationController reservationController;
-
-    @MockitoBean
-    PaymentService paymentService;
+    @LocalServerPort
+    int port;
 
     @Autowired
     ReservationService reservationService;
+
+    @Autowired
+    AuthService authService;
 
     @Autowired
     private MemberRepository memberRepository;
@@ -46,13 +47,16 @@ class AvailableReservationTimeTest {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
-    private String token;
+    String token;
+
+    LoginMemberRequest loginMemberRequest;
 
     @BeforeEach
     void setUp() {
+        RestAssured.port = port;
         Member member = memberRepository.save(new Member("어드민", "test_admin@test.com", "test", Role.ADMIN));
         token = jwtTokenProvider.createTokenByMember(member);
-        reservationController = new ReservationController(reservationService, paymentService);
+        loginMemberRequest = authService.getLoginMemberByToken(token);
     }
 
     @Test
@@ -111,17 +115,11 @@ class AvailableReservationTimeTest {
                 .statusCode(201)
                 .extract().jsonPath().getLong("id");
 
-        CreateReservationRequest reservation = new CreateReservationRequest(
-                todayDate, timeId, themeId, "paymentKey", "orderId", 1000, "paymentType"
+        AddReservationRequest reservation = new AddReservationRequest(
+                todayDate, timeId, themeId
         );
 
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", token)
-                .body(reservation)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(201);
+        reservationService.addReservation(reservation, loginMemberRequest);
 
         Response response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

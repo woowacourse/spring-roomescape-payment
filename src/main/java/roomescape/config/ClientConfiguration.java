@@ -17,7 +17,7 @@ public class ClientConfiguration {
 
         return builder
                 .baseUrl("https://api.tosspayments.com")
-                //.requestFactory(requestFactory)
+                .requestFactory(requestFactory)
                 .build();
     }
 }

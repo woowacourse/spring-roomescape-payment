@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import roomescape.entity.Member;
@@ -17,7 +18,7 @@ import roomescape.global.Role;
 import roomescape.jwt.JwtTokenProvider;
 import roomescape.repository.MemberRepository;
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class ThemeIntegrateTest {
@@ -27,6 +28,9 @@ class ThemeIntegrateTest {
             "description", "description",
             "thumbnail", "thumbnail"
     );
+
+    @LocalServerPort
+    int port;
 
     @Autowired
     MemberRepository memberRepository;
@@ -38,6 +42,7 @@ class ThemeIntegrateTest {
 
     @BeforeEach
     void setUp() {
+        RestAssured.port = port;
         Member member = memberRepository.save(new Member("어드민", "test_admin@test.com", "test", Role.ADMIN));
         token = jwtTokenProvider.createTokenByMember(member);
     }
