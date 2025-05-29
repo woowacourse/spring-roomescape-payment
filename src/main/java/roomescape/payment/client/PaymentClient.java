@@ -10,6 +10,7 @@ import org.springframework.web.client.RestClientResponseException;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.exception.PaymentApiException;
+import roomescape.payment.exception.PaymentApiUnauthorizedException;
 
 @RequiredArgsConstructor
 public class PaymentClient {
@@ -37,12 +38,12 @@ public class PaymentClient {
             JsonNode jsonNode = MAPPER.readTree(responseBody);
             String errorMessage = jsonNode.get("message").asText();
 
-            if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {  // todo: 예외 처리 커스텀 추가?
-                throw new RuntimeException("결제 확인에 실패했습니다. " + errorMessage + " - 결제 키: " + paymentKey);
+            if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+                throw new PaymentApiUnauthorizedException("결제 확인에 실패했습니다. " + errorMessage + " - 결제 키: " + paymentKey);
             }
             throw new PaymentApiException(responseBody, errorMessage, e.getStatusCode());
         } catch (JsonProcessingException parseException) {
-            throw new RuntimeException("파싱에 실패했습니다." + e.getMessage());
+            throw new IllegalArgumentException("파싱에 실패했습니다." + e.getMessage());
         }
     }
 }
