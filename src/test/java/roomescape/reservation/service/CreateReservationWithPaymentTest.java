@@ -14,7 +14,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.auth.service.dto.LoginMember;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
-import roomescape.payment.service.ReservationPaymentClient;
+import roomescape.payment.service.TossPaymentService;
 import roomescape.payment.service.dto.ConfirmPaymentRequest;
 import roomescape.payment.service.dto.ConfirmPaymentResponse;
 import roomescape.reservation.domain.Reservation;
@@ -48,7 +48,7 @@ public class CreateReservationWithPaymentTest {
     private CreateReservationService reservationService;
 
     @MockitoBean
-    private ReservationPaymentClient mockReservationPaymentClient = Mockito.mock(ReservationPaymentClient.class);
+    private TossPaymentService mockTossPaymentService = Mockito.mock(TossPaymentService.class);
 
     @BeforeEach
     void setup() {
@@ -63,7 +63,7 @@ public class CreateReservationWithPaymentTest {
         // given
         ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
         ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
-        Mockito.when(mockReservationPaymentClient.postConfirmPayment(paymentRequest)).thenReturn(paymentResponse);
+        Mockito.when(mockTossPaymentService.postConfirmPayment(paymentRequest)).thenReturn(paymentResponse);
 
         LocalDate date = now.plusDays(1).toLocalDate();
         ReservationWithPaymentRequest reservationWithPaymentRequest = new ReservationWithPaymentRequest(

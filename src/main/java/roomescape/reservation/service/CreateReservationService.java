@@ -8,7 +8,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.repository.PaymentRepository;
-import roomescape.payment.service.ReservationPaymentClient;
+import roomescape.payment.service.TossPaymentService;
 import roomescape.payment.service.dto.ConfirmPaymentRequest;
 import roomescape.payment.service.dto.ConfirmPaymentResponse;
 import roomescape.reservation.domain.Reservation;
@@ -30,7 +30,7 @@ public class CreateReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final PaymentRepository paymentRepository;
-    private final ReservationPaymentClient reservationPaymentClient;
+    private final TossPaymentService tossPaymentService;
 
     public CreateReservationService(
             ReservationRepository reservationRepository,
@@ -38,14 +38,14 @@ public class CreateReservationService {
             ThemeRepository themeRepository,
             MemberRepository memberRepository,
             PaymentRepository paymentRepository,
-            ReservationPaymentClient reservationPaymentClient
+            TossPaymentService tossPaymentService
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.paymentRepository = paymentRepository;
-        this.reservationPaymentClient = reservationPaymentClient;
+        this.tossPaymentService = tossPaymentService;
     }
 
     public ReservationResponse create(final ReservationCreateRequest request) {
@@ -104,7 +104,7 @@ public class CreateReservationService {
         );
         ReservationResponse reservationResponse = create(reservationCreateRequest);
 
-        ConfirmPaymentResponse paymentResponse = reservationPaymentClient.postConfirmPayment(ConfirmPaymentRequest.from(request));
+        ConfirmPaymentResponse paymentResponse = tossPaymentService.postConfirmPayment(ConfirmPaymentRequest.from(request));
         Payment payment = new Payment(paymentResponse.paymentKey(), paymentResponse.totalAmount());
         paymentRepository.save(payment);
 

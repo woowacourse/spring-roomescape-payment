@@ -2,6 +2,10 @@ spring:
   profiles:
     default: local
 
+api:
+  toss:
+    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+
 ---
 
 spring:
