@@ -14,4 +14,4 @@ jwt:
   secret: iwantcoffee-americano+ice-americano-is-best-i.love_it+yaho
   expirationMinute: 15
 payment:
-  secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6fakeKey
+  secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
