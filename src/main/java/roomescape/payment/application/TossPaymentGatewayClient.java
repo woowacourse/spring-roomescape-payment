@@ -28,8 +28,9 @@ public class TossPaymentGatewayClient {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    public TossPaymentGatewayClient(final ObjectMapper objectMapper) {
-        this.restClient = RestClient.builder()
+    public TossPaymentGatewayClient(final RestClient.Builder restClientBuilder,
+        final ObjectMapper objectMapper) {
+        this.restClient = restClientBuilder
             .baseUrl(BASE_URL)
             .defaultHeader(AUTHORIZATION, encodeSecretKey("test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"))
             .defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
@@ -52,11 +53,13 @@ public class TossPaymentGatewayClient {
             .retrieve()
             .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
                 TossErrorResponse error = deserializeError(res.getBody());
-                throw new TossConfirmException(HttpStatus.BAD_REQUEST, error.code(), error.message());
+                throw new TossConfirmException(HttpStatus.BAD_REQUEST, error.code(),
+                    error.message());
             })
             .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
                 TossErrorResponse error = deserializeError(res.getBody());
-                throw new TossConfirmException(HttpStatus.INTERNAL_SERVER_ERROR, error.code(), error.message());
+                throw new TossConfirmException(HttpStatus.INTERNAL_SERVER_ERROR, error.code(),
+                    error.message());
             })
             .body(TossConfirmResponse.class);
     }
