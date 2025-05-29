@@ -1,4 +1,4 @@
-package roomescape.reservation.domain;
+package roomescape.reservation.waiting.domain;
 
 import java.util.Objects;
 

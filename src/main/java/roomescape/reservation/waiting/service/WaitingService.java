@@ -1,4 +1,4 @@
-package roomescape.reservation.service;
+package roomescape.reservation.waiting.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,18 +13,18 @@ import roomescape.common.exception.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberId;
 import roomescape.member.repository.MemberRepository;
-import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.ReservationTimeId;
-import roomescape.reservation.domain.Theme;
-import roomescape.reservation.domain.ThemeId;
-import roomescape.reservation.domain.Waiting;
-import roomescape.reservation.domain.WaitingId;
+import roomescape.reservation.time.domain.ReservationTime;
+import roomescape.reservation.time.domain.ReservationTimeId;
+import roomescape.theme.domain.Theme;
+import roomescape.theme.domain.ThemeId;
+import roomescape.reservation.waiting.domain.Waiting;
+import roomescape.reservation.waiting.domain.WaitingId;
 import roomescape.reservation.dto.request.WaitingCreateRequest;
 import roomescape.reservation.dto.response.WaitingResponse;
 import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservation.repository.ReservationTimeRepository;
-import roomescape.reservation.repository.ThemeRepository;
-import roomescape.reservation.repository.WaitingRepository;
+import roomescape.reservation.time.repository.ReservationTimeRepository;
+import roomescape.theme.repository.ThemeRepository;
+import roomescape.reservation.waiting.repository.WaitingRepository;
 
 @Service
 public class WaitingService {

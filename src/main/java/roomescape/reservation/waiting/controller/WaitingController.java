@@ -1,4 +1,4 @@
-package roomescape.reservation.controller;
+package roomescape.reservation.waiting.controller;
 
 import java.net.URI;
 
@@ -15,7 +15,7 @@ import roomescape.auth.dto.LoginMember;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.request.WaitingCreateRequest;
 import roomescape.reservation.dto.response.WaitingResponse;
-import roomescape.reservation.service.WaitingService;
+import roomescape.reservation.waiting.service.WaitingService;
 
 @RequestMapping("/waitings")
 @RestController

@@ -1,4 +1,4 @@
-package roomescape.reservation.service;
+package roomescape.theme.service;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -8,12 +8,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import roomescape.common.exception.AlreadyInUseException;
 import roomescape.common.exception.EntityNotFoundException;
-import roomescape.reservation.domain.Theme;
-import roomescape.reservation.domain.ThemeId;
-import roomescape.reservation.dto.request.ThemeRequest;
-import roomescape.reservation.dto.response.ThemeResponse;
+import roomescape.theme.domain.Theme;
+import roomescape.theme.domain.ThemeId;
+import roomescape.theme.dto.request.ThemeRequest;
+import roomescape.theme.dto.response.ThemeResponse;
 import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservation.repository.ThemeRepository;
+import roomescape.theme.repository.ThemeRepository;
 
 @Service
 public class ThemeService {

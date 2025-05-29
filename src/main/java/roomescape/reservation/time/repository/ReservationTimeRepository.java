@@ -1,11 +1,11 @@
-package roomescape.reservation.repository;
+package roomescape.reservation.time.repository;
 
 import java.time.LocalTime;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.ReservationTimeId;
+import roomescape.reservation.time.domain.ReservationTime;
+import roomescape.reservation.time.domain.ReservationTimeId;
 
 public interface ReservationTimeRepository extends JpaRepository<ReservationTime, ReservationTimeId> {
 

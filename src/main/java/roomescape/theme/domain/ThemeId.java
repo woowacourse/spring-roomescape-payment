@@ -1,4 +1,4 @@
-package roomescape.reservation.domain;
+package roomescape.theme.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -10,17 +10,17 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.SequenceGenerator;
 
 @Embeddable
-public class ReservationTimeId implements Serializable {
+public class ThemeId implements Serializable {
 
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator", sequenceName = "TIME_ID_SEQUENCE", allocationSize = 1)
+    @SequenceGenerator(name = "sequenceGenerator", sequenceName = "THEME_ID_SEQUENCE", allocationSize = 1)
     private Long value;
 
-    protected ReservationTimeId() {
+    protected ThemeId() {
     }
 
-    public ReservationTimeId(final Long value) {
+    public ThemeId(final Long value) {
         this.value = value;
     }
 
@@ -33,10 +33,10 @@ public class ReservationTimeId implements Serializable {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ReservationTimeId that)) {
+        if (!(o instanceof ThemeId themeId)) {
             return false;
         }
-        return Objects.equals(getValue(), that.getValue());
+        return Objects.equals(getValue(), themeId.getValue());
     }
 
     @Override

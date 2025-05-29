@@ -4,6 +4,8 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import roomescape.reservation.time.domain.ReservationTime;
+
 class ReservationTimeTest {
 
     @DisplayName("시간은 null일 수 없다.")

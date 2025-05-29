@@ -1,4 +1,4 @@
-package roomescape.reservation.service;
+package roomescape.reservation.time.service;
 
 import java.util.List;
 
@@ -7,12 +7,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import roomescape.common.exception.AlreadyInUseException;
 import roomescape.common.exception.EntityNotFoundException;
-import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.ReservationTimeId;
+import roomescape.reservation.time.domain.ReservationTime;
+import roomescape.reservation.time.domain.ReservationTimeId;
 import roomescape.reservation.dto.request.ReservationTimeRequest;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservation.repository.ReservationTimeRepository;
+import roomescape.reservation.time.repository.ReservationTimeRepository;
 
 @Service
 public class ReservationTimeService {

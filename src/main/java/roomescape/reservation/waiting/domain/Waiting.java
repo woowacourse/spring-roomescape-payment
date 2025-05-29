@@ -1,4 +1,4 @@
-package roomescape.reservation.domain;
+package roomescape.reservation.waiting.domain;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,6 +15,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import roomescape.member.domain.Member;
+import roomescape.theme.domain.Theme;
+import roomescape.reservation.time.domain.ReservationTime;
 
 @Entity
 public class Waiting {

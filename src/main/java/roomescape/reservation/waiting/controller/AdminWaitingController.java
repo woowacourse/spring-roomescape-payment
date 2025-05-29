@@ -1,4 +1,4 @@
-package roomescape.reservation.controller;
+package roomescape.reservation.waiting.controller;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import roomescape.auth.annotation.RequiredAdmin;
 import roomescape.reservation.dto.response.WaitingResponse;
-import roomescape.reservation.service.WaitingService;
+import roomescape.reservation.waiting.service.WaitingService;
 
 @RequestMapping("/admin/waitings")
 @RestController

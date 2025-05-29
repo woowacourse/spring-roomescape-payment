@@ -14,8 +14,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.Theme;
+import roomescape.reservation.time.domain.ReservationTime;
+import roomescape.theme.domain.Theme;
 
 class PaymentTest {
 

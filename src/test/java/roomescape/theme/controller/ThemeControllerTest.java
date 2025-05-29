@@ -1,4 +1,4 @@
-package roomescape.reservation.controller;
+package roomescape.theme.controller;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -20,7 +19,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import roomescape.reservation.payment.dto.request.PaymentRequest;
 import roomescape.reservation.payment.service.PaymentService;
-import roomescape.reservation.repository.ThemeRepository;
+import roomescape.theme.repository.ThemeRepository;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
