@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.jdbc.Sql;
@@ -18,16 +19,20 @@ import roomescape.auth.dto.LoginRequest;
 import roomescape.waiting.dto.WaitingSimpleResponse;
 import roomescape.waiting.repository.WaitingRepository;
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @Sql({"/test-time-data.sql", "/test-theme-data.sql", "/test-member-data.sql", "/test-waiting-data.sql"})
 public class AdminWaitingApiTest {
+
+    @LocalServerPort
+    private int port;
 
     public static final String AUTH_COOKIE_NAME = "token";
     private static String ADMIN_TOKEN;
 
     @BeforeEach
     void setUp() {
+        RestAssured.port = port;
         ADMIN_TOKEN = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(new LoginRequest("admin@gmail.com", "1234"))

@@ -2,51 +2,84 @@ package roomescape.reservation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import static roomescape.fixture.ServerClientFixture.BASE_URL;
+import static roomescape.fixture.ServerClientFixture.MAPPER;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.web.client.MockRestServiceServer;
+import roomescape.TestClientConfig;
 import roomescape.auth.dto.LoginRequest;
+import roomescape.client.dto.PaymentsConfirmResponse;
 import roomescape.reservation.dto.CreateReservationWithMemberRequest;
 import roomescape.reservation.dto.CreateReservationWithPaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @Sql({"/test-time-data.sql", "/test-theme-data.sql", "/test-member-data.sql"})
+@Import(TestClientConfig.class)
 public class ReservationApiTest {
 
     private static final String AUTH_COOKIE_NAME = "token";
 
-    @Disabled // TODO 추후 수정
+    @LocalServerPort
+    private int port;
+
+    @BeforeEach
+    void setUp() {
+        RestAssured.port = port;
+    }
+
     @DisplayName("예약 생성 API 테스트")
     @Nested
     class CreateReservationTest {
 
         private static final LocalDate TOMORROW = LocalDate.now().plusDays(1);
         private static final CreateReservationWithPaymentRequest REQUEST = new CreateReservationWithPaymentRequest(
-                TOMORROW, 1L, 1L, null, null, null); // TODO 잊지 말자
+                TOMORROW, 1L, 1L, "payment_key", "order_id", 1000L);
         private static String TOKEN;
 
+        PaymentsConfirmResponse expectedResponse = new PaymentsConfirmResponse("aaa", 1000L);
+
+        @Autowired
+        private MockRestServiceServer server;
+
         @BeforeEach
-        void setUp() {
+        void setUp() throws JsonProcessingException {
             TOKEN = RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
                     .body(new LoginRequest("aaa@gmail.com", "1234"))
                     .when().post("/login")
                     .then().log().all()
                     .extract().cookie(AUTH_COOKIE_NAME);
+            server.reset();
+            server.expect(requestTo(BASE_URL + "/confirm"))
+                    .andExpect(method(HttpMethod.POST))
+                    .andRespond(withStatus(HttpStatus.OK)
+                            .body(MAPPER.writeValueAsString(expectedResponse))
+                            .contentType(MediaType.APPLICATION_JSON));
         }
 
         @DisplayName("예약 생성을 성공할 경우 201을 반환한다.")
@@ -85,7 +118,7 @@ public class ReservationApiTest {
 
         @DisplayName("중복 예약을 생성할 경우 400을 반환한다.")
         @Test
-        void testDuplicateReservation() {
+        void testDuplicateReservation() throws JsonProcessingException {
             // given
             RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
@@ -94,6 +127,13 @@ public class ReservationApiTest {
                     .when().post("/reservations")
                     .then().log().all()
                     .statusCode(201);
+
+            server.reset();
+            server.expect(requestTo(BASE_URL + "/confirm"))
+                    .andExpect(method(HttpMethod.POST))
+                    .andRespond(withStatus(HttpStatus.OK)
+                            .body(MAPPER.writeValueAsString(expectedResponse))
+                            .contentType(MediaType.APPLICATION_JSON));
             // when
             // then
             RestAssured.given().log().all()

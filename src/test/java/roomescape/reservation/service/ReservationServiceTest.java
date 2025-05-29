@@ -33,7 +33,7 @@ class ReservationServiceTest {
     private final FakeMemberDao fakeMemberDao = new FakeMemberDao();
     private final ReservationQueryService reservationQueryService = new ReservationQueryService(reservationDao, null);
     private final ReservationCommandService reservationCommandService = new ReservationCommandService(reservationDao,
-            reservationTimeDao, themeDao, fakeMemberDao, null, null, null);
+            reservationTimeDao, themeDao, fakeMemberDao, null, null);
 
     private static final LocalDate TOMORROW = LocalDate.now().plusDays(1);
 

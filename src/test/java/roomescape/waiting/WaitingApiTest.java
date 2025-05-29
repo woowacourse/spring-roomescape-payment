@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.jdbc.Sql;
@@ -21,8 +22,8 @@ import roomescape.waiting.dto.CreateWaitingRequest;
 import roomescape.waiting.dto.WaitingResponse;
 import roomescape.waiting.repository.WaitingRepository;
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @Sql({"/test-time-data.sql", "/test-theme-data.sql", "/test-member-data.sql", "/test-waiting-data.sql"})
 public class WaitingApiTest {
 
@@ -30,8 +31,13 @@ public class WaitingApiTest {
     private static String MEMBER_1_TOKEN;
     private static final LocalDate TOMORROW = LocalDate.now().plusDays(1);
 
+    @LocalServerPort
+    private int port;
+
     @BeforeEach
     void setUp() {
+        RestAssured.port = port;
+
         MEMBER_1_TOKEN = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(new LoginRequest("aaa@gmail.com", "1234"))
