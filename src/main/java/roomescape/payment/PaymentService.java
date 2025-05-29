@@ -22,12 +22,7 @@ public class PaymentService {
     private final RestClient restClient;
 
     public PaymentService(final Builder restClientBuilder) {
-        final SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(1500);
-        requestFactory.setReadTimeout(1500);
-
         restClient = restClientBuilder
-                .requestFactory(requestFactory)
                 .defaultStatusHandler(new PaymentErrorHandler())
                 .defaultHeader("Authorization", getAuthorization())
                 .defaultHeader("Content-Type", "application/json")
