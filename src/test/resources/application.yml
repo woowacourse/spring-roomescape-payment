@@ -30,6 +30,6 @@ security:
       expire-length: 900000 # 15분
 
 payment:
-  base-url: "localhost:8080"
+  base-url: "http://localhost:8080"
   confirm_api: "/v1/payments/confirm"
   secret-key: "test_secret"
