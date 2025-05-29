@@ -5,13 +5,15 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.web.client.ResourceAccessException;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 import roomescape.exception.PaymentException;
 import roomescape.utility.PaymentClient;
+import roomescape.utility.PaymentClientStub;
 import roomescape.utility.TossPaymentClient;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = WebEnvironment.NONE)
 class PaymentApiTest {
 
     private final String secretKey;
@@ -22,7 +24,7 @@ class PaymentApiTest {
     public PaymentApiTest(
             @Value("${toss_payment_url}") String paymentUrl,
             @Value("${toss_payment_secret_key}") String secretKey,
-            @Value("${toss_confirm_url") String confirmServerUrl
+            @Value("${toss_confirm_server_url}") String confirmServerUrl
     ) {
         this.paymentUrl = paymentUrl;
         this.secretKey = secretKey;
@@ -32,17 +34,25 @@ class PaymentApiTest {
     }
 
     @Test
-    void connectionError() {
+    void ifNotValidUrlThenError() {
         RestClient invalidRestClient = RestClient.builder().baseUrl(paymentUrl + "asdf").build();
         PaymentClient invalidPaymentClient = new TossPaymentClient(invalidRestClient, secretKey, confirmServerUrl);
         assertThatThrownBy(() -> invalidPaymentClient.pay("asdf", "asdf", 1234))
-                .isInstanceOf(ResourceAccessException.class);
+                .isInstanceOf(RestClientException.class);
+    }
+
+    @Test
+    void ifTimeoutThenError() {
+        PaymentClientStub invalidPaymentClient = new PaymentClientStub();
+        invalidPaymentClient.setOccurRestClientError(true);
+        assertThatThrownBy(() -> invalidPaymentClient.pay("asdf", "asdf", 1234))
+                .isInstanceOf(RestClientException.class);
     }
 
     @Test
     void connectSuccess() {
         assertThatThrownBy(() -> realPaymentClient.pay("asdf", "asdf", 1234))
-                .isNotInstanceOf(ResourceAccessException.class);
+                .isNotInstanceOf(RestClientException.class);
     }
 
     @Test

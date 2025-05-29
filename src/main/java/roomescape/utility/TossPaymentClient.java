@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.dto.business.PaymentExceptionContent;
 import roomescape.dto.business.PaymentResult;
@@ -39,11 +38,7 @@ public class TossPaymentClient implements PaymentClient {
                 "amount", amount
         );
 
-        try {
-            return doPay(requestBody);
-        } catch (ResourceAccessException e) {
-            throw new PaymentException(CONNECTION_ERROR_MESSAGE);
-        }
+        return doPay(requestBody);
     }
 
     private PaymentResult doPay(Map<String, Object> requestBody) {

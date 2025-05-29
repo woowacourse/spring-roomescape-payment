@@ -24,7 +24,7 @@ public class PaymentApiTest {
             @Value("${toss_order_id}") String orderId,
             @Value("${toss_order_payment_key}") String paymentKey,
             @Value("${toss_order_amount}") long amount,
-            @Value("${toss_confirm_url") String confirmServerUrl
+            @Value("${toss_confirm_server_url}") String confirmServerUrl
     ) {
         this.orderId = orderId;
         this.paymentKey = paymentKey;
