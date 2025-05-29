@@ -1,8 +1,10 @@
 package roomescape.payment.repository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 import roomescape.payment.domain.Payment;
 
+@Repository
 @RequiredArgsConstructor
 public class PaymentRepositoryImpl implements PaymentRepository {
 

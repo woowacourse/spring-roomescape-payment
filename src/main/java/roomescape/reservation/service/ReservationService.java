@@ -10,8 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.payment.PaymentRestClient;
-import roomescape.payment.RestClientConfig;
+import roomescape.payment.PaymentClient;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;
@@ -39,7 +38,7 @@ public class ReservationService {
     private final PaymentRepository paymentRepository;
     private final MemberRepository memberRepository;
     private final EntityManager entityManager;
-    private final RestClientConfig restClientConfig;
+    private final PaymentClient paymentClient;
 
     @Transactional
     public ReservationResponse addReservation(final long memberId, final ReservationPaymentRequest request) {
@@ -54,7 +53,7 @@ public class ReservationService {
         final ReservationTheme theme = reservationThemeRepository.findById(themeId)
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 테마 입니다."));
         final Reservation reservation = new Reservation(member, date, time, theme);
-        TossPaymentResponse paymentResponse = approvePayment(request);
+        TossPaymentResponse paymentResponse = approvePayment(request.orderId(), request.paymentKey(), request.amount());
         Reservation saved = reservationRepository.save(reservation);
         paymentRepository.save(new Payment(saved, paymentResponse.orderId(), paymentResponse.paymentKey(),
                 paymentResponse.totalAmount(), paymentResponse.type()));
@@ -108,10 +107,9 @@ public class ReservationService {
         );
     }
 
-    private TossPaymentResponse approvePayment(final ReservationPaymentRequest request) {
-        PaymentRestClient restClient = restClientConfig.getPaymentRestClient();
-        return restClient.requestPaymentApprove(
-                new TossPaymentRequest(request.orderId(), request.paymentKey(), request.amount()));
+    private TossPaymentResponse approvePayment(final String orderId, final String paymentKey, final long amount) {
+        return paymentClient.requestPaymentApprove(
+                new TossPaymentRequest(orderId, paymentKey, amount));
     }
 
     private void convertWaitingToReservation(final Reservation reservation) {
