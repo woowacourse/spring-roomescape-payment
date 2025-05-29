@@ -31,8 +31,7 @@ public class ReservationOperation {
         reservationValidator.validateNoDuplication(schedule);
         ReservationDetails reservationDetails = createReservationDetails(schedule, memberId);
         Reservation reservation = Reservation.createFuture(reservationDetails);
-        Reservation savedReservation = reservationRepository.save(reservation);
-        return savedReservation;
+        return reservationRepository.save(reservation);
     }
 
     @Transactional
