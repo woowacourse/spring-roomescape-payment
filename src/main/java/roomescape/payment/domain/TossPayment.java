@@ -1,8 +1,6 @@
 package roomescape.payment.domain;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,13 +15,12 @@ public class TossPayment {
     private String orderId;
     private int amount;
 
-    @Enumerated(EnumType.STRING)
-    private PaymentType paymentType;
+    private String paymentType;
 
     protected TossPayment() {
     }
 
-    public TossPayment(String paymentKey, String orderId, int amount, PaymentType paymentType) {
+    public TossPayment(String paymentKey, String orderId, int amount, String paymentType) {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
@@ -42,7 +39,7 @@ public class TossPayment {
         return amount;
     }
 
-    public PaymentType getPaymentType() {
+    public String getPaymentType() {
         return paymentType;
     }
 }
