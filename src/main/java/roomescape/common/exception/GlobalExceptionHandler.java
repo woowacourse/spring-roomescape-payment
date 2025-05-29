@@ -29,37 +29,37 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handle(final TossConfirmException e) {
         log.error(
             "toss api exception : " + "code : " + e.getCode() + ", message :" + e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), e.getStatus());
+        return new ResponseEntity<>("서버 내부에 오류가 발생했습니다.", e.getStatus());
     }
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<String> handle(final BadRequestException e) {
         log.error(e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("잘못된 요청입니다.", HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<String> handle(final NotFoundException e) {
         log.error(e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("잘못된 요청입니다.", HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<String> handle(final ConflictException e) {
         log.error(e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        return new ResponseEntity<>("잘못된 요청입니다.", HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<String> handle(final UnauthorizedException e) {
         log.warn("인증 실패: {}", e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>("잘못된 요청입니다.", HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<String> handle(final ForbiddenException e) {
         log.error(e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>("잘못된 요청입니다.", HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
