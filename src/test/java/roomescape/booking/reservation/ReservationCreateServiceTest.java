@@ -12,6 +12,7 @@ import roomescape.auth.dto.LoginMember;
 import roomescape.booking.reservation.dto.AdminReservationRequest;
 import roomescape.booking.reservation.dto.ReservationPaymentRequest;
 import roomescape.booking.reservation.dto.ReservationResponse;
+import roomescape.exception.custom.reason.payment.PaymentException;
 import roomescape.exception.custom.reason.reservation.ReservationConflictException;
 import roomescape.member.Member;
 import roomescape.member.MemberRole;
@@ -20,6 +21,7 @@ import roomescape.order.Order;
 import roomescape.order.OrderReader;
 import roomescape.order.PaymentStatus;
 import roomescape.payment.PaymentClient;
+import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.reservationtime.ReservationTime;
 import roomescape.schedule.Schedule;
 import roomescape.schedule.ScheduleService;
@@ -31,6 +33,7 @@ import java.time.LocalTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static roomescape.util.TestFactory.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,6 +57,7 @@ public class ReservationCreateServiceTest {
     class Create {
 
         private ReservationPaymentRequest request;
+        private PaymentConfirmRequest paymentConfirmRequest;
         private LoginMember loginMember;
         private Member member;
         private Schedule schedule;
@@ -75,6 +79,7 @@ public class ReservationCreateServiceTest {
             schedule = new Schedule(request.date(), reservationTime, theme);
             member = memberWithId(1L, new Member(loginMember.email(), "password", "boogie", MemberRole.MEMBER));
             reservation = reservationWithId(1L, new Reservation(member, schedule));
+            paymentConfirmRequest = new PaymentConfirmRequest("dummyOrderId", 1000L, "dummyKey");
         }
 
         @DisplayName("reservation request를 생성하면 response 값을 반환한다.")
@@ -119,6 +124,24 @@ public class ReservationCreateServiceTest {
             assertThatThrownBy(() -> {
                 reservationCreateService.create(request, loginMember);
             }).isInstanceOf(ReservationConflictException.class);
+        }
+
+        @DisplayName("결제 승인 API가 실패한다면 예외가 발생한다.")
+        @Test
+        void create4() {
+            // given
+            given(orderReader.getById(request.orderId()))
+                    .willReturn(new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule));
+            given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(), schedule.getTheme().getId()))
+                    .willReturn(schedule);
+            given(memberService.getByEmail(loginMember.email()))
+                    .willReturn(member);
+            doThrow(new PaymentException("결제에 실패하였습니다.")).when(paymentClient).confirm(paymentConfirmRequest);
+
+            // when & then
+            assertThatThrownBy(() -> {
+                reservationCreateService.create(request, loginMember);
+            }).isInstanceOf(PaymentException.class);
         }
     }
 
