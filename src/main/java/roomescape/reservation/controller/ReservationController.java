@@ -15,13 +15,11 @@ import roomescape.auth.service.dto.LoginMember;
 import roomescape.reservation.service.CreateReservationService;
 import roomescape.reservation.service.ReservationService;
 import roomescape.reservation.service.dto.request.FilteringReservationRequest;
-import roomescape.reservation.service.dto.request.ReservationCreateRequest;
-import roomescape.reservation.service.dto.request.ReservationRequest;
+import roomescape.reservation.service.dto.request.ReservationWithPaymentRequest;
 import roomescape.reservation.service.dto.response.MyReservationsResponse;
 import roomescape.reservation.service.dto.response.ReservationResponse;
 import roomescape.reservation.service.dto.response.ReservationTimeWithBookedResponse;
 
-import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -58,15 +56,12 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponse> create(
-            @Valid @RequestBody final ReservationRequest request,
+    public ResponseEntity<ReservationResponse> createWithPayment(
+            @Valid @RequestBody ReservationWithPaymentRequest request,
             final LoginMember loginMember
     ) {
-        ReservationCreateRequest createRequest = ReservationCreateRequest.from(request, loginMember);
-        ReservationResponse response = createReservationService.create(createRequest);
-
-        return ResponseEntity.created(URI.create("/reservations/" + response.id()))
-                .body(response);
+        ReservationResponse reservationResponse = createReservationService.createWithPayment(request, loginMember);
+        return ResponseEntity.ok(reservationResponse);
     }
 
     @DeleteMapping("/{id}")
