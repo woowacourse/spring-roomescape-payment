@@ -13,7 +13,7 @@ public class PaymentRestClient {
 
     private final RestClient restClient;
 
-    @Value("${TOSS-KEY}")
+    @Value("${toss.payment.api.key}")
     private String tossKey;
 
     public PaymentRestClient(RestClient restClient) {
