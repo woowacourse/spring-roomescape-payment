@@ -57,7 +57,7 @@
 
 | HTTP Method | Endpoint                      | AuthRole      | Success        | Description                    |
 |-------------|-------------------------------|---------------|----------------|--------------------------------|
-| POST        | /reservations                 | ADMIN, MEMBER | 201 CREATED    | 회원의 예약 추가                      |
+| POST        | /reservations                 | ADMIN, MEMBER | 201 CREATED    | 결제 후 예약 추가                     |
 | DELETE      | /reservations/{id}            | ADMIN, MEMBER | 204 NO_CONTENT | 회원의 예약 삭제                      |
 | GET         | /reservations/mine            | ADMIN, MEMBER | 200 OK         | 내 예약 목록 조회                     |
 | GET         | /reservations/available-times | PUBLIC        | 200 OK         | 조건부 예약 가능한 시간 목록 조회(예약 날짜, 테마) |
