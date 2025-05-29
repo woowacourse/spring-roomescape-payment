@@ -4,8 +4,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.util.Objects;
 import roomescape.infrastructure.error.exception.PaymentException;
+
+import java.util.Objects;
 
 @Entity
 public class Payment {
@@ -18,11 +19,11 @@ public class Payment {
 
     private long amount;
 
-    public Payment(String orderId, Long amount) {
+    public Payment(final String orderId, final Long amount) {
         this(null, orderId, amount);
     }
 
-    public Payment(Long id, String orderId, Long amount) {
+    public Payment(final Long id, final String orderId, final Long amount) {
         this.id = id;
         this.orderId = orderId;
         this.amount = amount;
@@ -31,7 +32,7 @@ public class Payment {
     protected Payment() {
     }
 
-    public void validateApprovalAmount(long amount) {
+    public void validateApprovalAmount(final long amount) {
         if (this.amount != amount) {
             throw new PaymentException(
                     "요청 금액과 승인 금액이 일치하지 않습니다. 현재 결제 금액: %d, 요청 금액: %d".formatted(this.amount, amount)
@@ -52,11 +53,11 @@ public class Payment {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Payment payment = (Payment) o;
+        final Payment payment = (Payment) o;
         return Objects.equals(id, payment.id);
     }
 

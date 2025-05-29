@@ -7,12 +7,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Objects;
 import roomescape.domain.BaseEntity;
 import roomescape.domain.member.Member;
 import roomescape.infrastructure.error.exception.WaitingException;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 public class Waiting extends BaseEntity {
@@ -35,11 +36,11 @@ public class Waiting extends BaseEntity {
     @JoinColumn(name = "theme_id")
     private Theme theme;
 
-    public Waiting(Member member, LocalDate date, ReservationTime time, Theme theme) {
+    public Waiting(final Member member, final LocalDate date, final ReservationTime time, final Theme theme) {
         this(null, member, date, time, theme);
     }
 
-    public Waiting(Long id, Member member, LocalDate date, ReservationTime time, Theme theme) {
+    public Waiting(final Long id, final Member member, final LocalDate date, final ReservationTime time, final Theme theme) {
         this.id = id;
         this.member = member;
         this.date = date;
@@ -50,22 +51,22 @@ public class Waiting extends BaseEntity {
     protected Waiting() {
     }
 
-    public void validateWaitable(LocalDateTime currentDateTime) {
-        LocalDateTime waitingDateTime = LocalDateTime.of(date, time.getStartAt());
+    public void validateWaitable(final LocalDateTime currentDateTime) {
+        final LocalDateTime waitingDateTime = LocalDateTime.of(date, time.getStartAt());
         if (waitingDateTime.isBefore(currentDateTime)) {
             throw new WaitingException("예약일이 지나 대기 신청을 할 수 없습니다.");
         }
     }
 
-    public boolean canBeApprovedBy(Member member) {
+    public boolean canBeApprovedBy(final Member member) {
         return member.isAdmin();
     }
 
-    public boolean canBeCanceledBy(Member member) {
+    public boolean canBeCanceledBy(final Member member) {
         return isOwner(member.getId()) || member.isAdmin();
     }
 
-    private boolean isOwner(Long memberId) {
+    private boolean isOwner(final Long memberId) {
         return Objects.equals(this.member.getId(), memberId);
     }
 

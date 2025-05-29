@@ -7,8 +7,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.util.Objects;
 import roomescape.infrastructure.error.exception.MemberException;
+
+import java.util.Objects;
 
 @Entity
 public class Member {
@@ -29,15 +30,15 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private MemberRole role;
 
-    public Member(String name, Email email, String password, MemberRole role) {
+    public Member(final String name, final Email email, final String password, final MemberRole role) {
         this(null, name, email, password, role);
     }
 
-    public Member(String name, Email email, String password) {
+    public Member(final String name, final Email email, final String password) {
         this(null, name, email, password, MemberRole.NORMAL);
     }
 
-    public Member(Long id, String name, Email email, String password, MemberRole role) {
+    public Member(final Long id, final String name, final Email email, final String password, final MemberRole role) {
         validateName(name);
         validatePassword(password);
         this.id = id;
@@ -50,7 +51,7 @@ public class Member {
     protected Member() {
     }
 
-    private void validateName(String name) {
+    private void validateName(final String name) {
         if (name.isBlank()) {
             throw new MemberException("사용자명은 비어있을 수 없습니다.");
         }
@@ -59,13 +60,13 @@ public class Member {
         }
     }
 
-    private void validatePassword(String password) {
+    private void validatePassword(final String password) {
         if (password.isBlank()) {
             throw new MemberException("비밀번호는 비어있을 수 없습니다.");
         }
     }
 
-    public boolean isNotPassword(String password) {
+    public boolean isNotPassword(final String password) {
         return !this.password.equals(password);
     }
 
@@ -94,16 +95,16 @@ public class Member {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Member member = (Member) o;
+        final Member member = (Member) o;
         return Objects.equals(id, member.id)
-                && Objects.equals(name, member.name)
-                && Objects.equals(email, member.email)
-                && Objects.equals(password, member.password)
-                && role == member.role;
+               && Objects.equals(name, member.name)
+               && Objects.equals(email, member.email)
+               && Objects.equals(password, member.password)
+               && role == member.role;
     }
 
     @Override

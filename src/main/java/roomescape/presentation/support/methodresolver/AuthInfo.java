@@ -7,4 +7,5 @@ public record AuthInfo(
         String name,
         MemberRole role
 ) {
+
 }

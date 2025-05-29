@@ -9,13 +9,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import roomescape.domain.BaseEntity;
+import roomescape.domain.member.Member;
+import roomescape.infrastructure.error.exception.ReservationException;
+
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import roomescape.domain.BaseEntity;
-import roomescape.domain.member.Member;
-import roomescape.infrastructure.error.exception.ReservationException;
 
 @Entity
 public class Reservation extends BaseEntity {
@@ -43,20 +44,20 @@ public class Reservation extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
-    public Reservation(Member member, LocalDate date, ReservationTime time, Theme theme) {
+    public Reservation(final Member member, final LocalDate date, final ReservationTime time, final Theme theme) {
         this(null, member, date, time, theme);
     }
 
-    public Reservation(Long id, Member member, LocalDate date, ReservationTime time, Theme theme) {
+    public Reservation(final Long id, final Member member, final LocalDate date, final ReservationTime time, final Theme theme) {
         this(id, member, date, time, theme, ReservationStatus.RESERVE);
     }
 
-    public Reservation(Long id,
-                       Member member,
-                       LocalDate date,
-                       ReservationTime time,
-                       Theme theme,
-                       ReservationStatus status) {
+    public Reservation(final Long id,
+                       final Member member,
+                       final LocalDate date,
+                       final ReservationTime time,
+                       final Theme theme,
+                       final ReservationStatus status) {
         this.id = id;
         this.member = member;
         this.date = date;
@@ -68,18 +69,18 @@ public class Reservation extends BaseEntity {
     protected Reservation() {
     }
 
-    public void validateReservable(LocalDateTime currentDateTime) {
-        LocalDateTime reservationDateTime = LocalDateTime.of(date, time.getStartAt());
+    public void validateReservable(final LocalDateTime currentDateTime) {
+        final LocalDateTime reservationDateTime = LocalDateTime.of(date, time.getStartAt());
         if (reservationDateTime.isBefore(currentDateTime)) {
             throw new ReservationException("지난 날짜와 시간에 대한 예약은 불가능합니다.");
         }
-        Duration duration = Duration.between(currentDateTime, reservationDateTime);
+        final Duration duration = Duration.between(currentDateTime, reservationDateTime);
         if (duration.toMinutes() < MIN_TIME_BEFORE_RESERVATION) {
             throw new ReservationException("예약 시간까지 %d분도 남지 않아 예약이 불가능합니다.".formatted(MIN_TIME_BEFORE_RESERVATION));
         }
     }
 
-    public boolean isEqualThemeId(Long themeId) {
+    public boolean isEqualThemeId(final Long themeId) {
         return theme.getId().equals(themeId);
     }
 
@@ -108,11 +109,11 @@ public class Reservation extends BaseEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Reservation that = (Reservation) o;
+        final Reservation that = (Reservation) o;
         return Objects.equals(id, that.id);
     }
 

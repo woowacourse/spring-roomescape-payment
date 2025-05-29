@@ -13,18 +13,18 @@ public class DeleteReservationTimeService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ReservationRepository reservationRepository;
 
-    public DeleteReservationTimeService(ReservationTimeRepository reservationTimeRepository,
-                                        ReservationRepository reservationRepository) {
+    public DeleteReservationTimeService(final ReservationTimeRepository reservationTimeRepository,
+                                        final ReservationRepository reservationRepository) {
         this.reservationTimeRepository = reservationTimeRepository;
         this.reservationRepository = reservationRepository;
     }
 
-    public void removeById(Long reservationTimeId) {
+    public void removeById(final Long reservationTimeId) {
         validateReservationTimeIsNotReserved(reservationTimeId);
         reservationTimeRepository.deleteById(reservationTimeId);
     }
 
-    private void validateReservationTimeIsNotReserved(Long reservationTimeId) {
+    private void validateReservationTimeIsNotReserved(final Long reservationTimeId) {
         if (reservationRepository.existsByTimeId(reservationTimeId)) {
             throw new ReservationTimeException("해당 예약 시간으로 예약된 예약이 존재합니다.");
         }

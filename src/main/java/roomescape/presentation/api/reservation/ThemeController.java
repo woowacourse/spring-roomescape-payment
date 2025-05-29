@@ -1,6 +1,5 @@
 package roomescape.presentation.api.reservation;
 
-import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,20 +8,22 @@ import roomescape.application.reservation.query.ThemeQueryService;
 import roomescape.application.reservation.query.dto.ThemeResult;
 import roomescape.presentation.api.reservation.response.ThemeResponse;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/themes")
 public class ThemeController {
 
     private final ThemeQueryService themeQueryService;
 
-    public ThemeController(ThemeQueryService themeQueryService) {
+    public ThemeController(final ThemeQueryService themeQueryService) {
         this.themeQueryService = themeQueryService;
     }
 
     @GetMapping
     public ResponseEntity<List<ThemeResponse>> findAll() {
-        List<ThemeResult> themeResults = themeQueryService.findAll();
-        List<ThemeResponse> themeResponses = themeResults.stream()
+        final List<ThemeResult> themeResults = themeQueryService.findAll();
+        final List<ThemeResponse> themeResponses = themeResults.stream()
                 .map(ThemeResponse::from)
                 .toList();
         return ResponseEntity.ok(themeResponses);
@@ -30,8 +31,8 @@ public class ThemeController {
 
     @GetMapping("/rank")
     public ResponseEntity<List<ThemeResponse>> findRankBetweenDate() {
-        List<ThemeResult> rank = themeQueryService.findWeeklyPopularThemes();
-        List<ThemeResponse> themeResponses = rank.stream()
+        final List<ThemeResult> rank = themeQueryService.findWeeklyPopularThemes();
+        final List<ThemeResponse> themeResponses = rank.stream()
                 .map(ThemeResponse::from)
                 .toList();
         return ResponseEntity.ok(themeResponses);

@@ -1,10 +1,5 @@
 package roomescape.application.reservation.command;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +15,12 @@ import roomescape.domain.reservation.repository.ReservationRepository;
 import roomescape.domain.reservation.repository.ReservationTimeRepository;
 import roomescape.domain.reservation.repository.ThemeRepository;
 import roomescape.infrastructure.error.exception.ThemeException;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class DeleteThemeServiceTest extends AbstractServiceIntegrationTest {
 
@@ -45,7 +46,7 @@ class DeleteThemeServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 테마를_삭제할_수_있다() {
         // given
-        Theme theme = themeRepository.save(new Theme("테마1", "설명1", "image1.png"));
+        final Theme theme = themeRepository.save(new Theme("테마1", "설명1", "image1.png"));
 
         // when
         deleteThemeService.removeById(theme.getId());
@@ -57,9 +58,9 @@ class DeleteThemeServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 예약이_존재하는_테마는_삭제할_수_없다() {
         // given
-        Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
-        Theme theme = themeRepository.save(new Theme("테마1", "설명1", "image1.png"));
-        ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
+        final Theme theme = themeRepository.save(new Theme("테마1", "설명1", "image1.png"));
+        final ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
         reservationRepository.save(new Reservation(member, LocalDate.now(clock), reservationTime, theme));
 
         // when

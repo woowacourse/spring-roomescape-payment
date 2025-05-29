@@ -16,31 +16,31 @@ public class DeleteWaitingService {
     private final WaitingRepository waitingRepository;
     private final MemberRepository memberRepository;
 
-    public DeleteWaitingService(WaitingRepository waitingRepository,
-                                MemberRepository memberRepository) {
+    public DeleteWaitingService(final WaitingRepository waitingRepository,
+                                final MemberRepository memberRepository) {
         this.waitingRepository = waitingRepository;
         this.memberRepository = memberRepository;
     }
 
-    public void cancel(Long waitingId, Long memberId) {
-        Member member = getMember(memberId);
-        Waiting waiting = getWaiting(waitingId);
+    public void cancel(final Long waitingId, final Long memberId) {
+        final Member member = getMember(memberId);
+        final Waiting waiting = getWaiting(waitingId);
         validateControlPermission(member, waiting);
         waitingRepository.delete(waiting);
     }
 
-    private void validateControlPermission(Member member, Waiting waiting) {
+    private void validateControlPermission(final Member member, final Waiting waiting) {
         if (!waiting.canBeCanceledBy(member)) {
             throw new WaitingException("대기 취소 권한이 없습니다.");
         }
     }
 
-    private Member getMember(Long memberId) {
+    private Member getMember(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException("회원 정보가 존재하지 않습니다."));
     }
 
-    private Waiting getWaiting(Long waitingId) {
+    private Waiting getWaiting(final Long waitingId) {
         return waitingRepository.findById(waitingId)
                 .orElseThrow(() -> new WaitingException("대기 정보가 존재하지 않습니다."));
     }

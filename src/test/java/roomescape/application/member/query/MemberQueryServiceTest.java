@@ -1,8 +1,5 @@
 package roomescape.application.member.query;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +9,10 @@ import roomescape.domain.member.Email;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRole;
 import roomescape.domain.member.repository.MemberRepository;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class MemberQueryServiceTest extends AbstractServiceIntegrationTest {
 
@@ -28,15 +29,15 @@ class MemberQueryServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 모든_회원_조회가_가능하다() {
         // given
-        Member member1 = memberRepository.save(
+        final Member member1 = memberRepository.save(
                 new Member("벨로", new Email("test1@email.com"), "1234", MemberRole.NORMAL)
         );
-        Member member2 = memberRepository.save(
+        final Member member2 = memberRepository.save(
                 new Member("서프", new Email("test2@email.com"), "1234", MemberRole.NORMAL)
         );
 
         // when
-        List<MemberResult> results = memberQueryService.findAll();
+        final List<MemberResult> results = memberQueryService.findAll();
 
         // then
         assertThat(results)

@@ -1,10 +1,5 @@
 package roomescape.application.reservation.query;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +16,12 @@ import roomescape.domain.reservation.repository.ReservationRepository;
 import roomescape.domain.reservation.repository.ReservationTimeRepository;
 import roomescape.domain.reservation.repository.ThemeRepository;
 import roomescape.domain.reservation.repository.WaitingRepository;
+
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class WaitingQueryServiceTest extends AbstractServiceIntegrationTest {
 
@@ -39,7 +40,6 @@ class WaitingQueryServiceTest extends AbstractServiceIntegrationTest {
     @Autowired
     private MemberRepository memberRepository;
 
-
     private WaitingQueryService waitingQueryService;
 
     @BeforeEach
@@ -50,17 +50,17 @@ class WaitingQueryServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 대기신청을_조회할_수_있다() {
         // given
-        LocalDateTime now = LocalDateTime.now(clock).plusDays(1);
-        Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
-        Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final LocalDateTime now = LocalDateTime.now(clock).plusDays(1);
+        final Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
+        final Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
+        final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
         reservationRepository.save(new Reservation(member, now.toLocalDate(), time, theme));
-        Reservation reservation = reservationRepository.findById(1L).orElseThrow();
-        Waiting waiting = new Waiting(member, reservation.getDate(), reservation.getTime(), reservation.getTheme());
-        Long waitingId = waitingRepository.save(waiting).getId();
+        final Reservation reservation = reservationRepository.findById(1L).orElseThrow();
+        final Waiting waiting = new Waiting(member, reservation.getDate(), reservation.getTime(), reservation.getTheme());
+        final Long waitingId = waitingRepository.save(waiting).getId();
 
         // when
-        var waitingResults = waitingQueryService.findWaitingByMemberId(member.getId());
+        final var waitingResults = waitingQueryService.findWaitingByMemberId(member.getId());
 
         // then
         assertAll(
@@ -76,17 +76,17 @@ class WaitingQueryServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 전체_대기신청을_조회할_수_있다() {
         // given
-        LocalDateTime now = LocalDateTime.now(clock).plusDays(1);
-        Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
-        Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final LocalDateTime now = LocalDateTime.now(clock).plusDays(1);
+        final Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
+        final Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
+        final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
         reservationRepository.save(new Reservation(member, now.toLocalDate(), time, theme));
-        Reservation reservation = reservationRepository.findById(1L).orElseThrow();
-        Waiting waiting = new Waiting(member, reservation.getDate(), reservation.getTime(), reservation.getTheme());
-        Long waitingId = waitingRepository.save(waiting).getId();
+        final Reservation reservation = reservationRepository.findById(1L).orElseThrow();
+        final Waiting waiting = new Waiting(member, reservation.getDate(), reservation.getTime(), reservation.getTheme());
+        final Long waitingId = waitingRepository.save(waiting).getId();
 
         // when
-        var waitingResults = waitingQueryService.findAll();
+        final var waitingResults = waitingQueryService.findAll();
 
         // then
         assertAll(

@@ -10,7 +10,7 @@ public record WaitingResponse(
         String startAt
 ) {
 
-    public static WaitingResponse from(WaitingResult waitingResult) {
+    public static WaitingResponse from(final WaitingResult waitingResult) {
         return new WaitingResponse(
                 waitingResult.waitingId(),
                 waitingResult.memberName(),

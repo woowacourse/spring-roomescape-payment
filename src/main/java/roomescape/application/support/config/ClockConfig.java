@@ -1,9 +1,10 @@
 package roomescape.application.support.config;
 
-import java.time.Clock;
-import java.time.ZoneId;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.time.Clock;
+import java.time.ZoneId;
 
 @Configuration
 public class ClockConfig {

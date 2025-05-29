@@ -1,7 +1,7 @@
 package roomescape.infrastructure.security;
 
-import java.util.Date;
 import javax.crypto.SecretKey;
+import java.util.Date;
 
 public record TokenIssueRequest(
         Date issuedAt,
@@ -9,4 +9,5 @@ public record TokenIssueRequest(
         Long identifier,
         SecretKey secretKey
 ) {
+
 }

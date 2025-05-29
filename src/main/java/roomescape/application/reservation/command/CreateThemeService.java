@@ -13,18 +13,18 @@ public class CreateThemeService {
 
     private final ThemeRepository themeRepository;
 
-    public CreateThemeService(ThemeRepository themeRepository) {
+    public CreateThemeService(final ThemeRepository themeRepository) {
         this.themeRepository = themeRepository;
     }
 
-    public Long register(CreateThemeCommand createCommand) {
+    public Long register(final CreateThemeCommand createCommand) {
         validateDuplicateThemeName(createCommand);
-        Theme theme = new Theme(createCommand.name(), createCommand.description(), createCommand.thumbnail());
-        Theme savedTheme = themeRepository.save(theme);
+        final Theme theme = new Theme(createCommand.name(), createCommand.description(), createCommand.thumbnail());
+        final Theme savedTheme = themeRepository.save(theme);
         return savedTheme.getId();
     }
 
-    private void validateDuplicateThemeName(CreateThemeCommand createCommand) {
+    private void validateDuplicateThemeName(final CreateThemeCommand createCommand) {
         if (themeRepository.existsByName(createCommand.name())) {
             throw new ThemeException("이미 같은 이름의 테마가 존재합니다.");
         }

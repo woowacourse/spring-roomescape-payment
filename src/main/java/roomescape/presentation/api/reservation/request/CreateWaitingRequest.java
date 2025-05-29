@@ -1,8 +1,9 @@
 package roomescape.presentation.api.reservation.request;
 
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDate;
 import roomescape.application.reservation.command.dto.CreateWaitingCommand;
+
+import java.time.LocalDate;
 
 public record CreateWaitingRequest(
         @NotNull(message = "date는 필수입니다.")
@@ -13,7 +14,7 @@ public record CreateWaitingRequest(
         Long time
 ) {
 
-    public CreateWaitingCommand toCreateCommand(Long memberId) {
+    public CreateWaitingCommand toCreateCommand(final Long memberId) {
         return new CreateWaitingCommand(
                 date,
                 theme,

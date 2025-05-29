@@ -5,4 +5,5 @@ public record PaymentCommand(
         String orderId,
         Long amount
 ) {
+
 }

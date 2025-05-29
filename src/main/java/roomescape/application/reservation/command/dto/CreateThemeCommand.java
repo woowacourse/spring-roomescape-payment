@@ -5,4 +5,5 @@ public record CreateThemeCommand(
         String description,
         String thumbnail
 ) {
+
 }

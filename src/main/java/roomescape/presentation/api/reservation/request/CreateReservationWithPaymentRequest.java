@@ -2,8 +2,9 @@ package roomescape.presentation.api.reservation.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDate;
 import roomescape.application.reservation.command.dto.CreateReservationWithPaymentCommand;
+
+import java.time.LocalDate;
 
 public record CreateReservationWithPaymentRequest(
         @NotNull(message = "date는 필수입니다.")
@@ -21,7 +22,8 @@ public record CreateReservationWithPaymentRequest(
         @NotBlank(message = "paymentType은 필수입니다.")
         String paymentType
 ) {
-    public CreateReservationWithPaymentCommand toCreateCommand(Long memberId) {
+
+    public CreateReservationWithPaymentCommand toCreateCommand(final Long memberId) {
         return new CreateReservationWithPaymentCommand(
                 date,
                 timeId,

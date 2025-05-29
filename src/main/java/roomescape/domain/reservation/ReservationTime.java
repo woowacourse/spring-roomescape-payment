@@ -4,9 +4,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import roomescape.infrastructure.error.exception.ReservationTimeException;
+
 import java.time.LocalTime;
 import java.util.Objects;
-import roomescape.infrastructure.error.exception.ReservationTimeException;
 
 @Entity
 public class ReservationTime {
@@ -20,11 +21,11 @@ public class ReservationTime {
 
     private LocalTime startAt;
 
-    public ReservationTime(LocalTime startAt) {
+    public ReservationTime(final LocalTime startAt) {
         this(null, startAt);
     }
 
-    public ReservationTime(Long id, LocalTime startAt) {
+    public ReservationTime(final Long id, final LocalTime startAt) {
         if (startAt.isBefore(RESERVATION_START_TIME) || startAt.isAfter(RESERVATION_END_TIME)) {
             throw new ReservationTimeException("해당 시간은 예약 가능 시간이 아닙니다.");
         }
@@ -44,16 +45,16 @@ public class ReservationTime {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == this) {
             return true;
         }
         if (obj == null || obj.getClass() != this.getClass()) {
             return false;
         }
-        var that = (ReservationTime) obj;
+        final var that = (ReservationTime) obj;
         return Objects.equals(this.id, that.id) &&
-                Objects.equals(this.startAt, that.startAt);
+               Objects.equals(this.startAt, that.startAt);
     }
 
     @Override

@@ -4,4 +4,5 @@ public record CreatePaymentCommand(
         String orderId,
         Long amount
 ) {
+
 }

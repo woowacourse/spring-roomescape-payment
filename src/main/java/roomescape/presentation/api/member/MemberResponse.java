@@ -7,7 +7,7 @@ public record MemberResponse(
         String name
 ) {
 
-    public static MemberResponse from(MemberResult memberResult) {
+    public static MemberResponse from(final MemberResult memberResult) {
         return new MemberResponse(memberResult.id(), memberResult.name());
     }
 }

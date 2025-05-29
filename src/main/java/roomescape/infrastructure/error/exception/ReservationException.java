@@ -2,7 +2,7 @@ package roomescape.infrastructure.error.exception;
 
 public class ReservationException extends RuntimeException {
 
-    public ReservationException(String message) {
+    public ReservationException(final String message) {
         super(message);
     }
 }

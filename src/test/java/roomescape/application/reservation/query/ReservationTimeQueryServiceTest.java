@@ -1,10 +1,5 @@
 package roomescape.application.reservation.query;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +16,12 @@ import roomescape.domain.reservation.Theme;
 import roomescape.domain.reservation.repository.ReservationRepository;
 import roomescape.domain.reservation.repository.ReservationTimeRepository;
 import roomescape.domain.reservation.repository.ThemeRepository;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ReservationTimeQueryServiceTest extends AbstractServiceIntegrationTest {
 
@@ -46,11 +47,11 @@ class ReservationTimeQueryServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 모든_예약시간을_조회할_수_있다() {
         // given
-        ReservationTime reservationTime1 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(12, 0)));
-        ReservationTime reservationTime2 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final ReservationTime reservationTime1 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(12, 0)));
+        final ReservationTime reservationTime2 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
 
         // when
-        List<ReservationTimeResult> results = reservationTimeQueryService.findAll();
+        final List<ReservationTimeResult> results = reservationTimeQueryService.findAll();
 
         // then
         assertThat(results).containsExactlyInAnyOrder(
@@ -62,14 +63,14 @@ class ReservationTimeQueryServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 예약시간을_예약여부와_함께_조회할_수_있다() {
         // given
-        Member member = memberRepository.save(new Member("test", new Email("test@test.com"), "test", MemberRole.ADMIN));
-        Theme theme = themeRepository.save(new Theme("test", "test", "test"));
-        ReservationTime reservationTime1 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(12, 0)));
-        ReservationTime reservationTime2 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final Member member = memberRepository.save(new Member("test", new Email("test@test.com"), "test", MemberRole.ADMIN));
+        final Theme theme = themeRepository.save(new Theme("test", "test", "test"));
+        final ReservationTime reservationTime1 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(12, 0)));
+        final ReservationTime reservationTime2 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
         reservationRepository.save(new Reservation(member, LocalDate.now().plusDays(1), reservationTime1, theme));
 
         // when
-        List<AvailableReservationTimeResult> availableTimesByThemeIdAndDate = reservationTimeQueryService.findAvailableTimesByThemeIdAndDate(
+        final List<AvailableReservationTimeResult> availableTimesByThemeIdAndDate = reservationTimeQueryService.findAvailableTimesByThemeIdAndDate(
                 theme.getId(),
                 LocalDate.now().plusDays(1)
         );

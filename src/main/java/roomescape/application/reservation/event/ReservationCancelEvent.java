@@ -7,4 +7,5 @@ public record ReservationCancelEvent(
         Long reservationTimeId,
         Long themeId
 ) {
+
 }

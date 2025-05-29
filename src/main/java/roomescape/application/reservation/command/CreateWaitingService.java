@@ -1,7 +1,5 @@
 package roomescape.application.reservation.command;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.reservation.command.dto.CreateWaitingCommand;
@@ -19,6 +17,9 @@ import roomescape.infrastructure.error.exception.ReservationTimeException;
 import roomescape.infrastructure.error.exception.ThemeException;
 import roomescape.infrastructure.error.exception.WaitingException;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
+
 @Service
 @Transactional
 public class CreateWaitingService {
@@ -30,12 +31,12 @@ public class CreateWaitingService {
     private final MemberRepository memberRepository;
     private final Clock clock;
 
-    public CreateWaitingService(WaitingRepository waitingRepository,
-                                ReservationRepository reservationRepository,
-                                ReservationTimeRepository reservationTimeRepository,
-                                ThemeRepository themeRepository,
-                                MemberRepository memberRepository,
-                                Clock clock) {
+    public CreateWaitingService(final WaitingRepository waitingRepository,
+                                final ReservationRepository reservationRepository,
+                                final ReservationTimeRepository reservationTimeRepository,
+                                final ThemeRepository themeRepository,
+                                final MemberRepository memberRepository,
+                                final Clock clock) {
         this.waitingRepository = waitingRepository;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
@@ -44,32 +45,32 @@ public class CreateWaitingService {
         this.clock = clock;
     }
 
-    public Long request(CreateWaitingCommand createCommand) {
+    public Long request(final CreateWaitingCommand createCommand) {
         validateNotAlreadyReservedOrWaiting(createCommand);
         validateReservationExists(createCommand);
-        Member member = getMember(createCommand.memberId());
-        ReservationTime time = getTime(createCommand.timeId());
-        Theme theme = getTheme(createCommand.themeId());
-        Waiting waiting = new Waiting(member, createCommand.reservationDate(), time, theme);
+        final Member member = getMember(createCommand.memberId());
+        final ReservationTime time = getTime(createCommand.timeId());
+        final Theme theme = getTheme(createCommand.themeId());
+        final Waiting waiting = new Waiting(member, createCommand.reservationDate(), time, theme);
         waiting.validateWaitable(LocalDateTime.now(clock));
-        Waiting savedWaiting = waitingRepository.save(waiting);
+        final Waiting savedWaiting = waitingRepository.save(waiting);
         return savedWaiting.getId();
     }
 
-    private void validateNotAlreadyReservedOrWaiting(CreateWaitingCommand createCommand) {
+    private void validateNotAlreadyReservedOrWaiting(final CreateWaitingCommand createCommand) {
         if (isAlreadyReservedOrWaiting(createCommand)) {
             throw new WaitingException("이미 예약했거나 대기 중입니다.");
         }
     }
 
-    private boolean isAlreadyReservedOrWaiting(CreateWaitingCommand createCommand) {
-        boolean isAlreadyReserved = reservationRepository.existsByDateAndTimeIdAndThemeIdAndMemberId(
+    private boolean isAlreadyReservedOrWaiting(final CreateWaitingCommand createCommand) {
+        final boolean isAlreadyReserved = reservationRepository.existsByDateAndTimeIdAndThemeIdAndMemberId(
                 createCommand.reservationDate(),
                 createCommand.timeId(),
                 createCommand.themeId(),
                 createCommand.memberId()
         );
-        boolean isAlreadyWaiting = waitingRepository.existsByDateAndTimeIdAndThemeIdAndMemberId(
+        final boolean isAlreadyWaiting = waitingRepository.existsByDateAndTimeIdAndThemeIdAndMemberId(
                 createCommand.reservationDate(),
                 createCommand.timeId(),
                 createCommand.themeId(),
@@ -78,8 +79,8 @@ public class CreateWaitingService {
         return isAlreadyReserved || isAlreadyWaiting;
     }
 
-    private void validateReservationExists(CreateWaitingCommand createCommand) {
-        boolean exists = reservationRepository.existsByDateAndTimeIdAndThemeId(
+    private void validateReservationExists(final CreateWaitingCommand createCommand) {
+        final boolean exists = reservationRepository.existsByDateAndTimeIdAndThemeId(
                 createCommand.reservationDate(),
                 createCommand.timeId(),
                 createCommand.themeId()
@@ -89,17 +90,17 @@ public class CreateWaitingService {
         }
     }
 
-    private Member getMember(Long memberId) {
+    private Member getMember(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다."));
     }
 
-    private ReservationTime getTime(Long timeId) {
+    private ReservationTime getTime(final Long timeId) {
         return reservationTimeRepository.findById(timeId)
                 .orElseThrow(() -> new ReservationTimeException("존재하지 않는 예약 시간입니다."));
     }
 
-    private Theme getTheme(Long themeId) {
+    private Theme getTheme(final Long themeId) {
         return themeRepository.findById(themeId)
                 .orElseThrow(() -> new ThemeException("존재하지 않는 테마입니다."));
     }

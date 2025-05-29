@@ -9,12 +9,12 @@ public class InterceptorConfig implements WebMvcConfigurer {
 
     private final AdminInterceptor adminInterceptor;
 
-    public InterceptorConfig(AdminInterceptor adminInterceptor) {
+    public InterceptorConfig(final AdminInterceptor adminInterceptor) {
         this.adminInterceptor = adminInterceptor;
     }
 
     @Override
-    public void addInterceptors(InterceptorRegistry registry) {
+    public void addInterceptors(final InterceptorRegistry registry) {
         registry.addInterceptor(adminInterceptor)
                 .addPathPatterns("/admin/**");
     }

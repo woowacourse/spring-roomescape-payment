@@ -2,11 +2,11 @@ package roomescape.infrastructure.error.exception;
 
 public class AuthInfoResolveException extends RuntimeException {
 
-    public AuthInfoResolveException(String message) {
+    public AuthInfoResolveException(final String message) {
         super(message);
     }
 
-    public AuthInfoResolveException(String message, Throwable cause) {
+    public AuthInfoResolveException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

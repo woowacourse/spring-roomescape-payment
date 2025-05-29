@@ -14,28 +14,28 @@ public class DeleteReservationService {
     private final ReservationRepository reservationRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public DeleteReservationService(ReservationRepository reservationRepository,
-                                    ApplicationEventPublisher applicationEventPublisher) {
+    public DeleteReservationService(final ReservationRepository reservationRepository,
+                                    final ApplicationEventPublisher applicationEventPublisher) {
         this.reservationRepository = reservationRepository;
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
-    public void cancelById(Long reservationId) {
-        Reservation reservation = getReservation(reservationId);
+    public void cancelById(final Long reservationId) {
+        final Reservation reservation = getReservation(reservationId);
         reservationRepository.delete(reservation);
         publishCancelEvent(reservation);
     }
 
-    private Reservation getReservation(Long reservationId) {
+    private Reservation getReservation(final Long reservationId) {
         return reservationRepository.findByIdWithTimeAndTheme(reservationId)
                 .orElseThrow(() -> new IllegalArgumentException("예약 정보가 존재하지 않습니다."));
     }
 
-    private void publishCancelEvent(Reservation reservation) {
+    private void publishCancelEvent(final Reservation reservation) {
         applicationEventPublisher.publishEvent(createCancelEvent(reservation));
     }
 
-    private ReservationCancelEvent createCancelEvent(Reservation reservation) {
+    private ReservationCancelEvent createCancelEvent(final Reservation reservation) {
         return new ReservationCancelEvent(
                 reservation.getDate(),
                 reservation.getTime().getId(),

@@ -1,8 +1,5 @@
 package roomescape.application.member.command;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +8,9 @@ import roomescape.application.member.command.dto.RegisterCommand;
 import roomescape.domain.member.Email;
 import roomescape.domain.member.repository.MemberRepository;
 import roomescape.infrastructure.error.exception.MemberException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 class CreateMemberServiceTest extends AbstractServiceIntegrationTest {
 
@@ -27,7 +27,7 @@ class CreateMemberServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 회원가입을_할_수_있다() {
         // given
-        RegisterCommand registerCommand = new RegisterCommand("bello@email.com", "password", "벨로");
+        final RegisterCommand registerCommand = new RegisterCommand("bello@email.com", "password", "벨로");
 
         // when
         createMemberService.register(registerCommand);
@@ -43,7 +43,7 @@ class CreateMemberServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 중복된_이메일로_회원가입을_할_수_없다() {
         // given
-        RegisterCommand registerCommand = new RegisterCommand("bello@email.com", "password", "벨로");
+        final RegisterCommand registerCommand = new RegisterCommand("bello@email.com", "password", "벨로");
         createMemberService.register(registerCommand);
 
         // when, then

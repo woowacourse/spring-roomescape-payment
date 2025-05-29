@@ -7,4 +7,5 @@ public record AvailableReservationTimeResult(
         LocalTime startAt,
         boolean booked
 ) {
+
 }

@@ -12,7 +12,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @SpringBootApplication
 public class RoomescapeApplication {
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         SpringApplication.run(RoomescapeApplication.class, args);
     }
 }

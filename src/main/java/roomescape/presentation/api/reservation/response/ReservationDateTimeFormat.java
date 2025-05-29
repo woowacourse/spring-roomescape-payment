@@ -10,11 +10,11 @@ public enum ReservationDateTimeFormat {
 
     private final DateTimeFormatter formatter;
 
-    ReservationDateTimeFormat(String pattern) {
+    ReservationDateTimeFormat(final String pattern) {
         this.formatter = DateTimeFormatter.ofPattern(pattern);
     }
 
-    public String format(TemporalAccessor temporal) {
+    public String format(final TemporalAccessor temporal) {
         return formatter.format(temporal);
     }
 }

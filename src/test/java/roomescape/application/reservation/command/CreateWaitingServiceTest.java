@@ -1,10 +1,5 @@
 package roomescape.application.reservation.command;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +18,12 @@ import roomescape.domain.reservation.repository.ThemeRepository;
 import roomescape.domain.reservation.repository.WaitingRepository;
 import roomescape.infrastructure.error.exception.MemberException;
 import roomescape.infrastructure.error.exception.WaitingException;
+
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 class CreateWaitingServiceTest extends AbstractServiceIntegrationTest {
 
@@ -58,15 +59,15 @@ class CreateWaitingServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 예약이_존재해야_대기신청을_할_수_있다() {
         // given
-        LocalDateTime now = LocalDateTime.now(clock).plusDays(1);
-        Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
-        Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final LocalDateTime now = LocalDateTime.now(clock).plusDays(1);
+        final Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
+        final Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
+        final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
         reservationRepository.save(new Reservation(member, now.toLocalDate(), time, theme));
-        Member requestMember = memberRepository.save(
+        final Member requestMember = memberRepository.save(
                 new Member("서프", new Email("sf@email.com"), "pw", MemberRole.NORMAL)
         );
-        CreateWaitingCommand command = new CreateWaitingCommand(
+        final CreateWaitingCommand command = new CreateWaitingCommand(
                 now.toLocalDate(),
                 theme.getId(),
                 time.getId(),
@@ -74,7 +75,7 @@ class CreateWaitingServiceTest extends AbstractServiceIntegrationTest {
         );
 
         // when
-        Long waitingId = createWaitingService.request(command);
+        final Long waitingId = createWaitingService.request(command);
 
         // then
         assertThat(waitingRepository.findById(waitingId))
@@ -84,15 +85,15 @@ class CreateWaitingServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 과거_예약일로_대기신청을_할_수_없다() {
         // given
-        LocalDateTime now = LocalDateTime.now(clock).minusDays(1);
-        Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
-        Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final LocalDateTime now = LocalDateTime.now(clock).minusDays(1);
+        final Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
+        final Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
+        final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
         reservationRepository.save(new Reservation(member, now.toLocalDate(), time, theme));
-        Member requestMember = memberRepository.save(
+        final Member requestMember = memberRepository.save(
                 new Member("서프", new Email("sf@email.com"), "pw", MemberRole.NORMAL)
         );
-        CreateWaitingCommand command = new CreateWaitingCommand(
+        final CreateWaitingCommand command = new CreateWaitingCommand(
                 now.toLocalDate(),
                 theme.getId(),
                 time.getId(),
@@ -109,13 +110,13 @@ class CreateWaitingServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 존재하지_않는_사용자는_대기신청을_할_수_없다() {
         // given
-        LocalDateTime now = LocalDateTime.now(clock);
-        Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
-        Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final LocalDateTime now = LocalDateTime.now(clock);
+        final Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
+        final Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
+        final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
         reservationRepository.save(new Reservation(member, now.toLocalDate(), time, theme));
-        long invalidMemberId = 999L;
-        CreateWaitingCommand command = new CreateWaitingCommand(
+        final long invalidMemberId = 999L;
+        final CreateWaitingCommand command = new CreateWaitingCommand(
                 now.toLocalDate(),
                 theme.getId(),
                 time.getId(),
@@ -132,13 +133,13 @@ class CreateWaitingServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 존재하지_않는_예약시간으로_대기신청을_할_수_없다() {
         // given
-        LocalDateTime now = LocalDateTime.now(clock);
-        Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
-        Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final LocalDateTime now = LocalDateTime.now(clock);
+        final Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
+        final Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
+        final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
         reservationRepository.save(new Reservation(member, now.toLocalDate(), time, theme));
-        long invalidTimeId = 999L;
-        CreateWaitingCommand command = new CreateWaitingCommand(
+        final long invalidTimeId = 999L;
+        final CreateWaitingCommand command = new CreateWaitingCommand(
                 now.toLocalDate(),
                 theme.getId(),
                 invalidTimeId,
@@ -155,13 +156,13 @@ class CreateWaitingServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 존재하지_않는_테마로_대기신청을_할_수_없다() {
         // given
-        LocalDateTime now = LocalDateTime.now(clock);
-        Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
-        Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final LocalDateTime now = LocalDateTime.now(clock);
+        final Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
+        final Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
+        final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
         reservationRepository.save(new Reservation(member, now.toLocalDate(), time, theme));
-        long invalidThemeId = 999L;
-        CreateWaitingCommand command = new CreateWaitingCommand(
+        final long invalidThemeId = 999L;
+        final CreateWaitingCommand command = new CreateWaitingCommand(
                 now.toLocalDate(),
                 invalidThemeId,
                 time.getId(),
@@ -178,15 +179,15 @@ class CreateWaitingServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 대기신청을_중복으로_할_수_없다() {
         // given
-        LocalDateTime now = LocalDateTime.now(clock).plusDays(1);
-        Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
-        Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final LocalDateTime now = LocalDateTime.now(clock).plusDays(1);
+        final Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
+        final Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
+        final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
         reservationRepository.save(new Reservation(member, now.toLocalDate(), time, theme));
-        Member requestMember = memberRepository.save(
+        final Member requestMember = memberRepository.save(
                 new Member("서프", new Email("sf@email.com"), "pw", MemberRole.NORMAL)
         );
-        CreateWaitingCommand command = new CreateWaitingCommand(
+        final CreateWaitingCommand command = new CreateWaitingCommand(
                 now.toLocalDate(),
                 theme.getId(),
                 time.getId(),

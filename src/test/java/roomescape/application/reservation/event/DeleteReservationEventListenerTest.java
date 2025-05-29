@@ -1,10 +1,5 @@
 package roomescape.application.reservation.event;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +17,12 @@ import roomescape.domain.reservation.repository.ReservationRepository;
 import roomescape.domain.reservation.repository.ReservationTimeRepository;
 import roomescape.domain.reservation.repository.ThemeRepository;
 import roomescape.domain.reservation.repository.WaitingRepository;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
 class DeleteReservationEventListenerTest {
@@ -48,15 +49,15 @@ class DeleteReservationEventListenerTest {
     @Test
     void 예약_삭제시_가장_빠른_대기를_자동_승인한다() {
         // given
-        Member admin = memberRepository.save(new Member("admin", new Email("admin@email.com"), "pw", MemberRole.ADMIN));
-        Member member = memberRepository.save(new Member("user", new Email("user@email.com"), "pw", MemberRole.NORMAL));
-        LocalDate date = LocalDate.now().plusDays(1);
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
-        Theme theme = themeRepository.save(new Theme("공포의 하수도", "설명", "썸네일"));
+        final Member admin = memberRepository.save(new Member("admin", new Email("admin@email.com"), "pw", MemberRole.ADMIN));
+        final Member member = memberRepository.save(new Member("user", new Email("user@email.com"), "pw", MemberRole.NORMAL));
+        final LocalDate date = LocalDate.now().plusDays(1);
+        final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final Theme theme = themeRepository.save(new Theme("공포의 하수도", "설명", "썸네일"));
 
-        Reservation reservation = reservationRepository.save(new Reservation(admin, date, time, theme));
-        Waiting firstWaiting = waitingRepository.save(new Waiting(member, date, time, theme));
-        Member another = memberRepository.save(
+        final Reservation reservation = reservationRepository.save(new Reservation(admin, date, time, theme));
+        final Waiting firstWaiting = waitingRepository.save(new Waiting(member, date, time, theme));
+        final Member another = memberRepository.save(
                 new Member("another", new Email("another@email.com"), "pw", MemberRole.NORMAL)
         );
         waitingRepository.save(new Waiting(another, date, time, theme));
@@ -79,12 +80,12 @@ class DeleteReservationEventListenerTest {
     @Test
     void 예약_삭제시_대기가_없으면_아무일도_일어나지_않는다() {
         // given
-        Member admin = memberRepository.save(new Member("admin", new Email("admin@email.com"), "pw", MemberRole.ADMIN));
-        LocalDate date = LocalDate.now().plusDays(1);
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
-        Theme theme = themeRepository.save(new Theme("공포의 하수도", "설명", "썸네일"));
+        final Member admin = memberRepository.save(new Member("admin", new Email("admin@email.com"), "pw", MemberRole.ADMIN));
+        final LocalDate date = LocalDate.now().plusDays(1);
+        final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final Theme theme = themeRepository.save(new Theme("공포의 하수도", "설명", "썸네일"));
 
-        Reservation reservation = reservationRepository.save(new Reservation(admin, date, time, theme));
+        final Reservation reservation = reservationRepository.save(new Reservation(admin, date, time, theme));
 
         // when: 예약 삭제 → 이벤트 발행 → 아무 일도 일어나지 않음
         deleteReservationService.cancelById(reservation.getId());
@@ -94,10 +95,10 @@ class DeleteReservationEventListenerTest {
                 .isNotPresent();
     }
 
-    private void waitUntil(int seconds) {
+    private void waitUntil(final int seconds) {
         try {
             Thread.sleep(seconds * 1_000L);
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }

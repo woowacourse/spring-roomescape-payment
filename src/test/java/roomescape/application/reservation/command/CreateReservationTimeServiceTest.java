@@ -1,9 +1,5 @@
 package roomescape.application.reservation.command;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-
-import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +8,11 @@ import roomescape.application.reservation.command.dto.CreateReservationTimeComma
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.reservation.repository.ReservationTimeRepository;
 import roomescape.infrastructure.error.exception.ReservationTimeException;
+
+import java.time.LocalTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 class CreateReservationTimeServiceTest extends AbstractServiceIntegrationTest {
 
@@ -28,12 +29,12 @@ class CreateReservationTimeServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 운영시간_내의_예약시간을_생성할_수_있다() {
         // given
-        CreateReservationTimeCommand createReservationTimeCommand = new CreateReservationTimeCommand(
+        final CreateReservationTimeCommand createReservationTimeCommand = new CreateReservationTimeCommand(
                 LocalTime.of(12, 0)
         );
 
         // when
-        Long timeId = createReservationTimeService.register(createReservationTimeCommand);
+        final Long timeId = createReservationTimeService.register(createReservationTimeCommand);
 
         // then
         assertThat(reservationTimeRepository.findById(timeId))
@@ -44,7 +45,7 @@ class CreateReservationTimeServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 운영시간_외의_예약시간을_생성할_수_없다() {
         // given
-        CreateReservationTimeCommand createReservationTimeCommand = new CreateReservationTimeCommand(
+        final CreateReservationTimeCommand createReservationTimeCommand = new CreateReservationTimeCommand(
                 LocalTime.of(4, 0)
         );
 
@@ -59,7 +60,7 @@ class CreateReservationTimeServiceTest extends AbstractServiceIntegrationTest {
     void 이미_존재하는_예약시간을_추가하는_경우_예외가_발생한다() {
         // given
         reservationTimeRepository.save(new ReservationTime(LocalTime.of(12, 0)));
-        CreateReservationTimeCommand createReservationTimeCommand = new CreateReservationTimeCommand(
+        final CreateReservationTimeCommand createReservationTimeCommand = new CreateReservationTimeCommand(
                 LocalTime.of(12, 0)
         );
 

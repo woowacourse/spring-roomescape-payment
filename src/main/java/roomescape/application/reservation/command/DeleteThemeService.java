@@ -13,17 +13,17 @@ public class DeleteThemeService {
     private final ThemeRepository themeRepository;
     private final ReservationRepository reservationRepository;
 
-    public DeleteThemeService(ThemeRepository themeRepository, ReservationRepository reservationRepository) {
+    public DeleteThemeService(final ThemeRepository themeRepository, final ReservationRepository reservationRepository) {
         this.themeRepository = themeRepository;
         this.reservationRepository = reservationRepository;
     }
 
-    public void removeById(Long themeId) {
+    public void removeById(final Long themeId) {
         validateThemeIsNotReserved(themeId);
         themeRepository.deleteById(themeId);
     }
 
-    private void validateThemeIsNotReserved(Long themeId) {
+    private void validateThemeIsNotReserved(final Long themeId) {
         if (reservationRepository.existsByThemeId(themeId)) {
             throw new ThemeException("해당 테마로 예약된 예약이 존재합니다.");
         }

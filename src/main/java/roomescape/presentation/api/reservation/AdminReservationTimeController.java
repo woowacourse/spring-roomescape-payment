@@ -1,7 +1,6 @@
 package roomescape.presentation.api.reservation;
 
 import jakarta.validation.Valid;
-import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +12,8 @@ import roomescape.application.reservation.command.CreateReservationTimeService;
 import roomescape.application.reservation.command.DeleteReservationTimeService;
 import roomescape.presentation.api.reservation.request.CreateReservationTimeRequest;
 
+import java.net.URI;
+
 @RestController
 @RequestMapping("/admin/times")
 public class AdminReservationTimeController {
@@ -22,22 +23,22 @@ public class AdminReservationTimeController {
     private final CreateReservationTimeService createReservationTimeService;
     private final DeleteReservationTimeService deleteReservationTimeService;
 
-    public AdminReservationTimeController(CreateReservationTimeService createReservationTimeService,
-                                          DeleteReservationTimeService deleteReservationTimeService) {
+    public AdminReservationTimeController(final CreateReservationTimeService createReservationTimeService,
+                                          final DeleteReservationTimeService deleteReservationTimeService) {
         this.createReservationTimeService = createReservationTimeService;
         this.deleteReservationTimeService = deleteReservationTimeService;
     }
 
     @PostMapping
     public ResponseEntity<Void> create(
-            @Valid @RequestBody CreateReservationTimeRequest createReservationTImeRequest) {
-        Long id = createReservationTimeService.register(createReservationTImeRequest.toCreateCommand());
+            @Valid @RequestBody final CreateReservationTimeRequest createReservationTImeRequest) {
+        final Long id = createReservationTimeService.register(createReservationTImeRequest.toCreateCommand());
         return ResponseEntity.created(URI.create(RESERVATION_TIMES_URL.formatted(id)))
                 .build();
     }
 
     @DeleteMapping("/{timeId}")
-    public ResponseEntity<Void> deleteReservationTime(@PathVariable("timeId") Long reservationTimeId) {
+    public ResponseEntity<Void> deleteReservationTime(@PathVariable("timeId") final Long reservationTimeId) {
         deleteReservationTimeService.removeById(reservationTimeId);
         return ResponseEntity.noContent().build();
     }

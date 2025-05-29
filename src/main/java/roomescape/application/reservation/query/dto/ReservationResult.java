@@ -1,8 +1,9 @@
 package roomescape.application.reservation.query.dto;
 
-import java.time.LocalDate;
 import roomescape.application.member.query.dto.MemberResult;
 import roomescape.domain.reservation.Reservation;
+
+import java.time.LocalDate;
 
 public record ReservationResult(
         Long id,
@@ -12,7 +13,7 @@ public record ReservationResult(
         ThemeResult theme
 ) {
 
-    public static ReservationResult from(Reservation reservation) {
+    public static ReservationResult from(final Reservation reservation) {
         return new ReservationResult(
                 reservation.getId(),
                 MemberResult.from(reservation.getMember()),

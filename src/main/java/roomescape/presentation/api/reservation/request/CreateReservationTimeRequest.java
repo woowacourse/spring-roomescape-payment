@@ -1,8 +1,9 @@
 package roomescape.presentation.api.reservation.request;
 
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalTime;
 import roomescape.application.reservation.command.dto.CreateReservationTimeCommand;
+
+import java.time.LocalTime;
 
 public record CreateReservationTimeRequest(
         @NotNull(message = "startAt는 필수입니다.")

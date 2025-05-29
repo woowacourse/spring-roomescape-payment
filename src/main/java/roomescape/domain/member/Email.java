@@ -2,9 +2,10 @@ package roomescape.domain.member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import roomescape.infrastructure.error.exception.MemberException;
+
 import java.util.Objects;
 import java.util.regex.Pattern;
-import roomescape.infrastructure.error.exception.MemberException;
 
 @Embeddable
 public class Email {
@@ -14,7 +15,7 @@ public class Email {
     @Column(name = "email")
     private String value;
 
-    public Email(String value) {
+    public Email(final String value) {
         if (!EMAIL_PATTERN.matcher(value).matches()) {
             throw new MemberException("이메일 형식이 아닙니다.");
         }
@@ -29,11 +30,11 @@ public class Email {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Email email = (Email) o;
+        final Email email = (Email) o;
         return Objects.equals(value, email.value);
     }
 

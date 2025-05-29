@@ -8,4 +8,5 @@ public record CreateWaitingCommand(
         Long timeId,
         Long memberId
 ) {
+
 }

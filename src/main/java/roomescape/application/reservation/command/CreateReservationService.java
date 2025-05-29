@@ -1,8 +1,5 @@
 package roomescape.application.reservation.command;
 
-import java.time.Clock;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.payment.TossPaymentClient;
@@ -24,6 +21,10 @@ import roomescape.infrastructure.error.exception.ReservationException;
 import roomescape.infrastructure.error.exception.ReservationTimeException;
 import roomescape.infrastructure.error.exception.ThemeException;
 
+import java.time.Clock;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Service
 @Transactional
 public class CreateReservationService {
@@ -36,13 +37,13 @@ public class CreateReservationService {
     private final PaymentRepository paymentRepository;
     private final Clock clock;
 
-    public CreateReservationService(ReservationRepository reservationRepository,
-                                    ReservationTimeRepository reservationTimeRepository,
-                                    ThemeRepository themeRepository,
-                                    MemberRepository memberRepository,
-                                    TossPaymentClient tossPaymentClient,
-                                    PaymentRepository paymentRepository,
-                                    Clock clock) {
+    public CreateReservationService(final ReservationRepository reservationRepository,
+                                    final ReservationTimeRepository reservationTimeRepository,
+                                    final ThemeRepository themeRepository,
+                                    final MemberRepository memberRepository,
+                                    final TossPaymentClient tossPaymentClient,
+                                    final PaymentRepository paymentRepository,
+                                    final Clock clock) {
         this.reservationTimeRepository = reservationTimeRepository;
         this.reservationRepository = reservationRepository;
         this.themeRepository = themeRepository;
@@ -52,50 +53,50 @@ public class CreateReservationService {
         this.clock = clock;
     }
 
-    public Long reserve(CreateReservationCommand command) {
-        Member member = getMember(command.memberId());
-        ReservationTime time = getTime(command.timeId());
-        Theme theme = getTheme(command.themeId());
+    public Long reserve(final CreateReservationCommand command) {
+        final Member member = getMember(command.memberId());
+        final ReservationTime time = getTime(command.timeId());
+        final Theme theme = getTheme(command.themeId());
         validateDuplicateReservation(command.date(), time, theme);
-        Reservation reservation = new Reservation(member, command.date(), time, theme);
+        final Reservation reservation = new Reservation(member, command.date(), time, theme);
         reservation.validateReservable(LocalDateTime.now(clock));
-        Reservation savedReservation = reservationRepository.save(reservation);
+        final Reservation savedReservation = reservationRepository.save(reservation);
         return savedReservation.getId();
     }
 
-    public Long reserve(CreateReservationWithPaymentCommand command) {
+    public Long reserve(final CreateReservationWithPaymentCommand command) {
         approvePayment(command);
         return reserve(command.toCreateWithoutPaymentCommand());
     }
 
-    private void approvePayment(CreateReservationWithPaymentCommand command) {
-        Payment payment = getPayment(command);
+    private void approvePayment(final CreateReservationWithPaymentCommand command) {
+        final Payment payment = getPayment(command);
         payment.validateApprovalAmount(command.amount());
         tossPaymentClient.approve(command.getPaymentCommand());
     }
 
-    private Member getMember(Long memberId) {
+    private Member getMember(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException("존재하지 않는 회원입니다."));
     }
 
-    private ReservationTime getTime(Long timeId) {
+    private ReservationTime getTime(final Long timeId) {
         return reservationTimeRepository.findById(timeId)
                 .orElseThrow(() -> new ReservationTimeException("존재하지 않는 예약 시간입니다."));
     }
 
-    private Theme getTheme(Long themeId) {
+    private Theme getTheme(final Long themeId) {
         return themeRepository.findById(themeId)
                 .orElseThrow(() -> new ThemeException("존재하지 않는 테마입니다."));
     }
 
-    private Payment getPayment(CreateReservationWithPaymentCommand command) {
+    private Payment getPayment(final CreateReservationWithPaymentCommand command) {
         return paymentRepository.findByOrderId(command.orderId())
                 .orElseThrow(() -> new PaymentException("존재하지 않는 결제입니다."));
     }
 
-    private void validateDuplicateReservation(LocalDate date, ReservationTime time, Theme theme) {
-        boolean duplicated = reservationRepository.existsByDateAndTimeIdAndThemeId(date, time.getId(), theme.getId());
+    private void validateDuplicateReservation(final LocalDate date, final ReservationTime time, final Theme theme) {
+        final boolean duplicated = reservationRepository.existsByDateAndTimeIdAndThemeId(date, time.getId(), theme.getId());
         if (duplicated) {
             throw new ReservationException("날짜와 시간이 중복된 예약이 존재합니다.");
         }

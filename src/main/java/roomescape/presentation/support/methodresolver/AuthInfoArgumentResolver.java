@@ -23,41 +23,41 @@ public class AuthInfoArgumentResolver implements HandlerMethodArgumentResolver {
     private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
 
-    public AuthInfoArgumentResolver(JwtTokenExtractor jwtTokenExtractor,
-                                    JwtProvider jwtProvider,
-                                    MemberRepository memberRepository) {
+    public AuthInfoArgumentResolver(final JwtTokenExtractor jwtTokenExtractor,
+                                    final JwtProvider jwtProvider,
+                                    final MemberRepository memberRepository) {
         this.jwtTokenExtractor = jwtTokenExtractor;
         this.jwtProvider = jwtProvider;
         this.memberRepository = memberRepository;
     }
 
     @Override
-    public boolean supportsParameter(MethodParameter parameter) {
+    public boolean supportsParameter(final MethodParameter parameter) {
         return parameter.getParameterType().equals(AuthInfo.class)
-                && parameter.hasParameterAnnotation(AuthPrincipal.class);
+               && parameter.hasParameterAnnotation(AuthPrincipal.class);
     }
 
     @Override
-    public Object resolveArgument(@NonNull MethodParameter parameter,
-                                  ModelAndViewContainer mavContainer,
-                                  NativeWebRequest webRequest,
-                                  WebDataBinderFactory binderFactory) {
-        HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
-        Member member = getMemberFromRequest(request);
+    public Object resolveArgument(@NonNull final MethodParameter parameter,
+                                  final ModelAndViewContainer mavContainer,
+                                  final NativeWebRequest webRequest,
+                                  final WebDataBinderFactory binderFactory) {
+        final HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+        final Member member = getMemberFromRequest(request);
         return new AuthInfo(member.getId(), member.getName(), member.getRole());
     }
 
-    private Member getMemberFromRequest(HttpServletRequest request) {
-        Long identifier = getIdentifier(request);
+    private Member getMemberFromRequest(final HttpServletRequest request) {
+        final Long identifier = getIdentifier(request);
         return memberRepository.findById(identifier)
                 .orElseThrow(() -> new UnauthorizedException("접근 권한이 없습니다."));
     }
 
-    private Long getIdentifier(HttpServletRequest request) {
+    private Long getIdentifier(final HttpServletRequest request) {
         try {
-            AccessToken accessToken = jwtTokenExtractor.extract(request);
+            final AccessToken accessToken = jwtTokenExtractor.extract(request);
             return jwtProvider.extractIdentifier(accessToken);
-        } catch (JwtExtractException e) {
+        } catch (final JwtExtractException e) {
             throw new UnauthorizedException("인증 정보를 확인할 수 없습니다.", e);
         }
     }

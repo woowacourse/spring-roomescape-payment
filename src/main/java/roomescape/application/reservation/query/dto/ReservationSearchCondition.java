@@ -8,4 +8,5 @@ public record ReservationSearchCondition(
         LocalDate from,
         LocalDate to
 ) {
+
 }

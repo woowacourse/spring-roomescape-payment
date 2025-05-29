@@ -2,7 +2,7 @@ package roomescape.infrastructure.error.exception;
 
 public class WaitingException extends RuntimeException {
 
-    public WaitingException(String message) {
+    public WaitingException(final String message) {
         super(message);
     }
 }

@@ -1,11 +1,11 @@
 package roomescape.domain.reservation;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.infrastructure.error.exception.ThemeException;
+
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ThemeTest {
 
@@ -28,7 +28,7 @@ class ThemeTest {
     @DisplayName("이름이 너무 길면 예외가 발생한다.")
     void 이름이_너무_길면_예외() {
         // given
-        String longName = "a".repeat(51);
+        final String longName = "a".repeat(51);
 
         // when
         // then
@@ -49,7 +49,7 @@ class ThemeTest {
     @DisplayName("설명이 너무 길면 예외가 발생한다.")
     void 설명이_너무_길면_예외() {
         // given
-        String longDescription = "a".repeat(201);
+        final String longDescription = "a".repeat(201);
 
         // when
         // then
@@ -70,7 +70,7 @@ class ThemeTest {
     @DisplayName("썸네일이 너무 길면 예외가 발생한다.")
     void 썸네일이_너무_길면_예외() {
         // given
-        String longThumbnail = "a".repeat(201);
+        final String longThumbnail = "a".repeat(201);
 
         // when
         // then

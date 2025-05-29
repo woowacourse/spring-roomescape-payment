@@ -2,11 +2,11 @@ package roomescape.infrastructure.error.exception;
 
 public class JwtExtractException extends RuntimeException {
 
-    public JwtExtractException(String message) {
+    public JwtExtractException(final String message) {
         super(message);
     }
 
-    public JwtExtractException(String message, Throwable cause) {
+    public JwtExtractException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

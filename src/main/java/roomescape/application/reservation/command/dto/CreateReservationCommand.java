@@ -8,4 +8,5 @@ public record CreateReservationCommand(
         Long themeId,
         Long memberId
 ) {
+
 }

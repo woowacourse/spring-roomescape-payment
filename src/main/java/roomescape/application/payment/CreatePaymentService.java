@@ -12,13 +12,13 @@ public class CreatePaymentService {
 
     private final PaymentRepository paymentRepository;
 
-    public CreatePaymentService(PaymentRepository paymentRepository) {
+    public CreatePaymentService(final PaymentRepository paymentRepository) {
         this.paymentRepository = paymentRepository;
     }
 
-    public Long register(CreatePaymentCommand createPaymentCommand) {
-        Payment payment = new Payment(createPaymentCommand.orderId(), createPaymentCommand.amount());
-        Payment savedPayment = paymentRepository.save(payment);
+    public Long register(final CreatePaymentCommand createPaymentCommand) {
+        final Payment payment = new Payment(createPaymentCommand.orderId(), createPaymentCommand.amount());
+        final Payment savedPayment = paymentRepository.save(payment);
         return savedPayment.getId();
     }
 }

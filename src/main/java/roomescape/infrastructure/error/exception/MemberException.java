@@ -2,7 +2,7 @@ package roomescape.infrastructure.error.exception;
 
 public class MemberException extends RuntimeException {
 
-    public MemberException(String message) {
+    public MemberException(final String message) {
         super(message);
     }
 }

@@ -1,13 +1,14 @@
 package roomescape.infrastructure.security;
 
 import io.jsonwebtoken.Jwts;
+
 import javax.crypto.SecretKey;
 
 public record AccessToken(
         String value
 ) {
 
-    public static AccessToken create(TokenIssueRequest tokenIssueRequest) {
+    public static AccessToken create(final TokenIssueRequest tokenIssueRequest) {
         return new AccessToken(Jwts.builder()
                 .issuedAt(tokenIssueRequest.issuedAt())
                 .expiration(tokenIssueRequest.expiration())
@@ -17,11 +18,11 @@ public record AccessToken(
         );
     }
 
-    public static AccessToken of(String value) {
+    public static AccessToken of(final String value) {
         return new AccessToken(value);
     }
 
-    public Long extractMemberId(SecretKey secretKey) {
+    public Long extractMemberId(final SecretKey secretKey) {
         return Long.valueOf(Jwts.parser()
                 .verifyWith(secretKey)
                 .build()

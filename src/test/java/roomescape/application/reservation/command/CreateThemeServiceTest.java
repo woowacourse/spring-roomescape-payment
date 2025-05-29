@@ -1,8 +1,5 @@
 package roomescape.application.reservation.command;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +8,9 @@ import roomescape.application.reservation.command.dto.CreateThemeCommand;
 import roomescape.domain.reservation.Theme;
 import roomescape.domain.reservation.repository.ThemeRepository;
 import roomescape.infrastructure.error.exception.ThemeException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 class CreateThemeServiceTest extends AbstractServiceIntegrationTest {
 
@@ -27,10 +27,10 @@ class CreateThemeServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 테마를_생성할_수_있다() {
         // given
-        CreateThemeCommand command = new CreateThemeCommand("방탈출", "재밌는 방", "image.png");
+        final CreateThemeCommand command = new CreateThemeCommand("방탈출", "재밌는 방", "image.png");
 
         // when
-        Long id = createThemeService.register(command);
+        final Long id = createThemeService.register(command);
 
         // then
         assertThat(themeRepository.findById(id))
@@ -46,7 +46,7 @@ class CreateThemeServiceTest extends AbstractServiceIntegrationTest {
     void 같은_이름의_테마를_생성할_경우_예외가_발생한다() {
         // given
         themeRepository.save(new Theme("테마1", "설명1", "image1.png"));
-        CreateThemeCommand command = new CreateThemeCommand("테마1", "재밌는 방", "image.png");
+        final CreateThemeCommand command = new CreateThemeCommand("테마1", "재밌는 방", "image.png");
 
         // when
         // then

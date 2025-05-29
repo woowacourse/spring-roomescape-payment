@@ -4,8 +4,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.util.Objects;
 import roomescape.infrastructure.error.exception.ThemeException;
+
+import java.util.Objects;
 
 @Entity
 public class Theme {
@@ -28,7 +29,7 @@ public class Theme {
         this(null, name, description, thumbnail);
     }
 
-    public Theme(Long id, String name, String description, String thumbnail) {
+    public Theme(final Long id, final String name, final String description, final String thumbnail) {
         validateName(name);
         validateDescription(description);
         validateThumbnail(thumbnail);
@@ -41,7 +42,7 @@ public class Theme {
     protected Theme() {
     }
 
-    private void validateName(String name) {
+    private void validateName(final String name) {
         if (name.isBlank()) {
             throw new ThemeException("테마 이름은 비어있을 수 없습니다.");
         }
@@ -50,7 +51,7 @@ public class Theme {
         }
     }
 
-    private void validateDescription(String description) {
+    private void validateDescription(final String description) {
         if (description.isBlank()) {
             throw new ThemeException("테마 설명은 비어있을 수 없습니다.");
         }
@@ -59,7 +60,7 @@ public class Theme {
         }
     }
 
-    private void validateThumbnail(String thumbnail) {
+    private void validateThumbnail(final String thumbnail) {
         if (thumbnail.isBlank()) {
             throw new ThemeException("테마 썸네일은 비어있을 수 없습니다.");
         }
@@ -89,11 +90,11 @@ public class Theme {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Theme theme = (Theme) o;
+        final Theme theme = (Theme) o;
         return Objects.equals(id, theme.id)
-                && Objects.equals(name, theme.name)
-                && Objects.equals(description, theme.description)
-                && Objects.equals(thumbnail, theme.thumbnail);
+               && Objects.equals(name, theme.name)
+               && Objects.equals(description, theme.description)
+               && Objects.equals(thumbnail, theme.thumbnail);
     }
 
     @Override

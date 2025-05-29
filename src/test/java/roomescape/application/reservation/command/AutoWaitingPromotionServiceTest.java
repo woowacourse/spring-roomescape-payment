@@ -1,11 +1,5 @@
 package roomescape.application.reservation.command;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +17,13 @@ import roomescape.domain.reservation.repository.ReservationTimeRepository;
 import roomescape.domain.reservation.repository.ThemeRepository;
 import roomescape.domain.reservation.repository.WaitingRepository;
 import roomescape.infrastructure.error.exception.WaitingException;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class AutoWaitingPromotionServiceTest extends AbstractServiceIntegrationTest {
 
@@ -55,13 +56,13 @@ class AutoWaitingPromotionServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 예약이_없는_대기를_승인할_수_있다() {
         // given
-        Member member = memberRepository.save(
+        final Member member = memberRepository.save(
                 new Member("member", new Email("member@email.com"), "pw", MemberRole.NORMAL)
         );
-        LocalDate reservationDate = LocalDate.now(clock).plusDays(1);
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
-        Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
-        Waiting waiting = waitingRepository.save(new Waiting(member, reservationDate, time, theme));
+        final LocalDate reservationDate = LocalDate.now(clock).plusDays(1);
+        final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
+        final Waiting waiting = waitingRepository.save(new Waiting(member, reservationDate, time, theme));
 
         // when
         autoWaitingPromotionService.promote(reservationDate, time.getId(), theme.getId());
@@ -81,12 +82,12 @@ class AutoWaitingPromotionServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 예약이_있는_대기를_승인할_수_없다() {
         // given
-        Member member = memberRepository.save(
+        final Member member = memberRepository.save(
                 new Member("member", new Email("member@email.com"), "pw", MemberRole.NORMAL)
         );
-        LocalDate reservationDate = LocalDate.now(clock).plusDays(1);
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
-        Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
+        final LocalDate reservationDate = LocalDate.now(clock).plusDays(1);
+        final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
         reservationRepository.save(new Reservation(member, reservationDate, time, theme));
         waitingRepository.save(new Waiting(member, reservationDate, time, theme));
 
@@ -100,17 +101,17 @@ class AutoWaitingPromotionServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 대기_승인이_가능한_경우_첫번째_대기를_승인한다() {
         // given
-        Member member = memberRepository.save(
+        final Member member = memberRepository.save(
                 new Member("member", new Email("member@email.com"), "pw", MemberRole.NORMAL)
         );
-        Member another = memberRepository.save(
+        final Member another = memberRepository.save(
                 new Member("another", new Email("a@email.com"), "pw", MemberRole.NORMAL)
         );
-        LocalDate reservationDate = LocalDate.now(clock).plusDays(1);
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
-        Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
-        Waiting firstWaiting = waitingRepository.save(new Waiting(member, reservationDate, time, theme));
-        Waiting secondWaiting = waitingRepository.save(new Waiting(another, reservationDate, time, theme));
+        final LocalDate reservationDate = LocalDate.now(clock).plusDays(1);
+        final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
+        final Waiting firstWaiting = waitingRepository.save(new Waiting(member, reservationDate, time, theme));
+        final Waiting secondWaiting = waitingRepository.save(new Waiting(another, reservationDate, time, theme));
 
         // when
         autoWaitingPromotionService.promote(reservationDate, time.getId(), theme.getId());

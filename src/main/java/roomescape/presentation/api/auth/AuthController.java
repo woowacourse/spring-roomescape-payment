@@ -1,7 +1,6 @@
 package roomescape.presentation.api.auth;
 
 import jakarta.validation.Valid;
-import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -15,6 +14,8 @@ import roomescape.application.auth.dto.LoginResult;
 import roomescape.presentation.support.methodresolver.AuthInfo;
 import roomescape.presentation.support.methodresolver.AuthPrincipal;
 
+import java.time.Duration;
+
 @RestController
 public class AuthController {
 
@@ -23,35 +24,35 @@ public class AuthController {
     private final LoginService loginService;
     private final Duration tokenCookieDuration;
 
-    public AuthController(LoginService loginService,
-                          @Value("${security.jwt.token.expire-duration}") Duration tokenCookieDuration) {
+    public AuthController(final LoginService loginService,
+                          @Value("${security.jwt.token.expire-duration}") final Duration tokenCookieDuration) {
         this.loginService = loginService;
         this.tokenCookieDuration = tokenCookieDuration;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@Valid @RequestBody LoginRequest loginRequest) {
-        LoginResult loginResult = loginService.login(loginRequest.toLoginCommand());
-        ResponseCookie jwtCookie = createCookie(TOKEN_COOKIE_KEY, loginResult.token(), tokenCookieDuration);
+    public ResponseEntity<Void> login(@Valid @RequestBody final LoginRequest loginRequest) {
+        final LoginResult loginResult = loginService.login(loginRequest.toLoginCommand());
+        final ResponseCookie jwtCookie = createCookie(TOKEN_COOKIE_KEY, loginResult.token(), tokenCookieDuration);
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .build();
     }
 
     @GetMapping("/login/check")
-    public ResponseEntity<LoginCheckResponse> loginCheck(@AuthPrincipal AuthInfo authInfo) {
+    public ResponseEntity<LoginCheckResponse> loginCheck(@AuthPrincipal final AuthInfo authInfo) {
         return ResponseEntity.ok().body(new LoginCheckResponse(authInfo.name()));
     }
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
-        ResponseCookie jwtCookie = createCookie(TOKEN_COOKIE_KEY, "", Duration.ZERO);
+        final ResponseCookie jwtCookie = createCookie(TOKEN_COOKIE_KEY, "", Duration.ZERO);
         return ResponseEntity.noContent()
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .build();
     }
 
-    private ResponseCookie createCookie(String name, String value, Duration maxAge) {
+    private ResponseCookie createCookie(final String name, final String value, final Duration maxAge) {
         return ResponseCookie.from(name, value)
                 .httpOnly(true)
                 .secure(false) //https 적용전 임시

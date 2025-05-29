@@ -1,15 +1,5 @@
 package roomescape.application.reservation.command;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -35,6 +25,17 @@ import roomescape.infrastructure.error.exception.PaymentException;
 import roomescape.infrastructure.error.exception.ReservationException;
 import roomescape.infrastructure.error.exception.ReservationTimeException;
 import roomescape.infrastructure.error.exception.ThemeException;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
 class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
 
@@ -74,12 +75,12 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 결제_이후_예약을_생성할_수_있다() {
         // given
-        Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
-        Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
-        String orderId = "orderId";
-        long amount = 10_000L;
-        CreateReservationWithPaymentCommand command = new CreateReservationWithPaymentCommand(
+        final Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
+        final Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
+        final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final String orderId = "orderId";
+        final long amount = 10_000L;
+        final CreateReservationWithPaymentCommand command = new CreateReservationWithPaymentCommand(
                 LocalDate.now(clock).plusDays(1),
                 time.getId(),
                 theme.getId(),
@@ -93,7 +94,7 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
         when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(new Payment(orderId, amount)));
 
         // when
-        Long id = createReservationService.reserve(command);
+        final Long id = createReservationService.reserve(command);
 
         // then
         assertThat(reservationRepository.findById(id)).isPresent();
@@ -102,12 +103,12 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 결제에서_문제가_생기면_예약을_생성할_수_없다() {
         // given
-        Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
-        Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
-        String orderId = "orderId";
-        long amount = 10_000L;
-        CreateReservationWithPaymentCommand command = new CreateReservationWithPaymentCommand(
+        final Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
+        final Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
+        final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final String orderId = "orderId";
+        final long amount = 10_000L;
+        final CreateReservationWithPaymentCommand command = new CreateReservationWithPaymentCommand(
                 LocalDate.now(clock).plusDays(1),
                 time.getId(),
                 theme.getId(),
@@ -130,13 +131,13 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 주문한_금액과_승인할_결제_요청의_금액이_다르면_예약할_수_없다() {
         // given
-        Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
-        Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
-        String orderId = "orderId";
-        long amount = 10_000L;
-        long invalidAmount = amount + 1;
-        CreateReservationWithPaymentCommand command = new CreateReservationWithPaymentCommand(
+        final Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
+        final Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
+        final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final String orderId = "orderId";
+        final long amount = 10_000L;
+        final long invalidAmount = amount + 1;
+        final CreateReservationWithPaymentCommand command = new CreateReservationWithPaymentCommand(
                 LocalDate.now(clock).plusDays(1),
                 time.getId(),
                 theme.getId(),
@@ -159,12 +160,12 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 승인할_결제가_존재하지_않으먄_예약할_수_없다() {
         // given
-        Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
-        Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
-        String orderId = "orderId";
-        long amount = 10_000L;
-        CreateReservationWithPaymentCommand command = new CreateReservationWithPaymentCommand(
+        final Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
+        final Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
+        final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final String orderId = "orderId";
+        final long amount = 10_000L;
+        final CreateReservationWithPaymentCommand command = new CreateReservationWithPaymentCommand(
                 LocalDate.now(clock).plusDays(1),
                 time.getId(),
                 theme.getId(),
@@ -187,15 +188,15 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 예약을_생성할_수_있다() {
         // given
-        Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
-        Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
+        final Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
+        final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
 
-        CreateReservationCommand command = new CreateReservationCommand(LocalDate.now(clock).plusDays(1), time.getId(),
+        final CreateReservationCommand command = new CreateReservationCommand(LocalDate.now(clock).plusDays(1), time.getId(),
                 theme.getId(), member.getId());
 
         // when
-        Long id = createReservationService.reserve(command);
+        final Long id = createReservationService.reserve(command);
 
         // then
         assertThat(reservationRepository.findById(id)).isPresent();
@@ -204,9 +205,9 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 존재하지_않는_회원으로_예약할_수_없다() {
         // given
-        Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
-        CreateReservationCommand command = new CreateReservationCommand(
+        final Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
+        final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final CreateReservationCommand command = new CreateReservationCommand(
                 LocalDate.now(clock),
                 time.getId(),
                 theme.getId(),
@@ -223,10 +224,10 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 존재하지_않는_예약시간으로_예약할_수_없다() {
         // given
-        Long invalidTimeId = 999L;
-        Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
-        Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
-        CreateReservationCommand command = new CreateReservationCommand(
+        final Long invalidTimeId = 999L;
+        final Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
+        final Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
+        final CreateReservationCommand command = new CreateReservationCommand(
                 LocalDate.now(clock),
                 invalidTimeId,
                 theme.getId(),
@@ -243,10 +244,10 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 존재하지_않는_테마로_예약할_수_없다() {
         // given
-        Long invalidThemeId = 999L;
-        Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
-        CreateReservationCommand command = new CreateReservationCommand(LocalDate.now(clock), time.getId(),
+        final Long invalidThemeId = 999L;
+        final Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
+        final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final CreateReservationCommand command = new CreateReservationCommand(LocalDate.now(clock), time.getId(),
                 invalidThemeId,
                 member.getId());
 
@@ -260,11 +261,11 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 같은_날짜와_같은_시간과_같은_테마에_예약이_존재한다면_예약을_생성하면_예외가_발생한다() {
         // given
-        Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
-        Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
-        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
+        final Member member = memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
+        final Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
+        final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
         reservationRepository.save(new Reservation(member, LocalDate.now(clock), time, theme));
-        CreateReservationCommand command = new CreateReservationCommand(
+        final CreateReservationCommand command = new CreateReservationCommand(
                 LocalDate.now(clock),
                 time.getId(),
                 theme.getId(),

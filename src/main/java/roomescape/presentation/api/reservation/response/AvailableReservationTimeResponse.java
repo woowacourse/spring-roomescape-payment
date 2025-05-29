@@ -8,7 +8,7 @@ public record AvailableReservationTimeResponse(
         boolean booked
 ) {
 
-    public static AvailableReservationTimeResponse from(AvailableReservationTimeResult availableReservationTimeResult) {
+    public static AvailableReservationTimeResponse from(final AvailableReservationTimeResult availableReservationTimeResult) {
         return new AvailableReservationTimeResponse(
                 availableReservationTimeResult.timeId(),
                 ReservationDateTimeFormat.TIME.format(availableReservationTimeResult.startAt()),

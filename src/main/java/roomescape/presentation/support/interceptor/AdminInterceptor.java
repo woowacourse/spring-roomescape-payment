@@ -21,36 +21,36 @@ public class AdminInterceptor implements HandlerInterceptor {
     private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
 
-    public AdminInterceptor(JwtTokenExtractor jwtTokenExtractor,
-                            JwtProvider jwtProvider,
-                            MemberRepository memberRepository) {
+    public AdminInterceptor(final JwtTokenExtractor jwtTokenExtractor,
+                            final JwtProvider jwtProvider,
+                            final MemberRepository memberRepository) {
         this.jwtTokenExtractor = jwtTokenExtractor;
         this.jwtProvider = jwtProvider;
         this.memberRepository = memberRepository;
     }
 
     @Override
-    public boolean preHandle(@NonNull HttpServletRequest request,
-                             @NonNull HttpServletResponse response,
-                             @NonNull Object handler) {
-        Member member = getMemberFromRequest(request);
+    public boolean preHandle(@NonNull final HttpServletRequest request,
+                             @NonNull final HttpServletResponse response,
+                             @NonNull final Object handler) {
+        final Member member = getMemberFromRequest(request);
         if (!member.isAdmin()) {
             throw new ForbiddenException("접근 권한이 없습니다.");
         }
         return true;
     }
 
-    private Member getMemberFromRequest(HttpServletRequest request) {
-        Long identifier = getIdentifier(request);
+    private Member getMemberFromRequest(final HttpServletRequest request) {
+        final Long identifier = getIdentifier(request);
         return memberRepository.findById(identifier)
                 .orElseThrow(() -> new UnauthorizedException("접근 권한이 없습니다."));
     }
 
-    private Long getIdentifier(HttpServletRequest request) {
+    private Long getIdentifier(final HttpServletRequest request) {
         try {
-            AccessToken accessToken = jwtTokenExtractor.extract(request);
+            final AccessToken accessToken = jwtTokenExtractor.extract(request);
             return jwtProvider.extractIdentifier(accessToken);
-        } catch (JwtExtractException e) {
+        } catch (final JwtExtractException e) {
             throw new UnauthorizedException("인증 정보를 확인할 수 없습니다.", e);
         }
     }

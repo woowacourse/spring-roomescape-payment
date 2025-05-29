@@ -1,9 +1,5 @@
 package roomescape.application.auth;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-
-import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +13,11 @@ import roomescape.domain.member.repository.MemberRepository;
 import roomescape.infrastructure.error.exception.LoginAuthException;
 import roomescape.infrastructure.security.JwtProperties;
 import roomescape.infrastructure.security.JwtProvider;
+
+import java.time.Duration;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 class LoginServiceTest extends AbstractServiceIntegrationTest {
 
@@ -42,10 +43,10 @@ class LoginServiceTest extends AbstractServiceIntegrationTest {
     void 사용자는_로그인을_할_수_있다() {
         // given
         memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
-        LoginCommand loginCommand = new LoginCommand("test@email.com", "pw");
+        final LoginCommand loginCommand = new LoginCommand("test@email.com", "pw");
 
         // when
-        LoginResult loginResult = loginService.login(loginCommand);
+        final LoginResult loginResult = loginService.login(loginCommand);
 
         // then
         assertThat(loginResult)
@@ -55,7 +56,7 @@ class LoginServiceTest extends AbstractServiceIntegrationTest {
     @Test
     void 로그인시_이메일에_해당하는_사용자가_없는경우_예외가_발생한다() {
         // given
-        LoginCommand loginCommand = new LoginCommand("invalid@email.com", "pw");
+        final LoginCommand loginCommand = new LoginCommand("invalid@email.com", "pw");
 
         // when
         // then
@@ -68,7 +69,7 @@ class LoginServiceTest extends AbstractServiceIntegrationTest {
     void 로그인시_비밀번호가_틀린경우_예외가_발생한다() {
         // given
         memberRepository.save(new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
-        LoginCommand loginCommand = new LoginCommand("test@email.com", "invalidpw");
+        final LoginCommand loginCommand = new LoginCommand("test@email.com", "invalidpw");
 
         // when
         // then

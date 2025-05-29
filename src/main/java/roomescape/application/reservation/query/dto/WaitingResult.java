@@ -1,8 +1,9 @@
 package roomescape.application.reservation.query.dto;
 
+import roomescape.domain.reservation.Waiting;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
-import roomescape.domain.reservation.Waiting;
 
 public record WaitingResult(
         Long waitingId,
@@ -12,7 +13,7 @@ public record WaitingResult(
         LocalTime reservationTime
 ) {
 
-    public static WaitingResult from(Waiting waiting) {
+    public static WaitingResult from(final Waiting waiting) {
         return new WaitingResult(
                 waiting.getId(),
                 waiting.getMember().getName(),
