@@ -1,4 +1,4 @@
-package roomescape.reservation.infrastructure;
+package roomescape.payment.infrastructure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
@@ -8,8 +8,9 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.reservation.exception.RequestPaymentErrorHandler;
+import roomescape.payment.domain.PaymentClient;
 import roomescape.reservation.presentation.dto.PaymentRequest;
-import roomescape.reservation.presentation.dto.PaymentResponse;
+import roomescape.payment.infrastructure.dto.PaymentResponse;
 
 @Component
 public class TossPaymentClient implements PaymentClient {
@@ -18,8 +19,7 @@ public class TossPaymentClient implements PaymentClient {
     private final RestClient restClient;
 
     public TossPaymentClient(
-        @Value("payment.toss.secret-key")String secretKey,
-        RestClient restClient) {
+        @Value("payment.toss.secret-key")String secretKey, RestClient restClient) {
         this.secretKey = secretKey;
         this.restClient = restClient;
     }

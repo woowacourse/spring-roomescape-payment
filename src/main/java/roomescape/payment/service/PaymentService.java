@@ -1,7 +1,7 @@
-package roomescape.reservation.service;
+package roomescape.payment.service;
 
 import org.springframework.stereotype.Service;
-import roomescape.reservation.infrastructure.PaymentClient;
+import roomescape.payment.domain.PaymentClient;
 import roomescape.reservation.presentation.dto.PaymentRequest;
 
 @Service
