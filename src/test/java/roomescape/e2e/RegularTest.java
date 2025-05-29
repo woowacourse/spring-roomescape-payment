@@ -23,13 +23,21 @@ import java.util.Map;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.common.security.dto.request.LoginRequest;
 import roomescape.common.security.dto.response.CheckLoginResponse;
 import roomescape.reservationslot.presentation.dto.response.MyReservationResponse;
+import roomescape.payment.application.client.PaymentClient;
+import roomescape.payment.domain.PaymentType;
+import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
+import roomescape.payment.presentation.dto.request.PaymentRequest;
+import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
+import roomescape.reservationslot.presentation.dto.response.MyReservationSlotResponse;
 import roomescape.reservationslot.presentation.dto.response.ReservationResponse;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -39,6 +47,8 @@ import roomescape.reservationslot.presentation.dto.response.ReservationResponse;
 })
 public class RegularTest {
 
+    @MockitoBean
+    private PaymentClient paymentClient;
     private String REGULAR_TOKEN;
 
     @BeforeEach
@@ -173,5 +183,27 @@ public class RegularTest {
                 .as(new TypeRef<>() {
                 });
         assertThat(responses).isEmpty();
+    }
+
+    @Test
+    void approvePayment() {
+        createReservation();
+        String paymentKey = "PAYMENT_KEY";
+        String orderId = "ORDER_ID";
+        long amount = 5000L;
+        PaymentRequest paymentRequest = new PaymentRequest(paymentKey, orderId, amount, PaymentType.NORMAL);
+        PaymentApproveRequest paymentApproveRequest = PaymentApproveRequest.from(paymentRequest);
+        PaymentApproveResponse paymentApproveResponse = new PaymentApproveResponse(paymentKey, orderId, amount);
+        Mockito.when(paymentClient.approvePayment(paymentApproveRequest)).thenReturn(paymentApproveResponse);
+
+        PaymentApproveResponse response = RestAssured.given().log().all()
+                .cookie(TOKEN, REGULAR_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(paymentRequest)
+                .when().post("/payments/approve")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(PaymentApproveResponse.class);
     }
 }
