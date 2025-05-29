@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.resolver.PaymentClient;
+import roomescape.payment.client.PaymentClient;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;

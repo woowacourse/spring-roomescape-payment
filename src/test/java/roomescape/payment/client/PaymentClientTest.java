@@ -1,4 +1,4 @@
-package roomescape.payment.resolver;
+package roomescape.payment.client;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

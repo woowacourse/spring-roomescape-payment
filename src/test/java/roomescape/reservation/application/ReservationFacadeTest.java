@@ -10,7 +10,7 @@ import roomescape.auth.sign.password.Password;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.domain.Email;
 import roomescape.common.exception.NotFoundException;
-import roomescape.payment.resolver.PaymentClient;
+import roomescape.payment.client.PaymentClient;
 import roomescape.reservation.application.dto.MyReservationsResponse;
 import roomescape.reservation.application.service.ReservationCommandService;
 import roomescape.reservation.application.service.ReservationQueryService;
