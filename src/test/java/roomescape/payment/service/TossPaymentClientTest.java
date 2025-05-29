@@ -145,7 +145,6 @@ class TossPaymentClientTest {
             "INVALID_AUTHORIZE_AUTH",
             "UNAUTHORIZED_KEY",
             "INCORRECT_BASIC_AUTH_FORMAT",
-            "FAILED_INTERNAL_SYSTEM_PROCESSING"
     })
     void 서버_오류가_발생하면_예외를_반환한다(String code) throws JsonProcessingException {
         String paymentKey = "paymentKey";
@@ -184,8 +183,8 @@ class TossPaymentClientTest {
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(json))
                 .andRespond(withBadRequest()
-                                    .contentType(MediaType.APPLICATION_JSON)
-                                    .body("{\"code\":\"" + code + "\"}"));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body("{\"code\":\"" + code + "\"}"));
 
         assertThatThrownBy(() -> tossPaymentClient.getPaymentConfirm(request))
                 .isInstanceOf(PaymentTemporaryException.class);

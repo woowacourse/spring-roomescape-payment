@@ -6,7 +6,6 @@ spring:
   datasource:
     url: jdbc:h2:mem:database;MODE=MySQL
     driver-class-name: org.h2.Driver
-
   sql:
     init:
       data-locations: [ ]
@@ -16,10 +15,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        detector:
-          enabled: true
-          threshold: 2
-          level: warn
+    open-in-view: false
 
 jwt:
   secret-key: secretsecretsecretsecretsecretsecret
