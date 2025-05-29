@@ -7,6 +7,7 @@ import java.util.Base64;
 import java.util.Map;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 import roomescape.dto.business.PaymentExceptionContent;
 import roomescape.dto.business.PaymentResult;
 import roomescape.exception.PaymentException;
@@ -14,6 +15,7 @@ import roomescape.exception.PaymentException;
 public class TossPaymentClient implements PaymentClient {
 
     private static final String CONNECTION_ERROR_MESSAGE = "결제 서버에 연결이 실패하였습니다. 이 현상이 지속되는 경우 어드민에게 문의해주세요.";
+    private static final String CONFIRM_SERVER_FAIL_MESSAGE = "결제 연동 서버가 아파요. 관리자에게 문의해주세요.";
 
     private final RestClient restClient;
     private final String secretKey;
@@ -38,7 +40,11 @@ public class TossPaymentClient implements PaymentClient {
                 "amount", amount
         );
 
-        return doPay(requestBody);
+        try {
+            return doPay(requestBody);
+        } catch (RestClientException restClientException) {
+            throw new RestClientException(CONNECTION_ERROR_MESSAGE);
+        }
     }
 
     private PaymentResult doPay(Map<String, Object> requestBody) {
@@ -47,10 +53,13 @@ public class TossPaymentClient implements PaymentClient {
                 .body(requestBody)
                 .header("Authorization", createAuthHeaderConcise())
                 .retrieve()
-                .onStatus(HttpStatusCode::isError, ((request, response) -> {
+                .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
                     PaymentExceptionContent paymentExceptionContent = statusParser.readValue(response.getBody(),
                             PaymentExceptionContent.class);
                     throw new PaymentException(paymentExceptionContent.message());
+                }))
+                .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
+                    throw new PaymentException(CONFIRM_SERVER_FAIL_MESSAGE);
                 }))
                 .body(PaymentResult.class);
     }

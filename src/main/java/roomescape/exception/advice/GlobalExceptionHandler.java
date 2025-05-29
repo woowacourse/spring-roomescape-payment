@@ -11,6 +11,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.ForbiddenException;
@@ -131,6 +132,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> paymentExceptionHandler(PaymentException paymentException) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         problemDetail.setTitle("결제 실패하였습니다 사유: " + paymentException.getMessage());
+        return ResponseEntity.internalServerError().body(problemDetail);
+    }
+
+    @ExceptionHandler(RestClientException.class)
+    public ResponseEntity<ProblemDetail> paymentConnectionExceptionHandler(RestClientException restClientException) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        problemDetail.setTitle("결제 실패하였습니다 사유: " + restClientException.getMessage());
         return ResponseEntity.internalServerError().body(problemDetail);
     }
 
