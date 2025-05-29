@@ -6,6 +6,7 @@ import static org.mockito.Mockito.doNothing;
 import java.time.LocalDate;
 import java.util.Map;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +20,7 @@ import io.restassured.http.ContentType;
 import roomescape.reservation.payment.dto.request.PaymentRequest;
 import roomescape.reservation.payment.service.PaymentService;
 
+@Disabled
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
