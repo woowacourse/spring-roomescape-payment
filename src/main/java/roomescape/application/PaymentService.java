@@ -7,11 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import roomescape.presentation.dto.request.PaymentProcessRequest;
 import roomescape.application.exception.PaymentException;
-import roomescape.infrastructure.thirdparty.PaymentRestClient;
 import roomescape.domain.Payment;
 import roomescape.infrastructure.repository.PaymentRepository;
+import roomescape.infrastructure.thirdparty.PaymentRestClient;
+import roomescape.presentation.dto.request.PaymentProcessRequest;
 
 @Service
 public class PaymentService {
@@ -43,13 +43,14 @@ public class PaymentService {
         }
 
         String message = jsonNode.get("message").asText();
+        HttpStatusCode statusCode = paymentResponse.getStatusCode();
 
         if (paymentResponse.getStatusCode() == HttpStatusCode.valueOf(401) ||
-            paymentResponse.getStatusCode().is5xxServerError()) {
+                paymentResponse.getStatusCode().is5xxServerError()) {
             throw new PaymentException(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        throw new PaymentException(message, HttpStatus.BAD_REQUEST);
+        throw new PaymentException(message, HttpStatus.valueOf(statusCode.value()));
     }
 
     private JsonNode getJsonNode(String body) {
