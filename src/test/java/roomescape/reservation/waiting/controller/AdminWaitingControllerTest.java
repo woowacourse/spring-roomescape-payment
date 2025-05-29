@@ -1,15 +1,16 @@
-package roomescape.reservation.controller;
+package roomescape.reservation.waiting.controller;
 
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doNothing;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 
 import java.time.LocalDate;
 import java.util.Map;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
@@ -20,57 +21,77 @@ import io.restassured.http.ContentType;
 import roomescape.reservation.payment.dto.request.PaymentRequest;
 import roomescape.reservation.payment.service.PaymentService;
 
-@Disabled
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-class WaitingControllerTest {
+class AdminWaitingControllerTest {
 
     @MockitoBean
     private PaymentService paymentService;
 
-    @DisplayName("예약 대기를 추가한다.")
+    @DisplayName("모든 예약대기 목록을 읽어온다.")
     @Test
-    void createReservationWaiting() {
+    void readAllWaiting() {
+        String tokenValue = getAdminLoginTokenValue();
         int timeId = addReservationTime("10:00");
         int themeId = addTheme();
-        String tokenValue = getAdminLoginTokenValue();
-        Map<String, Object> waitingParams = Map.of(
-                "date", getTomorrow(),
-                "timeId", timeId,
-                "themeId", themeId,
-                "paymentKey", "paymentKey",
-                "orderId", "orderId",
-                "amount", 1_000L
-        );
+        addReservation(tokenValue);
 
-        doNothing().when(paymentService)
-                .confirm(any(PaymentRequest.class));
-
+        String memberLoginTokenValue = getMemberLoginTokenValue();
         RestAssured.given()
-                .cookie("token", tokenValue)
+                .cookie("token", memberLoginTokenValue)
                 .contentType(ContentType.JSON)
-                .body(waitingParams)
-                .when().post("/reservations")
+                .body(Map.of(
+                        "date", LocalDate.now().plusDays(1L),
+                        "timeId", timeId,
+                        "themeId", themeId
+                )).when().post("/waitings")
                 .then();
 
-        String userLoginTokenValue = getUserLoginTokenValue();
         RestAssured.given().log().all()
-                .cookie("token", userLoginTokenValue)
-                .contentType(ContentType.JSON)
-                .body(waitingParams)
-                .when().post("/waitings")
+                .cookie("token", tokenValue)
+                .when().get("/admin/waitings")
                 .then().log().all()
-                .statusCode(201);
+                .statusCode(200)
+                .body("size()", is(1));
     }
 
-    @DisplayName("예약대기를 삭제한다.")
+    @DisplayName("일반 사용자는 모든 예약대기 목록을 읽어올 수 없다.")
     @Test
-    void deleteReservationWaiting() {
+    void readAllWaitingByMember() {
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(Map.of(
+                        "email", "member@woowa.com",
+                        "password", "12341234",
+                        "name", "일반"
+                )).when().post("/members")
+                .then()
+                .statusCode(HttpStatus.CREATED.value());
+
+        String tokenValue = RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(Map.of(
+                        "email", "member@woowa.com",
+                        "password", "12341234"
+                )).when().post("/login")
+                .then()
+                .extract().cookie("token");
+
+        RestAssured.given().log().all()
+                .cookie("token", tokenValue)
+                .when().get("/admin/waitings")
+                .then().log().all()
+                .statusCode(401);
+    }
+
+    @DisplayName("예약대기를 거절한다.")
+    @Test
+    void denyWaiting() {
         int timeId = addReservationTime("10:00");
         int themeId = addTheme();
-        String tokenValue = getAdminLoginTokenValue();
-        Map<String, Object> reservationParams = Map.of(
+        String adminLoginTokenValue = getAdminLoginTokenValue();
+        Map<String, Object> params = Map.of(
                 "date", getTomorrow(),
                 "timeId", timeId,
                 "themeId", themeId,
@@ -79,38 +100,21 @@ class WaitingControllerTest {
                 "amount", 1_000L
         );
 
-        doNothing().when(paymentService)
-                .confirm(any(PaymentRequest.class));
+        addReservation(adminLoginTokenValue);
 
-        RestAssured.given()
-                .cookie("token", tokenValue)
-                .contentType(ContentType.JSON)
-                .body(reservationParams)
-                .when().post("/reservations")
-                .then();
-
-        String userLoginTokenValue = getUserLoginTokenValue();
+        String memberLoginTokenValue = getMemberLoginTokenValue();
         int waitingId = RestAssured.given()
-                .cookie("token", userLoginTokenValue)
                 .contentType(ContentType.JSON)
-                .body(reservationParams)
+                .cookie("token", memberLoginTokenValue)
+                .body(params)
                 .when().post("/waitings")
                 .then().extract().path("id");
 
         RestAssured.given().log().all()
-                .cookie("token", userLoginTokenValue)
-                .when().delete("/waitings/" + waitingId)
+                .cookie("token", adminLoginTokenValue)
+                .when().delete("/admin/waitings/" + waitingId)
                 .then().log().all()
                 .statusCode(204);
-    }
-
-    @DisplayName("존재하지 않는 예약대기를 삭제할 경우 NOT_FOUND 반환한다.")
-    @Test
-    void deleteNonExistsReservationWaiting() {
-        RestAssured.given().log().all()
-                .when().delete("/waitings/0")
-                .then().log().all()
-                .statusCode(404);
     }
 
     private String getAdminLoginTokenValue() {
@@ -123,7 +127,7 @@ class WaitingControllerTest {
                 .extract().cookie("token");
     }
 
-    private String getUserLoginTokenValue() {
+    private String getMemberLoginTokenValue() {
         Map<String, String> adminLoginParams = Map.of("email", "user@woowa.com", "password", "12341234");
         return RestAssured.given()
                 .contentType(ContentType.JSON)
@@ -156,5 +160,25 @@ class WaitingControllerTest {
                 .body(themeParams)
                 .when().post("/themes")
                 .then().extract().path("id");
+    }
+
+    private void addReservation(final String tokenValue) {
+        Mockito.doNothing()
+                .when(paymentService)
+                .confirm(any(PaymentRequest.class));
+
+        RestAssured.given()
+                .cookie("token", tokenValue)
+                .contentType(ContentType.JSON)
+                .body(Map.of(
+                        "date", LocalDate.now().plusDays(1L),
+                        "timeId", 1,
+                        "themeId", 1,
+                        "paymentKey", "paymentKey",
+                        "orderId", "orderId",
+                        "amount", 1_000L
+                ))
+                .when().post("/reservations")
+                .then();
     }
 }

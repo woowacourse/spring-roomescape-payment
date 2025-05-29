@@ -1,4 +1,4 @@
-package roomescape.reservation.service;
+package roomescape.reservation.waiting.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -31,7 +31,6 @@ import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.time.repository.ReservationTimeRepository;
 import roomescape.theme.repository.ThemeRepository;
 import roomescape.reservation.waiting.repository.WaitingRepository;
-import roomescape.reservation.waiting.service.WaitingService;
 
 @ActiveProfiles("test")
 @DataJpaTest
