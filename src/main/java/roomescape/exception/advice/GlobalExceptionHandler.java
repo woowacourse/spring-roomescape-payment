@@ -17,6 +17,7 @@ import roomescape.exception.ForbiddenException;
 import roomescape.exception.InternalServerException;
 import roomescape.exception.LoginFailException;
 import roomescape.exception.NotFoundException;
+import roomescape.exception.PaymentException;
 import roomescape.exception.UnauthorizedException;
 
 
@@ -123,6 +124,13 @@ public class GlobalExceptionHandler {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         problemDetail.setTitle("예상치 못한 에러입니다.");
         problemDetail.setDetail(String.join("예상치 못한 예외 발생헸습니다."));
+        return ResponseEntity.internalServerError().body(problemDetail);
+    }
+
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<ProblemDetail> paymentExceptionHandler(PaymentException paymentException) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        problemDetail.setTitle("결제 실패하였습니다 사유: " + paymentException.getMessage());
         return ResponseEntity.internalServerError().body(problemDetail);
     }
 
