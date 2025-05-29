@@ -6,7 +6,7 @@ public record TossPaymentResponse(
         String paymentKey,
         String orderId,
         String orderName,
-        String taxExemptionAmount,
+        Long taxExemptionAmount,
         String status,
         Long totalAmount,
         EasyPay easyPay
