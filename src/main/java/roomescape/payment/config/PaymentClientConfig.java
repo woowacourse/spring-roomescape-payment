@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 @Configuration
-public class ClientConfig {
+public class PaymentClientConfig {
 
     @Value("${payment.secret.key}")
     private String secretKey;
