@@ -8,15 +8,14 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.jdbc.Sql;
+import roomescape.IntegrationTest;
 
 @Sql("/data.sql")
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class AuthTest {
+class AuthTest extends IntegrationTest {
 
     @Test
     void 로그인_요청시_set_cookie로_토큰을_받을_수_있다() {

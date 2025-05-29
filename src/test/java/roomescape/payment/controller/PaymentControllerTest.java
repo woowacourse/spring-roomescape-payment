@@ -17,12 +17,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.web.client.HttpClientErrorException;
+import roomescape.IntegrationTest;
 import roomescape.auth.infrastructure.jwt.JwtTokenProvider;
 import roomescape.payment.dto.ReservationPaymentRequest;
 import roomescape.payment.dto.TossPaymentRequest;
@@ -32,9 +32,8 @@ import roomescape.payment.infrastructure.TossRestClient;
 
 @Sql("/data.sql")
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@TestPropertySource(properties = "rest-client.toss-payment.base-url.base-url=http://localhost:8089")
-class PaymentControllerTest {
+@TestPropertySource(properties = "rest-client.toss-payment.base-url=http://localhost:8089")
+class PaymentControllerTest extends IntegrationTest {
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;

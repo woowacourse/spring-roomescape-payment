@@ -13,7 +13,6 @@ public class RestClientConfig {
 
     private static final int CONNECT_TIMEOUT = 5_000;
     private static final int CONNECTION_REQUEST_TIMEOUT = 2_000;
-    private static final int READ_TIMEOUT = 5_000;
 
     @Bean
     public TossRestClient tossRestClient(RestClient.Builder restClientBuilder, RestClientProperties restClientProperties) {
@@ -27,7 +26,7 @@ public class RestClientConfig {
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
         factory.setConnectTimeout(CONNECT_TIMEOUT);
         factory.setConnectionRequestTimeout(CONNECTION_REQUEST_TIMEOUT);
-        factory.setReadTimeout(READ_TIMEOUT);
+        factory.setReadTimeout(5_000);
         return factory;
     }
 }

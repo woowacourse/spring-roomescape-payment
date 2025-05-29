@@ -30,3 +30,7 @@ logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
+
+rest-client:
+  toss-payment:
+    base-url: http://localhost:8089

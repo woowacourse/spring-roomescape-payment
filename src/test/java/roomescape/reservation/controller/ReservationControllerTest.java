@@ -12,10 +12,10 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.jdbc.Sql;
+import roomescape.IntegrationTest;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Password;
 import roomescape.member.repository.MemberRepository;
@@ -31,8 +31,7 @@ import roomescape.theme.repository.ThemeRepository;
 
 @Sql("/member.sql")
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-class ReservationControllerTest {
+class ReservationControllerTest extends IntegrationTest {
 
     @Autowired
     ReservationTimeRepository timeRepository;

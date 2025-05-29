@@ -100,7 +100,7 @@ class WaitingReservationServiceTest {
                 member.getRole());
 
         // when
-        WaitingReservationResponse response = service.save(request, loginMember);
+        WaitingReservationResponse response = service.registerWaitingReservation(request, loginMember);
 
         // then
         SoftAssertions.assertSoftly(soft -> {
@@ -122,7 +122,7 @@ class WaitingReservationServiceTest {
         LoginMember nonExistentMember = new LoginMember(9999L, "존재안함", "none@example.com", MemberRole.MEMBER);
 
         // when & then
-        assertThatThrownBy(() -> service.save(request, nonExistentMember))
+        assertThatThrownBy(() -> service.registerWaitingReservation(request, nonExistentMember))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("존재하지 않는 멤버입니다.");
     }
@@ -143,29 +143,4 @@ class WaitingReservationServiceTest {
         assertThat(waitingReservationRepository.findById(waitingReservation.getId())).isEmpty();
         assertThat(roomEscapeInformationRepository.findById(roomEscapeInformation.getId())).isEmpty();
     }
-
-//    @Test
-//    void ID로_대기_예약을_찾을_수_있다() {
-//        // given
-//        WaitingReservation waitingReservation = WaitingReservation.builder()
-//                .roomEscapeInformation(roomEscapeInformation)
-//                .member(member)
-//                .build();
-//        WaitingReservation saved = waitingReservationRepository.save(waitingReservation);
-//
-//        // when
-//        WaitingReservation found = service.findWaitingReservationById(saved.getId());
-//
-//        // then
-//        assertThat(found).isNotNull();
-//        assertThat(found.getId()).isEqualTo(saved.getId());
-//    }
-//
-//    @Test
-//    void 존재하지_않는_대기_예약_ID로_조회시_예외발생() {
-//        // when & then
-//        assertThatThrownBy(() -> service.findWaitingReservationById(9999L))
-//                .isInstanceOf(NotFoundException.class)
-//                .hasMessage("존재하지 않는 대기 예약입니다.");
-//    }
 } 
