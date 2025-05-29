@@ -60,6 +60,14 @@ public class Payment {
         this(null, member, reservationTime, theme, date, paymentInfo, paymentGateway);
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public PaymentInfo getPaymentInfo() {
+        return paymentInfo;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {
