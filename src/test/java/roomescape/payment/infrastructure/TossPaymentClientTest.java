@@ -8,11 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
-import roomescape.reservation.exception.PaymentRequestException;
-import roomescape.reservation.exception.RequestPaymentErrorHandler;
+import roomescape.payment.exception.PaymentRequestException;
+import roomescape.payment.exception.RequestPaymentErrorHandler;
 import roomescape.reservation.presentation.dto.PaymentRequest;
 
 
@@ -25,12 +24,14 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 class TossPaymentClientTest {
 
+    private static final String BASE_URL = "https://api.tosspayments.com/v1/payments";
+
     private final RestClient.Builder testBuilder = RestClient.builder()
-        .baseUrl("https://api.tosspayments.com")
+        .baseUrl(BASE_URL)
         .defaultStatusHandler(new RequestPaymentErrorHandler(new ObjectMapper()));
 
-    private MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
-    private TossPaymentClient tossPaymentClient = new TossPaymentClient("test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6", testBuilder.build());
+    private final MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
+    private final TossPaymentClient tossPaymentClient = new TossPaymentClient(testBuilder.build());
 
     @BeforeEach
     void setUp() {
@@ -40,7 +41,7 @@ class TossPaymentClientTest {
     @DisplayName("결제를 요청한다.")
     @Test
     void confirmPayment() {
-        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+        server.expect(requestTo(BASE_URL + "/confirm"))
             .andExpect(method(HttpMethod.POST))
             .andRespond(withSuccess());
 
@@ -59,7 +60,7 @@ class TossPaymentClientTest {
                 }
                 """;
 
-        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+        server.expect(requestTo(BASE_URL + "/confirm"))
             .andExpect(method(HttpMethod.POST))
             .andRespond(
                 withStatus(HttpStatus.BAD_REQUEST).body(expectedBody).contentType(MediaType.APPLICATION_JSON));

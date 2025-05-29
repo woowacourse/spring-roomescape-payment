@@ -266,12 +266,13 @@ class ReservationServiceTest {
 
         @Bean
         public RestClient restClient() {
-            return RestClient.builder().baseUrl("https://api.tosspayments.com").build();
+            return RestClient.builder()
+                    .baseUrl("https://api.tosspayments.com/v1/payments").build();
         }
 
         @Bean
         public PaymentClient paymentClient() {
-            return new TossPaymentClient("test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6", restClient());
+            return new TossPaymentClient(restClient());
         }
 
         @Bean
