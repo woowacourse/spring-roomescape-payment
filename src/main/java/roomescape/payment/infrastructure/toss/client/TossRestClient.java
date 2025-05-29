@@ -3,12 +3,11 @@ package roomescape.payment.infrastructure.toss.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.util.Map;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.common.provider.RestClientProvider;
 import roomescape.payment.infrastructure.toss.exception.TossErrorResponse;
 import roomescape.payment.infrastructure.toss.exception.TossInternalException;
 import roomescape.payment.infrastructure.toss.exception.TossPaymentApprovalFailedException;
@@ -18,11 +17,9 @@ public class TossRestClient {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    public TossRestClient(RestClientProvider restClientProvider,
-                          @Value("${external.toss.baseUrl}") String baseUrl,
-                          @Value("${external.toss.secretKey}") String secretKey,
+    public TossRestClient(@Qualifier("tossApiRestClient") RestClient restClient,
                           ObjectMapper objectMapper) {
-        this.restClient = restClientProvider.createRestClient(baseUrl, secretKey);
+        this.restClient = restClient;
         this.objectMapper = objectMapper;
     }
 
