@@ -1,5 +1,6 @@
 package roomescape.payment.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestClient;
 import roomescape.common.exception.PaymentClientException;
 import roomescape.payment.service.dto.ConfirmPaymentRequest;
@@ -10,7 +11,9 @@ import java.util.Base64;
 import java.util.List;
 
 public class ReservationPaymentClient {
-    private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+    @Value("${payment.toss.secret-key}")
+    private String secretKey;
+
     private static final List<String> IGNORE_CODES = List.of(
             "INCORRECT_BASIC_AUTH_FORMAT",
             "INVALID_API_KEY"
@@ -25,7 +28,7 @@ public class ReservationPaymentClient {
     public ConfirmPaymentResponse postConfirmPayment(ConfirmPaymentRequest paymentRequest) {
         ConfirmPaymentResponse paymentResponse = restClient.post()
                 .uri("/confirm")
-                .header("Authorization", "Basic " + Base64.getEncoder().encodeToString((SECRET_KEY+":").getBytes()))
+                .header("Authorization", "Basic " + Base64.getEncoder().encodeToString((secretKey+":").getBytes()))
                 .body(paymentRequest)
                 .retrieve()
                 .body(ConfirmPaymentResponse.class);

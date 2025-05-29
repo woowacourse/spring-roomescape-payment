@@ -28,11 +28,16 @@ spring:
       mode: always
       data-locations: classpath:data.sql
 
+
 security:
   jwt:
     token:
       secret-key: Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E=
       expire-length: 36000000 # 60 minutes
+
+payment:
+  toss:
+    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
 
 ---
 
@@ -65,3 +70,7 @@ security:
     token:
       secret-key: Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E=
       expire-length: 36000000 # 60 minutes
+
+payment:
+  toss:
+    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
