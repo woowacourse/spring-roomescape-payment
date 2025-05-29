@@ -277,12 +277,9 @@ class WaitingServiceTest extends BaseTest {
     @Test
     @Transactional
     void 예약대기의_순번을_업데이트한다() {
-        Member member = memberDbFixture.듀이_사용자();
         ReservationTime reservationTime = reservationTimeDbFixture.예약시간_10시();
         Theme theme = themeDbFixture.공포();
-
-        Reservation reservation = reservationDbFixture.예약_한스_25_4_22_10시_공포(member, reservationTime, theme);
-        ReservationInfo reservationInfo = ReservationInfo.create(reservation);
+        ReservationInfo reservationInfo = createReservationInfo();
 
         Member firstWaitingMember = memberDbFixture.한스_사용자();
         Waiting waiting = waitingDbFixture.두번째_대기(reservationInfo, firstWaitingMember);
@@ -299,7 +296,7 @@ class WaitingServiceTest extends BaseTest {
         ReservationTime reservationTime = reservationTimeDbFixture.예약시간_10시();
         Theme theme = themeDbFixture.공포();
 
-        Reservation reservation = reservationDbFixture.예약_한스_25_4_22_10시_공포(member, reservationTime, theme);
+        Reservation reservation = reservationDbFixture.예약_생성(member, ReservationDateFixture.예약날짜_25_4_22, reservationTime, theme);
         return ReservationInfo.create(reservation);
     }
 }
