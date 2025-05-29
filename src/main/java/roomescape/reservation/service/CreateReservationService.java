@@ -6,11 +6,17 @@ import roomescape.common.exception.DuplicatedException;
 import roomescape.common.exception.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.repository.PaymentRepository;
+import roomescape.payment.service.ReservationPaymentClient;
+import roomescape.payment.service.dto.ConfirmPaymentRequest;
+import roomescape.payment.service.dto.ConfirmPaymentResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.service.dto.request.ReservationCreateRequest;
+import roomescape.reservation.service.dto.request.ReservationWithPaymentRequest;
 import roomescape.reservation.service.dto.response.ReservationResponse;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
@@ -23,12 +29,23 @@ public class CreateReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentRepository paymentRepository;
+    private final ReservationPaymentClient reservationPaymentClient;
 
-    public CreateReservationService(ReservationRepository reservationRepository, ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository, MemberRepository memberRepository) {
+    public CreateReservationService(
+            ReservationRepository reservationRepository,
+            ReservationTimeRepository reservationTimeRepository,
+            ThemeRepository themeRepository,
+            MemberRepository memberRepository,
+            PaymentRepository paymentRepository,
+            ReservationPaymentClient reservationPaymentClient
+    ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentRepository = paymentRepository;
+        this.reservationPaymentClient = reservationPaymentClient;
     }
 
     public ReservationResponse create(final ReservationCreateRequest request) {
@@ -76,5 +93,21 @@ public class CreateReservationService {
         if (reservation.isBefore(now)) {
             throw new IllegalArgumentException("과거 날짜의 예약은 생성할 수 없습니다.");
         }
+    }
+
+    public ReservationResponse createWithPayment(ReservationWithPaymentRequest request, LoginMember loginMember) {
+        ReservationCreateRequest reservationCreateRequest = new ReservationCreateRequest(
+                request.date(),
+                request.timeId(),
+                request.themeId(),
+                loginMember
+        );
+        ReservationResponse reservationResponse = create(reservationCreateRequest);
+
+        ConfirmPaymentResponse paymentResponse = reservationPaymentClient.postConfirmPayment(ConfirmPaymentRequest.from(request));
+        Payment payment = new Payment(paymentResponse.paymentKey(), paymentResponse.totalAmount());
+        paymentRepository.save(payment);
+
+        return reservationResponse;
     }
 }
