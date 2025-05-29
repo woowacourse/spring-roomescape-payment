@@ -23,7 +23,7 @@ public class HmacJwtGenerator implements JwtGenerator {
                        final Instant now,
                        final Instant expiration,
                        final SecretKey secretKey) {
-        final String uniqueId = UUID.randomUUID().toString(); // JTI
+        final String uniqueId = UUID.randomUUID().toString();
 
         return Jwt.from(
                 Jwts.builder()
