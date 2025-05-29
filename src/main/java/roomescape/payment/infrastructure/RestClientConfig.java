@@ -11,23 +11,23 @@ import org.springframework.web.client.RestClient;
 @EnableConfigurationProperties(RestClientProperties.class)
 public class RestClientConfig {
 
+    private static final int CONNECT_TIMEOUT = 5_000;
+    private static final int CONNECTION_REQUEST_TIMEOUT = 2_000;
+    private static final int READ_TIMEOUT = 5_000;
+
     @Bean
     public TossRestClient tossRestClient(RestClient.Builder restClientBuilder, RestClientProperties restClientProperties) {
         return new TossRestClient(restClientBuilder
                 .baseUrl(restClientProperties.getBaseUrl())
                 .requestFactory(clientHttpRequestFactory())
                 .build());
-        // "https://api.tosspayments.com"
     }
 
     private ClientHttpRequestFactory clientHttpRequestFactory() {
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        // 연결 최대 대기 시간 (밀리초)
-        factory.setConnectTimeout(5_000);
-        // 커넥션 풀에서 커넥션 가져올 최대 대기 시간 (밀리초)
-        factory.setConnectionRequestTimeout(2_000);
-        // 응답 읽기 최대 대기 시간 (밀리초)
-        factory.setReadTimeout(5_000);
+        factory.setConnectTimeout(CONNECT_TIMEOUT);
+        factory.setConnectionRequestTimeout(CONNECTION_REQUEST_TIMEOUT);
+        factory.setReadTimeout(READ_TIMEOUT);
         return factory;
     }
 }
