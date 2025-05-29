@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.RestClientException;
 import roomescape.dto.ErrorResponse;
 import roomescape.exception.AccessDeniedException;
 import roomescape.exception.BadRequestException;
@@ -60,6 +61,15 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TossPaymentException.class)
     public ResponseEntity<ErrorResponse> handleTossPaymentException(TossPaymentException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                HttpStatus.BAD_REQUEST
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(RestClientException.class)
+    public ResponseEntity<ErrorResponse> handleRestClientException(RestClientException ex) {
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getMessage(),
                 HttpStatus.BAD_REQUEST

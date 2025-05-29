@@ -6,19 +6,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.concurrent.TimeUnit;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.web.client.RestClientException;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.domain.member.Member;
@@ -50,6 +50,9 @@ class ReservationPaymentServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private PaymentClientService paymentClientService;
+
     @BeforeAll
     static void setUp() throws IOException {
         mockWebServer = new MockWebServer();
@@ -77,6 +80,7 @@ class ReservationPaymentServiceTest {
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(400)
                 .setHeader("Content-Type", "application/json")
+                .setBodyDelay(10, TimeUnit.SECONDS)
                 .setBody(errorResponse));
 
         Theme theme = Theme.createWithoutId("테마1", "테마1 설명", "thumbnail1.jpg");
@@ -93,5 +97,20 @@ class ReservationPaymentServiceTest {
         assertThatThrownBy(() -> reservationPaymentService.confirmPaymentAndAddReservation(
                 reservationCreateRequest, paymentConfirmRequest
         )).hasMessageContaining(errorResponse);
+    }
+
+    @DisplayName("토스 결제 승인 요청이 타임아웃됐을 때 예외를 발생한다.")
+    @Test
+    void confirmPaymentTimeout_shouldThrowTossPaymentException() {
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(400)
+                .setHeader("Content-Type", "application/json")
+                .setBodyDelay(10, TimeUnit.SECONDS)
+                .setBody("test body"));
+
+        // when & then
+        var paymentConfirmRequest = new PaymentConfirmRequest("orderId", 50000, "paymentKey", "TOSS");
+        assertThatThrownBy(() -> paymentClientService.confirm("token", paymentConfirmRequest))
+                .isInstanceOf(RestClientException.class);
     }
 }
