@@ -24,15 +24,14 @@ public class TossPaymentProvider implements PaymentProvider {
 
     private static final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
     private static final String NO_PASSWORD_SIGN = ":";
-    private static final String TOSS_API_BASE_URL = "https://api.tosspayments.com";
     private static final String AUTHORIZATION_PREFIX = "Basic ";
 
     private final RestClient restClient;
     private final String authorizationValue;
     private final Map<String, PaymentStatusCode> tossFailureCodes;
 
-    public TossPaymentProvider() {
-        restClient = RestClient.create(TOSS_API_BASE_URL);
+    public TossPaymentProvider(final RestClient restClient) {
+        this.restClient = restClient;
         authorizationValue = AUTHORIZATION_PREFIX + encodeSecretKey();
         tossFailureCodes = initializeFailureCode();
     }
