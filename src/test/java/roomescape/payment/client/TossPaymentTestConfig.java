@@ -28,6 +28,6 @@ public class TossPaymentTestConfig {
 
     @Bean
     public TokenCookieManager tokenCookieManager() {
-        return new TokenCookieManager(); // 생성자 인자가 있다면 채워야 함
+        return new TokenCookieManager();
     }
 }

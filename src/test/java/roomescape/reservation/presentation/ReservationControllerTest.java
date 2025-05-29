@@ -43,9 +43,6 @@ class ReservationControllerTest {
     private TossPaymentClient tossPaymentClient;
 
     @MockitoBean
-    private LoginService loginService;
-
-    @MockitoBean
     private PaymentService paymentService;
 
     @MockitoBean
