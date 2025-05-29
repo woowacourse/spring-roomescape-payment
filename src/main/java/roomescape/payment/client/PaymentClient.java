@@ -43,7 +43,7 @@ public class PaymentClient {
             }
             throw new PaymentApiException(responseBody, errorMessage, e.getStatusCode());
         } catch (JsonProcessingException parseException) {
-            throw new IllegalArgumentException("파싱에 실패했습니다." + e.getMessage());
+            throw new RuntimeException("JWT 파싱에 실패했습니다." + e.getMessage());
         }
     }
 }

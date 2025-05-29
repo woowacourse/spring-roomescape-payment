@@ -16,6 +16,10 @@ import java.util.Base64;
 @Configuration
 public class PaymentClientConfig {
 
+    @Value("${payment.api.base-url}")
+    private String baseUrl;
+    @Value("${payment.auth.scheme}")
+    private String authScheme;
     @Value("${payment.secret.key}")
     private String secretKey;
 
@@ -23,11 +27,11 @@ public class PaymentClientConfig {
     public PaymentClient getPaymentResolver() {
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
-        String authorizations = "Basic " + new String(encodedBytes);
+        String authorizations = authScheme + " " + new String(encodedBytes);
 
         return new PaymentClient(
                 RestClient.builder()
-                        .baseUrl("https://api.tosspayments.com")
+                        .baseUrl(baseUrl)
                         .defaultHeader("Content-Type", "application/json")
                         .defaultHeader("Authorization", authorizations)
                         .requestInterceptor(loggingInterceptor())

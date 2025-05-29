@@ -28,3 +28,7 @@ jwt:
 payment:
   secret:
     key: test-payment-key-not-real
+  api:
+    base-url: test-payment-url-not-real
+  auth:
+    scheme: Basic

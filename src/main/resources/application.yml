@@ -19,4 +19,10 @@ spring:
     username: sa
     password:
   config:
-    import: "optional:classpath:application-secret.yml"
+    import: optional:classpath:application-secret.yml
+
+payment:
+  api:
+    base-url: https://api.tosspayments.com
+  auth:
+    scheme: Basic

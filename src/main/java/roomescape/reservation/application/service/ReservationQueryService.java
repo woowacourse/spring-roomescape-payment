@@ -32,17 +32,17 @@ public class ReservationQueryService {
 
     public List<AvailableReservationTimeServiceResponse> getTimesWithAvailability(
             final AvailableReservationTimeServiceRequest request) {
-        final List<ReservationTime> allTimes = reservationTimeQueryService.getAll();
+        List<ReservationTime> allTimes = reservationTimeQueryService.getAll();
 
-        final Set<Long> bookedTimeIds = new HashSet<>(reservationRepository.findTimeIdByParams(
+        Set<Long> bookedTimeIds = new HashSet<>(reservationRepository.findTimeIdByParams(
                 request.date(),
                 request.themeId())
         );
 
-        final List<AvailableReservationTimeServiceResponse> responses = new ArrayList<>();
+        List<AvailableReservationTimeServiceResponse> responses = new ArrayList<>();
 
         for (final ReservationTime reservationTime : allTimes) {
-            final boolean isBooked = bookedTimeIds.contains(reservationTime.getId());
+            boolean isBooked = bookedTimeIds.contains(reservationTime.getId());
             responses.add(new AvailableReservationTimeServiceResponse(
                     reservationTime,
                     isBooked));

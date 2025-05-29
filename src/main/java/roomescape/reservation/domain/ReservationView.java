@@ -96,7 +96,7 @@ public class ReservationView {
             validateId();
             return Long.parseLong(compositeId.substring(2));
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Cannot parse ID from compositeId: " + compositeId, e);
+            throw new RuntimeException("Cannot parse ID from compositeId: " + compositeId, e);
         }
     }
 
