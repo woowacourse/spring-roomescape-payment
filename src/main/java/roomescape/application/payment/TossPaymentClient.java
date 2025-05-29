@@ -42,8 +42,8 @@ public class TossPaymentClient {
 
     private SimpleClientHttpRequestFactory createRequestFactory() {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(Duration.ofSeconds(30));
-        requestFactory.setReadTimeout(Duration.ofSeconds(60));
+        requestFactory.setConnectTimeout(Duration.ofSeconds(3));
+        requestFactory.setReadTimeout(Duration.ofSeconds(35));
         return requestFactory;
     }
 
