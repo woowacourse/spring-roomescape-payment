@@ -31,11 +31,15 @@ public class PaymentHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleBadRequestException(final HttpClientErrorException e, final WebRequest request)
     {
         final Optional<TossErrorResponse> response = extractResponse(e.getResponseBodyAsString());
-        if (response.isEmpty() || response.get().isPaymentError()) {
-            log.error(response.get().message(), e.getStatusCode());
-            return buildResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR, "결제 관련 내부 오류가 발생했습니다.", request);
+        if (response.isPresent()) {
+            TossErrorResponse tossError = response.get();
+            if (tossError.isPaymentError()) {
+                log.error(tossError.message(), e.getStatusCode());
+                return buildResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR, "결제 관련 내부 오류가 발생했습니다.", request);
+            }
+            return buildResponseEntity(e, e.getStatusCode(), tossError.message(), request);
         }
-        return buildResponseEntity(e, e.getStatusCode(), response.get().message(), request);
+        return buildResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR, "결제 관련 내부 오류가 발생했습니다.", request);
     }
 
     private Optional<TossErrorResponse> extractResponse(final String rawBody) {
