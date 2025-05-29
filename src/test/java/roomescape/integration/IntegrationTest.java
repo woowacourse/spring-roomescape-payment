@@ -216,8 +216,12 @@ class IntegrationTest extends BaseTest {
 
         @Test
         void 방탈출_예약_목록을_응답한다() {
+            givenCreatedAdmin();
+            String token = givenAdminLoginToken();
+
             RestAssured.given().log().all()
-                    .when().get("/reservations")
+                    .cookie("token", token)
+                    .when().get("/admin/reservations")
                     .then().log().all()
                     .statusCode(HttpStatus.OK.value())
                     .body("size()", is(0));
@@ -256,12 +260,15 @@ class IntegrationTest extends BaseTest {
         @Test
         void 전체_사용자_목록을_응답한다() {
             givenCreatedMember();
+            givenCreatedAdmin();
+            String token = givenAdminLoginToken();
 
             RestAssured.given().log().all()
-                    .when().get("/members")
+                    .cookie("token", token)
+                    .when().get("/admin/members")
                     .then().log().all()
                     .statusCode(HttpStatus.OK.value())
-                    .body("size()", is(2));
+                    .body("size()", is(3));
         }
     }
 

@@ -29,25 +29,9 @@ class DatabaseTest extends BaseTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    private static final Map<String, Object> reservation = new HashMap<>();
-    private static final Map<String, Object> authOfMember = new HashMap<>();
-
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        setUpReservation();
-        setUpAuthOfMember();
-    }
-
-    private void setUpReservation() {
-        reservation.put("date", "2025-08-05");
-        reservation.put("timeId", 1);
-        reservation.put("themeId", 1);
-    }
-
-    private void setUpAuthOfMember() {
-        authOfMember.put("email", "test@email.com");
-        authOfMember.put("password", "pass1");
     }
 
     @Test
@@ -59,37 +43,5 @@ class DatabaseTest extends BaseTest {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Test
-    void 방탈출_예약_목록을_조회한다() {
-        jdbcTemplate.update("INSERT INTO reservation_time (start_at) VALUES (?)",
-                "10:00");
-        jdbcTemplate.update("INSERT INTO theme (name, description, thumbnail) VALUES (?, ?, ?)",
-                "테마1", "설명1", "썸네일1");
-        jdbcTemplate.update("INSERT INTO member (name, role, email, password) VALUES (?, ?, ?, ?)",
-                "브라운", "USER", "test@email.com", "pass1");
-        jdbcTemplate.update(
-                "INSERT INTO reservation (date, time_id, theme_id, member_id, status) VALUES (?, ?, ?, ?, ?)",
-                "2025-08-05", 1, 1, 1, "RESERVED");
-
-        List<ReservationResponse> response = RestAssured.given().log().all()
-                .when().get("/reservations")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value()).extract()
-                .jsonPath().getList(".", ReservationResponse.class);
-
-        Integer count = jdbcTemplate.queryForObject("SELECT count(1) FROM reservation", Integer.class);
-
-        assertThat(response.size()).isEqualTo(count);
-    }
-
-    private String givenMemberLoginToken() {
-        return RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(authOfMember)
-                .when().post("/login")
-                .then()
-                .extract().response().cookie("token");
     }
 }

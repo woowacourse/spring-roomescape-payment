@@ -36,13 +36,6 @@ public class ReservationController {
         this.waitingService = waitingService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<ReservationResponse>> getReservations() {
-        List<ReservationResponse> responses = reservationService.getReservations();
-
-        return ResponseEntity.ok(responses);
-    }
-
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(
             @RequestBody @Valid ReservationWithPaymentRequest request,

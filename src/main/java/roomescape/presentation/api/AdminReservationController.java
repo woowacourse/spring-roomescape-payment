@@ -35,6 +35,13 @@ public class AdminReservationController {
         this.waitingService = waitingService;
     }
 
+    @GetMapping
+    public ResponseEntity<List<ReservationResponse>> getReservations() {
+        List<ReservationResponse> responses = reservationService.getReservations();
+
+        return ResponseEntity.ok(responses);
+    }
+
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(
             @RequestBody @Valid AdminReservationCreateRequest request
@@ -46,7 +53,7 @@ public class AdminReservationController {
                 .body(response);
     }
 
-    @GetMapping
+    @GetMapping(params = {"themeId", "memberId", "dateFrom", "dateTo"})
     public ResponseEntity<List<ReservationResponse>> getReservationsByFilter(
             @RequestParam Long themeId,
             @RequestParam Long memberId,

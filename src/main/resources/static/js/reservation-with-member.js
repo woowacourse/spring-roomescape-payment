@@ -3,7 +3,7 @@ const RESERVATION_API_ENDPOINT = '/reservations';
 const ADMIN_RESERVATION_API_ENDPOINT = '/admin/reservations';
 const TIME_API_ENDPOINT = '/times';
 const THEME_API_ENDPOINT = '/themes';
-const MEMBER_API_ENDPOINT = '/members';
+const ADMIN_MEMBER_API_ENDPOINT = '/admin/members';
 const timesOptions = [];
 const themesOptions = [];
 const membersOptions = [];
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('add-button').addEventListener('click', addInputRow);
   document.getElementById('filter-form').addEventListener('submit', applyFilter);
 
-  requestRead(RESERVATION_API_ENDPOINT)
+  requestRead(ADMIN_RESERVATION_API_ENDPOINT)
       .then(render)
       .catch(error => console.error('Error fetching reservations:', error));
 
@@ -57,7 +57,7 @@ function fetchThemes() {
 }
 
 function fetchMembers() {
-  requestRead(MEMBER_API_ENDPOINT)
+  requestRead(ADMIN_MEMBER_API_ENDPOINT)
       .then(data => {
         membersOptions.push(...data);
         populateSelect('member', membersOptions, 'name');
