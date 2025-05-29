@@ -74,7 +74,7 @@ Content-Type: application/json
 
 - 메서드 : POST
 - 요청 URL : /reservations
-- 설명 : 예약을 추가한다.
+- 설명 : 결제를 통해 예약을 추가한다.
 - 조건
     - 이름
         - 이름은 null이 될 수 없다.
@@ -90,9 +90,17 @@ cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6ImFkbWluIiwicm9sZSI6I
 host: localhost: 8080
 
 {
-"date": "2024-03-01",
-"themeId": 1,
-"timeId": 1
+"reservation": {
+"date": "2025-05-30",
+"themeId": "1",
+"timeId": "1"
+},
+"payment": {
+"paymentKey": "tgen_20250529131846fyrj9",
+"orderId": "WTESTMC4yNTQ0ODcwMTQ4NjA1",
+"amount": 1000,
+"paymentType": "NORMAL"
+}
 }
 ```
 
@@ -273,7 +281,7 @@ Content-Type: application/json
 "timeId": 1,
 "startAt": "10:00",
 "alreadyBooked": "true"
-}
+},
 {
 "timeId": 2,
 "startAt": "11:00",
@@ -707,7 +715,7 @@ Content-Type: application/json
 "theme": "테마1",
 "date": "2024-03-01",
 "time": "10:00",
-"reservedStatus": "1번째 예약대기"
+"reservedStatus": "예약대기"
 }
 ```
 
