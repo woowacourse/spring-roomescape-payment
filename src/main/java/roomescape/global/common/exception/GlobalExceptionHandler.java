@@ -9,6 +9,7 @@ import roomescape.global.auth.exception.ForbiddenException;
 import roomescape.global.auth.exception.UnAuthorizedException;
 import roomescape.member.exception.MemberDuplicatedException;
 import roomescape.payment.exception.TossPaymentClientException;
+import roomescape.payment.exception.TossPaymentServerException;
 import roomescape.reservationtime.exception.ReservationTimeInUseException;
 
 @RestControllerAdvice
@@ -55,7 +56,12 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(TossPaymentClientException.class)
-    public ResponseEntity<String> handleTossPaymentException(TossPaymentClientException e) {
+    public ResponseEntity<String> handleTossPaymentClientException(TossPaymentClientException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler(TossPaymentServerException.class)
+    public ResponseEntity<String> handleTossPaymentServerException(TossPaymentServerException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
 }
