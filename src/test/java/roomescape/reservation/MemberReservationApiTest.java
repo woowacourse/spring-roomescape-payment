@@ -2,6 +2,10 @@ package roomescape.reservation;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -15,8 +19,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.login.application.TokenCookieService;
 import roomescape.login.application.dto.LoginRequest;
+import roomescape.payment.application.PaymentService;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.application.dto.MemberReservationRequest;
 
 @ActiveProfiles("test")
@@ -27,6 +34,9 @@ public class MemberReservationApiTest {
     @LocalServerPort
     private int port;
     private String token;
+
+    @MockitoBean
+    private PaymentService paymentService;
 
     @BeforeEach
     void setUp() {
@@ -51,6 +61,9 @@ public class MemberReservationApiTest {
 
     @Test
     void 예약을_추가한다() {
+        when(paymentService.addPayment(any(), anyLong()))
+            .thenReturn(mock(Payment.class));
+
         final MemberReservationRequest request = createRequest(LocalDate.now().plusDays(1), 1L, 1L);
         RestAssured.given().log().all()
             .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
@@ -91,6 +104,9 @@ public class MemberReservationApiTest {
 
     @Test
     void 과거날짜로_예약을_하면_에러를_반환한다() {
+        when(paymentService.addPayment(any(), anyLong()))
+            .thenReturn(mock(Payment.class));
+        
         final MemberReservationRequest request = createRequest(LocalDate.now().minusDays(10), 1L,
             1L);
 
@@ -107,6 +123,9 @@ public class MemberReservationApiTest {
 
     @Test
     void 중복된_시간에_예약을_하면_에러가_발생한다() {
+        when(paymentService.addPayment(any(), anyLong()))
+            .thenReturn(mock(Payment.class));
+
         final MemberReservationRequest request1 = createRequest(
             LocalDate.now().plusDays(10),
             1L,

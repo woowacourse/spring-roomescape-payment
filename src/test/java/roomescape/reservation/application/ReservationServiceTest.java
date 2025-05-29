@@ -2,6 +2,10 @@ package roomescape.reservation.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -12,10 +16,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import roomescape.member.application.dto.MemberResponse;
+import roomescape.payment.application.PaymentService;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.application.dto.AvailableReservationTimeResponse;
 import roomescape.reservation.application.dto.MemberReservationRequest;
 import roomescape.reservation.application.dto.MyReservation;
 import roomescape.reservation.application.dto.ReservationResponse;
+import roomescape.reservation.application.dto.ReservationTimeResponse;
+import roomescape.theme.application.dto.ThemeResponse;
 import roomescape.waiting.application.WaitingService;
 import roomescape.waiting.application.dto.WaitingIdResponse;
 
@@ -27,23 +37,25 @@ class ReservationServiceTest {
     @Autowired
     private ReservationService reservationService;
 
+    @MockitoBean
+    private PaymentService paymentService;
+
     @Autowired
     private WaitingService waitingService;
 
     @Test
     void 모든_예약기록을_조회한다() {
-        // given
-
         // when & then
         assertThat(reservationService.findAll()).hasSize(6);
     }
 
-    /*
     @Test
     void 예약을_추가한다() {
         // given
-        final MemberReservationRequest request = new MemberReservationRequest(
-            LocalDate.now().plusDays(1), 1L, 1L);
+        final MemberReservationRequest request = createRequest(LocalDate.now().plusDays(1), 1L, 1L);
+
+        when(paymentService.addPayment(any(), anyLong()))
+            .thenReturn(mock(Payment.class));
 
         // when & then
         assertThat(reservationService.addMemberReservation(request, 1L)).isEqualTo(
@@ -55,8 +67,6 @@ class ReservationServiceTest {
                     "https://upload.wikimedia.org/wikipedia/ko/b/b7/%EC%9D%B8%ED%84%B0%EC%8A%A4%ED%85%94%EB%9D%BC.jpg?20150905075839"),
                 new MemberResponse(1L, "엠제이")));
     }
-
-     */
 
     @Test
     void 예약을_삭제한다() {
