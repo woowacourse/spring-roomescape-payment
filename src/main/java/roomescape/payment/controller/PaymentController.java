@@ -35,7 +35,7 @@ public class PaymentController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void save(@RequestBody @Valid ReservationPaymentRequest request, LoginMember loginMember) {
+    public void savePayment(@RequestBody @Valid ReservationPaymentRequest request, LoginMember loginMember) {
         paymentService.save(request, loginMember);
     }
 }

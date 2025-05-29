@@ -28,7 +28,7 @@ public class WaitingReservationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public WaitingReservationResponse save(@Valid @RequestBody final WaitingReservationRequest request,
+    public WaitingReservationResponse saveWaitingReservation(@Valid @RequestBody final WaitingReservationRequest request,
                                            final LoginMember member) {
         return waitingReservationService.save(request, member);
     }
