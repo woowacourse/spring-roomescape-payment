@@ -1,25 +1,33 @@
 package roomescape.reservation.controller;
 
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 
 import java.time.LocalDate;
 import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import roomescape.reservation.payment.dto.request.PaymentRequest;
+import roomescape.reservation.payment.service.PaymentService;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 class AdminWaitingControllerTest {
+
+    @MockitoBean
+    private PaymentService paymentService;
 
     @DisplayName("모든 예약대기 목록을 읽어온다.")
     @Test
@@ -86,15 +94,13 @@ class AdminWaitingControllerTest {
         Map<String, Object> params = Map.of(
                 "date", getTomorrow(),
                 "timeId", timeId,
-                "themeId", themeId
+                "themeId", themeId,
+                "paymentKey", "paymentKey",
+                "orderId", "orderId",
+                "amount", 1_000L
         );
 
-        RestAssured.given()
-                .cookie("token", adminLoginTokenValue)
-                .contentType(ContentType.JSON)
-                .body(params)
-                .when().post("/reservations")
-                .then();
+        addReservation(adminLoginTokenValue);
 
         String memberLoginTokenValue = getMemberLoginTokenValue();
         int waitingId = RestAssured.given()
@@ -157,13 +163,20 @@ class AdminWaitingControllerTest {
     }
 
     private void addReservation(final String tokenValue) {
+        Mockito.doNothing()
+                .when(paymentService)
+                .confirm(any(PaymentRequest.class));
+
         RestAssured.given()
                 .cookie("token", tokenValue)
                 .contentType(ContentType.JSON)
                 .body(Map.of(
                         "date", LocalDate.now().plusDays(1L),
                         "timeId", 1,
-                        "themeId", 1
+                        "themeId", 1,
+                        "paymentKey", "paymentKey",
+                        "orderId", "orderId",
+                        "amount", 1_000L
                 ))
                 .when().post("/reservations")
                 .then();

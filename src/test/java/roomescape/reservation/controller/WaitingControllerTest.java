@@ -1,5 +1,8 @@
 package roomescape.reservation.controller;
 
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doNothing;
+
 import java.time.LocalDate;
 import java.util.Map;
 
@@ -9,14 +12,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import roomescape.reservation.payment.dto.request.PaymentRequest;
+import roomescape.reservation.payment.service.PaymentService;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 class WaitingControllerTest {
+
+    @MockitoBean
+    private PaymentService paymentService;
 
     @DisplayName("예약 대기를 추가한다.")
     @Test
@@ -27,8 +36,14 @@ class WaitingControllerTest {
         Map<String, Object> waitingParams = Map.of(
                 "date", getTomorrow(),
                 "timeId", timeId,
-                "themeId", themeId
+                "themeId", themeId,
+                "paymentKey", "paymentKey",
+                "orderId", "orderId",
+                "amount", 1_000L
         );
+
+        doNothing().when(paymentService)
+                .confirm(any(PaymentRequest.class));
 
         RestAssured.given()
                 .cookie("token", tokenValue)
@@ -56,10 +71,14 @@ class WaitingControllerTest {
         Map<String, Object> reservationParams = Map.of(
                 "date", getTomorrow(),
                 "timeId", timeId,
-                "themeId", themeId
-
-
+                "themeId", themeId,
+                "paymentKey", "paymentKey",
+                "orderId", "orderId",
+                "amount", 1_000L
         );
+
+        doNothing().when(paymentService)
+                .confirm(any(PaymentRequest.class));
 
         RestAssured.given()
                 .cookie("token", tokenValue)
