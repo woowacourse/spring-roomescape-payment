@@ -55,11 +55,10 @@ public class WaitingApiTest {
     @Test
     @DisplayName("예약대기를 추가한다")
     void add_waiting() {
-        final MemberReservationRequest request = new MemberReservationRequest(
+        final MemberReservationRequest request = createRequest(
             LocalDate.now().plusDays(1),
             1L,
-            1L
-        );
+            1L);
 
         Long waitingId = RestAssured.given().log().all()
             .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
@@ -78,7 +77,7 @@ public class WaitingApiTest {
     @Test
     @DisplayName("웨이팅을 추가하고, 삭제한다")
     void add_waiting_and_delete() {
-        final MemberReservationRequest request = new MemberReservationRequest(
+        final MemberReservationRequest request = createRequest(
             LocalDate.now().plusDays(1),
             1L,
             1L
@@ -144,7 +143,7 @@ public class WaitingApiTest {
     @DisplayName("admin은 모든 회원의 waiting 삭제 API를 호출할 수 있다.")
     void admin_can_use_delete_waiting_api() {
         //given
-        final MemberReservationRequest request = new MemberReservationRequest(
+        final MemberReservationRequest request = createRequest(
             LocalDate.now().plusDays(1),
             1L,
             1L
@@ -187,5 +186,9 @@ public class WaitingApiTest {
             .header(HttpHeaders.SET_COOKIE)
             .split(";")[0]
             .split(TokenCookieService.COOKIE_TOKEN_KEY + "=")[1];
+    }
+
+    private MemberReservationRequest createRequest(LocalDate now, Long timeId, Long themeId) {
+        return new MemberReservationRequest(now, timeId, themeId, "key", "orderId", 1000L);
     }
 }

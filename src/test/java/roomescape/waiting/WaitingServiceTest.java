@@ -29,7 +29,7 @@ public class WaitingServiceTest {
     @Test
     @DisplayName("웨이팅 정보가 들어왔을 때, 성공적으로 저장할 수 있어야 한다.")
     void add_waiting() {
-        MemberReservationRequest memberReservationRequest = new MemberReservationRequest(
+        MemberReservationRequest memberReservationRequest = createRequest(
             LocalDate.of(2026, 5, 10),
             1L, 1L
         );
@@ -42,7 +42,7 @@ public class WaitingServiceTest {
     @DisplayName("멤버는 하나의 날짜,시간,테마에 대해 예약과 대기를 동시에 할 수 없다.")
     void member_cannot_reservation_and_waiting_at_the_same_time() {
         //given
-        MemberReservationRequest memberReservationRequest = new MemberReservationRequest(
+        MemberReservationRequest memberReservationRequest = createRequest(
             LocalDate.of(2026, 5, 10),
             1L, 1L
         );
@@ -58,7 +58,7 @@ public class WaitingServiceTest {
     @DisplayName("이미 하나의 날짜, 시간, 테마에 대해 대기가 존재한다면, 추가로 대기할 수 없다.")
     void already_waiting_then_cannot_waiting() {
         //given
-        MemberReservationRequest memberReservationRequest = new MemberReservationRequest(
+        MemberReservationRequest memberReservationRequest = createRequest(
             LocalDate.of(2026, 5, 10),
             1L, 1L
         );
@@ -73,7 +73,7 @@ public class WaitingServiceTest {
     @DisplayName("본인의 대기만 삭제할 수 있어야 한다.")
     void only_delete_myself_waiting() {
         //given
-        MemberReservationRequest memberReservationRequest = new MemberReservationRequest(
+        MemberReservationRequest memberReservationRequest = createRequest(
             LocalDate.of(2026, 5, 10),
             1L, 1L
         );
@@ -94,7 +94,7 @@ public class WaitingServiceTest {
     @DisplayName("다른 사람이 대기 삭제를 시도할 경우, 예외가 발생해야 한다.")
     void only_delete_myself_waiting_fail_case() {
         //given
-        MemberReservationRequest memberReservationRequest = new MemberReservationRequest(
+        MemberReservationRequest memberReservationRequest = createRequest(
             LocalDate.of(2026, 5, 10),
             1L, 1L
         );
@@ -106,6 +106,10 @@ public class WaitingServiceTest {
         assertThatThrownBy(() -> waitingService.cancel(2L, waitingIdResponse.waitingId()))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("본인의 대기만 삭제할 수 있습니다.");
+    }
+
+    private MemberReservationRequest createRequest(LocalDate now, Long timeId, Long themeId) {
+        return new MemberReservationRequest(now, timeId, themeId, "key", "orderId", 1000L);
     }
 
 }

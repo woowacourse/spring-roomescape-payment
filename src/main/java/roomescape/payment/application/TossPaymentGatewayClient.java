@@ -31,7 +31,7 @@ public class TossPaymentGatewayClient {
     public TossPaymentGatewayClient(final ObjectMapper objectMapper) {
         this.restClient = RestClient.builder()
             .baseUrl(BASE_URL)
-            .defaultHeader(AUTHORIZATION, encodeSecretKey("test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw"))
+            .defaultHeader(AUTHORIZATION, encodeSecretKey("test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"))
             .defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
             .build();
         this.objectMapper = objectMapper;

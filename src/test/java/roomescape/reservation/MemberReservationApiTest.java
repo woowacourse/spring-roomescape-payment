@@ -51,12 +51,7 @@ public class MemberReservationApiTest {
 
     @Test
     void 예약을_추가한다() {
-        final MemberReservationRequest request = new MemberReservationRequest(
-            LocalDate.now().plusDays(1),
-            1L,
-            1L
-        );
-
+        final MemberReservationRequest request = createRequest(LocalDate.now().plusDays(1), 1L, 1L);
         RestAssured.given().log().all()
             .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
             .contentType(ContentType.JSON)
@@ -68,7 +63,7 @@ public class MemberReservationApiTest {
 
     @Test
     void 예약날짜는_null을_받을_수_없다() {
-        final MemberReservationRequest request = new MemberReservationRequest(null, 1L, 1L);
+        final MemberReservationRequest request = createRequest(null, 1L, 1L);
 
         RestAssured.given().log().all()
             .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
@@ -82,8 +77,8 @@ public class MemberReservationApiTest {
 
     @Test
     void 예약_시간_id는_null을_받을_수_없다() {
-        final MemberReservationRequest request = new MemberReservationRequest(
-            LocalDate.now().plusDays(1), null, 1L);
+        final MemberReservationRequest request = createRequest(LocalDate.now().plusDays(1), null,
+            1L);
 
         RestAssured.given().log().all()
             .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
@@ -96,11 +91,8 @@ public class MemberReservationApiTest {
 
     @Test
     void 과거날짜로_예약을_하면_에러를_반환한다() {
-        final MemberReservationRequest request = new MemberReservationRequest(
-            LocalDate.now().minusDays(10),
-            1L,
-            1L
-        );
+        final MemberReservationRequest request = createRequest(LocalDate.now().minusDays(10), 1L,
+            1L);
 
         RestAssured.given().log().all()
             .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
@@ -115,17 +107,15 @@ public class MemberReservationApiTest {
 
     @Test
     void 중복된_시간에_예약을_하면_에러가_발생한다() {
-        final MemberReservationRequest request1 = new MemberReservationRequest(
+        final MemberReservationRequest request1 = createRequest(
             LocalDate.now().plusDays(10),
             1L,
-            1L
-        );
+            1L);
 
-        final MemberReservationRequest request2 = new MemberReservationRequest(
+        final MemberReservationRequest request2 = createRequest(
             LocalDate.now().plusDays(10),
             1L,
-            1L
-        );
+            1L);
 
         RestAssured.given().log().all()
             .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
@@ -162,5 +152,9 @@ public class MemberReservationApiTest {
             .when().get("/reservations/mine")
             .then().log().all()
             .statusCode(401);
+    }
+
+    private MemberReservationRequest createRequest(LocalDate now, Long timeId, Long themeId) {
+        return new MemberReservationRequest(now, timeId, themeId, "key", "orderId", 1000L);
     }
 }
