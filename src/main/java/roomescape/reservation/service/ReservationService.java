@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.InvalidArgumentException;
-import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResponse;
-import roomescape.payment.service.TossPaymentService;
+import roomescape.payment.toss.dto.TossPaymentRequest;
+import roomescape.payment.toss.dto.TossPaymentResponse;
+import roomescape.payment.toss.service.TossPaymentService;
 import roomescape.reservation.controller.request.ReservePaymentRequest;
 import roomescape.reservation.controller.response.MyReservationResponse;
 import roomescape.reservation.controller.response.ReservationResponse;
@@ -51,8 +51,8 @@ public class ReservationService {
         ReserveCommand reserveCommand = ReserveCommand.byPayment(request, memberId);
         Reservation reserved = reservationManager.reserved(reserveCommand);
 
-        PaymentRequest paymentRequest = new PaymentRequest(request.paymentKey(), request.orderId(), request.amount());
-        PaymentResponse paymentResponse = tossPaymentService.confirmPayment(paymentRequest);
+        TossPaymentRequest paymentRequest = new TossPaymentRequest(request.paymentKey(), request.orderId(), request.amount());
+        TossPaymentResponse tossPaymentResponse = tossPaymentService.confirmPayment(paymentRequest);
 
         return ReservationResponse.from(reserved);
     }

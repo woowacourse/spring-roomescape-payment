@@ -10,5 +10,4 @@ public class PaymentErrorCode implements ErrorCode {
 
     private final String value;
     private final String message;
-
 }

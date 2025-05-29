@@ -1,4 +1,4 @@
-package roomescape.payment.service;
+package roomescape.payment.toss.service;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
@@ -20,10 +20,10 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
-import roomescape.payment.config.TestTossPaymentConfig;
-import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.toss.config.TestTossPaymentConfig;
+import roomescape.payment.toss.dto.TossPaymentRequest;
 import roomescape.payment.exception.PaymentProcessException;
-import roomescape.payment.interceptor.TossPaymentResponseInterceptor;
+import roomescape.payment.toss.interceptor.TossPaymentResponseInterceptor;
 
 @ActiveProfiles("timeout")
 @RestClientTest(TossPaymentClient.class)
@@ -63,7 +63,7 @@ public class TossPaymentTimeoutTest {
         String orderId = "orderId";
         Long amount = 10000L;
 
-        PaymentRequest request = new PaymentRequest(paymentKey, orderId, amount);
+        TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount);
         String json = objectMapper.writeValueAsString(request);
 
         mockServer.expect(requestTo(PAYMENT_URL + "/confirm"))

@@ -1,4 +1,4 @@
-package roomescape.payment.service;
+package roomescape.payment.toss.service;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
@@ -18,13 +18,13 @@ import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import roomescape.payment.config.TestTossPaymentConfig;
-import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResponse;
+import roomescape.payment.toss.config.TestTossPaymentConfig;
+import roomescape.payment.toss.dto.TossPaymentRequest;
+import roomescape.payment.toss.dto.TossPaymentResponse;
 import roomescape.payment.exception.PaymentProcessException;
 import roomescape.payment.exception.PaymentServerException;
 import roomescape.payment.exception.PaymentTemporaryException;
-import roomescape.payment.interceptor.TossPaymentResponseInterceptor;
+import roomescape.payment.toss.interceptor.TossPaymentResponseInterceptor;
 
 
 @RestClientTest(TossPaymentClient.class)
@@ -40,16 +40,16 @@ class TossPaymentClientTest extends TossPaymentMockSupport {
         String orderId = "orderId";
         Long amount = 10000L;
 
-        PaymentResponse paymentResponse = new PaymentResponse(orderId);
-        PaymentRequest request = new PaymentRequest(paymentKey, orderId, amount);
+        TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(orderId);
+        TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount);
         String json = objectMapper.writeValueAsString(request);
 
         mockServer.expect(requestTo(PAYMENT_URL + "/confirm"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(json))
-                .andRespond(withSuccess(objectMapper.writeValueAsString(paymentResponse), MediaType.APPLICATION_JSON));
+                .andRespond(withSuccess(objectMapper.writeValueAsString(tossPaymentResponse), MediaType.APPLICATION_JSON));
 
-        PaymentResponse result = tossPaymentClient.getPaymentConfirm(request);
+        TossPaymentResponse result = tossPaymentClient.getPaymentConfirm(request);
 
         Assertions.assertThat(result.orderId()).isEqualTo(orderId);
     }
@@ -60,7 +60,7 @@ class TossPaymentClientTest extends TossPaymentMockSupport {
         String orderId = "";
         Long amount = 10000L;
 
-        PaymentRequest request = new PaymentRequest(paymentKey, orderId, amount);
+        TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount);
         String json = objectMapper.writeValueAsString(request);
 
         String expectedMessage = "결제 키와 주문 ID는 필수입니다.";
@@ -90,7 +90,7 @@ class TossPaymentClientTest extends TossPaymentMockSupport {
         String orderId = "orderId";
         Long amount = 10000L;
 
-        PaymentRequest request = new PaymentRequest(paymentKey, orderId, amount);
+        TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount);
         String json = objectMapper.writeValueAsString(request);
 
         mockServer.expect(requestTo(PAYMENT_URL + "/confirm"))
@@ -115,7 +115,7 @@ class TossPaymentClientTest extends TossPaymentMockSupport {
         String orderId = "orderId";
         Long amount = 10000L;
 
-        PaymentRequest request = new PaymentRequest(paymentKey, orderId, amount);
+        TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount);
         String json = objectMapper.writeValueAsString(request);
 
         mockServer.expect(requestTo(PAYMENT_URL + "/confirm"))

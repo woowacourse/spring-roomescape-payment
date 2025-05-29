@@ -1,4 +1,4 @@
-package roomescape.payment.interceptor;
+package roomescape.payment.toss.interceptor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -8,7 +8,7 @@ import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
-import roomescape.payment.dto.PaymentErrorResponse;
+import roomescape.payment.toss.dto.TossPaymentErrorResponse;
 import roomescape.payment.exception.PaymentProcessException;
 import roomescape.payment.exception.PaymentServerException;
 import roomescape.payment.exception.PaymentTemporaryException;
@@ -25,14 +25,14 @@ public class TossPaymentResponseInterceptor implements ClientHttpRequestIntercep
         ClientHttpResponse response = execution.execute(request, body);
 
         if (response.getStatusCode().isError()) {
-            PaymentErrorResponse errorResponse = getPaymentErrorResponse(response);
+            TossPaymentErrorResponse errorResponse = getPaymentErrorResponse(response);
             throwPaymentErrorResponseByErrorCode(errorResponse);
         }
 
         return response;
     }
 
-    private void throwPaymentErrorResponseByErrorCode(PaymentErrorResponse errorResponse) {
+    private void throwPaymentErrorResponseByErrorCode(TossPaymentErrorResponse errorResponse) {
         if (TossPaymentTemporaryErrorCode.isTemporaryError(errorResponse.code())) {
             throw new PaymentTemporaryException("결제 요청이 일시적으로 실패했습니다. 잠시 후 다시 시도해주세요.");
         }
@@ -44,7 +44,7 @@ public class TossPaymentResponseInterceptor implements ClientHttpRequestIntercep
         throw new PaymentProcessException(errorResponse.message());
     }
 
-    private PaymentErrorResponse getPaymentErrorResponse(ClientHttpResponse response) throws IOException {
-        return objectMapper.readValue(response.getBody(), PaymentErrorResponse.class);
+    private TossPaymentErrorResponse getPaymentErrorResponse(ClientHttpResponse response) throws IOException {
+        return objectMapper.readValue(response.getBody(), TossPaymentErrorResponse.class);
     }
 }

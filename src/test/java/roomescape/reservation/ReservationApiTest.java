@@ -27,8 +27,8 @@ import roomescape.config.AuthServiceTestConfig;
 import roomescape.fixture.db.MemberDbFixture;
 import roomescape.fixture.db.ReservationDateTimeDbFixture;
 import roomescape.fixture.db.ThemeDbFixture;
-import roomescape.payment.dto.PaymentResponse;
-import roomescape.payment.service.TossPaymentService;
+import roomescape.payment.toss.dto.TossPaymentResponse;
+import roomescape.payment.toss.service.TossPaymentService;
 import roomescape.reservation.controller.exception.ReservationExceptionHandler;
 import roomescape.reservation.controller.request.ReservePaymentRequest;
 import roomescape.reservation.domain.ReservationDateTime;
@@ -72,7 +72,7 @@ class ReservationApiTest {
         Long timeId = reservationDateTime.getReservationTime().getId();
 
         given(tossPaymentService.confirmPayment(any()))
-                .willReturn(mock(PaymentResponse.class));
+                .willReturn(mock(TossPaymentResponse.class));
 
         ReservePaymentRequest request = ReservePaymentRequest.builder()
                 .date(reservationDateTime.getDate())

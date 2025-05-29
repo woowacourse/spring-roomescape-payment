@@ -1,4 +1,4 @@
-package roomescape.payment.service;
+package roomescape.payment.toss.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -12,9 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResponse;
+import roomescape.payment.toss.dto.TossPaymentRequest;
+import roomescape.payment.toss.dto.TossPaymentResponse;
 import roomescape.payment.exception.PaymentTemporaryException;
+import roomescape.payment.toss.service.TossPaymentClient;
+import roomescape.payment.toss.service.TossPaymentService;
 
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
@@ -31,7 +33,7 @@ class TossPaymentServiceTest {
     void 일시적인_결제_오류가_발생하면_재시도한다() {
 
         // given
-        PaymentRequest request = new PaymentRequest("paymentId", "orderId", 1000L);
+        TossPaymentRequest request = new TossPaymentRequest("paymentId", "orderId", 1000L);
 
         given(tossPaymentClient.getPaymentConfirm(request))
                 .willThrow(new PaymentTemporaryException("Temporary error"));
@@ -40,15 +42,15 @@ class TossPaymentServiceTest {
         assertThatThrownBy(() -> tossPaymentService.confirmPayment(request))
                 .isInstanceOf(PaymentTemporaryException.class);
 
-        verify(tossPaymentClient, times(3)).getPaymentConfirm(any(PaymentRequest.class));
+        verify(tossPaymentClient, times(3)).getPaymentConfirm(any(TossPaymentRequest.class));
     }
 
     @Test
     void 일시적인_오류_후에_결제가_성공할_수_있다() {
         // given
-        PaymentRequest request = new PaymentRequest("paymentId", "orderId", 1000L);
+        TossPaymentRequest request = new TossPaymentRequest("paymentId", "orderId", 1000L);
 
-        PaymentResponse response = new PaymentResponse("orderId");
+        TossPaymentResponse response = new TossPaymentResponse("orderId");
         given(tossPaymentClient.getPaymentConfirm(request))
                 .willThrow(new PaymentTemporaryException("Temporary error"))
                 .willThrow(new PaymentTemporaryException("Temporary error"))
@@ -57,6 +59,6 @@ class TossPaymentServiceTest {
         // when & then
         assertThat(tossPaymentService.confirmPayment(request)).isEqualTo(response);
 
-        verify(tossPaymentClient, times(3)).getPaymentConfirm(any(PaymentRequest.class));
+        verify(tossPaymentClient, times(3)).getPaymentConfirm(any(TossPaymentRequest.class));
     }
 }

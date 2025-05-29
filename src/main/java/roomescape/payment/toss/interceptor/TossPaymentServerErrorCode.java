@@ -1,4 +1,4 @@
-package roomescape.payment.interceptor;
+package roomescape.payment.toss.interceptor;
 
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
