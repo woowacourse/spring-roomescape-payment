@@ -53,7 +53,7 @@
 - 사용자는 날짜와 테마를 선택하면 예약 가능한 시간을 확인할 수 있다.
     - 과거의 날짜는 예약할 수 없다.
 - 사용자는 예약 가능한 시간을 확인하고, 원하는 시간에 예약을 할 수 있다.
-    - 시간을 선택하고 예약자 명을 기입한 후 예약 버튼을 누르면 예약이 완료된다.
+    - 시간을 선택하고 예약하기 버튼을 누르면 결제 후 예약이 완료된다.
 - 사용자는 예약 가능한 시간을 확인하고, 원하는 시간에 예약 대기를 할 수 있다.
   - 시간을 선택하고 예약자 명을 기입한 후 예약 대기 버튼을 누르면 예약 대기가 완료된다.
 - 사용자는 본인의 예약을 확인할 수 있다.
@@ -84,3 +84,5 @@
     - InvalidInputException(`400 Bad Request`): 빈 값 / null / 불가능한 값
     - InUseException(`409 Conflict`): 사용 중인 상태를 삭제
     - NotFoundException(`404 Not Found`): 존재하지 않는 값
+    - PaymentFailedException(`400 Bad Request`): 잘못된 결제 요청
+    - PaymentInternalException(`500 Internal Server Error`): 서버 내부 오류로 결제 실패
