@@ -19,7 +19,7 @@ class PaymentTest {
         // then
         assertThatCode(() -> payment.validateApprovalAmount(approvalAmount))
                 .isInstanceOf(PaymentException.class)
-                .hasMessage("결제 금액(10,000)과 승인 요청 금액(10,000)이 일치하지 않아 결제 승인을 거부합니다.");
+                .hasMessage("결제 금액(10,000)과 승인 요청 금액(20,000)이 일치하지 않아 결제 승인을 거부합니다.");
     }
 
     @Test

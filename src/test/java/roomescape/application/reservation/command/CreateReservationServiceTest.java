@@ -145,19 +145,19 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
                 member.getId(),
                 "paymentKey",
                 orderId,
-                amount,
+                invalidAmount,
                 "NORMAL"
         );
         doThrow(new PaymentException("toss payment server 예외"))
                 .when(tossPaymentClient)
                 .approve(command.getPaymentCommand());
-        when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(new Payment(orderId, invalidAmount)));
+        when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(new Payment(orderId, amount)));
 
         // when
         // then
         assertThatCode(() -> createReservationService.reserve(command))
                 .isInstanceOf(PaymentException.class)
-                .hasMessage("요청 금액과 승인 금액이 일치하지 않습니다. 현재 결제 금액: 10001, 요청 금액: 10000");
+                .hasMessage("결제 금액(10,000)과 승인 요청 금액(10,001)이 일치하지 않아 결제 승인을 거부합니다.");
     }
 
     @Test

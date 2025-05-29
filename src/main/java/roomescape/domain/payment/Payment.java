@@ -34,7 +34,7 @@ public class Payment {
     public void validateApprovalAmount(long approvalAmount) {
         if (this.amount != approvalAmount) {
             throw new PaymentException(
-                    "결제 금액(%,d)과 승인 요청 금액(%,d)이 일치하지 않아 결제 승인을 거부합니다.".formatted(this.amount, amount)
+                    "결제 금액(%,d)과 승인 요청 금액(%,d)이 일치하지 않아 결제 승인을 거부합니다.".formatted(this.amount, approvalAmount)
             );
         }
     }
