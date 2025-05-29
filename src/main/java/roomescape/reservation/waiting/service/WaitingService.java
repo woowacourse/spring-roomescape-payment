@@ -104,13 +104,13 @@ public class WaitingService {
 
     private Waiting getWaiting(final WaitingCreateRequest request) {
         Member member = getMember(request);
-        ReservationTime time = gerReservationTime(request);
+        ReservationTime time = getReservationTime(request);
         Theme theme = getTheme(request);
 
         return new Waiting(request.date(), member, time, theme);
     }
 
-    private ReservationTime gerReservationTime(final WaitingCreateRequest request) {
+    private ReservationTime getReservationTime(final WaitingCreateRequest request) {
         Long timeId = request.timeId();
         return reservationTimeRepository.findById(new ReservationTimeId(timeId))
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 예약시간 입니다."));
