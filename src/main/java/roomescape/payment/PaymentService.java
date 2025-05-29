@@ -5,6 +5,7 @@ import java.util.Base64;
 import java.util.Base64.Encoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClient.Builder;
 import roomescape.reservation.controller.PaymentConfirmRequest;
 import roomescape.reservation.controller.PaymentConfirmResponse;
 
@@ -18,8 +19,8 @@ public class PaymentService {
 
     private final RestClient restClient;
 
-    public PaymentService() {
-        restClient = RestClient.builder()
+    public PaymentService(final Builder restClientBuilder) {
+        restClient = restClientBuilder
                 .defaultStatusHandler(new PaymentErrorHandler())
                 .defaultHeader("Authorization", getAuthorization())
                 .defaultHeader("Content-Type", "application/json")

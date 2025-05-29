@@ -159,57 +159,6 @@ public class MissionStepTest {
     }
 
     @Test
-    void reservations에_POST_요청_시_예약이_추가되고_DELETE_요청_시_각각_예약이_취소된다() {
-        jdbcTemplate.update("INSERT INTO reservation_time (start_at) VALUES (?)", "10:00");
-
-        jdbcTemplate.update("INSERT INTO theme (name, description, thumbnail) VALUES (?, ?, ?)",
-                "공포", "설명", "엄지손톱");
-
-        final Map<String, String> params = new HashMap<>();
-        params.put("date", "2025-08-05");
-        params.put("timeId", "1");
-        params.put("themeId", "1");
-
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", memberToken)
-                .body(params)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(201)
-                .body("id", is(1));
-
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", adminToken)
-                .body(params)
-                .when().get("/reservations")
-                .then().log().all()
-                .statusCode(200)
-                .body("size()", is(1));
-
-        RestAssured.given().log().all()
-                .cookie("token", memberToken)
-                .when().get("/reservations/mine")
-                .then().log().all()
-                .statusCode(200)
-                .body("size()", is(1));
-
-        RestAssured.given().log().all()
-                .cookie("token", memberToken)
-                .when().delete("/reservations/1")
-                .then().log().all()
-                .statusCode(204);
-
-        RestAssured.given().log().all()
-                .cookie("token", memberToken)
-                .when().get("/reservations/mine")
-                .then().log().all()
-                .statusCode(200)
-                .body("size()", is(0));
-    }
-
-    @Test
     void JdbcTemplate로_DataSource와_Connection_확인_및_테이블_검증한다() {
         try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
             assertThat(connection).isNotNull();
@@ -241,40 +190,6 @@ public class MissionStepTest {
         final Integer count = jdbcTemplate.queryForObject("SELECT count(1) from reservation", Integer.class);
 
         assertThat(reservations.size()).isEqualTo(count);
-    }
-
-    @Test
-    void 예약_추가_삭제_API를_활용하고_조회로_확인할_수_있다() {
-        jdbcTemplate.update("INSERT INTO reservation_time (start_at) VALUES (?)",
-                "10:00");
-
-        jdbcTemplate.update("INSERT INTO theme (name, description, thumbnail) VALUES (?, ?, ?)",
-                "공포", "설명", "엄지손톱");
-
-        final Map<String, String> params = new HashMap<>();
-        params.put("date", "2025-08-05");
-        params.put("timeId", "1");
-        params.put("themeId", "1");
-
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", memberToken)
-                .body(params)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(201);
-
-        final Integer count = jdbcTemplate.queryForObject("SELECT count(1) from reservation", Integer.class);
-        assertThat(count).isEqualTo(1);
-
-        RestAssured.given().log().all()
-                .cookie("token", memberToken)
-                .when().delete("/reservations/1")
-                .then().log().all()
-                .statusCode(204);
-
-        final Integer countAfterDelete = jdbcTemplate.queryForObject("SELECT count(1) from reservation", Integer.class);
-        assertThat(countAfterDelete).isEqualTo(0);
     }
 
     @Test

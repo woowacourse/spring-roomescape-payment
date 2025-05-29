@@ -14,4 +14,12 @@ public class PaymentException extends RuntimeException {
         this.statusCode = statusCode;
         this.code = code;
     }
+
+    public HttpStatusCode getStatusCode() {
+        return statusCode;
+    }
+
+    public String getCode() {
+        return code;
+    }
 }
