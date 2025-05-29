@@ -22,6 +22,8 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import roomescape.fixture.TestFixture;
@@ -30,17 +32,21 @@ import roomescape.reservation.presentation.dto.response.ConfirmedReservationWebR
 import roomescape.reservation.presentation.dto.response.WaitingWebResponse;
 import roomescape.reservationslot.presentation.dto.response.ReservationResponse;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
 })
 public class AdminTest {
 
+    @LocalServerPort
+    private int port;
+
     private String ADMIN_TOKEN;
 
     @BeforeEach
     void setUp() {
+        RestAssured.port = port;
         ADMIN_TOKEN = loginAndGetAuthToken(ADMIN_EMAIL, PASSWORD);
     }
 

@@ -84,9 +84,8 @@ class PaymentClientTest {
     @BeforeEach
     void setUp() {
         String baseUrl = paymentClientProperties.getBaseUrl();
-        String expectedResult = EXPECTED_RESULT;
         mockServer.expect(requestTo(baseUrl + paymentClientProperties.getConfirmApi()))
-                .andRespond(withSuccess(expectedResult, MediaType.APPLICATION_JSON));
+                .andRespond(withSuccess(EXPECTED_RESULT, MediaType.APPLICATION_JSON));
     }
 
     @Test
