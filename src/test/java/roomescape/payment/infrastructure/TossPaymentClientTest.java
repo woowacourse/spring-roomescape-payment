@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 import roomescape.payment.TestRestClientConfig;
 import roomescape.payment.application.dto.PaymentRequest;
 import roomescape.payment.application.dto.PaymentResponse;
@@ -112,6 +113,7 @@ class TossPaymentClientTest {
 
         // when & then
         assertThatThrownBy(() -> tossPaymentClient.requestPayment(request))
-                .hasCauseInstanceOf(SocketTimeoutException.class);
+                .hasCauseInstanceOf(SocketTimeoutException.class)
+                .isInstanceOf(RestClientException.class);
     }
 }
