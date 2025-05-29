@@ -21,10 +21,11 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 class PaymentServiceTest {
 
-    public static final String API_URL = "https://api.tosspayments.com/v1/payments/confirm";
+    static final String BASE_URL = "https://api.tosspayments.com";
+    static final String API_URL = BASE_URL + "/v1/payments/confirm";
 
-    private final RestClient.Builder testBuilder = RestClient.builder()
-            .baseUrl("https://api.tosspayments.com");
+    final RestClient.Builder testBuilder = RestClient.builder()
+            .baseUrl(BASE_URL);
 
     MockRestServiceServer mockServer = MockRestServiceServer.bindTo(testBuilder).build();
 
