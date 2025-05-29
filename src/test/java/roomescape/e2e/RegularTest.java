@@ -31,13 +31,12 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.common.security.dto.request.LoginRequest;
 import roomescape.common.security.dto.response.CheckLoginResponse;
-import roomescape.reservationslot.presentation.dto.response.MyReservationResponse;
 import roomescape.payment.application.client.PaymentClient;
 import roomescape.payment.domain.PaymentType;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
 import roomescape.payment.presentation.dto.request.PaymentRequest;
 import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
-import roomescape.reservationslot.presentation.dto.response.MyReservationSlotResponse;
+import roomescape.reservationslot.presentation.dto.response.MyReservationResponse;
 import roomescape.reservationslot.presentation.dto.response.ReservationResponse;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -49,6 +48,7 @@ public class RegularTest {
 
     @MockitoBean
     private PaymentClient paymentClient;
+
     private String REGULAR_TOKEN;
 
     @BeforeEach
