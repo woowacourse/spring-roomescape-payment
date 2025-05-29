@@ -3,12 +3,10 @@ package roomescape.waiting.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import roomescape.reservation.domain.ReservationTime;
-import roomescape.theme.domain.Theme;
+import roomescape.waiting.domain.ReservationInformation;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.repository.dto.WaitingInfoDataResponse;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,14 +20,11 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
     @Query("""
     SELECT w
     FROM Waiting w
-    WHERE
-        w.reservationInformation.theme = :theme
-        AND w.reservationInformation.time = :time
-        AND w.reservationInformation.date = :date
+    WHERE w.reservationInformation = :reservationInformation
     ORDER BY w.createdAt ASC
     LIMIT 1
     """)
-    Waiting findFirstByReservationInfo(LocalDate date, ReservationTime time, Theme theme);
+    Waiting findFirstByReservationInfo(ReservationInformation reservationInformation);
 
     @Query("""
     SELECT

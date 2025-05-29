@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 
@@ -31,6 +32,10 @@ public class ReservationInformation {
         this.date = date;
         this.time = time;
         this.theme = theme;
+    }
+
+    public static ReservationInformation of(Reservation reservation) {
+        return new ReservationInformation(reservation.getDate(), reservation.getTime(), reservation.getTheme());
     }
 
     public boolean isBefore(LocalDateTime compare) {

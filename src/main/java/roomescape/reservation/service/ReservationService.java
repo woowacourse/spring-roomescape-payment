@@ -1,6 +1,7 @@
 package roomescape.reservation.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.service.dto.LoginMember;
 import roomescape.common.exception.EntityNotFoundException;
 import roomescape.common.exception.ForbiddenException;
@@ -11,6 +12,7 @@ import roomescape.reservation.service.dto.request.FilteringReservationRequest;
 import roomescape.reservation.service.dto.response.MyReservationsResponse;
 import roomescape.reservation.service.dto.response.ReservationResponse;
 import roomescape.reservation.service.dto.response.ReservationTimeWithBookedResponse;
+import roomescape.waiting.domain.ReservationInformation;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.repository.WaitingRepository;
 
@@ -72,9 +74,11 @@ public class ReservationService {
                 .toList();
     }
 
+    @Transactional
     public void delete(final Long id, LoginMember loginMember) {
         Reservation reservation = getAuthorizedReservation(id, loginMember);
         reservationRepository.deleteById(id);
+        reservationRepository.flush(); // TODO: identity 키 생성을 위한 insert 과정에서 unique key 충돌 문제 발생 방지 (다른 방법 모색)
         promoteFirstWaitingFor(reservation);
     }
 
@@ -88,9 +92,7 @@ public class ReservationService {
     }
 
     private void promoteFirstWaitingFor(Reservation reservation) {
-        Waiting firstWaiting = waitingRepository.findFirstByReservationInfo(
-                reservation.getDate(), reservation.getTime(), reservation.getTheme()
-        );
+        Waiting firstWaiting = waitingRepository.findFirstByReservationInfo(ReservationInformation.of(reservation));
         if (firstWaiting != null) {
             waitingRepository.delete(firstWaiting);
             reservationRepository.save(Reservation.of(firstWaiting));

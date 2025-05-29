@@ -12,6 +12,7 @@ import roomescape.member.domain.Role;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 import roomescape.waiting.domain.Rank;
+import roomescape.waiting.domain.ReservationInformation;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.repository.dto.WaitingInfoDataResponse;
 
@@ -82,7 +83,7 @@ class WaitingRepositoryTest {
         entityManager.persist(secondWaiting);
 
         // when
-        Waiting result = waitingRepository.findFirstByReservationInfo(date, time, theme);
+        Waiting result = waitingRepository.findFirstByReservationInfo(new ReservationInformation(date, time, theme));
 
         // then
         assertThat(result.getId()).isEqualTo(firstWaiting.getId());
