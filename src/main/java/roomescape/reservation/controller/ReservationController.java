@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.reservation.dto.AdminReservationPaymentRequest;
 import roomescape.reservation.dto.MyPageReservationResponse;
 import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
@@ -44,12 +45,11 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-//    @PostMapping("/admin/reservations")
-//    public ResponseEntity<ReservationResponse> addReservationForAdmin(
-//            @RequestBody @Valid final ReservationRecipe recipe) {
-//        ReservationResponse response = reservationService.addReservation(recipe);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-//    }
+    @PostMapping("/admin/reservations")
+    public ResponseEntity<ReservationResponse> addReservationForAdmin(@RequestBody AdminReservationPaymentRequest request) {
+        ReservationResponse response = reservationService.addReservation(request.memberId(), ReservationPaymentRequest.from(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
     @GetMapping("/admin/reservations")
     public ResponseEntity<List<ReservationResponse>> getReservationsByFilterForAdmin(

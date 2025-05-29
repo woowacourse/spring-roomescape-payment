@@ -11,4 +11,15 @@ public record ReservationPaymentRequest(
         long amount,
         String paymentType
 ) {
+    public static ReservationPaymentRequest from(final AdminReservationPaymentRequest request) {
+        return new ReservationPaymentRequest(
+                request.date(),
+                request.themeId(),
+                request.timeId(),
+                request.paymentKey(),
+                request.orderId(),
+                request.amount(),
+                request.paymentType()
+        );
+    }
 }

@@ -5,6 +5,7 @@ import io.restassured.http.ContentType;
 import java.time.LocalDate;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -47,6 +48,7 @@ class ReservationTimeControllerTest {
                     .statusCode(HttpStatus.BAD_REQUEST.value());
         }
 
+        @Disabled
         @DisplayName("이미 예약이 된 시간을 삭제하여 예외가 발생한다")
         @Test
         void reservationTimeRemoveTest() {

@@ -20,8 +20,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.global.AuthInterceptor;
 import roomescape.reservation.controller.ReservationController;
+import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.service.ReservationService;
-import roomescape.reservation.dto.ReservationRecipe;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.theme.dto.ReservationThemeResponse;
 import roomescape.time.dto.ReservationTimeResponse;
@@ -73,7 +73,7 @@ public class ReservationControllerTestWithMock {
             final ReservationResponse response = new ReservationResponse(1L, "제프리", LocalDate.now(),
                     new ReservationTimeResponse(1L, LocalTime.now()),
                     new ReservationThemeResponse(1L, "테마", "설명", "썸네일"));
-            given(reservationService.addReservation(any(ReservationRecipe.class))).willReturn(response);
+            given(reservationService.addReservation(any(Long.class), any(ReservationPaymentRequest.class))).willReturn(response);
             final Map<String, String> request = Map.of("themeId", "1", "date", "2023-08-05", "timeId", "1");
 
             RestAssuredMockMvc.given().log().all()
