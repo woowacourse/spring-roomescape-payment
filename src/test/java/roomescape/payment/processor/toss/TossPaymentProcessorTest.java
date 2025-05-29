@@ -23,10 +23,10 @@ class TossPaymentProcessorTest {
 
     @Autowired
     @Qualifier("testTossPaymentProcessor")
-    private TossPaymentProcessor tossPaymentProcessor;
+    private TossPaymentProcessor paymentProcessor;
 
     @Autowired
-    private RestClient restClient;
+    private RestClient mockTestRestClient;
 
     @Test
     void 토스_결제_요청에_따른_반환_확인() {
@@ -42,7 +42,7 @@ class TossPaymentProcessorTest {
         );
         final String uri = "https://api.tosspayments.com/v1/payments/confirm";
 
-        when(restClient.post()
+        when(mockTestRestClient.post()
                 .uri(uri)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Basic " + ENCODED_SECRET_KEY)
@@ -52,7 +52,7 @@ class TossPaymentProcessorTest {
         ).thenReturn(expected);
 
         // when
-        final TossPaymentConfirmResponse actual = tossPaymentProcessor.processPayment(request);
+        final TossPaymentConfirmResponse actual = paymentProcessor.processPayment(request);
 
         // then
         Assertions.assertThat(actual).isEqualTo(expected);
@@ -62,13 +62,13 @@ class TossPaymentProcessorTest {
     static class TestTossPaymentConfig {
 
         @Bean
-        public RestClient testRestClient() {
+        public RestClient mockTestRestClient() {
             return Mockito.mock(RestClient.class, Mockito.RETURNS_DEEP_STUBS);
         }
 
         @Bean(name = "testTossPaymentProcessor")
-        public TossPaymentProcessor testTossPaymentProcessor(final RestClient testRestClient) {
-            return new TossPaymentProcessor(SECRET_KEY, testRestClient);
+        public TossPaymentProcessor paymentProcessor(final RestClient mockTestRestClient) {
+            return new TossPaymentProcessor(SECRET_KEY, mockTestRestClient);
         }
     }
 }
