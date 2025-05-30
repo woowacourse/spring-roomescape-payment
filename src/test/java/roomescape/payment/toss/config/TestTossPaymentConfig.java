@@ -2,7 +2,7 @@ package roomescape.payment.toss.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Base64;
-import org.springframework.beans.factory.annotation.Value;
+import okhttp3.mockwebserver.MockWebServer;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -17,13 +17,14 @@ public class TestTossPaymentConfig {
     private final ObjectMapper objectMapper;
     private final String token;
     private final int connectTimeoutMs;
+    private final String url;
 
     public TestTossPaymentConfig(ObjectMapper objectMapper,
-                                 @Value("${payment.token}") String token,
-                                 @Value("${payment.connection-timeout}") int connectTimeoutMs) {
+                                 TossPaymentConfigProperties tossPaymentConfigProperties) {
         this.objectMapper = objectMapper;
-        this.token = token;
-        this.connectTimeoutMs = connectTimeoutMs;
+        this.token = tossPaymentConfigProperties.getToken();
+        this.connectTimeoutMs = tossPaymentConfigProperties.getConnectionTimeoutMs();
+        this.url = tossPaymentConfigProperties.getUrl();
     }
 
     @Bean
@@ -32,7 +33,7 @@ public class TestTossPaymentConfig {
         requestFactory.setConnectTimeout(connectTimeoutMs);
 
         return RestClient.builder()
-                .baseUrl("https://api.tosspayments.com/v1/payments")
+                .baseUrl(url)
                 .requestInterceptor(new TossPaymentResponseInterceptor(objectMapper))
                 .requestFactory(requestFactory)
                 .defaultHeader("Authorization", "Basic " + Base64.getEncoder()

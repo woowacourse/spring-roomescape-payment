@@ -18,17 +18,18 @@ import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import roomescape.payment.toss.config.TestTossPaymentConfig;
-import roomescape.payment.toss.dto.TossPaymentRequest;
-import roomescape.payment.toss.dto.TossPaymentResponse;
 import roomescape.payment.exception.PaymentProcessException;
 import roomescape.payment.exception.PaymentServerException;
 import roomescape.payment.exception.PaymentTemporaryException;
+import roomescape.payment.toss.config.TestTossPaymentConfig;
+import roomescape.payment.toss.config.TossPaymentConfigProperties;
+import roomescape.payment.toss.dto.TossPaymentRequest;
+import roomescape.payment.toss.dto.TossPaymentResponse;
 import roomescape.payment.toss.interceptor.TossPaymentResponseInterceptor;
 
 
 @RestClientTest(TossPaymentClient.class)
-@Import({TestTossPaymentConfig.class, TossPaymentResponseInterceptor.class})
+@Import({TestTossPaymentConfig.class, TossPaymentResponseInterceptor.class, TossPaymentConfigProperties.class})
 class TossPaymentClientTest extends TossPaymentMockSupport {
 
     @Autowired
@@ -47,7 +48,8 @@ class TossPaymentClientTest extends TossPaymentMockSupport {
         mockServer.expect(requestTo(PAYMENT_URL + "/confirm"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(json))
-                .andRespond(withSuccess(objectMapper.writeValueAsString(tossPaymentResponse), MediaType.APPLICATION_JSON));
+                .andRespond(
+                        withSuccess(objectMapper.writeValueAsString(tossPaymentResponse), MediaType.APPLICATION_JSON));
 
         TossPaymentResponse result = tossPaymentClient.getPaymentConfirm(request);
 
