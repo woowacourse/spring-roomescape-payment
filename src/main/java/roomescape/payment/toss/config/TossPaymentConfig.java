@@ -25,8 +25,8 @@ public class TossPaymentConfig {
     private final int connectTimeoutMs;
 
     public TossPaymentConfig(ObjectMapper objectMapper,
-                             @Value("${payment.token}") String token,
-                             @Value("${payment.connection-timeout}") int connectTimeoutMs) {
+                             @Value("${toss.payment.token}") String token,
+                             @Value("${toss.payment.connection-timeout}") int connectTimeoutMs) {
         this.objectMapper = objectMapper;
         this.token = token;
         this.connectTimeoutMs = connectTimeoutMs;
