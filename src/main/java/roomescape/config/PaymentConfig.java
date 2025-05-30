@@ -1,4 +1,4 @@
-package roomescape.common.config;
+package roomescape.config;
 
 import java.time.Duration;
 import java.util.Base64;
