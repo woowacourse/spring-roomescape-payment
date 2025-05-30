@@ -13,10 +13,7 @@ import roomescape.model.Theme;
 public record ReservationTicketRegisterDto(
         @NotBlank String date,
         @NotNull Long timeId,
-        @NotNull Long themeId,
-        @NotBlank String paymentKey,
-        @NotBlank String orderId,
-        @NotNull Long amount
+        @NotNull Long themeId
 ) {
 
     public ReservationTicket convertToReservation(ReservationTime reservationTime, Theme theme, Member member) {

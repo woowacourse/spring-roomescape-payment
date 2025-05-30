@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.application.facade.ReservationTicketPaymentService;
 import roomescape.application.service.ReservationTicketService;
-import roomescape.application.service.TossPaymentService;
 import roomescape.dto.LoginMember;
 import roomescape.dto.request.ReservationSearchDto;
-import roomescape.dto.request.ReservationTicketRegisterDto;
+import roomescape.dto.request.ReservationTicketPaymentRequestDto;
 import roomescape.dto.response.ReservationTicketResponseDto;
 
 @RestController
@@ -26,7 +26,7 @@ import roomescape.dto.response.ReservationTicketResponseDto;
 public class ReservationTicketController {
 
     private final ReservationTicketService reservationTicketService;
-    private final TossPaymentService tossPaymentService;
+    private final ReservationTicketPaymentService reservationTicketPaymentService;
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
@@ -37,17 +37,17 @@ public class ReservationTicketController {
     @GetMapping("/search")
     @ResponseStatus(HttpStatus.OK)
     public List<ReservationTicketResponseDto> getReservations(
-        @ModelAttribute ReservationSearchDto reservationSearchDto) {
+            @ModelAttribute ReservationSearchDto reservationSearchDto) {
         return reservationTicketService.searchReservations(reservationSearchDto);
     }
 
-    @PostMapping("/toss")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ReservationTicketResponseDto addReservation(
-        @RequestBody @Valid ReservationTicketRegisterDto reservationTicketRegisterDto,
-        LoginMember loginMember) {
+            @RequestBody @Valid ReservationTicketPaymentRequestDto reservationTicketPaymentRequestDto,
+            LoginMember loginMember) {
 
-        return tossPaymentService.saveReservation(reservationTicketRegisterDto, loginMember);
+        return reservationTicketPaymentService.saveReservation(reservationTicketPaymentRequestDto, loginMember);
     }
 
     @DeleteMapping("/{id}")
