@@ -1,24 +1,25 @@
 package roomescape.payment.service;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClient.RequestBodySpec;
-import org.springframework.web.client.RestClient.RequestBodyUriSpec;
-import org.springframework.web.client.RestClient.ResponseSpec;
 import roomescape.global.error.exception.BadRequestException;
-import roomescape.payment.dto.request.PaymentConfirmRequest;
+import roomescape.global.error.exception.ServerException;
+import roomescape.payment.client.PaymentClient;
 import roomescape.payment.dto.response.PaymentConfirmResponse;
+import roomescape.payment.entity.Payment;
 import roomescape.payment.repository.PaymentRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,87 +31,71 @@ class PaymentServiceTest {
     private PaymentRepository paymentRepository;
 
     @Mock
-    private RestClient restClient;
-
-    @Mock
-    private RequestBodyUriSpec requestBodyUriSpec;
-
-    @Mock
-    private RequestBodySpec requestBodySpec;
-
-    @Mock
-    private ResponseSpec responseSpec;
+    private PaymentClient paymentClient;
 
     @BeforeEach
     void setUp() {
-        restClient = mock(RestClient.class);
-        requestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
-        requestBodySpec = mock(RestClient.RequestBodySpec.class);
-        responseSpec = mock(RestClient.ResponseSpec.class);
-        paymentService = new PaymentService(paymentRepository, restClient);
+        paymentService = new PaymentService(paymentClient, paymentRepository);
     }
 
     @Test
     @DisplayName("결제 승인 API를 호출한다.")
     void confirmPayment_Success() {
         // given
-        when(restClient.post())
-                .thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.body(any(PaymentConfirmRequest.class)))
-                .thenReturn(requestBodySpec);
-        when(requestBodySpec.retrieve())
-                .thenReturn(responseSpec);
-        when(responseSpec.onStatus(any()))
-                .thenReturn(responseSpec);
-        when(responseSpec.body(PaymentConfirmResponse.class))
-                .thenReturn(new PaymentConfirmResponse("key", "order", 100L, "CARD"));
+        String paymentKey = "paymentKey";
+        String orderId = "orderId";
+        Long amount = 1000L;
+        given(paymentClient.requestPaymentConfirm(paymentKey, orderId, amount))
+                .willReturn(new PaymentConfirmResponse(paymentKey, orderId, amount, "NORMAL"));
 
         // when
-        paymentService.confirmPayment("key", "order", 100L);
+        paymentService.confirmPayment(paymentKey, orderId, amount);
 
         // then
-        verify(paymentRepository).save(any());
+        ArgumentCaptor<Payment> captor = ArgumentCaptor.forClass(Payment.class);
+        verify(paymentRepository).save(captor.capture());
+        Payment saved = captor.getValue();
+        assertAll(
+                () -> assertThat(saved.getPaymentKey()).isEqualTo(paymentKey),
+                () -> assertThat(saved.getOrderId()).isEqualTo(orderId),
+                () -> assertThat(saved.getAmount()).isEqualTo(amount),
+                () -> assertThat(saved.getPaymentType()).isEqualTo("NORMAL")
+        );
     }
 
     @Test
     @DisplayName("결제 승인 API를 호출해서 400 예외가 터진다.")
     void confirmPayment_ThrowsBadRequestException() {
         // given
-        when(restClient.post())
-                .thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.body(any(PaymentConfirmRequest.class)))
-                .thenReturn(requestBodySpec);
-        when(requestBodySpec.retrieve())
-                .thenReturn(responseSpec);
-        when(responseSpec.onStatus(any()))
-                .thenReturn(responseSpec);
-        when(responseSpec.body(PaymentConfirmResponse.class))
-                .thenThrow(new BadRequestException("API 오류"));
+        String paymentKey = "paymentKey";
+        String orderId = "orderId";
+        Long amount = 1000L;
+        given(paymentClient.requestPaymentConfirm(paymentKey, orderId, amount))
+                .willThrow(new BadRequestException("API 오류"));
 
         // when & then
-        assertThatThrownBy(() -> paymentService.confirmPayment("key", "order", 100L))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("API 오류");
+        assertAll(
+                () -> assertThatThrownBy(() -> paymentService.confirmPayment(paymentKey, orderId, amount))
+                        .isInstanceOf(BadRequestException.class),
+                () -> verify(paymentRepository, never()).save(any())
+        );
     }
 
     @Test
     @DisplayName("결제 승인 API를 호출해서 500 예외가 터진다.")
     void confirmPayment_ThrowsInternalServerError() {
         // given
-        when(restClient.post())
-                .thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.body(any(PaymentConfirmRequest.class)))
-                .thenReturn(requestBodySpec);
-        when(requestBodySpec.retrieve())
-                .thenReturn(responseSpec);
-        when(responseSpec.onStatus(any()))
-                .thenReturn(responseSpec);
-        when(responseSpec.body(PaymentConfirmResponse.class))
-                .thenThrow(new BadRequestException("API 오류"));
+        String paymentKey = "paymentKey";
+        String orderId = "orderId";
+        Long amount = 1000L;
+        given(paymentClient.requestPaymentConfirm(paymentKey, orderId, amount))
+                .willThrow(new ServerException("API 오류"));
 
         // when & then
-        assertThatThrownBy(() -> paymentService.confirmPayment("key", "order", 100L))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("API 오류");
+        assertAll(
+                () -> assertThatThrownBy(() -> paymentService.confirmPayment(paymentKey, orderId, amount))
+                        .isInstanceOf(ServerException.class),
+                () -> verify(paymentRepository, never()).save(any())
+        );
     }
 }
