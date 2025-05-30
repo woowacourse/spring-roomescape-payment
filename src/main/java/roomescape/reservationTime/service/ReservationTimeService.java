@@ -57,7 +57,8 @@ public class ReservationTimeService {
                 .toList();
     }
 
-    private TimeConditionResponse toTimeConditionResponse(ReservationTime time, List<Reservation> reservations) {
+    private TimeConditionResponse toTimeConditionResponse(final ReservationTime time,
+                                                          final List<Reservation> reservations) {
         boolean hasTime = reservations.stream()
                 .anyMatch(reservation -> reservation.isSameTime(time));
         return new TimeConditionResponse(time.getId(), time.getStartAt(), hasTime);
