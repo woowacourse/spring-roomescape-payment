@@ -25,7 +25,7 @@ public class PaymentService {
     }
 
     private void throwPaymentException(final PaymentStatus status) {
-        if (PaymentStatusCode.FAILED_PAYMENT.equals(status.code())) {
+        if (PaymentStatusCode.FAILED_PAYMENT == status.code()) {
             throw new PaymentFailedException(status.message());
         }
         throw new PaymentInternalException(status.message());
