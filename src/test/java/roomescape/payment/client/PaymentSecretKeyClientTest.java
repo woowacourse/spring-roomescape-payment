@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import roomescape.common.exception.PaymentException;
+import roomescape.common.exception.ClientPaymentException;
 import roomescape.payment.client.dto.request.TossPaymentConfirmRequest;
 
 @SpringBootTest
@@ -25,7 +25,7 @@ class PaymentSecretKeyClientTest {
         );
 
         Assertions.assertThatThrownBy(() -> tossPaymentClient.confirmPayment(tossPaymentConfirmRequest))
-                .isInstanceOf(PaymentException.class)
+                .isInstanceOf(ClientPaymentException.class)
                 .hasMessage("결제 실패 : 인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다.");
     }
 }

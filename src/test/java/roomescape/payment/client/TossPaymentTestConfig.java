@@ -6,7 +6,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.web.client.RestClient;
 import roomescape.common.util.TokenCookieManager;
 
-import java.beans.BeanProperty;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
@@ -15,7 +14,7 @@ public class TossPaymentTestConfig {
 
     @Bean
     @Primary
-    public RestClient tossClient(){
+    public RestClient tossClient() {
         String secretKey = "WRONG_SECRET_KEY";
         String encodedAuth = Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
 
