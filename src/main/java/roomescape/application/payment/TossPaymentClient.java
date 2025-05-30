@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import roomescape.application.payment.dto.PaymentCommand;
-import roomescape.infrastructure.error.exception.PaymentException;
+import roomescape.infrastructure.error.exception.TossPaymentException;
 
 @Component
 public class TossPaymentClient {
@@ -59,8 +59,8 @@ public class TossPaymentClient {
                     .onStatus(HttpStatusCode::is5xxServerError, this::handle5xxError)
                     .toBodilessEntity();
         } catch (RestClientException e) {
-            log.warn("토스 페이먼트 결제 승인 API 호출 실패", e);
-            throw new PaymentException("토스 결제 승인 요청에 실패했습니다. 관리자에게 문의하세요.");
+            log.warn("RestClient 토스 페이먼트 결제 승인 API 호출 실패", e);
+            throw new TossPaymentException("잠시 후 다시 시도해주세요.");
         }
     }
 
@@ -73,19 +73,19 @@ public class TossPaymentClient {
         try {
             JsonNode node = objectMapper.readTree(clientHttpResponse.getBody());
             String code = node.path("code").asText();
-            String message = node.path("message").asText("토스 결제 실패 관리자에게 문의하세요.");
+            String message = node.path("message").asText("결제 승인 요청에 실패했습니다.");
             log.warn("결제 승인 실패 - code: {}, message: {}", code, message);
-            throw new PaymentException(message);
+            throw new TossPaymentException(message);
         } catch (JsonProcessingException e) {
             log.warn("토스 응답 처리 중 JSON 파싱 오류", e);
-            throw new PaymentException("토스 결제 승인 요청에 실패했습니다. 관리자에게 문의하세요.");
+            throw new TossPaymentException("관리자에게 문의해주세요.");
         } catch (IOException e) {
             log.error("토스 응답 처리 중 I/O 오류", e);
-            throw new PaymentException("토스 결제 승인 요청에 실패했습니다. 관리자에게 문의하세요.");
+            throw new TossPaymentException("관리자에게 문의해주세요.");
         }
     }
 
     private void handle5xxError(HttpRequest httpRequest, ClientHttpResponse clientHttpResponse) {
-        throw new PaymentException("결제 서버 오류, 잠시 후 다시 시도해주세요.");
+        throw new TossPaymentException("결제 서버 오류, 잠시 후 다시 시도해주세요.");
     }
 }

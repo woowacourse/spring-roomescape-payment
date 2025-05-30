@@ -35,6 +35,7 @@ import roomescape.infrastructure.error.exception.PaymentException;
 import roomescape.infrastructure.error.exception.ReservationException;
 import roomescape.infrastructure.error.exception.ReservationTimeException;
 import roomescape.infrastructure.error.exception.ThemeException;
+import roomescape.infrastructure.error.exception.TossPaymentException;
 
 class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
 
@@ -117,7 +118,7 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
                 amount,
                 "NORMAL"
         );
-        doThrow(new PaymentException("toss payment server 예외"))
+        doThrow(new TossPaymentException("관리자에게 문의해주세요."))
                 .when(tossPaymentClient)
                 .approve(command.getPaymentCommand());
         when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(new Payment(orderId, amount)));
@@ -126,7 +127,7 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
         // then
         assertThatCode(() -> createReservationService.reserve(command))
                 .isInstanceOf(PaymentException.class)
-                .hasMessage("toss payment server 예외");
+                .hasMessage("토스 결제 오류: 관리자에게 문의해주세요.");
     }
 
     @Test
@@ -148,7 +149,7 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
                 invalidAmount,
                 "NORMAL"
         );
-        doThrow(new PaymentException("toss payment server 예외"))
+        doThrow(new TossPaymentException("관리자에게 문의해주세요."))
                 .when(tossPaymentClient)
                 .approve(command.getPaymentCommand());
         when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(new Payment(orderId, amount)));
@@ -178,7 +179,7 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
                 amount,
                 "NORMAL"
         );
-        doThrow(new PaymentException("toss payment server 예외"))
+        doThrow(new TossPaymentException("관리자에게 문의해주세요."))
                 .when(tossPaymentClient)
                 .approve(command.getPaymentCommand());
         when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.empty());
