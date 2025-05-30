@@ -28,8 +28,9 @@ class PaymentRestClientTest {
 
     private final MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
 
-    private final PaymentRestClient paymentRestClient = new PaymentRestClient(
-            testBuilder, new PaymentResponseErrorHandler(), "testKey");
+//    private final PaymentRestClient paymentRestClient = new PaymentRestClient(
+//            testBuilder, new PaymentResponseErrorHandler(), "testKey:");
+    private final PaymentRestClient paymentRestClient = new PaymentRestClient(testBuilder.build(), "testKey:");
 
     @BeforeEach
     void setUp() {

@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.client.RestClient;
 import roomescape.reservation.entity.Payment;
 import roomescape.reservation.error.exception.PaymentClientException;
-import roomescape.reservation.error.handler.PaymentResponseErrorHandler;
 import roomescape.reservation.service.PaymentRestClient;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -21,9 +20,6 @@ public class PaymentApiTest {
 
     @Autowired
     private RestClient.Builder restClientBuilder;
-
-    @Autowired
-    private PaymentResponseErrorHandler paymentResponseErrorHandler;
 
     @Autowired
     PaymentRestClient paymentRestClient;
@@ -37,7 +33,7 @@ public class PaymentApiTest {
     void exceptionMessageTest(String errorCode, String errorMessage) {
         // given
         restClientBuilder.defaultHeader("TossPayments-Test-Code", errorCode);
-        paymentRestClient = new PaymentRestClient(restClientBuilder, paymentResponseErrorHandler, secretKey);
+        paymentRestClient = new PaymentRestClient(restClientBuilder.build(), secretKey);
         Payment payment = new Payment("paymentKey", "orderId", 1000L, "NORMAL");
 
         // when & then
