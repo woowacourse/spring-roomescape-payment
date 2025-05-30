@@ -26,7 +26,7 @@ import roomescape.infrastructure.thirdparty.PaymentRestClient;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @ExtendWith(MockitoExtension.class)
-public class PaymentServiceTest {
+class PaymentServiceTest {
 
     @Mock
     private PaymentRestClient paymentRestClient;
