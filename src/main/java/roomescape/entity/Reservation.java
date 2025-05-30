@@ -91,7 +91,8 @@ public class Reservation {
     private boolean isSameReservationCondition(Reservation target) {
         return this.theme.equals(target.theme)
                 && this.date.equals(target.date)
-                && this.reservationTime.equals(target.reservationTime);
+                && this.reservationTime.equals(target.reservationTime)
+                && this.status.equals(target.status);
     }
 
     private boolean isCreateAtBeforeOrEqual(Reservation reservation) {
