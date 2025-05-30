@@ -18,7 +18,7 @@ import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
 import roomescape.exception.PaymentException;
 import roomescape.infrastructure.payment.PaymentClient;
-import roomescape.infrastructure.payment.toss.PaymentErrorCode;
+import roomescape.infrastructure.payment.PaymentErrorCode;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentServiceTest {
