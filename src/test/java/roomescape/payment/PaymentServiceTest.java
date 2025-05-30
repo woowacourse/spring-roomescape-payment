@@ -48,7 +48,6 @@ class PaymentServiceTest {
                 .doesNotThrowAnyException();
     }
 
-
     @DisplayName("토스에서 FilteredPaymentErrorCode 외의 에러 코드 응답 시, 동일한 내용의 PaymentException을 던진다")
     @Test
     void confirmException1() throws JsonProcessingException {
