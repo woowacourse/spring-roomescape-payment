@@ -51,7 +51,7 @@ class AdminTest {
     }
 
     @Test
-    void accessAdminPage() {
+    void 관리자_페이지에_접근할_수_있다() {
         String authToken = loginAndGetAuthToken(ADMIN_EMAIL, PASSWORD);
 
         RestAssured.given().log().all()
@@ -62,7 +62,7 @@ class AdminTest {
     }
 
     @Test
-    void accessAdminReservationPage() {
+    void 관리자_예약_페이지에_접근할_수_있다() {
         String authToken = loginAndGetAuthToken(ADMIN_EMAIL, PASSWORD);
 
         RestAssured.given().log().all()
@@ -73,7 +73,7 @@ class AdminTest {
     }
 
     @Test
-    void exceptionHandle() {
+    void 잘못된_시간_형식으로는_예약시간을_등록할_수_없다() {
         Map<String, String> reservationTime = new HashMap<>();
         reservationTime.put("startAt", "10 00");
 
@@ -87,7 +87,7 @@ class AdminTest {
     }
 
     @Test
-    void deleteReservation() {
+    void 예약을_삭제한다() {
         createReservationTime();
         createTheme("추리");
         createRegularReservation(1L);
@@ -114,7 +114,7 @@ class AdminTest {
     }
 
     @Test
-    void createAndDeleteTheme() {
+    void 테마를_생성하고_삭제한다() {
         createTheme("추리");
         findThemesBySize(1);
 
@@ -128,7 +128,7 @@ class AdminTest {
 
 
     @Test
-    void createAndDeleteReservationTime() {
+    void 예약시간을_생성하고_삭제한다() {
         createReservationTime();
 
         RestAssured.given().log().all()
@@ -145,7 +145,7 @@ class AdminTest {
     }
 
     @Test
-    void addReservation() {
+    void 예약을_추가한다() {
         createReservationTime();
         createTheme("추리");
 
@@ -165,7 +165,7 @@ class AdminTest {
     }
 
     @Test
-    void findWaitingReservation() {
+    void 대기중인_예약을_조회한다() {
         makeWaitingReservations();
         List<WaitingWebResponse> responses = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -180,7 +180,7 @@ class AdminTest {
     }
 
     @Test
-    void removeWaitingReservation() {
+    void 대기중인_예약을_삭제한다() {
         ReservationResponse waitingResponse = makeWaitingReservations();
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -203,7 +203,7 @@ class AdminTest {
     }
 
     @Test
-    void findAllReservations() {
+    void 모든_예약을_조회한다() {
         createReservationTime();
         createTheme("추리");
         createRegularReservation(1L);
@@ -217,7 +217,7 @@ class AdminTest {
     }
 
     @Test
-    void filterReservations() {
+    void 예약을_필터링할_수_있다() {
         createReservationTime();
         createTheme("추리");
         createTheme("로맨스");
@@ -239,7 +239,7 @@ class AdminTest {
 
 
     @Test
-    void findAllRegulars() {
+    void 모든_일반_멤버들을_조회한다() {
         List<MemberWebResponse> memberWebRespons = RestAssured.given().log().all()
                 .cookie(TOKEN, ADMIN_TOKEN)
                 .contentType(ContentType.JSON)

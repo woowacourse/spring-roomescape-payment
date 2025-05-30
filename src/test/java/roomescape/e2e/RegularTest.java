@@ -63,7 +63,7 @@ class RegularTest {
     }
 
     @Test
-    void logout() {
+    void 로그아웃을_할_수_있다() {
         RestAssured.given().log().all()
                 .body(new LoginRequest(REGULAR_EMAIL, PASSWORD))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -74,7 +74,7 @@ class RegularTest {
     }
 
     @Test
-    void loginCheck() {
+    void 로그인_상태를_확인할_수_있다() {
         CheckLoginResponse checkLoginResponse = RestAssured.given().log().all()
                 .body(new LoginRequest(REGULAR_EMAIL, PASSWORD))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -90,7 +90,7 @@ class RegularTest {
 
 
     @Test
-    void createReservation() {
+    void 예약을_생성할_수_있다() {
         createReservationTime();
         createTheme("추리");
         createRegularReservation(1L);
@@ -105,7 +105,7 @@ class RegularTest {
     }
 
     @Test
-    void responseUnAuthorizedWhenRegularAccessAdminPage() {
+    void 로그인하지_않고_관리자_페이지에_접근할_경우_Unauthorize_예외가_발생한다() {
         RestAssured.given().log().all()
                 .when().get("/admin/reservation")
                 .then().log().all()
@@ -113,7 +113,7 @@ class RegularTest {
     }
 
     @Test
-    void responseForbiddenWhenRegularAccessAdminPage() {
+    void 로그인하고_관리자_페이지에_접근할_경우_Forbidden_예외가_발생한다() {
         RestAssured.given().log().all()
                 .cookie(TOKEN, REGULAR_TOKEN)
                 .when().get("/admin/reservation")
@@ -122,15 +122,15 @@ class RegularTest {
     }
 
     @Test
-    void createWaitingReservations() {
+    void 예약_대기를_생성할_수_있다() {
         ReservationResponse reservationResponse = makeWaitingReservations();
 
         assertThat(reservationResponse).isNotNull();
     }
 
     @Test
-    void findMyReservations() {
-        createWaitingReservations();
+    void 내_예약을_조회할_수_있다() {
+        예약_대기를_생성할_수_있다();
         String user2Token = loginAndGetAuthToken(REGULAR2_EMAIL, PASSWORD);
 
         List<MyReservationResponse> responses = RestAssured.given().log().all()
@@ -149,7 +149,7 @@ class RegularTest {
     }
 
     @Test
-    void removeWaitingReservations() {
+    void 대기_중인_예약을_삭제할_수_있다() {
         createReservationTime();
         createTheme("추리");
         createRegularReservation(1L);
@@ -192,8 +192,8 @@ class RegularTest {
     }
 
     @Test
-    void approvePayment() {
-        createReservation();
+    void 결제_승인을_요청할_수_있다() {
+        예약_대기를_생성할_수_있다();
         String paymentKey = "PAYMENT_KEY";
         String orderId = "ORDER_ID";
         long amount = 5000L;

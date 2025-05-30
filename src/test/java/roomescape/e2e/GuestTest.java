@@ -35,7 +35,7 @@ class GuestTest {
     }
 
     @Test
-    void findAvailableReservations() {
+    void 예약_가능한_시간을_찾는다() {
         createReservationTime();
         createTheme("추리");
 
@@ -48,7 +48,7 @@ class GuestTest {
     }
 
     @Test
-    void findPopularTheme() {
+    void 인기_테마를_찾는다() {
         createReservationTime();
         createTheme("추리1");
         createTheme("추리2");
@@ -72,7 +72,7 @@ class GuestTest {
     }
 
     @Test
-    void signup() {
+    void 회원가입을_한다() {
         RestAssured.given().log().all()
                 .body(new SignupWebRequest("testMember@gmail.com", PASSWORD, "testMember"))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
