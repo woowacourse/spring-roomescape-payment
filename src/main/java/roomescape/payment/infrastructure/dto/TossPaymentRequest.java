@@ -7,9 +7,6 @@ public record TossPaymentRequest(
         BigDecimal amount,
         String orderId,
         String paymentKey
-) {
+) implements PaymentRequest {
 
-    public static TossPaymentRequest from(final PaymentRequest request) {
-        return new TossPaymentRequest(request.amount(), request.orderId(), request.paymentKey());
-    }
 }

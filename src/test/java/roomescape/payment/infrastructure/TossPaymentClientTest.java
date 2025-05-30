@@ -22,7 +22,8 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import roomescape.payment.TestRestClientConfig;
 import roomescape.payment.application.dto.PaymentRequest;
-import roomescape.payment.application.dto.PaymentResponse;
+import roomescape.payment.infrastructure.dto.TossPaymentRequest;
+import roomescape.payment.infrastructure.dto.TossPaymentResponse;
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -45,7 +46,7 @@ class TossPaymentClientTest {
 
     @AfterEach
     void tearDown() throws IOException {
-        mockWebServer.shutdown(); // destroyMethod 있으니까 없어도 됨
+        mockWebServer.shutdown();
     }
 
     @Test
@@ -64,10 +65,10 @@ class TossPaymentClientTest {
                 .setBody(expectedResponse)
                 .addHeader("Content-Type", "application/json"));
 
-        PaymentRequest request = new PaymentRequest(BigDecimal.valueOf(1000), "orderId", "paymentKey");
+        PaymentRequest request = new TossPaymentRequest(BigDecimal.valueOf(1000), "orderId", "paymentKey");
 
         // when
-        PaymentResponse response = tossPaymentClient.requestPayment(request);
+        TossPaymentResponse response = (TossPaymentResponse) tossPaymentClient.requestPayment(request);
 
         // then
         assertThat(response.orderId()).isEqualTo("orderId");
@@ -89,7 +90,7 @@ class TossPaymentClientTest {
                 .setBody(errorJson)
                 .addHeader("Content-Type", "application/json"));
 
-        PaymentRequest request = new PaymentRequest(BigDecimal.valueOf(1000), "orderId", "paymentKey");
+        PaymentRequest request = new TossPaymentRequest(BigDecimal.valueOf(1000), "orderId", "paymentKey");
 
         assertThatThrownBy(() -> tossPaymentClient.requestPayment(request))
                 .isInstanceOf(TossPaymentException.class)
@@ -111,7 +112,7 @@ class TossPaymentClientTest {
                 .setBodyDelay(5, TimeUnit.SECONDS) // ★ 여기서 응답 지연
                 .addHeader("Content-Type", "application/json"));
 
-        PaymentRequest request = new PaymentRequest(BigDecimal.valueOf(1000), "orderId", "paymentKey");
+        PaymentRequest request = new TossPaymentRequest(BigDecimal.valueOf(1000), "orderId", "paymentKey");
 
         // when & then
         assertThatThrownBy(() -> tossPaymentClient.requestPayment(request))

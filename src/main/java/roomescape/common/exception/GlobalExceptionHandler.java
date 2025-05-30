@@ -1,5 +1,6 @@
 package roomescape.common.exception;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +17,7 @@ import roomescape.payment.infrastructure.TossPaymentException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handle(final Exception e) {

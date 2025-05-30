@@ -18,7 +18,7 @@ import roomescape.payment.application.PaymentClient;
 import roomescape.payment.application.dto.PaymentRequest;
 import roomescape.payment.application.dto.PaymentResponse;
 import roomescape.payment.infrastructure.dto.TossErrorResponse;
-import roomescape.payment.infrastructure.dto.TossPaymentRequest;
+import roomescape.payment.infrastructure.dto.TossPaymentResponse;
 
 @RequiredArgsConstructor
 @Component
@@ -40,13 +40,13 @@ public class TossPaymentClient implements PaymentClient {
         return restClient.post()
                 .uri("v1/payments/confirm")
                 .header("Authorization", "Basic " + encodedKey)
-                .body(TossPaymentRequest.from(request))
+                .body(request)
                 .retrieve()
                 .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
                         (req, res) -> {
                             handleException(res);
                         })
-                .body(PaymentResponse.class);
+                .body(TossPaymentResponse.class);
     }
 
     private void handleException(final ClientHttpResponse res) {
