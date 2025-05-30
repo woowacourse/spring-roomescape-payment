@@ -46,7 +46,7 @@ import roomescape.reservationslot.presentation.dto.response.ReservationResponse;
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
 })
-public class RegularTest {
+class RegularTest {
 
     @MockitoBean
     private PaymentClient paymentClient;

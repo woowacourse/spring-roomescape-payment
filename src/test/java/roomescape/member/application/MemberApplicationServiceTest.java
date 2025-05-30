@@ -19,7 +19,7 @@ import roomescape.member.presentation.dto.response.SignUpWebResponse;
 
 @DataJpaTest
 @Import(TestConfig.class)
-public class MemberApplicationServiceTest {
+class MemberApplicationServiceTest {
 
     private MemberApplicationService memberApplicationService;
 
