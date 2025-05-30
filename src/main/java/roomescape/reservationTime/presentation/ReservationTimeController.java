@@ -59,11 +59,5 @@ public class ReservationTimeController {
         return ResponseEntity.noContent().build();
     }
 
-    @ExceptionHandler(value = DateTimeParseException.class)
-    public ResponseEntity<ExceptionResponse> noMatchTimeType(final HttpServletRequest request) {
-        ExceptionResponse exceptionResponse = new ExceptionResponse(
-                "[ERROR] 요청 시간 형식이 맞지 않습니다.", request.getRequestURI()
-        );
-        return ResponseEntity.badRequest().body(exceptionResponse);
-    }
+
 }

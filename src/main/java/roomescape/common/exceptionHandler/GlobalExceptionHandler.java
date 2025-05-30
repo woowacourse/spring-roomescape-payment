@@ -10,6 +10,8 @@ import roomescape.common.exception.LoginException;
 import roomescape.common.exception.PaymentException;
 import roomescape.common.exceptionHandler.dto.ExceptionResponse;
 
+import java.time.format.DateTimeParseException;
+
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -66,6 +68,14 @@ public class GlobalExceptionHandler {
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(e.getMessage());
+    }
+
+    @ExceptionHandler(value = DateTimeParseException.class)
+    public ResponseEntity<ExceptionResponse> noMatchTimeType(final HttpServletRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+                "[ERROR] 요청 시간 형식이 맞지 않습니다.", request.getRequestURI()
+        );
+        return ResponseEntity.badRequest().body(exceptionResponse);
     }
 
     @ExceptionHandler(value = Exception.class)
