@@ -23,8 +23,13 @@ public class PaymentConfig {
     public TossPaymentWithRestClient tossPaymentWithRestClient(RestClient.Builder builder) {
         return new TossPaymentWithRestClient(builder
                 .baseUrl("https://api.tosspayments.com/v1/payments")
-                .defaultHeader(AUTHORIZATION_HEADER, AUTHORIZATION_SCHEME + encodeSecretKey())
                 .defaultStatusHandler(new PaymentExceptionHandler())
+                .requestInterceptor((request, body, execution) -> {
+                    if (request.getURI().getPath().contains("/confirm")) {
+                        request.getHeaders().add(AUTHORIZATION_HEADER, AUTHORIZATION_SCHEME + encodeSecretKey());
+                    }
+                    return execution.execute(request, body);
+                })
                 .requestFactory(createRequestFactory())
                 .build());
     }
