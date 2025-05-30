@@ -23,7 +23,7 @@ public class PaymentHistory extends AuditedEntity {
 
     }
 
-    public PaymentHistory(Long id, String orderId, String paymentKey, String paymentType) {
+    private PaymentHistory(Long id, String orderId, String paymentKey, String paymentType) {
         this.id = id;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
