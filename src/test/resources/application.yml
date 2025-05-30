@@ -31,5 +31,5 @@ security:
 
 payment:
   base-url: "http://localhost:8080"
-  confirm_api: "/v1/payments/confirm"
+  confirm-api: "/v1/payments/confirm"
   secret-key: "test_secret"
