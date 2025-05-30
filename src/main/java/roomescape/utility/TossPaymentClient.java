@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
@@ -51,7 +52,7 @@ public class TossPaymentClient implements PaymentClient {
         return restClient.post()
                 .uri(paymentConfirmUrl)
                 .body(requestBody)
-                .header("Authorization", createAuthHeaderConcise())
+                .header(HttpHeaders.AUTHORIZATION, createAuthHeaderConcise())
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
                     PaymentExceptionContent paymentExceptionContent = statusParser.readValue(response.getBody(),
