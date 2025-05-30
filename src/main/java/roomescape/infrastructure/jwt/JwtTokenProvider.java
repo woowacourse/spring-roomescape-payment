@@ -51,7 +51,7 @@ public class JwtTokenProvider {
     }
 
     public Role getRole(String token) {
-        return Role.valueOf(Jwts.parserBuilder()
+        return Role.from(Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)

@@ -31,10 +31,6 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
             throw new AuthException("[ERROR] 권한이 필요합니다.", HttpStatus.FORBIDDEN);
         }
 
-        if (uri.equals("/reservation-mine") && !Role.hasRole(role)) {
-            throw new AuthException("[ERROR] 로그인이 필요합니다.", HttpStatus.UNAUTHORIZED);
-        }
-
         return true;
     }
 }
