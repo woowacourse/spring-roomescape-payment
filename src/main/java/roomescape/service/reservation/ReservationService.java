@@ -1,8 +1,5 @@
 package roomescape.service.reservation;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +16,10 @@ import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.WaitingReservationResponse;
 import roomescape.service.member.MemberService;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.NoSuchElementException;
+
 @RequiredArgsConstructor
 @Service
 public class ReservationService {
@@ -29,10 +30,12 @@ public class ReservationService {
     private final ReservationThemeService reservationThemeService;
     private final ReservationTimeService reservationTimeService;
 
+    @Transactional
     public ReservationResponse addReservation(final CreateReservationRequest request) {
         return createReservation(request, ReservationStatus.ACCEPTED, false);
     }
 
+    @Transactional
     public ReservationResponse addPendingReservation(final CreateReservationRequest request) {
         return createReservation(request, ReservationStatus.PENDING, true);
     }
@@ -87,12 +90,14 @@ public class ReservationService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<ReservationResponse> getAllReservations() {
         return reservationRepository.findAllReservations().stream()
                 .map(ReservationResponse::from)
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<ReservationResponse> getFilteredReservations(final Long memberId,
                                                              final Long themeId,
                                                              final LocalDate dateFrom,
@@ -108,6 +113,7 @@ public class ReservationService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<WaitingReservationResponse> getAllWaitingReservations() {
         List<Reservation> waitingReservations = reservationRepository.findByReservationStatusOrderByIdDesc(ReservationStatus.PENDING);
         return waitingReservations.stream()
@@ -115,6 +121,7 @@ public class ReservationService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<MyPageReservationResponse> getReservationsByMemberId(Long memberId) {
         final Member member = memberService.getMemberById(memberId);
         List<Reservation> myReservations = reservationRepository.findByMemberId(member.getId());
