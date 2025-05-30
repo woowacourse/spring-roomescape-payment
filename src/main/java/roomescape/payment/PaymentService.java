@@ -24,12 +24,13 @@ public class PaymentService {
                 .defaultStatusHandler(new PaymentErrorHandler())
                 .defaultHeader("Authorization", getAuthorization())
                 .defaultHeader("Content-Type", "application/json")
-                .baseUrl("https://api.tosspayments.com/v1/payments/confirm")
+                .baseUrl("https://api.tosspayments.com/v1/payments")
                 .build();
     }
 
     public PaymentConfirmResponse confirm(final PaymentConfirmRequest request) {
         return restClient.post()
+                .uri("/confirm")
                 .body(request)
                 .retrieve()
                 .body(PaymentConfirmResponse.class);
