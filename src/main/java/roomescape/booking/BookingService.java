@@ -1,6 +1,5 @@
 package roomescape.booking;
 
-import jakarta.persistence.EntityManager;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +21,6 @@ public class BookingService {
 
     private final ReservationService reservationService;
     private final WaitingService waitingService;
-    private final EntityManager entityManager;
 
     @Transactional(readOnly = true)
     public List<BookingResponse> readAllByMember(final LoginMember loginMember) {
