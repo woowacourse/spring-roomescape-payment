@@ -97,7 +97,7 @@ public class Theme extends AuditedEntity {
 
     private void validateThumbnail(String thumbnail) {
         if (thumbnail == null || thumbnail.isBlank()) {
-            throw new IllegalArgumentException("비어있는 썸네일으로 테마를 생성할 수 없습니다.");
+            throw new IllegalArgumentException("비어있는 썸네일로 테마를 생성할 수 없습니다.");
         }
         if (thumbnail.length() > MAX_THUMBNAIL_LENGTH) {
             throw new IllegalArgumentException("최대길이를 초과한 썸네일로 테마를 생성할 수 없습니다.");

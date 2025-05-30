@@ -1,97 +1,97 @@
 package roomescape.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static roomescape.test.fixture.DateFixture.NEXT_DAY;
-import static roomescape.test.fixture.DateFixture.YESTERDAY;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class ReservationTest {
 
+    private static final LocalDate YESTERDAY = LocalDate.now().minusDays(1);
+    private static final LocalDate NEXT_DAY = LocalDate.now().plusDays(1);
+
     @Nested
     @DisplayName("예약을 생성할 때 검증을 수행한다.")
-    public class validate {
+    class validate {
 
-        @DisplayName("비어있는 예약날짜로는 예약을 생성할 수 없다")
         @Test
-        void cannotCreateReservationWithNullDate() {
+        @DisplayName("비어있는 예약날짜로는 예약을 생성할 수 없다")
+        void cannotCreateBecauseNullDate() {
             // given
-            Member member = new Member(1L, Role.GENERAL, "회원", "test@test.com", "qweqw123!");
+            Member member = Member.createWithoutId(Role.GENERAL, "회원", "test@test.com", "qweqw123!");
+            ReservationTime time = ReservationTime.createWithoutId(LocalTime.of(10, 0));
+            Theme theme = Theme.createWithoutId("회원", "설명", "섬네일");
             LocalDate nullDate = null;
-            ReservationTime time = new ReservationTime(1L, LocalTime.of(10, 0));
-            Theme theme = new Theme(1L, "이름", "설명", "썸네일");
 
             // when & then
-            assertThatThrownBy(() -> new Reservation(1L, nullDate, time, theme, member))
+            assertThatThrownBy(() -> Reservation.createWithoutIdAndPaymentHistory(nullDate, time, theme, member))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("비어있는 예약날짜로 예약을 생성할 수 없습니다.");
         }
 
-        @DisplayName("비어있는 예약시간으로는 예약을 생성할 수 없다")
         @Test
-        void cannotCreateReservationWithNullTime() {
+        @DisplayName("비어있는 예약시간으로는 예약을 생성할 수 없다")
+        void cannotCreateBecauseNullTime() {
             // given
-            Member member = new Member(1L, Role.GENERAL, "회원", "test@test.com", "qweqw123!");
-            LocalDate date = NEXT_DAY;
+            Member member = Member.createWithoutId(Role.GENERAL, "회원", "test@test.com", "qweqw123!");
             ReservationTime nullTime = null;
-            Theme theme = new Theme(1L, "이름", "설명", "썸네일");
+            Theme theme = Theme.createWithoutId("회원", "설명", "섬네일");
+            LocalDate date = LocalDate.now();
 
             // when & then
-            assertThatThrownBy(() -> new Reservation(1L, date, nullTime, theme, member))
+            assertThatThrownBy(() -> Reservation.createWithoutIdAndPaymentHistory(date, nullTime, theme, member))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("비어있는 예약시간으로는 예약을 생성할 수 없습니다.");
         }
 
-        @DisplayName("비어있는 테마로는 예약을 생성할 수 없다")
         @Test
-        void cannotCreateReservationWithNullTheme() {
+        @DisplayName("비어있는 테마로는 예약을 생성할 수 없다")
+        void cannotCreateBecauseNullTheme() {
             // given
-            Member member = new Member(1L, Role.GENERAL, "회원", "test@test.com", "qweqw123!");
-            LocalDate date = NEXT_DAY;
+            Member member = Member.createWithoutId(Role.GENERAL, "회원", "test@test.com", "qweqw123!");
             ReservationTime time = ReservationTime.createWithoutId(LocalTime.of(10, 0));
             Theme nullTheme = null;
+            LocalDate date = LocalDate.now();
 
             // when & then
             assertThatThrownBy(
-                    () -> new Reservation(1L, date, time, nullTheme, member))
+                    () -> Reservation.createWithoutIdAndPaymentHistory(date, time, nullTheme, member))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("비어있는 테마로는 예약을 생성할 수 없습니다.");
         }
 
-        @DisplayName("비어있는 멤버로는 예약을 생성할 수 없다")
         @Test
-        void cannotCreateReservationWithNullMember() {
+        @DisplayName("비어있는 멤버로는 예약을 생성할 수 없다")
+        void cannotCreateBecauseNullMember() {
             // given
             Member nullMember = null;
-            LocalDate date = NEXT_DAY;
             ReservationTime time = ReservationTime.createWithoutId(LocalTime.of(10, 0));
-            Theme theme = new Theme(1L, "이름", "설명", "썸네일");
+            Theme theme = Theme.createWithoutId("회원", "설명", "섬네일");
+            LocalDate date = LocalDate.now();
 
             // when & then
             assertThatThrownBy(
-                    () -> new Reservation(1L, date, time, theme, nullMember))
+                    () -> Reservation.createWithoutIdAndPaymentHistory(date, time, theme, nullMember))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("비어있는 멤버로는 예약을 생성할 수 없습니다.");
         }
     }
 
     @Nested
-    @DisplayName("과거의 예약인지 체크할 수 있다.")
-    public class isPastDateTime {
+    @DisplayName("예약 날짜가 지났는지 확인할 수 있다.")
+    class isPastDateTime {
 
-        @DisplayName("과거의 예약인 경우 true 리턴")
         @Test
         void isPastDateTime() {
             // given
-            ReservationTime time = new ReservationTime(1L, LocalTime.of(10, 0));
-            Theme theme = new Theme(1L, "회원", "설명", "섬네일");
-            Member member = new Member(1L, Role.GENERAL, "회원", "test@test.com", "qwer1234!");
-            Reservation reservation = new Reservation(1L, YESTERDAY, time, theme, member);
+            ReservationTime time = ReservationTime.createWithoutId(LocalTime.of(10, 0));
+            Theme theme = Theme.createWithoutId("회원", "설명", "섬네일");
+            Member member = Member.createWithoutId(Role.GENERAL, "회원", "test@test.com", "qwer1234!");
+            Reservation reservation = Reservation.createWithoutIdAndPaymentHistory(YESTERDAY, time, theme, member);
 
             // when
             boolean isPast = reservation.isPastDateTime();
@@ -100,14 +100,13 @@ class ReservationTest {
             assertThat(isPast).isTrue();
         }
 
-        @DisplayName("과거가 아닌 예약인 경우 false 리턴")
         @Test
         void isNotPastDateTime() {
             // given
-            ReservationTime time = new ReservationTime(1L, LocalTime.of(10, 0));
-            Theme theme = new Theme(1L, "회원", "설명", "섬네일");
-            Member member = new Member(1L, Role.GENERAL, "회원", "test@test.com", "qwer1234!");
-            Reservation reservation = new Reservation(1L, NEXT_DAY, time, theme, member);
+            ReservationTime time = ReservationTime.createWithoutId(LocalTime.of(10, 0));
+            Theme theme = Theme.createWithoutId("회원", "설명", "섬네일");
+            Member member = Member.createWithoutId(Role.GENERAL, "회원", "test@test.com", "qwer1234!");
+            Reservation reservation = Reservation.createWithoutIdAndPaymentHistory(NEXT_DAY, time, theme, member);
 
             // when
             boolean isPast = reservation.isPastDateTime();

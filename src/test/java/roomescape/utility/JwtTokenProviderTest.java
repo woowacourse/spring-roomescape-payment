@@ -25,7 +25,7 @@ class JwtTokenProviderTest {
         @Test
         void canCreateAccessToken() {
             // given
-            Member member = new Member(1L, Role.GENERAL, "회원", "test@test.com", "qwer1234!");
+            Member member = Member.createWithoutId(Role.GENERAL, "회원", "test@test.com", "qwer1234!");
             AccessTokenContent expectedTokenContent =
                     new AccessTokenContent(member.getId(), member.getRole(), member.getName());
 
@@ -51,7 +51,7 @@ class JwtTokenProviderTest {
         @Test
         void canParseAccessToken() {
             // given
-            Member member = new Member(1L, Role.GENERAL, "회원", "test@test.com", "qwer1234!");
+            Member member = Member.createWithoutId(Role.GENERAL, "회원", "test@test.com", "qwer1234!");
             AccessTokenContent expectedTokenContent =
                     new AccessTokenContent(member.getId(), member.getRole(), member.getName());
             String accessToken = jwtTokenProvider.createAccessToken(expectedTokenContent);
@@ -71,7 +71,8 @@ class JwtTokenProviderTest {
         @Test
         void cannotParseDamagedAccessToken() {
             // given
-            Member member = new Member(1L, Role.GENERAL, "회원", "test@test.com", "qwer1234!");
+            Member member = Member.createWithoutId(Role.GENERAL, "회원", "test@test.com", "qwer1234!");
+
             AccessTokenContent expectedTokenContent =
                     new AccessTokenContent(member.getId(), member.getRole(), member.getName());
             String accessToken = jwtTokenProvider.createAccessToken(expectedTokenContent);
@@ -89,7 +90,8 @@ class JwtTokenProviderTest {
             // given
             jwtTokenProvider = new JwtTokenProvider(
                     "test_secret_key_test_secret_key_test_secret_key", 0);
-            Member member = new Member(1L, Role.GENERAL, "회원", "test@test.com", "qwer1234!");
+            Member member = Member.createWithoutId(Role.GENERAL, "회원", "test@test.com", "qwer1234!");
+
             AccessTokenContent expectedTokenContent =
                     new AccessTokenContent(member.getId(), member.getRole(), member.getName());
             String expiredToken = jwtTokenProvider.createAccessToken(expectedTokenContent);
