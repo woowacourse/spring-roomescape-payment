@@ -34,7 +34,7 @@ public class PaymentHandler extends ResponseEntityExceptionHandler {
         if (response.isPresent()) {
             TossErrorResponse tossError = response.get();
             if (tossError.isPaymentError()) {
-                log.error(tossError.message(), e.getStatusCode());
+                log.error("Toss API exception. status: {}, message: {}", e.getStatusCode(), tossError.message());
                 return buildResponseEntity(e, HttpStatus.INTERNAL_SERVER_ERROR, "결제 관련 내부 오류가 발생했습니다.", request);
             }
             return buildResponseEntity(e, e.getStatusCode(), tossError.message(), request);
@@ -45,8 +45,8 @@ public class PaymentHandler extends ResponseEntityExceptionHandler {
     private Optional<TossErrorResponse> extractResponse(final String rawBody) {
         try {
             return Optional.of(OBJECT_MAPPER.readValue(rawBody, TossErrorResponse.class));
-        } catch (JsonProcessingException ex) {
-            log.warn("JSON 파싱 실패: 원본 바디 반환", ex);
+        } catch (JsonProcessingException e) {
+            log.warn("JSON 파싱 실패: 원본 바디 반환", e);
         }
         return Optional.empty();
     }
