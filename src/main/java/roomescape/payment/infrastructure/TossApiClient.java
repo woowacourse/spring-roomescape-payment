@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.request.TossPaymentRequest;
 import roomescape.payment.dto.response.PaymentResponse;
@@ -25,10 +26,10 @@ public class TossApiClient {
     private final RestClient restClient;
     private final String secretKey;
 
-    public TossApiClient(final RestClient.Builder builder, @Value("${toss.secret-key}") final String key) {
+    public TossApiClient(final RestClient restClient, @Value("${toss.secret-key}") final String key) {
         String totalSecretKey = key + SECRET_KEY_SUFFIX;
         secretKey = Base64.getEncoder().encodeToString(totalSecretKey.getBytes());
-        this.restClient = builder.build();
+        this.restClient = restClient;
     }
 
     public PaymentResponse authPayment(final String paymentKey, final String orderId,
@@ -50,7 +51,9 @@ public class TossApiClient {
             }
             throw new TossPaymentClientException(response.message());
         } catch (HttpServerErrorException e) {
-            throw new TossPaymentServerException("토스 서버로 문의해주세요");
+            throw new TossPaymentServerException("토스 서버로 문의해주세요.");
+        } catch (ResourceAccessException e) {
+            throw new TossPaymentServerException("토스 서버 응답이 지연되고 있어요. 잠시 후 다시 시도해주세요.");
         }
     }
 
