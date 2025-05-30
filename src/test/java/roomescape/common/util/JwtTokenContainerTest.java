@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import java.time.LocalDateTime;
 import org.springframework.test.util.ReflectionTestUtils;
-import roomescape.common.exception.LoginException;
+import roomescape.common.exception.UnauthorizedException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 
@@ -38,7 +38,7 @@ class JwtTokenContainerTest {
         String strangeToken = "asdasdasdsad";
         // when & then
         assertThatThrownBy(() -> jwtTokenContainer.validateToken(strangeToken))
-                .isInstanceOf(LoginException.class);
+                .isInstanceOf(UnauthorizedException.class);
     }
 
     @Test
@@ -51,7 +51,7 @@ class JwtTokenContainerTest {
         String jwtToken = jwtTokenContainer.createJwtToken(member, dateTime);
         // when
         assertThatThrownBy(() -> jwtTokenContainer.validateToken(jwtToken))
-                .isInstanceOf(LoginException.class);
+                .isInstanceOf(UnauthorizedException.class);
     }
 
     @Test
@@ -87,7 +87,7 @@ class JwtTokenContainerTest {
         String strangeToken = "asdasdasdsad";
         // when
         assertThatThrownBy(() -> jwtTokenContainer.getMemberId(strangeToken))
-                .isInstanceOf(LoginException.class);
+                .isInstanceOf(UnauthorizedException.class);
     }
 
     @Test
@@ -111,6 +111,6 @@ class JwtTokenContainerTest {
         String strangeToken = "asdasdasdsad";
         // when
         assertThatThrownBy(() -> jwtTokenContainer.getMemberRole(strangeToken))
-                .isInstanceOf(LoginException.class);
+                .isInstanceOf(UnauthorizedException.class);
     }
 }

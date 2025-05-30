@@ -2,7 +2,7 @@ package roomescape.payment.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
-
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.common.exception.PaymentException;
@@ -31,7 +31,8 @@ public class TossPaymentClient {
                         (req, res) -> {
                             String errorBody = new String(res.getBody().readAllBytes(), StandardCharsets.UTF_8);
                             TossErrorResponse errorResponse = objectMapper.readValue(errorBody, TossErrorResponse.class);
-                            throw new PaymentException("결제 실패 : " + errorResponse.message());
+                            HttpStatusCode statusCode = res.getStatusCode();
+                            throw new PaymentException(statusCode, "결제 실패 : " + errorResponse.message());
                         }
                 )
                 .body(TossPaymentResponse.class);

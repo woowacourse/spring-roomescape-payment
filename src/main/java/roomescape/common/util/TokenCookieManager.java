@@ -4,7 +4,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;
-import roomescape.common.exception.LoginException;
+import roomescape.common.exception.UnauthorizedException;
 
 @Component
 public class TokenCookieManager {
@@ -38,7 +38,7 @@ public class TokenCookieManager {
     private Cookie[] getCookies(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
-            throw new LoginException("로그인 되어있지 않습니다.");
+            throw new UnauthorizedException("로그인 되어있지 않습니다.");
         }
         return cookies;
     }

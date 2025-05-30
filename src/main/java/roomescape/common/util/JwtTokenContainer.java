@@ -10,7 +10,7 @@ import java.util.Date;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import roomescape.common.exception.LoginException;
+import roomescape.common.exception.UnauthorizedException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 
@@ -43,9 +43,9 @@ public class JwtTokenContainer {
                     .build()
                     .parseSignedClaims(token);
         } catch (ExpiredJwtException e) {
-            throw new LoginException("만료된 토큰입니다.");
+            throw new UnauthorizedException("만료된 토큰입니다.");
         } catch (JwtException e) {
-            throw new LoginException("올바르지 않은 토큰 형태입니다.");
+            throw new UnauthorizedException("올바르지 않은 토큰 형태입니다.");
         }
     }
 
@@ -59,7 +59,7 @@ public class JwtTokenContainer {
                     .getSubject();
             return Long.parseLong(id);
         } catch (JwtException e) {
-            throw new LoginException("올바르지 않은 토큰 형태입니다.");
+            throw new UnauthorizedException("올바르지 않은 토큰 형태입니다.");
         }
     }
 
@@ -73,7 +73,7 @@ public class JwtTokenContainer {
                     .get("role").toString();
             return Role.findRole(role);
         } catch (JwtException e) {
-            throw new LoginException("올바르지 않은 토큰 형태입니다.");
+            throw new UnauthorizedException("올바르지 않은 토큰 형태입니다.");
         }
     }
 

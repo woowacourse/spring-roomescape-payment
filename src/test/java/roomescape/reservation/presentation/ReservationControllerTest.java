@@ -11,17 +11,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.common.config.ReservationConfig;
-import roomescape.common.config.TossPaymentClientConfig;
 import roomescape.common.exception.PaymentException;
 import roomescape.member.dto.request.LoginMember;
-import roomescape.member.service.LoginService;
+import roomescape.payment.client.TossPaymentClient;
 import roomescape.payment.client.TossPaymentTestConfig;
 import roomescape.payment.client.dto.request.TossPaymentConfirmRequest;
-import roomescape.payment.client.TossPaymentClient;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.service.ReservationService;
 
@@ -60,7 +59,7 @@ class ReservationControllerTest {
 
         // when
         when(tossPaymentClient.confirmPayment(request))
-                .thenThrow(new PaymentException("결제 실패!"));
+                .thenThrow(new PaymentException(HttpStatusCode.valueOf(500), "결제 실패!"));
         String jsonContent = objectMapper.writeValueAsString(request);
 
         // then

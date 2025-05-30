@@ -5,11 +5,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import jakarta.servlet.http.Cookie;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import roomescape.common.exception.LoginException;
+import roomescape.common.exception.UnauthorizedException;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 class TokenCookieManagerTest {
 
@@ -51,7 +52,7 @@ class TokenCookieManagerTest {
     @DisplayName("토큰을 추출하려고 할 때 쿠키가 없으면 예외가 발생한다.")
     void extractTokenFromCookie_exception() {
         assertThatThrownBy(() -> cookieManager.extractTokenFromCookie(request))
-                .isInstanceOf(LoginException.class)
+                .isInstanceOf(UnauthorizedException.class)
                 .hasMessage("로그인 되어있지 않습니다.");
     }
 

@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.HandlerInterceptor;
-import roomescape.common.exception.LoginException;
+import roomescape.common.exception.UnauthorizedException;
 import roomescape.common.util.JwtTokenContainer;
 import roomescape.common.util.TokenCookieManager;
 import roomescape.member.domain.Role;
@@ -31,7 +31,7 @@ public class AdminInterceptor implements HandlerInterceptor {
             }
             response.setStatus(HttpStatus.FORBIDDEN.value());
             return false;
-        } catch (LoginException e) {
+        } catch (UnauthorizedException e) {
             return redirectedToLogin(response);
         }
     }

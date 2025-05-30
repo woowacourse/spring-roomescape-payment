@@ -11,7 +11,7 @@ import java.util.Optional;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.common.exception.LoginException;
+import roomescape.common.exception.UnauthorizedException;
 import roomescape.common.util.DateTime;
 import roomescape.common.util.JwtTokenContainer;
 import roomescape.fixture.TestFixture;
@@ -48,7 +48,7 @@ class LoginServiceMockTest {
                 .thenReturn(Optional.empty());
         // when & then
         assertThatThrownBy(() -> loginService.loginAndReturnToken(request))
-                .isInstanceOf(LoginException.class);
+                .isInstanceOf(UnauthorizedException.class);
     }
 
     @Test
@@ -77,7 +77,7 @@ class LoginServiceMockTest {
                 .thenReturn(Optional.empty());
         // then
         assertThatThrownBy(() -> loginService.loginCheck(token))
-                .isInstanceOf(LoginException.class);
+                .isInstanceOf(UnauthorizedException.class);
     }
 
     @Test

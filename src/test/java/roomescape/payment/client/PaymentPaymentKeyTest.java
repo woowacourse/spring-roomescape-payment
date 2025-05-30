@@ -1,11 +1,14 @@
 package roomescape.payment.client;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import roomescape.common.exception.PaymentException;
 import roomescape.payment.client.dto.request.TossPaymentConfirmRequest;
+
+import org.junit.jupiter.api.Test;
 
 @SpringBootTest
 public class PaymentPaymentKeyTest {
@@ -22,8 +25,16 @@ public class PaymentPaymentKeyTest {
                 ""
         );
 
+        // when
+        PaymentException exception = assertThrows(PaymentException.class, () -> {
+            tossPaymentClient.confirmPayment(tossPaymentConfirmRequest);
+        });
+
+        // then
         Assertions.assertThatThrownBy(() -> tossPaymentClient.confirmPayment(tossPaymentConfirmRequest))
                 .isInstanceOf(PaymentException.class)
                 .hasMessage("결제 실패 : 결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다.");
+        Assertions.assertThat(exception.getStatusCode().toString()).isEqualTo("404 NOT_FOUND");
     }
+
 }
