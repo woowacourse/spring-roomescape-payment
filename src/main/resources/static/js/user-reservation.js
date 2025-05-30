@@ -182,7 +182,7 @@ function onReservationButtonClick(event, paymentWidget) {
             amount: 1000,
         }).then(function (data) {
             console.debug(data);
-            fetchReservationPayment(data, reservationData);
+            fetchReservation(data, reservationData);
         }).catch(function (error) {
             // TOSS 에러 처리: 에러 목록을 확인하세요
             // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
@@ -193,7 +193,7 @@ function onReservationButtonClick(event, paymentWidget) {
     }
 }
 
-async function fetchReservationPayment(paymentData, reservationData) {
+async function fetchReservationPayment(paymentData) {
     /*
     TODO: [1단계]
         - 자신의 예약 API request에 맞게 reservationPaymentRequest 필드명 수정
@@ -224,9 +224,9 @@ async function fetchReservationPayment(paymentData, reservationData) {
                 window.alert(errorMessage);
             });
         } else {
-             response.json().then(successBody => {
+            response.json().then(successBody => {
                 console.log("예약 결제 성공 : " + JSON.stringify(successBody));
-                fetchReservation(reservationData);
+                window.location.reload();
             });
         }
     }).catch(error => {
@@ -234,7 +234,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
     });
 }
 
-async function fetchReservation(reservationData) {
+async function fetchReservation(paymentData, reservationData) {
     const reservationRequest = {
         date: reservationData.date,
         themeId: reservationData.themeId,
@@ -259,7 +259,7 @@ async function fetchReservation(reservationData) {
             response.json().then(successBody => {
                 console.log("예약 생성 성공 : " + JSON.stringify(successBody));
                 window.alert("예약이 생성되었습니다.");
-                window.location.reload();
+                fetchReservationPayment(paymentData, reservationData);
             });
         }
     }).catch(error => {
