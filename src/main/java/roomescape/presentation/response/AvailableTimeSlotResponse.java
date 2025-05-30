@@ -21,8 +21,8 @@ public record AvailableTimeSlotResponse(
             final AvailableTimeSlot availableTimeSlot
     ) {
         return new AvailableTimeSlotResponse(
-                availableTimeSlot.timeSlot().id(),
-                availableTimeSlot.timeSlot().startAt(),
+                availableTimeSlot.timeSlot().getId(),
+                availableTimeSlot.timeSlot().getStartAt(),
                 availableTimeSlot.alreadyBooked()
         );
     }

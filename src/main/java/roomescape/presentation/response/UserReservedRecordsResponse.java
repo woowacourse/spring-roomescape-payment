@@ -25,10 +25,10 @@ public record UserReservedRecordsResponse(
             final Reservation reservation
     ) {
         return new UserReservedRecordsResponse(
-                reservation.id(),
-                ThemeResponse.fromTheme(reservation.theme()),
-                reservation.date(),
-                TimeSlotResponse.fromTimeSlot(reservation.timeSlot()),
+                reservation.getId(),
+                ThemeResponse.fromTheme(reservation.getTheme()),
+                reservation.getDate(),
+                TimeSlotResponse.fromTimeSlot(reservation.getTimeSlot()),
                 "예약"
         );
     }
@@ -45,11 +45,11 @@ public record UserReservedRecordsResponse(
             final WaitingWithRank waitingWithRank
     ) {
         return new UserReservedRecordsResponse(
-                waitingWithRank.waiting().id(),
-                ThemeResponse.fromTheme(waitingWithRank.waiting().theme()),
-                waitingWithRank.waiting().date(),
-                TimeSlotResponse.fromTimeSlot(waitingWithRank.waiting().timeSlot()),
-                waitingWithRank.rank() + "번째 예약대기"
+                waitingWithRank.getWaiting().getId(),
+                ThemeResponse.fromTheme(waitingWithRank.getWaiting().getTheme()),
+                waitingWithRank.getWaiting().getDate(),
+                TimeSlotResponse.fromTimeSlot(waitingWithRank.getWaiting().getTimeSlot()),
+                waitingWithRank.getRank() + "번째 예약대기"
         );
     }
 }

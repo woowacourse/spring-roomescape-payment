@@ -24,11 +24,11 @@ public record ReservationResponse(
             final Reservation reservation
     ) {
         return new ReservationResponse(
-                reservation.id(),
-                UserResponse.fromUser(reservation.user()),
-                reservation.date(),
-                TimeSlotResponse.fromTimeSlot(reservation.timeSlot()),
-                ThemeResponse.fromTheme(reservation.theme())
+                reservation.getId(),
+                UserResponse.fromUser(reservation.getUser()),
+                reservation.getDate(),
+                TimeSlotResponse.fromTimeSlot(reservation.getTimeSlot()),
+                ThemeResponse.fromTheme(reservation.getTheme())
         );
     }
 }

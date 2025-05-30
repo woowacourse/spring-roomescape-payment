@@ -7,11 +7,9 @@ import jakarta.persistence.Id;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import lombok.experimental.Accessors;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
-@Accessors(fluent = true)
 @ToString
 @Entity
 public class Payment {

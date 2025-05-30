@@ -72,7 +72,7 @@ public class TimeSlotService {
         List<Reservation> reservations = reservationRepository.findByDateAndThemeId(date, themeId);
 
         return reservations.stream()
-                .map(Reservation::timeSlot)
+                .map(Reservation::getTimeSlot)
                 .toList();
     }
 }

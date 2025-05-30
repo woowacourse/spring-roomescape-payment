@@ -97,6 +97,6 @@ class ReservationServiceTest {
 
         // then
         var reservations = reservationRepository.findAll();
-        assertThat(reservations.getFirst().id()).isEqualTo(2L);
+        assertThat(reservations.getFirst().getId()).isEqualTo(2L);
     }
 }

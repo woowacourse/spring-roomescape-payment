@@ -81,11 +81,11 @@ class UserArgumentResolverTest {
         @GetMapping("/authenticatedUser")
         public ResponseEntity<UserResponseForTest> test(@Authenticated User user) {
             var response = new UserResponseForTest(
-                    user.id(),
-                    user.name(),
-                    user.role(),
-                    user.email(),
-                    user.password()
+                    user.getId(),
+                    user.getName(),
+                    user.getRole(),
+                    user.getEmail(),
+                    user.getPassword()
             );
             return ResponseEntity.ok(response);
         }

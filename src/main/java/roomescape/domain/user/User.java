@@ -9,13 +9,11 @@ import jakarta.persistence.Id;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import lombok.experimental.Accessors;
 import roomescape.exception.BusinessRuleViolationException;
 import roomescape.exception.InvalidInputException;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
-@Accessors(fluent = true)
 @ToString
 @Entity(name = "USERS")
 public class User {
@@ -34,7 +32,6 @@ public class User {
     private UserRole role;
     private String email;
     private String password;
-
 
     private User(final Long id,
                  final String name,

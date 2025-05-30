@@ -36,7 +36,7 @@ public class ReservationController {
     @ResponseStatus(CREATED)
     public ReservationResponse createReservationWithUserPrivileges(@Authenticated final User user,
                                                                    @RequestBody @Valid final CreateReservationRequest request) {
-        Reservation reservation = reservationService.saveReservationWithPurchase(user.id(), request.date(),
+        Reservation reservation = reservationService.saveReservationWithPurchase(user.getId(), request.date(),
                 request.timeId(), request.themeId(), request.toPaymentInfo());
 
         return ReservationResponse.fromReservation(reservation);

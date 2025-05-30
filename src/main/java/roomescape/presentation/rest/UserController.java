@@ -46,6 +46,6 @@ public class UserController {
     public List<UserReservedRecordsResponse> readAllRecordByUser(
             @Authenticated final User user
     ) {
-        return userService.findTotalRecordByUserId(user.id());
+        return userService.findTotalRecordByUserId(user.getId());
     }
 }

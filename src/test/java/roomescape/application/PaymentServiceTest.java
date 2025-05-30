@@ -18,7 +18,7 @@ import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
 import roomescape.exception.PaymentException;
 import roomescape.infrastructure.payment.PaymentClient;
-import roomescape.infrastructure.payment.PaymentErrorCode;
+import roomescape.infrastructure.payment.toss.PaymentErrorCode;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentServiceTest {
@@ -47,9 +47,9 @@ class PaymentServiceTest {
         Payment savedPayment = paymentService.savePayment(paymentInfo);
 
         // then
-        assertAll(() -> assertThat(savedPayment.paymentKey()).isEqualTo(paymentInfo.paymentKey()),
-                () -> assertThat(savedPayment.orderId()).isEqualTo(paymentInfo.orderId()),
-                () -> assertThat(savedPayment.amount()).isEqualTo(paymentInfo.amount()));
+        assertAll(() -> assertThat(savedPayment.getPaymentKey()).isEqualTo(paymentInfo.paymentKey()),
+                () -> assertThat(savedPayment.getOrderId()).isEqualTo(paymentInfo.orderId()),
+                () -> assertThat(savedPayment.getAmount()).isEqualTo(paymentInfo.amount()));
     }
 
     @Test

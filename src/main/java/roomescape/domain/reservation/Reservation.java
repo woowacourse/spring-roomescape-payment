@@ -10,7 +10,6 @@ import java.time.LocalTime;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import lombok.experimental.Accessors;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.user.User;
@@ -19,7 +18,6 @@ import roomescape.exception.BusinessRuleViolationException;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Getter
-@Accessors(fluent = true)
 @ToString
 @Entity
 public class Reservation {
@@ -61,7 +59,7 @@ public class Reservation {
     }
 
     public static Reservation fromWaiting(final Waiting waiting) {
-        return new Reservation(null, waiting.user(), waiting.date(), waiting.timeSlot(), waiting.theme());
+        return new Reservation(null, waiting.getUser(), waiting.getDate(), waiting.getTimeSlot(), waiting.getTheme());
     }
 
     private static void validateNotPastDateTime(final LocalDate date, final TimeSlot timeSlot) {

@@ -26,7 +26,7 @@ public class AuthenticationService {
             throw new AuthenticationException("비밀번호가 틀렸습니다.");
         }
 
-        AuthenticationInfo authenticationInfo = new AuthenticationInfo(user.id(), user.role());
+        AuthenticationInfo authenticationInfo = new AuthenticationInfo(user.getId(), user.getRole());
         return tokenHandler.createToken(authenticationInfo);
     }
 

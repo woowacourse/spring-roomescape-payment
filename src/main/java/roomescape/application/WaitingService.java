@@ -42,8 +42,8 @@ public class WaitingService {
         TimeSlot timeSlot = getTimeSlotById(timeId);
         Theme theme = getThemeById(themeId);
 
-        validateDuplicateWaiting(date, timeSlot.id(), theme.id(), user.id());
-        validateNotAlreadyReserved(date, timeSlot.id(), theme.id(), user.id());
+        validateDuplicateWaiting(date, timeSlot.getId(), theme.getId(), user.getId());
+        validateNotAlreadyReserved(date, timeSlot.getId(), theme.getId(), user.getId());
 
         Waiting waiting = Waiting.register(user, date, timeSlot, theme);
         return waitingRepository.save(waiting);

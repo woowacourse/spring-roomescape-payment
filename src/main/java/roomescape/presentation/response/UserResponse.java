@@ -20,8 +20,8 @@ public record UserResponse(
             final User user
     ) {
         return new UserResponse(
-                user.id(),
-                user.name()
+                user.getId(),
+                user.getName()
         );
     }
 }

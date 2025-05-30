@@ -42,7 +42,7 @@ class AuthenticationServiceTest {
         assertThat(tokenHandler.isValidToken(token)).isTrue();
         var userId = tokenHandler.extractId(token);
         var user = userRepository.findById(userId).orElseThrow();
-        assertThat(user.email()).isEqualTo(email);
+        assertThat(user.getEmail()).isEqualTo(email);
     }
 
     @Test
@@ -83,7 +83,7 @@ class AuthenticationServiceTest {
         User user = service.getUserByToken(token);
 
         // then
-        assertThat(user.email()).isEqualTo(email);
+        assertThat(user.getEmail()).isEqualTo(email);
     }
 
     @Test

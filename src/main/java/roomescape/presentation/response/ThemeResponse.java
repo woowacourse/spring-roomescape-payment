@@ -22,10 +22,10 @@ public record ThemeResponse(
             final Theme theme
     ) {
         return new ThemeResponse(
-                theme.id(),
-                theme.name(),
-                theme.description(),
-                theme.thumbnail()
+                theme.getId(),
+                theme.getName(),
+                theme.getDescription(),
+                theme.getThumbnail()
         );
     }
 }

@@ -21,8 +21,8 @@ public record TimeSlotResponse(
             final TimeSlot timeSlot
     ) {
         return new TimeSlotResponse(
-                timeSlot.id(),
-                timeSlot.startAt()
+                timeSlot.getId(),
+                timeSlot.getStartAt()
         );
     }
 }

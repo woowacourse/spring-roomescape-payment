@@ -24,11 +24,11 @@ public record WaitingResponse(
             final Waiting waiting
     ) {
         return new WaitingResponse(
-                waiting.id(),
-                UserResponse.fromUser(waiting.user()),
-                waiting.date(),
-                TimeSlotResponse.fromTimeSlot(waiting.timeSlot()),
-                ThemeResponse.fromTheme(waiting.theme())
+                waiting.getId(),
+                UserResponse.fromUser(waiting.getUser()),
+                waiting.getDate(),
+                TimeSlotResponse.fromTimeSlot(waiting.getTimeSlot()),
+                ThemeResponse.fromTheme(waiting.getTheme())
         );
     }
 }

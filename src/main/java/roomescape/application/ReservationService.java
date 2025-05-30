@@ -79,8 +79,8 @@ public class ReservationService {
     }
 
     private void validateDuplicateReservation(final LocalDate date, final TimeSlot timeSlot, final Theme theme) {
-        Optional<Reservation> reservation = reservationRepository.findByDateAndTimeSlotIdAndThemeId(date, timeSlot.id(),
-                theme.id());
+        Optional<Reservation> reservation = reservationRepository.findByDateAndTimeSlotIdAndThemeId(date, timeSlot.getId(),
+                theme.getId());
 
         if (reservation.isPresent()) {
             throw new AlreadyExistedException("이미 예약된 날짜, 시간, 테마에 대한 예약은 불가능합니다.");
@@ -101,12 +101,12 @@ public class ReservationService {
 
     private void approveNextWaitingIfExists(Reservation reservation) {
         Optional<Waiting> nextWaitingOpt = waitingRepository.findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(
-                reservation.date(), reservation.timeSlot().id(), reservation.theme().id());
+                reservation.getDate(), reservation.getTimeSlot().getId(), reservation.getTheme().getId());
 
         nextWaitingOpt.ifPresent(nextWaiting -> {
             Reservation approvedReservation = Reservation.fromWaiting(nextWaiting);
             reservationRepository.save(approvedReservation);
-            waitingRepository.deleteById(nextWaiting.id());
+            waitingRepository.deleteById(nextWaiting.getId());
         });
     }
 }
