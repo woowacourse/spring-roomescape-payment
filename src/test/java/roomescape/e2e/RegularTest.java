@@ -211,5 +211,12 @@ class RegularTest {
                 .statusCode(200)
                 .extract()
                 .as(PaymentApproveResponse.class);
+
+        SoftAssertions.assertSoftly(softAssertions -> {
+            softAssertions.assertThat(response).isNotNull();
+            softAssertions.assertThat(response.paymentKey()).isEqualTo(paymentKey);
+            softAssertions.assertThat(response.orderId()).isEqualTo(orderId);
+            softAssertions.assertThat(response.totalAmount()).isEqualTo(amount);
+        });
     }
 }
