@@ -1,6 +1,5 @@
 package roomescape.reservation.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -50,9 +49,10 @@ public class ReservationFacadeService {
     public List<MyReservationResponse> findMyReservations(final UserInfo userInfo) {
         List<Reservation> myReservations = reservationService.findMyReservations(userInfo);
         List<WaitingWithRank> waitingWithRanks = waitingService.findMyWaitingsWithRank(userInfo);
-        List<MyReservationResponse> myReservationResponses = new ArrayList<>();
-        return Stream.concat(myReservations.stream().map(MyReservationResponse::from),
-                waitingWithRanks.stream().map(MyReservationResponse::from)
+        return Stream.concat(myReservations.stream()
+                        .map(MyReservationResponse::from),
+                waitingWithRanks.stream()
+                        .map(MyReservationResponse::from)
         ).collect(Collectors.toList());
     }
 
