@@ -12,6 +12,7 @@ import java.util.Base64;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,6 +30,7 @@ public class PaymentClientControllerTest {
             .defaultHeader("Authorization", String.format("%s %s", "Basic", Base64.getEncoder()));
 
     private MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
+
     private PaymentClientController clientController = new PaymentClientController(testBuilder.build());
 
     @Test
