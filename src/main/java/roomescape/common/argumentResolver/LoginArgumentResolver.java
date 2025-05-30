@@ -9,7 +9,6 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import roomescape.common.util.JwtTokenContainer;
 import roomescape.common.util.TokenCookieManager;
 import roomescape.member.dto.request.LoginMember;
-import roomescape.member.service.LoginService;
 
 public class LoginArgumentResolver implements HandlerMethodArgumentResolver {
 
@@ -32,7 +31,7 @@ public class LoginArgumentResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public LoginMember resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer,
-                                  final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory) {
+                                       final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory) {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         String token = tokenCookieManager.extractTokenFromCookie(request);
         Long memberId = tokenContainer.getMemberId(token);

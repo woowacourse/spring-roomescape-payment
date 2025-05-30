@@ -3,9 +3,7 @@ package roomescape.payment.domain;
 import jakarta.persistence.*;
 import roomescape.reservation.domain.Reservation;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 @Entity
 public class Payment {
@@ -21,7 +19,7 @@ public class Payment {
 
     private PaymentStatus status;
 
-    @OneToOne(cascade = CascadeType.REMOVE , fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private Reservation reservation;
 
     public Payment(String orderId, LocalDateTime paymentDateTime, Long amount, PaymentStatus status, Reservation reservation) {
@@ -35,7 +33,7 @@ public class Payment {
     public Payment() {
     }
 
-    public void cancel(){
+    public void cancel() {
         this.status = PaymentStatus.CANCEL;
     }
 
