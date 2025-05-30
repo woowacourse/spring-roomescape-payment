@@ -56,7 +56,7 @@ class ReservationControllerTest {
                 1000L,
                 "invalidPaymentKey"
         );
-        LoginMember loginMember = new LoginMember(1L, "포라");
+        LoginMember loginMember = new LoginMember(1L);
 
         // when
         when(tossPaymentClient.confirmPayment(request))

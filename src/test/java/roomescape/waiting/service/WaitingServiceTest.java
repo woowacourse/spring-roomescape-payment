@@ -77,7 +77,7 @@ public class WaitingServiceTest {
         setUp(memberId, timeId, themeId);
 
         WaitingRequest request = new WaitingRequest(date, timeId, themeId);
-        LoginMember loginMember = new LoginMember(memberId, "포라");
+        LoginMember loginMember = new LoginMember(memberId);
 
         Waiting waiting = new Waiting(member, date, time, theme, LocalDateTime.of(2025, 1, 1, 10, 0));
         ReflectionTestUtils.setField(waiting, "id", 1L);
@@ -111,7 +111,7 @@ public class WaitingServiceTest {
         Long memberId = 1L;
 
         WaitingRequest request = new WaitingRequest(date, timeId, themeId);
-        LoginMember loginMember = new LoginMember(memberId, "포라");
+        LoginMember loginMember = new LoginMember(memberId);
 
         Waiting waiting = new Waiting(member, date, time, theme, LocalDateTime.of(2025, 1, 1, 10, 0));
         ReflectionTestUtils.setField(waiting, "id", 1L);

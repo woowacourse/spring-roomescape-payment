@@ -42,6 +42,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.internalServerError().body(exceptionResponse);
     }
 
+    @ExceptionHandler(value = DateTimeParseException.class)
+    public ResponseEntity<ExceptionResponse> noMatchTimeType(final HttpServletRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+                "[ERROR] 요청 시간 형식이 맞지 않습니다.", request.getRequestURI()
+        );
+        return ResponseEntity.badRequest().body(exceptionResponse);
+    }
+
     @ExceptionHandler(value = HttpMessageNotReadableException.class)
     public ResponseEntity<ExceptionResponse> notReadable(
             final HttpMessageNotReadableException exception, final HttpServletRequest request
@@ -70,15 +78,7 @@ public class GlobalExceptionHandler {
                 .body(e.getMessage());
     }
 
-    @ExceptionHandler(value = DateTimeParseException.class)
-    public ResponseEntity<ExceptionResponse> noMatchTimeType(final HttpServletRequest request) {
-        ExceptionResponse exceptionResponse = new ExceptionResponse(
-                "[ERROR] 요청 시간 형식이 맞지 않습니다.", request.getRequestURI()
-        );
-        return ResponseEntity.badRequest().body(exceptionResponse);
-    }
-
-    @ExceptionHandler(value = Exception.class)
+   @ExceptionHandler(value = Exception.class)
     public ResponseEntity<ExceptionResponse> unknownException(final HttpServletRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(
                 EXCEPTION_PREFIX + "예상치 못한 서버 오류입니다. 서버에 문의해주세요.", request.getRequestURI()
