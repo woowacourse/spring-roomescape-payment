@@ -3,6 +3,7 @@ package roomescape.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,10 @@ public class PaymentService {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    public PaymentService(RestClient restClient, ObjectMapper objectMapper) {
+    public PaymentService
+            (@Qualifier("tossClient") RestClient restClient,
+             ObjectMapper objectMapper
+            ) {
         this.restClient = restClient;
         this.objectMapper = objectMapper;
     }
