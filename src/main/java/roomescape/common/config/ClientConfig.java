@@ -22,15 +22,15 @@ public class ClientConfig {
     @Bean(name = "tossPaymentRestClient")
     public RestClient tossPaymentRestClient() {
         final SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        final Duration timeout = Duration.ofSeconds(tossPaymentProperties.getTossPaymentTimeoutSeconds());
+        final Duration timeout = Duration.ofSeconds(tossPaymentProperties.timeout());
         requestFactory.setConnectTimeout(timeout);
         requestFactory.setReadTimeout(timeout);
 
         final String encodedKey = Base64.getEncoder()
-                .encodeToString((tossPaymentProperties.getTossSecretKey() + ":").getBytes(StandardCharsets.UTF_8));
+                .encodeToString((tossPaymentProperties.secretKey() + ":").getBytes(StandardCharsets.UTF_8));
 
         return RestClient.builder()
-                .baseUrl(tossPaymentProperties.getTossPaymentBaseUrl())
+                .baseUrl(tossPaymentProperties.baseUrl())
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + encodedKey)
                 .requestFactory(requestFactory)
                 .build();
