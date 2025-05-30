@@ -25,7 +25,7 @@ public class PaymentService {
         Reservation byId = reservationRepository.findById(reservationId)
                 .orElseThrow();
 
-        Payment payment = new Payment(response.orderId(), response.approvedAt().toLocalDateTime(), response.totalAmount(), PaymentStatus.DONE, byId);
+        Payment payment = new Payment(response.orderId(), response.paymentKey(), response.approvedAt().toLocalDateTime(), response.totalAmount(), PaymentStatus.DONE, byId);
         return paymentRepository.save(payment);
     }
 

@@ -1,11 +1,14 @@
 package roomescape.payment.domain;
 
-import jakarta.persistence.*;
-import roomescape.reservation.domain.Reservation;
-
-import java.time.LocalDate;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
+import roomescape.reservation.domain.Reservation;
 
 @Entity
 public class Payment {
@@ -15,17 +18,20 @@ public class Payment {
 
     private String orderId;
 
+    private String paymentKey;
+
     private LocalDateTime paymentDateTime;
 
     private Long amount;
 
     private PaymentStatus status;
 
-    @OneToOne(cascade = CascadeType.REMOVE , fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private Reservation reservation;
 
-    public Payment(String orderId, LocalDateTime paymentDateTime, Long amount, PaymentStatus status, Reservation reservation) {
+    public Payment(String orderId, String paymentKey, LocalDateTime paymentDateTime, Long amount, PaymentStatus status, Reservation reservation) {
         this.orderId = orderId;
+        this.paymentKey = paymentKey;
         this.paymentDateTime = paymentDateTime;
         this.amount = amount;
         this.status = status;
@@ -35,12 +41,16 @@ public class Payment {
     public Payment() {
     }
 
-    public void cancel(){
+    public void cancel() {
         this.status = PaymentStatus.CANCEL;
     }
 
     public String getOrderId() {
         return orderId;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
     }
 
     public LocalDateTime getPaymentDateTime() {

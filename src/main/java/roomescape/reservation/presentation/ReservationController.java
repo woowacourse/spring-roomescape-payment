@@ -19,15 +19,15 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.common.argumentResolver.Login;
 import roomescape.common.exceptionHandler.dto.ExceptionResponse;
 import roomescape.member.dto.request.LoginMember;
+import roomescape.payment.client.TossPaymentClient;
+import roomescape.payment.client.dto.request.TossPaymentConfirmRequest;
 import roomescape.payment.client.dto.response.TossPaymentResponse;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
-import roomescape.payment.client.dto.request.TossPaymentConfirmRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
-import roomescape.payment.client.TossPaymentClient;
 import roomescape.reservation.service.ReservationService;
 
 @RestController
@@ -88,7 +88,6 @@ public class ReservationController {
         return ResponseEntity.badRequest().body(exceptionResponse);
     }
 
-    // TODO : URL
     @GetMapping("/mine")
     public ResponseEntity<List<MyReservationResponse>> getMyReservations(@Login LoginMember loginMember) {
         List<MyReservationResponse> myReservationResponses = reservationService.getMyReservations(loginMember.id());
