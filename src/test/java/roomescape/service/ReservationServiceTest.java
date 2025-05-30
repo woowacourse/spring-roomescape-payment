@@ -1,5 +1,19 @@
 package roomescape.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,18 +36,6 @@ import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationServiceTest {
@@ -64,14 +66,14 @@ class ReservationServiceTest {
     void setUp() {
         testMember = new Member(1L, "Test User", "test@example.com", Role.USER, "password");
         testTheme = new Theme(1L, "Test Theme", "Test Description", "test-thumbnail.jpg");
-        
+
         // 현재 시간보다 미래의 시간으로 설정
         LocalTime futureTime = LocalTime.now().plusHours(2);
         testReservationTime = new ReservationTime(1L, futureTime);
-        
+
         testDate = LocalDate.now().plusDays(1); // 내일 날짜로 설정
         testReservation = new Reservation(1L, testMember, testDate, testReservationTime, testTheme);
-        
+
         createRequest = new ReservationCreateRequest(testDate, 1L, 1L, 1L);
     }
 
@@ -158,7 +160,8 @@ class ReservationServiceTest {
     void findAllReservationResponses_ReturnsAllReservations() {
         // given
         Reservation reservation1 = testReservation;
-        Reservation reservation2 = new Reservation(2L, testMember, testDate.plusDays(1), testReservationTime, testTheme);
+        Reservation reservation2 = new Reservation(2L, testMember, testDate.plusDays(1), testReservationTime,
+                testTheme);
         List<Reservation> reservations = Arrays.asList(reservation1, reservation2);
 
         when(reservationRepository.findAll()).thenReturn(reservations);
@@ -182,7 +185,8 @@ class ReservationServiceTest {
         Long memberId = 1L;
 
         Reservation reservation1 = testReservation;
-        Reservation reservation2 = new Reservation(2L, testMember, testDate.plusDays(2), testReservationTime, testTheme);
+        Reservation reservation2 = new Reservation(2L, testMember, testDate.plusDays(2), testReservationTime,
+                testTheme);
         List<Reservation> reservations = Arrays.asList(reservation1, reservation2);
 
         when(reservationRepository.findReservationsByDateBetweenAndThemeIdAndMemberId(from, to, themeId, memberId))
@@ -230,9 +234,10 @@ class ReservationServiceTest {
     void findMyReservations_ReturnsUserReservations() {
         // given
         LoginInfo loginInfo = new LoginInfo(1L, "Test User", "test@example.com", Role.USER);
-        
+
         Reservation reservation1 = testReservation;
-        Reservation reservation2 = new Reservation(2L, testMember, testDate.plusDays(2), testReservationTime, testTheme);
+        Reservation reservation2 = new Reservation(2L, testMember, testDate.plusDays(2), testReservationTime,
+                testTheme);
         List<Reservation> reservations = Arrays.asList(reservation1, reservation2);
 
         when(reservationRepository.findReservationsByMemberId(loginInfo.id())).thenReturn(reservations);
@@ -247,7 +252,7 @@ class ReservationServiceTest {
         assertThat(responses.get(0).date()).isEqualTo(testDate);
         assertThat(responses.get(0).time()).isEqualTo(testReservationTime.getStartAt());
         assertThat(responses.get(0).status()).isEqualTo("예약");
-        
+
         assertThat(responses.get(1).id()).isEqualTo(2L);
     }
 }

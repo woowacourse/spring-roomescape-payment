@@ -44,8 +44,8 @@ class ReservationRepositoryTest {
         member = Member.createWithoutId("사용자", "user@example.com", Role.USER, "password");
         memberRepository.save(member);
 
-        theme1 = Theme.createWithoutId( "테마1", "테마1 설명", "thumbnail1.jpg");
-        theme2 = Theme.createWithoutId( "테마2", "테마2 설명", "thumbnail2.jpg");
+        theme1 = Theme.createWithoutId("테마1", "테마1 설명", "thumbnail1.jpg");
+        theme2 = Theme.createWithoutId("테마2", "테마2 설명", "thumbnail2.jpg");
         themeRepository.saveAll(List.of(theme1, theme2));
 
         time1 = ReservationTime.createWithoutId(LocalTime.of(10, 0));

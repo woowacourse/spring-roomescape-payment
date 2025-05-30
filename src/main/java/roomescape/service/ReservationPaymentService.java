@@ -14,10 +14,10 @@ public class ReservationPaymentService {
     @Value("toss.secret-key")
     private String secretKey;
 
-    private ReservationService reservationService;
-    private PaymentClientService paymentClientService;
-    private PaymentService paymentService;
-    private AuthorizationHeaderProvider authorizationHeaderProvider;
+    private final ReservationService reservationService;
+    private final PaymentClientService paymentClientService;
+    private final PaymentService paymentService;
+    private final AuthorizationHeaderProvider authorizationHeaderProvider;
 
     public ReservationPaymentService(ReservationService reservationService, PaymentClientService paymentClientService,
                                      PaymentService paymentService,

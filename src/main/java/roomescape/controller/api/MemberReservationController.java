@@ -39,7 +39,8 @@ public class MemberReservationController {
 
         responses.addAll(reservations);
         responses.addAll(waitings);
-        responses.sort(Comparator.comparing(MyReservationAndWaitingsResponse::date).thenComparing(MyReservationAndWaitingsResponse::time));
+        responses.sort(Comparator.comparing(MyReservationAndWaitingsResponse::date)
+                .thenComparing(MyReservationAndWaitingsResponse::time));
 
         return ResponseEntity.ok(responses);
     }

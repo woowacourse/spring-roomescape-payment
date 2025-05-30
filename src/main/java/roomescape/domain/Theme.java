@@ -7,7 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-@Table(name= "theme")
+@Table(name = "theme")
 @Entity
 public class Theme {
     @Id
