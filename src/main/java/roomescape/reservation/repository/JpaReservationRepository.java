@@ -70,6 +70,6 @@ public interface JpaReservationRepository extends ListCrudRepository<Reservation
             @Param("themeId") Long themeId
     );
 
-    @EntityGraph(attributePaths = "member")
+    @EntityGraph(attributePaths = {"member", "info.theme", "info.time"})
     List<Reservation> findByMemberId(Long memberId);
 }
