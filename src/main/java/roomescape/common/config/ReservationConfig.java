@@ -14,24 +14,21 @@ import roomescape.member.service.LoginService;
 @Configuration
 public class ReservationConfig implements WebMvcConfigurer {
 
-    private final LoginService loginService;
     private final TokenCookieManager tokenCookieManager;
     private final JwtTokenContainer jwtTokenContainer;
 
-    public ReservationConfig(LoginService loginService, TokenCookieManager tokenCookieManager,
-                             JwtTokenContainer jwtTokenContainer) {
-        this.loginService = loginService;
+    public ReservationConfig(final TokenCookieManager tokenCookieManager, final JwtTokenContainer jwtTokenContainer) {
         this.tokenCookieManager = tokenCookieManager;
         this.jwtTokenContainer = jwtTokenContainer;
     }
 
     @Override
-    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new LoginArgumentResolver(loginService, tokenCookieManager));
+    public void addArgumentResolvers(final List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(new LoginArgumentResolver(tokenCookieManager, jwtTokenContainer));
     }
 
     @Override
-    public void addInterceptors(InterceptorRegistry registry) {
+    public void addInterceptors(final InterceptorRegistry registry) {
         registry.addInterceptor(new AdminInterceptor(tokenCookieManager, jwtTokenContainer))
                 .addPathPatterns("/admin/**");
     }

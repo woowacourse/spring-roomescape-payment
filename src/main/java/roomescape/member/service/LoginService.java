@@ -18,14 +18,14 @@ public class LoginService {
     private final MemberRepository memberRepository;
     private final DateTime dateTime;
 
-    public LoginService(JwtTokenContainer jwtTokenContainer, MemberRepository memberRepository, DateTime dateTime) {
+    public LoginService(final JwtTokenContainer jwtTokenContainer,final MemberRepository memberRepository,final DateTime dateTime) {
         this.jwtTokenContainer = jwtTokenContainer;
         this.memberRepository = memberRepository;
         this.dateTime = dateTime;
     }
 
     @Transactional(readOnly = true)
-    public String loginAndReturnToken(LoginRequest request) {
+    public String loginAndReturnToken(final LoginRequest request) {
         Optional<Member> loginMember = memberRepository.findByEmailAndPassword(request.email(),
                 request.password());
         if (loginMember.isEmpty()) {
@@ -35,14 +35,9 @@ public class LoginService {
     }
 
     @Transactional(readOnly = true)
-    public LoginMember loginCheck(String token) {
-        jwtTokenContainer.validateToken(token);
-        Long memberId = jwtTokenContainer.getMemberId(token);
-        Optional<Member> member = memberRepository.findById(memberId);
-        if (member.isEmpty()) {
-            throw new LoginException("유효하지 않은 회원입니다.");
-        }
-        Member findMember = member.get();
-        return new LoginMember(memberId, findMember.getName());
+    public String findMemberName(final long memberId){
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 멤버입니다."));
+        return findMember.getName();
     }
 }

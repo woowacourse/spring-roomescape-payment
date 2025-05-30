@@ -15,14 +15,14 @@ public class AdminInterceptor implements HandlerInterceptor {
     private final TokenCookieManager tokenCookieManager;
     private final JwtTokenContainer jwtTokenContainer;
 
-    public AdminInterceptor(TokenCookieManager tokenCookieManager, JwtTokenContainer jwtTokenContainer) {
+    public AdminInterceptor(final TokenCookieManager tokenCookieManager, final JwtTokenContainer jwtTokenContainer) {
         this.tokenCookieManager = tokenCookieManager;
         this.jwtTokenContainer = jwtTokenContainer;
     }
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-            throws Exception {
+    public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler)
+    throws Exception {
         try {
             String token = tokenCookieManager.extractTokenFromCookie(request);
             Role memberRole = jwtTokenContainer.getMemberRole(token);
@@ -36,7 +36,7 @@ public class AdminInterceptor implements HandlerInterceptor {
         }
     }
 
-    private boolean redirectedToLogin(HttpServletResponse response) throws IOException {
+    private boolean redirectedToLogin(final HttpServletResponse response) throws IOException {
         response.sendRedirect("/login");
         return false;
     }

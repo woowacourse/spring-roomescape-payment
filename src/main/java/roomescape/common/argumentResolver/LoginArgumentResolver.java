@@ -6,21 +6,24 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import roomescape.common.util.JwtTokenContainer;
 import roomescape.common.util.TokenCookieManager;
 import roomescape.member.dto.request.LoginMember;
 import roomescape.member.service.LoginService;
 
 public class LoginArgumentResolver implements HandlerMethodArgumentResolver {
-    private final LoginService loginService;
-    private final TokenCookieManager tokenCookieManager;
 
-    public LoginArgumentResolver(LoginService loginService, TokenCookieManager tokenCookieManager) {
-        this.loginService = loginService;
+    private final TokenCookieManager tokenCookieManager;
+    private final JwtTokenContainer tokenContainer;
+
+
+    public LoginArgumentResolver(final TokenCookieManager tokenCookieManager, final JwtTokenContainer tokenContainer) {
         this.tokenCookieManager = tokenCookieManager;
+        this.tokenContainer = tokenContainer;
     }
 
     @Override
-    public boolean supportsParameter(MethodParameter parameter) {
+    public boolean supportsParameter(final MethodParameter parameter) {
         boolean hasAnnotation = parameter.hasParameterAnnotation(Login.class);
         boolean hasLoginMemberType = LoginMember.class.isAssignableFrom(parameter.getParameterType());
 
@@ -28,10 +31,11 @@ public class LoginArgumentResolver implements HandlerMethodArgumentResolver {
     }
 
     @Override
-    public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-                                  NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+    public LoginMember resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer,
+                                  final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory) {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         String token = tokenCookieManager.extractTokenFromCookie(request);
-        return loginService.loginCheck(token);
+        Long memberId = tokenContainer.getMemberId(token);
+        return new LoginMember(memberId);
     }
 }

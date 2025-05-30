@@ -33,7 +33,9 @@ public class LoginController {
 
     @GetMapping("/login/check")
     public ResponseEntity<LoginCheckResponse> loginCheck(@Login LoginMember member) {
-        return ResponseEntity.ok().body(new LoginCheckResponse(member.name()));
+        String memberName = loginService.findMemberName(member.id());
+        LoginCheckResponse loginCheckResponse = new LoginCheckResponse(memberName);
+        return ResponseEntity.ok().body(loginCheckResponse);
     }
 
     @PostMapping("/logout")
