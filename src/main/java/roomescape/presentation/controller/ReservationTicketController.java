@@ -17,7 +17,7 @@ import roomescape.application.facade.ReservationTicketPaymentService;
 import roomescape.application.service.ReservationTicketService;
 import roomescape.dto.LoginMember;
 import roomescape.dto.request.ReservationSearchDto;
-import roomescape.dto.request.ReservationTicketPaymentRequestDto;
+import roomescape.dto.request.ReservationTicketPaymentWithTossRequestDto;
 import roomescape.dto.response.ReservationTicketResponseDto;
 
 @RestController
@@ -44,10 +44,10 @@ public class ReservationTicketController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ReservationTicketResponseDto addReservation(
-            @RequestBody @Valid ReservationTicketPaymentRequestDto reservationTicketPaymentRequestDto,
+            @RequestBody @Valid ReservationTicketPaymentWithTossRequestDto reservationTicketPaymentWithTossRequestDto,
             LoginMember loginMember) {
 
-        return reservationTicketPaymentService.saveReservation(reservationTicketPaymentRequestDto, loginMember);
+        return reservationTicketPaymentService.saveReservationWithTossPaymentGateWay(reservationTicketPaymentWithTossRequestDto, loginMember);
     }
 
     @DeleteMapping("/{id}")

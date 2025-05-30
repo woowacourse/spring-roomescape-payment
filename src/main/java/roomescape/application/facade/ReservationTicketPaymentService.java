@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import roomescape.application.service.ReservationTicketService;
 import roomescape.application.service.TossPaymentService;
 import roomescape.dto.LoginMember;
-import roomescape.dto.request.ReservationTicketPaymentRequestDto;
+import roomescape.dto.request.ReservationTicketPaymentWithTossRequestDto;
 import roomescape.dto.response.ReservationTicketResponseDto;
 import roomescape.model.ReservationTicket;
 
@@ -16,13 +16,13 @@ public class ReservationTicketPaymentService {
     private final ReservationTicketService reservationTicketService;
     private final TossPaymentService tossPaymentService;
 
-    public ReservationTicketResponseDto saveReservation(
-            ReservationTicketPaymentRequestDto reservationTicketPaymentRequestDto,
+    public ReservationTicketResponseDto saveReservationWithTossPaymentGateWay(
+            ReservationTicketPaymentWithTossRequestDto reservationTicketPaymentWithTossRequestDto,
             LoginMember loginMember) {
         ReservationTicket reservationTicket = reservationTicketService.saveReservation(
-                reservationTicketPaymentRequestDto.reservationTicketRegisterDto(),
+                reservationTicketPaymentWithTossRequestDto.reservationTicketRegisterDto(),
                 loginMember);
-        tossPaymentService.processPayment(reservationTicketPaymentRequestDto.tossPaymentRequestDto(),
+        tossPaymentService.processPayment(reservationTicketPaymentWithTossRequestDto.tossPaymentRequestDto(),
                 reservationTicket);
 
         return new ReservationTicketResponseDto(reservationTicket);

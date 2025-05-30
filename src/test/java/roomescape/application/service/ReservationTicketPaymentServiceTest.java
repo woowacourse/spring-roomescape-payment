@@ -21,7 +21,7 @@ import roomescape.application.facade.ReservationTicketPaymentService;
 import roomescape.common.exception.DuplicatedException;
 import roomescape.common.exception.PaymentClientException;
 import roomescape.dto.LoginMember;
-import roomescape.dto.request.ReservationTicketPaymentRequestDto;
+import roomescape.dto.request.ReservationTicketPaymentWithTossRequestDto;
 import roomescape.dto.request.ReservationTicketRegisterDto;
 import roomescape.dto.request.TossPaymentConfirmDto;
 import roomescape.dto.request.TossPaymentRequestDto;
@@ -93,8 +93,8 @@ public class ReservationTicketPaymentServiceTest {
                 .thenReturn(tossPaymentConfirmResponseDto);
 
         // when
-        ReservationTicketResponseDto response = reservationTicketPaymentService.saveReservation(
-                new ReservationTicketPaymentRequestDto(request, tossPaymentRequestDto), loginMember);
+        ReservationTicketResponseDto response = reservationTicketPaymentService.saveReservationWithTossPaymentGateWay(
+                new ReservationTicketPaymentWithTossRequestDto(request, tossPaymentRequestDto), loginMember);
 
         // then
         List<TossPayment> tossPayments = tossPaymentJpaRepository.findAll();
@@ -132,8 +132,8 @@ public class ReservationTicketPaymentServiceTest {
 
         // when & then
         assertThatThrownBy(
-                () -> reservationTicketPaymentService.saveReservation(
-                        new ReservationTicketPaymentRequestDto(request, tossPaymentRequestDto),
+                () -> reservationTicketPaymentService.saveReservationWithTossPaymentGateWay(
+                        new ReservationTicketPaymentWithTossRequestDto(request, tossPaymentRequestDto),
                         loginMember)).isInstanceOf(
                 PaymentClientException.class);
     }
@@ -175,8 +175,8 @@ public class ReservationTicketPaymentServiceTest {
 
         // when && then
         assertThatThrownBy(
-                () -> reservationTicketPaymentService.saveReservation(
-                        new ReservationTicketPaymentRequestDto(request, tossPaymentRequestDto), loginMember))
+                () -> reservationTicketPaymentService.saveReservationWithTossPaymentGateWay(
+                        new ReservationTicketPaymentWithTossRequestDto(request, tossPaymentRequestDto), loginMember))
                 .isInstanceOf(DuplicatedException.class);
     }
 
@@ -208,8 +208,8 @@ public class ReservationTicketPaymentServiceTest {
 
         // when && then
         assertThatThrownBy(
-                () -> reservationTicketPaymentService.saveReservation(
-                        new ReservationTicketPaymentRequestDto(request, tossPaymentRequestDto), loginMember))
+                () -> reservationTicketPaymentService.saveReservationWithTossPaymentGateWay(
+                        new ReservationTicketPaymentWithTossRequestDto(request, tossPaymentRequestDto), loginMember))
                 .isInstanceOf(IllegalStateException.class);
     }
 

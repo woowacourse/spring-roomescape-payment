@@ -1,6 +1,6 @@
 package roomescape.dto.request;
 
-public record ReservationTicketPaymentRequestDto(
+public record ReservationTicketPaymentWithTossRequestDto(
         ReservationTicketRegisterDto reservationTicketRegisterDto,
         TossPaymentRequestDto tossPaymentRequestDto
 ) {
