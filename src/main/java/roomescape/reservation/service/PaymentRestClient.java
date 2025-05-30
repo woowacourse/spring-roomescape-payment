@@ -1,7 +1,6 @@
 package roomescape.reservation.service;
 
 import java.util.Base64;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -10,17 +9,28 @@ import roomescape.reservation.entity.Payment;
 import roomescape.reservation.error.handler.PaymentResponseErrorHandler;
 
 @Component
-@RequiredArgsConstructor
 public class PaymentRestClient {
+
+    public static final String TOSS_PAYMENT_URL = "https://api.tosspayments.com/v1/payments";
 
     private final RestClient restClient;
     private final PaymentResponseErrorHandler paymentResponseErrorHandler;
+    private final String testKey;
 
-    @Value("${toss.secret-key}")
-    private String testKey;
+    public PaymentRestClient(
+            RestClient.Builder builder,
+            PaymentResponseErrorHandler paymentResponseErrorHandler,
+            @Value("${toss.secret-key}") String testKey
+    ) {
+        this.restClient = builder
+                .baseUrl(TOSS_PAYMENT_URL)
+                .build();
+        this.paymentResponseErrorHandler = paymentResponseErrorHandler;
+        this.testKey = testKey;
+    }
 
-    public void approve(Payment payment) {
-        restClient.post()
+    public PaymentApproveResponse approve(Payment payment) {
+        return restClient.post()
                 .uri("/confirm")
                 .header("Authorization", "Basic " + getEncodedKey())
                 .body(payment)
