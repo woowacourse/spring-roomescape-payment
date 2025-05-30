@@ -20,7 +20,7 @@ public class TossPaymentClient implements PaymentClient {
 
     private final RestClient restClient;
     private final String secretKey;
-    private final ObjectMapper statusParser = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final String paymentConfirmUrl;
 
     public TossPaymentClient(
@@ -55,7 +55,7 @@ public class TossPaymentClient implements PaymentClient {
                 .header(HttpHeaders.AUTHORIZATION, createAuthHeaderConcise())
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
-                    PaymentExceptionContent paymentExceptionContent = statusParser.readValue(response.getBody(),
+                    PaymentExceptionContent paymentExceptionContent = objectMapper.readValue(response.getBody(),
                             PaymentExceptionContent.class);
                     throw new PaymentException(paymentExceptionContent.message());
                 }))
