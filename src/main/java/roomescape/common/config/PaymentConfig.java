@@ -7,8 +7,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
-import roomescape.common.exception.handler.PaymentExceptionHandler;
 import roomescape.infrastructure.payment.toss.TossPaymentWithRestClient;
+import roomescape.infrastructure.payment.toss.exception.PaymentExceptionHandler;
 
 @Configuration
 public class PaymentConfig {
@@ -22,11 +22,11 @@ public class PaymentConfig {
     @Bean
     public TossPaymentWithRestClient tossPaymentWithRestClient(RestClient.Builder builder) {
         return new TossPaymentWithRestClient(builder
-            .baseUrl("https://api.tosspayments.com/v1/payments")
-            .defaultHeader(AUTHORIZATION_HEADER, AUTHORIZATION_SCHEME + encodeSecretKey())
-            .defaultStatusHandler(new PaymentExceptionHandler())
-            .requestFactory(createRequestFactory())
-            .build());
+                .baseUrl("https://api.tosspayments.com/v1/payments")
+                .defaultHeader(AUTHORIZATION_HEADER, AUTHORIZATION_SCHEME + encodeSecretKey())
+                .defaultStatusHandler(new PaymentExceptionHandler())
+                .requestFactory(createRequestFactory())
+                .build());
     }
 
     private static SimpleClientHttpRequestFactory createRequestFactory() {
