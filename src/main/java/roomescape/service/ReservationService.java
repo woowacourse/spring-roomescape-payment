@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.ReservationWithRank;
 import roomescape.dto.request.AddReservationRequest;
 import roomescape.dto.request.AdminCreateReservationRequest;
-import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.request.CreateWaitReservationRequest;
 import roomescape.dto.request.LoginMemberRequest;
 import roomescape.dto.response.MyReservationResponse;
