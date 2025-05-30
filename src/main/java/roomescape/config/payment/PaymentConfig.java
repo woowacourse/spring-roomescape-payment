@@ -11,7 +11,7 @@ import roomescape.utility.PaymentClient;
 import roomescape.utility.TossPaymentClient;
 
 @Configuration
-@Profile("!test") // 테스트 프로필에서만 활성화
+@Profile("!test")
 public class PaymentConfig {
 
     @Bean
