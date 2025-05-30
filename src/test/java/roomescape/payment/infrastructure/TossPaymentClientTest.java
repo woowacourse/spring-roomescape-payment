@@ -4,6 +4,7 @@ package roomescape.payment.infrastructure;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.SocketTimeoutException;
@@ -37,11 +38,14 @@ class TossPaymentClientTest {
     @Autowired
     private RestClient restClient;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     private TossPaymentClient tossPaymentClient;
 
     @BeforeEach
     void setUp() {
-        tossPaymentClient = new TossPaymentClient(restClient);
+        tossPaymentClient = new TossPaymentClient(restClient, objectMapper);
     }
 
     @AfterEach

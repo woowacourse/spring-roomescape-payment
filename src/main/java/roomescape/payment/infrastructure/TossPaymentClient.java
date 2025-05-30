@@ -25,6 +25,8 @@ public class TossPaymentClient implements PaymentClient {
     @Qualifier("tossPaymentRestClient")
     private final RestClient restClient;
 
+    private final ObjectMapper objectMapper;
+
     @Retryable(
             value = {RestClientException.class, SocketTimeoutException.class, TossPaymentException.class},
             maxAttempts = 3,
@@ -44,7 +46,6 @@ public class TossPaymentClient implements PaymentClient {
 
     private void handleException(final ClientHttpResponse res) {
         try (InputStream is = res.getBody()) {
-            ObjectMapper objectMapper = new ObjectMapper();
             TossErrorResponse error = objectMapper.readValue(is, TossErrorResponse.class);
             throw new TossPaymentException(error.code(), error.message());
         } catch (IOException e) {
@@ -52,3 +53,4 @@ public class TossPaymentClient implements PaymentClient {
         }
     }
 }
+
