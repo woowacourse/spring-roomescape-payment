@@ -1,15 +1,24 @@
 package roomescape.reservationTime.presentation;
 
+import jakarta.servlet.http.HttpServletRequest;
+import java.net.URI;
+import java.time.format.DateTimeParseException;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import roomescape.common.exceptionHandler.dto.ExceptionResponse;
 import roomescape.reservationTime.dto.request.ReservationTimeRequest;
 import roomescape.reservationTime.dto.request.TimeConditionRequest;
 import roomescape.reservationTime.dto.response.ReservationTimeResponse;
 import roomescape.reservationTime.dto.response.TimeConditionResponse;
 import roomescape.reservationTime.service.ReservationTimeService;
-
-import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping(ReservationTimeController.RESERVATION_TIME_BASE_URL)

@@ -1,10 +1,16 @@
 package roomescape.reservation.service;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.util.DateTime;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
@@ -17,10 +23,6 @@ import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeRepository;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.domain.WaitingRepository;
-
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Stream;
 
 @Service
 public class ReservationService {
