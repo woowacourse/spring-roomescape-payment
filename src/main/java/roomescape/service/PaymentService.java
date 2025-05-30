@@ -1,6 +1,7 @@
 package roomescape.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.PaymentHistory;
 import roomescape.dto.business.PaymentHistoryCreationContent;
 import roomescape.dto.business.PaymentResult;
@@ -8,6 +9,7 @@ import roomescape.repository.PaymentHistoryRepository;
 import roomescape.utility.PaymentClient;
 
 @Service
+@Transactional
 public class PaymentService {
 
     private final PaymentHistoryRepository paymentHistoryRepository;

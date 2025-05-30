@@ -1,12 +1,13 @@
 package roomescape.domain;
 
+import java.time.LocalTime;
+import java.util.Objects;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.time.LocalTime;
-import java.util.Objects;
 
 @Entity
 public class ReservationTime extends AuditedEntity {
@@ -21,14 +22,13 @@ public class ReservationTime extends AuditedEntity {
     protected ReservationTime() {
     }
 
-    public ReservationTime(Long id, LocalTime startAt) {
+    private ReservationTime(LocalTime startAt) {
         validate(startAt);
-        this.id = id;
         this.startAt = startAt;
     }
 
     public static ReservationTime createWithoutId(LocalTime startAt) {
-        return new ReservationTime(null, startAt);
+        return new ReservationTime(startAt);
     }
 
     public Long getId() {

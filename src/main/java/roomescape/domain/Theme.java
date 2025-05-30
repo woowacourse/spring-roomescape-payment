@@ -1,12 +1,13 @@
 package roomescape.domain;
 
+import java.util.Objects;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Lob;
-import java.util.Objects;
 
 @Entity
 public class Theme extends AuditedEntity {
@@ -29,16 +30,15 @@ public class Theme extends AuditedEntity {
     protected Theme() {
     }
 
-    public Theme(Long id, String name, String description, String thumbnail) {
+    private Theme(String name, String description, String thumbnail) {
         validate(name, description, thumbnail);
-        this.id = id;
         this.name = name;
         this.description = description;
         this.thumbnail = thumbnail;
     }
 
     public static Theme createWithoutId(String name, String description, String thumbnail) {
-        return new Theme(null, name, description, thumbnail);
+        return new Theme(name, description, thumbnail);
     }
 
     public Long getId() {

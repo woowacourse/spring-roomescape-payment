@@ -20,21 +20,44 @@ public class PaymentHistory extends AuditedEntity {
     private String paymentType;
 
     protected PaymentHistory() {
-
     }
 
-    private PaymentHistory(Long id, String orderId, String paymentKey, String paymentType) {
-        this.id = id;
+    private PaymentHistory(String orderId, String paymentKey, String paymentType) {
+        validate(orderId, paymentKey, paymentType);
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.paymentType = paymentType;
     }
 
-    public static PaymentHistory createWithoutId(
-            String orderId,
-            String paymentKey,
-            String paymentType
-    ) {
-        return new PaymentHistory(null, orderId, paymentKey, paymentType);
+    public static PaymentHistory createWithoutId(String orderId, String paymentKey, String paymentType) {
+        return new PaymentHistory(orderId, paymentKey, paymentType);
+    }
+
+    private void validate(String orderId, String paymentKey, String paymentType) {
+        if (orderId == null || orderId.isBlank()) {
+            throw new IllegalArgumentException("주문 ID는 비어있을 수 없습니다.");
+        }
+        if (paymentKey == null || paymentKey.isBlank()) {
+            throw new IllegalArgumentException("결제 키는 비어있을 수 없습니다.");
+        }
+        if (paymentType == null || paymentType.isBlank()) {
+            throw new IllegalArgumentException("결제 타입은 비어있을 수 없습니다.");
+        }
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public String getPaymentType() {
+        return paymentType;
     }
 }

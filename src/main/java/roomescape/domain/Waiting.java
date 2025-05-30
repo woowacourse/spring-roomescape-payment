@@ -1,5 +1,9 @@
 package roomescape.domain;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Objects;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,9 +13,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Entity
 public class Waiting extends AuditedEntity {
@@ -36,14 +37,10 @@ public class Waiting extends AuditedEntity {
     private PaymentHistory paymentHistory;
 
     protected Waiting() {
-
     }
 
-    public Waiting(
-            Long id, LocalDate date, Theme theme, ReservationTime time,
-            Member member, PaymentHistory paymentHistory) {
+    private Waiting(LocalDate date, Theme theme, ReservationTime time, Member member, PaymentHistory paymentHistory) {
         validate(date, theme, time, member);
-        this.id = id;
         this.date = date;
         this.theme = theme;
         this.time = time;
@@ -53,12 +50,12 @@ public class Waiting extends AuditedEntity {
 
     public static Waiting createWithoutIdWithoutPayment(LocalDate date, Theme theme,
                                                         ReservationTime time, Member member) {
-        return new Waiting(null, date, theme, time, member, null);
+        return new Waiting(date, theme, time, member, null);
     }
 
     public static Waiting createWithoutId(LocalDate date, Theme theme, ReservationTime time,
                                           Member member, PaymentHistory paymentHistory) {
-        return new Waiting(null, date, theme, time, member, paymentHistory);
+        return new Waiting(date, theme, time, member, paymentHistory);
     }
 
     public boolean isPastWaiting() {

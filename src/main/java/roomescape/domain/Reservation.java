@@ -1,5 +1,9 @@
 package roomescape.domain;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Objects;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -9,9 +13,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Objects;
 
 @Entity
 public class Reservation extends AuditedEntity {
@@ -38,23 +39,8 @@ public class Reservation extends AuditedEntity {
     protected Reservation() {
     }
 
-    public Reservation(
-            Long id, LocalDate date, ReservationTime time, Theme theme, Member member
-    ) {
+    private Reservation(LocalDate date, ReservationTime time, Theme theme, Member member, PaymentHistory paymentHistory) {
         validate(date, time, theme, member);
-        this.id = id;
-        this.date = date;
-        this.reservationTime = time;
-        this.theme = theme;
-        this.member = member;
-        this.paymentHistory = null;
-    }
-
-    public Reservation(
-            Long id, LocalDate date, ReservationTime time, Theme theme, Member member, PaymentHistory paymentHistory
-    ) {
-        validate(date, time, theme, member);
-        this.id = id;
         this.date = date;
         this.reservationTime = time;
         this.theme = theme;
@@ -65,14 +51,14 @@ public class Reservation extends AuditedEntity {
     public static Reservation createWithoutIdAndPaymentHistory(
             LocalDate date, ReservationTime time, Theme theme, Member member
     ) {
-        return new Reservation(null, date, time, theme, member, null);
+        return new Reservation(date, time, theme, member, null);
     }
 
     public static Reservation createWithoutId(
             LocalDate date, ReservationTime time,
             Theme theme, Member member, PaymentHistory paymentHistory
     ) {
-        return new Reservation(null, date, time, theme, member, paymentHistory);
+        return new Reservation(date, time, theme, member, paymentHistory);
     }
 
     public boolean isPastDateTime() {

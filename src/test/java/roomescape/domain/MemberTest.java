@@ -20,7 +20,7 @@ class MemberTest {
         @Test
         void cannotCreateBecauseNullRole() {
             // when & then
-            assertThatThrownBy(() -> new Member(1L, null, "이름", "test@test.com", "asdfe123!"))
+            assertThatThrownBy(() -> Member.createWithoutId(null, "이름", "test@test.com", "asdfe123!"))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("비어있는 권한으로 멤버를 생성할 수 없습니다.");
         }
@@ -30,7 +30,7 @@ class MemberTest {
         @NullAndEmptySource
         void cannotCreateBecauseNullName(String name) {
             // when & then
-            assertThatThrownBy(() -> new Member(1L, Role.GENERAL, name, "test@test.com", "qwer1234!"))
+            assertThatThrownBy(() -> Member.createWithoutId(Role.GENERAL, name, "test@test.com", "qwer1234!"))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("비어있는 이름로 멤버를 생성할 수 없습니다.");
         }
@@ -39,10 +39,10 @@ class MemberTest {
         @Test
         void cannotCreateBecauseTooLongName() {
             // given
-            String tooLongName = "1" .repeat(256);
+            String tooLongName = "1".repeat(256);
 
             // when & then
-            assertThatThrownBy(() -> new Member(1L, Role.GENERAL, tooLongName, "test@test.com", "qwer1234!"))
+            assertThatThrownBy(() -> Member.createWithoutId(Role.GENERAL, tooLongName, "test@test.com", "qwer1234!"))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("최대길이를 초과한 이름으로는 멤버를 생성할 수 없습니다.");
         }
@@ -52,7 +52,7 @@ class MemberTest {
         @NullAndEmptySource
         void cannotCreateBecauseNullEmail(String email) {
             // when & then
-            assertThatThrownBy(() -> new Member(1L, Role.GENERAL, "이름", email, "qwer1234!"))
+            assertThatThrownBy(() -> Member.createWithoutId(Role.GENERAL, "이름", email, "qwer1234!"))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("비어있는 이메일로 멤버를 생성할 수 없습니다.");
         }
@@ -61,10 +61,10 @@ class MemberTest {
         @Test
         void cannotCreateBecauseTooLongEmail() {
             // given
-            String tooLongEmail = "1" .repeat(256);
+            String tooLongEmail = "1".repeat(256);
 
             // when & then
-            assertThatThrownBy(() -> new Member(1L, Role.GENERAL, "이름", tooLongEmail, "비밀번호"))
+            assertThatThrownBy(() -> Member.createWithoutId(Role.GENERAL, "이름", tooLongEmail, "비밀번호"))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("최대길이를 초과한 이메일로는 멤버를 생성할 수 없습니다.");
         }
@@ -76,7 +76,7 @@ class MemberTest {
             String invalidEmail = "invalidEmail";
 
             // when & then
-            assertThatThrownBy(() -> new Member(1L, Role.GENERAL, "이름", invalidEmail, "비밀번호"))
+            assertThatThrownBy(() -> Member.createWithoutId(Role.GENERAL, "이름", invalidEmail, "비밀번호"))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("올바르지 않은 형식의 이메일로는 멤버를 생성할 수 없습니다.");
         }
@@ -86,7 +86,7 @@ class MemberTest {
         @NullAndEmptySource
         void cannotCreateBecauseNullPassword(String password) {
             // when & then
-            assertThatThrownBy(() -> new Member(1L, Role.GENERAL, "이름", "test@test.com", password))
+            assertThatThrownBy(() -> Member.createWithoutId(Role.GENERAL, "이름", "test@test.com", password))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("비어있는 비밀번호로 멤버를 생성할 수 없습니다.");
         }
@@ -95,9 +95,9 @@ class MemberTest {
         @Test
         void cannotCreateBecauseTooLongPassword() {
             // given
-            String tooLongPassword = "i" .repeat(51);
+            String tooLongPassword = "i".repeat(51);
             // when & then
-            assertThatThrownBy(() -> new Member(1L, Role.GENERAL, "이름", "test@test.com", tooLongPassword))
+            assertThatThrownBy(() -> Member.createWithoutId(Role.GENERAL, "이름", "test@test.com", tooLongPassword))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("최대길이를 초과한 비밀번호로는 멤버를 생성할 수 없습니다.");
         }
@@ -107,7 +107,7 @@ class MemberTest {
         @ValueSource(strings = {"asdfasdf1", "asdfasdf!", "12341234!", "a213!"})
         void cannotCreateBecauseInvalidPassword(String invalidPassword) {
             // when & then
-            assertThatThrownBy(() -> new Member(1L, Role.GENERAL, "이름", "test@test.com", invalidPassword))
+            assertThatThrownBy(() -> Member.createWithoutId(Role.GENERAL, "이름", "test@test.com", invalidPassword))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("올바르지 않은 형식의 비밀번호로는 멤버를 생성할 수 없습니다.");
         }
@@ -121,7 +121,7 @@ class MemberTest {
         @Test
         void isEqualPassword() {
             // given
-            Member member = new Member(1L, Role.GENERAL, "회원", "test@test.com", "qwer1234!");
+            Member member = Member.createWithoutId(Role.GENERAL, "회원", "test@test.com", "qwer1234!");
 
             // when
             boolean isEqual = member.isEqualPassword("qwer1234!");
@@ -134,7 +134,7 @@ class MemberTest {
         @Test
         void isNotEqualPassword() {
             // given
-            Member member = new Member(1L, Role.ADMIN, "회원", "test@test.com", "qwer1234!");
+            Member member = Member.createWithoutId(Role.ADMIN, "회원", "test@test.com", "qwer1234!");
 
             // when
             boolean isNotEqual = member.isEqualPassword("asdf5678!");
@@ -152,7 +152,7 @@ class MemberTest {
         @Test
         void isMember() {
             // given
-            Member member = new Member(1L, Role.GENERAL, "회원", "test@test.com", "qwer1234!");
+            Member member = Member.createWithoutId(Role.GENERAL, "회원", "test@test.com", "qwer1234!");
 
             // when
             boolean isMember = member.isMember();
@@ -165,7 +165,7 @@ class MemberTest {
         @Test
         void isAdmin() {
             // given
-            Member member = new Member(1L, Role.ADMIN, "회원", "test@test.com", "qwer1234!");
+            Member member = Member.createWithoutId(Role.ADMIN, "회원", "test@test.com", "qwer1234!");
 
             // when
             boolean isMember = member.isMember();

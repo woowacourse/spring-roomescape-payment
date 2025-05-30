@@ -1,5 +1,7 @@
 package roomescape.domain;
 
+import java.util.Objects;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -7,7 +9,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.util.Objects;
 import roomescape.domain.regex.MemberFormat;
 
 @Entity
@@ -34,9 +35,8 @@ public class Member extends AuditedEntity {
     protected Member() {
     }
 
-    public Member(Long id, Role role, String name, String email, String password) {
+    private Member(Role role, String name, String email, String password) {
         validate(role, name, email, password);
-        this.id = id;
         this.role = role;
         this.name = name;
         this.email = email;
@@ -44,7 +44,7 @@ public class Member extends AuditedEntity {
     }
 
     public static Member createWithoutId(Role role, String name, String email, String password) {
-        return new Member(null, role, name, email, password);
+        return new Member(role, name, email, password);
     }
 
     public boolean isEqualPassword(String password) {
