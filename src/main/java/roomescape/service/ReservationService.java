@@ -94,7 +94,8 @@ public class ReservationService {
         return new ReservationResponse(savedReservation);
     }
 
-    public ReservationResponse addReservation(long memberId, ReservationCreationContent reservationCreationContent,
+    public ReservationResponse addReservation(long memberId,
+                                              ReservationCreationContent reservationCreationContent,
                                               PaymentHistoryCreationContent paymentHistoryCreationContent) {
         Member member = getMemberById(memberId);
         Theme theme = getThemeById(reservationCreationContent.themeId());

@@ -15,22 +15,22 @@ import roomescape.exception.PaymentException;
 
 public class TossPaymentClient implements PaymentClient {
 
-    private static final String CONNECTION_ERROR_MESSAGE = "결제 서버에 연결이 실패하였습니다. 이 현상이 지속되는 경우 어드민에게 문의해주세요.";
+    private static final String CONNECTION_FAIL_ERROR_MESSAGE = "결제 서버에 연결이 실패하였습니다. 이 현상이 지속되는 경우 어드민에게 문의해주세요.";
     private static final String CONFIRM_SERVER_FAIL_MESSAGE = "결제 연동 서버가 아파요. 관리자에게 문의해주세요.";
 
     private final RestClient restClient;
     private final String secretKey;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final String paymentConfirmUrl;
+    private final String paymentConfirmUri;
 
     public TossPaymentClient(
             RestClient restClient,
             String secretKey,
-            String paymentConfirmUrl
+            String paymentConfirmUri
     ) {
         this.restClient = restClient;
         this.secretKey = secretKey;
-        this.paymentConfirmUrl = paymentConfirmUrl;
+        this.paymentConfirmUri = paymentConfirmUri;
     }
 
     @Override
@@ -40,15 +40,15 @@ public class TossPaymentClient implements PaymentClient {
         try {
             return doPay(tossPaymentRequestBody);
         } catch (RestClientException restClientException) {
-            throw new RestClientException(CONNECTION_ERROR_MESSAGE);
+            throw new RestClientException(CONNECTION_FAIL_ERROR_MESSAGE);
         }
     }
 
     private PaymentResult doPay(TossPaymentRequestBody requestBody) {
         return restClient.post()
-                .uri(paymentConfirmUrl)
+                .uri(paymentConfirmUri)
                 .body(requestBody)
-                .header(HttpHeaders.AUTHORIZATION, createAuthHeaderConcise())
+                .header(HttpHeaders.AUTHORIZATION, createAuthHeaderFromSecretKey())
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
                     PaymentExceptionContent paymentExceptionContent = objectMapper.readValue(response.getBody(),
@@ -61,7 +61,7 @@ public class TossPaymentClient implements PaymentClient {
                 .body(PaymentResult.class);
     }
 
-    private String createAuthHeaderConcise() {
+    private String createAuthHeaderFromSecretKey() {
         return "Basic " + Base64.getEncoder()
                 .encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
     }

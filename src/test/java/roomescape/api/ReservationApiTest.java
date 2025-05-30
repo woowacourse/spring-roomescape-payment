@@ -26,7 +26,7 @@ import roomescape.domain.Theme;
 import roomescape.domain.Waiting;
 import roomescape.dto.business.AccessTokenContent;
 import roomescape.dto.request.AdminReservationRequest;
-import roomescape.dto.request.ReservationCreationRequest;
+import roomescape.dto.request.ReservationWithPaymentCreationRequest;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.PaymentHistoryRepository;
 import roomescape.repository.ReservationRepository;
@@ -186,8 +186,8 @@ class ReservationApiTest {
         String accessToken = tokenProvider.createAccessToken(
                 new AccessTokenContent(member.getId(), member.getRole(), member.getName()));
 
-        ReservationCreationRequest creationContent =
-                new ReservationCreationRequest(theme.getId(), NEXT_DAY, time.getId(),
+        ReservationWithPaymentCreationRequest creationContent =
+                new ReservationWithPaymentCreationRequest(theme.getId(), NEXT_DAY, time.getId(),
                         "asfqwe123!", "setqerwe123!", "NORMAL", 10000);
 
         // when & then

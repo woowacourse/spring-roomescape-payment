@@ -18,7 +18,7 @@ public class PaymentConfig {
     public PaymentClient paymentClient(
             @Value("${toss_payment_base_url}") String paymentUrl,
             @Value("${toss_payment_secret_key}") String secretKey,
-            @Value("${toss_confirm_server_uri}") String confirmServerUrl
+            @Value("${toss_confirm_server_uri}") String paymentConfirmUri
     ) {
         RestClient restClient = RestClient.builder()
                 .baseUrl(paymentUrl)
@@ -28,7 +28,7 @@ public class PaymentConfig {
                 })
                 .build();
 
-        return new TossPaymentClient(restClient, secretKey, confirmServerUrl);
+        return new TossPaymentClient(restClient, secretKey, paymentConfirmUri);
     }
 
     @Bean

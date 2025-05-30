@@ -3,7 +3,7 @@ package roomescape.dto.business;
 import java.time.LocalDate;
 import roomescape.domain.Waiting;
 import roomescape.dto.request.AdminReservationRequest;
-import roomescape.dto.request.ReservationCreationRequest;
+import roomescape.dto.request.ReservationWithPaymentCreationRequest;
 
 public record ReservationCreationContent(
         Long themeId,
@@ -15,7 +15,7 @@ public record ReservationCreationContent(
         this(request.themeId(), request.date(), request.timeId());
     }
 
-    public ReservationCreationContent(ReservationCreationRequest request) {
+    public ReservationCreationContent(ReservationWithPaymentCreationRequest request) {
         this(request.themeId(), request.date(), request.timeId());
     }
 

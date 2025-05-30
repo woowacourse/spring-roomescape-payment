@@ -21,7 +21,7 @@ import roomescape.dto.business.AccessTokenContent;
 import roomescape.dto.business.PaymentHistoryCreationContent;
 import roomescape.dto.business.ReservationCreationContent;
 import roomescape.dto.request.AdminReservationRequest;
-import roomescape.dto.request.ReservationCreationRequest;
+import roomescape.dto.request.ReservationWithPaymentCreationRequest;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationStatusResponse;
 import roomescape.service.ReservationService;
@@ -77,7 +77,7 @@ public class ReservationController {
     @PostMapping("/mine")
     @Authority(Role.GENERAL)
     public ResponseEntity<ReservationResponse> addReservationByMember(
-            @Valid @RequestBody ReservationCreationRequest request,
+            @Valid @RequestBody ReservationWithPaymentCreationRequest request,
             @RequiredAccessToken AccessTokenContent accessTokenContent
     ) {
         ReservationCreationContent creationContent = new ReservationCreationContent(request);

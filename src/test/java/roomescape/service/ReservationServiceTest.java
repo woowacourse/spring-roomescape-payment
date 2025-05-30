@@ -363,7 +363,7 @@ class ReservationServiceTest {
 
     @DisplayName("예약이 중복일 경우 예약을 추가할 수 없다.")
     @Test
-    void cannotAddReservationByDuplicationReservation() {
+    void cannotAddReservationByDuplicationReservationWithPayment() {
         // given
         Reservation alreadySavedReservation = entityManager.persist(
                 Reservation.createWithoutIdAndPaymentHistory(NEXT_DAY, reservationTime, theme, member));
@@ -376,7 +376,8 @@ class ReservationServiceTest {
         entityManager.flush();
 
         // when & then
-        assertThatThrownBy(() -> reservationService.addReservation(member.getId(), duplicatedCreationContent))
+        assertThatThrownBy(
+                () -> reservationService.addReservation(member.getId(), duplicatedCreationContent))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage("중복된 예약 입니다.");
     }
@@ -543,7 +544,8 @@ class ReservationServiceTest {
 
         assertAll(
                 () -> assertThatThrownBy(
-                        () -> reservationService.addReservation(member.getId(), reservationContent, paymentContent))
+                        () -> reservationService.addReservation(member.getId(), reservationContent,
+                                paymentContent))
                         .isInstanceOf(PaymentException.class),
                 () -> assertThat(paymentResultRepository.count()).isEqualTo(0)
         );
