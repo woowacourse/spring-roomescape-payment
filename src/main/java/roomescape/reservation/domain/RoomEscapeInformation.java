@@ -40,11 +40,11 @@ public class RoomEscapeInformation {
     @Column(nullable = false)
     private LocalDate date;
 
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "time_id", nullable = false)
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private ReservationTime time;
 
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "theme_id", nullable = false)
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Theme theme;
 

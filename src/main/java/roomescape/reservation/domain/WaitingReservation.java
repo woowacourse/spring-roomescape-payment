@@ -23,11 +23,11 @@ public class WaitingReservation extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(nullable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_escape_information_id", nullable = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private RoomEscapeInformation roomEscapeInformation;
 
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "member_id", nullable = false)
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Member member;
 
