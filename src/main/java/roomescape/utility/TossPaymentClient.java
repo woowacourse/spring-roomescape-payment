@@ -8,8 +8,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+import roomescape.domain.PaymentResult;
 import roomescape.dto.business.PaymentExceptionContent;
-import roomescape.dto.business.PaymentResult;
 import roomescape.dto.business.TossPaymentRequestBody;
 import roomescape.exception.PaymentException;
 

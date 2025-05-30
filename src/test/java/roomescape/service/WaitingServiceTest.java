@@ -28,6 +28,7 @@ import roomescape.exception.NotFoundException;
 import roomescape.exception.PaymentException;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.PaymentHistoryRepository;
+import roomescape.repository.PaymentResultRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -56,11 +57,14 @@ class WaitingServiceTest {
 
     private PaymentHistoryCreationContent paymentHistoryCreationContent;
     private PaymentClientStub paymentClient;
+    @Autowired
+    private PaymentResultRepository paymentResultRepository;
 
     @BeforeEach
     void setup() {
         paymentClient = new PaymentClientStub();
-        PaymentService paymentService = new PaymentService(paymentHistoryRepository, paymentClient);
+        PaymentService paymentService = new PaymentService(paymentHistoryRepository, paymentClient,
+                paymentResultRepository);
         waitingService = new WaitingService(
                 waitingRepository, themeRepository, reservationTimeRepository, memberRepository, reservationRepository,
                 paymentService);

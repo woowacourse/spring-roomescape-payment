@@ -4,7 +4,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
-import roomescape.domain.PaymentHistory;
+import roomescape.domain.PaymentResult;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.domain.Waiting;
@@ -59,8 +59,8 @@ public class WaitingService {
         ReservationTime time = getTimeById(content.timeId());
         Member member = getMemberById(content.memberId());
 
-        PaymentHistory paymentHistory = paymentService.pay(paymentHistoryCreationContent);
-        Waiting waiting = Waiting.createWithoutId(content.date(), theme, time, member, paymentHistory);
+        PaymentResult paymentResult = paymentService.pay(paymentHistoryCreationContent);
+        Waiting waiting = Waiting.createWithoutId(content.date(), theme, time, member, paymentResult);
 
         validateEmptyReservation(waiting);
         validatePastWaitingCreation(waiting);

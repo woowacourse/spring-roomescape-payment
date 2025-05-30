@@ -1,9 +1,5 @@
 package roomescape.domain;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Objects;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -13,6 +9,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 public class Reservation extends AuditedEntity {
@@ -34,18 +33,20 @@ public class Reservation extends AuditedEntity {
     @JoinColumn(nullable = false)
     private Member member;
     @OneToOne(fetch = FetchType.LAZY)
-    private PaymentHistory paymentHistory;
+    private roomescape.domain.PaymentResult paymentResult;
 
-    protected Reservation() {
-    }
-
-    private Reservation(LocalDate date, ReservationTime time, Theme theme, Member member, PaymentHistory paymentHistory) {
+    private Reservation(LocalDate date, ReservationTime time, Theme theme, Member member,
+                        PaymentResult paymentResult) {
         validate(date, time, theme, member);
         this.date = date;
         this.reservationTime = time;
         this.theme = theme;
         this.member = member;
-        this.paymentHistory = paymentHistory;
+        this.paymentResult = paymentResult;
+    }
+
+    protected Reservation() {
+
     }
 
     public static Reservation createWithoutIdAndPaymentHistory(
@@ -56,9 +57,9 @@ public class Reservation extends AuditedEntity {
 
     public static Reservation createWithoutId(
             LocalDate date, ReservationTime time,
-            Theme theme, Member member, PaymentHistory paymentHistory
+            Theme theme, Member member, PaymentResult paymentResult
     ) {
-        return new Reservation(date, time, theme, member, paymentHistory);
+        return new Reservation(date, time, theme, member, paymentResult);
     }
 
     public boolean isPastDateTime() {

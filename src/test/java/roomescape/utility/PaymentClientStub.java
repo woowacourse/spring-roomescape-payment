@@ -1,12 +1,12 @@
 package roomescape.utility;
 
 import org.springframework.web.client.RestClientException;
-import roomescape.dto.business.PaymentResult;
+import roomescape.domain.PaymentResult;
 import roomescape.exception.PaymentException;
 
 public class PaymentClientStub implements PaymentClient {
 
-    private PaymentResult paymentResult = new PaymentResult("askdkasrwe", "sdfa132", 1000L);
+    private PaymentResult paymentResult = PaymentResult.createWithoutId("askdkasrwe", "sdfa132", "asdfasdf", 0L);
     private String errorCase = null;
     private boolean occurRestClientError;
 

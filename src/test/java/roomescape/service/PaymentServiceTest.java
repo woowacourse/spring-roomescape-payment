@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import roomescape.dto.business.PaymentHistoryCreationContent;
 import roomescape.exception.PaymentException;
 import roomescape.repository.PaymentHistoryRepository;
+import roomescape.repository.PaymentResultRepository;
 import roomescape.utility.PaymentClientStub;
 
 @DataJpaTest
@@ -22,11 +23,15 @@ class PaymentServiceTest {
     private PaymentHistoryRepository paymentHistoryRepository;
 
     private final PaymentClientStub paymentClientStub = new PaymentClientStub();
+    
+    @Autowired
+    private PaymentResultRepository paymentResultRepository;
 
     @Test
     void paymentFailThenReturnErrorMessage() {
         paymentClientStub.setErrorCase(ALREADY_PROCESSED_PAYMENT);
-        PaymentService paymentService = new PaymentService(paymentHistoryRepository, paymentClientStub);
+        PaymentService paymentService = new PaymentService(paymentHistoryRepository, paymentClientStub,
+                paymentResultRepository);
         PaymentHistoryCreationContent paymentHistoryCreationContent = new PaymentHistoryCreationContent("asdf", "asdf",
                 "asdf", 1000);
         assertThatThrownBy(() -> paymentService.pay(paymentHistoryCreationContent)).isInstanceOf(

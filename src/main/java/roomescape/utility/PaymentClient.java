@@ -1,6 +1,6 @@
 package roomescape.utility;
 
-import roomescape.dto.business.PaymentResult;
+import roomescape.domain.PaymentResult;
 
 public interface PaymentClient {
 
