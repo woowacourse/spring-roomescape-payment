@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldNameConstants;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.validate.Validator;
-import roomescape.reservation.domain.ReservationView;
+import roomescape.reservation.infrastructure.entity.ReservationView;
 import roomescape.theme.ui.dto.ThemeResponse;
 import roomescape.time.domain.ReservationTime;
 

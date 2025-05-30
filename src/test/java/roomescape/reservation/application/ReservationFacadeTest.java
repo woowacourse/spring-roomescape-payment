@@ -20,8 +20,8 @@ import roomescape.reservation.application.service.WaitingReservationQueryService
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.domain.ReservationStatus;
-import roomescape.reservation.domain.ReservationView;
 import roomescape.reservation.domain.WaitingReservation;
+import roomescape.reservation.infrastructure.entity.ReservationView;
 import roomescape.reservation.ui.dto.CreateReservationWithUserIdWebRequest;
 import roomescape.reservation.ui.dto.ReservationResponse;
 import roomescape.reservation.ui.dto.ReservationSearchWebRequest;

@@ -3,6 +3,7 @@ package roomescape.reservation.domain;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.common.validate.InvalidInputException;
+import roomescape.reservation.infrastructure.entity.ReservationView;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeDescription;
 import roomescape.theme.domain.ThemeName;
