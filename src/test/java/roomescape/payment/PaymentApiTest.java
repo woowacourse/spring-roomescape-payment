@@ -1,6 +1,7 @@
 package roomescape.payment;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static roomescape.helper.TestFixture.PAYMENT;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.client.RestClient;
-import roomescape.reservation.entity.Payment;
 import roomescape.reservation.error.exception.PaymentClientException;
 import roomescape.reservation.service.PaymentRestClient;
 
@@ -34,10 +34,9 @@ public class PaymentApiTest {
         // given
         restClientBuilder.defaultHeader("TossPayments-Test-Code", errorCode);
         paymentRestClient = new PaymentRestClient(restClientBuilder.build(), secretKey);
-        Payment payment = new Payment("paymentKey", "orderId", 1000L, "NORMAL");
 
         // when & then
-        assertThatThrownBy(() -> paymentRestClient.approve(payment))
+        assertThatThrownBy(() -> paymentRestClient.approve(PAYMENT))
                 .isInstanceOf(PaymentClientException.class)
                 .hasMessageContaining(errorMessage);
     }

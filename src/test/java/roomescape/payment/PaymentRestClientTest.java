@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import static roomescape.helper.TestFixture.PAYMENT;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import roomescape.reservation.dto.response.PaymentApproveResponse;
-import roomescape.reservation.entity.Payment;
 import roomescape.reservation.error.exception.PaymentClientException;
 import roomescape.reservation.error.handler.PaymentResponseErrorHandler;
 import roomescape.reservation.service.PaymentRestClient;
@@ -28,8 +28,6 @@ class PaymentRestClientTest {
 
     private final MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
 
-//    private final PaymentRestClient paymentRestClient = new PaymentRestClient(
-//            testBuilder, new PaymentResponseErrorHandler(), "testKey:");
     private final PaymentRestClient paymentRestClient = new PaymentRestClient(testBuilder.build(), "testKey:");
 
     @BeforeEach
@@ -49,10 +47,8 @@ class PaymentRestClientTest {
                 """;
         postConfirmApi(expectedBody, HttpStatus.OK);
 
-        Payment payment = new Payment("paymentKey", "orderId", 1000L, "NORMAL");
-
         // when
-        PaymentApproveResponse response = paymentRestClient.approve(payment);
+        PaymentApproveResponse response = paymentRestClient.approve(PAYMENT);
 
         // then
         assertThat(response.paymentKey()).isEqualTo("paymentKey");
@@ -71,10 +67,8 @@ class PaymentRestClientTest {
                 """;
         postConfirmApi(expectedBody, HttpStatus.BAD_REQUEST);
 
-        Payment payment = new Payment("paymentKey", "orderId", 1000L, "NORMAL");
-
         // when & then
-        assertThatThrownBy(() -> paymentRestClient.approve(payment))
+        assertThatThrownBy(() -> paymentRestClient.approve(PAYMENT))
                 .isInstanceOf(PaymentClientException.class);
     }
 

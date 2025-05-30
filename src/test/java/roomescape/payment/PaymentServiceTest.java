@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static roomescape.helper.TestFixture.PAYMENT;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.reservation.dto.response.PaymentApproveResponse;
-import roomescape.reservation.entity.Payment;
 import roomescape.reservation.error.exception.PaymentClientException;
 import roomescape.reservation.repository.PaymentRepository;
 import roomescape.reservation.service.PaymentRestClient;
@@ -34,12 +34,11 @@ class PaymentServiceTest {
     @Test
     void dontSavePaymentWhenThrowException() {
         // given
-        Payment payment = new Payment("paymentKey", "orderId", 1000L, "NORMAL");
         when(paymentRestClient.approve(any()))
                 .thenThrow(PaymentClientException.class);
 
         // when & then
-        assertThatThrownBy(() -> paymentService.create(payment))
+        assertThatThrownBy(() -> paymentService.create(PAYMENT))
                 .isInstanceOf(PaymentClientException.class);
     }
 
@@ -47,15 +46,14 @@ class PaymentServiceTest {
     @Test
     void savePayment() {
         // given
-        Payment payment = new Payment("paymentKey", "orderId", 1000L, "NORMAL");
         PaymentApproveResponse paymentApproveResponse = new PaymentApproveResponse("paymentKey", "orderId");
         when(paymentRestClient.approve(any()))
                 .thenReturn(paymentApproveResponse);
         when(paymentRepository.save(any()))
-                .thenReturn(payment);
+                .thenReturn(PAYMENT);
 
         // when
-        paymentService.create(payment);
+        paymentService.create(PAYMENT);
 
         // then
         verify(paymentRepository).save(any());
