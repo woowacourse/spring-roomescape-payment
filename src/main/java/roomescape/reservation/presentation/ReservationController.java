@@ -22,7 +22,6 @@ import roomescape.member.dto.request.LoginMember;
 import roomescape.payment.client.TossPaymentClient;
 import roomescape.payment.client.dto.request.TossPaymentConfirmRequest;
 import roomescape.payment.client.dto.response.TossPaymentResponse;
-import roomescape.payment.domain.Payment;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
@@ -68,7 +67,7 @@ public class ReservationController {
 
         TossPaymentResponse tossPaymentResponse = tossPaymentClient.confirmPayment(confirmRequest);
         ReservationResponse response = reservationService.createReservation(request, loginMember.id());
-        Payment payment = paymentService.save(tossPaymentResponse, response.id());
+        paymentService.save(tossPaymentResponse, response.id());
 
         URI locationUri = URI.create(RESERVATION_BASE_URL + SLASH + response.id());
         return ResponseEntity.created(locationUri).body(response);

@@ -14,12 +14,11 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.method.HandlerMethod;
 import roomescape.admin.dto.AdminReservationRequest;
 import roomescape.admin.presentation.AdminController;
+import roomescape.admin.service.AdminReservationService;
 import roomescape.common.util.JwtTokenContainer;
 import roomescape.common.util.TokenCookieManager;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
-import roomescape.reservation.service.ReservationService;
-import roomescape.waiting.service.WaitingService;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,10 +32,7 @@ class AdminInterceptorUnitTest {
     private AdminInterceptor adminInterceptor = new AdminInterceptor(tokenCookieManager, jwtTokenContainer);
 
     @Mock
-    private ReservationService reservationService;
-
-    @Mock
-    private WaitingService waitingService;
+    private AdminReservationService reservationService;
 
     @Test
     @DisplayName("로그인이 안된 경우에는 login 페이지로 리다이렉트가 된다.")
@@ -44,7 +40,7 @@ class AdminInterceptorUnitTest {
         // given
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/admin/reservations");
         Method method = AdminController.class.getMethod("createReservation", AdminReservationRequest.class);
-        HandlerMethod handlerMethod = new HandlerMethod(new AdminController(reservationService, waitingService), method);
+        HandlerMethod handlerMethod = new HandlerMethod(new AdminController(reservationService), method);
         MockHttpServletResponse response = new MockHttpServletResponse();
         // when
         boolean check = adminInterceptor.preHandle(request, response, handlerMethod);
@@ -59,7 +55,7 @@ class AdminInterceptorUnitTest {
         // given
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/admin/reservations");
         Method method = AdminController.class.getMethod("createReservation", AdminReservationRequest.class);
-        HandlerMethod handlerMethod = new HandlerMethod(new AdminController(reservationService, waitingService), method);
+        HandlerMethod handlerMethod = new HandlerMethod(new AdminController(reservationService), method);
         MockHttpServletResponse response = new MockHttpServletResponse();
         String strangeToken = "Asdasdasd";
         putCookieToRequest(strangeToken, request);
@@ -76,7 +72,7 @@ class AdminInterceptorUnitTest {
         // given
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/admin/reservations");
         Method method = AdminController.class.getMethod("createReservation", AdminReservationRequest.class);
-        HandlerMethod handlerMethod = new HandlerMethod(new AdminController(reservationService, waitingService), method);
+        HandlerMethod handlerMethod = new HandlerMethod(new AdminController(reservationService), method);
         MockHttpServletResponse response = new MockHttpServletResponse();
         Member member = Member.createWithoutId("a", "a", "a", Role.ADMIN);
         ReflectionTestUtils.setField(member, "id", 1L);
@@ -95,7 +91,7 @@ class AdminInterceptorUnitTest {
         // given
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/admin/reservations");
         Method method = AdminController.class.getMethod("createReservation", AdminReservationRequest.class);
-        HandlerMethod handlerMethod = new HandlerMethod(new AdminController(reservationService, waitingService), method);
+        HandlerMethod handlerMethod = new HandlerMethod(new AdminController(reservationService), method);
         MockHttpServletResponse response = new MockHttpServletResponse();
         Member member = Member.createWithoutId("a", "a", "a", Role.USER);
         ReflectionTestUtils.setField(member, "id", 1L);
@@ -114,7 +110,7 @@ class AdminInterceptorUnitTest {
         // given
         MockHttpServletRequest request = new MockHttpServletRequest("POST", "/admin/reservations");
         Method method = AdminController.class.getMethod("createReservation", AdminReservationRequest.class);
-        HandlerMethod handlerMethod = new HandlerMethod(new AdminController(reservationService, waitingService), method);
+        HandlerMethod handlerMethod = new HandlerMethod(new AdminController(reservationService), method);
         MockHttpServletResponse response = new MockHttpServletResponse();
         Member member = Member.createWithoutId("a", "a", "a", Role.ADMIN);
         ReflectionTestUtils.setField(member, "id", 1L);
