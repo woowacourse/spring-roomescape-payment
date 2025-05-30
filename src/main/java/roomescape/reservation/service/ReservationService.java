@@ -33,16 +33,14 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
-    private final PaymentRepository paymentRepository;
 
-    public ReservationService(DateTime dateTime, ReservationRepository reservationRepository, ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository, MemberRepository memberRepository, WaitingRepository waitingRepository, PaymentRepository paymentRepository) {
+    public ReservationService(DateTime dateTime, ReservationRepository reservationRepository, ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository, MemberRepository memberRepository, WaitingRepository waitingRepository) {
         this.dateTime = dateTime;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
-        this.paymentRepository = paymentRepository;
     }
 
     @Transactional
@@ -51,14 +49,10 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 시간입니다."));
         Theme theme = themeRepository.findById(request.themeId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 테마입니다."));
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
 
-        Optional<Member> findMember = memberRepository.findById(memberId);
-        if (findMember.isEmpty()) {
-            throw new IllegalArgumentException("존재 하지 않는 유저입니다.");
-        }
-
-        Reservation reservation = Reservation.createWithoutId(dateTime.now(), findMember.get(), request.date(), time,
-                theme);
+        Reservation reservation = Reservation.createWithoutId(dateTime.now(), findMember, request.date(), time, theme);
 
         if (reservationRepository.existsByDateAndTimeStartAtAndThemeId(
                 reservation.getDate(),
@@ -74,7 +68,7 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReservationResponse> getReservations(ReservationConditionRequest request) {
+    public List<ReservationResponse> getReservations(final ReservationConditionRequest request) {
         if (request.isEmpty()) {
             return reservationRepository.findAll().stream()
                     .map(ReservationResponse::from)
@@ -106,7 +100,7 @@ public class ReservationService {
 
     }
 
-    private void approveWaiting(List<Waiting> waitings) {
+    private void approveWaiting(final List<Waiting> waitings) {
         Waiting firstWaiting = waitings.get(0);
 
         Reservation newReservation = Reservation.createWithoutId(
@@ -141,7 +135,7 @@ public class ReservationService {
                 .toList();
     }
 
-    private long calculateWaitingRank(Waiting waiting) {
+    private long calculateWaitingRank(final Waiting waiting) {
         return waitingRepository.countByDateAndThemeIdAndTimeIdAndCreatedAtBefore(
                 waiting.getDate(),
                 waiting.getTheme().getId(),
