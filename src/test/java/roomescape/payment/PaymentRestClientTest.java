@@ -46,13 +46,7 @@ class PaymentRestClientTest {
                   "orderId": "orderId"
                 }
                 """;
-
-        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(
-                        withStatus(HttpStatus.OK).body(expectedBody)
-                                .contentType(MediaType.APPLICATION_JSON)
-                );
+        postConfirmApi(expectedBody, HttpStatus.OK);
 
         Payment payment = new Payment("paymentKey", "orderId", 1000L, "NORMAL");
 
@@ -74,18 +68,21 @@ class PaymentRestClientTest {
                   "message": "존재하지 않는 결제 입니다."
                 }
                 """;
-
-        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(
-                        withStatus(HttpStatus.BAD_REQUEST).body(expectedBody)
-                                .contentType(MediaType.APPLICATION_JSON)
-                );
+        postConfirmApi(expectedBody, HttpStatus.BAD_REQUEST);
 
         Payment payment = new Payment("paymentKey", "orderId", 1000L, "NORMAL");
 
         // when & then
         assertThatThrownBy(() -> paymentRestClient.approve(payment))
                 .isInstanceOf(PaymentClientException.class);
+    }
+
+    private void postConfirmApi(String expectedBody, HttpStatus expectedStatus) {
+        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(
+                        withStatus(expectedStatus).body(expectedBody)
+                                .contentType(MediaType.APPLICATION_JSON)
+                );
     }
 }
