@@ -5,12 +5,14 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.Cookie;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +21,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.jsonwebtoken.Jwts;
-import jakarta.servlet.http.Cookie;
 import roomescape.auth.infrastructure.jwt.JwtTokenProvider;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
@@ -58,6 +55,8 @@ class ReservationControllerTest extends BaseTest {
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     private Member member;
     private Theme theme;
     private ReservationTime time;
@@ -83,7 +82,7 @@ class ReservationControllerTest extends BaseTest {
         params.put("paymentKey", "aaa");
         params.put("orderId", "aaa");
         params.put("amount", "1000");
-        String content = new ObjectMapper().writeValueAsString(params);
+        String content = objectMapper.writeValueAsString(params);
 
         // when & then
         mockMvc.perform(post("/reservations")
@@ -181,7 +180,7 @@ class ReservationControllerTest extends BaseTest {
         params.put("paymentKey", "aaa");
         params.put("orderId", "aaa");
         params.put("amount", "1000");
-        String content = new ObjectMapper().writeValueAsString(params);
+        String content = objectMapper.writeValueAsString(params);
 
         // when & then
         mockMvc.perform(post("/reservations")

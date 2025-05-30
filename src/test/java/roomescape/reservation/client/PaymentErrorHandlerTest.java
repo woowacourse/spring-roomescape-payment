@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Map;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,9 +16,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import roomescape.exception.PaymentClientException;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,7 +24,8 @@ class PaymentErrorHandlerTest {
     @Mock
     private ClientHttpResponse clientHttpResponse;
 
-    private PaymentErrorHandler paymentErrorHandler = new PaymentErrorHandler();
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final PaymentErrorHandler paymentErrorHandler = new PaymentErrorHandler(objectMapper);
 
     @ParameterizedTest
     @ValueSource(ints = {400, 401, 402, 403, 404, 499})
@@ -36,10 +34,8 @@ class PaymentErrorHandlerTest {
         when(clientHttpResponse.getStatusCode())
                 .thenReturn(HttpStatusCode.valueOf(statusCode));
 
-        PaymentErrorHandler errorHandler = new PaymentErrorHandler();
-
         // when
-        boolean result = errorHandler.hasError(clientHttpResponse);
+        boolean result = paymentErrorHandler.hasError(clientHttpResponse);
 
         // then
         assertThat(result).isTrue();
@@ -68,7 +64,7 @@ class PaymentErrorHandlerTest {
                 "message", message
         );
 
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(new ObjectMapper().writeValueAsBytes(params));
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(objectMapper.writeValueAsBytes(params));
         when(clientHttpResponse.getBody()).thenReturn(inputStream);
 
         //  when then
