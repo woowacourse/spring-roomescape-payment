@@ -44,7 +44,7 @@ public class PaymentService {
 
         String message = jsonNode.get("message").asText();
 
-        if (paymentResponse.getStatusCode() == HttpStatusCode.valueOf(401) ||
+        if (paymentResponse.getStatusCode().isSameCodeAs(HttpStatus.UNAUTHORIZED) ||
             paymentResponse.getStatusCode().is5xxServerError()) {
             throw new PaymentException(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
