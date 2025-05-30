@@ -7,6 +7,11 @@ import roomescape.reservation.presentation.dto.ReservationRequest;
 public class StubPaymentClient implements PaymentClient {
     @Override
     public Payment approve(final ReservationRequest reservationRequest) {
-        return null;
+        return new Payment(
+                reservationRequest.getPaymentKey(),
+                reservationRequest.getOrderId(),
+                reservationRequest.getAmount(),
+                "NORMAL"
+        );
     }
 }
