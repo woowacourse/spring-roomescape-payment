@@ -73,7 +73,4 @@ class TossPaymentClientTest {
                 .hasMessage("인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다.");
     }
 
-    // 연결 시간 예외 테스트
-    // 응답 시간 예외 테스트
-
 }
