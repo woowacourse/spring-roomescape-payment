@@ -497,4 +497,79 @@ class ReservationServiceTest {
             assertThat(deletedFirstWaiting).isNull();
         }
     }
+
+    @Test
+    @DisplayName("결제가 실패하더라도 결제 시도 내역은 저장된다")
+    void writePaymentHistoryEvenIfReservationFails() {
+        paymentClient.setErrorCase("error");
+        // given
+        Member member = Member.createWithoutId(Role.GENERAL, "asdfasdf", "asdf@naver.com", "passwordasdf1@");
+        Theme theme = Theme.createWithoutId("테마", "설명", "썸네일");
+        ReservationTime time = ReservationTime.createWithoutId(LocalTime.of(10, 0));
+        entityManager.persist(member);
+        entityManager.persist(theme);
+        entityManager.persist(time);
+
+        ReservationCreationContent reservationContent = new ReservationCreationContent(
+                theme.getId(), NEXT_DAY, time.getId());
+        PaymentHistoryCreationContent paymentContent = new PaymentHistoryCreationContent(
+                "orderId", "paymentKey", "CARD", 1000);
+
+        // when & then
+        assertThatThrownBy(
+                () -> reservationService.addReservation(member.getId(), reservationContent, paymentContent))
+                .isInstanceOf(PaymentException.class);
+
+        assertThat(paymentHistoryRepository.count()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("결제가 실패하면 결제 성공 내역은 남지않는다")
+    void noPaymentResultIfReservationFails() {
+        paymentClient.setErrorCase("error");
+
+        // given
+        Member member = Member.createWithoutId(Role.GENERAL, "asdfasdf", "asdf@naver.com", "passwordasdf1@");
+        Theme theme = Theme.createWithoutId("테마", "설명", "썸네일");
+        ReservationTime time = ReservationTime.createWithoutId(LocalTime.of(10, 0));
+        entityManager.persist(member);
+        entityManager.persist(theme);
+        entityManager.persist(time);
+
+        ReservationCreationContent reservationContent = new ReservationCreationContent(
+                theme.getId(), NEXT_DAY, time.getId());
+        PaymentHistoryCreationContent paymentContent = new PaymentHistoryCreationContent(
+                "orderId", "paymentKey", "CARD", 1000);
+
+        assertAll(
+                () -> assertThatThrownBy(
+                        () -> reservationService.addReservation(member.getId(), reservationContent, paymentContent))
+                        .isInstanceOf(PaymentException.class),
+                () -> assertThat(paymentResultRepository.count()).isEqualTo(0)
+        );
+    }
+
+    @Test
+    @DisplayName("결제가 성공하면 결제 성공 내역과 결제 이력이 모두 남는다")
+    void thereIsPaymentHistoryAndPaymentResultWhenReservationIsSuccessful() {
+
+        // given
+        Member member = Member.createWithoutId(Role.GENERAL, "asdfasdf", "asdf@naver.com", "passwordasdf1@");
+        Theme theme = Theme.createWithoutId("테마", "설명", "썸네일");
+        ReservationTime time = ReservationTime.createWithoutId(LocalTime.of(10, 0));
+        entityManager.persist(member);
+        entityManager.persist(theme);
+        entityManager.persist(time);
+
+        ReservationCreationContent reservationContent = new ReservationCreationContent(
+                theme.getId(), NEXT_DAY, time.getId());
+        PaymentHistoryCreationContent paymentContent = new PaymentHistoryCreationContent(
+                "orderId", "paymentKey", "CARD", 1000);
+
+        // when & then
+        reservationService.addReservation(member.getId(), reservationContent, paymentContent);
+
+        assertThat(paymentResultRepository.count()).isEqualTo(1);
+        assertThat(paymentHistoryRepository.count()).isEqualTo(1);
+    }
 }
