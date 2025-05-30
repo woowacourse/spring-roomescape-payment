@@ -18,6 +18,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import roomescape.payment.controller.PaymentController;
+import roomescape.payment.exception.custom.PaymentTimeoutException;
 
 
 @Slf4j
