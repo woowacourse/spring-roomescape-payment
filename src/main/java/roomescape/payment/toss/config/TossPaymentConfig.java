@@ -2,7 +2,7 @@ package roomescape.payment.toss.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Base64;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -13,23 +13,24 @@ import roomescape.payment.toss.interceptor.TossPaymentResponseInterceptor;
 import roomescape.payment.toss.service.TossPaymentClient;
 
 @Configuration
+@ConfigurationPropertiesScan
 public class TossPaymentConfig {
 
     private static final String COLON = ":";
-    private static final String PAYMENT_URL = "https://api.tosspayments.com/v1/payments";
     private static final String AUTHORIZATION_HEADER_PREFIX = "Authorization";
     private static final String BASIC_AUTHENTICATION_PREFIX = "Basic ";
 
     private final ObjectMapper objectMapper;
     private final String token;
     private final int connectTimeoutMs;
+    private final String paymentUrl;
 
     public TossPaymentConfig(ObjectMapper objectMapper,
-                             @Value("${payment.token}") String token,
-                             @Value("${payment.connection-timeout}") int connectTimeoutMs) {
+                             TossPaymentConfigProperties tossPaymentConfigProperties) {
         this.objectMapper = objectMapper;
-        this.token = token;
-        this.connectTimeoutMs = connectTimeoutMs;
+        this.token = tossPaymentConfigProperties.getToken();
+        this.connectTimeoutMs = tossPaymentConfigProperties.getConnectionTimeoutMs();
+        this.paymentUrl = tossPaymentConfigProperties.getUrl();
     }
 
     @Bean
@@ -53,7 +54,7 @@ public class TossPaymentConfig {
 
     private RestClient getRestClient(SimpleClientHttpRequestFactory requestFactory) {
         return RestClient.builder()
-                .baseUrl(PAYMENT_URL)
+                .baseUrl(paymentUrl)
                 .requestInterceptor(new TossPaymentResponseInterceptor(objectMapper))
                 .requestFactory(requestFactory)
                 .defaultHeader(AUTHORIZATION_HEADER_PREFIX, BASIC_AUTHENTICATION_PREFIX + Base64.getEncoder()
