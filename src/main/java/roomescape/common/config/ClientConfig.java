@@ -1,26 +1,35 @@
 package roomescape.common.config;
 
-import java.time.Duration;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
+import roomescape.payment.infrastructure.TossPaymentProperties;
 
+@RequiredArgsConstructor
+@EnableConfigurationProperties(TossPaymentProperties.class)
 @Configuration
 public class ClientConfig {
 
-    private static final String TOSS_PAYMENT_BASE_URL = "https://api.tosspayments.com/";
-    private static final Duration TOSS_PAYMENT_TIMEOUT = Duration.ofSeconds(3);
+    private final TossPaymentProperties tossPaymentProperties;
 
     @Bean
     public RestClient tossPaymentRestClient() {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(TOSS_PAYMENT_TIMEOUT);
-        requestFactory.setReadTimeout(TOSS_PAYMENT_TIMEOUT);
+        requestFactory.setConnectTimeout(tossPaymentProperties.timeout());
+        requestFactory.setReadTimeout(tossPaymentProperties.timeout());
+
+        String encodedKey = Base64.getEncoder()
+                .encodeToString((tossPaymentProperties.secretKey() + ":").getBytes(StandardCharsets.UTF_8));
 
         return RestClient.builder()
-                .baseUrl(TOSS_PAYMENT_BASE_URL)
+                .baseUrl(tossPaymentProperties.baseUrl())
                 .requestFactory(requestFactory)
+                .defaultHeader("Authorization", "Basic " + encodedKey)
                 .build();
     }
 }

@@ -22,15 +22,9 @@ public class TossPaymentClient implements PaymentClient {
 
     private final RestClient restClient;
 
-    @Value("${payment.toss.secret-key}")
-    private String secretKey;
-
     public PaymentResponse requestPayment(final PaymentRequest request) {
-        String encodedKey = Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
-
         return restClient.post()
                 .uri("v1/payments/confirm")
-                .header("Authorization", "Basic " + encodedKey)
                 .body(TossPaymentRequest.from(request))
                 .retrieve()
                 .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
