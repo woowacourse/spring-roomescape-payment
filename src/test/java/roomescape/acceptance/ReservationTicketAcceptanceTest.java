@@ -8,17 +8,12 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static io.restassured.RestAssured.post;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,8 +25,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.dto.request.TossPaymentConfirmDto;
 import roomescape.dto.response.ReservationTicketResponseDto;
 import roomescape.dto.response.TossPaymentConfirmResponseDto;
-import roomescape.infrastructure.payment.toss.TossPaymentWithRestClient;
 import roomescape.infrastructure.jwt.JjwtJwtTokenProvider;
+import roomescape.infrastructure.payment.toss.TossPaymentWithRestClient;
 import roomescape.model.Role;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -55,8 +50,8 @@ class ReservationTicketAcceptanceTest {
     void setUp() {
         this.email = "email@gmail.com";
         jdbcTemplate.update("INSERT INTO member"
-                + " (name, email,password, role) VALUES (?, ?, ?, ?)"
-            , "히로", email, "password", Role.ADMIN.name());
+                        + " (name, email,password, role) VALUES (?, ?, ?, ?)"
+                , "히로", email, "password", Role.ADMIN.name());
     }
 
     @Test
@@ -67,14 +62,14 @@ class ReservationTicketAcceptanceTest {
 
         // when
         List<ReservationTicketResponseDto> reservations = RestAssured.given().log().all()
-            .cookie("token", createToken())
-            .when().get("/reservations")
-            .then().log().all()
-            .statusCode(200).extract()
-            .jsonPath().getList(".", ReservationTicketResponseDto.class);
+                .cookie("token", createToken())
+                .when().get("/reservations")
+                .then().log().all()
+                .statusCode(200).extract()
+                .jsonPath().getList(".", ReservationTicketResponseDto.class);
 
         Integer count = jdbcTemplate.queryForObject("SELECT count(1) from reservation_ticket",
-            Integer.class);
+                Integer.class);
 
         // then
         assertThat(reservations.size()).isEqualTo(count);
@@ -84,69 +79,84 @@ class ReservationTicketAcceptanceTest {
     @DisplayName("예약 등록 시 잘못된 날짜로 요청하는 경우 400에러를 반환한다.")
     void test2() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "브라운");
-        params.put("date", "invalidDateRequest");
-        params.put("timeId", "1");
-        params.put("themeId", "1");
-        params.put("paymentKey", "paymentKey");
-        params.put("orderId", "orderId");
-        params.put("amount", "1000");
+        Map<String, Object> reservationTicketRegisterDto = new HashMap<>();
+        reservationTicketRegisterDto.put("date", "invalidDateInput");
+        reservationTicketRegisterDto.put("timeId", 1L);
+        reservationTicketRegisterDto.put("themeId", 1L);
+
+        Map<String, Object> tossPaymentRequestDto = new HashMap<>();
+        tossPaymentRequestDto.put("paymentKey", "paymentKey");
+        tossPaymentRequestDto.put("orderId", "orderId");
+        tossPaymentRequestDto.put("amount", 1000L);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("reservationTicketRegisterDto", reservationTicketRegisterDto);
+        params.put("tossPaymentRequestDto", tossPaymentRequestDto);
 
         // when & then
         RestAssured.given().log().all()
-            .contentType(ContentType.JSON)
-            .cookie("token", createToken())
-            .body(params)
-            .when().post("/reservations/toss")
-            .then().log().all()
-            .statusCode(400);
+                .contentType(ContentType.JSON)
+                .cookie("token", createToken())
+                .body(params)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(400);
     }
 
     @Test
     @DisplayName("존재하지 않는 time_id 를 이용해 예약을 등록하고자 하는 경우 404 를 반환한다.")
     void test3() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "브라운");
-        params.put("date", tomorrow.toString());
-        params.put("timeId", "345");
-        params.put("themeId", "1");
-        params.put("paymentKey", "paymentKey");
-        params.put("orderId", "orderId");
-        params.put("amount", "1000");
+        Map<String, Object> reservationTicketRegisterDto = new HashMap<>();
+        reservationTicketRegisterDto.put("date", tomorrow.toString());
+        reservationTicketRegisterDto.put("timeId", 334445L);
+        reservationTicketRegisterDto.put("themeId", 1L);
+
+        Map<String, Object> tossPaymentRequestDto = new HashMap<>();
+        tossPaymentRequestDto.put("paymentKey", "paymentKey");
+        tossPaymentRequestDto.put("orderId", "orderId");
+        tossPaymentRequestDto.put("amount", 1000L);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("reservationTicketRegisterDto", reservationTicketRegisterDto);
+        params.put("tossPaymentRequestDto", tossPaymentRequestDto);
 
         // when & then
         RestAssured.given().log().all()
-            .contentType(ContentType.JSON)
-            .cookie("token", createToken())
-            .body(params)
-            .when().post("/reservations/toss")
-            .then().log().all()
-            .statusCode(404);
+                .contentType(ContentType.JSON)
+                .cookie("token", createToken())
+                .body(params)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(404);
     }
 
     @Test
     @DisplayName("존재하지 않는 themeId 를 이용해 예약을 등록하고자 하는 경우 404 를 반환한다.")
     void test4() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "브라운");
-        params.put("date", tomorrow.toString());
-        params.put("timeId", "1");
-        params.put("themeId", "123");
-        params.put("paymentKey", "paymentKey");
-        params.put("orderId", "orderId");
-        params.put("amount", "1000");
+        Map<String, Object> reservationTicketRegisterDto = new HashMap<>();
+        reservationTicketRegisterDto.put("date", tomorrow.toString());
+        reservationTicketRegisterDto.put("timeId", 1L);
+        reservationTicketRegisterDto.put("themeId", 1234L);
+
+        Map<String, Object> tossPaymentRequestDto = new HashMap<>();
+        tossPaymentRequestDto.put("paymentKey", "paymentKey");
+        tossPaymentRequestDto.put("orderId", "orderId");
+        tossPaymentRequestDto.put("amount", 1000L);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("reservationTicketRegisterDto", reservationTicketRegisterDto);
+        params.put("tossPaymentRequestDto", tossPaymentRequestDto);
 
         // when & then
         RestAssured.given().log().all()
-            .contentType(ContentType.JSON)
-            .cookie("token", createToken())
-            .body(params)
-            .when().post("/reservations/toss")
-            .then().log().all()
-            .statusCode(404);
+                .contentType(ContentType.JSON)
+                .cookie("token", createToken())
+                .body(params)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(404);
     }
 
     @Test
@@ -157,53 +167,63 @@ class ReservationTicketAcceptanceTest {
         Long themeId = 1L;
         insertNewReservationWithJdbcTemplate(timeId, themeId);
 
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "브라운");
-        params.put("date", tomorrow.toString());
-        params.put("timeId", timeId.toString());
-        params.put("themeId", themeId.toString());
-        params.put("paymentKey", "paymentKey");
-        params.put("orderId", "orderId");
-        params.put("amount", "1000");
+        Map<String, Object> reservationTicketRegisterDto = new HashMap<>();
+        reservationTicketRegisterDto.put("date", tomorrow.toString());
+        reservationTicketRegisterDto.put("timeId", 1L);
+        reservationTicketRegisterDto.put("themeId", 1L);
+
+        Map<String, Object> tossPaymentRequestDto = new HashMap<>();
+        tossPaymentRequestDto.put("paymentKey", "paymentKey");
+        tossPaymentRequestDto.put("orderId", "orderId");
+        tossPaymentRequestDto.put("amount", 1000L);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("reservationTicketRegisterDto", reservationTicketRegisterDto);
+        params.put("tossPaymentRequestDto", tossPaymentRequestDto);
 
         // when & then
         RestAssured.given().log().all()
-            .contentType(ContentType.JSON)
-            .cookie("token", createToken())
-            .body(params)
-            .when().post("/reservations/toss")
-            .then().log().all()
-            .statusCode(409);
+                .contentType(ContentType.JSON)
+                .cookie("token", createToken())
+                .body(params)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(409);
     }
 
     @Test
     @DisplayName("정상적으로 예약이 등록되는 경우 201을 반환한다")
     void test6() {
         // given
-        Map<String, String> params = new HashMap<>();
-        params.put("name", "브라운");
-        params.put("date", tomorrow.toString());
-        params.put("timeId", "1");
-        params.put("themeId", "1");
-        params.put("paymentKey", "paymentKey");
-        params.put("orderId", "orderId");
-        params.put("amount", "1000");
+        Map<String, Object> reservationTicketRegisterDto = new HashMap<>();
+        reservationTicketRegisterDto.put("date", tomorrow.toString());
+        reservationTicketRegisterDto.put("timeId", 1L);
+        reservationTicketRegisterDto.put("themeId", 1L);
+
+        Map<String, Object> tossPaymentRequestDto = new HashMap<>();
+        tossPaymentRequestDto.put("paymentKey", "paymentKey");
+        tossPaymentRequestDto.put("orderId", "orderId");
+        tossPaymentRequestDto.put("amount", 1000L);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("reservationTicketRegisterDto", reservationTicketRegisterDto);
+        params.put("tossPaymentRequestDto", tossPaymentRequestDto);
 
         TossPaymentConfirmResponseDto tossPaymentConfirmResponseDto = new TossPaymentConfirmResponseDto(
-            "DONE", "paymentKey", "orderId"
+                "DONE", "paymentKey", "orderId"
         );
 
         when(tossPaymentWithRestClient.requestConfirmation(any(TossPaymentConfirmDto.class)))
-            .thenReturn(tossPaymentConfirmResponseDto);
+                .thenReturn(tossPaymentConfirmResponseDto);
 
         // when & then
         RestAssured.given().log().all()
-            .contentType(ContentType.JSON)
-            .cookie("token", createToken())
-            .body(params)
-            .when().post("/reservations/toss")
-            .then().log().all()
-            .statusCode(201);
+                .contentType(ContentType.JSON)
+                .cookie("token", createToken())
+                .body(params)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(201);
     }
 
     @Test
@@ -216,11 +236,11 @@ class ReservationTicketAcceptanceTest {
 
         // when & then
         RestAssured.given().log().all()
-            .contentType(ContentType.JSON)
-            .cookie("token", createToken())
-            .when().delete("/reservations/" + savedId)
-            .then().log().all()
-            .statusCode(204);
+                .contentType(ContentType.JSON)
+                .cookie("token", createToken())
+                .when().delete("/reservations/" + savedId)
+                .then().log().all()
+                .statusCode(204);
     }
 
     private Long insertNewReservationWithJdbcTemplate(final Long timeId, final Long themeId) {
@@ -228,8 +248,8 @@ class ReservationTicketAcceptanceTest {
 
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(
-                "INSERT INTO reservation_ticket (date, reservation_time_id, theme_id, member_id) VALUES (?, ?, ?, ?)",
-                new String[]{"id"});
+                    "INSERT INTO reservation_ticket (date, reservation_time_id, theme_id, member_id) VALUES (?, ?, ?, ?)",
+                    new String[]{"id"});
             ps.setDate(1, Date.valueOf(tomorrow));
             ps.setLong(2, timeId);
             ps.setLong(3, themeId);

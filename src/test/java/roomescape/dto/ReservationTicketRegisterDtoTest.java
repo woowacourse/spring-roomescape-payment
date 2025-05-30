@@ -30,9 +30,6 @@ class ReservationTicketRegisterDtoTest {
         ReservationTicketRegisterDto reservationTicketRegisterDto = new ReservationTicketRegisterDto(
                 input,
                 1L,
-                1L,
-                "paymentKey",
-                "orderId",
                 1L
         );
 
