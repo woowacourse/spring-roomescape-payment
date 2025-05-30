@@ -59,7 +59,6 @@ public class PaymentRestClient implements PaymentClient {
         }
     }
 
-
     private String getEncodedKey() {
         StringBuilder sb = new StringBuilder();
         sb.append("Basic ");
