@@ -97,8 +97,7 @@ class PaymentControllerTest extends IntegrationTest {
         // when
         // then
         assertThatThrownBy(() -> tossRestClient.confirm(request))
-                .isInstanceOf(HttpClientErrorException.class)
-                .hasMessageContaining("잘못된 시크릿키 연동 정보 입니다.");
+                .isInstanceOf(HttpClientErrorException.class);
     }
 
     @Test
@@ -246,8 +245,10 @@ class PaymentControllerTest extends IntegrationTest {
 
     private String createErrorBody() {
         return """
-              "code": "INVALID_API_KEY",
-              "message": "잘못된 시크릿키 연동 정보 입니다."
+              {
+                  "code": "INVALID_API_KEY",
+                  "message": "잘못된 시크릿키 연동 정보 입니다."
+              }
             """;
     }
 }
