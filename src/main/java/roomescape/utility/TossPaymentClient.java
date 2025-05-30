@@ -4,13 +4,13 @@ package roomescape.utility;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Map;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import roomescape.dto.business.PaymentExceptionContent;
 import roomescape.dto.business.PaymentResult;
+import roomescape.dto.business.TossPaymentRequestBody;
 import roomescape.exception.PaymentException;
 
 public class TossPaymentClient implements PaymentClient {
@@ -35,20 +35,16 @@ public class TossPaymentClient implements PaymentClient {
 
     @Override
     public PaymentResult pay(String paymentKey, String orderId, long amount) {
-        Map<String, Object> requestBody = Map.of(
-                "paymentKey", paymentKey,
-                "orderId", orderId,
-                "amount", amount
-        );
+        TossPaymentRequestBody tossPaymentRequestBody = new TossPaymentRequestBody(paymentKey, orderId, amount);
 
         try {
-            return doPay(requestBody);
+            return doPay(tossPaymentRequestBody);
         } catch (RestClientException restClientException) {
             throw new RestClientException(CONNECTION_ERROR_MESSAGE);
         }
     }
 
-    private PaymentResult doPay(Map<String, Object> requestBody) {
+    private PaymentResult doPay(TossPaymentRequestBody requestBody) {
         return restClient.post()
                 .uri(paymentConfirmUrl)
                 .body(requestBody)
