@@ -1,6 +1,7 @@
 package roomescape.common.config;
 
 import java.time.Duration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -9,17 +10,21 @@ import org.springframework.web.client.RestClient;
 @Configuration
 public class ClientConfig {
 
-    private static final String TOSS_PAYMENT_BASE_URL = "https://api.tosspayments.com/";
-    private static final Duration TOSS_PAYMENT_TIMEOUT = Duration.ofSeconds(3);
+    @Value("${payment.toss.base-url}")
+    private String tossPaymentBaseUrl;
+
+    @Value("${payment.toss.timeout-seconds}")
+    private int tossPaymentTimeoutSeconds;
 
     @Bean
     public RestClient tossPaymentRestClient() {
-        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(TOSS_PAYMENT_TIMEOUT);
-        requestFactory.setReadTimeout(TOSS_PAYMENT_TIMEOUT);
+        final SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        final Duration timeout = Duration.ofSeconds(tossPaymentTimeoutSeconds);
+        requestFactory.setConnectTimeout(timeout);
+        requestFactory.setReadTimeout(timeout);
 
         return RestClient.builder()
-                .baseUrl(TOSS_PAYMENT_BASE_URL)
+                .baseUrl(tossPaymentBaseUrl)
                 .requestFactory(requestFactory)
                 .build();
     }
