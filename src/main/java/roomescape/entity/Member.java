@@ -42,7 +42,7 @@ public class Member {
     private Role role;
 
     @OneToMany(mappedBy = "member",
-            cascade = CascadeType.ALL,
+            cascade = {CascadeType.PERSIST},
             orphanRemoval = true)
     private List<Reservation> reservations = new ArrayList<>();
 
