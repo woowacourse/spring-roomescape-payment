@@ -101,14 +101,18 @@ public class ReservationService {
         Theme theme = getThemeById(reservationCreationContent.themeId());
         ReservationTime time = getReservationTimeById(reservationCreationContent.timeId());
 
+        validateDuplicateReservation(theme, reservationCreationContent.date(), time);
+
+        Reservation validateReservation = Reservation.createWithoutIdAndPaymentHistory(
+                reservationCreationContent.date(), time,
+                theme, member);
+        validatePastReservationCreation(validateReservation);
+
         paymentService.writePaymentHistory(paymentHistoryCreationContent);
         PaymentResult paymentResult = paymentService.pay(paymentHistoryCreationContent);
 
         Reservation reservation = Reservation.createWithoutId(reservationCreationContent.date(), time, theme, member,
                 paymentResult);
-
-        validateDuplicateReservation(theme, reservationCreationContent.date(), time);
-        validatePastReservationCreation(reservation);
 
         Reservation savedReservation = reservationRepository.save(reservation);
         return new ReservationResponse(savedReservation);
