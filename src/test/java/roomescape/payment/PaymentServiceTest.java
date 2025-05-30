@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,13 +30,11 @@ class PaymentServiceTest {
     @Test
     void test1() throws JsonProcessingException {
         //given
-        PaymentError paymentError = new PaymentError("NOT_AVAILABLE_BANK", "은행 서비스 시간이 아닙니다.");
-        mockServer.expect(MockRestRequestMatchers.requestTo("https://api.tosspayments.com/v1/payments/confirm"))
-                .andRespond(MockRestResponseCreators.withForbiddenRequest()
-                        .body(new ObjectMapper().writeValueAsString(paymentError)));
+        final PaymentError paymentError = new PaymentError("NOT_AVAILABLE_BANK", "은행 서비스 시간이 아닙니다.");
+        settingMockServerResponse(paymentError);
 
         //when & then
-        PaymentConfirmRequest request = new PaymentConfirmRequest("a", "b", 1);
+        final PaymentConfirmRequest request = new PaymentConfirmRequest("a", "b", 1);
         assertThatThrownBy(() -> paymentService.confirm(request))
                 .isInstanceOf(PaymentException.class)
                 .satisfies(e -> {
@@ -51,13 +48,11 @@ class PaymentServiceTest {
     @Test
     void test2() throws JsonProcessingException {
         //given
-        PaymentError paymentError = new PaymentError("INCORRECT_BASIC_AUTH_FORMAT", "aaaa");
-        mockServer.expect(MockRestRequestMatchers.requestTo("https://api.tosspayments.com/v1/payments/confirm"))
-                .andRespond(MockRestResponseCreators.withForbiddenRequest()
-                        .body(new ObjectMapper().writeValueAsString(paymentError)));
+        final PaymentError paymentError = new PaymentError("INCORRECT_BASIC_AUTH_FORMAT", "aaaa");
+        settingMockServerResponse(paymentError);
 
         //when & then
-        PaymentConfirmRequest request = new PaymentConfirmRequest("a", "b", 1);
+        final PaymentConfirmRequest request = new PaymentConfirmRequest("a", "b", 1);
         assertThatThrownBy(() -> paymentService.confirm(request))
                 .isInstanceOf(PaymentException.class)
                 .satisfies(e -> {
@@ -65,5 +60,11 @@ class PaymentServiceTest {
                     assertThat(ex.getStatusCode()).isEqualTo(INTERNAL_SERVER_ERROR);
                     assertThat(ex.getMessage()).isEqualTo("서버 내부 오류입니다.");
                 });
+    }
+
+    private void settingMockServerResponse(final PaymentError paymentError) throws JsonProcessingException {
+        mockServer.expect(MockRestRequestMatchers.requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andRespond(MockRestResponseCreators.withForbiddenRequest()
+                        .body(new ObjectMapper().writeValueAsString(paymentError)));
     }
 }
