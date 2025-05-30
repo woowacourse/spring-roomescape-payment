@@ -25,7 +25,7 @@ public class PaymentClientConfig {
     }
 
     @Bean
-    PaymentApproveExceptionHandler paymentApproveExceptionHandler() {
+    public PaymentApproveExceptionHandler paymentApproveExceptionHandler() {
         return new PaymentApproveExceptionHandler();
     }
 }
