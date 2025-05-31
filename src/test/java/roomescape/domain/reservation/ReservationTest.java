@@ -75,7 +75,7 @@ class ReservationTest {
         // when & then
         assertThatThrownBy(() -> Reservation.register(user, date, timeSlot, theme))
                 .isInstanceOf(BusinessRuleViolationException.class)
-                .hasMessage("시간대 정보는 null일 수 없습니다.");
+                .hasMessage("시간 정보는 null일 수 없습니다.");
     }
 
     @ParameterizedTest
@@ -117,7 +117,7 @@ class ReservationTest {
     }
 
     private static User createUser() {
-        return User.ofExisting(1L, "user@email.com", UserRole.USER, "username", "password");
+        return User.ofExisting(1L, "name", UserRole.USER, "user@email.com", "password");
     }
 
     private static LocalDate createDate() {

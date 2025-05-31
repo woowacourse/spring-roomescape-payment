@@ -1,6 +1,8 @@
 package roomescape.domain.reservation;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -29,12 +31,17 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User user;
+
+    @Column(nullable = false)
     private LocalDate date;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private TimeSlot timeSlot;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Theme theme;
 
     private Reservation(final Long id,
@@ -42,10 +49,12 @@ public class Reservation {
                         final LocalDate date,
                         final TimeSlot timeSlot,
                         final Theme theme) {
+
         validateUser(user);
         validateDate(date);
         validateTimeSlot(timeSlot);
         validateTheme(theme);
+
         this.id = id;
         this.user = user;
         this.date = date;
@@ -58,8 +67,9 @@ public class Reservation {
                                        final TimeSlot timeSlot,
                                        final Theme theme) {
 
+        Reservation reservation = new Reservation(null, user, date, timeSlot, theme);
         validateNotPastDateTime(date, timeSlot);
-        return new Reservation(null, user, date, timeSlot, theme);
+        return reservation;
     }
 
     public static Reservation fromWaiting(final Waiting waiting) {

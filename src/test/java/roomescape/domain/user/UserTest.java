@@ -23,8 +23,8 @@ class UserTest {
 
         // when & then
         assertThatThrownBy(() -> User.register(name, email, password))
-                .isInstanceOf(InvalidInputException.class)
-                .hasMessage("이름은 공백일 수 없습니다.");
+                .isInstanceOf(BusinessRuleViolationException.class)
+                .hasMessage("이름은 null이거나 공백일 수 없습니다.");
     }
 
     @Test
@@ -51,9 +51,8 @@ class UserTest {
 
         // when & then
         assertThatThrownBy(() -> User.register(name, email, password))
-                .isInstanceOf(InvalidInputException.class)
-                .hasMessage("비밀번호는 공백일 수 없습니다.");
-
+                .isInstanceOf(BusinessRuleViolationException.class)
+                .hasMessage("이메일은 null이거나 공백일 수 없습니다.");
     }
 
     @ParameterizedTest
@@ -66,8 +65,8 @@ class UserTest {
 
         // when & then
         assertThatThrownBy(() -> User.register(name, email, password))
-                .isInstanceOf(InvalidInputException.class)
-                .hasMessage("비밀번호는 공백일 수 없습니다.");
+                .isInstanceOf(BusinessRuleViolationException.class)
+                .hasMessage("비밀번호는 null이거나 공백일 수 없습니다.");
     }
 
     @Test

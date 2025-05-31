@@ -1,5 +1,6 @@
 package roomescape.domain.timeslot;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,6 +25,7 @@ public class TimeSlot {
     @EqualsAndHashCode.Include
     private Long id;
 
+    @Column(nullable = false)
     private LocalTime startAt;
 
     private TimeSlot(final Long id, final LocalTime startAt) {

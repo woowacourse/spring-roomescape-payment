@@ -3,11 +3,13 @@ package roomescape.domain.waiting;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface WaitingRepository extends JpaRepository<Waiting, Long> {
 
+    @EntityGraph(attributePaths = {"user", "theme", "timeSlot"})
     Optional<Waiting> findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(LocalDate date, long timeSlotId, long themeId);
 
     @Query("""
@@ -23,6 +25,9 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
                     )
                 )
                 FROM Waiting w
+                JOIN FETCH w.user
+                JOIN FETCH w.theme
+                JOIN FETCH w.timeSlot
                 WHERE w.user.id = :userId
             """)
     List<WaitingWithRank> findWaitingWithRankByUserId(Long userId);

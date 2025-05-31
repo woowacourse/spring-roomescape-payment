@@ -1,14 +1,18 @@
 package roomescape.domain.waiting;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.timeslot.TimeSlot;
@@ -16,6 +20,7 @@ import roomescape.domain.user.User;
 import roomescape.exception.BusinessRuleViolationException;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
 @Entity
@@ -25,12 +30,17 @@ public class Waiting {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private Long id;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private User user;
+
+    @Column(nullable = false)
     private LocalDate date;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private TimeSlot timeSlot;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Theme theme;
 
     private Waiting(final Long id,
@@ -49,16 +59,14 @@ public class Waiting {
         this.theme = theme;
     }
 
-    protected Waiting() {
-    }
-
     public static Waiting register(final User user,
                                    final LocalDate date,
                                    final TimeSlot timeSlot,
                                    final Theme theme) {
 
+        Waiting waiting = new Waiting(null, user, date, timeSlot, theme);
         validateNotPastDateTime(date, timeSlot);
-        return new Waiting(null, user, date, timeSlot, theme);
+        return waiting;
     }
 
     private static void validateNotPastDateTime(final LocalDate date, final TimeSlot timeSlot) {
