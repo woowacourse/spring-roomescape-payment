@@ -19,9 +19,12 @@ import java.util.Set;
 @Component
 public class TossPaymentClient implements PaymentClient{
 
+    public static final String BASE_URL = "https://api.tosspayments.com";
     private static final String PAYMENT_CONFIRM_URL = "/v1/payments/confirm";
     private static final String PAYMENT_CONFIRM_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:";
     private static final String BASIC = "Basic ";
+    public static final String KEY_MESSAGE = "message";
+    public static final String KEY_CODE = "code";
     private static final Set<String> INVISIBLE_CLIENT_ERROR_CODE = Set.of(
             "INVALID_API_KEY",
             "INVALID_AUTHORIZE_AUTH",
@@ -45,20 +48,24 @@ public class TossPaymentClient implements PaymentClient{
 
         return RestClient.builder()
                 .requestFactory(factory)
-                .baseUrl("https://api.tosspayments.com")
+                .baseUrl(BASE_URL)
                 .defaultStatusHandler(HttpStatusCode::is4xxClientError, (req, res) -> {
                     JsonNode root = objectMapper.readTree(res.getBody());
-                    String message = root.path("message").asText();
-                    String code = root.path("code").asText();
+                    String message = root.path(KEY_MESSAGE).asText();
+                    String code = root.path(KEY_CODE).asText();
                     if (INVISIBLE_CLIENT_ERROR_CODE.contains(code)) {
-                        throw new PaymentConfirmServerException(message);
+                        TossErrorResponse errorResponse = new TossErrorResponse(HttpStatusCode.valueOf(400), code, message);
+                        throw new PaymentConfirmServerException(errorResponse);
                     }
-                    throw new PaymentConfirmClientException(message);
+                    TossErrorResponse errorResponse = new TossErrorResponse(HttpStatusCode.valueOf(500), code, message);
+                    throw new PaymentConfirmClientException(errorResponse);
                 })
                 .defaultStatusHandler(HttpStatusCode::is5xxServerError, (req, res) -> {
                     JsonNode root = objectMapper.readTree(res.getBody());
-                    String message = root.path("message").asText();
-                    throw new PaymentConfirmServerException(message);
+                    String message = root.path(KEY_MESSAGE).asText();
+                    String code = root.path(KEY_CODE).asText();
+                    TossErrorResponse errorResponse = new TossErrorResponse(HttpStatusCode.valueOf(500), code, message);
+                    throw new PaymentConfirmServerException(errorResponse);
                 })
                 .build();
     }

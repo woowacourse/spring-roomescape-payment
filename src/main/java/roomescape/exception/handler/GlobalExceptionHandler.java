@@ -6,8 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import roomescape.client.PaymentErrorResponse;
 import roomescape.exception.*;
-import roomescape.exception.dto.ErrorResponse;
+import roomescape.exception.dto.ApiErrorResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -16,9 +17,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleBadRequestException(BadRequestException ex) {
+    public ApiErrorResponse handleBadRequestException(BadRequestException ex) {
         log.error(ex.getMessage());
-        return new ErrorResponse(
+        return new ApiErrorResponse(
                 ex.getMessage(),
                 HttpStatus.BAD_REQUEST
         );
@@ -26,9 +27,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNotFoundException(NotFoundException ex) {
+    public ApiErrorResponse handleNotFoundException(NotFoundException ex) {
         log.error(ex.getMessage());
-        return new ErrorResponse(
+        return new ApiErrorResponse(
                 ex.getMessage(),
                 HttpStatus.NOT_FOUND
         );
@@ -36,9 +37,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UnauthorizationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ErrorResponse handleAuthorizationException(UnauthorizationException ex) {
+    public ApiErrorResponse handleAuthorizationException(UnauthorizationException ex) {
         log.error(ex.getMessage());
-        return new ErrorResponse(
+        return new ApiErrorResponse(
                 ex.getMessage(),
                 HttpStatus.UNAUTHORIZED
         );
@@ -46,9 +47,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse handleAccessDeniedException(AccessDeniedException ex) {
+    public ApiErrorResponse handleAccessDeniedException(AccessDeniedException ex) {
         log.error(ex.getMessage());
-        return new ErrorResponse(
+        return new ApiErrorResponse(
                 ex.getMessage(),
                 HttpStatus.FORBIDDEN
         );
@@ -56,19 +57,22 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PaymentConfirmClientException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse handlePaymentConfirmClientException(PaymentConfirmClientException ex) {
-        log.error(ex.getMessage());
-        return new ErrorResponse(
-                ex.getMessage(),
+    public ApiErrorResponse handlePaymentConfirmClientException(PaymentConfirmClientException ex) {
+        PaymentErrorResponse paymentErrorResponse = ex.getPaymentErrorResponse();
+        String errorMessage = paymentErrorResponse.getMessage();
+        log.error(errorMessage);
+        return new ApiErrorResponse(
+                errorMessage,
                 HttpStatus.FORBIDDEN
         );
     }
 
     @ExceptionHandler(PaymentConfirmServerException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handlePaymentConfirmServerException(PaymentConfirmServerException ex) {
-        log.error(ex.getMessage());
-        return new ErrorResponse(
+    public ApiErrorResponse handlePaymentConfirmServerException(PaymentConfirmServerException ex) {
+        PaymentErrorResponse paymentErrorResponse = ex.getPaymentErrorResponse();
+        log.error(paymentErrorResponse.getMessage());
+        return new ApiErrorResponse(
                 "결제가 실패했습니다. 잠시 후 다시 시도해주세요.",
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
@@ -76,9 +80,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleDefault(Exception ex) {
+    public ApiErrorResponse handleDefault(Exception ex) {
         log.error(ex.getMessage());
-        return new ErrorResponse(
+        return new ApiErrorResponse(
                 ex.getMessage(),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
