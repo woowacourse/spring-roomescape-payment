@@ -1,11 +1,15 @@
 package roomescape.domain.reservation;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.user.User;
@@ -13,7 +17,6 @@ import roomescape.domain.user.UserRole;
 import roomescape.exception.BusinessRuleViolationException;
 
 class ReservationTest {
-
 
     @Test
     @DisplayName("과거 날짜로 예약을 시도하면 예외를 던진다.")
@@ -28,5 +31,104 @@ class ReservationTest {
         assertThatThrownBy(() -> Reservation.register(user, pastDate, timeSlot, theme))
                 .isInstanceOf(BusinessRuleViolationException.class)
                 .hasMessage("이전 날짜로 예약할 수 없습니다.");
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @DisplayName("사용자가 null인 경우 예외를 던진다.")
+    void validateUser_WhenNull(User user) {
+        // given
+        var date = createDate();
+        var timeSlot = createTimeSlot();
+        var theme = createTheme();
+
+        // when & then
+        assertThatThrownBy(() -> Reservation.register(user, date, timeSlot, theme))
+                .isInstanceOf(BusinessRuleViolationException.class)
+                .hasMessage("사용자 정보는 null일 수 없습니다.");
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @DisplayName("날짜가 null인 경우 예외를 던진다.")
+    void validateDate_WhenNull(LocalDate date) {
+        // given
+        var user = createUser();
+        var timeSlot = createTimeSlot();
+        var theme = createTheme();
+
+        // when & then
+        assertThatThrownBy(() -> Reservation.register(user, date, timeSlot, theme))
+                .isInstanceOf(BusinessRuleViolationException.class)
+                .hasMessage("예약 날짜는 null일 수 없습니다.");
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @DisplayName("타임슬롯이 null인 경우 예외를 던진다.")
+    void validateTimeSlot_WhenNull(TimeSlot timeSlot) {
+        // given
+        var user = createUser();
+        var date = createDate();
+        var theme = createTheme();
+
+        // when & then
+        assertThatThrownBy(() -> Reservation.register(user, date, timeSlot, theme))
+                .isInstanceOf(BusinessRuleViolationException.class)
+                .hasMessage("시간대 정보는 null일 수 없습니다.");
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @DisplayName("테마가 null인 경우 예외를 던진다.")
+    void validateTheme_WhenNull(Theme theme) {
+        // given
+        var user = createUser();
+        var date = createDate();
+        var timeSlot = createTimeSlot();
+
+        // when & then
+        assertThatThrownBy(() -> Reservation.register(user, date, timeSlot, theme))
+                .isInstanceOf(BusinessRuleViolationException.class)
+                .hasMessage("테마 정보는 null일 수 없습니다.");
+    }
+
+    @Test
+    @DisplayName("예약을 정상적으로 생성한다.")
+    void register_WithValidFields() {
+        // given
+        var user = createUser();
+        var date = createDate();
+        var timeSlot = createTimeSlot();
+        var theme = createTheme();
+
+        // when
+        Reservation reservation = Reservation.register(user, date, timeSlot, theme);
+
+        // then
+        assertAll(
+                () -> assertThat(reservation).isNotNull(),
+                () -> assertThat(reservation.getUser()).isEqualTo(user),
+                () -> assertThat(reservation.getDate()).isEqualTo(date),
+                () -> assertThat(reservation.getTimeSlot()).isEqualTo(timeSlot),
+                () -> assertThat(reservation.getTheme()).isEqualTo(theme)
+        );
+
+    }
+
+    private static User createUser() {
+        return User.ofExisting(1L, "user@email.com", UserRole.USER, "username", "password");
+    }
+
+    private static LocalDate createDate() {
+        return LocalDate.now().plusDays(1);
+    }
+
+    private static TimeSlot createTimeSlot() {
+        return TimeSlot.ofExisting(1L, LocalTime.of(10, 0));
+    }
+
+    private static Theme createTheme() {
+        return Theme.ofExisting(1L, "테마", "설명", "thumbnail");
     }
 }

@@ -7,8 +7,10 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.timeslot.TimeSlot;
@@ -17,6 +19,7 @@ import roomescape.domain.waiting.Waiting;
 import roomescape.exception.BusinessRuleViolationException;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
 @Entity
@@ -39,14 +42,15 @@ public class Reservation {
                         final LocalDate date,
                         final TimeSlot timeSlot,
                         final Theme theme) {
+        validateUser(user);
+        validateDate(date);
+        validateTimeSlot(timeSlot);
+        validateTheme(theme);
         this.id = id;
         this.user = user;
         this.date = date;
         this.timeSlot = timeSlot;
         this.theme = theme;
-    }
-
-    protected Reservation() {
     }
 
     public static Reservation register(final User user,
@@ -71,6 +75,30 @@ public class Reservation {
 
         if (isPastDate || isCurrentDateAndPastTime) {
             throw new BusinessRuleViolationException("이전 날짜로 예약할 수 없습니다.");
+        }
+    }
+
+    private void validateUser(final User user) {
+        if (user == null) {
+            throw new BusinessRuleViolationException("사용자 정보는 null일 수 없습니다.");
+        }
+    }
+
+    private void validateDate(final LocalDate date) {
+        if (date == null) {
+            throw new BusinessRuleViolationException("예약 날짜는 null일 수 없습니다.");
+        }
+    }
+
+    private void validateTimeSlot(final TimeSlot timeSlot) {
+        if (timeSlot == null) {
+            throw new BusinessRuleViolationException("시간 정보는 null일 수 없습니다.");
+        }
+    }
+
+    private void validateTheme(final Theme theme) {
+        if (theme == null) {
+            throw new BusinessRuleViolationException("테마 정보는 null일 수 없습니다.");
         }
     }
 }

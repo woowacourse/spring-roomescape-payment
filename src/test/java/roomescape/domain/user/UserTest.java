@@ -6,21 +6,23 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import roomescape.exception.BusinessRuleViolationException;
 import roomescape.exception.InvalidInputException;
 
 class UserTest {
 
-    @Test
-    @DisplayName("이름이 공백인 경우 예외를 던진다.")
-    void validateNameLength_WhenBlank() {
+    @ParameterizedTest
+    @NullAndEmptySource
+    @DisplayName("이름이 공백이거나 null일 경우 예외를 던진다.")
+    void validateNameLength_WhenNullOrBlank(String name) {
         // given
-        var blankName = "   ";
         var email = "user3@email.com";
         var password = "password3";
 
         // when & then
-        assertThatThrownBy(() -> User.register(blankName, email, password))
+        assertThatThrownBy(() -> User.register(name, email, password))
                 .isInstanceOf(InvalidInputException.class)
                 .hasMessage("이름은 공백일 수 없습니다.");
     }
@@ -39,16 +41,31 @@ class UserTest {
                 .hasMessage("이름은 5자를 넘길 수 없습니다.");
     }
 
-    @Test
-    @DisplayName("비밀번호가 공백인 경우 예외를 던진다.")
-    void validatePasswordLength_WhenBlank() {
+    @ParameterizedTest
+    @NullAndEmptySource
+    @DisplayName("이메일이 공백이거나 null일 경우 예외를 던진다.")
+    void validateEmail_WhenNullOrBlank(String email) {
+        // given
+        var name = "사용자3";
+        var password = "password3";
+
+        // when & then
+        assertThatThrownBy(() -> User.register(name, email, password))
+                .isInstanceOf(InvalidInputException.class)
+                .hasMessage("비밀번호는 공백일 수 없습니다.");
+
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @DisplayName("비밀번호가 공백이거나 null일 경우 예외를 던진다.")
+    void validatePasswordLength_WhenNullOrBlank(String password) {
         // given
         var name = "사용자3";
         var email = "user3@email.com";
-        var blankPassword = "         ";
 
         // when & then
-        assertThatThrownBy(() -> User.register(name, email, blankPassword))
+        assertThatThrownBy(() -> User.register(name, email, password))
                 .isInstanceOf(InvalidInputException.class)
                 .hasMessage("비밀번호는 공백일 수 없습니다.");
     }

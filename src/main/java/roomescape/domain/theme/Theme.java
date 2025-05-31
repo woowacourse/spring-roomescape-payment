@@ -4,12 +4,15 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 import roomescape.exception.BusinessRuleViolationException;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
 @Entity
@@ -31,16 +34,14 @@ public class Theme {
                   final String description,
                   final String thumbnail) {
 
-        validateNameLength(name);
-        validateDescriptionLength(description);
+        validateName(name);
+        validateDescription(description);
+        validateThumbnail(thumbnail);
 
         this.id = id;
         this.name = name;
         this.description = description;
         this.thumbnail = thumbnail;
-    }
-
-    protected Theme() {
     }
 
     public static Theme ofExisting(final long id,
@@ -54,15 +55,28 @@ public class Theme {
         return new Theme(null, name, description, thumbnail);
     }
 
-    private void validateNameLength(final String name) {
+    private void validateName(final String name) {
+        if (name == null || name.isBlank()) {
+            throw new BusinessRuleViolationException("테마 이름은 null이거나 공백일 수 없습니다.");
+
+        }
         if (name.length() > NAME_MAX_LENGTH) {
             throw new BusinessRuleViolationException(String.format("이름은 %d자를 넘길 수 없습니다.", NAME_MAX_LENGTH));
         }
     }
 
-    private void validateDescriptionLength(final String description) {
+    private void validateDescription(final String description) {
+        if (description == null || description.isBlank()) {
+            throw new BusinessRuleViolationException("테마 설명은 null이거나 공백일 수 없습니다.");
+        }
         if (description.length() > DESCRIPTION_MAX_LENGTH) {
             throw new BusinessRuleViolationException(String.format("설명은 %d자를 넘길 수 없습니다.", DESCRIPTION_MAX_LENGTH));
+        }
+    }
+
+    private void validateThumbnail(final String thumbnail) {
+        if (thumbnail == null || thumbnail.isBlank()) {
+            throw new BusinessRuleViolationException("썸네일은 null이거나 공백일 수 없습니다.");
         }
     }
 }

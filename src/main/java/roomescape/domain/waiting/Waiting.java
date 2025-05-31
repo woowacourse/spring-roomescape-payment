@@ -38,6 +38,10 @@ public class Waiting {
                     final LocalDate date,
                     final TimeSlot timeSlot,
                     final Theme theme) {
+        validateUser(user);
+        validateDate(date);
+        validateTimeSlot(timeSlot);
+        validateTheme(theme);
         this.id = id;
         this.user = user;
         this.date = date;
@@ -66,6 +70,30 @@ public class Waiting {
 
         if (isPastDate || isCurrentDateAndPastTime) {
             throw new BusinessRuleViolationException("이전 날짜로 예약 대기 신청할 수 없습니다.");
+        }
+    }
+
+    private void validateUser(final User user) {
+        if (user == null) {
+            throw new BusinessRuleViolationException("사용자 정보는 null일 수 없습니다.");
+        }
+    }
+
+    private void validateDate(final LocalDate date) {
+        if (date == null) {
+            throw new BusinessRuleViolationException("예약 날짜는 null일 수 없습니다.");
+        }
+    }
+
+    private void validateTimeSlot(final TimeSlot timeSlot) {
+        if (timeSlot == null) {
+            throw new BusinessRuleViolationException("시간 정보는 null일 수 없습니다.");
+        }
+    }
+
+    private void validateTheme(final Theme theme) {
+        if (theme == null) {
+            throw new BusinessRuleViolationException("테마 정보는 null일 수 없습니다.");
         }
     }
 }
