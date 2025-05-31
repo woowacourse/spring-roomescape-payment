@@ -6,7 +6,7 @@ public record PaymentDetails(
 ) {
 
     public PaymentDetails(final PaymentConfirmation confirmation) {
-        this(confirmation, PaymentStatus.succeed());
+        this(confirmation, null);
     }
 
     public PaymentDetails(final PaymentStatus status) {
@@ -14,6 +14,6 @@ public record PaymentDetails(
     }
 
     public boolean isFailed() {
-        return status.isFailed();
+        return status != null;
     }
 }

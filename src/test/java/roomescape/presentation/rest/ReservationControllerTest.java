@@ -24,10 +24,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import roomescape.application.PaymentService;
 import roomescape.application.ReservationService;
 import roomescape.domain.auth.AuthenticationInfo;
+import roomescape.domain.payment.PaymentStatus;
+import roomescape.domain.payment.PaymentStatusCode;
 import roomescape.domain.user.UserRole;
 import roomescape.exception.NotFoundException;
 import roomescape.exception.PaymentFailedException;
-import roomescape.exception.PaymentInternalException;
 import roomescape.presentation.GlobalExceptionHandler;
 import roomescape.presentation.StubAuthenticationInfoArgumentResolver;
 
@@ -94,7 +95,8 @@ class ReservationControllerTest {
     @Test
     @DisplayName("잘못된 요청으로 결제 승인 실패 시 BAD REQUEST를 응답한다.")
     void cannotReserveWhenBadRequest() throws Exception {
-        Mockito.doThrow(new PaymentFailedException("결제에 실패했습니다."))
+        var paymentFailedException = new PaymentFailedException(PaymentStatus.fail(PaymentStatusCode.FAILED_PAYMENT, "결제 실패"));
+        Mockito.doThrow(paymentFailedException)
                 .when(paymentService).pay(anyString(), anyString(), anyLong());
 
         mockMvc.perform(post("/reservations")
@@ -117,7 +119,8 @@ class ReservationControllerTest {
     @Test
     @DisplayName("서버 내부 오류로 결제 승인 실패 시 INTERNAL SERVER ERROR를 응답한다.")
     void cannotReserveWhenInternalServerError() throws Exception {
-        Mockito.doThrow(new PaymentInternalException("결제에 실패했습니다."))
+        var paymentFailedException = new PaymentFailedException(PaymentStatus.fail(PaymentStatusCode.INVALID_AUTH_CREDENTIALS, "결제 실패"));
+        Mockito.doThrow(paymentFailedException)
                 .when(paymentService).pay(anyString(), anyString(), anyLong());
 
         mockMvc.perform(post("/reservations")

@@ -7,8 +7,6 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 public class PaymentStatus {
 
-    private static final String SUCCESS_MESSAGE = "결제에 성공했습니다.";
-
     private final PaymentStatusCode code;
     private final String message;
 
@@ -17,12 +15,8 @@ public class PaymentStatus {
         this.message = message;
     }
 
-    public boolean isFailed() {
-        return PaymentStatusCode.SUCCEEDED_PAYMENT != code;
-    }
-
-    public static PaymentStatus succeed() {
-        return new PaymentStatus(PaymentStatusCode.SUCCEEDED_PAYMENT, SUCCESS_MESSAGE);
+    public boolean causedBy(final PaymentStatusCode.Cause cause) {
+        return code.causedBy(cause);
     }
 
     public static PaymentStatus fail(final PaymentStatusCode code, final String message) {

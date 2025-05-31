@@ -3,12 +3,10 @@ package roomescape.application;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
 import roomescape.domain.payment.PaymentConfirmation;
 import roomescape.domain.payment.PaymentDetails;
@@ -17,7 +15,6 @@ import roomescape.domain.payment.PaymentRequest;
 import roomescape.domain.payment.PaymentStatus;
 import roomescape.domain.payment.PaymentStatusCode;
 import roomescape.exception.PaymentFailedException;
-import roomescape.exception.PaymentInternalException;
 
 class PaymentServiceTest {
 
@@ -39,8 +36,8 @@ class PaymentServiceTest {
 
     @ParameterizedTest
     @DisplayName("결제 실패 시 예외가 발생한다.")
-    @MethodSource("failToPaySource")
-    void failToPay(final PaymentStatusCode code, final Class<?> expectedException) {
+    @CsvSource({"FAILED_PAYMENT", "INVALID_AUTH_CREDENTIALS", "FAILED_INTERNAL_PROCESSING"})
+    void failToPay(final PaymentStatusCode code) {
         // given
         var request = new PaymentRequest("a", "1", 1000);
         var paymentDetails = new PaymentDetails(PaymentStatus.fail(code, "결제 실패"));
@@ -48,14 +45,7 @@ class PaymentServiceTest {
         Mockito.when(paymentProvider.confirm(request)).thenReturn(paymentDetails);
 
         // when & then
-        assertThatThrownBy(() -> paymentService.pay("a", "1", 1000)).isInstanceOf(expectedException);
-    }
-
-    private static Stream<Arguments> failToPaySource() {
-        return Stream.of(
-            Arguments.of(PaymentStatusCode.FAILED_PAYMENT, PaymentFailedException.class),
-            Arguments.of(PaymentStatusCode.INVALID_AUTH_CREDENTIALS, PaymentInternalException.class),
-            Arguments.of(PaymentStatusCode.FAILED_INTERNAL_PROCESSING, PaymentInternalException.class)
-        );
+        assertThatThrownBy(() -> paymentService.pay("a", "1", 1000))
+            .isInstanceOf(PaymentFailedException.class);
     }
 }
