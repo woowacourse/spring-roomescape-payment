@@ -31,10 +31,10 @@ public class PaymentService {
 
     @Transactional
     public Payment save(final TossPaymentResponse response, final long reservationId) {
-        Reservation byId = reservationRepository.findById(reservationId)
+        Reservation findReservation = reservationRepository.findById(reservationId)
                 .orElseThrow();
 
-        Payment payment = new Payment(response.orderId(), response.approvedAt().toLocalDateTime(), response.totalAmount(), PaymentStatus.DONE, byId);
+        Payment payment = new Payment(response.orderId(), response.approvedAt().toLocalDateTime(), response.totalAmount(), PaymentStatus.DONE, findReservation);
         return paymentRepository.save(payment);
     }
 }
