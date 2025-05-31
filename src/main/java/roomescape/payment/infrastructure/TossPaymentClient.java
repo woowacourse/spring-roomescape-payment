@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.infrastructure.dto.TossPaymentErrorResponse;
 import roomescape.payment.infrastructure.dto.TossPaymentRequest;
@@ -13,7 +14,8 @@ import roomescape.reservation.presentation.dto.ReservationRequest;
 
 public class TossPaymentClient implements PaymentClient {
 
-    private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+    @Value("${payment.secret-key.test}")
+    private String SECRET_KEY;
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -46,8 +48,8 @@ public class TossPaymentClient implements PaymentClient {
                 .body(Payment.class);
     }
 
-    private static String encodeSecretKey() {
-        String credentials = TossPaymentClient.SECRET_KEY + ":";
+    private String encodeSecretKey() {
+        String credentials = this.SECRET_KEY + ":";
         String base64Credentials = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
         return "Basic " + base64Credentials;
     }
