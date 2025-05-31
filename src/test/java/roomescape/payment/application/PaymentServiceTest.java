@@ -1,5 +1,9 @@
 package roomescape.payment.application;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,10 +11,6 @@ import roomescape.payment.application.service.PaymentClient;
 import roomescape.payment.application.service.PaymentService;
 import roomescape.payment.infrastructure.TossPaymentClient;
 import roomescape.reservation.presentation.dto.ReservationRequest;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 class PaymentServiceTest {
 
