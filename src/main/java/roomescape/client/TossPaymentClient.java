@@ -8,7 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.dto.reservation.PaymentConfirmRequestDto;
+import roomescape.domain.payment.Payment;
+import roomescape.dto.reservation.PaymentConfirmDto;
 import roomescape.exception.PaymentConfirmClientException;
 import roomescape.exception.PaymentConfirmServerException;
 
@@ -37,17 +38,6 @@ public class TossPaymentClient implements PaymentClient{
         this.objectMapper = objectMapper;
     }
 
-    public void confirmPayment(PaymentConfirmRequestDto requestDto) {
-        restClient.post()
-                .uri(PAYMENT_CONFIRM_URL)
-                .header(HttpHeaders.AUTHORIZATION, BASIC +
-                        Base64.getEncoder().encodeToString(PAYMENT_CONFIRM_SECRET_KEY.getBytes()))
-                .body(requestDto)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .toBodilessEntity();
-    }
-
     public RestClient buildRestClient() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(200);
@@ -71,5 +61,16 @@ public class TossPaymentClient implements PaymentClient{
                     throw new PaymentConfirmServerException(message);
                 })
                 .build();
+    }
+
+    public Payment confirmPayment(PaymentConfirmDto requestDto) {
+        return restClient.post()
+                .uri(PAYMENT_CONFIRM_URL)
+                .header(HttpHeaders.AUTHORIZATION, BASIC +
+                        Base64.getEncoder().encodeToString(PAYMENT_CONFIRM_SECRET_KEY.getBytes()))
+                .body(requestDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .body(Payment.class);
     }
 }

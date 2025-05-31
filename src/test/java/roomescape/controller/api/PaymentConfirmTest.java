@@ -5,33 +5,33 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestClient;
-import roomescape.client.PaymentClient;
-import roomescape.config.RestClientConfiguration;
-import roomescape.dto.reservation.TossPaymentConfirmRequestDto;
+import roomescape.client.TossPaymentClient;
+import roomescape.dto.reservation.PaymentConfirmDto;
 import roomescape.exception.PaymentConfirmClientException;
 import roomescape.exception.PaymentConfirmServerException;
+import roomescape.service.command.PaymentCommandService;
 
 import java.util.Base64;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {RestClientConfiguration.class, PaymentClient.class, ObjectMapper.class})
+@ContextConfiguration(classes = {PaymentCommandService.class, TossPaymentClient.class, ObjectMapper.class})
 public class PaymentConfirmTest {
 
     @Autowired
-    private RestClient restClient;
+    private TossPaymentClient tossPaymentClient;
 
     @Autowired
-    private PaymentClient paymentClient;
+    private PaymentCommandService paymentCommandService;
 
     @DisplayName("결제 예외 핸들링 테스트 - INVALID_API_KEY가 발생할 경우")
     @Test
     void paymentExceptionTest() {
+        RestClient restClient = tossPaymentClient.buildRestClient();
         assertThatThrownBy(
                 () -> restClient.post()
                         .uri("https://api.tosspayments.com/v1/payments/confirm")
@@ -47,7 +47,7 @@ public class PaymentConfirmTest {
     @Test
     void invalidPaymentKeyExceptionTest() {
         assertThatThrownBy(
-                () -> paymentClient.confirmPayment(new TossPaymentConfirmRequestDto(
+                () -> paymentCommandService.confirmPayment(new PaymentConfirmDto(
                         "wrongPaymentKey", "orderId", 1000L
                 ))
         ).isInstanceOf(PaymentConfirmClientException.class);

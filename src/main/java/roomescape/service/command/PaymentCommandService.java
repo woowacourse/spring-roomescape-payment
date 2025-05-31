@@ -2,7 +2,9 @@ package roomescape.service.command;
 
 import org.springframework.stereotype.Service;
 import roomescape.client.PaymentClient;
-import roomescape.dto.reservation.PaymentConfirmRequestDto;
+import roomescape.domain.payment.Payment;
+import roomescape.dto.payment.PaymentResponseDto;
+import roomescape.dto.reservation.PaymentConfirmDto;
 
 @Service
 public class PaymentCommandService {
@@ -13,7 +15,8 @@ public class PaymentCommandService {
         this.paymentClient = paymentClient;
     }
 
-    public void confirmPayment(PaymentConfirmRequestDto requestDto) {
-        paymentClient.confirmPayment(requestDto);
+    public PaymentResponseDto confirmPayment(PaymentConfirmDto requestDto) {
+        Payment payment = paymentClient.confirmPayment(requestDto);
+        return new PaymentResponseDto(payment.getOrderId(), payment.getTotalAmount());
     }
 }

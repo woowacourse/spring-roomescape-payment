@@ -11,8 +11,8 @@ public record MemberReservationCreateRequestDto
          String orderId,
          Long amount
 ) {
-    public PaymentConfirmRequestDto extractTossPaymentDto() {
-        return new PaymentConfirmRequestDto(paymentKey, orderId, amount);
+    public PaymentConfirmDto extractTossPaymentDto() {
+        return new PaymentConfirmDto(paymentKey, orderId, amount);
     }
 
 }
