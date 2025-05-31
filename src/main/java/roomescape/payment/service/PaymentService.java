@@ -11,6 +11,7 @@ import roomescape.payment.domain.PaymentStatus;
 import roomescape.payment.dto.ReservationPaymentRequest;
 import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;
+import roomescape.payment.exception.PaymentTimeoutException;
 import roomescape.payment.exception.TossPaymentException;
 import roomescape.payment.infrastructure.TossRestClient;
 import roomescape.payment.repository.PaymentRepository;
@@ -58,6 +59,9 @@ public class PaymentService {
             TossPaymentResponse response = tossRestClient.confirm(tossPaymentRequest);
             Payment payment = getPayment(tossPaymentRequest);
             updatePaymentInfoAfterConfirm(payment, response);
+
+        } catch (PaymentTimeoutException e) {
+            // 결제 상태 조회 후 결제 취소 API 호출
         } catch (TossPaymentException e) {
             Payment payment = getPayment(tossPaymentRequest);
             payment.updateStatusTo(PaymentStatus.FAILED);

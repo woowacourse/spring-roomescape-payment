@@ -56,9 +56,9 @@ public class TossRestClient {
                             })
                     .body(TossPaymentResponse.class);
         } catch (ResourceAccessException ex) {
-            log.error("Resourc Access Exception:", ex);
+            log.error("Resource Access Exception:", ex);
             if (ex.getCause() instanceof SocketTimeoutException) {
-                log.error("토스 결제 confirm 요청 타임아웃", ex);
+                log.error("토스 결제 confirm 요청 타임아웃");
                 throw new PaymentTimeoutException("결제 시스템이 응답하지 않아 시간이 초과되었습니다.");
             }
             throw ex;
