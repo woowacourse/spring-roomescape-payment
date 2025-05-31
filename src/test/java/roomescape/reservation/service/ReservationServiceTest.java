@@ -7,19 +7,17 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
 import static roomescape.constant.TestData.RESERVATION_COUNT;
 
+import jakarta.transaction.Transactional;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
-
-import jakarta.transaction.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.exception.NotFoundException;
 import roomescape.exception.PaymentClientException;
@@ -43,9 +41,6 @@ import roomescape.theme.repository.ThemeRepository;
 @Sql("/data.sql")
 @Transactional
 class ReservationServiceTest extends BaseTest {
-
-    // @Autowired
-    // private MockRestServiceServer server;
 
     @Autowired
     private ReservationRepository reservationRepository;

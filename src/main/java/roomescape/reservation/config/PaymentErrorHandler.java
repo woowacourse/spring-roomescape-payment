@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
@@ -25,7 +26,8 @@ public class PaymentErrorHandler implements ResponseErrorHandler {
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
-        return response.getStatusCode().is4xxClientError();
+        HttpStatusCode statusCode = response.getStatusCode();
+        return statusCode.is4xxClientError() || statusCode.is5xxServerError();
     }
 
     @Override

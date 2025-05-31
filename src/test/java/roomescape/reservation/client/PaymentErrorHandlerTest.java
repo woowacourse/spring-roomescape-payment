@@ -29,8 +29,8 @@ class PaymentErrorHandlerTest {
     private final PaymentErrorHandler paymentErrorHandler = new PaymentErrorHandler(objectMapper);
 
     @ParameterizedTest
-    @ValueSource(ints = {400, 401, 402, 403, 404, 499})
-    void _4xx_에러를_핸들링_한다(int statusCode) throws IOException {
+    @ValueSource(ints = {400, 401, 498, 499, 500, 501, 598, 599})
+    void _4xx과_5xx_에러를_핸들링_한다(int statusCode) throws IOException {
         // given
         when(clientHttpResponse.getStatusCode())
                 .thenReturn(HttpStatusCode.valueOf(statusCode));
@@ -43,8 +43,8 @@ class PaymentErrorHandlerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {500, 501, 502, 503, 504, 599})
-    void _4xx_외에_에러는_핸들링_하지_않는다(int statusCode) throws IOException {
+    @ValueSource(ints = {100, 101, 200, 201, 300, 301})
+    void _4xx과_5xx_외에는_핸들링_하지_않는다(int statusCode) throws IOException {
         // given
         when(clientHttpResponse.getStatusCode())
                 .thenReturn(HttpStatusCode.valueOf(statusCode));
