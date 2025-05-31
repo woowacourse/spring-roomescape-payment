@@ -7,9 +7,11 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.member.auth.vo.MemberInfo;
+import roomescape.payment.PaymentService;
 import roomescape.reservation.controller.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.controller.dto.CreateReservationByAdminWebRequest;
 import roomescape.reservation.controller.dto.CreateReservationWebRequest;
+import roomescape.reservation.controller.dto.CreateReservationWithPaymentWebRequest;
 import roomescape.reservation.controller.dto.ReservationSearchWebRequest;
 import roomescape.reservation.controller.dto.ReservationWaitWebResponse;
 import roomescape.reservation.controller.dto.ReservationWebResponse;
@@ -34,6 +36,8 @@ public class ReservationService {
     private final ReservationCommandUseCase reservationCommandUseCase;
     private final ReservationWaitQueryUseCase reservationWaitQueryUseCase;
     private final ReservationWaitCommandUseCase reservationWaitCommandUseCase;
+
+    private final PaymentService paymentService;
 
     public List<ReservationWebResponse> getAll() {
         return ReservationConverter.toDto(
@@ -99,10 +103,14 @@ public class ReservationService {
         return ReservationConverter.toDto(reservation);
     }
 
-    public ReservationWebResponse create(
-            final CreateReservationWebRequest createReservationWebRequest,
+    public ReservationWebResponse paymentConfirmAndCreate(
+            final CreateReservationWithPaymentWebRequest request,
             final MemberInfo memberInfo
     ) {
+        // TODO : paymentId 등 결제정보를 예약 저장시 db에 저장할지 고려
+        paymentService.confirm(request.toPaymentConfirmRequest());
+
+        final CreateReservationWebRequest createReservationWebRequest = request.toCreateReservationWebRequest();
         final Reservation reservation = reservationCommandUseCase.create(
                 new CreateReservationServiceRequest(
                         memberInfo.id(),
