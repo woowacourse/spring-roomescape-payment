@@ -1,6 +1,5 @@
 package roomescape.reservation;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +43,7 @@ public class ReservationService {
     @Transactional
     public ReservationResponse create(final ReservationPaymentRequest request, final LoginMember loginMember) {
         final ReservationTime reservationTime = getReservationTimeById(request.reservationRequest().timeId());
-        final Theme theme = getThemeById(request.reservationRequest().timeId());
+        final Theme theme = getThemeById(request.reservationRequest().themeId());
         final Member member = getMemberByEmail(loginMember.email());
 
         final LocalDateTime currentTimestamp = LocalDateTime.now();
