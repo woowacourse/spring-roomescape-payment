@@ -2,7 +2,9 @@ package roomescape.application;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.user.User;
@@ -14,21 +16,14 @@ import roomescape.exception.NotFoundException;
 import roomescape.presentation.response.UserReservedRecordsResponse;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
     private final WaitingRepository waitingRepository;
 
-    public UserService(final UserRepository userRepository,
-                       final ReservationRepository reservationRepository,
-                       final WaitingRepository waitingRepository
-    ) {
-        this.userRepository = userRepository;
-        this.reservationRepository = reservationRepository;
-        this.waitingRepository = waitingRepository;
-    }
-
+    @Transactional
     public User saveUser(final String email, final String password, final String name) {
         validateEmailNotRegistered(email);
         User user = User.register(name, email, password);
@@ -36,10 +31,12 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @Transactional(readOnly = true)
     public List<User> findAllUsers() {
         return userRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public List<UserReservedRecordsResponse> findTotalRecordByUserId(Long userId) {
         validateUserExists(userId);
         List<Reservation> reservations = reservationRepository.findByUserId(userId);

@@ -3,7 +3,9 @@ package roomescape.application;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.timeslot.AvailableTimeSlot;
@@ -13,29 +15,25 @@ import roomescape.exception.InUseException;
 import roomescape.exception.NotFoundException;
 
 @Service
+@RequiredArgsConstructor
 public class TimeSlotService {
 
     private final ReservationRepository reservationRepository;
     private final TimeSlotRepository timeSlotRepository;
 
-    public TimeSlotService(
-            final ReservationRepository reservationRepository,
-            final TimeSlotRepository timeSlotRepository
-    ) {
-        this.reservationRepository = reservationRepository;
-        this.timeSlotRepository = timeSlotRepository;
-    }
-
+    @Transactional
     public TimeSlot saveTimeSlot(final LocalTime startAt) {
         TimeSlot timeSlot = TimeSlot.register(startAt);
 
         return timeSlotRepository.save(timeSlot);
     }
 
+    @Transactional(readOnly = true)
     public List<TimeSlot> findAllTimeSlots() {
         return timeSlotRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public List<AvailableTimeSlot> findAvailableTimeSlots(final LocalDate date, final long themeId) {
         List<TimeSlot> reservedTimeSlots = findReservedTimeSlots(date, themeId);
         List<TimeSlot> allTimeSlots = timeSlotRepository.findAll();
@@ -45,6 +43,7 @@ public class TimeSlotService {
                 .toList();
     }
 
+    @Transactional
     public void removeById(final long id) {
         validateTimSlotNotInUse(id);
         validateTimeSlotExists(id);

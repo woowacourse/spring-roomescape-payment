@@ -2,7 +2,9 @@ package roomescape.application;
 
 import java.time.LocalDate;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
@@ -16,6 +18,7 @@ import roomescape.exception.BusinessRuleViolationException;
 import roomescape.exception.NotFoundException;
 
 @Service
+@RequiredArgsConstructor
 public class WaitingService {
 
     private final ReservationRepository reservationRepository;
@@ -23,18 +26,7 @@ public class WaitingService {
     private final TimeSlotRepository timeSlotRepository;
     private final ThemeRepository themeRepository;
 
-    public WaitingService(
-            final ReservationRepository reservationRepository,
-            final WaitingRepository waitingRepository,
-            final TimeSlotRepository timeSlotRepository,
-            final ThemeRepository themeRepository
-    ) {
-        this.reservationRepository = reservationRepository;
-        this.waitingRepository = waitingRepository;
-        this.timeSlotRepository = timeSlotRepository;
-        this.themeRepository = themeRepository;
-    }
-
+    @Transactional
     public Waiting saveWaiting(final User user,
                                final LocalDate date,
                                final long timeId,
@@ -49,10 +41,12 @@ public class WaitingService {
         return waitingRepository.save(waiting);
     }
 
+    @Transactional(readOnly = true)
     public List<Waiting> findAllWaitings() {
         return waitingRepository.findAll();
     }
 
+    @Transactional
     public void removeById(final long id) {
         validateWaitingExists(id);
 

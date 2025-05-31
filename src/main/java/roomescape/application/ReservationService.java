@@ -3,7 +3,9 @@ package roomescape.application;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.request.PaymentInfo;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
@@ -21,6 +23,7 @@ import roomescape.exception.NotFoundException;
 import roomescape.infrastructure.ReservationSpecifications;
 
 @Service
+@RequiredArgsConstructor
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -30,18 +33,7 @@ public class ReservationService {
     private final UserRepository userRepository;
     private final PaymentService paymentService;
 
-    public ReservationService(final ReservationRepository reservationRepository,
-                              final WaitingRepository waitingRepository, final TimeSlotRepository timeSlotRepository,
-                              final ThemeRepository themeRepository, final UserRepository userRepository,
-                              final PaymentService paymentService) {
-        this.reservationRepository = reservationRepository;
-        this.waitingRepository = waitingRepository;
-        this.timeSlotRepository = timeSlotRepository;
-        this.themeRepository = themeRepository;
-        this.userRepository = userRepository;
-        this.paymentService = paymentService;
-    }
-
+    @Transactional
     public Reservation saveReservationWithPurchase(final long userId, final LocalDate date, final long timeId,
                                                    final long themeId, final PaymentInfo paymentInfo) {
         Reservation reservation = registerReservation(userId, date, timeId, themeId);
@@ -50,9 +42,25 @@ public class ReservationService {
         return reservation;
     }
 
+    @Transactional
     public Reservation saveReservationWithoutPurchase(final long userId, final LocalDate date, final long timeId,
                                                       final long themeId) {
         return registerReservation(userId, date, timeId, themeId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Reservation> findReservationsByFilter(ReservationSearchFilter filter) {
+        return reservationRepository.findAll(ReservationSpecifications.byFilter(filter));
+    }
+
+    @Transactional
+    public void removeById(final long id) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 예약입니다."));
+
+        approveNextWaitingIfExists(reservation);
+
+        reservationRepository.deleteById(id);
     }
 
     private Reservation registerReservation(final long userId, final LocalDate date, final long timeId,
@@ -65,21 +73,9 @@ public class ReservationService {
         return reservationRepository.save(Reservation.register(user, date, timeSlot, theme));
     }
 
-    public List<Reservation> findReservationsByFilter(ReservationSearchFilter filter) {
-        return reservationRepository.findAll(ReservationSpecifications.byFilter(filter));
-    }
-
-    public void removeById(final long id) {
-        Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 예약입니다."));
-
-        approveNextWaitingIfExists(reservation);
-
-        reservationRepository.deleteById(id);
-    }
-
     private void validateDuplicateReservation(final LocalDate date, final TimeSlot timeSlot, final Theme theme) {
-        boolean hasDuplicatedReservation =  reservationRepository.existsByDateAndTimeSlotIdAndThemeId(date, timeSlot.getId(),
+        boolean hasDuplicatedReservation = reservationRepository.existsByDateAndTimeSlotIdAndThemeId(date,
+                timeSlot.getId(),
                 theme.getId());
 
         if (hasDuplicatedReservation) {
