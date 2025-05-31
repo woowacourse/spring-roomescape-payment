@@ -51,7 +51,7 @@ public class ReservationService {
         return reserve(userId, schedule, ReservationStatus.WAITING);
     }
 
-    public List<Reservation> findAllReservations(ReservationSearchFilter filter) {
+    public List<Reservation> findAllReservations(final ReservationSearchFilter filter) {
         return reservationRepository.findAll(byFilter(filter));
     }
 
