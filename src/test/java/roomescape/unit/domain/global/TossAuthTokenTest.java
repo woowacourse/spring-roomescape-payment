@@ -27,7 +27,7 @@ class TossAuthTokenTest {
         TossAuthToken tossAuthToken = new TossAuthToken("hans");
 
         // when
-        String token = tossAuthToken.getToken();
+        String token = tossAuthToken.generateToken();
 
         // then
         assertThat(token).containsPattern("aGFuczo=");

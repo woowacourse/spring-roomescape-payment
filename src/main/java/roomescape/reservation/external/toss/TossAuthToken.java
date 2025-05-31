@@ -11,12 +11,11 @@ public class TossAuthToken extends AuthToken {
     }
 
     @Override
-    public String getToken() {
-        return Base64.getEncoder().encodeToString((super.getToken() + ":").getBytes(StandardCharsets.UTF_8));
+    public String generateToken() {
+        return String.format("basic %s", encodeToken());
     }
 
-    @Override
-    public String generateToken() {
-        return String.format("basic %s", getToken());
+    private String encodeToken() {
+        return Base64.getEncoder().encodeToString((getToken() + ":").getBytes(StandardCharsets.UTF_8));
     }
 }
