@@ -5,4 +5,15 @@ public record PaymentInfo(
         Amount totalAmount,
         PaymentKey paymentKey
 ) {
+    public String orderIdAsString() {
+        return orderId.orderId();
+    }
+
+    public Long totalAmountAsLong() {
+        return totalAmount.amount();
+    }
+
+    public String paymentKeyAsString() {
+        return paymentKey.paymentKey();
+    }
 }

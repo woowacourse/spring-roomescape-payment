@@ -9,9 +9,9 @@ public record PaymentConfirmRequest(
 ) {
     public static PaymentConfirmRequest from(PaymentInfo info) {
         return new PaymentConfirmRequest(
-                info.paymentKey().paymentKey(),
-                info.totalAmount().amount(),
-                info.orderId().orderId()
+                info.paymentKeyAsString(),
+                info.totalAmountAsLong(),
+                info.orderIdAsString()
         );
     }
 }
