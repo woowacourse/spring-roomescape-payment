@@ -75,8 +75,7 @@ public class ReservationController {
     public ResponseEntity<List<ReservationResponse>> findAllByFilter(
             @ModelAttribute @Valid final FilteringReservationRequest request
     ) {
-        final List<ReservationResponse> reservationResponses =
-                reservationService.findReservationByFiltering(request);
+        final List<ReservationResponse> reservationResponses = reservationService.findReservationByFiltering(request);
 
         return ResponseEntity.ok(reservationResponses);
     }

@@ -68,10 +68,18 @@ public class ReservationService {
         LocalDate dateFrom = request.dateFrom();
         LocalDate dateTo = request.dateTo();
 
+        validateDateFromTo(dateFrom, dateTo);
+
         return reservationRepository.findByThemeIdAndMemberIdAndDateBetween(themeId, memberId, dateFrom, dateTo)
                 .stream()
                 .map(ReservationResponse::from)
                 .toList();
+    }
+
+    private void validateDateFromTo(LocalDate from, LocalDate to) {
+        if (from.isAfter(to)) {
+            throw new IllegalArgumentException("종료 날짜는 시작 날짜보다 앞설 수 없습니다.");
+        }
     }
 
     @Transactional
