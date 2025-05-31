@@ -8,6 +8,7 @@ import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
+import roomescape.payment.exception.PaymentNotFoundException;
 import roomescape.payment.toss.dto.TossPaymentErrorResponse;
 import roomescape.payment.exception.PaymentProcessException;
 import roomescape.payment.exception.PaymentServerException;
@@ -39,6 +40,10 @@ public class TossPaymentResponseInterceptor implements ClientHttpRequestIntercep
 
         if (TossPaymentServerErrorCode.isServerError(errorResponse.code())) {
             throw new PaymentServerException("결제가 제대로 수행되지 못했습니다.");
+        }
+
+        if (TossPaymentNotFoundErrorCode.isNotFoundError(errorResponse.code())) {
+            throw new PaymentNotFoundException(errorResponse.message());
         }
 
         throw new PaymentProcessException(errorResponse.message());
