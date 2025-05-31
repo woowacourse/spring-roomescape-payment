@@ -18,6 +18,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
+import roomescape.reservation.service.dto.request.FilteringReservationRequest;
 import roomescape.reservation.service.dto.response.ReservationResponse;
 import roomescape.reservation.service.dto.response.ReservationTimeWithBookedResponse;
 import roomescape.theme.domain.Theme;
@@ -156,6 +157,21 @@ class ReservationServiceTest {
                 .map(ReservationTimeWithBookedResponse::alreadyBooked)
                 .toList();
         assertThat(booleans).containsExactlyInAnyOrder(true, false);
+    }
+
+    @DisplayName("종료 날짜가 시작 날짜보다 앞서는 경우 예외가 발생한다.")
+    @Test
+    void cannotDateToIsBeforeThanDateFrom() {
+        // given
+        LocalDate from = LocalDate.of(2025, 5, 31);
+        LocalDate to = from.minusDays(1);
+
+        FilteringReservationRequest request = new FilteringReservationRequest(1L, 1L, from, to);
+
+        // when & then
+        assertThatThrownBy(() -> {
+            reservationService.findReservationByFiltering(request);
+        }).isInstanceOf(IllegalArgumentException.class);
     }
 
     private LocalDate nextDay() {
