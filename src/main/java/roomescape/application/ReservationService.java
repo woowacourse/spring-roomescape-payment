@@ -66,7 +66,7 @@ public class ReservationService {
         Member member = memberService.findMemberByEmail(loginMember.email());
 
         Reservation created = createReservation(request.date(), request.timeId(), request.themeId(), member);
-        paymentService.process(paymentProcessRequest);
+        paymentService.processPayment(paymentProcessRequest);
 
         return ReservationResponse.from(created);
     }
