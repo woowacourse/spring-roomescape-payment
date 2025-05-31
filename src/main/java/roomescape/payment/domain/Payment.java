@@ -42,7 +42,7 @@ public class Payment {
     @Column(nullable = false, unique = true)
     private String orderId;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private Long amount;
 
     private String method;
