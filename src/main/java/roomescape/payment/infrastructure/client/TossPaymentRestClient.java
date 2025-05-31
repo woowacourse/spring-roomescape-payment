@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestClient;
@@ -17,15 +18,15 @@ import roomescape.reservation.model.vo.PaymentInfo;
 @RequiredArgsConstructor
 public class TossPaymentRestClient implements PaymentClient {
 
-    private static final String CONFIRM_REQUEST_URL = "/v1/payments/confirm";
-
+    @Value("${payment.toss.endpoints.confirm}")
+    private String confirmUrl;
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
     @Override
     public void requestConfirm(final PaymentInfo paymentInfo) {
         restClient.post()
-                .uri(CONFIRM_REQUEST_URL)
+                .uri(confirmUrl)
                 .contentType(APPLICATION_JSON)
                 .body(paymentInfo)
                 .retrieve()

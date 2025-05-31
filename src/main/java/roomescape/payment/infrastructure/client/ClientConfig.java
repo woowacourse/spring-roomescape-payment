@@ -13,12 +13,14 @@ import org.springframework.web.client.RestClient;
 @Configuration
 public class ClientConfig {
 
-    private static final String URL = "https://api.tosspayments.com";
     private static final String HEADER_NAME = "Authorization";
     private static final String HEADER_VALUE = "Basic ";
 
     @Value("${payment-api.secret-key}")
     private String secretKey;
+
+    @Value("${payment.toss.base-url}")
+    private String baseUrl;
 
     private final ObjectMapper objectMapper;
 
@@ -27,7 +29,7 @@ public class ClientConfig {
         final String base64Auth = getEncodedKey();
         return new TossPaymentRestClient(
                 RestClient.builder()
-                        .baseUrl(URL)
+                        .baseUrl(baseUrl)
                         .defaultHeader(HEADER_NAME, HEADER_VALUE + base64Auth)
                         .build(),
                 objectMapper
