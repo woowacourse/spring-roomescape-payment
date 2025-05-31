@@ -59,10 +59,12 @@ public class JwtTokenProvider {
                 .getBody();
     }
 
-    public boolean validateToken(String token) {
+    public void validateToken(String token) {
         try {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-            return !claims.getBody().getExpiration().before(new Date());
+            if (claims.getBody().getExpiration().before(new Date())) {
+                throw new UnauthorizedException("만료된 토큰입니다.");
+            }
         } catch (JwtException | IllegalArgumentException e) {
             throw new UnauthorizedException("인증할 수 없는 토큰입니다.");
         }
