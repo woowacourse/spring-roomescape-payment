@@ -1,10 +1,10 @@
 package roomescape.application.payment;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatusCode;
@@ -24,7 +24,6 @@ import java.util.Base64;
 public class TossPaymentClient {
 
     private static final String TOSS_PAYMENT_SERVER_URL = "https://api.tosspayments.com/v1/payments";
-    private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:";
     private static final String CONFIRM_URI = "/confirm";
     private static final String AUTH_SCHEME = "Basic ";
 
@@ -32,9 +31,13 @@ public class TossPaymentClient {
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
+    private final String secretKey;
 
-    public TossPaymentClient(final ObjectMapper objectMapper) {
+    public TossPaymentClient(
+            final ObjectMapper objectMapper,
+            @Value("${toss-payment.secret-key}") final String secretKey) {
         this.objectMapper = objectMapper;
+        this.secretKey = secretKey;
         this.restClient = RestClient.builder()
                 .baseUrl(TOSS_PAYMENT_SERVER_URL)
                 .requestFactory(createRequestFactory())
@@ -60,8 +63,12 @@ public class TossPaymentClient {
     }
 
     private String createAuthorizationHeader() {
-        final String encoded = Base64.getEncoder().encodeToString(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+        final String encoded = Base64.getEncoder().encodeToString(buildSecretKey().getBytes(StandardCharsets.UTF_8));
         return AUTH_SCHEME + encoded;
+    }
+
+    private String buildSecretKey() {
+        return secretKey + ":";
     }
 
     private void handle4xxError(final HttpRequest httpRequest, final ClientHttpResponse clientHttpResponse) {
