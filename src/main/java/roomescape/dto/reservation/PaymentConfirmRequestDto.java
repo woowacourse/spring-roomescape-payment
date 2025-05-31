@@ -1,6 +1,6 @@
 package roomescape.dto.reservation;
 
-public record TossPaymentConfirmRequestDto(
+public record PaymentConfirmRequestDto(
         String paymentKey,
         String orderId,
         Long amount
