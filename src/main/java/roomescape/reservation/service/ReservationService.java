@@ -103,23 +103,10 @@ public class ReservationService {
 
         List<ReservationAndWaitingResponse> responses = new ArrayList<>();
 
-        getReservationByMember(member, responses);
-        getWaitingByMember(member, responses);
-
-        responses.sort(Comparator
-                .comparing(ReservationAndWaitingResponse::date)
-                .thenComparing(ReservationAndWaitingResponse::time));
-
-        return responses;
-    }
-
-    private void getReservationByMember(Member member, List<ReservationAndWaitingResponse> responses) {
         reservationRepository.findAllByMember(member).stream()
                 .map(ReservationAndWaitingResponse::from)
                 .forEach(responses::add);
-    }
 
-    private void getWaitingByMember(Member member, List<ReservationAndWaitingResponse> responses) {
         for (Waiting waiting : waitingRepository.findAllByMember(member)) {
             List<Waiting> waitings = waitingRepository.findAllByDateAndTimeIdAndThemeIdOrderByCreatedAt(
                     waiting.getDate(), waiting.getTime().getId(), waiting.getTheme().getId());
@@ -132,6 +119,12 @@ public class ReservationService {
             }
             responses.add(ReservationAndWaitingResponse.from(waiting, position));
         }
+
+        responses.sort(Comparator
+                .comparing(ReservationAndWaitingResponse::date)
+                .thenComparing(ReservationAndWaitingResponse::time));
+
+        return responses;
     }
 
     @Transactional
