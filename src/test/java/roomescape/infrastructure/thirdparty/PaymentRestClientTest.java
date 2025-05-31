@@ -14,7 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.client.MockRestServiceServer;
-import roomescape.application.exception.PaymentException;
+import roomescape.infrastructure.thirdparty.exception.PaymentException;
 import roomescape.infrastructure.thirdparty.dto.PaymentConfirmResponse;
 import roomescape.infrastructure.thirdparty.dto.TossErrorResponse;
 import roomescape.presentation.dto.request.PaymentProcessRequest;

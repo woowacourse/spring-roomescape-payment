@@ -8,9 +8,10 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.application.exception.PaymentException;
+import org.springframework.web.client.RestClientException;
 import roomescape.infrastructure.thirdparty.dto.PaymentConfirmResponse;
 import roomescape.infrastructure.thirdparty.dto.TossErrorResponse;
+import roomescape.infrastructure.thirdparty.exception.PaymentException;
 import roomescape.presentation.dto.request.PaymentProcessRequest;
 
 import java.io.InputStream;
@@ -39,20 +40,24 @@ public class PaymentRestClient {
     }
 
     public PaymentConfirmResponse getPaymentResponse(PaymentProcessRequest request) {
-        return restClient.post()
-                .uri(TOSS_CONFIRM_URI)
-                .body(request)
-                .retrieve()
-                .onStatus(status
-                        -> status.isSameCodeAs(HttpStatus.UNAUTHORIZED) || status.is5xxServerError(), (req, res) -> {
-                    TossErrorResponse response = parseError(res.getBody());
-                    throw new PaymentException(response.message(), HttpStatus.INTERNAL_SERVER_ERROR);
-                })
-                .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
-                    TossErrorResponse response = parseError(res.getBody());
-                    throw new PaymentException(response.message(), HttpStatus.BAD_REQUEST);
-                })
-                .body(PaymentConfirmResponse.class);
+        try {
+            return restClient.post()
+                    .uri(TOSS_CONFIRM_URI)
+                    .body(request)
+                    .retrieve()
+                    .onStatus(status
+                            -> status.isSameCodeAs(HttpStatus.UNAUTHORIZED) || status.is5xxServerError(), (req, res) -> {
+                        TossErrorResponse response = parseError(res.getBody());
+                        throw new PaymentException(response.message(), HttpStatus.INTERNAL_SERVER_ERROR);
+                    })
+                    .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
+                        TossErrorResponse response = parseError(res.getBody());
+                        throw new PaymentException(response.message(), HttpStatus.BAD_REQUEST);
+                    })
+                    .body(PaymentConfirmResponse.class);
+        } catch (RestClientException e) {
+            throw new PaymentException("[ERROR] 토스 시스템 통신 중 문제가 발생했습니다.", HttpStatus.SERVICE_UNAVAILABLE);
+        }
     }
 
     private TossErrorResponse parseError(InputStream body) {

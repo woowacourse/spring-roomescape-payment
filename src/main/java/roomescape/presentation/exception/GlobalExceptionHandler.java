@@ -9,8 +9,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import roomescape.application.exception.AuthException;
-import roomescape.application.exception.PaymentException;
 import roomescape.domain.exception.PastReservationException;
+import roomescape.infrastructure.thirdparty.exception.PaymentException;
 import roomescape.presentation.dto.response.ErrorResponse;
 
 import java.util.NoSuchElementException;
@@ -74,11 +74,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handlePaymentException(PaymentException e) {
         String message = e.getMessage();
         HttpStatus status = e.getStatus();
-        if (status.is5xxServerError()) {
-            handleAllExceptions(e);
+        if (status.isSameCodeAs(HttpStatus.UNAUTHORIZED)) {
+            return handleAllExceptions(e);
         }
+        log.warn(message, e);
         ErrorResponse errorResponse = ErrorResponse.of(status, message);
-        return ResponseEntity.status(e.getStatus()).body(errorResponse);
+        return ResponseEntity.status(status).body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)
