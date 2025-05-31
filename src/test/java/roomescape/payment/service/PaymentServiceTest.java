@@ -14,9 +14,10 @@ import static org.mockito.Mockito.when;
 
 public class PaymentServiceTest {
 
+    private final TossRestClient mockRestClient = mock(TossRestClient.class);
+
     @Test
     void 결제_승인_요청시_200_OK() {
-        TossRestClient mockRestClient = mock(TossRestClient.class);
         PaymentRequestDto dto = new PaymentRequestDto("paymentKey", "orderId", 1000, "NORMAL");
 
         TossPayment dummyPayment = new TossPayment("paymentKey", "orderId", 1000, "NORMAL");
@@ -32,7 +33,6 @@ public class PaymentServiceTest {
 
     @Test
     void 결제_승인_요청시_400에러가_발생하면_InvalidPaymentException_발생() {
-        TossRestClient mockRestClient = mock(TossRestClient.class);
         PaymentRequestDto dto = new PaymentRequestDto("paymentKey", "orderId", 1000, "NORMAL");
 
         when(mockRestClient.confirmPayment(any(PaymentRequestDto.class)))
