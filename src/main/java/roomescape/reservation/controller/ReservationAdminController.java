@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.common.utils.UriFactory;
 import roomescape.member.auth.RoleRequired;
@@ -20,26 +21,19 @@ import roomescape.reservation.service.ReservationService;
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/admin/reservations")
 public class ReservationAdminController {
-
-    public static final String BASE_PATH = "/reservations";
 
     private final ReservationService reservationService;
 
     @RoleRequired(value = Role.ADMIN)
-    @GetMapping(BASE_PATH)
-    public List<ReservationWebResponse> getAll() {
-        return reservationService.getAll();
-    }
-
-    @RoleRequired(value = Role.ADMIN)
-    @GetMapping(BASE_PATH + "/wait")
+    @GetMapping("/wait")
     public List<ReservationWaitWebResponse> getAllReservationWait() {
         return reservationService.getAllReservationWait();
     }
 
     @RoleRequired(value = Role.ADMIN)
-    @GetMapping("/admin" + BASE_PATH)
+    @GetMapping
     public ResponseEntity<List<ReservationWebResponse>> getReservationsByAdmin(
             @ModelAttribute final ReservationSearchWebRequest reservationSearchWebRequest
     ) {
@@ -47,14 +41,14 @@ public class ReservationAdminController {
     }
 
     @RoleRequired(value = Role.ADMIN)
-    @PostMapping("/admin" + BASE_PATH)
+    @PostMapping
     public ResponseEntity<ReservationWebResponse> createReservationByAdmin(
             @RequestBody final CreateReservationByAdminWebRequest createReservationByAdminWebRequest
     ) {
         final ReservationWebResponse reservationWebResponse = reservationService.create(
                 createReservationByAdminWebRequest
         );
-        final URI location = UriFactory.buildPath(BASE_PATH, String.valueOf(reservationWebResponse.id()));
+        final URI location = UriFactory.buildPath("/reservations", String.valueOf(reservationWebResponse.id()));
 
         return ResponseEntity.created(location)
                 .body(reservationWebResponse);
