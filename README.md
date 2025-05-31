@@ -80,7 +80,8 @@
 
 ### 토스 페이먼츠 API 결제 예외 처리
 
-아래 두 예외를 제외한 나머지 예외는 토스 API 예외를 그대로 반환한다.
+아래 예외를 제외한 나머지 예외는 토스 API 예외를 그대로 반환한다.
 
 - `INCORRECT_BASIC_AUTH_FORMAT`
 - `INVALID_API_KEY`
+- `INVALID_AUTHORIZE_AUTH`
