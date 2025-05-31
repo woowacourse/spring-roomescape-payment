@@ -29,7 +29,6 @@ host: localhost:8080
 - paymentkey를 클라이언트에서 획득하지 않은 값으로 요청
 - 이미 성공한 paymentKey로 요청
 - 요청 시간 만료
--
 
 ### 비고
 

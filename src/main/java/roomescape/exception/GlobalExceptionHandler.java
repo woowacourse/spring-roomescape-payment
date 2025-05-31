@@ -12,7 +12,9 @@ import roomescape.exception.custom.PaymentException;
 import roomescape.exception.custom.UnauthorizedException;
 import roomescape.exception.dto.ErrorResponse;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @ControllerAdvice
@@ -42,10 +44,18 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(exception = PaymentException.class)
-    public ResponseEntity<ErrorResponse> handlePaymentException(PaymentException e) {
+    public ResponseEntity<ErrorResponse> handleClientPaymentException(PaymentException e) {
         ErrorResponse response = ErrorResponse.from(e.getMessage());
 
-        return ResponseEntity.status(e.getStatusCode())
+        return ResponseEntity.status(BAD_REQUEST)
+                .body(response);
+    }
+
+    @ExceptionHandler(exception = Exception.class)
+    public ResponseEntity<ErrorResponse> handleException(Exception e) {
+        ErrorResponse response = ErrorResponse.from("문제가 발생하였습니다.");
+
+        return ResponseEntity.status(INTERNAL_SERVER_ERROR)
                 .body(response);
     }
 

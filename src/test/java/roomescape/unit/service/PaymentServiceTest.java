@@ -1,7 +1,6 @@
 package roomescape.unit.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
@@ -14,6 +13,7 @@ import roomescape.exception.custom.PaymentException;
 import roomescape.service.PaymentService;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withResourceNotFound;
@@ -90,7 +90,7 @@ class PaymentServiceTest {
                         .contentType(MediaType.APPLICATION_JSON));
 
         // when // then
-        Assertions.assertThatThrownBy(() -> paymentService.confirmPayment(request))
+        assertThatThrownBy(() -> paymentService.confirmPayment(request))
                 .isInstanceOf(PaymentException.class);
         mockServer.verify();
     }

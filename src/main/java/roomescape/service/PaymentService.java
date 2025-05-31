@@ -15,6 +15,8 @@ import roomescape.exception.custom.PaymentException;
 @Service
 public class PaymentService {
 
+    public static String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
@@ -36,16 +38,15 @@ public class PaymentService {
                     PaymentErrorResponse paymentErrorResponse = objectMapper.readValue(
                             response.getBody().readAllBytes(),
                             PaymentErrorResponse.class);
-                    throw new PaymentException(response.getStatusCode(), paymentErrorResponse.message());
+                    throw new PaymentException(paymentErrorResponse.message());
                 }))
                 .toEntity(ConfirmPaymentResponse.class)
                 .getBody();
     }
 
     private String getAuthorizationToken() {
-        String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
         Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
+        byte[] encodedBytes = encoder.encode((WIDGET_SECRET_KEY + ":").getBytes(StandardCharsets.UTF_8));
         return "Basic " + new String(encodedBytes);
     }
 }
