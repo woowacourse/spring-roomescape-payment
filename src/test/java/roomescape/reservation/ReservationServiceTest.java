@@ -5,7 +5,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.only;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -13,8 +15,6 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
-import org.mockito.BDDMockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.common.PaymentManager;
-import roomescape.common.dto.PaymentError;
+import roomescape.common.TimeManager;
 import roomescape.common.dto.PaymentRequest;
 import roomescape.exception.custom.reason.payment.PaymentConfirmException;
 import roomescape.exception.custom.reason.reservation.ReservationConflictException;
@@ -63,8 +63,7 @@ import roomescape.theme.repository.ThemeRepositoryImpl;
         ThemeRepositoryImpl.class,
         ReservationTimeRepositoryImpl.class,
         ReservationRepositoryImpl.class,
-        ReservationService.class,
-        PaymentManager.class
+        ReservationService.class
 })
 @Transactional(propagation = Propagation.SUPPORTS)
 public class ReservationServiceTest {
@@ -73,6 +72,8 @@ public class ReservationServiceTest {
     private final ReservationRepository reservationRepository;
     @MockitoBean
     private final PaymentManager paymentManager;
+    @MockitoBean
+    private final TimeManager timeManager;
     private final ReservationService reservationService;
 
     private final ReservationTimeRepository reservationTimeRepository;
@@ -84,6 +85,7 @@ public class ReservationServiceTest {
             final ReservationRepository reservationRepository,
             final ReservationService reservationService,
             final PaymentManager paymentManager,
+            final TimeManager timeManager,
 
             final ReservationTimeRepository reservationTimeRepository,
             final ThemeRepositoryImpl themeRepositoryFacade,
@@ -92,6 +94,7 @@ public class ReservationServiceTest {
         this.reservationRepository = reservationRepository;
         this.paymentManager = paymentManager;
         this.reservationService = reservationService;
+        this.timeManager = timeManager;
 
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepositoryFacade = themeRepositoryFacade;
@@ -107,16 +110,23 @@ public class ReservationServiceTest {
         @Test
         void create() {
             // given
+            // given - database
             final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
             final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
             final Theme theme = new Theme("야당", "야당당", "123");
+
             memberRepositoryFacade.save(member);
             reservationTimeRepository.save(reservationTime);
             themeRepositoryFacade.save(theme);
 
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
             final ReservationPaymentRequest request = new ReservationPaymentRequest(
-                new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
-                new PaymentRequest("BOOSTA-ORDER-001", "dummy-payment-key", 10000L, "CARD")
+                    new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
+                    new PaymentRequest("BOOSTA-ORDER-001", "dummy-payment-key", 10000L, "CARD")
             );
             final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
 
@@ -139,11 +149,18 @@ public class ReservationServiceTest {
         @Test
         void create1() {
             // given
+            // given - database
             final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
             final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+
             memberRepositoryFacade.save(member);
             reservationTimeRepository.save(reservationTime);
 
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
             final ReservationPaymentRequest request = new ReservationPaymentRequest(
                 new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
                 new PaymentRequest("BOOSTA-ORDER-002", "dummy-payment-key", 10000L, "CARD")
@@ -160,11 +177,17 @@ public class ReservationServiceTest {
         @Test
         void create2() {
             // given
+            // given - database
             final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
             final Theme theme = new Theme("야당", "야당당", "123");
             memberRepositoryFacade.save(member);
             themeRepositoryFacade.save(theme);
 
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
             final ReservationPaymentRequest request = new ReservationPaymentRequest(
                 new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
                 new PaymentRequest("BOOSTA-ORDER-003", "dummy-payment-key", 10000L, "CARD")
@@ -181,12 +204,18 @@ public class ReservationServiceTest {
         @Test
         void create6() {
             // given
+            // given - database
             final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
             final Theme theme = new Theme("야당", "야당당", "123");
 
             reservationTimeRepository.save(reservationTime);
             themeRepositoryFacade.save(theme);
 
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
             final ReservationPaymentRequest request = new ReservationPaymentRequest(
                 new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
                 new PaymentRequest("BOOSTA-ORDER-004", "dummy-payment-key", 10000L, "CARD")
@@ -203,10 +232,12 @@ public class ReservationServiceTest {
         @Test
         void create3() {
             // given
+            // given - database
             final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
             final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
             final Theme theme = new Theme("야당", "야당당", "123");
-            final LocalDateTime currentDateTime = LocalDateTime.of(2025, 12, 25, 12, 0);
+
+            final LocalDateTime currentDateTime = LocalDateTime.of(2025, 12, 25, 12, 40);
             final ReservationDate reservationDate = ReservationDate.of(LocalDate.of(2025, 12, 30),
                     currentDateTime.toLocalDate());
             final Reservation reservation = Reservation.of(reservationDate, member, reservationTime, theme,
@@ -217,6 +248,11 @@ public class ReservationServiceTest {
             themeRepositoryFacade.save(theme);
             reservationRepository.save(reservation);
 
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(currentDateTime);
+
+            // given - request
             final ReservationPaymentRequest request = new ReservationPaymentRequest(
                 new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
                 new PaymentRequest("BOOSTA-ORDER-005", "dummy-payment-key", 10000L, "CARD")
@@ -233,6 +269,7 @@ public class ReservationServiceTest {
         @Test
         void create4() {
             // given
+            // given - database
             final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
             final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
             final Theme theme = new Theme("야당", "야당당", "123");
@@ -240,8 +277,13 @@ public class ReservationServiceTest {
             reservationTimeRepository.save(reservationTime);
             themeRepositoryFacade.save(theme);
 
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
             final ReservationPaymentRequest request = new ReservationPaymentRequest(
-                new ReservationRequest(LocalDate.now().minusDays(1), 1L, 1L),
+                new ReservationRequest(LocalDate.of(2025, 11, 30), 1L, 1L),
                 new PaymentRequest("BOOSTA-ORDER-006", "dummy-payment-key", 10000L, "CARD")
             );
             final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
@@ -256,15 +298,22 @@ public class ReservationServiceTest {
         @Test
         void create5() {
             // given
+            // given - database
             final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
-            final ReservationTime reservationTime = new ReservationTime(LocalTime.now().minusMinutes(1));
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 39));
             final Theme theme = new Theme("야당", "야당당", "123");
+
             memberRepositoryFacade.save(member);
             reservationTimeRepository.save(reservationTime);
             themeRepositoryFacade.save(theme);
 
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
             final ReservationPaymentRequest request = new ReservationPaymentRequest(
-                new ReservationRequest(LocalDate.now(), 1L, 1L),
+                new ReservationRequest(LocalDate.of(2025, 12, 1), 1L, 1L),
                 new PaymentRequest("BOOSTA-ORDER-007", "dummy-payment-key", 10000L, "CARD")
             );
             final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
@@ -279,13 +328,20 @@ public class ReservationServiceTest {
         @Test
         void create7() {
             // given
+            // given - database
             final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
             final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
             final Theme theme = new Theme("야당", "야당당", "123");
+
             memberRepositoryFacade.save(member);
             reservationTimeRepository.save(reservationTime);
             themeRepositoryFacade.save(theme);
 
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
             final ReservationPaymentRequest request = new ReservationPaymentRequest(
                     new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
                     new PaymentRequest("BOOSTA-ORDER-001", "dummy-payment-key", 10000L, "CARD")
@@ -303,20 +359,26 @@ public class ReservationServiceTest {
         @Test
         void create8() {
             // given
+            // given - database
             final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
             final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
             final Theme theme = new Theme("야당", "야당당", "123");
+
             memberRepositoryFacade.save(member);
             reservationTimeRepository.save(reservationTime);
             themeRepositoryFacade.save(theme);
 
+            // given - request
             final ReservationPaymentRequest request = new ReservationPaymentRequest(
                     new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
                     new PaymentRequest("BOOSTA-ORDER-001", "dummy-payment-key", 10000L, "CARD")
             );
             final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
 
-            BDDMockito.doThrow(PaymentConfirmException.class)
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+            doThrow(PaymentConfirmException.class)
                     .when(paymentManager).confirmPayment(request.paymentRequest());
 
             // when & then
@@ -342,8 +404,10 @@ public class ReservationServiceTest {
             );
             final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
 
-            BDDMockito.doThrow(PaymentConfirmException.class)
+            doThrow(PaymentConfirmException.class)
                     .when(paymentManager).confirmPayment(request.paymentRequest());
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
 
             // when
             assertThatThrownBy(() -> reservationService.create(request, loginMember))
@@ -362,13 +426,20 @@ public class ReservationServiceTest {
         @Test
         void create() {
             // given
+            // given - database
             final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
             final ReservationTime reservationTime = new ReservationTime(LocalTime.of(22, 40));
             final Theme theme = new Theme("야당", "야당당", "123");
+
             memberRepositoryFacade.save(member);
             reservationTimeRepository.save(reservationTime);
             themeRepositoryFacade.save(theme);
 
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - reequest
             final AdminReservationRequest request = new AdminReservationRequest(
                     LocalDate.of(2025, 12, 30), 1L, 1L, 1L);
 
@@ -391,11 +462,18 @@ public class ReservationServiceTest {
         @Test
         void create1() {
             // given
+            // given - database
             final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
             final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+
             memberRepositoryFacade.save(member);
             reservationTimeRepository.save(reservationTime);
 
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
             final AdminReservationRequest request = new AdminReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L, 1L);
 
             // when & then
@@ -408,11 +486,18 @@ public class ReservationServiceTest {
         @Test
         void create2() {
             // given
+            // given - database
             final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
             final Theme theme = new Theme("야당", "야당당", "123");
+
             memberRepositoryFacade.save(member);
             themeRepositoryFacade.save(theme);
 
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
             final AdminReservationRequest request = new AdminReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L, 1L);
 
             // when & then
@@ -425,11 +510,18 @@ public class ReservationServiceTest {
         @Test
         void create6() {
             // given
+            // given - database
             final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
             final Theme theme = new Theme("야당", "야당당", "123");
+
             reservationTimeRepository.save(reservationTime);
             themeRepositoryFacade.save(theme);
 
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
             final AdminReservationRequest request = new AdminReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L, 1L);
 
             // when & then
@@ -442,6 +534,7 @@ public class ReservationServiceTest {
         @Test
         void create3() {
             // given
+            // given - database
             final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
             final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
             final Theme theme = new Theme("야당", "야당당", "123");
@@ -456,6 +549,11 @@ public class ReservationServiceTest {
             themeRepositoryFacade.save(theme);
             reservationRepository.save(reservation);
 
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
             final AdminReservationRequest request = new AdminReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L, 1L);
 
             // when & then
@@ -471,11 +569,17 @@ public class ReservationServiceTest {
             final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
             final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
             final Theme theme = new Theme("야당", "야당당", "123");
+
             memberRepositoryFacade.save(member);
             reservationTimeRepository.save(reservationTime);
             themeRepositoryFacade.save(theme);
 
-            final AdminReservationRequest request = new AdminReservationRequest(LocalDate.now().minusDays(1), 1L, 1L,
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
+            final AdminReservationRequest request = new AdminReservationRequest(LocalDate.of(2025, 11, 30), 1L, 1L,
                     1L);
 
             // when & then
@@ -488,14 +592,21 @@ public class ReservationServiceTest {
         @Test
         void create5() {
             // given
+            // given - database
             final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
-            final ReservationTime reservationTime = new ReservationTime(LocalTime.now().minusMinutes(1));
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 39));
             final Theme theme = new Theme("야당", "야당당", "123");
+
             memberRepositoryFacade.save(member);
             reservationTimeRepository.save(reservationTime);
             themeRepositoryFacade.save(theme);
 
-            final AdminReservationRequest request = new AdminReservationRequest(LocalDate.now(), 1L, 1L, 1L);
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
+            final AdminReservationRequest request = new AdminReservationRequest(LocalDate.of(2025, 12, 1), 1L, 1L, 1L);
 
             // when & then
             assertThatThrownBy(() -> {
@@ -725,6 +836,8 @@ public class ReservationServiceTest {
             themeRepositoryFacade.save(theme);
             reservationRepository.save(reservation);
 
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
             final ReservationPaymentRequest request = new ReservationPaymentRequest(
                 new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
                 new PaymentRequest("BOOSTA-ORDER-008", "dummy-payment-key", 10000L, "CARD")
@@ -764,15 +877,12 @@ public class ReservationServiceTest {
             themeRepositoryFacade.save(theme);
             reservationRepository.save(reservation);
 
-            final ReservationPaymentRequest request = new ReservationPaymentRequest(
-                new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
-                new PaymentRequest("BOOSTA-ORDER-009", "dummy-payment-key", 10000L, "CARD")
-            );
+            final ReservationRequest request = new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L);
             final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
 
             // when & then
             assertThatThrownBy(() -> {
-                reservationService.createWaiting(request.reservationRequest(), loginMember);
+                reservationService.createWaiting(request, loginMember);
             }).isInstanceOf(ReservationNotExistsMemberException.class);
 
         }
@@ -797,15 +907,12 @@ public class ReservationServiceTest {
             themeRepositoryFacade.save(theme);
             reservationRepository.save(reservation);
 
-            final ReservationPaymentRequest request = new ReservationPaymentRequest(
-                new ReservationRequest(LocalDate.of(2025, 12, 30), 2L, 1L),
-                new PaymentRequest("BOOSTA-ORDER-010", "dummy-payment-key", 10000L, "CARD")
-            );
+            final ReservationRequest request = new ReservationRequest(LocalDate.of(2025, 12, 30), 2L, 1L);
             final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
 
             // when & then
             assertThatThrownBy(() -> {
-                reservationService.createWaiting(request.reservationRequest(), loginMember);
+                reservationService.createWaiting(request, loginMember);
             }).isInstanceOf(ReservationNotExistsTimeException.class);
 
         }
@@ -830,19 +937,16 @@ public class ReservationServiceTest {
             reservationTimeRepository.save(reservationTime);
             reservationRepository.save(reservation);
 
-            final ReservationPaymentRequest request = new ReservationPaymentRequest(
-                new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 2L),
-                new PaymentRequest("BOOSTA-ORDER-011", "dummy-payment-key", 10000L, "CARD")
-            );
+            final ReservationRequest request = new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 2L);
             final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
 
             // when & then
             assertThatThrownBy(() -> {
-                reservationService.createWaiting(request.reservationRequest(), loginMember);
+                reservationService.createWaiting(request, loginMember);
             }).isInstanceOf(ReservationNotExistsThemeException.class);
         }
 
-        @DisplayName("이미 해당 시간, 날짜, 테마에 pending 예약이 존재한다면 예외가 발생한다.")
+        @DisplayName("이미 해당 시간, 날짜, 테마에 같은 멤버 pending 예약이 존재한다면 예외가 발생한다.")
         @Test
         void create5() {
             // given
@@ -859,16 +963,15 @@ public class ReservationServiceTest {
             reservationTimeRepository.save(reservationTime);
             themeRepositoryFacade.save(theme);
             reservationRepository.save(reservation);
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 25, 12, 0));
 
-            final ReservationPaymentRequest request = new ReservationPaymentRequest(
-                new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
-                new PaymentRequest("BOOSTA-ORDER-012", "dummy-payment-key", 10000L, "CARD")
-            );
+            final ReservationRequest request = new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L);
             final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
 
             // when
             assertThatThrownBy(() -> {
-                reservationService.createWaiting(request.reservationRequest(), loginMember);
+                reservationService.createWaiting(request, loginMember);
             }).isInstanceOf(ReservationConflictException.class);
         }
 
@@ -883,16 +986,15 @@ public class ReservationServiceTest {
             memberRepositoryFacade.save(member);
             reservationTimeRepository.save(reservationTime);
             themeRepositoryFacade.save(theme);
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 30, 12, 40));
 
-            final ReservationPaymentRequest request = new ReservationPaymentRequest(
-                new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
-                new PaymentRequest("BOOSTA-ORDER-013", "dummy-payment-key", 10000L, "CARD")
-            );
+            final ReservationRequest request = new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L);
             final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
 
             // when
             assertThatThrownBy(() -> {
-                reservationService.createWaiting(request.reservationRequest(), loginMember);
+                reservationService.createWaiting(request, loginMember);
             }).isInstanceOf(ReservationNotExistsPendingException.class);
         }
 
@@ -905,7 +1007,7 @@ public class ReservationServiceTest {
             final Theme theme = new Theme("야당", "야당당", "123");
 
             final Member anotherMember = new Member("xxxx", "pass", "아서", MemberRole.MEMBER);
-            final LocalDateTime currentDateTime = LocalDateTime.of(2025, 12, 25, 12, 0);
+            final LocalDateTime currentDateTime = LocalDateTime.of(2025, 12, 1, 12, 0);
             final ReservationDate reservationDate = ReservationDate.of(LocalDate.of(2025, 12, 30),
                     currentDateTime.toLocalDate());
             final Reservation reservation = Reservation.of(reservationDate, anotherMember, reservationTime, theme,
@@ -916,16 +1018,15 @@ public class ReservationServiceTest {
             reservationTimeRepository.save(reservationTime);
             themeRepositoryFacade.save(theme);
             reservationRepository.save(reservation);
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 25, 12, 40));
 
-            final ReservationPaymentRequest request = new ReservationPaymentRequest(
-                new ReservationRequest(LocalDate.of(2024, 12, 30), 1L, 1L),
-                new PaymentRequest("BOOSTA-ORDER-014", "dummy-payment-key", 10000L, "CARD")
-            );
+            final ReservationRequest request = new ReservationRequest(LocalDate.of(2024, 12, 30), 1L, 1L);
             final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
 
             // when
             assertThatThrownBy(() -> {
-                reservationService.createWaiting(request.reservationRequest(), loginMember);
+                reservationService.createWaiting(request, loginMember);
             }).isInstanceOf(ReservationPastDateException.class);
         }
 
@@ -934,15 +1035,15 @@ public class ReservationServiceTest {
         void create8() {
             // given
             final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
-            final ReservationTime reservationTime = new ReservationTime(LocalTime.now().minusMinutes(1));
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 30));
             final Theme theme = new Theme("야당", "야당당", "123");
 
             final Member anotherMember = new Member("xxxx", "pass", "아서", MemberRole.MEMBER);
-            final LocalDateTime currentDateTime = LocalDateTime.now().minusMinutes(1);
-            final ReservationDate reservationDate = ReservationDate.of(LocalDate.now(),
+            final LocalDateTime currentDateTime = LocalDateTime.of(2025, 11, 30, 12, 30);
+            final ReservationDate reservationDate = ReservationDate.of(LocalDate.of(2025, 11, 30),
                     currentDateTime.toLocalDate());
             final Reservation reservation = Reservation.of(reservationDate, anotherMember, reservationTime, theme,
-                    ReservationStatus.PENDING, currentDateTime.minusMinutes(1));
+                    ReservationStatus.PENDING, currentDateTime);
 
             memberRepositoryFacade.save(member);
             memberRepositoryFacade.save(anotherMember);
@@ -950,16 +1051,15 @@ public class ReservationServiceTest {
             reservationTimeRepository.save(reservationTime);
             themeRepositoryFacade.save(theme);
             reservationRepository.save(reservation);
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 11, 30, 12, 31));
 
-            final ReservationPaymentRequest request = new ReservationPaymentRequest(
-                new ReservationRequest(LocalDate.now(), 1L, 1L),
-                new PaymentRequest("BOOSTA-ORDER-015", "dummy-payment-key", 10000L, "CARD")
-            );
+            final ReservationRequest request = new ReservationRequest(LocalDate.of(2025, 11, 30), 1L, 1L);
             final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
 
             // when
             assertThatThrownBy(() -> {
-                reservationService.createWaiting(request.reservationRequest(), loginMember);
+                reservationService.createWaiting(request, loginMember);
             }).isInstanceOf(ReservationPastTimeException.class);
         }
 
@@ -972,11 +1072,13 @@ public class ReservationServiceTest {
             final Theme theme = new Theme("야당", "야당당", "123");
 
             final Member anotherMember = new Member("xxxx", "pass", "아서", MemberRole.MEMBER);
-            final LocalDateTime currentDateTime = LocalDateTime.of(2024, 12, 30, 12, 30);
+            final LocalDateTime currentDateTime = LocalDateTime.of(2024, 12, 30, 12, 40);
             final ReservationDate reservationDate = ReservationDate.of(LocalDate.of(2025, 12, 30),
                     currentDateTime.toLocalDate());
             final Reservation reservation = Reservation.of(reservationDate, anotherMember, reservationTime, theme,
                     ReservationStatus.PENDING, currentDateTime);
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 30, 12, 40));
 
             memberRepositoryFacade.save(member);
             memberRepositoryFacade.save(anotherMember);

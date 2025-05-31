@@ -2,6 +2,7 @@ package roomescape.theme;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 import java.time.LocalDate;
@@ -14,21 +15,23 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.common.TimeManager;
 import roomescape.exception.custom.reason.theme.ThemeNotFoundException;
 import roomescape.exception.custom.reason.theme.ThemeUsedException;
 import roomescape.member.domain.Member;
+import roomescape.member.domain.MemberRole;
 import roomescape.member.repository.MemberRepository;
 import roomescape.member.repository.MemberRepositoryImpl;
-import roomescape.member.domain.MemberRole;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationRepositoryImpl;
-import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.reservationtime.repository.ReservationTimeRepositoryImpl;
@@ -52,6 +55,8 @@ class ThemeServiceTest {
 
     @MockitoSpyBean
     private final ThemeRepository themeRepository;
+    @MockitoBean
+    private final TimeManager timeManager;
     private final ThemeService themeService;
 
     private final ReservationTimeRepository reservationTimeRepository;
@@ -62,6 +67,7 @@ class ThemeServiceTest {
     public ThemeServiceTest(
             final ThemeRepository themeRepository,
             final ThemeService themeService,
+            final TimeManager timeManager,
 
             final ReservationRepository reservationRepository,
             final ReservationTimeRepository reservationTimeRepository,
@@ -69,6 +75,7 @@ class ThemeServiceTest {
     ) {
         this.themeRepository = themeRepository;
         this.themeService = themeService;
+        this.timeManager = timeManager;
 
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
@@ -145,8 +152,12 @@ class ThemeServiceTest {
             // given
             final Member member = new Member("email", "pass", "name", MemberRole.MEMBER);
             final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+
             reservationTimeRepository.save(reservationTime);
             memberRepository.save(member);
+
+            given(timeManager.today())
+                    .willReturn(LocalDate.of(2024, 12, 25));
 
             final List<Theme> themes = List.of(
                     new Theme("1", "2", "3"),
@@ -154,24 +165,25 @@ class ThemeServiceTest {
                     new Theme("1", "2", "3")
             );
             final LocalDateTime currentDateTime = LocalDateTime.of(2024, 12, 25, 12, 0);
+            final LocalDate today = currentDateTime.toLocalDate();
             final List<Reservation> reservations = List.of(
-                    Reservation.of(ReservationDate.fromQuery(LocalDate.now().minusDays(1)), member, reservationTime, themes.get(0),
+                    Reservation.of(ReservationDate.fromQuery(today.minusDays(1)), member, reservationTime, themes.get(0),
                             ReservationStatus.PENDING, currentDateTime),
-                    Reservation.of(ReservationDate.fromQuery(LocalDate.now().minusDays(2)), member, reservationTime,
+                    Reservation.of(ReservationDate.fromQuery(today.minusDays(2)), member, reservationTime,
                             themes.get(0),
                             ReservationStatus.PENDING, currentDateTime),
-                    Reservation.of(ReservationDate.fromQuery(LocalDate.now().minusDays(3)), member, reservationTime,
+                    Reservation.of(ReservationDate.fromQuery(today.minusDays(3)), member, reservationTime,
                             themes.get(0),
                             ReservationStatus.PENDING, currentDateTime),
 
-                    Reservation.of(ReservationDate.fromQuery(LocalDate.now().minusDays(1)), member, reservationTime,
+                    Reservation.of(ReservationDate.fromQuery(today.minusDays(1)), member, reservationTime,
                             themes.get(1),
                             ReservationStatus.PENDING, currentDateTime),
-                    Reservation.of(ReservationDate.fromQuery(LocalDate.now().minusDays(2)), member, reservationTime,
+                    Reservation.of(ReservationDate.fromQuery(today.minusDays(2)), member, reservationTime,
                             themes.get(1),
                             ReservationStatus.PENDING, currentDateTime),
 
-                    Reservation.of(ReservationDate.fromQuery(LocalDate.now().minusDays(1)), member, reservationTime,
+                    Reservation.of(ReservationDate.fromQuery(today.minusDays(1)), member, reservationTime,
                             themes.get(2),
                             ReservationStatus.PENDING, currentDateTime)
             );

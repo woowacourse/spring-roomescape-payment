@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import roomescape.common.TimeManager;
 import roomescape.exception.custom.reason.theme.ThemeNotFoundException;
 import roomescape.exception.custom.reason.theme.ThemeUsedException;
 import roomescape.reservation.repository.ReservationJpaRepository;
@@ -21,6 +22,7 @@ public class ThemeService {
 
     private final ThemeRepository themeRepository;
     private final ReservationJpaRepository reservationJpaRepository;
+    private final TimeManager timeManager;
 
     public ThemeResponse create(
             final ThemeRequest request
@@ -42,7 +44,7 @@ public class ThemeService {
     }
 
     public List<ThemeResponse> findTopRank(final int size) {
-        final LocalDate now = LocalDate.now();
+        final LocalDate now = timeManager.today();
         final LocalDate from = now.minusDays(BETWEEN_DAY_START);
         final LocalDate to = now.minusDays(BETWEEN_DAY_END);
         return themeRepository.findAllOrderByRank(from, to, size).stream()

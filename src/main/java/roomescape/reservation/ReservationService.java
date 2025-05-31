@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.common.PaymentManager;
+import roomescape.common.TimeManager;
 import roomescape.exception.custom.reason.reservation.ReservationConflictException;
 import roomescape.exception.custom.reason.reservation.ReservationNotExistsMemberException;
 import roomescape.exception.custom.reason.reservation.ReservationNotExistsPendingException;
@@ -39,6 +40,7 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final PaymentManager paymentManager;
+    private final TimeManager timeManager;
 
     @Transactional
     public ReservationResponse create(final ReservationPaymentRequest request, final LoginMember loginMember) {
@@ -46,7 +48,7 @@ public class ReservationService {
         final Theme theme = getThemeById(request.reservationRequest().themeId());
         final Member member = getMemberByEmail(loginMember.email());
 
-        final LocalDateTime currentTimestamp = LocalDateTime.now();
+        final LocalDateTime currentTimestamp = timeManager.todayCurrentTime();
         final ReservationDate reservationDate = ReservationDate.of(request.reservationRequest().date(), currentTimestamp.toLocalDate());
 
         validateDuplicatePending(reservationDate, reservationTime, theme);
@@ -65,7 +67,7 @@ public class ReservationService {
         final Theme theme = getThemeById(request.themeId());
         final Member member = getMemberById(request.memberId());
 
-        final LocalDateTime currentTimestamp = LocalDateTime.now();
+        final LocalDateTime currentTimestamp = timeManager.todayCurrentTime();
         final ReservationDate reservationDate = ReservationDate.of(request.date(), currentTimestamp.toLocalDate());
 
         validateDuplicatePending(reservationDate, reservationTime, theme);
@@ -83,7 +85,7 @@ public class ReservationService {
         final ReservationTime reservationTime = getReservationTimeById(request.timeId());
         final Theme theme = getThemeById(request.themeId());
         final Member member = getMemberByEmail(loginMember.email());
-        final LocalDateTime currentTimestamp = LocalDateTime.now();
+        final LocalDateTime currentTimestamp = timeManager.todayCurrentTime();
         final ReservationDate reservationDate = ReservationDate.of(request.date(), currentTimestamp.toLocalDate());
 
         validateNotExistsPending(reservationDate, reservationTime, theme);
