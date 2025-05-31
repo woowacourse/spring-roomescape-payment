@@ -10,7 +10,6 @@ public class DateRange {
 
     private static final int DAYS_BEFORE_A_WEEK = 7;
     private static final int DAYS_BEFORE_YESTERDAY = 1;
-    public static final int TOW_MONTH = 2;
 
     private final LocalDate start;
     private final LocalDate end;
@@ -26,10 +25,10 @@ public class DateRange {
         return new DateRange(now.minusDays(DAYS_BEFORE_A_WEEK), now.minusDays(DAYS_BEFORE_YESTERDAY));
     }
 
-    public static DateRange createNextTwoMonthsRange(final Clock clock) {
+    public static DateRange createNextMonthsRange(final Clock clock, final int numberOfMonths) {
         validateClock(clock);
         LocalDate now = LocalDate.now(clock);
-        return new DateRange(now, now.plusMonths(TOW_MONTH));
+        return new DateRange(now, now.plusMonths(numberOfMonths));
     }
 
     public Set<LocalDate> getAllDays() {

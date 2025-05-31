@@ -12,8 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.common.GlobalConfig;
-import roomescape.global.config.ClockConfig;
+import roomescape.common.ClockConfig;
 import roomescape.integration.fixture.ReservationScheduleDbFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberEmail;
@@ -39,7 +38,7 @@ import roomescape.time.repository.ReservationTimeRepository;
 
 @Transactional
 @SpringBootTest
-@Import(GlobalConfig.class)
+@Import(ClockConfig.class)
 class ReservationTimeServiceTest {
 
     @Autowired

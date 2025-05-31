@@ -8,15 +8,13 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
-import net.bytebuddy.agent.builder.AgentBuilder.CircularityLock.Global;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.common.GlobalConfig;
-import roomescape.global.config.ClockConfig;
+import roomescape.common.ClockConfig;
 import roomescape.integration.fixture.MemberDbFixture;
 import roomescape.integration.fixture.ReservationDbFixture;
 import roomescape.integration.fixture.ReservationScheduleDbFixture;
@@ -44,7 +42,7 @@ import roomescape.time.repository.ReservationTimeRepository;
 
 @Transactional
 @SpringBootTest
-@Import(GlobalConfig.class)
+@Import(ClockConfig.class)
 class ReservationServiceTest {
 
     @Autowired

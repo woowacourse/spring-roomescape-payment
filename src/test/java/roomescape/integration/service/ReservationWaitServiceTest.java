@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.common.GlobalConfig;
+import roomescape.common.ClockConfig;
 import roomescape.global.exception.AccessDeniedException;
 import roomescape.integration.fixture.MemberDbFixture;
 import roomescape.integration.fixture.ReservationDbFixture;
@@ -36,7 +36,7 @@ import roomescape.wait.repository.ReservationWaitRepository;
 
 @Transactional
 @SpringBootTest
-@Import(GlobalConfig.class)
+@Import(ClockConfig.class)
 class ReservationWaitServiceTest {
 
     @Autowired
