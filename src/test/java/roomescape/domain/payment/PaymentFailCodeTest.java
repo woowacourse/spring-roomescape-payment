@@ -14,7 +14,7 @@ class PaymentFailCodeTest {
     @CsvSource({
         "CONDITION_NOT_SATISFIED,CLIENT_ERROR",
         "INVALID_AUTH_CREDENTIALS,SERVER_ERROR",
-        "EXTERNAL_PROCESSING,EXTERNAL_ERROR"
+        "EXTERNAL_SERVER_PROCESSING,EXTERNAL_ERROR"
     })
     void causedBy(final PaymentFailCode failCode, final Cause expectedCause) {
         assertThat(failCode.causedBy(expectedCause)).isTrue();
