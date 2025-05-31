@@ -1,12 +1,10 @@
 package roomescape.member.service;
 
-import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
 import roomescape.common.exception.EntityNotFoundException;
 import roomescape.member.domain.Email;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Password;
-import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
 import roomescape.member.service.dto.request.MemberCreateRequest;
 import roomescape.member.service.dto.response.MemberResponse;
@@ -34,13 +32,7 @@ public class MemberService {
                 .toList();
     }
 
-    public void create(final @Valid MemberCreateRequest request) {
-        final Member member = new Member(
-                request.name(),
-                request.email(),
-                request.password(),
-                Role.MEMBER
-        );
-        memberRepository.save(member);
+    public void create(MemberCreateRequest request) {
+        memberRepository.save(request.toEntity());
     }
 }
