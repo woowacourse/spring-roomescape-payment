@@ -6,8 +6,6 @@ import java.util.Base64.Encoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.Builder;
-import roomescape.reservation.controller.PaymentConfirmRequest;
-import roomescape.reservation.controller.PaymentConfirmResponse;
 
 @Service
 public class PaymentService {

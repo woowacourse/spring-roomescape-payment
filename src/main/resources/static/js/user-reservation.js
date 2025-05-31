@@ -216,13 +216,17 @@ async function fetchReservationPayment(paymentData, reservationData) {
       - 예약 결제 실패 시, 사용자가 실패 사유를 알 수 있도록 alert 에서 에러 메시지 수정
   */
   const reservationPaymentRequest = {
-    date: reservationData.date,
-    themeId: reservationData.themeId,
-    timeId: reservationData.timeId,
-    paymentKey: paymentData.paymentKey,
-    orderId: paymentData.orderId,
-    amount: paymentData.amount,
-    paymentType: paymentData.paymentType,
+    reservation: {
+      date: reservationData.date,
+      themeId: reservationData.themeId,
+      timeId: reservationData.timeId,
+    },
+    paymentConfirm: {
+      paymentKey: paymentData.paymentKey,
+      orderId: paymentData.orderId,
+      amount: paymentData.amount,
+      paymentType: paymentData.paymentType,
+    }
   }
 
   const reservationURL = "/reservations";

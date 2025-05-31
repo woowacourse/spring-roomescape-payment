@@ -6,9 +6,11 @@ import lombok.experimental.FieldNameConstants;
 import roomescape.common.utils.Validator;
 
 @FieldNameConstants(level = AccessLevel.PRIVATE)
-public record CreateReservationWebRequest(LocalDate date,
-                                          Long timeId,
-                                          Long themeId) {
+public record CreateReservationWebRequest(
+        LocalDate date,
+        Long timeId,
+        Long themeId
+) {
 
     public CreateReservationWebRequest {
         validate(date, timeId, themeId);

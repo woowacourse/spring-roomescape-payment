@@ -108,9 +108,9 @@ public class ReservationService {
             final MemberInfo memberInfo
     ) {
         // TODO : paymentId 등 결제정보를 예약 저장시 db에 저장할지 고려
-        paymentService.confirm(request.toPaymentConfirmRequest());
+        paymentService.confirm(request.paymentConfirmWebRequest().toPaymentConfirmRequest());
 
-        final CreateReservationWebRequest createReservationWebRequest = request.toCreateReservationWebRequest();
+        final CreateReservationWebRequest createReservationWebRequest = request.createReservationWebRequest();
         final Reservation reservation = reservationCommandUseCase.create(
                 new CreateReservationServiceRequest(
                         memberInfo.id(),

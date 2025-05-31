@@ -18,8 +18,6 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
 import roomescape.common.exception.PaymentException;
-import roomescape.reservation.controller.PaymentConfirmRequest;
-import roomescape.reservation.controller.PaymentConfirmResponse;
 
 @RestClientTest(PaymentService.class)
 class PaymentServiceTest {

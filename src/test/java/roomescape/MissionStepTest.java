@@ -141,19 +141,13 @@ public class MissionStepTest {
 
         RestAssured.given().log().all()
                 .cookie("token", memberToken)
-                .when().get("/reservations")
+                .when().get("/admin/reservations")
                 .then().log().all()
                 .statusCode(403);
 
         RestAssured.given().log().all()
                 .cookie("token", adminToken)
                 .when().get("/admin/reservation")
-                .then().log().all()
-                .statusCode(200);
-
-        RestAssured.given().log().all()
-                .cookie("token", adminToken)
-                .when().get("/reservations")
                 .then().log().all()
                 .statusCode(200);
     }

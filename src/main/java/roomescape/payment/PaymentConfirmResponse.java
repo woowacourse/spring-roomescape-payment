@@ -1,4 +1,4 @@
-package roomescape.reservation.controller;
+package roomescape.payment;
 
 public record PaymentConfirmResponse(
         String paymentKey,

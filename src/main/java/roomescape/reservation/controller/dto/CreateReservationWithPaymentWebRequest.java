@@ -1,22 +1,10 @@
 package roomescape.reservation.controller.dto;
 
-import java.time.LocalDate;
-import roomescape.reservation.controller.PaymentConfirmRequest;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import roomescape.payment.PaymentConfirmWebRequest;
 
 public record CreateReservationWithPaymentWebRequest(
-        LocalDate date,
-        Long themeId,
-        Long timeId,
-        String paymentKey,
-        String orderId,
-        int amount
+        @JsonProperty("reservation") CreateReservationWebRequest createReservationWebRequest,
+        @JsonProperty("paymentConfirm") PaymentConfirmWebRequest paymentConfirmWebRequest
 ) {
-
-    public PaymentConfirmRequest toPaymentConfirmRequest() {
-        return new PaymentConfirmRequest(this.paymentKey, this.orderId, this.amount);
-    }
-
-    public CreateReservationWebRequest toCreateReservationWebRequest() {
-        return new CreateReservationWebRequest(this.date, this.timeId, this.themeId);
-    }
 }
