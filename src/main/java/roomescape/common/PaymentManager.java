@@ -2,7 +2,6 @@ package roomescape.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
@@ -16,7 +15,6 @@ import roomescape.exception.custom.reason.payment.PaymentConfirmException;
 
 // toss pg사 이용
 @Component
-@RequiredArgsConstructor
 public class PaymentManager {
 
     private final ObjectMapper objectMapper;
