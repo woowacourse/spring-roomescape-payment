@@ -1,5 +1,7 @@
 package roomescape.global.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,17 +15,17 @@ import roomescape.global.exception.ExternalApiException;
 @Component
 public class CustomRestClient {
     private final CustomResponseMapper customResponseMapper;
-    private final CustomRequestMapper customRequestMapper;
     private final RestClient restClient;
+    private final ObjectMapper objectMapper;
 
     public CustomRestClient(
             final CustomResponseMapper customResponseMapper,
-            final CustomRequestMapper customRequestMapper,
-            final RestClient restClient
+            final RestClient restClient,
+            final ObjectMapper objectMapper
     ) {
         this.customResponseMapper = customResponseMapper;
-        this.customRequestMapper = customRequestMapper;
         this.restClient = restClient;
+        this.objectMapper = objectMapper;
     }
 
     public <T> T post(
@@ -38,7 +40,7 @@ public class CustomRestClient {
                     .uri(customRequestUri.getUriPath())
                     .header(HttpHeaders.AUTHORIZATION, authToken.generateToken())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(customRequestMapper.convertMap(body))
+                    .body(objectMapper.convertValue(body, Map.class))
                     .retrieve()
                     .body(responseType);
         } catch (RestClientResponseException e) {
