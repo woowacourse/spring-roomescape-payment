@@ -35,10 +35,7 @@ public class TossPaymentConfig {
 
     @Bean
     public TossPaymentClient paymentClient() {
-        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(connectTimeoutMs);
-
-        RestClient client = getRestClient(requestFactory);
+        RestClient client = getRestClient();
 
         return getTossPaymentClient(client);
     }
@@ -52,13 +49,21 @@ public class TossPaymentConfig {
         return factory.createClient(TossPaymentClient.class);
     }
 
-    private RestClient getRestClient(SimpleClientHttpRequestFactory requestFactory) {
+    private RestClient getRestClient() {
         return RestClient.builder()
                 .baseUrl(paymentUrl)
                 .requestInterceptor(new TossPaymentResponseInterceptor(objectMapper))
-                .requestFactory(requestFactory)
+                .requestFactory(getClientHttpRequestFactory())
                 .defaultHeader(AUTHORIZATION_HEADER_PREFIX, BASIC_AUTHENTICATION_PREFIX + Base64.getEncoder()
                         .encodeToString(((token + COLON).getBytes())))
                 .build();
+    }
+
+    private SimpleClientHttpRequestFactory getClientHttpRequestFactory() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(connectTimeoutMs);
+        factory.setReadTimeout(connectTimeoutMs);
+
+        return factory;
     }
 }

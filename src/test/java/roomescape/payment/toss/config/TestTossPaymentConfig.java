@@ -31,6 +31,7 @@ public class TestTossPaymentConfig {
     public RestClient.Builder restClientBuilder() {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(connectTimeoutMs);
+        requestFactory.setReadTimeout(connectTimeoutMs);
 
         return RestClient.builder()
                 .baseUrl(url)
