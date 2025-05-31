@@ -24,3 +24,7 @@ security:
 toss:
   confirm:
     secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+
+restclient:
+  connection-timeout: 3000
+  read-timeout: 5000
