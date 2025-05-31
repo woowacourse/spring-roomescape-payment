@@ -20,6 +20,7 @@ class TossPaymentProcessorTest {
     private static final String SECRET_KEY = "SecretKey";
     private static final String ENCODED_SECRET_KEY = Base64.getEncoder()
             .encodeToString((SECRET_KEY + ":base64").getBytes());
+    private static final String CONFIRM_URL = "https://api.tosspayments.com/v1/payments/confirm";
 
     @Autowired
     @Qualifier("testTossPaymentProcessor")
@@ -40,10 +41,9 @@ class TossPaymentProcessorTest {
                 "orderId",
                 "paymentKey"
         );
-        final String uri = "https://api.tosspayments.com/v1/payments/confirm";
 
         when(mockTestRestClient.post()
-                .uri(uri)
+                .uri(CONFIRM_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Basic " + ENCODED_SECRET_KEY)
                 .body(request)
@@ -68,7 +68,7 @@ class TossPaymentProcessorTest {
 
         @Bean(name = "testTossPaymentProcessor")
         public TossPaymentProcessor paymentProcessor(final RestClient mockTestRestClient) {
-            return new TossPaymentProcessor(SECRET_KEY, mockTestRestClient);
+            return new TossPaymentProcessor(SECRET_KEY, mockTestRestClient, CONFIRM_URL);
         }
     }
 }

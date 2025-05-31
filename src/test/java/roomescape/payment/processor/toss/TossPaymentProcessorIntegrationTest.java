@@ -23,9 +23,10 @@ class TossPaymentProcessorIntegrationTest {
                 .defaultStatusHandler(new TossPaymentProcessorErrorHandler(new ObjectMapper()));
         final MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
         final RestClient restClient = builder.build();
-        final TossPaymentProcessor processor = new TossPaymentProcessor("SecretKey", restClient);
+        final String confirmUrl = "https://api.tosspayments.com/v1/payments/confirm";
+        final TossPaymentProcessor processor = new TossPaymentProcessor("SecretKey", restClient, confirmUrl);
 
-        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+        server.expect(requestTo(confirmUrl))
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body("""
@@ -49,9 +50,10 @@ class TossPaymentProcessorIntegrationTest {
                 .defaultStatusHandler(new TossPaymentProcessorErrorHandler(new ObjectMapper()));
         final MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
         final RestClient restClient = builder.build();
-        final TossPaymentProcessor processor = new TossPaymentProcessor("SecretKey", restClient);
+        final String confirmUrl = "https://api.tosspayments.com/v1/payments/confirm";
+        final TossPaymentProcessor processor = new TossPaymentProcessor("SecretKey", restClient, confirmUrl);
 
-        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+        server.expect(requestTo(confirmUrl))
                 .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body("""

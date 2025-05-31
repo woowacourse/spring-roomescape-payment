@@ -8,22 +8,23 @@ public class TossPaymentProcessor {
 
     private final String secretKey;
     private final RestClient restClient;
+    private final String confirmUrl;
 
     public TossPaymentProcessor(
             final String secretKey,
-            final RestClient restClient
+            final RestClient restClient,
+            final String confirmUrl
     ) {
         this.secretKey = Base64.getEncoder().encodeToString((secretKey + ":base64").getBytes());
         this.restClient = restClient;
+        this.confirmUrl = confirmUrl;
     }
 
     public TossPaymentConfirmResponse processPayment(
             final TossPaymentConfirmRequest request
     ) {
-        final String uri = "https://api.tosspayments.com/v1/payments/confirm";
-
         return restClient.post()
-                .uri(uri)
+                .uri(confirmUrl)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Basic " + secretKey)
                 .body(request)

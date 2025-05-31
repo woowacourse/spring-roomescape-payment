@@ -13,13 +13,16 @@ public class RestClientConfig {
 
     private final ObjectMapper objectMapper;
     private final String secretKey;
+    private final String confirmUrl;
 
     public RestClientConfig(
             @Value("${payment.toss.secret-key}") final String secretKey,
+            @Value("${payment.toss.confirm-url}") final String confirmUrl,
             final ObjectMapper objectMapper
     ) {
         this.objectMapper = objectMapper;
         this.secretKey = secretKey;
+        this.confirmUrl = confirmUrl;
     }
 
     @Bean
@@ -28,6 +31,6 @@ public class RestClientConfig {
                 .defaultStatusHandler(new TossPaymentProcessorErrorHandler(objectMapper))
                 .build();
 
-        return new TossPaymentProcessor(secretKey, restClient);
+        return new TossPaymentProcessor(secretKey, restClient, confirmUrl);
     }
 }
