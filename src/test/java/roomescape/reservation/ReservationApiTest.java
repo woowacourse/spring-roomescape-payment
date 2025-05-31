@@ -29,6 +29,7 @@ import roomescape.fixture.db.ThemeDbFixture;
 import roomescape.payment.toss.dto.TossPaymentResponse;
 import roomescape.payment.toss.service.TossPaymentService;
 import roomescape.reservation.controller.exception.ReservationExceptionHandler;
+import roomescape.reservation.controller.request.PaymentInfoRequest;
 import roomescape.reservation.controller.request.ReservePaymentRequest;
 import roomescape.reservation.domain.ReservationDateTime;
 
@@ -76,14 +77,18 @@ class ReservationApiTest {
         given(tossPaymentService.getPayment(any()))
                 .willReturn(tossPaymentResponse);
 
+        PaymentInfoRequest paymentInfoRequest = new PaymentInfoRequest(
+                "paymentKey",
+                "orderId",
+                10000L,
+                "NORMAL"
+        );
+
         ReservePaymentRequest request = ReservePaymentRequest.builder()
                 .date(reservationDateTime.getDate())
                 .timeId(timeId)
                 .themeId(themeId)
-                .paymentKey("paymentKey")
-                .orderId("orderId")
-                .amount(10000L)
-                .paymentType("NORMAL")
+                .payment(paymentInfoRequest)
                 .build();
 
         RestAssured.given().log().all()
@@ -111,14 +116,18 @@ class ReservationApiTest {
         given(tossPaymentService.getPayment(any()))
                 .willReturn(tossPaymentResponse2);
 
+        PaymentInfoRequest paymentInfoRequest = new PaymentInfoRequest(
+                "paymentKey",
+                "orderId",
+                10000L,
+                "NORMAL"
+        );
+
         ReservePaymentRequest request = ReservePaymentRequest.builder()
                 .date(reservationDateTime.getDate())
                 .timeId(timeId)
                 .themeId(themeId)
-                .paymentKey("paymentKey")
-                .orderId("orderId")
-                .amount(10000L)
-                .paymentType("NORMAL")
+                .payment(paymentInfoRequest)
                 .build();
 
         RestAssured.given().log().all()
@@ -165,14 +174,18 @@ class ReservationApiTest {
         ReservationDateTime reservationDateTime = reservationDateTimeDbFixture._7일전_열시();
         Long timeId = reservationDateTime.getReservationTime().getId();
 
+        PaymentInfoRequest paymentInfoRequest = new PaymentInfoRequest(
+                "paymentKey",
+                "orderId",
+                10000L,
+                "NORMAL"
+        );
+
         ReservePaymentRequest request = ReservePaymentRequest.builder()
                 .date(reservationDateTime.getDate())
                 .timeId(timeId)
                 .themeId(themeId)
-                .paymentKey("paymentKey")
-                .orderId("orderId")
-                .amount(10000L)
-                .paymentType("NORMAL")
+                .payment(paymentInfoRequest)
                 .build();
 
         RestAssured.given().log().all()

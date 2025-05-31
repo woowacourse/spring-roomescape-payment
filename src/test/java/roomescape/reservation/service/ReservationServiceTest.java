@@ -85,8 +85,8 @@ class ReservationServiceTest {
         ReserveCommand command = new ReserveCommand(reservation.getDate(), reservation.getTheme().getId(),
                 reservation.getReservationTime().getId(), reservation.getReserver().getId());
 
-        assertThatThrownBy(() -> reservationService.reserve(command)).isInstanceOf(InvalidArgumentException.class)
-                .hasMessage("이미 예약이 존재하는 시간입니다.");
+        assertThatThrownBy(() -> reservationService.reserve(command))
+                .isInstanceOf(InAlreadyReservationException.class);
     }
 
     @Test

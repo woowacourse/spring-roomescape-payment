@@ -39,7 +39,7 @@ class TossPaymentServiceTest {
         assertThatThrownBy(() -> tossPaymentService.confirmPayment(request))
                 .isInstanceOf(PaymentTemporaryException.class);
 
-        verify(tossPaymentClient, times(3)).getPaymentConfirm(any(TossPaymentRequest.class));
+        verify(tossPaymentClient, times(2)).getPaymentConfirm(any(TossPaymentRequest.class));
     }
 
     @Test
@@ -50,12 +50,11 @@ class TossPaymentServiceTest {
         TossPaymentResponse response = new TossPaymentResponse("orderId");
         given(tossPaymentClient.getPaymentConfirm(request))
                 .willThrow(new PaymentTemporaryException("Temporary error"))
-                .willThrow(new PaymentTemporaryException("Temporary error"))
                 .willReturn(response);
 
         // when & then
         assertThat(tossPaymentService.confirmPayment(request)).isEqualTo(response);
 
-        verify(tossPaymentClient, times(3)).getPaymentConfirm(any(TossPaymentRequest.class));
+        verify(tossPaymentClient, times(2)).getPaymentConfirm(any(TossPaymentRequest.class));
     }
 }

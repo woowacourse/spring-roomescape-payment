@@ -57,8 +57,7 @@ public class ReservationService {
     }
 
     private void processPayment(ReservePaymentRequest request) {
-        TossPaymentRequest paymentRequest = new TossPaymentRequest(request.paymentKey(), request.orderId(),
-                request.amount());
+        TossPaymentRequest paymentRequest = TossPaymentRequest.from(request);
         TossPaymentResponse tossConfirmPaymentResponse = tossPaymentService.confirmPayment(paymentRequest);
         TossPaymentResponse tossPaymentResponse = tossPaymentService.getPayment(paymentRequest);
 
