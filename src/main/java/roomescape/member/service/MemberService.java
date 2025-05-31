@@ -1,13 +1,12 @@
 package roomescape.member.service;
 
 import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import roomescape.member.domain.Member;
 import roomescape.member.dto.MemberRequest;
 import roomescape.member.dto.MemberResponse;
+import roomescape.member.dto.MemberResponses;
 import roomescape.member.repository.MemberRepository;
 
 @Service
@@ -24,10 +23,12 @@ public class MemberService {
                 Member.withDefaultRole(memberRequest.name(), memberRequest.email(), memberRequest.password()));
     }
 
-    public List<MemberResponse> findAllMember() {
-        return memberRepository.findAll()
+    public MemberResponses findAllMember() {
+        List<MemberResponse> members = memberRepository.findAll()
                 .stream()
                 .map(MemberResponse::new)
                 .toList();
+
+        return new MemberResponses(members);
     }
 }

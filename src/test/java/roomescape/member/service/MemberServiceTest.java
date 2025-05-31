@@ -1,6 +1,5 @@
 package roomescape.member.service;
 
-import java.util.List;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,7 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.dto.MemberRequest;
-import roomescape.member.dto.MemberResponse;
+import roomescape.member.dto.MemberResponses;
 import roomescape.member.repository.MemberRepository;
 
 @DataJpaTest
@@ -53,18 +52,18 @@ class MemberServiceTest {
         memberRepository.save(m2);
 
         // when
-        List<MemberResponse> responses = memberService.findAllMember();
+        MemberResponses responses = memberService.findAllMember();
 
         // then
         SoftAssertions.assertSoftly(soft -> {
-            soft.assertThat(responses).hasSize(2);
-            soft.assertThat(responses.get(0).name()).isEqualTo("A");
-            soft.assertThat(responses.get(0).email()).isEqualTo("a@a.com");
-            soft.assertThat(responses.get(0).role()).isEqualTo(MemberRole.ADMIN.name());
+            soft.assertThat(responses.members()).hasSize(2);
+            soft.assertThat(responses.members().get(0).name()).isEqualTo("A");
+            soft.assertThat(responses.members().get(0).email()).isEqualTo("a@a.com");
+            soft.assertThat(responses.members().get(0).role()).isEqualTo(MemberRole.ADMIN.name());
 
-            soft.assertThat(responses.get(1).name()).isEqualTo("B");
-            soft.assertThat(responses.get(1).email()).isEqualTo("b@b.com");
-            soft.assertThat(responses.get(1).role()).isEqualTo(MemberRole.MEMBER.name());
+            soft.assertThat(responses.members().get(1).name()).isEqualTo("B");
+            soft.assertThat(responses.members().get(1).email()).isEqualTo("b@b.com");
+            soft.assertThat(responses.members().get(1).role()).isEqualTo(MemberRole.MEMBER.name());
         });
     }
 }

@@ -14,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
-
 import roomescape.member.dto.MemberRequest;
 import roomescape.member.repository.MemberRepository;
 import roomescape.member.service.MemberService;
@@ -46,12 +45,12 @@ class MemberControllerTest {
 
         // when & then
         mockMvc.perform(get("/members")
-                .contentType(MediaType.APPLICATION_JSON)
-        )
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.length()", is(2)))
-        .andExpect(jsonPath("[0].name", is("홍길동")))
-        .andExpect(jsonPath("[1].name", is("김철수")));
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.members.length()", is(2)))
+                .andExpect(jsonPath("$.members[0].name", is("홍길동")))
+                .andExpect(jsonPath("$.members[1].name", is("김철수")));
     }
 
     @Test
@@ -61,10 +60,10 @@ class MemberControllerTest {
 
         // when & then
         mockMvc.perform(post("/members")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"name\": \"신규회원\", \"email\": \"new@example.com\", \"password\": \"password123\"}")
-        )
-        .andExpect(status().isCreated());
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\": \"신규회원\", \"email\": \"new@example.com\", \"password\": \"password123\"}")
+                )
+                .andExpect(status().isCreated());
     }
 
     @Test
@@ -74,9 +73,9 @@ class MemberControllerTest {
 
         // when & then
         mockMvc.perform(post("/members")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"name\": \"중복회원\", \"email\": \"existing@example.com\", \"password\": \"password123\"}")
-        )
-        .andExpect(status().isBadRequest());
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\": \"중복회원\", \"email\": \"existing@example.com\", \"password\": \"password123\"}")
+                )
+                .andExpect(status().isBadRequest());
     }
 }
