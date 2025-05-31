@@ -1,4 +1,4 @@
-package roomescape.payment;
+package roomescape.e2e;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
