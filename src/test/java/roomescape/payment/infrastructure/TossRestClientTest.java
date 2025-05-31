@@ -25,7 +25,7 @@ import roomescape.payment.exception.PaymentTimeoutException;
 import roomescape.payment.exception.TossPaymentException;
 
 @SpringBootTest
-@TestPropertySource(properties = "rest-client.toss-payment.base-url=http://localhost:8089")
+@TestPropertySource(properties = "toss-payment.base-url=http://localhost:8089")
 class TossRestClientTest {
 
     @Autowired
@@ -101,7 +101,7 @@ class TossRestClientTest {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(SUCCESS_RESPONSE_BODY)
-                        .withFixedDelay(4_000)
+                        .withFixedDelay(1_000) // 테스트 타임아웃 설정시간 2초
                 ));
 
         String paymentKey = "test_key";
@@ -128,7 +128,7 @@ class TossRestClientTest {
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(SUCCESS_RESPONSE_BODY)
-                        .withFixedDelay(5_000)
+                        .withFixedDelay(2_000) // 테스트 타임아웃 설정시간 2초
                 ));
 
         String paymentKey = "test_key";
@@ -149,7 +149,7 @@ class TossRestClientTest {
         RestClient brokenRestClient = RestClient.builder()
                 .baseUrl("http://localhost:9999") // 잘못된 포트
                 .build();
-        TossRestClient brokenTossClient = new TossRestClient(brokenRestClient, new TossPaymentProperties("secret-key"));
+        TossRestClient brokenTossClient = new TossRestClient(brokenRestClient, new TossPaymentProperties("secret-key", "https://api.tosspayments.com"));
 
         wireMockServer.stubFor(post(urlEqualTo("/v1/payments/confirm"))
                 .willReturn(aResponse()

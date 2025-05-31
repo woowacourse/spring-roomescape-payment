@@ -1,7 +1,6 @@
 package roomescape.payment.infrastructure;
 
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,11 +11,8 @@ import org.springframework.validation.annotation.Validated;
 @Getter
 @Validated
 @RequiredArgsConstructor
-@ConfigurationProperties("rest-client.toss-payment")
+@ConfigurationProperties("rest-client")
 public class RestClientProperties {
-
-    @NotBlank(message = "baseUrl은 비어있을 수 없습니다.")
-    private final String baseUrl;
 
     @NotNull(message = "connectTimeout은 비어있을 수 없습니다.")
     private final int connectTimeout;

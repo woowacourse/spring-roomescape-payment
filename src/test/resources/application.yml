@@ -32,10 +32,9 @@ logging:
     org.hibernate.orm.jdbc.bind: trace
 
 rest-client:
-  toss-payment:
-    base-url: http://localhost:8089
-    connect-timeout: 5000
-    connection-request-timeout: 2000
-    read-timeout: 5000
+  connect-timeout: 1000
+  connection-request-timeout: 1000
+  read-timeout: 2000
 toss-payment:
   widget-secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  base-url: http://localhost:8089

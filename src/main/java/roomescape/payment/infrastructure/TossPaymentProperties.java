@@ -13,6 +13,9 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties("toss-payment")
 public class TossPaymentProperties {
 
+    @NotBlank(message = "baseUrl은 비어있을 수 없습니다.")
+    private final String baseUrl;
+
     @NotBlank(message = "widgetSecretKey은 비어있을 수 없습니다.")
     private final String widgetSecretKey;
 }
