@@ -24,16 +24,21 @@ public class TossPaymentProvider implements PaymentProvider {
 
     private static final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
     private static final String NO_PASSWORD_SIGN = ":";
-    private static final String AUTHORIZATION_PREFIX = "Basic ";
+    private static final String AUTHORIZATION_HEADER_VALUE = "Basic " + base64Encode(WIDGET_SECRET_KEY + NO_PASSWORD_SIGN);
+
+    private static final Map<String, PaymentFailCode> tossFailureCodeMappings = Map.ofEntries(
+        Map.entry("INVALID_API_KEY", INVALID_AUTH_CREDENTIALS),
+        Map.entry("UNAUTHORIZED_KEY", INVALID_AUTH_CREDENTIALS),
+        Map.entry("INCORRECT_BASIC_AUTH_FORMAT", INVALID_AUTH_CREDENTIALS),
+        Map.entry("FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING", EXTERNAL_SERVER_PROCESSING),
+        Map.entry("FAILED_INTERNAL_SYSTEM_PROCESSING", EXTERNAL_SERVER_PROCESSING),
+        Map.entry("UNKNOWN_PAYMENT_ERROR", EXTERNAL_SERVER_PROCESSING)
+    );
 
     private final RestClient restClient;
-    private final String authorizationValue;
-    private final Map<String, PaymentFailCode> tossFailureCodes;
 
     public TossPaymentProvider(final RestClient restClient) {
         this.restClient = restClient;
-        authorizationValue = AUTHORIZATION_PREFIX + encodeSecretKey();
-        tossFailureCodes = initializeFailureCode();
     }
 
     @Override
@@ -41,43 +46,32 @@ public class TossPaymentProvider implements PaymentProvider {
         var confirmUri = "/v1/payments/confirm";
         return restClient.post()
                 .uri(confirmUri)
-                .header("Authorization", authorizationValue)
+                .header("Authorization", AUTHORIZATION_HEADER_VALUE)
                 .header("Content-Type", "application/json")
                 .body(paymentRequest)
                 .exchange((request, response) -> convertToDetails(response));
     }
 
-    private PaymentDetails convertToDetails(final ConvertibleClientHttpResponse response) throws IOException {
-        if (HttpStatus.OK == response.getStatusCode()) {
-            var confirmation = response.bodyTo(PaymentConfirmation.class);
+    private PaymentDetails convertToDetails(final ConvertibleClientHttpResponse tossResponse) throws IOException {
+        if (HttpStatus.OK == tossResponse.getStatusCode()) {
+            var confirmation = tossResponse.bodyTo(PaymentConfirmation.class);
             return new PaymentDetails(confirmation);
         }
-        var tossResponse = response.bodyTo(FailureResponse.class);
-        var status = convertToStatus(tossResponse);
-        return new PaymentDetails(status);
+        var tossFailureResponse = tossResponse.bodyTo(TossFailureResponse.class);
+        var paymentFailure = convertToPaymentFailure(tossFailureResponse);
+        return new PaymentDetails(paymentFailure);
     }
 
-    private PaymentFailure convertToStatus(final FailureResponse tossResponse) {
-        var failureCode = tossFailureCodes.getOrDefault(tossResponse.code(), CONDITION_NOT_SATISFIED);
+    private PaymentFailure convertToPaymentFailure(final TossFailureResponse tossResponse) {
+        var failureCode = tossFailureCodeMappings.getOrDefault(tossResponse.code(), CONDITION_NOT_SATISFIED);
         return new PaymentFailure(failureCode, tossResponse.message());
     }
 
-    private String encodeSecretKey() {
+    private record TossFailureResponse(String code, String message) {}
+
+    private static String base64Encode(final String string) {
         var base64Encoder = Base64.getEncoder();
-        var encodedBytes = base64Encoder.encode((WIDGET_SECRET_KEY + NO_PASSWORD_SIGN).getBytes(StandardCharsets.UTF_8));
+        var encodedBytes = base64Encoder.encode(string.getBytes(StandardCharsets.UTF_8));
         return new String(encodedBytes);
     }
-
-    private Map<String, PaymentFailCode> initializeFailureCode() {
-        return Map.ofEntries(
-                Map.entry("INVALID_API_KEY", INVALID_AUTH_CREDENTIALS),
-                Map.entry("UNAUTHORIZED_KEY", INVALID_AUTH_CREDENTIALS),
-                Map.entry("INCORRECT_BASIC_AUTH_FORMAT", INVALID_AUTH_CREDENTIALS),
-                Map.entry("FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING", EXTERNAL_SERVER_PROCESSING),
-                Map.entry("FAILED_INTERNAL_SYSTEM_PROCESSING", EXTERNAL_SERVER_PROCESSING),
-                Map.entry("UNKNOWN_PAYMENT_ERROR", EXTERNAL_SERVER_PROCESSING)
-        );
-    }
-
-    private record FailureResponse(String code, String message) {}
 }
