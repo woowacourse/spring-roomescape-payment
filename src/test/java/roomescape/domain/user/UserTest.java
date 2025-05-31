@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import roomescape.exception.BusinessRuleViolationException;
-import roomescape.exception.InvalidInputException;
 
 class UserTest {
 

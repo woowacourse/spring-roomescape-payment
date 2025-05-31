@@ -1,15 +1,15 @@
 package roomescape.presentation.request;
 
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 
 public record CreateThemeRequest(
-        @NotEmpty
+        @NotBlank(message = "테마 이름을 입력해주세요.")
         String name,
 
-        @NotEmpty
+        @NotBlank(message = "테마 설명을 입력해주세요.")
         String description,
 
-        @NotEmpty
+        @NotBlank(message = "테마 썸네일을 입력해주세요.")
         String thumbnail
 ) {
 }

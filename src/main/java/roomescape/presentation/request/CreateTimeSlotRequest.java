@@ -6,7 +6,7 @@ import java.time.LocalTime;
 
 public record CreateTimeSlotRequest(
         @JsonFormat(pattern = "HH:mm")
-        @NotNull
+        @NotNull(message = "시간을 입력해주세요.")
         LocalTime startAt
 ) {
 }

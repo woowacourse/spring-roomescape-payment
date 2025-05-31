@@ -6,13 +6,13 @@ import java.time.LocalDate;
 
 public record CreateWaitingRequest(
         @JsonFormat(pattern = "yyyy-MM-dd")
-        @NotNull
+        @NotNull(message = "날짜를 선택해주세요.")
         LocalDate date,
 
-        @NotNull
+        @NotNull(message = "시간을 선택해주세요.")
         Long timeId,
 
-        @NotNull
+        @NotNull(message = "테마를 선택해주세요.")
         Long themeId
 ) {
 }

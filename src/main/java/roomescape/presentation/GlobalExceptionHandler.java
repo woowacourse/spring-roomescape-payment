@@ -31,7 +31,6 @@ import roomescape.exception.AuthenticationException;
 import roomescape.exception.AuthorizationException;
 import roomescape.exception.BusinessRuleViolationException;
 import roomescape.exception.InUseException;
-import roomescape.exception.InvalidInputException;
 import roomescape.exception.NotFoundException;
 import roomescape.exception.PaymentException;
 
