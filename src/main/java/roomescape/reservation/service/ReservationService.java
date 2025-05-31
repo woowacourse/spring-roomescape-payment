@@ -1,16 +1,13 @@
 package roomescape.reservation.service;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.util.DateTime;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
-import roomescape.payment.domain.Payment;
-import roomescape.payment.domain.PaymentRepository;
+import roomescape.payment.client.dto.request.TossPaymentConfirmRequest;
+import roomescape.payment.client.dto.response.TossPaymentResponse;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
@@ -24,18 +21,24 @@ import roomescape.theme.domain.ThemeRepository;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.domain.WaitingRepository;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Stream;
+
 @Service
 public class ReservationService {
 
     private final DateTime dateTime;
+    private final PaymentService paymentService;
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
 
-    public ReservationService(DateTime dateTime, ReservationRepository reservationRepository, ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository, MemberRepository memberRepository, WaitingRepository waitingRepository) {
+    public ReservationService(final DateTime dateTime, final PaymentService paymentService, final ReservationRepository reservationRepository, final ReservationTimeRepository reservationTimeRepository, final ThemeRepository themeRepository, final MemberRepository memberRepository, final WaitingRepository waitingRepository) {
         this.dateTime = dateTime;
+        this.paymentService = paymentService;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
@@ -44,7 +47,33 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse createReservation(final ReservationRequest request, final Long memberId) {
+    public ReservationResponse createReservation(final ReservationRequest request, final TossPaymentConfirmRequest paymentConfirmRequest, final Long memberId) {
+        ReservationTime time = reservationTimeRepository.findById(request.timeId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 시간입니다."));
+        Theme theme = themeRepository.findById(request.themeId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 테마입니다."));
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+
+        Reservation reservation = Reservation.createWithoutId(dateTime.now(), findMember, request.date(), time, theme);
+
+        if (reservationRepository.existsByDateAndTimeStartAtAndThemeId(
+                reservation.getDate(),
+                reservation.getReservationTime(),
+                reservation.getThemeId()
+        )) {
+            throw new IllegalArgumentException("이미 예약이 존재합니다.");
+        }
+
+        Reservation save = reservationRepository.save(reservation);
+
+        TossPaymentResponse paymentResponse = paymentService.confirm(paymentConfirmRequest);
+        paymentService.save(paymentResponse, save.getId());
+        return ReservationResponse.from(save);
+    }
+
+    @Transactional
+    public ReservationResponse createReservationWithoutPayment(final ReservationRequest request, final Long memberId) {
         ReservationTime time = reservationTimeRepository.findById(request.timeId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 시간입니다."));
         Theme theme = themeRepository.findById(request.themeId())

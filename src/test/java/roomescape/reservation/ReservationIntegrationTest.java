@@ -1,12 +1,8 @@
 package roomescape.reservation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +13,11 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.common.exceptionHandler.dto.ExceptionResponse;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -39,7 +40,7 @@ public class ReservationIntegrationTest {
         reservation.put("name", "브라운");
         reservation.put("date", date);
         reservation.put("timeId", 1);
-        ExceptionResponse expected = new ExceptionResponse("[ERROR] 요청 날짜 형식이 맞지 않습니다.", "/reservations");
+        ExceptionResponse expected = new ExceptionResponse("[ERROR] 요청 입력이 잘못되었습니다.", "/reservations");
         // when
         Response response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -102,7 +103,7 @@ public class ReservationIntegrationTest {
 
     @Test
     @DisplayName("마이 페이지를 반환한다.")
-    void get_my_page(){
+    void get_my_page() {
         RestAssured.given().log().all()
                 .when().get("/reservation-mine")
                 .then().log().all()
