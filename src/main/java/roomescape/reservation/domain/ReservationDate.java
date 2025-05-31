@@ -3,8 +3,8 @@ package roomescape.reservation.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import roomescape.exception.custom.reason.reservation.ReservationPastDateExcepti
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class ReservationDate {
 
-    private static final Map<LocalDate, ReservationDate> CACHE = new HashMap<>();
+    private static final Map<LocalDate, ReservationDate> CACHE = new ConcurrentHashMap<>();
 
     @EqualsAndHashCode.Include
     @Column(nullable = false)
