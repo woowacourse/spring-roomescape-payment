@@ -1,20 +1,17 @@
 package roomescape.payment.service;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
 import roomescape.payment.TossRestClient;
 import roomescape.payment.domain.TossPayment;
 import roomescape.payment.domain.dto.PaymentRequestDto;
 import roomescape.payment.exception.InvalidPaymentException;
 
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 public class PaymentServiceTest {
 
     @Test
