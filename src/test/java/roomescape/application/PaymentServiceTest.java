@@ -13,7 +13,7 @@ import roomescape.domain.payment.PaymentDetails;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.domain.payment.PaymentStatus;
-import roomescape.domain.payment.PaymentStatusCode;
+import roomescape.domain.payment.PaymentFailCode;
 import roomescape.exception.PaymentFailedException;
 
 class PaymentServiceTest {
@@ -37,7 +37,7 @@ class PaymentServiceTest {
     @ParameterizedTest
     @DisplayName("결제 실패 시 예외가 발생한다.")
     @CsvSource({"FAILED_PAYMENT", "INVALID_AUTH_CREDENTIALS", "FAILED_INTERNAL_PROCESSING"})
-    void failToPay(final PaymentStatusCode code) {
+    void failToPay(final PaymentFailCode code) {
         // given
         var request = new PaymentRequest("a", "1", 1000);
         var paymentDetails = new PaymentDetails(PaymentStatus.fail(code, "결제 실패"));

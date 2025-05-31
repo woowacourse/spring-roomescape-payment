@@ -25,7 +25,7 @@ import roomescape.application.PaymentService;
 import roomescape.application.ReservationService;
 import roomescape.domain.auth.AuthenticationInfo;
 import roomescape.domain.payment.PaymentStatus;
-import roomescape.domain.payment.PaymentStatusCode;
+import roomescape.domain.payment.PaymentFailCode;
 import roomescape.domain.user.UserRole;
 import roomescape.exception.NotFoundException;
 import roomescape.exception.PaymentFailedException;
@@ -95,7 +95,7 @@ class ReservationControllerTest {
     @Test
     @DisplayName("잘못된 요청으로 결제 승인 실패 시 BAD REQUEST를 응답한다.")
     void cannotReserveWhenBadRequest() throws Exception {
-        var paymentFailedException = new PaymentFailedException(PaymentStatus.fail(PaymentStatusCode.FAILED_PAYMENT, "결제 실패"));
+        var paymentFailedException = new PaymentFailedException(PaymentStatus.fail(PaymentFailCode.CONDITION_NOT_SATISFIED, "결제 실패"));
         Mockito.doThrow(paymentFailedException)
                 .when(paymentService).pay(anyString(), anyString(), anyLong());
 
@@ -119,7 +119,7 @@ class ReservationControllerTest {
     @Test
     @DisplayName("서버 내부 오류로 결제 승인 실패 시 INTERNAL SERVER ERROR를 응답한다.")
     void cannotReserveWhenInternalServerError() throws Exception {
-        var paymentFailedException = new PaymentFailedException(PaymentStatus.fail(PaymentStatusCode.INVALID_AUTH_CREDENTIALS, "결제 실패"));
+        var paymentFailedException = new PaymentFailedException(PaymentStatus.fail(PaymentFailCode.INVALID_AUTH_CREDENTIALS, "결제 실패"));
         Mockito.doThrow(paymentFailedException)
                 .when(paymentService).pay(anyString(), anyString(), anyLong());
 

@@ -1,8 +1,8 @@
 package roomescape.infrastructure;
 
-import static roomescape.domain.payment.PaymentStatusCode.FAILED_INTERNAL_PROCESSING;
-import static roomescape.domain.payment.PaymentStatusCode.FAILED_PAYMENT;
-import static roomescape.domain.payment.PaymentStatusCode.INVALID_AUTH_CREDENTIALS;
+import static roomescape.domain.payment.PaymentFailCode.EXTERNAL_PROCESSING;
+import static roomescape.domain.payment.PaymentFailCode.CONDITION_NOT_SATISFIED;
+import static roomescape.domain.payment.PaymentFailCode.INVALID_AUTH_CREDENTIALS;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -14,7 +14,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.RequestHeadersSpec.ConvertibleClientHttpResponse;
 import roomescape.domain.payment.PaymentConfirmation;
 import roomescape.domain.payment.PaymentDetails;
-import roomescape.domain.payment.PaymentStatusCode;
+import roomescape.domain.payment.PaymentFailCode;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.domain.payment.PaymentStatus;
@@ -28,7 +28,7 @@ public class TossPaymentProvider implements PaymentProvider {
 
     private final RestClient restClient;
     private final String authorizationValue;
-    private final Map<String, PaymentStatusCode> tossFailureCodes;
+    private final Map<String, PaymentFailCode> tossFailureCodes;
 
     public TossPaymentProvider(final RestClient restClient) {
         this.restClient = restClient;
@@ -58,7 +58,8 @@ public class TossPaymentProvider implements PaymentProvider {
     }
 
     private PaymentStatus convertToStatus(final FailureResponse tossResponse) {
-        var failureCode = tossFailureCodes.getOrDefault(tossResponse.code(), FAILED_PAYMENT);
+        var failureCode = tossFailureCodes.getOrDefault(tossResponse.code(),
+            CONDITION_NOT_SATISFIED);
         return PaymentStatus.fail(failureCode, tossResponse.message());
     }
 
@@ -68,14 +69,14 @@ public class TossPaymentProvider implements PaymentProvider {
         return new String(encodedBytes);
     }
 
-    private Map<String, PaymentStatusCode> initializeFailureCode() {
+    private Map<String, PaymentFailCode> initializeFailureCode() {
         return Map.ofEntries(
                 Map.entry("INVALID_API_KEY", INVALID_AUTH_CREDENTIALS),
                 Map.entry("UNAUTHORIZED_KEY", INVALID_AUTH_CREDENTIALS),
                 Map.entry("INCORRECT_BASIC_AUTH_FORMAT", INVALID_AUTH_CREDENTIALS),
-                Map.entry("FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING", FAILED_INTERNAL_PROCESSING),
-                Map.entry("FAILED_INTERNAL_SYSTEM_PROCESSING", FAILED_INTERNAL_PROCESSING),
-                Map.entry("UNKNOWN_PAYMENT_ERROR", FAILED_INTERNAL_PROCESSING)
+                Map.entry("FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING", EXTERNAL_PROCESSING),
+                Map.entry("FAILED_INTERNAL_SYSTEM_PROCESSING", EXTERNAL_PROCESSING),
+                Map.entry("UNKNOWN_PAYMENT_ERROR", EXTERNAL_PROCESSING)
         );
     }
 

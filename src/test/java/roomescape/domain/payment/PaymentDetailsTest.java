@@ -24,7 +24,7 @@ class PaymentDetailsTest {
     @Test
     @DisplayName("실패한 결제 세부사항을 생성한다.")
     void createWithStatus() {
-        var paymentStatus = PaymentStatus.fail(PaymentStatusCode.FAILED_PAYMENT, "결제 실패");
+        var paymentStatus = PaymentStatus.fail(PaymentFailCode.CONDITION_NOT_SATISFIED, "결제 실패");
 
         var paymentDetails = new PaymentDetails(paymentStatus);
 

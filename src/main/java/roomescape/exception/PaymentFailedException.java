@@ -1,7 +1,7 @@
 package roomescape.exception;
 
 import roomescape.domain.payment.PaymentStatus;
-import roomescape.domain.payment.PaymentStatusCode.Cause;
+import roomescape.domain.payment.PaymentFailCode.Cause;
 
 public class PaymentFailedException extends RuntimeException {
 

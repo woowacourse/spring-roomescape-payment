@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static roomescape.domain.payment.PaymentStatusCode.FAILED_INTERNAL_PROCESSING;
-import static roomescape.domain.payment.PaymentStatusCode.INVALID_AUTH_CREDENTIALS;
+import static roomescape.domain.payment.PaymentFailCode.EXTERNAL_PROCESSING;
+import static roomescape.domain.payment.PaymentFailCode.INVALID_AUTH_CREDENTIALS;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +22,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
-import roomescape.domain.payment.PaymentStatusCode;
+import roomescape.domain.payment.PaymentFailCode;
 
 @RestClientTest(PaymentProvider.class)
 @Import(TossPaymentConfig.class)
@@ -82,7 +82,7 @@ class TossPaymentProviderTest {
     @ParameterizedTest
     @DisplayName("결제 승인 실패하면 실패에 관한 결제 세부사항을 얻는다")
     @MethodSource("confirmPaymentFailedSource")
-    void confirmPaymentFailed(final String response, final PaymentStatusCode expectedStatusCode) {
+    void confirmPaymentFailed(final String response, final PaymentFailCode expectedStatusCode) {
         // given
         var request = new PaymentRequest("a", "1", 1000);
 
@@ -129,21 +129,21 @@ class TossPaymentProviderTest {
                     "code" : "FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING",
                     "message" : "Failed payment internal system processing"
                 }
-            """, FAILED_INTERNAL_PROCESSING
+            """, EXTERNAL_PROCESSING
             ),
             Arguments.of("""
                 {
                     "code" : "FAILED_INTERNAL_SYSTEM_PROCESSING",
                     "message" : "Failed internal system processing"
                 }
-            """, FAILED_INTERNAL_PROCESSING
+            """, EXTERNAL_PROCESSING
             ),
             Arguments.of("""
                 {
                     "code" : "UNKNOWN_PAYMENT_ERROR",
                     "message" : "Unknown payment error"
                 }
-            """, FAILED_INTERNAL_PROCESSING
+            """, EXTERNAL_PROCESSING
             )
         );
     }
