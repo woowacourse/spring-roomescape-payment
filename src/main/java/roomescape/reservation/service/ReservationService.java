@@ -102,15 +102,10 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse create(final ReservationCreateRequest request) {
-        if (isAlreadyBooked(request)) {
-            throw new AlreadyInUseException("이미 예약이 존재합니다.");
-        }
-        if (hasAlreadyWaiting(request)) {
-            throw new AlreadyInUseException("예약 대기가 존재해 예약을 생성할 수 없습니다.");
-        }
+        validateReservationCreate(request);
 
         Reservation reservation = getReservation(request, request.loginMember());
-        validateDateTime(LocalDateTime.now(), reservation.getDate(), reservation.getTime().getStartAt());
+        validatePastDateTime(reservation.getDate(), reservation.getTime().getStartAt());
 
         Reservation savedReservation = reservationRepository.save(reservation);
 
@@ -119,19 +114,31 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse create(final ReservationCreateRequest request, final PaymentRequest paymentRequest) {
+        validateReservationCreate(request);
+
+        Reservation reservation = getReservation(request, request.loginMember());
+        validatePastDateTime(reservation.getDate(), reservation.getTime().getStartAt());
+        paymentService.confirm(paymentRequest);
+
+        Reservation savedReservation = reservationRepository.save(reservation);
+        return ReservationResponse.from(savedReservation);
+    }
+
+    private void validateReservationCreate(final ReservationCreateRequest request) {
         if (isAlreadyBooked(request)) {
             throw new AlreadyInUseException("이미 예약이 존재합니다.");
         }
         if (hasAlreadyWaiting(request)) {
             throw new AlreadyInUseException("예약 대기가 존재해 예약을 생성할 수 없습니다.");
         }
+    }
 
-        Reservation reservation = getReservation(request, request.loginMember());
-        validateDateTime(LocalDateTime.now(), reservation.getDate(), reservation.getTime().getStartAt());
-        paymentService.confirm(paymentRequest);
-
-        Reservation savedReservation = reservationRepository.save(reservation);
-        return ReservationResponse.from(savedReservation);
+    private boolean isAlreadyBooked(final ReservationCreateRequest request) {
+        return reservationRepository.existsByDateAndTimeIdAndThemeId(
+                request.date(),
+                new ReservationTimeId(request.timeId()),
+                new ThemeId(request.themeId())
+        );
     }
 
     private boolean hasAlreadyWaiting(final ReservationCreateRequest request) {
@@ -152,14 +159,6 @@ public class ReservationService {
                 .stream()
                 .map(ReservationResponse::from)
                 .toList();
-    }
-
-    private boolean isAlreadyBooked(final ReservationCreateRequest request) {
-        return reservationRepository.existsByDateAndTimeIdAndThemeId(
-                request.date(),
-                new ReservationTimeId(request.timeId()),
-                new ThemeId(request.themeId())
-        );
     }
 
     private Reservation getReservation(final ReservationCreateRequest request, final LoginMember loginMember) {
@@ -183,8 +182,9 @@ public class ReservationService {
                 .orElseThrow(() -> new EntityNotFoundException("reservationsTime not found id =" + timeId));
     }
 
-    private void validateDateTime(final LocalDateTime now, final LocalDate date, final LocalTime time) {
+    private void validatePastDateTime(final LocalDate date, final LocalTime time) {
         LocalDateTime dateTime = LocalDateTime.of(date, time);
+        LocalDateTime now = LocalDateTime.now();
 
         if (now.isAfter(dateTime)) {
             throw new IllegalArgumentException("이미 지난 예약 시간입니다.");
