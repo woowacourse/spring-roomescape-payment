@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import roomescape.annotation.CheckRole;
-import roomescape.dto.request.AddReservationRequest;
-import roomescape.dto.request.ConfirmPaymentRequest;
 import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.request.CreateWaitReservationRequest;
 import roomescape.dto.request.LoginMemberRequest;
@@ -22,25 +20,22 @@ import roomescape.dto.response.MyReservationResponse;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationWaitResponse;
 import roomescape.global.Role;
-import roomescape.service.PaymentService;
-import roomescape.service.ReservationService;
+import roomescape.service.ReservationFacadeService;
 
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
 
-    private final ReservationService reservationService;
-    private final PaymentService paymentService;
+    private final ReservationFacadeService reservationFacadeService;
 
-    public ReservationController(ReservationService reservationService, PaymentService paymentService) {
-        this.reservationService = reservationService;
-        this.paymentService = paymentService;
+    public ReservationController(ReservationFacadeService reservationFacadeService) {
+        this.reservationFacadeService = reservationFacadeService;
     }
 
     @GetMapping
     @CheckRole(Role.ADMIN)
     public ResponseEntity<List<ReservationResponse>> getReservations() {
-        List<ReservationResponse> responses = reservationService.findAll();
+        List<ReservationResponse> responses = reservationFacadeService.findAllReservation();
 
         return ResponseEntity.ok(responses);
     }
@@ -48,8 +43,7 @@ public class ReservationController {
     @GetMapping("/mine")
     @CheckRole({Role.USER, Role.ADMIN})
     public ResponseEntity<List<MyReservationResponse>> getMyReservation(LoginMemberRequest loginMemberRequest) {
-        List<MyReservationResponse> responses = reservationService.findAllReservationOfMember(
-                loginMemberRequest.id());
+        List<MyReservationResponse> responses = reservationFacadeService.findAllReservationOfMember(loginMemberRequest);
 
         return ResponseEntity.ok(responses);
     }
@@ -60,11 +54,7 @@ public class ReservationController {
             @RequestBody @Valid CreateReservationRequest request,
             LoginMemberRequest loginMemberRequest) {
 
-        ConfirmPaymentRequest confirmPaymentRequest = ConfirmPaymentRequest.from(request);
-        paymentService.confirmPayment(confirmPaymentRequest);
-
-        AddReservationRequest addReservationRequest = AddReservationRequest.from(request);
-        ReservationResponse response = reservationService.addReservation(addReservationRequest, loginMemberRequest);
+        ReservationResponse response = reservationFacadeService.addReservation(request, loginMemberRequest);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -79,7 +69,7 @@ public class ReservationController {
     public ResponseEntity<ReservationWaitResponse> addWaitReservation(
             @RequestBody @Valid CreateWaitReservationRequest request,
             LoginMemberRequest loginMemberRequest) {
-        ReservationWaitResponse response = reservationService.addWaitReservation(request, loginMemberRequest);
+        ReservationWaitResponse response = reservationFacadeService.addWaitReservation(request, loginMemberRequest);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
@@ -92,7 +82,7 @@ public class ReservationController {
     @DeleteMapping("/{id}")
     @CheckRole(value = {Role.ADMIN, Role.USER})
     public ResponseEntity<Void> deleteReservations(@PathVariable Long id) {
-        reservationService.deleteReservation(id);
+        reservationFacadeService.deleteReservation(id);
 
         return ResponseEntity.noContent().build();
     }
@@ -100,7 +90,7 @@ public class ReservationController {
     @DeleteMapping("/waiting/{id}")
     @CheckRole(value = {Role.ADMIN, Role.USER})
     public ResponseEntity<Void> deleteWaitReservation(@PathVariable Long id) {
-        reservationService.deleteReservation(id);
+        reservationFacadeService.deleteReservation(id);
 
         return ResponseEntity.noContent().build();
     }

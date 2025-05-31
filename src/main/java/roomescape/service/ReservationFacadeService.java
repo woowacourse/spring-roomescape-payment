@@ -1,0 +1,54 @@
+package roomescape.service;
+
+import java.util.List;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import roomescape.dto.request.AddReservationRequest;
+import roomescape.dto.request.ConfirmPaymentRequest;
+import roomescape.dto.request.CreateReservationRequest;
+import roomescape.dto.request.CreateWaitReservationRequest;
+import roomescape.dto.request.LoginMemberRequest;
+import roomescape.dto.response.MyReservationResponse;
+import roomescape.dto.response.ReservationResponse;
+import roomescape.dto.response.ReservationWaitResponse;
+
+@Service
+@Transactional
+public class ReservationFacadeService {
+
+    private final ReservationService reservationService;
+    private final PaymentService paymentService;
+
+    public ReservationFacadeService(ReservationService reservationService, PaymentService paymentService) {
+        this.reservationService = reservationService;
+        this.paymentService = paymentService;
+    }
+
+    public ReservationResponse addReservation(CreateReservationRequest request,
+                                              LoginMemberRequest loginMemberRequest) {
+        AddReservationRequest addReservationRequest = AddReservationRequest.from(request);
+        ReservationResponse response = reservationService.addReservation(addReservationRequest, loginMemberRequest);
+
+        ConfirmPaymentRequest confirmPaymentRequest = ConfirmPaymentRequest.from(request);
+        paymentService.confirmPayment(confirmPaymentRequest);
+
+        return response;
+    }
+
+    public List<ReservationResponse> findAllReservation() {
+        return reservationService.findAll();
+    }
+
+    public List<MyReservationResponse> findAllReservationOfMember(LoginMemberRequest loginMemberRequest) {
+        return reservationService.findAllReservationOfMember(loginMemberRequest.id());
+    }
+
+    public ReservationWaitResponse addWaitReservation(CreateWaitReservationRequest request,
+                                                      LoginMemberRequest loginMemberRequest) {
+        return reservationService.addWaitReservation(request, loginMemberRequest);
+    }
+
+    public void deleteReservation(final Long id) {
+        reservationService.deleteReservation(id);
+    }
+}

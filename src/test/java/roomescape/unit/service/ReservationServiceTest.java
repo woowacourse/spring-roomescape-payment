@@ -15,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.dto.request.AddReservationRequest;
-import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.request.CreateWaitReservationRequest;
 import roomescape.dto.request.LoginMemberRequest;
 import roomescape.dto.response.MyReservationResponse;
@@ -266,8 +265,9 @@ class ReservationServiceTest {
         reservationService.deleteReservation(1L);
 
         //then
+        Reservation first = member.getReservations().getFirst();
         assertAll(
-                () -> assertThat(member.getReservations()).contains(wait),
+                () -> assertThat(first.getStatus()).isEqualTo(ReservationStatus.RESERVED),
                 () -> assertThat(wait.getMember()).isEqualTo(member),
                 () -> assertThat(wait.getStatus()).isEqualTo(ReservationStatus.RESERVED)
         );
