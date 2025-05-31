@@ -1,8 +1,8 @@
-package roomescape.reservation.domain;
+package roomescape.reservation.dto;
 
 import java.util.ResourceBundle;
 
-public enum ReservationStatus {
+public enum ReservationStatusForResponse {
     BOOKED,
     WAITING,
     ;

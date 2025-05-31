@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationStatus;
 
 public record MyReservationResponse(
         Long reservationId,
@@ -15,7 +14,7 @@ public record MyReservationResponse(
         Long rank
 ) {
 
-    public MyReservationResponse(final Reservation reservation, final ReservationStatus status) {
+    public MyReservationResponse(final Reservation reservation, final ReservationStatusForResponse status) {
         this(
                 reservation.getId(),
                 reservation.getRoomEscapeInformation().getTheme().getName(),
@@ -27,7 +26,7 @@ public record MyReservationResponse(
     }
 
     public MyReservationResponse(final WaitingReservationWithRank waitingReservationWithRank,
-                                 ReservationStatus status) {
+                                 ReservationStatusForResponse status) {
         this(
                 waitingReservationWithRank.reservationId(),
                 waitingReservationWithRank.theme(),
@@ -39,10 +38,10 @@ public record MyReservationResponse(
     }
 
     public static MyReservationResponse from(Reservation reservation) {
-        return new MyReservationResponse(reservation, ReservationStatus.BOOKED);
+        return new MyReservationResponse(reservation, ReservationStatusForResponse.BOOKED);
     }
 
     public static MyReservationResponse from(WaitingReservationWithRank waiting) {
-        return new MyReservationResponse(waiting, ReservationStatus.WAITING);
+        return new MyReservationResponse(waiting, ReservationStatusForResponse.WAITING);
     }
 }
