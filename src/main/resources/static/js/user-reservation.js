@@ -42,9 +42,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
-    document.getElementById('wait-button').addEventListener('click', onWaitButtonClick);
+    document.getElementById('wait-button').addEventListener('click', onWaitButtonClickWithPaymentWidget);
     function onReservationButtonClickWithPaymentWidget(event) {
         onReservationButtonClick(event, paymentWidget);
+    }
+    function onWaitButtonClickWithPaymentWidget(event) {
+        onWaitButtonClick(event, paymentWidget);
     }
 });
 
@@ -224,7 +227,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
     });
 }
 
-function onWaitButtonClick() {
+function onWaitButtonClick(event, paymentWidget) {
     const selectedDate = document.getElementById("datepicker").value;
     const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
     const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
@@ -236,25 +239,21 @@ function onWaitButtonClick() {
             timeId: selectedTimeId
         };
 
-        fetch('/reservations', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(reservationData)
-        })
-            .then(response => {
-                if (!response.ok) throw new Error('Reservation waiting failed');
-                return response.json();
-            })
-            .then(data => {
-                alert('Reservation waiting successful!');
-                location.reload();
-            })
-            .catch(error => {
-                alert("An error occurred while making the reservation waiting.");
-                console.error(error);
-            });
+        const generateRandomString = () =>
+            window.btoa(Math.random()).slice(0, 20);
+
+        // TOSS 결제 위젯을 통한 결제 요청
+        const orderIdPrefix = "RoomescapeWaiting_";
+        paymentWidget.requestPayment({
+            orderId: orderIdPrefix + generateRandomString(),
+            orderName: "테스트 방탈출 예약 대기 결제 1건",
+            amount: 1000,
+        }).then(function (data) {
+            // 결제 성공 시 예약 정보를 서버로 전송 (서버에서 웨이팅 처리)
+            fetchReservationPayment(data, reservationData);
+        }).catch(function (error) {
+            alert(error.code + " :" + error.message + "/ orderId : " + error.orderId);
+        });
     } else {
         alert("Please select a date, theme, and time before making a reservation waiting.");
     }
