@@ -2,18 +2,18 @@ package roomescape.domain.payment;
 
 public record PaymentDetails(
         PaymentConfirmation confirmation,
-        PaymentStatus status
+        PaymentFailure failure
 ) {
 
     public PaymentDetails(final PaymentConfirmation confirmation) {
         this(confirmation, null);
     }
 
-    public PaymentDetails(final PaymentStatus status) {
-        this(null, status);
+    public PaymentDetails(final PaymentFailure failure) {
+        this(null, failure);
     }
 
     public boolean isFailed() {
-        return status != null;
+        return failure != null;
     }
 }

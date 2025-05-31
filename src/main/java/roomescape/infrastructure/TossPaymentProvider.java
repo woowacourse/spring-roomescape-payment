@@ -17,7 +17,7 @@ import roomescape.domain.payment.PaymentDetails;
 import roomescape.domain.payment.PaymentFailCode;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
-import roomescape.domain.payment.PaymentStatus;
+import roomescape.domain.payment.PaymentFailure;
 
 @Component
 public class TossPaymentProvider implements PaymentProvider {
@@ -57,10 +57,9 @@ public class TossPaymentProvider implements PaymentProvider {
         return new PaymentDetails(status);
     }
 
-    private PaymentStatus convertToStatus(final FailureResponse tossResponse) {
-        var failureCode = tossFailureCodes.getOrDefault(tossResponse.code(),
-            CONDITION_NOT_SATISFIED);
-        return PaymentStatus.fail(failureCode, tossResponse.message());
+    private PaymentFailure convertToStatus(final FailureResponse tossResponse) {
+        var failureCode = tossFailureCodes.getOrDefault(tossResponse.code(), CONDITION_NOT_SATISFIED);
+        return new PaymentFailure(failureCode, tossResponse.message());
     }
 
     private String encodeSecretKey() {

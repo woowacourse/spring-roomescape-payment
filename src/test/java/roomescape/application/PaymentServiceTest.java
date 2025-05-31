@@ -12,7 +12,7 @@ import roomescape.domain.payment.PaymentConfirmation;
 import roomescape.domain.payment.PaymentDetails;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
-import roomescape.domain.payment.PaymentStatus;
+import roomescape.domain.payment.PaymentFailure;
 import roomescape.domain.payment.PaymentFailCode;
 import roomescape.exception.PaymentFailedException;
 
@@ -34,13 +34,12 @@ class PaymentServiceTest {
         assertThatCode(() -> paymentService.pay("a", "1", 1000)).doesNotThrowAnyException();
     }
 
-    @ParameterizedTest
+    @Test
     @DisplayName("결제 실패 시 예외가 발생한다.")
-    @CsvSource({"FAILED_PAYMENT", "INVALID_AUTH_CREDENTIALS", "FAILED_INTERNAL_PROCESSING"})
-    void failToPay(final PaymentFailCode code) {
+    void failToPay() {
         // given
         var request = new PaymentRequest("a", "1", 1000);
-        var paymentDetails = new PaymentDetails(PaymentStatus.fail(code, "결제 실패"));
+        var paymentDetails = new PaymentDetails(new PaymentFailure(PaymentFailCode.CONDITION_NOT_SATISFIED, "결제 실패"));
 
         Mockito.when(paymentProvider.confirm(request)).thenReturn(paymentDetails);
 

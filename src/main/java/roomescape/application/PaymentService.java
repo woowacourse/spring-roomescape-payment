@@ -17,7 +17,7 @@ public class PaymentService {
 
         var paymentDetails = paymentProvider.confirm(request);
         if (paymentDetails.isFailed()) {
-            throw new PaymentFailedException(paymentDetails.status());
+            throw new PaymentFailedException(paymentDetails.failure());
         }
     }
 }

@@ -75,7 +75,7 @@ class TossPaymentProviderTest {
         assertAll(
             () -> assertThat(paymentDetails.confirmation()).isNotNull(),
             () -> assertThat(paymentDetails.isFailed()).isFalse(),
-            () -> assertThat(paymentDetails.status()).isNull()
+            () -> assertThat(paymentDetails.failure()).isNull()
         );
     }
 
@@ -97,7 +97,7 @@ class TossPaymentProviderTest {
         assertAll(
             () -> assertThat(paymentDetails.confirmation()).isNull(),
             () -> assertThat(paymentDetails.isFailed()).isTrue(),
-            () -> assertThat(paymentDetails.status().code()).isEqualTo(expectedStatusCode)
+            () -> assertThat(paymentDetails.failure().code()).isEqualTo(expectedStatusCode)
         );
     }
 
