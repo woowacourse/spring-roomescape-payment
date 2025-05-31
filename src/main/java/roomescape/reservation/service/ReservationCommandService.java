@@ -53,28 +53,13 @@ public class ReservationCommandService {
         final Member member = memberRepository.findById(loginMember.id())
                 .orElseThrow(() -> new UnauthorizedException("예약자를 찾을 수 없습니다."));
         final Payment payment = paymentService.confirmAndSavePayment(new PaymentsConfirmRequest(request));
-        final Reservation reservation = convertToReservation(
-                request.themeId(),
-                request.timeId(),
-                request.date(),
-                member,
-                payment
-        );
-        final Reservation savedReservation = reservationRepository.save(reservation);
-        return new ReservationResponse(savedReservation);
+        return createReservation(request.themeId(), request.timeId(), request.date(), member, payment);
     }
 
     public ReservationResponse createReservationByAdmin(final CreateReservationWithMemberRequest request) {
         final Member member = memberRepository.findById(request.memberId())
                 .orElseThrow(() -> new BadRequestException("예약자를 찾을 수 없습니다."));
-        final Reservation reservation = convertToReservation(
-                request.themeId(),
-                request.timeId(),
-                request.date(),
-                member
-        );
-        final Reservation savedReservation = reservationRepository.save(reservation);
-        return new ReservationResponse(savedReservation);
+        return createReservation(request.themeId(), request.timeId(), request.date(), member, null);
     }
 
     public void cancelReservationById(final long id) {
@@ -85,11 +70,15 @@ public class ReservationCommandService {
                 );
     }
 
-    private void processWaitingToReservation(final long id, final Waiting waiting) {
-        final Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("예약을 찾을 수 없습니다."));
-        reservation.updateMember(waiting.getMember());
-        waitingRepository.delete(waiting);
+    private ReservationResponse createReservation(
+            final long themeId,
+            final long timeId,
+            final LocalDate date,
+            final Member member,
+            final Payment payment) {
+        final Reservation reservation = convertToReservation(themeId, timeId, date, member, payment);
+        final Reservation savedReservation = reservationRepository.save(reservation);
+        return new ReservationResponse(savedReservation);
     }
 
     private Reservation convertToReservation(
@@ -98,30 +87,32 @@ public class ReservationCommandService {
             final LocalDate date,
             final Member member,
             final Payment payment) {
-        final Theme theme = themeRepository.findById(themeId)
-                .orElseThrow(() -> new BadRequestException("테마가 존재하지 않습니다."));
-        final ReservationTime time = reservationTimeRepository.findById(timeId)
-                .orElseThrow(() -> new BadRequestException("예약 시간이 존재하지 않습니다."));
-        if (reservationRepository.existsByDateAndTimeIdAndThemeId(date, time.getId(),
-                theme.getId())) {
-            throw new BadRequestException("해당 시간에 이미 예약이 존재합니다.");
-        }
+        final Theme theme = validateAndGetTheme(themeId);
+        final ReservationTime time = validateAndGetTime(timeId);
+        validateDuplicateReservation(date, time.getId(), theme.getId());
         return Reservation.register(member, date, time, theme, payment);
     }
 
-    private Reservation convertToReservation(
-            final long themeId,
-            final long timeId,
-            final LocalDate date,
-            final Member member) {
-        final Theme theme = themeRepository.findById(themeId)
+    private void processWaitingToReservation(final long id, final Waiting waiting) {
+        final Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("예약을 찾을 수 없습니다."));
+        reservation.updateMember(waiting.getMember());
+        waitingRepository.delete(waiting);
+    }
+
+    private Theme validateAndGetTheme(final long themeId) {
+        return themeRepository.findById(themeId)
                 .orElseThrow(() -> new BadRequestException("테마가 존재하지 않습니다."));
-        final ReservationTime time = reservationTimeRepository.findById(timeId)
+    }
+
+    private ReservationTime validateAndGetTime(final long timeId) {
+        return reservationTimeRepository.findById(timeId)
                 .orElseThrow(() -> new BadRequestException("예약 시간이 존재하지 않습니다."));
-        if (reservationRepository.existsByDateAndTimeIdAndThemeId(date, time.getId(),
-                theme.getId())) {
+    }
+
+    private void validateDuplicateReservation(final LocalDate date, final long timeId, final long themeId) {
+        if (reservationRepository.existsByDateAndTimeIdAndThemeId(date, timeId, themeId)) {
             throw new BadRequestException("해당 시간에 이미 예약이 존재합니다.");
         }
-        return Reservation.register(member, date, time, theme);
     }
 }

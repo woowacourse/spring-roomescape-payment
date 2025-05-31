@@ -60,14 +60,9 @@ public class Reservation {
         this.payment = payment;
     }
 
-
     public static Reservation register(final Member member, final LocalDate date,
                                        final ReservationTime time, final Theme theme) {
-        Reservation reservation = new Reservation(null, member, date, time, theme);
-        if (reservation.isBefore(LocalDateTime.now())) {
-            throw new BadRequestException("지나간 날짜와 시간은 예약 불가합니다.");
-        }
-        return reservation;
+        return register(member, date, time, theme, null);
     }
 
     public static Reservation register(final Member member, final LocalDate date, final ReservationTime time,
