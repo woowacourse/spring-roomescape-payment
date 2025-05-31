@@ -12,7 +12,7 @@ import roomescape.client.dto.PaymentsConfirmResponse;
 import roomescape.client.dto.TossErrorResponse;
 import roomescape.global.exception.custom.TossPaymentsException;
 
-public class TossPaymentsClient {
+public class TossPaymentsClient implements PaymentClient {
 
     private final RestClient restClient;
 
@@ -20,6 +20,7 @@ public class TossPaymentsClient {
         this.restClient = restClient;
     }
 
+    @Override
     public PaymentsConfirmResponse confirmPayments(final PaymentsConfirmRequest request) {
         return restClient.post()
                 .uri("/confirm")

@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
+import roomescape.client.PaymentClient;
 import roomescape.client.TossPaymentsClient;
 
 @TestConfiguration
@@ -22,9 +23,9 @@ public class TestClientConfig {
                 .build();
     }
 
-    @Bean
+    @Bean("paymentClient")
     @DependsOn(value = {"MockRestServiceServer"})
-    public TossPaymentsClient tossPaymentsClient() {
+    public PaymentClient tossPaymentsClient() {
         return new TossPaymentsClient(TEST_BUILDER.build());
     }
 }
