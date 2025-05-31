@@ -12,6 +12,14 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum PaymentErrorCode {
+
+    CONNECTION_ERROR(
+            INTERNAL_SERVER_ERROR, "외부 API 서버에 연결할 수 없습니다."),
+    SOCKET_TIMEOUT(
+            INTERNAL_SERVER_ERROR, "외부 API 응답 시간이 초과되었습니다"),
+    EXTERNAL_API_ERROR(
+            INTERNAL_SERVER_ERROR, "외부 API와 통신 중 오류가 발생했습니다."),
+
     EXCEED_MAX_DAILY_PAYMENT_COUNT(
             BAD_REQUEST, "하루 결제 가능 횟수를 초과했습니다."),
     NOT_SUPPORTED_INSTALLMENT_PLAN_CARD_OR_MERCHANT(
@@ -101,9 +109,6 @@ public enum PaymentErrorCode {
     }
 
     public static PaymentErrorCode from(String code) {
-        return Arrays.stream(values())
-                .filter(e -> e.name().equals(code))
-                .findFirst()
-                .orElse(UNKNOWN);
+        return Arrays.stream(values()).filter(e -> e.name().equals(code)).findFirst().orElse(UNKNOWN);
     }
 }
