@@ -1,10 +1,10 @@
 package roomescape.reservation.service.manager;
 
 import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.global.exception.InvalidArgumentException;
 import roomescape.global.function.TriFunction;
 import roomescape.member.domain.Member;
 import roomescape.member.service.MemberQueryService;
@@ -12,6 +12,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.domain.ReservationDateTime;
 import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.exception.InAlreadyReservationException;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.service.command.ReserveCommand;
 import roomescape.theme.domain.Theme;
@@ -36,8 +37,11 @@ public class ReservationManager {
     }
 
     private void isAlreadyReservedTime(LocalDate date, Long timeId) {
-        if (reservationRepository.existsByDateAndTimeIdAndStatus(date, timeId, ReservationStatus.RESERVED)) {
-            throw new InvalidArgumentException("이미 예약이 존재하는 시간입니다.");
+        List<Reservation> reservations = reservationRepository.findByDateAndTimeIdAndStatusWithLock(
+                date, timeId, ReservationStatus.RESERVED);
+
+        if (!reservations.isEmpty()) {
+            throw new InAlreadyReservationException("이미 예약된 시간입니다.");
         }
     }
 
