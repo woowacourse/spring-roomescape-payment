@@ -24,12 +24,14 @@ public class PaymentClient {
     public void confirmPayment(TossPaymentConfirmRequestDto requestDto) {
         restClient.post()
                 .uri(PAYMENT_CONFIRM_URL)
-                .header(AUTHORIZATION,
-                        BASIC_AUTHORIZATION +
-                                Base64.getEncoder().encodeToString(PAYMENT_CONFIRM_SECRET_KEY.getBytes()))
+                .header(AUTHORIZATION, getBasicAuthorizationHeader())
                 .body(requestDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .toBodilessEntity();
+    }
+
+    private static String getBasicAuthorizationHeader() {
+        return BASIC_AUTHORIZATION + Base64.getEncoder().encodeToString(PAYMENT_CONFIRM_SECRET_KEY.getBytes());
     }
 }
