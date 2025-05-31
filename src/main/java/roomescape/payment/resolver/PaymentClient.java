@@ -20,7 +20,6 @@ public class PaymentClient {
     private final ObjectMapper objectMapper;
 
     public PaymentResponse confirmPayment(final PaymentRequest request) {
-
         try {
             return restClient.post()
                     .uri("/v1/payments/confirm")
@@ -28,19 +27,19 @@ public class PaymentClient {
                     .retrieve()
                     .body(PaymentResponse.class);
         } catch (RestClientResponseException e) {
-            exceptionable(e, request.paymentKey());
+            exceptionable(e);
         }
         throw new RuntimeException("결제 과정 중 에러가 발생했습니다.");
     }
 
-    private void exceptionable(final RestClientResponseException e, final String paymentKey) {
+    private void exceptionable(final RestClientResponseException e) {
         try {
             String responseBody = e.getResponseBodyAsString();
             JsonNode jsonNode = objectMapper.readTree(responseBody);
             String errorMessage = jsonNode.get("message").asText();
 
             if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-                throw new RuntimeException("결제 확인에 실패했습니다. " + errorMessage + " - 결제 키: " + paymentKey);
+                throw new RuntimeException("결제 확인에 실패했습니다. " + errorMessage);
             }
             throw new PaymentApiException(responseBody, errorMessage, e.getStatusCode());
         } catch (JsonProcessingException parseException) {
