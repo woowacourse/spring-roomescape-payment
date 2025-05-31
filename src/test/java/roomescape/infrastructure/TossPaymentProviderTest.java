@@ -4,10 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static roomescape.domain.payment.PaymentFailCode.EXTERNAL_SERVER_PROCESSING;
 import static roomescape.domain.payment.PaymentFailCode.INVALID_AUTH_CREDENTIALS;
 
 import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,19 +22,28 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.test.web.client.response.MockRestResponseCreators;
+import org.springframework.web.client.RestTemplate;
+import roomescape.domain.payment.PaymentFailCode;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
-import roomescape.domain.payment.PaymentFailCode;
 
 @RestClientTest(PaymentProvider.class)
-@Import(TossPaymentConfig.class)
+@Import(TossPaymentProviderConfig.class)
 class TossPaymentProviderTest {
 
+    private static final String EXPECTED_CONFIRM_URI = "https://api.tosspayments.com/v1/payments/confirm";
+
     @Autowired
+    private RestTemplate restTemplate;
+
     private MockRestServiceServer server;
-    @Autowired
     private PaymentProvider paymentProvider;
+
+    @BeforeEach
+    public void setup() {
+        paymentProvider = new TossPaymentProvider(restTemplate);
+        server = MockRestServiceServer.createServer(restTemplate);
+    }
 
     @Test
     @DisplayName("결제 승인 API 스펙에 맞게 HTTP 요청을 보낸다.")
@@ -39,9 +51,9 @@ class TossPaymentProviderTest {
         // given
         var request = new PaymentRequest("a", "1", 1000);
 
-        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+        server.expect(requestTo(EXPECTED_CONFIRM_URI))
             .andExpect(method(HttpMethod.POST))
-            .andRespond(MockRestResponseCreators.withSuccess());
+            .andRespond(withSuccess());
 
         // when
         paymentProvider.confirm(request);
@@ -64,9 +76,9 @@ class TossPaymentProviderTest {
             }
             """;
 
-        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+        server.expect(requestTo(EXPECTED_CONFIRM_URI))
             .andExpect(method(HttpMethod.POST))
-            .andRespond(MockRestResponseCreators.withSuccess(response, MediaType.APPLICATION_JSON));
+            .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
 
         // when
         var paymentDetails = paymentProvider.confirm(request);
@@ -86,9 +98,9 @@ class TossPaymentProviderTest {
         // given
         var request = new PaymentRequest("a", "1", 1000);
 
-        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+        server.expect(requestTo(EXPECTED_CONFIRM_URI))
             .andExpect(method(HttpMethod.POST))
-            .andRespond(MockRestResponseCreators.withBadRequest().contentType(MediaType.APPLICATION_JSON).body(response));
+            .andRespond(withBadRequest().contentType(MediaType.APPLICATION_JSON).body(response));
 
         // when
         var paymentDetails = paymentProvider.confirm(request);

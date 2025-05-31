@@ -1,30 +1,26 @@
 package roomescape.infrastructure;
 
-import static roomescape.domain.payment.PaymentFailCode.EXTERNAL_SERVER_PROCESSING;
 import static roomescape.domain.payment.PaymentFailCode.CONDITION_NOT_SATISFIED;
+import static roomescape.domain.payment.PaymentFailCode.EXTERNAL_SERVER_PROCESSING;
 import static roomescape.domain.payment.PaymentFailCode.INVALID_AUTH_CREDENTIALS;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClient.RequestHeadersSpec.ConvertibleClientHttpResponse;
+import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.client.RestTemplate;
 import roomescape.domain.payment.PaymentConfirmation;
 import roomescape.domain.payment.PaymentDetails;
 import roomescape.domain.payment.PaymentFailCode;
+import roomescape.domain.payment.PaymentFailure;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
-import roomescape.domain.payment.PaymentFailure;
 
+@RequiredArgsConstructor
 @Component
 public class TossPaymentProvider implements PaymentProvider {
-
-    private static final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
-    private static final String NO_PASSWORD_SIGN = ":";
-    private static final String AUTHORIZATION_HEADER_VALUE = "Basic " + base64Encode(WIDGET_SECRET_KEY + NO_PASSWORD_SIGN);
 
     private static final Map<String, PaymentFailCode> tossFailureCodeMappings = Map.ofEntries(
         Map.entry("INVALID_API_KEY", INVALID_AUTH_CREDENTIALS),
@@ -35,43 +31,40 @@ public class TossPaymentProvider implements PaymentProvider {
         Map.entry("UNKNOWN_PAYMENT_ERROR", EXTERNAL_SERVER_PROCESSING)
     );
 
-    private final RestClient restClient;
+    private static final String CONFIRM_URI = "/v1/payments/confirm";
 
-    public TossPaymentProvider(final RestClient restClient) {
-        this.restClient = restClient;
-    }
+    private final RestTemplate restTemplate;
 
-    @Override
-    public PaymentDetails confirm(final PaymentRequest paymentRequest) {
-        var confirmUri = "/v1/payments/confirm";
-        return restClient.post()
-                .uri(confirmUri)
-                .header("Authorization", AUTHORIZATION_HEADER_VALUE)
-                .header("Content-Type", "application/json")
-                .body(paymentRequest)
-                .exchange((request, response) -> convertToDetails(response));
-    }
-
-    private PaymentDetails convertToDetails(final ConvertibleClientHttpResponse tossResponse) throws IOException {
-        if (HttpStatus.OK == tossResponse.getStatusCode()) {
-            var confirmation = tossResponse.bodyTo(PaymentConfirmation.class);
-            return new PaymentDetails(confirmation);
+    public PaymentDetails confirm(final PaymentRequest request) {
+        try {
+            return sendRequestForConfirmation(request);
+        } catch (final RestClientResponseException e) {
+            return createFailureDetails(e);
         }
-        var tossFailureResponse = tossResponse.bodyTo(TossFailureResponse.class);
-        var paymentFailure = convertToPaymentFailure(tossFailureResponse);
+    }
+
+    private PaymentDetails sendRequestForConfirmation(final PaymentRequest request) {
+        var successResponse = restTemplate.postForEntity(CONFIRM_URI, request, PaymentConfirmation.class);
+        var paymentConfirmation = successResponse.getBody();
+        return new PaymentDetails(paymentConfirmation);
+    }
+
+    private PaymentDetails createFailureDetails(final RestClientResponseException e) {
+        var failureResponse = readTossFailureResponse(e);
+        var failureCode = tossFailureCodeMappings.getOrDefault(failureResponse.code(), CONDITION_NOT_SATISFIED);
+        var paymentFailure = new PaymentFailure(failureCode, failureResponse.message());
         return new PaymentDetails(paymentFailure);
     }
 
-    private PaymentFailure convertToPaymentFailure(final TossFailureResponse tossResponse) {
-        var failureCode = tossFailureCodeMappings.getOrDefault(tossResponse.code(), CONDITION_NOT_SATISFIED);
-        return new PaymentFailure(failureCode, tossResponse.message());
+    private TossFailureResponse readTossFailureResponse(final RestClientResponseException e) {
+        var objectMapper = new ObjectMapper();
+        var json = e.getResponseBodyAsString();
+        try {
+            return objectMapper.readValue(json, TossFailureResponse.class);
+        } catch (JsonProcessingException jsonEx) {
+            throw new RuntimeException(jsonEx);
+        }
     }
 
     private record TossFailureResponse(String code, String message) {}
-
-    private static String base64Encode(final String string) {
-        var base64Encoder = Base64.getEncoder();
-        var encodedBytes = base64Encoder.encode(string.getBytes(StandardCharsets.UTF_8));
-        return new String(encodedBytes);
-    }
 }
