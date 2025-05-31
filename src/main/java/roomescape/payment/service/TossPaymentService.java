@@ -61,7 +61,8 @@ public class TossPaymentService {
         }
         PaymentFailure failure = response.failure();
         if (IGNORE_CODES.contains(failure.code())) {
-            throw new CustomException(ErrorCode.SERVER_ERROR, failure.message());
+            // TODO: failure.message() Logging
+            throw new CustomException(ErrorCode.SERVER_ERROR);
         }
         throw new BadRequestException(failure.message());
     }
