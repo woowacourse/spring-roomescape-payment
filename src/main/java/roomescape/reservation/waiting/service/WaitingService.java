@@ -13,18 +13,18 @@ import roomescape.common.exception.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberId;
 import roomescape.member.repository.MemberRepository;
-import roomescape.reservation.time.domain.ReservationTime;
-import roomescape.reservation.time.domain.ReservationTimeId;
-import roomescape.theme.domain.Theme;
-import roomescape.theme.domain.ThemeId;
-import roomescape.reservation.waiting.domain.Waiting;
-import roomescape.reservation.waiting.domain.WaitingId;
 import roomescape.reservation.dto.request.WaitingCreateRequest;
 import roomescape.reservation.dto.response.WaitingResponse;
 import roomescape.reservation.repository.ReservationRepository;
+import roomescape.reservation.time.domain.ReservationTime;
+import roomescape.reservation.time.domain.ReservationTimeId;
 import roomescape.reservation.time.repository.ReservationTimeRepository;
-import roomescape.theme.repository.ThemeRepository;
+import roomescape.reservation.waiting.domain.Waiting;
+import roomescape.reservation.waiting.domain.WaitingId;
 import roomescape.reservation.waiting.repository.WaitingRepository;
+import roomescape.theme.domain.Theme;
+import roomescape.theme.domain.ThemeId;
+import roomescape.theme.repository.ThemeRepository;
 
 @Service
 public class WaitingService {
@@ -104,13 +104,13 @@ public class WaitingService {
 
     private Waiting getWaiting(final WaitingCreateRequest request) {
         Member member = getMember(request);
-        ReservationTime time = gerReservationTime(request);
+        ReservationTime time = getReservationTime(request);
         Theme theme = getTheme(request);
 
         return new Waiting(request.date(), member, time, theme);
     }
 
-    private ReservationTime gerReservationTime(final WaitingCreateRequest request) {
+    private ReservationTime getReservationTime(final WaitingCreateRequest request) {
         Long timeId = request.timeId();
         return reservationTimeRepository.findById(new ReservationTimeId(timeId))
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 예약시간 입니다."));
