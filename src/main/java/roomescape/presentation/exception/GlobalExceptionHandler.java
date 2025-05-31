@@ -1,5 +1,7 @@
 package roomescape.presentation.exception;
 
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -12,9 +14,6 @@ import roomescape.application.exception.AuthException;
 import roomescape.application.exception.PaymentException;
 import roomescape.domain.exception.PastReservationException;
 import roomescape.presentation.dto.response.ErrorResponse;
-
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
