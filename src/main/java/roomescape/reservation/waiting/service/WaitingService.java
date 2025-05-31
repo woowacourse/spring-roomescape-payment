@@ -69,8 +69,7 @@ public class WaitingService {
         }
 
         Waiting waiting = getWaiting(request);
-        LocalDateTime now = LocalDateTime.now();
-        validateDateTime(now, waiting.getDate(), waiting.getTime().getStartAt());
+        validatePastDateTime(waiting.getDate(), waiting.getTime().getStartAt());
 
         Waiting savedWaiting = waitingRepository.save(waiting);
         return WaitingResponse.from(savedWaiting);
@@ -128,8 +127,9 @@ public class WaitingService {
                 .orElseThrow(() -> new EntityNotFoundException("등록되지 않은 회원입니다."));
     }
 
-    private void validateDateTime(final LocalDateTime now, final LocalDate date, final LocalTime time) {
+    private void validatePastDateTime(final LocalDate date, final LocalTime time) {
         LocalDateTime reservationDateTime = LocalDateTime.of(date, time);
+        LocalDateTime now = LocalDateTime.now();
 
         if (now.isAfter(reservationDateTime)) {
             throw new IllegalArgumentException("이미 지난 예약 시간입니다.");
