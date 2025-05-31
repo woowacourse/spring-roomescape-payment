@@ -23,12 +23,6 @@ import roomescape.member.domain.MemberId;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationId;
-import roomescape.reservation.time.domain.ReservationTime;
-import roomescape.reservation.time.domain.ReservationTimeId;
-import roomescape.theme.domain.Theme;
-import roomescape.theme.domain.ThemeId;
-import roomescape.reservation.waiting.domain.Waiting;
-import roomescape.reservation.waiting.domain.WaitingWithRank;
 import roomescape.reservation.dto.request.FilteringReservationRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.response.BookedReservationTimeResponse;
@@ -38,9 +32,15 @@ import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.reservation.payment.dto.request.PaymentRequest;
 import roomescape.reservation.payment.service.PaymentService;
 import roomescape.reservation.repository.ReservationRepository;
+import roomescape.reservation.time.domain.ReservationTime;
+import roomescape.reservation.time.domain.ReservationTimeId;
 import roomescape.reservation.time.repository.ReservationTimeRepository;
-import roomescape.theme.repository.ThemeRepository;
+import roomescape.reservation.waiting.domain.Waiting;
+import roomescape.reservation.waiting.domain.WaitingWithRank;
 import roomescape.reservation.waiting.repository.WaitingRepository;
+import roomescape.theme.domain.Theme;
+import roomescape.theme.domain.ThemeId;
+import roomescape.theme.repository.ThemeRepository;
 
 @Service
 public class ReservationService {
@@ -77,13 +77,12 @@ public class ReservationService {
     }
 
     public List<MyReservationsResponse> getAllMyReservations(final LoginMember loginMember) {
-        List<Reservation> reservations = reservationRepository.findAllByMemberId(new MemberId(loginMember.id()))
-                .stream()
-                .toList();
+        List<Reservation> reservations = reservationRepository.findAllByMemberId(
+                new MemberId(loginMember.id())
+        );
         List<WaitingWithRank> waitingWithRanks = waitingRepository.findAllWaitingWithRankByMemberId(
-                        new MemberId(loginMember.id()))
-                .stream()
-                .toList();
+                new MemberId(loginMember.id())
+        );
         return toMyReservationResponses(reservations, waitingWithRanks);
     }
 
