@@ -33,7 +33,7 @@ VALUES ('Theme 1', '설명1',
         '2025-05-23 18:37:43.488281', '2025-05-23 18:37:43.488281');
 
 -- reservation
-INSERT INTO reservation(date, reservation_time_id, theme_id, member_id, created_at, updated_at, payment_history_id)
+INSERT INTO reservation(date, reservation_time_id, theme_id, member_id, created_at, updated_at, payment_result_id)
 VALUES ('2025-05-10', 1, 1, 1, '2025-05-23 19:37:43.488281', '2025-05-23 19:37:43.488281', NULL),
 
        ('2025-05-10', 1, 2, 1, '2025-05-23 19:37:43.488281', '2025-05-23 19:37:43.488281', NULL),
@@ -49,7 +49,7 @@ VALUES ('2025-05-10', 1, 1, 1, '2025-05-23 19:37:43.488281', '2025-05-23 19:37:4
        ('2025-05-30', 4, 4, 1, '2025-05-23 19:37:43.488281', '2025-05-23 19:37:43.488281', NULL);
 
 -- waiting
-INSERT INTO waiting(date, theme_id, time_id, member_id, created_at, updated_at, payment_history_id)
+INSERT INTO waiting(date, theme_id, time_id, member_id, created_at, updated_at, payment_result_id)
 VALUES ('2025-05-10', 1, 1, 2, '2025-05-23 20:37:43.488281', '2025-05-23 20:37:43.488281', NULL),
        ('2025-05-10', 1, 1, 3, '2025-05-23 21:37:43.488281', '2025-05-23 20:37:43.488281', NULL),
        ('2025-05-10', 1, 1, 4, '2025-05-23 22:37:43.488281', '2025-05-23 20:37:43.488281', NULL);
