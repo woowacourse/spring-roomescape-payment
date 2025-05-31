@@ -1,22 +1,18 @@
 package roomescape.controller.api;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestClient;
 import roomescape.client.PaymentClient;
-import roomescape.controller.annotation.AdminMember;
+import roomescape.controller.annotation.AdminOnly;
 import roomescape.controller.annotation.CurrentMember;
 import roomescape.dto.auth.LoginInfo;
 import roomescape.dto.reservation.MemberReservationCreateRequestDto;
 import roomescape.dto.reservation.MyReservationResponseDto;
 import roomescape.dto.reservation.ReservationResponseDto;
-import roomescape.dto.reservation.TossPaymentConfirmRequestDto;
 import roomescape.service.command.ReservationCommandService;
 import roomescape.service.dto.ReservationCreateDto;
 import roomescape.service.query.ReservationQueryService;
 
-import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -35,11 +31,10 @@ public class ReservationController {
         this.paymentClient = paymentClient;
     }
 
+    @AdminOnly
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ReservationResponseDto> getAllReservationWaitings(
-            @AdminMember LoginInfo loginInfo
-    ) {
+    public List<ReservationResponseDto> getAllReservationWaitings() {
         return reservationQueryService.findAllReservations();
     }
 
