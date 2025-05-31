@@ -2,7 +2,7 @@ package roomescape.payment.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.ResponseErrorHandler;
+import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
 import roomescape.payment.error.PaymentClientErrorHandler;
 import roomescape.payment.error.PaymentServerErrorHandler;
 
@@ -10,12 +10,12 @@ import roomescape.payment.error.PaymentServerErrorHandler;
 public class PaymentErrorHandlerConfig {
 
     @Bean
-    public ResponseErrorHandler paymentClientErrorHandler() {
+    public ErrorHandler paymentClientErrorHandler() {
         return new PaymentClientErrorHandler();
     }
 
     @Bean
-    public ResponseErrorHandler paymentServerErrorHandler() {
+    public ErrorHandler paymentServerErrorHandler() {
         return new PaymentServerErrorHandler();
     }
 }

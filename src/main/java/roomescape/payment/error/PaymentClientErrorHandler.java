@@ -3,22 +3,16 @@ package roomescape.payment.error;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.net.URI;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.web.client.ResponseErrorHandler;
+import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
 import roomescape.global.error.exception.BadRequestException;
 import roomescape.payment.dto.response.PaymentErrorResponse;
 
-public class PaymentClientErrorHandler implements ResponseErrorHandler {
+public class PaymentClientErrorHandler implements ErrorHandler {
 
     @Override
-    public boolean hasError(ClientHttpResponse response) throws IOException {
-        return response.getStatusCode().is4xxClientError();
-    }
-
-    @Override
-    public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
+    public void handle(HttpRequest request, ClientHttpResponse response) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 

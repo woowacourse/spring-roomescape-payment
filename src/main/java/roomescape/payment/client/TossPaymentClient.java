@@ -1,9 +1,10 @@
 package roomescape.payment.client;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
 import roomescape.payment.dto.request.PaymentConfirmRequest;
 import roomescape.payment.dto.response.PaymentConfirmResponse;
 
@@ -11,13 +12,13 @@ import roomescape.payment.dto.response.PaymentConfirmResponse;
 public class TossPaymentClient implements PaymentClient {
 
     private final RestClient restClient;
-    private final ResponseErrorHandler paymentClientErrorHandler;
-    private final ResponseErrorHandler paymentServerErrorHandler;
+    private final ErrorHandler paymentClientErrorHandler;
+    private final ErrorHandler paymentServerErrorHandler;
 
     public TossPaymentClient(
             @Qualifier("tossPaymentRestClient") RestClient restClient,
-            @Qualifier("paymentClientErrorHandler") ResponseErrorHandler clientErrorHandler,
-            @Qualifier("paymentServerErrorHandler") ResponseErrorHandler serverErrorHandler
+            @Qualifier("paymentClientErrorHandler") ErrorHandler clientErrorHandler,
+            @Qualifier("paymentServerErrorHandler") ErrorHandler serverErrorHandler
     ) {
         this.restClient = restClient;
         this.paymentClientErrorHandler = clientErrorHandler;
@@ -31,8 +32,8 @@ public class TossPaymentClient implements PaymentClient {
         return restClient.post()
                 .body(new PaymentConfirmRequest(paymentKey, orderId, amount))
                 .retrieve()
-                .onStatus(paymentClientErrorHandler)
-                .onStatus(paymentServerErrorHandler)
+                .onStatus(HttpStatusCode::is4xxClientError, paymentClientErrorHandler)
+                .onStatus(HttpStatusCode::is5xxServerError, paymentServerErrorHandler)
                 .body(PaymentConfirmResponse.class);
     }
 }
