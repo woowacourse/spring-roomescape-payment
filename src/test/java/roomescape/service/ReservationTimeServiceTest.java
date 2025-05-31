@@ -1,53 +1,30 @@
 package roomescape.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import roomescape.domain.member.Member;
+import roomescape.domain.member.MemberRole;
+import roomescape.domain.reservation.ReservationStatus;
+import roomescape.domain.reservationitem.ReservationItem;
+import roomescape.domain.reservationitem.ReservationTheme;
+import roomescape.domain.reservationitem.ReservationTime;
+import roomescape.dto.request.ReservationTimeRequest;
+import roomescape.dto.response.ReservationTimeResponse;
+import roomescape.service.reservation.ReservationTimeService;
+import roomescape.test_util.ServiceTest;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.TestPropertySource;
-import roomescape.dto.request.CreateReservationRequest;
-import roomescape.dto.request.MemberRegisterRequest;
-import roomescape.dto.request.ReservationThemeRequest;
-import roomescape.dto.request.ReservationTimeRequest;
-import roomescape.dto.response.MemberRegisterResponse;
-import roomescape.dto.response.ReservationResponse;
-import roomescape.dto.response.ReservationThemeResponse;
-import roomescape.dto.response.ReservationTimeResponse;
-import roomescape.service.member.MemberService;
-import roomescape.service.reservation.ReservationService;
-import roomescape.service.reservation.ReservationThemeService;
-import roomescape.service.reservation.ReservationTimeService;
 
-@SpringBootTest
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-@TestPropertySource(properties = {
-        "spring.sql.init.mode=never",
-        "spring.jpa.hibernate.ddl-auto=create-drop"
-})
-class ReservationTimeServiceTest {
+import static org.assertj.core.api.Assertions.*;
+
+class ReservationTimeServiceTest extends ServiceTest {
 
     @Autowired
     private ReservationTimeService reservationTimeService;
-
-    @Autowired
-    private ReservationThemeService reservationThemeService;
-
-    @Autowired
-    private MemberService memberService;
-
-    @Autowired
-    private ReservationService reservationService;
 
     @Test
     @DisplayName("예약 시간을 성공적으로 추가한다")
@@ -59,30 +36,25 @@ class ReservationTimeServiceTest {
         ReservationTimeResponse response = reservationTimeService.addReservationTime(reservationTimeRequest);
 
         // then
-        assertAll(
-                () -> assertThat(response.id()).isEqualTo(1L),
-                () -> assertThat(response.startAt()).isEqualTo(LocalTime.of(12, 12))
-        );
+        assertThat(response.startAt()).isEqualTo(LocalTime.of(12, 12));
     }
 
     @Test
     @DisplayName("예약 시간을 삭제한다")
     void removeReservationTimeTest() {
         // given
-        ReservationTimeRequest reservationTimeRequest = new ReservationTimeRequest(LocalTime.of(12, 12));
-        reservationTimeService.addReservationTime(reservationTimeRequest);
-        Long id = 1L;
+        ReservationTime savedTime = insertReservationTime(LocalTime.of(12, 12));
 
         // when, then
-        assertThatCode(() -> reservationTimeService.removeReservationTime(id))
+        assertThatCode(() -> reservationTimeService.removeReservationTime(savedTime.getId()))
                 .doesNotThrowAnyException();
     }
 
     @Test
-    @DisplayName("예약 시간이 예약에 사용되고 있다면 예외가 발생한다")
+    @DisplayName("존재하지 않는 예약 시간을 삭제하면 예외가 발생한다.")
     void removeReferencedReservationTimeTest() {
         // given
-        Long id = 1L;
+        long id = 1L;
 
         // when, then
         assertThatThrownBy(() -> reservationTimeService.removeReservationTime(id))
@@ -93,12 +65,10 @@ class ReservationTimeServiceTest {
     @DisplayName("모든 예약 시간을 검색한다")
     void findReservationTimesTest() {
         // given
-        ReservationTimeRequest reservationTimeRequest = new ReservationTimeRequest(LocalTime.of(12, 12));
-        reservationTimeService.addReservationTime(reservationTimeRequest);
+        insertReservationTime(LocalTime.of(12, 12));
 
         // when
         List<ReservationTimeResponse> reservationTimes = reservationTimeService.findReservationTimesInfo();
-
 
         // then
         assertThat(reservationTimes).hasSize(1);
@@ -108,18 +78,14 @@ class ReservationTimeServiceTest {
     @DisplayName("이미 예약이 존재하는 상황에 시간을 삭제하려 하면 예외가 발생한다.")
     void deleteExistReservationTest() {
         // given
-        final MemberRegisterResponse member = memberService.addMember(
-                new MemberRegisterRequest("test", "test", "test"));
-        final ReservationThemeResponse theme = reservationThemeService.addReservationTheme(
-                new ReservationThemeRequest("test", "test", "test"));
-        final ReservationTimeResponse time = reservationTimeService.addReservationTime(
-                new ReservationTimeRequest(LocalTime.now()));
-        final ReservationResponse reservation = reservationService.addReservation(
-                new CreateReservationRequest(member.id(), LocalDate.now().plusDays(1), theme.id(), time.id())
-        );
+        ReservationTheme theme = insertReservationTheme("테마", "설명", "썸네일");
+        ReservationTime time = insertReservationTime(LocalTime.of(12, 12));
+        ReservationItem item = insertReservationItem(LocalDate.now().plusDays(1), time, theme);
+        Member member = insertMember("이메일", "비밀번호", "이름", MemberRole.USER);
+        insertReservation(member, item, ReservationStatus.PENDING);
 
         // when, then
-        assertThatThrownBy(() -> reservationTimeService.removeReservationTime(time.id()))
+        assertThatThrownBy(() -> reservationTimeService.removeReservationTime(time.getId()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

@@ -150,7 +150,7 @@ class ReservationThemeRepositoryImplTest {
         //given
         Long themeId = savedTheme1.getId();
 
-        //when & then
+        //when, then
         assertAll(
                 () -> assertThatCode(() -> repository.deleteById(themeId)).doesNotThrowAnyException(),
                 () -> assertThat(repository.findById(themeId)).isEmpty()

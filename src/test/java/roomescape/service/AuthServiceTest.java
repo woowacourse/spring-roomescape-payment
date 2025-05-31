@@ -1,51 +1,27 @@
 package roomescape.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
-import java.util.NoSuchElementException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.TestPropertySource;
-import roomescape.config.JpaConfig;
 import roomescape.domain.member.Member;
-import roomescape.domain.member.MemberRepository;
 import roomescape.dto.request.LoginRequest;
 import roomescape.dto.request.MemberRegisterRequest;
 import roomescape.dto.response.MemberRegisterResponse;
-import roomescape.global.PasswordEncoder;
-import roomescape.repository.impl.MemberRepositoryImpl;
-import roomescape.repository.jpa.MemberJpaRepository;
 import roomescape.service.auth.AuthService;
 import roomescape.service.member.MemberService;
+import roomescape.test_util.ServiceTest;
 
-@TestPropertySource(properties = {
-        "spring.sql.init.mode=never",
-        "spring.jpa.hibernate.ddl-auto=create-drop"
-})
-@Import(JpaConfig.class)
-@DataJpaTest
-class AuthServiceTest {
+import java.util.NoSuchElementException;
 
-    private AuthService authService;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
-    private MemberService memberService;
+class AuthServiceTest extends ServiceTest {
 
     @Autowired
-    private MemberJpaRepository memberJpaRepository;
-
-    @BeforeEach
-    void setUp() {
-        final MemberRepository memberRepository = new MemberRepositoryImpl(memberJpaRepository);
-        final PasswordEncoder passwordEncoder = new PasswordEncoder();
-        memberService = new MemberService(memberRepository, passwordEncoder);
-        authService = new AuthService(memberService, passwordEncoder);
-    }
+    private AuthService authService;
+    @Autowired
+    private MemberService memberService;
 
     @Test
     @DisplayName("사용자의 이메일, 비밀번호를 확인한 후 사용자의 아이디를 반환한다.")

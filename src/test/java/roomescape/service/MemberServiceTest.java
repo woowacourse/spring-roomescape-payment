@@ -1,57 +1,35 @@
 package roomescape.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
-import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.TestPropertySource;
-import roomescape.config.JpaConfig;
 import roomescape.domain.member.Member;
-import roomescape.domain.member.MemberRepository;
 import roomescape.dto.request.MemberRegisterRequest;
 import roomescape.dto.response.MemberRegisterResponse;
 import roomescape.dto.response.MemberResponse;
-import roomescape.global.PasswordEncoder;
-import roomescape.repository.impl.MemberRepositoryImpl;
-import roomescape.repository.jpa.MemberJpaRepository;
 import roomescape.service.member.MemberService;
+import roomescape.test_util.ServiceTest;
 
-@TestPropertySource(properties = {
-        "spring.sql.init.mode=never",          // SQL 스크립트 실행 중지
-        "spring.jpa.hibernate.ddl-auto=create-drop",  // Hibernate DDL 자동 생성 비활성화
-})
-@Import(JpaConfig.class)
-@DataJpaTest
-class MemberServiceTest {
+import java.util.List;
 
-    private MemberService memberService;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
+class MemberServiceTest extends ServiceTest {
 
     @Autowired
-    private MemberJpaRepository memberJpaRepository;
-
-    @BeforeEach
-    void setUp() {
-        MemberRepository memberRepository = new MemberRepositoryImpl(memberJpaRepository);
-        memberService = new MemberService(memberRepository, new PasswordEncoder());
-    }
+    private MemberService memberService;
 
     @DisplayName("사용자를 정상적으로 추가한다")
     @Test
     void addMember() {
-        //given
+        // given
         final MemberRegisterRequest memberRegisterRequest = new MemberRegisterRequest("test", "test", "차니");
 
-        //when
+        // when
         final MemberRegisterResponse expected = memberService.addMember(memberRegisterRequest);
 
-        //then
+        // then
         assertAll(
                 () -> assertThat(expected.name()).isEqualTo("차니"),
                 () -> assertThat(expected.email()).isEqualTo("test")
@@ -74,14 +52,14 @@ class MemberServiceTest {
     @DisplayName("모든 사용자를 조회한다")
     @Test
     void getAllMembers() {
-        //given
+        // given
         final MemberRegisterRequest memberRegisterRequest = new MemberRegisterRequest("test", "test", "차니");
         memberService.addMember(memberRegisterRequest);
 
-        //when
+        // when
         final List<MemberResponse> expected = memberService.getAllMembers();
 
-        //then
+        // then
         assertThat(expected).hasSize(1);
 
     }
@@ -89,14 +67,14 @@ class MemberServiceTest {
     @DisplayName("사용자의 id로 사용자를 조회한다")
     @Test
     void getMemberById() {
-        //given
+        // given
         final MemberRegisterRequest memberRegisterRequest = new MemberRegisterRequest("test", "test", "차니");
         final MemberRegisterResponse saved = memberService.addMember(memberRegisterRequest);
 
-        //when
+        // when
         final Member expected = memberService.getMemberById(saved.id());
 
-        //then
+        // then
         assertAll(
                 () -> assertThat(expected.getName()).isEqualTo("차니"),
                 () -> assertThat(expected.getEmail()).isEqualTo("test")
