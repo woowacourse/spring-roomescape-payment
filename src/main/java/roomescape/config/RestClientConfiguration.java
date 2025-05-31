@@ -19,14 +19,6 @@ public class RestClientConfiguration {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private static final Set<String> INVISIBLE_CLIENT_ERROR_CODE = Set.of(
-            "INVALID_API_KEY",
-            "INVALID_AUTHORIZE_AUTH",
-            "UNAPPROVED_ORDER_ID",
-            "UNAUTHORIZED_KEY",
-            "INCORRECT_BASIC_AUTH_FORMAT"
-    );
-
     @Bean
     public RestClient restClient() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
@@ -36,18 +28,15 @@ public class RestClientConfiguration {
         return RestClient.builder()
                 .requestFactory(factory)
                 .defaultStatusHandler(HttpStatusCode::is4xxClientError, (req, res) -> {
-                    JsonNode root = objectMapper.readTree(res.getBody());
-                    String message = root.path("message").asText();
-                    String code = root.path("code").asText();
-                    if (INVISIBLE_CLIENT_ERROR_CODE.contains(code)) {
-                        throw new PaymentConfirmServerException(message);
+                    RestClientErrorResponse restClientErrorResponse = objectMapper.readValue(res.getBody(), RestClientErrorResponse.class);
+                    if (restClientErrorResponse.isInvisibleError()) {
+                        throw new PaymentConfirmServerException(restClientErrorResponse.getMessage());
                     }
-                    throw new PaymentConfirmClientException(message);
+                    throw new PaymentConfirmClientException(restClientErrorResponse.getMessage());
                 })
                 .defaultStatusHandler(HttpStatusCode::is5xxServerError, (req, res) -> {
-                    JsonNode root = objectMapper.readTree(res.getBody());
-                    String message = root.path("message").asText();
-                    throw new PaymentConfirmServerException(message);
+                    RestClientErrorResponse restClientErrorResponse = objectMapper.readValue(res.getBody(), RestClientErrorResponse.class);
+                    throw new PaymentConfirmClientException(restClientErrorResponse.getMessage());
                 })
                 .build();
     }
