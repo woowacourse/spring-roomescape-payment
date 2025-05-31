@@ -3,7 +3,9 @@ package roomescape.payment.service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import roomescape.common.exception.PaymentClientException;
+import roomescape.common.exception.BadRequestException;
+import roomescape.common.exception.CustomException;
+import roomescape.common.exception.vo.ErrorCode;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.service.dto.ConfirmPaymentRequest;
 import roomescape.payment.service.dto.ConfirmPaymentResponse;
@@ -59,8 +61,8 @@ public class TossPaymentService {
         }
         PaymentFailure failure = response.failure();
         if (IGNORE_CODES.contains(failure.code())) {
-            throw new RuntimeException(failure.message());
+            throw new CustomException(ErrorCode.SERVER_ERROR, failure.message());
         }
-        throw new PaymentClientException(failure.message());
+        throw new BadRequestException(failure.message());
     }
 }

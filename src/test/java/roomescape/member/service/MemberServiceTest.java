@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import roomescape.common.exception.EntityNotFoundException;
+import roomescape.common.exception.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
@@ -49,6 +49,6 @@ class MemberServiceTest {
         memberRepository.save(new Member("이프", email, password, Role.MEMBER));
 
         assertThatThrownBy(() -> memberService.findMemberByEmailAndPassword(unmatchedEmail, unmatchedPassword))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(NotFoundException.class);
     }
 }

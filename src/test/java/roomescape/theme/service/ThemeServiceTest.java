@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import roomescape.common.exception.AlreadyInUseException;
-import roomescape.common.exception.EntityNotFoundException;
+import roomescape.common.exception.ConflictException;
+import roomescape.common.exception.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
@@ -104,7 +104,7 @@ class ThemeServiceTest {
     void test5() {
         // when & then
         assertThatThrownBy(() -> themeService.delete(1L))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(NotFoundException.class);
     }
 
     @DisplayName("예약 정보가 있는 테마의 경우 삭제할 수 없다")
@@ -125,7 +125,7 @@ class ThemeServiceTest {
 
         // when & then
         assertThatThrownBy(() -> themeService.delete(themeId))
-                .isInstanceOf(AlreadyInUseException.class);
+                .isInstanceOf(ConflictException.class);
     }
 
     @DisplayName("1~8일 전 사이의 예약이 많은 최대 10개의 테마 정보를 가져온다")

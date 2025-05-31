@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
-import roomescape.common.exception.AuthenticationException;
+import roomescape.common.exception.UnauthorizedException;
 
 @Component
 public class AuthTokenCookieProvider {
@@ -18,14 +18,14 @@ public class AuthTokenCookieProvider {
     public String extractToken(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
-            throw new AuthenticationException("로그인이 필요한 서비스입니다.");
+            throw new UnauthorizedException("로그인이 필요한 서비스입니다.");
         }
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals(TOKEN_NAME)) {
                 return cookie.getValue();
             }
         }
-        throw new AuthenticationException("로그인이 필요한 서비스입니다.");
+        throw new UnauthorizedException("로그인이 필요한 서비스입니다.");
     }
 
     public ResponseCookie generate(String token) {

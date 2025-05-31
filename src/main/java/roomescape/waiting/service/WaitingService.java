@@ -3,8 +3,8 @@ package roomescape.waiting.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.service.dto.LoginMember;
-import roomescape.common.exception.EntityNotFoundException;
 import roomescape.common.exception.ForbiddenException;
+import roomescape.common.exception.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.ReservationTime;
@@ -55,9 +55,9 @@ public class WaitingService {
     private Waiting getAuthorizedWaiting(final Long id, LoginMember loginMember) {
         return switch (loginMember.role()) {
             case ADMIN -> waitingRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 대기 예약 건입니다."));
+                    .orElseThrow(() -> new NotFoundException("존재하지 않는 대기 예약 건입니다."));
             case MEMBER -> waitingRepository.findByIdAndMemberId(id, loginMember.id())
-                    .orElseThrow(() -> new ForbiddenException("권한이 없습니다."));
+                    .orElseThrow(() -> new ForbiddenException("삭제 권한이 없습니다."));
         };
     }
 
@@ -75,16 +75,16 @@ public class WaitingService {
 
     private Member getMember(final Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotFoundException("등록되지 않은 회원입니다."));
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 회원입니다."));
     }
 
     private Theme getTheme(final Long themeId) {
         return themeRepository.findById(themeId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("%d 식별자를 갖는 테마가 존재하지 않습니다.", themeId)));
+                .orElseThrow(() -> new NotFoundException("테마", themeId));
     }
 
     private ReservationTime getReservationTime(final Long timeId) {
         return timeRepository.findById(timeId)
-                .orElseThrow(() -> new EntityNotFoundException(String.format("%d 식별자를 갖는 예약 시간이 존재하지 않습니다.", timeId)));
+                .orElseThrow(() -> new NotFoundException("예약 시간", timeId));
     }
 }

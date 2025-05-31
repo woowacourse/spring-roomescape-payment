@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import roomescape.common.exception.BadRequestException;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -24,7 +25,7 @@ class PasswordTest {
     @ParameterizedTest
     void createPasswordByBlankValue(String value) {
         assertThatThrownBy(() -> new Password(value))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @DisplayName("비밀번호 값이 유효 길이 범위를 벗어나면 비밀번호를 생성할 수 없다.")
@@ -32,6 +33,6 @@ class PasswordTest {
     @ParameterizedTest
     void createPasswordByInvalidLength(String value) {
         assertThatThrownBy(() -> new Password(value))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 }

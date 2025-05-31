@@ -1,5 +1,7 @@
 package roomescape.member.domain;
 
+import roomescape.common.exception.BadRequestException;
+
 public enum Role {
     ADMIN,
     MEMBER;
@@ -10,6 +12,6 @@ public enum Role {
                 return role;
             }
         }
-        throw new IllegalArgumentException("존재하지 않는 권한입니다.");
+        throw new BadRequestException("존재하지 않는 권한입니다.");
     }
 }

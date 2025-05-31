@@ -1,6 +1,7 @@
 package roomescape.member.domain;
 
 import jakarta.persistence.Embeddable;
+import roomescape.common.exception.BadRequestException;
 
 import java.util.regex.Pattern;
 
@@ -20,7 +21,7 @@ public record Email(String value) {
 
     private void validateBlank(final String email) {
         if (email == null || email.isBlank()) {
-            throw new IllegalArgumentException("값이 존재하지 않습니다.");
+            throw new BadRequestException("값이 존재하지 않습니다.");
         }
     }
 
@@ -28,7 +29,7 @@ public record Email(String value) {
         if (!EMAIL_PATTERN.matcher(email)
                 .matches()
         ) {
-            throw new IllegalArgumentException("%s는 이메일 형식이 아닙니다.".formatted(email));
+            throw new BadRequestException("%s는 이메일 형식이 아닙니다.".formatted(email));
         }
     }
 }

@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import roomescape.common.exception.BadRequestException;
 
 @Entity
 public class Theme {
@@ -42,7 +43,7 @@ public class Theme {
 
     private void validateTheme() {
         if (name == null || description == null || thumbnail == null) {
-            throw new IllegalArgumentException("Theme field cannot be null");
+            throw new BadRequestException("값이 모두 입력되지 않았습니다.");
         }
     }
 

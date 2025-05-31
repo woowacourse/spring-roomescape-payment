@@ -8,7 +8,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import roomescape.auth.annotation.RequiredAdmin;
 import roomescape.auth.service.JwtTokenHandler;
 import roomescape.common.AuthTokenCookieProvider;
-import roomescape.common.exception.AuthenticationException;
+import roomescape.common.exception.UnauthorizedException;
 import roomescape.member.domain.Role;
 
 @Component
@@ -45,6 +45,6 @@ public class AdminInterceptor implements HandlerInterceptor {
         if (role == Role.ADMIN) {
             return true;
         }
-        throw new AuthenticationException("권한이 존재하지 않습니다.");
+        throw new UnauthorizedException("권한이 존재하지 않습니다.");
     }
 }

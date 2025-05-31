@@ -10,8 +10,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.auth.service.dto.LoginMember;
-import roomescape.common.exception.DuplicatedException;
-import roomescape.common.exception.EntityNotFoundException;
+import roomescape.common.exception.BadRequestException;
+import roomescape.common.exception.ConflictException;
+import roomescape.common.exception.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.payment.service.TossPaymentService;
@@ -87,7 +88,7 @@ class CreateReservationServiceTest {
 
         // when & then
         assertThatThrownBy(() -> reservationService.create(duplicatedRequest))
-                .isInstanceOf(DuplicatedException.class);
+                .isInstanceOf(ConflictException.class);
     }
 
     @DisplayName("과거 날짜에 예약을 추가하면 예외가 발생한다.")
@@ -103,7 +104,7 @@ class CreateReservationServiceTest {
 
         // when & then
         assertThatThrownBy(() -> reservationService.create(requestDto))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @DisplayName("존재하지 않는 예약 시간 ID로 저장하면 예외를 반환한다.")
@@ -116,7 +117,7 @@ class CreateReservationServiceTest {
                 new ReservationCreateRequest(date, notExistId, theme.getId(), LoginMember.of(member));
 
         assertThatThrownBy(() -> reservationService.create(requestDto))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(NotFoundException.class);
     }
 
     @DisplayName("존재하지 않는 테마 ID로 저장하면 예외를 반환한다.")
@@ -131,7 +132,7 @@ class CreateReservationServiceTest {
         ReservationCreateRequest requestDto = new ReservationCreateRequest(date, time.getId(), notExistId, LoginMember.of(member));
 
         assertThatThrownBy(() -> reservationService.create(requestDto))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(NotFoundException.class);
     }
 
     private LocalDate nextDay() {

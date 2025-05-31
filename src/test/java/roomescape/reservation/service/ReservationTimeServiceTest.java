@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import roomescape.common.exception.AlreadyInUseException;
-import roomescape.common.exception.EntityNotFoundException;
+import roomescape.common.exception.ConflictException;
+import roomescape.common.exception.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
@@ -114,7 +114,7 @@ class ReservationTimeServiceTest {
 
         // when & then
         assertThatThrownBy(() -> reservationTimeService.delete(id))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(NotFoundException.class);
     }
 
     @DisplayName("예약이 존재할 때 예약을 삭제하면 예외를 반환한다.")
@@ -130,6 +130,6 @@ class ReservationTimeServiceTest {
 
         // when & then
         assertThatThrownBy(() -> reservationTimeService.delete(timeId))
-                .isInstanceOf(AlreadyInUseException.class);
+                .isInstanceOf(ConflictException.class);
     }
 }

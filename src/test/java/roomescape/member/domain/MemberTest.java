@@ -5,6 +5,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import roomescape.common.exception.BadRequestException;
 
 import java.util.stream.Stream;
 
@@ -17,7 +18,7 @@ class MemberTest {
     @ParameterizedTest
     void createMemberByNullMemberInfo(String memberName, String email, String password) {
         assertThatThrownBy(() -> new Member(memberName, email, password, Role.MEMBER))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     private static Stream<Arguments> createMemberByNullMemberInfo() {
@@ -36,7 +37,7 @@ class MemberTest {
         String password = "12345678";
 
         assertThatThrownBy(() -> new Member(invalidName, email, password, Role.MEMBER))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @ParameterizedTest
@@ -47,7 +48,7 @@ class MemberTest {
         String password = "12345678";
 
         assertThatThrownBy(() -> new Member(name, invalidEmail, password, Role.MEMBER))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @ParameterizedTest
@@ -58,6 +59,6 @@ class MemberTest {
         String email = "if@posty.com";
 
         assertThatThrownBy(() -> new Member(name, email, invalidPassword, Role.MEMBER))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 }

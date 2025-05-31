@@ -9,8 +9,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.auth.service.dto.LoginMember;
-import roomescape.common.exception.EntityNotFoundException;
+import roomescape.common.exception.BadRequestException;
 import roomescape.common.exception.ForbiddenException;
+import roomescape.common.exception.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
@@ -131,7 +132,7 @@ class ReservationServiceTest {
         Member member = new Member("어드민", "test@test.com", "12341234", Role.ADMIN);
         Long id = 1L;
         assertThatThrownBy(() -> reservationService.delete(id, LoginMember.of(member)))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(NotFoundException.class);
     }
 
     @DisplayName("가능한 시간 대에 대하여 반환한다.")
@@ -171,7 +172,7 @@ class ReservationServiceTest {
         // when & then
         assertThatThrownBy(() -> {
             reservationService.findReservationByFiltering(request);
-        }).isInstanceOf(IllegalArgumentException.class);
+        }).isInstanceOf(BadRequestException.class);
     }
 
     private LocalDate nextDay() {

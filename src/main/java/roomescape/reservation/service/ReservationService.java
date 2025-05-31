@@ -3,8 +3,9 @@ package roomescape.reservation.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.service.dto.LoginMember;
-import roomescape.common.exception.EntityNotFoundException;
+import roomescape.common.exception.BadRequestException;
 import roomescape.common.exception.ForbiddenException;
+import roomescape.common.exception.NotFoundException;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
@@ -78,7 +79,7 @@ public class ReservationService {
 
     private void validateDateFromTo(LocalDate from, LocalDate to) {
         if (from.isAfter(to)) {
-            throw new IllegalArgumentException("종료 날짜는 시작 날짜보다 앞설 수 없습니다.");
+            throw new BadRequestException("종료 날짜는 시작 날짜보다 앞설 수 없습니다.");
         }
     }
 
@@ -95,7 +96,7 @@ public class ReservationService {
             case MEMBER -> reservationRepository.findByIdAndMemberId(id, loginMember.id())
                     .orElseThrow(() -> new ForbiddenException("삭제 권한이 없습니다."));
             case ADMIN -> reservationRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 예약입니다."));
+                    .orElseThrow(() -> new NotFoundException("존재하지 않는 예약입니다."));
         };
     }
 

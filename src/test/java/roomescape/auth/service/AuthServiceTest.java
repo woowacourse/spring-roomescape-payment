@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.auth.service.dto.request.LoginRequest;
 import roomescape.auth.service.dto.response.LoginResponse;
-import roomescape.common.exception.EntityNotFoundException;
-import roomescape.common.exception.LoginFailException;
+import roomescape.common.exception.NotFoundException;
+import roomescape.common.exception.UnauthorizedException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
@@ -55,7 +55,7 @@ class AuthServiceTest {
         LoginRequest loginRequest = new LoginRequest(email, password);
 
         assertThatThrownBy(() -> authService.login(loginRequest))
-                .isInstanceOf(LoginFailException.class);
+                .isInstanceOf(UnauthorizedException.class);
     }
 
     @DisplayName("아이디를 통해 사용자를 조회한다.")
@@ -72,6 +72,6 @@ class AuthServiceTest {
     @Test
     void findMemberByNonExistsId() {
         assertThatThrownBy(() -> authService.findById(0L))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(NotFoundException.class);
     }
 }

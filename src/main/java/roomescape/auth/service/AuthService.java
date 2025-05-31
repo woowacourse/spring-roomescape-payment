@@ -4,8 +4,8 @@ import org.springframework.stereotype.Service;
 import roomescape.auth.service.dto.LoginMember;
 import roomescape.auth.service.dto.request.LoginRequest;
 import roomescape.auth.service.dto.response.LoginResponse;
-import roomescape.common.exception.EntityNotFoundException;
-import roomescape.common.exception.LoginFailException;
+import roomescape.common.exception.NotFoundException;
+import roomescape.common.exception.UnauthorizedException;
 import roomescape.member.domain.Email;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Password;
@@ -25,7 +25,7 @@ public class AuthService {
     public LoginResponse login(final LoginRequest request) {
         Member member = memberRepository.findByEmailAndPassword(
                 new Email(request.email()), new Password(request.password())
-        ).orElseThrow(() -> new LoginFailException("이메일 또는 비밀번호가 잘못 되었습니다."));
+        ).orElseThrow(() -> new UnauthorizedException("이메일 또는 비밀번호가 잘못 되었습니다."));
 
         String tokenValue = jwtTokenHandler.createToken(member);
         return new LoginResponse(tokenValue);
@@ -33,7 +33,7 @@ public class AuthService {
 
     public Member findById(final Long id) {
         return memberRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 사용자 입니다."));
+                .orElseThrow(() -> new NotFoundException("사용자", id));
     }
 
     public LoginMember findLoginMemberById(final Long id) {

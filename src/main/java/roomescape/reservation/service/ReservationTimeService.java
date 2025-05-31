@@ -2,8 +2,8 @@ package roomescape.reservation.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.common.exception.AlreadyInUseException;
-import roomescape.common.exception.EntityNotFoundException;
+import roomescape.common.exception.ConflictException;
+import roomescape.common.exception.NotFoundException;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
@@ -38,7 +38,7 @@ public class ReservationTimeService {
     public ReservationTimeResponse create(final ReservationTimeRequest request) {
         ReservationTime reservationTime = request.toEntity();
         if (isAlreadyExist(reservationTime)) {
-            throw new AlreadyInUseException("이미 존재하는 시간입니다.");
+            throw new ConflictException("이미 존재하는 시간입니다.");
         }
 
         ReservationTime savedReservationTime = reservationTimeRepository.save(reservationTime);
@@ -53,10 +53,10 @@ public class ReservationTimeService {
     @Transactional
     public void delete(final Long id) {
         if (!reservationTimeRepository.existsById(id)) {
-            throw new EntityNotFoundException("존재하지 않는 예약 시간입니다.");
+            throw new NotFoundException("예약 시간", id);
         }
         if (reservationRepository.existsByTimeId(id)) {
-            throw new AlreadyInUseException("사용 중인 예약 시간은 삭제할 수 없습니다.");
+            throw new ConflictException("사용 중인 예약 시간은 삭제할 수 없습니다.");
         }
         reservationTimeRepository.deleteById(id);
     }

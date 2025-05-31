@@ -3,8 +3,9 @@ package roomescape.reservation.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.service.dto.LoginMember;
-import roomescape.common.exception.DuplicatedException;
-import roomescape.common.exception.EntityNotFoundException;
+import roomescape.common.exception.BadRequestException;
+import roomescape.common.exception.ConflictException;
+import roomescape.common.exception.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.service.TossPaymentService;
@@ -67,7 +68,7 @@ public class CreateReservationService {
 
     private void validateDuplicated(Reservation reservation) {
         if (isAlreadyBooked(reservation)) {
-            throw new DuplicatedException("중복되는 예약이 존재합니다.");
+            throw new ConflictException("중복되는 예약이 존재합니다.");
         }
     }
 
@@ -80,26 +81,26 @@ public class CreateReservationService {
         Theme theme = getTheme(request);
         LoginMember loginMember = request.loginMember();
         Member member = memberRepository.findById(loginMember.id())
-                .orElseThrow(() -> new EntityNotFoundException("등록되지 않은 회원입니다."));
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 회원입니다."));
         return new Reservation(member, request.date(), reservationTime, theme);
     }
 
     private Theme getTheme(final ReservationCreateRequest request) {
         Long themeId = request.themeId();
         return themeRepository.findById(themeId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 테마입니다."));
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 테마입니다."));
     }
 
     private ReservationTime getReservationTime(final ReservationCreateRequest request) {
         Long timeId = request.timeId();
         return reservationTimeRepository.findById(timeId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 예약 가능 시간입니다."));
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 예약 가능 시간입니다."));
     }
 
     private void validateReservationDateTime(Reservation reservation) {
         LocalDateTime now = LocalDateTime.now();
         if (reservation.isBefore(now)) {
-            throw new IllegalArgumentException("과거 날짜의 예약은 생성할 수 없습니다.");
+            throw new BadRequestException("과거 날짜의 예약은 생성할 수 없습니다.");
         }
     }
 }

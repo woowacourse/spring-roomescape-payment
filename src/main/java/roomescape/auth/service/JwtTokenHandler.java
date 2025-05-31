@@ -8,7 +8,8 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import roomescape.common.exception.AuthenticationException;
+import roomescape.common.exception.BadRequestException;
+import roomescape.common.exception.UnauthorizedException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 
@@ -54,7 +55,7 @@ public class JwtTokenHandler {
             Claims claims = getBodyWithValidation(token);
             return Long.parseLong(claims.getSubject());
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("잘못된 형식의 토큰입니다.");
+            throw new BadRequestException("잘못된 형식의 토큰입니다.");
         }
     }
 
@@ -68,7 +69,7 @@ public class JwtTokenHandler {
         try {
             return parser.parseSignedClaims(token).getPayload();
         } catch (JwtException | IllegalArgumentException e) {
-            throw new AuthenticationException("사용할 수 없는 토큰입니다.");
+            throw new UnauthorizedException("사용할 수 없는 토큰입니다.");
         }
     }
 }

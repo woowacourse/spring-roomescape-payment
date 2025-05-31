@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import roomescape.common.exception.BadRequestException;
 
 import java.time.LocalTime;
 
@@ -30,7 +31,7 @@ public class ReservationTime {
 
     public void validateReservationTime() {
         if (startAt == null) {
-            throw new IllegalArgumentException("startAt cannot be null");
+            throw new BadRequestException("시간이 입력되지 않았습니다.");
         }
     }
 

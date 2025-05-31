@@ -2,6 +2,7 @@ package roomescape.theme.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import roomescape.common.exception.BadRequestException;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -17,7 +18,7 @@ class ThemeTest {
         // when & then
         assertThatThrownBy(() -> {
             new Theme(name, description, thumbnail);
-        }).isInstanceOf(IllegalArgumentException.class);
+        }).isInstanceOf(BadRequestException.class);
     }
 
     @DisplayName("설명은 null이 될 수 없다")
@@ -31,7 +32,7 @@ class ThemeTest {
         // when & then
         assertThatThrownBy(() -> {
             new Theme(name, description, thumbnail);
-        }).isInstanceOf(IllegalArgumentException.class);
+        }).isInstanceOf(BadRequestException.class);
     }
 
     @DisplayName("테마 명은 null이 될 수 없다")
@@ -45,6 +46,6 @@ class ThemeTest {
         // when & then
         assertThatThrownBy(() -> {
             new Theme(name, description, thumbnail);
-        }).isInstanceOf(IllegalArgumentException.class);
+        }).isInstanceOf(BadRequestException.class);
     }
 }

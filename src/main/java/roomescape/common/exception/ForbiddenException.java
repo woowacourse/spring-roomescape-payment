@@ -1,7 +1,9 @@
 package roomescape.common.exception;
 
-public class ForbiddenException extends IllegalStateException {
-    public ForbiddenException(String s) {
-        super(s);
+import roomescape.common.exception.vo.ErrorCode;
+
+public class ForbiddenException extends CustomException {
+    public ForbiddenException(String detail) {
+        super(ErrorCode.FORBIDDEN, detail);
     }
 }
