@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
 import roomescape.global.exception.ClientFailException.PaymentClientFailException;
 import roomescape.payment.model.PaymentClient;
 import roomescape.reservation.model.vo.PaymentInfo;
@@ -28,15 +29,24 @@ public class TossPaymentRestClient implements PaymentClient {
                 .contentType(APPLICATION_JSON)
                 .body(paymentInfo)
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
-                    final PaymentErrorResponse errorResponse = getPaymentErrorResponse(response);
-                    throw new PaymentClientFailException(errorResponse.message(), response.getStatusCode().value());
-                })
-                .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
-                    throw new PaymentClientFailException("내부 시스템처리 작업이 실패했습니다. 잠시 후 다시 시도해주세요.",
-                            response.getStatusCode().value());
-                })
+                .onStatus(HttpStatusCode::is4xxClientError, handleClientError())
+                .onStatus(HttpStatusCode::is5xxServerError, handleServerError())
                 .toBodilessEntity();
+    }
+
+    private ErrorHandler handleClientError() {
+        return (request, response) -> {
+            final PaymentErrorResponse errorResponse = getPaymentErrorResponse(response);
+            final int statusCode = response.getStatusCode().value();
+            throw new PaymentClientFailException(errorResponse.message(), statusCode);
+        };
+    }
+
+    private ErrorHandler handleServerError() {
+        return (request, response) -> {
+            final int statusCode = response.getStatusCode().value();
+            throw new PaymentClientFailException("내부 시스템처리 작업이 실패했습니다. 잠시 후 다시 시도해주세요.", statusCode);
+        };
     }
 
     private PaymentErrorResponse getPaymentErrorResponse(final ClientHttpResponse response) throws IOException {

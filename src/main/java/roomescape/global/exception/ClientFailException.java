@@ -14,7 +14,6 @@ public class ClientFailException extends RestClientException {
     }
 
     public static final class PaymentClientFailException extends ClientFailException {
-
         public PaymentClientFailException(final String message, final int statusCode) {
             super(message, statusCode);
         }
