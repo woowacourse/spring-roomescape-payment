@@ -14,9 +14,6 @@ public class PaymentService {
 
     private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
 
-    private static final String AUTHORIZATION_PREFIX = "Basic ";
-    private static final String AUTHORIZATION_DELIMITER = ":";
-
     private final RestClient restClient;
 
     public PaymentService(final Builder restClientBuilder) {
@@ -37,7 +34,7 @@ public class PaymentService {
     }
 
     private String getAuthorization() {
-        return AUTHORIZATION_PREFIX + encodeToBase64((SECRET_KEY + AUTHORIZATION_DELIMITER));
+        return "Basic " + encodeToBase64((SECRET_KEY + ":"));
     }
 
     private String encodeToBase64(final String value) {
