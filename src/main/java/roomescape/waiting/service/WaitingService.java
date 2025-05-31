@@ -1,6 +1,7 @@
 package roomescape.waiting.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.service.dto.LoginMember;
 import roomescape.common.exception.EntityNotFoundException;
 import roomescape.common.exception.ForbiddenException;
@@ -60,12 +61,13 @@ public class WaitingService {
         };
     }
 
+    @Transactional
     public CreateWaitingResponse createWaiting(CreateWaitingRequest request, LoginMember loginMember) {
         Member member = getMember(loginMember.id());
         ReservationTime time = getReservationTime(request.timeId());
         Theme theme = getTheme(request.themeId());
-        Waiting waiting = new Waiting(request.date(), time, theme, member, LocalDateTime.now());
 
+        Waiting waiting = new Waiting(request.date(), time, theme, member, LocalDateTime.now());
         Waiting saved = waitingRepository.save(waiting);
 
         return CreateWaitingResponse.from(saved);

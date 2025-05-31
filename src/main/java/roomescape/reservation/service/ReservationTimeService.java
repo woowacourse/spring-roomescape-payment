@@ -1,6 +1,7 @@
 package roomescape.reservation.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.AlreadyInUseException;
 import roomescape.common.exception.EntityNotFoundException;
 import roomescape.reservation.domain.ReservationTime;
@@ -33,17 +34,23 @@ public class ReservationTimeService {
                 .toList();
     }
 
+    @Transactional
     public ReservationTimeResponse create(final ReservationTimeRequest request) {
-        if (reservationTimeRepository.existsByStartAt(request.startAt())) {
+        ReservationTime reservationTime = request.toEntity();
+        if (isAlreadyExist(reservationTime)) {
             throw new AlreadyInUseException("이미 존재하는 시간입니다.");
         }
-        ReservationTime reservationTime = request.toEntity();
 
         ReservationTime savedReservationTime = reservationTimeRepository.save(reservationTime);
 
         return ReservationTimeResponse.from(savedReservationTime);
     }
 
+    private boolean isAlreadyExist(ReservationTime time) {
+        return reservationTimeRepository.existsByStartAt(time.getStartAt());
+    }
+
+    @Transactional
     public void delete(final Long id) {
         if (!reservationTimeRepository.existsById(id)) {
             throw new EntityNotFoundException("존재하지 않는 예약 시간입니다.");

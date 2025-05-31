@@ -43,6 +43,17 @@ public class CreateReservationService {
         this.tossPaymentService = tossPaymentService;
     }
 
+    @Transactional
+    public ReservationResponse createWithPayment(ReservationWithPaymentRequest request, LoginMember loginMember) {
+        ReservationCreateRequest reservationCreateRequest = ReservationCreateRequest.from(request, loginMember);
+
+        ReservationResponse reservationResponse = create(reservationCreateRequest);
+        tossPaymentService.postConfirmPayment(ConfirmPaymentRequest.from(request));
+
+        return reservationResponse;
+    }
+
+    @Transactional
     public ReservationResponse create(final ReservationCreateRequest request) {
         Reservation reservation = convertRequestToReservation(request);
 
@@ -90,15 +101,5 @@ public class CreateReservationService {
         if (reservation.isBefore(now)) {
             throw new IllegalArgumentException("과거 날짜의 예약은 생성할 수 없습니다.");
         }
-    }
-
-    @Transactional
-    public ReservationResponse createWithPayment(ReservationWithPaymentRequest request, LoginMember loginMember) {
-        ReservationCreateRequest reservationCreateRequest = ReservationCreateRequest.from(request, loginMember);
-
-        ReservationResponse reservationResponse = create(reservationCreateRequest);
-        tossPaymentService.postConfirmPayment(ConfirmPaymentRequest.from(request));
-
-        return reservationResponse;
     }
 }

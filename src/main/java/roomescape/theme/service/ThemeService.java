@@ -1,6 +1,7 @@
 package roomescape.theme.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.AlreadyInUseException;
 import roomescape.common.exception.EntityNotFoundException;
 import roomescape.reservation.repository.ReservationRepository;
@@ -38,12 +39,13 @@ public class ThemeService {
         return ThemeResponse.from(theme);
     }
 
+    @Transactional
     public void delete(final Long id) {
-        if (reservationRepository.existsByThemeId(id)) {
-            throw new AlreadyInUseException("Theme with id " + id + " is already in use");
-        }
         if (!themeRepository.existsById(id)) {
             throw new EntityNotFoundException("존재하지 않는 테마입니다.");
+        }
+        if (reservationRepository.existsByThemeId(id)) {
+            throw new AlreadyInUseException("사용 중인 테마는 삭제할 수 없습니다.");
         }
         themeRepository.deleteById(id);
     }
