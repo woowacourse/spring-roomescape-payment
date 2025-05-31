@@ -1,5 +1,7 @@
 package roomescape.payment;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.config.RestClientConfiguration;
 import roomescape.exception.custom.reason.payment.PaymentException;
 import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.TossErrorResponse;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
@@ -54,12 +57,8 @@ class TossPaymentClientTest {
     @Test
     void confirm2() {
         // given
-        String expectedBody = """
-                {
-                  "code": "ALREADY_PROCESSED_PAYMENT",
-                  "message": "이미 처리된 결제 입니다."
-                }
-                """;
+        TossErrorResponse expectedErrorResponse = new TossErrorResponse("ALREADY_PROCESSED_PAYMENT", "이미 처리된 결제 입니다.", null);
+        String expectedBody = toErrorResponse(expectedErrorResponse);
 
         mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))
@@ -82,12 +81,8 @@ class TossPaymentClientTest {
     @Test
     void confirm3() {
         // given
-        String expectedBody = """
-                {
-                  "code": "INVALID_API_KEY",
-                  "message": "잘못된 시크릿키 연동 정보 입니다."
-                }
-                """;
+        TossErrorResponse expectedErrorResponse = new TossErrorResponse("INVALID_API_KEY", "잘못된 시크릿키 연동 정보 입니다.", null);
+        String expectedBody = toErrorResponse(expectedErrorResponse);
 
         mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))
@@ -110,12 +105,8 @@ class TossPaymentClientTest {
     @Test
     void confirm4() {
         // given
-        String expectedBody = """
-                {
-                  "code": "바보",
-                  "message": "바보입니다."
-                }
-                """;
+        TossErrorResponse expectedErrorResponse = new TossErrorResponse("바보", "바보입니다.", null);
+        String expectedBody = toErrorResponse(expectedErrorResponse);
 
         mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))
@@ -174,5 +165,14 @@ class TossPaymentClientTest {
         assertThatThrownBy(() -> tossPaymentClient.confirm(paymentConfirmRequest))
                 .isInstanceOf(PaymentException.class)
                 .hasMessage("결제 승인에 실패하였습니다.");
+    }
+
+    private String toErrorResponse(TossErrorResponse errorResponse) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.writeValueAsString(errorResponse);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException();
+        }
     }
 }
