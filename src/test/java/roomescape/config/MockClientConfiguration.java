@@ -16,7 +16,9 @@ public class MockClientConfiguration {
         MockServerRestClientCustomizer customizer = new MockServerRestClientCustomizer();
         RestClient.Builder builder = RestClient.builder();
         customizer.customize(builder);
-        RestClient restClient = builder.build();
+        RestClient restClient = builder
+                .baseUrl("https://api.tosspayments.com/v1/payments")
+                .build();
         mockRestServiceServer = customizer.getServer();
         return restClient;
     }

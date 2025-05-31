@@ -11,13 +11,21 @@ import org.springframework.web.client.RestClient;
 
 @Configuration
 @Profile("production")
-public class RestClientConfiguration {
+public class TossRestClientConfiguration {
+
+    private final TossPaymentInterceptor tossPaymentInterceptor;
+
+    public TossRestClientConfiguration(TossPaymentInterceptor tossPaymentInterceptor) {
+        this.tossPaymentInterceptor = tossPaymentInterceptor;
+    }
 
     @Bean
     public RestClient restClient() {
         ClientHttpRequestFactory requestFactory = createRequestFactory(createRequestSettings());
-        return RestClient.builder().
-                requestFactory(requestFactory)
+        return RestClient.builder()
+                .baseUrl("https://api.tosspayments.com/v1/payments")
+                .requestInterceptor(tossPaymentInterceptor)
+                .requestFactory(requestFactory)
                 .build();
     }
 
