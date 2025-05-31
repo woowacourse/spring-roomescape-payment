@@ -3,10 +3,7 @@ package roomescape.payment.infrastructure;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -16,11 +13,14 @@ import roomescape.payment.application.dto.PaymentResponse;
 import roomescape.payment.infrastructure.dto.TossErrorResponse;
 import roomescape.payment.infrastructure.dto.TossPaymentRequest;
 
-@RequiredArgsConstructor
 @Component
 public class TossPaymentClient implements PaymentClient {
 
     private final RestClient restClient;
+
+    public TossPaymentClient(@Qualifier("tossPaymentRestClient") RestClient restClient) {
+        this.restClient = restClient;
+    }
 
     public PaymentResponse requestPayment(final PaymentRequest request) {
         return restClient.post()
