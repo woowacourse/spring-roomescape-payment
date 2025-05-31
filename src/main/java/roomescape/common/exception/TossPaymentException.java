@@ -1,16 +1,10 @@
 package roomescape.common.exception;
 
-import lombok.Getter;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import roomescape.payment.exception.PaymentException;
 
-@Getter
-public class TossPaymentException extends RuntimeException {
-
-    private final HttpStatusCode status;
-
-    public TossPaymentException(HttpStatusCode status, String message) {
-        super(message);
-        this.status = status;
+public class TossPaymentException extends PaymentException {
+    public TossPaymentException(final HttpStatusCode status, final String message) {
+        super(status, message);
     }
 }
