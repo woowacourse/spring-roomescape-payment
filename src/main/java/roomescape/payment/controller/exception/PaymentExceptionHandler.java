@@ -20,7 +20,7 @@ public class PaymentExceptionHandler {
         PaymentErrorCode paymentErrorCode = new PaymentErrorCode(SERVER_ERROR_CODE, e.getMessage());
 
         return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .status(HttpStatus.BAD_GATEWAY)
                 .body(ApiResponse.fail(paymentErrorCode));
     }
 

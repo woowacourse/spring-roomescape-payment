@@ -12,11 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import roomescape.payment.exception.PaymentTemporaryException;
 import roomescape.payment.toss.dto.TossPaymentRequest;
 import roomescape.payment.toss.dto.TossPaymentResponse;
-import roomescape.payment.exception.PaymentTemporaryException;
-import roomescape.payment.toss.service.TossPaymentClient;
-import roomescape.payment.toss.service.TossPaymentService;
 
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
@@ -27,7 +25,6 @@ class TossPaymentServiceTest {
 
     @MockitoBean
     private TossPaymentClient tossPaymentClient;
-
 
     @Test
     void 일시적인_결제_오류가_발생하면_재시도한다() {

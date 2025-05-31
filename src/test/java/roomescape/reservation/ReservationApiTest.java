@@ -2,7 +2,6 @@ package roomescape.reservation;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -71,8 +70,11 @@ class ReservationApiTest {
         ReservationDateTime reservationDateTime = reservationDateTimeDbFixture.내일_열시();
         Long timeId = reservationDateTime.getReservationTime().getId();
 
+        TossPaymentResponse tossPaymentResponse = new TossPaymentResponse("orderId");
         given(tossPaymentService.confirmPayment(any()))
-                .willReturn(mock(TossPaymentResponse.class));
+                .willReturn(tossPaymentResponse);
+        given(tossPaymentService.getPayment(any()))
+                .willReturn(tossPaymentResponse);
 
         ReservePaymentRequest request = ReservePaymentRequest.builder()
                 .date(reservationDateTime.getDate())
@@ -93,6 +95,39 @@ class ReservationApiTest {
                 .statusCode(201);
 
         verify(tossPaymentService, times(1)).confirmPayment(any());
+    }
+
+    @Test
+    void 결졔_시_결제_정보가_맞지_않다면_예외를_반환한다() throws JsonProcessingException {
+        Long themeId = themeDbFixture.공포().getId();
+        ReservationDateTime reservationDateTime = reservationDateTimeDbFixture.내일_열시();
+        Long timeId = reservationDateTime.getReservationTime().getId();
+
+        TossPaymentResponse tossPaymentResponse1 = new TossPaymentResponse("orderId1");
+        TossPaymentResponse tossPaymentResponse2 = new TossPaymentResponse("orderId2");
+
+        given(tossPaymentService.confirmPayment(any()))
+                .willReturn(tossPaymentResponse1);
+        given(tossPaymentService.getPayment(any()))
+                .willReturn(tossPaymentResponse2);
+
+        ReservePaymentRequest request = ReservePaymentRequest.builder()
+                .date(reservationDateTime.getDate())
+                .timeId(timeId)
+                .themeId(themeId)
+                .paymentKey("paymentKey")
+                .orderId("orderId")
+                .amount(10000L)
+                .paymentType("NORMAL")
+                .build();
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .cookie("token", StubTokenProvider.USER_STUB_TOKEN)
+                .body(objectMapper.writeValueAsString(request))
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(502);
     }
 
     @Test

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.InvalidArgumentException;
+import roomescape.payment.exception.PaymentServerException;
 import roomescape.payment.toss.dto.TossPaymentRequest;
 import roomescape.payment.toss.dto.TossPaymentResponse;
 import roomescape.payment.toss.service.TossPaymentService;
@@ -50,11 +51,20 @@ public class ReservationService {
     public ReservationResponse reserve(ReservePaymentRequest request, Long memberId) {
         ReserveCommand reserveCommand = ReserveCommand.byPayment(request, memberId);
         Reservation reserved = reservationManager.reserved(reserveCommand);
-
-        TossPaymentRequest paymentRequest = new TossPaymentRequest(request.paymentKey(), request.orderId(), request.amount());
-        TossPaymentResponse tossPaymentResponse = tossPaymentService.confirmPayment(paymentRequest);
+        processPayment(request);
 
         return ReservationResponse.from(reserved);
+    }
+
+    private void processPayment(ReservePaymentRequest request) {
+        TossPaymentRequest paymentRequest = new TossPaymentRequest(request.paymentKey(), request.orderId(),
+                request.amount());
+        TossPaymentResponse tossConfirmPaymentResponse = tossPaymentService.confirmPayment(paymentRequest);
+        TossPaymentResponse tossPaymentResponse = tossPaymentService.getPayment(paymentRequest);
+
+        if (!tossConfirmPaymentResponse.orderId().equals(tossPaymentResponse.orderId())) {
+            throw new PaymentServerException("결제 서버에서 에러가 발생했습니다. 다시 시도해주세요.");
+        }
     }
 
     private void validateAvailableWaiting(ReserveCommand reserveCommand) {
