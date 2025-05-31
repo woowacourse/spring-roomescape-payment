@@ -12,20 +12,20 @@ public class TokenCookieManager {
     private static final String TOKEN_FILED = "token";
     private static final String TOKEN_COOKIE_DEFAULT_PATH = "/";
 
-    public void addTokenCookie(HttpServletResponse response, String token) {
+    public void addTokenCookie(final HttpServletResponse response, final String token) {
         Cookie cookie = new Cookie(TOKEN_FILED, token);
         cookie.setHttpOnly(true);
         cookie.setPath(TOKEN_COOKIE_DEFAULT_PATH);
         response.addCookie(cookie);
     }
 
-    public void deleteTokenCookie(HttpServletResponse response) {
+    public void deleteTokenCookie(final HttpServletResponse response) {
         Cookie cookie = new Cookie(TOKEN_FILED, null);
         cookie.setMaxAge(0);
         response.addCookie(cookie);
     }
 
-    public String extractTokenFromCookie(HttpServletRequest request) {
+    public String extractTokenFromCookie(final HttpServletRequest request) {
         Cookie[] cookies = getCookies(request);
         for (Cookie cookie : cookies) {
             if (cookie.getName().equals(TOKEN_FILED)) {
@@ -35,7 +35,7 @@ public class TokenCookieManager {
         return "";
     }
 
-    private Cookie[] getCookies(HttpServletRequest request) {
+    private Cookie[] getCookies(final HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
             throw new LoginException("로그인 되어있지 않습니다.");

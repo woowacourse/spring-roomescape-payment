@@ -4,15 +4,16 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.Date;
-import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import roomescape.common.exception.LoginException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
+
+import javax.crypto.SecretKey;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 
 @Component
 public class JwtTokenContainer {
@@ -21,11 +22,11 @@ public class JwtTokenContainer {
 
     private final SecretKey secretKey;
 
-    public JwtTokenContainer(@Value("${security.jwt.token.secret-key}") String key) {
+    public JwtTokenContainer(@Value("${security.jwt.token.secret-key}") final String key) {
         this.secretKey = Keys.hmacShaKeyFor(key.getBytes());
     }
 
-    public String createJwtToken(Member member, LocalDateTime now) {
+    public String createJwtToken(final Member member, final LocalDateTime now) {
         Date expirationDate = createExpirationDate(now);
 
         return Jwts.builder()
@@ -36,7 +37,7 @@ public class JwtTokenContainer {
                 .compact();
     }
 
-    public void validateToken(String token) {
+    public void validateToken(final String token) {
         try {
             Jwts.parser()
                     .verifyWith(secretKey)
@@ -49,7 +50,7 @@ public class JwtTokenContainer {
         }
     }
 
-    public Long getMemberId(String token) {
+    public Long getMemberId(final String token) {
         try {
             String id = Jwts.parser()
                     .verifyWith(secretKey)
@@ -63,7 +64,7 @@ public class JwtTokenContainer {
         }
     }
 
-    public Role getMemberRole(String token) {
+    public Role getMemberRole(final String token) {
         try {
             String role = Jwts.parser()
                     .verifyWith(secretKey)
@@ -77,7 +78,7 @@ public class JwtTokenContainer {
         }
     }
 
-    private Date createExpirationDate(LocalDateTime now) {
+    private Date createExpirationDate(final LocalDateTime now) {
         LocalDateTime expirationTime = now.plusMinutes(TOKEN_EXPIRATION_MINUTES);
         return Date.from(expirationTime.atZone(ZoneId.systemDefault()).toInstant());
     }

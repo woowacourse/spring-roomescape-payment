@@ -9,7 +9,7 @@ public class MemberName {
 
     private String name;
 
-    public MemberName(String name) {
+    public MemberName(final String name) {
         validate(name);
         this.name = name;
     }
@@ -18,7 +18,7 @@ public class MemberName {
 
     }
 
-    private void validate(String name) {
+    private void validate(final String name) {
         if (name == null || name.isBlank() || name.length() > MAX_NAME_LENGTH) {
             throw new IllegalArgumentException("[ERROR] 이름은 1글자 이상 10글자 이하여야합니다.");
         }

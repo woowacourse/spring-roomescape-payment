@@ -1,10 +1,11 @@
 package roomescape.member.infrastructure;
 
-import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Repository;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
+
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class MemberRepositoryImpl implements MemberRepository {
@@ -16,22 +17,22 @@ public class MemberRepositoryImpl implements MemberRepository {
     }
 
     @Override
-    public Member save(Member member) {
+    public Member save(final Member member) {
         return jpaMemberRepository.save(member);
     }
 
     @Override
-    public boolean existsByEmail(String email) {
+    public boolean existsByEmail(final String email) {
         return jpaMemberRepository.existsByEmail(email);
     }
 
     @Override
-    public Optional<Member> findByEmailAndPassword(String email, String password) {
+    public Optional<Member> findByEmailAndPassword(final String email, final String password) {
         return jpaMemberRepository.findByEmailAndPassword(email, password);
     }
 
     @Override
-    public Optional<Member> findById(Long memberId) {
+    public Optional<Member> findById(final Long memberId) {
         return jpaMemberRepository.findById(memberId);
     }
 
