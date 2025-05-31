@@ -4,15 +4,13 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import roomescape.auth.dto.LoginMember;
 import roomescape.exception.ReservationException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.reservation.client.PaymentClient;
+import roomescape.reservation.config.PaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.AdminReservationRequest;
@@ -64,7 +62,7 @@ public class ReservationService {
     }
 
     private Reservation waitingReservation(LocalDate date, ReservationTime reservationTime,
-            Theme theme, LoginMember loginMember) {
+                                           Theme theme, LoginMember loginMember) {
         final Member member = Member.from(loginMember);
         if (reservationRepository.existsByDateAndTimeAndThemeAndMember(date, reservationTime, theme, member)) {
             throw new IllegalArgumentException("이미 예약한 사용자입니다.");
@@ -77,7 +75,7 @@ public class ReservationService {
     }
 
     private Reservation bookedReservation(LocalDate date, ReservationTime reservationTime,
-            Theme theme, LoginMember loginMember) {
+                                          Theme theme, LoginMember loginMember) {
         final Member member = Member.from(loginMember);
         Reservation reservation = Reservation.of(date, reservationTime, theme, member, LocalDateTime.now(clock));
 

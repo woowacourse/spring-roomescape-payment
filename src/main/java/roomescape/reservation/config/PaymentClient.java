@@ -1,7 +1,6 @@
-package roomescape.reservation.client;
+package roomescape.reservation.config;
 
 import org.springframework.http.ResponseEntity;
-
 import roomescape.reservation.service.PaymentApprovalRequest;
 
 public interface PaymentClient {

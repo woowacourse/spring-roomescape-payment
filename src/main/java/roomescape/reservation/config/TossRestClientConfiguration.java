@@ -1,4 +1,4 @@
-package roomescape.config;
+package roomescape.reservation.config;
 
 import java.time.Duration;
 import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;

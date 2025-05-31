@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import roomescape.exception.PaymentClientException;
+import roomescape.reservation.config.PaymentErrorHandler;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentErrorHandlerTest {

@@ -27,7 +27,7 @@ import roomescape.exception.ReservationException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.BaseTest;
-import roomescape.reservation.client.PaymentClient;
+import roomescape.reservation.config.PaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Status;
 import roomescape.reservation.dto.MyReservationResponse;

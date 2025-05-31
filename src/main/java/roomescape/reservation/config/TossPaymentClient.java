@@ -1,4 +1,4 @@
-package roomescape.reservation.client;
+package roomescape.reservation.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;

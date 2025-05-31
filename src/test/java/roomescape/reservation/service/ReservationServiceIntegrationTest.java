@@ -3,22 +3,20 @@ package roomescape.reservation.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import jakarta.transaction.Transactional;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalTime;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
-
-import jakarta.transaction.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.exception.ReservationException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.BaseTest;
-import roomescape.reservation.client.PaymentClient;
+import roomescape.reservation.config.PaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Status;
 import roomescape.reservation.dto.ReservationRequest;
