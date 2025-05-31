@@ -1,0 +1,64 @@
+package roomescape.reservation.controller;
+
+import static org.springframework.http.HttpStatus.CREATED;
+import static roomescape.reservation.controller.response.ReservationSuccessCode.GET_MY_RESERVATIONS;
+import static roomescape.reservation.controller.response.ReservationSuccessCode.RESERVE;
+
+import jakarta.validation.Valid;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import roomescape.auth.web.resolver.Authenticated;
+import roomescape.global.response.ApiResponse;
+import roomescape.reservation.controller.request.ReservePaymentRequest;
+import roomescape.reservation.controller.response.MyReservationResponse;
+import roomescape.reservation.controller.response.ReservationResponse;
+import roomescape.reservation.service.ReservationService;
+import roomescape.reservation.service.ReservedService;
+
+@RestController
+@RequestMapping("/reservations")
+@RequiredArgsConstructor
+public class ReservationApiController {
+
+    private final ReservationService reservationService;
+    private final ReservedService reservedService;
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<ReservationResponse>> createReservation(
+            @RequestBody @Valid ReservePaymentRequest request,
+            @Authenticated Long memberId
+    ) {
+        ReservationResponse response = reservationService.reserve(
+                request, memberId
+        );
+
+        return ResponseEntity
+                .status(CREATED)
+                .body(ApiResponse.success(RESERVE, response));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<List<MyReservationResponse>>> getMyReservations(
+            @Authenticated Long memberId
+    ) {
+        List<MyReservationResponse> responses = reservationService.getAllReservations(memberId);
+        return ResponseEntity.ok(
+                ApiResponse.success(GET_MY_RESERVATIONS, responses)
+        );
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> cancelReservation(@PathVariable Long id, @Authenticated Long memberId) {
+        reservedService.cancel(id, memberId);
+
+        return ResponseEntity.noContent().build();
+    }
+}
