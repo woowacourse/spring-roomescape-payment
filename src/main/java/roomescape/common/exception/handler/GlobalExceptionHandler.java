@@ -11,6 +11,9 @@ import roomescape.common.exception.handler.dto.ExceptionResponse;
 import roomescape.member.exception.EmailException;
 import roomescape.member.exception.NameException;
 
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -54,6 +57,24 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponse> handleException(final Exception exception, final HttpServletRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(
                 HttpStatus.BAD_REQUEST.value(), "[ERROR] " + exception.getMessage(), request.getRequestURI()
+        );
+
+        return ResponseEntity.badRequest().body(exceptionResponse);
+    }
+
+    @ExceptionHandler(SocketTimeoutException.class)
+    public ResponseEntity<ExceptionResponse> handleSocketTimeoutException(final SocketTimeoutException e, final HttpServletRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+            HttpStatus.BAD_REQUEST.value(), "[ERROR] 결제 API 응답이 지연되었습니다.", request.getRequestURI()
+        );
+
+        return ResponseEntity.badRequest().body(exceptionResponse);
+    }
+
+    @ExceptionHandler(ConnectException.class)
+    public ResponseEntity<ExceptionResponse> handleConnectException(final SocketTimeoutException e, final HttpServletRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(
+            HttpStatus.BAD_REQUEST.value(), "[ERROR] 결제 서버 연결에 실패하였습니다.", request.getRequestURI()
         );
 
         return ResponseEntity.badRequest().body(exceptionResponse);
