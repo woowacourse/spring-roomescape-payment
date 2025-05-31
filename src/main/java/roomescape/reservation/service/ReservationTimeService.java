@@ -35,7 +35,7 @@ public class ReservationTimeService {
 
     public ReservationTimeResponse create(final ReservationTimeRequest request) {
         if (reservationTimeRepository.existsByStartAt(request.startAt())) {
-            throw new AlreadyInUseException("Reservation time already exists");
+            throw new AlreadyInUseException("이미 존재하는 시간입니다.");
         }
         ReservationTime reservationTime = request.toEntity();
 
@@ -45,11 +45,11 @@ public class ReservationTimeService {
     }
 
     public void delete(final Long id) {
-        if (reservationRepository.existsByTimeId(id)) {
-            throw new AlreadyInUseException("Reservation is already in use");
-        }
         if (!reservationTimeRepository.existsById(id)) {
             throw new EntityNotFoundException("존재하지 않는 예약 시간입니다.");
+        }
+        if (reservationRepository.existsByTimeId(id)) {
+            throw new AlreadyInUseException("사용 중인 예약 시간은 삭제할 수 없습니다.");
         }
         reservationTimeRepository.deleteById(id);
     }
