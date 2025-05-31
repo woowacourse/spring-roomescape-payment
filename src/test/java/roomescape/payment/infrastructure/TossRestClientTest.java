@@ -12,10 +12,13 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.payment.exception.PaymentTimeoutException;
@@ -41,8 +44,9 @@ class TossRestClientTest {
         wireMockServer.stop();
     }
 
+    @DisplayName("결제 승인 정상 처리")
     @Test
-    void 결제_승인_정상_응답_확인() {
+    void confirmSuccess() {
         // given
         wireMockServer.stubFor(post(urlEqualTo("/v1/payments/confirm"))
                 .willReturn(aResponse()
@@ -66,8 +70,9 @@ class TossRestClientTest {
         });
     }
 
+    @DisplayName("결제 승인 실패 클라이언트 에러(4xx 에러코드)")
     @Test
-    void 결제_승인_잘못된_key_예외_처리() {
+    void confirmError_wrongSecretKey() {
         // given
         wireMockServer.stubFor(post(urlEqualTo("/v1/payments/confirm"))
                 .willReturn(aResponse()
@@ -81,15 +86,15 @@ class TossRestClientTest {
         Long amount = 1000L;
         TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount);
 
-        // when
-        // then
+        // when & then
         assertThatThrownBy(() -> tossRestClient.confirm(request))
                 .isInstanceOf(TossPaymentException.class)
                 .hasMessageContaining("잘못된 시크릿키 연동 정보 입니다.");
     }
 
+    @DisplayName("타임아웃 시간 내 응답 시 정상 처리")
     @Test
-    void 타임아웃_시간내_응답_시_정상_응답_확인() {
+    void confirmSuccess_beforeTimeout() {
         // given
         wireMockServer.stubFor(post(urlEqualTo("/v1/payments/confirm"))
                 .willReturn(aResponse()
@@ -98,7 +103,6 @@ class TossRestClientTest {
                         .withBody(SUCCESS_RESPONSE_BODY)
                         .withFixedDelay(4_000)
                 ));
-
 
         String paymentKey = "test_key";
         String orderId = "a4CWyWY5m89PNh7xJwhk1";
@@ -115,8 +119,9 @@ class TossRestClientTest {
         });
     }
 
+    @DisplayName("타임아웃 시간 초과 시 예외 처리")
     @Test
-    void 타임아웃_시간외_응답_시_예외_처리() {
+    void confirmError_timeout() {
         // given
         wireMockServer.stubFor(post(urlEqualTo("/v1/payments/confirm"))
                 .willReturn(aResponse()
@@ -125,7 +130,6 @@ class TossRestClientTest {
                         .withBody(SUCCESS_RESPONSE_BODY)
                         .withFixedDelay(5_000)
                 ));
-
 
         String paymentKey = "test_key";
         String orderId = "a4CWyWY5m89PNh7xJwhk1";
@@ -136,5 +140,61 @@ class TossRestClientTest {
         // then
         assertThatThrownBy(() -> tossRestClient.confirm(request))
                 .isInstanceOf(PaymentTimeoutException.class);
+    }
+
+    @DisplayName("타임아웃 외 네트워크 오류 시 예외 그대로 전파")
+    @Test
+    void confirmError_resourceAccessException() {
+        // given
+        RestClient brokenRestClient = RestClient.builder()
+                .baseUrl("http://localhost:9999") // 잘못된 포트
+                .build();
+        TossRestClient brokenTossClient = new TossRestClient(brokenRestClient, new TossPaymentProperties("secret-key"));
+
+        wireMockServer.stubFor(post(urlEqualTo("/v1/payments/confirm"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(SUCCESS_RESPONSE_BODY)
+                ));
+
+        String paymentKey = "test_key";
+        String orderId = "a4CWyWY5m89PNh7xJwhk1";
+        Long amount = 1000L;
+        TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount);
+
+        // when
+        // then
+        assertThatThrownBy(() -> brokenTossClient.confirm(request))
+                .isInstanceOf(ResourceAccessException.class);
+    }
+
+    @DisplayName("에러 응답 파싱 실패시 예외 처리")
+    @Test
+    void confirmError_errorResponseParsingFail() {
+        // given
+        String invalidFormattedErrorResponse = """
+                {
+                    잘못된JSON형식
+                }
+                """;
+
+        wireMockServer.stubFor(post(urlEqualTo("/v1/payments/confirm"))
+                .willReturn(aResponse()
+                        .withStatus(400)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(invalidFormattedErrorResponse)
+                ));
+
+        String paymentKey = "test_key";
+        String orderId = "a4CWyWY5m89PNh7xJwhk1";
+        Long amount = 1000L;
+        TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount);
+
+        // when
+        // then
+        assertThatThrownBy(() -> tossRestClient.confirm(request))
+                .isInstanceOf(TossPaymentException.class)
+                .hasMessage("토스 오류 응답을 파싱할 수 없습니다.");
     }
 }
