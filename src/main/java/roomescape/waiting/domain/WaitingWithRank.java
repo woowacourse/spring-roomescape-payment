@@ -6,8 +6,8 @@ import roomescape.theme.domain.ThemeName;
 
 public class WaitingWithRank {
 
-    private Waiting waiting;
-    private long rank;
+    private final Waiting waiting;
+    private final long rank;
 
     public WaitingWithRank(final Waiting waiting, final long rank) {
         this.waiting = waiting;

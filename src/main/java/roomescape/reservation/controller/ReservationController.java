@@ -44,7 +44,8 @@ public class ReservationController {
     }
 
     @GetMapping("/me/reservations")
-    public ResponseEntity<List<MyReservationResponse>> findAllMyReservations(@AuthMember LoginMember loginMember) {
+    public ResponseEntity<List<MyReservationResponse>> findAllMyReservations(
+            @AuthMember final LoginMember loginMember) {
         final List<MyReservationResponse> responses = reservationQueryService.getMyReservations(loginMember);
         return ResponseEntity.ok().body(responses);
     }

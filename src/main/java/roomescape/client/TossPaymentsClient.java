@@ -30,7 +30,7 @@ public class TossPaymentsClient {
                 .body(PaymentsConfirmResponse.class);
     }
 
-    private void handlerTossPaymentsException(ClientHttpResponse res) throws IOException {
+    private void handlerTossPaymentsException(final ClientHttpResponse res) throws IOException {
         final ObjectMapper objectMapper = new ObjectMapper().configure(
                 DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         final TossErrorResponse errorResponse = objectMapper.readValue(res.getBody(),

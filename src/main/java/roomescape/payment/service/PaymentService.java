@@ -13,7 +13,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final TossPaymentsClient tossPaymentsClient;
 
-    public PaymentService(PaymentRepository paymentRepository, TossPaymentsClient tossPaymentsClient) {
+    public PaymentService(final PaymentRepository paymentRepository, final TossPaymentsClient tossPaymentsClient) {
         this.paymentRepository = paymentRepository;
         this.tossPaymentsClient = tossPaymentsClient;
     }

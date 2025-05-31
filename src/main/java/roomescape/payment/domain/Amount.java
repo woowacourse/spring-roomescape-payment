@@ -8,7 +8,7 @@ public class Amount {
 
     private long amount;
 
-    public Amount(long amount) {
+    public Amount(final long amount) {
         this.amount = amount;
     }
 
@@ -20,7 +20,7 @@ public class Amount {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (!(o instanceof Amount amount1)) {
             return false;
         }

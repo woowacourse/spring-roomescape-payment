@@ -31,7 +31,7 @@ public class Payment {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (!(o instanceof Payment payment)) {
             return false;
         }

@@ -8,7 +8,7 @@ public class PaymentKey {
 
     private String paymentKey;
 
-    public PaymentKey(String paymentKey) {
+    public PaymentKey(final String paymentKey) {
         this.paymentKey = paymentKey;
     }
 
@@ -20,7 +20,7 @@ public class PaymentKey {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (!(o instanceof PaymentKey that)) {
             return false;
         }
