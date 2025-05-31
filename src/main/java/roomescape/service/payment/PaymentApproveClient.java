@@ -1,23 +1,26 @@
 package roomescape.service.payment;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import roomescape.dto.response.PaymentSuccessResponse;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Map;
+
 @Service
 public class PaymentApproveClient {
 
     private final RestClient restClient;
     private final String widgetSecretKey;
+    private final String paymentApproveUrl;
 
     public PaymentApproveClient(
             @Value("${toss.payments.base-url}") String baseUrl,
             @Value("${toss.payments.widget-secret-key}") String widgetSecretKey,
+            @Value("${toss.payments.payment-approve-url}") String paymentApproveUrl,
             MyClientHttpRequestFactory requestFactory
     ) {
         this.restClient = RestClient.builder()
@@ -26,6 +29,7 @@ public class PaymentApproveClient {
                 .defaultStatusHandler(new PaymentApproveErrorHandler())
                 .build();
         this.widgetSecretKey = widgetSecretKey;
+        this.paymentApproveUrl = paymentApproveUrl;
     }
 
     public PaymentSuccessResponse approvePayment(String paymentKey, String orderId, int amount) {
@@ -36,7 +40,7 @@ public class PaymentApproveClient {
                 "paymentKey", paymentKey
         );
 
-        return restClient.post().uri("/v1/payments/confirm")
+        return restClient.post().uri(paymentApproveUrl)
                 .header("Authorization", authorizations)
                 .accept(MediaType.APPLICATION_JSON)
                 .body(requestBody)
