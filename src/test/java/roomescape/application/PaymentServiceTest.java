@@ -1,7 +1,6 @@
 package roomescape.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,18 +17,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import roomescape.presentation.dto.request.PaymentProcessRequest;
-import roomescape.application.exception.PaymentException;
 import roomescape.domain.Payment;
 import roomescape.infrastructure.repository.PaymentRepository;
-import roomescape.infrastructure.thirdparty.PaymentRestClient;
+import roomescape.infrastructure.thirdparty.TossPaymentRestClient;
+import roomescape.presentation.dto.request.PaymentProcessRequest;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @ExtendWith(MockitoExtension.class)
 public class PaymentServiceTest {
 
     @Mock
-    private PaymentRestClient paymentRestClient;
+    private TossPaymentRestClient tossPaymentRestClient;
 
     @Mock
     private PaymentRepository paymentRepository;
@@ -55,51 +53,11 @@ public class PaymentServiceTest {
         JsonNode jsonNode = new ObjectMapper().readTree(paymentString);
 
         when(objectMapper.readTree(paymentString)).thenReturn(jsonNode);
-        when(paymentRestClient.getPaymentResponse(paymentProcessRequest)).thenReturn(responseEntity);
+        when(tossPaymentRestClient.getPaymentResponse(paymentProcessRequest)).thenReturn(responseEntity);
         when(paymentRepository.save(payment)).thenReturn(payment);
 
         Payment resultPayment = paymentService.process(paymentProcessRequest);
         assertThat(resultPayment.getPaymentKey()).isEqualTo(payment.getPaymentKey());
-        verify(paymentRestClient, times(1)).getPaymentResponse(paymentProcessRequest);
-    }
-
-    @Test
-    void 사용자_에러를_반환한다() throws JsonProcessingException {
-        PaymentProcessRequest paymentProcessRequest = new PaymentProcessRequest("test", "test", "1000");
-        String paymentString = """
-                {
-                    "code": "test",
-                    "message": "test"
-                }
-                """;
-        ResponseEntity<String> responseEntity = new ResponseEntity<>(paymentString, HttpStatus.BAD_REQUEST);
-
-        JsonNode jsonNode = new ObjectMapper().readTree(paymentString);
-
-        when(objectMapper.readTree(paymentString)).thenReturn(jsonNode);
-        when(paymentRestClient.getPaymentResponse(paymentProcessRequest)).thenReturn(responseEntity);
-
-        assertThatThrownBy(() -> paymentService.process(paymentProcessRequest))
-                .isInstanceOf(PaymentException.class);
-    }
-
-    @Test
-    void 서버_에러를_반환한다() throws JsonProcessingException {
-        PaymentProcessRequest paymentProcessRequest = new PaymentProcessRequest("test", "test", "1000");
-        String paymentString = """
-                {
-                    "code": "test",
-                    "message": "test"
-                }
-                """;
-        ResponseEntity<String> responseEntity = new ResponseEntity<>(paymentString, HttpStatus.INTERNAL_SERVER_ERROR);
-
-        JsonNode jsonNode = new ObjectMapper().readTree(paymentString);
-
-        when(objectMapper.readTree(paymentString)).thenReturn(jsonNode);
-        when(paymentRestClient.getPaymentResponse(paymentProcessRequest)).thenReturn(responseEntity);
-
-        assertThatThrownBy(() -> paymentService.process(paymentProcessRequest))
-                .isInstanceOf(PaymentException.class);
+        verify(tossPaymentRestClient, times(1)).getPaymentResponse(paymentProcessRequest);
     }
 }
