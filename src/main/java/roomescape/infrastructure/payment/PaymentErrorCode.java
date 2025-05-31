@@ -19,6 +19,9 @@ public enum PaymentErrorCode {
             INTERNAL_SERVER_ERROR, "외부 API 응답 시간이 초과되었습니다"),
     EXTERNAL_API_ERROR(
             INTERNAL_SERVER_ERROR, "외부 API와 통신 중 오류가 발생했습니다."),
+    RESPONSE_PARSING_ERROR(
+            INTERNAL_SERVER_ERROR, "외부 API 응답을 변환하는 과정에서 오류가 발생했습니다."),
+
 
     EXCEED_MAX_DAILY_PAYMENT_COUNT(
             BAD_REQUEST, "하루 결제 가능 횟수를 초과했습니다."),

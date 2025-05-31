@@ -1,6 +1,8 @@
 package roomescape.infrastructure.payment.toss;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static roomescape.infrastructure.payment.PaymentErrorCode.RESPONSE_PARSING_ERROR;
+import static roomescape.infrastructure.payment.PaymentErrorCode.UNKNOWN;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,8 +12,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 import roomescape.application.request.PaymentInfo;
 import roomescape.application.response.PaymentResponse;
 import roomescape.application.response.TossErrorResponse;
@@ -36,9 +40,17 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     public PaymentResponse confirmPayment(final PaymentInfo paymentInfo) {
-        return restClient.post().uri(TOSS_PAYMENT_CONFIRM_URI).contentType(MediaType.APPLICATION_JSON).body(paymentInfo)
-                .retrieve().onStatus(HttpStatusCode::isError, (request, response) -> processErrorResponse(response))
-                .body(PaymentResponse.class);
+        try {
+            return restClient.post().uri(TOSS_PAYMENT_CONFIRM_URI).contentType(MediaType.APPLICATION_JSON)
+                    .body(paymentInfo).retrieve()
+                    .onStatus(HttpStatusCode::isError, (request, response) -> processErrorResponse(response))
+                    .body(PaymentResponse.class);
+        } catch (RestClientException e) {
+            if (e.getCause() instanceof JsonProcessingException || e.getCause() instanceof HttpMessageNotReadableException) {
+                throw new PaymentException(RESPONSE_PARSING_ERROR);
+            }
+            throw new PaymentException(UNKNOWN, e.getMessage());
+        }
     }
 
     private void processErrorResponse(final ClientHttpResponse response) throws IOException {

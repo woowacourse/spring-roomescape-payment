@@ -26,7 +26,7 @@ public class RestClientInterceptor implements ClientHttpRequestInterceptor {
         } catch (SocketTimeoutException e) {
             throw new PaymentException(SOCKET_TIMEOUT);
         } catch (Exception e) {
-            throw new PaymentException(EXTERNAL_API_ERROR);
+            throw new PaymentException(EXTERNAL_API_ERROR, e.getMessage());
         }
     }
 }
