@@ -56,7 +56,7 @@ class PaymentErrorHandlerTest {
     }
 
     @Test
-    void 예외_응답에서_메시지만_추출하여_던진다() throws IOException {
+    void 외부_예외_응답의_메시지만_추출해_예외를_던진다() throws IOException {
         // given
         String message = "요청이 올바르지 않습니다";
         Map<String, String> params = Map.of(
@@ -68,7 +68,8 @@ class PaymentErrorHandlerTest {
         when(clientHttpResponse.getBody()).thenReturn(inputStream);
 
         //  when then
-        assertThatCode(() -> paymentErrorHandler.handleError(null, null, clientHttpResponse)).isInstanceOf(
-                PaymentClientException.class).hasMessage(message);
+        assertThatCode(() -> paymentErrorHandler.handleError(null, null, clientHttpResponse))
+                .isInstanceOf(PaymentClientException.class)
+                .hasMessage(message);
     }
 }
