@@ -64,8 +64,8 @@ public class Reservation {
     public Reservation() {
     }
 
-    public void setStatus(ReservationStatus reservationStatus) {
-        this.status = reservationStatus;
+    public void changeStatusToReserved() {
+        this.status = ReservationStatus.RESERVED;
     }
 
     public boolean isReservationWaiting() {
