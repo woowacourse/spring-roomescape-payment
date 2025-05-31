@@ -10,6 +10,8 @@ import roomescape.payment.infrastructure.TossPaymentClient;
 @Configuration
 public class ClientConfig {
 
+    private static final String PRODUCTION_BASE_URL = "https://api.tosspayments.com/v1";
+
     @Bean
     public PaymentClient paymentClient() {
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
@@ -18,6 +20,6 @@ public class ClientConfig {
 
         return new TossPaymentClient(RestClient.builder()
                 .requestFactory(factory)
-                .baseUrl("https://api.tosspayments.com/v1").build());
+                .baseUrl(PRODUCTION_BASE_URL).build());
     }
 }
