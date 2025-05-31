@@ -13,7 +13,7 @@ import java.util.Base64;
 
 @Slf4j
 @AllArgsConstructor
-public class TossPaymentClient implements PaymentClient {
+public class TossPaymentClient {
 
     private static final String TEST_WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:";
     private static final String ENCODED_SECRET_KEY = Base64.getEncoder().encodeToString(TEST_WIDGET_SECRET_KEY.getBytes());
@@ -22,7 +22,6 @@ public class TossPaymentClient implements PaymentClient {
     private final RestClient restClient;
     private final TossPaymentConfirmErrorHandler tossPaymentConfirmErrorHandler;
 
-    @Override
     public void confirm(final PaymentConfirmRequest request) {
         try {
             ResponseEntity<Void> response = restClient.post()

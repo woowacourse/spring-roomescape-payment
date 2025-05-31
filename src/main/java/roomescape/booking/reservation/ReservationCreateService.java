@@ -13,7 +13,7 @@ import roomescape.member.Member;
 import roomescape.member.MemberService;
 import roomescape.order.Order;
 import roomescape.order.OrderReader;
-import roomescape.payment.PaymentClient;
+import roomescape.payment.TossPaymentClient;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.schedule.Schedule;
 import roomescape.schedule.ScheduleService;
@@ -26,7 +26,7 @@ public class ReservationCreateService {
     private final ScheduleService scheduleService;
     private final MemberService memberService;
     private final OrderReader orderReader;
-    private final PaymentClient paymentClient;
+    private final TossPaymentClient tossPaymentClient;
 
     @Transactional
     public ReservationResponse create(final ReservationPaymentRequest request, final LoginMember loginMember) {
@@ -36,7 +36,7 @@ public class ReservationCreateService {
         order.pay(request.amount(), member, schedule);
 
         PaymentConfirmRequest paymentRequest = new PaymentConfirmRequest(request.orderId(), request.amount(), request.paymentKey());
-        paymentClient.confirm(paymentRequest);
+        tossPaymentClient.confirm(paymentRequest);
 
         validatePast(schedule);
         validateDuplication(schedule);

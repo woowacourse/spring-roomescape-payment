@@ -20,7 +20,7 @@ import roomescape.member.MemberService;
 import roomescape.order.Order;
 import roomescape.order.OrderReader;
 import roomescape.order.PaymentStatus;
-import roomescape.payment.PaymentClient;
+import roomescape.payment.TossPaymentClient;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.reservationtime.ReservationTime;
 import roomescape.schedule.Schedule;
@@ -48,7 +48,7 @@ public class ReservationCreateServiceTest {
     @Mock
     private OrderReader orderReader;
     @Mock
-    private PaymentClient paymentClient;
+    private TossPaymentClient paymentClient;
     @InjectMocks
     private ReservationCreateService reservationCreateService;
 

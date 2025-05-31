@@ -10,12 +10,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
-import roomescape.payment.PaymentClient;
+import roomescape.payment.TossPaymentClient;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -23,9 +22,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
 
-//TODO: PaymentClient fake 객체로 변경하기
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ReservationApiTest {
 
@@ -40,20 +37,15 @@ public class ReservationApiTest {
     private final JdbcTemplate jdbcTemplate;
     private final int port;
 
+    @MockBean
+    private TossPaymentClient tossPaymentClient;
+
     public ReservationApiTest(
             @LocalServerPort final int port,
             @Autowired final JdbcTemplate jdbcTemplate
     ) {
         this.port = port;
         this.jdbcTemplate = jdbcTemplate;
-    }
-
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        public PaymentClient paymentClient() {
-            return mock(PaymentClient.class);
-        }
     }
 
     @BeforeAll
