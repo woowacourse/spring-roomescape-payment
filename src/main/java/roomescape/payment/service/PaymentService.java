@@ -5,8 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
+import roomescape.exception.NotFoundException;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentStatus;
 import roomescape.payment.dto.ReservationPaymentRequest;
+import roomescape.payment.dto.TossPaymentRequest;
+import roomescape.payment.dto.TossPaymentResponse;
+import roomescape.payment.exception.TossPaymentException;
+import roomescape.payment.infrastructure.TossRestClient;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.ReservationResponse;
@@ -17,15 +23,17 @@ import roomescape.reservation.service.ReservationService;
 @RequiredArgsConstructor
 public class PaymentService {
 
+    private final TossRestClient tossRestClient;
     private final PaymentRepository paymentRepository;
     private final ReservationService reservationService;
 
     @Transactional
-    public void savePayment(final ReservationPaymentRequest request, final LoginMember loginMember) {
+    public void saveReservationPayment(final ReservationPaymentRequest request, final LoginMember loginMember) {
         log.debug("ReservationPaymentRequest: {}", request);
         log.debug("LoginMember: {}", loginMember);
 
-        final ReservationResponse reservationResponse = reservationService.resisterReservation(request.toReservationRequest(), loginMember);
+        final ReservationResponse reservationResponse = reservationService.resisterReservation(
+                request.toReservationRequest(), loginMember);
         final Reservation reservation = reservationService.findById(reservationResponse.id());
         log.debug("Reservation ID: {}", reservation.getId());
 
@@ -35,7 +43,35 @@ public class PaymentService {
                 .amount(request.amount())
                 .reservation(reservation)
                 .member(reservation.getMember())
+                .status(PaymentStatus.PENDING)
                 .build();
         paymentRepository.save(payment);
+    }
+
+    @Transactional
+    public void confirmPayment(TossPaymentRequest tossPaymentRequest) {
+        try {
+            TossPaymentResponse response = tossRestClient.confirm(tossPaymentRequest);
+            Payment payment = getPayment(tossPaymentRequest);
+            payment.updateStatusTo(PaymentStatus.COMPLETED);
+            payment.updateConfirmedInfo(
+                    response.method(),
+                    response.cardNumber(),
+                    response.cardApprovedNo(),
+                    response.easyPayProvider(),
+                    response.receiptUrl()
+            );
+        } catch (TossPaymentException e) {
+            Payment payment = getPayment(tossPaymentRequest);
+            payment.updateStatusTo(PaymentStatus.FAILED);
+            throw e;
+        }
+    }
+
+    private Payment getPayment(TossPaymentRequest tossPaymentRequest) {
+        return paymentRepository.findByPaymentKey(tossPaymentRequest.paymentKey())
+                .orElseThrow(() -> new NotFoundException(
+                        "Payment를 찾을 수 없습니다, paymentKey: " + tossPaymentRequest.paymentKey()
+                ));
     }
 }

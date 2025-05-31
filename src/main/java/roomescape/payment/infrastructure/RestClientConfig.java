@@ -23,7 +23,9 @@ public class RestClientConfig {
         return new TossRestClient(restClientBuilder
                 .baseUrl(restClientProperties.getBaseUrl())
                 .requestFactory(clientHttpRequestFactory())
-                .build(), tossPaymentProperties.getWidgetSecretKey());
+                .build(),
+                tossPaymentProperties
+        );
     }
 
     private ClientHttpRequestFactory clientHttpRequestFactory() {

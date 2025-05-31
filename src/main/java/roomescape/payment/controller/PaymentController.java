@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoginMember;
 import roomescape.payment.dto.ReservationPaymentRequest;
 import roomescape.payment.dto.TossPaymentRequest;
-import roomescape.payment.dto.TossPaymentResponse;
-import roomescape.payment.infrastructure.TossRestClient;
 import roomescape.payment.service.PaymentService;
 
 @RestController
@@ -20,22 +18,17 @@ import roomescape.payment.service.PaymentService;
 @RequestMapping("/payments")
 public class PaymentController {
 
-    private final TossRestClient tossRestClient;
     private final PaymentService paymentService;
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/confirm/tossPay")
-    public TossPaymentResponse confirmPayment(@RequestBody @Valid final ReservationPaymentRequest request) {
+    public void confirmPayment(@RequestBody @Valid final ReservationPaymentRequest request, final LoginMember loginMember) {
         final TossPaymentRequest tossPaymentRequest = new TossPaymentRequest(
                 request.paymentKey(),
                 request.orderId(),
                 request.amount()
         );
-        return tossRestClient.confirm(tossPaymentRequest);
-    }
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public void savePayment(@RequestBody @Valid final ReservationPaymentRequest request, final LoginMember loginMember) {
-        paymentService.savePayment(request, loginMember);
+        paymentService.saveReservationPayment(request, loginMember);
+        paymentService.confirmPayment(tossPaymentRequest);
     }
 }
