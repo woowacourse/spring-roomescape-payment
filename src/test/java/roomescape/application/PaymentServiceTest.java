@@ -1,0 +1,69 @@
+package roomescape.application;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import roomescape.application.request.PaymentInfo;
+import roomescape.application.response.PaymentResponse;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.payment.PaymentRepository;
+import roomescape.infrastructure.payment.PaymentClient;
+import roomescape.infrastructure.payment.toss.TossPaymentErrorCode;
+import roomescape.infrastructure.payment.toss.TossPaymentException;
+
+@ExtendWith(MockitoExtension.class)
+class PaymentServiceTest {
+
+    @Mock
+    private PaymentClient paymentClient;
+
+    @Mock
+    private PaymentRepository paymentRepository;
+
+    @InjectMocks
+    private PaymentService paymentService;
+
+    @Test
+    @DisplayName("결제 승인 요청이 성공하면 결제 정보를 저장하고 반환한다")
+    void savePayment_Success() {
+        // given
+        PaymentInfo paymentInfo = new PaymentInfo("test_payment_key", "test_order_id", 1000);
+        PaymentResponse response = new PaymentResponse("test_payment_key", "test_order_id", "테스트 결제", 1000);
+
+        when(paymentClient.confirmPayment(paymentInfo)).thenReturn(response);
+        when(paymentRepository.save(any(Payment.class))).thenReturn(
+                Payment.register(response.paymentKey(), response.orderId(), response.orderName(), response.amount()));
+
+        // when
+        Payment savedPayment = paymentService.savePayment(paymentInfo);
+
+        // then
+        assertAll(() -> assertThat(savedPayment.getPaymentKey()).isEqualTo(paymentInfo.paymentKey()),
+                () -> assertThat(savedPayment.getOrderId()).isEqualTo(paymentInfo.orderId()),
+                () -> assertThat(savedPayment.getAmount()).isEqualTo(paymentInfo.amount()));
+    }
+
+    @Test
+    @DisplayName("결제 승인 요청이 실패하면 PaymentException이 발생한다")
+    void savePayment_Failure() {
+        // given
+        PaymentInfo paymentInfo = new PaymentInfo("test_payment_key", "test_order_id", 1000);
+        TossPaymentException expectedException = new TossPaymentException(TossPaymentErrorCode.REJECT_CARD_PAYMENT);
+
+        when(paymentClient.confirmPayment(paymentInfo)).thenThrow(expectedException);
+
+        // when & then
+        assertThatThrownBy(() -> paymentService.savePayment(paymentInfo)).isInstanceOf(TossPaymentException.class)
+                .hasFieldOrPropertyWithValue("errorCode", TossPaymentErrorCode.REJECT_CARD_PAYMENT)
+                .hasMessageContaining("한도초과 혹은 잔액부족");
+    }
+} 
