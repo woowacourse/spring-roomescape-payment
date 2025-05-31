@@ -108,7 +108,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         if (ex.causedByClient()) {
             return createProblemDetail(BAD_REQUEST, "결제에 실패했습니다.", ex.getMessage());
         }
-        return createProblemDetail(INTERNAL_SERVER_ERROR, "결제 중 오류가 발생했습니다.", "서버에서 결제 처리에 실패했습니다.");
+        if (ex.causedByExternalServer()) {
+            return createProblemDetail(INTERNAL_SERVER_ERROR, "결제 중 오류가 발생했습니다.", "선택한 결제 수단의 서버에서 오류가 발생했습니다.");
+        }
+        return createProblemDetail(INTERNAL_SERVER_ERROR, "결제 중 오류가 발생했습니다.", "일시적인 서버 오류로 결제 처리에 실패했습니다.");
     }
 
     @ExceptionHandler(Exception.class)
