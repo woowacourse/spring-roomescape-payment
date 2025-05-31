@@ -3,7 +3,7 @@ package roomescape.domain.payment;
 public enum PaymentFailCode {
     CONDITION_NOT_SATISFIED(Cause.CLIENT_ERROR),
     INVALID_AUTH_CREDENTIALS(Cause.SERVER_ERROR),
-    EXTERNAL_PROCESSING(Cause.EXTERNAL_ERROR);
+    EXTERNAL_SERVER_PROCESSING(Cause.EXTERNAL_ERROR);
 
     private final Cause cause;
 

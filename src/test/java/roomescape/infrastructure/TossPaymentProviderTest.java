@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static roomescape.domain.payment.PaymentFailCode.EXTERNAL_PROCESSING;
+import static roomescape.domain.payment.PaymentFailCode.EXTERNAL_SERVER_PROCESSING;
 import static roomescape.domain.payment.PaymentFailCode.INVALID_AUTH_CREDENTIALS;
 
 import java.util.stream.Stream;
@@ -129,21 +129,21 @@ class TossPaymentProviderTest {
                     "code" : "FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING",
                     "message" : "Failed payment internal system processing"
                 }
-            """, EXTERNAL_PROCESSING
+            """, EXTERNAL_SERVER_PROCESSING
             ),
             Arguments.of("""
                 {
                     "code" : "FAILED_INTERNAL_SYSTEM_PROCESSING",
                     "message" : "Failed internal system processing"
                 }
-            """, EXTERNAL_PROCESSING
+            """, EXTERNAL_SERVER_PROCESSING
             ),
             Arguments.of("""
                 {
                     "code" : "UNKNOWN_PAYMENT_ERROR",
                     "message" : "Unknown payment error"
                 }
-            """, EXTERNAL_PROCESSING
+            """, EXTERNAL_SERVER_PROCESSING
             )
         );
     }

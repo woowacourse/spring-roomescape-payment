@@ -1,6 +1,6 @@
 package roomescape.infrastructure;
 
-import static roomescape.domain.payment.PaymentFailCode.EXTERNAL_PROCESSING;
+import static roomescape.domain.payment.PaymentFailCode.EXTERNAL_SERVER_PROCESSING;
 import static roomescape.domain.payment.PaymentFailCode.CONDITION_NOT_SATISFIED;
 import static roomescape.domain.payment.PaymentFailCode.INVALID_AUTH_CREDENTIALS;
 
@@ -73,9 +73,9 @@ public class TossPaymentProvider implements PaymentProvider {
                 Map.entry("INVALID_API_KEY", INVALID_AUTH_CREDENTIALS),
                 Map.entry("UNAUTHORIZED_KEY", INVALID_AUTH_CREDENTIALS),
                 Map.entry("INCORRECT_BASIC_AUTH_FORMAT", INVALID_AUTH_CREDENTIALS),
-                Map.entry("FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING", EXTERNAL_PROCESSING),
-                Map.entry("FAILED_INTERNAL_SYSTEM_PROCESSING", EXTERNAL_PROCESSING),
-                Map.entry("UNKNOWN_PAYMENT_ERROR", EXTERNAL_PROCESSING)
+                Map.entry("FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING", EXTERNAL_SERVER_PROCESSING),
+                Map.entry("FAILED_INTERNAL_SYSTEM_PROCESSING", EXTERNAL_SERVER_PROCESSING),
+                Map.entry("UNKNOWN_PAYMENT_ERROR", EXTERNAL_SERVER_PROCESSING)
         );
     }
 

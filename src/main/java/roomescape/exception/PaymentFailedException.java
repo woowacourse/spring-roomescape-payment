@@ -15,4 +15,12 @@ public class PaymentFailedException extends RuntimeException {
     public boolean causedByClient() {
         return paymentFailure.causedBy(Cause.CLIENT_ERROR);
     }
+
+    public boolean causedByServer() {
+        return paymentFailure.causedBy(Cause.SERVER_ERROR);
+    }
+
+    public boolean causedByExternalServer() {
+        return paymentFailure.causedBy(Cause.EXTERNAL_ERROR);
+    }
 }
