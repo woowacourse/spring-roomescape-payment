@@ -44,7 +44,7 @@ public class ReservationTime {
         if (!(o instanceof ReservationTime that)) {
             return false;
         }
-        return Objects.equals(getId(), that.getId());
+        return this.getId() != null && Objects.equals(getId(), that.getId());
     }
 
     @Override

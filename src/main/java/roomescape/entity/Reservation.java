@@ -167,7 +167,7 @@ public class Reservation {
         if (!(o instanceof Reservation that)) {
             return false;
         }
-        return Objects.equals(getId(), that.getId());
+        return this.getId() != null && Objects.equals(getId(), that.getId());
     }
 
     @Override

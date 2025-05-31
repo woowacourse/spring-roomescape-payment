@@ -144,7 +144,7 @@ public class Member {
         if (!(o instanceof Member member)) {
             return false;
         }
-        return Objects.equals(getId(), member.getId());
+        return this.getId() != null && Objects.equals(getId(), member.getId());
     }
 
     @Override

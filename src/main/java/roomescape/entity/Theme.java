@@ -59,7 +59,7 @@ public class Theme {
         if (!(o instanceof Theme theme)) {
             return false;
         }
-        return Objects.equals(getId(), theme.getId());
+        return this.getId() != null && Objects.equals(getId(), theme.getId());
     }
 
     @Override
