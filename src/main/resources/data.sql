@@ -21,12 +21,17 @@ VALUES ('10:00'),
        ('11:00'),
        ('12:00');
 
-INSERT INTO reservation(date, time_id, theme_id, member_id)
-VALUES ('2025-05-18', 1, 1, 1),
-       ('2025-05-19', 2, 1, 2),
-       ('2025-05-20', 3, 3, 1),
-       ('2025-05-21', 1, 1, 1);
+INSERT INTO payment (payment_key, order_id, amount, payment_type)
+VALUES ('pay_001', 'order_001', 1000, 'NORMAL'),
+       ('pay_002', 'order_002', 1000, 'NORMAL'),
+       ('pay_003', 'order_003', 1000, 'NORMAL'),
+       ('pay_004', 'order_004', 1000, 'NORMAL');
 
+INSERT INTO reservation(date, time_id, theme_id, member_id, payment_id)
+VALUES ('2025-05-18', 1, 1, 1, 1),
+       ('2025-05-19', 2, 1, 2, 2),
+       ('2025-05-20', 3, 3, 1, 3),
+       ('2025-05-21', 1, 1, 1, 4);
 
 INSERT INTO waiting (date, time_id, theme_id, member_id)
 VALUES ('2025-05-18', 1, 1, 2),
