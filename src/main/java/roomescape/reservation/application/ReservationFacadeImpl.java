@@ -1,12 +1,15 @@
 package roomescape.reservation.application;
 
+import java.time.LocalDate;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.exception.DuplicateException;
 import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.resolver.PaymentClient;
 import roomescape.reservation.application.dto.AvailableReservationTimeServiceRequest;
 import roomescape.reservation.application.dto.CreateReservationServiceRequest;
@@ -27,11 +30,6 @@ import roomescape.reservation.ui.dto.ReservationSearchWebRequest;
 import roomescape.reservation.ui.dto.WaitingReservationResponse;
 import roomescape.user.application.service.UserQueryService;
 import roomescape.user.domain.User;
-
-import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -95,9 +93,9 @@ public class ReservationFacadeImpl implements ReservationFacade {
     public ReservationResponse create(final CreateReservationWithUserIdWebRequest request) {
         final User user = userQueryService.getById(request.userId());
         final Reservation reservation = reservationCommandService.create(
-                request.toServiceRequest()); // todo. paymentKey를 저장하기?
+                request.toServiceRequest());
 
-        PaymentResponse response = paymentClient.confirmPayment(
+        paymentClient.confirmPayment(
                 new PaymentRequest(request.paymentKey(),
                         request.amount(),
                         request.orderId(),
