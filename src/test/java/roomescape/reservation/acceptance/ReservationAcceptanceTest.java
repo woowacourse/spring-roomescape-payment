@@ -27,6 +27,7 @@ import roomescape.payment.entity.Payment;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.ReservationAdminCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
+import roomescape.reservation.dto.request.ReservationCreateRequest.PaymentDetail;
 import roomescape.reservation.entity.ReservationTime;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.theme.entity.Theme;
@@ -78,10 +79,12 @@ class ReservationAcceptanceTest {
                 LocalDate.now().plusDays(1),
                 1L,
                 1L,
-                "any",
-                "1",
-                100L,
-                "any"
+                new PaymentDetail(
+                        "any",
+                        "1",
+                        100L,
+                        "any"
+                )
         );
 
         // when & then
@@ -102,10 +105,12 @@ class ReservationAcceptanceTest {
                 LocalDate.now().plusDays(1),
                 1L,
                 1L,
-                "any",
-                "1",
-                100L,
-                "any"
+                new PaymentDetail(
+                        "any",
+                        "1",
+                        100L,
+                        "any"
+                )
         );
         TestHelper.postWithToken("/reservations", reservationRequest, token);
 
@@ -124,10 +129,12 @@ class ReservationAcceptanceTest {
                 LocalDate.now().plusDays(1),
                 1L,
                 1L,
-                "any",
-                "1",
-                100L,
-                "any"
+                new PaymentDetail(
+                        "any",
+                        "1",
+                        100L,
+                        "any"
+                )
         );
         TestHelper.postWithToken("/reservations", reservationRequest, token);
 
@@ -152,10 +159,12 @@ class ReservationAcceptanceTest {
                 LocalDate.now().plusDays(1),
                 1L,
                 1L,
-                "any",
-                "1",
-                100L,
-                "any"
+                new PaymentDetail(
+                        "any",
+                        "1",
+                        100L,
+                        "any"
+                )
         );
 
         TestHelper.postWithToken("/reservations", reservationRequest, token);
@@ -180,10 +189,12 @@ class ReservationAcceptanceTest {
                 LocalDate.now().plusDays(1),
                 1L,
                 1L,
-                "any",
-                "1",
-                100L,
-                "any"
+                new PaymentDetail(
+                        "any",
+                        "1",
+                        100L,
+                        "any"
+                )
         );
         TestHelper.postWithToken("/reservations", reservationRequest, token);
         String url = String.format("/admin/reservations/filtered?themeId=%d&memberId=%d&dateFrom=%s&dateTo=%s",
@@ -210,10 +221,12 @@ class ReservationAcceptanceTest {
                 LocalDate.now().plusDays(1),
                 1L,
                 1L,
-                "any",
-                "1",
-                100L,
-                "any"
+                new PaymentDetail(
+                        "any",
+                        "1",
+                        100L,
+                        "any"
+                )
         );
 
         TestHelper.postWithToken("/reservations", reservationRequest, token);

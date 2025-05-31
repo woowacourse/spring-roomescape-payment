@@ -49,9 +49,9 @@ public class ReservationService {
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 테마 입니다."));
 
         Payment payment = paymentService.confirmPayment(
-                request.paymentKey(),
-                request.orderId(),
-                request.amount()
+                request.payment().paymentKey(),
+                request.payment().orderId(),
+                request.payment().amount()
         );
 
         Reservation newReservation = new Reservation(request.date(), time, theme, member, payment);

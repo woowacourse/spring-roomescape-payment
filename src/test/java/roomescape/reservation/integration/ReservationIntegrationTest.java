@@ -71,10 +71,7 @@ class ReservationIntegrationTest {
                 date,
                 time.getId(),
                 theme.getId(),
-                "any",
-                "1",
-                100L,
-                "any"
+                new ReservationCreateRequest.PaymentDetail("any", "1", 100L, "any")
         );
 
         // when
@@ -121,10 +118,7 @@ class ReservationIntegrationTest {
                 date,
                 time.getId(),
                 theme.getId(),
-                "any",
-                "1",
-                100L,
-                "any"
+                new ReservationCreateRequest.PaymentDetail("any", "1", 100L, "any")
         );
 
         // when & then
@@ -145,10 +139,7 @@ class ReservationIntegrationTest {
                 date,
                 time.getId(),
                 theme.getId(),
-                "any",
-                "1",
-                100L,
-                "any"
+                new ReservationCreateRequest.PaymentDetail("any", "1", 100L, "any")
         );
         reservationService.createReservation(member.getId(), request);
 
@@ -170,10 +161,7 @@ class ReservationIntegrationTest {
                 date,
                 time.getId(),
                 theme.getId(),
-                "any",
-                "1",
-                100L,
-                "any"
+                new ReservationCreateRequest.PaymentDetail("any", "1", 100L, "any")
         );
         reservationService.createReservation(member.getId(), request);
 
@@ -204,10 +192,7 @@ class ReservationIntegrationTest {
                 date,
                 time.getId(),
                 theme.getId(),
-                "any",
-                "1",
-                100L,
-                "any"
+                new ReservationCreateRequest.PaymentDetail("any", "1", 100L, "any")
         );
         reservationService.createReservation(member.getId(), request);
 
@@ -245,10 +230,7 @@ class ReservationIntegrationTest {
                 date,
                 time.getId(),
                 theme.getId(),
-                "any",
-                "1",
-                100L,
-                "any"
+                new ReservationCreateRequest.PaymentDetail("any", "1", 100L, "any")
         );
         var response = reservationService.createReservation(member.getId(), request);
 
@@ -272,10 +254,7 @@ class ReservationIntegrationTest {
                 date,
                 time.getId(),
                 theme.getId(),
-                "any",
-                "1",
-                100L,
-                "any"
+                new ReservationCreateRequest.PaymentDetail("any", "1", 100L, "any")
         );
         reservationService.createReservation(member.getId(), request);
 

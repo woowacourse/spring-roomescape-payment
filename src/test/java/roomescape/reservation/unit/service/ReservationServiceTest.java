@@ -87,10 +87,12 @@ class ReservationServiceTest {
                 LocalDate.now().plusDays(1),
                 time.getId(),
                 theme.getId(),
-                "any",
-                "1",
-                100L,
-                "any"
+                new ReservationCreateRequest.PaymentDetail(
+                        "any",
+                        "1",
+                        100L,
+                        "any"
+                )
         );
 
         // when
@@ -140,10 +142,12 @@ class ReservationServiceTest {
                 LocalDate.now().minusDays(1),
                 time.getId(),
                 theme.getId(),
-                "any",
-                "1",
-                100L,
-                "any"
+                new ReservationCreateRequest.PaymentDetail(
+                        "any",
+                        "1",
+                        100L,
+                        "any"
+                )
         );
 
         // when & then
@@ -164,10 +168,12 @@ class ReservationServiceTest {
                 date,
                 time.getId(),
                 theme.getId(),
-                "any",
-                "1",
-                100L,
-                "any"
+                new ReservationCreateRequest.PaymentDetail(
+                        "any",
+                        "1",
+                        100L,
+                        "any"
+                )
         );
         reservationService.createReservation(member.getId(), request);
 
@@ -189,10 +195,12 @@ class ReservationServiceTest {
                 date,
                 time.getId(),
                 theme.getId(),
-                "any",
-                "1",
-                100L,
-                "any"
+                new ReservationCreateRequest.PaymentDetail(
+                        "any",
+                        "1",
+                        100L,
+                        "any"
+                )
         );
         reservationService.createReservation(member.getId(), request);
 
@@ -221,10 +229,12 @@ class ReservationServiceTest {
                 date,
                 time.getId(),
                 theme.getId(),
-                "any",
-                "1",
-                100L,
-                "any"
+                new ReservationCreateRequest.PaymentDetail(
+                        "any",
+                        "1",
+                        100L,
+                        "any"
+                )
         );
         reservationService.createReservation(member.getId(), request);
 
@@ -266,11 +276,12 @@ class ReservationServiceTest {
                 date,
                 time.getId(),
                 theme2.getId(),
-                "any",
-                "1",
-                100L,
-                "any"
-
+                new ReservationCreateRequest.PaymentDetail(
+                        "any",
+                        "1",
+                        100L,
+                        "any"
+                )
         );
         reservationService.createReservation(member.getId(), request);
 
