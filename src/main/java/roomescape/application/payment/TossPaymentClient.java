@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import roomescape.application.payment.dto.PaymentCommand;
+import roomescape.infrastructure.error.exception.PaymentException;
 import roomescape.infrastructure.error.exception.TossPaymentException;
 
 @Component
@@ -73,19 +74,29 @@ public class TossPaymentClient {
         try {
             JsonNode node = objectMapper.readTree(clientHttpResponse.getBody());
             String code = node.path("code").asText();
-            String message = node.path("message").asText("결제 승인 요청에 실패했습니다.");
+            String message = node.path("message").asText();
             log.warn("결제 승인 실패 - code: {}, message: {}", code, message);
-            throw new TossPaymentException(message);
+            TossPaymentErrorCode tossPaymentErrorCode = getTossPaymentErrorCode(code);
+            throw new TossPaymentException(tossPaymentErrorCode.getKoreanMessage());
         } catch (JsonProcessingException e) {
             log.warn("토스 응답 처리 중 JSON 파싱 오류", e);
-            throw new TossPaymentException("관리자에게 문의해주세요.");
+            throw new TossPaymentException(TossPaymentErrorCode.SYSTEM_ERROR_MESSAGE);
         } catch (IOException e) {
             log.error("토스 응답 처리 중 I/O 오류", e);
-            throw new TossPaymentException("관리자에게 문의해주세요.");
+            throw new TossPaymentException(TossPaymentErrorCode.SYSTEM_ERROR_MESSAGE);
+        }
+    }
+
+    private TossPaymentErrorCode getTossPaymentErrorCode(String code) {
+        try {
+            return TossPaymentErrorCode.fromCode(code);
+        } catch (PaymentException e) {
+            log.warn("알 수 없는 결제 오류 코드: {}", code, e);
+            throw new TossPaymentException(TossPaymentErrorCode.SYSTEM_ERROR_MESSAGE);
         }
     }
 
     private void handle5xxError(HttpRequest httpRequest, ClientHttpResponse clientHttpResponse) {
-        throw new TossPaymentException("결제 서버 오류, 잠시 후 다시 시도해주세요.");
+        throw new TossPaymentException(TossPaymentErrorCode.SYSTEM_ERROR_MESSAGE);
     }
 }

@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.application.AbstractServiceIntegrationTest;
 import roomescape.application.payment.TossPaymentClient;
+import roomescape.application.payment.TossPaymentErrorCode;
 import roomescape.application.reservation.command.dto.CreateReservationCommand;
 import roomescape.application.reservation.command.dto.CreateReservationWithPaymentCommand;
 import roomescape.domain.member.Email;
@@ -118,7 +119,7 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
                 amount,
                 "NORMAL"
         );
-        doThrow(new TossPaymentException("관리자에게 문의해주세요."))
+        doThrow(new TossPaymentException(TossPaymentErrorCode.SYSTEM_ERROR_MESSAGE))
                 .when(tossPaymentClient)
                 .approve(command.getPaymentCommand());
         when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(new Payment(orderId, amount)));
@@ -127,7 +128,7 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
         // then
         assertThatCode(() -> createReservationService.reserve(command))
                 .isInstanceOf(PaymentException.class)
-                .hasMessage("토스 결제 오류: 관리자에게 문의해주세요.");
+                .hasMessage("토스 결제 시스템에서 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
     }
 
     @Test
