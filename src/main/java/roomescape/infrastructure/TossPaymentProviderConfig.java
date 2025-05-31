@@ -2,6 +2,7 @@ package roomescape.infrastructure;
 
 import static roomescape.infrastructure.EncodeUtil.base64Encode;
 
+import java.time.Duration;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +29,8 @@ public class TossPaymentProviderConfig {
         return new RestTemplateBuilder()
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE)
-            .rootUri(TOSS_API_BASE_URL);
+            .rootUri(TOSS_API_BASE_URL)
+            .connectTimeout(Duration.ofSeconds(1))
+            .readTimeout(Duration.ofSeconds(2));
     }
 }
