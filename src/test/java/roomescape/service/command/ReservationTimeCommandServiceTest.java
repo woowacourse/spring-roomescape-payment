@@ -8,8 +8,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import roomescape.domain.ReservationTime;
+import roomescape.domain.reservation.slot.ReservationTime;
 import roomescape.dto.time.ReservationTimeCreateRequestDto;
 import roomescape.dto.time.ReservationTimeResponseDto;
 import roomescape.exception.DuplicateContentException;

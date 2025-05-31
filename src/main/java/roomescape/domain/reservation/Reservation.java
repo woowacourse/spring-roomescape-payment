@@ -12,9 +12,10 @@ import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Theme;
+import roomescape.domain.reservation.slot.ReservationTime;
+import roomescape.domain.reservation.slot.Theme;
 import roomescape.domain.member.Member;
+import roomescape.domain.reservation.waiting.ReservationWaitingTicket;
 import roomescape.exception.InvalidRequestException;
 
 @Entity
