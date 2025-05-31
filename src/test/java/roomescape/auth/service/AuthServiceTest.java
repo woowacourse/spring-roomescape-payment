@@ -23,7 +23,7 @@ import roomescape.member.domain.Role;
 class AuthServiceTest {
 
     private final FakeMemberDao fakeMemberDao = new FakeMemberDao();
-    private final JwtTokenProvider jwtTokenProvider = new JwtTokenProvider();
+    private final JwtTokenProvider jwtTokenProvider = new JwtTokenProvider("secret", 30000L);
     private final AuthService authService = new AuthService(fakeMemberDao, jwtTokenProvider);
 
     private final static long USER_ID = 1L;
