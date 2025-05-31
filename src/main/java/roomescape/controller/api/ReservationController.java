@@ -1,22 +1,18 @@
 package roomescape.controller.api;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestClient;
-import roomescape.client.PaymentClient;
 import roomescape.controller.annotation.AdminMember;
 import roomescape.controller.annotation.CurrentMember;
 import roomescape.dto.auth.LoginInfo;
 import roomescape.dto.reservation.MemberReservationCreateRequestDto;
 import roomescape.dto.reservation.MyReservationResponseDto;
 import roomescape.dto.reservation.ReservationResponseDto;
-import roomescape.dto.reservation.TossPaymentConfirmRequestDto;
+import roomescape.service.command.PaymentCommandService;
 import roomescape.service.command.ReservationCommandService;
 import roomescape.service.dto.ReservationCreateDto;
 import roomescape.service.query.ReservationQueryService;
 
-import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -25,14 +21,14 @@ public class ReservationController {
 
     private final ReservationQueryService reservationQueryService;
     private final ReservationCommandService reservationCommandService;
-    private final PaymentClient paymentClient;
+    private final PaymentCommandService paymentCommandService;
 
     public ReservationController(ReservationQueryService reservationQueryService,
                                  ReservationCommandService reservationCommandService,
-                                 PaymentClient paymentClient) {
+                                 PaymentCommandService paymentCommandService) {
         this.reservationQueryService = reservationQueryService;
         this.reservationCommandService = reservationCommandService;
-        this.paymentClient = paymentClient;
+        this.paymentCommandService = paymentCommandService;
     }
 
     @GetMapping
@@ -57,7 +53,7 @@ public class ReservationController {
             @CurrentMember LoginInfo loginInfo,
             @RequestBody final MemberReservationCreateRequestDto requestDto
     ) {
-        paymentClient.confirmPayment(requestDto.extractTossPaymentDto());
+        paymentCommandService.confirmPayment(requestDto.extractTossPaymentDto());
 
         ReservationCreateDto reservationCreateDto = new ReservationCreateDto(
                 requestDto.date(), requestDto.timeId(), requestDto.themeId(), loginInfo.id());

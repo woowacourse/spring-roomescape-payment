@@ -1,24 +1,26 @@
-package roomescape.config;
+package roomescape.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import roomescape.dto.reservation.TossPaymentConfirmRequestDto;
 import roomescape.exception.PaymentConfirmClientException;
 import roomescape.exception.PaymentConfirmServerException;
 
+import java.util.Base64;
 import java.util.Set;
 
-@Configuration
-public class RestClientConfiguration {
+@Component
+public class TossPaymentClient {
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
+    private static final String PAYMENT_CONFIRM_URL = "/v1/payments/confirm";
+    private static final String PAYMENT_CONFIRM_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:";
+    private static final String BASIC = "Basic ";
     private static final Set<String> INVISIBLE_CLIENT_ERROR_CODE = Set.of(
             "INVALID_API_KEY",
             "INVALID_AUTHORIZE_AUTH",
@@ -27,14 +29,32 @@ public class RestClientConfiguration {
             "INCORRECT_BASIC_AUTH_FORMAT"
     );
 
-    @Bean
-    public RestClient restClient() {
+    private final ObjectMapper objectMapper;
+
+    public TossPaymentClient(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
+    public void confirmPayment(TossPaymentConfirmRequestDto requestDto) {
+        RestClient restClient = buildRestClient();
+        restClient.post()
+                .uri(PAYMENT_CONFIRM_URL)
+                .header(HttpHeaders.AUTHORIZATION, BASIC +
+                        Base64.getEncoder().encodeToString(PAYMENT_CONFIRM_SECRET_KEY.getBytes()))
+                .body(requestDto)
+                .accept(MediaType.APPLICATION_JSON)
+                .retrieve()
+                .toBodilessEntity();
+    }
+
+    public RestClient buildRestClient() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(200);
         factory.setReadTimeout(30000);
 
         return RestClient.builder()
                 .requestFactory(factory)
+                .baseUrl("https://api.tosspayments.com")
                 .defaultStatusHandler(HttpStatusCode::is4xxClientError, (req, res) -> {
                     JsonNode root = objectMapper.readTree(res.getBody());
                     String message = root.path("message").asText();
