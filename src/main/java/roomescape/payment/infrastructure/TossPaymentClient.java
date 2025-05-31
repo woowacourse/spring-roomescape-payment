@@ -17,9 +17,12 @@ import roomescape.payment.infrastructure.dto.TossPaymentRequest;
 public class TossPaymentClient implements PaymentClient {
 
     private final RestClient restClient;
+    private final ObjectMapper objectMapper;
 
-    public TossPaymentClient(@Qualifier("tossPaymentRestClient") RestClient restClient) {
+    public TossPaymentClient(@Qualifier("tossPaymentRestClient") final RestClient restClient,
+                             final ObjectMapper objectMapper) {
         this.restClient = restClient;
+        this.objectMapper = objectMapper;
     }
 
     public PaymentResponse requestPayment(final PaymentRequest request) {
@@ -36,7 +39,6 @@ public class TossPaymentClient implements PaymentClient {
 
     private void handleException(final ClientHttpResponse res) {
         try (InputStream is = res.getBody()) {
-            ObjectMapper objectMapper = new ObjectMapper();
             TossErrorResponse error = objectMapper.readValue(is, TossErrorResponse.class);
             throw new TossPaymentException(error.code(), error.message());
         } catch (IOException e) {

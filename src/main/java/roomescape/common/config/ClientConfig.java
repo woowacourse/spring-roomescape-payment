@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.infrastructure.TossPaymentProperties;
@@ -29,7 +30,7 @@ public class ClientConfig {
         return RestClient.builder()
                 .baseUrl(tossPaymentProperties.baseUrl())
                 .requestFactory(requestFactory)
-                .defaultHeader("Authorization", "Basic " + encodedKey)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Basic " + encodedKey)
                 .build();
     }
 }
