@@ -76,7 +76,7 @@ public class Payment {
         this.status = status;
     }
 
-    public void updateConfirmedInfo(String method, String cardNumber, String cardApprovedNo, String easyPayProvider, String receiptUrl) {
+    public void updateConfirmed(String method, String cardNumber, String cardApprovedNo, String easyPayProvider, String receiptUrl) {
         this.method = method;
         this.cardNumber = cardNumber;
         this.cardApprovedNo = cardApprovedNo;

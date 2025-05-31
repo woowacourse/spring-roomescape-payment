@@ -37,7 +37,12 @@ public class PaymentService {
         final Reservation reservation = reservationService.findById(reservationResponse.id());
         log.debug("Reservation ID: {}", reservation.getId());
 
-        final Payment payment = Payment.builder()
+        final Payment payment = createPayment(request, reservation);
+        paymentRepository.save(payment);
+    }
+
+    private Payment createPayment(ReservationPaymentRequest request, Reservation reservation) {
+        return Payment.builder()
                 .paymentKey(request.paymentKey())
                 .orderId(request.orderId())
                 .amount(request.amount())
@@ -45,7 +50,6 @@ public class PaymentService {
                 .member(reservation.getMember())
                 .status(PaymentStatus.PENDING)
                 .build();
-        paymentRepository.save(payment);
     }
 
     @Transactional
@@ -53,19 +57,23 @@ public class PaymentService {
         try {
             TossPaymentResponse response = tossRestClient.confirm(tossPaymentRequest);
             Payment payment = getPayment(tossPaymentRequest);
-            payment.updateStatusTo(PaymentStatus.COMPLETED);
-            payment.updateConfirmedInfo(
-                    response.method(),
-                    response.cardNumber(),
-                    response.cardApprovedNo(),
-                    response.easyPayProvider(),
-                    response.receiptUrl()
-            );
+            updatePaymentInfoAfterConfirm(payment, response);
         } catch (TossPaymentException e) {
             Payment payment = getPayment(tossPaymentRequest);
             payment.updateStatusTo(PaymentStatus.FAILED);
             throw e;
         }
+    }
+
+    private void updatePaymentInfoAfterConfirm(Payment payment, TossPaymentResponse response) {
+        payment.updateStatusTo(PaymentStatus.COMPLETED);
+        payment.updateConfirmed(
+                response.method(),
+                response.cardNumber(),
+                response.cardApprovedNo(),
+                response.easyPayProvider(),
+                response.receiptUrl()
+        );
     }
 
     private Payment getPayment(TossPaymentRequest tossPaymentRequest) {
