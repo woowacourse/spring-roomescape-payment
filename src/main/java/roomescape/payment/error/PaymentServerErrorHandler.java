@@ -7,14 +7,14 @@ import java.net.URI;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
-import roomescape.global.error.exception.BadRequestException;
+import roomescape.global.error.exception.ServerException;
 import roomescape.payment.dto.response.PaymentErrorResponse;
 
-public class ClientErrorHandler implements ResponseErrorHandler {
+public class PaymentServerErrorHandler implements ResponseErrorHandler {
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
-        return response.getStatusCode().is4xxClientError();
+        return response.getStatusCode().is5xxServerError();
     }
 
     @Override
@@ -26,6 +26,6 @@ public class ClientErrorHandler implements ResponseErrorHandler {
                 response.getBody(),
                 PaymentErrorResponse.class
         );
-        throw new BadRequestException(paymentErrorResponse.message());
+        throw new ServerException(paymentErrorResponse.message());
     }
 }

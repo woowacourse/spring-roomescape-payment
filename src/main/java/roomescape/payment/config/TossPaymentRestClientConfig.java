@@ -4,7 +4,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +16,6 @@ public class TossPaymentRestClientConfig {
     private String tossSecretKey;
 
     @Bean
-    @Qualifier("tossPaymentRestClient")
     public RestClient tossPaymentRestClient() {
         String base64EncodedKey = Base64.getEncoder()
                 .encodeToString((tossSecretKey + ":").getBytes(StandardCharsets.UTF_8));

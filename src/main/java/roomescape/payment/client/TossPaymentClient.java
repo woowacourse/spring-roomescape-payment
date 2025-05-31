@@ -2,19 +2,26 @@ package roomescape.payment.client;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.request.PaymentConfirmRequest;
 import roomescape.payment.dto.response.PaymentConfirmResponse;
-import roomescape.payment.error.ClientErrorHandler;
-import roomescape.payment.error.ServerErrorHandler;
 
 @Component
 public class TossPaymentClient implements PaymentClient {
 
     private final RestClient restClient;
+    private final ResponseErrorHandler paymentClientErrorHandler;
+    private final ResponseErrorHandler paymentServerErrorHandler;
 
-    public TossPaymentClient(@Qualifier("tossPaymentRestClient") RestClient restClient) {
+    public TossPaymentClient(
+            @Qualifier("tossPaymentRestClient") RestClient restClient,
+            @Qualifier("paymentClientErrorHandler") ResponseErrorHandler clientErrorHandler,
+            @Qualifier("paymentServerErrorHandler") ResponseErrorHandler serverErrorHandler
+    ) {
         this.restClient = restClient;
+        this.paymentClientErrorHandler = clientErrorHandler;
+        this.paymentServerErrorHandler = serverErrorHandler;
     }
 
     // TODO: 테스트 고민..
@@ -24,8 +31,8 @@ public class TossPaymentClient implements PaymentClient {
         return restClient.post()
                 .body(new PaymentConfirmRequest(paymentKey, orderId, amount))
                 .retrieve()
-                .onStatus(new ClientErrorHandler())
-                .onStatus(new ServerErrorHandler())
+                .onStatus(paymentClientErrorHandler)
+                .onStatus(paymentServerErrorHandler)
                 .body(PaymentConfirmResponse.class);
     }
 }
