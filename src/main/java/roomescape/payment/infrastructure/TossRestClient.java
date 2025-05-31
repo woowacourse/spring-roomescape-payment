@@ -67,7 +67,8 @@ public class TossRestClient {
 
     private TossErrorResponse extractResponseFrom(InputStream errorStream) {
         try (errorStream) {
-            return objectMapper.readValue(errorStream, TossErrorResponse.class);
+            String errorBody = new String(errorStream.readAllBytes(), StandardCharsets.UTF_8);
+            return objectMapper.readValue(errorBody, TossErrorResponse.class);
         } catch (IOException e) {
             boolean isServerError = true;
             throw new TossPaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "토스 오류 응답을 파싱할 수 없습니다.", isServerError);
