@@ -1,23 +1,27 @@
 package roomescape.reservation.service;
 
-import static org.mockito.Mockito.verify;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
+import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.PaymentException;
 import roomescape.member.auth.vo.MemberInfo;
-import roomescape.member.domain.Member;
-import roomescape.member.domain.MemberEmail;
-import roomescape.member.domain.MemberName;
 import roomescape.member.domain.Role;
 import roomescape.payment.PaymentConfirmResponse;
 import roomescape.payment.PaymentConfirmWebRequest;
@@ -25,45 +29,52 @@ import roomescape.payment.PaymentService;
 import roomescape.reservation.controller.dto.CreateReservationWebRequest;
 import roomescape.reservation.controller.dto.CreateReservationWithPaymentWebRequest;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationDate;
-import roomescape.reservation.service.dto.CreateReservationServiceRequest;
-import roomescape.reservation.service.usecase.ReservationCommandUseCase;
-import roomescape.theme.domain.Theme;
-import roomescape.theme.domain.ThemeDescription;
-import roomescape.theme.domain.ThemeName;
-import roomescape.theme.domain.ThemeThumbnail;
-import roomescape.time.domain.ReservationTime;
 
+@SpringBootTest
+@Transactional
 @ExtendWith(MockitoExtension.class)
 public class ReservationServiceTest {
 
-    @Mock
-    private ReservationCommandUseCase reservationCommandUseCase;
+    @Autowired
+    private EntityManager entityManager;
 
-    @Mock
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private ReservationService reservationService;
+
+    @MockitoBean
     private PaymentService paymentService;
 
-    @InjectMocks
-    private ReservationService reservationService;
+    @BeforeEach
+    void setUp() {
+        jdbcTemplate.update(
+                "INSERT INTO member (id, name, email, role) VALUES (?, ?, ?, ?)",
+                1L, "member1", "11@gmail.com", "USER"
+        );
+        jdbcTemplate.update(
+                "INSERT INTO theme (id, name, description, thumbnail) VALUES (?, ?, ?, ?)",
+                1L, "테마1", "테마1 설명", "www.theme1.com"
+        );
+
+        jdbcTemplate.update(
+                "INSERT INTO reservation_time (id, start_at) VALUES (?, ?)",
+                1L, LocalTime.of(14, 30)
+        );
+    }
 
     @Nested
     class create {
 
         private static final CreateReservationWithPaymentWebRequest REQUEST = new CreateReservationWithPaymentWebRequest(
                 new CreateReservationWebRequest(
-                        LocalDate.of(2023, 10, 15), 1L, 1L
+                        LocalDate.of(2025, 10, 15), 1L, 1L
                 ),
                 new PaymentConfirmWebRequest("paymentKey", "orderId", 1000)
         );
 
         private static final MemberInfo MEMBER_INFO = new MemberInfo(1L, "name", "email", Role.USER);
-
-        private static final CreateReservationServiceRequest CREATE_RESERVATION_SERVICE_REQUEST = new CreateReservationServiceRequest(
-                MEMBER_INFO.id(),
-                REQUEST.createReservationWebRequest().date(),
-                REQUEST.createReservationWebRequest().timeId(),
-                REQUEST.createReservationWebRequest().themeId()
-        );
 
         private static final PaymentConfirmResponse PAYMENT_CONFIRM_RESPONSE = new PaymentConfirmResponse(
                 "paymentKey",
@@ -79,14 +90,15 @@ public class ReservationServiceTest {
             when(paymentService.confirm(REQUEST.paymentConfirmWebRequest().toPaymentConfirmRequest()))
                     .thenReturn(PAYMENT_CONFIRM_RESPONSE);
 
-            when(reservationCommandUseCase.create(CREATE_RESERVATION_SERVICE_REQUEST))
-                    .thenReturn(ReservationFixture.createWithId());
-
             // when
             reservationService.paymentConfirmAndCreate(REQUEST, MEMBER_INFO);
 
             // then
-            verify(reservationCommandUseCase).create(CREATE_RESERVATION_SERVICE_REQUEST);
+            final List<Reservation> actual = entityManager
+                    .createQuery("SELECT r FROM Reservation r", Reservation.class)
+                    .getResultList();
+
+            assertThat(actual).hasSize(1);
         }
 
         @DisplayName("결제 승인 요청에 실패하면 예약을 생성하지 않는다.")
@@ -96,24 +108,15 @@ public class ReservationServiceTest {
             when(paymentService.confirm(REQUEST.paymentConfirmWebRequest().toPaymentConfirmRequest()))
                     .thenThrow(new PaymentException(HttpStatus.FORBIDDEN, "결제 승인 실패", "FAILED"));
 
-            // when
-        }
-    }
+            // when & then
+            assertThatThrownBy(() -> reservationService.paymentConfirmAndCreate(REQUEST, MEMBER_INFO))
+                    .isInstanceOf(PaymentException.class);
 
-    private static class ReservationFixture {
-        private static final Member MEMBER = Member.withId(1L, MemberName.from("name"),
-                MemberEmail.from("email@email.com"), Role.USER);
-        private static final ReservationDate DATE = ReservationDate.from(LocalDate.of(2023, 10, 15));
-        private static final ReservationTime TIME = ReservationTime.withId(1L, LocalTime.of(10, 0));
-        private static final Theme THEME = Theme.withId(1L, ThemeName.from("theme"),
-                ThemeDescription.from("description"), ThemeThumbnail.from("thumbnail"));
+            final List<Reservation> actual = entityManager
+                    .createQuery("SELECT r FROM Reservation r", Reservation.class)
+                    .getResultList();
 
-        public static Reservation createWithId() {
-            return Reservation.withId(1L, MEMBER, DATE, TIME, THEME);
-        }
-
-        public static Reservation createWithoutId() {
-            return Reservation.withoutId(MEMBER, DATE, TIME, THEME);
+            assertThat(actual).isEmpty();
         }
     }
 }
