@@ -20,9 +20,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.application.request.PaymentInfo;
 import roomescape.application.response.PaymentResponse;
-import roomescape.exception.PaymentException;
 import roomescape.infrastructure.payment.PaymentClient;
-import roomescape.infrastructure.payment.PaymentErrorCode;
+import roomescape.infrastructure.payment.toss.TossPaymentErrorCode;
+import roomescape.infrastructure.payment.toss.TossPaymentException;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -60,20 +60,20 @@ class ReservationControllerTest {
                 .body("date", Matchers.equalTo("3000-03-17"));
     }
 
-    @EnumSource(PaymentErrorCode.class)
+    @EnumSource(TossPaymentErrorCode.class)
     @ParameterizedTest
     @DisplayName("예약 추가 요청시, 결제에 실패하면 실패 에러 응답 코드를 반환한다")
-    void createReservation_WhenPaymentFailed(PaymentErrorCode errorCode) {
+    void createReservation_WhenPaymentFailed(TossPaymentErrorCode errorCode) {
         PaymentInfo paymentInfo = new PaymentInfo("paymentKey", "orderId", 1000);
 
-        given(paymentClient.confirmPayment(paymentInfo)).willThrow(new PaymentException(errorCode));
+        given(paymentClient.confirmPayment(paymentInfo)).willThrow(new TossPaymentException(errorCode));
 
         var token = RestAssured.given().contentType(ContentType.JSON)
                 .body(Map.of("email", "user1@email.com", "password", "password1")).when().post("/login").then()
                 .statusCode(200).extract().response().getDetailedCookies().getValue("token");
 
         RestAssured.given().log().all().contentType(ContentType.JSON).cookie("token", token).body(RESERVATION_BODY)
-                .when().post("/reservations").then().log().all().statusCode(errorCode.getStatusCode().value())
+                .when().post("/reservations").then().log().all().statusCode(errorCode.getHttpStatus().value())
                 .body("message", Matchers.equalTo(errorCode.getMessage()));
     }
 

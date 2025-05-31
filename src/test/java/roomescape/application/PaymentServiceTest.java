@@ -16,9 +16,9 @@ import roomescape.application.request.PaymentInfo;
 import roomescape.application.response.PaymentResponse;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
-import roomescape.exception.PaymentException;
 import roomescape.infrastructure.payment.PaymentClient;
-import roomescape.infrastructure.payment.PaymentErrorCode;
+import roomescape.infrastructure.payment.toss.TossPaymentErrorCode;
+import roomescape.infrastructure.payment.toss.TossPaymentException;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentServiceTest {
@@ -57,13 +57,13 @@ class PaymentServiceTest {
     void savePayment_Failure() {
         // given
         PaymentInfo paymentInfo = new PaymentInfo("test_payment_key", "test_order_id", 1000);
-        PaymentException expectedException = new PaymentException(PaymentErrorCode.REJECT_CARD_PAYMENT);
+        TossPaymentException expectedException = new TossPaymentException(TossPaymentErrorCode.REJECT_CARD_PAYMENT);
 
         when(paymentClient.confirmPayment(paymentInfo)).thenThrow(expectedException);
 
         // when & then
-        assertThatThrownBy(() -> paymentService.savePayment(paymentInfo)).isInstanceOf(PaymentException.class)
-                .hasFieldOrPropertyWithValue("errorCode", PaymentErrorCode.REJECT_CARD_PAYMENT)
+        assertThatThrownBy(() -> paymentService.savePayment(paymentInfo)).isInstanceOf(TossPaymentException.class)
+                .hasFieldOrPropertyWithValue("errorCode", TossPaymentErrorCode.REJECT_CARD_PAYMENT)
                 .hasMessageContaining("한도초과 혹은 잔액부족");
     }
 } 

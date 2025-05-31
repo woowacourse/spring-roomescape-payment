@@ -1,13 +1,14 @@
 package roomescape.infrastructure.payment.toss;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static roomescape.infrastructure.payment.PaymentErrorCode.RESPONSE_PARSING_ERROR;
-import static roomescape.infrastructure.payment.PaymentErrorCode.UNKNOWN;
+import static roomescape.exception.code.RestClientErrorCode.RESPONSE_PARSING_ERROR;
+import static roomescape.infrastructure.payment.toss.TossPaymentErrorCode.UNKNOWN;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Base64;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -19,9 +20,8 @@ import org.springframework.web.client.RestClientException;
 import roomescape.application.request.PaymentInfo;
 import roomescape.application.response.PaymentResponse;
 import roomescape.application.response.TossErrorResponse;
-import roomescape.exception.PaymentException;
+import roomescape.exception.ExternalApiException;
 import roomescape.infrastructure.payment.PaymentClient;
-import roomescape.infrastructure.payment.PaymentErrorCode;
 
 @Component
 public class TossPaymentClient implements PaymentClient {
@@ -34,7 +34,8 @@ public class TossPaymentClient implements PaymentClient {
     private final ObjectMapper objectMapper;
 
     public TossPaymentClient(final @Value("${payment.toss.secret-key}") String secretKey,
-                             final ObjectMapper objectMapper, final RestClient.Builder restClientBuilder) {
+                             final ObjectMapper objectMapper,
+                             final @Qualifier("tossClientBuilder") RestClient.Builder restClientBuilder) {
         this.restClient = initRestClient(restClientBuilder, secretKey);
         this.objectMapper = objectMapper;
     }
@@ -46,17 +47,18 @@ public class TossPaymentClient implements PaymentClient {
                     .onStatus(HttpStatusCode::isError, (request, response) -> processErrorResponse(response))
                     .body(PaymentResponse.class);
         } catch (RestClientException e) {
-            if (e.getCause() instanceof JsonProcessingException || e.getCause() instanceof HttpMessageNotReadableException) {
-                throw new PaymentException(RESPONSE_PARSING_ERROR);
+            if (e.getCause() instanceof JsonProcessingException
+                    || e.getCause() instanceof HttpMessageNotReadableException) {
+                throw new ExternalApiException(RESPONSE_PARSING_ERROR);
             }
-            throw new PaymentException(UNKNOWN, e.getMessage());
+            throw new ExternalApiException(UNKNOWN, e.getMessage());
         }
     }
 
     private void processErrorResponse(final ClientHttpResponse response) throws IOException {
         TossErrorResponse error = objectMapper.readValue(response.getBody(), TossErrorResponse.class);
-        PaymentErrorCode code = PaymentErrorCode.from(error.code());
-        throw new PaymentException(code);
+        TossPaymentErrorCode code = TossPaymentErrorCode.from(error.code());
+        throw new TossPaymentException(code);
     }
 
     private RestClient initRestClient(final RestClient.Builder builder, final String secretKey) {

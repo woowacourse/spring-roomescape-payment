@@ -1,8 +1,8 @@
 package roomescape.common.interceptor;
 
-import static roomescape.infrastructure.payment.PaymentErrorCode.CONNECTION_ERROR;
-import static roomescape.infrastructure.payment.PaymentErrorCode.EXTERNAL_API_ERROR;
-import static roomescape.infrastructure.payment.PaymentErrorCode.SOCKET_TIMEOUT;
+import static roomescape.exception.code.RestClientErrorCode.CONNECTION_ERROR;
+import static roomescape.exception.code.RestClientErrorCode.EXTERNAL_API_ERROR;
+import static roomescape.exception.code.RestClientErrorCode.SOCKET_TIMEOUT;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -11,7 +11,7 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
-import roomescape.exception.PaymentException;
+import roomescape.exception.ExternalApiException;
 
 public class RestClientInterceptor implements ClientHttpRequestInterceptor {
 
@@ -22,11 +22,11 @@ public class RestClientInterceptor implements ClientHttpRequestInterceptor {
         try {
             return execution.execute(request, body);
         } catch (ConnectException e) {
-            throw new PaymentException(CONNECTION_ERROR);
+            throw new ExternalApiException(CONNECTION_ERROR);
         } catch (SocketTimeoutException e) {
-            throw new PaymentException(SOCKET_TIMEOUT);
+            throw new ExternalApiException(SOCKET_TIMEOUT);
         } catch (Exception e) {
-            throw new PaymentException(EXTERNAL_API_ERROR, e.getMessage());
+            throw new ExternalApiException(EXTERNAL_API_ERROR, e.getMessage());
         }
     }
 }

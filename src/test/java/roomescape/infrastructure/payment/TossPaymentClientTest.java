@@ -14,6 +14,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -28,8 +29,11 @@ import org.springframework.web.client.RestClient;
 import roomescape.application.request.PaymentInfo;
 import roomescape.application.response.PaymentResponse;
 import roomescape.common.interceptor.RestClientInterceptor;
-import roomescape.exception.PaymentException;
+import roomescape.exception.ExternalApiException;
+import roomescape.exception.code.RestClientErrorCode;
 import roomescape.infrastructure.payment.toss.TossPaymentClient;
+import roomescape.infrastructure.payment.toss.TossPaymentErrorCode;
+import roomescape.infrastructure.payment.toss.TossPaymentException;
 import roomescape.infrastructure.payment.toss.TossRestClientProperties;
 
 @ActiveProfiles("test")
@@ -69,14 +73,14 @@ class TossPaymentClientTest {
     }
 
     @ParameterizedTest
-    @EnumSource(PaymentErrorCode.class)
+    @EnumSource(TossPaymentErrorCode.class)
     @DisplayName("토스 결제 승인 요청 API 호출 시 에러가 발생하면 PaymentException 예외가 발생한다.")
-    void confirmPayment_WhenExceptionThrown(PaymentErrorCode errorCode) {
+    void confirmPayment_WhenExceptionThrown(TossPaymentErrorCode errorCode) {
         // given
         PaymentInfo paymentInfo = new PaymentInfo("paymentKey", "ROOM_ESCAPE_test_order_id", 1000);
 
         server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm")).andExpect(method(HttpMethod.POST))
-                .andRespond(withStatus(errorCode.getStatusCode()).contentType(MediaType.APPLICATION_JSON)
+                .andRespond(withStatus(errorCode.getHttpStatus()).contentType(MediaType.APPLICATION_JSON)
                         .body(String.format("""
                                 {
                                     "code": "%s",
@@ -85,8 +89,8 @@ class TossPaymentClientTest {
                                 """, errorCode.name(), errorCode.getMessage())));
 
         // when & then
-        assertThatThrownBy(() -> paymentClient.confirmPayment(paymentInfo)).isInstanceOf(PaymentException.class)
-                .matches(exception -> ((PaymentException) exception).getErrorCode() == errorCode);
+        assertThatThrownBy(() -> paymentClient.confirmPayment(paymentInfo)).isInstanceOf(TossPaymentException.class)
+                .matches(exception -> ((TossPaymentException) exception).getErrorCode() == errorCode);
     }
 
     @ParameterizedTest
@@ -106,8 +110,8 @@ class TossPaymentClientTest {
 
         // when & then
         assertThatThrownBy(() -> paymentClient.confirmPayment(paymentInfo))
-                .isInstanceOf(PaymentException.class)
-                .hasFieldOrPropertyWithValue("errorCode", PaymentErrorCode.RESPONSE_PARSING_ERROR)
+                .isInstanceOf(ExternalApiException.class)
+                .hasFieldOrPropertyWithValue("errorCode", RestClientErrorCode.RESPONSE_PARSING_ERROR)
                 .hasMessageContaining("외부 API 응답을 변환하는 과정에서 오류가 발생했습니다.");
     }
 
@@ -115,6 +119,7 @@ class TossPaymentClientTest {
     public static class TossClientTestConfig {
 
         @Bean
+        @Qualifier("tossClientBuilder")
         public RestClient.Builder tossTestClientBuilder(PaymentClientProperties properties,
                                                         MockServerRestClientCustomizer mockServerRestClientCustomizer) {
 
