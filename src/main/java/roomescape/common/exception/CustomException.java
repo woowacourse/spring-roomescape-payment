@@ -6,7 +6,7 @@ public class CustomException extends RuntimeException {
     private final ErrorCode errorCode;
 
     public CustomException(ErrorCode errorCode, String detail) {
-        super(errorCode.message + ", 원인: " + detail);
+        super(errorCode.message + " 원인: " + detail);
         this.errorCode = errorCode;
     }
 
