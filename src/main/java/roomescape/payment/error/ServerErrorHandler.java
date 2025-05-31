@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URI;
-import java.rmi.ServerException;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
+import roomescape.global.error.exception.ServerException;
 import roomescape.payment.dto.response.PaymentErrorResponse;
 
 public class ServerErrorHandler implements ResponseErrorHandler {
