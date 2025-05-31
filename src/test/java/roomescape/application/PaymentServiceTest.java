@@ -5,15 +5,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mockito;
 import roomescape.domain.payment.PaymentConfirmation;
 import roomescape.domain.payment.PaymentDetails;
+import roomescape.domain.payment.PaymentFailCode;
+import roomescape.domain.payment.PaymentFailure;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
-import roomescape.domain.payment.PaymentFailure;
-import roomescape.domain.payment.PaymentFailCode;
 import roomescape.exception.PaymentFailedException;
 
 class PaymentServiceTest {

@@ -17,6 +17,7 @@ class PaymentDetailsTest {
 
         assertAll(
             () -> assertThat(paymentDetails.confirmation()).isNotNull(),
+            () -> assertThat(paymentDetails.failure()).isNull(),
             () -> assertThat(paymentDetails.isFailed()).isFalse()
         );
     }
@@ -29,6 +30,7 @@ class PaymentDetailsTest {
 
         assertAll(
             () -> assertThat(paymentDetails.confirmation()).isNull(),
+            () -> assertThat(paymentDetails.failure()).isNotNull(),
             () -> assertThat(paymentDetails.isFailed()).isTrue()
         );
     }
