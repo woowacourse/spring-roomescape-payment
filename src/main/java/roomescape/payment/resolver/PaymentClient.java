@@ -5,17 +5,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.exception.PaymentApiException;
 
+@Component
 @RequiredArgsConstructor
 public class PaymentClient {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
     private final RestClient restClient;
+    private final ObjectMapper objectMapper;
 
     public PaymentResponse confirmPayment(final PaymentRequest request) {
 
@@ -34,7 +36,7 @@ public class PaymentClient {
     private void exceptionable(final RestClientResponseException e, final String paymentKey) {
         try {
             String responseBody = e.getResponseBodyAsString();
-            JsonNode jsonNode = MAPPER.readTree(responseBody);
+            JsonNode jsonNode = objectMapper.readTree(responseBody);
             String errorMessage = jsonNode.get("message").asText();
 
             if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
