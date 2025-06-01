@@ -1,6 +1,6 @@
 package roomescape.payment.service.dto;
 
-public record PaymentClientErrorResponse (
+public record TossPaymentsClientErrorResponse(
     String code,
     String message,
     String data

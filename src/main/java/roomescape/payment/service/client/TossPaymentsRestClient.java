@@ -16,7 +16,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.common.exception.ConnectionException;
 import roomescape.common.exception.PaymentErrorCode;
 import roomescape.common.exception.PaymentException;
-import roomescape.payment.service.dto.PaymentClientErrorResponse;
+import roomescape.payment.service.dto.TossPaymentsClientErrorResponse;
 import roomescape.payment.service.dto.PaymentClientResponse;
 import roomescape.payment.service.dto.PaymentConfirmRequest;
 
@@ -62,8 +62,8 @@ public class TossPaymentsRestClient implements PaymentClient {
     private void handlePaymentError(ClientHttpResponse res) {
         try {
             byte[] body = res.getBody().readAllBytes();
-            PaymentClientErrorResponse error = objectMapper.readValue(body,
-                PaymentClientErrorResponse.class);
+            TossPaymentsClientErrorResponse error = objectMapper.readValue(body,
+                TossPaymentsClientErrorResponse.class);
             throw getPaymentError(error, res.getStatusCode());
         } catch (IOException e) {
             throw new RuntimeException("응답 바디 파싱에 실패하였습니다.", e);
@@ -71,7 +71,7 @@ public class TossPaymentsRestClient implements PaymentClient {
     }
 
     private PaymentException getPaymentError(
-        PaymentClientErrorResponse error, HttpStatusCode httpStatusCode) {
+        TossPaymentsClientErrorResponse error, HttpStatusCode httpStatusCode) {
         if (serverErrorCases.contains(error.code())) {
             throw new PaymentException(error.message(), PaymentErrorCode.SERVER_ERROR);
         }

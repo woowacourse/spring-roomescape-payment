@@ -24,7 +24,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.common.exception.ConnectionException;
 import roomescape.common.exception.PaymentErrorCode;
 import roomescape.common.exception.PaymentException;
-import roomescape.payment.service.dto.PaymentClientErrorResponse;
+import roomescape.payment.service.dto.TossPaymentsClientErrorResponse;
 import roomescape.payment.service.dto.PaymentClientResponse;
 import roomescape.payment.service.dto.PaymentConfirmRequest;
 
@@ -96,7 +96,7 @@ class PaymentServerTest {
     void confirmPaymentClientErrorToServerError(String code) throws JsonProcessingException {
         PaymentConfirmRequest requestDto = new PaymentConfirmRequest(
                 "paymentKey", "orderId", 1000L);
-        PaymentClientErrorResponse errorResponseDto = new PaymentClientErrorResponse(
+        TossPaymentsClientErrorResponse errorResponseDto = new TossPaymentsClientErrorResponse(
                 code, null, null);
         String errorJsonResponse = objectMapper.writeValueAsString(errorResponseDto);
 
@@ -117,7 +117,7 @@ class PaymentServerTest {
     void confirmPaymentClientError() throws JsonProcessingException {
         PaymentConfirmRequest requestDto = new PaymentConfirmRequest(
                 "paymentKey", "orderId", 1000L);
-        PaymentClientErrorResponse errorResponseDto = new PaymentClientErrorResponse(
+        TossPaymentsClientErrorResponse errorResponseDto = new TossPaymentsClientErrorResponse(
                 "ALREADY_PROCESSED_PAYMENT", "이미 처리된 결제 입니다.", null);
         String errorJsonResponse = objectMapper.writeValueAsString(errorResponseDto);
 
@@ -138,7 +138,7 @@ class PaymentServerTest {
     void confirmPaymentServerError() throws JsonProcessingException {
         PaymentConfirmRequest requestDto = new PaymentConfirmRequest(
                 "paymentKey", "orderId", 1000L);
-        PaymentClientErrorResponse errorResponseDto = new PaymentClientErrorResponse(
+        TossPaymentsClientErrorResponse errorResponseDto = new TossPaymentsClientErrorResponse(
                 "FAILED_INTERNAL_SYSTEM_PROCESSING", "내부 시스템 처리 작업이 실패했습니다. 잠시 후 다시 시도해주세요.", null);
         String errorJsonResponse = objectMapper.writeValueAsString(errorResponseDto);
 
