@@ -15,12 +15,12 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import roomescape.client.TossPaymentClient;
+import roomescape.client.TossPaymentTestConfig;
+import roomescape.client.dto.request.TossPaymentConfirmRequest;
 import roomescape.common.config.ReservationConfig;
 import roomescape.common.exception.PaymentException;
 import roomescape.member.dto.request.LoginMember;
-import roomescape.payment.client.TossPaymentClient;
-import roomescape.payment.client.TossPaymentTestConfig;
-import roomescape.payment.client.dto.request.TossPaymentConfirmRequest;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.service.ReservationService;
 

@@ -7,16 +7,17 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.common.exceptionHandler.dto.ExceptionResponse;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -62,7 +63,7 @@ public class ReservationIntegrationTest {
         reservation.put("name", "브라운");
         reservation.put("date", "2024-12-03");
         reservation.put("timeId", "a");
-        ExceptionResponse expected = new ExceptionResponse("[ERROR] 요청 입력이 잘못되었습니다.", "/reservations");
+        ExceptionResponse expected = new ExceptionResponse("[ERROR] 요청 형식이 올바르지 않습니다.", "/reservations");
         // when
         Response response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -102,7 +103,7 @@ public class ReservationIntegrationTest {
 
     @Test
     @DisplayName("마이 페이지를 반환한다.")
-    void get_my_page(){
+    void get_my_page() {
         RestAssured.given().log().all()
                 .when().get("/reservation-mine")
                 .then().log().all()

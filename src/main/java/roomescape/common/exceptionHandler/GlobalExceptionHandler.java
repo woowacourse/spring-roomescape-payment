@@ -41,11 +41,11 @@ public class GlobalExceptionHandler {
             final HttpMessageNotReadableException e, final HttpServletRequest request
     ) {
         Throwable rootCause = e.getRootCause();
-        if (rootCause instanceof IllegalArgumentException) {
+        if (rootCause instanceof InvalidReservationException) {
             return new ExceptionResponse(EXCEPTION_PREFIX + rootCause.getMessage(), request.getRequestURI());
         }
 
-        return new ExceptionResponse(EXCEPTION_PREFIX + e.getMessage(), request.getRequestURI());
+        return new ExceptionResponse(EXCEPTION_PREFIX + "요청 형식이 올바르지 않습니다.", request.getRequestURI());
     }
 
     /**

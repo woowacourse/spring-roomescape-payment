@@ -1,7 +1,8 @@
-package roomescape.common.config;
+package roomescape.client.config;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -9,9 +10,16 @@ import org.springframework.web.client.RestClient;
 
 @Configuration
 public class TossPaymentClientConfig {
+
+    private final String secretKey;
+
+    public TossPaymentClientConfig(@Value("${toss-payments.secret-key}") String secretKey) {
+        this.secretKey = secretKey;
+    }
+
     @Bean
     public RestClient tossRestClient() {
-        String secretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+//        String secretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
         String encodedAuth = "Basic " + Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
 
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();

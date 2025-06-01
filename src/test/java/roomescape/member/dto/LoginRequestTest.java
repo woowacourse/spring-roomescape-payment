@@ -2,6 +2,7 @@ package roomescape.member.dto;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import roomescape.common.exception.InvalidReservationException;
 import roomescape.member.dto.request.LoginRequest;
 
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +16,7 @@ class LoginRequestTest {
     @DisplayName("이메일 빈 값 에외 테스트")
     void email_exception(String email) {
         assertThatThrownBy(() -> new LoginRequest(email, "a"))
-                .isInstanceOf(NullPointerException.class);
+                .isInstanceOf(InvalidReservationException.class);
     }
 
     @ParameterizedTest
@@ -23,7 +24,7 @@ class LoginRequestTest {
     @DisplayName("비밀번호 빈 값 에외 테스트")
     void password_exception(String password) {
         assertThatThrownBy(() -> new LoginRequest("a@naver.com", password))
-                .isInstanceOf(NullPointerException.class);
+                .isInstanceOf(InvalidReservationException.class);
     }
 
 }

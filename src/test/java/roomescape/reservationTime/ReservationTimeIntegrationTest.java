@@ -8,16 +8,17 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.common.exceptionHandler.dto.ExceptionResponse;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -66,7 +67,7 @@ public class ReservationTimeIntegrationTest {
         // given
         Map<String, Object> reservationTime = new HashMap<>();
         reservationTime.put("startAt", null);
-        ExceptionResponse expected = new ExceptionResponse("[ERROR] 시간은 null 일 수 없습니다.", "/times");
+        ExceptionResponse expected = new ExceptionResponse("[ERROR] 시간은 비어있을 수 없습니다.", "/times");
         // when
         Response response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
