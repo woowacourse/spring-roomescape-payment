@@ -18,6 +18,8 @@ import roomescape.exception.UnauthorizedException;
 @RequiredArgsConstructor
 public class PaymentErrorHandler implements ResponseErrorHandler {
 
+    private static final String ERROR_CODE_DELIMITER = "_";
+
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
         return response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError();
@@ -28,33 +30,45 @@ public class PaymentErrorHandler implements ResponseErrorHandler {
         ObjectMapper objectMapper = new ObjectMapper();
         TossPaymentErrorResponse tossPaymentErrorResponse = objectMapper.readValue(response.getBody(),
                 TossPaymentErrorResponse.class);
-        HttpStatusCode statusCode = response.getStatusCode();
-        TossErrorType tossErrorType = TossErrorType.findByCode(tossPaymentErrorResponse.code);
-        String message = tossPaymentErrorResponse.message;
-        if (tossErrorType != TossErrorType.NONE) {
-            statusCode = tossErrorType.getStatus();
-            message = tossErrorType.getMessage();
-        }
+        final String message = getErrorMessage(tossPaymentErrorResponse.code);
+        final HttpStatusCode statusCode = getHttpStatusCode(tossPaymentErrorResponse.code, response);
+        throwException(statusCode, tossPaymentErrorResponse, message);
+    }
 
+    private static void throwException(final HttpStatusCode statusCode,
+                                  final TossPaymentErrorResponse tossPaymentErrorResponse, final String message) {
         if (statusCode == HttpStatus.BAD_REQUEST) {
             throw new BadRequestException(tossPaymentErrorResponse.code, message);
         }
-
         if (statusCode == HttpStatus.UNAUTHORIZED) {
             throw new UnauthorizedException(tossPaymentErrorResponse.code, message);
         }
-
         if (statusCode == HttpStatus.NOT_FOUND) {
             throw new NotFoundException(tossPaymentErrorResponse.code, message);
         }
-
         if (statusCode == HttpStatus.FORBIDDEN) {
             throw new ForbiddenException(tossPaymentErrorResponse.code, message);
         }
-
         if (statusCode == HttpStatus.INTERNAL_SERVER_ERROR) {
             throw new InternalServerException(tossPaymentErrorResponse.code, message);
         }
+    }
+
+    private String getErrorMessage(final String errorCode) {
+        final TossErrorType tossErrorType = TossErrorType.findByCode(errorCode);
+        if (tossErrorType != TossErrorType.NONE) {
+            return tossErrorType.getMessage();
+        }
+        return TossErrorDefaultMessage.getMessageByErrorCode(errorCode.split(ERROR_CODE_DELIMITER));
+    }
+
+    private HttpStatusCode getHttpStatusCode(final String errorCode, final ClientHttpResponse response)
+            throws IOException {
+        final TossErrorType tossErrorType = TossErrorType.findByCode(errorCode);
+        if (tossErrorType != TossErrorType.NONE) {
+            return tossErrorType.getStatus();
+        }
+        return response.getStatusCode();
     }
 
     record TossPaymentErrorResponse(

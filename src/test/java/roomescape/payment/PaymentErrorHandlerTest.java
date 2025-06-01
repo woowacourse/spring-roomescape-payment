@@ -76,7 +76,7 @@ class PaymentErrorHandlerTest {
                 paymentErrorHandler.handleError(testUri, HttpMethod.POST, response)
         )
                 .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("잘못된 요청입니다.");
+                .hasMessageContaining("요청 내용을 확인해주세요.");
     }
 
     @Test
@@ -92,7 +92,7 @@ class PaymentErrorHandlerTest {
                 paymentErrorHandler.handleError(testUri, HttpMethod.POST, response)
         )
                 .isInstanceOf(UnauthorizedException.class)
-                .hasMessageContaining("인증되지 않은 요청입니다.");
+                .hasMessageContaining("인증 정보를 확인해주세요.");
     }
 
     @Test
@@ -108,7 +108,7 @@ class PaymentErrorHandlerTest {
                 paymentErrorHandler.handleError(testUri, HttpMethod.POST, response)
         )
                 .isInstanceOf(ForbiddenException.class)
-                .hasMessageContaining("권한이 없습니다.");
+                .hasMessageContaining("인증 정보를 확인해주세요.");
     }
 
 
