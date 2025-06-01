@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.application.payment.CreatePaymentService;
+import roomescape.application.payment.command.CreatePaymentService;
 
 @RestController
 @RequestMapping("/payments")

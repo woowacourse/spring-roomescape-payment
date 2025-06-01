@@ -1,4 +1,4 @@
-package roomescape.application.payment;
+package roomescape.application.payment.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -17,8 +17,8 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
-import roomescape.application.payment.dto.PaymentCommand;
-import roomescape.application.payment.dto.PaymentResponse;
+import roomescape.application.payment.command.dto.PaymentCommand;
+import roomescape.application.payment.client.dto.PaymentResponse;
 import roomescape.infrastructure.error.exception.PaymentException;
 import roomescape.infrastructure.error.exception.TossPaymentException;
 

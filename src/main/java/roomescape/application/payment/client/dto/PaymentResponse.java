@@ -1,4 +1,4 @@
-package roomescape.application.payment.dto;
+package roomescape.application.payment.client.dto;
 
 public record PaymentResponse(
         String paymentKey,

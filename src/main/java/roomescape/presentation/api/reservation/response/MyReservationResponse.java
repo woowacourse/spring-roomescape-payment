@@ -11,17 +11,23 @@ public record MyReservationResponse(
         LocalDate date,
         String time,
         String status,
-        ReservationResponseType type
+        ReservationResponseType type,
+        String paymentKey,
+        Long amount
 ) {
 
-    public static MyReservationResponse from(ReservationWithStatusResult reservationWithStatusResult) {
+    public static MyReservationResponse from(ReservationWithStatusResult reservationWithStatusResult,
+                                             String paymentKey,
+                                             Long amount) {
         return new MyReservationResponse(
                 reservationWithStatusResult.reservationId(),
                 reservationWithStatusResult.themeName(),
                 reservationWithStatusResult.reservationDate(),
                 ReservationDateTimeFormat.TIME.format(reservationWithStatusResult.reservationTime()),
                 toDisplayStatus(reservationWithStatusResult.status()),
-                ReservationResponseType.RESERVE
+                ReservationResponseType.RESERVE,
+                paymentKey,
+                amount
         );
     }
 
@@ -32,7 +38,9 @@ public record MyReservationResponse(
                 waitingWithRankResult.reservationDate(),
                 ReservationDateTimeFormat.TIME.format(waitingWithRankResult.reservationTime()),
                 toDisplayStatus(waitingWithRankResult.waitingCount()),
-                ReservationResponseType.WAITING
+                ReservationResponseType.WAITING,
+                null,
+                null
         );
     }
 
