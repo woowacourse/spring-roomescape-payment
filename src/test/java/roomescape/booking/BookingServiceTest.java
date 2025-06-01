@@ -61,7 +61,7 @@ class BookingServiceTest {
         bookingService.deleteReservationById(1L);
 
         // then
-        then(reservationService).should().create(new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), ReservationStatus.PENDING));
-        then(reservationService).should().create(new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), ReservationStatus.PENDING));
+        then(reservationService).should().create(new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), ReservationStatus.PROMOTED));
+        then(reservationService).should().create(new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), ReservationStatus.PROMOTED));
     }
 }

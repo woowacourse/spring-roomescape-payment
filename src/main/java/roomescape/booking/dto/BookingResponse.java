@@ -15,7 +15,7 @@ public record BookingResponse(
         if (reservation.getReservationStatus() == ReservationStatus.CONFIRMED) {
             return new BookingResponse(reservation.getId(), ScheduleResponse.of(reservation.getSchedule()), "예약");
         }
-        if (reservation.getReservationStatus() == ReservationStatus.PENDING) {
+        if (reservation.getReservationStatus() == ReservationStatus.PROMOTED) {
             return new BookingResponse(reservation.getId(), ScheduleResponse.of(reservation.getSchedule()), "결제 대기");
         }
         return new BookingResponse(reservation.getId(), ScheduleResponse.of(reservation.getSchedule()), "결제 실패");

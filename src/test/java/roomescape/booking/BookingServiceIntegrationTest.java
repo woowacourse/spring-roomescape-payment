@@ -80,6 +80,6 @@ class BookingServiceIntegrationTest {
         assertThat(waitingRepository.findAll()).hasSize(0);
         assertThat(reservationRepository.findAll()).hasSize(1)
                 .extracting("member", "schedule", "reservationStatus")
-                .containsExactly(Tuple.tuple(member, schedule, ReservationStatus.PENDING));
+                .containsExactly(Tuple.tuple(member, schedule, ReservationStatus.PROMOTED));
     }
 }

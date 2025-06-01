@@ -74,7 +74,7 @@ public class ReservationCreateService {
     }
 
     private Reservation saveReservationForAdmin(final Schedule schedule, final Member member) {
-        final Reservation notSavedReservation = new Reservation(member, schedule, ReservationStatus.PENDING);
+        final Reservation notSavedReservation = new Reservation(member, schedule, ReservationStatus.PROMOTED);
         return reservationRepository.save(notSavedReservation);
     }
 }
