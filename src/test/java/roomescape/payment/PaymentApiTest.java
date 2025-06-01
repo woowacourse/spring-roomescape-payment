@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.client.RestClient;
-import roomescape.reservation.error.exception.PaymentClientException;
-import roomescape.reservation.service.PaymentRestClient;
+import roomescape.reservation.external.client.PaymentRestClient;
+import roomescape.reservation.external.error.exception.PaymentClientException;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class PaymentApiTest {

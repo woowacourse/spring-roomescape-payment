@@ -1,8 +1,8 @@
-package roomescape.reservation.error.exception;
+package roomescape.reservation.external.error.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatusCode;
-import roomescape.reservation.dto.response.PaymentErrorResponse;
+import roomescape.reservation.external.dto.respone.PaymentErrorResponse;
 
 @Getter
 public class PaymentServerException extends RuntimeException {

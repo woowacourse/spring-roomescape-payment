@@ -1,12 +1,12 @@
-package roomescape.reservation.error.handler;
+package roomescape.reservation.external.error.handler;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import roomescape.reservation.dto.response.ErrorResponse;
-import roomescape.reservation.error.exception.PaymentClientException;
-import roomescape.reservation.error.exception.PaymentServerException;
+import roomescape.reservation.external.error.exception.PaymentClientException;
+import roomescape.reservation.external.error.exception.PaymentServerException;
 
 @RestControllerAdvice
 @Order(1)

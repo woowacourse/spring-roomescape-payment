@@ -7,8 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.global.config.properties.TossProperties;
-import roomescape.reservation.error.handler.PaymentResponseErrorHandler;
-import roomescape.reservation.service.PaymentRestClient;
+import roomescape.reservation.external.client.PaymentRestClient;
+import roomescape.reservation.external.error.handler.PaymentResponseErrorHandler;
 
 @Configuration
 @EnableConfigurationProperties(TossProperties.class)

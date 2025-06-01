@@ -12,10 +12,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.reservation.dto.response.PaymentApproveResponse;
-import roomescape.reservation.error.exception.PaymentClientException;
+import roomescape.reservation.external.client.PaymentRestClient;
+import roomescape.reservation.external.dto.respone.PaymentApproveResponse;
+import roomescape.reservation.external.error.exception.PaymentClientException;
 import roomescape.reservation.repository.PaymentRepository;
-import roomescape.reservation.service.PaymentRestClient;
 import roomescape.reservation.service.PaymentService;
 
 @ExtendWith(MockitoExtension.class)
