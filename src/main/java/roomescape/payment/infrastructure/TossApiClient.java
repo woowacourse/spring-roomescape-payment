@@ -9,6 +9,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
+import roomescape.payment.dto.request.PaymentCommand;
 import roomescape.payment.dto.request.TossPaymentRequest;
 import roomescape.payment.dto.response.PaymentResponse;
 import roomescape.payment.exception.TossPaymentClientException;
@@ -17,7 +18,7 @@ import roomescape.payment.exception.TossServerErrorCode;
 import roomescape.reservation.dto.response.FailureResponse;
 
 @Component
-public class TossApiClient {
+public class TossApiClient implements PaymentClient {
 
     private static final String SECRET_KEY_SUFFIX = ":";
     private static final String AUTHORIZATION_HEADER = "Basic ";
@@ -32,9 +33,10 @@ public class TossApiClient {
         this.restClient = restClient;
     }
 
-    public PaymentResponse authPayment(final String paymentKey, final String orderId,
-                                       final Integer amount, final String paymentType) {
-        TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount, paymentType);
+    @Override
+    public PaymentResponse authPayment(final PaymentCommand paymentCommand) {
+        TossPaymentRequest request = new TossPaymentRequest(paymentCommand.paymentKey(), paymentCommand.orderId(),
+                paymentCommand.amount(), paymentCommand.paymentType());
         try {
             return restClient.post()
                     .uri(PAYMENT_URL)

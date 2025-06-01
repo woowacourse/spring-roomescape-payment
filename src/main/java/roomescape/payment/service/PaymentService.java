@@ -1,19 +1,20 @@
 package roomescape.payment.service;
 
 import org.springframework.stereotype.Service;
-import roomescape.payment.infrastructure.TossApiClient;
+import roomescape.payment.dto.request.PaymentCommand;
+import roomescape.payment.infrastructure.PaymentClient;
+import roomescape.reservation.dto.request.PaymentRequest;
 
 @Service
 public class PaymentService {
 
-    private final TossApiClient tossApiClient;
+    private final PaymentClient paymentClient;
 
-    public PaymentService(final TossApiClient tossApiClient) {
-        this.tossApiClient = tossApiClient;
+    public PaymentService(PaymentClient paymentClient) {
+        this.paymentClient = paymentClient;
     }
 
-    public void payment(final String paymentKey, final String orderId,
-                        final Integer amount, final String paymentType) {
-        tossApiClient.authPayment(paymentKey, orderId, amount, paymentType);
+    public void payment(final PaymentRequest request) {
+        paymentClient.authPayment(PaymentCommand.createByPaymentRequest(request));
     }
 }

@@ -67,8 +67,7 @@ public class ReservationFacadeService {
     public ReservationResponse create(final ReservationCreateRequest request, final Long memberId) {
 
         if (!reservationService.isReservationExists(request.reservation())) {
-            paymentService.payment(request.getPaymentKey(), request.getOrderId(), request.getAmount(),
-                    request.getPaymentType());
+            paymentService.payment(request.payment());
             return createReservation(request.reservation(), memberId);
         }
         throw new ReservationAlreadyExistsException("이미 예약이 존재합니다.");

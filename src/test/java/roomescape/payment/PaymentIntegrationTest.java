@@ -19,6 +19,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.global.auth.dto.LoginRequest;
+import roomescape.payment.dto.request.PaymentCommand;
 import roomescape.payment.exception.TossPaymentClientException;
 import roomescape.payment.exception.TossPaymentServerException;
 import roomescape.payment.infrastructure.TossApiClient;
@@ -50,7 +51,8 @@ public class PaymentIntegrationTest {
 
     @Test
     void tossPaymentClientException() {
-        when(tossApiClient.authPayment(eq("test_payment_key"), eq("test_order_id"), eq(50000), eq("CARD")))
+        PaymentCommand paymentCommand = new PaymentCommand("test_payment_key", "test_order_id", 50000, "CARD");
+        when(tossApiClient.authPayment(eq(paymentCommand)))
                 .thenThrow(new TossPaymentClientException("결제 승인이 거절되었습니다."));
         String expected = "결제 승인이 거절되었습니다.";
         createTheme("테마1");
@@ -73,7 +75,8 @@ public class PaymentIntegrationTest {
 
     @Test
     void tossPaymentServerException() {
-        when(tossApiClient.authPayment(eq("test_payment_key"), eq("test_order_id"), eq(50000), eq("CARD")))
+        PaymentCommand paymentCommand = new PaymentCommand("test_payment_key", "test_order_id", 50000, "CARD");
+        when(tossApiClient.authPayment(eq(paymentCommand)))
                 .thenThrow(new TossPaymentServerException("내부 시스템 처리 작업이 실패했습니다. 잠시 후 다시 시도해주세요."));
         String expected = "내부 시스템 처리 작업이 실패했습니다. 잠시 후 다시 시도해주세요.";
         createTheme("테마1");

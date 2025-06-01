@@ -17,6 +17,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
+import roomescape.payment.dto.request.PaymentCommand;
 import roomescape.payment.dto.response.PaymentResponse;
 import roomescape.payment.exception.TossPaymentClientException;
 import roomescape.payment.exception.TossPaymentServerException;
@@ -44,9 +45,9 @@ class TossApiClientTest {
         PaymentResponse expected = new PaymentResponse("tgen_20250528204823hWav3", "MC4xNTU3MDQ1MDk3Njkx", "NORMAL",
                 50000, "DONE", "2025-05-28T20:48:23+09:00");
         setUpForSuccess();
-
-        PaymentResponse paymentResponse = tossApiClient.authPayment("tgen_20250528204823hWav3", "MC4xNTU3MDQ1MDk3Njkx",
+        PaymentCommand paymentCommand = new PaymentCommand("tgen_20250528204823hWav3", "MC4xNTU3MDQ1MDk3Njkx",
                 50000, "NORMAL");
+        PaymentResponse paymentResponse = tossApiClient.authPayment(paymentCommand);
 
         Assertions.assertThat(paymentResponse).isEqualTo(expected);
     }
@@ -54,8 +55,9 @@ class TossApiClientTest {
     @Test
     void authPayment_shouldReturnErrorWhenServerError() {
         setUpForServerError();
-        assertThatThrownBy(() -> tossApiClient.authPayment("tgen_20250528204823hWav3", "MC4xNTU3MDQ1MDk3Njkx",
-                50000, "NORMAL"))
+        PaymentCommand paymentCommand = new PaymentCommand("tgen_20250528204823hWav3", "MC4xNTU3MDQ1MDk3Njkx",
+                50000, "NORMAL");
+        assertThatThrownBy(() -> tossApiClient.authPayment(paymentCommand))
                 .isInstanceOf(TossPaymentServerException.class)
                 .hasMessageContaining("서버 오류입니다. 서버 관리자한테 문의해주세요.");
     }
@@ -63,8 +65,9 @@ class TossApiClientTest {
     @Test
     void authPayment_shouldReturnErrorWhenTossServerError() {
         setUpForTossServerError();
-        assertThatThrownBy(() -> tossApiClient.authPayment("tgen_20250528204823hWav3", "MC4xNTU3MDQ1MDk3Njkx",
-                50000, "NORMAL"))
+        PaymentCommand paymentCommand = new PaymentCommand("tgen_20250528204823hWav3", "MC4xNTU3MDQ1MDk3Njkx",
+                50000, "NORMAL");
+        assertThatThrownBy(() -> tossApiClient.authPayment(paymentCommand))
                 .isInstanceOf(TossPaymentServerException.class)
                 .hasMessageContaining("토스 서버로 문의해주세요");
     }
@@ -72,8 +75,9 @@ class TossApiClientTest {
     @Test
     void authPayment_shouldReturnErrorWhenClientError() {
         setUpForClientError();
-        assertThatThrownBy(() -> tossApiClient.authPayment("tgen_20250528204823hWav3", "MC4xNTU3MDQ1MDk3Njkx",
-                50000, "NORMAL"))
+        PaymentCommand paymentCommand = new PaymentCommand("tgen_20250528204823hWav3", "MC4xNTU3MDQ1MDk3Njkx",
+                50000, "NORMAL");
+        assertThatThrownBy(() -> tossApiClient.authPayment(paymentCommand))
                 .isInstanceOf(TossPaymentClientException.class)
                 .hasMessageContaining("카드 사용이 거절되었습니다. 카드사 문의가 필요합니다.");
     }
