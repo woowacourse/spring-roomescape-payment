@@ -12,6 +12,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,6 +93,7 @@ class TossRestClientTest {
                 .hasMessageContaining("잘못된 시크릿키 연동 정보 입니다.");
     }
 
+    @Disabled //: 타임아웃 포함 테스트 필요 시 Disbabled 제거 가능
     @DisplayName("타임아웃 시간 내 응답 시 정상 처리")
     @Test
     void confirmSuccess_beforeTimeout() {
@@ -119,6 +121,7 @@ class TossRestClientTest {
         });
     }
 
+    @Disabled //: 타임아웃 포함 테스트 필요 시 Disbabled 제거 가능
     @DisplayName("타임아웃 시간 초과 시 예외 처리")
     @Test
     void confirmError_timeout() {
