@@ -11,7 +11,7 @@ import roomescape.utility.PaymentClient;
 import roomescape.utility.TossPaymentClient;
 
 @Disabled
-public class PaymentApiTest {
+class PaymentApiTest {
 
     private String orderId;
     private String paymentKey;

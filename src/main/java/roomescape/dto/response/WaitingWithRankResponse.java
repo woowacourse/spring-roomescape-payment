@@ -9,7 +9,8 @@ public record WaitingWithRankResponse(
         ThemeProfileResponse theme,
         ReservationTimeResponse time,
         MemberProfileResponse member,
-        Long rank
+        Long rank,
+        PaymentResultResponse paymentResultResponse
 ) {
 
     public WaitingWithRankResponse(WaitingWithRank waitingWithRank) {
@@ -19,7 +20,8 @@ public record WaitingWithRankResponse(
                 new ThemeProfileResponse(waitingWithRank.theme()),
                 new ReservationTimeResponse(waitingWithRank.time()),
                 new MemberProfileResponse(waitingWithRank.member()),
-                waitingWithRank.rank()
+                waitingWithRank.rank(),
+                waitingWithRank.paymentResultResponse()
         );
     }
 }
