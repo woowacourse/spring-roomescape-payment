@@ -11,8 +11,8 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.processor.PaymentConfirmRequest;
-import roomescape.payment.processor.PaymentConfirmResponse;
+import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.PaymentConfirmResponse;
 
 import static org.mockito.Mockito.when;
 

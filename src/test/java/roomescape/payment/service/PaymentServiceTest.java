@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import roomescape.payment.processor.PaymentConfirmResponse;
+import roomescape.payment.dto.PaymentConfirmResponse;
 import roomescape.payment.processor.PaymentType;
 import roomescape.payment.processor.toss.TossPaymentConfirmRequest;
 import roomescape.payment.processor.toss.TossPaymentConfirmResponse;

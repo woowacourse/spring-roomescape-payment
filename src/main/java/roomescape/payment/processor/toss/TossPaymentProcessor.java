@@ -3,8 +3,8 @@ package roomescape.payment.processor.toss;
 import java.util.Base64;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.processor.PaymentConfirmRequest;
-import roomescape.payment.processor.PaymentConfirmResponse;
+import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.PaymentConfirmResponse;
 import roomescape.payment.processor.PaymentProcessor;
 import roomescape.payment.processor.PaymentType;
 

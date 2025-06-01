@@ -1,4 +1,4 @@
-package roomescape.payment.processor;
+package roomescape.payment.dto;
 
 public interface PaymentConfirmResponse {
 }

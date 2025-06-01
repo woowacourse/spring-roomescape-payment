@@ -2,8 +2,8 @@ package roomescape.payment.service;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
-import roomescape.payment.processor.PaymentConfirmRequest;
-import roomescape.payment.processor.PaymentConfirmResponse;
+import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.PaymentConfirmResponse;
 import roomescape.payment.processor.PaymentProcessor;
 import roomescape.payment.processor.PaymentType;
 

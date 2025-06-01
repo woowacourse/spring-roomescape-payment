@@ -1,4 +1,4 @@
-package roomescape.payment.processor;
+package roomescape.payment.dto;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

@@ -15,7 +15,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.auth.jwt.JwtTokenProvider;
-import roomescape.payment.processor.PaymentConfirmRequest;
+import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.processor.PaymentType;
 import roomescape.payment.processor.toss.TossPaymentConfirmRequest;
 import roomescape.payment.processor.toss.TossPaymentProcessor;
