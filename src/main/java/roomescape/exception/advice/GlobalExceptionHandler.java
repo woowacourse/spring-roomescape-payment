@@ -56,8 +56,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ProblemDetail> loginFailExceptionHandler(LoginFailException exception) {
         exception.printStackTrace();
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
-        problemDetail.setTitle("로그인에 실패했습니다. 로그인 정보를 다시 확인해주세요.");
-        problemDetail.setDetail(exception.getMessage());
+        problemDetail.setTitle("로그인에 실패했습니다.");
+        problemDetail.setDetail("로그인 정보를 다시 확인해주세요.");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(problemDetail);
     }
 
