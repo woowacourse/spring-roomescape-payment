@@ -1,5 +1,7 @@
 package roomescape.payment.infrastructure.toss.config;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +15,11 @@ public class TossRestClientConfig {
 
     @Bean(name = "tossApiRestClient")
     public RestClient tossRestClient() {
-        return RestClientProvider.createRestClient(tossApiProperties);
+        String credentials = tossApiProperties.getSecretKey() + ":";
+        String encoded = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
+        return RestClientProvider.createRestClient(tossApiProperties)
+                .defaultHeader("Authorization", "Basic " + encoded)
+                .defaultHeader("Content-Type", "application/json")
+                .build();
     }
 }
