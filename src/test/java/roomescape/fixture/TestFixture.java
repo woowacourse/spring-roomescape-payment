@@ -36,9 +36,7 @@ public class TestFixture {
     }
 
     public static Member makeMember() {
-        Member member = new Member("Mint", "mint@gmail.com", "password", MemberRole.REGULAR);
-        ReflectionTestUtils.setField(member, "id", 4L);
-        return member;
+        return new Member("Mint", "mint@gmail.com", "password", MemberRole.REGULAR);
     }
 
     private static LocalDate makeAfterOneWeekDate() {
