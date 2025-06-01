@@ -44,7 +44,7 @@ public class ReservationCreateService {
             TossPaymentConfirmCommand confirmCommand = tossPaymentConfirmCommandFactory.toPaymentConfirmCommand(request);
             tossPaymentAdapter.confirmPayment(confirmCommand);
         } catch (Exception e) {
-            reservation.isCanceled();
+            reservation.markStatusAsCanceled();
             throw e;
         }
 
@@ -72,8 +72,8 @@ public class ReservationCreateService {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     protected void confirmReservation(final Order order, final Reservation reservation) {
-        order.isPaidStatus();
-        reservation.isConfirmed();
+        order.markAsPaid();
+        reservation.markStatusAsConfirmed();
     }
 
     private void validatePast(final Schedule schedule) {

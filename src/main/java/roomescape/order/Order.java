@@ -67,7 +67,7 @@ public class Order {
     /**
      * 결제 승인 요청 프로세스에서만 호출하는 메서드입니다.
      */
-    public void isPaidStatus() {
+    public void markAsPaid() {
         this.paymentStatus = PaymentStatus.SUCCESS;
     }
 

@@ -49,11 +49,11 @@ public class Reservation {
         this.orderId = orderId;
     }
 
-    public void isConfirmed() {
+    public void markStatusAsConfirmed() {
         this.reservationStatus = ReservationStatus.CONFIRMED;
     }
 
-    public void isCanceled() {
+    public void markStatusAsCanceled() {
         this.reservationStatus = ReservationStatus.CANCELED;
     }
 }
