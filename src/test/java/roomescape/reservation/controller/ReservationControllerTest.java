@@ -19,8 +19,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import roomescape.reservation.payment.dto.request.PaymentRequest;
-import roomescape.reservation.payment.service.PaymentService;
+import roomescape.payment.dto.request.PaymentRequest;
+import roomescape.payment.service.PaymentService;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)

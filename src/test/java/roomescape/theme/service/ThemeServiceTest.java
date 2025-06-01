@@ -21,12 +21,12 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.time.domain.ReservationTime;
+import roomescape.reservation.domain.ReservationTime;
+import roomescape.reservation.repository.ReservationRepository;
+import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.dto.request.ThemeRequest;
 import roomescape.theme.dto.response.ThemeResponse;
-import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservation.time.repository.ReservationTimeRepository;
 import roomescape.theme.repository.ThemeRepository;
 
 @ActiveProfiles("test")

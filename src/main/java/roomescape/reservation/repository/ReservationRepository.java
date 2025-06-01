@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import roomescape.member.domain.MemberId;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationId;
-import roomescape.reservation.time.domain.ReservationTimeId;
+import roomescape.reservation.domain.ReservationTimeId;
 import roomescape.theme.domain.ThemeId;
 
 public interface ReservationRepository extends JpaRepository<Reservation, ReservationId> {

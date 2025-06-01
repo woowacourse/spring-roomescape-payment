@@ -24,8 +24,8 @@ import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.BookedReservationTimeResponse;
 import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
-import roomescape.reservation.payment.dto.request.PaymentRequest;
-import roomescape.reservation.payment.service.PaymentService;
+import roomescape.payment.dto.request.PaymentRequest;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.service.ReservationService;
 
 @RequestMapping("/reservations")

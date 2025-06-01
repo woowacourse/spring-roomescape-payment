@@ -4,7 +4,7 @@ import java.time.LocalTime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import roomescape.reservation.time.domain.ReservationTime;
+import roomescape.reservation.domain.ReservationTime;
 
 public record ReservationTimeResponse(
         Long id,

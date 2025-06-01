@@ -28,22 +28,22 @@ import roomescape.common.exception.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.dto.request.PaymentRequest;
+import roomescape.payment.repository.PaymentRepository;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.time.domain.ReservationTime;
-import roomescape.theme.domain.Theme;
-import roomescape.reservation.waiting.domain.Waiting;
+import roomescape.reservation.domain.ReservationTime;
+import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.response.BookedReservationTimeResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
-import roomescape.theme.dto.response.ThemeResponse;
-import roomescape.reservation.payment.dto.request.PaymentRequest;
-import roomescape.reservation.payment.repository.PaymentRepository;
-import roomescape.reservation.payment.service.PaymentService;
 import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservation.time.repository.ReservationTimeRepository;
+import roomescape.reservation.repository.ReservationTimeRepository;
+import roomescape.reservation.repository.WaitingRepository;
+import roomescape.theme.domain.Theme;
+import roomescape.theme.dto.response.ThemeResponse;
 import roomescape.theme.repository.ThemeRepository;
-import roomescape.reservation.waiting.repository.WaitingRepository;
 
 @ActiveProfiles("test")
 @DataJpaTest
@@ -348,7 +348,7 @@ class ReservationServiceTest {
         LocalTime time1 = LocalTime.of(8, 0);
         LocalTime time2 = LocalTime.of(9, 0);
         ReservationTime reservationTime1 = reservationTimeRepository.save(new ReservationTime(time1));
-        ReservationTime reservationTime2 = reservationTimeRepository.save(new ReservationTime(time2));
+        reservationTimeRepository.save(new ReservationTime(time2));
         Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
         Long themeId = savedTheme.getId();
         Member member = new Member("포스티", "test@test.com", "12341234", Role.MEMBER);
