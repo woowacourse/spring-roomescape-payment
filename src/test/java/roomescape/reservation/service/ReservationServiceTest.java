@@ -39,9 +39,11 @@ import roomescape.reservation.presentation.dto.ReservationRequest;
 import roomescape.reservation.presentation.dto.ReservationResponse;
 import roomescape.reservation.presentation.dto.WaitingResponse;
 import roomescape.reservation.service.ReservationServiceTest.ReservationConfig;
+import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.reservationTime.domain.ReservationTimeRepository;
 import roomescape.reservationTime.infrastructure.JpaReservationTimeRepository;
 import roomescape.reservationTime.infrastructure.JpaReservationTimeRepositoryAdaptor;
+import roomescape.reservationTime.presentation.dto.ReservationTimeResponse;
 import roomescape.theme.domain.ThemeRepository;
 import roomescape.theme.infrastructure.JpaThemeRepository;
 import roomescape.theme.infrastructure.JpaThemeRepositoryAdaptor;
@@ -265,6 +267,28 @@ class ReservationServiceTest {
         }
 
         @Bean
+        public PaymentService paymentService() {
+            return new PaymentService(paymentClient());
+        }
+
+        @Bean
+        public ReservationWriterService reservationWriterService(
+            DateTime dateTime,
+            ReservationRepository reservationRepository,
+            ReservationTimeRepository reservationTimeRepository,
+            ThemeRepository themeRepository,
+            MemberRepository memberRepository
+        ) {
+            return new ReservationWriterService(
+                dateTime,
+                reservationRepository,
+                reservationTimeRepository,
+                themeRepository,
+                memberRepository
+                );
+        }
+
+        @Bean
         public RestClient restClient() {
             return RestClient.builder().baseUrl("https://api.tosspayments.com").build();
         }
@@ -275,28 +299,21 @@ class ReservationServiceTest {
         }
 
         @Bean
-        public PaymentService paymentService() {
-            return new PaymentService(paymentClient());
-        }
-
-        @Bean
         public ReservationService reservationService(
             DateTime dateTime,
             ReservationRepository reservationRepository,
-            ReservationTimeRepository reservationTimeRepository,
-            ThemeRepository themeRepository,
             MemberRepository memberRepository,
             WaitingRepository waitingRepository,
-            PaymentService paymentService
+            PaymentService paymentService,
+            ReservationWriterService reservationWriterService
         ) {
             return new ReservationService(
                 dateTime,
                 reservationRepository,
-                reservationTimeRepository,
-                themeRepository,
                 memberRepository,
                 waitingRepository,
-                paymentService
+                paymentService,
+                reservationWriterService
             );
         }
     }

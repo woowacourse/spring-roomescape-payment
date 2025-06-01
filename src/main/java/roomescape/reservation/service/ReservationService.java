@@ -35,54 +35,32 @@ public class ReservationService {
 
     private final DateTime dateTime;
     private final ReservationRepository reservationRepository;
-    private final ReservationTimeRepository reservationTimeRepository;
-    private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
     private final PaymentService paymentService;
+    private final ReservationWriterService reservationWriterService;
 
     public ReservationService(
         final DateTime dateTime,
         final ReservationRepository reservationRepository,
-        final ReservationTimeRepository reservationTimeRepository,
-        final ThemeRepository themeRepository,
         final MemberRepository memberRepository,
         final WaitingRepository waitingRepository,
-        final PaymentService paymentService
+        final PaymentService paymentService,
+        final ReservationWriterService reservationWriterService
     ) {
         this.dateTime = dateTime;
         this.reservationRepository = reservationRepository;
-        this.reservationTimeRepository = reservationTimeRepository;
-        this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
         this.paymentService = paymentService;
+        this.reservationWriterService = reservationWriterService;
     }
 
     public ReservationResponse createReservation(final ReservationRequest request, final Long memberId) {
-        Reservation reservation = saveReservation(request, memberId);
         PaymentRequest paymentRequest = new PaymentRequest(request.paymentKey(), request.orderId(), request.amount());
+        Reservation reservation = reservationWriterService.saveReservation(request, memberId);
         paymentService.confirmPayment(paymentRequest);
         return ReservationResponse.from(reservation);
-    }
-
-
-    @Transactional
-    public Reservation saveReservation(final ReservationRequest request, final Long memberId) {
-        ReservationTime time = reservationTimeRepository.findById(request.timeId())
-            .orElseThrow(() -> new ReservationTimeException("예약 시간을 찾을 수 없습니다."));
-        Theme theme = themeRepository.findById(request.themeId())
-            .orElseThrow(() -> new ThemeException("테마를 찾을 수 없습니다."));
-        Member member = memberRepository.findById(memberId)
-            .orElseThrow(() -> new MemberNotFound("멤버를 찾을 수 없습니다."));
-
-        List<Reservation> reservations = reservationRepository.findAllByDateAndThemeId(request.date(), request.themeId());
-        validateExistDuplicateReservation(reservations, time);
-
-        Reservation reservation = Reservation.createWithoutId(request.date(), time, theme, member, Status.RESERVED);
-        validateCanReserveDateTime(reservation, dateTime.now());
-
-        return reservationRepository.save(reservation);
     }
 
     @Transactional
@@ -107,24 +85,15 @@ public class ReservationService {
         }
     }
 
-    private void validateDuplicateWaiting(Reservation reservation, Member member) {
-        if (waitingRepository.existsByReservationIdAndMemberId(reservation.getId(), member.getId())) {
-            throw new ReservationException("이미 예약대기 중입니다.");
-        }
-    }
-
-    private void validateExistDuplicateReservation(final List<Reservation> reservations, final ReservationTime time) {
-        boolean isBooked = reservations.stream()
-            .anyMatch(reservation -> reservation.isSameTime(time));
-
-        if (isBooked) {
-            throw new ReservationException("이미 예약이 존재합니다.");
-        }
-    }
-
     private void validateCanReserveDateTime(final Reservation reservation, final LocalDateTime now) {
         if (reservation.isCannotReserveDateTime(now)) {
             throw new ReservationException("예약할 수 없는 날짜와 시간입니다.");
+        }
+    }
+
+    private void validateDuplicateWaiting(Reservation reservation, Member member) {
+        if (waitingRepository.existsByReservationIdAndMemberId(reservation.getId(), member.getId())) {
+            throw new ReservationException("이미 예약대기 중입니다.");
         }
     }
 
