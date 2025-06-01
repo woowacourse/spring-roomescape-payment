@@ -16,7 +16,7 @@ public interface JpaReservationWaitingTicketRepository extends JpaRepository<Res
     void deleteByReservationId(Long reservationId);
 
     @Query(
-            "select new roomescape.domain.reservation.ReservationWaitingRank(" +
+            "select new roomescape.domain.reservation.waiting.ReservationWaitingRank(" +
                     "cast(count(r) + 1 as int)) " +
                     "from ReservationWaitingTicket rwt " +
                     "left join rwt.reservation r " +

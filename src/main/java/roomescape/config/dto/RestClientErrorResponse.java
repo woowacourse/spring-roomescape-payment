@@ -1,4 +1,4 @@
-package roomescape.config;
+package roomescape.config.dto;
 
 import java.util.Set;
 

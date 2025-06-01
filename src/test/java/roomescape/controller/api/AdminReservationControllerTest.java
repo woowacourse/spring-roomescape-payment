@@ -66,7 +66,7 @@ class AdminReservationControllerTest {
     }
 
     @Nested
-    class searchAdminReservationTest {
+    class SearchAdminReservationTest {
 
         @Autowired
         JpaReservationRepository reservationRepository;

@@ -77,6 +77,7 @@ class ReservationTimeControllerTest {
             params.put("startAt", "15:40:00");
 
             RestAssured.given().log().all()
+                    .cookie("token", loginToken)
                     .contentType(ContentType.JSON)
                     .body(params)
                     .when().post("/times")
@@ -91,6 +92,7 @@ class ReservationTimeControllerTest {
             params.put("startAt", "25:40");
 
             RestAssured.given().log().all()
+                    .cookie("token", loginToken)
                     .contentType(ContentType.JSON)
                     .body(params)
                     .when().post("/times")
