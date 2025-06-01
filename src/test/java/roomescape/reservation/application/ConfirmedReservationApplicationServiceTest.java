@@ -24,6 +24,7 @@ import roomescape.member.exception.MemberNotFoundException;
 import roomescape.member.infrastructure.MemberRepository;
 import roomescape.reservation.application.dto.request.ConfirmedReservationByCriteriaWebRequest;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
+import roomescape.reservation.application.dto.request.WaitingReservationCreateRequest;
 import roomescape.reservation.infrastructure.ReservationRepository;
 import roomescape.reservation.presentation.dto.response.ConfirmedReservationWebResponse;
 import roomescape.reservationslot.application.ReservationSlotDataService;
@@ -218,7 +219,7 @@ class ConfirmedReservationApplicationServiceTest {
     }
 
     @Test
-    void findMyReservations_shouldReturnMemberReservations() {
+    void findReservations_shouldReturnMemberReservationsByMemberId() {
         // given
         Long themeId2 = themeRepository.save(new Theme("논리", "논리 게임 with Danny", "image.png")).getId();
         Long memberId2 = memberRepository.save(new Member("free", "free@gmail.com", "password", MemberRole.REGULAR))
@@ -228,7 +229,7 @@ class ConfirmedReservationApplicationServiceTest {
                         afterOneHour));
 
         // when
-        List<MyReservationResponse> result = confirmedReservationApplicationService.findMyReservations(memberId);
+        List<MyReservationResponse> result = confirmedReservationApplicationService.findReservationsByMemberId(memberId);
 
         // then
         SoftAssertions.assertSoftly(softAssertions -> {
@@ -239,9 +240,9 @@ class ConfirmedReservationApplicationServiceTest {
     }
 
     @Test
-    void findMyReservations_whenMemberIdNotFound_throwsMemberNotFoundException() {
+    void findReservations_ByMemberId_whenMemberIdNotFound_throwsMemberNotFoundException() {
         assertThatThrownBy(
-                () -> confirmedReservationApplicationService.findMyReservations(999L))
+                () -> confirmedReservationApplicationService.findReservationsByMemberId(999L))
                 .isInstanceOf(MemberNotFoundException.class)
                 .hasMessageContaining("존재하지 않은 멤버입니다.");
     }

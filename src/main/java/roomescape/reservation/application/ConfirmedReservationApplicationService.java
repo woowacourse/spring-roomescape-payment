@@ -2,6 +2,7 @@ package roomescape.reservation.application;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.application.MemberDataService;
 import roomescape.member.domain.Member;
 import roomescape.reservation.application.dto.request.ConfirmedReservationByCriteriaWebRequest;
@@ -18,6 +19,7 @@ import roomescape.theme.application.ThemeDataService;
 import roomescape.theme.domain.Theme;
 
 @Service
+@Transactional
 public class ConfirmedReservationApplicationService {
 
     private final ReservationSlotDataService reservationSlotDataService;
@@ -39,13 +41,13 @@ public class ConfirmedReservationApplicationService {
     }
 
     public ConfirmedReservationWebResponse create(final ConfirmedReservationCreateRequest request) {
-        reservationSlotDataService.validateReservationSlotNotExists(request.date(), request.timeId(),
+        reservationSlotDataService.validateReservationSlotNotExists(request.reservationDate(), request.timeId(),
                 request.themeId());
 
         ReservationSlot slot = createReservationSlot(
-                new ReservationCreateWebRequest(request.date(), request.timeId(), request.themeId()));
+                new ReservationCreateWebRequest(request.reservationDate(), request.timeId(), request.themeId()));
         Member member = memberDataService.getById(request.memberId());
-        slot.addReservation(member, request.now());
+        slot.addReservation(member, request.reservationDateTime());
         ReservationSlot savedSlot = reservationSlotDataService.save(slot);
 
         return ConfirmedReservationWebResponse.of(savedSlot);
@@ -62,9 +64,9 @@ public class ConfirmedReservationApplicationService {
                 .toList();
     }
 
-    public List<MyReservationResponse> findMyReservations(final Long memberId) {
+    public List<MyReservationResponse> findReservationsByMemberId(final Long memberId) {
         memberDataService.validateExists(memberId);
-        return reservationDataService.findMyReservations(memberId);
+        return reservationDataService.findReservationsByMemberId(memberId);
     }
 
     public void cancel(final Long reservationId) {
