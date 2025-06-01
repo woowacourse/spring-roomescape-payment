@@ -2,9 +2,9 @@ package roomescape.payment.application.dto;
 
 import java.math.BigDecimal;
 
-public record PaymentDataRequest(
+public record DefaultPaymentRequest(
+        String paymentKey,
         String orderId,
-        String orderName,
         BigDecimal amount
-) {
+) implements PaymentRequest {
 }

@@ -1,6 +1,6 @@
 package roomescape.reservation.ui;
 
-import static roomescape.payment.ui.PaymentController.PAYMENT_DATA;
+import static roomescape.payment.ui.PaymentController.PRE_PAYMENT;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.login.application.dto.LoginCheckRequest;
-import roomescape.payment.application.dto.PaymentDataRequest;
+import roomescape.payment.application.dto.PrePaymentRequest;
 import roomescape.reservation.application.ReservationCommandService;
 import roomescape.reservation.application.ReservationQueryService;
 import roomescape.reservation.application.dto.AvailableReservationTimeResponse;
@@ -60,10 +60,12 @@ public class UserReservationController {
             final LoginCheckRequest loginCheckRequest,
             final HttpSession session
     ) {
-        final PaymentDataRequest paymentData = (PaymentDataRequest) session.getAttribute(PAYMENT_DATA);
-        final ReservationResponse reservationResponse = reservationCommandService.addMemberReservation(
-                request, loginCheckRequest.id(), paymentData);
-        return new ResponseEntity<>(reservationResponse, HttpStatus.CREATED);
+        final ReservationResponse response = reservationCommandService.addMemberReservation(
+                request,
+                loginCheckRequest.id(),
+                (PrePaymentRequest) session.getAttribute(PRE_PAYMENT)
+        );
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PostMapping("/waitings")

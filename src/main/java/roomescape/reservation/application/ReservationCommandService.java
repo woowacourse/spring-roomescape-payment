@@ -12,7 +12,7 @@ import roomescape.common.exception.impl.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.payment.application.PaymentService;
-import roomescape.payment.application.dto.PaymentDataRequest;
+import roomescape.payment.application.dto.PrePaymentRequest;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.MemberReservationRequest;
 import roomescape.reservation.application.dto.MemberWaitingRequest;
@@ -42,7 +42,7 @@ public class ReservationCommandService {
     public ReservationResponse addMemberReservation(
             final MemberReservationRequest request,
             final Long memberId,
-            final PaymentDataRequest paymentDataRequest
+            final PrePaymentRequest prePaymentRequest
     ) {
         final ReservationTime time = getReservationTime(request.timeId());
         final Theme theme = getTheme(request.themeId());
@@ -53,7 +53,7 @@ public class ReservationCommandService {
 
         final Reservation reservation = new Reservation(request.date(), time, theme, member);
 
-        paymentService.pay(paymentDataRequest, request.toPaymentConfirmRequest(), reservation);
+        paymentService.pay(prePaymentRequest, request.toPaymentConfirmRequest(), reservation);
         return ReservationResponse.from(reservationRepository.save(reservation));
     }
 
@@ -103,7 +103,7 @@ public class ReservationCommandService {
         reservationRepository.deleteById(id);
     }
 
-    public void acceptReservation(final Long id, final PaymentDataRequest request) {
+    public void acceptReservation(final Long id, final PrePaymentRequest request) {
         final Waiting waiting = getWaitingWithAssociations(id);
         validateIsBooked(waiting);
         waiting.accept();

@@ -3,10 +3,11 @@ package roomescape.payment.application;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.common.exception.impl.BadRequestException;
+import roomescape.payment.application.dto.DefaultPaymentRequest;
 import roomescape.payment.application.dto.PaymentConfirmRequest;
-import roomescape.payment.application.dto.PaymentDataRequest;
 import roomescape.payment.application.dto.PaymentRequest;
 import roomescape.payment.application.dto.PaymentResponse;
+import roomescape.payment.application.dto.PrePaymentRequest;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
@@ -19,17 +20,19 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
 
     public Payment pay(
-            final PaymentDataRequest paymentDataRequest,
-            final PaymentConfirmRequest request,
+            final PrePaymentRequest prePaymentRequest,
+            final PaymentConfirmRequest paymentConfirmRequest,
             final Reservation reservation
     ) {
-        validatePaymentData(request, paymentDataRequest);
-        final PaymentRequest paymentRequest = new PaymentRequest(
-                request.amount(), request.orderId(), request.paymentKey());
+        validatePrePayment(paymentConfirmRequest, prePaymentRequest);
+
+        final PaymentRequest paymentRequest = new DefaultPaymentRequest(
+                paymentConfirmRequest.paymentKey(), paymentConfirmRequest.orderId(), paymentConfirmRequest.amount()
+        );
         final Payment payment = Payment.pending(
-                request.orderId(),
-                request.paymentKey(),
-                request.amount(),
+                paymentConfirmRequest.orderId(),
+                paymentConfirmRequest.paymentKey(),
+                paymentConfirmRequest.amount(),
                 reservation
         );
         paymentRepository.save(payment);
@@ -42,19 +45,19 @@ public class PaymentService {
         return payment;
     }
 
-    public Payment await(final PaymentDataRequest request, final Reservation reservation) {
+    public Payment await(final PrePaymentRequest request, final Reservation reservation) {
         final Payment payment = Payment.await(request.orderId(), request.amount(), reservation);
         return paymentRepository.save(payment);
     }
 
-    private void validatePaymentData(
-            final PaymentConfirmRequest request,
-            final PaymentDataRequest paymentDataRequest
+    private void validatePrePayment(
+            final PaymentConfirmRequest paymentConfirmRequest,
+            final PrePaymentRequest prePaymentRequest
     ) {
-        if (!paymentDataRequest.orderId().equals(request.orderId())) {
+        if (!prePaymentRequest.orderId().equals(paymentConfirmRequest.orderId())) {
             throw new BadRequestException("결제 주문번호가 일치하지 않습니다.");
         }
-        if (!paymentDataRequest.amount().equals(request.amount())) {
+        if (!prePaymentRequest.amount().equals(paymentConfirmRequest.amount())) {
             throw new BadRequestException("결제 금액이 일치하지 않습니다.");
         }
     }

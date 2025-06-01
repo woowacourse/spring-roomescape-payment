@@ -12,6 +12,7 @@ import roomescape.payment.application.dto.PaymentRequest;
 import roomescape.payment.application.dto.PaymentResponse;
 import roomescape.payment.infrastructure.dto.TossErrorResponse;
 import roomescape.payment.infrastructure.dto.TossPaymentRequest;
+import roomescape.payment.infrastructure.dto.TossPaymentResponse;
 
 @Component
 public class TossPaymentClient implements PaymentClient {
@@ -34,7 +35,7 @@ public class TossPaymentClient implements PaymentClient {
                         (req, res) -> {
                             handleException(res);
                         })
-                .body(PaymentResponse.class);
+                .body(TossPaymentResponse.class);
     }
 
     private void handleException(final ClientHttpResponse res) {

@@ -4,12 +4,15 @@ import java.math.BigDecimal;
 import roomescape.payment.application.dto.PaymentRequest;
 
 public record TossPaymentRequest(
-        BigDecimal amount,
+        String paymentKey,
         String orderId,
-        String paymentKey
+        BigDecimal amount
 ) {
-
-    public static TossPaymentRequest from(final PaymentRequest request) {
-        return new TossPaymentRequest(request.amount(), request.orderId(), request.paymentKey());
+    public static TossPaymentRequest from(PaymentRequest request) {
+        return new TossPaymentRequest(
+                request.paymentKey(),
+                request.orderId(),
+                request.amount()
+        );
     }
 }

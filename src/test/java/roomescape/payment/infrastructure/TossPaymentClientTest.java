@@ -21,6 +21,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import roomescape.payment.TestRestClientConfig;
+import roomescape.payment.application.dto.DefaultPaymentRequest;
 import roomescape.payment.application.dto.PaymentRequest;
 import roomescape.payment.application.dto.PaymentResponse;
 
@@ -67,7 +68,7 @@ class TossPaymentClientTest {
                 .setBody(expectedResponse)
                 .addHeader("Content-Type", "application/json"));
 
-        PaymentRequest request = new PaymentRequest(BigDecimal.valueOf(1000), "orderId", "paymentKey");
+        PaymentRequest request = new DefaultPaymentRequest("paymentKey", "orderId", BigDecimal.valueOf(1000));
 
         // when
         PaymentResponse response = tossPaymentClient.requestPayment(request);
@@ -92,7 +93,7 @@ class TossPaymentClientTest {
                 .setBody(errorJson)
                 .addHeader("Content-Type", "application/json"));
 
-        PaymentRequest request = new PaymentRequest(BigDecimal.valueOf(1000), "orderId", "paymentKey");
+        PaymentRequest request = new DefaultPaymentRequest("paymentKey", "orderId", BigDecimal.valueOf(1000));
 
         assertThatThrownBy(() -> tossPaymentClient.requestPayment(request))
                 .isInstanceOf(TossPaymentException.class)
@@ -114,7 +115,7 @@ class TossPaymentClientTest {
                 .setBodyDelay(5, TimeUnit.SECONDS) // ★ 여기서 응답 지연
                 .addHeader("Content-Type", "application/json"));
 
-        PaymentRequest request = new PaymentRequest(BigDecimal.valueOf(1000), "orderId", "paymentKey");
+        PaymentRequest request = new DefaultPaymentRequest("paymentKey", "orderId", BigDecimal.valueOf(1000));
 
         // when & then
         assertThatThrownBy(() -> tossPaymentClient.requestPayment(request))
