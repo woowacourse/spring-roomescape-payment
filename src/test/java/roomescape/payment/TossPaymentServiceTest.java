@@ -11,17 +11,20 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
 import roomescape.common.exception.PaymentException;
-import roomescape.reservation.controller.PaymentConfirmRequest;
+import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.toss.TossPaymentClient;
+import roomescape.payment.toss.TossPaymentError;
 
-@RestClientTest(PaymentClient.class)
-class PaymentClientTest {
+@RestClientTest({PaymentService.class, TossPaymentClient.class})
+class TossPaymentServiceTest {
 
     @Autowired
-    private PaymentClient paymentClient;
+    private PaymentService paymentService;
 
     @Autowired
     MockRestServiceServer mockServer;
@@ -30,14 +33,14 @@ class PaymentClientTest {
     @Test
     void test1() throws JsonProcessingException {
         //given
-        PaymentError paymentError = new PaymentError("NOT_AVAILABLE_BANK", "은행 서비스 시간이 아닙니다.");
+        TossPaymentError tossPaymentError = new TossPaymentError("NOT_AVAILABLE_BANK", "은행 서비스 시간이 아닙니다.");
         mockServer.expect(MockRestRequestMatchers.requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andRespond(MockRestResponseCreators.withForbiddenRequest()
-                        .body(new ObjectMapper().writeValueAsString(paymentError)));
+                        .body(new ObjectMapper().writeValueAsString(tossPaymentError)));
 
         //when & then
         PaymentConfirmRequest request = new PaymentConfirmRequest("a", "b", 1);
-        assertThatThrownBy(() -> paymentClient.confirm(request))
+        assertThatThrownBy(() -> paymentService.confirm(request))
                 .isInstanceOf(PaymentException.class)
                 .satisfies(e -> {
                     PaymentException ex = (PaymentException) e;
@@ -46,18 +49,20 @@ class PaymentClientTest {
                 });
     }
 
-    @DisplayName("토스에서 FilteredPaymentErrorCode 에러 코드 응답 시, INTERNAL_SERVER_ERROR PaymentException을 던진다")
+    @DisplayName("토스에서 Filva:43)\n"
+            + "\tat java.base/java.lang.reflect.Method.invoke(Method.java:580)\n"
+            + "\tat java.base/java.util.ArrayList.forEach(ArrayList.java:1596)teredPaymentErrorCode 에러 코드 응답 시, INTERNAL_SERVER_ERROR PaymentException을 던진다")
     @Test
     void test2() throws JsonProcessingException {
         //given
-        PaymentError paymentError = new PaymentError("INCORRECT_BASIC_AUTH_FORMAT", "aaaa");
+        TossPaymentError tossPaymentError = new TossPaymentError("INCORRECT_BASIC_AUTH_FORMAT", "aaaa");
         mockServer.expect(MockRestRequestMatchers.requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andRespond(MockRestResponseCreators.withForbiddenRequest()
-                        .body(new ObjectMapper().writeValueAsString(paymentError)));
+                        .body(new ObjectMapper().writeValueAsString(tossPaymentError)));
 
         //when & then
         PaymentConfirmRequest request = new PaymentConfirmRequest("a", "b", 1);
-        assertThatThrownBy(() -> paymentClient.confirm(request))
+        assertThatThrownBy(() -> paymentService.confirm(request))
                 .isInstanceOf(PaymentException.class)
                 .satisfies(e -> {
                     PaymentException ex = (PaymentException) e;

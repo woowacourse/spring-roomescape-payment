@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.common.utils.UriFactory;
 import roomescape.member.auth.LoginMember;
 import roomescape.member.auth.vo.MemberInfo;
-import roomescape.payment.PaymentClient;
 import roomescape.reservation.controller.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.controller.dto.CreateReservationWebRequest;
 import roomescape.reservation.controller.dto.CreateReservationWithPaymentWebRequest;

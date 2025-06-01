@@ -1,9 +1,9 @@
-package roomescape.payment;
+package roomescape.payment.toss;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record PaymentError(
+public record TossPaymentError(
         String code,
         String message
 ) {

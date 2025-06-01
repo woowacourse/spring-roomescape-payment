@@ -1,0 +1,6 @@
+timeout:
+  connection: 2000
+  read: 8000
+
+toss:
+  base-url: https://api.tosspayments.com/v1/payments/confirm

@@ -2,7 +2,7 @@ package roomescape.reservation.controller.dto;
 
 import java.time.LocalDate;
 import roomescape.member.auth.vo.MemberInfo;
-import roomescape.reservation.controller.PaymentConfirmRequest;
+import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.reservation.service.dto.CreateReservationServiceRequest;
 
 public record CreateReservationWithPaymentWebRequest(

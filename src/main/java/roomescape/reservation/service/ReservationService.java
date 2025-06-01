@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.auth.vo.MemberInfo;
-import roomescape.payment.PaymentClient;
+import roomescape.payment.PaymentService;
 import roomescape.reservation.controller.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.controller.dto.CreateReservationByAdminWebRequest;
 import roomescape.reservation.controller.dto.CreateReservationWebRequest;
@@ -37,7 +37,7 @@ public class ReservationService {
     private final ReservationCommandUseCase reservationCommandUseCase;
     private final ReservationWaitQueryUseCase reservationWaitQueryUseCase;
     private final ReservationWaitCommandUseCase reservationWaitCommandUseCase;
-    private final PaymentClient paymentClient;
+    private final PaymentService paymentService;
 
     public List<ReservationWebResponse> getAll() {
         return ReservationConverter.toDto(
@@ -105,7 +105,7 @@ public class ReservationService {
         CreateReservationServiceRequest createRequest = webRequest.toCreateServiceRequest(webRequest, memberInfo);
         Reservation reservation = reservationCommandUseCase.create(createRequest);
 
-        paymentClient.confirm(webRequest.toPaymentConfirmRequest());
+        paymentService.confirm(webRequest.toPaymentConfirmRequest());
         return ReservationConverter.toDto(reservation);
     }
 
