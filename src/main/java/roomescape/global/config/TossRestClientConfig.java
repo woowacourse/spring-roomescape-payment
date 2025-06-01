@@ -3,6 +3,7 @@ package roomescape.global.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestClient;
 
 import java.nio.charset.StandardCharsets;
@@ -28,8 +29,8 @@ public class TossRestClientConfig {
 
         return RestClient.builder()
                 .baseUrl(baseUrl)
-                .defaultHeader("Authorization", basicAuthValue)
-                .defaultHeader("Content-Type", APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, basicAuthValue)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 .build();
     }
 
