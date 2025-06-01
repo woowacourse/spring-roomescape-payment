@@ -31,8 +31,9 @@ public class DataInserter {
     private final ReservationThemeJpaRepository reservationThemeJpaRepository;
     private final PaymentJpaRepository paymentJpaRepository;
 
-    public Payment insertPayment(String paymentKey, Long reservationId) {
-        return paymentJpaRepository.save(new Payment(reservationId, paymentKey));
+    public Payment insertPayment(String paymentKey, int amount, Long reservationId) {
+        Payment payment = new Payment(paymentKey, amount, reservationId);
+        return paymentJpaRepository.save(payment);
     }
 
     public Reservation insertReservation(Member member, ReservationItem reservationItem, ReservationStatus reservationStatus) {

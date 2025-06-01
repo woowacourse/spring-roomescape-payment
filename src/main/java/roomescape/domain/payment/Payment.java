@@ -13,11 +13,12 @@ public class Payment {
 
     @Id
     private final String paymentKey;
-
+    private final int amount;
     private final Long reservationId;
 
-    public Payment(Long reservationId, String paymentKey) {
-        this.reservationId = reservationId;
+    public Payment(String paymentKey, int amount, Long reservationId) {
         this.paymentKey = paymentKey;
+        this.amount = amount;
+        this.reservationId = reservationId;
     }
 }

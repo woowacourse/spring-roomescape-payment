@@ -21,6 +21,6 @@ public class PaymentService {
                 orderId,
                 amount
         );
-        paymentRepository.save(new Payment(reservationId, response.paymentKey()));
+        paymentRepository.save(new Payment(response.paymentKey(), amount, reservationId));
     }
 }

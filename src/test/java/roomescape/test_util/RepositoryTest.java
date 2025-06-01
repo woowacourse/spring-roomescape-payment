@@ -44,8 +44,8 @@ public abstract class RepositoryTest {
         dataCleaner.clean();
     }
 
-    public Payment insertPayment(String paymentKey, Long reservationId) {
-        return dataInserter.insertPayment(paymentKey, reservationId);
+    public Payment insertPayment(String paymentKey, int amount, Long reservationId) {
+        return dataInserter.insertPayment(paymentKey, amount, reservationId);
     }
 
     public Reservation insertReservation(Member member, ReservationItem reservationItem, ReservationStatus reservationStatus) {
