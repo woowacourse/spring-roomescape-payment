@@ -1,11 +1,11 @@
-package roomescape.config.interceptor;
+package roomescape.configuration.interceptor;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
-import roomescape.config.annotation.Authority;
+import roomescape.configuration.annotation.Authority;
 import roomescape.domain.Role;
 import roomescape.dto.business.AccessTokenContent;
 import roomescape.exception.ForbiddenException;

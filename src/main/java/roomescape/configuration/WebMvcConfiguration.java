@@ -1,12 +1,12 @@
-package roomescape.config;
+package roomescape.configuration;
 
 import java.util.List;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import roomescape.config.interceptor.RoleCheckInterceptor;
-import roomescape.config.resolver.LoginMemberArgumentResolver;
+import roomescape.configuration.interceptor.RoleCheckInterceptor;
+import roomescape.configuration.resolver.LoginMemberArgumentResolver;
 import roomescape.utility.CookieUtility;
 import roomescape.utility.JwtTokenProvider;
 

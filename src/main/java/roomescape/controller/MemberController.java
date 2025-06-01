@@ -4,7 +4,7 @@ import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.config.annotation.Authority;
+import roomescape.configuration.annotation.Authority;
 import roomescape.domain.Role;
 import roomescape.dto.response.MemberProfileResponse;
 import roomescape.service.query.MemberQueryService;

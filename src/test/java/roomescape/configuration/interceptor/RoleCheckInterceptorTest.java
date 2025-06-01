@@ -1,4 +1,4 @@
-package roomescape.config.interceptor;
+package roomescape.configuration.interceptor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -12,7 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.method.HandlerMethod;
-import roomescape.config.annotation.Authority;
+import roomescape.configuration.annotation.Authority;
 import roomescape.domain.Role;
 import roomescape.dto.business.AccessTokenContent;
 import roomescape.exception.ForbiddenException;

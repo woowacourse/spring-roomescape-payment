@@ -1,4 +1,4 @@
-package roomescape.config.annotation;
+package roomescape.configuration.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

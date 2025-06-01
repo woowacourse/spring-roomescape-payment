@@ -1,4 +1,4 @@
-package roomescape.config;
+package roomescape.configuration;
 
 import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
