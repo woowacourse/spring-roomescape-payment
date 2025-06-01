@@ -11,22 +11,19 @@ public class ClientConfig {
 
     private static final int READ_TIMEOUT = 60_000;
     private static final int CONNECT_TIMEOUT = 5_000;
-    private static final String baseUrl = "https://api.tosspayments.com";
-    private static final String secretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:";
+    private static final String BASE_URL = "https://api.tosspayments.com";
+    private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:";
 
     @Bean
-    public RestClient paymentClient() {
+    public RestClient createPaymentClient() {
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
         factory.setConnectTimeout(CONNECT_TIMEOUT);
         factory.setReadTimeout(READ_TIMEOUT);
 
-        System.out.println(baseUrl);
-        System.out.println(secretKey);
-
         return RestClient.builder()
-                .baseUrl(baseUrl)
+                .baseUrl(BASE_URL)
                 .defaultHeader("Authorization", String.format("%s %s", "Basic", Base64.getEncoder()
-                        .encodeToString(secretKey.getBytes())))
+                        .encodeToString(SECRET_KEY.getBytes())))
                 .requestFactory(factory)
                 .build();
     }

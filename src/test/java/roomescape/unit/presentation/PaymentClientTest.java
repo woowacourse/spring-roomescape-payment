@@ -17,13 +17,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
-import roomescape.config.paymentResponseErrorHandler;
 import roomescape.domain.PaymentInfo;
 import roomescape.dto.request.PaymentRequest;
 import roomescape.exception.FilteredPaymentException;
-import roomescape.presentation.PaymentClientController;
+import roomescape.infrastructure.payment.PaymentClient;
+import roomescape.infrastructure.payment.paymentResponseErrorHandler;
 
-public class PaymentClientControllerTest {
+public class PaymentClientTest {
 
     private final RestClient.Builder testBuilder = RestClient.builder()
             .baseUrl("https://api.tosspayments.com")
@@ -32,7 +32,7 @@ public class PaymentClientControllerTest {
     private final paymentResponseErrorHandler paymentResponseErrorHandler = new paymentResponseErrorHandler();
 
     private MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
-    private PaymentClientController clientController = new PaymentClientController(testBuilder.build(),
+    private PaymentClient clientController = new PaymentClient(testBuilder.build(),
             paymentResponseErrorHandler);
 
     @Test
