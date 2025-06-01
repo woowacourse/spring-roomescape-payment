@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
@@ -16,6 +17,9 @@ import roomescape.payment.dto.TossPaymentResponse;
 @Component
 @Profile("!test")
 public class PaymentRestClient implements PaymentClient {
+
+    private static final String AUTH_HEADER = "Authorization";
+    private static final String CONTENT_TYPE_HEADER = "Content-Type";
 
     private final RestClient restClient;
     private final String TEST_KEY;
@@ -36,8 +40,8 @@ public class PaymentRestClient implements PaymentClient {
         requestFactory.setReadTimeout(Duration.ofSeconds(2));
         return RestClient.builder()
                 .baseUrl(BASE_URL)
-                .defaultHeader("Authorization", getEncodedKey())
-                .defaultHeader("Content-Type", "application/json")
+                .defaultHeader(AUTH_HEADER, getEncodedKey())
+                .defaultHeader(CONTENT_TYPE_HEADER, MediaType.APPLICATION_JSON_VALUE)
                 .defaultStatusHandler(new PaymentErrorHandler())
                 .requestFactory(requestFactory)
                 .build();
