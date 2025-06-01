@@ -51,12 +51,14 @@ class ReservationControllerTest {
     @Test
     void 사용자가_예약을_생성한다() throws Exception {
         // given
-        ReservationCreateRequest request = new ReservationCreateRequest(LocalDate.of(2025, 1, 1), 1L, 1L, "1","1",1000);
+        ReservationCreateRequest request = new ReservationCreateRequest(LocalDate.of(2025, 1, 1), 1L, 1L, "1", "1",
+                1000);
         ReservationResponse response = new ReservationResponse(1L, "memberName1", LocalDate.of(2025, 1, 1),
                 new ReservationTimeResponse(1L, LocalTime.of(9, 0)), "themeName1");
         PaymentInfo paymentInfo = new PaymentInfo("1", 1000);
         given(paymentClientController.postPaymentInfo(any())).willReturn(paymentInfo);
-        given(reservationService.createReservationForMember(1L, request.timeId(), request.themeId(), request.date(), paymentInfo)).willReturn(
+        given(reservationService.createReservationForMember(1L, request.timeId(), request.themeId(), request.date(),
+                paymentInfo)).willReturn(
                 response);
         given(tokenProvider.extractSubject("accessToken")).willReturn("1");
         // when & then

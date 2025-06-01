@@ -25,7 +25,6 @@ import roomescape.exception.MemberNotFoundException;
 import roomescape.exception.ReservationNotFoundException;
 import roomescape.exception.ReservationTimeNotFoundException;
 import roomescape.exception.ThemeNotFoundException;
-import roomescape.presentation.PaymentClientController;
 
 @Service
 @Transactional

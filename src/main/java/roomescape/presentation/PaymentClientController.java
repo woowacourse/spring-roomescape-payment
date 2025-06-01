@@ -2,23 +2,19 @@ package roomescape.presentation;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
+import java.util.List;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.client.RestClient;
 import roomescape.domain.PaymentInfo;
 import roomescape.dto.PaymentRequest;
 import roomescape.exception.FilteredPaymentException;
 import roomescape.exception.PaymentException;
 
-import java.util.Arrays;
-import java.util.List;
-
 @Component
 public class PaymentClientController {
 
-    private static final List<String> CODES = List.of("INVALID_API_KEY", "UNAUTHORIZED_KEY", "INCORRECT_BASIC_AUTH_FORMAT");
+    private static final List<String> CODES = List.of("INVALID_API_KEY", "UNAUTHORIZED_KEY",
+            "INCORRECT_BASIC_AUTH_FORMAT");
 
     private final RestClient restClient;
 
