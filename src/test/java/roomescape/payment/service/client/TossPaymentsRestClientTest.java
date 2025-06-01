@@ -10,10 +10,10 @@ import roomescape.common.exception.PaymentException;
 import roomescape.payment.service.dto.PaymentConfirmRequest;
 
 @SpringBootTest
-class PaymentRestClientTest {
+class TossPaymentsRestClientTest {
 
     @Autowired
-    private PaymentRestClient paymentRestClient;
+    private TossPaymentsRestClient tossPaymentsRestClient;
 
     @Test
     @DisplayName("적절하지 않은 정보로 결제를 요청할 시 예외가 발생한다")
@@ -26,7 +26,7 @@ class PaymentRestClientTest {
         );
 
         // When & Then
-        assertThatThrownBy(() -> paymentRestClient.confirm(request))
+        assertThatThrownBy(() -> tossPaymentsRestClient.confirm(request))
             .isInstanceOf(PaymentException.class);
     }
 }

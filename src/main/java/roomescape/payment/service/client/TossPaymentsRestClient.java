@@ -21,7 +21,7 @@ import roomescape.payment.service.dto.PaymentClientResponse;
 import roomescape.payment.service.dto.PaymentConfirmRequest;
 
 @Component
-public class PaymentRestClient implements PaymentClient {
+public class TossPaymentsRestClient implements PaymentClient {
 
     private static final Set<String> serverErrorCases = Set.of(
             "INVALID_API_KEY", "INVALID_AUTHORIZE_AUTH",
@@ -31,14 +31,14 @@ public class PaymentRestClient implements PaymentClient {
 
     private final RestClient restClient;
 
-    private final String SECRET_KEY;
+    private final String secretKey;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public PaymentRestClient(@Qualifier("tossPaymentsRestClient") RestClient restClient,
-                             @Value("${payment.key}") String SECRET_KEY) {
+    public TossPaymentsRestClient(@Qualifier("tossPaymentsRestClient") RestClient restClient,
+                             @Value("${payment.key}") String secretKey) {
         this.restClient = restClient;
-        this.SECRET_KEY = SECRET_KEY;
+        this.secretKey = secretKey;
     }
 
     public PaymentClientResponse confirm(PaymentConfirmRequest paymentConfirmRequest) {
@@ -46,7 +46,7 @@ public class PaymentRestClient implements PaymentClient {
             return restClient.post().uri("/confirm")
                     .contentType(MediaType.APPLICATION_JSON)
                     .header("Authorization", "Basic " + Base64.getEncoder()
-                            .encodeToString((SECRET_KEY + ':').getBytes(StandardCharsets.UTF_8)))
+                            .encodeToString((secretKey + ':').getBytes(StandardCharsets.UTF_8)))
                     .body(paymentConfirmRequest)
                     .retrieve()
                     .onStatus(
