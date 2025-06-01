@@ -23,7 +23,7 @@ public class PaymentService {
     @Transactional
     public void createPayment(PaymentConfirmResponse paymentConfirm, Long reservationId) {
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new NotFoundException(""));
+                .orElseThrow(() -> new NotFoundException("[ERROR] 예약을 찾을 수 없습니다. id : " + reservationId));
         Payment payment = Payment.createWithoutId(paymentConfirm.orderId(), paymentConfirm.paymentKey(),
                 paymentConfirm.totalAmount(), reservation);
         paymentRepository.save(payment);
