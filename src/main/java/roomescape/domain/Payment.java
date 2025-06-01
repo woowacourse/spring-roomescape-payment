@@ -33,10 +33,6 @@ public class Payment {
     protected Payment() {
     }
 
-    public Long getId() {
-        return id;
-    }
-
     private Payment(Long id, String orderId, String paymentKey, Long amount, Reservation reservation) {
         this.id = id;
         this.orderId = orderId;
@@ -47,6 +43,10 @@ public class Payment {
 
     public static Payment createWithoutId(String orderId, String paymentKey, Long amount, Reservation reservation) {
         return new Payment(null, orderId, paymentKey, amount, reservation);
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getOrderId() {
