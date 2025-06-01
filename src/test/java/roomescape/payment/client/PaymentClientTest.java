@@ -1,5 +1,13 @@
 package roomescape.payment.client;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.springframework.web.client.RestClient.RequestBodySpec;
+import static org.springframework.web.client.RestClient.RequestBodyUriSpec;
+import static org.springframework.web.client.RestClient.ResponseSpec;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,14 +21,6 @@ import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.exception.PaymentApiException;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.springframework.web.client.RestClient.RequestBodySpec;
-import static org.springframework.web.client.RestClient.RequestBodyUriSpec;
-import static org.springframework.web.client.RestClient.ResponseSpec;
-
 @ExtendWith(MockitoExtension.class)
 class PaymentClientTest {
 
@@ -28,7 +28,7 @@ class PaymentClientTest {
     private RestClient restClient;
 
     @InjectMocks
-    private PaymentClient paymentClient;
+    private TossPaymentClient paymentClinet;
 
     @Test
     @DisplayName("정상 결제 응답 반환한다")
@@ -47,7 +47,7 @@ class PaymentClientTest {
         when(bodySpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.body(PaymentResponse.class)).thenReturn(expectedResponse);
 
-        PaymentResponse result = paymentClient.confirmPayment(request);
+        PaymentResponse result = paymentClinet.confirmPayment(request);
 
         // then
         assertThat(result).isEqualTo(expectedResponse);
@@ -80,7 +80,7 @@ class PaymentClientTest {
         when(responseSpec.body(PaymentResponse.class)).thenThrow(exception);
 
         // When & Then
-        assertThatThrownBy(() -> paymentClient.confirmPayment(request))
+        assertThatThrownBy(() -> paymentClinet.confirmPayment(request))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("결제 확인에 실패했습니다.")
                 .hasMessageContaining("인증 실패")
@@ -114,7 +114,7 @@ class PaymentClientTest {
         when(responseSpec.body(PaymentResponse.class)).thenThrow(exception);
 
         // When & Then
-        assertThatThrownBy(() -> paymentClient.confirmPayment(request))
+        assertThatThrownBy(() -> paymentClinet.confirmPayment(request))
                 .isInstanceOf(PaymentApiException.class)
                 .hasMessageContaining("결제 Api가 실패하였습니다.")
                 .hasMessageContaining("잘못된 요청")
@@ -148,7 +148,7 @@ class PaymentClientTest {
         when(responseSpec.body(PaymentResponse.class)).thenThrow(exception);
 
         // When & Then
-        assertThatThrownBy(() -> paymentClient.confirmPayment(request))
+        assertThatThrownBy(() -> paymentClinet.confirmPayment(request))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("파싱에 실패했습니다.");
     }

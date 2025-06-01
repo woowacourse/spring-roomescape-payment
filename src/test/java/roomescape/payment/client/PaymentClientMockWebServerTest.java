@@ -1,5 +1,8 @@
 package roomescape.payment.client;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -14,13 +17,10 @@ import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.exception.PaymentApiException;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 class PaymentClientMockWebServerTest {
 
     private MockWebServer mockWebServer;
-    private PaymentClient paymentClient;
+    private TossPaymentClient paymentClinet;
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -34,7 +34,7 @@ class PaymentClientMockWebServerTest {
                 .baseUrl(mockWebServer.url("/").toString())
                 .build();
 
-        paymentClient = new PaymentClient(restClient);
+        paymentClinet = new TossPaymentClient(restClient);
     }
 
     @AfterEach
@@ -55,7 +55,7 @@ class PaymentClientMockWebServerTest {
                 .addHeader("Content-Type", "application/json"));
 
         // when
-        PaymentResponse result = paymentClient.confirmPayment(request);
+        PaymentResponse result = paymentClinet.confirmPayment(request);
 
         // then
         assertThat(result).isEqualTo(expectedResponse);
@@ -83,7 +83,7 @@ class PaymentClientMockWebServerTest {
 
         // when
         // then
-        assertThatThrownBy(() -> paymentClient.confirmPayment(request))
+        assertThatThrownBy(() -> paymentClinet.confirmPayment(request))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("결제 확인에 실패했습니다.")
                 .hasMessageContaining("인증 실패")
@@ -104,7 +104,7 @@ class PaymentClientMockWebServerTest {
 
         // when
         // then
-        assertThatThrownBy(() -> paymentClient.confirmPayment(request))
+        assertThatThrownBy(() -> paymentClinet.confirmPayment(request))
                 .isInstanceOf(PaymentApiException.class)
                 .hasMessageContaining("결제 Api가 실패하였습니다.")
                 .hasMessageContaining("잘못된 요청")
@@ -125,7 +125,7 @@ class PaymentClientMockWebServerTest {
 
         // when
         // then
-        assertThatThrownBy(() -> paymentClient.confirmPayment(request))
+        assertThatThrownBy(() -> paymentClinet.confirmPayment(request))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("파싱에 실패했습니다.");
     }
@@ -141,7 +141,7 @@ class PaymentClientMockWebServerTest {
 
         // when
         // then
-        assertThatThrownBy(() -> paymentClient.confirmPayment(request))
+        assertThatThrownBy(() -> paymentClinet.confirmPayment(request))
                 .isInstanceOf(Exception.class);
     }
 }

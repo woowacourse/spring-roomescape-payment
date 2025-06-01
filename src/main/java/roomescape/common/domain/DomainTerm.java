@@ -15,7 +15,9 @@ public enum DomainTerm {
     RESERVATION_WAITING("예약 대기"),
     RESERVATION_WAITING_ORDER("예약 대기 순서"),
 
+    // 예약 & 예약 대기 도메인
     RESERVATION_VIEW_ID("예약 조회 식별자"),
+
 
     // Payment 도메인
     PAYMENT("결제"),
@@ -45,8 +47,8 @@ public enum DomainTerm {
 
     // Common
     DOMAIN_ID("도메인 식별자"),
-    EMAIL("이메일");
-
+    EMAIL("이메일"),
+    ;
     private final String label;
 
     DomainTerm(final String label) {

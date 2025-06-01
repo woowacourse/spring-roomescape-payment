@@ -1,5 +1,18 @@
 package roomescape.reservation.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.willThrow;
+import static org.mockito.Mockito.times;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.NoSuchElementException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,7 +23,7 @@ import roomescape.auth.sign.password.Password;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.domain.Email;
 import roomescape.common.exception.NotFoundException;
-import roomescape.payment.client.PaymentClient;
+import roomescape.payment.client.TossPaymentClient;
 import roomescape.reservation.application.dto.MyReservationsResponse;
 import roomescape.reservation.application.service.ReservationCommandService;
 import roomescape.reservation.application.service.ReservationQueryService;
@@ -36,20 +49,6 @@ import roomescape.user.domain.User;
 import roomescape.user.domain.UserName;
 import roomescape.user.domain.UserRole;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.BDDMockito.willThrow;
-import static org.mockito.Mockito.times;
-
 @ExtendWith(MockitoExtension.class)
 class ReservationFacadeTest {
 
@@ -69,7 +68,7 @@ class ReservationFacadeTest {
     private ReservationCommandService reservationCommandService;
 
     @Mock
-    private PaymentClient paymentClient;
+    private TossPaymentClient tossPaymentClient;
 
     @Mock
     private UserQueryService userQueryService;
@@ -202,7 +201,7 @@ class ReservationFacadeTest {
         Reservation reservation = createReservation(1L);
         given(userQueryService.getById(any())).willReturn(createUser(1L));
         given(reservationCommandService.create(any())).willReturn(reservation);
-        given(paymentClient.confirmPayment(any())).willReturn(null);
+        given(tossPaymentClient.confirmPayment(any())).willReturn(null);
         //when
         ReservationResponse result = reservationFacade.create(request);
 

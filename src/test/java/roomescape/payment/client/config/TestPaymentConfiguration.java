@@ -5,7 +5,6 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.client.PaymentClient;
 
 @TestConfiguration
 public class TestPaymentConfiguration {
@@ -15,12 +14,10 @@ public class TestPaymentConfiguration {
 
     @Bean
     @Primary
-    public PaymentClient paymentClient(RestClient.Builder restClientBuilder) {
-        RestClient restClient = restClientBuilder
+    public RestClient getRestClient(RestClient.Builder restClientBuilder) {
+        return restClientBuilder
                 .baseUrl(URL)
                 .defaultHeader("Content-Type", "application/json")
                 .build();
-
-        return new PaymentClient(restClient);
     }
 }
