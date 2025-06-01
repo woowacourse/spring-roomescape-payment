@@ -37,3 +37,4 @@ logging:
 payment:
   toss:
     auth-token: Basic bitamokoliwonbitamokoliwon
+    base-url: https://api.tosspayments.com
