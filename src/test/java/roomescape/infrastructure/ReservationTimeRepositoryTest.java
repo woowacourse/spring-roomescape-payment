@@ -16,13 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import roomescape.business.model.entity.ReservationTime;
-import roomescape.business.model.repository.ReservationTimeRepository;
 import roomescape.business.model.vo.Id;
-import roomescape.business.model.vo.ReservationStatus;
+import roomescape.presentation.dto.response.ReservationTimeResponseWithBooked;
 import roomescape.test_util.JpaTestUtil;
 
 @DataJpaTest
-@Import({JpaReservationTimeRepository.class, JpaTestUtil.class})
+@Import(JpaTestUtil.class)
 class ReservationTimeRepositoryTest {
 
     private static final LocalTime TIME1 = LocalTime.of(10, 0);
@@ -32,7 +31,8 @@ class ReservationTimeRepositoryTest {
     private final JpaTestUtil testUtil;
 
     @Autowired
-    ReservationTimeRepositoryTest(ReservationTimeRepository sut, JpaTestUtil testUtil) {
+    ReservationTimeRepositoryTest(ReservationTimeRepository sut,
+                                  JpaTestUtil testUtil) {
         this.sut = sut;
         this.testUtil = testUtil;
     }
@@ -67,7 +67,7 @@ class ReservationTimeRepositoryTest {
     }
 
     @Test
-    void 해당_날짜와_테마에_예약되지_않은_모든_예약_시간을_찾을_수_있다() {
+    void 해당_날짜와_테마에_모든_예약_시간을_예약_여부와_함께_찾을_수_있다() {
         // given
         String timeId1 = generateId();
         String timeId2 = generateId();
@@ -81,44 +81,16 @@ class ReservationTimeRepositoryTest {
         testUtil.insertReservationTime(timeId3, LocalTime.of(14, 0));
         testUtil.insertTheme(themeId, "주홍색 연구");
         testUtil.insertUser(userId, "돔푸");
-        testUtil.insertReservation(reservationId, LocalDate.now().plusDays(10), timeId1, themeId, userId,
-                ReservationStatus.RESERVED);
-
+        testUtil.insertReservation(reservationId, LocalDate.now().plusDays(10), timeId1, themeId, userId);
         // when
-        final List<ReservationTime> result = sut.findAvailableByDateAndThemeId(LocalDate.now().plusDays(10),
-                Id.create(themeId));
+        final List<ReservationTimeResponseWithBooked> result = sut.findByDateAndThemeIdWithAlreadyBooked(
+                LocalDate.now().plusDays(10), Id.create(themeId));
 
         // then
-        assertThat(result.size()).isEqualTo(2);
-        assertThat(result.get(0).getId().value()).isEqualTo(timeId2);
-        assertThat(result.get(1).getId().value()).isEqualTo(timeId3);
-    }
-
-    @Test
-    void 해당_날짜와_테마에_예약된_모든_예약_시간을_찾을_수_있다() {
-        // given
-        String timeId1 = generateId();
-        String timeId2 = generateId();
-        String timeId3 = generateId();
-        String themeId = generateId();
-        String userId = generateId();
-        String reservationId = generateId();
-
-        testUtil.insertReservationTime(timeId1, LocalTime.of(10, 0));
-        testUtil.insertReservationTime(timeId2, LocalTime.of(12, 0));
-        testUtil.insertReservationTime(timeId3, LocalTime.of(14, 0));
-        testUtil.insertTheme(themeId, "주홍색 연구");
-        testUtil.insertUser(userId, "돔푸");
-        testUtil.insertReservation(reservationId, LocalDate.now().plusDays(10), timeId1, themeId, userId,
-                ReservationStatus.RESERVED);
-
-        // when
-        final List<ReservationTime> result = sut.findNotAvailableByDateAndThemeId(LocalDate.now().plusDays(10),
-                Id.create(themeId));
-
-        // then
-        assertThat(result.size()).isEqualTo(1);
-        assertThat(result.getFirst().getId().value()).isEqualTo(timeId1);
+        assertThat(result.size()).isEqualTo(3);
+        assertThat(result.get(0).alreadyBooked()).isTrue();
+        assertThat(result.get(1).alreadyBooked()).isFalse();
+        assertThat(result.get(2).alreadyBooked()).isFalse();
     }
 
     @Test
@@ -144,7 +116,7 @@ class ReservationTimeRepositoryTest {
         testUtil.insertReservationTime(timeId, TIME1);
 
         // when
-        final boolean result = sut.existById(Id.create(timeId));
+        final boolean result = sut.existsById(Id.create(timeId));
 
         // then
         assertThat(result).isTrue();
@@ -157,7 +129,7 @@ class ReservationTimeRepositoryTest {
         testUtil.insertReservationTime(timeId, TIME1);
 
         // when
-        final boolean result = sut.existByTime(TIME1);
+        final boolean result = sut.existsByStartTime_Value(TIME1);
 
         // then
         assertThat(result).isTrue();
@@ -171,7 +143,7 @@ class ReservationTimeRepositoryTest {
         testUtil.insertReservationTime(timeId, LocalTime.of(10, minute));
 
         // when
-        final boolean result = sut.existBetween(LocalTime.of(10, 0), LocalTime.of(10, 30));
+        final boolean result = sut.existsByStartTime_ValueBetween(LocalTime.of(10, 0), LocalTime.of(10, 30));
 
         // then
         assertThat(result).isTrue();

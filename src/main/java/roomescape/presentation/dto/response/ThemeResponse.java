@@ -1,8 +1,6 @@
 package roomescape.presentation.dto.response;
 
-import java.util.Comparator;
-import java.util.List;
-import roomescape.business.dto.ThemeDto;
+import roomescape.business.model.entity.Theme;
 
 public record ThemeResponse(
         String id,
@@ -10,14 +8,8 @@ public record ThemeResponse(
         String description,
         String thumbnail
 ) {
-    public static ThemeResponse from(ThemeDto dto) {
-        return new ThemeResponse(dto.id().value(), dto.name().value(), dto.description(), dto.thumbnail());
-    }
-
-    public static List<ThemeResponse> from(List<ThemeDto> dtos) {
-        return dtos.stream()
-                .map(ThemeResponse::from)
-                .sorted(Comparator.comparing(ThemeResponse::name))
-                .toList();
+    public static ThemeResponse from(Theme theme) {
+        return new ThemeResponse(theme.getId().value(), theme.getName().value(), theme.getDescription(),
+                theme.getThumbnail());
     }
 }

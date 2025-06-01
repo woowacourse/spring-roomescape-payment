@@ -1,9 +1,7 @@
 package roomescape.presentation.dto.response;
 
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
-import roomescape.business.dto.ReservationDto;
+import roomescape.business.model.entity.Reservation;
 
 public record ReservationResponse(
         String id,
@@ -12,20 +10,13 @@ public record ReservationResponse(
         ReservationTimeResponse time,
         ThemeResponse theme
 ) {
-    public static ReservationResponse from(ReservationDto dto) {
+    public static ReservationResponse from(Reservation reservation) {
         return new ReservationResponse(
-                dto.id().value(),
-                UserResponse.from(dto.user()),
-                dto.date().value(),
-                ReservationTimeResponse.from(dto.time()),
-                ThemeResponse.from(dto.theme())
+                reservation.getId().value(),
+                UserResponse.from(reservation.getUser()),
+                reservation.getDate().value(),
+                ReservationTimeResponse.from(reservation.getTime()),
+                ThemeResponse.from(reservation.getTheme())
         );
-    }
-
-    public static List<ReservationResponse> from(List<ReservationDto> dtos) {
-        return dtos.stream()
-                .map(ReservationResponse::from)
-                .sorted(Comparator.comparing(ReservationResponse::date))
-                .toList();
     }
 }

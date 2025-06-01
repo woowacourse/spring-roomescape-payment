@@ -4,12 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestClient;
-import roomescape.business.dto.PaymentApproveDto;
 import roomescape.exception.PaymentApproveException;
+import roomescape.infrastructure.payment.dto.PaymentApproveDto;
 
+@Component
 public class TossPaymentClient {
 
     private final RestClient restClient;
@@ -17,10 +20,10 @@ public class TossPaymentClient {
     private final String secretKey;
 
     public TossPaymentClient(
-            RestClient restClient,
+            RestClient.Builder restClientBuilder,
             ObjectMapper objectMapper,
-            String secretKey) {
-        this.restClient = restClient;
+            @Value("${payment.secret-key}") String secretKey) {
+        this.restClient = restClientBuilder.build();
         this.objectMapper = objectMapper;
         this.secretKey = secretKey;
     }
@@ -28,7 +31,7 @@ public class TossPaymentClient {
     public void approvePayment(PaymentApproveDto paymentApproveDto) {
         String encodedSecretKey = Base64.getEncoder().encodeToString((secretKey + ":").getBytes());
         restClient.post()
-                .uri("/v1/payments/confirm")
+                .uri("https://api.tosspayments.com/v1/payments/confirm")
                 .body(paymentApproveDto)
                 .header("Authorization", "Basic " + encodedSecretKey)
                 .retrieve()

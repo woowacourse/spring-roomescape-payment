@@ -12,14 +12,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Pageable;
 import roomescape.business.model.entity.Theme;
-import roomescape.business.model.repository.ThemeRepository;
 import roomescape.business.model.vo.Id;
-import roomescape.business.model.vo.ReservationStatus;
 import roomescape.test_util.JpaTestUtil;
 
 @DataJpaTest
-@Import({JpaThemeRepository.class, JpaTestUtil.class})
+@Import(JpaTestUtil.class)
 class ThemeRepositoryTest {
 
     private static final LocalDate DATE = LocalDate.now().plusDays(5);
@@ -60,14 +59,16 @@ class ThemeRepositoryTest {
         testUtil.insertTheme("4", "범위_외부_테마");
         testUtil.insertUser("5", "돔푸");
         testUtil.insertUser("6", "레몬");
-        testUtil.insertReservation("A", DATE, "1", "2", "5", ReservationStatus.RESERVED);
-        testUtil.insertReservation("B", DATE, "1", "3", "5", ReservationStatus.RESERVED);
-        testUtil.insertReservation("C", DATE, "1", "3", "5", ReservationStatus.RESERVED);
-        testUtil.insertReservation("D", DATE.minusDays(10), "1", "4", "6", ReservationStatus.RESERVED);
-        testUtil.insertReservation("E", DATE.minusDays(10), "1", "4", "6", ReservationStatus.RESERVED);
-        testUtil.insertReservation("F", DATE.plusDays(10), "1", "4", "6", ReservationStatus.RESERVED);
+        testUtil.insertReservation("A", DATE, "1", "2", "5");
+        testUtil.insertReservation("B", DATE, "1", "3", "5");
+        testUtil.insertReservation("C", DATE, "1", "3", "5");
+        testUtil.insertReservation("D", DATE.minusDays(10), "1", "4", "6");
+        testUtil.insertReservation("E", DATE.minusDays(10), "1", "4", "6");
+        testUtil.insertReservation("F", DATE.plusDays(10), "1", "4", "6");
 
-        final List<Theme> result = sut.findPopularThemes(DATE.minusDays(5), DATE.plusDays(5), 2);
+        final List<Theme> result = sut.findByDateBetweenOrderByReservationCountDescNameAsc(DATE.minusDays(5),
+                DATE.plusDays(5),
+                Pageable.ofSize(2));
 
         assertThat(result).hasSize(2);
         assertThat(result.get(0).getId().value()).isEqualTo("3");
@@ -89,7 +90,7 @@ class ThemeRepositoryTest {
     void ID를_기준으로_존재하는지_확인할_수_있다() {
         testUtil.insertTheme("1", "주홍색 연구");
 
-        final boolean result = sut.existById(Id.create("1"));
+        final boolean result = sut.existsById(Id.create("1"));
 
         assertThat(result).isTrue();
     }

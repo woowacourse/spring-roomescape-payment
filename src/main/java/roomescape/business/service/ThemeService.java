@@ -6,56 +6,61 @@ import static roomescape.exception.ErrorCode.THEME_NOT_EXIST;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.business.dto.ThemeDto;
 import roomescape.business.model.entity.Theme;
-import roomescape.business.model.repository.ReservationRepository;
-import roomescape.business.model.repository.ThemeRepository;
 import roomescape.business.model.vo.Id;
 import roomescape.exception.business.NotFoundException;
 import roomescape.exception.business.RelatedEntityExistException;
+import roomescape.infrastructure.ReservationRepository;
+import roomescape.infrastructure.ThemeRepository;
+import roomescape.presentation.dto.response.ThemeResponse;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class ThemeService {
 
-    private static final int AGGREGATE_START_DATE_INTERVAL = 7;
-    private static final int AGGREGATE_END_DATE_INTERVAL = 1;
+    private static final int TOP_THEMES_COUNT = 10;
+    private static final int DAYS_BEFORE_START = 7;
+    private static final int DAYS_BEFORE_END = 1;
 
     private final ThemeRepository themeRepository;
     private final ReservationRepository reservationRepository;
 
-    public ThemeDto addAndGet(final String name, final String description, final String thumbnail) {
+    public ThemeResponse addAndGet(final String name, final String description, final String thumbnail) {
         Theme theme = Theme.create(name, description, thumbnail);
         themeRepository.save(theme);
-        return ThemeDto.fromEntity(theme);
+        return ThemeResponse.from(theme);
     }
 
     @Transactional(readOnly = true)
-    public List<ThemeDto> getAll() {
-        final List<Theme> themes = themeRepository.findAll();
-        return ThemeDto.fromEntities(themes);
+    public List<ThemeResponse> getAll() {
+        return themeRepository.findAll()
+                .stream()
+                .map(ThemeResponse::from)
+                .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<ThemeDto> getPopular(int size) {
-        LocalDate now = LocalDate.now();
-        final List<Theme> popularThemes = themeRepository.findPopularThemes(
-                now.minusDays(AGGREGATE_START_DATE_INTERVAL),
-                now.minusDays(AGGREGATE_END_DATE_INTERVAL),
-                size
-        );
-        return ThemeDto.fromEntities(popularThemes);
+    public List<ThemeResponse> getPopular() {
+        LocalDate startDate = LocalDate.now().minusDays(DAYS_BEFORE_START);
+        LocalDate endDate = LocalDate.now().minusDays(DAYS_BEFORE_END);
+        Pageable page = PageRequest.ofSize(TOP_THEMES_COUNT);
+        return themeRepository.findByDateBetweenOrderByReservationCountDescNameAsc(startDate, endDate, page)
+                .stream()
+                .map(ThemeResponse::from)
+                .toList();
     }
 
     public void delete(final String themeIdValue) {
         Id themeId = Id.create(themeIdValue);
-        if (reservationRepository.existByThemeId(themeId)) {
+        if (reservationRepository.existsByThemeId(themeId)) {
             throw new RelatedEntityExistException(RESERVED_THEME);
         }
-        if (!themeRepository.existById(themeId)) {
+        if (!themeRepository.existsById(themeId)) {
             throw new NotFoundException(THEME_NOT_EXIST);
         }
         themeRepository.deleteById(themeId);

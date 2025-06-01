@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.AuthRequired;
 import roomescape.auth.Role;
-import roomescape.business.dto.UserDto;
 import roomescape.business.model.vo.UserRole;
 import roomescape.business.service.UserService;
 import roomescape.presentation.dto.request.RegisterRequest;
@@ -25,17 +24,13 @@ public class UserApiController {
     @GetMapping("/members")
     @AuthRequired
     @Role(UserRole.ADMIN)
-    public ResponseEntity<List<UserResponse>> getUsers() {
-        List<UserDto> users = userService.getAll();
-        List<UserResponse> responses = UserResponse.from(users);
-        return ResponseEntity.ok(responses);
+    public List<UserResponse> getUsers() {
+        return userService.getAll();
     }
 
     @PostMapping("/members")
     public ResponseEntity<UserResponse> register(@RequestBody RegisterRequest request) {
-        final UserDto user = userService.register(request.name(), request.email(), request.password());
-        final UserResponse response = UserResponse.from(user);
-        final URI uri = URI.create("/members");
-        return ResponseEntity.created(uri).body(response);
+        final UserResponse response = userService.register(request.name(), request.email(), request.password());
+        return ResponseEntity.created(URI.create("/members")).body(response);
     }
 }

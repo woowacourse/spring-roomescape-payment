@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.AuthRequired;
 import roomescape.auth.AuthToken;
 import roomescape.auth.LoginInfo;
-import roomescape.business.dto.UserDto;
 import roomescape.business.service.AuthService;
 import roomescape.business.service.UserService;
 import roomescape.presentation.dto.request.LoginRequest;
@@ -32,7 +31,7 @@ public class AuthApiController {
     @GetMapping("/login/check")
     @AuthRequired
     public ResponseEntity<UserResponse> check(LoginInfo loginInfo) {
-        UserDto userDto = userService.getById(loginInfo.id());
-        return ResponseEntity.ok(UserResponse.from(userDto));
+        UserResponse response = userService.getById(loginInfo.id());
+        return ResponseEntity.ok(response);
     }
 }

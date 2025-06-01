@@ -16,17 +16,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.business.dto.ReservableReservationTimeDto;
-import roomescape.business.dto.ReservationTimeDto;
 import roomescape.business.model.entity.ReservationTime;
-import roomescape.business.model.repository.ReservationRepository;
-import roomescape.business.model.repository.ReservationTimeRepository;
 import roomescape.business.model.vo.Id;
-import roomescape.business.model.vo.StartTime;
 import roomescape.exception.business.DuplicatedException;
 import roomescape.exception.business.InvalidCreateArgumentException;
 import roomescape.exception.business.NotFoundException;
 import roomescape.exception.business.RelatedEntityExistException;
+import roomescape.infrastructure.ReservationRepository;
+import roomescape.infrastructure.ReservationTimeRepository;
+import roomescape.presentation.dto.response.ReservationTimeResponse;
+import roomescape.presentation.dto.response.ReservationTimeResponseWithBooked;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationTimeServiceTest {
@@ -45,17 +44,18 @@ class ReservationTimeServiceTest {
         // given
         LocalTime time = LocalTime.of(10, 0);
 
-        when(reservationTimeRepository.existByTime(time)).thenReturn(false);
-        when(reservationTimeRepository.existBetween(any(LocalTime.class), any(LocalTime.class))).thenReturn(false);
+        when(reservationTimeRepository.existsByStartTime_Value(time)).thenReturn(false);
+        when(reservationTimeRepository.existsByStartTime_ValueBetween(any(LocalTime.class),
+                any(LocalTime.class))).thenReturn(false);
 
         // when
-        ReservationTimeDto result = sut.addAndGet(time);
+        ReservationTimeResponse result = sut.addAndGet(time);
 
         // then
         assertThat(result).isNotNull();
-        assertThat(result.startTime().value()).isEqualTo(time);
-        verify(reservationTimeRepository).existByTime(time);
-        verify(reservationTimeRepository).existBetween(any(LocalTime.class), any(LocalTime.class));
+        assertThat(result.startAt()).isEqualTo(time);
+        verify(reservationTimeRepository).existsByStartTime_Value(time);
+        verify(reservationTimeRepository).existsByStartTime_ValueBetween(any(LocalTime.class), any(LocalTime.class));
         verify(reservationTimeRepository).save(any(ReservationTime.class));
     }
 
@@ -64,14 +64,15 @@ class ReservationTimeServiceTest {
         // given
         LocalTime time = LocalTime.of(10, 0);
 
-        when(reservationTimeRepository.existByTime(time)).thenReturn(true);
+        when(reservationTimeRepository.existsByStartTime_Value(time)).thenReturn(true);
 
         // when, then
         assertThatThrownBy(() -> sut.addAndGet(time))
                 .isInstanceOf(DuplicatedException.class);
 
-        verify(reservationTimeRepository).existByTime(time);
-        verify(reservationTimeRepository, never()).existBetween(any(LocalTime.class), any(LocalTime.class));
+        verify(reservationTimeRepository).existsByStartTime_Value(time);
+        verify(reservationTimeRepository, never()).existsByStartTime_ValueBetween(any(LocalTime.class),
+                any(LocalTime.class));
         verify(reservationTimeRepository, never()).save(any(ReservationTime.class));
     }
 
@@ -80,15 +81,16 @@ class ReservationTimeServiceTest {
         // given
         LocalTime time = LocalTime.of(10, 0);
 
-        when(reservationTimeRepository.existByTime(time)).thenReturn(false);
-        when(reservationTimeRepository.existBetween(any(LocalTime.class), any(LocalTime.class))).thenReturn(true);
+        when(reservationTimeRepository.existsByStartTime_Value(time)).thenReturn(false);
+        when(reservationTimeRepository.existsByStartTime_ValueBetween(any(LocalTime.class),
+                any(LocalTime.class))).thenReturn(true);
 
         // when, then
         assertThatThrownBy(() -> sut.addAndGet(time))
                 .isInstanceOf(InvalidCreateArgumentException.class);
 
-        verify(reservationTimeRepository).existByTime(time);
-        verify(reservationTimeRepository).existBetween(any(LocalTime.class), any(LocalTime.class));
+        verify(reservationTimeRepository).existsByStartTime_Value(time);
+        verify(reservationTimeRepository).existsByStartTime_ValueBetween(any(LocalTime.class), any(LocalTime.class));
         verify(reservationTimeRepository, never()).save(any(ReservationTime.class));
     }
 
@@ -100,15 +102,15 @@ class ReservationTimeServiceTest {
                 ReservationTime.restore("time-id-2", LocalTime.of(14, 0))
         );
 
-        List<ReservationTimeDto> expectedTimes = List.of(
-                new ReservationTimeDto(Id.create("time-id-1"), new StartTime(LocalTime.of(10, 0))),
-                new ReservationTimeDto(Id.create("time-id-2"), new StartTime(LocalTime.of(14, 0)))
+        List<ReservationTimeResponse> expectedTimes = List.of(
+                new ReservationTimeResponse("time-id-1", LocalTime.of(10, 0)),
+                new ReservationTimeResponse("time-id-2", LocalTime.of(14, 0))
         );
 
         when(reservationTimeRepository.findAll()).thenReturn(dataTimes);
 
         // when
-        List<ReservationTimeDto> result = sut.getAll();
+        List<ReservationTimeResponse> result = sut.getAll();
 
         // then
         assertThat(result).isEqualTo(expectedTimes);
@@ -120,33 +122,22 @@ class ReservationTimeServiceTest {
         // given
         LocalDate date = LocalDate.now();
         Id themeId = Id.create("theme-id");
-        List<ReservationTime> availableTimes = Arrays.asList(
-                ReservationTime.restore("time-id-3", LocalTime.of(11, 0)),
-                ReservationTime.restore("time-id-4", LocalTime.of(15, 0))
-        );
-        List<ReservationTime> notAvailableTimes = Arrays.asList(
-                ReservationTime.restore("time-id-5", LocalTime.of(12, 0)),
-                ReservationTime.restore("time-id-6", LocalTime.of(16, 0))
-        );
-        List<ReservableReservationTimeDto> expectedAvailableTimes = Arrays.asList(
-                new ReservableReservationTimeDto(Id.create("time-id-3"), new StartTime(LocalTime.of(11, 0)), true),
-                new ReservableReservationTimeDto(Id.create("time-id-4"), new StartTime(LocalTime.of(15, 0)), true),
-                new ReservableReservationTimeDto(Id.create("time-id-5"), new StartTime(LocalTime.of(12, 0)), false),
-                new ReservableReservationTimeDto(Id.create("time-id-6"), new StartTime(LocalTime.of(16, 0)), false)
+        List<ReservationTimeResponseWithBooked> expected = Arrays.asList(
+                new ReservationTimeResponseWithBooked("time-id-3", LocalTime.of(11, 0), true),
+                new ReservationTimeResponseWithBooked("time-id-4", LocalTime.of(15, 0), true),
+                new ReservationTimeResponseWithBooked("time-id-5", LocalTime.of(12, 0), false),
+                new ReservationTimeResponseWithBooked("time-id-6", LocalTime.of(16, 0), false)
         );
 
-        when(reservationTimeRepository.findAvailableByDateAndThemeId(date, themeId))
-                .thenReturn(availableTimes);
-        when(reservationTimeRepository.findNotAvailableByDateAndThemeId(date, themeId))
-                .thenReturn(notAvailableTimes);
+        when(reservationTimeRepository.findByDateAndThemeIdWithAlreadyBooked(date, themeId))
+                .thenReturn(expected);
 
         // when
-        List<ReservableReservationTimeDto> result = sut.getAllByDateAndThemeId(date, themeId.value());
+        List<ReservationTimeResponseWithBooked> result = sut.getAllByDateAndThemeId(date, themeId.value());
 
         // then
-        assertThat(result).containsExactlyElementsOf(expectedAvailableTimes);
-        verify(reservationTimeRepository).findAvailableByDateAndThemeId(date, themeId);
-        verify(reservationTimeRepository).findNotAvailableByDateAndThemeId(date, themeId);
+        assertThat(result).containsExactlyElementsOf(expected);
+        verify(reservationTimeRepository).findByDateAndThemeIdWithAlreadyBooked(date, themeId);
     }
 
     @Test
@@ -154,15 +145,15 @@ class ReservationTimeServiceTest {
         // given
         Id timeId = Id.create("time-id");
 
-        when(reservationRepository.existByTimeId(timeId)).thenReturn(false);
-        when(reservationTimeRepository.existById(timeId)).thenReturn(true);
+        when(reservationRepository.existsByTimeId(timeId)).thenReturn(false);
+        when(reservationTimeRepository.existsById(timeId)).thenReturn(true);
 
         // when
         sut.delete(timeId.value());
 
         // then
-        verify(reservationRepository).existByTimeId(timeId);
-        verify(reservationTimeRepository).existById(timeId);
+        verify(reservationRepository).existsByTimeId(timeId);
+        verify(reservationTimeRepository).existsById(timeId);
         verify(reservationTimeRepository).deleteById(timeId);
     }
 
@@ -171,15 +162,15 @@ class ReservationTimeServiceTest {
         // given
         Id timeId = Id.create("non-existing-id");
 
-        when(reservationRepository.existByTimeId(timeId)).thenReturn(false);
-        when(reservationTimeRepository.existById(timeId)).thenReturn(false);
+        when(reservationRepository.existsByTimeId(timeId)).thenReturn(false);
+        when(reservationTimeRepository.existsById(timeId)).thenReturn(false);
 
         // when, then
         assertThatThrownBy(() -> sut.delete(timeId.value()))
                 .isInstanceOf(NotFoundException.class);
 
-        verify(reservationRepository).existByTimeId(timeId);
-        verify(reservationTimeRepository).existById(timeId);
+        verify(reservationRepository).existsByTimeId(timeId);
+        verify(reservationTimeRepository).existsById(timeId);
         verify(reservationTimeRepository, never()).deleteById(timeId);
     }
 
@@ -188,14 +179,14 @@ class ReservationTimeServiceTest {
         // given
         Id timeId = Id.create("time-with-reservations");
 
-        when(reservationRepository.existByTimeId(timeId)).thenReturn(true);
+        when(reservationRepository.existsByTimeId(timeId)).thenReturn(true);
 
         // when, then
         assertThatThrownBy(() -> sut.delete(timeId.value()))
                 .isInstanceOf(RelatedEntityExistException.class);
 
-        verify(reservationRepository).existByTimeId(timeId);
-        verify(reservationTimeRepository, never()).existById(timeId);
+        verify(reservationRepository).existsByTimeId(timeId);
+        verify(reservationTimeRepository, never()).existsById(timeId);
         verify(reservationTimeRepository, never()).deleteById(timeId);
     }
 }

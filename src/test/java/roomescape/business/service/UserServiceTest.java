@@ -15,15 +15,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.business.dto.UserDto;
 import roomescape.business.model.entity.User;
-import roomescape.business.model.repository.UserRepository;
-import roomescape.business.model.vo.Email;
-import roomescape.business.model.vo.Id;
-import roomescape.business.model.vo.UserName;
-import roomescape.business.model.vo.UserRole;
 import roomescape.exception.business.InvalidCreateArgumentException;
 import roomescape.exception.business.NotFoundException;
+import roomescape.infrastructure.UserRepository;
+import roomescape.presentation.dto.response.UserResponse;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -41,13 +37,13 @@ class UserServiceTest {
         String email = "test@example.com";
         String password = "password123";
 
-        when(userRepository.existByEmail(email)).thenReturn(false);
+        when(userRepository.existsByEmail_Value(email)).thenReturn(false);
 
         // when
         sut.register(name, email, password);
 
         // then
-        verify(userRepository).existByEmail(email);
+        verify(userRepository).existsByEmail_Value(email);
         verify(userRepository).save(any(User.class));
     }
 
@@ -58,13 +54,13 @@ class UserServiceTest {
         String email = "test@example.com";
         String password = "password123";
 
-        when(userRepository.existByEmail(email)).thenReturn(true);
+        when(userRepository.existsByEmail_Value(email)).thenReturn(true);
 
         // when, then
         assertThatThrownBy(() -> sut.register(name, email, password))
                 .isInstanceOf(InvalidCreateArgumentException.class);
 
-        verify(userRepository).existByEmail(email);
+        verify(userRepository).existsByEmail_Value(email);
         verify(userRepository, never()).save(any(User.class));
     }
 
@@ -73,17 +69,16 @@ class UserServiceTest {
         // given
         String email = "test@example.com";
         User userData = User.restore("user-id", "USER", "Test User", email, "password123");
-        UserDto expectedUser = new UserDto(Id.create("user-id"), UserRole.USER, new UserName("Test User"),
-                new Email(email));
+        UserResponse expectedUser = new UserResponse("user-id", "Test User", email);
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(userData));
+        when(userRepository.findByEmail_Value(email)).thenReturn(Optional.of(userData));
 
         // when
-        UserDto result = sut.getByEmail(email);
+        UserResponse result = sut.getByEmail(email);
 
         // then
         assertThat(result).isEqualTo(expectedUser);
-        verify(userRepository).findByEmail(email);
+        verify(userRepository).findByEmail_Value(email);
     }
 
     @Test
@@ -91,13 +86,13 @@ class UserServiceTest {
         // given
         String email = "nonexistent@example.com";
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+        when(userRepository.findByEmail_Value(email)).thenReturn(Optional.empty());
 
         // when, then
         assertThatThrownBy(() -> sut.getByEmail(email))
                 .isInstanceOf(NotFoundException.class);
 
-        verify(userRepository).findByEmail(email);
+        verify(userRepository).findByEmail_Value(email);
     }
 
     @Test
@@ -107,17 +102,15 @@ class UserServiceTest {
                 User.restore("user-id-1", "USER", "User One", "user1@example.com", "password1"),
                 User.restore("user-id-2", "USER", "User Two", "user2@example.com", "password2")
         );
-        List<UserDto> expectedUsers = Arrays.asList(
-                new UserDto(Id.create("user-id-1"), UserRole.USER, new UserName("User One"),
-                        new Email("user1@example.com")),
-                new UserDto(Id.create("user-id-2"), UserRole.USER, new UserName("User Two"),
-                        new Email("user2@example.com"))
+        List<UserResponse> expectedUsers = Arrays.asList(
+                new UserResponse("user-id-1", "User One", "user1@example.com"),
+                new UserResponse("user-id-2", "User Two", "user2@example.com")
         );
 
         when(userRepository.findAll()).thenReturn(userData);
 
         // when
-        List<UserDto> result = sut.getAll();
+        List<UserResponse> result = sut.getAll();
 
         // then
         assertThat(result).isEqualTo(expectedUsers);

@@ -11,12 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import roomescape.business.model.entity.User;
-import roomescape.business.model.repository.UserRepository;
 import roomescape.business.model.vo.Id;
 import roomescape.test_util.JpaTestUtil;
 
 @DataJpaTest
-@Import({JpaUserRepository.class, JpaTestUtil.class})
+@Import(JpaTestUtil.class)
 class UserRepositoryTest {
 
     private final UserRepository sut;
@@ -91,7 +90,7 @@ class UserRepositoryTest {
         testUtil.insertUser("1", name);
 
         // when
-        final Optional<User> result = sut.findByEmail(email);
+        final Optional<User> result = sut.findByEmail_Value(email);
 
         // then
         assertThat(result).isPresent();
@@ -103,7 +102,7 @@ class UserRepositoryTest {
     @Test
     void 존재하지_않는_이메일로_사용자를_조회하면_빈_Optional을_반환한다() {
         // when
-        final Optional<User> result = sut.findByEmail("nonexistent@email.com");
+        final Optional<User> result = sut.findByEmail_Value("nonexistent@email.com");
 
         // then
         assertThat(result).isEmpty();
@@ -117,7 +116,7 @@ class UserRepositoryTest {
         testUtil.insertUser("1", name);
 
         // when
-        final boolean result = sut.existByEmail(email);
+        final boolean result = sut.existsByEmail_Value(email);
 
         // then
         assertThat(result).isTrue();
@@ -126,7 +125,7 @@ class UserRepositoryTest {
     @Test
     void 존재하지_않는_이메일로_확인하면_false를_반환한다() {
         // when
-        final boolean result = sut.existByEmail("nonexistent@email.com");
+        final boolean result = sut.existsByEmail_Value("nonexistent@email.com");
 
         // then
         assertThat(result).isFalse();

@@ -17,8 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import roomescape.auth.AuthToken;
 import roomescape.auth.jwt.JwtUtil;
 import roomescape.business.model.entity.User;
-import roomescape.business.model.repository.UserRepository;
 import roomescape.exception.auth.AuthenticationException;
+import roomescape.infrastructure.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -41,7 +41,7 @@ class AuthServiceTest {
         User user = User.restore("user-id", "USER", "Test User", email, encodedPassword);
         AuthToken expectedAuth = mock(AuthToken.class);
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail_Value(email)).thenReturn(Optional.of(user));
         when(jwtUtil.createToken(user)).thenReturn(expectedAuth);
 
         // when
@@ -49,7 +49,7 @@ class AuthServiceTest {
 
         // then
         assertThat(result).isEqualTo(expectedAuth);
-        verify(userRepository).findByEmail(email);
+        verify(userRepository).findByEmail_Value(email);
         verify(jwtUtil).createToken(user);
     }
 
@@ -59,13 +59,13 @@ class AuthServiceTest {
         String email = "nonexistent@example.com";
         String password = "password123";
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+        when(userRepository.findByEmail_Value(email)).thenReturn(Optional.empty());
 
         // when, then
         assertThatThrownBy(() -> sut.authenticate(email, password))
                 .isInstanceOf(AuthenticationException.class);
 
-        verify(userRepository).findByEmail(email);
+        verify(userRepository).findByEmail_Value(email);
         verifyNoInteractions(jwtUtil);
     }
 
@@ -78,13 +78,13 @@ class AuthServiceTest {
         String encodedPassword = new BCryptPasswordEncoder().encode(correctPassword);
         User user = User.restore("user-id", "USER", "Test User", email, encodedPassword);
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail_Value(email)).thenReturn(Optional.of(user));
 
         // when, then
         assertThatThrownBy(() -> sut.authenticate(email, wrongPassword))
                 .isInstanceOf(AuthenticationException.class);
 
-        verify(userRepository).findByEmail(email);
+        verify(userRepository).findByEmail_Value(email);
         verifyNoInteractions(jwtUtil);
     }
 }

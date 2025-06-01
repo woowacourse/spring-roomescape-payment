@@ -15,13 +15,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.AuthRequired;
 import roomescape.auth.Role;
-import roomescape.business.dto.ReservableReservationTimeDto;
-import roomescape.business.dto.ReservationTimeDto;
 import roomescape.business.model.vo.UserRole;
 import roomescape.business.service.ReservationTimeService;
 import roomescape.presentation.dto.request.ReservationTimeRequest;
-import roomescape.presentation.dto.response.BookedReservationTimeResponse;
 import roomescape.presentation.dto.response.ReservationTimeResponse;
+import roomescape.presentation.dto.response.ReservationTimeResponseWithBooked;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,29 +32,23 @@ public class ReservationTimeApiController {
     @Role(UserRole.ADMIN)
     public ResponseEntity<ReservationTimeResponse> createReservationTime(
             @RequestBody @Valid ReservationTimeRequest request) {
-        ReservationTimeDto dtos = reservationTimeService.addAndGet(request.startAtToLocalTime());
-        ReservationTimeResponse response = ReservationTimeResponse.from(dtos);
-        return ResponseEntity.created(URI.create("/times")).body(response);
+        ReservationTimeResponse response = reservationTimeService.addAndGet(request.startAtToLocalTime());
+        return ResponseEntity.created(URI.create("/times/" + response.id())).body(response);
     }
 
     @GetMapping("/times")
     @AuthRequired
-    public ResponseEntity<List<ReservationTimeResponse>> getAllReservationTime() {
-        List<ReservationTimeDto> reservationTimeDtos = reservationTimeService.getAll();
-        List<ReservationTimeResponse> responses = ReservationTimeResponse.from(reservationTimeDtos);
-        return ResponseEntity.ok(responses);
+    public List<ReservationTimeResponse> getAllReservationTime() {
+        return reservationTimeService.getAll();
     }
 
     @GetMapping("/times/possible")
     @AuthRequired
-    public ResponseEntity<List<BookedReservationTimeResponse>> getAvailableReservationTimes(
+    public List<ReservationTimeResponseWithBooked> getAvailableReservationTimes(
             @RequestParam("date") LocalDate date,
             @RequestParam("themeId") String themeId
     ) {
-        List<ReservableReservationTimeDto> reservationTimeDtos = reservationTimeService.getAllByDateAndThemeId(date,
-                themeId);
-        List<BookedReservationTimeResponse> responses = BookedReservationTimeResponse.from(reservationTimeDtos);
-        return ResponseEntity.ok(responses);
+        return reservationTimeService.getAllByDateAndThemeId(date, themeId);
     }
 
     @DeleteMapping("/times/{id}")

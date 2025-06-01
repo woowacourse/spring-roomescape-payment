@@ -10,6 +10,9 @@ public enum ErrorCode {
     RESERVATION_NOT_EXIST("존재하지 않는 예약입니다."),
     RESERVATION_DUPLICATED("중복된 예약입니다."),
 
+    // 대기
+    WAITING_NOT_EXIST("존재하지 않는 예약입니다."),
+
     // 예약 날짜
     RESERVATION_DATE_PAST("과거 날짜로 예약할 수 없습니다."),
     RESERVATION_DATE_TOO_FAR_IN_FUTURE("%d일 전부터 예약할 수 있습니다."),
@@ -29,8 +32,7 @@ public enum ErrorCode {
     EMAIL_FORMAT_INVALID("이메일 형식이어야 합니다."),
 
     // 결제
-    PAYMENT_NOT_APPROVED("결제 승인이 거부되었습니다.")
-    ;
+    PAYMENT_NOT_APPROVED("결제 승인이 거부되었습니다.");
 
     private final String message;
 

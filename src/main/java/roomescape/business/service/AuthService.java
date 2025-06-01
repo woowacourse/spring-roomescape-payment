@@ -9,8 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.AuthToken;
 import roomescape.auth.jwt.JwtUtil;
 import roomescape.business.model.entity.User;
-import roomescape.business.model.repository.UserRepository;
 import roomescape.exception.auth.AuthenticationException;
+import roomescape.infrastructure.UserRepository;
 
 @Service
 @Transactional
@@ -21,7 +21,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     public AuthToken authenticate(final String email, final String password) {
-        final User user = userRepository.findByEmail(email)
+        final User user = userRepository.findByEmail_Value(email)
                 .orElseThrow(() -> new AuthenticationException(INVALID_EMAIL));
 
         if (!user.isPasswordCorrect(password)) {

@@ -7,12 +7,12 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.business.dto.UserDto;
 import roomescape.business.model.entity.User;
-import roomescape.business.model.repository.UserRepository;
 import roomescape.business.model.vo.Id;
 import roomescape.exception.business.InvalidCreateArgumentException;
 import roomescape.exception.business.NotFoundException;
+import roomescape.infrastructure.UserRepository;
+import roomescape.presentation.dto.response.UserResponse;
 
 @Service
 @Transactional
@@ -21,32 +21,34 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public UserDto register(final String name, final String email, final String password) {
-        if (userRepository.existByEmail(email)) {
+    public UserResponse register(final String name, final String email, final String password) {
+        if (userRepository.existsByEmail_Value(email)) {
             throw new InvalidCreateArgumentException(EMAIL_DUPLICATED);
         }
         User user = User.create(name, email, password);
         userRepository.save(user);
-        return UserDto.fromEntity(user);
+        return UserResponse.from(user);
     }
 
     @Transactional(readOnly = true)
-    public UserDto getById(final String userIdValue) {
+    public UserResponse getById(final String userIdValue) {
         User user = userRepository.findById(Id.create(userIdValue))
                 .orElseThrow(() -> new NotFoundException(USER_NOT_EXIST));
-        return UserDto.fromEntity(user);
+        return UserResponse.from(user);
     }
 
     @Transactional(readOnly = true)
-    public UserDto getByEmail(final String email) {
-        User user = userRepository.findByEmail(email)
+    public UserResponse getByEmail(final String email) {
+        User user = userRepository.findByEmail_Value(email)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_EXIST));
-        return UserDto.fromEntity(user);
+        return UserResponse.from(user);
     }
 
     @Transactional(readOnly = true)
-    public List<UserDto> getAll() {
-        List<User> users = userRepository.findAll();
-        return UserDto.fromEntities(users);
+    public List<UserResponse> getAll() {
+        return userRepository.findAll()
+                .stream()
+                .map(UserResponse::from)
+                .toList();
     }
 }

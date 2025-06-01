@@ -1,51 +1,58 @@
 package roomescape.infrastructure.payment;
 
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.springframework.web.client.RestClient;
-import roomescape.business.dto.PaymentApproveDto;
-import roomescape.exception.PaymentApproveException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestClient;
+import roomescape.exception.PaymentApproveException;
+import roomescape.infrastructure.payment.dto.PaymentApproveDto;
+
+@RestClientTest(value = {TossPaymentClient.class})
 class TossPaymentClientTest {
 
-    private static final String testKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
-
+    @Autowired
     private TossPaymentClient paymentClient;
 
-    public TossPaymentClientTest() {
-        this.paymentClient = new TossPaymentClient(
-                RestClient.builder()
-                        .baseUrl("https://api.tosspayments.com")
-                        .build(),
-                new Jackson2ObjectMapperBuilder().createXmlMapper(false).build(),
-                testKey
-        );
-    }
+    @Autowired
+    private MockRestServiceServer mockServer;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Test
-    void 결제시간이_만료될_경우_예외가_발생한다() {
+    void 결제시간이_만료될_경우_예외가_발생한다() throws Exception {
         // given
+        PaymentApproveException response = new PaymentApproveException("code", "결제 시간이 료되어 결제 진행 데이터가 존재하지 않습니다.");
         PaymentApproveDto paymentApproveDto = new PaymentApproveDto("paymentKey", "1", 1000L);
+        mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andRespond(withStatus(HttpStatus.BAD_REQUEST)
+                        .body(objectMapper.writeValueAsString(response)));
         // when
-        Assertions.assertThatThrownBy(() -> paymentClient.approvePayment(paymentApproveDto))
+        assertThatThrownBy(() -> paymentClient.approvePayment(paymentApproveDto))
                 .isInstanceOf(PaymentApproveException.class)
-                .hasMessage("결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다.");
+                .hasMessage("결제 시간이 료되어 결제 진행 데이터가 존재하지 않습니다.");
     }
 
     @Test
-    void 잘못된_키로_요청을_보내면_예외가_발생한다() {
+    void 잘못된_키로_실제_요청을_보내면_예외가_발생한다() {
         // given
         paymentClient = new TossPaymentClient(
                 RestClient.builder()
-                        .baseUrl("https://api.tosspayments.com")
-                        .build(),
+                        .baseUrl("https://api.tosspayments.com"),
                 new Jackson2ObjectMapperBuilder().createXmlMapper(false).build(),
                 "invalidKey"
         );
         PaymentApproveDto paymentApproveDto = new PaymentApproveDto("paymentKey", "1", 1000L);
         // when
-        Assertions.assertThatThrownBy(() -> paymentClient.approvePayment(paymentApproveDto))
+        assertThatThrownBy(() -> paymentClient.approvePayment(paymentApproveDto))
                 .isInstanceOf(PaymentApproveException.class)
                 .hasMessage("인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다.");
     }
