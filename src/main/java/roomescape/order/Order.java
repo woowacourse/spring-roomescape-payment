@@ -20,6 +20,8 @@ public class Order {
 
     private Long amount;
 
+    private String paymentKey;
+
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
 
@@ -54,6 +56,13 @@ public class Order {
             throw new IllegalArgumentException("결제를 할 수 없는 상태입니다.");
         }
         this.paymentStatus = PaymentStatus.SUCCESS;
+    }
+
+    /**
+     * 결제 승인 요청 프로세스에서만 호출하는 메서드입니다.
+     */
+    public void updatePaymentKey(final String paymentKey) {
+        this.paymentKey = paymentKey;
     }
 
     private boolean isAmount(final Long amount) {
