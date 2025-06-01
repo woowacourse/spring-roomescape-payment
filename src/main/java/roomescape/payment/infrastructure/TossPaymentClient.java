@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.infrastructure.dto.TossPaymentErrorResponse;
 import roomescape.payment.infrastructure.dto.TossPaymentRequest;
@@ -34,7 +35,7 @@ public class TossPaymentClient implements PaymentClient {
 
         return restClient.post()
                 .uri("/payments/confirm")
-                .header("Authorization", encodeSecretKey())
+                .header(HttpHeaders.AUTHORIZATION, encodeSecretKey())
                 .body(tossPaymentRequest)
                 .retrieve()
                 .onStatus(
