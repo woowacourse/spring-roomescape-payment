@@ -6,6 +6,7 @@ import java.io.InputStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -29,7 +30,7 @@ public class TossPaymentClient implements PaymentClient {
                 .uri("v1/payments/confirm")
                 .body(request)
                 .retrieve()
-                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                .onStatus(HttpStatusCode::isError,
                         (req, res) -> {
                             handleException(res);
                         })
