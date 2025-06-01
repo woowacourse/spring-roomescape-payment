@@ -37,7 +37,7 @@ public class ThemeService {
     public void deleteThemeById(Long id) {
         Theme theme = themeQueryService.getThemeById(id);
         validateReservationInTheme(theme);
-        validateMemberInTime(theme);
+        validateWaitingInTime(theme);
         themeRepository.deleteById(id);
     }
 
@@ -48,10 +48,10 @@ public class ThemeService {
         }
     }
 
-    private void validateMemberInTime(Theme theme) {
+    private void validateWaitingInTime(Theme theme) {
         boolean isExistWaiting = waitingQueryService.existsWaitingInTheme(theme);
         if (isExistWaiting) {
-            throw new BadRequestException("이미 예약이 존재하는 예약시간입니다.");
+            throw new BadRequestException("이미 예약 대기가 존재하는 테마입니다.");
         }
     }
 }
