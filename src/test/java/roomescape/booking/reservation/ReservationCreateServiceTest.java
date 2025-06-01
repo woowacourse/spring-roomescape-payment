@@ -21,6 +21,7 @@ import roomescape.order.Order;
 import roomescape.order.OrderReader;
 import roomescape.order.PaymentStatus;
 import roomescape.payment.TossPaymentAdapter;
+import roomescape.payment.dto.TossPaymentConfirmCommand;
 import roomescape.reservationtime.ReservationTime;
 import roomescape.schedule.Schedule;
 import roomescape.schedule.ScheduleService;
@@ -137,7 +138,7 @@ public class ReservationCreateServiceTest {
                     .willReturn(schedule);
             given(memberService.getByEmail(loginMember.email()))
                     .willReturn(member);
-            doThrow(new PaymentException("결제에 실패하였습니다.")).when(paymentAdapter).confirmPayment(request.orderId(), request.amount(), request.paymentKey());
+            doThrow(new PaymentException("결제에 실패하였습니다.")).when(paymentAdapter).confirmPayment(new TossPaymentConfirmCommand(request.orderId(), request.amount(), request.paymentKey()));
             given(reservationRepository.save(new Reservation(member, schedule)))
                     .willReturn(reservation);
 

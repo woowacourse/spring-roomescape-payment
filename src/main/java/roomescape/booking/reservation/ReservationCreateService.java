@@ -16,6 +16,7 @@ import roomescape.member.MemberService;
 import roomescape.order.Order;
 import roomescape.order.OrderReader;
 import roomescape.payment.TossPaymentAdapter;
+import roomescape.payment.dto.TossPaymentConfirmCommand;
 import roomescape.schedule.Schedule;
 import roomescape.schedule.ScheduleService;
 
@@ -39,7 +40,8 @@ public class ReservationCreateService {
         ReservationResponse response = ReservationResponse.from(reservation);
 
         try {
-            tossPaymentAdapter.confirmPayment(request.orderId(), request.amount(), request.paymentKey());
+            TossPaymentConfirmCommand confirmCommand = new TossPaymentConfirmCommand(request.orderId(), request.amount(), request.paymentKey());
+            tossPaymentAdapter.confirmPayment(confirmCommand);
         } catch (Exception e) {
             reservation.isCanceled();
             throw e;
