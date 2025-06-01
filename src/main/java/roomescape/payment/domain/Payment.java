@@ -24,5 +24,4 @@ public class Payment {
 
     @Column(nullable = false)
     BigDecimal amount;
-
 }
