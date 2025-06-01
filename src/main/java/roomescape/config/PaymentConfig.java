@@ -1,7 +1,9 @@
 package roomescape.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import java.util.Base64;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +13,10 @@ import roomescape.infrastructure.payment.toss.TossPaymentWithRestClient;
 import roomescape.infrastructure.payment.toss.exception.PaymentExceptionHandler;
 
 @Configuration
+@RequiredArgsConstructor
 public class PaymentConfig {
+
+    private final ObjectMapper mapper;
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String AUTHORIZATION_SCHEME = "Basic ";
@@ -23,7 +28,7 @@ public class PaymentConfig {
     public TossPaymentWithRestClient tossPaymentWithRestClient(RestClient.Builder builder) {
         return new TossPaymentWithRestClient(builder
                 .baseUrl("https://api.tosspayments.com/v1/payments")
-                .defaultStatusHandler(new PaymentExceptionHandler())
+                .defaultStatusHandler(new PaymentExceptionHandler(mapper))
                 .requestInterceptor((request, body, execution) -> {
                     if (request.getURI().getPath().contains("/confirm")) {
                         request.getHeaders().add(AUTHORIZATION_HEADER, AUTHORIZATION_SCHEME + encodeSecretKey());

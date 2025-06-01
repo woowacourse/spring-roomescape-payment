@@ -1,18 +1,21 @@
 package roomescape.infrastructure.payment.toss.exception;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
 import roomescape.common.exception.PaymentClientException;
 import roomescape.common.exception.PaymentServerException;
 
+@RequiredArgsConstructor
 public class PaymentExceptionHandler implements ResponseErrorHandler {
+
+    private final ObjectMapper mapper;
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
@@ -55,9 +58,6 @@ public class PaymentExceptionHandler implements ResponseErrorHandler {
 
     private TossPaymentErrorResponse parseToTossPaymentErrorResponse(InputStream bodyStream)
             throws IOException {
-        ObjectMapper mapper = new ObjectMapper().configure(
-                DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
-                false);
         return mapper.readValue(bodyStream, TossPaymentErrorResponse.class);
     }
 
