@@ -19,7 +19,7 @@ public class TossPaymentProcessor implements PaymentProcessor {
             final RestClient restClient,
             final String confirmUrl
     ) {
-        this.secretKey = Base64.getEncoder().encodeToString((secretKey + ":base64").getBytes());
+        this.secretKey = secretKey;
         this.restClient = restClient;
         this.confirmUrl = confirmUrl;
     }
@@ -30,7 +30,7 @@ public class TossPaymentProcessor implements PaymentProcessor {
         return restClient.post()
                 .uri(confirmUrl)
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Basic " + secretKey)
+                .header("Authorization", createBasicAuthHeader(secretKey))
                 .body(tossRequest)
                 .retrieve()
                 .body(TossPaymentConfirmResponse.class);
@@ -41,4 +41,9 @@ public class TossPaymentProcessor implements PaymentProcessor {
         return paymentType == PaymentType.TOSS;
     }
 
+    private String createBasicAuthHeader(final String secretKey) {
+        final String encodedSecretKey = Base64.getEncoder().encodeToString((secretKey + ":base64").getBytes());
+
+        return "Basic " + encodedSecretKey;
+    }
 }
