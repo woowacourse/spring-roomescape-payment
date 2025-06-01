@@ -129,4 +129,8 @@ public class Waiting extends AuditedEntity {
             throw new IllegalArgumentException("비어있는 회원으로 대기를 생성할 수 없습니다.");
         }
     }
+
+    public PaymentResult getPaymentResult() {
+        return paymentResult;
+    }
 }
