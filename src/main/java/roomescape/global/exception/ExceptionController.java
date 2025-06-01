@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.ResourceAccessException;
 import roomescape.payment.infrastructure.PaymentException;
 import roomescape.payment.presentation.dto.PaymentErrorResponse;
+import roomescape.payment.presentation.dto.TimeoutErrorResponse;
 
 @RestControllerAdvice
 public class ExceptionController {
@@ -32,11 +33,10 @@ public class ExceptionController {
     }
 
     @ExceptionHandler(ResourceAccessException.class)
-    public ResponseEntity<PaymentErrorResponse> handleResourceAccessException(ResourceAccessException e) {
-        return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).body(new PaymentErrorResponse(
+    public ResponseEntity<TimeoutErrorResponse> handleResourceAccessException(ResourceAccessException e) {
+        return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).body(new TimeoutErrorResponse(
                 HttpStatus.GATEWAY_TIMEOUT.toString(),
-                e.getMessage(),
-                null
+                e.getMessage()
         ));
     }
 
