@@ -25,7 +25,7 @@ public class ClientConfig {
         requestFactory.setReadTimeout(tossProperties.readTimeout());
 
         return new PaymentRestClient(
-                restClient().baseUrl("https://api.tosspayments.com/v1/payments")
+                restClient().baseUrl(tossProperties.baseUrl())
                         .requestFactory(requestFactory)
                         .defaultStatusHandler(paymentResponseErrorHandler)
                         .build(),
