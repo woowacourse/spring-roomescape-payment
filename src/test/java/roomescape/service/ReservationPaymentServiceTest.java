@@ -90,6 +90,6 @@ class ReservationPaymentServiceTest {
         var paymentConfirmRequest = new PaymentConfirmRequest("orderId", 50000, "paymentKey", "TOSS");
         assertThatThrownBy(() -> reservationPaymentService.confirmPaymentAndAddReservation(
                 reservationCreateRequest, paymentConfirmRequest
-        )).hasMessageContaining("클라이언트 에러 발생: 400 BAD_REQUEST");
+        )).hasMessageContaining("400 Client Error: ");
     }
 }

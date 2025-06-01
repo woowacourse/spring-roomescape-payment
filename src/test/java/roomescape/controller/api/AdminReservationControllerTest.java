@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
@@ -20,6 +21,7 @@ import roomescape.dto.auth.LoginRequest;
 import roomescape.dto.reservation.AdminReservationCreateRequest;
 import roomescape.dto.theme.ThemeCreateRequest;
 import roomescape.dto.time.ReservationTimeCreateRequest;
+import roomescape.fixture.InitDatabaseHelper;
 import roomescape.repository.MemberRepository;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -32,10 +34,15 @@ class AdminReservationControllerTest {
         @Autowired
         MemberRepository memberRepository;
 
+        @Autowired
+        InitDatabaseHelper dbHelper;
+
         String loginToken;
 
         @BeforeEach
         void setUp() {
+            dbHelper.clear();
+
             LocalTime reservationTime = LocalTime.of(15, 30);
             ReservationTimeCreateRequest requestTime = new ReservationTimeCreateRequest(reservationTime);
 
@@ -123,10 +130,15 @@ class AdminReservationControllerTest {
         @Autowired
         MemberRepository memberRepository;
 
+        @Autowired
+        InitDatabaseHelper dbHelper;
+
         String loginToken;
 
         @BeforeEach
         void setUp() {
+            dbHelper.clear();
+
             LocalTime reservationTime = LocalTime.of(15, 30);
             ReservationTimeCreateRequest requestTime = new ReservationTimeCreateRequest(reservationTime);
 

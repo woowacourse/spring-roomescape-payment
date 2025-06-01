@@ -8,10 +8,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.dto.auth.LoginRequest;
+import roomescape.fixture.InitDatabaseHelper;
 import roomescape.repository.MemberRepository;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -20,11 +22,17 @@ class AdminPageControllerTest {
 
     @Autowired
     MemberRepository memberRepository;
+
+    @Autowired
+    InitDatabaseHelper dbHelper;
+
     String adminToken;
     String userToken;
 
     @BeforeEach
     void setUp() {
+        dbHelper.clear();
+
         memberRepository.save(Member.createWithoutId("가이온", "hello@woowa.com", Role.USER, "password"));
         memberRepository.save(Member.createWithoutId("가이온1", "hello1@woowa.com", Role.ADMIN, "password"));
 
