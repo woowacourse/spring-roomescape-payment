@@ -64,4 +64,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleTossPaymentServerException(TossPaymentServerException e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleRuntimeException() {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("예상치 못한 서버 오류입니다. 서버에 문의해주세요.");
+    }
 }
