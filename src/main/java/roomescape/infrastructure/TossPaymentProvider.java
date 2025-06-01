@@ -13,7 +13,6 @@ import roomescape.domain.payment.PaymentConfirmation;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.exception.PaymentFailedException;
-import roomescape.exception.PaymentFailedException.Cause;
 import roomescape.infrastructure.TossPaymentProviderConfig.TossApiProperties;
 
 @RequiredArgsConstructor
@@ -33,14 +32,14 @@ public class TossPaymentProvider implements PaymentProvider {
 
             } catch (RestClientResponseException e) {
                 var failResponse = readTossFailureResponse(e);
-                throw new PaymentFailedException(mapTossErrorToCause(failResponse.code), failResponse.message);
+                throw newPaymentFailedException(failResponse.code, failResponse.message);
 
             } catch (ResourceAccessException e) {
                 logger.error(e.getMessage());
             }
         }
 
-        throw new PaymentFailedException(Cause.EXTERNAL_ERROR, "토스 서버에 연결할 수 없습니다.");
+        throw PaymentFailedException.byExternalServer();
     }
 
     private TossFailureResponse readTossFailureResponse(final RestClientResponseException e) {
@@ -55,17 +54,17 @@ public class TossPaymentProvider implements PaymentProvider {
 
     private record TossFailureResponse(String code, String message) {}
 
-    private Cause mapTossErrorToCause(final String tossCode) {
+    private PaymentFailedException newPaymentFailedException(final String tossCode, final String message) {
         return switch(tossCode) {
             case "INVALID_API_KEY",
                  "UNAUTHORIZED_KEY",
-                 "INCORRECT_BASIC_AUTH_FORMAT" -> Cause.SERVER_ERROR;
+                 "INCORRECT_BASIC_AUTH_FORMAT" -> PaymentFailedException.byServer();
 
             case "FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING",
                  "FAILED_INTERNAL_SYSTEM_PROCESSING",
-                 "UNKNOWN_PAYMENT_ERROR" -> Cause.EXTERNAL_ERROR;
+                 "UNKNOWN_PAYMENT_ERROR" -> PaymentFailedException.byExternalServer();
 
-            default -> Cause.CLIENT_ERROR;
+            default -> PaymentFailedException.byClient(message);
         };
     }
 }
