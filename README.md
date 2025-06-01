@@ -79,6 +79,12 @@
 | 관리자 | GET    | `/admin/waiting-reservations`      | 예약 대기 목록 조회 |
 | 관리자 | DELETE | `/admin/waiting-reservations/{id}` | 예약 대기 삭제    |
 
+### 💰 결제 관리
+
+| 권한  | 메서드  | URL                 | 설명    |
+|-----|------|---------------------|-------|
+| 사용자 | POST | `/payments/approve` | 결제 승인 |
+
 ---
 
 ## 📅 예약 관리
@@ -672,8 +678,6 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9...
 HTTP/1.1 204 OK
 ```
 
-
-
 ### 🔧 관리자
 
 #### 👥 모든 사용자 조회
@@ -833,19 +837,56 @@ Content-Type: application/json
 
 ---
 
+## 💰결제 관리
+
+### 👤 사용자
+
+#### 📝 결제 승인
+
+| 메서드  | URL                 | 설명    |
+|------|---------------------|-------|
+| POST | `/payments/approve` | 결제 승인 |
+
+**요청 예시**
+
+```http
+POST /payments/approve HTTP/1.1  
+cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBRE1JTiJ9.vcK93ONRQYPFCxT5KleSM6b7cl1FE-neSLKaFyslsZM  
+host: localhost: 8080  
+{  
+"paymentKey": "tgen_20250527203038iSZT3",  
+"orderId": "ROOMESCAPE_ORDER_MC4zODI4Njg5ODExNTg4",  
+"amount": 1000,  
+"paymentType": "NORMAL"  
+}  
+```
+
+**응답 예시**
+
+```json
+HTTP/1.1 200
+Content-Type: application/json
+{
+"paymentKey": "tgen_20250527203038iSZT3",
+"orderId": "ROOMESCAPE_ORDER_MC4zODI4Njg5ODExNTg4",
+"totalAmount": 1000
+}
+```
+
 ## ❌ 예외 처리
 
 ### 에러 코드 및 상황
 
-| 예외 타입                    | HTTP 상태 | 설명                               |
-|--------------------------|---------|----------------------------------|
-| `DateTimeParseException` | 400     | 날짜(yyyy-MM-dd) & 시간(HH:mm) 파싱 오류 |
-| `ValidationException`    | 400     | 입력 데이터 검증 실패 (예약자명, 필수값 등)       |
-| `InUseException`         | 400     | 리소스가 사용 중이어서 삭제/수정 불가 (외래키 제약)   |
-| `UnAuthorizedException`  | 401     | 인증되지 않은 사용자 (로그인 필요)             |
-| `ForbiddenException`     | 403     | 권한 없음 (접근 권한 부족)                 |
-| `NotFoundException`      | 404     | 예약, 예약 시간, 회원, 테마가 존재하지 않음       |
-| `DuplicatedException`    | 409     | 중복된 리소스 (이메일, 예약 시간 등)           |
+| 예외 타입                     | HTTP 상태 | 설명                               |
+|---------------------------|---------|----------------------------------|
+| `DateTimeParseException`  | 400     | 날짜(yyyy-MM-dd) & 시간(HH:mm) 파싱 오류 |
+| `ValidationException`     | 400     | 입력 데이터 검증 실패 (예약자명, 필수값 등)       |
+| `InUseException`          | 400     | 리소스가 사용 중이어서 삭제/수정 불가 (외래키 제약)   |
+| `UnAuthorizedException`   | 401     | 인증되지 않은 사용자 (로그인 필요)             |
+| `ForbiddenException`      | 403     | 권한 없음 (접근 권한 부족)                 |
+| `NotFoundException`       | 404     | 예약, 예약 시간, 회원, 테마가 존재하지 않음       |
+| `DuplicatedException`     | 409     | 중복된 리소스 (이메일, 예약 시간 등)           |
+| `PaymentApproveException` | 4xx     | 유효하지 않은 결제 승인                    |
 
 ### 🔍 검증 규칙
 
