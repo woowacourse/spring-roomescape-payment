@@ -1,6 +1,7 @@
 package roomescape.reservation.domain;
 
-import org.assertj.core.api.SoftAssertions;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -8,17 +9,10 @@ import roomescape.reservation.time.domain.ReservationTime;
 
 class ReservationTimeTest {
 
-    @DisplayName("시간은 null일 수 없다.")
+    @DisplayName("시작 시간이 존재하지 않으면 예약 시간을 생성할 수 없다.")
     @Test
-    void test2() {
-        SoftAssertions softAssertions = new SoftAssertions();
-
-        softAssertions.assertThatThrownBy(() -> new ReservationTime(1L, null))
+    void createReservationTimeWithNull() {
+        assertThatThrownBy(() -> new ReservationTime(null))
                 .isInstanceOf(IllegalArgumentException.class);
-
-        softAssertions.assertThatThrownBy(() -> new ReservationTime(null))
-                .isInstanceOf(IllegalArgumentException.class);
-
-        softAssertions.assertAll();
     }
 }

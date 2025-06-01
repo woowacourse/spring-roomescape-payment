@@ -14,24 +14,24 @@ public class ReservationTime {
     @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false))
     private ReservationTimeId id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private LocalTime startAt;
 
     protected ReservationTime() {}
 
     public ReservationTime(final Long id, final LocalTime startAt) {
+        validateNull(startAt);
         this.id = new ReservationTimeId(id);
         this.startAt = startAt;
-        validateReservationTime();
     }
 
     public ReservationTime(final LocalTime startAt) {
         this(null, startAt);
     }
 
-    public void validateReservationTime() {
+    private void validateNull(final LocalTime startAt) {
         if (startAt == null) {
-            throw new IllegalArgumentException("startAt cannot be null");
+            throw new IllegalArgumentException("시작 시간이 존재하지 않습니다.");
         }
     }
 
