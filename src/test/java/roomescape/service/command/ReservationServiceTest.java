@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
@@ -22,17 +23,14 @@ import roomescape.domain.Role;
 import roomescape.domain.Theme;
 import roomescape.domain.Waiting;
 import roomescape.dto.business.PaymentHistoryCreationContent;
+import roomescape.dto.business.PaymentResult;
 import roomescape.dto.business.ReservationCreationContent;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.NotFoundException;
 import roomescape.exception.PaymentException;
-import roomescape.repository.MemberRepository;
 import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
-import roomescape.repository.ReservationTimeRepository;
-import roomescape.repository.ThemeRepository;
-import roomescape.repository.WaitingRepository;
 import roomescape.service.query.MemberQueryService;
 import roomescape.service.query.ReservationQueryService;
 import roomescape.service.query.ReservationTimeQueryService;
@@ -41,6 +39,11 @@ import roomescape.service.query.WaitingQueryService;
 import roomescape.test.stub.PaymentClientStub;
 
 @DataJpaTest
+@Import(value = {
+        PaymentService.class, MemberQueryService.class, ThemeQueryService.class,
+        ReservationTimeQueryService.class, ReservationQueryService.class, WaitingQueryService.class,
+        ReservationService.class, PaymentClientStub.class
+})
 class ReservationServiceTest {
 
     @Autowired
@@ -48,53 +51,30 @@ class ReservationServiceTest {
     @Autowired
     private ReservationRepository reservationRepository;
     @Autowired
-    private ReservationTimeRepository reservationTimeRepository;
-    @Autowired
-    private ThemeRepository themeRepository;
-    @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
-    private WaitingRepository waitingRepository;
-    @Autowired
     private PaymentRepository paymentRepository;
-
-    private PaymentService paymentService;
-    private MemberQueryService memberQueryService;
-    private ThemeQueryService themeQueryService;
-    private ReservationTimeQueryService timeQueryService;
-    private ReservationQueryService reservationQueryService;
-    private WaitingQueryService waitingQueryService;
+    @Autowired
     private ReservationService reservationService;
+    @Autowired
+    private PaymentClientStub paymentClientStub;
 
     private ReservationTime reservationTime;
     private Theme theme;
     private Member member;
-    private PaymentClientStub paymentClient;
 
     @BeforeEach
     void setup() {
-        paymentClient = new PaymentClientStub();
-        paymentService = new PaymentService(paymentRepository, paymentClient);
-        memberQueryService = new MemberQueryService(memberRepository);
-        themeQueryService = new ThemeQueryService(themeRepository);
-        timeQueryService = new ReservationTimeQueryService(reservationTimeRepository);
-        reservationQueryService = new ReservationQueryService(
-                reservationRepository, memberRepository, waitingRepository);
-        waitingQueryService = new WaitingQueryService(waitingRepository);
-        reservationService = new ReservationService(
-                reservationRepository, waitingRepository, memberQueryService, themeQueryService,
-                timeQueryService, paymentService, reservationQueryService, waitingQueryService);
-
         reservationTime = entityManager.persist(
                 ReservationTime.createWithoutId(LocalTime.of(10, 0)));
         theme = entityManager.persist(
                 Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
         member = entityManager.persist(
                 Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "password123!"));
+        entityManager.flush();
+        entityManager.clear();
     }
 
     @Nested
-    @DisplayName("예약을 추가할 수 있다.")
+    @DisplayName("결제 정보 없이 예약을 추가할 수 있다.")
     class addReservation {
 
         @DisplayName("예약을 성공적으로 추가할 수 있다.")
@@ -160,16 +140,78 @@ class ReservationServiceTest {
                     .hasMessage("ID에 해당하는 예약시간은 존재하지 않습니다.");
         }
 
-        @DisplayName("결제 실패시 예약이 실패한다.")
+        @DisplayName("예약이 중복일 경우 예약을 추가할 수 없다.")
         @Test
-        void rollbackWhenPaymentFail() {
+        void cannotAddReservationByDuplicationReservation() {
             // given
-            paymentClient.setErrorCase("에러");
+            Reservation alreadySavedReservation = entityManager.persist(
+                    Reservation.createWithoutIdAndPaymentHistory(NEXT_DAY, reservationTime, theme, member));
+
+            ReservationCreationContent duplicatedCreationContent = new ReservationCreationContent(
+                    alreadySavedReservation.getTheme().getId(),
+                    alreadySavedReservation.getDate(),
+                    alreadySavedReservation.getReservationTime().getId());
+
+            entityManager.flush();
+
+            // when & then
+            assertThatThrownBy(() -> reservationService.addReservation(member.getId(), duplicatedCreationContent))
+                    .isInstanceOf(BadRequestException.class)
+                    .hasMessage("중복된 예약 입니다.");
+        }
+
+        @DisplayName("과거의 시간으로 예약을 할 수 없다.")
+        @Test
+        void cannotAddReservationByPastDateTime() {
+            // given
+            ReservationCreationContent creationContentWithPast =
+                    new ReservationCreationContent(theme.getId(), YESTERDAY, reservationTime.getId());
+
+            // when & then
+            assertThatThrownBy(() -> reservationService.addReservation(member.getId(), creationContentWithPast))
+                    .isInstanceOf(BadRequestException.class)
+                    .hasMessage("과거 예약은 생성할 수 없습니다.");
+        }
+    }
+
+    @Nested
+    @DisplayName("결제정보를 포함하여 예약을 추가할 수 있다")
+    public class addReservationWithPayment {
+
+        @DisplayName("결제 성공시 예약이 성공한다.")
+        @Test
+        void canReserveWhenPaymentSuccess() {
+            // given
+            PaymentResult paymentResult = new PaymentResult("order_id", "payment_key", 1000L);
+            paymentClientStub.setAuthorizePayment(paymentResult);
 
             ReservationCreationContent reservationCreationContent =
                     new ReservationCreationContent(theme.getId(), NEXT_DAY, reservationTime.getId());
             PaymentHistoryCreationContent paymentHistoryCreationContent =
-                    new PaymentHistoryCreationContent("312313", "12312re", "NORMAL", 1000);
+                    new PaymentHistoryCreationContent("order_id", "payment_key", "NORMAL", 1000);
+
+            // when
+            ReservationResponse reservationResponse = reservationService.addReservation(
+                    member.getId(), reservationCreationContent, paymentHistoryCreationContent);
+
+            // then
+            assertAll(
+                    () -> assertThat(reservationRepository.findAll()).hasSize(1),
+                    () -> assertThat(paymentRepository.findAll()).hasSize(1)
+            );
+        }
+
+        @DisplayName("결제 실패시 예약이 실패한다.")
+        @Test
+        void cannotReserveWhenPaymentFail() {
+            // given
+            PaymentException paymentException = new PaymentException("결제 승인 실패");
+            paymentClientStub.setAuthorizePayment(paymentException);
+
+            ReservationCreationContent reservationCreationContent =
+                    new ReservationCreationContent(theme.getId(), NEXT_DAY, reservationTime.getId());
+            PaymentHistoryCreationContent paymentHistoryCreationContent =
+                    new PaymentHistoryCreationContent("order_id", "payment_key", "NORMAL", 1000);
 
             // when & then
             assertAll(
@@ -179,39 +221,6 @@ class ReservationServiceTest {
                     () -> assertThat(reservationRepository.findAll()).hasSize(0)
             );
         }
-    }
-
-    @DisplayName("예약이 중복일 경우 예약을 추가할 수 없다.")
-    @Test
-    void cannotAddReservationByDuplicationReservation() {
-        // given
-        Reservation alreadySavedReservation = entityManager.persist(
-                Reservation.createWithoutIdAndPaymentHistory(NEXT_DAY, reservationTime, theme, member));
-
-        ReservationCreationContent duplicatedCreationContent = new ReservationCreationContent(
-                alreadySavedReservation.getTheme().getId(),
-                alreadySavedReservation.getDate(),
-                alreadySavedReservation.getReservationTime().getId());
-
-        entityManager.flush();
-
-        // when & then
-        assertThatThrownBy(() -> reservationService.addReservation(member.getId(), duplicatedCreationContent))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage("중복된 예약 입니다.");
-    }
-
-    @DisplayName("과거의 시간으로 예약을 할 수 없다.")
-    @Test
-    void cannotAddReservationByPastDateTime() {
-        // given
-        ReservationCreationContent creationContentWithPast =
-                new ReservationCreationContent(theme.getId(), YESTERDAY, reservationTime.getId());
-
-        // when & then
-        assertThatThrownBy(() -> reservationService.addReservation(member.getId(), creationContentWithPast))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessage("과거 예약은 생성할 수 없습니다.");
     }
 
     @Nested

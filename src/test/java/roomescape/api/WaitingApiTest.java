@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
@@ -29,9 +30,11 @@ import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.repository.WaitingRepository;
+import roomescape.test.stub.PaymentClientStub;
 import roomescape.utility.JwtTokenProvider;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@Import(value = {PaymentClientStub.class})
 class WaitingApiTest {
 
     @LocalServerPort
