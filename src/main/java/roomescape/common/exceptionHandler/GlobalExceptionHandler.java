@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
             final HttpMessageNotReadableException e, final HttpServletRequest request
     ) {
         Throwable rootCause = e.getRootCause();
-        if (rootCause instanceof InvalidReservationException) {
+        if (rootCause instanceof IllegalArgumentException) {
             return new ExceptionResponse(EXCEPTION_PREFIX + rootCause.getMessage(), request.getRequestURI());
         }
 

@@ -68,7 +68,7 @@ class GlobalExceptionHandlerTest {
     @DisplayName("HttpMessageNotReadableException 처리 테스트")
     void HttpMessageNotReadableException_Handler_Test() {
         // given
-        ExceptionResponse expected = new ExceptionResponse("[ERROR] HttpMessageNotReadableException 예외 테스트",
+        ExceptionResponse expected = new ExceptionResponse("[ERROR] 요청 형식이 올바르지 않습니다.",
                 "/httpMessageNotReadableException");
         // when
         Response response = RestAssured.given().log().all()

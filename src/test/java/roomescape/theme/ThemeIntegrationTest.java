@@ -80,7 +80,7 @@ public class ThemeIntegrationTest {
         params.put("name", name);
         params.put("description", "hi");
         params.put("thumbnail", "http");
-        ExceptionResponse expected = new ExceptionResponse("[ERROR] 테마 이름이 비어있을 수 없습니다.", "/themes");
+        ExceptionResponse expected = new ExceptionResponse("[ERROR] 요청 형식이 올바르지 않습니다.", "/themes");
         // when
         Response response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -103,7 +103,7 @@ public class ThemeIntegrationTest {
         params.put("name", "제목");
         params.put("description", null);
         params.put("thumbnail", "http");
-        ExceptionResponse expected = new ExceptionResponse("[ERROR] 테마 설명이 비어있을 수 없습니다.", "/themes");
+        ExceptionResponse expected = new ExceptionResponse("[ERROR] 요청 형식이 올바르지 않습니다.", "/themes");
         // when
         Response response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -126,7 +126,7 @@ public class ThemeIntegrationTest {
         params.put("name", "제목");
         params.put("description", "hi");
         params.put("thumbnail", null);
-        ExceptionResponse expected = new ExceptionResponse("[ERROR] 테마 썸네일이 비어있을 수 없습니다.", "/themes");
+        ExceptionResponse expected = new ExceptionResponse("[ERROR] 요청 형식이 올바르지 않습니다.", "/themes");
         // when
         Response response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
