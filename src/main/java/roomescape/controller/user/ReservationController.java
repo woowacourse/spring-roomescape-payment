@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.dto.request.CreateReservationRequest;
+import roomescape.dto.request.ReservationPendingRequest;
 import roomescape.dto.request.ReservationRequest;
 import roomescape.dto.response.MyPageReservationResponse;
 import roomescape.dto.response.ReservationResponse;
@@ -52,8 +53,8 @@ public class ReservationController {
 
     @PostMapping("/reservations/pending")
     public ResponseEntity<ReservationResponse> addPendingReservation(
-            @RequestBody @Valid ReservationRequest request,
-            long memberId
+            @RequestBody @Valid ReservationPendingRequest request,
+            Long memberId
     ) {
         CreateReservationRequest createReservationRequest = new CreateReservationRequest(
                 memberId,
@@ -61,7 +62,7 @@ public class ReservationController {
                 request.themeId(),
                 request.timeId()
         );
-        ReservationResponse response = reservationService.addPendingReservation(createReservationRequest);
+        ReservationResponse response = reservationService.pending(createReservationRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

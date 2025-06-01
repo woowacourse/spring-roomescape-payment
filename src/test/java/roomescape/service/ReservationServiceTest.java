@@ -401,7 +401,7 @@ class ReservationServiceTest extends ServiceTest {
         final CreateReservationRequest request = new CreateReservationRequest(member2.getId(), DATE1, theme.getId(), time.getId());
 
         // when
-        final ReservationResponse reservation = reservationService.addPendingReservation(request);
+        final ReservationResponse reservation = reservationService.pending(request);
 
         // then
         assertThat(reservation.status()).isEqualTo(ReservationStatus.PENDING.description);
@@ -417,7 +417,7 @@ class ReservationServiceTest extends ServiceTest {
         ReservationTime time = insertReservationTime(TIME1);
 
         ReservationResponse acceptedReservation = reservationService.addReservation(new CreateReservationRequest(member1.getId(), DATE1, theme.getId(), time.getId()));
-        ReservationResponse pendingReservation = reservationService.addPendingReservation(new CreateReservationRequest(member2.getId(), DATE1, theme.getId(), time.getId()));
+        ReservationResponse pendingReservation = reservationService.pending(new CreateReservationRequest(member2.getId(), DATE1, theme.getId(), time.getId()));
 
         int beforeCount = countReservation();
 
@@ -444,7 +444,7 @@ class ReservationServiceTest extends ServiceTest {
         ReservationTime time = insertReservationTime(TIME1);
 
         ReservationResponse acceptedReservation = reservationService.addReservation(new CreateReservationRequest(member1.getId(), DATE1, theme.getId(), time.getId()));
-        ReservationResponse pendingReservation = reservationService.addPendingReservation(new CreateReservationRequest(member2.getId(), DATE1, theme.getId(), time.getId()));
+        ReservationResponse pendingReservation = reservationService.pending(new CreateReservationRequest(member2.getId(), DATE1, theme.getId(), time.getId()));
 
         int beforeCount = countReservation();
 

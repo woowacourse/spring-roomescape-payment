@@ -39,7 +39,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse addPendingReservation(final CreateReservationRequest request) {
+    public ReservationResponse pending(final CreateReservationRequest request) {
         return createReservation(request, ReservationStatus.PENDING, true);
     }
 

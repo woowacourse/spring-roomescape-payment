@@ -27,7 +27,7 @@ public class AuthController {
     private final AuthService authService;
     private final MemberService memberService;
 
-    @PostMapping("/members")
+    @PostMapping("/signup")
     public ResponseEntity<MemberRegisterResponse> register(@RequestBody MemberRegisterRequest request) {
         MemberRegisterResponse response = memberService.addMember(request);
         return ResponseEntity.status(HttpStatus.OK).body(response);

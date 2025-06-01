@@ -96,7 +96,7 @@ function checkDateAndTheme() {
 }
 
 function fetchAvailableTimes(date, themeId) {
-    fetch(`/themes/${themeId}/available-times?date=${date}`, {
+    fetch(`/times/${themeId}/available?date=${date}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -244,8 +244,8 @@ function onWaitButtonClick() {
     if (selectedDate && selectedThemeId && selectedTimeId) {
         const reservationData = {
             date: selectedDate,
-            theme: selectedThemeId,
-            time: selectedTimeId
+            themeId: selectedThemeId,
+            timeId: selectedTimeId
         };
 
         /*

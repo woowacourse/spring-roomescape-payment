@@ -33,8 +33,8 @@ public class AdminReservationController {
 
     @GetMapping("/admin/reservations")
     public ResponseEntity<List<ReservationResponse>> getReservationsByFilter(
-            @RequestParam(required = false, name = "memberId") long memberId,
-            @RequestParam(required = false, name = "themeId") long themeId,
+            @RequestParam(required = false, name = "memberId") Long memberId,
+            @RequestParam(required = false, name = "themeId") Long themeId,
             @RequestParam(required = false, name = "dateFrom") LocalDate dateFrom,
             @RequestParam(required = false, name = "dateTo") LocalDate dateTo
     ) {
