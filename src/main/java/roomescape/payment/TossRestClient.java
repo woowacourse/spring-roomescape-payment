@@ -1,5 +1,6 @@
 package roomescape.payment;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
@@ -14,14 +15,16 @@ import java.nio.charset.StandardCharsets;
 public class TossRestClient {
 
     private final RestClient restClient;
+    private final String confirmPaymentPath;
 
-    public TossRestClient(RestClient tossPayRestClient) {
+    public TossRestClient(RestClient tossPayRestClient, @Value("${toss.payment.payment-confirm-uri}") String confirmPaymentPath) {
         this.restClient = tossPayRestClient;
+        this.confirmPaymentPath = confirmPaymentPath;
     }
 
     public TossPayment confirmPayment(PaymentRequestDto requestDto) {
         return restClient.post()
-                .uri("/v1/payments/confirm")
+                .uri(confirmPaymentPath)
                 .body(requestDto)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
