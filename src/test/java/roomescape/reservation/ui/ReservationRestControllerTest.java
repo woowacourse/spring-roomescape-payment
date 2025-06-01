@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.springframework.http.HttpStatus.BAD_GATEWAY;
 import static roomescape.fixture.domain.PaymentFixture.AMOUNT;
 import static roomescape.fixture.domain.PaymentFixture.ORDER_ID;
 import static roomescape.fixture.domain.PaymentFixture.PAYMENT_KEY;
@@ -32,6 +34,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.auth.ui.dto.LoginRequest;
+import roomescape.exception.payment.PaymentException;
 import roomescape.member.ui.dto.SignUpRequest;
 import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.domain.PaymentInfo;
@@ -315,5 +318,28 @@ class ReservationRestControllerTest {
                 date, timeId, themeId,
                 PAYMENT_KEY, ORDER_ID, AMOUNT
         );
+    }
+
+    @Test
+    void 결제_승인이_실패하면_예약이_실패한다() {
+        // given
+        final SignUpRequest signUpRequest = signUpRequest1();
+        final Map<String, String> memberCookies = memberLoginAndGetCookies(
+                new LoginRequest(signUpRequest.email(), signUpRequest.password()));
+        final CreateBookedReservationWithPaymentRequest request = bookedReservationRequest1();
+
+        // when: 결제 승인 시도 시 실패 예외 발생을 시뮬레이션
+        doThrow(new PaymentException(BAD_GATEWAY, "결제 승인에 실패했습니다."))
+                .when(paymentClient)
+                .approvePayment(any(PaymentInfo.class));
+
+        // then: 클라이언트는 예약 요청 실패로 응답을 받음
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .cookies(memberCookies)
+                .body(request)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(BAD_GATEWAY.value());
     }
 }
