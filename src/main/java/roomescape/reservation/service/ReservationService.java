@@ -41,7 +41,8 @@ public class ReservationService {
     private final PaymentClient paymentClient;
 
     @Transactional
-    public ReservationResponse addReservation(final long memberId, final ReservationPaymentRequest request) {
+    public ReservationResponse addReservation(final long memberId, final ReservationPaymentRequest request,
+                                              final TossPaymentResponse tossPaymentResponse) {
         long timeId = request.timeId();
         final long themeId = request.themeId();
         final LocalDate date = request.date();
@@ -53,10 +54,9 @@ public class ReservationService {
         final ReservationTheme theme = reservationThemeRepository.findById(themeId)
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 테마 입니다."));
         final Reservation reservation = new Reservation(member, date, time, theme);
-        TossPaymentResponse paymentResponse = approvePayment(request.orderId(), request.paymentKey(), request.amount());
         Reservation saved = reservationRepository.save(reservation);
-        paymentRepository.save(new Payment(saved, paymentResponse.orderId(), paymentResponse.paymentKey(),
-                paymentResponse.totalAmount(), paymentResponse.type()));
+        paymentRepository.save(new Payment(saved, tossPaymentResponse.orderId(), tossPaymentResponse.paymentKey(),
+                tossPaymentResponse.totalAmount(), tossPaymentResponse.type()));
         return ReservationResponse.fromV2(saved);
     }
 
@@ -100,6 +100,11 @@ public class ReservationService {
         return myPageReservationResponses;
     }
 
+    public TossPaymentResponse approvePayment(final String orderId, final String paymentKey, final long amount) {
+        return paymentClient.requestPaymentApprove(
+                new TossPaymentRequest(orderId, paymentKey, amount));
+    }
+
     @Transactional
     public void removeReservation(final long id) {
         validateExistsById(id);
@@ -110,11 +115,6 @@ public class ReservationService {
                     convertWaitingToReservation(reservation);
                 }
         );
-    }
-
-    private TossPaymentResponse approvePayment(final String orderId, final String paymentKey, final long amount) {
-        return paymentClient.requestPaymentApprove(
-                new TossPaymentRequest(orderId, paymentKey, amount));
     }
 
     private void convertWaitingToReservation(final Reservation reservation) {

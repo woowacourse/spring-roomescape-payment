@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.reservation.dto.AdminReservationPaymentRequest;
 import roomescape.reservation.dto.MyPageReservationResponse;
 import roomescape.reservation.dto.ReservationPaymentRequest;
@@ -36,7 +37,9 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> addReservation(
             @RequestBody @Valid final ReservationPaymentRequest request,
             final Long memberId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.addReservation(memberId, request));
+        final TossPaymentResponse tossPaymentResponse = reservationService.approvePayment(request.orderId(),
+                request.paymentKey(), request.amount());
+        return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.addReservation(memberId, request, tossPaymentResponse));
     }
 
     @DeleteMapping("/reservations/{id}")
@@ -47,7 +50,9 @@ public class ReservationController {
 
     @PostMapping("/admin/reservations")
     public ResponseEntity<ReservationResponse> addReservationForAdmin(@RequestBody AdminReservationPaymentRequest request) {
-        ReservationResponse response = reservationService.addReservation(request.memberId(), ReservationPaymentRequest.from(request));
+        final TossPaymentResponse tossPaymentResponse = reservationService.approvePayment(request.orderId(),
+                request.paymentKey(), request.amount());
+        ReservationResponse response = reservationService.addReservation(request.memberId(), ReservationPaymentRequest.from(request), tossPaymentResponse);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
