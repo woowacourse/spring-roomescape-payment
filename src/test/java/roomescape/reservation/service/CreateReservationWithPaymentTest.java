@@ -14,9 +14,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.auth.service.dto.LoginMember;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
-import roomescape.payment.service.ReservationPaymentClient;
-import roomescape.payment.service.dto.ConfirmPaymentRequest;
-import roomescape.payment.service.dto.ConfirmPaymentResponse;
+import roomescape.payment.infraStructure.PaymentClientSelector;
+import roomescape.payment.infraStructure.toss.TossPaymentClient;
+import roomescape.payment.infraStructure.dto.ConfirmPaymentRequest;
+import roomescape.payment.infraStructure.dto.ConfirmPaymentResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.service.dto.request.ReservationWithPaymentRequest;
@@ -33,7 +34,7 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @ActiveProfiles("test")
 @DataJpaTest
-@Import({CreateReservationService.class})
+@Import({CreateReservationService.class, PaymentClientSelector.class})
 public class CreateReservationWithPaymentTest {
 
     private final LocalDateTime now = LocalDateTime.now();
@@ -48,7 +49,7 @@ public class CreateReservationWithPaymentTest {
     private CreateReservationService reservationService;
 
     @MockitoBean
-    private ReservationPaymentClient mockReservationPaymentClient = Mockito.mock(ReservationPaymentClient.class);
+    private TossPaymentClient mockTossPaymentClient = Mockito.mock(TossPaymentClient.class);
 
     @BeforeEach
     void setup() {
@@ -63,7 +64,7 @@ public class CreateReservationWithPaymentTest {
         // given
         ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
         ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
-        Mockito.when(mockReservationPaymentClient.postConfirmPayment(paymentRequest)).thenReturn(paymentResponse);
+        Mockito.when(mockTossPaymentClient.postConfirmPayment(paymentRequest)).thenReturn(paymentResponse);
 
         LocalDate date = now.plusDays(1).toLocalDate();
         ReservationWithPaymentRequest reservationWithPaymentRequest = new ReservationWithPaymentRequest(
@@ -72,7 +73,8 @@ public class CreateReservationWithPaymentTest {
                 theme.getId(),
                 paymentResponse.paymentKey(),
                 paymentRequest.orderId(),
-                1000
+                1000,
+                "TOSS"
         );
 
         // when

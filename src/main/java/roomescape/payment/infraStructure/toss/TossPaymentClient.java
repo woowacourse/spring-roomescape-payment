@@ -1,16 +1,17 @@
-package roomescape.payment.service;
+package roomescape.payment.infraStructure.toss;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestClient;
 import roomescape.common.exception.PaymentClientException;
-import roomescape.payment.service.dto.ConfirmPaymentRequest;
-import roomescape.payment.service.dto.ConfirmPaymentResponse;
-import roomescape.payment.service.dto.PaymentFailure;
+import roomescape.payment.infraStructure.PaymentGatewayClient;
+import roomescape.payment.infraStructure.dto.ConfirmPaymentRequest;
+import roomescape.payment.infraStructure.dto.ConfirmPaymentResponse;
+import roomescape.payment.infraStructure.dto.PaymentFailure;
 
 import java.util.Base64;
 import java.util.List;
 
-public class ReservationPaymentClient {
+public class TossPaymentClient implements PaymentGatewayClient {
     @Value("${payment.toss.secret-key}")
     private String secretKey;
 
@@ -21,10 +22,11 @@ public class ReservationPaymentClient {
 
     private final RestClient restClient;
 
-    public ReservationPaymentClient(RestClient restClient) {
+    public TossPaymentClient(RestClient restClient) {
         this.restClient = restClient;
     }
 
+    @Override
     public ConfirmPaymentResponse postConfirmPayment(ConfirmPaymentRequest paymentRequest) {
         ConfirmPaymentResponse paymentResponse = restClient.post()
                 .uri("/confirm")

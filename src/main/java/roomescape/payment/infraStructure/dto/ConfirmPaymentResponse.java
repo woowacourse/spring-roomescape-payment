@@ -1,4 +1,4 @@
-package roomescape.payment.service.dto;
+package roomescape.payment.infraStructure.dto;
 
 public record ConfirmPaymentResponse(
         Integer totalAmount,

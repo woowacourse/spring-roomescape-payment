@@ -7,10 +7,11 @@ import roomescape.common.exception.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.infraStructure.PaymentClientSelector;
+import roomescape.payment.infraStructure.PaymentGatewayClient;
+import roomescape.payment.infraStructure.dto.ConfirmPaymentRequest;
+import roomescape.payment.infraStructure.dto.ConfirmPaymentResponse;
 import roomescape.payment.repository.PaymentRepository;
-import roomescape.payment.service.ReservationPaymentClient;
-import roomescape.payment.service.dto.ConfirmPaymentRequest;
-import roomescape.payment.service.dto.ConfirmPaymentResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.repository.ReservationRepository;
@@ -30,7 +31,7 @@ public class CreateReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final PaymentRepository paymentRepository;
-    private final ReservationPaymentClient reservationPaymentClient;
+    private final PaymentClientSelector paymentClientSelector;
 
     public CreateReservationService(
             ReservationRepository reservationRepository,
@@ -38,14 +39,14 @@ public class CreateReservationService {
             ThemeRepository themeRepository,
             MemberRepository memberRepository,
             PaymentRepository paymentRepository,
-            ReservationPaymentClient reservationPaymentClient
+            PaymentClientSelector paymentClientSelector
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.paymentRepository = paymentRepository;
-        this.reservationPaymentClient = reservationPaymentClient;
+        this.paymentClientSelector = paymentClientSelector;
     }
 
     public ReservationResponse create(final ReservationCreateRequest request) {
@@ -103,8 +104,8 @@ public class CreateReservationService {
                 loginMember
         );
         ReservationResponse reservationResponse = create(reservationCreateRequest);
-
-        ConfirmPaymentResponse paymentResponse = reservationPaymentClient.postConfirmPayment(ConfirmPaymentRequest.from(request));
+        PaymentGatewayClient paymentGatewayClient = paymentClientSelector.getPaymentGatewayBySelector(request.pgType());
+        ConfirmPaymentResponse paymentResponse = paymentGatewayClient.postConfirmPayment(ConfirmPaymentRequest.from(request));
         Payment payment = new Payment(paymentResponse.paymentKey(), paymentResponse.totalAmount());
         paymentRepository.save(payment);
 

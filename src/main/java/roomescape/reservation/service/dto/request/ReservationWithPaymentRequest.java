@@ -15,6 +15,7 @@ public record ReservationWithPaymentRequest(
         @NotNull Long themeId,
         @NotEmpty String paymentKey,
         @NotEmpty String orderId,
-        @NotNull Integer amount
+        @NotNull Integer amount,
+        @NotNull String pgType
 ) {
 }

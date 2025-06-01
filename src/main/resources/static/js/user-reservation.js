@@ -41,11 +41,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
+  document.getElementById('reserve-button').addEventListener('click',event=>{
+      const pgType = event.target.value; // "TOSS", "KAKAO"
+      onReservationButtonClickWithPaymentWidget(event, pgType)
+   });
   document.getElementById('wait-button').addEventListener('click', onWaitButtonClick);
 
-  function onReservationButtonClickWithPaymentWidget(event) {
-    onReservationButtonClick(event, paymentWidget);
+  function onReservationButtonClickWithPaymentWidget(event,pgType) {
+    onReservationButtonClick(event, paymentWidget,pgType);
   }
 });
 
@@ -156,11 +159,10 @@ function checkDateAndThemeAndTime() {
   }
 }
 
-function onReservationButtonClick(event, paymentWidget) {
+function onReservationButtonClick(event, paymentWidget, pgType) {
   const selectedDate = document.getElementById("datepicker").value;
   const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
   const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
-
   if (selectedDate && selectedThemeId && selectedTimeId) {
 
     const reservationData = {
@@ -184,7 +186,7 @@ function onReservationButtonClick(event, paymentWidget) {
       amount: 1000,
     }).then(function (data) {
       console.debug(data);
-      fetchReservationPayment(data, reservationData);
+      fetchReservationPayment(data, reservationData, pgType);
     }).catch(function (error) {
       // TOSS 에러 처리: 에러 목록을 확인하세요
       // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
@@ -195,7 +197,7 @@ function onReservationButtonClick(event, paymentWidget) {
   }
 }
 
-async function fetchReservationPayment(paymentData, reservationData) {
+async function fetchReservationPayment(paymentData, reservationData, pgType) {
   /*
   TODO: [1단계]
       - 자신의 예약 API request에 맞게 reservationPaymentRequest 필드명 수정
@@ -210,6 +212,7 @@ async function fetchReservationPayment(paymentData, reservationData) {
     orderId: paymentData.orderId,
     amount: paymentData.amount,
     paymentType: paymentData.paymentType,
+    pgType: pgType
   }
 
   const reservationURL = "/reservations";
