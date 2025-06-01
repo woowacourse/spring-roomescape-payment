@@ -14,9 +14,7 @@ import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.ToString;
 import roomescape.exception.custom.reason.reservation.ReservationPastTimeException;
 import roomescape.member.domain.Member;
 import roomescape.reservationtime.domain.ReservationTime;
@@ -25,13 +23,10 @@ import roomescape.theme.domain.Theme;
 @Entity
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@ToString
 public class Reservation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include
     private final Long id;
 
     @Embedded

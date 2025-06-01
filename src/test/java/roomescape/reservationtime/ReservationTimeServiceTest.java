@@ -2,6 +2,7 @@ package roomescape.reservationtime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.then;
 
 import java.time.LocalDate;
@@ -233,7 +234,8 @@ public class ReservationTimeServiceTest {
             reservationTimeService.deleteById(1L);
 
             // then
-            then(reservationTimeRepository).should().delete(reservationTime);
+            then(reservationTimeRepository).should()
+                    .delete(argThat(argument -> argument.getId().equals(reservationTime.getId())));
         }
 
         @DisplayName("id에 해당하는 time이 없다면 예외가 발생한다.")

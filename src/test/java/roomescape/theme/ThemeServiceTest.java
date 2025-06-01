@@ -2,6 +2,7 @@ package roomescape.theme;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -221,7 +222,8 @@ class ThemeServiceTest {
             themeService.deleteById(1L);
 
             // then
-            then(themeRepository).should().delete(theme);
+            then(themeRepository).should()
+                    .delete(argThat(argument -> argument.getId().equals(theme.getId())));
         }
 
         @DisplayName("주어진 id에 해당하는 테마가 존재하지 않는다면 예외가 발생한다.")

@@ -6,18 +6,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Entity
 @AllArgsConstructor
 @Getter
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Theme {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include
     private final Long id;
 
     @Column(nullable = false)

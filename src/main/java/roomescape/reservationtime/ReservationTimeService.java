@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.custom.reason.reservationtime.ReservationTimeConflictException;
 import roomescape.exception.custom.reason.reservationtime.ReservationTimeNotExistsThemeException;
 import roomescape.exception.custom.reason.reservationtime.ReservationTimeNotFoundException;
@@ -43,6 +44,7 @@ public class ReservationTimeService {
                 .toList();
     }
 
+    @Transactional
     public List<AvailableReservationTimeResponse> findAllAvailable(final Long themeId, final LocalDate date) {
         final List<ReservationTime> times = reservationTimeRepository.findAll();
         final Theme theme = themeRepository.findById(themeId)
