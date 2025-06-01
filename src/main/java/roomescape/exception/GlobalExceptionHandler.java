@@ -17,12 +17,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(e.getStatus()).body(body);
     }
 
-    @ExceptionHandler(value = PaymentException.class)
-    public ResponseEntity<ErrorResponse> handlePaymentException(PaymentException e) {
-        ErrorResponse body = new ErrorResponse(e.getMessage());
-        return ResponseEntity.status(e.getStatus()).body(body);
-    }
-
     @ExceptionHandler(value = ResourceAccessException.class)
     public ResponseEntity<ErrorResponse> handleSocketException(ResourceAccessException e) {
         ErrorResponse body = new ErrorResponse("연결에 실패했습니다.");
