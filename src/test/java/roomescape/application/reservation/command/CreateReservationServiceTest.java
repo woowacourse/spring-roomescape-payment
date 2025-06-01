@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.application.AbstractServiceIntegrationTest;
 import roomescape.application.payment.TossPaymentClient;
 import roomescape.application.payment.TossPaymentErrorCode;
+import roomescape.application.payment.dto.PaymentResponse;
 import roomescape.application.reservation.command.dto.CreateReservationCommand;
 import roomescape.application.reservation.command.dto.CreateReservationWithPaymentCommand;
 import roomescape.domain.member.Email;
@@ -25,6 +26,7 @@ import roomescape.domain.member.MemberRole;
 import roomescape.domain.member.repository.MemberRepository;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.repository.PaymentRepository;
+import roomescape.domain.payment.repository.ReservationPaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.reservation.Theme;
@@ -52,6 +54,9 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private ReservationPaymentRepository reservationPaymentRepository;
+
     @Mock
     private PaymentRepository paymentRepository;
 
@@ -69,6 +74,7 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
                 memberRepository,
                 tossPaymentClient,
                 paymentRepository,
+                reservationPaymentRepository,
                 clock
         );
     }
@@ -91,8 +97,9 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
                 amount,
                 "NORMAL"
         );
-        doNothing().when(tossPaymentClient).approve(command.getPaymentCommand());
-        when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(new Payment(orderId, amount)));
+        when(tossPaymentClient.approve(command.getPaymentCommand()))
+                .thenReturn(new PaymentResponse("paymentKey", orderId, amount, "NORMAL", "APPROVED"));
+        when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(new Payment(null, orderId, amount)));
 
         // when
         Long id = createReservationService.reserve(command);
@@ -122,7 +129,7 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
         doThrow(new TossPaymentException(TossPaymentErrorCode.SYSTEM_ERROR_MESSAGE))
                 .when(tossPaymentClient)
                 .approve(command.getPaymentCommand());
-        when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(new Payment(orderId, amount)));
+        when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(new Payment("paymentKey", orderId, amount)));
 
         // when
         // then
@@ -153,7 +160,7 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
         doThrow(new TossPaymentException("관리자에게 문의해주세요."))
                 .when(tossPaymentClient)
                 .approve(command.getPaymentCommand());
-        when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(new Payment(orderId, amount)));
+        when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(new Payment("paymentKey", orderId, amount)));
 
         // when
         // then

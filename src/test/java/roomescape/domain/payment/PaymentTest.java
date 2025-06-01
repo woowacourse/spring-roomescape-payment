@@ -10,9 +10,10 @@ class PaymentTest {
     @Test
     void 승인_요청_금액과_결제_금액이_일치하지_않으면_예외가_발생한다() {
         // given
+        String paymentKey = "paymentKey";
         String orderId = "orderId";
         long amount = 10_000L;
-        Payment payment = new Payment(orderId, amount);
+        Payment payment = new Payment(paymentKey, orderId, amount);
         long approvalAmount = 20_000L;
 
         // when
@@ -25,9 +26,10 @@ class PaymentTest {
     @Test
     void 승인_요청_금액과_결제_금액이_일치하면_예외가_발생하지_않는다() {
         // given
+        String paymentKey = "paymentKey";
         String orderId = "orderId";
         long amount = 10_000L;
-        Payment payment = new Payment(orderId, amount);
+        Payment payment = new Payment(paymentKey, orderId, amount);
 
         // when
         // then

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import roomescape.application.payment.dto.PaymentCommand;
+import roomescape.application.payment.dto.PaymentResponse;
 import roomescape.infrastructure.error.exception.PaymentException;
 import roomescape.infrastructure.error.exception.TossPaymentException;
 
@@ -49,16 +50,17 @@ public class TossPaymentClient {
         return requestFactory;
     }
 
-    public void approve(PaymentCommand command) {
+    public PaymentResponse approve(PaymentCommand command) {
         try {
-            restClient.post()
+            return restClient.post()
                     .uri(CONFIRM_URI)
                     .header(HttpHeaders.AUTHORIZATION, createAuthorizationHeader())
                     .body(command)
                     .retrieve()
                     .onStatus(HttpStatusCode::is4xxClientError, this::handle4xxError)
                     .onStatus(HttpStatusCode::is5xxServerError, this::handle5xxError)
-                    .toBodilessEntity();
+                    .toEntity(PaymentResponse.class)
+                    .getBody();
         } catch (RestClientException e) {
             log.warn("RestClient 토스 페이먼트 결제 승인 API 호출 실패", e);
             throw new TossPaymentException("잠시 후 다시 시도해주세요.");

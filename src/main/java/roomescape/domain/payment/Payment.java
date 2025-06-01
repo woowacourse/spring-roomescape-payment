@@ -5,25 +5,33 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.util.Objects;
+import roomescape.domain.BaseEntity;
 import roomescape.infrastructure.error.exception.PaymentException;
 
 @Entity
-public class Payment {
+public class Payment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String paymentKey;
+
     private String orderId;
 
     private long amount;
 
-    public Payment(String orderId, long amount) {
-        this(null, orderId, amount);
+    public Payment(String paymentKey, String orderId, long amount) {
+        this(null, paymentKey, orderId, amount);
     }
 
-    public Payment(Long id, String orderId, long amount) {
+    public Payment(String orderId, long amount) {
+        this(null, null, orderId, amount);
+    }
+
+    public Payment(Long id, String paymentKey, String orderId, long amount) {
         this.id = id;
+        this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
     }
@@ -39,8 +47,19 @@ public class Payment {
         }
     }
 
+    public void approvePayment(String paymentKey) {
+        if (this.paymentKey != null) {
+            throw new PaymentException("이미 결제가 승인되었습니다.");
+        }
+        this.paymentKey = paymentKey;
+    }
+
     public Long getId() {
         return id;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
     }
 
     public String getOrderId() {
