@@ -1,7 +1,7 @@
 package roomescape.payment.application;
 
-import java.math.BigDecimal;
+import roomescape.payment.application.dto.PaymentApprovalRequest;
 
 public interface PaymentApprovalService {
-    void approvePayment(String orderId, BigDecimal amount, String paymentKey);
+    void approvePayment(PaymentApprovalRequest paymentApprovalRequest);
 }

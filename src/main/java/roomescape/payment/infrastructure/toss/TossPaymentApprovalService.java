@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import roomescape.payment.application.PaymentApprovalService;
+import roomescape.payment.application.dto.PaymentApprovalRequest;
 import roomescape.payment.infrastructure.toss.client.TossRestClient;
 
 @Component
@@ -13,7 +14,7 @@ public class TossPaymentApprovalService implements PaymentApprovalService {
     private final TossRestClient tossRestClient;
 
     @Override
-    public void approvePayment(String orderId, BigDecimal amount, String paymentKey) {
-        tossRestClient.approve(orderId, amount, paymentKey);
+    public void approvePayment(PaymentApprovalRequest paymentApprovalRequest) {
+        tossRestClient.approve(paymentApprovalRequest);
     }
 }

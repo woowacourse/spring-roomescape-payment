@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import roomescape.payment.application.dto.PaymentApprovalRequest;
 import roomescape.payment.infrastructure.toss.exception.TossErrorResponse;
 import roomescape.payment.infrastructure.toss.exception.TossInternalException;
 import roomescape.payment.infrastructure.toss.exception.TossPaymentApprovalFailedException;
@@ -23,16 +24,11 @@ public class TossRestClient {
         this.objectMapper = objectMapper;
     }
 
-    public void approve(String orderId, BigDecimal amount, String paymentKey) {
-        Map<String, Object> body = Map.of(
-                "orderId", orderId,
-                "amount", amount,
-                "paymentKey", paymentKey
-        );
+    public void approve(PaymentApprovalRequest paymentApprovalRequest) {
 
         restClient.post()
                 .uri("/v1/payments/confirm")
-                .body(body)
+                .body(paymentApprovalRequest)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError,
                         (request, response) -> {

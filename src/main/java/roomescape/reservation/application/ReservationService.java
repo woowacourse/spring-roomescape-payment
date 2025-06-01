@@ -13,6 +13,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.member.exception.MemberNotFoundException;
 import roomescape.payment.application.PaymentApprovalService;
+import roomescape.payment.application.dto.PaymentApprovalRequest;
 import roomescape.payment.exception.InvalidPaymentAmountException;
 import roomescape.payment.exception.PaymentSessionExpiredException;
 import roomescape.reservation.application.dto.AdminReservationRequest;
@@ -91,7 +92,7 @@ public class ReservationService {
 
         ReservationResponse response = create(memberId, request.date(), request.timeId(), request.themeId());
 
-        paymentApprovalService.approvePayment(orderId, amount, request.paymentKey());
+        paymentApprovalService.approvePayment(new PaymentApprovalRequest(orderId, amount, request.paymentKey()));
 
         return response;
     }
