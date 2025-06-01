@@ -29,42 +29,42 @@ HTTP/1.1 200
 Content-Type: application/json
 
 [
-{
-"id": 1,
-"member": {
-"id": 1,
-"name": "Alice"
-},
-"date": "2025-05-05",
-"time": {
-"id": 1,
-"startAt": "08:00:00"
-},
-"theme": {
-"id": 12,
-"name": "논리",
-"description": "퍼즐 마스터",
-"thumbnail": "image/thumbnail.png"
-}
-},
-{
-"id": 2,
-"member": {
-"id": 2,
-"name": "Bob"
-},
-"date": "2025-05-05",
-"time": {
-"id": 2,
-"startAt": "12:00:00"
-},
-"theme": {
-"id": 12,
-"name": "논리",
-"description": "퍼즐 마스터",
-"thumbnail": "image/thumbnail.png"
-}
-}
+  {
+    "id": 1,
+    "member": {
+      "id": 1,
+      "name": "Alice"
+    },
+    "date": "2025-05-05",
+    "time": {
+      "id": 1,
+      "startAt": "08:00:00"
+    },
+    "theme": {
+      "id": 12,
+      "name": "논리",
+      "description": "퍼즐 마스터",
+      "thumbnail": "image/thumbnail.png"
+    }
+  },
+  {
+    "id": 2,
+    "member": {
+      "id": 2,
+      "name": "Bob"
+    },
+    "date": "2025-05-05",
+    "time": {
+      "id": 2,
+      "startAt": "12:00:00"
+    },
+    "theme": {
+      "id": 12,
+      "name": "논리",
+      "description": "퍼즐 마스터",
+      "thumbnail": "image/thumbnail.png"
+    }
+  }
 ]
 ```
 
@@ -90,17 +90,17 @@ cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6ImFkbWluIiwicm9sZSI6I
 host: localhost: 8080
 
 {
-"reservation": {
-"date": "2025-05-30",
-"themeId": "1",
-"timeId": "1"
-},
-"payment": {
-"paymentKey": "tgen_20250529131846fyrj9",
-"orderId": "WTESTMC4yNTQ0ODcwMTQ4NjA1",
-"amount": 1000,
-"paymentType": "NORMAL"
-}
+  "reservation": {
+    "date": "2025-05-30",
+    "themeId": "1",
+    "timeId": "1"
+  },
+  "payment": {
+    "paymentKey": "tgen_20250529131846fyrj9",
+    "orderId": "WTESTMC4yNTQ0ODcwMTQ4NjA1",
+    "amount": 1000,
+    "paymentType": "NORMAL"
+  }
 }
 ```
 
@@ -111,19 +111,19 @@ HTTP/1.1 201
 Content-Type: application/json
 
 {
-"id": 1,
-"name": "브라운",
-"date": "2023-08-05",
-"time": {
-"id": 1,
-"startAt": "10:00"
-},
-"theme": {
-"id" : 1,
-"name": "추리",
-"description": "추리 with mint",
-"thumbnail": "thumbnail.png"
-}
+  "id": 1,
+  "name": "브라운",
+  "date": "2023-08-05",
+  "time": {
+    "id": 1,
+    "startAt": "10:00"
+  },
+  "theme": {
+    "id": 1,
+    "name": "추리",
+    "description": "추리 with mint",
+    "thumbnail": "thumbnail.png"
+  }
 }
 ```
 
@@ -138,10 +138,10 @@ cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6ImFkbWluIiwicm9sZSI6I
 host: localhost: 8080
 
 {
-"date": "2024-03-01",
-"themeId": 1,
-"timeId": 1,
-"memberId": 1
+  "date": "2024-03-01",
+  "themeId": 1,
+  "timeId": 1,
+  "memberId": 1
 }
 ```
 
@@ -152,19 +152,19 @@ HTTP/1.1 201
 Content-Type: application/json
 
 {
-"id": 1,
-"name": "브라운",
-"date": "2023-08-05",
-"time": {
-"id": 1,
-"startAt": "10:00"
-},
-"theme": {
-"id" : 1,
-"name": "추리",
-"description": "추리 with mint",
-"thumbnail": "thumbnail.png"
-}
+  "id": 1,
+  "name": "브라운",
+  "date": "2023-08-05",
+  "time": {
+    "id": 1,
+    "startAt": "10:00"
+  },
+  "theme": {
+    "id": 1,
+    "name": "추리",
+    "description": "추리 with mint",
+    "thumbnail": "thumbnail.png"
+  }
 }
 ```
 
@@ -198,7 +198,7 @@ POST /times HTTP/1.1
 content-type: application/json
 
 {
-"startAt": "10:00"
+  "startAt": "10:00"
 }
 ```
 
@@ -209,8 +209,8 @@ HTTP/1.1 201
 Content-Type: application/json
 
 {
-"id": 1,
-"startAt": "10:00"
+  "id": 1,
+  "startAt": "10:00"
 }
 ```
 
@@ -233,10 +233,10 @@ HTTP/1.1 200
 Content-Type: application/json
 
 [
-{
-"id": 1,
-"startAt": "10:00"
-}
+  {
+    "id": 1,
+    "startAt": "10:00"
+  }
 ]
 ```
 
@@ -277,16 +277,16 @@ HTTP/1.1 200
 Content-Type: application/json
 
 [
-{
-"timeId": 1,
-"startAt": "10:00",
-"alreadyBooked": "true"
-},
-{
-"timeId": 2,
-"startAt": "11:00",
-"alreadyBooked": "false"
-}
+  {
+    "timeId": 1,
+    "startAt": "10:00",
+    "alreadyBooked": "true"
+  },
+  {
+    "timeId": 2,
+    "startAt": "11:00",
+    "alreadyBooked": "false"
+  }
 ]
 ```
 
@@ -310,42 +310,42 @@ HTTP/1.1 200
 Content-Type: application/json
 
 [
-{
-"id": 1,
-"member": {
-"id": 2,
-"name": "Alice"
-},
-"date": "2025-05-11",
-"time": {
-"id": 1,
-"startAt": "08:00:00"
-},
-"theme": {
-"id": 12,
-"name": "논리",
-"description": "퍼즐 마스터",
-"thumbnail": "image/thumbnail.png"
-}
-},
-{
-"id": 2,
-"member": {
-"id": 3,
-"name": "Bob"
-},
-"date": "2025-05-11",
-"time": {
-"id": 2,
-"startAt": "12:00:00"
-},
-"theme": {
-"id": 12,
-"name": "논리",
-"description": "퍼즐 마스터",
-"thumbnail": "image/thumbnail.png"
-}
-}
+  {
+    "id": 1,
+    "member": {
+      "id": 2,
+      "name": "Alice"
+    },
+    "date": "2025-05-11",
+    "time": {
+      "id": 1,
+      "startAt": "08:00:00"
+    },
+    "theme": {
+      "id": 12,
+      "name": "논리",
+      "description": "퍼즐 마스터",
+      "thumbnail": "image/thumbnail.png"
+    }
+  },
+  {
+    "id": 2,
+    "member": {
+      "id": 3,
+      "name": "Bob"
+    },
+    "date": "2025-05-11",
+    "time": {
+      "id": 2,
+      "startAt": "12:00:00"
+    },
+    "theme": {
+      "id": 12,
+      "name": "논리",
+      "description": "퍼즐 마스터",
+      "thumbnail": "image/thumbnail.png"
+    }
+  }
 ]
 ```
 
@@ -368,12 +368,12 @@ HTTP/1.1 200
 Content-Type: application/json
 
 [
-{
-"id": 1,
-"name": "레벨2 탈출",
-"description": "우테코 레벨2를 탈출하는 내용입니다.",
-"thumbnail": "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"
-}
+  {
+    "id": 1,
+    "name": "레벨2 탈출",
+    "description": "우테코 레벨2를 탈출하는 내용입니다.",
+    "thumbnail": "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"
+  }
 ]
 ```
 
@@ -396,66 +396,66 @@ HTTP/1.1 200
 Content-Type: application/json
 
 [
-{
-"id": 1,
-"name": "추리",
-"description": "셜록 with Danny",
-"thumbnail": "image/thumbnail.png"
-},
-{
-"id": 2,
-"name": "공포",
-"description": "어둠 속의 비명",
-"thumbnail": "image/thumbnail.png"
-},
-{
-"id": 3,
-"name": "모험",
-"description": "잃어버린 도시",
-"thumbnail": "image/thumbnail.png"
-},
-{
-"id": 4,
-"name": "SF",
-"description": "우주 탈출 미션",
-"thumbnail": "image/thumbnail.png"
-},
-{
-"id": 5,
-"name": "감성",
-"description": "시간을 걷는 집",
-"thumbnail": "image/thumbnail.png"
-},
-{
-"id": 12,
-"name": "논리",
-"description": "퍼즐 마스터",
-"thumbnail": "image/thumbnail.png"
-},
-{
-"id": 11,
-"name": "로맨스",
-"description": "잃어버린 편지",
-"thumbnail": "image/thumbnail.png"
-},
-{
-"id": 8,
-"name": "범죄",
-"description": "은행 강도 사건",
-"thumbnail": "image/thumbnail.png"
-},
-{
-"id": 9,
-"name": "스릴러",
-"description": "잠입 작전",
-"thumbnail": "image/thumbnail.png"
-},
-{
-"id": 7,
-"name": "역사",
-"description": "고려 왕실의 비밀",
-"thumbnail": "image/thumbnail.png"
-}
+  {
+    "id": 1,
+    "name": "추리",
+    "description": "셜록 with Danny",
+    "thumbnail": "image/thumbnail.png"
+  },
+  {
+    "id": 2,
+    "name": "공포",
+    "description": "어둠 속의 비명",
+    "thumbnail": "image/thumbnail.png"
+  },
+  {
+    "id": 3,
+    "name": "모험",
+    "description": "잃어버린 도시",
+    "thumbnail": "image/thumbnail.png"
+  },
+  {
+    "id": 4,
+    "name": "SF",
+    "description": "우주 탈출 미션",
+    "thumbnail": "image/thumbnail.png"
+  },
+  {
+    "id": 5,
+    "name": "감성",
+    "description": "시간을 걷는 집",
+    "thumbnail": "image/thumbnail.png"
+  },
+  {
+    "id": 12,
+    "name": "논리",
+    "description": "퍼즐 마스터",
+    "thumbnail": "image/thumbnail.png"
+  },
+  {
+    "id": 11,
+    "name": "로맨스",
+    "description": "잃어버린 편지",
+    "thumbnail": "image/thumbnail.png"
+  },
+  {
+    "id": 8,
+    "name": "범죄",
+    "description": "은행 강도 사건",
+    "thumbnail": "image/thumbnail.png"
+  },
+  {
+    "id": 9,
+    "name": "스릴러",
+    "description": "잠입 작전",
+    "thumbnail": "image/thumbnail.png"
+  },
+  {
+    "id": 7,
+    "name": "역사",
+    "description": "고려 왕실의 비밀",
+    "thumbnail": "image/thumbnail.png"
+  }
 ]
 ```
 
@@ -472,9 +472,9 @@ POST /themes HTTP/1.1
 content-type: application/json
 
 {
-"name": "레벨2 탈출",
-"description": "우테코 레벨2를 탈출하는 내용입니다.",
-"thumbnail": "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"
+  "name": "레벨2 탈출",
+  "description": "우테코 레벨2를 탈출하는 내용입니다.",
+  "thumbnail": "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"
 }
 ```
 
@@ -486,10 +486,10 @@ Location: /themes/1
 Content-Type: application/json
 
 {
-"id": 1,
-"name": "레벨2 탈출",
-"description": "우테코 레벨2를 탈출하는 내용입니다.",
-"thumbnail": "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"
+  "id": 1,
+  "name": "레벨2 탈출",
+  "description": "우테코 레벨2를 탈출하는 내용입니다.",
+  "thumbnail": "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"
 }
 ```
 
@@ -521,8 +521,8 @@ content-type: application/json
 host: localhost: 8080
 
 {
-"password": "password",
-"email": "admin@email.com"
+  "password": "password",
+  "email": "admin@email.com"
 }
 ```
 
@@ -545,9 +545,9 @@ content-type: application/json
 host: localhost: 8080
 
 {
-"email": "admin@email.com"
-"password": "password",
-"name": "admin"
+  "email": "admin@email.com",
+  "password": "password",
+  "name": "admin"
 }
 ```
 
@@ -559,7 +559,7 @@ Content-Type: application/json
 Keep-Alive: timeout=60
 
 {
-"id": 3
+  "id": 3
 }
 ```
 
@@ -603,7 +603,7 @@ Keep-Alive: timeout=60
 Transfer-Encoding: chunked
 
 {
-"name": "어드민"
+  "name": "어드민"
 }
 ```
 
@@ -628,14 +628,14 @@ Keep-Alive: timeout=60
 Transfer-Encoding: chunked
 
 [
-{
-"id": 2,
-"name": "mint"
-},
-{
-"id": 3,
-"name": "danny"
-}
+  {
+    "id": 2,
+    "name": "mint"
+  },
+  {
+    "id": 3,
+    "name": "danny"
+  }
 ]
 ```
 
@@ -656,34 +656,34 @@ HTTP/1.1 200
 Content-Type: application/json
 
 [
-{
-"reservationId": 1,
-"theme": "테마1",
-"date": "2024-03-01",
-"time": "10:00",
-"reservedStatus": "예약"
-},
-{
-"reservationId": 2,
-"theme": "테마2",
-"date": "2024-03-01",
-"time": "12:00",
-"reservedStatus": "예약"
-},
-{
-"reservationId": 3,
-"theme": "테마3",
-"date": "2024-03-01",
-"time": "14:00",
-"reservedStatus": "예약"
-},
-{
-"reservationId": 4,
-"theme": "테마4",
-"date": "2024-03-01",
-"time": "16:00",
-"reservedStatus": "1번째 예약대기"
-}
+  {
+    "reservationId": 1,
+    "theme": "테마1",
+    "date": "2024-03-01",
+    "time": "10:00",
+    "reservedStatus": "예약"
+  },
+  {
+    "reservationId": 2,
+    "theme": "테마2",
+    "date": "2024-03-01",
+    "time": "12:00",
+    "reservedStatus": "예약"
+  },
+  {
+    "reservationId": 3,
+    "theme": "테마3",
+    "date": "2024-03-01",
+    "time": "14:00",
+    "reservedStatus": "예약"
+  },
+  {
+    "reservationId": 4,
+    "theme": "테마4",
+    "date": "2024-03-01",
+    "time": "16:00",
+    "reservedStatus": "1번째 예약대기"
+  }
 ]
 ```
 
@@ -698,9 +698,9 @@ cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvb
 host: localhost: 8080
 
 {
-"date": "2024-03-01",
-"themeId": 1,
-"timeId": 1
+  "date": "2024-03-01",
+  "themeId": 1,
+  "timeId": 1
 }
 ```
 
@@ -711,11 +711,11 @@ HTTP/1.1 201
 Content-Type: application/json
 
 {
-"id": 1,
-"theme": "테마1",
-"date": "2024-03-01",
-"time": "10:00",
-"reservedStatus": "예약대기"
+  "id": 1,
+  "theme": "테마1",
+  "date": "2024-03-01",
+  "time": "10:00",
+  "reservedStatus": "예약대기"
 }
 ```
 
@@ -724,9 +724,7 @@ Content-Type: application/json
 ### 요청
 
 ```json
-DELETE /waitings/{
-  id
-} HTTP/1.1
+DELETE /waitings/{id} HTTP/1.1
 cookie: token=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIiwibmFtZSI6IuyWtOuTnOuvvCIsInJvbGUiOiJBRE1JTiJ9.vcK93ONRQYPFCxT5KleSM6b7cl1FE-neSLKaFyslsZM
 host: localhost: 8080
 ```
@@ -754,20 +752,20 @@ HTTP/1.1 200
 Content-Type: application/json
 
 [
-{
-"id": 1,
-"theme": "테마1",
-"date": "2024-03-01",
-"time": "10:00",
-"reservedStatus": "1번째 예약대기"
-},
-{
-"id": 2,
-"theme": "테마2",
-"date": "2024-03-01",
-"time": "12:00",
-"reservedStatus": "2번째 예약대기"
-}
+  {
+    "id": 1,
+    "theme": "테마1",
+    "date": "2024-03-01",
+    "time": "10:00",
+    "reservedStatus": "1번째 예약대기"
+  },
+  {
+    "id": 2,
+    "theme": "테마2",
+    "date": "2024-03-01",
+    "time": "12:00",
+    "reservedStatus": "2번째 예약대기"
+  }
 ]
 ```
 
