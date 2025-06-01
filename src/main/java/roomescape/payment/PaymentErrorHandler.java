@@ -18,17 +18,16 @@ public class PaymentErrorHandler extends DefaultResponseErrorHandler {
 
     @Override
     public void handleError(final ClientHttpResponse response) throws IOException {
-        if (response.getStatusCode().is2xxSuccessful()) {
-            return;
-        }
-        final String body = new String(getResponseBody(response), StandardCharsets.UTF_8);
-        final PaymentError paymentError = mapper.readValue(body, PaymentError.class);
+        if (response.getStatusCode().isError()) {
+            final String body = new String(getResponseBody(response), StandardCharsets.UTF_8);
+            final PaymentError paymentError = mapper.readValue(body, PaymentError.class);
 
-        boolean exists = FilteredPaymentErrorCode.exists(paymentError.code());
-        if (exists) {
-            throw new PaymentException(INTERNAL_SERVER_ERROR, "서버 내부 오류입니다.", INTERNAL_SERVER_ERROR.name());
+            boolean exists = FilteredPaymentErrorCode.exists(paymentError.code());
+            if (exists) {
+                throw new PaymentException(INTERNAL_SERVER_ERROR, "서버 내부 오류입니다.", INTERNAL_SERVER_ERROR.name());
+            }
+            throw new PaymentException(response.getStatusCode(), paymentError.message(), paymentError.code());
         }
-        throw new PaymentException(response.getStatusCode(), paymentError.message(), paymentError.code());
     }
 
     @Getter
