@@ -1,18 +1,9 @@
 package roomescape.unit.presentation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Base64;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,7 +14,18 @@ import roomescape.dto.PaymentRequest;
 import roomescape.exception.FilteredPaymentException;
 import roomescape.presentation.PaymentClientController;
 
+import java.util.Base64;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+
 public class PaymentClientControllerTest {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final RestClient.Builder testBuilder = RestClient.builder()
             .baseUrl("https://api.tosspayments.com")
@@ -36,9 +38,9 @@ public class PaymentClientControllerTest {
     @Test
     void 결제_요청_응답을_확인한다() throws Exception {
         //given
-        ObjectMapper objectMapper = new ObjectMapper();
+
         PaymentInfo paymentInfo = new PaymentInfo("1", 1000);
-        String paymentInfoJson = objectMapper.writeValueAsString(paymentInfo);
+        String paymentInfoJson = MAPPER.writeValueAsString(paymentInfo);
 
         server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))
@@ -55,9 +57,8 @@ public class PaymentClientControllerTest {
     @ValueSource(strings = {"INVALID_API_KEY", "UNAUTHORIZED_KEY", "INCORRECT_BASIC_AUTH_FORMAT"})
     void 필터링된_예외를_발생시킨다(String code) throws Exception {
         // given
-        ObjectMapper objectMapper = new ObjectMapper();
         Error error = new Error(code, "Empty");
-        String errorJson = objectMapper.writeValueAsString(error);
+        String errorJson = MAPPER.writeValueAsString(error);
 
         server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))
