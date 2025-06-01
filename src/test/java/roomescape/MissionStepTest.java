@@ -20,11 +20,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.global.auth.dto.CheckLoginResponse;
 import roomescape.global.auth.dto.LoginRequest;
 import roomescape.member.dto.request.SignupRequest;
@@ -43,7 +43,7 @@ import roomescape.reservation.fixture.TestFixture;
 })
 public class MissionStepTest {
 
-    @MockBean
+    @MockitoBean
     private TossApiClient tossApiClient;
 
     @BeforeEach
@@ -56,7 +56,7 @@ public class MissionStepTest {
                 "DONE",
                 "2025-05-28T20:48:23+09:00"
         );
-        when(tossApiClient.authPayment(any(), any(), any(), any())).thenReturn(mockResponse);
+        when(tossApiClient.authPayment(any())).thenReturn(mockResponse);
     }
 
     private static final String USER_EMAIL = "user@gmail.com";
