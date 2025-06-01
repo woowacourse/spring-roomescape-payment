@@ -1,14 +1,11 @@
 package roomescape.presentation;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import roomescape.config.paymentResponseErrorHandler;
 import roomescape.domain.PaymentInfo;
 import roomescape.dto.PaymentRequest;
-import roomescape.exception.FilteredPaymentException;
-import roomescape.exception.PaymentException;
 
 @Component
 public class PaymentClientController {
@@ -17,9 +14,12 @@ public class PaymentClientController {
             "INCORRECT_BASIC_AUTH_FORMAT");
 
     private final RestClient restClient;
+    private final paymentResponseErrorHandler paymentResponseErrorHandler;
 
-    public PaymentClientController(final RestClient restClient) {
+    public PaymentClientController(final RestClient restClient,
+                                   final paymentResponseErrorHandler paymentResponseErrorHandler) {
         this.restClient = restClient;
+        this.paymentResponseErrorHandler = paymentResponseErrorHandler;
     }
 
     public PaymentInfo postPaymentInfo(PaymentRequest paymentRequest) {
@@ -28,16 +28,9 @@ public class PaymentClientController {
                 .body(paymentRequest)
                 .retrieve()
                 .onStatus(status ->
-                        status.is4xxClientError() || status.is5xxServerError(), (request, response) -> {
-                    ObjectMapper objectMapper = new ObjectMapper();
-                    JsonNode node = objectMapper.readTree(response.getBody());
-                    String message = node.get("message").asText();
-                    String code = node.get("code").asText();
-                    if (CODES.contains(code)) {
-                        throw new FilteredPaymentException();
-                    }
-                    throw new PaymentException(message, response.getStatusCode());
-                })
+                                status.is4xxClientError() || status.is5xxServerError(),
+                        (request, response) -> paymentResponseErrorHandler.handleError(response,
+                                response.getStatusCode()))
                 .body(PaymentInfo.class);
     }
 }

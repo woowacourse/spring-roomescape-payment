@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
+import roomescape.config.paymentResponseErrorHandler;
 import roomescape.domain.PaymentInfo;
 import roomescape.dto.PaymentRequest;
 import roomescape.exception.FilteredPaymentException;
@@ -27,9 +28,12 @@ public class PaymentClientControllerTest {
     private final RestClient.Builder testBuilder = RestClient.builder()
             .baseUrl("https://api.tosspayments.com")
             .defaultHeader("Authorization", String.format("%s %s", "Basic", Base64.getEncoder()));
+    
+    private final paymentResponseErrorHandler paymentResponseErrorHandler = new paymentResponseErrorHandler();
 
     private MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
-    private PaymentClientController clientController = new PaymentClientController(testBuilder.build());
+    private PaymentClientController clientController = new PaymentClientController(testBuilder.build(),
+            paymentResponseErrorHandler);
 
     @Test
     void 결제_요청_응답을_확인한다() throws Exception {
