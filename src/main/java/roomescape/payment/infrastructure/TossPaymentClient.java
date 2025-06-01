@@ -4,7 +4,9 @@ import static org.springframework.http.HttpStatus.GATEWAY_TIMEOUT;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
+import java.net.SocketTimeoutException;
 import java.util.Base64;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -14,6 +16,7 @@ import roomescape.exception.payment.PaymentException;
 import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.domain.PaymentInfo;
 
+@Slf4j
 public class TossPaymentClient implements PaymentClient {
 
     @Value("${toss.confirm-url}")
@@ -52,8 +55,16 @@ public class TossPaymentClient implements PaymentClient {
                     })
                     .toBodilessEntity();
         } catch (ResourceAccessException e) {
-            throw new PaymentException(GATEWAY_TIMEOUT, "결제 API가 응답하지 않습니다.");
-        } catch (Exception e) {
+            log.warn("결제 API 연결 실패: {}", e.getMessage(), e);
+
+            Throwable rootCause = e.getCause();
+            if (rootCause instanceof SocketTimeoutException) {
+                throw new PaymentException(GATEWAY_TIMEOUT, "결제 처리 중 지연이 발생했습니다. 잠시 후 다시 시도해주세요.");
+            }
+
+            throw new PaymentException(HttpStatus.BAD_GATEWAY, "결제 서비스에 일시적인 문제가 발생했습니다.");
+        }
+        catch (Exception e) {
             throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 과정중 서버에 문제가 생겼습니다. 고객센터에게 문의하세요");
         }
     }
