@@ -5,6 +5,7 @@ import static org.springframework.http.HttpStatus.GATEWAY_TIMEOUT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
 import java.util.Base64;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.ResourceAccessException;
@@ -15,8 +16,10 @@ import roomescape.payment.domain.PaymentInfo;
 
 public class TossPaymentClient implements PaymentClient {
 
-    private static final String CONFIRM_URL = "https://api.tosspayments.com/v1/payments/confirm";
-    private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+    @Value("${toss.confirm-url}")
+    private String confrimUrl;
+    @Value("${toss.secret-key}")
+    private String secretKey;
 
     private final RestClient restClient;
 
@@ -32,7 +35,7 @@ public class TossPaymentClient implements PaymentClient {
 
         try {
             restClient.post()
-                    .uri(CONFIRM_URL)
+                    .uri(confrimUrl)
                     .header("Authorization", encodedSecretKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(request)
@@ -55,7 +58,7 @@ public class TossPaymentClient implements PaymentClient {
 
     private String getEncodedSecretKey() {
         return "Basic " + Base64.getEncoder()
-                .encodeToString((SECRET_KEY + ":").getBytes());
+                .encodeToString((secretKey + ":").getBytes());
     }
 }
 

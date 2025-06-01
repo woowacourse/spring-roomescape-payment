@@ -26,3 +26,8 @@ security:
 logging:
   level:
     org.hibernate.SQL: debug
+
+# application.yml
+toss:
+  confirm-url: https://api.tosspayments.com/v1/payments/confirm
+  secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
