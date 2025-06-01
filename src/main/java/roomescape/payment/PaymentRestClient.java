@@ -36,8 +36,8 @@ public class PaymentRestClient implements PaymentClient {
 
     private RestClient initRestClient() {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(Duration.ofSeconds(1));
-        requestFactory.setReadTimeout(Duration.ofSeconds(2));
+        requestFactory.setConnectTimeout(Duration.ofSeconds(5));
+        requestFactory.setReadTimeout(Duration.ofSeconds(45));
         return RestClient.builder()
                 .baseUrl(BASE_URL)
                 .defaultHeader(AUTH_HEADER, getEncodedKey())
