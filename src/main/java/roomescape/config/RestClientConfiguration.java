@@ -9,11 +9,22 @@ import org.springframework.web.client.RestClient.Builder;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 import roomescape.service.PaymentClientService;
+import roomescape.util.AuthorizationHeaderProvider;
 
 @Configuration
 public class RestClientConfiguration {
-    @Value("${toss.base-url}")
-    private String baseUrl;
+
+    private final String baseUrl;
+    private final String tokenValue;
+    private final AuthorizationHeaderProvider authProvider;
+
+    public RestClientConfiguration(@Value("${toss.base-url}") String baseUrl,
+                                   @Value("${toss.secret-key}") String tokenValue,
+                                   AuthorizationHeaderProvider authProvider) {
+        this.baseUrl = baseUrl;
+        this.tokenValue = tokenValue;
+        this.authProvider = authProvider;
+    }
 
     @Bean
     public RestClient.Builder restClientBuilder() {
@@ -21,9 +32,12 @@ public class RestClientConfiguration {
         clientFactory.setConnectTimeout(1_200);
         clientFactory.setReadTimeout(6_000);
 
+        String authorizationHeader = authProvider.provide(tokenValue);
+
         return RestClient.builder()
                 .requestFactory(clientFactory)
-                .baseUrl(baseUrl);
+                .baseUrl(baseUrl)
+                .defaultHeader("Authorization", authorizationHeader);
     }
 
     @Bean

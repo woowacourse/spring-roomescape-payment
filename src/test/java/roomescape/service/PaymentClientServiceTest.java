@@ -53,7 +53,7 @@ class PaymentClientServiceTest {
 
         // when & then
         var paymentConfirmRequest = new PaymentConfirmRequest("orderId", 50000, "paymentKey", "TOSS");
-        assertThatThrownBy(() -> paymentClientService.confirm("token", paymentConfirmRequest))
+        assertThatThrownBy(() -> paymentClientService.confirm(paymentConfirmRequest))
                 .hasCauseInstanceOf(SocketTimeoutException.class);
     }
 }
