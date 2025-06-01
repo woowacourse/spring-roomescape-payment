@@ -19,7 +19,6 @@ public class TossPaymentClientConfig {
 
     @Bean
     public RestClient tossRestClient() {
-//        String secretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
         String encodedAuth = "Basic " + Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
 
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
