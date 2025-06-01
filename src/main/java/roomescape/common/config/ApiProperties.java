@@ -1,12 +1,12 @@
 package roomescape.common.config;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
+@AllArgsConstructor
 public class ApiProperties {
-    private String baseUrl;
-    private int connectTimeout;
-    private int readTimeout;
+    private final String baseUrl;
+    private final int connectTimeout;
+    private final int readTimeout;
 }
