@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ApiProperties {
+public abstract class ApiProperties {
     private String baseUrl;
     private String secretKey;
     private int connectTimeout;

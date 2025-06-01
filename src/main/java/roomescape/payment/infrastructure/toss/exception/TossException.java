@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public class TossException extends RuntimeException {
+public abstract class TossException extends RuntimeException {
     private final HttpStatus status;
     private final String message;
 
