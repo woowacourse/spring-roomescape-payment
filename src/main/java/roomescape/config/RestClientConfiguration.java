@@ -18,8 +18,8 @@ public class RestClientConfiguration {
     @Bean
     public RestClient.Builder restClientBuilder() {
         var clientFactory = new HttpComponentsClientHttpRequestFactory();
-        clientFactory.setConnectTimeout(5000);
-        clientFactory.setReadTimeout(5000);
+        clientFactory.setConnectTimeout(1_200);
+        clientFactory.setReadTimeout(30_000);
 
         return RestClient.builder()
                 .requestFactory(clientFactory)
