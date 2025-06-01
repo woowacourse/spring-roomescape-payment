@@ -6,13 +6,9 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.jdbc.Sql;
 import roomescape.IntegrationTest;
+import roomescape.TestFixture;
 
-@Sql("/member.sql")
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 class MemberControllerTest extends IntegrationTest {
 
     @Test
@@ -31,6 +27,11 @@ class MemberControllerTest extends IntegrationTest {
 
     @Test
     void 모든_유저_조회() {
+        // given
+        dbHelper.insertMember(TestFixture.createMember("멍구", "test1@email.com", "1234"));
+        dbHelper.insertMember(TestFixture.createMember("새로이", "test2@email.com", "1234"));
+
+        // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .when().get("/members")

@@ -3,25 +3,28 @@ package roomescape.payment.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static roomescape.TestFixture.DEFAULT_DATE;
+import static roomescape.TestFixture.createClaims;
+import static roomescape.TestFixture.createDefaultMember_1;
+import static roomescape.TestFixture.createDefaultTheme;
+import static roomescape.TestFixture.createTimeAt_10;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.contract.spec.internal.HttpStatus;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.jdbc.Sql;
 import roomescape.IntegrationTest;
 import roomescape.auth.infrastructure.jwt.JwtTokenProvider;
+import roomescape.member.domain.Member;
 import roomescape.payment.dto.ReservationPaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.payment.infrastructure.TossRestClient;
+import roomescape.reservationtime.domain.ReservationTime;
+import roomescape.theme.domain.Theme;
 
-@Sql("/data.sql")
 @TestPropertySource(properties = "rest-client.toss-payment.base-url=http://localhost:8089")
 class PaymentControllerTest extends IntegrationTest {
 
@@ -33,27 +36,27 @@ class PaymentControllerTest extends IntegrationTest {
 
     @Test
     void 결제_정상_승인시_payment_저장_및_reservation_저장() {
-        // given - data.sql
-        LocalDate date = LocalDate.of(2999,5,5);
-        Long themeId = 1L;
-        Long timeId = 1L;
+        // given
+        ReservationTime reservationTime = createTimeAt_10();
+        Theme theme = createDefaultTheme();
+        dbHelper.insertTime(reservationTime);
+        dbHelper.insertTheme(theme);
+
         String paymentKey = "paymentKey";
         String orderId = "orderId";
         Long amount = 1000L;
         String paymentType = "paymentType";
-        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(date, themeId, timeId,
+        ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(DEFAULT_DATE, theme.getId(), reservationTime.getId(),
                 paymentKey, orderId, amount, paymentType);
 
-        Claims claims = Jwts.claims()
-                .subject("1")
-                .build();
-        String token = jwtTokenProvider.createToken(claims);
+        Member member = createDefaultMember_1();
+        dbHelper.insertMember(member);
+        String token = jwtTokenProvider.createToken(createClaims(member));
 
         given(tossRestClient.confirm(any()))
                 .willReturn(mock(TossPaymentResponse.class));
 
-        // when
-        // then
+        // when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", token)

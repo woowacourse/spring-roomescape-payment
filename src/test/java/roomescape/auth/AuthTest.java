@@ -1,6 +1,9 @@
 package roomescape.auth;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static roomescape.TestFixture.createAdminMember;
+import static roomescape.TestFixture.createClaims;
+import static roomescape.TestFixture.createMember;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -8,18 +11,23 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.IntegrationTest;
+import roomescape.auth.infrastructure.jwt.JwtTokenProvider;
+import roomescape.member.domain.Member;
 
-@Sql("/data.sql")
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 class AuthTest extends IntegrationTest {
+
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
 
     @Test
     void 로그인_요청시_set_cookie로_토큰을_받을_수_있다() {
-        Map<String, String> loginParams = Map.of("email", "admin@naver.com", "password", "1234");
+        // given
+        dbHelper.insertMember(createMember("멍구", "test@naver.com", "1234"));
+
+        // when
+        Map<String, String> loginParams = Map.of("email", "test@naver.com", "password", "1234");
         ExtractableResponse<Response> response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(loginParams)
@@ -45,18 +53,12 @@ class AuthTest extends IntegrationTest {
     @Test
     void 어드민_회원이_어드민_페이지에_접근_시_통과() {
         // given
-        Map<String, String> adminUser = Map.of("email", "admin@naver.com", "password", "1234");
-        String token = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(adminUser)
-                .when().post("/login")
-                .then().log().all()
-                .statusCode(200)
-                .extract()
-                .cookie("token");
+        Member adminMember = createAdminMember("관리자", "admin@naver.com", "1234");
+        dbHelper.insertMember(adminMember);
 
-        // when
-        // then
+        String token = jwtTokenProvider.createToken(createClaims(adminMember));
+
+        // when & then
         RestAssured.given().log().all()
                 .cookie("token", token)
                 .when().get("/admin")
@@ -65,20 +67,14 @@ class AuthTest extends IntegrationTest {
     }
 
     @Test
-    void 이단계_어드민_예약페이지_접근() {
+    void 어드민_예약페이지_접근_통과() {
         // given
-        Map<String, String> adminUser = Map.of("email", "admin@naver.com", "password", "1234");
-        String token = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(adminUser)
-                .when().post("/login")
-                .then().log().all()
-                .statusCode(200)
-                .extract()
-                .cookie("token");
+        Member adminMember = createAdminMember("관리자", "admin@naver.com", "1234");
+        dbHelper.insertMember(adminMember);
 
-        // then
-        // when
+        String token = jwtTokenProvider.createToken(createClaims(adminMember));
+
+        // when & then
         RestAssured.given().log().all()
                 .cookie("token", token)
                 .when().get("/admin/reservation")
@@ -89,18 +85,12 @@ class AuthTest extends IntegrationTest {
     @Test
     void 일반_회원이_어드민_페이지에_접근_시_예외_발생() {
         // given
-        Map<String, String> normalUser = Map.of("email", "member@naver.com", "password", "1234");
-        String token = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(normalUser)
-                .when().post("/login")
-                .then().log().all()
-                .statusCode(200)
-                .extract()
-                .cookie("token");
+        Member normalMember = createMember("멍구", "test@naver.com", "1234");
+        dbHelper.insertMember(normalMember);
 
-        // when
-        // then
+        String token = jwtTokenProvider.createToken(createClaims(normalMember));
+
+        // when & then
         RestAssured.given().log().all()
                 .cookie("token", token)
                 .when().get("/admin")
@@ -111,18 +101,12 @@ class AuthTest extends IntegrationTest {
     @Test
     void 정상적으로_로그아웃() {
         // given
-        Map<String, String> normalUser = Map.of("email", "member@naver.com", "password", "1234");
-        final String token = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(normalUser)
-                .when().post("/login")
-                .then().log().all()
-                .statusCode(200)
-                .extract()
-                .cookie("token");
+        Member normalMember = createMember("멍구", "test@naver.com", "1234");
+        dbHelper.insertMember(normalMember);
 
-        // when
-        // then
+        String token = jwtTokenProvider.createToken(createClaims(normalMember));
+
+        // when & then
         RestAssured.given().log().all()
                 .cookie("token", token)
                 .when().post("/logout")
@@ -131,20 +115,14 @@ class AuthTest extends IntegrationTest {
     }
 
     @Test
-    void 쿠키가_존재_한다면_통과() {
+    void 쿠키가_존재_한다면_로그인체크_가능() {
         // given
-        Map<String, String> normalUser = Map.of("email", "member@naver.com", "password", "1234");
-        final String token = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(normalUser)
-                .when().post("/login")
-                .then().log().all()
-                .statusCode(200)
-                .extract()
-                .cookie("token");
+        Member normalMember = createMember("멍구", "test@naver.com", "1234");
+        dbHelper.insertMember(normalMember);
 
-        // when
-        // then
+        String token = jwtTokenProvider.createToken(createClaims(normalMember));
+
+        // when & then
         RestAssured.given().log().all()
                 .cookie("token", token)
                 .when().get("/login/check")

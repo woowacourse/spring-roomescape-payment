@@ -1,117 +1,121 @@
 package roomescape.reservationtime.controller;
 
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static roomescape.TestFixture.DEFAULT_DATE;
+import static roomescape.TestFixture.createAdminMember;
+import static roomescape.TestFixture.createClaims;
+import static roomescape.TestFixture.createDefaultTheme;
+import static roomescape.TestFixture.createReservationOf;
+import static roomescape.TestFixture.createTimeAt;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.util.Map;
+import java.time.LocalTime;
+import java.util.List;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.beans.factory.annotation.Autowired;
 import roomescape.IntegrationTest;
+import roomescape.auth.infrastructure.jwt.JwtTokenProvider;
+import roomescape.member.domain.Member;
+import roomescape.reservationtime.domain.ReservationTime;
+import roomescape.reservationtime.dto.ReservationTimeRequest;
+import roomescape.reservationtime.dto.ReservationTimeResponse;
 
-@Sql({"/data.sql"})
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 class ReservationTimeControllerTest extends IntegrationTest {
+
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
 
     @Test
     void 예약_시간_조회() {
-        Map<String, String> adminUser = Map.of("email", "admin@naver.com", "password", "1234");
+        // given
+        Member adminMember = createAdminMember("관리자", "admin@naver.com", "1234");
+        dbHelper.insertMember(adminMember);
+        String token = jwtTokenProvider.createToken(createClaims(adminMember));
 
-        String token = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(adminUser)
-                .when().post("/login")
-                .then().log().all()
-                .statusCode(200)
-                .extract()
-                .cookie("token");
+        dbHelper.insertTime(createTimeAt(LocalTime.of(10, 0)));
+        dbHelper.insertTime(createTimeAt(LocalTime.of(11, 0)));
 
-        RestAssured.given().log().all()
+        // when & then
+        List<ReservationTimeResponse> responses = RestAssured.given().log().all()
                 .cookie("token", token)
                 .when().get("/times")
                 .then().log().all()
                 .statusCode(200)
-                .body("size()", is(2));
+                .extract().jsonPath().getList(".", ReservationTimeResponse.class);
+
+        SoftAssertions.assertSoftly(softly -> {
+            assertThat(responses).hasSize(2);
+            assertThat(responses)
+                    .extracting("startAt")
+                    .containsExactly(
+                            LocalTime.of(10, 0),
+                            LocalTime.of(11, 0)
+                    );
+        });
     }
 
 
     @Test
     void 예약_시간_저장() {
-        Map<String, String> adminUser = Map.of("email", "admin@naver.com", "password", "1234");
-        Map<String, String> time = Map.of("startAt", "13:00");
+        // given
+        Member adminMember = createAdminMember("관리자", "admin@naver.com", "1234");
+        dbHelper.insertMember(adminMember);
+        String token = jwtTokenProvider.createToken(createClaims(adminMember));
 
-        String token = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(adminUser)
-                .when().post("/login")
-                .then().log().all()
-                .statusCode(200)
-                .extract()
-                .cookie("token");
+        ReservationTimeRequest timeRequest = new ReservationTimeRequest(LocalTime.of(10, 0));
 
-        RestAssured.given().log().all()
+        // when & then
+        ReservationTimeResponse timeResponse = RestAssured.given().log().all()
                 .cookie("token", token)
                 .contentType(ContentType.JSON)
-                .body(time)
+                .body(timeRequest)
                 .when().post("/times")
                 .then().log().all()
-                .statusCode(201);
+                .statusCode(201)
+                .extract().as(ReservationTimeResponse.class);
+
+        assertThat(timeResponse.startAt()).isEqualTo(LocalTime.of(10, 0));
     }
 
     @Test
-    @Sql({"/reset.sql", "/member.sql", "/time.sql"})
     void 예약_시간_삭제() {
-        Map<String, String> adminUser = Map.of("email", "admin@naver.com", "password", "1234");
+        // given
+        Member adminMember = createAdminMember("관리자", "admin@naver.com", "1234");
+        dbHelper.insertMember(adminMember);
+        String token = jwtTokenProvider.createToken(createClaims(adminMember));
 
-        String token = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(adminUser)
-                .when().post("/login")
-                .then().log().all()
-                .statusCode(200)
-                .extract()
-                .cookie("token");
+        ReservationTime reservationTime = createTimeAt(LocalTime.of(10, 0));
+        dbHelper.insertTime(reservationTime);
 
+        // when & then
         RestAssured.given().log().all()
                 .cookie("token", token)
-                .when().get("/times")
-                .then().log().all()
-                .statusCode(200)
-                .body("size()", is(2));
-
-        RestAssured.given().log().all()
-                .cookie("token", token)
-                .when().delete("/times/1")
+                .when().delete("/times/" + reservationTime.getId())
                 .then().log().all()
                 .statusCode(204);
     }
 
     @Test
     void 예약_시간이_포함된_예약이_있다면_삭제시도_시_예외_발생() {
-        Map<String, String> adminUser = Map.of("email", "admin@naver.com", "password", "1234");
+         // given
+        Member adminMember = createAdminMember("관리자", "admin@naver.com", "1234");
+        dbHelper.insertMember(adminMember);
+        String token = jwtTokenProvider.createToken(createClaims(adminMember));
 
-        String token = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(adminUser)
-                .when().post("/login")
-                .then().log().all()
-                .statusCode(200)
-                .extract()
-                .cookie("token");
+        ReservationTime reservationTime = createTimeAt(LocalTime.of(10, 0));
+        dbHelper.insertTime(reservationTime);
 
+        dbHelper.insertReservation(createReservationOf(adminMember, DEFAULT_DATE, reservationTime, createDefaultTheme()));
+
+        // when & the
         RestAssured.given().log().all()
                 .cookie("token", token)
-                .when().get("/times")
+                .when().delete("/times/" + reservationTime.getId())
                 .then().log().all()
-                .statusCode(200)
-                .body("size()", is(2));
-
-        RestAssured.given().log().all()
-                .cookie("token", token)
-                .when().delete("/times/1")
-                .then().log().all()
-                .statusCode(400);
+                .statusCode(400)
+                .body("detail", equalTo("해당 시간으로 예약된 건이 존재합니다."));
     }
 }
