@@ -59,8 +59,16 @@ public class ReservationService {
         this.paymentService = paymentService;
     }
 
-    @Transactional
     public ReservationResponse createReservation(final ReservationRequest request, final Long memberId) {
+        Reservation reservation = saveReservation(request, memberId);
+        PaymentRequest paymentRequest = new PaymentRequest(request.paymentKey(), request.orderId(), request.amount());
+        paymentService.confirmPayment(paymentRequest);
+        return ReservationResponse.from(reservation);
+    }
+
+
+    @Transactional
+    public Reservation saveReservation(final ReservationRequest request, final Long memberId) {
         ReservationTime time = reservationTimeRepository.findById(request.timeId())
             .orElseThrow(() -> new ReservationTimeException("예약 시간을 찾을 수 없습니다."));
         Theme theme = themeRepository.findById(request.themeId())
@@ -74,12 +82,7 @@ public class ReservationService {
         Reservation reservation = Reservation.createWithoutId(request.date(), time, theme, member, Status.RESERVED);
         validateCanReserveDateTime(reservation, dateTime.now());
 
-        PaymentRequest paymentRequest = new PaymentRequest(request.paymentKey(), request.orderId(), request.amount());
-        paymentService.confirmPayment(paymentRequest);
-
-        reservation = reservationRepository.save(reservation);
-
-        return ReservationResponse.from(reservation);
+        return reservationRepository.save(reservation);
     }
 
     @Transactional
