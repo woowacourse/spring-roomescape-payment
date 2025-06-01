@@ -18,6 +18,7 @@ import roomescape.domain.payment.PaymentFailCode;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.exception.PaymentFailedException;
+import roomescape.infrastructure.TossPaymentProviderConfig.TossApiProperties;
 
 @RequiredArgsConstructor
 @Component
@@ -25,15 +26,13 @@ public class TossPaymentProvider implements PaymentProvider {
 
     private final Logger logger = LoggerFactory.getLogger(TossPaymentProvider.class);
 
-    private static final String CONFIRM_URI = "/v1/payments/confirm";
-    private static final int MAX_RETRY_COUNT = 3;
-
     private final RestTemplate restTemplate;
+    private final TossApiProperties properties;
 
     public PaymentConfirmation confirm(final PaymentRequest request) {
-        for (int tried = 1; tried <= MAX_RETRY_COUNT; tried++) {
+        for (int tried = 1; tried <= properties.connectionTryCount(); tried++) {
             try {
-                var successResponse = restTemplate.postForEntity(CONFIRM_URI, request, PaymentConfirmation.class);
+                var successResponse = restTemplate.postForEntity(properties.confirmUri(), request, PaymentConfirmation.class);
                 return successResponse.getBody();
 
             } catch (RestClientResponseException e) {

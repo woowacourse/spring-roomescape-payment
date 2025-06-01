@@ -30,6 +30,7 @@ import roomescape.domain.payment.PaymentFailCode;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.exception.PaymentFailedException;
+import roomescape.infrastructure.TossPaymentProviderConfig.TossApiProperties;
 
 @RestClientTest(PaymentProvider.class)
 @Import(TossPaymentProviderConfig.class)
@@ -39,13 +40,15 @@ class TossPaymentProviderTest {
 
     @Autowired
     private RestTemplate restTemplate;
+    @Autowired
+    private TossApiProperties tossApiProperties;
 
     private MockRestServiceServer server;
     private PaymentProvider paymentProvider;
 
     @BeforeEach
     public void setup() {
-        paymentProvider = new TossPaymentProvider(restTemplate);
+        paymentProvider = new TossPaymentProvider(restTemplate, tossApiProperties);
         server = MockRestServiceServer.createServer(restTemplate);
     }
 
