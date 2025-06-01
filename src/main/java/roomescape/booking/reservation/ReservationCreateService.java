@@ -34,6 +34,7 @@ public class ReservationCreateService {
         final Member member = memberService.getByEmail(loginMember.email());
         final Schedule schedule = scheduleService.getByDateAndTimeIdAndThemeId(request.date(), request.timeId(), request.themeId());
         order.pay(request.amount(), member, schedule);
+        order.updatePaymentKey(request.paymentKey());
 
         PaymentConfirmRequest paymentRequest = new PaymentConfirmRequest(request.orderId(), request.amount(), request.paymentKey());
         tossPaymentClient.confirm(paymentRequest);
