@@ -17,20 +17,6 @@ public record MyPageReservationResponse(
         String paymentKey,
         Integer amount
 ) {
-
-    public static MyPageReservationResponse from(Reservation reservation, int priority, Payment payment) {
-        return new MyPageReservationResponse(
-                reservation.getId(),
-                reservation.getReservationItem().getTheme().getName(),
-                reservation.getReservationItem().getDate(),
-                reservation.getReservationItem().getTime().getStartAt(),
-                reservation.getReservationStatus().description,
-                priority,
-                payment.getPaymentKey(),
-                payment.getAmount()
-        );
-    }
-
     public static MyPageReservationResponse accepted(final Reservation reservation, final Payment payment) {
         ReservationItem item = reservation.getReservationItem();
 
