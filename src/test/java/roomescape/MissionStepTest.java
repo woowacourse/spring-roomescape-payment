@@ -29,7 +29,7 @@ import roomescape.global.auth.dto.CheckLoginResponse;
 import roomescape.global.auth.dto.LoginRequest;
 import roomescape.member.dto.request.SignupRequest;
 import roomescape.member.dto.response.MemberResponse;
-import roomescape.payment.dto.response.PaymentResponse;
+import roomescape.payment.infrastructure.dto.response.PaymentResponse;
 import roomescape.payment.infrastructure.TossApiClient;
 import roomescape.reservation.controller.ReservationController;
 import roomescape.reservation.dto.response.MyReservationResponse;

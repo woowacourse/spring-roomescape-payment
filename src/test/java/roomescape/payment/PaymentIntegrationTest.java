@@ -19,7 +19,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.global.auth.dto.LoginRequest;
-import roomescape.payment.dto.request.PaymentCommand;
+import roomescape.payment.infrastructure.dto.reqeust.PaymentCommand;
 import roomescape.payment.exception.TossPaymentClientException;
 import roomescape.payment.exception.TossPaymentServerException;
 import roomescape.payment.infrastructure.TossApiClient;

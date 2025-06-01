@@ -1,4 +1,4 @@
-package roomescape.payment.dto.request;
+package roomescape.payment.infrastructure.dto.reqeust;
 
 public record TossPaymentRequest(String paymentKey, String orderId, Integer amount, String paymentType) {
     public TossPaymentRequest {
