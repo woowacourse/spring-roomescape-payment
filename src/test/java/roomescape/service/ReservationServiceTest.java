@@ -475,6 +475,7 @@ class ReservationServiceTest extends ServiceTest {
         ReservationItem item = insertReservationItem(DATE1, time, theme);
         Reservation acceptedReservation = insertReservation(member1, item, ReservationStatus.ACCEPTED);
         insertReservation(member2, item, ReservationStatus.PENDING);
+        insertPayment("paymentKey", 10000, acceptedReservation.getId());
 
         // when
         List<MyPageReservationResponse> myReservations = reservationService.getReservationsByMemberId(member1.getId());

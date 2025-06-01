@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
@@ -15,6 +16,7 @@ import roomescape.dto.response.MyPageReservationResponse;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.WaitingReservationResponse;
 import roomescape.service.member.MemberService;
+import roomescape.service.payment.PaymentService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,6 +31,7 @@ public class ReservationService {
     private final MemberService memberService;
     private final ReservationThemeService reservationThemeService;
     private final ReservationTimeService reservationTimeService;
+    private final PaymentService paymentService;
 
     @Transactional
     public ReservationResponse addReservation(final CreateReservationRequest request) {
@@ -127,10 +130,13 @@ public class ReservationService {
         List<Reservation> myReservations = reservationRepository.findByMemberId(member.getId());
         return myReservations.stream()
                 .map(reservation -> {
-                            final int priority = calculatePriority(reservation);
-                            return MyPageReservationResponse.from(reservation, priority);
-                        }
-                )
+                    if (reservation.getReservationStatus() == ReservationStatus.ACCEPTED) {
+                        Payment payment = paymentService.getByReservationId(reservation.getId());
+                        return MyPageReservationResponse.accepted(reservation, payment);
+                    }
+                    final int priority = calculatePriority(reservation);
+                    return MyPageReservationResponse.pending(reservation, priority);
+                })
                 .toList();
     }
 

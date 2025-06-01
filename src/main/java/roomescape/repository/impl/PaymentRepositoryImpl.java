@@ -6,6 +6,8 @@ import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
 import roomescape.repository.jpa.PaymentJpaRepository;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class PaymentRepositoryImpl implements PaymentRepository {
@@ -15,5 +17,10 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     @Override
     public void save(Payment payment) {
         repository.save(payment);
+    }
+
+    @Override
+    public Optional<Payment> findByReservationId(final Long reservationId) {
+        return repository.findByReservationId(reservationId);
     }
 }
