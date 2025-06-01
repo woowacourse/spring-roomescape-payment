@@ -5,11 +5,11 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
+@Getter
 public class PaymentException extends RuntimeException {
 
     private static final List<String> CODE_BLACKLIST = List.of("UNAUTHORIZED_KEY", "INCORRECT_BASIC_AUTH_FORMAT");
 
-    @Getter
     private final HttpStatus status;
     private final String message;
 
@@ -28,10 +28,5 @@ public class PaymentException extends RuntimeException {
             return "오류가 발생하였습니다. 고객센터에 문의해주세요";
         }
         return message;
-    }
-
-    @Override
-    public String getMessage() {
-        return this.message;
     }
 }
