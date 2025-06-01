@@ -2,8 +2,8 @@ package roomescape.reservation.infrastructure;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.reservation.domain.Reservation;
 
@@ -27,8 +27,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
               )             
             ORDER BY rs.id, r.createdAt asc 
             """)
-    List<Reservation> findByThemeIdAndDateBetweenAndReservationMemberId(Long themeId, LocalDate startDate,
-                                                                        LocalDate endDate, Long memberId);
+    List<Reservation> findFirstByCriteria(Long themeId, LocalDate startDate,
+                                          LocalDate endDate, Long memberId);
 
     @Query("""
             SELECT r 
@@ -38,15 +38,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             JOIN FETCH rs.theme th                   
             WHERE r.member.id = :memberId
             """)
-    List<Reservation> findByReservationMemberId(Long memberId);
+    List<Reservation> findByMemberId(Long memberId);
 
-    @Modifying
-    @Query("""
-            DELETE FROM Reservation r 
-            WHERE r.reservationSlot.id = :reservationId
-            AND r.member.id = :memberId
-            """)
-    void deleteByReservationIdAndMemberId(Long reservationId, Long memberId);
+    void deleteByReservationSlotIdAndMemberId(Long reservationSlotId, Long memberId);
 
     boolean existsByReservationSlotIdAndMemberId(Long reservationSlotId, Long memberId);
 
@@ -58,10 +52,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             JOIN FETCH rs.theme th      
             WHERE r.id NOT IN (
             SELECT MIN(r2.id)
-            FROM Reservation r2
-            GROUP BY r2.reservationSlot.id
+                FROM Reservation r2
+                GROUP BY r2.reservationSlot.id
             )             
             ORDER BY rs.id, r.createdAt asc 
             """)
     List<Reservation> findAllWaitingReservations();
+
+    Optional<Reservation> findByReservationSlotIdAndMemberId(Long reservationId, Long memberId);
 }

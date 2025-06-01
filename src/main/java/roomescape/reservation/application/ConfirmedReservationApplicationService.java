@@ -2,7 +2,6 @@ package roomescape.reservation.application;
 
 import java.util.List;
 import org.springframework.stereotype.Service;
-import roomescape.common.security.dto.request.MemberInfo;
 import roomescape.member.application.MemberDataService;
 import roomescape.member.domain.Member;
 import roomescape.reservation.application.dto.request.ConfirmedReservationByCriteriaWebRequest;
@@ -40,7 +39,7 @@ public class ConfirmedReservationApplicationService {
     }
 
     public ConfirmedReservationWebResponse create(final ConfirmedReservationCreateRequest request) {
-        reservationSlotDataService.validateReservationSlotDoesNotExists(request.date(), request.timeId(),
+        reservationSlotDataService.validateReservationSlotNotExists(request.date(), request.timeId(),
                 request.themeId());
 
         ReservationSlot slot = createReservationSlot(
@@ -54,8 +53,8 @@ public class ConfirmedReservationApplicationService {
 
     public List<ConfirmedReservationWebResponse> findByCriteria(
             final ConfirmedReservationByCriteriaWebRequest request) {
-        List<Reservation> reservations = reservationDataService.findByCriteria(request.themeId(), request.memberId(),
-                request.startDate(), request.endDate());
+        List<Reservation> reservations = reservationDataService.findFirstByCriteria(request.themeId(),
+                request.memberId(), request.startDate(), request.endDate());
         return reservations
                 .stream()
                 .map(Reservation::getReservationSlot)
@@ -70,8 +69,8 @@ public class ConfirmedReservationApplicationService {
 
     public void cancel(final Long reservationId) {
         Reservation reservation = reservationDataService.getById(reservationId);
-        reservationDataService.deleteById(reservationId);
         cleanupEmptyReservationSlot(reservation.getReservationSlot().getId());
+        reservationDataService.deleteById(reservationId);
     }
 
     private ReservationSlot createReservationSlot(final ReservationCreateWebRequest reservationCreateWebRequest) {

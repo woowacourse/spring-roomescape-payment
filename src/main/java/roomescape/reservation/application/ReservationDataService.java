@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.exception.ReservationNotFoundException;
-import roomescape.reservation.exception.ReservationOwnerException;
 import roomescape.reservation.infrastructure.ReservationRepository;
 import roomescape.reservationslot.presentation.dto.response.MyReservationResponse;
 
@@ -24,33 +23,24 @@ public class ReservationDataService {
     }
 
     public List<MyReservationResponse> findMyReservations(final Long memberId) {
-        return reservationRepository.findByReservationMemberId(memberId)
+        return reservationRepository.findByMemberId(memberId)
                 .stream()
                 .map(MyReservationResponse::from)
                 .toList();
-    }
-
-    @Transactional
-    public void deleteByReservationSlotIdAndMemberId(final Long reservationSlotId, final Long memberId) {
-        validateWaitingOwner(reservationSlotId, memberId);
-        reservationRepository.deleteByReservationIdAndMemberId(reservationSlotId, memberId);
-    }
-
-    public void validateWaitingOwner(final Long reservationSlotId, final Long memberId) {
-        boolean doesExists = reservationRepository.existsByReservationSlotIdAndMemberId(reservationSlotId, memberId);
-        if (!doesExists) {
-            throw new ReservationOwnerException("자신의 예약 대기가 아닙니다.");
-        }
     }
 
     public List<Reservation> findAllWaitingReservations() {
         return reservationRepository.findAllWaitingReservations();
     }
 
-    public List<Reservation> findByCriteria(final Long themeId, final Long memberId,
-                                            final LocalDate startDate, final LocalDate endDate) {
-        return reservationRepository.findByThemeIdAndDateBetweenAndReservationMemberId(themeId, startDate, endDate,
-                memberId);
+    public List<Reservation> findFirstByCriteria(final Long themeId, final Long memberId,
+                                                 final LocalDate startDate, final LocalDate endDate) {
+        return reservationRepository.findFirstByCriteria(themeId, startDate, endDate, memberId);
+    }
+
+    public Reservation getByReservationSlotIdAndMemberId(final Long reservationSlotId, final Long memberId) {
+        return reservationRepository.findByReservationSlotIdAndMemberId(reservationSlotId, memberId)
+                .orElseThrow(() -> new ReservationNotFoundException("존재하지 않는 예약입니다."));
     }
 
     public Reservation getById(final Long reservationId) {
@@ -58,7 +48,7 @@ public class ReservationDataService {
                 .orElseThrow(() -> new ReservationNotFoundException("존재하지 않는 예약입니다."));
     }
 
-    public void removeWaitingReservation(final Reservation reservation) {
+    public void cancel(final Reservation reservation) {
         reservationRepository.delete(reservation);
     }
 
@@ -66,7 +56,8 @@ public class ReservationDataService {
         reservationRepository.deleteById(reservationId);
     }
 
-    public boolean existsByReservationSlotIdAndMemberId(final Long reservationSlotId, final Long memberId) {
-        return reservationRepository.existsByReservationSlotIdAndMemberId(reservationSlotId, memberId);
+    @Transactional
+    public void deleteByReservationSlotIdAndMemberId(final Long reservationSlotId, final Long memberId) {
+        reservationRepository.deleteByReservationSlotIdAndMemberId(reservationSlotId, memberId);
     }
 }
