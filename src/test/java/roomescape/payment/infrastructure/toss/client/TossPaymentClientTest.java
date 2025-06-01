@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
+import roomescape.payment.application.dto.PaymentApprovalRequest;
 import roomescape.payment.infrastructure.toss.exception.TossInternalException;
 import roomescape.payment.infrastructure.toss.exception.TossPaymentApprovalFailedException;
 
@@ -43,7 +44,7 @@ class TossPaymentClientTest {
                 .andRespond(withSuccess());
 
         // when & then
-        assertDoesNotThrow(() -> tossPaymentClient.approve(orderId, amount, paymentKey));
+        assertDoesNotThrow(() -> tossPaymentClient.approve(new PaymentApprovalRequest(orderId, amount, paymentKey)));
     }
 
     @DisplayName("결제 승인 API 호출 - 400에러이면서 메세지 노출이 가능한 경우 TossPaymentApprovalFailedException 발생")
@@ -61,7 +62,7 @@ class TossPaymentClientTest {
                 .andRespond(
                         withStatus(HttpStatus.BAD_REQUEST).body(expectedBody).contentType(MediaType.APPLICATION_JSON));
 
-        assertThatCode(() -> tossPaymentClient.approve(orderId, amount, paymentKey))
+        assertThatCode(() -> tossPaymentClient.approve(new PaymentApprovalRequest(orderId, amount, paymentKey)))
                 .isInstanceOf(TossPaymentApprovalFailedException.class);
     }
 
@@ -80,7 +81,7 @@ class TossPaymentClientTest {
                 .andRespond(
                         withStatus(HttpStatus.BAD_REQUEST).body(expectedBody).contentType(MediaType.APPLICATION_JSON));
 
-        assertThatCode(() -> tossPaymentClient.approve(orderId, amount, paymentKey))
+        assertThatCode(() -> tossPaymentClient.approve(new PaymentApprovalRequest(orderId, amount, paymentKey)))
                 .isInstanceOf(TossInternalException.class);
     }
 
@@ -100,7 +101,7 @@ class TossPaymentClientTest {
                         withStatus(HttpStatus.INTERNAL_SERVER_ERROR).body(expectedBody)
                                 .contentType(MediaType.APPLICATION_JSON));
 
-        assertThatCode(() -> tossPaymentClient.approve(orderId, amount, paymentKey))
+        assertThatCode(() -> tossPaymentClient.approve(new PaymentApprovalRequest(orderId, amount, paymentKey)))
                 .isInstanceOf(TossPaymentApprovalFailedException.class);
     }
 

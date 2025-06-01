@@ -1,12 +1,12 @@
 package roomescape.payment.application;
 
 
-import java.math.BigDecimal;
+import roomescape.payment.application.dto.PaymentApprovalRequest;
 
 public class FakePaymentApprovalService implements PaymentApprovalService {
 
     @Override
-    public void approvePayment(String orderId, BigDecimal amount, String paymentKey) {
+    public void approvePayment(PaymentApprovalRequest request) {
         return;
     }
 }
