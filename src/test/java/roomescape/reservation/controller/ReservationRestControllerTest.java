@@ -15,14 +15,15 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.auth.jwt.JwtTokenProvider;
+import roomescape.payment.processor.PaymentConfirmRequest;
+import roomescape.payment.processor.PaymentType;
 import roomescape.payment.processor.toss.TossPaymentConfirmRequest;
-import roomescape.payment.processor.toss.TossPaymentConfirmResponse;
 import roomescape.payment.processor.toss.TossPaymentProcessor;
 import roomescape.reservation.dto.AvailableReservationTimeResponse;
-import roomescape.reservation.dto.TossPaymentRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
@@ -43,10 +44,11 @@ class ReservationRestControllerTest {
     void 요청_형식이_맞지_않아_예약_정보_저장에_실패하는_경우_bad_request를_반환한다() {
         //given
         final Map<String, Object> params = createReservationRequestJsonMap(
-            "2025 04 15",
-            "1",
-            "1",
-            new TossPaymentRequest("paymentKey", "orderId", 10000)
+                "2025 04 15",
+                "1",
+                "1",
+                PaymentType.TOSS,
+                new TossPaymentConfirmRequest(10000, "orderId", "paymentKey")
         );
 
         //when & then
@@ -63,26 +65,28 @@ class ReservationRestControllerTest {
         //given
         final String payload = "wooga@gmail.com";
         final String token = jwtTokenProvider.createToken(payload);
-        final TossPaymentRequest tossPaymentRequest = new TossPaymentRequest("paymentKey", "orderId", 10000);
-        final TossPaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(
-            tossPaymentRequest.amount(),
-            tossPaymentRequest.orderId(),
-            tossPaymentRequest.paymentKey()
-        );
-        final Map<String, Object> params = createReservationRequestJsonMap(
-            "2025-10-15",
-            "1",
-            "1",
-            tossPaymentRequest
+        final PaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(
+                10000,
+                "orderId",
+                "paymentKey"
         );
 
-        setTossPaymentConfirm(tossPaymentConfirmRequest, null);
+        when(tossPaymentProcessor.supports(PaymentType.TOSS)).thenReturn(true);
+        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(null);
+
+        final Map<String, Object> reservationParams = createReservationRequestJsonMap(
+                "2026-04-15",
+                "1",
+                "1",
+                PaymentType.TOSS,
+                tossPaymentConfirmRequest
+        );
 
         //when & then
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
-                .body(params)
+                .body(reservationParams)
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value());
@@ -93,25 +97,27 @@ class ReservationRestControllerTest {
         //given
         final String payload = "wooga@gmail.com";
         final String token = jwtTokenProvider.createToken(payload);
-        final TossPaymentRequest tossPaymentRequest = new TossPaymentRequest("paymentKey", "orderId", 10000);
-        final TossPaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(
-            tossPaymentRequest.amount(),
-            tossPaymentRequest.orderId(),
-            tossPaymentRequest.paymentKey()
-        );
-        final Map<String, Object> params = createReservationRequestJsonMap(
-            "2025-10-15",
-            "1",
-            "1",
-            tossPaymentRequest
+        final PaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(
+                10000,
+                "orderId",
+                "paymentKey"
         );
 
-        setTossPaymentConfirm(tossPaymentConfirmRequest, null);
+        when(tossPaymentProcessor.supports(PaymentType.TOSS)).thenReturn(true);
+        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(null);
+
+        final Map<String, Object> reservationParams = createReservationRequestJsonMap(
+                "2026-04-15",
+                "1",
+                "1",
+                PaymentType.TOSS,
+                tossPaymentConfirmRequest
+        );
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
-                .body(params)
+                .body(reservationParams)
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value());
@@ -137,25 +143,27 @@ class ReservationRestControllerTest {
         //given
         final String payload = "wooga@gmail.com";
         final String token = jwtTokenProvider.createToken(payload);
-        final TossPaymentRequest tossPaymentRequest = new TossPaymentRequest("paymentKey", "orderId", 10000);
-        final TossPaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(
-            tossPaymentRequest.amount(),
-            tossPaymentRequest.orderId(),
-            tossPaymentRequest.paymentKey()
-        );
-        final Map<String, Object> params = createReservationRequestJsonMap(
-            "2025-10-15",
-            "1",
-            "1",
-            tossPaymentRequest
+        final PaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(
+                10000,
+                "orderId",
+                "paymentKey"
         );
 
-        setTossPaymentConfirm(tossPaymentConfirmRequest, null);
+        when(tossPaymentProcessor.supports(PaymentType.TOSS)).thenReturn(true);
+        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(null);
+
+        final Map<String, Object> reservationParams = createReservationRequestJsonMap(
+                "2026-04-15",
+                "1",
+                "1",
+                PaymentType.TOSS,
+                tossPaymentConfirmRequest
+        );
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
-                .body(params)
+                .body(reservationParams)
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value());
@@ -172,25 +180,27 @@ class ReservationRestControllerTest {
         //given
         final String payload = "wooga@gmail.com";
         final String token = jwtTokenProvider.createToken(payload);
-        final TossPaymentRequest tossPaymentRequest = new TossPaymentRequest("paymentKey", "orderId", 10000);
-        final TossPaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(
-            tossPaymentRequest.amount(),
-            tossPaymentRequest.orderId(),
-            tossPaymentRequest.paymentKey()
-        );
-        final Map<String, Object> params = createReservationRequestJsonMap(
-            "2026-04-15",
-            "1",
-            "1",
-            tossPaymentRequest
+        final PaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(
+                10000,
+                "orderId",
+                "paymentKey"
         );
 
-        setTossPaymentConfirm(tossPaymentConfirmRequest, null);
+        when(tossPaymentProcessor.supports(PaymentType.TOSS)).thenReturn(true);
+        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(null);
+
+        final Map<String, Object> reservationParams = createReservationRequestJsonMap(
+                "2026-04-15",
+                "1",
+                "1",
+                PaymentType.TOSS,
+                tossPaymentConfirmRequest
+        );
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
-                .body(params)
+                .body(reservationParams)
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value());
@@ -217,25 +227,27 @@ class ReservationRestControllerTest {
         //given
         final String payload = "wooga@gmail.com";
         final String token = jwtTokenProvider.createToken(payload);
-        final TossPaymentRequest tossPaymentRequest = new TossPaymentRequest("paymentKey", "orderId", 10000);
-        final TossPaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(
-            tossPaymentRequest.amount(),
-            tossPaymentRequest.orderId(),
-            tossPaymentRequest.paymentKey()
-        );
-        final Map<String, Object> params = createReservationRequestJsonMap(
-            "2026-04-15",
-            "1",
-            "1",
-            tossPaymentRequest
+        final PaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(
+                10000,
+                "orderId",
+                "paymentKey"
         );
 
-        setTossPaymentConfirm(tossPaymentConfirmRequest, null);
+        when(tossPaymentProcessor.supports(PaymentType.TOSS)).thenReturn(true);
+        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(null);
+
+        final Map<String, Object> reservationParams = createReservationRequestJsonMap(
+                "2026-04-15",
+                "1",
+                "1",
+                PaymentType.TOSS,
+                tossPaymentConfirmRequest
+        );
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
-                .body(params)
+                .body(reservationParams)
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value());
@@ -254,20 +266,23 @@ class ReservationRestControllerTest {
         //given
         final String payload = "wooga@gmail.com";
         final String token = jwtTokenProvider.createToken(payload);
-        final TossPaymentRequest tossPaymentRequest = new TossPaymentRequest("paymentKey", "orderId", 10000);
-        final TossPaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(
-            tossPaymentRequest.amount(),
-            tossPaymentRequest.orderId(),
-            tossPaymentRequest.paymentKey()
-        );
-        final Map<String, Object> reservationParams = createReservationRequestJsonMap(
-            "2026-04-15",
-            "1",
-            "1",
-            tossPaymentRequest
+        final PaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(
+                10000,
+                "orderId",
+                "paymentKey"
         );
 
-        setTossPaymentConfirm(tossPaymentConfirmRequest, null);
+        when(tossPaymentProcessor.supports(PaymentType.TOSS)).thenReturn(true);
+        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(null);
+
+        final Map<String, Object> reservationParams = createReservationRequestJsonMap(
+                "2026-04-15",
+                "1",
+                "1",
+                PaymentType.TOSS,
+                tossPaymentConfirmRequest
+        );
+
         final Map<String, String> waitingParams = createWaitingRequestJsonMap("2026-04-15", "1", "1");
 
         RestAssured.given().log().all()
@@ -293,20 +308,23 @@ class ReservationRestControllerTest {
         //given
         final String payload = "wooga@gmail.com";
         final String token = jwtTokenProvider.createToken(payload);
-        final TossPaymentRequest tossPaymentRequest = new TossPaymentRequest("paymentKey", "orderId", 10000);
-        final TossPaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(
-            tossPaymentRequest.amount(),
-            tossPaymentRequest.orderId(),
-            tossPaymentRequest.paymentKey()
-        );
-        final Map<String, Object> reservationParams = createReservationRequestJsonMap(
-            "2026-04-15",
-            "1",
-            "1",
-            tossPaymentRequest
+        final PaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(
+                10000,
+                "orderId",
+                "paymentKey"
         );
 
-        setTossPaymentConfirm(tossPaymentConfirmRequest, null);
+        when(tossPaymentProcessor.supports(PaymentType.TOSS)).thenReturn(true);
+        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(null);
+
+        final Map<String, Object> reservationParams = createReservationRequestJsonMap(
+                "2026-04-15",
+                "1",
+                "1",
+                PaymentType.TOSS,
+                tossPaymentConfirmRequest
+        );
+
         final Map<String, String> waitingParams = createWaitingRequestJsonMap("2026-04-15", "1", "1");
 
         RestAssured.given().log().all()
@@ -347,9 +365,9 @@ class ReservationRestControllerTest {
     }
 
     private Map<String, String> createWaitingRequestJsonMap(
-        final String date,
-        final String theme,
-        final String time) {
+            final String date,
+            final String theme,
+            final String time) {
         return Map.of(
                 "date", date,
                 "theme", theme,
@@ -357,26 +375,26 @@ class ReservationRestControllerTest {
         );
     }
 
-
     private Map<String, Object> createReservationRequestJsonMap(
-        final String date,
-        final String themeId,
-        final String timeId,
-        final TossPaymentRequest request) {
+            final String date,
+            final String themeId,
+            final String timeId,
+            final PaymentType paymentType,
+            final PaymentConfirmRequest paymentRequest) {
+
+        TossPaymentConfirmRequest tossPaymentRequest = (TossPaymentConfirmRequest) paymentRequest;
         return Map.of(
-            "date", date,
-            "themeId", themeId,
-            "timeId", timeId,
-            "tossPaymentRequest", Map.of(
-                "paymentKey", request.paymentKey(),
-                "orderId", request.orderId(),
-                "amount", request.amount()
-            )
+                "date", date,
+                "themeId", themeId,
+                "timeId", timeId,
+                "paymentType", paymentType.name(),
+                "paymentRequest", Map.of(
+                        "type", "TOSS",
+                        "paymentKey", tossPaymentRequest.paymentKey(),
+                        "orderId", tossPaymentRequest.orderId(),
+                        "amount", tossPaymentRequest.amount()
+                )
         );
     }
 
-    private void setTossPaymentConfirm(TossPaymentConfirmRequest request, TossPaymentConfirmResponse response) {
-        when(tossPaymentProcessor.processPayment(request))
-            .thenReturn(response);
-    }
 }

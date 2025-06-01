@@ -11,6 +11,8 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
+import roomescape.payment.processor.PaymentConfirmRequest;
+import roomescape.payment.processor.PaymentConfirmResponse;
 
 import static org.mockito.Mockito.when;
 
@@ -32,7 +34,7 @@ class TossPaymentProcessorTest {
     @Test
     void 토스_결제_요청에_따른_반환_확인() {
         // given
-        final TossPaymentConfirmRequest request = new TossPaymentConfirmRequest(
+        final PaymentConfirmRequest request = new TossPaymentConfirmRequest(
                 10000,
                 "orderId",
                 "paymentKey"
@@ -52,7 +54,7 @@ class TossPaymentProcessorTest {
         ).thenReturn(expected);
 
         // when
-        final TossPaymentConfirmResponse actual = paymentProcessor.processPayment(request);
+        final PaymentConfirmResponse actual = paymentProcessor.processPayment(request);
 
         // then
         Assertions.assertThat(actual).isEqualTo(expected);

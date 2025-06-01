@@ -32,12 +32,10 @@ public class ReservationServiceFacade {
     private final PaymentService paymentService;
 
     @Transactional
-    public CreateReservationResponse saveReservation(final CreateReservationRequest request,
-                                                     final LoginMember loginMember) {
-        final int amount = request.tossPaymentRequest().amount();
-        final String orderId = request.tossPaymentRequest().orderId();
-        final String paymentKey = request.tossPaymentRequest().paymentKey();
-        paymentService.processPayment(amount, orderId, paymentKey);
+    public CreateReservationResponse saveReservation(
+            final CreateReservationRequest request,
+            final LoginMember loginMember) {
+        paymentService.processPayment(request.paymentType(), request.paymentRequest());
 
         final Member member = memberService.findMemberByEmail(loginMember.email());
         final LocalDate date = request.date();

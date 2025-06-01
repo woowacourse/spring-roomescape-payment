@@ -12,12 +12,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
+import roomescape.payment.processor.PaymentConfirmRequest;
+import roomescape.payment.processor.PaymentType;
 import roomescape.payment.processor.toss.TossPaymentConfirmRequest;
-import roomescape.payment.processor.toss.TossPaymentConfirmResponse;
 import roomescape.payment.processor.toss.TossPaymentProcessor;
-import roomescape.reservation.dto.TossPaymentRequest;
 
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -103,27 +104,26 @@ class AdminRestControllerTest {
     @Test
     void 어드민이_대기_거절한다() {
         // given
-        final String adminToken = RestAssured.given()
-                .contentType(ContentType.JSON)
-                .body(Map.of("email", "yebink@email.com", "password", "1234"))
-                .when().post("/login").getCookie("token");
-
-        final TossPaymentRequest tossPaymentRequest = new TossPaymentRequest("paymentKey", "orderId", 10000);
-        final TossPaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(
-            tossPaymentRequest.amount(),
-            tossPaymentRequest.orderId(),
-            tossPaymentRequest.paymentKey()
+        final PaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(
+                10000,
+                "orderId",
+                "paymentKey"
         );
+
+        when(tossPaymentProcessor.supports(PaymentType.TOSS)).thenReturn(true);
+        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(null);
+
         final Map<String, Object> reservationParams = createReservationRequestJsonMap(
-            "2026-04-15",
-            "1",
-            "1",
-            tossPaymentRequest
+                "2026-04-15",
+                "1",
+                "1",
+                PaymentType.TOSS,
+                tossPaymentConfirmRequest
         );
 
-        setTossPaymentConfirm(tossPaymentConfirmRequest, null);
         final Map<String, String> waitingParams = createWaitingRequestJsonMap("2026-04-15", "1", "1");
 
+        // 예약 생성
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
@@ -132,6 +132,7 @@ class AdminRestControllerTest {
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value());
 
+        // 대기 생성
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
@@ -140,7 +141,7 @@ class AdminRestControllerTest {
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value());
 
-        // when & then
+        // when & then: 대기 거절
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", adminToken)
@@ -160,26 +161,25 @@ class AdminRestControllerTest {
         );
     }
 
-
     private Map<String, Object> createReservationRequestJsonMap(
-        final String date,
-        final String themeId,
-        final String timeId,
-        final TossPaymentRequest request) {
-        return Map.of(
-            "date", date,
-            "themeId", themeId,
-            "timeId", timeId,
-            "tossPaymentRequest", Map.of(
-                "paymentKey", request.paymentKey(),
-                "orderId", request.orderId(),
-                "amount", request.amount()
-            )
-        );
-    }
+            final String date,
+            final String themeId,
+            final String timeId,
+            final PaymentType paymentType,
+            final PaymentConfirmRequest paymentRequest) {
 
-    private void setTossPaymentConfirm(TossPaymentConfirmRequest request, TossPaymentConfirmResponse response) {
-        when(tossPaymentProcessor.processPayment(request))
-            .thenReturn(response);
+        TossPaymentConfirmRequest tossPaymentRequest = (TossPaymentConfirmRequest) paymentRequest;
+        return Map.of(
+                "date", date,
+                "themeId", themeId,
+                "timeId", timeId,
+                "paymentType", paymentType.name(),
+                "paymentRequest", Map.of(
+                        "type", "TOSS",
+                        "paymentKey", tossPaymentRequest.paymentKey(),
+                        "orderId", tossPaymentRequest.orderId(),
+                        "amount", tossPaymentRequest.amount()
+                )
+        );
     }
 }

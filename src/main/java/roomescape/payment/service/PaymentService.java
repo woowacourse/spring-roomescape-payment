@@ -1,24 +1,26 @@
 package roomescape.payment.service;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
-import roomescape.payment.processor.toss.TossPaymentConfirmRequest;
-import roomescape.payment.processor.toss.TossPaymentConfirmResponse;
-import roomescape.payment.processor.toss.TossPaymentProcessor;
+import roomescape.payment.processor.PaymentConfirmRequest;
+import roomescape.payment.processor.PaymentConfirmResponse;
+import roomescape.payment.processor.PaymentProcessor;
+import roomescape.payment.processor.PaymentType;
 
 @Service
 public class PaymentService {
+    private final List<PaymentProcessor> processors;
 
-    private final TossPaymentProcessor tossPaymentProcessor;
-
-    public PaymentService(final TossPaymentProcessor tossPaymentProcessor) {
-        this.tossPaymentProcessor = tossPaymentProcessor;
+    public PaymentService(final List<PaymentProcessor> processors) {
+        this.processors = processors;
     }
 
-    public TossPaymentConfirmResponse processPayment(
-            final int amount,
-            final String orderId,
-            final String paymentKey
-    ) {
-        return tossPaymentProcessor.processPayment(new TossPaymentConfirmRequest(amount, orderId, paymentKey));
+    public PaymentConfirmResponse processPayment(final PaymentType type, final PaymentConfirmRequest request) {
+        return processors.stream()
+                .filter(processor -> processor.supports(type))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 결제 수단입니다."))
+                .processPayment(request)
+                ;
     }
 }

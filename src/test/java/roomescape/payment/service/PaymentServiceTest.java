@@ -5,10 +5,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import roomescape.payment.processor.PaymentConfirmResponse;
+import roomescape.payment.processor.PaymentType;
 import roomescape.payment.processor.toss.TossPaymentConfirmRequest;
 import roomescape.payment.processor.toss.TossPaymentConfirmResponse;
 import roomescape.payment.processor.toss.TossPaymentProcessor;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -32,11 +35,14 @@ class PaymentServiceTest {
                 "orderId",
                 "paymentKey"
         );
-        when(tossPaymentProcessor.processPayment(request)).thenReturn(expected);
+
+        when(tossPaymentProcessor.supports(PaymentType.TOSS)).thenReturn(true);
+        when(tossPaymentProcessor.processPayment(any(TossPaymentConfirmRequest.class))).thenReturn(expected);
 
         // when
-        final TossPaymentConfirmResponse actual = paymentService.processPayment(
-                request.amount(), request.orderId(), request.paymentKey()
+        final PaymentConfirmResponse actual = paymentService.processPayment(
+                PaymentType.TOSS,
+                request
         );
 
         // then

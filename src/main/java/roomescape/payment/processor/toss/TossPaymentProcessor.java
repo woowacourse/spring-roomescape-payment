@@ -3,8 +3,12 @@ package roomescape.payment.processor.toss;
 import java.util.Base64;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
+import roomescape.payment.processor.PaymentConfirmRequest;
+import roomescape.payment.processor.PaymentConfirmResponse;
+import roomescape.payment.processor.PaymentProcessor;
+import roomescape.payment.processor.PaymentType;
 
-public class TossPaymentProcessor {
+public class TossPaymentProcessor implements PaymentProcessor {
 
     private final String secretKey;
     private final RestClient restClient;
@@ -20,15 +24,21 @@ public class TossPaymentProcessor {
         this.confirmUrl = confirmUrl;
     }
 
-    public TossPaymentConfirmResponse processPayment(
-            final TossPaymentConfirmRequest request
-    ) {
+    public PaymentConfirmResponse processPayment(final PaymentConfirmRequest request) {
+        final TossPaymentConfirmRequest tossRequest = (TossPaymentConfirmRequest) request;
+
         return restClient.post()
                 .uri(confirmUrl)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Basic " + secretKey)
-                .body(request)
+                .body(tossRequest)
                 .retrieve()
                 .body(TossPaymentConfirmResponse.class);
     }
+
+    @Override
+    public boolean supports(final PaymentType paymentType) {
+        return paymentType == PaymentType.TOSS;
+    }
+
 }
