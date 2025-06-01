@@ -13,12 +13,12 @@ import roomescape.payment.infrastructure.toss.exception.TossInternalException;
 import roomescape.payment.infrastructure.toss.exception.TossPaymentApprovalFailedException;
 
 @Component
-public class TossRestClient {
+public class TossPaymentClient {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    public TossRestClient(@Qualifier("tossApiRestClient") RestClient restClient,
-                          ObjectMapper objectMapper) {
+    public TossPaymentClient(@Qualifier("tossApiRestClient") RestClient restClient,
+                             ObjectMapper objectMapper) {
         this.restClient = restClient;
         this.objectMapper = objectMapper;
     }

@@ -2,18 +2,18 @@ package roomescape.payment.infrastructure.toss;
 
 import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import roomescape.payment.application.PaymentApprovalService;
-import roomescape.payment.infrastructure.toss.client.TossRestClient;
+import roomescape.payment.infrastructure.toss.client.TossPaymentClient;
 
-@Component
+@Service
 @AllArgsConstructor
 public class TossPaymentApprovalService implements PaymentApprovalService {
 
-    private final TossRestClient tossRestClient;
+    private final TossPaymentClient tossPaymentClient;
 
     @Override
     public void approvePayment(String orderId, BigDecimal amount, String paymentKey) {
-        tossRestClient.approve(orderId, amount, paymentKey);
+        tossPaymentClient.approve(orderId, amount, paymentKey);
     }
 }
