@@ -15,11 +15,35 @@ spring:
     defer-datasource-initialization: true
     open-in-view: false
 
+  profiles:
+    active: prod
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: prod
 api:
   toss:
     connection-try-count: 3
     connection-timeout-millis: 2000
     read-timeout-millis: 30000
+    base-url: "https://api.tosspayments.com"
+    confirm-uri: "/v1/payments/confirm"
+    widget-secret-key: "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:"
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+api:
+  toss:
+    connection-try-count: 3
+    connection-timeout-millis: 2000
+    read-timeout-millis: 10000
     base-url: "https://api.tosspayments.com"
     confirm-uri: "/v1/payments/confirm"
     widget-secret-key: "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:"
