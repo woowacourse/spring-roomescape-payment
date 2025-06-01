@@ -19,7 +19,7 @@ class InternalServerErrorCodeTest {
             "ALREADY_PROCESSED_PAYMENT,false"
     })
     @ParameterizedTest
-    void test(String errorCode, boolean expected) {
+    void containsServerErrorCode(String errorCode, boolean expected) {
         assertThat(InternalServerErrorCode.contains(errorCode)).isEqualTo(expected);
     }
 }

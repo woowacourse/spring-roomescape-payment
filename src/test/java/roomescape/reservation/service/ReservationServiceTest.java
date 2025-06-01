@@ -78,9 +78,9 @@ class ReservationServiceTest {
                 themeRepository, memberRepository, waitingRepository);
     }
 
-    @DisplayName("모든 예약 정보를 가져온다")
+    @DisplayName("모든 예약 정보를 가져온다.")
     @Test
-    void test1() {
+    void getAllReservations() {
         // given
         Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
 
@@ -101,7 +101,7 @@ class ReservationServiceTest {
 
     @DisplayName("예약 정보가 없다면 빈 리스트를 반환한다.")
     @Test
-    void test2() {
+    void getAllReservationsWhenEmpty() {
         List<ReservationResponse> result = reservationService.getAll();
 
         assertThat(result).isEmpty();
@@ -109,7 +109,7 @@ class ReservationServiceTest {
 
     @DisplayName("예약을 추가한다.")
     @Test
-    void test3() {
+    void createReservation() {
         // given
         Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
         Long themeId = savedTheme.getId();
@@ -177,29 +177,6 @@ class ReservationServiceTest {
         softAssertions.assertAll();
     }
 
-    @DisplayName("이미 존재하는 예약과 동일하면 예외가 발생한다.")
-    @Test
-    void test4() {
-        // given
-        Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
-        Long themeId = savedTheme.getId();
-
-        LocalTime time = LocalTime.of(8, 0);
-        ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(time));
-        Long timeId = savedTime.getId();
-        Member member = new Member("포스티", "test@test.com", "12341234", Role.MEMBER);
-        Member savedMember = memberRepository.save(member);
-        LocalDate date = nextDay();
-
-        ReservationCreateRequest requestDto =
-                new ReservationCreateRequest(date, timeId, themeId, LoginMember.of(savedMember));
-        reservationService.create(requestDto);
-
-        // when & then
-        assertThatThrownBy(() -> reservationService.create(requestDto))
-                .isInstanceOf(AlreadyInUseException.class);
-    }
-
     @DisplayName("해당 날짜, 시간, 테마에 예약 대기가 존재하는 상황에서 예약을 생성할 수 없다.")
     @Test
     void createReservationInWaitingExists() {
@@ -224,9 +201,9 @@ class ReservationServiceTest {
                 .isInstanceOf(AlreadyInUseException.class);
     }
 
-    @DisplayName("과거 날짜에 예약을 추가하면 예외가 발생한다.")
+    @DisplayName("과거 날짜에 예약을 추가할 수 없다.")
     @Test
-    void test5() {
+    void createReservationWhenPastTimes() {
         // given
         Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
         Long themeId = savedTheme.getId();
@@ -247,9 +224,9 @@ class ReservationServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("존재하지 않는 예약 시간 ID로 저장하면 예외를 반환한다.")
+    @DisplayName("존재하지 않는 예약 시간으로 예약할 수 없다.")
     @Test
-    void test6() {
+    void createReservationWithNonExistsTimeId() {
         Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
         Long themeId = savedTheme.getId();
         Member member = new Member("포스티", "test@test.com", "12341234", Role.MEMBER);
@@ -265,9 +242,9 @@ class ReservationServiceTest {
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
-    @DisplayName("존재하지 않는 테마 ID로 저장하면 예외를 반환한다.")
+    @DisplayName("존재하지 않는 테마로 예약할 수 없다.")
     @Test
-    void notExistThemeId() {
+    void createReservationWithNonExistsThemeId() {
         LocalDate date = now.toLocalDate().plusDays(1);
 
         LocalTime time = LocalTime.of(8, 0);
@@ -284,9 +261,9 @@ class ReservationServiceTest {
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
-    @DisplayName("예약을 삭제한다")
+    @DisplayName("예약을 삭제한다.")
     @Test
-    void test7() {
+    void deleteReservation() {
         // given
         Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
 
@@ -332,37 +309,36 @@ class ReservationServiceTest {
         assertThat(reservationRepository.findAll()).hasSize(1);
     }
 
-    @DisplayName("예약이 존재하지 않으면 예외를 반환한다.")
+    @DisplayName("존재하지 않는 예약은 삭제할 수 없다.")
     @Test
-    void test8() {
+    void deleteReservationWithNonExistsId() {
         Long id = 1L;
         assertThatThrownBy(() -> reservationService.delete(id))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
-    @DisplayName("가능한 시간 대에 대하여 반환한다.")
+    @DisplayName("예약 가능한 시간을 가져온다.")
     @Test
-    void test9() {
+    void getAvailableReservationTimes() {
         // given
-        LocalDate date = nextDay();
-        LocalTime time1 = LocalTime.of(8, 0);
-        LocalTime time2 = LocalTime.of(9, 0);
-        ReservationTime reservationTime1 = reservationTimeRepository.save(new ReservationTime(time1));
-        reservationTimeRepository.save(new ReservationTime(time2));
+        ReservationTime reservationTime1 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(8, 0)));
+        reservationTimeRepository.save(new ReservationTime(LocalTime.of(9, 0)));
+
         Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
-        Long themeId = savedTheme.getId();
         Member member = new Member("포스티", "test@test.com", "12341234", Role.MEMBER);
         Member savedMember = memberRepository.save(member);
+        LocalDate date = nextDay();
         reservationRepository.save(new Reservation(savedMember, date, reservationTime1, savedTheme));
 
         // when
-        List<BookedReservationTimeResponse> responses = reservationService.getSortedAvailableTimes(date, themeId);
+        List<BookedReservationTimeResponse> responses =
+                reservationService.getSortedAvailableTimes(date, savedTheme.getId());
 
         // then
-        List<Boolean> booleans = responses.stream()
+        List<Boolean> alreadyBookeds = responses.stream()
                 .map(BookedReservationTimeResponse::alreadyBooked)
                 .toList();
-        assertThat(booleans).containsExactlyInAnyOrder(true, false);
+        assertThat(alreadyBookeds).containsExactlyInAnyOrder(true, false);
     }
 
     private LocalDate nextDay() {

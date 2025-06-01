@@ -45,9 +45,9 @@ class ThemeServiceTest {
     @Autowired
     private ThemeService themeService;
 
-    @DisplayName("모든 테마 정보를 가져온다")
+    @DisplayName("모든 테마 정보를 가져온다.")
     @Test
-    void test1() {
+    void getAllThemes() {
         // given
         themeRepository.save(new Theme("테마1", "테마1", "www.m.com"));
         themeRepository.save(new Theme("테마2", "테마2", "www.m.com"));
@@ -59,9 +59,9 @@ class ThemeServiceTest {
         assertThat(responses).hasSize(2);
     }
 
-    @DisplayName("테마가 없다면 빈 테마 정보를 가져온다")
+    @DisplayName("테마가 없다면 빈 테마 정보를 가져온다.")
     @Test
-    void test2() {
+    void getAllThemesWhenEmpty() {
         // when
         List<ThemeResponse> responses = themeService.getAll();
 
@@ -69,25 +69,22 @@ class ThemeServiceTest {
         assertThat(responses).isEmpty();
     }
 
-    @DisplayName("테마를 추가한다")
+    @DisplayName("테마를 생성한다.")
     @Test
-    void test3() {
+    void createTheme() {
         // given
         ThemeRequest request = new ThemeRequest("테마1", "테마1", "www.m.com");
 
         // when
-        ThemeResponse response = themeService.create(request);
+        ThemeResponse result = themeService.create(request);
 
         // then
-        assertThat(response.id()).isNotNull();
-        assertThat(response.name()).isEqualTo("테마1");
-        assertThat(response.description()).isEqualTo("테마1");
-        assertThat(response.thumbnail()).isEqualTo("www.m.com");
+        assertThat(result).isEqualTo(new ThemeResponse(result.id(), "테마1", "테마1", "www.m.com"));
     }
 
-    @DisplayName("테마를 삭제한다")
+    @DisplayName("테마를 삭제한다.")
     @Test
-    void test4() {
+    void deleteTheme() {
         // given
         ThemeRequest request = new ThemeRequest("테마1", "테마1", "www.m.com");
         ThemeResponse response = themeService.create(request);
@@ -100,17 +97,17 @@ class ThemeServiceTest {
         assertThat(themeRepository.findAll()).isEmpty();
     }
 
-    @DisplayName("없는 테마를 삭제할 수 없다")
+    @DisplayName("존재하지 않는 테마를 삭제할 수 없다.")
     @Test
-    void test5() {
+    void deleteThemeWithNonExistsThemeId() {
         // when & then
         assertThatThrownBy(() -> themeService.delete(1L))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
-    @DisplayName("예약 정보가 있는 테마의 경우 삭제할 수 없다")
+    @DisplayName("예약 정보가 있는 테마의 경우 삭제할 수 없다.")
     @Test
-    void test6() {
+    void deleteThemeWhenUsing() {
         // given
         Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
         Long themeId = savedTheme.getId();
@@ -129,9 +126,9 @@ class ThemeServiceTest {
                 .isInstanceOf(AlreadyInUseException.class);
     }
 
-    @DisplayName("1~8일 전 사이의 예약이 많은 최대 10개의 테마 정보를 가져온다")
+    @DisplayName("1~8일 전 사이의 예약이 많은 최대 10개의 테마 정보를 가져온다.")
     @Test
-    void test7() {
+    void getPopularThemes() {
         // given
         ReservationTime reservationTime = reservationTimeRepository.save(
                 new ReservationTime(LocalTime.of(10, 0)));

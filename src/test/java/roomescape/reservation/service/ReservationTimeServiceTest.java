@@ -23,11 +23,11 @@ import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
-import roomescape.theme.domain.Theme;
 import roomescape.reservation.dto.request.ReservationTimeRequest;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
+import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
 
 @ActiveProfiles("test")
@@ -51,9 +51,9 @@ class ReservationTimeServiceTest {
         reservationTimeService = new ReservationTimeService(reservationTimeRepository, reservationRepository);
     }
 
-    @DisplayName("모든 시간 정보를 가져온다.")
+    @DisplayName("모든 예약 시간을 가져온다.")
     @Test
-    void test1() {
+    void getAllReservationTimes() {
         // given
         LocalTime localTime1 = LocalTime.of(8, 0);
         LocalTime localTime2 = LocalTime.of(9, 0);
@@ -67,13 +67,15 @@ class ReservationTimeServiceTest {
         List<ReservationTimeResponse> result = reservationTimeService.getAll();
 
         // then
-        List<LocalTime> resultTimes = result.stream().map(ReservationTimeResponse::startAt).toList();
+        List<LocalTime> resultTimes = result.stream()
+                .map(ReservationTimeResponse::startAt)
+                .toList();
         assertThat(resultTimes).containsExactlyInAnyOrderElementsOf(localTimes);
     }
 
     @DisplayName("정보가 없다면 빈 리스트를 반환한다.")
     @Test
-    void test2() {
+    void getAllReservationTimesWhenEmpty() {
         // given & when
         List<ReservationTimeResponse> result = reservationTimeService.getAll();
 
@@ -81,9 +83,9 @@ class ReservationTimeServiceTest {
         assertThat(result).isEmpty();
     }
 
-    @DisplayName("예약 시간을 저장한다.")
+    @DisplayName("예약 시간을 생성한다.")
     @Test
-    void test3() {
+    void createReservationTime() {
         // given
         LocalTime localTime1 = LocalTime.of(8, 0);
         ReservationTimeRequest reservationTimeRequest = new ReservationTimeRequest(localTime1);
@@ -96,9 +98,9 @@ class ReservationTimeServiceTest {
         assertThat(result.startAt()).isEqualTo(localTime1);
     }
 
-    @DisplayName("예약 시간을 삭제한다")
+    @DisplayName("예약 시간을 삭제한다.")
     @Test
-    void test4() {
+    void deleteReservationTime() {
         // given
         ReservationTime saved = reservationTimeRepository.save(new ReservationTime(LocalTime.of(8, 0)));
         Long id = saved.getId();
@@ -107,9 +109,9 @@ class ReservationTimeServiceTest {
         assertThatCode(() -> reservationTimeService.delete(id)).doesNotThrowAnyException();
     }
 
-    @DisplayName("예약 시간이 존재하지 않으면 예외를 반환한다.")
+    @DisplayName("존재하지 않는 예약 시간은 삭제할 수 없다.")
     @Test
-    void test5() {
+    void deleteReservationTimeWithNonExistsTimeId() {
         // given
         Long id = 1L;
 
@@ -118,9 +120,9 @@ class ReservationTimeServiceTest {
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
-    @DisplayName("예약이 존재할 때 예약을 삭제하면 예외를 반환한다.")
+    @DisplayName("예약 시간이 사용중이면 삭제할 수 없다.")
     @Test
-    void test6() {
+    void deleteReservationTimeWhenUsing() {
         // given
         Theme theme = themeRepository.save(new Theme("테마1", "테마1", "www.m.com"));
         ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(8, 0)));

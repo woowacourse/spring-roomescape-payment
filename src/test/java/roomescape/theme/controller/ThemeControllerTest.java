@@ -35,7 +35,7 @@ class ThemeControllerTest {
 
     @DisplayName("테마를 추가한다.")
     @Test
-    void test1() {
+    void postThemes() {
         Map<String, String> params = new HashMap<>();
         params.put("name", "테마1");
         params.put("description", "테마1");
@@ -49,9 +49,9 @@ class ThemeControllerTest {
                 .statusCode(201);
     }
 
-    @DisplayName("테마를 가져온다")
+    @DisplayName("테마를 가져온다.")
     @Test
-    void test2() {
+    void getThemes() {
         Map<String, String> params = new HashMap<>();
         params.put("name", "테마1");
         params.put("description", "테마1");
@@ -71,9 +71,9 @@ class ThemeControllerTest {
                 .body("size()", is(1));
     }
 
-    @DisplayName("해당 테마를 삭제한다")
+    @DisplayName("테마를 삭제한다.")
     @Test
-    void test3() {
+    void deleteThemes() {
         Map<String, Object> params = new HashMap<>();
         params.put("name", "테마1");
         params.put("description", "테마1");
@@ -91,9 +91,9 @@ class ThemeControllerTest {
                 .statusCode(204);
     }
 
-    @DisplayName("없는 테마를 삭제하면 NOT FOUND 반환")
+    @DisplayName("존재하지 않는 테마를 삭제할 수 없다.")
     @Test
-    void test4() {
+    void deleteThemesWithNonExistsThemeId() {
         int notFoundStatusCode = 404;
 
         RestAssured.given().log().all()
@@ -102,9 +102,9 @@ class ThemeControllerTest {
                 .statusCode(notFoundStatusCode);
     }
 
-    @DisplayName("사용 중인 테마가 있다면 삭제를 하면 409 CONFLICT를 반환한다.")
+    @DisplayName("테마가 사용 중이면 삭제할 수 없다.")
     @Test
-    void test5() {
+    void deleteThemesWhenUsing() {
         int themeId = addTheme(Map.of("name", "테마1", "description", "테마1", "thumbnail", "www.m.com"));
         int timeId = addReservationTime("10:00");
         addReservation(timeId, themeId);
@@ -116,9 +116,9 @@ class ThemeControllerTest {
                 .statusCode(conflictStatusCode);
     }
 
-    @DisplayName("가장 인기있는 테마를 가져온다.")
+    @DisplayName("인기 테마를 가져온다.")
     @Test
-    void test6() {
+    void getPopularThemes() {
         RestAssured.given().log().all()
                 .when().get("/themes/popular")
                 .then().log().all()

@@ -1,7 +1,8 @@
 package roomescape.reservation.controller;
 
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doNothing;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -29,7 +30,7 @@ class ReservationTimeControllerTest {
 
     @DisplayName("예약 시간을 추가한다.")
     @Test
-    void test1() {
+    void postTimes() {
         Map<String, String> params = new HashMap<>();
         params.put("startAt", "10:00");
 
@@ -41,9 +42,9 @@ class ReservationTimeControllerTest {
                 .statusCode(201);
     }
 
-    @DisplayName("예약 시간 요청에 초가 있으면 Bad Request 반환")
+    @DisplayName("예약 시간에 초(seconds)가 포함되어 있으면 추가할 수 없다.")
     @Test
-    void test2() {
+    void postTimesWithSeconds() {
         Map<String, String> params = new HashMap<>();
         params.put("startAt", "10:00:20");
 
@@ -55,9 +56,9 @@ class ReservationTimeControllerTest {
                 .statusCode(400);
     }
 
-    @DisplayName("예약 시간을 가져온다")
+    @DisplayName("모든 예약 시간을 가져온다.")
     @Test
-    void test3() {
+    void getTimes() {
         addReservationTime("10:00");
 
         RestAssured.given().log().all()
@@ -67,9 +68,9 @@ class ReservationTimeControllerTest {
                 .body("size()", is(1));
     }
 
-    @DisplayName("해당 예약 시간을 삭제한다")
+    @DisplayName("해당 예약 시간을 삭제한다.")
     @Test
-    void test4() {
+    void deleteTimes() {
         int timeId = addReservationTime("10:00");
 
         RestAssured.given().log().all()
@@ -78,20 +79,18 @@ class ReservationTimeControllerTest {
                 .statusCode(204);
     }
 
-    @DisplayName("없는 예약 시간을 삭제하면 NOT FOUND 반환")
+    @DisplayName("존재하지 않는 예약 시간은 삭제할 수 없다.")
     @Test
-    void test5() {
-        int notFoundStatusCode = 404;
-
+    void deleteTimesWithNonExistsTimeId() {
         RestAssured.given().log().all()
                 .when().delete("/times/0")
                 .then().log().all()
-                .statusCode(notFoundStatusCode);
+                .statusCode(404);
     }
 
-    @DisplayName("사용 중인 예약 시간이 있다면 삭제를 하면 409 CONFLICT를 반환한다.")
+    @DisplayName("사용중인 예약 시간은 삭제할 수 없다.")
     @Test
-    void test6() {
+    void deleteTimesWhenUsing() {
         int conflictStatusCode = 409;
         int timeId = addReservationTime("10:00");
         int themeId = addTheme();
