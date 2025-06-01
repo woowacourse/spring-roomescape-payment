@@ -1,23 +1,18 @@
-package roomescape.presentation;
+package roomescape.infrastructure.payment;
 
-import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.config.paymentResponseErrorHandler;
 import roomescape.domain.PaymentInfo;
 import roomescape.dto.request.PaymentRequest;
 
 @Component
-public class PaymentClientController {
-
-    private static final List<String> CODES = List.of("INVALID_API_KEY", "UNAUTHORIZED_KEY",
-            "INCORRECT_BASIC_AUTH_FORMAT");
+public class PaymentClient {
 
     private final RestClient restClient;
     private final paymentResponseErrorHandler paymentResponseErrorHandler;
 
-    public PaymentClientController(final RestClient restClient,
-                                   final paymentResponseErrorHandler paymentResponseErrorHandler) {
+    public PaymentClient(final RestClient restClient,
+                         final paymentResponseErrorHandler paymentResponseErrorHandler) {
         this.restClient = restClient;
         this.paymentResponseErrorHandler = paymentResponseErrorHandler;
     }
