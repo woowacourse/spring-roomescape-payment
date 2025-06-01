@@ -25,7 +25,7 @@ public class ClientConfig {
         requestFactory.setReadTimeout(tossProperties.readTimeout());
 
         return new PaymentRestClient(
-                restClient().baseUrl(tossProperties.baseUrl())
+                restClientBuilder().baseUrl(tossProperties.baseUrl())
                         .requestFactory(requestFactory)
                         .defaultStatusHandler(paymentResponseErrorHandler)
                         .build(),
@@ -34,7 +34,7 @@ public class ClientConfig {
     }
 
     @Bean
-    public RestClient.Builder restClient() {
+    public RestClient.Builder restClientBuilder() {
         return RestClient.builder();
     }
 }

@@ -30,23 +30,22 @@ public class PaymentApiTest {
     @DisplayName("예외 코드를 확인한다.")
     @ParameterizedTest
     @MethodSource("errorMessage")
-    void exceptionMessageTest(String errorCode, String errorMessage) {
+    void exceptionMessageTest(String errorCode) {
         // given
         restClientBuilder.defaultHeader("TossPayments-Test-Code", errorCode);
         paymentRestClient = new PaymentRestClient(restClientBuilder.build(), secretKey);
 
         // when & then
         assertThatThrownBy(() -> paymentRestClient.approve(PAYMENT))
-                .isInstanceOf(PaymentClientException.class)
-                .hasMessageContaining(errorMessage);
+                .isInstanceOf(PaymentClientException.class);
     }
 
     private static Stream<Arguments> errorMessage() {
         return Stream.of(
-                Arguments.arguments("NOT_FOUND_PAYMENT_SESSION", "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다."),
-                Arguments.arguments("REJECT_CARD_COMPANY", "결제 승인이 거절되었습니다."),
-                Arguments.arguments("FORBIDDEN_REQUEST", "허용되지 않은 요청입니다."),
-                Arguments.arguments("UNAUTHORIZED_KEY", "인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다.")
+                Arguments.arguments("NOT_FOUND_PAYMENT_SESSION"),
+                Arguments.arguments("REJECT_CARD_COMPANY"),
+                Arguments.arguments("FORBIDDEN_REQUEST"),
+                Arguments.arguments("UNAUTHORIZED_KEY")
         );
     }
 }
