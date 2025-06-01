@@ -79,7 +79,7 @@ class PaymentServerTest {
                         .setBody(expectedJsonResponse)
         );
 
-        PaymentClientResponse actualResponse = tossPaymentsRestClient.confirm(requestDto);
+        PaymentClientResponse actualResponse = tossPaymentsRestClient.completePayment(requestDto);
 
         assertThat(actualResponse).isNotNull();
     }
@@ -107,7 +107,7 @@ class PaymentServerTest {
                         .setBody(errorJsonResponse)
         );
 
-        assertThatThrownBy(() -> tossPaymentsRestClient.confirm(requestDto))
+        assertThatThrownBy(() -> tossPaymentsRestClient.completePayment(requestDto))
                 .isInstanceOf(PaymentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", PaymentErrorCode.SERVER_ERROR);
     }
@@ -128,7 +128,7 @@ class PaymentServerTest {
                         .setBody(errorJsonResponse)
         );
 
-        assertThatThrownBy(() -> tossPaymentsRestClient.confirm(requestDto))
+        assertThatThrownBy(() -> tossPaymentsRestClient.completePayment(requestDto))
                 .isInstanceOf(PaymentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", PaymentErrorCode.CLIENT_ERROR);
     }
@@ -149,7 +149,7 @@ class PaymentServerTest {
                         .setBody(errorJsonResponse)
         );
 
-        assertThatThrownBy(() -> tossPaymentsRestClient.confirm(requestDto))
+        assertThatThrownBy(() -> tossPaymentsRestClient.completePayment(requestDto))
                 .isInstanceOf(PaymentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", PaymentErrorCode.PAYMENT_SERVER_ERROR);
     }
@@ -166,7 +166,7 @@ class PaymentServerTest {
                         .setBodyDelay(TIME_OUT_SECOND + 10, TimeUnit.SECONDS)
         );
 
-        assertThatThrownBy(() -> tossPaymentsRestClient.confirm(requestDto))
+        assertThatThrownBy(() -> tossPaymentsRestClient.completePayment(requestDto))
                 .isInstanceOf(ConnectionException.class);
     }
 }

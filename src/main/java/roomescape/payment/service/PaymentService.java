@@ -15,7 +15,7 @@ public class PaymentService {
     private final PaymentClient paymentClient;
 
     public Payment confirm(PaymentConfirmRequest paymentConfirmRequest) {
-        PaymentClientResponse confirm = paymentClient.confirm(paymentConfirmRequest);
+        PaymentClientResponse confirm = paymentClient.completePayment(paymentConfirmRequest);
         return PaymentConverter.toDomain(confirm);
     }
 

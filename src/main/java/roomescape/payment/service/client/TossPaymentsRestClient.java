@@ -41,7 +41,7 @@ public class TossPaymentsRestClient implements PaymentClient {
         this.secretKey = secretKey;
     }
 
-    public PaymentClientResponse confirm(PaymentConfirmRequest paymentConfirmRequest) {
+    public PaymentClientResponse completePayment(PaymentConfirmRequest paymentConfirmRequest) {
         try {
             return restClient.post().uri("/confirm")
                     .contentType(MediaType.APPLICATION_JSON)

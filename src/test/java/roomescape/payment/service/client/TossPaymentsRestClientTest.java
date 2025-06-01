@@ -17,7 +17,7 @@ class TossPaymentsRestClientTest {
 
     @Test
     @DisplayName("적절하지 않은 정보로 결제를 요청할 시 예외가 발생한다")
-    void confirmFailed() {
+    void completePaymentFailed() {
         // Given
         PaymentConfirmRequest request = new PaymentConfirmRequest(
             "payment123",
@@ -26,7 +26,7 @@ class TossPaymentsRestClientTest {
         );
 
         // When & Then
-        assertThatThrownBy(() -> tossPaymentsRestClient.confirm(request))
+        assertThatThrownBy(() -> tossPaymentsRestClient.completePayment(request))
             .isInstanceOf(PaymentException.class);
     }
 }
