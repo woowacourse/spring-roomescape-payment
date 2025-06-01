@@ -12,11 +12,8 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.exception.PaymentRequestException;
 import roomescape.payment.exception.RequestPaymentErrorHandler;
-import roomescape.reservation.presentation.dto.PaymentRequest;
+import roomescape.payment.infrastructure.dto.PaymentRequest;
 
-
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;

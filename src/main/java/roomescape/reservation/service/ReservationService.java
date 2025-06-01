@@ -11,6 +11,7 @@ import roomescape.auth.login.presentation.dto.SearchCondition;
 import roomescape.common.util.time.DateTime;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
+import roomescape.payment.infrastructure.dto.PaymentRequest;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.infrastructure.dto.WaitingWithRank;
 import roomescape.member.exception.MemberNotFound;
