@@ -41,7 +41,7 @@ public class TossPaymentResponseInterceptor implements ClientHttpRequestIntercep
             throw new PaymentServerException("결제가 제대로 수행되지 못했습니다.");
         }
 
-        throw new PaymentProcessException(errorResponse.message());
+        throw new PaymentProcessException(errorResponse);
     }
 
     private TossPaymentErrorResponse getPaymentErrorResponse(ClientHttpResponse response) throws IOException {

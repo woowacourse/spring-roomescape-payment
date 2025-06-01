@@ -6,7 +6,7 @@ import roomescape.global.response.ErrorCode;
 
 @Getter
 @RequiredArgsConstructor
-public class PaymentErrorCode implements ErrorCode {
+public class TossPaymentErrorCode implements ErrorCode {
 
     private final String value;
     private final String message;
