@@ -60,7 +60,7 @@ public class JwtTokenProvider implements TokenProvider {
             final Jwt<?, Claims> jwt = jwtParser.parseSignedClaims(token);
             return jwt.getPayload();
         } catch (ExpiredJwtException e) {
-            throw new UnauthorizedException("토큰이 만료되었습니다.");
+            throw new UnauthorizedException("로그인이 만료되었습니다. 다시 로그인 해주세요");
         } catch (UnsupportedJwtException | MalformedJwtException e) {
             throw new UnauthorizedException("유효하지 않은 토큰 형식입니다.");
         } catch (SignatureException e) {
