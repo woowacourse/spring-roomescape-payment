@@ -9,6 +9,7 @@ import roomescape.payment.infrastructure.dto.TossPaymentErrorResponse;
 import roomescape.payment.infrastructure.dto.TossPaymentRequest;
 import roomescape.payment.application.service.PaymentClient;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.presentation.dto.PaymentRequest;
 import roomescape.reservation.presentation.dto.ReservationRequest;
 
 public class TossPaymentClient implements PaymentClient {
@@ -23,11 +24,11 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public Payment approve(ReservationRequest reservationRequest) {
+    public Payment approve(PaymentRequest paymentRequest) {
         TossPaymentRequest tossPaymentRequest = new TossPaymentRequest(
-                reservationRequest.getAmount(),
-                reservationRequest.getOrderId(),
-                reservationRequest.getPaymentKey()
+                paymentRequest.getAmount(),
+                paymentRequest.getOrderId(),
+                paymentRequest.getPaymentKey()
         );
 
         return restClient.post()

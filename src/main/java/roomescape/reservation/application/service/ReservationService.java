@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.payment.application.service.PaymentService;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.presentation.dto.PaymentRequest;
 import roomescape.reservation.presentation.dto.ReservationRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
@@ -54,7 +56,13 @@ public class ReservationService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchElementException("유저 정보를 찾을 수 없습니다."));
 
-        paymentService.approve(reservationRequest);
+        paymentService.approve(new PaymentRequest(
+                reservationRequest.getPaymentKey(),
+                reservationRequest.getOrderId(),
+                reservationRequest.getAmount(),
+                reservationRequest.getPaymentType()
+        ));
+
         return createUserReservation(reservationRequest, member);
     }
 

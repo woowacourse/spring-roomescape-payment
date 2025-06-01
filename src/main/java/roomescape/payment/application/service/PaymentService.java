@@ -1,6 +1,7 @@
 package roomescape.payment.application.service;
 
 import org.springframework.stereotype.Service;
+import roomescape.payment.presentation.dto.PaymentRequest;
 import roomescape.reservation.presentation.dto.ReservationRequest;
 
 @Service
@@ -12,7 +13,7 @@ public class PaymentService {
         this.paymentClient = paymentClient;
     }
 
-    public void approve(final ReservationRequest reservationRequest) {
-        paymentClient.approve(reservationRequest);
+    public void approve(final PaymentRequest paymentRequest) {
+        paymentClient.approve(paymentRequest);
     }
 }
