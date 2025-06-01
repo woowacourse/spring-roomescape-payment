@@ -1,24 +1,34 @@
 package roomescape.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.member.dto.LoginRequest;
+import roomescape.payment.PaymentClient;
+import roomescape.payment.domain.PaymentType;
+import roomescape.payment.dto.TossPaymentRequest;
+import roomescape.payment.dto.TossPaymentResponse;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 class ReservationControllerTest {
 
     private String sessionId;
+
+    @MockitoBean
+    private PaymentClient paymentClient;
 
     @BeforeEach
     void setUp() {
@@ -66,7 +76,6 @@ class ReservationControllerTest {
                     .statusCode(400);
         }
 
-        @Disabled
         @DisplayName("같은 날짜 및 시간 예약이 존재하면 400 Bad Request를 던진다")
         @Test
         void reservationAddDuplicatedTest() {
@@ -81,7 +90,9 @@ class ReservationControllerTest {
                     "amount", 1000,
                     "paymentType", "NORMAL"
             );
-
+            final TossPaymentResponse response = new TossPaymentResponse("test", "test", 1000,
+                    PaymentType.NORMAL);
+            given(paymentClient.requestPaymentApprove(any(TossPaymentRequest.class))).willReturn(response);
 
             RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
@@ -91,10 +102,15 @@ class ReservationControllerTest {
                     .then().log().all()
                     .statusCode(201);
 
-            Map<String, String> duplicated = Map.of(
+            Map<String, Object> duplicated = Map.of(
+                    "memberId", "1",
                     "date", LocalDate.now().plusDays(1).toString(),
                     "themeId", "1",
-                    "timeId", "1"
+                    "timeId", "1",
+                    "paymentKey", "test",
+                    "orderId", "test",
+                    "amount", 1000,
+                    "paymentType", "NORMAL"
             );
 
             //when & then
