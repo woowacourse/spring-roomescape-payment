@@ -18,7 +18,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.web.client.RestClientException;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.domain.member.Member;
@@ -36,7 +35,7 @@ class ReservationPaymentServiceTest {
     private static MockWebServer mockWebServer;
 
     @Autowired
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper;
 
     @Autowired
     private ReservationPaymentService reservationPaymentService;
@@ -83,19 +82,19 @@ class ReservationPaymentServiceTest {
                 .setBody(errorResponse));
 
         Theme theme = Theme.createWithoutId("테마1", "테마1 설명", "thumbnail1.jpg");
-        themeRepository.save(theme);
+        Theme saveedTheme = themeRepository.save(theme);
         ReservationTime reservationTime = ReservationTime.createWithoutId(LocalTime.of(10, 0));
-        reservationTimeRepository.save(reservationTime);
+        ReservationTime savedTime = reservationTimeRepository.save(reservationTime);
         Member member = Member.createWithoutId("사용자", "user@example.com", Role.USER, "password");
-        memberRepository.save(member);
+        Member savedMember = memberRepository.save(member);
 
         // when & then
-        var reservationCreateRequest = new ReservationCreateRequest(LocalDate.now().plusDays(1), theme.getId(),
-                reservationTime.getId(), member.getId());
+        var reservationCreateRequest = new ReservationCreateRequest(LocalDate.now().plusDays(1), saveedTheme.getId(),
+                savedTime.getId(), savedMember.getId());
         var paymentConfirmRequest = new PaymentConfirmRequest("orderId", 50000, "paymentKey", "TOSS");
         assertThatThrownBy(() -> reservationPaymentService.confirmPaymentAndAddReservation(
                 reservationCreateRequest, paymentConfirmRequest
-        )).hasMessageContaining(errorResponse);
+        )).hasMessageContaining("클라이언트 에러 발생: 400 BAD_REQUEST");
     }
 
     @DisplayName("토스 결제 승인 요청이 타임아웃됐을 때 예외를 발생한다.")
@@ -110,6 +109,7 @@ class ReservationPaymentServiceTest {
         // when & then
         var paymentConfirmRequest = new PaymentConfirmRequest("orderId", 50000, "paymentKey", "TOSS");
         assertThatThrownBy(() -> paymentClientService.confirm("token", paymentConfirmRequest))
-                .isInstanceOf(RestClientException.class);
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("클라이언트 에러 발생: 400 BAD_REQUEST");
     }
 }
