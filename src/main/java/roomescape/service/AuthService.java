@@ -1,0 +1,43 @@
+package roomescape.service;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import roomescape.domain.Member;
+import roomescape.dto.business.AccessTokenContent;
+import roomescape.dto.request.LoginRequest;
+import roomescape.dto.response.AccessTokenResponse;
+import roomescape.exception.LoginFailException;
+import roomescape.repository.MemberRepository;
+import roomescape.utility.JwtTokenProvider;
+
+@Service
+@Transactional
+public class AuthService {
+
+    private final JwtTokenProvider jwtTokenProvider;
+    private final MemberRepository memberRepository;
+
+    public AuthService(JwtTokenProvider jwtTokenProvider, MemberRepository memberRepository) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.memberRepository = memberRepository;
+    }
+
+    public AccessTokenResponse login(LoginRequest loginRequest) {
+        Member member = getMemberByEmail(loginRequest.email());
+        validatePasswordForLogin(member, loginRequest.password());
+        String accessToken = jwtTokenProvider.createAccessToken(
+                new AccessTokenContent(member.getId(), member.getRole(), member.getName()));
+        return new AccessTokenResponse(accessToken);
+    }
+
+    private Member getMemberByEmail(String email) {
+        return memberRepository.findOneByEmail(email)
+                .orElseThrow(() -> new LoginFailException("이메일에 해당하는 회원이 존재하지 않습니다."));
+    }
+
+    private void validatePasswordForLogin(Member member, String password) {
+        if (!member.isEqualPassword(password)) {
+            throw new LoginFailException("로그인 정보가 올바르지 않습니다.");
+        }
+    }
+}

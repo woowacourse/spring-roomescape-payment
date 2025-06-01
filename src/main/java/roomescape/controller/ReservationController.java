@@ -1,0 +1,101 @@
+package roomescape.controller;
+
+import jakarta.validation.Valid;
+import java.net.URI;
+import java.time.LocalDate;
+import java.util.List;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import roomescape.config.annotation.Authority;
+import roomescape.config.annotation.RequiredAccessToken;
+import roomescape.domain.Role;
+import roomescape.dto.business.AccessTokenContent;
+import roomescape.dto.business.PaymentHistoryCreationContent;
+import roomescape.dto.business.ReservationCreationContent;
+import roomescape.dto.request.AdminReservationRequest;
+import roomescape.dto.request.ReservationWithPaymentCreationRequest;
+import roomescape.dto.response.ReservationResponse;
+import roomescape.dto.response.ReservationStatusResponse;
+import roomescape.service.ReservationService;
+
+@RestController
+@RequestMapping("/reservations")
+public class ReservationController {
+
+    private final ReservationService reservationService;
+
+    public ReservationController(ReservationService reservationService) {
+        this.reservationService = reservationService;
+    }
+
+    @GetMapping
+    @Authority(Role.ADMIN)
+    public List<ReservationResponse> findAllReservations() {
+        return reservationService.findAllReservations();
+    }
+
+    @GetMapping(params = {"memberId", "themeId", "from", "to"})
+    @Authority(Role.ADMIN)
+    public List<ReservationResponse> searchReservationsByFilter(
+            @RequestParam("memberId") Long memberId,
+            @RequestParam("themeId") Long themeId,
+            @RequestParam("from") LocalDate from,
+            @RequestParam("to") LocalDate to
+    ) {
+        return reservationService.findReservationsByFilter(memberId, themeId, from, to);
+    }
+
+    @GetMapping("/state")
+    @Authority(Role.GENERAL)
+    public ReservationStatusResponse findAllReservationStateByMember(
+            @RequiredAccessToken AccessTokenContent accessTokenContent
+    ) {
+        return reservationService.findAllReservationStatusByMember(accessTokenContent.id());
+    }
+
+    @PostMapping
+    @Authority(Role.ADMIN)
+    public ResponseEntity<ReservationResponse> addReservationByAdmin(
+            @Valid @RequestBody AdminReservationRequest request
+    ) {
+        ReservationCreationContent creationRequest = new ReservationCreationContent(request);
+        ReservationResponse reservationResponse =
+                reservationService.addReservation(request.memberId(), creationRequest);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .location(URI.create("/reservation/" + reservationResponse.id()))
+                .body(reservationResponse);
+    }
+
+    @PostMapping("/mine")
+    @Authority(Role.GENERAL)
+    public ResponseEntity<ReservationResponse> addReservationByMember(
+            @Valid @RequestBody ReservationWithPaymentCreationRequest request,
+            @RequiredAccessToken AccessTokenContent accessTokenContent
+    ) {
+        ReservationCreationContent creationContent = new ReservationCreationContent(request);
+        PaymentHistoryCreationContent paymentHistoryCreationContent = new PaymentHistoryCreationContent(request);
+
+        ReservationResponse reservationResponse = reservationService.addReservation(accessTokenContent.id(),
+                creationContent, paymentHistoryCreationContent);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .location(URI.create("/reservation/" + reservationResponse.id()))
+                .body(reservationResponse);
+    }
+
+    @DeleteMapping("/{reservationId}")
+    @Authority(Role.ADMIN)
+    public ResponseEntity<Void> deleteReservationById(
+            @PathVariable("reservationId") Long id
+    ) {
+        reservationService.deleteReservationById(id);
+        return ResponseEntity.noContent().build();
+    }
+}
