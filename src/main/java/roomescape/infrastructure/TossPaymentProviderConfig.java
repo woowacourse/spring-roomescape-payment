@@ -30,7 +30,7 @@ public class TossPaymentProviderConfig {
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .defaultHeader(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER_VALUE)
             .rootUri(TOSS_API_BASE_URL)
-            .connectTimeout(Duration.ofSeconds(1))
-            .readTimeout(Duration.ofSeconds(2));
+            .connectTimeout(Duration.ofSeconds(2))
+            .readTimeout(Duration.ofSeconds(30));
     }
 }
