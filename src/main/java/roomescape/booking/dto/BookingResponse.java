@@ -1,7 +1,7 @@
 package roomescape.booking.dto;
 
 import roomescape.booking.reservation.Reservation;
-import roomescape.booking.reservation.ReservationPaymentStatus;
+import roomescape.booking.reservation.ReservationStatus;
 import roomescape.booking.waiting.Waiting;
 import roomescape.schedule.dto.ScheduleResponse;
 
@@ -12,10 +12,10 @@ public record BookingResponse(
 ) {
 
     public static BookingResponse of(Reservation reservation) {
-        if (reservation.getPaymentStatus() == ReservationPaymentStatus.SUCCESS) {
+        if (reservation.getReservationStatus() == ReservationStatus.CONFIRMED) {
             return new BookingResponse(reservation.getId(), ScheduleResponse.of(reservation.getSchedule()), "예약");
         }
-        if (reservation.getPaymentStatus() == ReservationPaymentStatus.WAITING) {
+        if (reservation.getReservationStatus() == ReservationStatus.PENDING) {
             return new BookingResponse(reservation.getId(), ScheduleResponse.of(reservation.getSchedule()), "결제 대기");
         }
         return new BookingResponse(reservation.getId(), ScheduleResponse.of(reservation.getSchedule()), "결제 실패");

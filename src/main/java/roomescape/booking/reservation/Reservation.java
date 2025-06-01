@@ -26,17 +26,17 @@ public class Reservation {
     private Schedule schedule;
 
     @Enumerated(EnumType.STRING)
-    private ReservationPaymentStatus paymentStatus;
+    private ReservationStatus reservationStatus;
 
     public Reservation(final Member member, final Schedule schedule) {
         this.member = member;
         this.schedule = schedule;
-        this.paymentStatus = ReservationPaymentStatus.SUCCESS;
+        this.reservationStatus = ReservationStatus.CONFIRMED;
     }
 
-    public Reservation(final Member member, final Schedule schedule, final ReservationPaymentStatus paymentStatus) {
+    public Reservation(final Member member, final Schedule schedule, final ReservationStatus reservationStatus) {
         this.member = member;
         this.schedule = schedule;
-        this.paymentStatus = paymentStatus;
+        this.reservationStatus = reservationStatus;
     }
 }

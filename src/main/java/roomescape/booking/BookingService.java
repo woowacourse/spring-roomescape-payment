@@ -6,8 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.booking.dto.BookingResponse;
 import roomescape.booking.reservation.Reservation;
-import roomescape.booking.reservation.ReservationPaymentStatus;
 import roomescape.booking.reservation.ReservationService;
+import roomescape.booking.reservation.ReservationStatus;
 import roomescape.booking.waiting.Waiting;
 import roomescape.booking.waiting.WaitingService;
 import roomescape.schedule.Schedule;
@@ -49,7 +49,7 @@ public class BookingService {
 
     private void changeFirstWaitingToReservation(final Waiting firstWaiting) {
         waitingService.delete(firstWaiting);
-        Reservation reservation = new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), ReservationPaymentStatus.WAITING);
+        Reservation reservation = new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), ReservationStatus.PENDING);
         reservationService.create(reservation);
     }
 }

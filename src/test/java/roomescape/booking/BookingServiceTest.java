@@ -8,8 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.booking.reservation.Reservation;
-import roomescape.booking.reservation.ReservationPaymentStatus;
 import roomescape.booking.reservation.ReservationService;
+import roomescape.booking.reservation.ReservationStatus;
 import roomescape.booking.waiting.Waiting;
 import roomescape.booking.waiting.WaitingService;
 import roomescape.member.Member;
@@ -61,7 +61,7 @@ class BookingServiceTest {
         bookingService.deleteReservationById(1L);
 
         // then
-        then(reservationService).should().create(new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), ReservationPaymentStatus.WAITING));
-        then(reservationService).should().create(new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), ReservationPaymentStatus.WAITING));
+        then(reservationService).should().create(new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), ReservationStatus.PENDING));
+        then(reservationService).should().create(new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), ReservationStatus.PENDING));
     }
 }
