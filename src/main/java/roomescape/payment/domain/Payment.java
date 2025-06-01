@@ -62,10 +62,16 @@ public class Payment {
     }
 
     public void success() {
+        if (this.status != PaymentStatus.PENDING) {
+            throw new IllegalStateException("결제 상태가 PENDING일 때만 성공으로 바꿀 수 있습니다.");
+        }
         this.status = PaymentStatus.SUCCESS;
     }
 
     public void fail() {
+        if (this.status != PaymentStatus.PENDING) {
+            throw new IllegalStateException("결제 상태가 PENDING일 때만 실패로 바꿀 수 있습니다.");
+        }
         this.status = PaymentStatus.FAILED;
     }
 }
