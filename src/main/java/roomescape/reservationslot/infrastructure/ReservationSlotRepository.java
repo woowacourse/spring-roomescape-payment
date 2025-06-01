@@ -14,21 +14,13 @@ public interface ReservationSlotRepository extends JpaRepository<ReservationSlot
 
     boolean existsByDateAndTimeIdAndThemeId(LocalDate date, Long timeId, Long themeId);
 
-    @Query("""
-            SELECT rs 
-            FROM ReservationSlot rs                
-            JOIN rs.time t 
-            JOIN rs.theme th                   
-            WHERE th.id = :themeId     
-              AND t.id = :timeId
-              AND rs.date = :date
-            """)
     Optional<ReservationSlot> findByDateAndTimeIdAndThemeId(LocalDate date, Long timeId, Long themeId);
 
     @Query("""
-                SELECT CASE WHEN SIZE(rs.reservations) = 1 THEN TRUE ELSE FALSE END 
+                SELECT COUNT(r) = 1
                 FROM ReservationSlot rs
+                LEFT JOIN rs.reservations r
                 WHERE rs.id = :slotId
             """)
-    boolean hasOnlyOneReservation(Long slotId);
+    boolean hasSingleReservation(Long slotId);
 }

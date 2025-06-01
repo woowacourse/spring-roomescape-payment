@@ -1,6 +1,5 @@
 package roomescape.reservation.application;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -27,11 +26,10 @@ public class WaitingReservationApplicationService {
         this.reservationDataService = reservationDataService;
     }
 
-    public ReservationResponse create(final LocalDate date, final Long timeId, final Long themeId,
-                                      final Long memberId) {
-        ReservationSlot slot = reservationSlotDataService.getReservationSlotByDateAndTimeAndTheme(date,
-                timeId, themeId);
-        Member member = memberDataService.getById(memberId);
+    public ReservationResponse create(final WaitingReservationCreateRequest createRequest) {
+        ReservationSlot slot = reservationSlotDataService.getReservationSlotByDateAndTimeAndTheme(createRequest.date(),
+                createRequest.timeId(), createRequest.themeId());
+        Member member = memberDataService.getById(createRequest.memberId());
         Reservation reservation = slot.addReservation(member, LocalDateTime.now());
         reservationDataService.save(reservation);
 
@@ -45,22 +43,17 @@ public class WaitingReservationApplicationService {
                 .toList();
     }
 
-    public void cancel(final Long reservationSlotId, final Long memberId) {
+    public void cancelByReservationSlotIdAndMemberId(final Long reservationSlotId, final Long memberId) {
+        Reservation reservation = reservationDataService.getByReservationSlotIdAndMemberId(reservationSlotId, memberId);
         reservationDataService.deleteByReservationSlotIdAndMemberId(reservationSlotId, memberId);
-        if (reservationDataService.existsByReservationSlotIdAndMemberId(reservationSlotId, memberId)) {
-            reservationSlotDataService.deleteById(reservationSlotId);
-        }
+        ReservationSlot reservationSlot = reservationSlotDataService.getById(reservationSlotId);
+        reservationSlot.getReservations().remove(reservation);
     }
 
-    public void removeWaitingReservationWithoutMemberId(final Long reservationId) {
+    public void cancel(final Long reservationId) {
         Reservation reservation = reservationDataService.getById(reservationId);
-        reservationDataService.removeWaitingReservation(reservation);
-        cleanupEmptyReservationSlot(reservation.getReservationSlot().getId());
-    }
-
-    private void cleanupEmptyReservationSlot(final Long slotId) {
-        if (reservationSlotDataService.hasSingleReservation(slotId)) {
-            reservationSlotDataService.deleteById(slotId);
-        }
+        reservationDataService.cancel(reservation);
+        ReservationSlot reservationSlot = reservationSlotDataService.getById(reservation.getReservationSlot().getId());
+        reservationSlot.getReservations().remove(reservation);
     }
 }
