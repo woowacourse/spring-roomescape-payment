@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -34,7 +35,7 @@ public class PaymentRestClient implements PaymentClient {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public PaymentRestClient(RestClient restClient,
+    public PaymentRestClient(@Qualifier("tossPaymentsRestClient") RestClient restClient,
                              @Value("${payment.key}") String SECRET_KEY) {
         this.restClient = restClient;
         this.SECRET_KEY = SECRET_KEY;
