@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import roomescape.common.exception.InvalidReservationException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.reservation.domain.Reservation;
@@ -44,7 +45,7 @@ class ReservationTimeServiceMockTest {
 
         // when & then
         assertThatThrownBy(() -> reservationTimeService.deleteReservationTimeById(1L))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(InvalidReservationException.class);
     }
 
     @DisplayName("예약 가능 시간 조회 테스트")

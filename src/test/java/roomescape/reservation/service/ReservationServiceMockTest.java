@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import roomescape.common.exception.InvalidReservationException;
 import roomescape.common.util.DateTime;
 import roomescape.fixture.TestFixture;
 import roomescape.member.domain.Member;
@@ -104,7 +105,7 @@ class ReservationServiceMockTest {
         // when & then
         ReservationRequest reservationRequest = new ReservationRequest(LocalDate.of(2024, 10, 6), 1L, 1L, "paymentKey", "orderId", 1000L);
         assertThatThrownBy(() -> reservationService.createReservation(reservationRequest, 1L))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(InvalidReservationException.class);
     }
 
     @Test

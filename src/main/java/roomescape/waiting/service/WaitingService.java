@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.common.exception.InvalidReservationException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.member.dto.request.LoginMember;
@@ -38,11 +39,11 @@ public class WaitingService {
     @Transactional
     public WaitingResponse createWaiting(WaitingRequest request, LoginMember loginMember) {
         Member member = memberRepository.findById(loginMember.id())
-                .orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다"));
+                .orElseThrow(() -> new InvalidReservationException("회원을 찾을 수 없습니다"));
         ReservationTime time = reservationTimeRepository.findById(request.timeId())
-                .orElseThrow(() -> new IllegalArgumentException("예약 시간을 찾을 수 없습니다"));
+                .orElseThrow(() -> new InvalidReservationException("예약 시간을 찾을 수 없습니다"));
         Theme theme = themeRepository.findById(request.themeId())
-                .orElseThrow(() -> new IllegalArgumentException("테마를 찾을 수 없습니다"));
+                .orElseThrow(() -> new InvalidReservationException("테마를 찾을 수 없습니다"));
 
         boolean isBooking = reservationRepository.existsByDateAndTimeStartAtAndThemeId(request.date(), time.getStartAt(), request.themeId());
         if (!isBooking) {
@@ -80,7 +81,7 @@ public class WaitingService {
     @Transactional
     public void cancelWaiting(Long waitingId) {
         Waiting waiting = waitingRepository.findById(waitingId)
-                .orElseThrow(() -> new IllegalArgumentException("대기 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new InvalidReservationException("대기 정보를 찾을 수 없습니다."));
         waitingRepository.delete(waiting);
     }
 

@@ -1,11 +1,16 @@
 package roomescape.reservation.domain;
 
-import jakarta.persistence.*;
-
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
+import roomescape.common.exception.InvalidReservationException;
 import roomescape.member.domain.Member;
 import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
@@ -52,12 +57,12 @@ public class Reservation {
                                                     final ReservationTime time) {
         LocalDate nowDate = now.toLocalDate();
         if (reservationDate.isBefore(nowDate)) {
-            throw new IllegalArgumentException("예약할 수 없는 날짜와 시간입니다.");
+            throw new InvalidReservationException("예약할 수 없는 날짜와 시간입니다.");
         }
 
         LocalTime nowTime = now.toLocalTime();
         if (nowDate.isEqual(reservationDate) && time.isBeforeTime(nowTime)) {
-            throw new IllegalArgumentException("예약할 수 없는 날짜와 시간입니다.");
+            throw new InvalidReservationException("예약할 수 없는 날짜와 시간입니다.");
         }
     }
 

@@ -3,6 +3,7 @@ package roomescape.theme.service;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.common.exception.InvalidReservationException;
 import roomescape.common.util.DateTime;
 import roomescape.reservation.domain.ReservationPeriod;
 import roomescape.reservation.domain.ReservationRepository;
@@ -42,7 +43,7 @@ public class ThemeService {
     @Transactional
     public void deleteThemeById(final Long id) {
         if (reservationRepository.existsByThemeId(id)) {
-            throw new IllegalArgumentException("예약한 기록이 존재하여 삭제할 수 없습니다.");
+            throw new InvalidReservationException("예약한 기록이 존재하여 삭제할 수 없습니다.");
         }
         themeRepository.deleteById(id);
     }

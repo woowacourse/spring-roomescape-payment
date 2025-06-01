@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.stream.Stream;
+import roomescape.common.exception.InvalidReservationException;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -32,9 +33,9 @@ class ThemeTest {
     void create_theme_exception_test(String name, String description, String thumbnail) {
         assertAll(
                 () -> assertThatThrownBy(() -> Theme.createWithoutId(name, description, thumbnail))
-                        .isInstanceOf(IllegalArgumentException.class),
+                        .isInstanceOf(InvalidReservationException.class),
                 () -> assertThatThrownBy(() -> Theme.createWithoutId(name, description, thumbnail))
-                        .isInstanceOf(IllegalArgumentException.class)
+                        .isInstanceOf(InvalidReservationException.class)
         );
     }
 }

@@ -1,6 +1,7 @@
 package roomescape.reservation.domain;
 
 import java.time.LocalDate;
+import roomescape.common.exception.InvalidReservationException;
 
 public class ReservationPeriod {
 
@@ -25,10 +26,10 @@ public class ReservationPeriod {
 
     private void validateOffset(int startOffset, int endOffset) {
         if (startOffset < 0 || endOffset < 0) {
-            throw new IllegalArgumentException("Offset은 0 이상이어야 합니다.");
+            throw new InvalidReservationException("Offset은 0 이상이어야 합니다.");
         }
         if (endOffset > startOffset) {
-            throw new IllegalArgumentException("endOffset는 startOffset보다 클 수 없습니다. (종료일은 시작일보다 미래일 수 없습니다)");
+            throw new InvalidReservationException("endOffset는 startOffset보다 클 수 없습니다. (종료일은 시작일보다 미래일 수 없습니다)");
         }
     }
 }

@@ -3,6 +3,7 @@ package roomescape.reservationTime.service;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.common.exception.InvalidReservationException;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservationTime.domain.ReservationTime;
@@ -35,7 +36,7 @@ public class ReservationTimeService {
     @Transactional
     public void deleteReservationTimeById(final Long id) {
         if (reservationRepository.existsByTimeId(id)) {
-            throw new IllegalArgumentException("삭제할 수 없는 예약 시간입니다.");
+            throw new InvalidReservationException("삭제할 수 없는 예약 시간입니다.");
         }
         reservationTimeRepository.deleteById(id);
     }

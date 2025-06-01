@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
+import roomescape.common.exception.InvalidReservationException;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -35,13 +37,13 @@ class ReservationPeriodTest {
     @DisplayName("offset 음수 예외 테스트")
     void offset_negative_test() {
         assertThatThrownBy(() -> new ReservationPeriod(LocalDate.of(2000, 11, 5), -1, -1))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(InvalidReservationException.class);
     }
 
     @Test
     @DisplayName("offset 범위 예외 테스트")
     void offset_range_test() {
         assertThatThrownBy(() -> new ReservationPeriod(LocalDate.of(2000, 11, 5), 1, 3))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(InvalidReservationException.class);
     }
 }

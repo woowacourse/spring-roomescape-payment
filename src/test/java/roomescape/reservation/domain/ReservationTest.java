@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.stream.Stream;
+import roomescape.common.exception.InvalidReservationException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.reservationTime.domain.ReservationTime;
@@ -55,6 +56,6 @@ class ReservationTest {
         Member member = Member.createWithoutId("a", "a", "a", Role.USER);
         // when & then
         assertThatThrownBy(() -> Reservation.createWithoutId(now, member, date, reservationTime, theme))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(InvalidReservationException.class);
     }
 }

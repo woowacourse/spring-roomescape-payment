@@ -1,6 +1,7 @@
 package roomescape.member.domain;
 
 import jakarta.persistence.Embeddable;
+import roomescape.common.exception.InvalidReservationException;
 
 @Embeddable
 public class MemberName {
@@ -20,7 +21,7 @@ public class MemberName {
 
     private void validate(String name) {
         if (name == null || name.isBlank() || name.length() > MAX_NAME_LENGTH) {
-            throw new IllegalArgumentException("[ERROR] 이름은 1글자 이상 10글자 이하여야합니다.");
+            throw new InvalidReservationException("[ERROR] 이름은 1글자 이상 10글자 이하여야합니다.");
         }
     }
 

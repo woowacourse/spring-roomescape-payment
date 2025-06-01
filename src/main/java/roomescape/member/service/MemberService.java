@@ -3,6 +3,7 @@ package roomescape.member.service;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.common.exception.InvalidReservationException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.member.domain.Role;
@@ -22,7 +23,7 @@ public class MemberService {
     @Transactional
     public SignupResponse createUser(SignupRequest request) {
         if (memberRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("이미 가입된 이메일입니다");
+            throw new InvalidReservationException("이미 가입된 이메일입니다");
         }
 
         Member member = Member.createWithoutId(request.name(), request.email(), request.password(), Role.USER);

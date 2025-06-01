@@ -4,14 +4,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import roomescape.common.exception.InvalidReservationException;
 import roomescape.common.exception.PaymentException;
 import roomescape.common.exception.UnauthorizedException;
 import roomescape.common.exceptionHandler.dto.ExceptionResponse;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final String EXCEPTION_PREFIX = "[ERROR] ";
@@ -26,17 +27,25 @@ public class GlobalExceptionHandler {
     /**
      * 400 Bad Request
      */
+    @ExceptionHandler(value = InvalidReservationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ExceptionResponse handleInvalidReservationException(
+            final InvalidReservationException e, final HttpServletRequest request
+    ) {
+        return new ExceptionResponse(EXCEPTION_PREFIX + e.getMessage(), request.getRequestURI());
+    }
+
     @ExceptionHandler(value = HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ExceptionResponse notReadable(
-            final HttpMessageNotReadableException exception, final HttpServletRequest request
+            final HttpMessageNotReadableException e, final HttpServletRequest request
     ) {
-        Throwable rootCause = exception.getRootCause();
+        Throwable rootCause = e.getRootCause();
         if (rootCause instanceof IllegalArgumentException) {
             return new ExceptionResponse(EXCEPTION_PREFIX + rootCause.getMessage(), request.getRequestURI());
         }
 
-        return new ExceptionResponse(EXCEPTION_PREFIX + "요청 형식이 올바르지 않습니다.", request.getRequestURI());
+        return new ExceptionResponse(EXCEPTION_PREFIX + e.getMessage(), request.getRequestURI());
     }
 
     /**

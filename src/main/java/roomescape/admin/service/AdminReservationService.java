@@ -2,6 +2,7 @@ package roomescape.admin.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.common.exception.InvalidReservationException;
 import roomescape.common.util.DateTime;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
@@ -34,11 +35,11 @@ public class AdminReservationService {
     @Transactional
     public ReservationResponse createReservation(final ReservationRequest request, final Long memberId) {
         ReservationTime time = reservationTimeRepository.findById(request.timeId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 시간입니다."));
+                .orElseThrow(() -> new InvalidReservationException("존재하지 않는 시간입니다."));
         Theme theme = themeRepository.findById(request.themeId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 테마입니다."));
+                .orElseThrow(() -> new InvalidReservationException("존재하지 않는 테마입니다."));
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("존재 하지 않는 유저입니다."));
+                .orElseThrow(() -> new InvalidReservationException("존재 하지 않는 유저입니다."));
 
         Reservation reservation = Reservation.createWithoutId(dateTime.now(), member, request.date(), time, theme);
 
@@ -47,7 +48,7 @@ public class AdminReservationService {
                 reservation.getReservationTime(),
                 reservation.getThemeId()
         )) {
-            throw new IllegalArgumentException("이미 예약이 존재합니다.");
+            throw new InvalidReservationException("이미 예약이 존재합니다.");
         }
 
         Reservation save = reservationRepository.save(reservation);

@@ -11,6 +11,7 @@ import java.util.List;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import roomescape.common.exception.InvalidReservationException;
 import roomescape.common.util.DateTime;
 import roomescape.reservation.domain.ReservationPeriod;
 import roomescape.reservation.domain.ReservationRepository;
@@ -46,7 +47,7 @@ class ThemeServiceMockTest {
 
         // when & then
         assertThatThrownBy(() -> themeService.deleteThemeById(1L))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(InvalidReservationException.class);
     }
 
     @DisplayName("인기 테마를 가져올 수 있다.")

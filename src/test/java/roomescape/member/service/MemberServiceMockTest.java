@@ -9,6 +9,7 @@ import java.util.List;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import roomescape.common.exception.InvalidReservationException;
 import roomescape.fixture.TestFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
@@ -39,7 +40,7 @@ class MemberServiceMockTest {
                 .thenReturn(true);
         // when & then
         assertThatThrownBy(() -> memberService.createUser(signupRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(InvalidReservationException.class);
     }
 
     @Test
