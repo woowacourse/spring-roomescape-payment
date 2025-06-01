@@ -42,7 +42,6 @@ public class Waiting extends AuditedEntity {
     public Waiting(
             Long id, LocalDate date, Theme theme, ReservationTime time,
             Member member, Payment paymentHistory) {
-        validate(date, theme, time, member);
         this.id = id;
         this.date = date;
         this.theme = theme;
@@ -92,7 +91,7 @@ public class Waiting extends AuditedEntity {
             return false;
         }
         Waiting waiting = (Waiting) o;
-        if (this.id == null || waiting.id == null) {
+        if (getId() == null || waiting.getId() == null) {
             return false;
         }
         return Objects.equals(id, waiting.id);
@@ -101,36 +100,5 @@ public class Waiting extends AuditedEntity {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
-    }
-
-    private void validate(LocalDate date, Theme theme, ReservationTime time, Member member) {
-        validateDate(date);
-        validateTheme(theme);
-        validateTime(time);
-        validateMember(member);
-    }
-
-    private void validateDate(LocalDate date) {
-        if (date == null) {
-            throw new IllegalArgumentException("비어있는 날짜로 대기를 생성할 수 없습니다.");
-        }
-    }
-
-    private void validateTheme(Theme theme) {
-        if (theme == null) {
-            throw new IllegalArgumentException("비어있는 테마로 대기를 생성할 수 없습니다.");
-        }
-    }
-
-    private void validateTime(ReservationTime time) {
-        if (time == null) {
-            throw new IllegalArgumentException("비어있는 시간으로 대기를 생성할 수 없습니다.");
-        }
-    }
-
-    private void validateMember(Member member) {
-        if (member == null) {
-            throw new IllegalArgumentException("비어있는 회원으로 대기를 생성할 수 없습니다.");
-        }
     }
 }

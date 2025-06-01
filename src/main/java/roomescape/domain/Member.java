@@ -35,7 +35,7 @@ public class Member extends AuditedEntity {
     }
 
     public Member(Long id, Role role, String name, String email, String password) {
-        validate(role, name, email, password);
+        validate(email, password);
         this.id = id;
         this.role = role;
         this.name = name;
@@ -81,7 +81,7 @@ public class Member extends AuditedEntity {
             return false;
         }
         Member member = (Member) o;
-        if (this.id == null || member.id == null) {
+        if (getId() == null || member.getId() == null) {
             return false;
         }
         return Objects.equals(id, member.id);
@@ -92,26 +92,9 @@ public class Member extends AuditedEntity {
         return Objects.hashCode(id);
     }
 
-    private void validate(Role role, String name, String email, String password) {
-        validateRole(role);
-        validateName(name);
+    private void validate(String email, String password) {
         validateEmail(email);
         validatePassword(password);
-    }
-
-    private void validateRole(Role role) {
-        if (role == null) {
-            throw new IllegalArgumentException("비어있는 권한으로 멤버를 생성할 수 없습니다.");
-        }
-    }
-
-    private void validateName(String name) {
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("비어있는 이름로 멤버를 생성할 수 없습니다.");
-        }
-        if (name.length() >= MAX_NAME_LENGTH) {
-            throw new IllegalArgumentException("최대길이를 초과한 이름으로는 멤버를 생성할 수 없습니다.");
-        }
     }
 
     private void validateEmail(String email) {

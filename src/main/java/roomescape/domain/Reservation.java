@@ -41,7 +41,6 @@ public class Reservation extends AuditedEntity {
     public Reservation(
             Long id, LocalDate date, ReservationTime time, Theme theme, Member member
     ) {
-        validate(date, time, theme, member);
         this.id = id;
         this.date = date;
         this.reservationTime = time;
@@ -53,7 +52,6 @@ public class Reservation extends AuditedEntity {
     public Reservation(
             Long id, LocalDate date, ReservationTime time, Theme theme, Member member, Payment paymentHistory
     ) {
-        validate(date, time, theme, member);
         this.id = id;
         this.date = date;
         this.reservationTime = time;
@@ -106,7 +104,7 @@ public class Reservation extends AuditedEntity {
             return false;
         }
         Reservation reservation = (Reservation) o;
-        if (this.id == null || reservation.id == null) {
+        if (getId() == null || reservation.getId() == null) {
             return false;
         }
         return Objects.equals(id, reservation.id);
@@ -115,36 +113,5 @@ public class Reservation extends AuditedEntity {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
-    }
-
-    private void validate(LocalDate date, ReservationTime time, Theme theme, Member member) {
-        validateDate(date);
-        validateTime(time);
-        validateTheme(theme);
-        validateMember(member);
-    }
-
-    private void validateDate(LocalDate date) {
-        if (date == null) {
-            throw new IllegalArgumentException("비어있는 예약날짜로 예약을 생성할 수 없습니다.");
-        }
-    }
-
-    private void validateTime(ReservationTime reservationTime) {
-        if (reservationTime == null) {
-            throw new IllegalArgumentException("비어있는 예약시간으로는 예약을 생성할 수 없습니다.");
-        }
-    }
-
-    private void validateTheme(Theme theme) {
-        if (theme == null) {
-            throw new IllegalArgumentException("비어있는 테마로는 예약을 생성할 수 없습니다.");
-        }
-    }
-
-    private void validateMember(Member member) {
-        if (member == null) {
-            throw new IllegalArgumentException("비어있는 멤버로는 예약을 생성할 수 없습니다.");
-        }
     }
 }

@@ -16,37 +16,6 @@ class MemberTest {
     @DisplayName("회원을 생성할 때 검증을 수행한다.")
     public class validate {
 
-        @DisplayName("비어있는 권한으로는 멤버를 생성할 수 없다")
-        @Test
-        void cannotCreateBecauseNullRole() {
-            // when & then
-            assertThatThrownBy(() -> new Member(1L, null, "이름", "test@test.com", "asdfe123!"))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("비어있는 권한으로 멤버를 생성할 수 없습니다.");
-        }
-
-        @DisplayName("비어있는 이름으로 멤버를 생성할 수 없다")
-        @ParameterizedTest
-        @NullAndEmptySource
-        void cannotCreateBecauseNullName(String name) {
-            // when & then
-            assertThatThrownBy(() -> new Member(1L, Role.GENERAL, name, "test@test.com", "qwer1234!"))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("비어있는 이름로 멤버를 생성할 수 없습니다.");
-        }
-
-        @DisplayName("최대길이를 초과한 이름으로 멤버를 생성할 수 없다")
-        @Test
-        void cannotCreateBecauseTooLongName() {
-            // given
-            String tooLongName = "1" .repeat(256);
-
-            // when & then
-            assertThatThrownBy(() -> new Member(1L, Role.GENERAL, tooLongName, "test@test.com", "qwer1234!"))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("최대길이를 초과한 이름으로는 멤버를 생성할 수 없습니다.");
-        }
-
         @DisplayName("비어있는 이메일로 멤버를 생성할 수 없다")
         @ParameterizedTest
         @NullAndEmptySource
@@ -61,7 +30,7 @@ class MemberTest {
         @Test
         void cannotCreateBecauseTooLongEmail() {
             // given
-            String tooLongEmail = "1" .repeat(256);
+            String tooLongEmail = "1".repeat(256);
 
             // when & then
             assertThatThrownBy(() -> new Member(1L, Role.GENERAL, "이름", tooLongEmail, "비밀번호"))
@@ -95,7 +64,7 @@ class MemberTest {
         @Test
         void cannotCreateBecauseTooLongPassword() {
             // given
-            String tooLongPassword = "i" .repeat(51);
+            String tooLongPassword = "i".repeat(51);
             // when & then
             assertThatThrownBy(() -> new Member(1L, Role.GENERAL, "이름", "test@test.com", tooLongPassword))
                     .isInstanceOf(IllegalArgumentException.class)
