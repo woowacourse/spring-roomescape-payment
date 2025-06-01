@@ -7,7 +7,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.member.auth.vo.MemberInfo;
-import roomescape.payment.PaymentService;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.controller.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.controller.dto.CreateReservationByAdminWebRequest;
 import roomescape.reservation.controller.dto.CreateReservationWebRequest;

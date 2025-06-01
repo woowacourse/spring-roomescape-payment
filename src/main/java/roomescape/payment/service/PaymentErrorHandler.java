@@ -1,4 +1,4 @@
-package roomescape.payment;
+package roomescape.payment.service;
 
 
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
@@ -11,6 +11,7 @@ import lombok.Getter;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import roomescape.common.exception.PaymentException;
+import roomescape.payment.service.dto.PaymentError;
 
 public class PaymentErrorHandler extends DefaultResponseErrorHandler {
 
