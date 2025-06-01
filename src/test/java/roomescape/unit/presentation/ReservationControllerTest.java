@@ -1,18 +1,7 @@
 package roomescape.unit.presentation;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -29,6 +18,16 @@ import roomescape.infrastructure.JwtTokenProvider;
 import roomescape.presentation.PaymentClientController;
 import roomescape.presentation.ReservationController;
 import roomescape.service.ReservationService;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(value = {ReservationController.class, AuthorizationExtractor.class})
 class ReservationControllerTest {
@@ -56,7 +55,7 @@ class ReservationControllerTest {
                 new ReservationTimeResponse(1L, LocalTime.of(9, 0)), "themeName1");
         PaymentInfo paymentInfo = new PaymentInfo("1", 1000);
         given(paymentClientController.postPaymentInfo(any())).willReturn(paymentInfo);
-        given(reservationService.createReservationForMember(1L, request.timeId(), request.themeId(), request.date(), paymentInfo)).willReturn(
+        given(reservationService.createReservationForMember(1L, request.timeId(), request.themeId(), request.date())).willReturn(
                 response);
         given(tokenProvider.extractSubject("accessToken")).willReturn("1");
         // when & then

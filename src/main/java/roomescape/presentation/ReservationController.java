@@ -40,8 +40,7 @@ public class ReservationController {
         PaymentInfo paymentInfo = paymentClientController.postPaymentInfo(paymentRequest);
 
         ReservationResponse reservationResponse = reservationService.createReservationForMember(
-                memberId, request.timeId(), request.themeId(), request.date(), paymentInfo
-        );
+                memberId, request.timeId(), request.themeId(), request.date());
 
         return ResponseEntity
                 .created(URI.create("/reservations/" + reservationResponse.id()))

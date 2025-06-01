@@ -97,8 +97,7 @@ public class ReservationService {
     public ReservationResponse createReservationForMember(Long memberId,
                                                           Long timeId,
                                                           Long themeId,
-                                                          LocalDate date,
-                                                          PaymentInfo paymentInfo) {
+                                                          LocalDate date) {
 
         ReservationTime reservationTime = reservationTimeRepository.findById(timeId)
                 .orElseThrow(ReservationTimeNotFoundException::new);
