@@ -1,4 +1,4 @@
-package roomescape.utility;
+package roomescape.utility.payment;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,61 +10,60 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import roomescape.dto.business.PaymentExceptionContent;
 import roomescape.dto.business.PaymentResult;
+import roomescape.exception.ExternalApiConnectionException;
 import roomescape.exception.PaymentException;
 
 public class TossPaymentClient implements PaymentClient {
 
-    private static final String CONNECTION_ERROR_MESSAGE = "결제 서버에 연결이 실패하였습니다. 이 현상이 지속되는 경우 어드민에게 문의해주세요.";
-    private static final String CONFIRM_SERVER_FAIL_MESSAGE = "결제 연동 서버가 아파요. 관리자에게 문의해주세요.";
+    private static final String CONNECTION_ERROR_MESSAGE = "토스 결제 서버에 연결이 실패하였습니다.";
+    private static final String PAYMENT_SERVER_ERROR_MESSAGE = "토스 결제 서버에서 예상치 못한 예외가 발생했습니다.";
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
     private final RestClient restClient;
     private final String secretKey;
-    private final ObjectMapper statusParser = new ObjectMapper();
-    private final String paymentConfirmUrl;
+    private final String paymentAuthorizationUrl;
 
     public TossPaymentClient(
             RestClient restClient,
             String secretKey,
-            String paymentConfirmUrl
+            String paymentAuthorizationUrl
     ) {
         this.restClient = restClient;
         this.secretKey = secretKey;
-        this.paymentConfirmUrl = paymentConfirmUrl;
+        this.paymentAuthorizationUrl = paymentAuthorizationUrl;
     }
 
     @Override
-    public PaymentResult pay(String paymentKey, String orderId, long amount) {
+    public PaymentResult authorizePayment(String paymentKey, String orderId, long amount) {
         Map<String, Object> requestBody = Map.of(
                 "paymentKey", paymentKey,
                 "orderId", orderId,
-                "amount", amount
-        );
-
+                "amount", amount);
         try {
-            return doPay(requestBody);
+            return doAuthorizePayment(requestBody);
         } catch (RestClientException restClientException) {
-            throw new RestClientException(CONNECTION_ERROR_MESSAGE);
+            throw new ExternalApiConnectionException(CONNECTION_ERROR_MESSAGE);
         }
     }
 
-    private PaymentResult doPay(Map<String, Object> requestBody) {
+    private PaymentResult doAuthorizePayment(Map<String, Object> requestBody) {
         return restClient.post()
-                .uri(paymentConfirmUrl)
+                .uri(paymentAuthorizationUrl)
                 .body(requestBody)
-                .header("Authorization", createAuthHeaderConcise())
+                .header("Authorization", createAuthorizationHeaderContent(secretKey))
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, ((request, response) -> {
-                    PaymentExceptionContent paymentExceptionContent = statusParser.readValue(response.getBody(),
-                            PaymentExceptionContent.class);
+                    PaymentExceptionContent paymentExceptionContent =
+                            objectMapper.readValue(response.getBody(), PaymentExceptionContent.class);
                     throw new PaymentException(paymentExceptionContent.message());
                 }))
                 .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
-                    throw new PaymentException(CONFIRM_SERVER_FAIL_MESSAGE);
+                    throw new PaymentException(PAYMENT_SERVER_ERROR_MESSAGE);
                 }))
                 .body(PaymentResult.class);
     }
 
-    public String createAuthHeaderConcise() {
+    public String createAuthorizationHeaderContent(String secretKey) {
         return "Basic " + Base64.getEncoder()
                 .encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
     }

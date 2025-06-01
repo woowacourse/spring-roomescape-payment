@@ -27,7 +27,7 @@ import roomescape.exception.BadRequestException;
 import roomescape.exception.NotFoundException;
 import roomescape.exception.PaymentException;
 import roomescape.repository.MemberRepository;
-import roomescape.repository.PaymentHistoryRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -37,7 +37,7 @@ import roomescape.service.query.ReservationQueryService;
 import roomescape.service.query.ReservationTimeQueryService;
 import roomescape.service.query.ThemeQueryService;
 import roomescape.service.query.WaitingQueryService;
-import roomescape.utility.PaymentClientStub;
+import roomescape.test.stub.PaymentClientStub;
 
 @DataJpaTest
 class WaitingServiceTest {
@@ -55,7 +55,7 @@ class WaitingServiceTest {
     @Autowired
     private WaitingRepository waitingRepository;
     @Autowired
-    private PaymentHistoryRepository paymentHistoryRepository;
+    private PaymentRepository paymentRepository;
 
     private PaymentService paymentService;
     private MemberQueryService memberQueryService;
@@ -71,7 +71,7 @@ class WaitingServiceTest {
     @BeforeEach
     void setup() {
         paymentClient = new PaymentClientStub();
-        paymentService = new PaymentService(paymentHistoryRepository, paymentClient);
+        paymentService = new PaymentService(paymentRepository, paymentClient);
         memberQueryService = new MemberQueryService(memberRepository);
         themeQueryService = new ThemeQueryService(themeRepository);
         timeQueryService = new ReservationTimeQueryService(reservationTimeRepository);

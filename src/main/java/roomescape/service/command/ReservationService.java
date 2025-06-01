@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
-import roomescape.domain.PaymentHistory;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
@@ -54,7 +54,10 @@ public class ReservationService {
         this.waitingQueryService = waitingQueryService;
     }
 
-    public ReservationResponse addReservation(long memberId, ReservationCreationContent request) {
+    public ReservationResponse addReservation(
+            long memberId,
+            ReservationCreationContent request
+    ) {
         Member member = memberQueryService.getMemberById(memberId);
         Theme theme = themeQueryService.getThemeById(request.themeId());
         ReservationTime time = timeQueryService.getReservationTimeById(request.timeId());
@@ -69,13 +72,16 @@ public class ReservationService {
         return new ReservationResponse(savedReservation);
     }
 
-    public ReservationResponse addReservation(long memberId, ReservationCreationContent reservationCreationContent,
-            PaymentHistoryCreationContent paymentHistoryCreationContent) {
+    public ReservationResponse addReservation(
+            long memberId,
+            ReservationCreationContent reservationCreationContent,
+            PaymentHistoryCreationContent paymentHistoryCreationContent
+    ) {
         Member member = memberQueryService.getMemberById(memberId);
         Theme theme = themeQueryService.getThemeById(reservationCreationContent.themeId());
         ReservationTime time = timeQueryService.getReservationTimeById(reservationCreationContent.timeId());
 
-        PaymentHistory paymentHistory = paymentService.pay(paymentHistoryCreationContent);
+        Payment paymentHistory = paymentService.savePayment(paymentHistoryCreationContent);
 
         Reservation reservation = Reservation.createWithoutId(reservationCreationContent.date(), time, theme, member,
                 paymentHistory);

@@ -3,7 +3,7 @@ package roomescape.service.command;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
-import roomescape.domain.PaymentHistory;
+import roomescape.domain.Payment;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.domain.Waiting;
@@ -57,7 +57,7 @@ public class WaitingService {
         ReservationTime time = timeQueryService.getTimeById(content.timeId());
         Member member = memberQueryService.getMemberById(content.memberId());
 
-        PaymentHistory paymentHistory = paymentService.pay(paymentHistoryCreationContent);
+        Payment paymentHistory = paymentService.savePayment(paymentHistoryCreationContent);
         Waiting waiting = Waiting.createWithoutId(content.date(), theme, time, member, paymentHistory);
 
         validateEmptyReservation(waiting);

@@ -28,7 +28,7 @@ import roomescape.dto.business.AccessTokenContent;
 import roomescape.dto.request.AdminReservationRequest;
 import roomescape.dto.request.ReservationCreationRequest;
 import roomescape.repository.MemberRepository;
-import roomescape.repository.PaymentHistoryRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -54,13 +54,13 @@ class ReservationApiTest {
     @Autowired
     private JwtTokenProvider tokenProvider;
     @Autowired
-    private PaymentHistoryRepository paymentHistoryRepository;
+    private PaymentRepository paymentRepository;
 
     @AfterEach
     void setup() {
         reservationRepository.deleteAll();
         waitingRepository.deleteAll();
-        paymentHistoryRepository.deleteAll();
+        paymentRepository.deleteAll();
         memberRepository.deleteAll();
         timeRepository.deleteAll();
         themeRepository.deleteAll();

@@ -1,8 +1,9 @@
-package roomescape.utility;
+package roomescape.test.stub;
 
 import org.springframework.web.client.RestClientException;
 import roomescape.dto.business.PaymentResult;
 import roomescape.exception.PaymentException;
+import roomescape.utility.payment.PaymentClient;
 
 public class PaymentClientStub implements PaymentClient {
 
@@ -11,7 +12,7 @@ public class PaymentClientStub implements PaymentClient {
     private boolean occurRestClientError;
 
     @Override
-    public PaymentResult pay(String paymentKey, String orderId, long amount) {
+    public PaymentResult authorizePayment(String paymentKey, String orderId, long amount) {
         if (occurRestClientError) {
             throw new RestClientException("restclienterror");
         }

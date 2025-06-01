@@ -8,8 +8,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import roomescape.dto.business.PaymentHistoryCreationContent;
 import roomescape.exception.PaymentException;
-import roomescape.repository.PaymentHistoryRepository;
-import roomescape.utility.PaymentClientStub;
+import roomescape.repository.PaymentRepository;
+import roomescape.test.stub.PaymentClientStub;
 
 @DataJpaTest
 class PaymentServiceTest {
@@ -19,17 +19,17 @@ class PaymentServiceTest {
     private TestEntityManager testEntityManager;
 
     @Autowired
-    private PaymentHistoryRepository paymentHistoryRepository;
+    private PaymentRepository paymentRepository;
 
     private final PaymentClientStub paymentClientStub = new PaymentClientStub();
 
     @Test
     void paymentFailThenReturnErrorMessage() {
         paymentClientStub.setErrorCase(ALREADY_PROCESSED_PAYMENT);
-        PaymentService paymentService = new PaymentService(paymentHistoryRepository, paymentClientStub);
+        PaymentService paymentService = new PaymentService(paymentRepository, paymentClientStub);
         PaymentHistoryCreationContent paymentHistoryCreationContent = new PaymentHistoryCreationContent("asdf", "asdf",
                 "asdf", 1000);
-        assertThatThrownBy(() -> paymentService.pay(paymentHistoryCreationContent)).isInstanceOf(
+        assertThatThrownBy(() -> paymentService.savePayment(paymentHistoryCreationContent)).isInstanceOf(
                         PaymentException.class)
                 .hasMessage(ALREADY_PROCESSED_PAYMENT);
     }

@@ -1,4 +1,4 @@
-package roomescape.config.payment;
+package roomescape.config;
 
 import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
@@ -7,32 +7,28 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
-import roomescape.utility.PaymentClient;
-import roomescape.utility.TossPaymentClient;
+import roomescape.utility.payment.PaymentClient;
+import roomescape.utility.payment.TossPaymentClient;
 
 @Configuration
-@Profile("!test") // 테스트 프로필에서만 활성화
-public class PaymentConfig {
+@Profile("!test")
+public class ClientConfiguration {
 
     @Bean
     public PaymentClient paymentClient(
-            @Value("${toss_payment_url}") String paymentUrl,
+            @Value("${toss_payment_base_url}") String paymentUrl,
             @Value("${toss_payment_secret_key}") String secretKey,
-            @Value("${toss_confirm_server_url}") String confirmServerUrl
+            @Value("${toss_payment_authorization_url}") String paymentAuthorizationUrl
     ) {
         RestClient restClient = RestClient.builder()
                 .baseUrl(paymentUrl)
                 .requestFactory(simpleClientHttpRequestFactory())
-                .defaultHeaders(headers -> {
-                    headers.set("Content-Type", "application/json");
-                })
+                .defaultHeaders(headers -> headers.set("Content-Type", "application/json"))
                 .build();
-
-        return new TossPaymentClient(restClient, secretKey, confirmServerUrl);
+        return new TossPaymentClient(restClient, secretKey, paymentAuthorizationUrl);
     }
 
-    @Bean
-    public SimpleClientHttpRequestFactory simpleClientHttpRequestFactory() {
+    private SimpleClientHttpRequestFactory simpleClientHttpRequestFactory() {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(Duration.ofSeconds(5));
         requestFactory.setReadTimeout(Duration.ofSeconds(30));

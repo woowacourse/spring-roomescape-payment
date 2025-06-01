@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestClient;
 import roomescape.dto.business.PaymentResult;
-import roomescape.utility.PaymentClient;
-import roomescape.utility.TossPaymentClient;
+import roomescape.utility.payment.PaymentClient;
+import roomescape.utility.payment.TossPaymentClient;
 
 @Disabled
 public class PaymentApiTest {
@@ -36,7 +36,7 @@ public class PaymentApiTest {
 
     @Test
     void whenPaymentIsCorrectThenSuccess() {
-        assertThat(realPaymentClient.pay(orderId, paymentKey, amount))
+        assertThat(realPaymentClient.authorizePayment(orderId, paymentKey, amount))
                 .isEqualTo(new PaymentResult(orderId, paymentKey, amount));
 
     }

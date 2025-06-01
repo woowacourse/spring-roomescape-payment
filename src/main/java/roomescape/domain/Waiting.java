@@ -33,7 +33,7 @@ public class Waiting extends AuditedEntity {
     @JoinColumn(nullable = false)
     private Member member;
     @OneToOne(fetch = FetchType.LAZY)
-    private PaymentHistory paymentHistory;
+    private Payment paymentHistory;
 
     protected Waiting() {
 
@@ -41,7 +41,7 @@ public class Waiting extends AuditedEntity {
 
     public Waiting(
             Long id, LocalDate date, Theme theme, ReservationTime time,
-            Member member, PaymentHistory paymentHistory) {
+            Member member, Payment paymentHistory) {
         validate(date, theme, time, member);
         this.id = id;
         this.date = date;
@@ -52,12 +52,12 @@ public class Waiting extends AuditedEntity {
     }
 
     public static Waiting createWithoutIdWithoutPayment(LocalDate date, Theme theme,
-                                                        ReservationTime time, Member member) {
+            ReservationTime time, Member member) {
         return new Waiting(null, date, theme, time, member, null);
     }
 
     public static Waiting createWithoutId(LocalDate date, Theme theme, ReservationTime time,
-                                          Member member, PaymentHistory paymentHistory) {
+            Member member, Payment paymentHistory) {
         return new Waiting(null, date, theme, time, member, paymentHistory);
     }
 

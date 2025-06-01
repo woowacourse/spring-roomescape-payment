@@ -1,10 +1,10 @@
-package roomescape.config.payment;
+package roomescape.test.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import roomescape.utility.PaymentClient;
-import roomescape.utility.PaymentClientStub;
+import roomescape.test.stub.PaymentClientStub;
+import roomescape.utility.payment.PaymentClient;
 
 @Configuration
 @Profile("test") // 테스트 프로필에서만 활성화

@@ -8,10 +8,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+import roomescape.exception.ExternalApiConnectionException;
 import roomescape.exception.PaymentException;
-import roomescape.utility.PaymentClient;
-import roomescape.utility.PaymentClientStub;
-import roomescape.utility.TossPaymentClient;
+import roomescape.test.stub.PaymentClientStub;
+import roomescape.utility.payment.PaymentClient;
+import roomescape.utility.payment.TossPaymentClient;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 class PaymentApiTest {
@@ -22,9 +23,9 @@ class PaymentApiTest {
     private final String confirmServerUrl;
 
     public PaymentApiTest(
-            @Value("${toss_payment_url}") String paymentUrl,
+            @Value("${toss_payment_base_url}") String paymentUrl,
             @Value("${toss_payment_secret_key}") String secretKey,
-            @Value("${toss_confirm_server_url}") String confirmServerUrl
+            @Value("${toss_payment_authorization_url}") String confirmServerUrl
     ) {
         this.paymentUrl = paymentUrl;
         this.secretKey = secretKey;
@@ -37,27 +38,27 @@ class PaymentApiTest {
     void ifNotValidUrlThenError() {
         RestClient invalidRestClient = RestClient.builder().baseUrl(paymentUrl + "asdf").build();
         PaymentClient invalidPaymentClient = new TossPaymentClient(invalidRestClient, secretKey, confirmServerUrl);
-        assertThatThrownBy(() -> invalidPaymentClient.pay("asdf", "asdf", 1234))
-                .isInstanceOf(RestClientException.class);
+        assertThatThrownBy(() -> invalidPaymentClient.authorizePayment("asdf", "asdf", 1234))
+                .isInstanceOf(ExternalApiConnectionException.class);
     }
 
     @Test
     void ifTimeoutThenError() {
         PaymentClientStub invalidPaymentClient = new PaymentClientStub();
         invalidPaymentClient.setOccurRestClientError(true);
-        assertThatThrownBy(() -> invalidPaymentClient.pay("asdf", "asdf", 1234))
+        assertThatThrownBy(() -> invalidPaymentClient.authorizePayment("asdf", "asdf", 1234))
                 .isInstanceOf(RestClientException.class);
     }
 
     @Test
     void connectSuccess() {
-        assertThatThrownBy(() -> realPaymentClient.pay("asdf", "asdf", 1234))
+        assertThatThrownBy(() -> realPaymentClient.authorizePayment("asdf", "asdf", 1234))
                 .isNotInstanceOf(RestClientException.class);
     }
 
     @Test
     void notFoundWhenNotPreparePayment() {
-        assertThatThrownBy(() -> realPaymentClient.pay("asdf", "asdf", 1234))
+        assertThatThrownBy(() -> realPaymentClient.authorizePayment("asdf", "asdf", 1234))
                 .isInstanceOf(PaymentException.class)
                 .hasMessage("결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다.");
     }

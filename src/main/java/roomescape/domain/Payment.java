@@ -7,7 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-public class PaymentHistory extends AuditedEntity {
+public class Payment extends AuditedEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,22 +19,22 @@ public class PaymentHistory extends AuditedEntity {
     @Column(nullable = false)
     private String paymentType;
 
-    protected PaymentHistory() {
+    protected Payment() {
 
     }
 
-    public PaymentHistory(Long id, String orderId, String paymentKey, String paymentType) {
+    public Payment(Long id, String orderId, String paymentKey, String paymentType) {
         this.id = id;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.paymentType = paymentType;
     }
 
-    public static PaymentHistory createWithoutId(
+    public static Payment createWithoutId(
             String orderId,
             String paymentKey,
             String paymentType
     ) {
-        return new PaymentHistory(null, orderId, paymentKey, paymentType);
+        return new Payment(null, orderId, paymentKey, paymentType);
     }
 }

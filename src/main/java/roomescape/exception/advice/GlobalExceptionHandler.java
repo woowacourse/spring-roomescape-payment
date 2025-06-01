@@ -11,9 +11,9 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import roomescape.exception.BadRequestException;
+import roomescape.exception.ExternalApiConnectionException;
 import roomescape.exception.ForbiddenException;
 import roomescape.exception.InternalServerException;
 import roomescape.exception.LoginFailException;
@@ -98,56 +98,53 @@ public class GlobalExceptionHandler {
     ) {
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problemDetail.setTitle("올바르지 않은 입력입니다.");
-        problemDetail.setDetail(String.join("요청 메세지의 형식을 다시 확인해주세요."));
+        problemDetail.setDetail("요청 메세지의 형식을 다시 확인해주세요.");
+        return ResponseEntity.badRequest().body(problemDetail);
+    }
+
+    @ExceptionHandler(ExternalApiConnectionException.class)
+    public ResponseEntity<ProblemDetail> externalApiConnectionExceptionHandler(
+            ExternalApiConnectionException exception
+    ) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        problemDetail.setTitle("외부 API 연결에 실패했습니다.");
+        problemDetail.setDetail(exception.getMessage());
+        return ResponseEntity.internalServerError().body(problemDetail);
+    }
+
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<ProblemDetail> paymentExceptionHandler(
+            PaymentException exception
+    ) {
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        problemDetail.setTitle("결제 승인에 실패했습니다");
+        problemDetail.setDetail(exception.getMessage());
         return ResponseEntity.badRequest().body(problemDetail);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ProblemDetail> illegalArgumentExceptionHandler(IllegalArgumentException exception) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problemDetail.setTitle("올바르지 않은 입력입니다.");
         problemDetail.setDetail(exception.getMessage());
         return ResponseEntity.internalServerError().body(problemDetail);
     }
 
     @ExceptionHandler(InternalServerException.class)
-    public ResponseEntity<ProblemDetail> InternalServerExceptionHandler(InternalServerException exception) {
+    public ResponseEntity<ProblemDetail> internalServerExceptionHandler(InternalServerException exception) {
         System.out.println("exception = " + exception);
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         problemDetail.setTitle("서버 내부 에러입니다.");
-        problemDetail.setDetail(String.join("서버 내부에서 로직 예외 발생헸습니다."));
-        return ResponseEntity.internalServerError().body(problemDetail);
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ProblemDetail> runtimeExceptionHandler(RuntimeException exception) {
-        System.out.println("exception = " + exception);
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        problemDetail.setTitle("예상치 못한 에러입니다.");
-        problemDetail.setDetail(String.join("예상치 못한 예외 발생헸습니다."));
-        return ResponseEntity.internalServerError().body(problemDetail);
-    }
-
-    @ExceptionHandler(PaymentException.class)
-    public ResponseEntity<ProblemDetail> paymentExceptionHandler(PaymentException paymentException) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        problemDetail.setTitle("결제 실패하였습니다 사유: " + paymentException.getMessage());
-        return ResponseEntity.internalServerError().body(problemDetail);
-    }
-
-    @ExceptionHandler(RestClientException.class)
-    public ResponseEntity<ProblemDetail> paymentConnectionExceptionHandler(RestClientException restClientException) {
-        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-        problemDetail.setTitle("결제 실패하였습니다 사유: " + restClientException.getMessage());
+        problemDetail.setDetail("서버 내부에서 로직 예외 발생했습니다.");
         return ResponseEntity.internalServerError().body(problemDetail);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ProblemDetail> otherExceptionHandler(Exception exception) {
+    public ResponseEntity<ProblemDetail> defaultExceptionHandler(Exception exception) {
         System.out.println("exception = " + exception);
         ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.INTERNAL_SERVER_ERROR);
         problemDetail.setTitle("예상치 못한 에러입니다.");
-        problemDetail.setDetail(String.join("예상치 못한 예외 발생헸습니다."));
+        problemDetail.setDetail("예상치 못한 예외 발생헸습니다.");
         return ResponseEntity.internalServerError().body(problemDetail);
     }
 }
