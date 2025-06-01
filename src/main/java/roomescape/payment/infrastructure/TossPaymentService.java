@@ -27,7 +27,7 @@ public class TossPaymentService implements PaymentService {
     private final PaymentRepository paymentRepository;
 
     @Retryable(
-            value = {RestClientException.class, SocketTimeoutException.class, PaymentException.class},
+            value = {RestClientException.class, SocketTimeoutException.class, TossPaymentException.class},
             maxAttempts = 3,
             backoff = @Backoff(delay = 1000, multiplier = 2, maxDelay = 10000)
     )

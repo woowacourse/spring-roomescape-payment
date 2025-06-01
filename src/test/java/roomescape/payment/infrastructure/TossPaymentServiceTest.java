@@ -174,11 +174,11 @@ class TossPaymentServiceTest {
 
         // when
         when(paymentClient.requestPayment(any())).thenThrow(
-                new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "재시도 테스트 실패"));
+                new TossPaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "재시도 테스트 실패"));
 
         // then
         assertThatThrownBy(() -> paymentService.pay(paymentDataRequest, paymentConfirmRequest, reservation))
-                .isInstanceOf(PaymentException.class)
+                .isInstanceOf(TossPaymentException.class)
                 .hasMessage("재시도 테스트 실패");
 
         // 재시도 횟수 검증
