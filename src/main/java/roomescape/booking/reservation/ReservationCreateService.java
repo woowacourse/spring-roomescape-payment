@@ -1,7 +1,9 @@
 package roomescape.booking.reservation;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.booking.reservation.dto.AdminReservationRequest;
@@ -13,41 +15,62 @@ import roomescape.member.Member;
 import roomescape.member.MemberService;
 import roomescape.order.Order;
 import roomescape.order.OrderReader;
-import roomescape.payment.TossPaymentClient;
-import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.TossPaymentAdapter;
 import roomescape.schedule.Schedule;
 import roomescape.schedule.ScheduleService;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class ReservationCreateService {
 
     private final ReservationRepository reservationRepository;
     private final ScheduleService scheduleService;
     private final MemberService memberService;
     private final OrderReader orderReader;
-    private final TossPaymentClient tossPaymentClient;
+    private final TossPaymentAdapter tossPaymentAdapter;
 
     @Transactional
     public ReservationResponse create(final ReservationPaymentRequest request, final LoginMember loginMember) {
-        final Order order = orderReader.getById(request.orderId());
         final Member member = memberService.getByEmail(loginMember.email());
         final Schedule schedule = scheduleService.getByDateAndTimeIdAndThemeId(request.date(), request.timeId(), request.themeId());
-        order.pay(request.amount(), member, schedule);
+        final Order order = getOrder(request, member, schedule);
+        final Reservation reservation = saveReservation(schedule, member, request.orderId());
+        ReservationResponse response = ReservationResponse.from(reservation);
+
+        try {
+            tossPaymentAdapter.confirmPayment(request.orderId(), request.amount(), request.paymentKey());
+        } catch (Exception e) {
+            reservation.isCanceled();
+            throw e;
+        }
+
+        try {
+            confirmReservation(order, reservation);
+        } catch (Exception e) {
+            log.error("결제 상태 업데이트 실패", e);
+        }
+        return response;
+    }
+
+    private Order getOrder(final ReservationPaymentRequest request, final Member member, final Schedule schedule) {
+        final Order order = orderReader.getById(request.orderId());
+        order.validateOrder(request.amount(), member, schedule);
         order.updatePaymentKey(request.paymentKey());
-
-        PaymentConfirmRequest paymentRequest = new PaymentConfirmRequest(request.orderId(), request.amount(), request.paymentKey());
-        tossPaymentClient.confirm(paymentRequest);
-
-        validatePast(schedule);
-        validateDuplication(schedule);
-        final Reservation savedReservation = saveReservation(schedule, member, request.orderId());
-        return ReservationResponse.from(savedReservation);
+        return order;
     }
 
     private Reservation saveReservation(final Schedule schedule, final Member member, final String orderId) {
-        final Reservation notSavedReservation = new Reservation(member, schedule, ReservationStatus.CONFIRMED, orderId);
+        validatePast(schedule);
+        validateDuplication(schedule);
+        final Reservation notSavedReservation = new Reservation(member, schedule, ReservationStatus.PENDING, orderId);
         return reservationRepository.save(notSavedReservation);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    protected void confirmReservation(final Order order, final Reservation reservation) {
+        order.isPaidStatus();
+        reservation.isConfirmed();
     }
 
     private void validatePast(final Schedule schedule) {
@@ -57,7 +80,7 @@ public class ReservationCreateService {
     }
 
     private void validateDuplication(final Schedule schedule) {
-        if (reservationRepository.existsBySchedule(schedule)) {
+        if (reservationRepository.existsByScheduleAndReservationStatusNot(schedule, ReservationStatus.CANCELED)) {
             throw new ReservationConflictException();
         }
     }

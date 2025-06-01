@@ -42,7 +42,7 @@ public class Order {
         this.schedule = schedule;
     }
 
-    public void pay(final Long amount, final Member member, final Schedule schedule) {
+    public void validateOrder(final Long amount, final Member member, final Schedule schedule) {
         if (!isAmount(amount)) {
             throw new IllegalArgumentException("주문 금액과 결제 금액이 일치하지 않아 결제를 할 수 없습니다.");
         }
@@ -55,7 +55,6 @@ public class Order {
         if (this.paymentStatus != PaymentStatus.WAITING) {
             throw new IllegalArgumentException("결제를 할 수 없는 상태입니다.");
         }
-        this.paymentStatus = PaymentStatus.SUCCESS;
     }
 
     /**
@@ -63,6 +62,13 @@ public class Order {
      */
     public void updatePaymentKey(final String paymentKey) {
         this.paymentKey = paymentKey;
+    }
+
+    /**
+     * 결제 승인 요청 프로세스에서만 호출하는 메서드입니다.
+     */
+    public void isPaidStatus() {
+        this.paymentStatus = PaymentStatus.SUCCESS;
     }
 
     private boolean isAmount(final Long amount) {

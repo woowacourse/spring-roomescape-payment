@@ -48,4 +48,12 @@ public class Reservation {
         this.reservationStatus = reservationStatus;
         this.orderId = orderId;
     }
+
+    public void isConfirmed() {
+        this.reservationStatus = ReservationStatus.CONFIRMED;
+    }
+
+    public void isCanceled() {
+        this.reservationStatus = ReservationStatus.CANCELED;
+    }
 }

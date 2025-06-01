@@ -20,8 +20,7 @@ import roomescape.member.MemberService;
 import roomescape.order.Order;
 import roomescape.order.OrderReader;
 import roomescape.order.PaymentStatus;
-import roomescape.payment.TossPaymentClient;
-import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.TossPaymentAdapter;
 import roomescape.reservationtime.ReservationTime;
 import roomescape.schedule.Schedule;
 import roomescape.schedule.ScheduleService;
@@ -32,6 +31,7 @@ import java.time.LocalTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static roomescape.util.TestFactory.*;
@@ -48,7 +48,7 @@ public class ReservationCreateServiceTest {
     @Mock
     private OrderReader orderReader;
     @Mock
-    private TossPaymentClient paymentClient;
+    private TossPaymentAdapter paymentAdapter;
     @InjectMocks
     private ReservationCreateService reservationCreateService;
 
@@ -57,7 +57,6 @@ public class ReservationCreateServiceTest {
     class Create {
 
         private ReservationPaymentRequest request;
-        private PaymentConfirmRequest paymentConfirmRequest;
         private LoginMember loginMember;
         private Member member;
         private Schedule schedule;
@@ -79,20 +78,20 @@ public class ReservationCreateServiceTest {
             schedule = new Schedule(request.date(), reservationTime, theme);
             member = memberWithId(1L, new Member(loginMember.email(), "password", "boogie", MemberRole.MEMBER));
             reservation = reservationWithId(1L, new Reservation(member, schedule));
-            paymentConfirmRequest = new PaymentConfirmRequest("dummyOrderId", 1000L, "dummyKey");
         }
 
-        @DisplayName("reservation request를 생성하면 response 값을 반환한다.")
+        @DisplayName("예약 생성 및 결제 승인 api 요청 성공 시, 예약 상태는 CONFIRMED, 주문의 결제 상태가 SUCCESS로 변경되고, response 값을 반환한다.")
         @Test
-        void create() {
+        void create1() {
             // given
+            Order order = new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule);
             given(orderReader.getById(request.orderId()))
-                    .willReturn(new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule));
+                    .willReturn(order);
             given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(), schedule.getTheme().getId()))
                     .willReturn(schedule);
             given(memberService.getByEmail(loginMember.email()))
                     .willReturn(member);
-            given(reservationRepository.existsBySchedule(schedule))
+            given(reservationRepository.existsByScheduleAndReservationStatusNot(schedule, ReservationStatus.CANCELED))
                     .willReturn(false);
             given(reservationRepository.save(
                     new Reservation(member, schedule)))
@@ -102,10 +101,33 @@ public class ReservationCreateServiceTest {
             final ReservationResponse response = reservationCreateService.create(request, loginMember);
 
             // then
-            assertThat(response).isEqualTo(ReservationResponse.from(reservation));
+            assertAll(
+                    () -> assertThat(reservation.getReservationStatus()).isEqualTo(ReservationStatus.CONFIRMED),
+                    () -> assertThat(order.getPaymentStatus()).isEqualTo(PaymentStatus.SUCCESS),
+                    () -> assertThat(response).isEqualTo(ReservationResponse.from(reservation))
+            );
         }
 
         @DisplayName("이미 해당 시간, 날짜에 예약이 존재한다면 예외가 발생한다.")
+        @Test
+        void create2() {
+            // given
+            given(orderReader.getById(request.orderId()))
+                    .willReturn(new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule));
+            given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(), schedule.getTheme().getId()))
+                    .willReturn(schedule);
+            given(memberService.getByEmail(loginMember.email()))
+                    .willReturn(member);
+            given(reservationRepository.existsByScheduleAndReservationStatusNot(schedule, ReservationStatus.CANCELED))
+                    .willReturn(true);
+
+            // when & then
+            assertThatThrownBy(() -> {
+                reservationCreateService.create(request, loginMember);
+            }).isInstanceOf(ReservationConflictException.class);
+        }
+
+        @DisplayName("결제 승인 API가 실패한다면 예약이 취소되고 예외가 발생한다.")
         @Test
         void create3() {
             // given
@@ -115,33 +137,16 @@ public class ReservationCreateServiceTest {
                     .willReturn(schedule);
             given(memberService.getByEmail(loginMember.email()))
                     .willReturn(member);
-            given(reservationRepository.existsBySchedule(schedule))
-                    .willReturn(false);
-            given(reservationRepository.existsBySchedule(schedule))
-                    .willReturn(true);
+            doThrow(new PaymentException("결제에 실패하였습니다.")).when(paymentAdapter).confirmPayment(request.orderId(), request.amount(), request.paymentKey());
+            given(reservationRepository.save(new Reservation(member, schedule)))
+                    .willReturn(reservation);
 
             // when & then
-            assertThatThrownBy(() -> {
-                reservationCreateService.create(request, loginMember);
-            }).isInstanceOf(ReservationConflictException.class);
-        }
-
-        @DisplayName("결제 승인 API가 실패한다면 예외가 발생한다.")
-        @Test
-        void create4() {
-            // given
-            given(orderReader.getById(request.orderId()))
-                    .willReturn(new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule));
-            given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(), schedule.getTheme().getId()))
-                    .willReturn(schedule);
-            given(memberService.getByEmail(loginMember.email()))
-                    .willReturn(member);
-            doThrow(new PaymentException("결제에 실패하였습니다.")).when(paymentClient).confirm(paymentConfirmRequest);
-
-            // when & then
-            assertThatThrownBy(() -> {
-                reservationCreateService.create(request, loginMember);
-            }).isInstanceOf(PaymentException.class);
+            assertAll(
+                    () -> assertThatThrownBy(() -> reservationCreateService.create(request, loginMember))
+                            .isInstanceOf(PaymentException.class),
+                    () -> assertThat(reservation.getReservationStatus()).isEqualTo(ReservationStatus.CANCELED)
+            );
         }
     }
 
@@ -172,7 +177,7 @@ public class ReservationCreateServiceTest {
                     .willReturn(schedule);
             given(memberService.getById(request.memberId()))
                     .willReturn(member);
-            given(reservationRepository.existsBySchedule(schedule))
+            given(reservationRepository.existsByScheduleAndReservationStatusNot(schedule, ReservationStatus.CANCELED))
                     .willReturn(false);
             given(reservationRepository.save(
                     new Reservation(member, schedule)))
@@ -191,7 +196,7 @@ public class ReservationCreateServiceTest {
             // given
             given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(), schedule.getTheme().getId()))
                     .willReturn(schedule);
-            given(reservationRepository.existsBySchedule(schedule))
+            given(reservationRepository.existsByScheduleAndReservationStatusNot(schedule, ReservationStatus.CANCELED))
                     .willReturn(true);
 
             // when & then
