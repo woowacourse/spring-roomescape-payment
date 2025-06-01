@@ -22,6 +22,7 @@ import roomescape.common.config.ReservationConfig;
 import roomescape.common.exception.PaymentException;
 import roomescape.member.dto.request.LoginMember;
 import roomescape.payment.service.PaymentService;
+import roomescape.reservation.service.ReservationPaymentFacade;
 import roomescape.reservation.service.ReservationService;
 
 import org.junit.jupiter.api.Test;
@@ -43,6 +44,9 @@ class ReservationControllerTest {
 
     @MockitoBean
     private PaymentService paymentService;
+
+    @MockitoBean
+    private ReservationPaymentFacade reservationPaymentFacade;
 
     @MockitoBean
     private ReservationConfig reservationConfig;
