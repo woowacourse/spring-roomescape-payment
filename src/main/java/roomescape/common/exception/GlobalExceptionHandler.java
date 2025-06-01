@@ -12,7 +12,7 @@ import roomescape.common.exception.impl.ConflictException;
 import roomescape.common.exception.impl.ForbiddenException;
 import roomescape.common.exception.impl.NotFoundException;
 import roomescape.common.exception.impl.UnauthorizedException;
-import roomescape.payment.infrastructure.TossPaymentException;
+import roomescape.payment.application.PaymentException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -56,9 +56,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("잘못된 요청입니다.", HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(TossPaymentException.class)
-    public ResponseEntity<String> handle(final TossPaymentException e) {
-        if (e.getCode().equals("500")) {
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<String> handle(final PaymentException e) {
+        if (e.is5xxServerError()) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

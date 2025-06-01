@@ -16,6 +16,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.common.exception.impl.BadRequestException;
@@ -87,7 +88,8 @@ class TossPaymentServiceTest {
         final Reservation reservation = new Reservation(1L, null, null, null, null);
 
         // when
-        when(paymentClient.requestPayment(any())).thenThrow(new PaymentException("결제 승인 에러"));
+        when(paymentClient.requestPayment(any())).thenThrow(
+                new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 승인 에러"));
 
         // then
         assertThatThrownBy(() -> paymentService.pay(paymentDataRequest, paymentConfirmRequest, reservation))
@@ -171,7 +173,8 @@ class TossPaymentServiceTest {
         final Reservation reservation = new Reservation(1L, null, null, null, null);
 
         // when
-        when(paymentClient.requestPayment(any())).thenThrow(new PaymentException("재시도 테스트 실패"));
+        when(paymentClient.requestPayment(any())).thenThrow(
+                new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "재시도 테스트 실패"));
 
         // then
         assertThatThrownBy(() -> paymentService.pay(paymentDataRequest, paymentConfirmRequest, reservation))

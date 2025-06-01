@@ -84,7 +84,7 @@ class TossPaymentClientTest {
     void 결제요청_실패하면_TossPaymentException_던짐() {
         String errorJson = """
                 {
-                  "code": "INVALID_REQUEST",
+                  "code": "BAD_REQUEST",
                   "message": "잘못된 요청입니다."
                 }
                 """;

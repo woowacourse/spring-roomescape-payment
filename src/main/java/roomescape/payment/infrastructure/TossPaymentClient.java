@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -38,7 +39,7 @@ public class TossPaymentClient implements PaymentClient {
     private void handleException(final ClientHttpResponse res) {
         try (InputStream is = res.getBody()) {
             TossErrorResponse error = objectMapper.readValue(is, TossErrorResponse.class);
-            throw new TossPaymentException(error.code(), error.message());
+            throw new TossPaymentException(HttpStatus.valueOf(error.code()), error.message());
         } catch (IOException e) {
             throw new RuntimeException("에러 응답 파싱 실패", e);
         }
