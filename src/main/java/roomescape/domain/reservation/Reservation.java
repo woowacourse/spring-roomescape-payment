@@ -42,8 +42,8 @@ public class Reservation {
         this.reservationStatus = reservationStatus;
     }
 
-    public void changeStatusToAccepted() {
-        this.reservationStatus = ReservationStatus.ACCEPTED;
+    public void changeStatusToNotPaid() {
+        this.reservationStatus = ReservationStatus.NOT_PAID;
     }
 
     public void changeStatusToDenied() {

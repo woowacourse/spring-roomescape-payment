@@ -174,7 +174,7 @@ public class ReservationService {
                 reservationItem, ReservationStatus.PENDING
         ).ifPresentOrElse(
                 nextReservation -> {
-                    nextReservation.changeStatusToAccepted();
+                    nextReservation.changeStatusToNotPaid();
                     reservationRepository.save(nextReservation);
                     deleteReservationOnly(targetReservation);
                 },

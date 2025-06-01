@@ -2,6 +2,7 @@ package roomescape.domain.reservation;
 
 public enum ReservationStatus {
     ACCEPTED("예약 확정"),
+    NOT_PAID("결제 대기"),
     PENDING("예약 대기"),
     DENIED("예약 거절"),
     ;

@@ -435,7 +435,7 @@ class ReservationServiceTest extends ServiceTest {
     }
 
     @Test
-    @DisplayName("확정 예약 삭제 시 다음 대기가 있으면 예약 항목은 삭제되지 않고 다음 예약이 확정상태가 된다.")
+    @DisplayName("확정 예약 삭제 시 다음 대기가 있으면 예약 항목은 삭제되지 않고 다음 예약이 결제 대기 상태가 된다.")
     void deleteAcceptedReservationAndHasPendingReservationTest() {
         // given
         Member member1 = insertMember("member1@example.com", "password1", "Member 1", MemberRole.USER);
@@ -458,7 +458,7 @@ class ReservationServiceTest extends ServiceTest {
                 () -> assertThat(remainingReservations).noneMatch(reservation -> reservation.id() == acceptedReservation.id()),
                 () -> assertThat(remainingReservations).anyMatch(reservation ->
                         reservation.id() == pendingReservation.id() &&
-                        reservation.status().equals(ReservationStatus.ACCEPTED.description)
+                        reservation.status().equals(ReservationStatus.NOT_PAID.description)
                 )
         );
 
