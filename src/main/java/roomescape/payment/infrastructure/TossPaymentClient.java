@@ -53,6 +53,8 @@ public class TossPaymentClient implements PaymentClient {
                     .toBodilessEntity();
         } catch (ResourceAccessException e) {
             throw new PaymentException(GATEWAY_TIMEOUT, "결제 API가 응답하지 않습니다.");
+        } catch (Exception e) {
+            throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 과정중 서버에 문제가 생겼습니다. 고객센터에게 문의하세요");
         }
     }
 
