@@ -27,6 +27,7 @@ import roomescape.reservation.dto.request.ReservationConditionRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
+import roomescape.reservation.service.ReservationPaymentFacade;
 import roomescape.reservation.service.ReservationService;
 
 @RestController
@@ -39,11 +40,13 @@ public class ReservationController {
     private final ReservationService reservationService;
     private final TossPaymentClient tossPaymentClient;
     private final PaymentService paymentService;
+    private final ReservationPaymentFacade reservationPaymentFacade;
 
-    public ReservationController(ReservationService reservationService, TossPaymentClient tossPaymentClient, PaymentService paymentService) {
+    public ReservationController(ReservationService reservationService, TossPaymentClient tossPaymentClient, PaymentService paymentService, ReservationPaymentFacade reservationPaymentFacade) {
         this.reservationService = reservationService;
         this.tossPaymentClient = tossPaymentClient;
         this.paymentService = paymentService;
+        this.reservationPaymentFacade = reservationPaymentFacade;
     }
 
     @GetMapping
@@ -66,8 +69,9 @@ public class ReservationController {
         );
 
         TossPaymentResponse tossPaymentResponse = tossPaymentClient.confirmPayment(confirmRequest);
-        ReservationResponse response = reservationService.createReservation(request, loginMember.id());
-        paymentService.save(tossPaymentResponse, response.id());
+//        ReservationResponse response = reservationService.createReservation(request, loginMember.id());
+//        paymentService.save(tossPaymentResponse, response.id());
+        ReservationResponse response = reservationPaymentFacade.createReservationAndSavePayment(request, loginMember, tossPaymentResponse);
 
         URI locationUri = URI.create(RESERVATION_BASE_URL + SLASH + response.id());
         return ResponseEntity.created(locationUri).body(response);

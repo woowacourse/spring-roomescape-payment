@@ -44,7 +44,6 @@ public class ReservationService {
         this.paymentRepository = paymentRepository;
     }
 
-    @Transactional
     public ReservationResponse createReservation(final ReservationRequest request, final Long memberId) {
         ReservationTime time = reservationTimeRepository.findById(request.timeId())
                 .orElseThrow(() -> new InvalidReservationException("존재하지 않는 시간입니다."));
