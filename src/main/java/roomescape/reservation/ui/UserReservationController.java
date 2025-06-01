@@ -76,7 +76,7 @@ public class UserReservationController {
         return new ResponseEntity<>(waitingResponse, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("waitings/{id}")
+    @DeleteMapping("/waitings/{id}")
     public ResponseEntity<Void> cancelWaiting(
             @PathVariable("id") final Long id,
             final LoginCheckRequest request
