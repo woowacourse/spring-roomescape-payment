@@ -25,8 +25,14 @@ public class PaymentExceptionHandler implements ResponseErrorHandler {
         InputStream inputStream = response.getBody();
         TossPaymentErrorResponse tossPaymentErrorResponse = parseToTossPaymentErrorResponse(
                 inputStream);
+
         checkClientError(tossPaymentErrorResponse);
         checkServerError(tossPaymentErrorResponse);
+        throwUnDefinedError(tossPaymentErrorResponse);
+    }
+
+    private void throwUnDefinedError(TossPaymentErrorResponse tossPaymentErrorResponse) {
+        throw new PaymentServerException(tossPaymentErrorResponse.message);
     }
 
     private static void checkServerError(TossPaymentErrorResponse tossPaymentErrorResponse) {
