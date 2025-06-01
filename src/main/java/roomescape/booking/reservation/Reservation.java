@@ -28,6 +28,8 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private ReservationStatus reservationStatus;
 
+    private String orderId;
+
     public Reservation(final Member member, final Schedule schedule) {
         this.member = member;
         this.schedule = schedule;
@@ -38,5 +40,12 @@ public class Reservation {
         this.member = member;
         this.schedule = schedule;
         this.reservationStatus = reservationStatus;
+    }
+
+    public Reservation(final Member member, final Schedule schedule, final ReservationStatus reservationStatus, final String orderId) {
+        this.member = member;
+        this.schedule = schedule;
+        this.reservationStatus = reservationStatus;
+        this.orderId = orderId;
     }
 }

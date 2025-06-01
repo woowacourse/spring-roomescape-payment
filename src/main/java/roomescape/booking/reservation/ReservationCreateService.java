@@ -41,12 +41,12 @@ public class ReservationCreateService {
 
         validatePast(schedule);
         validateDuplication(schedule);
-        final Reservation savedReservation = saveReservation(schedule, member);
+        final Reservation savedReservation = saveReservation(schedule, member, request.orderId());
         return ReservationResponse.from(savedReservation);
     }
 
-    private Reservation saveReservation(final Schedule schedule, final Member member) {
-        final Reservation notSavedReservation = new Reservation(member, schedule, ReservationStatus.CONFIRMED);
+    private Reservation saveReservation(final Schedule schedule, final Member member, final String orderId) {
+        final Reservation notSavedReservation = new Reservation(member, schedule, ReservationStatus.CONFIRMED, orderId);
         return reservationRepository.save(notSavedReservation);
     }
 
@@ -69,7 +69,12 @@ public class ReservationCreateService {
         validateDuplication(schedule);
 
         final Member member = memberService.getById(request.memberId());
-        final Reservation savedReservation = saveReservation(schedule, member);
+        final Reservation savedReservation = saveReservationForAdmin(schedule, member);
         return ReservationResponse.from(savedReservation);
+    }
+
+    private Reservation saveReservationForAdmin(final Schedule schedule, final Member member) {
+        final Reservation notSavedReservation = new Reservation(member, schedule, ReservationStatus.PENDING);
+        return reservationRepository.save(notSavedReservation);
     }
 }
