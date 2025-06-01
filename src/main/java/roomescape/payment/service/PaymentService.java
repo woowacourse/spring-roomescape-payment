@@ -54,7 +54,13 @@ public class PaymentService {
     }
 
     @Transactional
-    public void confirmPayment(TossPaymentRequest tossPaymentRequest) {
+    public void confirmPayment(final ReservationPaymentRequest request) {
+        final TossPaymentRequest tossPaymentRequest = new TossPaymentRequest(
+                request.paymentKey(),
+                request.orderId(),
+                request.amount()
+        );
+
         try {
             TossPaymentResponse response = tossRestClient.confirm(tossPaymentRequest);
             Payment payment = getPayment(tossPaymentRequest);
