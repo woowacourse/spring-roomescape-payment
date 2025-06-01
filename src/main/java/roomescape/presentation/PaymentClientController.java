@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.config.paymentResponseErrorHandler;
 import roomescape.domain.PaymentInfo;
-import roomescape.dto.PaymentRequest;
+import roomescape.dto.request.PaymentRequest;
 
 @Component
 public class PaymentClientController {
