@@ -1,20 +1,9 @@
 package roomescape.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.TestPropertySource;
-import roomescape.config.JpaConfig;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.member.MemberRole;
@@ -37,14 +26,17 @@ import roomescape.repository.jpa.ReservationItemJpaRepository;
 import roomescape.repository.jpa.ReservationJpaRepository;
 import roomescape.repository.jpa.ReservationThemeJpaRepository;
 import roomescape.repository.jpa.ReservationTimeJpaRepository;
+import roomescape.test_util.RepositoryTest;
 
-@TestPropertySource(properties = {
-        "spring.sql.init.mode=never",
-        "spring.jpa.hibernate.ddl-auto=create-drop"
-})
-@Import(JpaConfig.class)
-@DataJpaTest
-public class ReservationRepositoryTest {
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
+public class ReservationRepositoryTest extends RepositoryTest {
 
     private ReservationRepository reservationRepository;
 
@@ -76,8 +68,8 @@ public class ReservationRepositoryTest {
     void setUp() {
         reservationRepository = new ReservationRepositoryImpl(reservationJpaRepository);
         memberRepository = new MemberRepositoryImpl(memberJpaRepository);
-        reservationThemeRepository = new ReservationThemeRepositoryImpl(reservationThemeJpaRepository);
-        reservationTimeRepository = new ReservationTimeRepositoryImpl(reservationTimeJpaRepository);
+        reservationThemeRepository = new ReservationThemeRepositoryImpl(reservationThemeJpaRepository, reservationJpaRepository);
+        reservationTimeRepository = new ReservationTimeRepositoryImpl(reservationTimeJpaRepository, reservationJpaRepository);
         reservationItemRepository = new ReservationItemRepositoryImpl(reservationItemJpaRepository);
 
         member = memberRepository.save(

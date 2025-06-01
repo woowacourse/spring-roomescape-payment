@@ -1,74 +1,58 @@
 package roomescape.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import roomescape.domain.reservationitem.ReservationTime;
+import roomescape.domain.reservationitem.ReservationTimeRepository;
+import roomescape.test_util.RepositoryTest;
 
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.TestPropertySource;
-import roomescape.config.JpaConfig;
-import roomescape.domain.reservationitem.ReservationTime;
-import roomescape.domain.reservationitem.ReservationTimeRepository;
-import roomescape.repository.impl.ReservationTimeRepositoryImpl;
-import roomescape.repository.jpa.ReservationTimeJpaRepository;
 
-@TestPropertySource(properties = {
-        "spring.sql.init.mode=never",
-        "spring.jpa.hibernate.ddl-auto=create-drop"
-})
-@Import(JpaConfig.class)
-@DataJpaTest
-class ReservationTimeRepositoryTest {
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
-    ReservationTimeRepository timeRepository;
+class ReservationTimeRepositoryTest extends RepositoryTest {
 
     @Autowired
-    ReservationTimeJpaRepository reservationTimeJpaRepository;
-
-    private Long timeId;
-    private LocalTime now;
-
-    @BeforeEach
-    void setUp() {
-        timeRepository = new ReservationTimeRepositoryImpl(reservationTimeJpaRepository);
-
-        now = LocalTime.now();
-        timeId = timeRepository.save(new ReservationTime(now)).getId();
-    }
+    ReservationTimeRepository timeRepository;
 
     @DisplayName("id로 예약 시간을 조회한다.")
     @Test
     void findById() {
+        // given
+        ReservationTime savedTime = insertReservationTime(LocalTime.of(12, 12));
+
         // when
-        Optional<ReservationTime> time = timeRepository.findById(timeId);
+        Optional<ReservationTime> time = timeRepository.findById(savedTime.getId());
 
         // then
         assertAll(
                 () -> assertThat(time).isPresent(),
-                () -> assertThat(time.get().getStartAt()).isEqualTo(now)
+                () -> assertThat(time.get().getStartAt()).isEqualTo(savedTime.getStartAt())
         );
     }
 
     @DisplayName("모든 예약 시간을 조회한다.")
     @Test
     void findAll() {
+        // given
+        ReservationTime savedTime1 = insertReservationTime(LocalTime.of(12, 12));
+        ReservationTime savedTime2 = insertReservationTime(LocalTime.of(12, 13));
+        ReservationTime savedTime3 = insertReservationTime(LocalTime.of(12, 14));
+
         // when
         List<ReservationTime> times = timeRepository.findAll();
-        ReservationTime time = times.getFirst();
 
         // then
-        assertAll(
-                () -> assertThat(times).hasSize(1),
-                () -> assertThat(time.getId()).isEqualTo(timeId),
-                () -> assertThat(time.getStartAt()).isEqualTo(now)
-        );
+        assertThat(times).hasSize(3).extracting(ReservationTime::getStartAt)
+                .containsExactlyInAnyOrder(
+                        savedTime1.getStartAt(),
+                        savedTime2.getStartAt(),
+                        savedTime3.getStartAt()
+                );
     }
 
     @DisplayName("예약 시간을 저장한다.")
@@ -80,7 +64,6 @@ class ReservationTimeRepositoryTest {
 
         // when
         ReservationTime saved = timeRepository.save(reservationTime);
-
 
         // then
         Optional<ReservationTime> found = timeRepository.findById(saved.getId());
@@ -94,18 +77,25 @@ class ReservationTimeRepositoryTest {
     @DisplayName("id로 예약시간을 삭제한다.")
     @Test
     void deleteById() {
+        // given
+        ReservationTime savedTime = insertReservationTime(LocalTime.of(12, 12));
+
         // when
-        timeRepository.deleteById(timeId);
+        timeRepository.deleteById(savedTime.getId());
 
         // then
         assertThat(timeRepository.findAll()).isEmpty();
     }
 
-    @DisplayName("이미 존재하는 예약 시간이므로 true를 반환한다.")
+    @DisplayName("이미 존재하는 예약 시간인지 확인한다.")
     @Test
     void existByStartAt() {
+        // given
+        LocalTime savedTimeValue = LocalTime.of(12, 12);
+        insertReservationTime(savedTimeValue);
+
         // when
-        final boolean expected = timeRepository.existsByStartAt(now);
+        final boolean expected = timeRepository.existsByStartAt(savedTimeValue);
 
         // then
         assertThat(expected).isTrue();

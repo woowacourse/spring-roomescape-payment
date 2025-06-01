@@ -1,55 +1,31 @@
 package roomescape.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
-import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.TestPropertySource;
-import roomescape.config.JpaConfig;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
 import roomescape.domain.member.MemberRole;
-import roomescape.repository.impl.MemberRepositoryImpl;
-import roomescape.repository.jpa.MemberJpaRepository;
+import roomescape.test_util.RepositoryTest;
 
-@TestPropertySource(properties = {
-        "spring.sql.init.mode=never",
-        "spring.jpa.hibernate.ddl-auto=create-drop"
-})
-@Import(JpaConfig.class)
-@DataJpaTest
-public class MemberRepositoryTest {
+import java.util.Optional;
 
-    private MemberRepository memberRepository;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
+public class MemberRepositoryTest extends RepositoryTest {
 
     @Autowired
-    private MemberJpaRepository memberJpaRepository;
-
-    private Member member;
-
-    @BeforeEach
-    void setUp() {
-        memberRepository = new MemberRepositoryImpl(memberJpaRepository);
-
-        member = memberRepository.save(
-                new Member("test@example.com", "testPassword", "test", MemberRole.USER)
-        );
-    }
+    private MemberRepository memberRepository;
 
     @Test
     @DisplayName("사용자의 이메일을 통해 사용자를 찾는다")
     void findByEmailTest() {
         // given
-        String email = member.getEmail();
+        Member member = insertMember("이메일", "비밀번호", "이름", MemberRole.USER);
 
         // when
-        final Optional<Member> found = memberRepository.findByEmail(email);
+        final Optional<Member> found = memberRepository.findByEmail(member.getEmail());
 
         // then
         assertAll(
@@ -75,27 +51,29 @@ public class MemberRepositoryTest {
     @DisplayName("이메일이 존재하는 지 확인한다")
     void existByEmailTest() {
         // given
-        String existEmail = member.getEmail();
+        Member member = insertMember("이메일", "비밀번호", "이름", MemberRole.USER);
         String nonExistEmail = "non-exist@example.com";
 
         // when
-        final boolean exist = memberRepository.existByEmail(existEmail);
+        final boolean exist = memberRepository.existByEmail(member.getEmail());
         final boolean nonExist = memberRepository.existByEmail(nonExistEmail);
 
         // then
-        assertThat(exist).isTrue();
-        assertThat(nonExist).isFalse();
+        assertAll(
+                () -> assertThat(exist).isTrue(),
+                () -> assertThat(nonExist).isFalse()
+        );
     }
 
     @Test
     @DisplayName("이름으로 사용자가 존재하는 지 확인한다")
     void findByNameTest() {
         // given
-        String existName = member.getName();
+        Member member = insertMember("이메일", "비밀번호", "이름", MemberRole.USER);
         String nonExistName = "non-exist";
 
         // when
-        final boolean exist = memberRepository.existByName(existName);
+        final boolean exist = memberRepository.existByName(member.getName());
         final boolean nonExist = memberRepository.existByName(nonExistName);
 
         // then
