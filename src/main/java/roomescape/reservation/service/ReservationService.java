@@ -87,19 +87,6 @@ public class ReservationService {
         return getMyPageReservationResponses(myReservations, myReservationWaitings);
     }
 
-    private List<MyPageReservationResponse> getMyPageReservationResponses(final List<Reservation> myReservations,
-                                                                          final List<ReservationWaiting> myReservationWaitings) {
-        final List<MyPageReservationResponse> myPageReservationResponses = myReservations.stream()
-                .map(MyPageReservationResponse::from)
-                .collect(Collectors.toList());
-        List<MyPageReservationResponse> myPageReservationWaitingResponses = myReservationWaitings.stream()
-                .map(myReservationWaiting -> MyPageReservationResponse.of(myReservationWaiting,
-                        getWaitingOrderByMember(myReservationWaiting.getMember())))
-                .toList();
-        myPageReservationResponses.addAll(myPageReservationWaitingResponses);
-        return myPageReservationResponses;
-    }
-
     public TossPaymentResponse approvePayment(final String orderId, final String paymentKey, final long amount) {
         return paymentClient.requestPaymentApprove(
                 new TossPaymentRequest(orderId, paymentKey, amount));
@@ -115,6 +102,19 @@ public class ReservationService {
                     convertWaitingToReservation(reservation);
                 }
         );
+    }
+
+    private List<MyPageReservationResponse> getMyPageReservationResponses(final List<Reservation> myReservations,
+                                                                          final List<ReservationWaiting> myReservationWaitings) {
+        final List<MyPageReservationResponse> myPageReservationResponses = myReservations.stream()
+                .map(MyPageReservationResponse::from)
+                .collect(Collectors.toList());
+        List<MyPageReservationResponse> myPageReservationWaitingResponses = myReservationWaitings.stream()
+                .map(myReservationWaiting -> MyPageReservationResponse.of(myReservationWaiting,
+                        getWaitingOrderByMember(myReservationWaiting.getMember())))
+                .toList();
+        myPageReservationResponses.addAll(myPageReservationWaitingResponses);
+        return myPageReservationResponses;
     }
 
     private void convertWaitingToReservation(final Reservation reservation) {

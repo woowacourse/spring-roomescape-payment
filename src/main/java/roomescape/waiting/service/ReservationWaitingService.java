@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.member.service.MemberService;
 import roomescape.reservation.repository.ReservationRepository;
@@ -25,6 +26,7 @@ public class ReservationWaitingService {
     private final ReservationTimeService reservationTimeService;
     private final ReservationThemeService reservationThemeService;
 
+    @Transactional
     public ReservationWaitingResponse addReservationWaiting(final ReservationWaitingRequest request,
                                                             final long memberId) {
         final Member member = memberService.getMemberById(memberId);
@@ -35,22 +37,24 @@ public class ReservationWaitingService {
         return ReservationWaitingResponse.from(reservationWaitingRepository.save(reservation));
     }
 
+    @Transactional
     public void removeReservationWaiting(final long id) {
         validateReservationWaiting(id);
         reservationWaitingRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AdminReservationWaitingResponse> getAllReservationWaiting() {
+        final List<ReservationWaiting> reservationWaitings = reservationWaitingRepository.findAll();
+        return reservationWaitings.stream()
+                .map(AdminReservationWaitingResponse::from)
+                .toList();
     }
 
     private void validateReservationWaiting(final long id) {
         if (!reservationWaitingRepository.existsById(id)) {
             throw new NoSuchElementException("[ERROR] 존재하지 않는 예약대기 입니다.");
         }
-    }
-
-    public List<AdminReservationWaitingResponse> getAllReservationWaiting() {
-        final List<ReservationWaiting> reservationWaitings = reservationWaitingRepository.findAll();
-        return reservationWaitings.stream()
-                .map(AdminReservationWaitingResponse::from)
-                .toList();
     }
 
     private void validateDuplicateWaiting(final ReservationWaitingRequest request, final long memberId) {
