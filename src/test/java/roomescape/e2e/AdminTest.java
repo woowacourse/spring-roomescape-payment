@@ -3,7 +3,7 @@ package roomescape.e2e;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static roomescape.fixture.IntegrationFixture.ADMIN_EMAIL;
-import static roomescape.fixture.IntegrationFixture.FUTURE_DATE;
+import static roomescape.fixture.IntegrationFixture.FUTURE_DATE_TEXT;
 import static roomescape.fixture.IntegrationFixture.PASSWORD;
 import static roomescape.fixture.IntegrationFixture.TOKEN;
 import static roomescape.fixture.IntegrationFixture.createRegularReservation;
@@ -12,6 +12,7 @@ import static roomescape.fixture.IntegrationFixture.createTheme;
 import static roomescape.fixture.IntegrationFixture.findThemesBySize;
 import static roomescape.fixture.IntegrationFixture.loginAndGetAuthToken;
 import static roomescape.fixture.IntegrationFixture.makeWaitingReservations;
+import static roomescape.fixture.TestFixture.FUTURE_DATE;
 
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
@@ -26,7 +27,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
-import roomescape.fixture.TestFixture;
 import roomescape.member.presentation.dto.response.MemberWebResponse;
 import roomescape.reservation.presentation.dto.response.ConfirmedReservationWebResponse;
 import roomescape.reservation.presentation.dto.response.WaitingWebResponse;
@@ -150,7 +150,7 @@ public class AdminTest {
         createTheme("추리");
 
         Map<String, Object> reservation = new HashMap<>();
-        reservation.put("date", FUTURE_DATE);
+        reservation.put("date", FUTURE_DATE_TEXT);
         reservation.put("timeId", 1);
         reservation.put("themeId", 1);
         reservation.put("memberId", 2);
@@ -226,8 +226,8 @@ public class AdminTest {
 
         List<ConfirmedReservationWebResponse> reservationsFilteredByThemeId = RestAssured.given().log().all()
                 .cookie(TOKEN, ADMIN_TOKEN)
-                .when().queryParams("themeId", 1L, "memberId", 2L, "dateFrom", FUTURE_DATE,
-                        "dateTo", TestFixture.makeAfterOneWeekDate().plusDays(1).toString())
+                .when().queryParams("themeId", 1L, "memberId", 2L, "dateFrom", FUTURE_DATE_TEXT,
+                        "dateTo", FUTURE_DATE.plusDays(1).toString())
                 .get("/admin/reservations")
                 .then().log().all()
                 .statusCode(200)
