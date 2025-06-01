@@ -30,6 +30,7 @@ public class ReservationCreateService {
     private final MemberService memberService;
     private final OrderReader orderReader;
     private final TossPaymentAdapter tossPaymentAdapter;
+    private final TossPaymentConfirmCommandFactory tossPaymentConfirmCommandFactory;
 
     @Transactional
     public ReservationResponse create(final ReservationPaymentRequest request, final LoginMember loginMember) {
@@ -40,7 +41,7 @@ public class ReservationCreateService {
         ReservationResponse response = ReservationResponse.from(reservation);
 
         try {
-            TossPaymentConfirmCommand confirmCommand = new TossPaymentConfirmCommand(request.orderId(), request.amount(), request.paymentKey());
+            TossPaymentConfirmCommand confirmCommand = tossPaymentConfirmCommandFactory.toPaymentConfirmCommand(request);
             tossPaymentAdapter.confirmPayment(confirmCommand);
         } catch (Exception e) {
             reservation.isCanceled();

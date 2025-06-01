@@ -50,6 +50,8 @@ public class ReservationCreateServiceTest {
     private OrderReader orderReader;
     @Mock
     private TossPaymentAdapter paymentAdapter;
+    @Mock
+    private TossPaymentConfirmCommandFactory paymentConfirmCommandFactory;
     @InjectMocks
     private ReservationCreateService reservationCreateService;
 
@@ -97,6 +99,8 @@ public class ReservationCreateServiceTest {
             given(reservationRepository.save(
                     new Reservation(member, schedule)))
                     .willReturn(reservation);
+            given(paymentConfirmCommandFactory.toPaymentConfirmCommand(request))
+                    .willReturn(new TossPaymentConfirmCommand(request.orderId(), request.amount(), request.paymentKey()));
 
             // when
             final ReservationResponse response = reservationCreateService.create(request, loginMember);
@@ -141,6 +145,8 @@ public class ReservationCreateServiceTest {
             doThrow(new PaymentException("결제에 실패하였습니다.")).when(paymentAdapter).confirmPayment(new TossPaymentConfirmCommand(request.orderId(), request.amount(), request.paymentKey()));
             given(reservationRepository.save(new Reservation(member, schedule)))
                     .willReturn(reservation);
+            given(paymentConfirmCommandFactory.toPaymentConfirmCommand(request))
+                    .willReturn(new TossPaymentConfirmCommand(request.orderId(), request.amount(), request.paymentKey()));
 
             // when & then
             assertAll(
