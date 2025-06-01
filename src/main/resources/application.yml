@@ -34,3 +34,4 @@ logging:
 payment:
   toss:
     auth-token: Basic dGVzdF9nc2tfZG9jc19PYVB6OEw1S2RtUVhrelJ6M3k0N0JNdzY6
+    base-url: https://api.tosspayments.com/v1/payments
