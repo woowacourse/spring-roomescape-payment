@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URI;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
@@ -27,6 +28,14 @@ public class TossPaymentProcessorErrorHandler implements ResponseErrorHandler {
     public void handleError(final URI url, final HttpMethod method, final ClientHttpResponse response)
             throws IOException {
         final TossPaymentConfirmError error = objectMapper.readValue(response.getBody(), TossPaymentConfirmError.class);
+
+        if (error.code().equals("INVALID_API_KEY")) {
+            throw new TossPaymentException(HttpStatus.INTERNAL_SERVER_ERROR, error.message());
+        }
+        if (error.code().equals("INCORRECT_BASIC_AUTH_FORMAT")) {
+            throw new TossPaymentException(HttpStatus.INTERNAL_SERVER_ERROR, error.message());
+        }
+
         throw new TossPaymentException(response.getStatusCode(), error.message());
     }
 }
