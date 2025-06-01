@@ -1,8 +1,8 @@
 package roomescape.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.client.ExpectedCount.times;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
@@ -130,15 +130,9 @@ class TossPaymentProviderTest {
             .andExpect(method(HttpMethod.POST))
             .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
 
-        // when
-        var paymentDetails = paymentProvider.confirm(request);
-
-        // then
-        assertAll(
-            () -> assertThat(paymentDetails.confirmation()).isNotNull(),
-            () -> assertThat(paymentDetails.isFailed()).isFalse(),
-            () -> assertThat(paymentDetails.failure()).isNull()
-        );
+        // when & then
+        assertThatCode(() -> paymentProvider.confirm(request))
+            .doesNotThrowAnyException();
     }
 
     @ParameterizedTest

@@ -7,7 +7,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import roomescape.domain.payment.PaymentConfirmation;
-import roomescape.domain.payment.PaymentDetails;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.exception.PaymentFailedException;
@@ -22,9 +21,9 @@ class PaymentServiceTest {
     void pay() {
         // given
         var request = new PaymentRequest("a", "1", 1000);
-        var paymentDetails = new PaymentDetails(new PaymentConfirmation("a", "1", "order", 1000));
+        var confirmation = new PaymentConfirmation("a", "1", "order", 1000);
 
-        Mockito.when(paymentProvider.confirm(request)).thenReturn(paymentDetails);
+        Mockito.when(paymentProvider.confirm(request)).thenReturn(confirmation);
 
         // when & then
         assertThatCode(() -> paymentService.pay("a", "1", 1000)).doesNotThrowAnyException();

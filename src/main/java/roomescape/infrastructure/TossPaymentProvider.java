@@ -14,7 +14,6 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import roomescape.domain.payment.PaymentConfirmation;
-import roomescape.domain.payment.PaymentDetails;
 import roomescape.domain.payment.PaymentFailCode;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
@@ -31,14 +30,15 @@ public class TossPaymentProvider implements PaymentProvider {
 
     private final RestTemplate restTemplate;
 
-    public PaymentDetails confirm(final PaymentRequest request) {
+    public PaymentConfirmation confirm(final PaymentRequest request) {
         for (int tried = 1; tried <= MAX_RETRY_COUNT; tried++) {
             try {
-                return requestConfirmationDetails(request);
+                var successResponse = restTemplate.postForEntity(CONFIRM_URI, request, PaymentConfirmation.class);
+                return successResponse.getBody();
 
             } catch (RestClientResponseException e) {
-                var tossResponse = readTossFailureResponse(e);
-                throw new PaymentFailedException(mapToFailCode(tossResponse.code), tossResponse.message);
+                var failResponse = readTossFailureResponse(e);
+                throw new PaymentFailedException(mapToFailCode(failResponse.code), failResponse.message);
 
             } catch (ResourceAccessException e) {
                 logger.error(e.getMessage());
@@ -46,12 +46,6 @@ public class TossPaymentProvider implements PaymentProvider {
         }
 
         throw new PaymentFailedException(EXTERNAL_SERVER_PROCESSING, "토스 서버에 연결할 수 없습니다.");
-    }
-
-    private PaymentDetails requestConfirmationDetails(final PaymentRequest request) {
-        var successResponse = restTemplate.postForEntity(CONFIRM_URI, request, PaymentConfirmation.class);
-        var paymentConfirmation = successResponse.getBody();
-        return new PaymentDetails(paymentConfirmation);
     }
 
     private TossFailureResponse readTossFailureResponse(final RestClientResponseException e) {

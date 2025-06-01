@@ -1,12 +1,24 @@
 package roomescape.exception;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import roomescape.domain.payment.PaymentFailCode;
 
 class PaymentFailedExceptionTest {
+
+    @Test
+    @DisplayName("결제 실패 예외를 생성한다.")
+    void newPaymentFailureException() {
+        var exception = new PaymentFailedException(PaymentFailCode.CONDITION_NOT_SATISFIED, "결제 실패");
+
+        assertAll(
+            () -> assertThat(exception.getFailCode()).isEqualTo(PaymentFailCode.CONDITION_NOT_SATISFIED),
+            () -> assertThat(exception.getMessage()).isEqualTo("결제 실패")
+        );
+    }
 
     @Test
     @DisplayName("예외 발생 원인이 클라이언트에게 있는 지 알 수 있다.")
