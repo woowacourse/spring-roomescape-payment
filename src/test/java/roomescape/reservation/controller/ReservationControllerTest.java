@@ -32,7 +32,7 @@ class ReservationControllerTest {
 
     @DisplayName("어드민 페이지로 접근할 수 있다.")
     @Test
-    void test1() {
+    void accessAdminPage() {
         String tokenValue = getAdminLoginTokenValue();
 
         RestAssured.given().log().all()
@@ -44,7 +44,7 @@ class ReservationControllerTest {
 
     @DisplayName("어드민이 예약 관리 페이지에 접근한다.")
     @Test
-    void test2() {
+    void accessAdminReservationPage() {
         String tokenValue = getAdminLoginTokenValue();
 
         RestAssured.given().log().all()
@@ -56,7 +56,7 @@ class ReservationControllerTest {
 
     @DisplayName("모든 예약 정보를 반환한다.")
     @Test
-    void test3() {
+    void getReservations() {
         addReservationTime("10:00");
         addTheme();
         String tokenValue = getAdminLoginTokenValue();
@@ -84,12 +84,11 @@ class ReservationControllerTest {
                 .then().log().all()
                 .statusCode(200)
                 .body("size()", is(1));
-
     }
 
     @DisplayName("예약 정보를 추가한다.")
     @Test
-    void test4() {
+    void postReservation() {
         int timeId = addReservationTime("10:00");
         int themeId = addTheme();
         String tokenValue = getAdminLoginTokenValue();
@@ -117,7 +116,7 @@ class ReservationControllerTest {
 
     @DisplayName("존재하지 않는 예약 시간 ID 를 추가하면 예외를 반환한다.")
     @Test
-    void test5() {
+    void postReservationWithNonExistsTimeId() {
         String tokenValue = getAdminLoginTokenValue();
         int themeId = addTheme();
         Map<String, Object> reservationParams = Map.of(
@@ -140,7 +139,7 @@ class ReservationControllerTest {
 
     @DisplayName("존재하지 않는 테마 ID 를 추가하면 예외를 반환한다.")
     @Test
-    void notExistThemeId() {
+    void postReservationWithNonExistsThemeId() {
         String tokenValue = getAdminLoginTokenValue();
         int timeId = addReservationTime("10:00");
         Map<String, Object> reservationParams = Map.of(
@@ -163,7 +162,7 @@ class ReservationControllerTest {
 
     @DisplayName("예약을 삭제한다.")
     @Test
-    void test6() {
+    void deleteReservation() {
         int timeId = addReservationTime("10:00");
         int themeId = addTheme();
         String tokenValue = getAdminLoginTokenValue();
@@ -195,7 +194,7 @@ class ReservationControllerTest {
 
     @DisplayName("존재하지 않는 예약을 삭제할 경우 NOT_FOUND 반환")
     @Test
-    void test7() {
+    void deleteReservationWithNonExistsId() {
         RestAssured.given().log().all()
                 .when().delete("/reservations/0")
                 .then().log().all()
@@ -204,9 +203,9 @@ class ReservationControllerTest {
 
     @DisplayName("예약 가능한 시간을 반환한다")
     @Test
-    void test9() {
+    void getAvailableReservationTimes() {
         int timeId1 = addReservationTime("10:00");
-        int timeId2 = addReservationTime("11:00");
+        addReservationTime("11:00");
         int themeId = addTheme();
         String tokenValue = getAdminLoginTokenValue();
         LocalDate day = LocalDate.now().plusDays(1L);
