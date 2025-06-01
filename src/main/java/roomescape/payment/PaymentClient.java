@@ -10,7 +10,7 @@ import roomescape.reservation.controller.PaymentConfirmRequest;
 import roomescape.reservation.controller.PaymentConfirmResponse;
 
 @Service
-public class PaymentService {
+public class PaymentClient {
 
     private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
 
@@ -19,7 +19,7 @@ public class PaymentService {
 
     private final RestClient restClient;
 
-    public PaymentService(final Builder restClientBuilder) {
+    public PaymentClient(final Builder restClientBuilder) {
         restClient = restClientBuilder
                 .defaultStatusHandler(new PaymentErrorHandler())
                 .defaultHeader("Authorization", getAuthorization())

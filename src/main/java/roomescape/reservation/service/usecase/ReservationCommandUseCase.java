@@ -25,10 +25,8 @@ public class ReservationCommandUseCase {
 
     private final ReservationRepository reservationRepository;
     private final ReservationQueryUseCase reservationQueryUseCase;
-
     private final ReservationWaitQueryUseCase reservationWaitQueryUseCase;
     private final ReservationWaitCommandUseCase reservationWaitCommandUseCase;
-
     private final ReservationTimeQueryUseCase reservationTimeQueryUseCase;
     private final ThemeQueryUseCase themeQueryUseCase;
     private final MemberQueryUseCase memberQueryUseCase;

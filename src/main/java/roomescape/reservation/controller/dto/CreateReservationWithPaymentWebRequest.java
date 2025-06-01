@@ -1,7 +1,9 @@
 package roomescape.reservation.controller.dto;
 
 import java.time.LocalDate;
+import roomescape.member.auth.vo.MemberInfo;
 import roomescape.reservation.controller.PaymentConfirmRequest;
+import roomescape.reservation.service.dto.CreateReservationServiceRequest;
 
 public record CreateReservationWithPaymentWebRequest(
         LocalDate date,
@@ -16,7 +18,11 @@ public record CreateReservationWithPaymentWebRequest(
         return new PaymentConfirmRequest(this.paymentKey, this.orderId, this.amount);
     }
 
-    public CreateReservationWebRequest toCreateReservationWebRequest() {
-        return new CreateReservationWebRequest(this.date, this.timeId, this.themeId);
+    public CreateReservationServiceRequest toCreateServiceRequest(
+            CreateReservationWithPaymentWebRequest webRequest,
+            MemberInfo memberInfo
+    ) {
+        return new CreateReservationServiceRequest(memberInfo.id(), webRequest.date(), webRequest.timeId(),
+                webRequest.themeId());
     }
 }

@@ -1,6 +1,7 @@
 package roomescape.common.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.time.format.DateTimeParseException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

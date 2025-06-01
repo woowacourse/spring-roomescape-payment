@@ -6,10 +6,13 @@ import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.auth.vo.MemberInfo;
+import roomescape.payment.PaymentClient;
 import roomescape.reservation.controller.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.controller.dto.CreateReservationByAdminWebRequest;
 import roomescape.reservation.controller.dto.CreateReservationWebRequest;
+import roomescape.reservation.controller.dto.CreateReservationWithPaymentWebRequest;
 import roomescape.reservation.controller.dto.ReservationSearchWebRequest;
 import roomescape.reservation.controller.dto.ReservationWaitWebResponse;
 import roomescape.reservation.controller.dto.ReservationWebResponse;
@@ -34,6 +37,7 @@ public class ReservationService {
     private final ReservationCommandUseCase reservationCommandUseCase;
     private final ReservationWaitQueryUseCase reservationWaitQueryUseCase;
     private final ReservationWaitCommandUseCase reservationWaitCommandUseCase;
+    private final PaymentClient paymentClient;
 
     public List<ReservationWebResponse> getAll() {
         return ReservationConverter.toDto(
@@ -72,21 +76,15 @@ public class ReservationService {
                 .toList();
     }
 
-    public List<AvailableReservationTimeWebResponse> getAvailable(
-            final LocalDate date,
-            final Long id
-    ) {
+    public List<AvailableReservationTimeWebResponse> getAvailable(final LocalDate date, final Long id) {
         final AvailableReservationTimeServiceRequest serviceRequest = new AvailableReservationTimeServiceRequest(date,
                 id);
-
         return reservationQueryUseCase.getTimesWithAvailability(serviceRequest).stream()
                 .map(ReservationConverter::toWebDto)
                 .toList();
     }
 
-    public ReservationWebResponse create(
-            final CreateReservationByAdminWebRequest createReservationByAdminWebRequest
-    ) {
+    public ReservationWebResponse create(final CreateReservationByAdminWebRequest createReservationByAdminWebRequest) {
         final Reservation reservation = reservationCommandUseCase.create(
                 new CreateReservationServiceRequest(
                         createReservationByAdminWebRequest.memberId(),
@@ -99,19 +97,15 @@ public class ReservationService {
         return ReservationConverter.toDto(reservation);
     }
 
-    public ReservationWebResponse create(
-            final CreateReservationWebRequest createReservationWebRequest,
+    @Transactional
+    public ReservationWebResponse createAndPay(
+            final CreateReservationWithPaymentWebRequest webRequest,
             final MemberInfo memberInfo
     ) {
-        final Reservation reservation = reservationCommandUseCase.create(
-                new CreateReservationServiceRequest(
-                        memberInfo.id(),
-                        createReservationWebRequest.date(),
-                        createReservationWebRequest.timeId(),
-                        createReservationWebRequest.themeId()
-                )
-        );
+        CreateReservationServiceRequest createRequest = webRequest.toCreateServiceRequest(webRequest, memberInfo);
+        Reservation reservation = reservationCommandUseCase.create(createRequest);
 
+        paymentClient.confirm(webRequest.toPaymentConfirmRequest());
         return ReservationConverter.toDto(reservation);
     }
 
@@ -139,9 +133,7 @@ public class ReservationService {
         reservationWaitCommandUseCase.delete(id);
     }
 
-    public List<ReservationWebResponse> search(
-            final ReservationSearchWebRequest reservationSearchWebRequest
-    ) {
+    public List<ReservationWebResponse> search(final ReservationSearchWebRequest reservationSearchWebRequest) {
         final List<Reservation> reservations = reservationQueryUseCase.search(
                 reservationSearchWebRequest.memberId(),
                 reservationSearchWebRequest.themeId(),

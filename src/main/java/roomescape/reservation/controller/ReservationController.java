@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.common.utils.UriFactory;
 import roomescape.member.auth.LoginMember;
 import roomescape.member.auth.vo.MemberInfo;
-import roomescape.payment.PaymentService;
+import roomescape.payment.PaymentClient;
 import roomescape.reservation.controller.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.controller.dto.CreateReservationWebRequest;
 import roomescape.reservation.controller.dto.CreateReservationWithPaymentWebRequest;
@@ -31,7 +31,6 @@ import roomescape.reservation.service.ReservationService;
 public class ReservationController {
 
     private final ReservationService reservationService;
-    private final PaymentService paymentService;
 
     @GetMapping("/mine")
     public List<ReservationWithStatusResponse> getAllWithReservationWait(@LoginMember MemberInfo memberInfo) {
@@ -51,16 +50,8 @@ public class ReservationController {
             @RequestBody final CreateReservationWithPaymentWebRequest request,
             @LoginMember final MemberInfo memberInfo
     ) {
-        // TODO : paymentId 등 결제정보를 예약 저장시 db에 저장할지 고려
-        paymentService.confirm(request.toPaymentConfirmRequest());
-
-        final ReservationWebResponse reservationWebResponse = reservationService.create(
-                request.toCreateReservationWebRequest(),
-                memberInfo
-        );
-
+        final ReservationWebResponse reservationWebResponse = reservationService.createAndPay(request, memberInfo);
         final URI location = UriFactory.buildPath("/reservations", String.valueOf(reservationWebResponse.id()));
-
         return ResponseEntity.created(location)
                 .body(reservationWebResponse);
     }

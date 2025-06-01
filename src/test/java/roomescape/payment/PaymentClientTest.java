@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,11 +17,11 @@ import org.springframework.test.web.client.response.MockRestResponseCreators;
 import roomescape.common.exception.PaymentException;
 import roomescape.reservation.controller.PaymentConfirmRequest;
 
-@RestClientTest(PaymentService.class)
-class PaymentServiceTest {
+@RestClientTest(PaymentClient.class)
+class PaymentClientTest {
 
     @Autowired
-    private PaymentService paymentService;
+    private PaymentClient paymentClient;
 
     @Autowired
     MockRestServiceServer mockServer;
@@ -38,7 +37,7 @@ class PaymentServiceTest {
 
         //when & then
         PaymentConfirmRequest request = new PaymentConfirmRequest("a", "b", 1);
-        assertThatThrownBy(() -> paymentService.confirm(request))
+        assertThatThrownBy(() -> paymentClient.confirm(request))
                 .isInstanceOf(PaymentException.class)
                 .satisfies(e -> {
                     PaymentException ex = (PaymentException) e;
@@ -58,7 +57,7 @@ class PaymentServiceTest {
 
         //when & then
         PaymentConfirmRequest request = new PaymentConfirmRequest("a", "b", 1);
-        assertThatThrownBy(() -> paymentService.confirm(request))
+        assertThatThrownBy(() -> paymentClient.confirm(request))
                 .isInstanceOf(PaymentException.class)
                 .satisfies(e -> {
                     PaymentException ex = (PaymentException) e;
