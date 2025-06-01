@@ -1,7 +1,10 @@
 package roomescape.e2e;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static roomescape.fixture.IntegrationFixture.PASSWORD;
+import static roomescape.fixture.IntegrationFixture.REGULAR_EMAIL;
+import static roomescape.fixture.IntegrationFixture.TOKEN;
 import static roomescape.fixture.IntegrationFixture.createReservationTime;
 import static roomescape.fixture.IntegrationFixture.createTheme;
 import static roomescape.fixture.IntegrationFixture.findThemesBySize;
@@ -17,6 +20,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
+import roomescape.common.security.dto.request.LoginRequest;
+import roomescape.common.security.dto.response.CheckLoginResponse;
 import roomescape.member.presentation.dto.request.SignupWebRequest;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -81,5 +86,21 @@ public class GuestTest {
                 .statusCode(201);
 
         loginAndGetAuthToken("testMember@gmail.com", PASSWORD);
+    }
+
+    @Test
+    void loginCheck() {
+        String regularToken = loginAndGetAuthToken(REGULAR_EMAIL, PASSWORD);
+        CheckLoginResponse checkLoginResponse = RestAssured.given().log().all()
+                .body(new LoginRequest(REGULAR_EMAIL, PASSWORD))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .cookie(TOKEN, regularToken)
+                .when().get("/login/check")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(CheckLoginResponse.class);
+
+        assertThat(checkLoginResponse.name()).isEqualTo("Regular");
     }
 }

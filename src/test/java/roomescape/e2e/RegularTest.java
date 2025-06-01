@@ -32,7 +32,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.common.security.dto.request.LoginRequest;
-import roomescape.common.security.dto.response.CheckLoginResponse;
 import roomescape.payment.application.client.PaymentClient;
 import roomescape.payment.domain.PaymentType;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
@@ -72,22 +71,6 @@ public class RegularTest {
                 .then().log().all()
                 .statusCode(204);
     }
-
-    @Test
-    void loginCheck() {
-        CheckLoginResponse checkLoginResponse = RestAssured.given().log().all()
-                .body(new LoginRequest(REGULAR_EMAIL, PASSWORD))
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .cookie(TOKEN, REGULAR_TOKEN)
-                .when().get("/login/check")
-                .then().log().all()
-                .statusCode(200)
-                .extract()
-                .as(CheckLoginResponse.class);
-
-        assertThat(checkLoginResponse.name()).isEqualTo("Regular");
-    }
-
 
     @Test
     void createReservation() {

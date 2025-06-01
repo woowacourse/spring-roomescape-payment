@@ -66,8 +66,8 @@
 |-----|------|------------------|-----------|
 | 게스트 | POST | `/login`         | 로그인       |
 | 게스트 | POST | `/members`       | 회원가입      |
+| 게스트 | GET  | `/login/check`   | 로그인 여부 확인 |
 | 사용자 | POST | `/logout`        | 로그아웃      |
-| 사용자 | GET  | `/login/check`   | 인증 정보 조회  |
 | 관리자 | GET  | `/admin/members` | 모든 사용자 조회 |
 
 ### ⏳ 예약 대기 관리
@@ -628,6 +628,29 @@ Content-Type: application/json
 }
 ```
 
+#### ✅ 인증 정보 조회
+
+| 메서드 | URL            | 설명        |
+|-----|----------------|-----------|
+| GET | `/login/check` | 로그인 여부 확인 |
+
+**요청 예시**
+
+```http
+GET /login/check HTTP/1.1
+```
+
+**응답 예시**
+
+```json
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+"name": "어드민"
+}
+```
+
 ### 👤 사용자
 
 #### 🚪 로그아웃
@@ -649,29 +672,7 @@ Cookie: token=eyJhbGciOiJIUzI1NiJ9...
 HTTP/1.1 204 OK
 ```
 
-#### ✅ 인증 정보 조회
 
-| 메서드 | URL            | 설명               |
-|-----|----------------|------------------|
-| GET | `/login/check` | 현재 로그인 사용자 정보 확인 |
-
-**요청 예시**
-
-```http
-GET /login/check HTTP/1.1
-Cookie: token=eyJhbGciOiJIUzI1NiJ9...
-```
-
-**응답 예시**
-
-```json
-HTTP/1.1 200 OK
-Content-Type: application/json
-
-{
-"name": "어드민"
-}
-```
 
 ### 🔧 관리자
 
