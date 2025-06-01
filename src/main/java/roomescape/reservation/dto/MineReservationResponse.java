@@ -14,7 +14,7 @@ public record MineReservationResponse(
         Long rank
 ) {
 
-    public static MineReservationResponse from(final WaitingRankReservation waitingRankReservation){
+    public static MineReservationResponse from(final WaitingRankReservation waitingRankReservation) {
         return new MineReservationResponse(
                 waitingRankReservation.getReservation().getId(),
                 waitingRankReservation.getReservation().getTheme().getName(),

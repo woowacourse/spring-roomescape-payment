@@ -9,6 +9,7 @@ public interface ReservationTimeRepository {
     ReservationTime save(ReservationTime reservationTime);
 
     Optional<ReservationTime> findById(Long id);
+
     List<ReservationTime> findAll();
 
     void delete(ReservationTime reservationTime);

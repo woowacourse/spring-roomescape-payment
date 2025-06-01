@@ -49,10 +49,10 @@ public class ReservationService {
         final Member member = getMemberByEmail(loginMember.email());
 
         final LocalDateTime currentTimestamp = timeManager.todayCurrentTime();
-        final ReservationDate reservationDate = ReservationDate.of(request.reservationRequest().date(), currentTimestamp.toLocalDate());
+        final ReservationDate reservationDate = ReservationDate.of(request.reservationRequest().date(),
+                currentTimestamp.toLocalDate());
 
         validateDuplicatePending(reservationDate, reservationTime, theme);
-
 
         final Reservation notSavedReservation = Reservation.of(reservationDate, member, reservationTime, theme,
                 ReservationStatus.PENDING, currentTimestamp);
@@ -71,7 +71,6 @@ public class ReservationService {
         final ReservationDate reservationDate = ReservationDate.of(request.date(), currentTimestamp.toLocalDate());
 
         validateDuplicatePending(reservationDate, reservationTime, theme);
-
 
         final Reservation notSavedReservation = Reservation.of(reservationDate, member, reservationTime, theme,
                 ReservationStatus.PENDING, currentTimestamp);
@@ -135,7 +134,7 @@ public class ReservationService {
         final Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(ReservationNotFoundException::new);
 
-        if(reservation.isPending()){
+        if (reservation.isPending()) {
             pendingNextReservation(reservation);
         }
 

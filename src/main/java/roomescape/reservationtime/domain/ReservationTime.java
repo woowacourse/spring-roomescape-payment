@@ -16,7 +16,8 @@ import lombok.Getter;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class ReservationTime {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Include
     private final Long id;
 

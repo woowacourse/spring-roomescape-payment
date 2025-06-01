@@ -9,7 +9,9 @@ public interface ThemeRepository {
     Theme save(Theme theme);
 
     Optional<Theme> findById(Long id);
+
     List<Theme> findAll();
+
     List<Theme> findAllOrderByRank(LocalDate from, LocalDate to, int size);
 
     void delete(Theme theme);

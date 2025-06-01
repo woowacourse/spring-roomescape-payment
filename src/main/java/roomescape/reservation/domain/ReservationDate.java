@@ -34,7 +34,7 @@ public class ReservationDate {
         return CACHE.computeIfAbsent(date, ReservationDate::new);
     }
 
-    public static ReservationDate fromQuery(final LocalDate date){
+    public static ReservationDate fromQuery(final LocalDate date) {
         return CACHE.computeIfAbsent(date, ReservationDate::new);
     }
 

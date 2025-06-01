@@ -51,13 +51,13 @@ public class AuthorizationAdminInterceptor implements HandlerInterceptor {
     }
 
     private void validateToken(final String token) {
-        if(!jwtProvider.isValidToken(token)){
+        if (!jwtProvider.isValidToken(token)) {
             throw new AuthNotValidTokenException();
         }
     }
 
     private void validateExistsCookies(final Cookie[] cookies) {
-        if(cookies == null){
+        if (cookies == null) {
             throw new AuthNotExistsCookieException();
         }
     }

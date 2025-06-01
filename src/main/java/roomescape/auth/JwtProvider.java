@@ -20,7 +20,7 @@ public class JwtProvider {
     public JwtProvider(
             @Value("${secret.jwt-key}") final String secretKey,
             @Value("${secret.jwt-expiration}") final Long validityInMilliseconds
-    ){
+    ) {
         this.validityInMilliseconds = validityInMilliseconds;
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
     }

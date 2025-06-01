@@ -16,26 +16,34 @@ public interface ReservationRepository {
     Optional<Reservation> findById(Long id);
 
     List<Reservation> findAll();
+
     List<Reservation> findAllByThemeAndDate(Theme theme, ReservationDate date);
-    List<Reservation> findAllByMemberAndThemeAndDateBetween(Member member, Theme theme, ReservationDate from, ReservationDate to);
+
+    List<Reservation> findAllByMemberAndThemeAndDateBetween(Member member, Theme theme, ReservationDate from,
+                                                            ReservationDate to);
+
     List<Reservation> findAllByReservationStatus(ReservationStatus reservationStatus);
+
     List<Reservation> findAllByDateAndReservationTimeAndThemeAndReservationStatusOrderByAsc(
             ReservationDate date,
             ReservationTime reservationTime,
             Theme theme,
             ReservationStatus reservationStatus
     );
+
     List<WaitingRankReservation> findAllWaitingRankByMember(Member member);
 
     void deleteById(Long id);
 
     boolean existsByReservationTime(ReservationTime reservationTime);
+
     boolean existsByDuplicateMember(
             ReservationDate date,
             ReservationTime reservationTime,
             Theme theme,
             Member member
     );
+
     boolean existsDuplicateStatus(
             ReservationTime reservationTime,
             ReservationDate date,

@@ -56,11 +56,13 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     }
 
     @Override
-    public List<Reservation> findAllByDateAndReservationTimeAndThemeAndReservationStatusOrderByAsc(final ReservationDate date,
-                                                                                         final ReservationTime reservationTime,
-                                                                                         final Theme theme,
-                                                                                         final ReservationStatus reservationStatus) {
-        return reservationJpaRepository.findAllByDateAndReservationTimeAndThemeAndReservationStatusOrderByIdAsc(date, reservationTime,
+    public List<Reservation> findAllByDateAndReservationTimeAndThemeAndReservationStatusOrderByAsc(
+            final ReservationDate date,
+            final ReservationTime reservationTime,
+            final Theme theme,
+            final ReservationStatus reservationStatus) {
+        return reservationJpaRepository.findAllByDateAndReservationTimeAndThemeAndReservationStatusOrderByIdAsc(date,
+                reservationTime,
                 theme,
                 reservationStatus);
     }
@@ -90,7 +92,8 @@ public class ReservationRepositoryImpl implements ReservationRepository {
             final Theme theme,
             final ReservationStatus reservationStatus
     ) {
-        return reservationJpaRepository.existsByReservationTimeAndDateAndThemeAndReservationStatus(reservationTime, date,
+        return reservationJpaRepository.existsByReservationTimeAndDateAndThemeAndReservationStatus(reservationTime,
+                date,
                 theme, reservationStatus);
     }
 }

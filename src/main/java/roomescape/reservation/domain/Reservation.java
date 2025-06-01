@@ -64,16 +64,16 @@ public class Reservation {
             final Theme theme,
             final ReservationStatus reservationStatus,
             final LocalDateTime currentDateTime
-            ) {
+    ) {
         validatePastTime(date, reservationTime, currentDateTime);
 
         return new Reservation(null, date, member, reservationTime, theme, reservationStatus);
     }
 
     private static void validatePastTime(final ReservationDate date, final ReservationTime reservationTime,
-                                  final LocalDateTime currentDateTime) {
-        if(date.isEqualToDate(currentDateTime.toLocalDate())
-                && reservationTime.isBefore(currentDateTime.toLocalTime())){
+                                         final LocalDateTime currentDateTime) {
+        if (date.isEqualToDate(currentDateTime.toLocalDate())
+                && reservationTime.isBefore(currentDateTime.toLocalTime())) {
             throw new ReservationPastTimeException();
         }
     }
@@ -82,7 +82,7 @@ public class Reservation {
         return reservationStatus == ReservationStatus.PENDING;
     }
 
-    public void pending(){
+    public void pending() {
         this.reservationStatus = ReservationStatus.PENDING;
     }
 }
