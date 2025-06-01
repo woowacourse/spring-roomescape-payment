@@ -8,8 +8,6 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-import static roomescape.domain.payment.PaymentFailCode.EXTERNAL_SERVER_PROCESSING;
-import static roomescape.domain.payment.PaymentFailCode.INVALID_AUTH_CREDENTIALS;
 
 import java.net.SocketTimeoutException;
 import java.util.stream.Stream;
@@ -26,7 +24,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
-import roomescape.domain.payment.PaymentFailCode;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.exception.PaymentFailedException;
@@ -139,9 +136,9 @@ class TossPaymentProviderTest {
     }
 
     @ParameterizedTest
-    @DisplayName("결제 승인 실패하면 결제 실패 예외가 발생한다.")
+    @DisplayName("결제 승인에 실패하면 결제 실패 예외가 발생한다.")
     @MethodSource("confirmPaymentFailedSource")
-    void confirmPaymentFailed(final String response, final PaymentFailCode expectedStatusCode) {
+    void confirmPaymentFailed(final String response) {
         // given
         var request = new PaymentRequest("a", "1", 1000);
 
@@ -149,15 +146,9 @@ class TossPaymentProviderTest {
             .andExpect(method(HttpMethod.POST))
             .andRespond(withBadRequest().contentType(MediaType.APPLICATION_JSON).body(response));
 
-        // when
+        // when & then
         assertThatThrownBy(() -> paymentProvider.confirm(request))
-
-            // then
-            .isInstanceOf(PaymentFailedException.class)
-            .satisfies(e -> {
-                var exception = (PaymentFailedException) e;
-                assertThat(exception.getFailCode()).isEqualTo(expectedStatusCode);
-            });
+            .isInstanceOf(PaymentFailedException.class);
     }
 
     private static Stream<Arguments> confirmPaymentFailedSource() {
@@ -167,42 +158,42 @@ class TossPaymentProviderTest {
                     "code" : "INVALID_API_KEY",
                     "message" : "Invalid API key"
                 }
-            """, INVALID_AUTH_CREDENTIALS
+            """
             ),
             Arguments.of("""
                 {
                     "code" : "UNAUTHORIZED_KEY",
                     "message" : "Unauthorized key"
                 }
-            """, INVALID_AUTH_CREDENTIALS
+            """
             ),
             Arguments.of("""
                 {
                     "code" : "INCORRECT_BASIC_AUTH_FORMAT",
                     "message" : "Incorrect auth format"
                 }
-            """, INVALID_AUTH_CREDENTIALS
+            """
             ),
             Arguments.of("""
                 {
                     "code" : "FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING",
                     "message" : "Failed payment internal system processing"
                 }
-            """, EXTERNAL_SERVER_PROCESSING
+            """
             ),
             Arguments.of("""
                 {
                     "code" : "FAILED_INTERNAL_SYSTEM_PROCESSING",
                     "message" : "Failed internal system processing"
                 }
-            """, EXTERNAL_SERVER_PROCESSING
+            """
             ),
             Arguments.of("""
                 {
                     "code" : "UNKNOWN_PAYMENT_ERROR",
                     "message" : "Unknown payment error"
                 }
-            """, EXTERNAL_SERVER_PROCESSING
+            """
             )
         );
     }

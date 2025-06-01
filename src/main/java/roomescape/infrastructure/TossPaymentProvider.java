@@ -1,9 +1,5 @@
 package roomescape.infrastructure;
 
-import static roomescape.domain.payment.PaymentFailCode.CONDITION_NOT_SATISFIED;
-import static roomescape.domain.payment.PaymentFailCode.EXTERNAL_SERVER_PROCESSING;
-import static roomescape.domain.payment.PaymentFailCode.INVALID_AUTH_CREDENTIALS;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +10,10 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 import roomescape.domain.payment.PaymentConfirmation;
-import roomescape.domain.payment.PaymentFailCode;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.exception.PaymentFailedException;
+import roomescape.exception.PaymentFailedException.Cause;
 import roomescape.infrastructure.TossPaymentProviderConfig.TossApiProperties;
 
 @RequiredArgsConstructor
@@ -37,14 +33,14 @@ public class TossPaymentProvider implements PaymentProvider {
 
             } catch (RestClientResponseException e) {
                 var failResponse = readTossFailureResponse(e);
-                throw new PaymentFailedException(mapToFailCode(failResponse.code), failResponse.message);
+                throw new PaymentFailedException(mapTossErrorToCause(failResponse.code), failResponse.message);
 
             } catch (ResourceAccessException e) {
                 logger.error(e.getMessage());
             }
         }
 
-        throw new PaymentFailedException(EXTERNAL_SERVER_PROCESSING, "토스 서버에 연결할 수 없습니다.");
+        throw new PaymentFailedException(Cause.EXTERNAL_ERROR, "토스 서버에 연결할 수 없습니다.");
     }
 
     private TossFailureResponse readTossFailureResponse(final RestClientResponseException e) {
@@ -59,17 +55,17 @@ public class TossPaymentProvider implements PaymentProvider {
 
     private record TossFailureResponse(String code, String message) {}
 
-    private PaymentFailCode mapToFailCode(final String tossCode) {
+    private Cause mapTossErrorToCause(final String tossCode) {
         return switch(tossCode) {
             case "INVALID_API_KEY",
                  "UNAUTHORIZED_KEY",
-                 "INCORRECT_BASIC_AUTH_FORMAT" -> INVALID_AUTH_CREDENTIALS;
+                 "INCORRECT_BASIC_AUTH_FORMAT" -> Cause.SERVER_ERROR;
 
             case "FAILED_PAYMENT_INTERNAL_SYSTEM_PROCESSING",
                  "FAILED_INTERNAL_SYSTEM_PROCESSING",
-                 "UNKNOWN_PAYMENT_ERROR" -> EXTERNAL_SERVER_PROCESSING;
+                 "UNKNOWN_PAYMENT_ERROR" -> Cause.EXTERNAL_ERROR;
 
-            default -> CONDITION_NOT_SATISFIED;
+            default -> Cause.CLIENT_ERROR;
         };
     }
 }
