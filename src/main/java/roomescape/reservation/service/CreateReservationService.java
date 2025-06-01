@@ -1,6 +1,7 @@
 package roomescape.reservation.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.service.dto.LoginMember;
 import roomescape.common.exception.DuplicatedException;
 import roomescape.common.exception.EntityNotFoundException;
@@ -96,6 +97,7 @@ public class CreateReservationService {
         }
     }
 
+    @Transactional
     public ReservationResponse createWithPayment(ReservationWithPaymentRequest request, LoginMember loginMember) {
         ReservationCreateRequest reservationCreateRequest = new ReservationCreateRequest(
                 request.date(),
