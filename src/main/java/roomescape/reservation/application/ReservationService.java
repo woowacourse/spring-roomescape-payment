@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +39,7 @@ import roomescape.waiting.domain.WaitingWithRank;
 import roomescape.waiting.domain.Waitings;
 
 @Service
+@Slf4j
 @AllArgsConstructor
 @Transactional(readOnly = true)
 public class ReservationService {
@@ -83,6 +85,7 @@ public class ReservationService {
         String orderId = request.orderId();
         BigDecimal amount = request.amount();
         if (originAmount.compareTo(amount) != 0) {
+            log.warn("결제 금액 불일치 발생! [orderId: {}] expected = {}, actual = {}", orderId, originAmount, amount);
             throw new InvalidPaymentAmountException();
         }
 
