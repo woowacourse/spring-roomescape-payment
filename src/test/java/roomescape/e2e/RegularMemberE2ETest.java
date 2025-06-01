@@ -36,7 +36,6 @@ import roomescape.common.security.dto.response.CheckLoginResponse;
 import roomescape.payment.application.client.PaymentClient;
 import roomescape.payment.domain.PaymentType;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
-import roomescape.payment.presentation.dto.request.PaymentRequest;
 import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
 import roomescape.reservationslot.presentation.dto.response.MyReservationResponse;
 import roomescape.reservationslot.presentation.dto.response.ReservationResponse;
@@ -46,7 +45,7 @@ import roomescape.reservationslot.presentation.dto.response.ReservationResponse;
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
 })
-class RegularTest {
+class RegularMemberE2ETest {
 
     @MockitoBean
     private PaymentClient paymentClient;

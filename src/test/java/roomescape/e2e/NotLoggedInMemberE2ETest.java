@@ -24,7 +24,7 @@ import roomescape.member.presentation.dto.request.SignupWebRequest;
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
 })
-class GuestTest {
+class NotLoggedInMemberE2ETest {
 
     @LocalServerPort
     private int port;

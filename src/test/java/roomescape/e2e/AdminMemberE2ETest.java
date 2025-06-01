@@ -37,7 +37,7 @@ import roomescape.reservationslot.presentation.dto.response.ReservationResponse;
 @TestPropertySource(properties = {
         "spring.sql.init.data-locations=classpath:test-data.sql"
 })
-class AdminTest {
+class AdminMemberE2ETest {
 
     @LocalServerPort
     private int port;
