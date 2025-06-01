@@ -1,6 +1,6 @@
 package roomescape.infrastructure;
 
-import static roomescape.infrastructure.EncodeUtil.base64Encode;
+import static roomescape.infrastructure.EncodeUtil.encodeBase64;
 
 import java.time.Duration;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -17,7 +17,7 @@ public class TossPaymentProviderConfig {
 
     private static final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
     private static final String NO_PASSWORD_SIGN = ":";
-    private static final String AUTHORIZATION_HEADER_VALUE = "Basic " + base64Encode(WIDGET_SECRET_KEY + NO_PASSWORD_SIGN);
+    private static final String AUTHORIZATION_HEADER_VALUE = "Basic " + encodeBase64(WIDGET_SECRET_KEY + NO_PASSWORD_SIGN);
 
     @Bean
     public RestTemplate restTemplate(final RestTemplateBuilder builder) {
