@@ -13,7 +13,6 @@ import roomescape.payment.application.PaymentService;
 import roomescape.payment.application.dto.PaymentConfirmRequest;
 import roomescape.payment.application.dto.PaymentDataRequest;
 import roomescape.payment.application.dto.PaymentRequest;
-import roomescape.payment.application.dto.PaymentResponse;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.payment.infrastructure.dto.TossPaymentRequest;
@@ -50,7 +49,7 @@ public class TossPaymentService implements PaymentService {
         );
         paymentRepository.save(payment);
         try {
-            final PaymentResponse paymentResponse = paymentClient.requestPayment(paymentRequest);
+            paymentClient.requestPayment(paymentRequest);
             payment.success();
         } catch (PaymentException e) {
             payment.fail();
