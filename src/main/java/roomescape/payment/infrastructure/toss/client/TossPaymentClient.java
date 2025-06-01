@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.application.dto.PaymentApprovalRequest;
@@ -27,26 +28,35 @@ public class TossPaymentClient {
                 .uri("/v1/payments/confirm")
                 .body(approvalRequest)
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError,
-                        (request, response) -> {
-                            TossErrorResponse errorResponse = objectMapper.readValue(response.getBody(),
-                                    TossErrorResponse.class);
-                            handleError(errorResponse);
-                        })
-                .onStatus(HttpStatusCode::is5xxServerError,
-                        (request, response) -> {
-                            TossErrorResponse errorResponse = objectMapper.readValue(response.getBody(),
-                                    TossErrorResponse.class);
-                            throw new TossPaymentApprovalFailedException(HttpStatus.INTERNAL_SERVER_ERROR,
-                                    errorResponse.message());
-                        })
+                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> handle4xxError(response))
+                .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> handle5xxError(response))
                 .toBodilessEntity();
     }
 
-    private void handleError(TossErrorResponse errorResponse) {
+    private void handle4xxError(ClientHttpResponse response) {
+        TossErrorResponse errorResponse = parseErrorResponse(response);
         if (errorResponse.hasNonUserFacingMessage()) {
             throw new TossInternalException();
         }
-        throw new TossPaymentApprovalFailedException(HttpStatus.BAD_REQUEST, errorResponse.message());
+        throw new TossPaymentApprovalFailedException(
+                HttpStatus.BAD_REQUEST,
+                errorResponse.message()
+        );
+    }
+
+    private void handle5xxError(ClientHttpResponse response) {
+        TossErrorResponse errorResponse = parseErrorResponse(response);
+        throw new TossPaymentApprovalFailedException(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                errorResponse.message()
+        );
+    }
+
+    private TossErrorResponse parseErrorResponse(ClientHttpResponse response) {
+        try {
+            return objectMapper.readValue(response.getBody(), TossErrorResponse.class);
+        } catch (Exception e) {
+            throw new TossInternalException();
+        }
     }
 }
