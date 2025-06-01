@@ -1,10 +1,9 @@
-package roomescape.service;
+package roomescape.service.command;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static roomescape.test.fixture.DateFixture.NEXT_DAY;
-import static roomescape.test.fixture.DateFixture.TODAY;
 import static roomescape.test.fixture.DateFixture.YESTERDAY;
 
 import java.time.LocalTime;
@@ -24,11 +23,7 @@ import roomescape.domain.Theme;
 import roomescape.domain.Waiting;
 import roomescape.dto.business.PaymentHistoryCreationContent;
 import roomescape.dto.business.ReservationCreationContent;
-import roomescape.dto.response.MemberProfileResponse;
 import roomescape.dto.response.ReservationResponse;
-import roomescape.dto.response.ReservationStatusResponse;
-import roomescape.dto.response.ThemeResponse;
-import roomescape.dto.response.WaitingWithRankResponse;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.NotFoundException;
 import roomescape.exception.PaymentException;
@@ -38,6 +33,11 @@ import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.repository.WaitingRepository;
+import roomescape.service.query.MemberQueryService;
+import roomescape.service.query.ReservationQueryService;
+import roomescape.service.query.ReservationTimeQueryService;
+import roomescape.service.query.ThemeQueryService;
+import roomescape.service.query.WaitingQueryService;
 import roomescape.utility.PaymentClientStub;
 
 @DataJpaTest
@@ -58,24 +58,32 @@ class ReservationServiceTest {
     @Autowired
     private PaymentHistoryRepository paymentHistoryRepository;
 
+    private PaymentService paymentService;
+    private MemberQueryService memberQueryService;
+    private ThemeQueryService themeQueryService;
+    private ReservationTimeQueryService timeQueryService;
+    private ReservationQueryService reservationQueryService;
+    private WaitingQueryService waitingQueryService;
     private ReservationService reservationService;
+
     private ReservationTime reservationTime;
     private Theme theme;
     private Member member;
-    private PaymentService paymentService;
     private PaymentClientStub paymentClient;
 
     @BeforeEach
     void setup() {
         paymentClient = new PaymentClientStub();
         paymentService = new PaymentService(paymentHistoryRepository, paymentClient);
+        memberQueryService = new MemberQueryService(memberRepository);
+        themeQueryService = new ThemeQueryService(themeRepository);
+        timeQueryService = new ReservationTimeQueryService(reservationTimeRepository);
+        reservationQueryService = new ReservationQueryService(
+                reservationRepository, memberRepository, waitingRepository);
+        waitingQueryService = new WaitingQueryService(waitingRepository);
         reservationService = new ReservationService(
-                reservationRepository,
-                reservationTimeRepository,
-                themeRepository,
-                memberRepository,
-                waitingRepository,
-                paymentService);
+                reservationRepository, waitingRepository, memberQueryService, themeQueryService,
+                timeQueryService, paymentService, reservationQueryService, waitingQueryService);
 
         reservationTime = entityManager.persist(
                 ReservationTime.createWithoutId(LocalTime.of(10, 0)));
@@ -83,191 +91,6 @@ class ReservationServiceTest {
                 Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
         member = entityManager.persist(
                 Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "password123!"));
-    }
-
-    @DisplayName("모든 예약을 조회할 수 있다.")
-    @Test
-    void canFindAll() {
-        // given
-        entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                TODAY, reservationTime, theme, member));
-        entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                TODAY, reservationTime, theme, member));
-        entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                TODAY, reservationTime, theme, member));
-
-        entityManager.flush();
-
-        // when
-        List<ReservationResponse> allReservations = reservationService.findAllReservations();
-
-        // then
-        assertAll(
-                () -> assertThat(allReservations).hasSize(3),
-                () -> assertThat(allReservations)
-                        .extracting(ReservationResponse::member)
-                        .extracting(MemberProfileResponse::id)
-                        .containsExactly(member.getId(), member.getId(), member.getId())
-        );
-    }
-
-    @DisplayName("회원의 모든 예약을 조회할 수 있다.")
-    @Test
-    void testMethodNameHere() {
-        // given
-        entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                TODAY, reservationTime, theme, member));
-        entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                TODAY, reservationTime, theme, member));
-        entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                TODAY, reservationTime, theme, member));
-
-        Member otherMember = entityManager.persist(
-                Member.createWithoutId(Role.GENERAL, "회원", "member2@test.com", "password123!"));
-
-        entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                TODAY, reservationTime, theme, otherMember));
-
-        entityManager.flush();
-
-        // when
-        List<ReservationResponse> allReservations = reservationService.findAllReservationsByMember(member.getId());
-
-        // then
-        assertAll(
-                () -> assertThat(allReservations).hasSize(3),
-                () -> assertThat(allReservations)
-                        .extracting(ReservationResponse::member)
-                        .extracting(MemberProfileResponse::id)
-                        .containsExactly(member.getId(), member.getId(), member.getId())
-        );
-    }
-
-    @DisplayName("회원의 모든 예약 상태를 조회할 수 있다.")
-    @Test
-    void canFindAllReservationStatusByMember() {
-        // given
-        List<Reservation> reservations = List.of(
-                entityManager.persist(
-                        Reservation.createWithoutIdAndPaymentHistory(TODAY, reservationTime, theme, member)),
-                entityManager.persist(
-                        Reservation.createWithoutIdAndPaymentHistory(TODAY, reservationTime, theme, member)),
-                entityManager.persist(
-                        Reservation.createWithoutIdAndPaymentHistory(TODAY, reservationTime, theme, member)));
-        List<Waiting> waitings = List.of(
-                entityManager.persist(
-                        Waiting.createWithoutIdWithoutPayment(TODAY, theme, reservationTime, member)),
-                entityManager.persist(Waiting.createWithoutIdWithoutPayment(TODAY, theme, reservationTime, member)),
-                entityManager.persist(Waiting.createWithoutIdWithoutPayment(TODAY, theme, reservationTime, member)));
-
-        // when
-        ReservationStatusResponse allReservationState =
-                reservationService.findAllReservationStatusByMember(member.getId());
-
-        // then
-        List<Long> reservationIds = reservations.stream().map(Reservation::getId).toList();
-        List<Long> waitingIds = waitings.stream().map(Waiting::getId).toList();
-        assertAll(
-                () -> assertThat(allReservationState.reservationResponses())
-                        .extracting(ReservationResponse::id)
-                        .containsExactlyElementsOf(reservationIds),
-                () -> assertThat(allReservationState.waitingWithRankResponses())
-                        .extracting(WaitingWithRankResponse::id)
-                        .containsExactlyElementsOf(waitingIds)
-        );
-    }
-
-    @Nested
-    @DisplayName("필터를 통해 예약을 조회할 수 있다")
-    class findReservationsByFilter {
-
-        @Test
-        @DisplayName("필터 조건으로 특정 유저의 예약을 조회할 수 있다")
-        void canFindReservationsByMemberFilter() {
-            // given
-            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                    TODAY, reservationTime, theme, member));
-
-            Member otherMember = entityManager.persist(
-                    Member.createWithoutId(Role.GENERAL, "다른회원", "otherMember@test.com", "password123!"));
-
-            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                    TODAY, reservationTime, theme, otherMember));
-            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                    NEXT_DAY, reservationTime, theme, otherMember));
-
-            entityManager.flush();
-
-            // when
-            List<ReservationResponse> reservations = reservationService.findReservationsByFilter(
-                    otherMember.getId(), theme.getId(), TODAY, TODAY.plusDays(7));
-
-            // then
-            assertAll(
-                    () -> assertThat(reservations).hasSize(2),
-                    () -> assertThat(reservations)
-                            .extracting(ReservationResponse::member)
-                            .extracting(MemberProfileResponse::id)
-                            .containsExactly(otherMember.getId(), otherMember.getId())
-            );
-        }
-
-        @Test
-        @DisplayName("필터 조건으로 특정 테마의 예약을 조회할 수 있다")
-        void canFindReservationsByThemeFilter() {
-            // given
-            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                    TODAY, reservationTime, theme, member));
-
-            Theme otherTheme = entityManager.persist(
-                    Theme.createWithoutId("다른테마", "설명", "thumbnail.jpg"));
-
-            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                    TODAY, reservationTime, otherTheme, member));
-            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                    NEXT_DAY, reservationTime, otherTheme, member));
-
-            entityManager.flush();
-
-            // when
-            List<ReservationResponse> reservations = reservationService.findReservationsByFilter(
-                    member.getId(), otherTheme.getId(), TODAY, TODAY.plusDays(7));
-
-            // then
-            assertAll(
-                    () -> assertThat(reservations).hasSize(2),
-                    () -> assertThat(reservations)
-                            .extracting(ReservationResponse::theme)
-                            .extracting(ThemeResponse::id)
-                            .containsExactly(otherTheme.getId(), otherTheme.getId())
-            );
-        }
-
-        @Test
-        @DisplayName("필터 조건으로 특정 기간의 예약을 조회할 수 있다")
-        void canFindReservationsByDateFilter() {
-            // given
-            entityManager.persist(
-                    Reservation.createWithoutIdAndPaymentHistory(YESTERDAY, reservationTime, theme, member));
-            entityManager.persist(
-                    Reservation.createWithoutIdAndPaymentHistory(TODAY, reservationTime, theme, member));
-            entityManager.persist(
-                    Reservation.createWithoutIdAndPaymentHistory(NEXT_DAY, reservationTime, theme, member));
-
-            entityManager.flush();
-
-            // when
-            List<Reservation> reservations = reservationRepository.findReservationsByFilter(
-                    member.getId(), theme.getId(), TODAY, NEXT_DAY);
-
-            // then
-            assertAll(
-                    () -> assertThat(reservations).hasSize(2),
-                    () -> assertThat(reservations)
-                            .extracting(Reservation::getDate)
-                            .containsExactlyInAnyOrder(TODAY, NEXT_DAY)
-            );
-        }
     }
 
     @Nested
@@ -320,7 +143,7 @@ class ReservationServiceTest {
             // when & then
             assertThatThrownBy(() -> reservationService.addReservation(member.getId(), creationContent))
                     .isInstanceOf(NotFoundException.class)
-                    .hasMessage("ID에 해당하는 테마을 찾을 수 없습니다.");
+                    .hasMessage("ID에 해당하는 테마는 존재하지 않습니다.");
         }
 
         @DisplayName("예약시간이 존재하지 않을 경우 예약을 추가할 수 없다.")
@@ -334,7 +157,7 @@ class ReservationServiceTest {
             // when & then
             assertThatThrownBy(() -> reservationService.addReservation(member.getId(), creationContent))
                     .isInstanceOf(NotFoundException.class)
-                    .hasMessage("ID에 해당하는 예약 시간을 찾을 수 없습니다.");
+                    .hasMessage("ID에 해당하는 예약시간은 존재하지 않습니다.");
         }
 
         @DisplayName("결제 실패시 예약이 실패한다.")

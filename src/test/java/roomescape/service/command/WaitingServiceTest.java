@@ -1,4 +1,4 @@
-package roomescape.service;
+package roomescape.service.command;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -32,6 +32,11 @@ import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.repository.WaitingRepository;
+import roomescape.service.query.MemberQueryService;
+import roomescape.service.query.ReservationQueryService;
+import roomescape.service.query.ReservationTimeQueryService;
+import roomescape.service.query.ThemeQueryService;
+import roomescape.service.query.WaitingQueryService;
 import roomescape.utility.PaymentClientStub;
 
 @DataJpaTest
@@ -40,30 +45,43 @@ class WaitingServiceTest {
     @Autowired
     private TestEntityManager entityManager;
     @Autowired
-    private WaitingRepository waitingRepository;
-    @Autowired
-    private ThemeRepository themeRepository;
+    private ReservationRepository reservationRepository;
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
     @Autowired
+    private ThemeRepository themeRepository;
+    @Autowired
     private MemberRepository memberRepository;
     @Autowired
-    private ReservationRepository reservationRepository;
+    private WaitingRepository waitingRepository;
     @Autowired
     private PaymentHistoryRepository paymentHistoryRepository;
 
+    private PaymentService paymentService;
+    private MemberQueryService memberQueryService;
+    private ThemeQueryService themeQueryService;
+    private ReservationTimeQueryService timeQueryService;
+    private ReservationQueryService reservationQueryService;
+    private WaitingQueryService waitingQueryService;
+    private PaymentClientStub paymentClient;
     private WaitingService waitingService;
 
     private PaymentHistoryCreationContent paymentHistoryCreationContent;
-    private PaymentClientStub paymentClient;
 
     @BeforeEach
     void setup() {
         paymentClient = new PaymentClientStub();
-        PaymentService paymentService = new PaymentService(paymentHistoryRepository, paymentClient);
+        paymentService = new PaymentService(paymentHistoryRepository, paymentClient);
+        memberQueryService = new MemberQueryService(memberRepository);
+        themeQueryService = new ThemeQueryService(themeRepository);
+        timeQueryService = new ReservationTimeQueryService(reservationTimeRepository);
+        reservationQueryService = new ReservationQueryService(
+                reservationRepository, memberRepository, waitingRepository);
+        waitingQueryService = new WaitingQueryService(waitingRepository);
         waitingService = new WaitingService(
-                waitingRepository, themeRepository, reservationTimeRepository, memberRepository, reservationRepository,
-                paymentService);
+                waitingRepository, memberQueryService, themeQueryService,
+                timeQueryService, reservationQueryService, waitingQueryService, paymentService);
+
         this.paymentHistoryCreationContent = new PaymentHistoryCreationContent("312313", "12312re", "NORMAL", 1000);
     }
 
@@ -150,7 +168,7 @@ class WaitingServiceTest {
             // when & then
             assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentHistoryCreationContent))
                     .isInstanceOf(NotFoundException.class)
-                    .hasMessage("ID에 해당하는 테마가 존재하지 않습니다.");
+                    .hasMessage("ID에 해당하는 테마는 존재하지 않습니다.");
 
         }
 
@@ -199,7 +217,7 @@ class WaitingServiceTest {
             // when & then
             assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentHistoryCreationContent))
                     .isInstanceOf(NotFoundException.class)
-                    .hasMessage("ID에 해당하는 회원이 존재하지 않습니다.");
+                    .hasMessage("ID에 해당하는 회원을 찾을 수 없습니다.");
         }
 
         @DisplayName("과거의 대기 데이터를 저장하는 것은 허용하지 않는다.")

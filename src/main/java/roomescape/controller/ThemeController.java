@@ -18,28 +18,31 @@ import roomescape.domain.Role;
 import roomescape.dto.business.ThemeCreationContent;
 import roomescape.dto.request.ThemeCreationRequest;
 import roomescape.dto.response.ThemeResponse;
-import roomescape.service.ThemeService;
+import roomescape.service.command.ThemeService;
+import roomescape.service.query.ThemeQueryService;
 
 @RestController
 @RequestMapping("/themes")
 public class ThemeController {
 
     private final ThemeService themeService;
+    private final ThemeQueryService themeQueryService;
 
-    public ThemeController(ThemeService themeService) {
+    public ThemeController(ThemeService themeService, ThemeQueryService themeQueryService) {
         this.themeService = themeService;
+        this.themeQueryService = themeQueryService;
     }
 
     @GetMapping
     public List<ThemeResponse> findAllTheme() {
-        return themeService.findAllThemes();
+        return themeQueryService.findAllThemes();
     }
 
     @GetMapping("/ranking")
     public List<ThemeResponse> findTopTheme(@RequestParam("size") int size) {
         LocalDate to = LocalDate.now();
         LocalDate from = to.minusDays(7);
-        return themeService.findTopThemes(from, to, size);
+        return themeQueryService.findTopThemes(from, to, size);
     }
 
     @PostMapping

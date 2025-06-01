@@ -1,4 +1,4 @@
-package roomescape.service;
+package roomescape.service.command;
 
 import org.springframework.stereotype.Service;
 import roomescape.domain.PaymentHistory;
@@ -13,7 +13,10 @@ public class PaymentService {
     private final PaymentHistoryRepository paymentHistoryRepository;
     private final PaymentClient paymentClient;
 
-    public PaymentService(PaymentHistoryRepository paymentHistoryRepository, PaymentClient paymentClient) {
+    public PaymentService(
+            PaymentHistoryRepository paymentHistoryRepository,
+            PaymentClient paymentClient
+    ) {
         this.paymentHistoryRepository = paymentHistoryRepository;
         this.paymentClient = paymentClient;
     }

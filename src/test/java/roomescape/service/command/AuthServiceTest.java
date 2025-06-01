@@ -1,4 +1,4 @@
-package roomescape.service;
+package roomescape.service.command;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -17,6 +17,7 @@ import roomescape.dto.request.LoginRequest;
 import roomescape.dto.response.AccessTokenResponse;
 import roomescape.exception.LoginFailException;
 import roomescape.repository.MemberRepository;
+import roomescape.service.query.MemberQueryService;
 import roomescape.utility.JwtTokenProvider;
 
 @DataJpaTest
@@ -27,15 +28,17 @@ public class AuthServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    private JwtTokenProvider jwtTokenProvider;
     private AuthService authService;
+    private MemberQueryService memberQueryService;
+    private JwtTokenProvider jwtTokenProvider;
 
     @BeforeEach
     void beforeEach() {
         jwtTokenProvider = new JwtTokenProvider(
                 "test_secret_key_test_secret_key_test_secret_key_test_secret_key",
                 60000);
-        authService = new AuthService(jwtTokenProvider, memberRepository);
+        memberQueryService = new MemberQueryService(memberRepository);
+        authService = new AuthService(jwtTokenProvider, memberQueryService);
     }
 
     @Nested

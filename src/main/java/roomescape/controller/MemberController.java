@@ -7,24 +7,21 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.config.annotation.Authority;
 import roomescape.domain.Role;
 import roomescape.dto.response.MemberProfileResponse;
-import roomescape.service.MemberService;
-import roomescape.service.ReservationService;
+import roomescape.service.query.MemberQueryService;
 
 @RestController
 @RequestMapping("/members")
 public class MemberController {
 
-    private final MemberService memberService;
-    private final ReservationService reservationService;
+    private final MemberQueryService memberQueryService;
 
-    public MemberController(MemberService memberService, ReservationService reservationService) {
-        this.memberService = memberService;
-        this.reservationService = reservationService;
+    public MemberController(MemberQueryService memberQueryService) {
+        this.memberQueryService = memberQueryService;
     }
 
     @GetMapping
     @Authority(Role.ADMIN)
     public List<MemberProfileResponse> findAllMember() {
-        return memberService.findAllMemberProfile();
+        return memberQueryService.findAllMemberProfile();
     }
 }

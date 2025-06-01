@@ -1,4 +1,4 @@
-package roomescape.service;
+package roomescape.service.command;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 

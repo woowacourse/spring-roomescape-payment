@@ -33,5 +33,4 @@ class AccessTokenContentTest {
             assertThat(memberTokenContent.isAdminToken()).isFalse();
         }
     }
-
 }

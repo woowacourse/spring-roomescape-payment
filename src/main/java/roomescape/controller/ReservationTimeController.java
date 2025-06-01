@@ -21,21 +21,24 @@ import roomescape.dto.business.ReservationTimeWithBookState;
 import roomescape.dto.request.ReservationTimeCreationRequest;
 import roomescape.dto.response.ReservationTimeResponse;
 import roomescape.dto.response.ReservationTimeWithBookingResponse;
-import roomescape.service.ReservationTimeService;
+import roomescape.service.command.ReservationTimeService;
+import roomescape.service.query.ReservationTimeQueryService;
 
 @RestController
 @RequestMapping("/times")
 public class ReservationTimeController {
 
     private final ReservationTimeService timeService;
+    private final ReservationTimeQueryService timeQueryService;
 
-    public ReservationTimeController(ReservationTimeService timeService) {
+    public ReservationTimeController(ReservationTimeService timeService, ReservationTimeQueryService timeQueryService) {
         this.timeService = timeService;
+        this.timeQueryService = timeQueryService;
     }
 
     @GetMapping
     public List<ReservationTimeResponse> findAllReservationTimes() {
-        return timeService.findAllReservationTimes();
+        return timeQueryService.findAllReservationTimes();
     }
 
     @GetMapping(params = {"themeId", "date"})
@@ -44,7 +47,7 @@ public class ReservationTimeController {
             @RequestParam("date") LocalDate date
     ) {
         List<ReservationTimeWithBookState> reservations =
-                timeService.findReservationTimesWithBooking(themeId, date);
+                timeQueryService.findReservationTimesWithBooking(themeId, date);
         return reservations.stream()
                 .map(ReservationTimeWithBookingResponse::new)
                 .toList();

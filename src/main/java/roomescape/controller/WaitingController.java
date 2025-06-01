@@ -19,22 +19,25 @@ import roomescape.dto.business.PaymentHistoryCreationContent;
 import roomescape.dto.business.WaitingCreationContent;
 import roomescape.dto.request.WaitingCreationRequest;
 import roomescape.dto.response.WaitingResponse;
-import roomescape.service.WaitingService;
+import roomescape.service.command.WaitingService;
+import roomescape.service.query.WaitingQueryService;
 
 @RestController
 @RequestMapping("/waiting")
 public class WaitingController {
 
     private final WaitingService waitingService;
+    private final WaitingQueryService waitingQueryService;
 
-    public WaitingController(WaitingService waitingService) {
+    public WaitingController(WaitingService waitingService, WaitingQueryService waitingQueryService) {
         this.waitingService = waitingService;
+        this.waitingQueryService = waitingQueryService;
     }
 
     @GetMapping
     @Authority(Role.ADMIN)
     public List<WaitingResponse> findAllWaiting() {
-        return waitingService.findAllWaiting();
+        return waitingQueryService.findAllWaiting();
     }
 
     @PostMapping

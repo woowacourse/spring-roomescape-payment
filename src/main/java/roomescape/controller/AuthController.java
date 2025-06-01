@@ -16,7 +16,7 @@ import roomescape.dto.business.AccessTokenContent;
 import roomescape.dto.request.LoginRequest;
 import roomescape.dto.response.AccessTokenResponse;
 import roomescape.dto.response.MemberProfileResponse;
-import roomescape.service.AuthService;
+import roomescape.service.command.AuthService;
 
 @RestController
 public class AuthController {

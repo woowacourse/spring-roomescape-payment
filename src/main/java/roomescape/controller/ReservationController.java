@@ -24,22 +24,28 @@ import roomescape.dto.request.AdminReservationRequest;
 import roomescape.dto.request.ReservationCreationRequest;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationStatusResponse;
-import roomescape.service.ReservationService;
+import roomescape.service.command.ReservationService;
+import roomescape.service.query.ReservationQueryService;
 
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final ReservationQueryService reservationQueryService;
 
-    public ReservationController(ReservationService reservationService) {
+    public ReservationController(
+            ReservationService reservationService,
+            ReservationQueryService reservationQueryService
+    ) {
         this.reservationService = reservationService;
+        this.reservationQueryService = reservationQueryService;
     }
 
     @GetMapping
     @Authority(Role.ADMIN)
     public List<ReservationResponse> findAllReservations() {
-        return reservationService.findAllReservations();
+        return reservationQueryService.findAllReservations();
     }
 
     @GetMapping(params = {"memberId", "themeId", "from", "to"})
@@ -50,7 +56,7 @@ public class ReservationController {
             @RequestParam("from") LocalDate from,
             @RequestParam("to") LocalDate to
     ) {
-        return reservationService.findReservationsByFilter(memberId, themeId, from, to);
+        return reservationQueryService.findReservationsByFilter(memberId, themeId, from, to);
     }
 
     @GetMapping("/state")
@@ -58,7 +64,7 @@ public class ReservationController {
     public ReservationStatusResponse findAllReservationStateByMember(
             @RequiredAccessToken AccessTokenContent accessTokenContent
     ) {
-        return reservationService.findAllReservationStatusByMember(accessTokenContent.id());
+        return reservationQueryService.findAllReservationStatusByMember(accessTokenContent.id());
     }
 
     @PostMapping

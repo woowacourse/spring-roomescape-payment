@@ -1,4 +1,4 @@
-package roomescape.service;
+package roomescape.service.command;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,7 +7,7 @@ import roomescape.dto.business.AccessTokenContent;
 import roomescape.dto.request.LoginRequest;
 import roomescape.dto.response.AccessTokenResponse;
 import roomescape.exception.LoginFailException;
-import roomescape.repository.MemberRepository;
+import roomescape.service.query.MemberQueryService;
 import roomescape.utility.JwtTokenProvider;
 
 @Service
@@ -15,24 +15,22 @@ import roomescape.utility.JwtTokenProvider;
 public class AuthService {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private final MemberRepository memberRepository;
+    private final MemberQueryService memberQueryService;
 
-    public AuthService(JwtTokenProvider jwtTokenProvider, MemberRepository memberRepository) {
+    public AuthService(
+            JwtTokenProvider jwtTokenProvider,
+            MemberQueryService memberQueryService
+    ) {
         this.jwtTokenProvider = jwtTokenProvider;
-        this.memberRepository = memberRepository;
+        this.memberQueryService = memberQueryService;
     }
 
     public AccessTokenResponse login(LoginRequest loginRequest) {
-        Member member = getMemberByEmail(loginRequest.email());
+        Member member = memberQueryService.getMemberByEmail(loginRequest.email());
         validatePasswordForLogin(member, loginRequest.password());
         String accessToken = jwtTokenProvider.createAccessToken(
                 new AccessTokenContent(member.getId(), member.getRole(), member.getName()));
         return new AccessTokenResponse(accessToken);
-    }
-
-    private Member getMemberByEmail(String email) {
-        return memberRepository.findOneByEmail(email)
-                .orElseThrow(() -> new LoginFailException("이메일에 해당하는 회원이 존재하지 않습니다."));
     }
 
     private void validatePasswordForLogin(Member member, String password) {
