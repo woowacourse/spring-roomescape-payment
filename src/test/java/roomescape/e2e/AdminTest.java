@@ -101,7 +101,7 @@ public class AdminTest {
                 .when().get("/reservations")
                 .then().log().all()
                 .statusCode(200)
-                .body("size()", is(1));
+                .body("data.size()", is(1));
 
         RestAssured.given().log().all()
                 .cookie(TOKEN, authToken)
@@ -113,7 +113,7 @@ public class AdminTest {
                 .when().get("/reservations")
                 .then().log().all()
                 .statusCode(200)
-                .body("size()", is(0));
+                .body("data.size()", is(0));
     }
 
     @Test

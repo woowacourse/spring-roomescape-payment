@@ -18,6 +18,7 @@ import roomescape.reservation.dto.request.AdminReservationRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
+import roomescape.reservation.dto.response.ReservationsResponse;
 import roomescape.reservation.service.ReservationFacadeService;
 import roomescape.reservation.service.ReservationService;
 
@@ -34,13 +35,14 @@ public class ReservationController {
     }
 
     @GetMapping("/reservations")
-    public ResponseEntity<List<ReservationResponse>> findReservations(
+    public ResponseEntity<ReservationsResponse> findReservations(
             @RequestParam(required = false) Long themeId,
             @RequestParam(required = false) Long memberId,
             @RequestParam(required = false) LocalDate dateFrom,
             @RequestParam(required = false) LocalDate dateTo
     ) {
-        return ResponseEntity.ok(reservationService.findReservations(themeId, memberId, dateFrom, dateTo));
+        List<ReservationResponse> reservations = reservationService.findReservations(themeId, memberId, dateFrom, dateTo);
+        return ResponseEntity.ok(ReservationsResponse.of(reservations));
     }
 
     @RequireRole(MemberRole.USER)
@@ -49,7 +51,6 @@ public class ReservationController {
             @RequestBody ReservationCreateRequest request,
             UserInfo userInfo
     ) {
-
         ReservationResponse dto = reservationFacadeService.create(request, userInfo.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
@@ -77,9 +78,6 @@ public class ReservationController {
     @GetMapping("/reservations-mine")
     public ResponseEntity<List<MyReservationResponse>> findMyReservations(UserInfo userInfo) {
         List<MyReservationResponse> myReservations = reservationFacadeService.findMyReservations(userInfo);
-
-        reservationFacadeService.findMyReservations(userInfo);
-
         return ResponseEntity.ok().body(myReservations);
     }
 

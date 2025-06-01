@@ -787,3 +787,46 @@ Content-Type: application/json
 - [x] 지나간 날짜와 시간에 대한 예약 생성은 불가능하다.
 - [x] 중복 예약은 불가능하다.
     - ex. 이미 4월 1일 10시에 예약이 되어있다면, 4월 1일 10시에 대한 예약을 생성할 수 없다.
+
+### 예약 목록 조회
+
+```http
+GET /reservations?themeId=1&dateFrom=2024-03-20&dateTo=2024-03-21
+```
+
+#### 응답
+
+```json
+{
+  "reservations": [
+    {
+      "id": 1,
+      "time": {
+        "id": 1,
+        "startAt": "10:00"
+      },
+      "theme": {
+        "id": 1,
+        "name": "공포",
+        "description": "공포 테마입니다.",
+        "thumbnail": "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"
+      },
+      "date": "2024-03-20"
+    },
+    {
+      "id": 2,
+      "time": {
+        "id": 2,
+        "startAt": "11:00"
+      },
+      "theme": {
+        "id": 1,
+        "name": "공포",
+        "description": "공포 테마입니다.",
+        "thumbnail": "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"
+      },
+      "date": "2024-03-20"
+    }
+  ]
+}
+```

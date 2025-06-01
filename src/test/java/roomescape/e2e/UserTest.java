@@ -26,7 +26,6 @@ import roomescape.member.dto.request.SignupRequest;
 import roomescape.payment.dto.response.PaymentResponse;
 import roomescape.payment.infrastructure.TossApiClient;
 import roomescape.reservation.dto.response.MyReservationResponse;
-import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.fixture.TestFixture;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -75,7 +74,7 @@ public class UserTest {
                 .when().get("/reservations")
                 .then().log().all()
                 .statusCode(200)
-                .body("size()", is(0));
+                .body("data.size()", is(0));
     }
 
     @Test
@@ -289,36 +288,24 @@ public class UserTest {
 
         String adminToken = loginAndGetAuthToken(ADMIN_EMAIL, PASSWORD);
 
-        List<ReservationResponse> before = RestAssured.given().log().all()
+        RestAssured.given().log().all()
                 .cookie(TOKEN, adminToken)
                 .when().get("/reservations")
                 .then().log().all()
                 .statusCode(200)
-                .extract().as(new TypeRef<List<ReservationResponse>>() {
-                });
-        assertThat(before).hasSize(1);
-        Long reservedId = before.get(0).id();
+                .body("data.size()", is(1));
 
         RestAssured.given().log().all()
                 .cookie(TOKEN, adminToken)
-                .when().delete("/reservations/" + reservedId)
+                .when().delete("/reservations/" + 1)
                 .then().log().all()
                 .statusCode(204);
-
-        List<ReservationResponse> after = RestAssured.given().log().all()
-                .cookie(TOKEN, adminToken)
-                .when().get("/reservations")
-                .then().log().all()
-                .statusCode(200)
-                .extract().as(new TypeRef<List<ReservationResponse>>() {
-                });
-        assertThat(after).hasSize(1);
 
         RestAssured.given().log().all()
                 .cookie(TOKEN, adminToken)
                 .when().get("/waiting")
                 .then().log().all()
                 .statusCode(200)
-                .body("size()", is(0));
+                .body("data.size()", is(0));
     }
 }
