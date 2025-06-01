@@ -37,7 +37,7 @@ class AuthServiceTest {
     void login() {
         String email = "if@woowa.com";
         String password = "12341234";
-        Member member = memberRepository.save(new Member("이프", email, password, Role.ADMIN));
+        memberRepository.save(new Member("이프", email, password, Role.ADMIN));
         LoginRequest loginRequest = new LoginRequest(email, password);
 
         LoginResponse loginResponse = authService.login(loginRequest);
