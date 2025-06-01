@@ -58,11 +58,4 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse("서버에서 예기치 못한 예외가 발생하였습니다."));
     }
-
-    @ExceptionHandler(PaymentException.class)
-    public ResponseEntity<ErrorResponse> handlePaymentException(PaymentException e) {
-        e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse(e.getMessage()));
-    }
 }

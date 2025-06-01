@@ -1,12 +1,15 @@
 package roomescape.exception.custom.reason.payment;
 
-public class PaymentException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+import roomescape.exception.custom.status.CustomException;
 
-    public PaymentException(final String message, final Throwable cause) {
-        super(message, cause);
+public class PaymentException extends CustomException {
+
+    public PaymentException(String message, Throwable cause) {
+        super(message, cause, HttpStatus.BAD_REQUEST);
     }
 
-    public PaymentException(final String message) {
-        super(message);
+    public PaymentException(String message) {
+        super(HttpStatus.BAD_REQUEST, message);
     }
 }
