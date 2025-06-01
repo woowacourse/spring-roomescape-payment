@@ -5,10 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservationitem.ReservationTheme;
 import roomescape.domain.reservationitem.ReservationThemeRepository;
-import roomescape.domain.reservationitem.ReservationTime;
 import roomescape.dto.request.ReservationThemeRequest;
 import roomescape.dto.response.ReservationThemeResponse;
-import roomescape.dto.response.ReservationTimeWithAvailabilityResponse;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -52,19 +50,6 @@ public class ReservationThemeService {
         validateUniqueThemes(reservationTheme);
         ReservationTheme saved = reservationThemeRepository.save(reservationTheme);
         return ReservationThemeResponse.from(saved);
-    }
-
-    @Transactional(readOnly = true)
-    public List<ReservationTimeWithAvailabilityResponse> findReservationTimeOfTheme(long themeId, LocalDate date) {
-        final ReservationTheme theme = getThemeById(themeId);
-
-        List<ReservationTime> availableReservationTime = reservationTimeService.findReservationTimes();
-        return availableReservationTime.stream()
-                .map(reservationTime -> {
-                            boolean isBooked = reservationItemService.isExistReservationItem(date, reservationTime, theme);
-                            return ReservationTimeWithAvailabilityResponse.from(reservationTime, isBooked);
-                        }
-                ).toList();
     }
 
     @Transactional

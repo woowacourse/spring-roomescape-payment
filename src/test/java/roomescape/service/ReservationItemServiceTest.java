@@ -92,8 +92,8 @@ class ReservationItemServiceTest extends ServiceTest {
         insertReservationItem(date, time, theme);
 
         // when
-        final boolean exist = reservationItemService.isExistReservationItem(date, time, theme);
-        final boolean nonExist = reservationItemService.isExistReservationItem(illegalDate, time, theme);
+        final boolean exist = reservationItemService.isExistReservationItem(date, time.getId(), theme.getId());
+        final boolean nonExist = reservationItemService.isExistReservationItem(illegalDate, time.getId(), theme.getId());
 
         // then
         assertAll(

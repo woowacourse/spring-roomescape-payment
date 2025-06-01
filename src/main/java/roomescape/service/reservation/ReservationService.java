@@ -48,15 +48,14 @@ public class ReservationService {
             final ReservationStatus status,
             final boolean requiresExistingReservation) {
 
+        validateReservationAvailability(request.date(), request.timeId(), request.themeId(), requiresExistingReservation);
+
         final Member member = memberService.getMemberById(request.memberId());
         final ReservationTime time = reservationTimeService.getReservationTimeById(request.timeId());
         final ReservationTheme theme = reservationThemeService.getThemeById(request.themeId());
         final LocalDate date = request.date();
 
-        validateReservationAvailability(date, time, theme, requiresExistingReservation);
-
-        final ReservationItem reservationItem = reservationItemService.createReservationItemIfNotExist(
-                date, time, theme);
+        final ReservationItem reservationItem = reservationItemService.createReservationItemIfNotExist(date, time, theme);
 
         validateDuplicateReservation(member, reservationItem);
 
@@ -72,11 +71,11 @@ public class ReservationService {
 
     private void validateReservationAvailability(
             final LocalDate date,
-            final ReservationTime time,
-            final ReservationTheme theme,
+            final Long timeId,
+            final Long themeId,
             final boolean requiresExistingReservation) {
 
-        final boolean reservationExists = reservationItemService.isExistReservationItem(date, time, theme);
+        final boolean reservationExists = reservationItemService.isExistReservationItem(date, timeId, themeId);
 
         if (requiresExistingReservation && !reservationExists) {
             throw new IllegalArgumentException("[ERROR] 대기 예약은 기존 예약이 있을 때만 가능합니다.");

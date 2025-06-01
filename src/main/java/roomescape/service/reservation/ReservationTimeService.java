@@ -7,7 +7,9 @@ import roomescape.domain.reservationitem.ReservationTime;
 import roomescape.domain.reservationitem.ReservationTimeRepository;
 import roomescape.dto.request.ReservationTimeRequest;
 import roomescape.dto.response.ReservationTimeResponse;
+import roomescape.dto.response.ReservationTimeWithAvailabilityResponse;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -17,6 +19,7 @@ import java.util.NoSuchElementException;
 public class ReservationTimeService {
 
     private final ReservationTimeRepository reservationTimeRepository;
+    private final ReservationItemService reservationItemService;
 
     @Transactional
     public ReservationTimeResponse addReservationTime(final ReservationTimeRequest request) {
@@ -35,6 +38,17 @@ public class ReservationTimeService {
             throw new IllegalArgumentException("[ERROR] 예약이 존재해 테마를 삭제할 수 없습니다.");
         }
         reservationTimeRepository.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReservationTimeWithAvailabilityResponse> findReservationTimeOfTheme(long themeId, LocalDate date) {
+        List<ReservationTime> availableReservationTime = findReservationTimes();
+        return availableReservationTime.stream()
+                .map(reservationTime -> {
+                            boolean isBooked = reservationItemService.isExistReservationItem(date, reservationTime.getId(), themeId);
+                            return ReservationTimeWithAvailabilityResponse.from(reservationTime, isBooked);
+                        }
+                ).toList();
     }
 
     @Transactional(readOnly = true)

@@ -13,6 +13,6 @@ import java.util.Optional;
 public interface ReservationItemJpaRepository extends JpaRepository<ReservationItem, Long> {
 
     Optional<ReservationItem> findReservationItemByDateAndTimeAndTheme(LocalDate date, ReservationTime time, ReservationTheme theme);
-
-    boolean existsByDateAndTimeAndTheme(LocalDate date, ReservationTime time, ReservationTheme theme);
+    
+    boolean existsByDateAndTime_IdAndTheme_Id(LocalDate date, Long timeId, Long themeId);
 }

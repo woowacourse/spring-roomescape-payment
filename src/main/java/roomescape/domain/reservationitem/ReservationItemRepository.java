@@ -11,5 +11,5 @@ public interface ReservationItemRepository {
 
     Optional<ReservationItem> findReservationItemByDateAndTimeAndTheme(LocalDate date, ReservationTime time, ReservationTheme theme);
 
-    boolean existsByDateAndTimeAndTheme(LocalDate date, ReservationTime time, ReservationTheme theme);
+    boolean existsByDateAndTimeAndTheme(LocalDate date, Long timeId, Long theme);
 }

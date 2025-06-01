@@ -1,4 +1,4 @@
-package roomescape.controller.reservation;
+package roomescape.controller.user;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.request.ReservationRequest;
+import roomescape.dto.response.MyPageReservationResponse;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.service.reservation.ReservationService;
 import roomescape.service.reservation.ReservingService;
@@ -20,22 +20,24 @@ import roomescape.service.reservation.ReservingService;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RequestMapping("/reservations")
 @RestController
 public class ReservationController {
 
     private final ReservationService reservationService;
     private final ReservingService reservingService;
 
-    @GetMapping()
-    public ResponseEntity<List<ReservationResponse>> reservationList() {
-        return ResponseEntity.status(HttpStatus.OK).body(reservationService.getAllReservations());
+    @GetMapping("/reservations")
+    public ResponseEntity<List<MyPageReservationResponse>> getMyReservations(long memberId) {
+        List<MyPageReservationResponse> response = reservationService.getReservationsByMemberId(memberId);
+        return ResponseEntity.ok(response);
     }
 
-    @PostMapping()
-    public ResponseEntity<ReservationResponse> addReservation(@RequestBody @Valid final ReservationRequest request,
-                                                              final Long memberId) {
-        final ReservationResponse response = reservingService.reserve(
+    @PostMapping("/reservations")
+    public ResponseEntity<ReservationResponse> reserve(
+            @RequestBody @Valid ReservationRequest request,
+            long memberId
+    ) {
+        ReservationResponse response = reservingService.reserve(
                 request.date(),
                 request.themeId(),
                 request.timeId(),
@@ -48,22 +50,24 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PostMapping("/pending")
+    @PostMapping("/reservations/pending")
     public ResponseEntity<ReservationResponse> addPendingReservation(
-            @RequestBody @Valid final ReservationRequest request, final Long memberId) {
-        final CreateReservationRequest createReservationRequest = new CreateReservationRequest(
+            @RequestBody @Valid ReservationRequest request,
+            long memberId
+    ) {
+        CreateReservationRequest createReservationRequest = new CreateReservationRequest(
                 memberId,
                 request.date(),
                 request.themeId(),
                 request.timeId()
         );
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(reservationService.addPendingReservation(createReservationRequest));
+        ReservationResponse response = reservationService.addPendingReservation(createReservationRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> removeReservation(@PathVariable(name = "id") long id) {
-        reservationService.removeReservation(id);
+    @DeleteMapping("/reservations/{reservationId}")
+    public ResponseEntity<Void> removeReservation(@PathVariable long reservationId) {
+        reservationService.removeReservation(reservationId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

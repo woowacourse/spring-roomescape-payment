@@ -21,7 +21,7 @@ public class ReservationItemService {
     public ReservationItem createReservationItemIfNotExist(LocalDate date,
                                                            ReservationTime reservationTime,
                                                            ReservationTheme theme) {
-        if (isExistReservationItem(date, reservationTime, theme)) {
+        if (isExistReservationItem(date, reservationTime.getId(), theme.getId())) {
             return getReservationItemByDateAndTimeAndTheme(date, reservationTime, theme);
         }
         return addReservationItem(date, reservationTime, theme);
@@ -50,7 +50,7 @@ public class ReservationItemService {
     }
 
     @Transactional(readOnly = true)
-    public boolean isExistReservationItem(LocalDate date, ReservationTime reservationTime, ReservationTheme theme) {
-        return reservationItemRepository.existsByDateAndTimeAndTheme(date, reservationTime, theme);
+    public boolean isExistReservationItem(LocalDate date, Long timeId, Long themeId) {
+        return reservationItemRepository.existsByDateAndTimeAndTheme(date, timeId, themeId);
     }
 }
