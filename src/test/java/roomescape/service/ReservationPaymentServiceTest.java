@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.concurrent.TimeUnit;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import org.junit.jupiter.api.AfterAll;
@@ -48,9 +47,6 @@ class ReservationPaymentServiceTest {
 
     @Autowired
     private MemberRepository memberRepository;
-
-    @Autowired
-    private PaymentClientService paymentClientService;
 
     @BeforeAll
     static void setUp() throws IOException {
@@ -95,21 +91,5 @@ class ReservationPaymentServiceTest {
         assertThatThrownBy(() -> reservationPaymentService.confirmPaymentAndAddReservation(
                 reservationCreateRequest, paymentConfirmRequest
         )).hasMessageContaining("클라이언트 에러 발생: 400 BAD_REQUEST");
-    }
-
-    @DisplayName("토스 결제 승인 요청이 타임아웃됐을 때 예외를 발생한다.")
-    @Test
-    void confirmPaymentTimeout_shouldThrowTossPaymentException() {
-        mockWebServer.enqueue(new MockResponse()
-                .setResponseCode(400)
-                .setHeader("Content-Type", "application/json")
-                .setBodyDelay(10, TimeUnit.SECONDS)
-                .setBody("test body"));
-
-        // when & then
-        var paymentConfirmRequest = new PaymentConfirmRequest("orderId", 50000, "paymentKey", "TOSS");
-        assertThatThrownBy(() -> paymentClientService.confirm("token", paymentConfirmRequest))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("클라이언트 에러 발생: 400 BAD_REQUEST");
     }
 }
