@@ -142,7 +142,7 @@ class TossPaymentProviderTest {
     }
 
     @ParameterizedTest
-    @DisplayName("결제 승인 실패하면 실패에 관한 결제 세부사항을 얻는다")
+    @DisplayName("결제 승인 실패하면 결제 실패 예외가 발생한다.")
     @MethodSource("confirmPaymentFailedSource")
     void confirmPaymentFailed(final String response, final PaymentFailCode expectedStatusCode) {
         // given
@@ -153,14 +153,14 @@ class TossPaymentProviderTest {
             .andRespond(withBadRequest().contentType(MediaType.APPLICATION_JSON).body(response));
 
         // when
-        var paymentDetails = paymentProvider.confirm(request);
+        assertThatThrownBy(() -> paymentProvider.confirm(request))
 
-        // then
-        assertAll(
-            () -> assertThat(paymentDetails.confirmation()).isNull(),
-            () -> assertThat(paymentDetails.isFailed()).isTrue(),
-            () -> assertThat(paymentDetails.failure().code()).isEqualTo(expectedStatusCode)
-        );
+            // then
+            .isInstanceOf(PaymentFailedException.class)
+            .satisfies(e -> {
+                var exception = (PaymentFailedException) e;
+                assertThat(exception.getFailCode()).isEqualTo(expectedStatusCode);
+            });
     }
 
     private static Stream<Arguments> confirmPaymentFailedSource() {

@@ -1,26 +1,30 @@
 package roomescape.exception;
 
-import roomescape.domain.payment.PaymentFailure;
+import roomescape.domain.payment.PaymentFailCode;
 import roomescape.domain.payment.PaymentFailCode.Cause;
 
 public class PaymentFailedException extends RuntimeException {
 
-    private final PaymentFailure paymentFailure;
+    private final PaymentFailCode failCode;
 
-    public PaymentFailedException(final PaymentFailure failure) {
-        super(failure.message());
-        this.paymentFailure = failure;
+    public PaymentFailedException(final PaymentFailCode failCode, final String message) {
+        super(message);
+        this.failCode = failCode;
     }
 
     public boolean causedByClient() {
-        return paymentFailure.causedBy(Cause.CLIENT_ERROR);
+        return failCode.causedBy(Cause.CLIENT_ERROR);
     }
 
     public boolean causedByServer() {
-        return paymentFailure.causedBy(Cause.SERVER_ERROR);
+        return failCode.causedBy(Cause.SERVER_ERROR);
     }
 
     public boolean causedByExternalServer() {
-        return paymentFailure.causedBy(Cause.EXTERNAL_ERROR);
+        return failCode.causedBy(Cause.EXTERNAL_ERROR);
+    }
+
+    public PaymentFailCode getFailCode() {
+        return failCode;
     }
 }

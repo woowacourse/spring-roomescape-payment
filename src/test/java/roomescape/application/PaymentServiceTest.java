@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import roomescape.domain.payment.PaymentConfirmation;
 import roomescape.domain.payment.PaymentDetails;
-import roomescape.domain.payment.PaymentFailCode;
-import roomescape.domain.payment.PaymentFailure;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.exception.PaymentFailedException;
@@ -37,9 +35,8 @@ class PaymentServiceTest {
     void failToPay() {
         // given
         var request = new PaymentRequest("a", "1", 1000);
-        var paymentDetails = new PaymentDetails(new PaymentFailure(PaymentFailCode.CONDITION_NOT_SATISFIED, "결제 실패"));
 
-        Mockito.when(paymentProvider.confirm(request)).thenReturn(paymentDetails);
+        Mockito.when(paymentProvider.confirm(request)).thenThrow(PaymentFailedException.class);
 
         // when & then
         assertThatThrownBy(() -> paymentService.pay("a", "1", 1000))
