@@ -19,7 +19,7 @@ public class RestClientConfiguration {
     public RestClient.Builder restClientBuilder() {
         var clientFactory = new HttpComponentsClientHttpRequestFactory();
         clientFactory.setConnectTimeout(1_200);
-        clientFactory.setReadTimeout(30_000);
+        clientFactory.setReadTimeout(6_000);
 
         return RestClient.builder()
                 .requestFactory(clientFactory)
