@@ -15,11 +15,9 @@ import roomescape.service.ReservationService;
 public class MemberController {
 
     private final MemberService memberService;
-    private final ReservationService reservationService;
 
     public MemberController(MemberService memberService, ReservationService reservationService) {
         this.memberService = memberService;
-        this.reservationService = reservationService;
     }
 
     @GetMapping
