@@ -65,11 +65,7 @@ public class ReservationService {
         Reservation reservation = Reservation.createWithoutIdAndPaymentHistory(
                 request.date(), time, theme, member);
 
-        validateDuplicateReservation(theme, request.date(), time);
-        validatePastReservationCreation(reservation);
-
-        Reservation savedReservation = reservationRepository.save(reservation);
-        return new ReservationResponse(savedReservation);
+        return saveReservation(reservation);
     }
 
     public ReservationResponse addReservation(
@@ -82,15 +78,10 @@ public class ReservationService {
         ReservationTime time = timeQueryService.getReservationTimeById(reservationCreationContent.timeId());
 
         Payment paymentHistory = paymentService.savePayment(paymentHistoryCreationContent);
-
         Reservation reservation = Reservation.createWithoutId(reservationCreationContent.date(), time, theme, member,
                 paymentHistory);
 
-        validateDuplicateReservation(theme, reservationCreationContent.date(), time);
-        validatePastReservationCreation(reservation);
-
-        Reservation savedReservation = reservationRepository.save(reservation);
-        return new ReservationResponse(savedReservation);
+        return saveReservation(reservation);
     }
 
     public void deleteReservationById(long reservationId) {
@@ -108,6 +99,14 @@ public class ReservationService {
             addReservation(memberId, creationContent);
             waitingRepository.delete(waiting);
         }
+    }
+
+    private ReservationResponse saveReservation(Reservation newReservation) {
+        validateDuplicateReservation(
+                newReservation.getTheme(), newReservation.getDate(), newReservation.getReservationTime());
+        validatePastReservationCreation(newReservation);
+        Reservation savedReservation = reservationRepository.save(newReservation);
+        return new ReservationResponse(savedReservation);
     }
 
     private void validateDuplicateReservation(Theme theme, LocalDate date, ReservationTime time) {
