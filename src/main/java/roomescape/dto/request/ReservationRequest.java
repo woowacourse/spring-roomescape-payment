@@ -1,7 +1,8 @@
 package roomescape.dto.request;
 
-import java.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
 
 public record ReservationRequest(
         @DateTimeFormat(pattern = "yyyy-MM-dd")

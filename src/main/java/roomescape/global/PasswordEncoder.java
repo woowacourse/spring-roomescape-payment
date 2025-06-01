@@ -1,7 +1,8 @@
 package roomescape.global;
 
-import java.util.Base64;
 import org.springframework.stereotype.Component;
+
+import java.util.Base64;
 
 @Component
 public class PasswordEncoder {

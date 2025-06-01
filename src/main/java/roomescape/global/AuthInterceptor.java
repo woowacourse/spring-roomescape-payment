@@ -24,7 +24,6 @@ public class AuthInterceptor implements HandlerInterceptor {
     public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler)
             throws Exception {
 
-
         HttpSession session = request.getSession(false);
 
         if (session == null || session.getAttribute(SESSION_KEY) == null) {

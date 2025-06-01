@@ -1,8 +1,9 @@
 package roomescape.dto.response;
 
+import roomescape.domain.reservation.Reservation;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
-import roomescape.domain.reservation.Reservation;
 
 public record WaitingReservationResponse(
         Long id,
@@ -12,13 +13,22 @@ public record WaitingReservationResponse(
         LocalDate date
 ) {
 
-    public record WaitingReservationMemberSlot(Long memberId, String name) {
+    public record WaitingReservationMemberSlot(
+            Long memberId,
+            String name
+    ) {
     }
 
-    public record WaitingReservationThemeSlot(Long themeId, String themeName) {
+    public record WaitingReservationThemeSlot(
+            Long themeId,
+            String themeName
+    ) {
     }
 
-    public record WaitingReservationTimeSlot(Long timeId, LocalTime startAt) {
+    public record WaitingReservationTimeSlot(
+            Long timeId,
+            LocalTime startAt
+    ) {
     }
 
     public static WaitingReservationResponse from(Reservation reservation) {

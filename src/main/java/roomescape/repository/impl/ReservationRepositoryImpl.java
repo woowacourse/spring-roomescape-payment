@@ -1,8 +1,5 @@
 package roomescape.repository.impl;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import roomescape.domain.member.Member;
@@ -11,6 +8,10 @@ import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationitem.ReservationItem;
 import roomescape.repository.jpa.ReservationJpaRepository;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Repository
@@ -45,7 +46,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 
     @Override
     public Optional<Reservation> findFirstByReservationItemAndReservationStatusOrderByIdAsc(ReservationItem reservationItem,
-                                                                                     ReservationStatus reservationStatus) {
+                                                                                            ReservationStatus reservationStatus) {
         return reservationJpaRepository.findFirstByReservationItemAndReservationStatusOrderByIdAsc(reservationItem, reservationStatus);
     }
 

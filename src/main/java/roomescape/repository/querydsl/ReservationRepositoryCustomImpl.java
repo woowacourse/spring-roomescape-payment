@@ -2,8 +2,6 @@ package roomescape.repository.querydsl;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.time.LocalDate;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import roomescape.domain.member.QMember;
@@ -13,9 +11,12 @@ import roomescape.domain.reservationitem.QReservationItem;
 import roomescape.domain.reservationitem.QReservationTheme;
 import roomescape.domain.reservationitem.QReservationTime;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @RequiredArgsConstructor
 @Repository
-public class ReservationRepositoryCustomImpl implements ReservationRepositoryCustom{
+public class ReservationRepositoryCustomImpl implements ReservationRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
@@ -42,6 +43,7 @@ public class ReservationRepositoryCustomImpl implements ReservationRepositoryCus
                 )
                 .fetch();
     }
+
     private BooleanExpression memberIdEq(Long memberId) {
         return memberId != null ? QReservation.reservation.member.id.eq(memberId) : null;
     }

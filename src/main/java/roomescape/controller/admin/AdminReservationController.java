@@ -1,8 +1,6 @@
 package roomescape.controller.admin;
 
 import jakarta.validation.Valid;
-import java.time.LocalDate;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +16,9 @@ import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.WaitingReservationResponse;
 import roomescape.service.reservation.ReservationService;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RequestMapping("/admin/reservations")
@@ -39,7 +40,7 @@ public class AdminReservationController {
             @RequestParam(required = false, name = "dateFrom") LocalDate dateFrom,
             @RequestParam(required = false, name = "dateTo") LocalDate dateTo
     ) {
-        return ResponseEntity.status(HttpStatus.OK).body( reservationService.getFilteredReservations(memberId, themeId, dateFrom, dateTo));
+        return ResponseEntity.status(HttpStatus.OK).body(reservationService.getFilteredReservations(memberId, themeId, dateFrom, dateTo));
     }
 
     @GetMapping("/pending")

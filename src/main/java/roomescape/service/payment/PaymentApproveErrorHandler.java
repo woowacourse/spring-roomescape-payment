@@ -2,14 +2,15 @@ package roomescape.service.payment;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.util.List;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.ResponseErrorHandler;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.util.List;
 
 public class PaymentApproveErrorHandler implements ResponseErrorHandler {
 
@@ -19,7 +20,8 @@ public class PaymentApproveErrorHandler implements ResponseErrorHandler {
             "INVALID_API_KEY",
             "UNAPPROVED_ORDER_ID",
             "UNAUTHORIZED_KEY",
-            "INCORRECT_BASIC_AUTH_FORMAT");
+            "INCORRECT_BASIC_AUTH_FORMAT"
+    );
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
