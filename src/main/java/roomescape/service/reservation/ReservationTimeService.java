@@ -1,7 +1,6 @@
 package roomescape.service.reservation;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservationitem.ReservationTime;
@@ -29,12 +28,13 @@ public class ReservationTimeService {
 
     @Transactional
     public void removeReservationTime(final long id) {
-        final ReservationTime reservationTime = getReservationTimeById(id);
-        try {
-            reservationTimeRepository.deleteById(reservationTime.getId());
-        } catch (DataIntegrityViolationException e) {
-            throw new IllegalArgumentException("[ERROR] 이미 예약이 존재해 시간을 삭제할 수 없습니다.");
+        if (!reservationTimeRepository.existsById(id)) {
+            throw new NoSuchElementException("[ERROR] 존재하지 않는 테마입니다.");
         }
+        if (!reservationTimeRepository.isAvailableToRemove(id)) {
+            throw new IllegalArgumentException("[ERROR] 예약이 존재해 테마를 삭제할 수 없습니다.");
+        }
+        reservationTimeRepository.deleteById(id);
     }
 
     @Transactional(readOnly = true)

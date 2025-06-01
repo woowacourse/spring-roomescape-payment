@@ -1,23 +1,26 @@
 package roomescape.repository.impl;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import roomescape.domain.reservationitem.ReservationTheme;
 import roomescape.domain.reservationitem.ReservationThemeRepository;
+import roomescape.repository.jpa.ReservationJpaRepository;
 import roomescape.repository.jpa.ReservationThemeJpaRepository;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Repository
 public class ReservationThemeRepositoryImpl implements ReservationThemeRepository {
 
     private final ReservationThemeJpaRepository reservationThemeJpaRepository;
+    private final ReservationJpaRepository reservationJpaRepository;
 
     @Override
     public Optional<ReservationTheme> findById(final Long id) {
-       return reservationThemeJpaRepository.findById(id);
+        return reservationThemeJpaRepository.findById(id);
     }
 
     @Override
@@ -43,5 +46,15 @@ public class ReservationThemeRepositoryImpl implements ReservationThemeRepositor
     @Override
     public boolean existsByName(final String name) {
         return reservationThemeJpaRepository.existsByName(name);
+    }
+
+    @Override
+    public boolean isAvailableToRemove(final long id) {
+        return !reservationJpaRepository.existsByReservationItem_Theme_Id(id);
+    }
+
+    @Override
+    public boolean existsById(final long id) {
+        return reservationThemeJpaRepository.existsById(id);
     }
 }

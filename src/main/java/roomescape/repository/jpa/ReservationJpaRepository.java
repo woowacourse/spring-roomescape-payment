@@ -1,8 +1,5 @@
 package roomescape.repository.jpa;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,17 +10,21 @@ import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationitem.ReservationItem;
 import roomescape.repository.querydsl.ReservationRepositoryCustom;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface ReservationJpaRepository extends JpaRepository<Reservation, Long>, ReservationRepositoryCustom {
 
     @Query(value = """
-    SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END
-    FROM reservation r
-    JOIN reservation_item ri ON r.reservation_item_id = ri.id
-    WHERE ri.date = :date 
-    AND ri.time_id = :timeId 
-    AND ri.theme_id = :themeId
-    """, nativeQuery = true)
+            SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END
+            FROM reservation r
+            JOIN reservation_item ri ON r.reservation_item_id = ri.id
+            WHERE ri.date = :date 
+            AND ri.time_id = :timeId 
+            AND ri.theme_id = :themeId
+            """, nativeQuery = true)
     boolean existsByDateAndTimeIdAndThemeId(
             @Param("date") LocalDate date,
             @Param("timeId") long timeId,
@@ -31,11 +32,11 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
     );
 
     @Query("""
-        SELECT COUNT(r)
-        FROM Reservation r
-        WHERE r.reservationItem.id = :reservationItemId
-        AND r.id < :currentReservationId
-        """)
+            SELECT COUNT(r)
+            FROM Reservation r
+            WHERE r.reservationItem.id = :reservationItemId
+            AND r.id < :currentReservationId
+            """)
     long countByReservationItemIdAndIdLessThan(
             @Param("reservationItemId") Long reservationItemId,
             @Param("currentReservationId") Long currentReservationId
@@ -48,4 +49,8 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
     List<Reservation> findByReservationStatusOrderByIdDesc(ReservationStatus reservationStatus);
 
     List<Reservation> findByMemberId(Long memberId);
+
+    boolean existsByReservationItem_Theme_Id(Long themeId);
+
+    boolean existsByReservationItem_Time_Id(Long timeId);
 }

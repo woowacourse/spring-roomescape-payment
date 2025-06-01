@@ -1,7 +1,6 @@
 package roomescape.service.reservation;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservationitem.ReservationTheme;
@@ -70,12 +69,13 @@ public class ReservationThemeService {
 
     @Transactional
     public void removeReservationTheme(final long id) {
-        final ReservationTheme theme = getThemeById(id);
-        try {
-            reservationThemeRepository.deleteById(theme.getId());
-        } catch (DataIntegrityViolationException e) {
+        if (!reservationThemeRepository.existsById(id)) {
+            throw new NoSuchElementException("[ERROR] 존재하지 않는 테마입니다.");
+        }
+        if (!reservationThemeRepository.isAvailableToRemove(id)) {
             throw new IllegalArgumentException("[ERROR] 예약이 존재해 테마를 삭제할 수 없습니다.");
         }
+        reservationThemeRepository.deleteById(id);
     }
 
     @Transactional(readOnly = true)
