@@ -28,23 +28,20 @@ public class ReservationService {
 
     private final WaitingDomainService waitingDomainService;
     private final PaymentService paymentService;
-    private final ReservationDomainService reservationWriterService;
     private final ReservationDomainService reservationDomainService;
 
     public ReservationService(
         final WaitingDomainService waitingDomainService,
         final PaymentService paymentService,
-        final ReservationDomainService reservationWriterService,
         ReservationDomainService reservationDomainService) {
         this.waitingDomainService = waitingDomainService;
         this.paymentService = paymentService;
-        this.reservationWriterService = reservationWriterService;
         this.reservationDomainService = reservationDomainService;
     }
 
     public ReservationResponse createReservation(final ReservationRequest request, final Long memberId) {
         PaymentRequest paymentRequest = new PaymentRequest(request.paymentKey(), request.orderId(), request.amount());
-        Reservation reservation = reservationWriterService.saveReservation(request, memberId);
+        Reservation reservation = reservationDomainService.saveReservation(request, memberId);
         paymentService.confirmPayment(paymentRequest);
         return ReservationResponse.from(reservation);
     }
