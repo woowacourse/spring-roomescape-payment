@@ -29,7 +29,7 @@ public class PaymentService {
         return requestPay(content);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW, timeout = 3)
     public void writePaymentHistory(PaymentHistoryCreationContent content) {
         PaymentHistory paymentHistory = PaymentHistory.createWithoutId(content.orderId(),
                 content.paymentKey(), content.paymentType());

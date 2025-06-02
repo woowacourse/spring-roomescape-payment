@@ -1,11 +1,14 @@
 package roomescape.service;
 
-import java.time.LocalTime;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static roomescape.test.fixture.DateFixture.NEXT_DAY;
+import static roomescape.test.fixture.DateFixture.TODAY;
+import static roomescape.test.fixture.DateFixture.YESTERDAY;
+
+import java.time.LocalTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
@@ -37,9 +39,6 @@ import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.repository.WaitingRepository;
-import static roomescape.test.fixture.DateFixture.NEXT_DAY;
-import static roomescape.test.fixture.DateFixture.TODAY;
-import static roomescape.test.fixture.DateFixture.YESTERDAY;
 import roomescape.utility.PaymentClientStub;
 
 @DataJpaTest
@@ -50,8 +49,6 @@ class ReservationServiceTest {
     @Autowired
     private ReservationRepository reservationRepository;
     @Autowired
-    private ReservationTimeRepository reservationTimeRepository;
-    @Autowired
     private ThemeRepository themeRepository;
     @Autowired
     private MemberRepository memberRepository;
@@ -59,6 +56,10 @@ class ReservationServiceTest {
     private WaitingRepository waitingRepository;
     @Autowired
     private PaymentHistoryRepository paymentHistoryRepository;
+    @Autowired
+    private PaymentResultRepository paymentResultRepository;
+    @Autowired
+    private ReservationTimeRepository timeRepository;
 
     private ReservationService reservationService;
     private ReservationTime reservationTime;
@@ -66,8 +67,6 @@ class ReservationServiceTest {
     private Member member;
     private PaymentService paymentService;
     private PaymentClientStub paymentClient;
-    @Autowired
-    private PaymentResultRepository paymentResultRepository;
 
     @BeforeEach
     void setup() {
@@ -75,7 +74,7 @@ class ReservationServiceTest {
         paymentService = new PaymentService(paymentHistoryRepository, paymentClient, paymentResultRepository);
         reservationService = new ReservationService(
                 reservationRepository,
-                reservationTimeRepository,
+                timeRepository,
                 themeRepository,
                 memberRepository,
                 waitingRepository,
@@ -572,6 +571,7 @@ class ReservationServiceTest {
         // when & then
         reservationService.addReservation(member.getId(), reservationContent, paymentContent);
 
+        assertThat(reservationRepository.count()).isEqualTo(1L);
         assertThat(paymentResultRepository.count()).isEqualTo(1);
         assertThat(paymentHistoryRepository.count()).isEqualTo(1);
     }

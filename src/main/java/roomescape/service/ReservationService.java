@@ -94,6 +94,7 @@ public class ReservationService {
         return new ReservationResponse(savedReservation);
     }
 
+    @Transactional
     public ReservationResponse addReservation(long memberId,
                                               ReservationCreationContent reservationCreationContent,
                                               PaymentHistoryCreationContent paymentHistoryCreationContent) {
@@ -108,7 +109,6 @@ public class ReservationService {
                 theme, member);
         validatePastReservationCreation(validateReservation);
 
-        paymentService.writePaymentHistory(paymentHistoryCreationContent);
         PaymentResult paymentResult = paymentService.pay(paymentHistoryCreationContent);
 
         Reservation reservation = Reservation.createWithoutId(reservationCreationContent.date(), time, theme, member,

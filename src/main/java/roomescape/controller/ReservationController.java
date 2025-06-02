@@ -24,6 +24,7 @@ import roomescape.dto.request.AdminReservationRequest;
 import roomescape.dto.request.ReservationWithPaymentCreationRequest;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationStatusResponse;
+import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 
 @RestController
@@ -31,8 +32,10 @@ import roomescape.service.ReservationService;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final PaymentService paymentService;
 
-    public ReservationController(ReservationService reservationService) {
+    public ReservationController(ReservationService reservationService, PaymentService paymentService) {
+        this.paymentService = paymentService;
         this.reservationService = reservationService;
     }
 
@@ -82,6 +85,8 @@ public class ReservationController {
     ) {
         ReservationCreationContent creationContent = new ReservationCreationContent(request);
         PaymentHistoryCreationContent paymentHistoryCreationContent = new PaymentHistoryCreationContent(request);
+
+        paymentService.writePaymentHistory(paymentHistoryCreationContent);
 
         ReservationResponse reservationResponse = reservationService.addReservation(accessTokenContent.id(),
                 creationContent, paymentHistoryCreationContent);

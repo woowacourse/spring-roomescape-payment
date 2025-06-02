@@ -6,7 +6,7 @@ import roomescape.exception.PaymentException;
 
 public class PaymentClientStub implements PaymentClient {
 
-    private PaymentResult paymentResult = PaymentResult.createWithoutId("askdkasrwe", "sdfa132", "asdfasdf", 0L);
+    private PaymentResult paymentResult = PaymentResult.createWithoutId("askdkasrwe", "sdfa132", "asdfasdf", 1L);
     private String errorCase = null;
     private boolean occurRestClientError;
 
