@@ -17,7 +17,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     Boolean existsBySchedule_Theme(Theme theme);
 
-    boolean existsByScheduleAndReservationStatusNot(Schedule schedule, ReservationStatus reservationStatus);
+    Boolean existsByScheduleAndReservationStatusNot(Schedule schedule, ReservationStatus reservationStatus);
 
     Boolean existsBySchedule(Schedule schedule);
 
