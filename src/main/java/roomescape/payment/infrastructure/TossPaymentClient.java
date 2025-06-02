@@ -15,14 +15,19 @@ import roomescape.payment.domain.PaymentInfo;
 
 public class TossPaymentClient implements PaymentClient {
 
-    private static final String CONFIRM_URL = "https://api.tosspayments.com/v1/payments/confirm";
-    private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
-
+    private final String confirmUrl;
+    private final String secretKey;
     private final RestClient restClient;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public TossPaymentClient(RestClient restClient) {
+    public TossPaymentClient(
+            final String confirmUrl,
+            final String secretKey,
+            final RestClient restClient
+    ) {
+        this.confirmUrl = confirmUrl;
+        this.secretKey = secretKey;
         this.restClient = restClient;
     }
 
@@ -32,7 +37,7 @@ public class TossPaymentClient implements PaymentClient {
 
         try {
             restClient.post()
-                    .uri(CONFIRM_URL)
+                    .uri(confirmUrl)
                     .header("Authorization", encodedSecretKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(request)
@@ -55,7 +60,7 @@ public class TossPaymentClient implements PaymentClient {
 
     private String getEncodedSecretKey() {
         return "Basic " + Base64.getEncoder()
-                .encodeToString((SECRET_KEY + ":").getBytes());
+                .encodeToString((secretKey + ":").getBytes());
     }
 }
 

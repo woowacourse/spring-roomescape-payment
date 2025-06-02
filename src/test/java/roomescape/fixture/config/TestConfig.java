@@ -3,14 +3,12 @@ package roomescape.fixture.config;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.web.client.RestClient;
+import org.springframework.context.annotation.Import;
 import roomescape.member.application.MemberService;
 import roomescape.member.domain.MemberRepository;
 import roomescape.member.infrastructure.JpaMemberRepository;
 import roomescape.member.infrastructure.MemberRepositoryImpl;
-import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.domain.PaymentDomainService;
-import roomescape.payment.infrastructure.TossPaymentClient;
 import roomescape.reservation.application.AdminReservationService;
 import roomescape.reservation.application.AdminWaitingService;
 import roomescape.reservation.application.ReservationService;
@@ -31,6 +29,7 @@ import roomescape.theme.infrastructure.JpaThemeRepository;
 import roomescape.theme.infrastructure.ThemeRepositoryImpl;
 
 @TestConfiguration
+@Import(PaymentConfig.class)
 public class TestConfig {
 
     @Bean
@@ -161,20 +160,6 @@ public class TestConfig {
                 memberRepository,
                 reservationRepository,
                 waitingRepository
-        );
-    }
-
-    @Bean
-    public PaymentDomainService paymentDomainService(
-            final PaymentClient paymentClient
-    ) {
-        return new PaymentDomainService(paymentClient);
-    }
-
-    @Bean
-    public PaymentClient paymentClient() {
-        return new TossPaymentClient(
-                RestClient.builder().build()
         );
     }
 }

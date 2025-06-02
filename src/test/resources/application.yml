@@ -23,6 +23,12 @@ spring:
     init:
       mode: always
       data-locations: classpath:test-data.sql
+
+payment:
+  toss:
+    secret-key: "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"
+    confirm-url: "https://api.tosspayments.com/v1/payments/confirm"
+      
 security:
   jwt:
     access-token:

@@ -16,6 +16,10 @@ spring:
 #    properties:
 #      hibernate:
 #        format_sql: true # 출력되는 SQL 쿼리를 보기 편하게 포맷팅 (들여쓰기 등)
+payment:
+  toss:
+    secret-key: "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6"
+    confirm-url: "https://api.tosspayments.com/v1/payments/confirm"
 
 security:
   jwt:
