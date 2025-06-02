@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
@@ -17,6 +18,7 @@ import roomescape.infrastructure.TossPaymentProviderConfig.TossApiProperties;
 
 @RequiredArgsConstructor
 @Component
+@EnableConfigurationProperties(TossApiProperties.class)
 public class TossPaymentProvider implements PaymentProvider {
 
     private final Logger logger = LoggerFactory.getLogger(TossPaymentProvider.class);

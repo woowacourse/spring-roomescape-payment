@@ -3,7 +3,7 @@ package roomescape.infrastructure;
 import static roomescape.infrastructure.EncodeUtil.encodeBase64;
 
 import java.time.Duration;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,19 +29,7 @@ public class TossPaymentProviderConfig {
             .readTimeout(Duration.ofMillis(properties.readTimeoutMillis));
     }
 
-    @Bean
-    public TossApiProperties tossApiProperties(
-        @Value("${api.toss.connection-try-count}") final int connectionTryCount,
-        @Value("${api.toss.connection-timeout-millis}") final long connectionTimeoutMillis,
-        @Value("${api.toss.read-timeout-millis}") final long readTimeoutMillis,
-        @Value("${api.toss.base-url}") final String baseUrl,
-        @Value("${api.toss.confirm-uri}") final String confirmUri,
-        @Value("${api.toss.widget-secret-key}") final String widgetSecretKey
-    ) {
-        return new TossApiProperties(connectionTryCount, connectionTimeoutMillis, readTimeoutMillis,
-            baseUrl, confirmUri, widgetSecretKey);
-    }
-
+    @ConfigurationProperties(prefix = "api.toss")
     public record TossApiProperties (
         int connectionTryCount,
         long connectionTimeoutMillis,
