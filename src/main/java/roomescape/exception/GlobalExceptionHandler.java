@@ -32,10 +32,10 @@ public class GlobalExceptionHandler {
         return ErrorResponse.securedResponse(HttpStatus.FORBIDDEN, e.clientMessage()).toResponseEntity();
     }
 
-    @ExceptionHandler(PaymentApproveException.class)
-    public ResponseEntity<ErrorResponse> handle(PaymentApproveException e) {
-        logger.warn("Handled PaymentApproveException: {}", e.getMessage());
-        return ErrorResponse.securedResponse(HttpStatus.FORBIDDEN, e.getMessage()).toResponseEntity();
+    @ExceptionHandler(ExternalApiErrorException.class)
+    public ResponseEntity<ErrorResponse> handle(ExternalApiErrorException e) {
+        logger.warn("Handled ExternalApiErrorException: {}", e.getMessage());
+        return ErrorResponse.securedResponse().toResponseEntity();
     }
 
     @ExceptionHandler(Exception.class)
