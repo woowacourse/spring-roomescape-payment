@@ -1,6 +1,9 @@
 package roomescape.reservation.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
@@ -57,16 +60,24 @@ class ReservationServiceTest {
     @Autowired
     private ReservationService reservationService;
 
+    @DisplayName("예약을 생성할 수 있다.")
+    @Test
+    void can_create_reservation() {
+        ReservationRequest request = new ReservationRequest(LocalDate.of(2025, 4, 29), 2L, 1L, paymentKey, orderId, amount);
+        assertThatCode(() -> reservationService.createReservation(request, 1L))
+                .doesNotThrowAnyException();
+    }
+
     @DisplayName("멤버별 예약을 조회 할 수 있다.")
     @Test
     void can_find_my_reservation() {
         LoginMemberInfo loginMemberInfo = new LoginMemberInfo(1L);
-
         List<MyReservationResponse> result = reservationService.getMemberReservations(loginMemberInfo);
 
         List<MyReservationResponse> expected = List.of(
             new MyReservationResponse(1L, "테마1", LocalDate.of(2025, 4, 28), LocalTime.of(10, 0), "예약"),
             new MyReservationResponse(2L, "테마1", LocalDate.of(2025, 4, 28), LocalTime.of(11, 0), "예약"));
+
         assertThat(result).isEqualTo(expected);
     }
 
@@ -74,7 +85,7 @@ class ReservationServiceTest {
     @ParameterizedTest
     @MethodSource
     void cant_not_reserve_before_now(final LocalDate date, final Long timeId) {
-        Assertions.assertThatThrownBy(
+        assertThatThrownBy(
             () -> reservationService.createReservation(new ReservationRequest(date, timeId, 1L, paymentKey, orderId, amount), 1L))
             .isInstanceOf(ReservationException.class);
     }
@@ -91,7 +102,7 @@ class ReservationServiceTest {
     @DisplayName("중복 예약이 불가하다.")
     @Test
     void cant_not_reserve_duplicate() {
-        Assertions.assertThatThrownBy(() -> reservationService.createReservation(
+        assertThatThrownBy(() -> reservationService.createReservation(
                 new ReservationRequest(LocalDate.of(2025, 4, 28), 1L, 1L, paymentKey, orderId, amount), 1L))
             .isInstanceOf(ReservationException.class);
     }
@@ -100,7 +111,7 @@ class ReservationServiceTest {
     @ParameterizedTest
     @MethodSource
     void cant_not_reserve_waiting_before_now(final LocalDate date, final Long timeId, final Long themeId, final Long memberId) {
-        Assertions.assertThatThrownBy(
+        assertThatThrownBy(
                 () -> reservationService.createWaiting(new ReservationRequest(date, timeId, themeId, paymentKey, orderId, amount), memberId))
             .isInstanceOf(ReservationException.class)
             .hasMessage("예약할 수 없는 날짜와 시간입니다.");
@@ -116,7 +127,7 @@ class ReservationServiceTest {
     @DisplayName("예약한 멤버는 예약대기를 생성할 수 없다.")
     @Test
     void cant_reserve_waiting_by_reservation_owner() {
-        Assertions.assertThatThrownBy(
+        assertThatThrownBy(
                 () -> reservationService.createWaiting(
                     new ReservationRequest(LocalDate.of(2025, 4, 28), 1L, 1L, paymentKey, orderId, amount), 1L))
             .isInstanceOf(ReservationException.class)
@@ -126,7 +137,7 @@ class ReservationServiceTest {
     @DisplayName("동일한 사용자가 중복 예약대기를 할 수 없다.")
     @Test
     void cant_reserve_waiting_by_duplicate_member() {
-        Assertions.assertThatThrownBy(
+        assertThatThrownBy(
                 () -> reservationService.createWaiting(
                     new ReservationRequest(LocalDate.of(2025, 4, 28), 1L, 1L, paymentKey, orderId, amount), 2L))
             .isInstanceOf(ReservationException.class)
@@ -176,7 +187,7 @@ class ReservationServiceTest {
     void cannot_delete_non_existent_waiting() {
         Long nonExistentWaitingId = 999L;
 
-        Assertions.assertThatThrownBy(() -> reservationService.deleteWaiting(nonExistentWaitingId))
+        assertThatThrownBy(() -> reservationService.deleteWaiting(nonExistentWaitingId))
             .isInstanceOf(ReservationException.class)
             .hasMessage("예약 대기를 찾을 수 없습니다.");
     }
@@ -227,7 +238,7 @@ class ReservationServiceTest {
     void cannot_delete_non_existent_reservation() {
         Long nonExistentReservationId = 999L;
 
-        Assertions.assertThatThrownBy(() -> reservationService.deleteReservationById(nonExistentReservationId))
+        assertThatThrownBy(() -> reservationService.deleteReservationById(nonExistentReservationId))
             .isInstanceOf(ReservationException.class)
             .hasMessage("예약을 찾을 수 없습니다.");
     }
@@ -265,39 +276,33 @@ class ReservationServiceTest {
         }
 
         @Bean
-        public RestClient restClient() {
-            return RestClient.builder()
-                    .baseUrl("https://api.tosspayments.com/v1/payments").build();
-        }
-
-        @Bean
         public PaymentClient paymentClient() {
-            return new TossPaymentClient(restClient(), new ObjectMapper());
+            return mock(PaymentClient.class);
         }
 
         @Bean
-        public PaymentService paymentService() {
-            return new PaymentService(paymentClient());
+        public PaymentService paymentService(PaymentClient paymentClient) {
+            return new PaymentService(paymentClient);
         }
 
         @Bean
         public ReservationService reservationService(
-            DateTime dateTime,
-            ReservationRepository reservationRepository,
-            ReservationTimeRepository reservationTimeRepository,
-            ThemeRepository themeRepository,
-            MemberRepository memberRepository,
-            WaitingRepository waitingRepository,
-            PaymentService paymentService
+                DateTime dateTime,
+                ReservationRepository reservationRepository,
+                ReservationTimeRepository reservationTimeRepository,
+                ThemeRepository themeRepository,
+                MemberRepository memberRepository,
+                WaitingRepository waitingRepository,
+                PaymentService paymentService
         ) {
             return new ReservationService(
-                dateTime,
-                reservationRepository,
-                reservationTimeRepository,
-                themeRepository,
-                memberRepository,
-                waitingRepository,
-                paymentService
+                    dateTime,
+                    reservationRepository,
+                    reservationTimeRepository,
+                    themeRepository,
+                    memberRepository,
+                    waitingRepository,
+                    paymentService
             );
         }
     }
