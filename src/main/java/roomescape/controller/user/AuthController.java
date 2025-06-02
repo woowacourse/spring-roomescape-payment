@@ -27,26 +27,26 @@ public class AuthController {
     private final AuthService authService;
     private final MemberService memberService;
 
-    @PostMapping("/signup")
+    @PostMapping("/auth/signup")
     public ResponseEntity<MemberRegisterResponse> register(@RequestBody MemberRegisterRequest request) {
         MemberRegisterResponse response = memberService.addMember(request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/login")
+    @PostMapping("/auth/login")
     public ResponseEntity<Void> login(@RequestBody @Valid LoginRequest loginRequest, HttpSession session) throws AuthenticationException {
         authService.authenticate(loginRequest, session);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @GetMapping("/login/check")
+    @GetMapping("/auth/login/check")
     public ResponseEntity<LoginResponse> loginCheck(LoginInfo loginInfo) {
         Member member = memberService.getMemberById(loginInfo.memberId());
         LoginResponse response = new LoginResponse(member.getName());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/logout")
+    @PostMapping("/auth/logout")
     public ResponseEntity<Void> logout(HttpSession session) {
         authService.logout(session);
         return ResponseEntity.status(HttpStatus.OK).build();
