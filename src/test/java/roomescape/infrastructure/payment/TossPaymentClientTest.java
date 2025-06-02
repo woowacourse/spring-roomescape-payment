@@ -27,7 +27,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import roomescape.application.request.PaymentInfo;
-import roomescape.application.response.PaymentResponse;
+import roomescape.application.response.PaymentClientResponse;
 import roomescape.common.interceptor.RestClientInterceptor;
 import roomescape.exception.ExternalApiException;
 import roomescape.exception.code.RestClientErrorCode;
@@ -64,7 +64,7 @@ class TossPaymentClientTest {
                         """, MediaType.APPLICATION_JSON));
 
         // when
-        PaymentResponse result = paymentClient.confirmPayment(paymentInfo);
+        PaymentClientResponse result = paymentClient.confirmPayment(paymentInfo);
 
         // then
         assertAll(() -> assertThat(result.paymentKey()).isEqualTo(paymentInfo.paymentKey()),

@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import roomescape.application.request.PaymentInfo;
-import roomescape.application.response.PaymentResponse;
+import roomescape.application.response.PaymentClientResponse;
 import roomescape.application.response.TossErrorResponse;
 import roomescape.exception.ExternalApiException;
 import roomescape.infrastructure.payment.PaymentClient;
@@ -40,12 +40,12 @@ public class TossPaymentClient implements PaymentClient {
         this.objectMapper = objectMapper;
     }
 
-    public PaymentResponse confirmPayment(final PaymentInfo paymentInfo) {
+    public PaymentClientResponse confirmPayment(final PaymentInfo paymentInfo) {
         try {
             return restClient.post().uri(TOSS_PAYMENT_CONFIRM_URI).contentType(MediaType.APPLICATION_JSON)
                     .body(paymentInfo).retrieve()
                     .onStatus(HttpStatusCode::isError, (request, response) -> processErrorResponse(response))
-                    .body(PaymentResponse.class);
+                    .body(PaymentClientResponse.class);
         } catch (RestClientException e) {
             if (e.getCause() instanceof JsonProcessingException
                     || e.getCause() instanceof HttpMessageNotReadableException) {

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.request.PaymentInfo;
-import roomescape.application.response.PaymentResponse;
+import roomescape.application.response.PaymentClientResponse;
 import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
 import roomescape.infrastructure.payment.PaymentClient;
@@ -18,7 +18,7 @@ public class PaymentService {
 
     @Transactional
     public Payment savePayment(final PaymentInfo paymentInfo) {
-        PaymentResponse response = paymentClient.confirmPayment(paymentInfo);
+        PaymentClientResponse response = paymentClient.confirmPayment(paymentInfo);
         Payment payment = Payment.register(response.paymentKey(), response.orderId(), response.orderName(),
                 response.amount());
 

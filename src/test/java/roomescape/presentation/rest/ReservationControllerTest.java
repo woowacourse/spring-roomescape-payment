@@ -19,7 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.application.request.PaymentInfo;
-import roomescape.application.response.PaymentResponse;
+import roomescape.application.response.PaymentClientResponse;
 import roomescape.infrastructure.payment.PaymentClient;
 import roomescape.infrastructure.payment.toss.TossPaymentErrorCode;
 import roomescape.infrastructure.payment.toss.TossPaymentException;
@@ -47,7 +47,7 @@ class ReservationControllerTest {
     @DisplayName("예약 추가 요청시, id를 포함한 예약 내용과 CREATED를 응답한다")
     void createReservation() {
         PaymentInfo paymentInfo = new PaymentInfo("paymentKey", "orderId", 1000);
-        PaymentResponse response = new PaymentResponse("paymentKey", "orderId", "테스트 방탈출 예약 결제 1건", 1000);
+        PaymentClientResponse response = new PaymentClientResponse("paymentKey", "orderId", "테스트 방탈출 예약 결제 1건", 1000);
 
         given(paymentClient.confirmPayment(paymentInfo)).willReturn(response);
 
