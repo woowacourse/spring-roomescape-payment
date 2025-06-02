@@ -55,7 +55,7 @@ class ReservationCommandServiceTest {
         );
 
         // when
-        ReservationResponse response = reservationCommandService.addMemberReservation(
+        ReservationResponse response = reservationCommandService.reserveWithPayment(
                 request,
                 memberId,
                 prePaymentRequest
@@ -116,7 +116,7 @@ class ReservationCommandServiceTest {
                 pastDate, 1L, 1L, "dummy", "dummy", BigDecimal.ZERO, "NORMAL"
         );
 
-        assertThatThrownBy(() -> reservationCommandService.addMemberReservation(request, 1L, prePaymentRequest))
+        assertThatThrownBy(() -> reservationCommandService.reserveWithPayment(request, 1L, prePaymentRequest))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage("현재보다 과거의 날짜로 예약할 수 없습니다.");
     }
@@ -139,7 +139,7 @@ class ReservationCommandServiceTest {
         MemberReservationRequest reservation = new MemberReservationRequest(
                 LocalDate.now().plusDays(1), 1L, 1L, "dummy", "dummy", BigDecimal.valueOf(1000), "NORMAL"
         );
-        reservationCommandService.addMemberReservation(reservation, 1L, prePaymentRequest);
+        reservationCommandService.reserveWithPayment(reservation, 1L, prePaymentRequest);
 
         MemberWaitingRequest waiting = new MemberWaitingRequest(LocalDate.now().plusDays(1), 1L, 1L);
         assertThatThrownBy(() -> reservationCommandService.addMemberWaiting(waiting, 1L))

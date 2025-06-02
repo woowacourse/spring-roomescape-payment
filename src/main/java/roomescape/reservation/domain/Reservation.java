@@ -60,6 +60,17 @@ public class Reservation {
         this(null, date, time, theme, member);
     }
 
+    public static Reservation acceptFrom(
+            final Waiting waiting
+    ) {
+        return new Reservation(
+                waiting.getDate(),
+                waiting.getTime(),
+                waiting.getTheme(),
+                waiting.getMember()
+        );
+    }
+
     public boolean hasConflictWith(final ReservationTime reservationTime, final Theme theme) {
         final LocalTime startAt = time.getStartAt();
         return this.theme.equals(theme) &&

@@ -36,11 +36,13 @@ public class PaymentService {
                 reservation
         );
         paymentRepository.save(payment);
+        
         try {
             final PaymentResponse paymentResponse = paymentClient.requestPayment(paymentRequest);
             payment.success();
         } catch (PaymentException e) {
             payment.fail();
+            throw e;
         }
         return payment;
     }

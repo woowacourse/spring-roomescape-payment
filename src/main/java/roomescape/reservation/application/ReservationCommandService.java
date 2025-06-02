@@ -11,6 +11,7 @@ import roomescape.common.exception.impl.ConflictException;
 import roomescape.common.exception.impl.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
+import roomescape.payment.application.PaymentException;
 import roomescape.payment.application.PaymentService;
 import roomescape.payment.application.dto.PrePaymentRequest;
 import roomescape.reservation.application.dto.AdminReservationRequest;
@@ -39,10 +40,21 @@ public class ReservationCommandService {
     private final WaitingRepository waitingRepository;
     private final PaymentService paymentService;
 
-    public ReservationResponse addMemberReservation(
+    public ReservationResponse reserveWithPayment(
             final MemberReservationRequest request,
             final Long memberId,
             final PrePaymentRequest prePaymentRequest
+    ) {
+        Reservation reservation = reserve(request, memberId);
+
+        pay(request, prePaymentRequest, reservation);
+
+        return ReservationResponse.from(reservation);
+    }
+
+    private Reservation reserve(
+            final MemberReservationRequest request,
+            final Long memberId
     ) {
         final ReservationTime time = getReservationTime(request.timeId());
         final Theme theme = getTheme(request.themeId());
@@ -52,9 +64,22 @@ public class ReservationCommandService {
         validatePastDateTime(request.date(), time.getStartAt());
 
         final Reservation reservation = new Reservation(request.date(), time, theme, member);
+        return reservationRepository.save(reservation);
+    }
 
-        paymentService.pay(prePaymentRequest, request.toPaymentConfirmRequest(), reservation);
-        return ReservationResponse.from(reservationRepository.save(reservation));
+    private void pay(MemberReservationRequest request,
+                     PrePaymentRequest prePaymentRequest,
+                     Reservation reservation) {
+        try {
+            paymentService.pay(
+                    prePaymentRequest,
+                    request.toPaymentConfirmRequest(),
+                    reservation
+            );
+        } catch (PaymentException e) {
+            reservationRepository.delete(reservation);
+            throw e;
+        }
     }
 
     public ReservationResponse addAdminReservation(
@@ -107,8 +132,7 @@ public class ReservationCommandService {
         final Waiting waiting = getWaitingWithAssociations(id);
         validateIsBooked(waiting);
         waiting.accept();
-        final Reservation reservation = new Reservation(waiting.getDate(), waiting.getTime(), waiting.getTheme(),
-                waiting.getMember());
+        final Reservation reservation = Reservation.acceptFrom(waiting);
         reservationRepository.save(reservation);
         paymentService.await(request, reservation);
     }

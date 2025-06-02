@@ -3,19 +3,15 @@ package roomescape.payment.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.common.exception.impl.BadRequestException;
 import roomescape.payment.application.dto.PaymentConfirmRequest;
 import roomescape.payment.application.dto.PrePaymentRequest;
@@ -26,23 +22,13 @@ import roomescape.reservation.domain.Reservation;
 @SpringBootTest
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-@Import(PaymentServiceTest.TestConfig.class)
 class PaymentServiceTest {
 
     @Autowired
     private PaymentService paymentService;
 
-    @Autowired
+    @MockitoBean
     private PaymentClient paymentClient;
-
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        @Primary
-        public PaymentClient paymentClient() {
-            return mock(PaymentClient.class);
-        }
-    }
 
     @Test
     void 결제한다() {
@@ -81,12 +67,11 @@ class PaymentServiceTest {
         );
         final Reservation reservation = new Reservation(1L, null, null, null, null);
 
-        // when
+        // when & then
         when(paymentClient.requestPayment(any())).thenThrow(new PaymentException("결제 승인 에러"));
-        final Payment payment = paymentService.pay(prePaymentRequest, paymentConfirmRequest, reservation);
-
-        // then
-        assertThat(payment.getStatus()).isEqualTo(PaymentStatus.FAILED);
+        assertThatThrownBy(() -> paymentService.pay(prePaymentRequest, paymentConfirmRequest, reservation))
+                .isInstanceOf(PaymentException.class)
+                .hasMessage("결제 승인 에러");
     }
 
     @Test

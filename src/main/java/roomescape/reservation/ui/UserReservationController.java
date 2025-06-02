@@ -60,7 +60,7 @@ public class UserReservationController {
             final LoginCheckRequest loginCheckRequest,
             final HttpSession session
     ) {
-        final ReservationResponse response = reservationCommandService.addMemberReservation(
+        final ReservationResponse response = reservationCommandService.reserveWithPayment(
                 request,
                 loginCheckRequest.id(),
                 (PrePaymentRequest) session.getAttribute(PRE_PAYMENT)
