@@ -6,9 +6,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentStatus;
+import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.dto.ReservationPaymentRequest;
 import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;
+import roomescape.payment.exception.custom.PaymentBadRequestException;
 import roomescape.payment.infrastructure.TossRestClient;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.util.IdempotencyKeyGenerator;
@@ -25,13 +28,25 @@ public class PaymentService {
     private final ReservationService reservationService;
     private final TossRestClient restClient;
 
-    public TossPaymentResponse confirm(final TossPaymentRequest tossPaymentRequest) {
+    @Transactional
+    public TossPaymentResponse confirm(final TossPaymentRequest tossPaymentRequest, final long id) {
+        final Payment payment = paymentRepository.findById(id)
+                .orElseThrow(() -> new PaymentBadRequestException("존재하지 않은 결제입니다."));
         final String idempotencyKey = IdempotencyKeyGenerator.generate();
-        return restClient.confirm(tossPaymentRequest, idempotencyKey);
+        try {
+            final TossPaymentResponse response = restClient.confirm(tossPaymentRequest, idempotencyKey);
+            payment.completePayment();
+            return response;
+        } catch (RuntimeException e) {
+            payment.failPayment();
+            final Reservation reservation = payment.getReservation();
+            reservationService.findById(reservation.getId());
+            throw e;
+        }
     }
 
     @Transactional
-    public void savePayment(final ReservationPaymentRequest request, final LoginMember loginMember) {
+    public PaymentResponse savePayment(final ReservationPaymentRequest request, final LoginMember loginMember) {
         log.debug("ReservationPaymentRequest: {}", request);
         log.debug("LoginMember: {}", loginMember);
 
@@ -43,9 +58,10 @@ public class PaymentService {
                 .paymentKey(request.paymentKey())
                 .orderId(request.orderId())
                 .amount(request.amount())
+                .paymentStatus(PaymentStatus.PENDING)
                 .reservation(reservation)
                 .member(reservation.getMember())
                 .build();
-        paymentRepository.save(payment);
+        return new PaymentResponse(paymentRepository.save(payment));
     }
 }

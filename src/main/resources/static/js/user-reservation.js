@@ -211,9 +211,8 @@ async function fetchReservationPayment(paymentData, reservationData) {
         paymentType: paymentData.paymentType,
     }
 
-    const paymentConfirmURL = "/payments/confirm/tossPay";
     const paymentURL = "/payments"
-    fetch(paymentConfirmURL, {
+    fetch(paymentURL, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -222,15 +221,15 @@ async function fetchReservationPayment(paymentData, reservationData) {
     }).then(response => {
         if (!response.ok) {
             return response.json().then(errorBody => {
-                console.error("예약 결제 실패 : " + JSON.stringify(errorBody));
-                window.alert("예약 결제 실패 메시지");
+                console.error("예약 실패 : " + JSON.stringify(errorBody));
+                window.alert("예약 실패 메시지");
             });
         } else {
             response.json().then(successBody => {
-                console.log("예약 결제 성공 : " + JSON.stringify(successBody));
+                console.log("예약 성공 : " + JSON.stringify(successBody));
 
-                // 예약 + 결제 저장하기
-                fetch(paymentURL, {
+                // 결제 승인
+                fetch(`/payments/${successBody.id}/confirm/tossPay`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -239,12 +238,12 @@ async function fetchReservationPayment(paymentData, reservationData) {
                 }).then(response => {
                   if(response.status !== 201) {
                       return response.json().then(errorBody => {
-                          console.error("예약 실패 : " + JSON.stringify(errorBody));
-                          window.alert("예약 실패 메시지");
+                          console.error("예약 결제 실패 : " + JSON.stringify(errorBody));
+                          window.alert("예약 결제 실패 메시지");
                       });
                   }else {
                       response.json().then(successBody => {
-                          console.log("예약 성공 : " + JSON.stringify(successBody));
+                          console.log("예약 결제 성공 : " + JSON.stringify(successBody));
                       });
                   }
                 })
