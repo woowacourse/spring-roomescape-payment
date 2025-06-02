@@ -13,7 +13,7 @@ public abstract class PaymentErrorResponse implements ErrorResponse {
 
     @Override
     public HttpStatusCode getStatusCode() {
-        return getStatusCode();
+        return this.httpStatusCode;
     }
 
     @Override

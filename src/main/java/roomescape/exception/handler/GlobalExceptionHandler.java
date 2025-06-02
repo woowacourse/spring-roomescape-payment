@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiErrorResponse handleBadRequestException(BadRequestException ex) {
-        log.error(ex.getMessage());
+        log.error("예외 발생: ", ex);
         return new ApiErrorResponse(
                 ex.getMessage(),
                 HttpStatus.BAD_REQUEST
@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiErrorResponse handleNotFoundException(NotFoundException ex) {
-        log.error(ex.getMessage());
+        log.error("예외 발생: ", ex);
         return new ApiErrorResponse(
                 ex.getMessage(),
                 HttpStatus.NOT_FOUND
@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ApiErrorResponse handleAuthorizationException(UnauthorizationException ex) {
-        log.error(ex.getMessage());
+        log.error("예외 발생: ", ex);
         return new ApiErrorResponse(
                 ex.getMessage(),
                 HttpStatus.UNAUTHORIZED
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ApiErrorResponse handleAccessDeniedException(AccessDeniedException ex) {
-        log.error(ex.getMessage());
+        log.error("예외 발생: ", ex);
         return new ApiErrorResponse(
                 ex.getMessage(),
                 HttpStatus.FORBIDDEN
@@ -56,14 +56,14 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(PaymentConfirmClientException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiErrorResponse handlePaymentConfirmClientException(PaymentConfirmClientException ex) {
         PaymentErrorResponse paymentErrorResponse = ex.getPaymentErrorResponse();
         String errorMessage = paymentErrorResponse.getMessage();
-        log.error(errorMessage);
+        log.error("예외 발생: ", ex);
         return new ApiErrorResponse(
                 errorMessage,
-                HttpStatus.FORBIDDEN
+                HttpStatus.BAD_REQUEST
         );
     }
 
@@ -71,7 +71,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiErrorResponse handlePaymentConfirmServerException(PaymentConfirmServerException ex) {
         PaymentErrorResponse paymentErrorResponse = ex.getPaymentErrorResponse();
-        log.error(paymentErrorResponse.getMessage());
+        log.error("예외 발생: ", ex);
         return new ApiErrorResponse(
                 "결제가 실패했습니다. 잠시 후 다시 시도해주세요.",
                 HttpStatus.INTERNAL_SERVER_ERROR
@@ -81,7 +81,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiErrorResponse handleDefault(Exception ex) {
-        log.error(ex.getMessage());
+        log.error("예외 발생: ", ex);
         return new ApiErrorResponse(
                 ex.getMessage(),
                 HttpStatus.INTERNAL_SERVER_ERROR);
