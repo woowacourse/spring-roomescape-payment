@@ -23,6 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.business.dto.PaymentApproveDto;
 import roomescape.business.dto.ReservationDto;
+import roomescape.business.dto.ReservationSpecDto;
 import roomescape.business.dto.ReservationTimeDto;
 import roomescape.business.dto.ThemeDto;
 import roomescape.business.dto.UserDto;
@@ -78,7 +79,8 @@ class ReservationServiceTest {
 
         // when, then
         assertThatThrownBy(
-                () -> sut.addAndGetWithoutPayment(date, timeId, themeId, userIdValue, ReservationStatus.RESERVED))
+                () -> sut.addAndGetWithoutPayment(
+                        ReservationSpecDto.of(date, timeId, themeId, userIdValue, ReservationStatus.RESERVED)))
                 .isInstanceOf(NotFoundException.class);
 
         verify(userRepository).findById(userId);
@@ -101,7 +103,8 @@ class ReservationServiceTest {
         when(reservationTimeRepository.findById(Id.create(timeId))).thenReturn(Optional.empty());
 
         // when, then
-        assertThatThrownBy(() -> sut.addAndGetWithoutPayment(date, timeId, themeId, userId, ReservationStatus.RESERVED))
+        assertThatThrownBy(() -> sut.addAndGetWithoutPayment(
+                ReservationSpecDto.of(date, timeId, themeId, userId, ReservationStatus.RESERVED)))
                 .isInstanceOf(NotFoundException.class);
 
         verify(userRepository).findById(Id.create(userId));
@@ -129,8 +132,9 @@ class ReservationServiceTest {
         when(themeRepository.findById(themeId)).thenReturn(Optional.empty());
 
         // when, then
-        assertThatThrownBy(() -> sut.addAndGetWithoutPayment(date, timeIdValue, themeIdValue, userIdValue,
-                ReservationStatus.RESERVED))
+        assertThatThrownBy(
+                () -> sut.addAndGetWithoutPayment(ReservationSpecDto.of(date, timeIdValue, themeIdValue, userIdValue,
+                        ReservationStatus.RESERVED)))
                 .isInstanceOf(NotFoundException.class);
 
         verify(userRepository).findById(userId);
@@ -161,8 +165,9 @@ class ReservationServiceTest {
                 .thenReturn(true);
 
         // when, then
-        assertThatThrownBy(() -> sut.addAndGetWithoutPayment(date, timeIdValue, themeIdValue, userIdValue,
-                ReservationStatus.RESERVED))
+        assertThatThrownBy(
+                () -> sut.addAndGetWithoutPayment(ReservationSpecDto.of(date, timeIdValue, themeIdValue, userIdValue,
+                        ReservationStatus.RESERVED)))
                 .isInstanceOf(DuplicatedException.class);
 
         verify(userRepository).findById(userId);
@@ -262,8 +267,8 @@ class ReservationServiceTest {
         doNothing().when(paymentClient).approvePayment(any(PaymentApproveDto.class));
 
         // when
-        ReservationDto result = sut.addAndGet(date, timeIdValue, themeIdValue, userIdValue,
-                ReservationStatus.RESERVED, "paymentKey", "orderId", 1000L);
+        ReservationDto result = sut.addAndGet(ReservationSpecDto.of(date, timeIdValue, themeIdValue, userIdValue,
+                ReservationStatus.RESERVED), PaymentApproveDto.of("paymentKey", "orderId", 1000L));
 
         // then
         assertThat(result).isNotNull();
@@ -296,8 +301,8 @@ class ReservationServiceTest {
         doNothing().when(waitingService).updateWaitingReservations(any(Reservation.class));
 
         // when
-        ReservationDto result = sut.addAndGet(date, timeIdValue, themeIdValue, userIdValue,
-                ReservationStatus.WAITING, "paymentKey", "orderId", 1000L);
+        ReservationDto result = sut.addAndGet(ReservationSpecDto.of(date, timeIdValue, themeIdValue, userIdValue,
+                ReservationStatus.WAITING), PaymentApproveDto.of("paymentKey", "orderId", 1000L));
 
         // then
         assertThat(result).isNotNull();

@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.AuthRequired;
 import roomescape.auth.LoginInfo;
 import roomescape.auth.Role;
+import roomescape.business.dto.PaymentApproveDto;
 import roomescape.business.dto.ReservationDto;
+import roomescape.business.dto.ReservationSpecDto;
 import roomescape.business.dto.ReservationWithAheadDto;
 import roomescape.business.model.vo.ReservationStatus;
 import roomescape.business.model.vo.UserRole;
@@ -36,9 +38,11 @@ public class ReservationApiController {
     @AuthRequired
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody @Valid ReservationRequest request,
                                                                  LoginInfo loginInfo) {
-        ReservationDto reservationDto = reservationService.addAndGet(request.date(), request.timeId(),
-                request.themeId(), loginInfo.id(), request.reservationStatus(), request.paymentKey(), request.orderId(),
-                request.amount());
+        ReservationDto reservationDto = reservationService.addAndGet(
+                ReservationSpecDto.of(request.date(), request.timeId(),
+                        request.themeId(), loginInfo.id(), request.reservationStatus()),
+                PaymentApproveDto.of(request.paymentKey(), request.orderId(),
+                        request.amount()));
         ReservationResponse response = ReservationResponse.from(reservationDto);
         return ResponseEntity.created(URI.create("/reservations")).body(response);
     }
@@ -48,8 +52,9 @@ public class ReservationApiController {
     @Role(UserRole.ADMIN)
     public ResponseEntity<ReservationResponse> adminCreateReservation(
             @RequestBody @Valid AdminReservationRequest request) {
-        ReservationDto reservationDto = reservationService.addAndGetWithoutPayment(request.date(), request.timeId(),
-                request.themeId(), request.userId(), ReservationStatus.RESERVED);
+        ReservationDto reservationDto = reservationService.addAndGetWithoutPayment(
+                ReservationSpecDto.of(request.date(), request.timeId(),
+                        request.themeId(), request.userId(), ReservationStatus.RESERVED));
         ReservationResponse response = ReservationResponse.from(reservationDto);
         return ResponseEntity.created(URI.create("/reservations")).body(response);
     }
