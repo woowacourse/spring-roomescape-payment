@@ -8,11 +8,11 @@ public class ReservationViewController {
 
     @GetMapping("/reservation")
     public String reservation() {
-        return "/reservation";
+        return "reservation";
     }
 
     @GetMapping("/reservation-mine")
     public String reservationMine() {
-        return "/reservation-mine";
+        return "reservation-mine";
     }
 }
