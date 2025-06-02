@@ -19,7 +19,6 @@ import org.springframework.test.context.TestPropertySource;
 import roomescape.member.dto.MemberRegisterRequest;
 import roomescape.member.service.MemberService;
 import roomescape.payment.PaymentClient;
-import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
@@ -69,11 +68,9 @@ class ReservationServiceTest {
                 1000,
                 "NORMAL"
         );
-        TossPaymentResponse tossPaymentResponse = reservationService.approvePayment(reservationRequest.orderId(),
-                reservationRequest.paymentKey(), reservationRequest.amount());
 
         // when
-        ReservationResponse reservationResponse = reservationService.addReservation(memberId, reservationRequest, tossPaymentResponse);
+        ReservationResponse reservationResponse = reservationService.addReservation(memberId, reservationRequest);
 
         // then
         assertAll(
@@ -113,19 +110,13 @@ class ReservationServiceTest {
                 "NORMAL"
         );
 
-        TossPaymentResponse tossPaymentResponse1 = reservationService.approvePayment(reservationRequest1.orderId(),
-                reservationRequest1.paymentKey(), reservationRequest1.amount());
-
-        TossPaymentResponse tossPaymentResponse2 = reservationService.approvePayment(reservationRequest2.orderId(),
-                reservationRequest2.paymentKey(), reservationRequest2.amount());
-
         // when, then
         assertAll(
                 () -> assertThatThrownBy(
-                        () -> reservationService.addReservation(memberId, reservationRequest1, tossPaymentResponse1)
+                        () -> reservationService.addReservation(memberId, reservationRequest1)
                 ).isInstanceOf(NoSuchElementException.class),
                 () -> assertThatThrownBy(
-                        () -> reservationService.addReservation(memberId, reservationRequest2, tossPaymentResponse2)
+                        () -> reservationService.addReservation(memberId, reservationRequest2)
                 ).isInstanceOf(NoSuchElementException.class)
         );
     }
@@ -158,19 +149,13 @@ class ReservationServiceTest {
                 "NORMAL"
         );
 
-        TossPaymentResponse tossPaymentResponse1 = reservationService.approvePayment(reservationRequest1.orderId(),
-                reservationRequest1.paymentKey(), reservationRequest1.amount());
-
-        TossPaymentResponse tossPaymentResponse2 = reservationService.approvePayment(reservationRequest2.orderId(),
-                reservationRequest2.paymentKey(), reservationRequest2.amount());
-
         // when, then
         assertAll(
                 () -> assertThatThrownBy(
-                        () -> reservationService.addReservation(memberId,reservationRequest1, tossPaymentResponse1)
+                        () -> reservationService.addReservation(memberId,reservationRequest1)
                 ).isInstanceOf(IllegalArgumentException.class),
                 () -> assertThatThrownBy(
-                        () -> reservationService.addReservation(memberId,reservationRequest2, tossPaymentResponse2)
+                        () -> reservationService.addReservation(memberId,reservationRequest2)
                 ).isInstanceOf(IllegalArgumentException.class)
         );
     }
@@ -194,14 +179,10 @@ class ReservationServiceTest {
                 "NORMAL"
         );
 
-        TossPaymentResponse tossPaymentResponse = reservationService.approvePayment(reservationRequest.orderId(),
-                reservationRequest.paymentKey(), reservationRequest.amount());
-
-
-        reservationService.addReservation(memberId, reservationRequest, tossPaymentResponse);
+        reservationService.addReservation(memberId, reservationRequest);
 
         // when & then
-        assertThatThrownBy(() -> reservationService.addReservation(memberId, reservationRequest, tossPaymentResponse))
+        assertThatThrownBy(() -> reservationService.addReservation(memberId, reservationRequest))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -223,10 +204,7 @@ class ReservationServiceTest {
                 "NORMAL"
         );
 
-        TossPaymentResponse tossPaymentResponse = reservationService.approvePayment(reservationRequest.orderId(),
-                reservationRequest.paymentKey(), reservationRequest.amount());
-
-        reservationService.addReservation(memberId, reservationRequest, tossPaymentResponse);
+        reservationService.addReservation(memberId, reservationRequest);
         //when
         final List<ReservationResponse> expected = reservationService.getAllReservations();
 

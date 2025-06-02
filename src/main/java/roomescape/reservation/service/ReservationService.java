@@ -1,20 +1,17 @@
 package roomescape.reservation.service;
 
 import jakarta.persistence.EntityManager;
-import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.payment.PaymentClient;
-import roomescape.payment.domain.Payment;
-import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;
-import roomescape.payment.repository.PaymentRepository;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.MyPageReservationResponse;
 import roomescape.reservation.dto.ReservationPaymentRequest;
@@ -35,14 +32,12 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ReservationThemeRepository reservationThemeRepository;
     private final ReservationWaitingRepository reservationWaitingRepository;
-    private final PaymentRepository paymentRepository;
     private final MemberRepository memberRepository;
     private final EntityManager entityManager;
-    private final PaymentClient paymentClient;
+    private final PaymentService paymentService;
 
     @Transactional
-    public ReservationResponse addReservation(final long memberId, final ReservationPaymentRequest request,
-                                              final TossPaymentResponse tossPaymentResponse) {
+    public ReservationResponse addReservation(final long memberId, final ReservationPaymentRequest request) {
         long timeId = request.timeId();
         final long themeId = request.themeId();
         final LocalDate date = request.date();
@@ -55,8 +50,9 @@ public class ReservationService {
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 테마 입니다."));
         final Reservation reservation = new Reservation(member, date, time, theme);
         Reservation saved = reservationRepository.save(reservation);
-        paymentRepository.save(new Payment(saved, tossPaymentResponse.orderId(), tossPaymentResponse.paymentKey(),
-                tossPaymentResponse.totalAmount(), tossPaymentResponse.type()));
+        final TossPaymentResponse tossPaymentResponse = paymentService.approvePayment(request.orderId(),
+                request.paymentKey(), request.amount());
+        paymentService.savePayment(saved, tossPaymentResponse);
         return ReservationResponse.fromV2(saved);
     }
 
@@ -85,11 +81,6 @@ public class ReservationService {
         final List<ReservationWaiting> myReservationWaitings = reservationWaitingRepository.findByMemberId(
                 member.getId());
         return getMyPageReservationResponses(myReservations, myReservationWaitings);
-    }
-
-    public TossPaymentResponse approvePayment(final String orderId, final String paymentKey, final long amount) {
-        return paymentClient.requestPaymentApprove(
-                new TossPaymentRequest(orderId, paymentKey, amount));
     }
 
     @Transactional
