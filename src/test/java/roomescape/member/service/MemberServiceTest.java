@@ -58,12 +58,7 @@ class MemberServiceTest {
         SoftAssertions.assertSoftly(soft -> {
             soft.assertThat(responses.members()).hasSize(2);
             soft.assertThat(responses.members().get(0).name()).isEqualTo("A");
-            soft.assertThat(responses.members().get(0).email()).isEqualTo("a@a.com");
-            soft.assertThat(responses.members().get(0).role()).isEqualTo(MemberRole.ADMIN.name());
-
             soft.assertThat(responses.members().get(1).name()).isEqualTo("B");
-            soft.assertThat(responses.members().get(1).email()).isEqualTo("b@b.com");
-            soft.assertThat(responses.members().get(1).role()).isEqualTo(MemberRole.MEMBER.name());
         });
     }
 }

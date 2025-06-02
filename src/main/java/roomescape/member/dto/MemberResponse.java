@@ -4,13 +4,13 @@ import roomescape.member.domain.Member;
 
 public record MemberResponse(
         Long id,
-        String name,
-        String email,
-        String password,
-        String role
+        String name
 ) {
 
     public MemberResponse(Member member) {
-        this(member.getId(), member.getName(), member.getEmail(), member.getPassword(), member.getRole().name());
+        this(
+                member.getId(),
+                member.getName()
+        );
     }
 }
