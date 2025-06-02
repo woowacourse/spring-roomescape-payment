@@ -1,16 +1,15 @@
 package roomescape.reservation.service;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,6 +27,7 @@ import roomescape.common.exception.AlreadyInUseException;
 import roomescape.common.exception.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
+import roomescape.member.dto.MemberResponse;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.dto.request.PaymentRequest;
 import roomescape.payment.repository.PaymentRepository;
@@ -83,15 +83,12 @@ class ReservationServiceTest {
     @Test
     void getAllReservations() {
         // given
-        Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
+        Theme theme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
+        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(8, 0)));
+        Member member = memberRepository.save(new Member("포스티", "test@test.com", "12341234", Role.MEMBER));
+        LocalDate date = nextDay();
 
-        LocalTime time = LocalTime.of(8, 0);
-        ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(time));
-        Member member = new Member("포스티", "test@test.com", "12341234", Role.MEMBER);
-        Member savedMember = memberRepository.save(member);
-
-        LocalDate date = LocalDate.of(2024, 4, 29);
-        reservationRepository.save(new Reservation(savedMember, date, savedTime, savedTheme));
+        reservationRepository.save(new Reservation(member, date, time, theme));
 
         // when
         List<ReservationResponse> response = reservationService.getAll();
@@ -112,51 +109,38 @@ class ReservationServiceTest {
     @Test
     void createReservation() {
         // given
-        Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
-        Long themeId = savedTheme.getId();
-
-        LocalTime time = LocalTime.of(8, 0);
-        ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(time));
-        Long timeId = savedTime.getId();
-        Member savedMember = memberRepository.save(new Member("포스티", "test@test.com", "12341234", Role.MEMBER));
-
+        Theme theme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
+        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(8, 0)));
+        Member member = memberRepository.save(new Member("포스티", "test@test.com", "12341234", Role.MEMBER));
         LocalDate date = nextDay();
 
         ReservationCreateRequest requestDto =
-                new ReservationCreateRequest(date, timeId, themeId, LoginMember.of(savedMember));
+                new ReservationCreateRequest(date, time.getId(), theme.getId(), LoginMember.of(member));
 
         // when
         ReservationResponse result = reservationService.create(requestDto);
 
         // then
-        SoftAssertions softAssertions = new SoftAssertions();
-
-        softAssertions.assertThat(result.member().name()).isEqualTo("포스티");
-        softAssertions.assertThat(result.date()).isEqualTo(date);
-        softAssertions.assertThat(result.time()).isEqualTo(new ReservationTimeResponse(timeId, time));
-        softAssertions.assertThat(result.theme())
-                .isEqualTo(new ThemeResponse(themeId, savedTheme.getName(), savedTheme.getDescription(),
-                        savedTheme.getThumbnail()));
-
-        softAssertions.assertAll();
+        assertThat(result).isEqualTo(new ReservationResponse(
+                result.id(),
+                MemberResponse.fromEntity(member),
+                date,
+                ReservationTimeResponse.from(time),
+                ThemeResponse.from(theme)
+        ));
     }
 
     @DisplayName("결제 예약을 추가한다.")
     @Test
     void createReservationWithPayment() {
         // given
-        Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
-        Long themeId = savedTheme.getId();
-
-        LocalTime time = LocalTime.of(8, 0);
-        ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(time));
-        Long timeId = savedTime.getId();
-        Member savedMember = memberRepository.save(new Member("포스티", "test@test.com", "12341234", Role.MEMBER));
-
+        Theme theme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
+        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(8, 0)));
+        Member member = memberRepository.save(new Member("포스티", "test@test.com", "12341234", Role.MEMBER));
         LocalDate date = nextDay();
 
         ReservationCreateRequest requestDto =
-                new ReservationCreateRequest(date, timeId, themeId, LoginMember.of(savedMember));
+                new ReservationCreateRequest(date, time.getId(), theme.getId(), LoginMember.of(member));
         PaymentRequest paymentRequest = new PaymentRequest("paymentKey", "orderId", 1_000L);
 
         server.expect(MockRestRequestMatchers.requestTo("https://api.tosspayments.com/v1/payments/confirm"))
@@ -167,36 +151,31 @@ class ReservationServiceTest {
         ReservationResponse result = reservationService.createWithPayment(requestDto, paymentRequest);
 
         // then
-        SoftAssertions softAssertions = new SoftAssertions();
-        softAssertions.assertThat(result.member().name()).isEqualTo("포스티");
-        softAssertions.assertThat(result.date()).isEqualTo(date);
-        softAssertions.assertThat(result.time()).isEqualTo(new ReservationTimeResponse(timeId, time));
-        softAssertions.assertThat(result.theme())
-                .isEqualTo(new ThemeResponse(themeId, savedTheme.getName(), savedTheme.getDescription(),
-                        savedTheme.getThumbnail()));
-
-        softAssertions.assertAll();
-        assertThat(paymentRepository.findAll()).hasSize(1);
+        assertAll(() -> {
+            assertThat(result).isEqualTo(new ReservationResponse(
+                    result.id(),
+                    MemberResponse.fromEntity(member),
+                    date,
+                    ReservationTimeResponse.from(time),
+                    ThemeResponse.from(theme)
+            ));
+            assertThat(paymentRepository.findAll()).hasSize(1);
+        });
     }
 
     @DisplayName("해당 날짜, 시간, 테마에 예약 대기가 존재하는 상황에서 예약을 생성할 수 없다.")
     @Test
     void createReservationInWaitingExists() {
         // given
-        Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
-        Long themeId = savedTheme.getId();
-
-        LocalTime time = LocalTime.of(8, 0);
-        ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(time));
-        Long timeId = savedTime.getId();
-        Member member = new Member("포스티", "test@test.com", "12341234", Role.MEMBER);
-        Member savedMember = memberRepository.save(member);
+        Theme theme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
+        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(8, 0)));
+        Member member = memberRepository.save(new Member("포스티", "test@test.com", "12341234", Role.MEMBER));
         LocalDate date = nextDay();
 
-        waitingRepository.save(new Waiting(date, savedMember, savedTime, savedTheme));
+        waitingRepository.save(new Waiting(date, member, time, theme));
 
         ReservationCreateRequest requestDto =
-                new ReservationCreateRequest(date, timeId, themeId, LoginMember.of(savedMember));
+                new ReservationCreateRequest(date, time.getId(), theme.getId(), LoginMember.of(member));
 
         // when & then
         assertThatThrownBy(() -> reservationService.create(requestDto))
@@ -207,19 +186,15 @@ class ReservationServiceTest {
     @Test
     void createReservationWhenPastTimes() {
         // given
-        Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
-        Long themeId = savedTheme.getId();
-        Member member = new Member("포스티", "test@test.com", "12341234", Role.MEMBER);
-        Member savedMember = memberRepository.save(member);
-
+        Theme theme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
+        Member member = memberRepository.save(new Member("포스티", "test@test.com", "12341234", Role.MEMBER));
         LocalDate date = now.toLocalDate();
-        LocalTime pastTime = now.toLocalTime().minusMinutes(1);
-
-        ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(pastTime));
-        Long timeId = savedTime.getId();
+        ReservationTime pastTime = reservationTimeRepository.save(
+                new ReservationTime(now.toLocalTime().minusMinutes(1))
+        );
 
         ReservationCreateRequest requestDto =
-                new ReservationCreateRequest(date, timeId, themeId, LoginMember.of(savedMember));
+                new ReservationCreateRequest(date, pastTime.getId(), theme.getId(), LoginMember.of(member));
 
         // when & then
         assertThatThrownBy(() -> reservationService.create(requestDto))
@@ -229,17 +204,15 @@ class ReservationServiceTest {
     @DisplayName("존재하지 않는 예약 시간으로 예약할 수 없다.")
     @Test
     void createReservationWithNonExistsTimeId() {
-        Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
-        Long themeId = savedTheme.getId();
-        Member member = new Member("포스티", "test@test.com", "12341234", Role.MEMBER);
-        Member savedMember = memberRepository.save(member);
-
+        // given
+        Theme theme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
+        Member member = memberRepository.save(new Member("포스티", "test@test.com", "12341234", Role.MEMBER));
         LocalDate date = nextDay();
-
-        Long notExistId = 1000L;
+        Long notExistId = 0L;
         ReservationCreateRequest requestDto =
-                new ReservationCreateRequest(date, notExistId, themeId, LoginMember.of(savedMember));
+                new ReservationCreateRequest(date, notExistId, theme.getId(), LoginMember.of(member));
 
+        // when & then
         assertThatThrownBy(() -> reservationService.create(requestDto))
                 .isInstanceOf(EntityNotFoundException.class);
     }
@@ -247,18 +220,15 @@ class ReservationServiceTest {
     @DisplayName("존재하지 않는 테마로 예약할 수 없다.")
     @Test
     void createReservationWithNonExistsThemeId() {
-        LocalDate date = now.toLocalDate().plusDays(1);
-
-        LocalTime time = LocalTime.of(8, 0);
-        ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(time));
-        Long timeId = savedTime.getId();
-        Member member = new Member("포스티", "test@test.com", "12341234", Role.MEMBER);
-        Member savedMember = memberRepository.save(member);
-
-        Long notExistId = 1000L;
+        // given
+        LocalDate date = nextDay();
+        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(8, 0)));
+        Member member = memberRepository.save(new Member("포스티", "test@test.com", "12341234", Role.MEMBER));
+        Long notExistId = 0L;
         ReservationCreateRequest requestDto =
-                new ReservationCreateRequest(date, timeId, notExistId, LoginMember.of(savedMember));
+                new ReservationCreateRequest(date, time.getId(), notExistId, LoginMember.of(member));
 
+        // when & then
         assertThatThrownBy(() -> reservationService.create(requestDto))
                 .isInstanceOf(EntityNotFoundException.class);
     }
@@ -267,21 +237,15 @@ class ReservationServiceTest {
     @Test
     void deleteReservation() {
         // given
-        Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
-
-        LocalTime time = LocalTime.of(8, 0);
-        ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(time));
-        Member member = new Member("포스티", "test@test.com", "12341234", Role.MEMBER);
-        Member savedMember = memberRepository.save(member);
-
+        Theme theme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
+        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(8, 0)));
+        Member member = memberRepository.save(new Member("포스티", "test@test.com", "12341234", Role.MEMBER));
         LocalDate date = nextDay();
-        Reservation savedReservation = reservationRepository.save(
-                new Reservation(savedMember, date, savedTime, savedTheme));
+        Reservation reservation = reservationRepository.save(new Reservation(member, date, time, theme));
+        Long reservationId = reservation.getId();
 
-        Long id = savedReservation.getId();
-
-        // then
-        assertThatCode(() -> reservationService.delete(id))
+        // when & then
+        assertThatCode(() -> reservationService.delete(reservationId))
                 .doesNotThrowAnyException();
     }
 
@@ -289,33 +253,30 @@ class ReservationServiceTest {
     @Test
     void deleteReservationWhenExistsWaiting() {
         // given
-        Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
-
-        LocalTime time = LocalTime.of(8, 0);
-        ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(time));
-        Member member = new Member("포스티", "test@test.com", "12341234", Role.MEMBER);
-        Member member2 = new Member("로키", "test1@test.com", "12341234", Role.MEMBER);
-        Member savedMember = memberRepository.save(member);
-        Member savedMember2 = memberRepository.save(member2);
+        Theme theme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
+        ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(8, 0)));
+        Member member1 = memberRepository.save(new Member("포스티", "test@test.com", "12341234", Role.MEMBER));
+        Member member2 = memberRepository.save(new Member("로키", "test1@test.com", "12341234", Role.MEMBER));
 
         LocalDate date = nextDay();
-        Reservation savedReservation = reservationRepository.save(
-                new Reservation(savedMember, date, savedTime, savedTheme));
-        Long id = savedReservation.getId();
-        waitingRepository.save(new Waiting(date, savedMember2, savedTime, savedTheme));
+        Reservation reservation1 = reservationRepository.save(new Reservation(member1, date, time, theme));
+        waitingRepository.save(new Waiting(date, member2, time, theme));
 
         // when
-        reservationService.delete(id);
+        reservationService.delete(reservation1.getId());
 
         // then
-        assertThat(reservationRepository.findAll()).hasSize(1);
+        assertAll(() -> {
+            assertThat(reservationRepository.findAll()).hasSize(1);
+            assertThat(waitingRepository.findAll()).isEmpty();
+        });
+
     }
 
     @DisplayName("존재하지 않는 예약은 삭제할 수 없다.")
     @Test
     void deleteReservationWithNonExistsId() {
-        Long id = 1L;
-        assertThatThrownBy(() -> reservationService.delete(id))
+        assertThatThrownBy(() -> reservationService.delete(1L))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
@@ -326,15 +287,13 @@ class ReservationServiceTest {
         ReservationTime reservationTime1 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(8, 0)));
         reservationTimeRepository.save(new ReservationTime(LocalTime.of(9, 0)));
 
-        Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
-        Member member = new Member("포스티", "test@test.com", "12341234", Role.MEMBER);
-        Member savedMember = memberRepository.save(member);
+        Theme theme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
+        Member member = memberRepository.save(new Member("포스티", "test@test.com", "12341234", Role.MEMBER));
         LocalDate date = nextDay();
-        reservationRepository.save(new Reservation(savedMember, date, reservationTime1, savedTheme));
+        reservationRepository.save(new Reservation(member, date, reservationTime1, theme));
 
         // when
-        List<BookedReservationTimeResponse> responses =
-                reservationService.getSortedAvailableTimes(date, savedTheme.getId());
+        List<BookedReservationTimeResponse> responses = reservationService.getSortedAvailableTimes(date, theme.getId());
 
         // then
         List<Boolean> alreadyBookeds = responses.stream()

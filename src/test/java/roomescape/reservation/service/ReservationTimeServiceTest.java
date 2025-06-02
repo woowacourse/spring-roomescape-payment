@@ -1,7 +1,6 @@
 package roomescape.reservation.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDate;
@@ -55,22 +54,17 @@ class ReservationTimeServiceTest {
     @Test
     void getAllReservationTimes() {
         // given
-        LocalTime localTime1 = LocalTime.of(8, 0);
-        LocalTime localTime2 = LocalTime.of(9, 0);
-        List<LocalTime> localTimes = List.of(localTime1, localTime2);
-
-        for (LocalTime localTime : localTimes) {
-            reservationTimeRepository.save(new ReservationTime(localTime));
-        }
+        ReservationTime reservationTime1 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(8, 0)));
+        ReservationTime reservationTime2 = reservationTimeRepository.save(new ReservationTime(LocalTime.of(9, 0)));
 
         // when
         List<ReservationTimeResponse> result = reservationTimeService.getAll();
 
         // then
-        List<LocalTime> resultTimes = result.stream()
-                .map(ReservationTimeResponse::startAt)
-                .toList();
-        assertThat(resultTimes).containsExactlyInAnyOrderElementsOf(localTimes);
+        assertThat(result).containsExactlyInAnyOrder(
+                ReservationTimeResponse.from(reservationTime1),
+                ReservationTimeResponse.from(reservationTime2)
+        );
     }
 
     @DisplayName("정보가 없다면 빈 리스트를 반환한다.")
@@ -87,36 +81,33 @@ class ReservationTimeServiceTest {
     @Test
     void createReservationTime() {
         // given
-        LocalTime localTime1 = LocalTime.of(8, 0);
-        ReservationTimeRequest reservationTimeRequest = new ReservationTimeRequest(localTime1);
+        ReservationTimeRequest reservationTimeRequest = new ReservationTimeRequest(LocalTime.of(8, 0));
 
         // when
         ReservationTimeResponse result = reservationTimeService.create(reservationTimeRequest);
 
         // then
-        assertThat(result.id()).isNotNull();
-        assertThat(result.startAt()).isEqualTo(localTime1);
+        assertThat(result).isEqualTo(new ReservationTimeResponse(result.id(), LocalTime.of(8, 0)));
+
     }
 
     @DisplayName("예약 시간을 삭제한다.")
     @Test
     void deleteReservationTime() {
         // given
-        ReservationTime saved = reservationTimeRepository.save(new ReservationTime(LocalTime.of(8, 0)));
-        Long id = saved.getId();
+        ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.of(8, 0)));
 
-        // when & then
-        assertThatCode(() -> reservationTimeService.delete(id)).doesNotThrowAnyException();
+        // when
+        reservationTimeService.delete(reservationTime.getId());
+
+        // then
+        assertThat(reservationTimeRepository.existsByStartAt(LocalTime.of(8, 0))).isFalse();
     }
 
     @DisplayName("존재하지 않는 예약 시간은 삭제할 수 없다.")
     @Test
     void deleteReservationTimeWithNonExistsTimeId() {
-        // given
-        Long id = 1L;
-
-        // when & then
-        assertThatThrownBy(() -> reservationTimeService.delete(id))
+        assertThatThrownBy(() -> reservationTimeService.delete(1L))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 

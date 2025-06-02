@@ -2,7 +2,6 @@ package roomescape.auth.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -81,9 +80,6 @@ class AuthServiceTest {
 
         LoginMember loginMember = authService.createLoginMemberByToken(token);
 
-        assertAll(
-                () -> assertThat(loginMember.name()).isEqualTo("로키"),
-                () -> assertThat(loginMember.role()).isEqualTo(Role.ADMIN)
-        );
+        assertThat(loginMember).isEqualTo(new LoginMember(loginMember.id(), "로키", Role.ADMIN));
     }
 }

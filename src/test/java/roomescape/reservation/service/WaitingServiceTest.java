@@ -3,7 +3,6 @@ package roomescape.reservation.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -20,16 +19,19 @@ import roomescape.common.exception.AlreadyInUseException;
 import roomescape.common.exception.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
+import roomescape.member.dto.MemberResponse;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.dto.request.WaitingCreateRequest;
+import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.reservation.dto.response.WaitingResponse;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.repository.WaitingRepository;
 import roomescape.theme.domain.Theme;
+import roomescape.theme.dto.response.ThemeResponse;
 import roomescape.theme.repository.ThemeRepository;
 
 @ActiveProfiles("test")
@@ -65,15 +67,17 @@ class WaitingServiceTest {
                 new WaitingCreateRequest(date, time.getId(), theme.getId(), LoginMember.of(waitingMember));
 
         // when
-        WaitingResponse response = waitingService.createWaiting(request);
+        WaitingResponse result = waitingService.createWaiting(request);
 
         // then
-        assertAll(
-                () -> assertThat(response.id()).isNotNull(),
-                () -> assertThat(response.member().name()).isEqualTo("포스티"),
-                () -> assertThat(response.date()).isEqualTo(date),
-                () -> assertThat(response.time().startAt()).isEqualTo(LocalTime.of(10, 0)),
-                () -> assertThat(response.theme().name()).isEqualTo("테마1")
+        assertThat(result).isEqualTo(
+                new WaitingResponse(
+                        result.id(),
+                        MemberResponse.fromEntity(waitingMember),
+                        date,
+                        ReservationTimeResponse.from(time),
+                        ThemeResponse.from(theme)
+                )
         );
     }
 
