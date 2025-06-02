@@ -22,7 +22,6 @@ public class BookingService {
 
     private final ReservationService reservationService;
     private final WaitingService waitingService;
-    private final EntityManager entityManager;
 
     @Transactional(readOnly = true)
     public List<BookingResponse> readAllByMember(final LoginMember loginMember) {
