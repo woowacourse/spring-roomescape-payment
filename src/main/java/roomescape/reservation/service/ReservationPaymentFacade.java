@@ -30,9 +30,7 @@ public class ReservationPaymentFacade {
         ReservationResponse reservation = null;
         try {
             reservation = reservationService.createReservation(request, loginMember.id());
-
             TossPaymentResponse response = tossPaymentClient.confirmPayment(confirmRequest);
-
             paymentService.save(response, reservation.id());
 
             reservationService.confirm(reservation.id());

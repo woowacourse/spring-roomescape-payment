@@ -22,10 +22,11 @@ public class PaymentService {
 
     @Transactional
     public Payment save(TossPaymentResponse response, long reservationId) {
-        Reservation byId = reservationRepository.findById(reservationId)
+        Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow();
 
-        Payment payment = new Payment(response.orderId(), response.paymentKey(), response.approvedAt().toLocalDateTime(), response.totalAmount(), PaymentStatus.DONE, byId);
+        // 나중에 결제 실패 or 결제 취소는 지금 고려 x
+        Payment payment = new Payment(response.orderId(), response.paymentKey(), response.approvedAt().toLocalDateTime(), response.totalAmount(), PaymentStatus.DONE, reservation);
         return paymentRepository.save(payment);
     }
 

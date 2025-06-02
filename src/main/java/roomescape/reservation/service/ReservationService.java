@@ -48,6 +48,13 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse createReservation(final ReservationRequest request, final Long memberId) {
+        Reservation reservation = getReservation(request, memberId);
+        Reservation savedReservation = reservationRepository.save(reservation);
+
+        return ReservationResponse.from(savedReservation);
+    }
+
+    private Reservation getReservation(ReservationRequest request, Long memberId) {
         ReservationTime time = reservationTimeRepository.findById(request.timeId())
                 .orElseThrow(() -> new InvalidReservationException("존재하지 않는 시간입니다."));
         Theme theme = themeRepository.findById(request.themeId())
@@ -64,10 +71,7 @@ public class ReservationService {
         )) {
             throw new InvalidReservationException("이미 예약이 존재합니다.");
         }
-
-        Reservation save = reservationRepository.save(reservation);
-
-        return ReservationResponse.from(save);
+        return reservation;
     }
 
     @Transactional(readOnly = true)
