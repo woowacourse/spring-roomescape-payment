@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
@@ -28,7 +29,7 @@ class PaymentErrorHandlerTest {
 
     @BeforeEach
     void setUp() {
-        paymentErrorHandler = new PaymentErrorHandler();
+        paymentErrorHandler = new PaymentErrorHandler(new ObjectMapper());
         response = mock(ClientHttpResponse.class);
         testUri = URI.create("https://api.tosspayments.com/v1/payments");
     }
