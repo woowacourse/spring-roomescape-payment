@@ -52,8 +52,4 @@ public class Reservation {
     public void markStatusAsConfirmed() {
         this.reservationStatus = ReservationStatus.CONFIRMED;
     }
-
-    public void markStatusAsCanceled() {
-        this.reservationStatus = ReservationStatus.CANCELED;
-    }
 }
