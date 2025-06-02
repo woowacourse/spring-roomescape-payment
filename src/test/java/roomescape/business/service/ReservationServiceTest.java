@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -210,7 +212,7 @@ class ReservationServiceTest {
     }
 
     @Test
-    void 결제승인_요청을_보내고_예약을_생성한다() {
+    void 예약을_생성하고_결제승인_요청을_보낸다() {
         // given
         LocalDate date = LocalDate.now().plusDays(1);
         String timeIdValue = "time-id";
@@ -238,12 +240,13 @@ class ReservationServiceTest {
 
         // then
         assertThat(result).isNotNull();
-        verify(paymentClient).approvePayment(any(PaymentApproveRequest.class));
         verify(userRepository).findById(userId);
         verify(reservationTimeRepository).findById(timeId);
         verify(themeRepository).findById(themeId);
         verify(reservationRepository).existsByDate_ValueAndTime_StartTime_ValueAndThemeId(eq(date),
                 any(LocalTime.class), eq(theme.getId()));
-        verify(reservationRepository).save(any(Reservation.class));
+        InOrder inOrder = inOrder(paymentClient, reservationRepository);
+        inOrder.verify(reservationRepository).save(any(Reservation.class));
+        inOrder.verify(paymentClient).approvePayment(any(PaymentApproveRequest.class));
     }
 }
