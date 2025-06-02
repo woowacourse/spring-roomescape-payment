@@ -18,18 +18,23 @@ public class TossPaymentClientConfig {
     }
 
     @Bean
-    public RestClient tossRestClient() {
-        String encodedAuth = "Basic " + Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
-
+    public RestClient.Builder restClientBuilder() {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(3000);
         factory.setReadTimeout(3000);
 
         return RestClient.builder()
-                .baseUrl("https://api.tosspayments.com/v1")
                 .requestFactory(factory)
+                .defaultHeader("Content-Type", "application/json");
+    }
+
+    @Bean
+    public RestClient tossRestClient(RestClient.Builder restClientBuilder) {
+        String encodedAuth = "Basic " + Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
+
+        return restClientBuilder
+                .baseUrl("https://api.tosspayments.com/v1")
                 .defaultHeader("Authorization", encodedAuth)
-                .defaultHeader("Content-Type", "application/json")
                 .build();
     }
 }
