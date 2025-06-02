@@ -28,7 +28,7 @@ rest-client:
     base-url: https://api.tosspayments.com
     connect-timeout: 3000
     connection-request-timeout: 2000
-    read-timeout: 60000
+    read-timeout: 20000
 toss-payment:
   widget-secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
 logging:
