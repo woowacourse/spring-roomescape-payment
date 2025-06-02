@@ -5,13 +5,11 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Stream;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.web.client.RestClient;
 import roomescape.auth.dto.LoginMemberInfo;
 import roomescape.common.util.time.DateTime;
 import roomescape.member.domain.MemberRepository;
@@ -29,7 +26,6 @@ import roomescape.member.dto.MyReservationResponse;
 import roomescape.member.infrastructure.JpaMemberRepository;
 import roomescape.member.infrastructure.JpaMemberRepositoryAdapter;
 import roomescape.payment.domain.PaymentClient;
-import roomescape.payment.infrastructure.TossPaymentClient;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.WaitingRepository;
@@ -53,9 +49,11 @@ import roomescape.theme.infrastructure.JpaThemeRepositoryAdapter;
 @Import(ReservationConfig.class)
 class ReservationServiceTest {
 
-    private static final String paymentKey = "tgen_20240513184816ZSAZ9";
-    private static final String orderId = "MC4wNDYzMzA0OTc2MDgy";
-    private static final int amount = 1000;
+    private static final String PAYMENT_KEY = "tgen_20240513184816ZSAZ9";
+    private static final String ORDER_ID = "MC4wNDYzMzA0OTc2MDgy";
+    private static final int AMOUNT = 1000;
+    
+    private static final LocalDate currentDate = LocalDate.of(2025, 4, 28);
 
     @Autowired
     private ReservationService reservationService;
@@ -63,7 +61,7 @@ class ReservationServiceTest {
     @DisplayName("예약을 생성할 수 있다.")
     @Test
     void can_create_reservation() {
-        ReservationRequest request = new ReservationRequest(LocalDate.of(2025, 4, 29), 2L, 1L, paymentKey, orderId, amount);
+        ReservationRequest request = new ReservationRequest(LocalDate.of(2025, 4, 29), 2L, 1L, PAYMENT_KEY, ORDER_ID, AMOUNT);
         assertThatCode(() -> reservationService.createReservation(request, 1L))
                 .doesNotThrowAnyException();
     }
@@ -75,8 +73,8 @@ class ReservationServiceTest {
         List<MyReservationResponse> result = reservationService.getMemberReservations(loginMemberInfo);
 
         List<MyReservationResponse> expected = List.of(
-            new MyReservationResponse(1L, "테마1", LocalDate.of(2025, 4, 28), LocalTime.of(10, 0), "예약"),
-            new MyReservationResponse(2L, "테마1", LocalDate.of(2025, 4, 28), LocalTime.of(11, 0), "예약"));
+            new MyReservationResponse(1L, "테마1", currentDate, LocalTime.of(10, 0), "예약"),
+            new MyReservationResponse(2L, "테마1", currentDate, LocalTime.of(11, 0), "예약"));
 
         assertThat(result).isEqualTo(expected);
     }
@@ -86,7 +84,8 @@ class ReservationServiceTest {
     @MethodSource
     void cant_not_reserve_before_now(final LocalDate date, final Long timeId) {
         assertThatThrownBy(
-            () -> reservationService.createReservation(new ReservationRequest(date, timeId, 1L, paymentKey, orderId, amount), 1L))
+            () -> reservationService.createReservation(new ReservationRequest(date, timeId, 1L, PAYMENT_KEY, ORDER_ID,
+                    AMOUNT), 1L))
             .isInstanceOf(ReservationException.class);
     }
 
@@ -103,7 +102,7 @@ class ReservationServiceTest {
     @Test
     void cant_not_reserve_duplicate() {
         assertThatThrownBy(() -> reservationService.createReservation(
-                new ReservationRequest(LocalDate.of(2025, 4, 28), 1L, 1L, paymentKey, orderId, amount), 1L))
+                new ReservationRequest(currentDate, 1L, 1L, PAYMENT_KEY, ORDER_ID, AMOUNT), 1L))
             .isInstanceOf(ReservationException.class);
     }
 
@@ -112,7 +111,8 @@ class ReservationServiceTest {
     @MethodSource
     void cant_not_reserve_waiting_before_now(final LocalDate date, final Long timeId, final Long themeId, final Long memberId) {
         assertThatThrownBy(
-                () -> reservationService.createWaiting(new ReservationRequest(date, timeId, themeId, paymentKey, orderId, amount), memberId))
+                () -> reservationService.createWaiting(new ReservationRequest(date, timeId, themeId, PAYMENT_KEY,
+                        ORDER_ID, AMOUNT), memberId))
             .isInstanceOf(ReservationException.class)
             .hasMessage("예약할 수 없는 날짜와 시간입니다.");
     }
@@ -129,7 +129,7 @@ class ReservationServiceTest {
     void cant_reserve_waiting_by_reservation_owner() {
         assertThatThrownBy(
                 () -> reservationService.createWaiting(
-                    new ReservationRequest(LocalDate.of(2025, 4, 28), 1L, 1L, paymentKey, orderId, amount), 1L))
+                    new ReservationRequest(currentDate, 1L, 1L, PAYMENT_KEY, ORDER_ID, AMOUNT), 1L))
             .isInstanceOf(ReservationException.class)
             .hasMessage("예약자는 예약대기를 할 수 없습니다.");
     }
@@ -139,7 +139,7 @@ class ReservationServiceTest {
     void cant_reserve_waiting_by_duplicate_member() {
         assertThatThrownBy(
                 () -> reservationService.createWaiting(
-                    new ReservationRequest(LocalDate.of(2025, 4, 28), 1L, 1L, paymentKey, orderId, amount), 2L))
+                    new ReservationRequest(currentDate, 1L, 1L, PAYMENT_KEY, ORDER_ID, AMOUNT), 2L))
             .isInstanceOf(ReservationException.class)
             .hasMessage("이미 예약대기 중입니다.");
     }
@@ -147,13 +147,14 @@ class ReservationServiceTest {
     @DisplayName("예약 대기를 생성할 수 있다.")
     @Test
     void can_create_waiting() {
-        ReservationRequest request = new ReservationRequest(LocalDate.of(2025, 4, 28), 2L, 1L, paymentKey, orderId, amount);
+        ReservationRequest request = new ReservationRequest(currentDate, 2L, 1L, PAYMENT_KEY, ORDER_ID,
+                AMOUNT);
         Long memberId = 2L;
 
         WaitingResponse response = reservationService.createWaiting(request, memberId);
 
         assertThat(response.theme()).isEqualTo("테마1");
-        assertThat(response.date()).isEqualTo(LocalDate.of(2025, 4, 28));
+        assertThat(response.date()).isEqualTo(currentDate);
         assertThat(response.startAt()).isEqualTo(LocalTime.of(11, 0));
     }
 
@@ -164,7 +165,7 @@ class ReservationServiceTest {
 
         assertThat(responses).containsExactly(
             new MyReservationResponse(3L, "테마3", LocalDate.of(2025, 4, 26), LocalTime.of(10, 0), "예약"),
-            new MyReservationResponse(1L, "테마1", LocalDate.of(2025, 4, 28), LocalTime.of(10, 0), "1번째 예약대기")
+            new MyReservationResponse(1L, "테마1", currentDate, LocalTime.of(10, 0), "1번째 예약대기")
         );
     }
 
@@ -200,7 +201,7 @@ class ReservationServiceTest {
 
         assertThat(waitings.size()).isEqualTo(2);
         assertThat(secondResponse.theme().id()).isEqualTo(1L);
-        assertThat(secondResponse.date()).isEqualTo(LocalDate.of(2025,4, 28));
+        assertThat(secondResponse.date()).isEqualTo(currentDate);
         assertThat(secondResponse.time().id()).isEqualTo(1L);
     }
 
@@ -227,7 +228,7 @@ class ReservationServiceTest {
         List<MyReservationResponse> memberReservations = reservationService.getMemberReservations(new LoginMemberInfo(firstWaitingMemberId));
         assertThat(memberReservations).anyMatch(reservation ->
             reservation.theme().equals("테마1") &&
-            reservation.date().equals(LocalDate.of(2025, 4, 28)) &&
+            reservation.date().equals(currentDate) &&
             reservation.time().equals(LocalTime.of(10, 0)) &&
             reservation.status().equals("예약")
         );
@@ -247,7 +248,7 @@ class ReservationServiceTest {
 
         @Bean
         public DateTime dateTime() {
-            return () -> LocalDateTime.of(2025, 4, 28, 10, 0);
+            return () -> LocalDateTime.of(currentDate, LocalTime.of(10, 0));
         }
 
         @Bean
