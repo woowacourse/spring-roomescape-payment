@@ -15,7 +15,9 @@ auth:
     valid-time: 1800000
   cookie:
     max-age: 1800
-toss:
-  payment:
+payment:
+  toss:
     base-url: https://api.tosspayments.com
     secret-key: "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:"
+    connect-timeout: 5000
+    read-timeout: 60000
