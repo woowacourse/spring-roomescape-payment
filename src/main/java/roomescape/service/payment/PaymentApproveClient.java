@@ -18,7 +18,7 @@ public class PaymentApproveClient {
     public PaymentApproveClient(
             @Value("${toss.payments.base-url}") String baseUrl,
             @Value("${toss.payments.widget-secret-key}") String widgetSecretKey,
-            MyClientHttpRequestFactory requestFactory
+            PaymentApproveClientRequestFactory requestFactory
     ) {
         this.restClient = RestClient.builder()
                 .baseUrl(baseUrl)
