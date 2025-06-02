@@ -1,0 +1,48 @@
+package roomescape.config;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClient.Builder;
+import org.springframework.web.client.support.RestClientAdapter;
+import org.springframework.web.service.invoker.HttpServiceProxyFactory;
+import roomescape.service.PaymentClientService;
+
+@Configuration
+public class RestClientConfiguration {
+    @Value("${toss.base-url}")
+    private String baseUrl;
+    @Value("${rest-client.connect-timeout}")
+    private int connectTimeoutThreshold;
+    @Value("${rest-client.read-timeout}")
+    private int readTimeoutThreshold;
+
+    @Bean
+    public RestClient.Builder restClientBuilder() {
+        var clientFactory = new HttpComponentsClientHttpRequestFactory();
+        clientFactory.setConnectTimeout(connectTimeoutThreshold);
+        clientFactory.setReadTimeout(readTimeoutThreshold);
+
+        return RestClient.builder()
+                .requestFactory(clientFactory)
+                .baseUrl(baseUrl)
+                .defaultStatusHandler(new TossPaymentExceptionHandler());
+    }
+
+    @Bean
+    public RestClient restClient() {
+        Builder builder = restClientBuilder();
+        return builder.build();
+    }
+
+    @Bean
+    public PaymentClientService createPaymentService() {
+        RestClient restClient = restClient();
+        RestClientAdapter adapter = RestClientAdapter.create(restClient);
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builderFor(adapter).build();
+
+        return factory.createClient(PaymentClientService.class);
+    }
+}

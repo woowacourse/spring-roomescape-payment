@@ -1,0 +1,27 @@
+package roomescape.dto.reservation;
+
+import java.time.LocalDate;
+import roomescape.domain.Reservation;
+import roomescape.dto.member.MemberNameResponse;
+import roomescape.dto.theme.ThemeResponse;
+import roomescape.dto.time.ReservationTimeResponse;
+
+public record ReservationResponse(Long id,
+                                  MemberNameResponse member,
+                                  LocalDate date,
+                                  ThemeResponse theme,
+                                  ReservationTimeResponse time) {
+
+    public static ReservationResponse from(Reservation reservation) {
+        MemberNameResponse memberResponse = new MemberNameResponse(reservation.getMember().getName());
+        ReservationTimeResponse timeResponse = ReservationTimeResponse.from(reservation.getTime());
+        ThemeResponse themeResponse = ThemeResponse.from(reservation.getTheme());
+
+        return new ReservationResponse(
+                reservation.getId(),
+                memberResponse,
+                reservation.getDate(),
+                themeResponse,
+                timeResponse);
+    }
+}
