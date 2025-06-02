@@ -12,9 +12,12 @@ import roomescape.client.TossPaymentsClient;
 public class ClientConfig {
 
     private final String secretKey;
+    private final String baseUrl;
 
-    public ClientConfig(@Value("${toss.payments.secret-key}") String secretKey) {
+    public ClientConfig(@Value("${toss.payments.secret-key}") final String secretKey,
+                        @Value("${toss.payments.url}") final String baseUrl) {
         this.secretKey = secretKey;
+        this.baseUrl = baseUrl;
     }
 
     @Bean
@@ -24,7 +27,7 @@ public class ClientConfig {
         requestFactory.setReadTimeout(30000);
         return new TossPaymentsClient(
                 RestClient.builder()
-                        .baseUrl("https://api.tosspayments.com/v1/payments/")
+                        .baseUrl(baseUrl)
                         .requestFactory(requestFactory)
                         .defaultHeader("Authorization", getBasicAuthorizationValue())
                         .build()
