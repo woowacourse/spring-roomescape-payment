@@ -1,5 +1,6 @@
 package roomescape.domain.member;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -16,18 +17,23 @@ import lombok.NoArgsConstructor;
 @Entity
 public class Member {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
     private String sessionId;
 
+    @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
     private MemberRole role;
 
@@ -37,20 +43,7 @@ public class Member {
         this.password = password;
         this.name = name;
         this.role = role;
-    }
-
-    public Member(final Long id,
-                  final String email,
-                  final String password,
-                  final String name,
-                  final String sessionId,
-                  final MemberRole role) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.sessionId = sessionId;
-        this.role = role;
+        this.sessionId = "";
     }
 
     public void updateSessionId(String sessionId) {

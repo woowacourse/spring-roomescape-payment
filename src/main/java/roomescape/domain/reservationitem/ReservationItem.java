@@ -1,5 +1,6 @@
 package roomescape.domain.reservationitem;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,18 +20,19 @@ import java.time.LocalDateTime;
 @Entity
 public class ReservationItem {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private LocalDate date;
 
-    @ManyToOne
-    @JoinColumn(name = "time_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "time_id", nullable = false)
     private ReservationTime time;
 
-    @ManyToOne
-    @JoinColumn(name = "theme_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "theme_id", nullable = false)
     private ReservationTheme theme;
 
     @Builder

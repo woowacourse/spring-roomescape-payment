@@ -1,5 +1,6 @@
 package roomescape.domain.reservation;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -20,19 +21,20 @@ import roomescape.domain.reservationitem.ReservationItem;
 @Entity
 public class Reservation {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @ManyToOne
-    @JoinColumn(name = "reservation_item_id")
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "reservation_item_id", nullable = false)
     private ReservationItem reservationItem;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ReservationStatus reservationStatus;
 
     @Builder
