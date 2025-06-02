@@ -12,8 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.payment.application.service.PaymentService;
-import roomescape.reservation.presentation.dto.ReservationRequest;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationInfo;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.Waiting;
@@ -22,6 +23,7 @@ import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.domain.repository.ThemeRepository;
 import roomescape.reservation.domain.repository.WaitingRepository;
 import roomescape.reservation.presentation.dto.AdminReservationRequest;
+import roomescape.reservation.presentation.dto.ReservationRequest;
 import roomescape.reservation.presentation.dto.ReservationResponse;
 import roomescape.reservation.presentation.dto.UserReservationsResponse;
 
@@ -54,17 +56,26 @@ public class ReservationService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchElementException("유저 정보를 찾을 수 없습니다."));
 
-        paymentService.approve(reservationRequest);
-        return createUserReservation(reservationRequest, member);
+        Payment payment = paymentService.processPaymentRequest(reservationRequest);
+        return createPaidReservation(reservationRequest, member, payment);
     }
 
-    private ReservationResponse createUserReservation(final ReservationRequest reservationRequest, final Member member) {
-        return createReservation(
-                reservationRequest.getTimeId(),
-                reservationRequest.getThemeId(),
-                reservationRequest.getDate(),
-                member
+    private ReservationResponse createPaidReservation(final ReservationRequest reservationRequest, final Member member, final Payment payment) {
+        ReservationTime reservationTime = getReservationTime(reservationRequest.getTimeId());
+        Theme theme = getTheme(reservationRequest.getThemeId());
+        validateReservationDateTime(reservationRequest.getDate(), reservationTime);
+
+        final Reservation reservation = new Reservation(
+                member,
+                new ReservationInfo(
+                        theme,
+                        reservationRequest.getDate(),
+                        reservationTime
+                ),
+                payment
         );
+
+        return new ReservationResponse(reservationRepository.save(reservation));
     }
 
     @Transactional
