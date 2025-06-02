@@ -11,21 +11,18 @@ import roomescape.util.AuthorizationHeaderProvider;
 
 @Service
 public class ReservationPaymentService {
-    @Value("toss.secret-key")
-    private String secretKey;
-
     private final ReservationService reservationService;
     private final PaymentClientService paymentClientService;
     private final PaymentService paymentService;
-    private final AuthorizationHeaderProvider authorizationHeaderProvider;
+    private final AuthorizationHeaderProvider authorizationHeaderProvider = new AuthorizationHeaderProvider();
+    @Value("toss.secret-key")
+    private String secretKey;
 
     public ReservationPaymentService(ReservationService reservationService, PaymentClientService paymentClientService,
-                                     PaymentService paymentService,
-                                     AuthorizationHeaderProvider authorizationHeaderProvider) {
+                                     PaymentService paymentService) {
         this.reservationService = reservationService;
         this.paymentClientService = paymentClientService;
         this.paymentService = paymentService;
-        this.authorizationHeaderProvider = authorizationHeaderProvider;
     }
 
     @Transactional
