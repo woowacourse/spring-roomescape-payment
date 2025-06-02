@@ -1,5 +1,6 @@
 package roomescape.infrastructure.payment;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
@@ -8,12 +9,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.web.client.RestClientBuilderConfigurer;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.ExternalApiErrorException;
@@ -50,17 +49,14 @@ class TossPaymentClientTest {
     }
 
     @Test
-    void 잘못된_키로_실제_요청을_보내면_예외가_발생한다() {
+    void 결제_승인_요청_결과가_성공이면_예외가_발생하지_않는다() {
         // given
-        paymentClient = new TossPaymentClient(
-                new RestClientBuilderConfigurer().configure(RestClient.builder()).build(),
-                new Jackson2ObjectMapperBuilder().createXmlMapper(false).build(),
-                "invalidKey"
-        );
         PaymentApproveRequest paymentApproveRequest = new TossPaymentApproveRequest("paymentKey", "1", 1000L);
+        mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andRespond(withStatus(HttpStatus.OK));
         // when
-        assertThatThrownBy(() -> paymentClient.approvePayment(paymentApproveRequest))
-                .isInstanceOf(ExternalApiErrorException.class);
+        assertThatCode(() -> paymentClient.approvePayment(paymentApproveRequest))
+                .doesNotThrowAnyException();
     }
 
     @TestConfiguration
