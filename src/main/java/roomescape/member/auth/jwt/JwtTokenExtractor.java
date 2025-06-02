@@ -10,7 +10,9 @@ import org.springframework.stereotype.Component;
 import roomescape.common.exception.AuthenticationException;
 import roomescape.common.exception.AuthorizationException;
 import roomescape.common.exception.ErrorCode;
+import roomescape.member.auth.vo.MemberInfo;
 import roomescape.member.domain.MemberName;
+import roomescape.member.domain.Role;
 
 @Component
 public class JwtTokenExtractor {
@@ -31,16 +33,33 @@ public class JwtTokenExtractor {
 
         throw new AuthorizationException("로그인이 필요합니다.", ErrorCode.MUST_BE_MEMBER);
     }
+    
+    public MemberInfo extractMemberInfoFromToken(final String token) {
+        final Claims claims = extractClaimsFromToken(token);
+        final Long id = Long.valueOf(claims.getSubject());
+        final String name = claims.get("name").toString();
+        final String email = claims.get("email").toString();
+        final Role role = Role.valueOf(claims.get("role").toString());
 
-    public MemberName extractMemberNameFromToken(String token) {
-        String name = extractClaimsFromToken(token)
-                .get("name").toString();
-        return MemberName.from(name);
+        return new MemberInfo(id, name, email, role);
+    }
+
+    public Role extractRoleFromToken(final String token) {
+        final Claims claims = extractClaimsFromToken(token);
+        final String role = claims.get("role").toString();
+
+        return Role.valueOf(role);
     }
 
     public Long extractMemberIdFromToken(String token) {
         Long id = Long.valueOf(extractClaimsFromToken(token).getSubject());
         return id;
+    }
+
+    public MemberName extractMemberNameFromToken(String token) {
+        String name = extractClaimsFromToken(token)
+                .get("name").toString();
+        return MemberName.from(name);
     }
 
     private Claims extractClaimsFromToken(String token) {

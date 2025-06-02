@@ -16,21 +16,20 @@ import roomescape.member.service.AuthService;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    private final AuthService authService;
     private final JwtTokenExtractor jwtTokenExtractor;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new MemberInfoArgumentResolver(jwtTokenExtractor, authService));
+        resolvers.add(new MemberInfoArgumentResolver(jwtTokenExtractor));
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new AuthorizationInterceptor(jwtTokenExtractor, authService))
+        registry.addInterceptor(new AuthorizationInterceptor(jwtTokenExtractor))
                 .addPathPatterns("/**")
                 .excludePathPatterns("/", "/login", "/signup");
 
-        registry.addInterceptor(new AdminPageInterceptor(jwtTokenExtractor, authService))
+        registry.addInterceptor(new AdminPageInterceptor(jwtTokenExtractor))
                 .addPathPatterns("/admin/**");
     }
 }

@@ -14,7 +14,6 @@ import roomescape.member.service.AuthService;
 public class MemberInfoArgumentResolver implements HandlerMethodArgumentResolver {
 
     private final JwtTokenExtractor jwtTokenExtractor;
-    private final AuthService authService;
 
     @Override
     public boolean supportsParameter(final MethodParameter parameter) {
@@ -28,8 +27,9 @@ public class MemberInfoArgumentResolver implements HandlerMethodArgumentResolver
             final NativeWebRequest webRequest,
             final WebDataBinderFactory binderFactory
     ) {
-        HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
+        final HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         final String token = jwtTokenExtractor.extractTokenFromCookie(request.getCookies());
-        return authService.getMemberInfo(token);
+
+        return jwtTokenExtractor.extractMemberInfoFromToken(token);
     }
 }

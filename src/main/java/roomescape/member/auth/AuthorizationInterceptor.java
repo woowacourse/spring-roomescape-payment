@@ -10,13 +10,11 @@ import roomescape.common.exception.AuthorizationException;
 import roomescape.member.auth.jwt.JwtTokenExtractor;
 import roomescape.member.auth.vo.MemberInfo;
 import roomescape.member.domain.Role;
-import roomescape.member.service.AuthService;
 
 @RequiredArgsConstructor
 public class AuthorizationInterceptor implements HandlerInterceptor {
 
     private final JwtTokenExtractor jwtTokenExtractor;
-    private final AuthService authService;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
@@ -29,7 +27,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         }
 
         final String token = jwtTokenExtractor.extractTokenFromCookie(request.getCookies());
-        MemberInfo memberInfo = authService.getMemberInfo(token);
+        final MemberInfo memberInfo = jwtTokenExtractor.extractMemberInfoFromToken(token);
 
         if (handlerMethod.hasMethodAnnotation(RoleRequired.class)) {
             RoleRequired roleRequired = handlerMethod.getMethodAnnotation(RoleRequired.class);
