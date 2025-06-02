@@ -19,7 +19,7 @@ public class RestClientConfig {
     @Bean
     public RestClient tossPaymentRestClient() {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setReadTimeout(10000);
+        requestFactory.setReadTimeout(15_000);
 
         return RestClient.builder()
                 .baseUrl(tossPaymentBaseUrl)
