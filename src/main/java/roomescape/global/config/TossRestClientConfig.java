@@ -27,8 +27,8 @@ public class TossRestClientConfig {
 
         return RestClient.builder()
                 .baseUrl(baseUrl)
-                .defaultHeader("Authorization", basicAuthValue)
-                .defaultHeader("Content-Type", APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.AUTHORIZATION, basicAuthValue)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 .build();
     }
 
