@@ -27,7 +27,7 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     public void approvePayment(final PaymentInfo paymentInfo) {
-        final ApproveTossPaymentRequest request = ApproveTossPaymentRequest.from(paymentInfo);
+        final TossPaymentApproveRequest request = TossPaymentApproveRequest.from(paymentInfo);
         final String encodedSecretKey = getEncodedSecretKey();
 
         try {
