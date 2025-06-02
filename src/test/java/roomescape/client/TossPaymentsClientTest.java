@@ -66,4 +66,22 @@ class TossPaymentsClientTest {
                 .isInstanceOf(TossPaymentsException.class)
                 .hasMessage(errorResponse.message());
     }
+
+    @DisplayName("특정 예외는 사용자에게 정해진 메시지를 전달한다.")
+    @Test
+    void testConfirmPaymentsExceptionWithMaskedErrorCodes() throws JsonProcessingException {
+        // given
+        PaymentsConfirmRequest request = new PaymentsConfirmRequest("aaa", "111", 1000L);
+        TossErrorResponse tossErrorResponse = new TossErrorResponse("잘못된 요청입니다.", "INVALID_REQUEST");
+        // when
+        SERVER.expect(requestTo(BASE_URL + "/confirm"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withBadRequest()
+                        .body(MAPPER.writeValueAsString(tossErrorResponse))
+                        .contentType(MediaType.APPLICATION_JSON));
+        // then
+        assertThatThrownBy(() -> paymentsClient.confirmPayments(request))
+                .isInstanceOf(TossPaymentsException.class)
+                .hasMessage("결제에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    }
 }
