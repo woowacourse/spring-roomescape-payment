@@ -33,6 +33,7 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     public void approvePayment(final PaymentInfo paymentInfo) {
+
         final ApproveTossPaymentRequest request = ApproveTossPaymentRequest.from(paymentInfo);
         final String encodedSecretKey = getEncodedSecretKey();
 
@@ -62,7 +63,7 @@ public class TossPaymentClient implements PaymentClient {
                 throw new PaymentException(GATEWAY_TIMEOUT, "결제 처리 중 지연이 발생했습니다. 잠시 후 다시 시도해주세요.");
             }
 
-            throw new PaymentException(HttpStatus.BAD_GATEWAY, "결제 서비스에 일시적인 문제가 발생했습니다.");
+            throw new PaymentException(HttpStatus.SERVICE_UNAVAILABLE, "결제 서비스에 일시적인 문제가 발생했습니다.");
         }
         catch (Exception e) {
             throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 과정중 서버에 문제가 생겼습니다. 고객센터에게 문의하세요");
