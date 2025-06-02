@@ -88,4 +88,8 @@ public class Reservation extends TimeStamp {
     public ReservationTime getReservationTime() {
         return reservationInfo.getReservationTime();
     }
+
+    public Payment getPayment() {
+        return payment;
+    }
 }
