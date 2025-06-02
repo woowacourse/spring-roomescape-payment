@@ -49,7 +49,7 @@ class TossApiClientTest {
         assertThatThrownBy(() -> tossApiClient.authPayment("tgen_20250528204823hWav3", "MC4xNTU3MDQ1MDk3Njkx",
                 50000, "NORMAL"))
                 .isInstanceOf(TossPaymentServerException.class)
-                .hasMessageContaining("서버 오류입니다. 서버 관리자한테 문의해주세요.");
+                .hasMessageContaining("서비스에 문제가 발생했습니다. 잠시 후 다시 시도하거나 관리자에게 문의주세요. ");
     }
 
     @Test
@@ -58,7 +58,7 @@ class TossApiClientTest {
         assertThatThrownBy(() -> tossApiClient.authPayment("tgen_20250528204823hWav3", "MC4xNTU3MDQ1MDk3Njkx",
                 50000, "NORMAL"))
                 .isInstanceOf(TossPaymentServerException.class)
-                .hasMessageContaining("토스 서버로 문의해주세요");
+                .hasMessageContaining("결제 서버에 문제가 발생했습니다. 잠시 후 다시 시도하거나 다른 결제 수단을 이용하세요");
     }
 
     @Test

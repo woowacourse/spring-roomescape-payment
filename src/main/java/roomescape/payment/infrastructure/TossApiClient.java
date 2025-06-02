@@ -40,7 +40,7 @@ public class TossApiClient implements ApiClient {
         } catch (HttpClientErrorException e) {
             FailureResponse response = e.getResponseBodyAs(FailureResponse.class);
             if (TossServerErrorCode.isServerError(response.code())) {
-                throw new TossPaymentServerException("서버 오류입니다. 서버 관리자한테 문의해주세요.");
+                throw new TossPaymentServerException("서비스에 문제가 발생했습니다. 잠시 후 다시 시도하거나 관리자에게 문의주세요. ");
             }
             throw new TossPaymentClientException(response.message());
         } catch (HttpServerErrorException e) {
