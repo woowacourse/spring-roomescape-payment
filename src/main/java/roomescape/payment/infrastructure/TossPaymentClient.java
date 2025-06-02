@@ -42,19 +42,9 @@ public class TossPaymentClient implements PaymentClient {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(request)
                     .retrieve()
-                    .onStatus((status) -> status.value() != HttpStatus.OK.value(), (req, res) -> {
-                        InputStream body = res.getBody();
-                        TossPaymentErrorResponse errorResponse
-                                = objectMapper.readValue(body, TossPaymentErrorResponse.class);
-                        throw new PaymentException(
-                                res.getStatusCode(),
-                                errorResponse.code(),
-                                errorResponse.message()
-                        );
-                    })
                     .toBodilessEntity();
         } catch (ResourceAccessException e) {
-            throw new PaymentException(GATEWAY_TIMEOUT, "결제 API가 응답하지 않습니다.");
+            throw new PaymentException(GATEWAY_TIMEOUT, "토스 결제 승인 API가 응답하지 않습니다.");
         }
     }
 
