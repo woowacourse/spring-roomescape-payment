@@ -29,6 +29,7 @@ import roomescape.theme.service.dto.response.ThemeResponse;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.UUID;
 
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
@@ -64,8 +65,12 @@ public class CreateReservationWithPaymentTest {
         // given
         ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
         ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
-        Mockito.when(mockTossPaymentClient.postConfirmPayment(paymentRequest)).thenReturn(ResponseEntity.ok(paymentResponse));
-
+        Mockito.when(
+                mockTossPaymentClient.postConfirmPayment(
+                        Mockito.any(ConfirmPaymentRequest.class), 
+                        Mockito.any(UUID.class)
+                ))
+                .thenReturn(ResponseEntity.ok(paymentResponse));
         LocalDate date = now.plusDays(1).toLocalDate();
         ReservationWithPaymentRequest reservationWithPaymentRequest = new ReservationWithPaymentRequest(
                 date,

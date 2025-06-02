@@ -29,8 +29,7 @@ public class TossPaymentClient {
 
     // TODO: 결제 실패시 환불
     @Retryable
-    public ResponseEntity<ConfirmPaymentResponse> postConfirmPayment(ConfirmPaymentRequest paymentRequest) {
-        UUID idempotencyKey = UUID.randomUUID();
+    public ResponseEntity<ConfirmPaymentResponse> postConfirmPayment(ConfirmPaymentRequest paymentRequest, UUID idempotencyKey) {
         return restClient.post()
                 .uri("/confirm")
                 .header("Idempotency-Key", idempotencyKey.toString())

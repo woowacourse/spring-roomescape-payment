@@ -33,6 +33,7 @@ import roomescape.theme.domain.Theme;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
@@ -83,7 +84,12 @@ class CreateReservationWithPaymentServiceTest {
     @Test
     void noReservationAndFailedPayment4xxResponse() {
         // given
-        Mockito.when(mockTossPaymentClient.postConfirmPayment(PAYMENT_REQUEST)).thenReturn(ResponseEntity.status(400).body(PAYMENT_RESPONSE));
+        Mockito.when(
+                mockTossPaymentClient.postConfirmPayment(
+                        Mockito.any(ConfirmPaymentRequest.class),
+                        Mockito.any(UUID.class)
+                ))
+                .thenReturn(ResponseEntity.status(400).body(PAYMENT_RESPONSE));
         ReservationWithPaymentRequest request = new ReservationWithPaymentRequest(
                 now.plusDays(1).toLocalDate(),
                 time.getId(),
@@ -111,7 +117,12 @@ class CreateReservationWithPaymentServiceTest {
     @Test
     void noReservationAndFailedPayment5xxResponse() {
         // given
-        Mockito.when(mockTossPaymentClient.postConfirmPayment(PAYMENT_REQUEST)).thenReturn(ResponseEntity.status(500).body(PAYMENT_RESPONSE));
+        Mockito.when(
+                mockTossPaymentClient.postConfirmPayment(
+                        Mockito.any(ConfirmPaymentRequest.class),
+                        Mockito.any(UUID.class)
+                ))
+                .thenReturn(ResponseEntity.status(500).body(PAYMENT_RESPONSE));
         ReservationWithPaymentRequest request = new ReservationWithPaymentRequest(
                 now.plusDays(1).toLocalDate(),
                 time.getId(),
@@ -139,7 +150,12 @@ class CreateReservationWithPaymentServiceTest {
     @Test
     void reservationAndCompletePayment2xxResponse() {
         // given
-        Mockito.when(mockTossPaymentClient.postConfirmPayment(PAYMENT_REQUEST)).thenReturn(ResponseEntity.status(200).body(PAYMENT_RESPONSE));
+        Mockito.when(
+                mockTossPaymentClient.postConfirmPayment(
+                        Mockito.any(ConfirmPaymentRequest.class),
+                        Mockito.any(UUID.class)
+                ))
+                .thenReturn(ResponseEntity.status(200).body(PAYMENT_RESPONSE));
         ReservationWithPaymentRequest request = new ReservationWithPaymentRequest(
                 now.plusDays(1).toLocalDate(),
                 time.getId(),

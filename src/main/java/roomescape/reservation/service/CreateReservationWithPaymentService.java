@@ -11,6 +11,8 @@ import roomescape.payment.service.PaymentService;
 import roomescape.reservation.service.dto.request.ReservationWithPaymentRequest;
 import roomescape.reservation.service.dto.response.ReservationWithPaymentResponse;
 
+import java.util.UUID;
+
 @Service
 public class CreateReservationWithPaymentService {
 
@@ -33,7 +35,10 @@ public class CreateReservationWithPaymentService {
 
     public ReservationWithPaymentResponse create(ReservationWithPaymentRequest request, LoginMember loginMember) {
         ReservationWithPaymentResponse reservationWithPaymentResponse = createReservationService.createWithPendingPayment(request, loginMember);
-        ResponseEntity<ConfirmPaymentResponse> confirmPaymentResponse = tossPaymentClient.postConfirmPayment(ConfirmPaymentRequest.from(request));
+        ResponseEntity<ConfirmPaymentResponse> confirmPaymentResponse = tossPaymentClient.postConfirmPayment(
+                ConfirmPaymentRequest.from(request),
+                UUID.randomUUID()
+        );
 
         if (confirmPaymentResponse.getStatusCode().is2xxSuccessful()) {
             paymentService.completePayment(reservationWithPaymentResponse.paymentId());
