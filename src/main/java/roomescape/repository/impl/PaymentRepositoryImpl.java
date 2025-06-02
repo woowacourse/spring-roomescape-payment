@@ -21,6 +21,6 @@ public class PaymentRepositoryImpl implements PaymentRepository {
 
     @Override
     public Optional<Payment> findByReservationId(final Long reservationId) {
-        return repository.findByReservationId(reservationId);
+        return repository.findByReservation_Id(reservationId);
     }
 }

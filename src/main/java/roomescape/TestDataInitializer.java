@@ -118,26 +118,26 @@ public class TestDataInitializer {
                 pending6, pending7, pending8, pending9, pending10
         ));
 
-        Payment payment1 = new Payment("paymentKey1", 10000, accepted1.getId());
-        Payment payment2 = new Payment("paymentKey2", 15000, accepted2.getId());
-        Payment payment3 = new Payment("paymentKey3", 20000, accepted3.getId());
-        Payment payment4 = new Payment("paymentKey4", 25000, accepted4.getId());
-        Payment payment5 = new Payment("paymentKey5", 10000, accepted5.getId());
-        Payment payment6 = new Payment("paymentKey6", 15000, accepted6.getId());
-        Payment payment7 = new Payment("paymentKey7", 20000, accepted7.getId());
-        Payment payment8 = new Payment("paymentKey8", 25000, accepted8.getId());
-        Payment payment9 = new Payment("paymentKey9", 10000, accepted9.getId());
-        Payment payment10 = new Payment("paymentKey10", 15000, accepted10.getId());
-        Payment payment11 = new Payment("paymentKey11", 20000, accepted11.getId());
-        Payment payment12 = new Payment("paymentKey12", 25000, accepted12.getId());
-        Payment payment13 = new Payment("paymentKey13", 10000, accepted13.getId());
-        Payment payment14 = new Payment("paymentKey14", 15000, accepted14.getId());
-        Payment payment15 = new Payment("paymentKey15", 20000, accepted15.getId());
-        Payment payment16 = new Payment("paymentKey16", 25000, accepted16.getId());
-        Payment payment17 = new Payment("paymentKey17", 10000, accepted17.getId());
-        Payment payment18 = new Payment("paymentKey18", 15000, accepted18.getId());
-        Payment payment19 = new Payment("paymentKey19", 20000, accepted19.getId());
-        Payment payment20 = new Payment("paymentKey20", 25000, accepted20.getId());
+        Payment payment1 = new Payment("paymentKey1", 10000, accepted1);
+        Payment payment2 = new Payment("paymentKey2", 15000, accepted2);
+        Payment payment3 = new Payment("paymentKey3", 20000, accepted3);
+        Payment payment4 = new Payment("paymentKey4", 25000, accepted4);
+        Payment payment5 = new Payment("paymentKey5", 10000, accepted5);
+        Payment payment6 = new Payment("paymentKey6", 15000, accepted6);
+        Payment payment7 = new Payment("paymentKey7", 20000, accepted7);
+        Payment payment8 = new Payment("paymentKey8", 25000, accepted8);
+        Payment payment9 = new Payment("paymentKey9", 10000, accepted9);
+        Payment payment10 = new Payment("paymentKey10", 15000, accepted10);
+        Payment payment11 = new Payment("paymentKey11", 20000, accepted11);
+        Payment payment12 = new Payment("paymentKey12", 25000, accepted12);
+        Payment payment13 = new Payment("paymentKey13", 10000, accepted13);
+        Payment payment14 = new Payment("paymentKey14", 15000, accepted14);
+        Payment payment15 = new Payment("paymentKey15", 20000, accepted15);
+        Payment payment16 = new Payment("paymentKey16", 25000, accepted16);
+        Payment payment17 = new Payment("paymentKey17", 10000, accepted17);
+        Payment payment18 = new Payment("paymentKey18", 15000, accepted18);
+        Payment payment19 = new Payment("paymentKey19", 20000, accepted19);
+        Payment payment20 = new Payment("paymentKey20", 25000, accepted20);
         paymentRepository.saveAll(List.of(
                 payment1, payment2, payment3, payment4, payment5,
                 payment6, payment7, payment8, payment9, payment10,
