@@ -37,3 +37,6 @@ toss-payment:
   connect-timeout: 1000
   connection-request-timeout: 1000
   read-timeout: 2000
+
+server:
+  address: 0.0.0.0
