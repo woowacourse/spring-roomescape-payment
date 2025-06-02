@@ -1,8 +1,5 @@
 package roomescape.payment.infrastructure;
 
-import java.util.Base64;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -23,12 +20,9 @@ public class TossApiClient {
     public static final String PAYMENT_URL = "https://api.tosspayments.com/v1/payments/confirm";
 
     private final RestClient restClient;
-    private final String secretKey;
 
-    public TossApiClient(final RestClient.Builder builder, @Value("${toss.secret-key}") final String key) {
-        String totalSecretKey = key + SECRET_KEY_SUFFIX;
-        secretKey = Base64.getEncoder().encodeToString(totalSecretKey.getBytes());
-        this.restClient = builder.build();
+    public TossApiClient(RestClient restClient) {
+        this.restClient = restClient;
     }
 
     public PaymentResponse authPayment(final String paymentKey, final String orderId,
@@ -37,7 +31,6 @@ public class TossApiClient {
         try {
             return restClient.post()
                     .uri(PAYMENT_URL)
-                    .header(HttpHeaders.AUTHORIZATION, AUTHORIZATION_HEADER + secretKey)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(request)
                     .retrieve()
