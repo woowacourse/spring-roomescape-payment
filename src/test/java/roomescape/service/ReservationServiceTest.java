@@ -12,12 +12,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import roomescape.member.dto.MemberRegisterRequest;
 import roomescape.member.service.MemberService;
+import roomescape.payment.FakePaymentRestClientConfig;
 import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
@@ -32,7 +34,7 @@ import roomescape.time.service.ReservationTimeService;
         "spring.sql.init.mode=never",
         "spring.jpa.hibernate.ddl-auto=create-drop"
 })
-@ActiveProfiles("test")
+@Import(FakePaymentRestClientConfig.class)
 class ReservationServiceTest {
 
     @Autowired

@@ -21,6 +21,7 @@ import roomescape.exception.ForbiddenException;
 import roomescape.exception.InternalServerException;
 import roomescape.exception.UnauthorizedException;
 import roomescape.payment.toss.PaymentErrorHandler;
+import roomescape.payment.toss.TossErrorMapper;
 
 class PaymentErrorHandlerTest {
     private PaymentErrorHandler paymentErrorHandler;
@@ -29,7 +30,7 @@ class PaymentErrorHandlerTest {
 
     @BeforeEach
     void setUp() {
-        paymentErrorHandler = new PaymentErrorHandler(new ObjectMapper());
+        paymentErrorHandler = new PaymentErrorHandler(new ObjectMapper(), new TossErrorMapper());
         response = mock(ClientHttpResponse.class);
         testUri = URI.create("https://api.tosspayments.com/v1/payments");
     }

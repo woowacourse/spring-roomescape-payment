@@ -14,6 +14,7 @@ import roomescape.exception.InternalServerException;
 public class PaymentErrorHandler implements ResponseErrorHandler {
 
     private final ObjectMapper objectMapper;
+    private final TossErrorMapper tossErrorMapper;
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
@@ -24,7 +25,7 @@ public class PaymentErrorHandler implements ResponseErrorHandler {
     public void handleError(URI url, HttpMethod method, ClientHttpResponse httpResponse) throws IOException {
         TossPaymentErrorResponse errorResponse = getTossErrorResponse(httpResponse);
         HttpStatus httpStatus = HttpStatus.resolve(httpResponse.getStatusCode().value());
-        throw TossErrorException.createException(errorResponse, httpStatus);
+        throw tossErrorMapper.createException(errorResponse, httpStatus);
     }
 
     private TossPaymentErrorResponse getTossErrorResponse(ClientHttpResponse httpResponse) {

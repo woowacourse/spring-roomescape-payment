@@ -10,6 +10,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.PaymentClient;
 import roomescape.payment.toss.PaymentErrorHandler;
+import roomescape.payment.toss.TossErrorMapper;
 import roomescape.payment.toss.TossPaymentRestClient;
 import roomescape.util.Base64Utils;
 
@@ -36,8 +37,8 @@ public class TossPaymentRestClientConfig {
     }
 
     @Bean
-    public PaymentErrorHandler paymentErrorHandler(ObjectMapper objectMapper) {
-        return new PaymentErrorHandler(objectMapper);
+    public PaymentErrorHandler paymentErrorHandler(ObjectMapper objectMapper, TossErrorMapper tossErrorMapper) {
+        return new PaymentErrorHandler(objectMapper, tossErrorMapper);
     }
 
     @Bean
