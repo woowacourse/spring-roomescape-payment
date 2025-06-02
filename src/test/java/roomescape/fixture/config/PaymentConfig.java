@@ -35,7 +35,7 @@ public class PaymentConfig {
     public PaymentClient paymentClient() {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(Duration.ofSeconds(2));
-        requestFactory.setReadTimeout(Duration.ofSeconds(2));
+        requestFactory.setReadTimeout(Duration.ofSeconds(30));
 
         return new TossPaymentClient(
                 confirmUrl,
