@@ -1,14 +1,12 @@
-package roomescape.global.api;
+package roomescape.global.converter;
 
 import static org.assertj.core.api.Assertions.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import roomescape.global.converter.CustomRequestMapper;
 
 @SpringBootTest
 class CustomRequestMapperTest {
