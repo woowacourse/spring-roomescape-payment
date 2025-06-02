@@ -5,10 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
-import static roomescape.fixture.ServerClientFixture.BASE_URL;
-import static roomescape.fixture.ServerClientFixture.MAPPER;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
@@ -56,12 +55,15 @@ public class ReservationApiTest {
     @Nested
     class CreateReservationTest {
 
+        private static final String BASE_URL = "https://api.tosspayments.com/v1/payments";
         private static final LocalDate TOMORROW = LocalDate.now().plusDays(1);
         private static final CreateReservationWithPaymentRequest REQUEST = new CreateReservationWithPaymentRequest(
                 TOMORROW, 1L, 1L, "payment_key", "order_id", 1000L);
         private static String TOKEN;
+        private static final PaymentsConfirmResponse EXPECTED_RESPONSE = new PaymentsConfirmResponse("aaa", 1000L);
 
-        PaymentsConfirmResponse expectedResponse = new PaymentsConfirmResponse("aaa", 1000L);
+        @Autowired
+        private ObjectMapper mapper;
 
         @Autowired
         private MockRestServiceServer server;
@@ -78,7 +80,7 @@ public class ReservationApiTest {
             server.expect(requestTo(BASE_URL + "/confirm"))
                     .andExpect(method(HttpMethod.POST))
                     .andRespond(withStatus(HttpStatus.OK)
-                            .body(MAPPER.writeValueAsString(expectedResponse))
+                            .body(mapper.writeValueAsString(EXPECTED_RESPONSE))
                             .contentType(MediaType.APPLICATION_JSON));
         }
 
@@ -132,7 +134,7 @@ public class ReservationApiTest {
             server.expect(requestTo(BASE_URL + "/confirm"))
                     .andExpect(method(HttpMethod.POST))
                     .andRespond(withStatus(HttpStatus.OK)
-                            .body(MAPPER.writeValueAsString(expectedResponse))
+                            .body(mapper.writeValueAsString(EXPECTED_RESPONSE))
                             .contentType(MediaType.APPLICATION_JSON));
             // when
             // then

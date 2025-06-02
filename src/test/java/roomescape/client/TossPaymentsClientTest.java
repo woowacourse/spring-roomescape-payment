@@ -6,10 +6,6 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
-import static roomescape.fixture.ServerClientFixture.BASE_URL;
-import static roomescape.fixture.ServerClientFixture.MAPPER;
-import static roomescape.fixture.ServerClientFixture.SERVER;
-import static roomescape.fixture.ServerClientFixture.TEST_BUILDER;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestClient;
 import roomescape.client.dto.PaymentsConfirmRequest;
 import roomescape.client.dto.PaymentsConfirmResponse;
 import roomescape.client.dto.TossErrorResponse;
@@ -26,7 +24,16 @@ import roomescape.global.exception.custom.TossPaymentsException;
 
 class TossPaymentsClientTest {
 
-    private final TossPaymentsClient paymentsClient = new TossPaymentsClient(TEST_BUILDER.build(), new ObjectMapper());
+    private static final String BASE_URL = "https://api.tosspayments.com/v1/payments";
+    private static final String CONFIRM_URL = "https://api.tosspayments.com/v1/payments/confirm";
+    private static final RestClient.Builder TEST_BUILDER = RestClient.builder()
+            .baseUrl(BASE_URL);
+    private static final MockRestServiceServer SERVER = MockRestServiceServer
+            .bindTo(TEST_BUILDER)
+            .build();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    private final TossPaymentsClient paymentsClient = new TossPaymentsClient(TEST_BUILDER.build(), MAPPER);
 
     @BeforeEach
     void setUp() {
@@ -39,7 +46,7 @@ class TossPaymentsClientTest {
         // given
         PaymentsConfirmRequest request = new PaymentsConfirmRequest("aaa", "111", 1000L);
         PaymentsConfirmResponse expectedResponse = new PaymentsConfirmResponse("aaa", 1000L);
-        SERVER.expect(requestTo(BASE_URL + "/confirm"))
+        SERVER.expect(requestTo(CONFIRM_URL))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.OK)
                         .body(MAPPER.writeValueAsString(expectedResponse))
@@ -56,7 +63,7 @@ class TossPaymentsClientTest {
         // given
         PaymentsConfirmRequest request = new PaymentsConfirmRequest("aaa", "111", 1000L);
         TossErrorResponse errorResponse = new TossErrorResponse("잘못된 요청입니다.", "TEST_ERROR_CODE");
-        SERVER.expect(requestTo(BASE_URL + "/confirm"))
+        SERVER.expect(requestTo(CONFIRM_URL))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withBadRequest()
                         .body(MAPPER.writeValueAsString(errorResponse))
@@ -75,7 +82,7 @@ class TossPaymentsClientTest {
         PaymentsConfirmRequest request = new PaymentsConfirmRequest("aaa", "111", 1000L);
         TossErrorResponse tossErrorResponse = new TossErrorResponse("잘못된 요청입니다.", "INVALID_REQUEST");
         // when
-        SERVER.expect(requestTo(BASE_URL + "/confirm"))
+        SERVER.expect(requestTo(CONFIRM_URL))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withBadRequest()
                         .body(MAPPER.writeValueAsString(tossErrorResponse))

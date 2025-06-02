@@ -5,10 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
-import static roomescape.fixture.ServerClientFixture.BASE_URL;
-import static roomescape.fixture.ServerClientFixture.MAPPER;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,6 +31,11 @@ import roomescape.payment.domain.Payment;
 @Import(TestClientConfig.class)
 class PaymentServiceTest {
 
+    private static final String BASE_URL = "https://api.tosspayments.com/v1/payments";
+
+    @Autowired
+    private ObjectMapper mapper;
+
     @Autowired
     private MockRestServiceServer server;
 
@@ -52,7 +56,7 @@ class PaymentServiceTest {
         server.expect(requestTo(BASE_URL + "/confirm"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.OK)
-                        .body(MAPPER.writeValueAsString(expectedResponse))
+                        .body(mapper.writeValueAsString(expectedResponse))
                         .contentType(MediaType.APPLICATION_JSON));
         // when
         Payment payment = paymentService.confirmAndSavePayment(request);
