@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
+import roomescape.global.converter.CustomRequestMapper;
 import roomescape.global.converter.CustomResponseMapper;
 import roomescape.global.exception.ErrorCode;
 import roomescape.global.exception.ExternalApiException;
