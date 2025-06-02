@@ -2,6 +2,7 @@ package roomescape.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatusCode;
@@ -29,9 +30,12 @@ public class TossPaymentClient implements PaymentClient{
     private static final String KEY_MESSAGE = "message";
     private static final String KEY_CODE = "code";
 
-    private static final String PAYMENT_CONFIRM_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
-    private static final int CONNECT_TIMEOUT_MILLIS = 3_000;
-    private static final int READ_TIMEOUT_MILLIS = 30_000;
+    @Value("${toss.payment.confirm.secretKey}")
+    private String PAYMENT_CONFIRM_SECRET_KEY;
+    @Value("${toss.payment.confirm.connect-timeout}")
+    private int CONNECT_TIMEOUT_MILLIS;
+    @Value("${toss.payment.confirm.read-timeout}")
+    private int READ_TIMEOUT_MILLIS;
 
     private static final Set<String> INVISIBLE_CLIENT_ERROR_CODE = Set.of(
             "INVALID_API_KEY",
