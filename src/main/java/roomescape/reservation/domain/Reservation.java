@@ -11,6 +11,8 @@ import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import roomescape.global.exception.custom.BadRequestException;
 import roomescape.member.domain.Member;
@@ -42,15 +44,6 @@ public class Reservation {
     private Payment payment;
 
     public Reservation(final Long id, final Member member, final LocalDate date, final ReservationTime time,
-                       final Theme theme) {
-        this.id = id;
-        this.date = date;
-        this.time = time;
-        this.member = member;
-        this.theme = theme;
-    }
-
-    public Reservation(final Long id, final Member member, final LocalDate date, final ReservationTime time,
                        final Theme theme, final Payment payment) {
         this.id = id;
         this.date = date;
@@ -60,23 +53,19 @@ public class Reservation {
         this.payment = payment;
     }
 
-
-    public static Reservation register(final Member member, final LocalDate date,
-                                       final ReservationTime time, final Theme theme) {
-        Reservation reservation = new Reservation(null, member, date, time, theme);
-        if (reservation.isBefore(LocalDateTime.now())) {
+    public static Reservation register(final Member member, final LocalDate date, final ReservationTime time,
+                                       final Theme theme, final Payment payment) {
+        final Reservation reservation = new Reservation(null, member, date, time, theme, payment);
+        final ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+        if (reservation.isBefore(LocalDateTime.from(now))) {
             throw new BadRequestException("지나간 날짜와 시간은 예약 불가합니다.");
         }
         return reservation;
     }
 
-    public static Reservation register(final Member member, final LocalDate date, final ReservationTime time,
-                                       final Theme theme, final Payment payment) {
-        Reservation reservation = new Reservation(null, member, date, time, theme, payment);
-        if (reservation.isBefore(LocalDateTime.now())) {
-            throw new BadRequestException("지나간 날짜와 시간은 예약 불가합니다.");
-        }
-        return reservation;
+    public static Reservation register(final Member member, final LocalDate date,
+                                       final ReservationTime time, final Theme theme) {
+        return register(member, date, time, theme, null);
     }
 
     protected Reservation() {
