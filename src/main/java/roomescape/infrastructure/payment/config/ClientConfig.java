@@ -1,4 +1,4 @@
-package roomescape.infrastructure.payment;
+package roomescape.infrastructure.payment.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

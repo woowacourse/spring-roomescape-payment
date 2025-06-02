@@ -15,6 +15,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import roomescape.business.dto.PaymentApproveDto;
 import roomescape.exception.PaymentApproveException;
+import roomescape.infrastructure.payment.config.ClientConfig;
 
 @RestClientTest(value = {ClientConfig.class, TossPaymentClient.class})
 class TossPaymentClientTest {
