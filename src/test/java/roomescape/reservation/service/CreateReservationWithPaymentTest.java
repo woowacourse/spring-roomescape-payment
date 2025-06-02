@@ -21,8 +21,8 @@ import roomescape.infrastructure.dto.response.ConfirmPaymentResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.service.dto.request.ReservationWithPaymentRequest;
-import roomescape.reservation.service.dto.response.ReservationResponse;
 import roomescape.reservation.service.dto.response.ReservationTimeResponse;
+import roomescape.reservation.service.dto.response.ReservationWithPaymentResponse;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.service.dto.response.ThemeResponse;
 
@@ -77,7 +77,7 @@ public class CreateReservationWithPaymentTest {
         );
 
         // when
-        ReservationResponse result = reservationService.createWithPayment(reservationWithPaymentRequest, LoginMember.of(member));
+        ReservationWithPaymentResponse result = reservationService.createWithPendingPayment(reservationWithPaymentRequest, LoginMember.of(member));
 
         // then
         assertSoftly(softly -> {

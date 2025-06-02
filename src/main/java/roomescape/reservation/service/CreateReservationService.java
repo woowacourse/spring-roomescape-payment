@@ -8,8 +8,8 @@ import roomescape.common.exception.ConflictException;
 import roomescape.common.exception.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.payment.service.TossPaymentService;
-import roomescape.payment.service.dto.ConfirmPaymentRequest;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.repository.ReservationRepository;
@@ -17,6 +17,7 @@ import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.reservation.service.dto.request.ReservationCreateRequest;
 import roomescape.reservation.service.dto.request.ReservationWithPaymentRequest;
 import roomescape.reservation.service.dto.response.ReservationResponse;
+import roomescape.reservation.service.dto.response.ReservationWithPaymentResponse;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
 
@@ -28,42 +29,48 @@ public class CreateReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
-    private final TossPaymentService tossPaymentService;
+    private final PaymentRepository paymentRepository;
 
     public CreateReservationService(
             ReservationRepository reservationRepository,
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
             MemberRepository memberRepository,
-            TossPaymentService tossPaymentService
+            PaymentRepository paymentRepository
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
-        this.tossPaymentService = tossPaymentService;
+        this.paymentRepository = paymentRepository;
     }
 
     @Transactional
-    public ReservationResponse createWithPayment(ReservationWithPaymentRequest request, LoginMember loginMember) {
+    public ReservationWithPaymentResponse createWithPendingPayment(
+            ReservationWithPaymentRequest request,
+            LoginMember loginMember
+    ) {
         ReservationCreateRequest reservationCreateRequest = ReservationCreateRequest.from(request, loginMember);
 
-        ReservationResponse reservationResponse = create(reservationCreateRequest);
-        tossPaymentService.postConfirmPayment(ConfirmPaymentRequest.from(request));
+        Reservation savedReservation = createReservation(reservationCreateRequest);
+        Payment savedPayment = paymentRepository.save(request.toPendingPayment(savedReservation));
 
-        return reservationResponse;
+        return ReservationWithPaymentResponse.from(savedReservation, savedPayment);
     }
 
     @Transactional
     public ReservationResponse create(final ReservationCreateRequest request) {
+        Reservation savedReservation = createReservation(request);
+        return ReservationResponse.from(savedReservation);
+    }
+
+    private Reservation createReservation(ReservationCreateRequest request) {
         Reservation reservation = convertRequestToReservation(request);
 
         validateDuplicated(reservation);
         validateReservationDateTime(reservation);
 
-        Reservation savedReservation = reservationRepository.save(reservation);
-
-        return ReservationResponse.from(savedReservation);
+        return reservationRepository.save(reservation);
     }
 
     private void validateDuplicated(Reservation reservation) {

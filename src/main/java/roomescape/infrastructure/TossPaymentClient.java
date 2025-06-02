@@ -39,15 +39,35 @@ public class TossPaymentClient {
                 .toEntity(ConfirmPaymentResponse.class);
     }
 
-    private void handlePaymentResponse(ConfirmPaymentResponse response) {
-        if (response.failure() == null) {
-            return ;
+    public void validateResponse(ResponseEntity<ConfirmPaymentResponse> response) {
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return;
         }
-        PaymentFailure failure = response.failure();
-        if (IGNORE_CODES.contains(failure.code())) {
-            // TODO: failure.message() Logging
-            throw new CustomException(ErrorCode.SERVER_ERROR);
+
+        PaymentFailure failure = response.getBody().failure();
+
+        if (failure == null || is5xxResponse(response)) {
+            throw new InternalServerErrorException();
         }
-        throw new BadRequestException(failure.message());
+
+        if (is4xxResponse(response)) {
+            throw new BadRequestException(failure.message());
+        }
+    }
+
+    private boolean is4xxResponse(ResponseEntity<ConfirmPaymentResponse> response) {
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return false;
+        }
+        PaymentFailure failure = response.getBody().failure();
+        return !IGNORE_CODES.contains(failure.code());
+    }
+
+    private boolean is5xxResponse(ResponseEntity<ConfirmPaymentResponse> response) {
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return false;
+        }
+        PaymentFailure failure = response.getBody().failure();
+        return IGNORE_CODES.contains(failure.code());
     }
 }
