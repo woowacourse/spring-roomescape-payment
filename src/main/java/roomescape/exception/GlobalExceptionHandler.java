@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PaymentException.class)
     public ResponseEntity<Object> handlePaymentException(final PaymentException e) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(e.getStatus(), "유효성 검증에 실패했습니다.");
+        final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(e.getStatus(), e.getMessage());
 
         return ResponseEntity.status(e.getStatus())
                 .body(problemDetail);
