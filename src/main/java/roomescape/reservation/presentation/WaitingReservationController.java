@@ -14,7 +14,7 @@ import roomescape.common.security.dto.request.MemberInfo;
 import roomescape.member.domain.MemberRole;
 import roomescape.reservation.application.WaitingReservationApplicationService;
 import roomescape.reservation.application.WaitingReservationCreateRequest;
-import roomescape.reservation.presentation.dto.request.ConfirmedReservationCreateWebRequest;
+import roomescape.reservation.presentation.dto.request.WaitingReservationCreateWebRequest;
 import roomescape.reservation.presentation.dto.response.WaitingWebResponse;
 import roomescape.reservationslot.presentation.dto.response.ReservationResponse;
 
@@ -31,7 +31,7 @@ public class WaitingReservationController {
     @RequireRole(MemberRole.REGULAR)
     @PostMapping("/waiting-reservations")
     public ResponseEntity<ReservationResponse> create(
-            @RequestBody ConfirmedReservationCreateWebRequest request,
+            @RequestBody WaitingReservationCreateWebRequest request,
             MemberInfo memberInfo
     ) {
         ReservationResponse reservationResponse = waitingReservationApplicationService.create(
