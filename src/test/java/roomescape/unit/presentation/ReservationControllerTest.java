@@ -26,9 +26,8 @@ import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationTimeResponse;
 import roomescape.dto.response.ReservationWithStatusResponse;
 import roomescape.infrastructure.JwtTokenProvider;
-import roomescape.infrastructure.payment.PaymentClient;
+import roomescape.presentation.PaymentClientController;
 import roomescape.presentation.ReservationController;
-import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 
 @WebMvcTest(value = {ReservationController.class, AuthorizationExtractor.class})
@@ -41,10 +40,7 @@ class ReservationControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private PaymentClient paymentClient;
-
-    @MockitoBean
-    private PaymentService paymentService;
+    private PaymentClientController paymentClientController;
 
     @MockitoBean
     private ReservationService reservationService;
@@ -60,7 +56,7 @@ class ReservationControllerTest {
         ReservationResponse response = new ReservationResponse(1L, "memberName1", LocalDate.of(2025, 1, 1),
                 new ReservationTimeResponse(1L, LocalTime.of(9, 0)), "themeName1");
         PaymentInfo paymentInfo = new PaymentInfo("1", 1000);
-        given(paymentService.createPaymentInfo(any())).willReturn(paymentInfo);
+        given(paymentClientController.postPaymentInfo(any())).willReturn(paymentInfo);
         given(reservationService.createReservationForMember(1L, request.timeId(), request.themeId(), request.date(),
                 paymentInfo)).willReturn(
                 response);

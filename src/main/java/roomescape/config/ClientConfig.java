@@ -15,10 +15,13 @@ public class ClientConfig {
     private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:";
 
     @Bean
-    public RestClient createPaymentClient() {
+    public RestClient paymentClient() {
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
         factory.setConnectTimeout(CONNECT_TIMEOUT);
         factory.setReadTimeout(READ_TIMEOUT);
+
+        System.out.println(baseUrl);
+        System.out.println(secretKey);
 
         return RestClient.builder()
                 .baseUrl(BASE_URL)

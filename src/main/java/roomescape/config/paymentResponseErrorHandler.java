@@ -1,4 +1,4 @@
-package roomescape.infrastructure.payment;
+package roomescape.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

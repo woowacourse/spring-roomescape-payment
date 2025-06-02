@@ -31,7 +31,7 @@ import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ThemeRepository;
 import roomescape.domain.repository.WaitingRepository;
 import roomescape.infrastructure.JwtTokenProvider;
-import roomescape.infrastructure.payment.PaymentClient;
+import roomescape.presentation.PaymentClientController;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -59,7 +59,7 @@ public class ReservationApiTest {
     private JwtTokenProvider tokenProvider;
 
     @MockitoBean
-    private PaymentClient paymentClient;
+    private PaymentClientController paymentClientController;
 
     @BeforeEach
     void setUpRestAssuredPort() {
@@ -83,7 +83,7 @@ public class ReservationApiTest {
         reservation.put("amount", 1000);
 
         PaymentInfo paymentInfo = new PaymentInfo("1", 1000);
-        BDDMockito.given(paymentClient.postPaymentInfo(any())).willReturn(paymentInfo);
+        BDDMockito.given(paymentClientController.postPaymentInfo(any())).willReturn(paymentInfo);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
