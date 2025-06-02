@@ -43,6 +43,20 @@ public class PaymentConfirmTest {
         ).isInstanceOf(PaymentConfirmServerException.class);
     }
 
+    @DisplayName("결제 예외 핸들링 테스트 - 유효하지 않은 Secret Key인 걍우")
+    @Test
+    void paymentExceptionTest2() {
+        RestClient restClient = tossPaymentClient.buildRestClient();
+        assertThatThrownBy(
+                () -> restClient.post()
+                        .uri("/v1/payments/confirm")
+                        .header("Authorization", "Basic " +
+                                Base64.getEncoder().encodeToString("testFail_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:".getBytes()))
+                        .retrieve()
+                        .toBodilessEntity()
+        ).isInstanceOf(PaymentConfirmServerException.class);
+    }
+
     @DisplayName("paymentkey를 클라이언트에서 획득하지 않은 값으로 요청 테스트")
     @Test
     void invalidPaymentKeyExceptionTest() {
