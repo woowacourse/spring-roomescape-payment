@@ -17,12 +17,12 @@ import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import roomescape.theme.domain.ReservationTheme;
 import roomescape.global.AuthInterceptor;
-import roomescape.theme.service.ReservationThemeService;
+import roomescape.theme.controller.ReservationThemeController;
+import roomescape.theme.domain.ReservationTheme;
 import roomescape.theme.dto.ReservationThemeRequest;
 import roomescape.theme.dto.ReservationThemeResponse;
-import roomescape.theme.controller.ReservationThemeController;
+import roomescape.theme.service.ReservationThemeService;
 
 @WebMvcTest(ReservationThemeController.class)
 class ReservationThemeControllerTest {

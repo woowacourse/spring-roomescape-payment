@@ -17,10 +17,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.global.AuthInterceptor;
-import roomescape.waiting.service.ReservationWaitingService;
+import roomescape.waiting.controller.ReservationWaitingController;
 import roomescape.waiting.dto.ReservationWaitingRequest;
 import roomescape.waiting.dto.ReservationWaitingResponse;
-import roomescape.waiting.controller.ReservationWaitingController;
+import roomescape.waiting.service.ReservationWaitingService;
 
 @WebMvcTest(value = ReservationWaitingController.class)
 class ReservationWaitingControllerTest {

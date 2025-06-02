@@ -22,11 +22,11 @@ public class PaymentService {
         TossPaymentRequest request = new TossPaymentRequest(orderId, paymentKey, amount);
         TossPaymentResponse response = paymentClient.requestPaymentApprove(request);
         Payment payment = new Payment(
-                        reservation,
-                        response.orderId(),
-                        response.paymentKey(),
-                        response.totalAmount(),
-                        response.type());
+                reservation,
+                response.orderId(),
+                response.paymentKey(),
+                response.totalAmount(),
+                response.type());
         paymentRepository.save(payment);
     }
 }

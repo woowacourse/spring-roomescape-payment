@@ -11,12 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import roomescape.member.domain.Member;
-import roomescape.theme.domain.ReservationTheme;
-import roomescape.time.domain.ReservationTime;
-import roomescape.waiting.domain.ReservationWaiting;
 import roomescape.member.repository.MemberJpaRepository;
+import roomescape.theme.domain.ReservationTheme;
 import roomescape.theme.repository.ReservationThemeJpaRepository;
+import roomescape.time.domain.ReservationTime;
 import roomescape.time.repository.ReservationTimeJpaRepository;
+import roomescape.waiting.domain.ReservationWaiting;
 import roomescape.waiting.repository.ReservationWaitingRepository;
 import roomescape.waiting.repository.ReservationWaitingRepositoryImpl;
 

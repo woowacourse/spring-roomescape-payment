@@ -3,7 +3,6 @@ package roomescape.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -19,7 +18,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import roomescape.member.dto.MemberRegisterRequest;
 import roomescape.member.service.MemberService;
-import roomescape.payment.PaymentClient;
 import roomescape.reservation.dto.ReservationPaymentRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
@@ -150,10 +148,10 @@ class ReservationServiceTest {
         // when, then
         assertAll(
                 () -> assertThatThrownBy(
-                        () -> reservationService.addReservation(memberId,reservationRequest1)
+                        () -> reservationService.addReservation(memberId, reservationRequest1)
                 ).isInstanceOf(IllegalArgumentException.class),
                 () -> assertThatThrownBy(
-                        () -> reservationService.addReservation(memberId,reservationRequest2)
+                        () -> reservationService.addReservation(memberId, reservationRequest2)
                 ).isInstanceOf(IllegalArgumentException.class)
         );
     }
