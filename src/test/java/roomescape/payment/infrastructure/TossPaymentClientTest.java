@@ -39,7 +39,6 @@ class TossPaymentClientTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
     private TossPaymentClient tossPaymentClient;
 
     @BeforeEach
@@ -101,6 +100,48 @@ class TossPaymentClientTest {
     }
 
     @Test
+    void 이미_처리된_결제는_ALREDY_PROCESSED_PAYMENT_에러를_던진다() {
+        String errorJson = """
+                {
+                  "code": "ALREADY_PROCESSED_PAYMENT",
+                  "message": "이미 처리된 결제 입니다."
+                }
+                """;
+
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(400)
+                .setBody(errorJson)
+                .addHeader("Content-Type", "application/json"));
+
+        PaymentRequest request = new DefaultPaymentRequest("paymentKey", "orderId", BigDecimal.valueOf(1000));
+
+        assertThatThrownBy(() -> tossPaymentClient.requestPayment(request))
+                .isInstanceOf(TossPaymentException.class)
+                .hasMessageContaining("이미 처리된 결제");
+    }
+
+    @Test
+    void 토스_장애시_PROVIDER_ERROR_에러를_던진다() {
+        String errorJson = """
+                {
+                  "code": "PROVIDER_ERROR",
+                  "message": "일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+                }
+                """;
+
+        mockWebServer.enqueue(new MockResponse()
+                .setResponseCode(400)
+                .setBody(errorJson)
+                .addHeader("Content-Type", "application/json"));
+
+        PaymentRequest request = new DefaultPaymentRequest("paymentKey", "orderId", BigDecimal.valueOf(1000));
+
+        assertThatThrownBy(() -> tossPaymentClient.requestPayment(request))
+                .isInstanceOf(TossPaymentException.class)
+                .hasMessageContaining("일시적인 오류");
+    }
+
+    @Test
     void 응답시간이_타임아웃을_초과하면_예외를_던짐() {
         // given: 5초 뒤에 응답 오게 설정
         mockWebServer.enqueue(new MockResponse()
@@ -122,4 +163,6 @@ class TossPaymentClientTest {
                 .hasCauseInstanceOf(SocketTimeoutException.class)
                 .isInstanceOf(RestClientException.class);
     }
+
+
 }
