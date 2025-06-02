@@ -1,5 +1,6 @@
 package roomescape.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -7,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
+import roomescape.payment.PaymentClient;
 import roomescape.payment.toss.PaymentErrorHandler;
 import roomescape.payment.toss.TossPaymentRestClient;
 import roomescape.util.Base64Utils;
@@ -20,21 +22,26 @@ public class TossPaymentRestClientConfig {
 
     @Bean
     public RestClient tossRestClient(
-            RestClient.Builder builder,
+            PaymentErrorHandler paymentErrorHandler,
             @Value("${toss.base-url}") String baseUrl,
             @Value("${toss.secret-key}") String secretKey
     ) {
-        return builder
+        return RestClient.builder()
                 .baseUrl(baseUrl)
                 .defaultHeader("Authorization", "Basic " + Base64Utils.encode(secretKey))
                 .defaultHeader("Content-Type", "application/json")
-                .defaultStatusHandler(new PaymentErrorHandler())
+                .defaultStatusHandler(paymentErrorHandler)
                 .requestFactory(simpleClientHttpRequestFactory())
                 .build();
     }
 
     @Bean
-    public TossPaymentRestClient tossPaymentRestClientWrapper(RestClient tossPaymentRestClient) {
+    public PaymentErrorHandler paymentErrorHandler(ObjectMapper objectMapper) {
+        return new PaymentErrorHandler(objectMapper);
+    }
+
+    @Bean
+    public PaymentClient tossPaymentRestClientWrapper(RestClient tossPaymentRestClient) {
         return new TossPaymentRestClient(tossPaymentRestClient);
     }
 
@@ -44,5 +51,4 @@ public class TossPaymentRestClientConfig {
         requestFactory.setReadTimeout(Duration.ofSeconds(RESPONSE_TIMEOUT_SECOND));
         return requestFactory;
     }
-
 }
