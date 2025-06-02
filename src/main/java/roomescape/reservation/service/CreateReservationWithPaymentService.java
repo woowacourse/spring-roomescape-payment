@@ -32,18 +32,18 @@ public class CreateReservationWithPaymentService {
     }
 
     public ReservationWithPaymentResponse create(ReservationWithPaymentRequest request, LoginMember loginMember) {
-        ReservationWithPaymentResponse reservationResponse = createReservationService.createWithPendingPayment(request, loginMember);
-        ResponseEntity<ConfirmPaymentResponse> response = tossPaymentClient.postConfirmPayment(ConfirmPaymentRequest.from(request));
+        ReservationWithPaymentResponse reservationWithPaymentResponse = createReservationService.createWithPendingPayment(request, loginMember);
+        ResponseEntity<ConfirmPaymentResponse> confirmPaymentResponse = tossPaymentClient.postConfirmPayment(ConfirmPaymentRequest.from(request));
 
-        if (response.getStatusCode().is2xxSuccessful()) {
-            paymentService.completePayment(reservationResponse.paymentId());
-            return reservationResponse;
+        if (confirmPaymentResponse.getStatusCode().is2xxSuccessful()) {
+            paymentService.completePayment(reservationWithPaymentResponse.paymentId());
+            return reservationWithPaymentResponse;
         }
 
-        deleteReservationService.delete(reservationResponse.id(), loginMember);
-        paymentService.failedPayment(reservationResponse.paymentId());
+        deleteReservationService.delete(reservationWithPaymentResponse.id(), loginMember);
+        paymentService.failedPayment(reservationWithPaymentResponse.paymentId());
 
-        tossPaymentClient.validateResponse(response);
+        tossPaymentClient.validateResponse(confirmPaymentResponse);
         throw new InternalServerErrorException();
     }
 }
