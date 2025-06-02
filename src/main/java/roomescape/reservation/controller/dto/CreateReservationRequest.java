@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import roomescape.reservation.domain.Amount;
 import roomescape.reservation.domain.OrderId;
-import roomescape.reservation.domain.PaymentInfo;
+import roomescape.reservation.external.toss.TossPaymentResponse;
 import roomescape.reservation.domain.PaymentKey;
 
 public record CreateReservationRequest(
@@ -16,11 +16,7 @@ public record CreateReservationRequest(
         @NotNull Long amount,
         @NotBlank String paymentKey
 ) {
-    public PaymentInfo toPaymentInfo() {
-        return new PaymentInfo(
-                new OrderId(orderId),
-                new Amount(amount),
-                new PaymentKey(paymentKey)
-        );
+    public TossPaymentResponse toPaymentResponse() {
+        return new TossPaymentResponse(orderId, amount, paymentKey);
     }
 }

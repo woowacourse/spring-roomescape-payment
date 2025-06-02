@@ -10,13 +10,12 @@ import java.util.UUID;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import roomescape.common.RestAssuredTestBase;
-import roomescape.reservation.domain.PaymentInfo;
+import roomescape.reservation.external.toss.TossPaymentResponse;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @SuppressWarnings("NonAsciiCharacters")
@@ -51,7 +50,7 @@ class LoginPageTest extends RestAssuredTestBase {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(requestBody)
                     .retrieve()
-                    .body(PaymentInfo.class);
+                    .body(TossPaymentResponse.class);
             System.out.println("결제 확인 응답: " + response);
         } catch (RestClientResponseException e) {
             System.err.println("요청 실패: " + e.getResponseBodyAsString());
@@ -84,7 +83,7 @@ class LoginPageTest extends RestAssuredTestBase {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(requestBody)
                     .retrieve()
-                    .body(PaymentInfo.class);
+                    .body(TossPaymentResponse.class);
             System.out.println("결제 확인 응답: " + response);
         } catch (RestClientResponseException e) {
             System.err.println("요청 실패: " + e.getResponseBodyAsString());

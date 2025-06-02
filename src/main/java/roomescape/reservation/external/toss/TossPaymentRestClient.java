@@ -1,5 +1,6 @@
-package roomescape.global.api;
+package roomescape.reservation.external.toss;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -7,46 +8,39 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import roomescape.global.converter.CustomRequestMapper;
-import roomescape.global.converter.CustomResponseMapper;
 import roomescape.global.exception.ErrorCode;
 import roomescape.global.exception.ExternalApiException;
 
 @Component
-public class CustomRestClient {
-    private final CustomResponseMapper customResponseMapper;
+public class TossPaymentRestClient {
+
+    private final String confirmUri;
     private final CustomRequestMapper customRequestMapper;
     private final RestClient restClient;
 
-    public CustomRestClient(
-            final CustomResponseMapper customResponseMapper,
+    public TossPaymentRestClient(
+            @Value("${api.toss.payment.uri.confirm}") String confirmUri,
             final CustomRequestMapper customRequestMapper,
             final RestClient restClient
     ) {
-        this.customResponseMapper = customResponseMapper;
+        this.confirmUri = confirmUri;
         this.customRequestMapper = customRequestMapper;
         this.restClient = restClient;
     }
 
-    public <T> T post(
-            CustomRequestUri customRequestUri,
-            AuthToken authToken,
-            Object body,
-            Class<T> responseType,
-            Class errorResponseType
-            ) {
+    public TossPaymentResponse post(TossAuthToken authToken, Object body) {
         try {
             return restClient.post()
-                    .uri(customRequestUri.getUriPath())
+                    .uri(confirmUri)
                     .header(HttpHeaders.AUTHORIZATION, authToken.generateToken())
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(customRequestMapper.convertMap(body))
                     .retrieve()
-                    .body(responseType);
+                    .body(TossPaymentResponse.class);
         } catch (RestClientResponseException e) {
             String responseBody = e.getResponseBodyAsString();
             throw new ExternalApiException(new ErrorCode(
-                    HttpStatus.valueOf(e.getStatusCode().value()),
-                    customResponseMapper.convertJsonToErrorResponse(responseBody, errorResponseType).getMessage()
+                    HttpStatus.valueOf(e.getStatusCode().value()), responseBody
             ));
         }
     }
