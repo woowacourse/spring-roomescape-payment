@@ -6,7 +6,7 @@ const createCellFields = ['', createInput()];
 function createBody(inputs) {
     return {
         startAt: inputs[0].value,
-        alreadyBooked : inputs[1].value
+        alreadyBooked: inputs[1].value
     };
 }
 
@@ -121,7 +121,8 @@ function requestRead() {
         .then(response => {
             if (response.status === 200) return response.json();
             throw new Error('Read failed');
-        });
+        })
+        .then(json => json.data);
 }
 
 function requestDelete(id) {

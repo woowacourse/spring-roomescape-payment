@@ -1,6 +1,5 @@
 package roomescape.reservation.controller;
 
-import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,6 +13,7 @@ import roomescape.global.auth.dto.UserInfo;
 import roomescape.member.domain.MemberRole;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
+import roomescape.reservation.dto.response.ReservationsResponse;
 import roomescape.reservation.service.ReservationFacadeService;
 import roomescape.reservation.service.WaitingService;
 
@@ -30,9 +30,9 @@ public class WaitingController {
     }
 
     @GetMapping("/waiting")
-    public ResponseEntity<List<ReservationResponse>> findWaitings(
+    public ResponseEntity<ReservationsResponse> findWaitings(
     ) {
-        return ResponseEntity.ok(waitingService.findWaitings());
+        return ResponseEntity.ok(ReservationsResponse.of(waitingService.findWaitings()));
     }
 
     @RequireRole(MemberRole.USER)

@@ -17,6 +17,7 @@ import roomescape.member.domain.MemberRole;
 import roomescape.reservation.dto.request.AdminReservationRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
+import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationsResponse;
 import roomescape.reservation.service.ReservationFacadeService;
@@ -41,7 +42,8 @@ public class ReservationController {
             @RequestParam(required = false) LocalDate dateFrom,
             @RequestParam(required = false) LocalDate dateTo
     ) {
-        List<ReservationResponse> reservations = reservationService.findReservations(themeId, memberId, dateFrom, dateTo);
+        List<ReservationResponse> reservations = reservationService.findReservations(themeId, memberId, dateFrom,
+                dateTo);
         return ResponseEntity.ok(ReservationsResponse.of(reservations));
     }
 
@@ -76,9 +78,8 @@ public class ReservationController {
 
     @RequireRole(MemberRole.USER)
     @GetMapping("/reservations-mine")
-    public ResponseEntity<List<MyReservationResponse>> findMyReservations(UserInfo userInfo) {
+    public ResponseEntity<MyReservationsResponse> findMyReservations(UserInfo userInfo) {
         List<MyReservationResponse> myReservations = reservationFacadeService.findMyReservations(userInfo);
-        return ResponseEntity.ok().body(myReservations);
+        return ResponseEntity.ok().body(MyReservationsResponse.of(myReservations));
     }
-
 }

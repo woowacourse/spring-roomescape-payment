@@ -14,6 +14,7 @@ import roomescape.global.auth.annotation.RequireRole;
 import roomescape.member.domain.MemberRole;
 import roomescape.theme.dto.request.ThemeCreateRequest;
 import roomescape.theme.dto.response.ThemeResponse;
+import roomescape.theme.dto.response.ThemesResponse;
 import roomescape.theme.service.ThemeService;
 
 @RestController
@@ -27,8 +28,8 @@ public class ThemeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ThemeResponse>> getThemes() {
-        return ResponseEntity.ok(themeService.getThemes());
+    public ResponseEntity<ThemesResponse> getThemes() {
+        return ResponseEntity.ok(ThemesResponse.of(themeService.getThemes()));
     }
 
     @GetMapping("/popular")

@@ -9,7 +9,6 @@ import static roomescape.e2e.fixture.TestFixtureE2e.loginAndGetAuthToken;
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,7 +24,7 @@ import roomescape.global.auth.dto.LoginRequest;
 import roomescape.member.dto.request.SignupRequest;
 import roomescape.payment.dto.response.PaymentResponse;
 import roomescape.payment.infrastructure.TossApiClient;
-import roomescape.reservation.dto.response.MyReservationResponse;
+import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.fixture.TestFixture;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -188,7 +187,7 @@ public class UserTest {
         TestFixtureE2e.createTheme("추리");
         TestFixtureE2e.createUserReservation(1L);
 
-        List<MyReservationResponse> responses = RestAssured.given().log().all()
+        MyReservationsResponse responses = RestAssured.given().log().all()
                 .cookie(TOKEN, authToken)
                 .when().get("/reservations-mine")
                 .then().log().all()
@@ -197,7 +196,7 @@ public class UserTest {
                 .as(new TypeRef<>() {
                 });
 
-        assertThat(responses.size()).isEqualTo(1);
+        assertThat(responses.data().size()).isEqualTo(1);
     }
 
     @Test
@@ -231,7 +230,7 @@ public class UserTest {
                 .when().get("/reservations-mine")
                 .then().log().all()
                 .statusCode(200)
-                .body("size()", is(2));
+                .body("data.size()", is(2));
     }
 
     @Test
@@ -246,7 +245,7 @@ public class UserTest {
         Long waitingId = RestAssured.given().log().all()
                 .cookie(TOKEN, authToken)
                 .when().get("/waiting")
-                .then().extract().jsonPath().getLong("[0].id");
+                .then().extract().jsonPath().getLong("data[0].id");
 
         RestAssured.given().log().all()
                 .cookie(TOKEN, authToken)
@@ -258,7 +257,7 @@ public class UserTest {
                 .when().get("/waiting")
                 .then().log().all()
                 .statusCode(200)
-                .body("size()", is(0));
+                .body("data.size()", is(0));
     }
 
     @Test

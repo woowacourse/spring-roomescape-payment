@@ -28,44 +28,46 @@
 HTTP/1.1 200
 Content-Type: application/json
 
-[
-  {
-    "id": 1,
-    "member": {
+{
+  "data": [
+    {
       "id": 1,
-      "name": "Alice"
+      "member": {
+        "id": 1,
+        "name": "Alice"
+      },
+      "date": "2025-05-05",
+      "time": {
+        "id": 1,
+        "startAt": "08:00:00"
+      },
+      "theme": {
+        "id": 12,
+        "name": "논리",
+        "description": "퍼즐 마스터",
+        "thumbnail": "image/thumbnail.png"
+      }
     },
-    "date": "2025-05-05",
-    "time": {
-      "id": 1,
-      "startAt": "08:00:00"
-    },
-    "theme": {
-      "id": 12,
-      "name": "논리",
-      "description": "퍼즐 마스터",
-      "thumbnail": "image/thumbnail.png"
-    }
-  },
-  {
-    "id": 2,
-    "member": {
+    {
       "id": 2,
-      "name": "Bob"
-    },
-    "date": "2025-05-05",
-    "time": {
-      "id": 2,
-      "startAt": "12:00:00"
-    },
-    "theme": {
-      "id": 12,
-      "name": "논리",
-      "description": "퍼즐 마스터",
-      "thumbnail": "image/thumbnail.png"
+      "member": {
+        "id": 2,
+        "name": "Bob"
+      },
+      "date": "2025-05-05",
+      "time": {
+        "id": 2,
+        "startAt": "12:00:00"
+      },
+      "theme": {
+        "id": 12,
+        "name": "논리",
+        "description": "퍼즐 마스터",
+        "thumbnail": "image/thumbnail.png"
+      }
     }
-  }
-]
+  ]
+}
 ```
 
 ## 예약 추가 (사용자)
@@ -232,12 +234,14 @@ GET /times HTTP/1.1
 HTTP/1.1 200
 Content-Type: application/json
 
-[
-  {
-    "id": 1,
-    "startAt": "10:00"
-  }
-]
+{
+  "data": [
+    {
+      "id": 1,
+      "startAt": "10:00"
+    }
+  ]
+}
 ```
 
 ## 시간 삭제
@@ -276,18 +280,20 @@ GET /times/available?date={date}&themeId={themeId} HTTP/1.1
 HTTP/1.1 200
 Content-Type: application/json
 
-[
-  {
-    "timeId": 1,
-    "startAt": "10:00",
-    "alreadyBooked": "true"
-  },
-  {
-    "timeId": 2,
-    "startAt": "11:00",
-    "alreadyBooked": "false"
-  }
-]
+{
+  "data": [
+    {
+      "timeId": 1,
+      "startAt": "10:00",
+      "alreadyBooked": "true"
+    },
+    {
+      "timeId": 2,
+      "startAt": "11:00",
+      "alreadyBooked": "false"
+    }
+  ]
+}
 ```
 
 ## 예약 조건별 필터링
@@ -309,44 +315,46 @@ GET /reservations?themeId={themeId}&memberId={memberId}&dateFrom={dateFrom}&date
 HTTP/1.1 200
 Content-Type: application/json
 
-[
-  {
-    "id": 1,
-    "member": {
-      "id": 2,
-      "name": "Alice"
-    },
-    "date": "2025-05-11",
-    "time": {
+{
+  "data": [
+    {
       "id": 1,
-      "startAt": "08:00:00"
+      "member": {
+        "id": 2,
+        "name": "Alice"
+      },
+      "date": "2025-05-11",
+      "time": {
+        "id": 1,
+        "startAt": "08:00:00"
+      },
+      "theme": {
+        "id": 12,
+        "name": "논리",
+        "description": "퍼즐 마스터",
+        "thumbnail": "image/thumbnail.png"
+      }
     },
-    "theme": {
-      "id": 12,
-      "name": "논리",
-      "description": "퍼즐 마스터",
-      "thumbnail": "image/thumbnail.png"
-    }
-  },
-  {
-    "id": 2,
-    "member": {
-      "id": 3,
-      "name": "Bob"
-    },
-    "date": "2025-05-11",
-    "time": {
+    {
       "id": 2,
-      "startAt": "12:00:00"
-    },
-    "theme": {
-      "id": 12,
-      "name": "논리",
-      "description": "퍼즐 마스터",
-      "thumbnail": "image/thumbnail.png"
+      "member": {
+        "id": 3,
+        "name": "Bob"
+      },
+      "date": "2025-05-11",
+      "time": {
+        "id": 2,
+        "startAt": "12:00:00"
+      },
+      "theme": {
+        "id": 12,
+        "name": "논리",
+        "description": "퍼즐 마스터",
+        "thumbnail": "image/thumbnail.png"
+      }
     }
-  }
-]
+  ]
+}
 ```
 
 ## 테마 조회
@@ -367,14 +375,16 @@ GET /themes HTTP/1.1
 HTTP/1.1 200
 Content-Type: application/json
 
-[
-  {
-    "id": 1,
-    "name": "레벨2 탈출",
-    "description": "우테코 레벨2를 탈출하는 내용입니다.",
-    "thumbnail": "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"
-  }
-]
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "레벨2 탈출",
+      "description": "우테코 레벨2를 탈출하는 내용입니다.",
+      "thumbnail": "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"
+    }
+  ]
+}
 ```
 
 ## 테마 조회
@@ -395,68 +405,70 @@ GET /themes/popular HTTP/1.1
 HTTP/1.1 200
 Content-Type: application/json
 
-[
-  {
-    "id": 1,
-    "name": "추리",
-    "description": "셜록 with Danny",
-    "thumbnail": "image/thumbnail.png"
-  },
-  {
-    "id": 2,
-    "name": "공포",
-    "description": "어둠 속의 비명",
-    "thumbnail": "image/thumbnail.png"
-  },
-  {
-    "id": 3,
-    "name": "모험",
-    "description": "잃어버린 도시",
-    "thumbnail": "image/thumbnail.png"
-  },
-  {
-    "id": 4,
-    "name": "SF",
-    "description": "우주 탈출 미션",
-    "thumbnail": "image/thumbnail.png"
-  },
-  {
-    "id": 5,
-    "name": "감성",
-    "description": "시간을 걷는 집",
-    "thumbnail": "image/thumbnail.png"
-  },
-  {
-    "id": 12,
-    "name": "논리",
-    "description": "퍼즐 마스터",
-    "thumbnail": "image/thumbnail.png"
-  },
-  {
-    "id": 11,
-    "name": "로맨스",
-    "description": "잃어버린 편지",
-    "thumbnail": "image/thumbnail.png"
-  },
-  {
-    "id": 8,
-    "name": "범죄",
-    "description": "은행 강도 사건",
-    "thumbnail": "image/thumbnail.png"
-  },
-  {
-    "id": 9,
-    "name": "스릴러",
-    "description": "잠입 작전",
-    "thumbnail": "image/thumbnail.png"
-  },
-  {
-    "id": 7,
-    "name": "역사",
-    "description": "고려 왕실의 비밀",
-    "thumbnail": "image/thumbnail.png"
-  }
-]
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "추리",
+      "description": "셜록 with Danny",
+      "thumbnail": "image/thumbnail.png"
+    },
+    {
+      "id": 2,
+      "name": "공포",
+      "description": "어둠 속의 비명",
+      "thumbnail": "image/thumbnail.png"
+    },
+    {
+      "id": 3,
+      "name": "모험",
+      "description": "잃어버린 도시",
+      "thumbnail": "image/thumbnail.png"
+    },
+    {
+      "id": 4,
+      "name": "SF",
+      "description": "우주 탈출 미션",
+      "thumbnail": "image/thumbnail.png"
+    },
+    {
+      "id": 5,
+      "name": "감성",
+      "description": "시간을 걷는 집",
+      "thumbnail": "image/thumbnail.png"
+    },
+    {
+      "id": 12,
+      "name": "논리",
+      "description": "퍼즐 마스터",
+      "thumbnail": "image/thumbnail.png"
+    },
+    {
+      "id": 11,
+      "name": "로맨스",
+      "description": "잃어버린 편지",
+      "thumbnail": "image/thumbnail.png"
+    },
+    {
+      "id": 8,
+      "name": "범죄",
+      "description": "은행 강도 사건",
+      "thumbnail": "image/thumbnail.png"
+    },
+    {
+      "id": 9,
+      "name": "스릴러",
+      "description": "잠입 작전",
+      "thumbnail": "image/thumbnail.png"
+    },
+    {
+      "id": 7,
+      "name": "역사",
+      "description": "고려 왕실의 비밀",
+      "thumbnail": "image/thumbnail.png"
+    }
+  ]
+}
 ```
 
 ## 테마 추가
@@ -627,16 +639,18 @@ Date: Sun, 03 Mar 2024 19: 16: 56 GMT
 Keep-Alive: timeout=60
 Transfer-Encoding: chunked
 
-[
-  {
-    "id": 2,
-    "name": "mint"
-  },
-  {
-    "id": 3,
-    "name": "danny"
-  }
-]
+{
+  "data": [
+    {
+      "id": 2,
+      "name": "mint"
+    },
+    {
+      "id": 3,
+      "name": "danny"
+    }
+  ]
+}
 ```
 
 ## 예약 목록 조회 기능
@@ -655,36 +669,38 @@ host: localhost: 8080
 HTTP/1.1 200
 Content-Type: application/json
 
-[
-  {
-    "reservationId": 1,
-    "theme": "테마1",
-    "date": "2024-03-01",
-    "time": "10:00",
-    "reservedStatus": "예약"
-  },
-  {
-    "reservationId": 2,
-    "theme": "테마2",
-    "date": "2024-03-01",
-    "time": "12:00",
-    "reservedStatus": "예약"
-  },
-  {
-    "reservationId": 3,
-    "theme": "테마3",
-    "date": "2024-03-01",
-    "time": "14:00",
-    "reservedStatus": "예약"
-  },
-  {
-    "reservationId": 4,
-    "theme": "테마4",
-    "date": "2024-03-01",
-    "time": "16:00",
-    "reservedStatus": "1번째 예약대기"
-  }
-]
+{
+  "data": [
+    {
+      "reservationId": 1,
+      "theme": "테마1",
+      "date": "2024-03-01",
+      "time": "10:00",
+      "reservedStatus": "예약"
+    },
+    {
+      "reservationId": 2,
+      "theme": "테마2",
+      "date": "2024-03-01",
+      "time": "12:00",
+      "reservedStatus": "예약"
+    },
+    {
+      "reservationId": 3,
+      "theme": "테마3",
+      "date": "2024-03-01",
+      "time": "14:00",
+      "reservedStatus": "예약"
+    },
+    {
+      "reservationId": 4,
+      "theme": "테마4",
+      "date": "2024-03-01",
+      "time": "16:00",
+      "reservedStatus": "1번째 예약대기"
+    }
+  ]
+}
 ```
 
 ## 예약 대기 추가
@@ -751,22 +767,24 @@ host: localhost: 8080
 HTTP/1.1 200
 Content-Type: application/json
 
-[
-  {
-    "id": 1,
-    "theme": "테마1",
-    "date": "2024-03-01",
-    "time": "10:00",
-    "reservedStatus": "1번째 예약대기"
-  },
-  {
-    "id": 2,
-    "theme": "테마2",
-    "date": "2024-03-01",
-    "time": "12:00",
-    "reservedStatus": "2번째 예약대기"
-  }
-]
+{
+  "data": [
+    {
+      "id": 1,
+      "theme": "테마1",
+      "date": "2024-03-01",
+      "time": "10:00",
+      "reservedStatus": "1번째 예약대기"
+    },
+    {
+      "id": 2,
+      "theme": "테마2",
+      "date": "2024-03-01",
+      "time": "12:00",
+      "reservedStatus": "2번째 예약대기"
+    }
+  ]
+}
 ```
 
 ## 예외

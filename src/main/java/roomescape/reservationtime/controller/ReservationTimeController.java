@@ -17,6 +17,7 @@ import roomescape.member.domain.MemberRole;
 import roomescape.reservationtime.dto.request.ReservationTimeCreateRequest;
 import roomescape.reservationtime.dto.response.AvailableReservationTimeResponse;
 import roomescape.reservationtime.dto.response.ReservationTimeResponse;
+import roomescape.reservationtime.dto.response.ReservationTimesResponse;
 import roomescape.reservationtime.service.ReservationTimeService;
 
 @RestController
@@ -30,8 +31,8 @@ public class ReservationTimeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ReservationTimeResponse>> getReservationTimes() {
-        return ResponseEntity.ok(reservationTimeService.getReservationTimes());
+    public ResponseEntity<ReservationTimesResponse> getReservationTimes() {
+        return ResponseEntity.ok(ReservationTimesResponse.of(reservationTimeService.getReservationTimes()));
     }
 
     @GetMapping("/available")

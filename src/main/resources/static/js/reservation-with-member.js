@@ -161,10 +161,7 @@ function saveRow(event) {
     const timeSelect = row.querySelector('#time-select');
 
     const reservation = {
-        date: dateInput.value,
-        themeId: themeSelect.value,
-        timeId: timeSelect.value,
-        memberId: memberSelect.value,
+        date: dateInput.value, themeId: themeSelect.value, timeId: timeSelect.value, memberId: memberSelect.value,
     };
 
     requestCreate(reservation)
@@ -198,8 +195,7 @@ function applyFilter(event) {
           요청 포맷에 맞게 설정
     */
     fetch(`/reservations?themeId=${themeId}&memberId=${memberId}&dateFrom=${dateFrom}&dateTo=${dateTo}`, { // 예약 검색 API 호출
-        method: 'GET',
-        headers: {
+        method: 'GET', headers: {
             'Content-Type': 'application/json'
         },
     }).then(response => {
@@ -211,9 +207,7 @@ function applyFilter(event) {
 
 function requestCreate(reservation) {
     const requestOptions = {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(reservation)
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(reservation)
     };
 
     return fetch(ADMIN_RESERVATION_API_ENDPOINT, requestOptions)
@@ -239,5 +233,6 @@ function requestRead(endpoint) {
         .then(response => {
             if (response.status === 200) return response.json();
             throw new Error('Read failed');
-        });
+        })
+        .then(json => json.data);
 }
