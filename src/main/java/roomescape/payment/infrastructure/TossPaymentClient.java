@@ -3,17 +3,19 @@ package roomescape.payment.infrastructure;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.exception.RequestPaymentErrorHandler;
 import roomescape.payment.domain.PaymentClient;
-import roomescape.reservation.dto.PaymentRequest;
+import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
+import roomescape.payment.exception.TossPaymentErrorHandler;
 
 public class TossPaymentClient implements PaymentClient {
 
     private final RestClient restClient;
+    private final TossPaymentErrorHandler errorHandler;
 
-    public TossPaymentClient(RestClient restClient) {
+    public TossPaymentClient(RestClient restClient, ObjectMapper objectMapper) {
         this.restClient = restClient;
+        this.errorHandler = new TossPaymentErrorHandler(objectMapper);
     }
 
     @Override
@@ -23,7 +25,7 @@ public class TossPaymentClient implements PaymentClient {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(paymentRequest)
                 .retrieve()
-                .onStatus(new RequestPaymentErrorHandler(new ObjectMapper()))
+                .onStatus(errorHandler)
                 .body(PaymentResponse.class);
     }
 }

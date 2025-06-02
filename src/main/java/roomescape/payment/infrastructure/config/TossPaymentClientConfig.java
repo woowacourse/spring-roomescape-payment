@@ -1,5 +1,6 @@
 package roomescape.payment.infrastructure.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
@@ -15,9 +16,12 @@ import roomescape.payment.infrastructure.TossPaymentClient;
 @Configuration
 public class TossPaymentClientConfig {
 
-    private static final String BASE_URL = "https://api.tosspayments.com/v1/payments";
     private static final String AUTH_TYPE_BASIC = "Basic";
-    private static final String DELIMITER = ":";
+    private static final String AUTH_DELIMITER = ":";
+    private static final String URL_DELIMITER = "/";
+
+    @Value("${payment.toss.base-url}")
+    private String baseUrl;
 
     @Value("${payment.toss.secret-key}")
     private String secretKey;
@@ -30,13 +34,13 @@ public class TossPaymentClientConfig {
 
     @Bean
     public TossPaymentClient tossPaymentClient() {
-        return new TossPaymentClient(createRestClient());
+        return new TossPaymentClient(createRestClient(), new ObjectMapper());
     }
 
     private RestClient createRestClient() {
         return RestClient.builder()
                 .requestFactory(createRequestFactory())
-                .baseUrl(BASE_URL)
+                .baseUrl(String.join(URL_DELIMITER, baseUrl, "v1", "payments"))
                 .defaultHeader(HttpHeaders.AUTHORIZATION, createAuthorizationHeader())
                 .build();
     }
@@ -49,7 +53,7 @@ public class TossPaymentClientConfig {
     }
 
     private String createAuthorizationHeader() {
-        return AUTH_TYPE_BASIC + " " + base64Encode(secretKey + DELIMITER);
+        return AUTH_TYPE_BASIC + " " + base64Encode(secretKey + AUTH_DELIMITER);
     }
 
     private String base64Encode(String input) {
