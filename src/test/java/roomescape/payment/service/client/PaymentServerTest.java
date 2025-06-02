@@ -33,7 +33,7 @@ class PaymentServerTest {
     public static final int TIME_OUT_SECOND = 1;
     private static final String TEST_SECRET_KEY = "test_secret_key_123";
 
-    private TossPaymentsRestClient tossPaymentsRestClient;
+    private TossPaymentsClient tossPaymentsClient;
     private MockWebServer mockWebServer;
     private ObjectMapper objectMapper;
 
@@ -54,7 +54,7 @@ class PaymentServerTest {
                 .requestFactory(requestFactory)
                 .build();
 
-        tossPaymentsRestClient = new TossPaymentsRestClient(restClient, TEST_SECRET_KEY);
+        tossPaymentsClient = new TossPaymentsClient(restClient, TEST_SECRET_KEY);
     }
 
     @AfterEach
@@ -79,7 +79,7 @@ class PaymentServerTest {
                         .setBody(expectedJsonResponse)
         );
 
-        PaymentClientResponse actualResponse = tossPaymentsRestClient.completePayment(requestDto);
+        PaymentClientResponse actualResponse = tossPaymentsClient.completePayment(requestDto);
 
         assertThat(actualResponse).isNotNull();
     }
@@ -107,7 +107,7 @@ class PaymentServerTest {
                         .setBody(errorJsonResponse)
         );
 
-        assertThatThrownBy(() -> tossPaymentsRestClient.completePayment(requestDto))
+        assertThatThrownBy(() -> tossPaymentsClient.completePayment(requestDto))
                 .isInstanceOf(PaymentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", PaymentErrorCode.SERVER_ERROR);
     }
@@ -128,7 +128,7 @@ class PaymentServerTest {
                         .setBody(errorJsonResponse)
         );
 
-        assertThatThrownBy(() -> tossPaymentsRestClient.completePayment(requestDto))
+        assertThatThrownBy(() -> tossPaymentsClient.completePayment(requestDto))
                 .isInstanceOf(PaymentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", PaymentErrorCode.CLIENT_ERROR);
     }
@@ -149,7 +149,7 @@ class PaymentServerTest {
                         .setBody(errorJsonResponse)
         );
 
-        assertThatThrownBy(() -> tossPaymentsRestClient.completePayment(requestDto))
+        assertThatThrownBy(() -> tossPaymentsClient.completePayment(requestDto))
                 .isInstanceOf(PaymentException.class)
                 .hasFieldOrPropertyWithValue("errorCode", PaymentErrorCode.PAYMENT_SERVER_ERROR);
     }
@@ -166,7 +166,7 @@ class PaymentServerTest {
                         .setBodyDelay(TIME_OUT_SECOND + 10, TimeUnit.SECONDS)
         );
 
-        assertThatThrownBy(() -> tossPaymentsRestClient.completePayment(requestDto))
+        assertThatThrownBy(() -> tossPaymentsClient.completePayment(requestDto))
                 .isInstanceOf(ConnectionException.class);
     }
 }

@@ -21,7 +21,7 @@ import roomescape.payment.service.dto.PaymentClientResponse;
 import roomescape.payment.service.dto.PaymentConfirmRequest;
 
 @Component
-public class TossPaymentsRestClient implements PaymentClient {
+public class TossPaymentsClient implements PaymentsClient {
 
     private static final Set<String> serverErrorCases = Set.of(
             "INVALID_API_KEY", "INVALID_AUTHORIZE_AUTH",
@@ -35,7 +35,7 @@ public class TossPaymentsRestClient implements PaymentClient {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public TossPaymentsRestClient(@Qualifier("tossPaymentsRestClient") RestClient restClient,
+    public TossPaymentsClient(@Qualifier("tossPaymentsRestClient") RestClient restClient,
                              @Value("${payment.toss-key}") String secretKey) {
         this.restClient = restClient;
         this.secretKey = secretKey;
