@@ -21,13 +21,8 @@ public class TossPaymentConfig {
     }
 
     @Bean
-    public RestClient tossRestClient(final RestClient.Builder builder) {
-        return builder.baseUrl(TOSS_API_BASE_URL).build();
-    }
-
-    @Bean
-    public TossPaymentProvider tossPaymentProvider(final RestClient restClient) {
-        return new TossPaymentProvider(restClient, createAuthorizationValue());
+    public TossPaymentProvider tossPaymentProvider(final RestClient.Builder builder) {
+        return new TossPaymentProvider(builder.baseUrl(TOSS_API_BASE_URL), createAuthorizationValue());
     }
 
     private String createAuthorizationValue() {

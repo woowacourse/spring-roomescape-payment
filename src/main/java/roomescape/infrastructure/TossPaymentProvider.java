@@ -22,8 +22,8 @@ public class TossPaymentProvider implements PaymentProvider {
     private final String authorizationValue;
     private final Map<String, PaymentStatusCode> tossFailureCodes;
 
-    public TossPaymentProvider(final RestClient tossRestClient, final String authorizationValue) {
-        this.tossRestClient = tossRestClient;
+    public TossPaymentProvider(final RestClient.Builder builder, final String authorizationValue) {
+        this.tossRestClient = builder.build();
         this.authorizationValue = authorizationValue;
         tossFailureCodes = initializeFailureCode();
     }
