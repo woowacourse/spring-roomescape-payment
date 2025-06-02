@@ -16,6 +16,7 @@ import roomescape.repository.jpa.ReservationJpaRepository;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @SpringBootTest
 @Import({DataCleaner.class, DataInserter.class})
@@ -55,6 +56,10 @@ public abstract class ServiceTest {
 
     public ReservationItem insertReservationItem(LocalDate date, ReservationTime time, ReservationTheme theme) {
         return dataInserter.insertReservationItem(date, time, theme);
+    }
+
+    public List<Reservation> getAllReservations() {
+        return reservationJpaRepository.findAll();
     }
 
     public int countReservation() {

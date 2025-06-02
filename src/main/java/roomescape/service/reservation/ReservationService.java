@@ -9,14 +9,13 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationitem.ReservationItem;
-import roomescape.domain.reservationitem.ReservationTheme;
-import roomescape.domain.reservationitem.ReservationTime;
 import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.response.MyPageReservationResponse;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.WaitingReservationResponse;
-import roomescape.service.member.MemberService;
-import roomescape.service.payment.PaymentService;
+import roomescape.service.helper.MemberHelper;
+import roomescape.service.helper.PaymentHelper;
+import roomescape.service.helper.ReservationItemHelper;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,11 +26,9 @@ import java.util.NoSuchElementException;
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
-    private final ReservationItemService reservationItemService;
-    private final MemberService memberService;
-    private final ReservationThemeService reservationThemeService;
-    private final ReservationTimeService reservationTimeService;
-    private final PaymentService paymentService;
+    private final MemberHelper memberHelper;
+    private final ReservationItemHelper itemHelper;
+    private final PaymentHelper paymentHelper;
 
     @Transactional
     public ReservationResponse addReservation(final CreateReservationRequest request) {
@@ -46,26 +43,19 @@ public class ReservationService {
     private ReservationResponse createReservation(
             final CreateReservationRequest request,
             final ReservationStatus status,
-            final boolean requiresExistingReservation) {
-
+            final boolean requiresExistingReservation
+    ) {
         validateReservationAvailability(request.date(), request.timeId(), request.themeId(), requiresExistingReservation);
+        final Member member = memberHelper.getById(request.memberId());
+        final ReservationItem item = itemHelper.getOrCreate(request.date(), request.timeId(), request.themeId());
+        validateDuplicateReservation(member, item);
 
-        final Member member = memberService.getMemberById(request.memberId());
-        final ReservationTime time = reservationTimeService.getReservationTimeById(request.timeId());
-        final ReservationTheme theme = reservationThemeService.getThemeById(request.themeId());
-        final LocalDate date = request.date();
-
-        final ReservationItem reservationItem = reservationItemService.createReservationItemIfNotExist(date, time, theme);
-
-        validateDuplicateReservation(member, reservationItem);
-
-        final Reservation saved = reservationRepository.save(
-                Reservation.builder()
-                        .member(member)
-                        .reservationItem(reservationItem)
-                        .reservationStatus(status)
-                        .build()
-        );
+        Reservation newReservation = Reservation.builder()
+                .member(member)
+                .reservationItem(item)
+                .reservationStatus(status)
+                .build();
+        final Reservation saved = reservationRepository.save(newReservation);
         return ReservationResponse.from(saved);
     }
 
@@ -73,14 +63,12 @@ public class ReservationService {
             final LocalDate date,
             final Long timeId,
             final Long themeId,
-            final boolean requiresExistingReservation) {
-
-        final boolean reservationExists = reservationItemService.isExistReservationItem(date, timeId, themeId);
-
+            final boolean requiresExistingReservation
+    ) {
+        final boolean reservationExists = itemHelper.isExistReservationItem(date, timeId, themeId);
         if (requiresExistingReservation && !reservationExists) {
             throw new IllegalArgumentException("[ERROR] 대기 예약은 기존 예약이 있을 때만 가능합니다.");
         }
-
         if (!requiresExistingReservation && reservationExists) {
             throw new IllegalArgumentException("[ERROR] 이미 예약된 시간입니다.");
         }
@@ -93,17 +81,12 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReservationResponse> getAllReservations() {
-        return reservationRepository.findAllReservations().stream()
-                .map(ReservationResponse::from)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<ReservationResponse> getFilteredReservations(final Long memberId,
-                                                             final Long themeId,
-                                                             final LocalDate dateFrom,
-                                                             final LocalDate dateTo) {
+    public List<ReservationResponse> getFilteredReservations(
+            final Long memberId,
+            final Long themeId,
+            final LocalDate dateFrom,
+            final LocalDate dateTo
+    ) {
         final List<Reservation> reservations = reservationRepository.findByMemberIdAndThemeIdAndDateFromAndDateTo(
                 memberId,
                 themeId,
@@ -125,12 +108,12 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public List<MyPageReservationResponse> getReservationsByMemberId(Long memberId) {
-        final Member member = memberService.getMemberById(memberId);
+        final Member member = memberHelper.getById(memberId);
         List<Reservation> myReservations = reservationRepository.findByMemberId(member.getId());
         return myReservations.stream()
                 .map(reservation -> {
                     if (reservation.getReservationStatus() == ReservationStatus.ACCEPTED) {
-                        Payment payment = paymentService.getByReservationId(reservation.getId());
+                        Payment payment = paymentHelper.getByReservationId(reservation.getId());
                         return MyPageReservationResponse.accepted(reservation, payment);
                     }
                     final int priority = calculatePriority(reservation);
@@ -193,6 +176,6 @@ public class ReservationService {
 
     private void deleteReservationWithItem(Reservation reservation, ReservationItem reservationItem) {
         reservationRepository.deleteById(reservation.getId());
-        reservationItemService.deleteReservationItem(reservationItem);
+        itemHelper.delete(reservationItem);
     }
 }

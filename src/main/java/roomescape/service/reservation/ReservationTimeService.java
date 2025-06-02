@@ -8,6 +8,7 @@ import roomescape.domain.reservationitem.ReservationTimeRepository;
 import roomescape.dto.request.ReservationTimeRequest;
 import roomescape.dto.response.ReservationTimeResponse;
 import roomescape.dto.response.ReservationTimeWithAvailabilityResponse;
+import roomescape.service.helper.ReservationItemHelper;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -19,7 +20,7 @@ import java.util.NoSuchElementException;
 public class ReservationTimeService {
 
     private final ReservationTimeRepository reservationTimeRepository;
-    private final ReservationItemService reservationItemService;
+    private final ReservationItemHelper itemHelper;
 
     @Transactional
     public ReservationTimeResponse addReservationTime(final ReservationTimeRequest request) {
@@ -27,6 +28,13 @@ public class ReservationTimeService {
         validateUniqueReservationTime(reservationTime);
         ReservationTime saved = reservationTimeRepository.save(reservationTime);
         return ReservationTimeResponse.from(saved);
+    }
+
+    private void validateUniqueReservationTime(final ReservationTime reservationTime) {
+        final LocalTime startAt = reservationTime.getStartAt();
+        if (reservationTimeRepository.existsByStartAt(startAt)) {
+            throw new IllegalArgumentException("[ERROR] 이미 존재하는 예약 시간 입니다.");
+        }
     }
 
     @Transactional
@@ -42,36 +50,18 @@ public class ReservationTimeService {
 
     @Transactional(readOnly = true)
     public List<ReservationTimeWithAvailabilityResponse> findReservationTimeOfTheme(long themeId, LocalDate date) {
-        List<ReservationTime> availableReservationTime = findReservationTimes();
+        List<ReservationTime> availableReservationTime = reservationTimeRepository.findAll();
         return availableReservationTime.stream()
                 .map(reservationTime -> {
-                            boolean isBooked = reservationItemService.isExistReservationItem(date, reservationTime.getId(), themeId);
+                            boolean isBooked = itemHelper.isExistReservationItem(date, reservationTime.getId(), themeId);
                             return ReservationTimeWithAvailabilityResponse.from(reservationTime, isBooked);
                         }
                 ).toList();
     }
 
     @Transactional(readOnly = true)
-    public ReservationTime getReservationTimeById(long id) {
-        return reservationTimeRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하는 시간이 없습니다."));
-    }
-
-    @Transactional(readOnly = true)
     public List<ReservationTimeResponse> findReservationTimesInfo() {
-        return findReservationTimes().stream()
+        return reservationTimeRepository.findAll().stream()
                 .map(ReservationTimeResponse::from).toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<ReservationTime> findReservationTimes() {
-        return reservationTimeRepository.findAll();
-    }
-
-    private void validateUniqueReservationTime(final ReservationTime reservationTime) {
-        final LocalTime startAt = reservationTime.getStartAt();
-        if (reservationTimeRepository.existsByStartAt(startAt)) {
-            throw new IllegalArgumentException("[ERROR] 이미 존재하는 예약 시간 입니다.");
-        }
     }
 }

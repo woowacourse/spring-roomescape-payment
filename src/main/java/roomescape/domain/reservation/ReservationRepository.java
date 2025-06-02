@@ -11,9 +11,7 @@ import java.util.Optional;
 public interface ReservationRepository {
 
     Optional<Reservation> findById(Long id);
-
-    List<Reservation> findAllReservations();
-
+    
     Reservation save(final Reservation reservation);
 
     void deleteById(final long id);

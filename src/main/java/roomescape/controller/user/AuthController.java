@@ -16,6 +16,7 @@ import roomescape.dto.response.LoginResponse;
 import roomescape.dto.response.MemberRegisterResponse;
 import roomescape.global.LoginInfo;
 import roomescape.service.auth.AuthService;
+import roomescape.service.helper.MemberHelper;
 import roomescape.service.member.MemberService;
 
 import javax.naming.AuthenticationException;
@@ -26,10 +27,11 @@ public class AuthController {
 
     private final AuthService authService;
     private final MemberService memberService;
+    private final MemberHelper memberHelper;
 
     @PostMapping("/auth/signup")
     public ResponseEntity<MemberRegisterResponse> register(@RequestBody MemberRegisterRequest request) {
-        MemberRegisterResponse response = memberService.addMember(request);
+        MemberRegisterResponse response = memberService.register(request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -41,7 +43,7 @@ public class AuthController {
 
     @GetMapping("/auth/login/check")
     public ResponseEntity<LoginResponse> loginCheck(LoginInfo loginInfo) {
-        Member member = memberService.getMemberById(loginInfo.memberId());
+        Member member = memberHelper.getById(loginInfo.memberId());
         LoginResponse response = new LoginResponse(member.getName());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

@@ -21,8 +21,6 @@ public class ReservationThemeService {
     public static final int POPULAR_THEME_DATE_TO = 1;
 
     private final ReservationThemeRepository reservationThemeRepository;
-    private final ReservationTimeService reservationTimeService;
-    private final ReservationItemService reservationItemService;
 
     @Transactional(readOnly = true)
     public List<ReservationThemeResponse> findReservationThemes() {
@@ -61,12 +59,6 @@ public class ReservationThemeService {
             throw new IllegalArgumentException("[ERROR] 예약이 존재해 테마를 삭제할 수 없습니다.");
         }
         reservationThemeRepository.deleteById(id);
-    }
-
-    @Transactional(readOnly = true)
-    public ReservationTheme getThemeById(long id) {
-        return reservationThemeRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 테마입니다."));
     }
 
     private void validateUniqueThemes(final ReservationTheme reservationTheme) {

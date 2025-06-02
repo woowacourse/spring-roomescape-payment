@@ -30,10 +30,4 @@ public class PaymentService {
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 예약입니다."));
         paymentRepository.save(new Payment(response.paymentKey(), amount, reservation));
     }
-
-    @Transactional(readOnly = true)
-    public Payment getByReservationId(Long reservationId) {
-        return paymentRepository.findByReservationId(reservationId)
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 결제 정보입니다."));
-    }
 }

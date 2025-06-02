@@ -12,7 +12,6 @@ import roomescape.dto.response.MemberResponse;
 import roomescape.global.PasswordEncoder;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
 @Service
@@ -22,7 +21,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public MemberRegisterResponse addMember(final MemberRegisterRequest request) {
+    public MemberRegisterResponse register(final MemberRegisterRequest request) {
         validateDuplicateEmail(request.email());
         validateDuplicateName(request.name());
         final Member newMember = Member.builder()
@@ -39,18 +38,6 @@ public class MemberService {
         return memberRepository.findAll().stream()
                 .map(MemberResponse::from)
                 .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public Member getMemberById(final long id) {
-        return memberRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 사용자가 존재하지 않습니다."));
-    }
-
-    @Transactional(readOnly = true)
-    public Member getMemberByEmail(final String email) {
-        return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 사용자가 존재하지 않습니다."));
     }
 
     private void validateDuplicateEmail(final String email) {

@@ -110,27 +110,6 @@ class ReservationServiceTest extends ServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Test
-    @DisplayName("모든 예약 정보를 가져온다.")
-    void getAllReservationsTest() {
-        // given
-        Member member = insertMember("이메일", "비밀번호", "이름", MemberRole.USER);
-        ReservationTheme theme = insertReservationTheme("테마", "설명", "썸네일");
-        ReservationTime time = insertReservationTime(TIME1);
-        ReservationItem item = insertReservationItem(DATE1, time, theme);
-        Reservation reservation1 = insertReservation(member, item, ReservationStatus.ACCEPTED);
-        Reservation reservation2 = insertReservation(member, item, ReservationStatus.PENDING);
-        Reservation reservation3 = insertReservation(member, item, ReservationStatus.PENDING);
-        Reservation reservation4 = insertReservation(member, item, ReservationStatus.PENDING);
-
-        // when
-        final List<ReservationResponse> result = reservationService.getAllReservations();
-
-        // then
-        assertThat(result).hasSize(4).extracting(ReservationResponse::id)
-                .containsExactlyInAnyOrder(reservation1.getId(), reservation2.getId(), reservation3.getId(), reservation4.getId());
-    }
-
     @Nested
     class 필터링_조회_테스트 {
 
@@ -425,11 +404,11 @@ class ReservationServiceTest extends ServiceTest {
         reservationService.removeReservation(pendingReservation.id());
 
         // then
-        List<ReservationResponse> remainingReservations = reservationService.getAllReservations();
+        List<Reservation> remainingReservations = getAllReservations();
         assertAll(
                 () -> assertThat(remainingReservations).hasSize(beforeCount - 1),
-                () -> assertThat(remainingReservations).noneMatch(reservation -> reservation.id() == pendingReservation.id()),
-                () -> assertThat(remainingReservations).anyMatch(reservation -> reservation.id() == acceptedReservation.id())
+                () -> assertThat(remainingReservations).noneMatch(reservation -> reservation.getId() == pendingReservation.id()),
+                () -> assertThat(remainingReservations).anyMatch(reservation -> reservation.getId() == acceptedReservation.id())
         );
 
     }
@@ -452,16 +431,15 @@ class ReservationServiceTest extends ServiceTest {
         reservationService.removeReservation(acceptedReservation.id());
 
         // then
-        List<ReservationResponse> remainingReservations = reservationService.getAllReservations();
+        List<Reservation> remainingReservations = getAllReservations();
         assertAll(
                 () -> assertThat(remainingReservations).hasSize(beforeCount - 1),
-                () -> assertThat(remainingReservations).noneMatch(reservation -> reservation.id() == acceptedReservation.id()),
+                () -> assertThat(remainingReservations).noneMatch(reservation -> reservation.getId() == acceptedReservation.id()),
                 () -> assertThat(remainingReservations).anyMatch(reservation ->
-                        reservation.id() == pendingReservation.id() &&
-                        reservation.status().equals(ReservationStatus.NOT_PAID.description)
+                        reservation.getId() == pendingReservation.id() &&
+                        reservation.getReservationStatus() == ReservationStatus.NOT_PAID
                 )
         );
-
     }
 
     @Test

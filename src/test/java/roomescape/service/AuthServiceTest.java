@@ -26,7 +26,7 @@ class AuthServiceTest extends ServiceTest {
     @DisplayName("사용자의 이메일, 비밀번호를 확인한 후 사용자의 아이디를 반환한다.")
     void authenticateTest() throws AuthenticationException {
         // given
-        memberService.addMember(new MemberRegisterRequest("test@test.com", "testPassword", "test"));
+        memberService.register(new MemberRegisterRequest("test@test.com", "testPassword", "test"));
         final LoginRequest loginRequest = new LoginRequest("test@test.com", "testPassword");
         MockHttpSession session = new MockHttpSession();
 
@@ -41,7 +41,7 @@ class AuthServiceTest extends ServiceTest {
     @DisplayName("사용자의 이메일을 찾을 수 없는 경우 예외가 발생한다")
     void noEmailAuthenticateTest() {
         // given
-        memberService.addMember(new MemberRegisterRequest("test@test.com", "testPassword", "test"));
+        memberService.register(new MemberRegisterRequest("test@test.com", "testPassword", "test"));
         final LoginRequest loginRequest = new LoginRequest("wrongEmail@test.com", "testPassword");
 
         // when, then
@@ -53,7 +53,7 @@ class AuthServiceTest extends ServiceTest {
     @DisplayName("사용자의 패스워드가 일치하지 않는 경우 예외가 발생한다.")
     void wrongPasswordAuthenticateTest() {
         // given
-        memberService.addMember(new MemberRegisterRequest("test@test.com", "testPassword", "test"));
+        memberService.register(new MemberRegisterRequest("test@test.com", "testPassword", "test"));
         final LoginRequest loginRequest = new LoginRequest("test@test.com", "wrongPassword");
 
         // when, then

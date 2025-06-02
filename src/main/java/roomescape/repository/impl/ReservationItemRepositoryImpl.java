@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import roomescape.domain.reservationitem.ReservationItem;
 import roomescape.domain.reservationitem.ReservationItemRepository;
-import roomescape.domain.reservationitem.ReservationTheme;
-import roomescape.domain.reservationitem.ReservationTime;
 import roomescape.repository.jpa.ReservationItemJpaRepository;
 
 import java.time.LocalDate;
@@ -28,10 +26,8 @@ public class ReservationItemRepositoryImpl implements ReservationItemRepository 
     }
 
     @Override
-    public Optional<ReservationItem> findReservationItemByDateAndTimeAndTheme(LocalDate date,
-                                                                              ReservationTime time,
-                                                                              ReservationTheme theme) {
-        return reservationItemJpaRepository.findReservationItemByDateAndTimeAndTheme(date, time, theme);
+    public Optional<ReservationItem> findReservationItemByDateAndTimeIdAndThemeId(final LocalDate date, final Long timeId, final Long themeId) {
+        return reservationItemJpaRepository.findReservationItemByDateAndTime_IdAndTheme_Id(date, timeId, themeId);
     }
 
     @Override
