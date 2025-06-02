@@ -10,19 +10,19 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoginMember;
 import roomescape.payment.dto.ReservationPaymentRequest;
-import roomescape.payment.service.PaymentService;
+import roomescape.payment.service.TossPaymentService;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/payments")
 public class PaymentController {
 
-    private final PaymentService paymentService;
+    private final TossPaymentService tossPaymentService;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/confirm/tossPay")
     public void confirmPayment(@RequestBody @Valid final ReservationPaymentRequest request, final LoginMember loginMember) {
-        paymentService.saveReservationPayment(request, loginMember);
-        paymentService.confirmPayment(request);
+        tossPaymentService.saveReservationPayment(request, loginMember);
+        tossPaymentService.confirmPayment(request);
     }
 }

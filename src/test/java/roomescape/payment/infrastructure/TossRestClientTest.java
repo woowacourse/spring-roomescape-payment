@@ -152,7 +152,15 @@ class TossRestClientTest {
         RestClient brokenRestClient = RestClient.builder()
                 .baseUrl("http://localhost:9999") // 잘못된 포트
                 .build();
-        TossRestClient brokenTossClient = new TossRestClient(brokenRestClient, new TossPaymentProperties("secret-key", "https://api.tosspayments.com"));
+        TossRestClient brokenTossClient = new TossRestClient(brokenRestClient,
+                new TossPaymentProperties(
+                        "secret-key",
+                        "https://api.tosspayments.com",
+                        1000,
+                        2000,
+                        1000
+                )
+        );
 
         wireMockServer.stubFor(post(urlEqualTo("/v1/payments/confirm"))
                 .willReturn(aResponse()
