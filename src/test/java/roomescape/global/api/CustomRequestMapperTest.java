@@ -17,11 +17,6 @@ class CustomRequestMapperTest {
     ObjectMapper objectMapper;
 
     @Test
-    @DisplayName("""
-            Map<String, Object>로 맵핑한다.
-            - 객체의 필드 이름을 key로 맵핑
-            - 객체의 값을 value로 맵핑
-            """)
     void 객체를_restClient에_필요한_바디로_변환한다() {
         //given
         record Request(Long orderId, String name) {
