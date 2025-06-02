@@ -1,6 +1,8 @@
 package roomescape.common.exception.handler;
 
 import java.time.format.DateTimeParseException;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,9 +13,7 @@ import roomescape.common.exception.NotFoundException;
 import roomescape.common.exception.ValidationException;
 import roomescape.common.security.exception.ForbiddenException;
 import roomescape.common.security.exception.UnAuthorizedException;
-import roomescape.member.exception.MemberDuplicatedException;
 import roomescape.payment.exception.PaymentApproveException;
-import roomescape.reservationtime.exception.ReservationTimeInUseException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(PaymentApproveException.class)
-    public ResponseEntity<String> handlePaymentApproveException(PaymentApproveException e) {
-        return ResponseEntity.status(e.getHttpStatusCode()).body(e.getMessage());
+    public ResponseEntity<Map<String, String>> handlePaymentApproveException(PaymentApproveException e) {
+        return ResponseEntity.status(e.getHttpStatusCode()).body(Map.of("message", e.getMessage()));
     }
 }
