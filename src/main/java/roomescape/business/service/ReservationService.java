@@ -32,7 +32,6 @@ import roomescape.presentation.dto.response.ReservationResponse;
 @RequiredArgsConstructor
 @Transactional
 public class ReservationService {
-    private final WaitingService waitingService;
 
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
@@ -45,54 +44,42 @@ public class ReservationService {
     public ReservationResponse addAndGet(final LocalDate date, final String timeIdValue, final String themeIdValue,
                                          final String userIdValue, final String paymentKey, final String orderId,
                                          final Long amount) {
-        User user = getUser(userIdValue);
-        ReservationTime reservationTime = getReservationTime(timeIdValue);
-        Theme theme = getTheme(themeIdValue);
+        User user = userRepository.findById(Id.create(userIdValue))
+                .orElseThrow(() -> new NotFoundException(USER_NOT_EXIST));
+        ReservationTime reservationTime = reservationTimeRepository.findById(Id.create(timeIdValue))
+                .orElseThrow(() -> new NotFoundException(RESERVATION_NOT_EXIST));
+        Theme theme = themeRepository.findById(Id.create(themeIdValue))
+                .orElseThrow(() -> new NotFoundException(THEME_NOT_EXIST));
 
-        if (reservationRepository.existsByDate_ValueAndTime_StartTime_ValueAndThemeId(date,
-                reservationTime.startTimeValue(),
-                theme.getId())) {
-            throw new DuplicatedException(RESERVATION_DUPLICATED);
-        }
+        validateDuplicatedReservation(date, reservationTime, theme);
         Reservation reservation = Reservation.create(user, date, reservationTime, theme);
         paymentClient.approvePayment(new PaymentApproveRequest(paymentKey, orderId, amount));
         reservationRepository.save(reservation);
         return ReservationResponse.from(reservation);
     }
 
-    public ReservationResponse addAndGetWithoutPayment(final LocalDate date, final String timeIdValue,
-                                                       final String themeIdValue,
-                                                       final String userIdValue) {
-        User user = getUser(userIdValue);
-        ReservationTime reservationTime = getReservationTime(timeIdValue);
-        Theme theme = getTheme(themeIdValue);
-
+    private void validateDuplicatedReservation(LocalDate date, ReservationTime reservationTime, Theme theme) {
         if (reservationRepository.existsByDate_ValueAndTime_StartTime_ValueAndThemeId(date,
                 reservationTime.startTimeValue(),
                 theme.getId())) {
             throw new DuplicatedException(RESERVATION_DUPLICATED);
         }
+    }
+
+    public ReservationResponse addAndGetWithoutPayment(final LocalDate date, final String timeIdValue,
+                                                       final String themeIdValue,
+                                                       final String userIdValue) {
+        User user = userRepository.findById(Id.create(userIdValue))
+                .orElseThrow(() -> new NotFoundException(USER_NOT_EXIST));
+        ReservationTime reservationTime = reservationTimeRepository.findById(Id.create(timeIdValue))
+                .orElseThrow(() -> new NotFoundException(RESERVATION_NOT_EXIST));
+        Theme theme = themeRepository.findById(Id.create(themeIdValue))
+                .orElseThrow(() -> new NotFoundException(THEME_NOT_EXIST));
+
+        validateDuplicatedReservation(date, reservationTime, theme);
         Reservation reservation = Reservation.create(user, date, reservationTime, theme);
         reservationRepository.save(reservation);
         return ReservationResponse.from(reservation);
-    }
-
-    private Theme getTheme(String themeIdValue) {
-        Theme theme = themeRepository.findById(Id.create(themeIdValue))
-                .orElseThrow(() -> new NotFoundException(THEME_NOT_EXIST));
-        return theme;
-    }
-
-    private ReservationTime getReservationTime(String timeIdValue) {
-        ReservationTime reservationTime = reservationTimeRepository.findById(Id.create(timeIdValue))
-                .orElseThrow(() -> new NotFoundException(RESERVATION_NOT_EXIST));
-        return reservationTime;
-    }
-
-    private User getUser(String userIdValue) {
-        User user = userRepository.findById(Id.create(userIdValue))
-                .orElseThrow(() -> new NotFoundException(USER_NOT_EXIST));
-        return user;
     }
 
     @Transactional(readOnly = true)
