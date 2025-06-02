@@ -7,50 +7,45 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@Table(name = "member")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Member {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "email")
+    @NotNull
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "password")
     private String password;
 
-    @Column(nullable = false)
+    @Column(name = "name")
     private String name;
 
-    private String sessionId;
-
+    @Column(name = "role")
     @Enumerated(value = EnumType.STRING)
     private MemberRole role;
 
+    private String sessionId;
+
     @Builder
     public Member(String email, String password, String name, MemberRole role) {
+        //TODO : 도메인 필드 검증 로직 추가
         this.email = email;
         this.password = password;
         this.name = name;
-        this.role = role;
-    }
-
-
-    public Member(final Long id, final String email, final String password, final String name, final String sessionId,
-                  final MemberRole role) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.sessionId = sessionId;
         this.role = role;
     }
 

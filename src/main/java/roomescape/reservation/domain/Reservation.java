@@ -7,6 +7,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -14,32 +19,41 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import roomescape.member.domain.Member;
+import roomescape.payment.domain.Payment;
 import roomescape.theme.domain.ReservationTheme;
 import roomescape.time.domain.ReservationTime;
 
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
+@Table(name = "reservaiton")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class Reservation {
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @Column(nullable = false)
+    @Column(name = "date")
+    @Temporal(TemporalType.DATE)
+    @NotNull
     private LocalDate date;
 
     @ManyToOne
     @JoinColumn(name = "time_id")
+    @NotNull
     private ReservationTime time;
 
     @ManyToOne
     @JoinColumn(name = "theme_id")
+    @NotNull
     private ReservationTheme theme;
+
+    @OneToOne(mappedBy = "reservation")
+    private Payment payment;
 
     public Reservation(Long id, Member member, LocalDate date, ReservationTime time, ReservationTheme theme) {
         this.id = id;
