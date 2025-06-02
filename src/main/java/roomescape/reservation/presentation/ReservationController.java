@@ -16,12 +16,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.client.TossPaymentClient;
 import roomescape.client.dto.request.TossPaymentConfirmRequest;
 import roomescape.common.argumentResolver.Login;
 import roomescape.common.exceptionHandler.dto.ExceptionResponse;
 import roomescape.member.dto.request.LoginMember;
-import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
@@ -37,14 +35,10 @@ public class ReservationController {
     private static final String SLASH = "/";
 
     private final ReservationService reservationService;
-    private final TossPaymentClient tossPaymentClient;
-    private final PaymentService paymentService;
     private final ReservationPaymentFacade reservationPaymentFacade;
 
-    public ReservationController(ReservationService reservationService, TossPaymentClient tossPaymentClient, PaymentService paymentService, ReservationPaymentFacade reservationPaymentFacade) {
+    public ReservationController(ReservationService reservationService, ReservationPaymentFacade reservationPaymentFacade) {
         this.reservationService = reservationService;
-        this.tossPaymentClient = tossPaymentClient;
-        this.paymentService = paymentService;
         this.reservationPaymentFacade = reservationPaymentFacade;
     }
 
