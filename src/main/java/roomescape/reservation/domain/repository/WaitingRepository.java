@@ -59,7 +59,7 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
               AND w.waitingStatus = :waitingStaus
             """)
     List<Waiting> findByMemberIdAndWaitingStatusWithAssociations(@Param("memberId") Long memberId,
-                                                                 @Param("waitingStaus") WaitingStatus waitingStatus);
+                                                                 @Param("waitingStatus") WaitingStatus waitingStatus);
 
     @Query("""
               SELECT COUNT(w)

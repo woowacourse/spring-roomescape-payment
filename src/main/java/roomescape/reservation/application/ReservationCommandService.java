@@ -161,7 +161,7 @@ public class ReservationCommandService {
             final ReservationTime time,
             final Theme theme
     ) {
-        boolean isConflict = reservationRepository.findByDateAndThemeIdWithAssociations(date, time.getId())
+        boolean isConflict = reservationRepository.findByDateAndThemeIdWithAssociations(date, theme.getId())
                 .stream()
                 .anyMatch(r -> r.hasConflictWith(time, theme));
 

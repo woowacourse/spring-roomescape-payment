@@ -82,7 +82,7 @@ public class AdminReservationController {
     @PutMapping("/waitings/accept/{id}")
     public ResponseEntity<Void> acceptReservation(
             @PathVariable("id") final Long id,
-            final PrePaymentRequest request
+            @RequestBody final PrePaymentRequest request
     ) {
         reservationCommandService.acceptReservation(id, request);
         return ResponseEntity.ok().build();
