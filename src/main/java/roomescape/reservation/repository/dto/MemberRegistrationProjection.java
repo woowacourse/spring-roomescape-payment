@@ -10,4 +10,6 @@ public interface MemberRegistrationProjection {
     LocalDate getDate();
     LocalTime getTime();
     int getRank();
+    String getPaymentKey();
+    Long getAmount();
 }

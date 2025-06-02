@@ -1,12 +1,17 @@
 package roomescape.config;
 
 import java.time.LocalDate;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentStatus;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.RoomEscapeInformation;
 import roomescape.reservation.domain.WaitingReservation;
@@ -29,6 +34,7 @@ public class SampleReservationInitializer implements CommandLineRunner {
     private final ReservationTimeRepository timeRepository;
     private final ThemeRepository themeRepository;
     private final RoomEscapeInformationRepository roomEscapeInformationRepository;
+    private final PaymentRepository paymentRepository;
 
     @Transactional
     @Override
@@ -62,8 +68,10 @@ public class SampleReservationInitializer implements CommandLineRunner {
     }
 
     private void saveInformation(LocalDate date, Long timeId, Long themeId) {
-        ReservationTime time = timeRepository.findById(timeId).orElseThrow(() -> new IllegalArgumentException("timeId 찾기 오류, timeId: " + timeId));
-        Theme theme = themeRepository.findById(themeId).orElseThrow(() -> new IllegalArgumentException("themeId 찾기 오류, themeId: " + themeId));
+        ReservationTime time = timeRepository.findById(timeId)
+                .orElseThrow(() -> new IllegalArgumentException("timeId 찾기 오류, timeId: " + timeId));
+        Theme theme = themeRepository.findById(themeId)
+                .orElseThrow(() -> new IllegalArgumentException("themeId 찾기 오류, themeId: " + themeId));
 
         RoomEscapeInformation info = RoomEscapeInformation.builder()
                 .date(date)
@@ -74,11 +82,22 @@ public class SampleReservationInitializer implements CommandLineRunner {
     }
 
     private void saveReservation(Long memberId, Long infoId) {
+        Member member = memberRepository.findById(memberId).get();
         Reservation reservation = Reservation.builder()
-                .member(memberRepository.findById(memberId).get())
+                .member(member)
                 .roomEscapeInformation(roomEscapeInformationRepository.findById(infoId).get())
                 .build();
         reservationRepository.save(reservation);
+
+        Payment payment = Payment.builder()
+                .amount(10000L)
+                .status(PaymentStatus.COMPLETED)
+                .member(member)
+                .reservation(reservation)
+                .paymentKey("test-paymentKe-" + UUID.randomUUID().toString().substring(0, 4))
+                .orderId("test-orderId-" + UUID.randomUUID().toString().substring(0, 4))
+                .build();
+        paymentRepository.save(payment);
     }
 
     private void saveWaiting(Long memberId, Long infoId) {

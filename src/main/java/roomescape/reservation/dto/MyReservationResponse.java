@@ -12,7 +12,9 @@ public record MyReservationResponse(
         @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
         @JsonFormat(pattern = "HH:mm") LocalTime time,
         String status,
-        int rank
+        int rank,
+        String paymentKey,
+        long amount
 ) {
     public static MyReservationResponse from(MemberRegistrationProjection projection) {
         return new MyReservationResponse(
@@ -21,7 +23,9 @@ public record MyReservationResponse(
                 projection.getDate(),
                 projection.getTime(),
                 RegistrationStatus.from(projection.getType()).getOutput(),
-                projection.getRank()
+                projection.getRank(),
+                projection.getPaymentKey(),
+                projection.getAmount()
         );
     }
 

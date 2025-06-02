@@ -17,11 +17,14 @@ public interface RegistrationQueryRepository extends JpaRepository<Reservation, 
                 t.name AS themeName,
                 ri.date AS date,
                 rt.start_at AS time,
-                0 AS rank
+                0 AS rank,
+                p.payment_key AS paymentKey,
+                p.amount AS amount
             FROM reservation r
             JOIN room_escape_information ri ON r.room_escape_information_id = ri.id
             JOIN theme t ON ri.theme_id = t.id
             JOIN reservation_time rt ON ri.time_id = rt.id
+            JOIN payment p ON p.reservation_id = r.id
             WHERE r.member_id = :memberId
             
             UNION ALL
@@ -42,7 +45,9 @@ public interface RegistrationQueryRepository extends JpaRepository<Reservation, 
                             w2.created_at < w.created_at OR
                             (w2.created_at = w.created_at AND w2.id < w.id)
                           )
-                ) + 1 AS rank
+                ) + 1 AS rank,
+                '' AS paymentKey,
+                0 AS amount
             FROM waiting_reservation w
             JOIN room_escape_information ri ON w.room_escape_information_id = ri.id
             JOIN theme t ON ri.theme_id = t.id
