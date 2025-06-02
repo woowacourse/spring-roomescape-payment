@@ -21,7 +21,7 @@ public class ClientConfig {
     public TossPaymentsClient tossRestClient() {
         final SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(3000);
-        requestFactory.setReadTimeout(5000);
+        requestFactory.setReadTimeout(30000);
         return new TossPaymentsClient(
                 RestClient.builder()
                         .baseUrl("https://api.tosspayments.com/v1/payments/")

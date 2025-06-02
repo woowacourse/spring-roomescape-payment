@@ -54,7 +54,7 @@ class TossPaymentsClientTest {
     void testConfirmPaymentsException() throws JsonProcessingException {
         // given
         PaymentsConfirmRequest request = new PaymentsConfirmRequest("aaa", "111", 1000L);
-        TossErrorResponse errorResponse = new TossErrorResponse("잘못된 요청입니다.");
+        TossErrorResponse errorResponse = new TossErrorResponse("잘못된 요청입니다.", "TEST_ERROR_CODE");
         SERVER.expect(requestTo(BASE_URL + "/confirm"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withBadRequest()

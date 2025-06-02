@@ -1,4 +1,4 @@
 package roomescape.client.dto;
 
-public record TossErrorResponse(String message) {
+public record TossErrorResponse(String message, String code) {
 }
