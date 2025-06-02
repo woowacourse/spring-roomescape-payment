@@ -9,22 +9,22 @@ import org.springframework.web.client.RestClient;
 @Configuration
 public class MockClientConfiguration {
 
-    private MockRestServiceServer mockRestServiceServer;
-
     @Bean
-    public RestClient restClient() {
-        MockServerRestClientCustomizer customizer = new MockServerRestClientCustomizer();
-        RestClient.Builder builder = RestClient.builder();
-        customizer.customize(builder);
-        RestClient restClient = builder
-                .baseUrl("https://api.tosspayments.com/v1/payments")
-                .build();
-        mockRestServiceServer = customizer.getServer();
-        return restClient;
+    public MockServerRestClientCustomizer mockServerRestClientCustomizer() {
+        return new MockServerRestClientCustomizer();
     }
 
     @Bean
-    public MockRestServiceServer server(RestClient restClient) {
-        return mockRestServiceServer;
+    public RestClient restClient(final MockServerRestClientCustomizer customizer) {
+        RestClient.Builder builder = RestClient.builder();
+        customizer.customize(builder);
+        return builder
+                .baseUrl("https://api.tosspayments.com/v1/payments")
+                .build();
+    }
+
+    @Bean
+    public MockRestServiceServer mockRestServiceServer(final MockServerRestClientCustomizer customizer) {
+        return customizer.getServer();
     }
 }
