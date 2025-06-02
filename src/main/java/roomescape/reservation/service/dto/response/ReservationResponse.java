@@ -28,4 +28,14 @@ public record ReservationResponse(
                 themeResponse
         );
     }
+
+    public static ReservationResponse from(ReservationWithPaymentResponse response) {
+        return new ReservationResponse(
+                response.id(),
+                response.member(),
+                response.date(),
+                response.time(),
+                response.theme()
+        );
+    }
 }
