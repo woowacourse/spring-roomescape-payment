@@ -1,5 +1,11 @@
 package roomescape.auth.login.presentation;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +19,6 @@ import roomescape.auth.presentation.AdminLoginController;
 import roomescape.auth.presentation.MemberLoginController;
 import roomescape.auth.service.LoginService;
 import roomescape.auth.token.JwtTokenManager;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest({MemberLoginController.class, AdminLoginController.class})
 @Import({LoginService.class, JwtTokenManager.class})

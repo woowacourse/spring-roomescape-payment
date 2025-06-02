@@ -14,10 +14,10 @@ import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.infrastructure.JpaReservationRepository;
 import roomescape.reservation.infrastructure.JpaReservationRepositoryAdapter;
 import roomescape.theme.domain.ThemeRepository;
+import roomescape.theme.dto.PopularThemeResponse;
 import roomescape.theme.exception.ThemeException;
 import roomescape.theme.infrastructure.JpaThemeRepository;
 import roomescape.theme.infrastructure.JpaThemeRepositoryAdapter;
-import roomescape.theme.dto.PopularThemeResponse;
 import roomescape.theme.service.ThemeServiceTest.ThemeConfig;
 
 @DataJpaTest

@@ -3,7 +3,6 @@ package roomescape.reservation.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMemberInfo;
@@ -11,25 +10,29 @@ import roomescape.auth.dto.SearchCondition;
 import roomescape.common.util.time.DateTime;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
+import roomescape.member.dto.MemberResponse;
+import roomescape.member.dto.MyReservationResponse;
+import roomescape.member.exception.MemberNotFound;
+import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.service.PaymentService;
-import roomescape.reservation.dto.PaymentRequest;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationRepository;
+import roomescape.reservation.domain.Status;
+import roomescape.reservation.domain.Waiting;
+import roomescape.reservation.domain.WaitingRepository;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.WaitingResponse;
 import roomescape.reservation.dto.WaitingWithRank;
-import roomescape.member.exception.MemberNotFound;
-import roomescape.member.dto.MemberResponse;
-import roomescape.member.dto.MyReservationResponse;
-import roomescape.reservation.domain.*;
 import roomescape.reservation.exception.ReservationException;
 import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.reservationTime.domain.ReservationTimeRepository;
-import roomescape.reservationTime.exception.ReservationTimeException;
 import roomescape.reservationTime.dto.ReservationTimeResponse;
+import roomescape.reservationTime.exception.ReservationTimeException;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeRepository;
-import roomescape.theme.exception.ThemeException;
 import roomescape.theme.dto.ThemeResponse;
+import roomescape.theme.exception.ThemeException;
 
 @Service
 @Transactional(readOnly = true)

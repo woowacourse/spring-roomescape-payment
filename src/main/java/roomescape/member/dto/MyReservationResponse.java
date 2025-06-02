@@ -2,9 +2,8 @@ package roomescape.member.dto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-
-import roomescape.reservation.dto.WaitingWithRank;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.dto.WaitingWithRank;
 
 public record MyReservationResponse(Long reservationId, String theme, LocalDate date, LocalTime time, String status) {
 

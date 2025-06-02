@@ -1,9 +1,8 @@
 package roomescape.reservation.domain;
 
-import roomescape.reservation.dto.WaitingWithRank;
-
 import java.util.List;
 import java.util.Optional;
+import roomescape.reservation.dto.WaitingWithRank;
 
 public interface WaitingRepository {
 

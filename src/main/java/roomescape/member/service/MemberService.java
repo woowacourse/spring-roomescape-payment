@@ -6,10 +6,10 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Email;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
-import roomescape.member.exception.EmailException;
-import roomescape.member.exception.MemberNotFound;
 import roomescape.member.dto.MemberRequest;
 import roomescape.member.dto.MemberResponse;
+import roomescape.member.exception.EmailException;
+import roomescape.member.exception.MemberNotFound;
 
 @Service
 @Transactional(readOnly = true)

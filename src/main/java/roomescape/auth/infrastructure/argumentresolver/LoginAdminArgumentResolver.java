@@ -7,10 +7,10 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import roomescape.auth.annotation.LoginAdmin;
+import roomescape.auth.dto.LoginAdminInfo;
 import roomescape.auth.token.JwtTokenManager;
 import roomescape.auth.token.TokenExtractor;
-import roomescape.auth.dto.LoginAdminInfo;
-import roomescape.auth.annotation.LoginAdmin;
 
 @Component
 public class LoginAdminArgumentResolver implements HandlerMethodArgumentResolver {

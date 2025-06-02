@@ -3,9 +3,9 @@ package roomescape.auth.service;
 import org.springframework.stereotype.Service;
 import roomescape.admin.domain.Admin;
 import roomescape.admin.service.AdminService;
+import roomescape.auth.dto.LoginRequest;
 import roomescape.auth.exception.UnauthorizedException;
 import roomescape.auth.token.JwtTokenManager;
-import roomescape.auth.dto.LoginRequest;
 import roomescape.member.domain.Member;
 import roomescape.member.service.MemberService;
 

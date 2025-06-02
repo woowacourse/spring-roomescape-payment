@@ -7,11 +7,11 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import roomescape.auth.annotation.LoginMember;
+import roomescape.auth.dto.LoginMemberInfo;
 import roomescape.auth.exception.ForbiddenException;
 import roomescape.auth.token.JwtTokenManager;
 import roomescape.auth.token.TokenExtractor;
-import roomescape.auth.dto.LoginMemberInfo;
-import roomescape.auth.annotation.LoginMember;
 
 @Component
 public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolver {

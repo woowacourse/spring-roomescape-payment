@@ -1,15 +1,14 @@
 package roomescape.member.infrastructure;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import roomescape.member.domain.Email;
 import roomescape.member.domain.Member;
-
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 class JpaMemberRepositoryTest {

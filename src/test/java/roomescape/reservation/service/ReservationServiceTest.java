@@ -2,12 +2,12 @@ package roomescape.reservation.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Stream;
-
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,22 +22,22 @@ import org.springframework.web.client.RestClient;
 import roomescape.auth.dto.LoginMemberInfo;
 import roomescape.common.util.time.DateTime;
 import roomescape.member.domain.MemberRepository;
+import roomescape.member.dto.MyReservationResponse;
 import roomescape.member.infrastructure.JpaMemberRepository;
 import roomescape.member.infrastructure.JpaMemberRepositoryAdapter;
-import roomescape.member.dto.MyReservationResponse;
+import roomescape.payment.domain.PaymentClient;
+import roomescape.payment.infrastructure.TossPaymentClient;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.WaitingRepository;
+import roomescape.reservation.dto.ReservationRequest;
+import roomescape.reservation.dto.ReservationResponse;
+import roomescape.reservation.dto.WaitingResponse;
 import roomescape.reservation.exception.ReservationException;
 import roomescape.reservation.infrastructure.JpaReservationRepository;
 import roomescape.reservation.infrastructure.JpaReservationRepositoryAdapter;
 import roomescape.reservation.infrastructure.JpaWaitingRepository;
 import roomescape.reservation.infrastructure.JpaWaitingRepositoryAdapter;
-import roomescape.payment.domain.PaymentClient;
-import roomescape.payment.infrastructure.TossPaymentClient;
-import roomescape.reservation.dto.ReservationRequest;
-import roomescape.reservation.dto.ReservationResponse;
-import roomescape.reservation.dto.WaitingResponse;
 import roomescape.reservation.service.ReservationServiceTest.ReservationConfig;
 import roomescape.reservationTime.domain.ReservationTimeRepository;
 import roomescape.reservationTime.infrastructure.JpaReservationTimeRepository;
@@ -272,7 +272,7 @@ class ReservationServiceTest {
 
         @Bean
         public PaymentClient paymentClient() {
-            return new TossPaymentClient(restClient());
+            return new TossPaymentClient(restClient(), new ObjectMapper());
         }
 
         @Bean

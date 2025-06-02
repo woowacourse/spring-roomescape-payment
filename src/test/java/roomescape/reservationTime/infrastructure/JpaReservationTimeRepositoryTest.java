@@ -1,15 +1,13 @@
 package roomescape.reservationTime.infrastructure;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import roomescape.reservation.infrastructure.JpaReservationRepository;
-import roomescape.reservationTime.domain.ReservationTime;
+import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 import java.time.LocalTime;
 import java.util.List;
-
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import roomescape.reservationTime.domain.ReservationTime;
 
 @DataJpaTest
 class JpaReservationTimeRepositoryTest {

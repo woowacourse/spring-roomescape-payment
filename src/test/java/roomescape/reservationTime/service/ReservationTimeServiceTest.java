@@ -14,11 +14,11 @@ import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.infrastructure.JpaReservationRepository;
 import roomescape.reservation.infrastructure.JpaReservationRepositoryAdapter;
 import roomescape.reservationTime.domain.ReservationTimeRepository;
+import roomescape.reservationTime.dto.TimeConditionRequest;
+import roomescape.reservationTime.dto.TimeConditionResponse;
 import roomescape.reservationTime.exception.ReservationTimeException;
 import roomescape.reservationTime.infrastructure.JpaReservationTimeRepository;
 import roomescape.reservationTime.infrastructure.JpaReservationTimeRepositoryAdapter;
-import roomescape.reservationTime.dto.TimeConditionRequest;
-import roomescape.reservationTime.dto.TimeConditionResponse;
 import roomescape.reservationTime.service.ReservationTimeServiceTest.ReservationTimeConfig;
 
 @DataJpaTest

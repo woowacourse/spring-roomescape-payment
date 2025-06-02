@@ -1,5 +1,7 @@
 package roomescape.auth.token;
 
+import static io.jsonwebtoken.Jwts.SIG.HS256;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
@@ -11,8 +13,6 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import roomescape.auth.exception.JwtExtractException;
-
-import static io.jsonwebtoken.Jwts.SIG.*;
 
 @Component
 public class JwtTokenManager {

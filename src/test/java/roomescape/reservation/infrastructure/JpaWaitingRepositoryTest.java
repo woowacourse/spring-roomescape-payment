@@ -1,14 +1,13 @@
 package roomescape.reservation.infrastructure;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.dto.WaitingWithRank;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 class JpaWaitingRepositoryTest {
