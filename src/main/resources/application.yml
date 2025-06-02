@@ -14,3 +14,5 @@ spring:
       ddl-auto: create-drop
     defer-datasource-initialization: true
     open-in-view: false
+toss:
+  widget-secret-key: ${TOSS_WIDGET_SECRET_KEY}
