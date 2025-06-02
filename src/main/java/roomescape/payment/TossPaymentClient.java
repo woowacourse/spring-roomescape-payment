@@ -34,8 +34,13 @@ public class TossPaymentClient {
             if (response.getStatusCode() != HttpStatus.OK) {
                 throw new PaymentException("결제 승인에 실패하였습니다.");
             }
+        } catch (PaymentException e) {
+            throw e;
         } catch (ResourceAccessException e) {
             log.warn("리소스 접근 에러 ", e);
+            throw new PaymentException("결제 승인에 실패하였습니다.");
+        } catch (Exception e) {
+            log.warn("예기치 못한 에러 ", e);
             throw new PaymentException("결제 승인에 실패하였습니다.");
         }
     }
