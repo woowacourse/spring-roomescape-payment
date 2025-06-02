@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.global.LoginId;
 import roomescape.waiting.dto.AdminReservationWaitingResponse;
 import roomescape.waiting.dto.ReservationWaitingRequest;
 import roomescape.waiting.dto.ReservationWaitingResponse;
@@ -24,7 +25,7 @@ public class ReservationWaitingController {
 
     @PostMapping("/reservations-waiting")
     public ResponseEntity<ReservationWaitingResponse> addReservationWaiting(
-            @RequestBody @Valid final ReservationWaitingRequest request, final Long memberId) {
+            @RequestBody @Valid final ReservationWaitingRequest request, @LoginId final Long memberId) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(reservationWaitingService.addReservationWaiting(request, memberId));
     }

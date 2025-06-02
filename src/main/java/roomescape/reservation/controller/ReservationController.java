@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.global.LoginId;
 import roomescape.reservation.dto.AdminReservationPaymentRequest;
 import roomescape.reservation.dto.MyPageReservationResponse;
 import roomescape.reservation.dto.ReservationPaymentRequest;
@@ -35,7 +36,7 @@ public class ReservationController {
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> addReservation(
             @RequestBody @Valid final ReservationPaymentRequest request,
-            final Long memberId) {
+            @LoginId final Long memberId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.addReservation(memberId, request));
     }
 
@@ -63,7 +64,7 @@ public class ReservationController {
     }
 
     @GetMapping("/members/reservations")
-    public ResponseEntity<List<MyPageReservationResponse>> getMyReservationsForUser(Long memberId) {
+    public ResponseEntity<List<MyPageReservationResponse>> getMyReservationsForUser(@LoginId final Long memberId) {
         List<MyPageReservationResponse> reservations = reservationService.getReservationsByMemberId(memberId);
         return ResponseEntity.ok(reservations);
     }
