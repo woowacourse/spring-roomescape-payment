@@ -24,8 +24,8 @@ import roomescape.infrastructure.ReservationTimeRepository;
 import roomescape.infrastructure.ThemeRepository;
 import roomescape.infrastructure.UserRepository;
 import roomescape.infrastructure.WaitingRepository;
-import roomescape.infrastructure.payment.TossPaymentClient;
-import roomescape.infrastructure.payment.dto.PaymentApproveRequest;
+import roomescape.infrastructure.payment.PaymentClient;
+import roomescape.infrastructure.payment.toss.dto.TossPaymentApproveRequest;
 import roomescape.presentation.dto.response.ReservationResponse;
 
 @Service
@@ -38,8 +38,7 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final WaitingRepository waitingRepository;
-
-    private final TossPaymentClient paymentClient;
+    private final PaymentClient paymentClient;
 
     public ReservationResponse addAndGet(final LocalDate date, final String timeIdValue, final String themeIdValue,
                                          final String userIdValue, final String paymentKey, final String orderId,
@@ -54,7 +53,7 @@ public class ReservationService {
         validateDuplicatedReservation(date, reservationTime, theme);
         Reservation reservation = Reservation.create(user, date, reservationTime, theme);
         reservationRepository.save(reservation);
-        paymentClient.approvePayment(new PaymentApproveRequest(paymentKey, orderId, amount));
+        paymentClient.approvePayment(new TossPaymentApproveRequest(paymentKey, orderId, amount));
         return ReservationResponse.from(reservation);
     }
 

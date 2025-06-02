@@ -33,7 +33,7 @@ import roomescape.infrastructure.ReservationRepository;
 import roomescape.infrastructure.ReservationTimeRepository;
 import roomescape.infrastructure.ThemeRepository;
 import roomescape.infrastructure.UserRepository;
-import roomescape.infrastructure.payment.TossPaymentClient;
+import roomescape.infrastructure.payment.PaymentClient;
 import roomescape.infrastructure.payment.dto.PaymentApproveRequest;
 import roomescape.presentation.dto.response.ReservationResponse;
 import roomescape.presentation.dto.response.ReservationTimeResponse;
@@ -59,7 +59,7 @@ class ReservationServiceTest {
     private WaitingService waitingService;
 
     @Mock
-    private TossPaymentClient paymentClient;
+    private PaymentClient paymentClient;
 
     @InjectMocks
     private ReservationService sut;

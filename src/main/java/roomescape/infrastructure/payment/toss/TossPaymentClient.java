@@ -1,4 +1,4 @@
-package roomescape.infrastructure.payment;
+package roomescape.infrastructure.payment.toss;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -13,11 +13,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.ExternalApiErrorException;
-import roomescape.infrastructure.payment.dto.PaymentApproveErrorResponse;
+import roomescape.infrastructure.payment.PaymentClient;
 import roomescape.infrastructure.payment.dto.PaymentApproveRequest;
+import roomescape.infrastructure.payment.toss.dto.TossPaymentApproveErrorResponse;
 
 @Component
-public class TossPaymentClient {
+public class TossPaymentClient implements PaymentClient {
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
@@ -39,6 +40,7 @@ public class TossPaymentClient {
         this.secretKey = secretKey;
     }
 
+    @Override
     public void approvePayment(PaymentApproveRequest paymentApproveRequest) {
         String encodedSecretKey = Base64.getEncoder().encodeToString((secretKey + ":").getBytes());
         try {
@@ -56,8 +58,8 @@ public class TossPaymentClient {
 
     private void handleError(HttpRequest request, ClientHttpResponse response) {
         try {
-            PaymentApproveErrorResponse errorResponse = objectMapper.readValue(response.getBody(),
-                    PaymentApproveErrorResponse.class);
+            TossPaymentApproveErrorResponse errorResponse = objectMapper.readValue(response.getBody(),
+                    TossPaymentApproveErrorResponse.class);
             throw new ExternalApiErrorException(errorResponse.message());
         } catch (IOException exception) {
             throw new ExternalApiErrorException("에러 응답을 읽을 수 없습니다.");
