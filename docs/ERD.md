@@ -5,22 +5,22 @@ erDiagram
         VARCHAR(255) email
         VARCHAR(255) password
         VARCHAR(255) name
-        VARCHAR(255) sessionId
-        VARCHAR(50) role
+        VARCHAR(255) session_id
+        ENUM role "values: ADMIN, NONE, USER"
     }
 
     RESERVATION {
         BIGINT id PK
-        BIGINT member_id FK "MEMBER.id"
-        BIGINT reservation_item_id FK "RESERVATION_ITEM.id"
-        VARCHAR(50) reservationStatus
+        BIGINT member_id FK "references: MEMBER.id"
+        BIGINT reservation_item_id FK "references: RESERVATION_ITEM.id"
+        ENUM reservation_status "values: ACCEPTED, DENIED, NOT_PAID, PENDING"
     }
 
     RESERVATION_ITEM {
         BIGINT id PK
         DATE date
-        BIGINT time_id FK "RESERVATION_TIME.id"
-        BIGINT theme_id FK "RESERVATION_THEME.id"
+        BIGINT time_id FK "references: RESERVATION_TIME.id"
+        BIGINT theme_id FK "references: RESERVATION_THEME.id"
     }
 
     RESERVATION_THEME {
@@ -32,18 +32,18 @@ erDiagram
 
     RESERVATION_TIME {
         BIGINT id PK
-        TIME startAt
+        TIME(6) start_at
     }
 
     PAYMENT {
-        VARCHAR(255) paymentKey PK
+        VARCHAR(255) payment_key PK
         INTEGER amount
-        BIGINT reservationId FK "RESERVATION.id"
+        BIGINT reservation_id FK "references: RESERVATION.id"
     }
 
-    MEMBER ||--o{ RESERVATION: "makes"
-    RESERVATION }o--|| RESERVATION_ITEM: "books"
-    RESERVATION_ITEM }o--|| RESERVATION_TIME: "uses"
-    RESERVATION_ITEM }o--|| RESERVATION_THEME: "is_for"
-    RESERVATION ||--|| PAYMENT: "results_in"
+    MEMBER ||--o{ RESERVATION: ""
+    RESERVATION }o--|| RESERVATION_ITEM: ""
+    RESERVATION_ITEM }o--|| RESERVATION_TIME: ""
+    RESERVATION_ITEM }o--|| RESERVATION_THEME: ""
+    RESERVATION ||--|| PAYMENT: ""
 ```
