@@ -53,17 +53,9 @@ public class ReservationService {
 
         validateDuplicatedReservation(date, reservationTime, theme);
         Reservation reservation = Reservation.create(user, date, reservationTime, theme);
-        paymentClient.approvePayment(new PaymentApproveRequest(paymentKey, orderId, amount));
         reservationRepository.save(reservation);
+        paymentClient.approvePayment(new PaymentApproveRequest(paymentKey, orderId, amount));
         return ReservationResponse.from(reservation);
-    }
-
-    private void validateDuplicatedReservation(LocalDate date, ReservationTime reservationTime, Theme theme) {
-        if (reservationRepository.existsByDate_ValueAndTime_StartTime_ValueAndThemeId(date,
-                reservationTime.startTimeValue(),
-                theme.getId())) {
-            throw new DuplicatedException(RESERVATION_DUPLICATED);
-        }
     }
 
     public ReservationResponse addAndGetWithoutPayment(final LocalDate date, final String timeIdValue,
@@ -80,6 +72,14 @@ public class ReservationService {
         Reservation reservation = Reservation.create(user, date, reservationTime, theme);
         reservationRepository.save(reservation);
         return ReservationResponse.from(reservation);
+    }
+
+    private void validateDuplicatedReservation(LocalDate date, ReservationTime reservationTime, Theme theme) {
+        if (reservationRepository.existsByDate_ValueAndTime_StartTime_ValueAndThemeId(date,
+                reservationTime.startTimeValue(),
+                theme.getId())) {
+            throw new DuplicatedException(RESERVATION_DUPLICATED);
+        }
     }
 
     @Transactional(readOnly = true)
