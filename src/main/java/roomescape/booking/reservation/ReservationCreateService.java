@@ -39,15 +39,8 @@ public class ReservationCreateService {
         final Reservation reservation = saveReservation(schedule, member, order);
         ReservationResponse response = ReservationResponse.from(reservation);
 
-        try {
-            TossPaymentConfirmCommand confirmCommand = tossPaymentConfirmCommandFactory.toPaymentConfirmCommand(request);
-            tossPaymentAdapter.confirmPayment(confirmCommand);
-        } catch (Exception e) {
-            log.error("결제 승인 실패", e);
-            throw e;
-        }
-
         confirmReservation(order, reservation);
+        confirmPayment(request);
         return response;
     }
 
@@ -66,11 +59,17 @@ public class ReservationCreateService {
     }
 
     private void confirmReservation(final Order order, final Reservation reservation) {
+        order.markAsPaid();
+        reservation.markStatusAsConfirmed();
+    }
+
+    private void confirmPayment(final ReservationPaymentRequest request) {
         try {
-            order.markAsPaid();
-            reservation.markStatusAsConfirmed();
+            TossPaymentConfirmCommand confirmCommand = tossPaymentConfirmCommandFactory.toPaymentConfirmCommand(request);
+            tossPaymentAdapter.confirmPayment(confirmCommand);
         } catch (Exception e) {
-            log.error("결제 상태 업데이트 실패", e);
+            log.error("결제 승인 실패", e);
+            throw e;
         }
     }
 
