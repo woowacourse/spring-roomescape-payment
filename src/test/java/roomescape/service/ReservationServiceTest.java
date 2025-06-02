@@ -49,9 +49,6 @@ class ReservationServiceTest {
     @Autowired
     private ReservationThemeService reservationThemeService;
 
-    @Autowired
-    private PaymentClient paymentClient;
-
     @Test
     @DisplayName("사용자의 id를 이용해 예약을 생성한다")
     void createReservationTest() {
