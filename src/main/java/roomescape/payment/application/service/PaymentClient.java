@@ -1,9 +1,9 @@
 package roomescape.payment.application.service;
 
-import roomescape.payment.domain.Payment;
+import roomescape.payment.infrastructure.dto.TossPaymentResponse;
 import roomescape.reservation.presentation.dto.ReservationRequest;
 
 public interface PaymentClient {
 
-    Payment approve(final ReservationRequest reservationRequest);
+    TossPaymentResponse approve(final ReservationRequest reservationRequest);
 }

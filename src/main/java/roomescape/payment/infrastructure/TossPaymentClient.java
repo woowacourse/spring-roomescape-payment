@@ -9,7 +9,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.payment.infrastructure.dto.TossPaymentErrorResponse;
 import roomescape.payment.infrastructure.dto.TossPaymentRequest;
 import roomescape.payment.application.service.PaymentClient;
-import roomescape.payment.domain.Payment;
+import roomescape.payment.infrastructure.dto.TossPaymentResponse;
 import roomescape.reservation.presentation.dto.ReservationRequest;
 
 public class TossPaymentClient implements PaymentClient {
@@ -25,7 +25,7 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public Payment approve(ReservationRequest reservationRequest) {
+    public TossPaymentResponse approve(ReservationRequest reservationRequest) {
         TossPaymentRequest tossPaymentRequest = new TossPaymentRequest(
                 reservationRequest.getAmount(),
                 reservationRequest.getOrderId(),
@@ -45,7 +45,7 @@ public class TossPaymentClient implements PaymentClient {
                                 throw new PaymentException(errorResponse, res.getStatusCode(), tossPaymentRequest.getOrderId());
                         }
                 )
-                .body(Payment.class);
+                .body(TossPaymentResponse.class);
     }
 
     private String encodeSecretKey() {
