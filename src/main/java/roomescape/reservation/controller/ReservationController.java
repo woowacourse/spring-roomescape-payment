@@ -12,13 +12,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.service.dto.LoginMember;
-import roomescape.reservation.service.CreateReservationService;
-import roomescape.reservation.service.ReservationService;
+import roomescape.reservation.service.CreateReservationWithPaymentService;
+import roomescape.reservation.service.DeleteReservationService;
+import roomescape.reservation.service.ReservationQueryService;
 import roomescape.reservation.service.dto.request.FilteringReservationRequest;
 import roomescape.reservation.service.dto.request.ReservationWithPaymentRequest;
 import roomescape.reservation.service.dto.response.MyReservationsResponse;
 import roomescape.reservation.service.dto.response.ReservationResponse;
 import roomescape.reservation.service.dto.response.ReservationTimeWithBookedResponse;
+import roomescape.reservation.service.dto.response.ReservationWithPaymentResponse;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,20 +29,23 @@ import java.util.List;
 @RestController
 public class ReservationController {
 
-    private final ReservationService reservationService;
-    private final CreateReservationService createReservationService;
+    private final ReservationQueryService reservationQueryService;
+    private final CreateReservationWithPaymentService createReservationWithPaymentService;
+    private final DeleteReservationService deleteReservationService;
 
     public ReservationController(
-            final ReservationService reservationService,
-            final CreateReservationService createReservationService
+            final ReservationQueryService reservationQueryService,
+            final CreateReservationWithPaymentService createReservationWithPaymentService,
+            final DeleteReservationService deleteReservationService
     ) {
-        this.reservationService = reservationService;
-        this.createReservationService = createReservationService;
+        this.reservationQueryService = reservationQueryService;
+        this.createReservationWithPaymentService = createReservationWithPaymentService;
+        this.deleteReservationService = deleteReservationService;
     }
 
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> readAllReservations() {
-        List<ReservationResponse> response = reservationService.getAll();
+        List<ReservationResponse> response = reservationQueryService.getAll();
 
         return ResponseEntity.ok(response);
     }
@@ -50,7 +55,7 @@ public class ReservationController {
             @RequestParam("date") final LocalDate date,
             @RequestParam("themeId") final Long themeId
     ) {
-        List<ReservationTimeWithBookedResponse> responses = reservationService.getReservationTimesWithBooked(date, themeId);
+        List<ReservationTimeWithBookedResponse> responses = reservationQueryService.getReservationTimesWithBooked(date, themeId);
 
         return ResponseEntity.ok(responses);
     }
@@ -60,14 +65,14 @@ public class ReservationController {
             @Valid @RequestBody ReservationWithPaymentRequest request,
             final LoginMember loginMember
     ) {
-        ReservationResponse reservationResponse = createReservationService.createWithPayment(request, loginMember);
-        return ResponseEntity.ok(reservationResponse);
+        ReservationWithPaymentResponse response = createReservationWithPaymentService.create(request, loginMember);
+
+        return ResponseEntity.ok(ReservationResponse.from(response));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") final Long id, LoginMember loginMember) {
-        reservationService.delete(id, loginMember);
-
+        deleteReservationService.delete(id, loginMember);
         return ResponseEntity.noContent().build();
     }
 
@@ -75,14 +80,14 @@ public class ReservationController {
     public ResponseEntity<List<ReservationResponse>> findAllByFilter(
             @ModelAttribute @Valid final FilteringReservationRequest request
     ) {
-        final List<ReservationResponse> reservationResponses = reservationService.findReservationByFiltering(request);
+        final List<ReservationResponse> reservationResponses = reservationQueryService.findReservationByFiltering(request);
 
         return ResponseEntity.ok(reservationResponses);
     }
 
     @GetMapping("/my")
     public ResponseEntity<List<MyReservationsResponse>> getMyReservations(@Valid LoginMember loginMember) {
-        List<MyReservationsResponse> response = reservationService.getAllLoginMemberReservations(loginMember);
+        List<MyReservationsResponse> response = reservationQueryService.getAllLoginMemberReservations(loginMember);
         return ResponseEntity.ok(response);
     }
 }

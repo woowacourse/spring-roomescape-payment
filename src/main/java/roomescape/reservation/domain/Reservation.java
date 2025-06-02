@@ -38,15 +38,6 @@ public class Reservation {
     }
 
     public Reservation(
-            final Member member,
-            final LocalDate date,
-            final ReservationTime time,
-            final Theme theme
-    ) {
-        this(member, new ReservationInformation(date, time, theme));
-    }
-
-    public Reservation(
             final Long id,
             final Member member,
             final ReservationInformation reservationInformation
@@ -54,6 +45,15 @@ public class Reservation {
         this.id = id;
         this.member = member;
         this.reservationInformation = reservationInformation;
+    }
+
+    public Reservation(
+            final Member member,
+            final LocalDate date,
+            final ReservationTime time,
+            final Theme theme
+    ) {
+        this(member, new ReservationInformation(date, time, theme));
     }
 
     public Reservation(Member member, ReservationInformation reservationInformation) {
