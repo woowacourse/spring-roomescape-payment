@@ -12,11 +12,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.common.config.TestConfig;
 import roomescape.fixture.TestFixture;
 import roomescape.member.application.MemberDataService;
 import roomescape.member.domain.Member;
 import roomescape.member.infrastructure.MemberRepository;
+import roomescape.payment.application.PaymentService;
+import roomescape.payment.application.client.PaymentClient;
 import roomescape.reservation.application.ConfirmedReservationApplicationService;
 import roomescape.reservation.application.ReservationDataService;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
@@ -61,6 +64,9 @@ class ReservationTimeApplicationServiceTest {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @MockitoBean
+    private PaymentClient paymentClient;
+
     @BeforeEach
     void setUp() {
         ReservationSlotDataService reservationSlotDataService = new ReservationSlotDataService(
@@ -73,8 +79,9 @@ class ReservationTimeApplicationServiceTest {
         theme = themeRepository.save(theme);
         member = memberRepository.save(member);
         ReservationDataService slotReservationDataService = new ReservationDataService(reservationRepository);
+        PaymentService paymentService = new PaymentService(paymentClient);
         confirmedReservationApplicationService = new ConfirmedReservationApplicationService(reservationSlotDataService,
-                reservationTimeDataService, themeDataService, memberDataService, slotReservationDataService);
+                reservationTimeDataService, themeDataService, memberDataService, slotReservationDataService, paymentService);
     }
 
     @Test

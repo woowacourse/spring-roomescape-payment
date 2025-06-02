@@ -13,12 +13,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.common.config.TestConfig;
 import roomescape.fixture.TestFixture;
 import roomescape.member.application.MemberDataService;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.infrastructure.MemberRepository;
+import roomescape.payment.application.PaymentService;
+import roomescape.payment.application.client.PaymentClient;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
 import roomescape.reservation.exception.ReservationNotFoundException;
 import roomescape.reservation.infrastructure.ReservationRepository;
@@ -55,6 +58,9 @@ class WaitingReservationApplicationServiceTest {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @MockitoBean
+    private PaymentClient paymentClient;
+
     private Long timeId;
     private Long themeId;
     private Long memberId;
@@ -73,9 +79,10 @@ class WaitingReservationApplicationServiceTest {
                 reservationTimeRepository, reservationSlotDataService);
         waitingReservationApplicationService = new WaitingReservationApplicationService(
                 reservationSlotDataService, memberDataService, reservationDataService);
+        PaymentService paymentService = new PaymentService(paymentClient);
         ConfirmedReservationApplicationService confirmedReservationApplicationService = new ConfirmedReservationApplicationService(
                 reservationSlotDataService, reservationTimeDataService, themeDataService, memberDataService,
-                reservationDataService);
+                reservationDataService, paymentService);
 
         timeId = reservationTimeRepository.save(new ReservationTime(LocalTime.of(9, 0))).getId();
         themeId = themeRepository.save(TestFixture.makeTheme()).getId();

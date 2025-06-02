@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.common.security.annotation.RequireRole;
 import roomescape.common.security.dto.request.MemberInfo;
 import roomescape.member.domain.MemberRole;
+import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
 import roomescape.reservation.application.ConfirmedReservationApplicationService;
 import roomescape.reservation.application.dto.request.ConfirmedReservationByCriteriaWebRequest;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
@@ -56,12 +57,13 @@ public class ConfirmedReservationController {
 
     @RequireRole(MemberRole.REGULAR)
     @PostMapping("/reservations")
-    public ResponseEntity<ConfirmedReservationWebResponse> create(
+    public ResponseEntity<ConfirmedReservationWebResponse> createWithPayment(
             @RequestBody ConfirmedReservationCreateWebRequest request,
             MemberInfo memberInfo
     ) {
-        ConfirmedReservationWebResponse response = confirmedReservationApplicationService.create(
-                ConfirmedReservationCreateRequest.of(request, memberInfo));
+        ConfirmedReservationWebResponse response = confirmedReservationApplicationService.createWithPayment(
+                ConfirmedReservationCreateRequest.of(request, memberInfo),
+                PaymentApproveRequest.from(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

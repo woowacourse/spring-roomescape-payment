@@ -31,19 +31,20 @@ public class IntegrationFixture {
                 .cookie(TOKEN);
     }
 
-    public static void createRegularReservation(final Long themeId) {
-        String authToken = loginAndGetAuthToken(REGULAR_EMAIL, PASSWORD);
+    public static void createReservation(final Long themeId, final String secretKey, final String orderId, final Long amount) {
+        String adminAuthToken = loginAndGetAuthToken(ADMIN_EMAIL, PASSWORD);
 
         Map<String, Object> reservation = new HashMap<>();
         reservation.put("date", FUTURE_DATE_TEXT);
         reservation.put("timeId", 1);
         reservation.put("themeId", themeId);
+        reservation.put("memberId", 2);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(reservation)
-                .cookie(TOKEN, authToken)
-                .when().post("/reservations")
+                .cookie(TOKEN, adminAuthToken)
+                .when().post("/admin/reservations")
                 .then().log().all()
                 .statusCode(201);
     }
@@ -91,7 +92,7 @@ public class IntegrationFixture {
     public static ReservationResponse makeWaitingReservations() {
         createReservationTime();
         createTheme("추리");
-        createRegularReservation(1L);
+        createReservation(1L, "testtest", "orderorder", 10000L);
 
         String user2Token = loginAndGetAuthToken(REGULAR2_EMAIL, PASSWORD);
         Map<String, Object> reservation = new HashMap<>();

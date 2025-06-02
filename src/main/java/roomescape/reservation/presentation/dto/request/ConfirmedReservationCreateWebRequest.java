@@ -7,7 +7,10 @@ public record ConfirmedReservationCreateWebRequest(
         @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate date,
         Long timeId,
-        Long themeId
+        Long themeId,
+        String paymentKey,
+        String orderId,
+        Long amount
 ) {
     public ConfirmedReservationCreateWebRequest {
         if (date == null) {
@@ -18,6 +21,15 @@ public record ConfirmedReservationCreateWebRequest(
         }
         if (themeId == null) {
             throw new IllegalArgumentException("themeId는 반드시 입력해야합니다.");
+        }
+        if (paymentKey == null || paymentKey.isBlank()) {
+            throw new IllegalArgumentException("paymentKey는 반드시 입력해야합니다.");
+        }
+        if (orderId == null || orderId.isBlank()) {
+            throw new IllegalArgumentException("orderId는 반드시 입력해야합니다.");
+        }
+        if (amount == null) {
+            throw new IllegalArgumentException("amount는 반드시 입력해야합니다.");
         }
     }
 }

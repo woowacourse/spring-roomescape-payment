@@ -29,7 +29,7 @@ class PaymentClientTest {
                 {
                   "paymentKey": "tgen_20250528175227f6y46",
                   "orderId": "MC44NjE2MTQzMjcyMzM2",
-                  "totalAmount": 50000,
+                  "totalAmount": 50000
                 }
             """;
     private static final String PAYMENT_KEY = "tgen_20250528175227f6y46";

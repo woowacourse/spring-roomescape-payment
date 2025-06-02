@@ -201,7 +201,10 @@ async function fetchReservationPayment(paymentData, reservationData) {
         - 예약 결제 실패 시, 사용자가 실패 사유를 알 수 있도록 alert 에서 에러 메시지 수정
     */
     // 결제 요청 완료 후 suceessUrl
-    const paymentRequest = {
+    const reservationPaymentRequest = {
+        date: reservationData.date,
+        themeId: reservationData.themeId,
+        timeId: reservationData.timeId,
         paymentKey: paymentData.paymentKey,
         orderId: paymentData.orderId,
         amount: paymentData.amount,
@@ -209,56 +212,23 @@ async function fetchReservationPayment(paymentData, reservationData) {
     }
 
     // TODO : 결제 승인 api
-    const reservationURL = "/payments/approve";
-    fetch(reservationURL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(paymentRequest),
-    }).then(async response => {
-        if (!response.ok) {
-            return response.json().then(async errorBody => {
-                let errorMessage = JSON.stringify(errorBody.message);
-                console.error("예약 결제 실패 : " + errorMessage);
-                window.alert(errorMessage);
-            });
-        } else {
-             response.json().then(successBody => {
-                console.log("예약 결제 성공 : " + JSON.stringify(successBody));
-                fetchReservation(reservationData);
-            });
-        }
-    }).catch(error => {
-        console.error(error.message);
-    });
-}
-
-async function fetchReservation(reservationData) {
-    const reservationRequest = {
-        date: reservationData.date,
-        themeId: reservationData.themeId,
-        timeId: reservationData.timeId
-    }
-
-    // 예약 생성 api
     const reservationURL = "/reservations";
     fetch(reservationURL, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify(reservationRequest),
+        body: JSON.stringify(reservationPaymentRequest),
     }).then(response => {
         if (!response.ok) {
             return response.json().then(errorBody => {
-                console.error("예약 생성 실패 : " + JSON.stringify(errorBody));
-                window.alert("예약 생성 실패 메시지");
+                let errorMessage = errorBody.message;
+                console.error("예약 결제 실패 : " + errorMessage);
+                window.alert(errorMessage);
             });
         } else {
             response.json().then(successBody => {
-                console.log("예약 생성 성공 : " + JSON.stringify(successBody));
-                window.alert("예약이 생성되었습니다.");
+                console.log("예약 결제 성공 : " + JSON.stringify(successBody));
                 window.location.reload();
             });
         }

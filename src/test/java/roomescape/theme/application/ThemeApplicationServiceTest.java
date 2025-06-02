@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.common.config.TestConfig;
 import roomescape.common.security.application.MyPasswordEncoder;
 import roomescape.fixture.TestFixture;
@@ -25,6 +26,8 @@ import roomescape.member.domain.Member;
 import roomescape.member.infrastructure.MemberRepository;
 import roomescape.member.presentation.dto.request.SignupWebRequest;
 import roomescape.member.presentation.dto.response.SignUpWebResponse;
+import roomescape.payment.application.PaymentService;
+import roomescape.payment.application.client.PaymentClient;
 import roomescape.reservation.application.ConfirmedReservationApplicationService;
 import roomescape.reservation.application.ReservationDataService;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
@@ -63,6 +66,9 @@ class ThemeApplicationServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @MockitoBean
+    private PaymentClient paymentClient;
+
     private ThemeDataService themeDataService;
 
     private ReservationTimeDataService reservationTimeDataService;
@@ -93,8 +99,9 @@ class ThemeApplicationServiceTest {
                         reservationSlotDataService));
         reservationTimeDataService = new ReservationTimeDataService(reservationTimeRepository,
                 reservationSlotDataService);
+        PaymentService paymentService = new PaymentService(paymentClient);
         confirmedReservationApplicationService = new ConfirmedReservationApplicationService(reservationSlotDataService,
-                reservationTimeDataService, themeDataService, memberDataService, reservationDataService);
+                reservationTimeDataService, themeDataService, memberDataService, reservationDataService, paymentService);
     }
 
     @Test
