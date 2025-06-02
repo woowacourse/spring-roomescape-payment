@@ -1,5 +1,6 @@
 package roomescape.domain.reservation;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -7,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import lombok.AccessLevel;
@@ -14,6 +16,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.user.User;
@@ -44,10 +47,10 @@ public class Reservation {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Theme theme;
 
-    private Reservation(final Long id,
-                        final User user,
-                        final LocalDate date,
-                        final TimeSlot timeSlot,
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Payment payment;
+
+    private Reservation(final Long id, final User user, final LocalDate date, final TimeSlot timeSlot,
                         final Theme theme) {
 
         validateUser(user);
@@ -62,9 +65,7 @@ public class Reservation {
         this.theme = theme;
     }
 
-    public static Reservation register(final User user,
-                                       final LocalDate date,
-                                       final TimeSlot timeSlot,
+    public static Reservation register(final User user, final LocalDate date, final TimeSlot timeSlot,
                                        final Theme theme) {
 
         Reservation reservation = new Reservation(null, user, date, timeSlot, theme);
@@ -74,6 +75,10 @@ public class Reservation {
 
     public static Reservation fromWaiting(final Waiting waiting) {
         return new Reservation(null, waiting.getUser(), waiting.getDate(), waiting.getTimeSlot(), waiting.getTheme());
+    }
+
+    public void registerPayment(Payment payment) {
+        this.payment = payment;
     }
 
     private static void validateNotPastDateTime(final LocalDate date, final TimeSlot timeSlot) {

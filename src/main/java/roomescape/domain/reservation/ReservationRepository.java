@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long>, JpaSpecificationExecutor<Reservation> {
 
-    @EntityGraph(attributePaths = {"theme", "user", "timeSlot"})
+    @EntityGraph(attributePaths = {"theme", "user", "timeSlot", "payment"})
     List<Reservation> findByUserId(long id);
 
     @EntityGraph(attributePaths = {"timeSlot"})

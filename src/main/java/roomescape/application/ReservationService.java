@@ -37,7 +37,7 @@ public class ReservationService {
     public Reservation saveReservationWithPurchase(final long userId, final LocalDate date, final long timeId,
                                                    final long themeId, final PaymentInfo paymentInfo) {
         Reservation reservation = registerReservation(userId, date, timeId, themeId);
-        paymentService.savePayment(paymentInfo);
+        reservation.registerPayment(paymentService.savePayment(paymentInfo));
 
         return reservation;
     }
@@ -75,8 +75,7 @@ public class ReservationService {
 
     private void validateDuplicateReservation(final LocalDate date, final TimeSlot timeSlot, final Theme theme) {
         boolean hasDuplicatedReservation = reservationRepository.existsByDateAndTimeSlotIdAndThemeId(date,
-                timeSlot.getId(),
-                theme.getId());
+                timeSlot.getId(), theme.getId());
 
         if (hasDuplicatedReservation) {
             throw new AlreadyExistedException("이미 예약된 날짜, 시간, 테마에 대한 예약은 불가능합니다.");
