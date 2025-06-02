@@ -12,8 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
-import roomescape.exception.PaymentApproveException;
-import roomescape.infrastructure.payment.dto.PaymentApproveDto;
+import roomescape.infrastructure.payment.dto.PaymentApproveErrorResponse;
+import roomescape.infrastructure.payment.dto.PaymentApproveRequest;
 
 @RestClientTest(value = {TossPaymentClient.class})
 class TossPaymentClientTest {
@@ -30,14 +30,15 @@ class TossPaymentClientTest {
     @Test
     void 결제시간이_만료될_경우_예외가_발생한다() throws Exception {
         // given
-        PaymentApproveException response = new PaymentApproveException("code", "결제 시간이 료되어 결제 진행 데이터가 존재하지 않습니다.");
-        PaymentApproveDto paymentApproveDto = new PaymentApproveDto("paymentKey", "1", 1000L);
+        PaymentApproveErrorResponse response = new PaymentApproveErrorResponse("code",
+                "결제 시간이 료되어 결제 진행 데이터가 존재하지 않습니다.");
+        PaymentApproveRequest paymentApproveRequest = new PaymentApproveRequest("paymentKey", "1", 1000L);
         mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST)
                         .body(objectMapper.writeValueAsString(response)));
         // when
-        assertThatThrownBy(() -> paymentClient.approvePayment(paymentApproveDto))
-                .isInstanceOf(PaymentApproveException.class)
+        assertThatThrownBy(() -> paymentClient.approvePayment(paymentApproveRequest))
+                .isInstanceOf(PaymentApproveErrorResponse.class)
                 .hasMessage("결제 시간이 료되어 결제 진행 데이터가 존재하지 않습니다.");
     }
 
@@ -50,10 +51,10 @@ class TossPaymentClientTest {
                 new Jackson2ObjectMapperBuilder().createXmlMapper(false).build(),
                 "invalidKey"
         );
-        PaymentApproveDto paymentApproveDto = new PaymentApproveDto("paymentKey", "1", 1000L);
+        PaymentApproveRequest paymentApproveRequest = new PaymentApproveRequest("paymentKey", "1", 1000L);
         // when
-        assertThatThrownBy(() -> paymentClient.approvePayment(paymentApproveDto))
-                .isInstanceOf(PaymentApproveException.class)
+        assertThatThrownBy(() -> paymentClient.approvePayment(paymentApproveRequest))
+                .isInstanceOf(PaymentApproveErrorResponse.class)
                 .hasMessage("인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다.");
     }
 }

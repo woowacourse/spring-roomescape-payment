@@ -25,7 +25,7 @@ import roomescape.infrastructure.ThemeRepository;
 import roomescape.infrastructure.UserRepository;
 import roomescape.infrastructure.WaitingRepository;
 import roomescape.infrastructure.payment.TossPaymentClient;
-import roomescape.infrastructure.payment.dto.PaymentApproveDto;
+import roomescape.infrastructure.payment.dto.PaymentApproveRequest;
 import roomescape.presentation.dto.response.ReservationResponse;
 
 @Service
@@ -55,7 +55,7 @@ public class ReservationService {
             throw new DuplicatedException(RESERVATION_DUPLICATED);
         }
         Reservation reservation = Reservation.create(user, date, reservationTime, theme);
-        paymentClient.approvePayment(new PaymentApproveDto(paymentKey, orderId, amount));
+        paymentClient.approvePayment(new PaymentApproveRequest(paymentKey, orderId, amount));
         reservationRepository.save(reservation);
         return ReservationResponse.from(reservation);
     }

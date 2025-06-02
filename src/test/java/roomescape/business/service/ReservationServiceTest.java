@@ -32,7 +32,7 @@ import roomescape.infrastructure.ReservationTimeRepository;
 import roomescape.infrastructure.ThemeRepository;
 import roomescape.infrastructure.UserRepository;
 import roomescape.infrastructure.payment.TossPaymentClient;
-import roomescape.infrastructure.payment.dto.PaymentApproveDto;
+import roomescape.infrastructure.payment.dto.PaymentApproveRequest;
 import roomescape.presentation.dto.response.ReservationResponse;
 import roomescape.presentation.dto.response.ReservationTimeResponse;
 import roomescape.presentation.dto.response.ThemeResponse;
@@ -230,7 +230,7 @@ class ReservationServiceTest {
         when(reservationRepository.existsByDate_ValueAndTime_StartTime_ValueAndThemeId(eq(date),
                 eq(LocalTime.of(10, 0)), eq(theme.getId())))
                 .thenReturn(false);
-        doNothing().when(paymentClient).approvePayment(any(PaymentApproveDto.class));
+        doNothing().when(paymentClient).approvePayment(any(PaymentApproveRequest.class));
 
         // when
         ReservationResponse result = sut.addAndGet(date, timeIdValue, themeIdValue, userIdValue, "paymentKey",
@@ -238,7 +238,7 @@ class ReservationServiceTest {
 
         // then
         assertThat(result).isNotNull();
-        verify(paymentClient).approvePayment(any(PaymentApproveDto.class));
+        verify(paymentClient).approvePayment(any(PaymentApproveRequest.class));
         verify(userRepository).findById(userId);
         verify(reservationTimeRepository).findById(timeId);
         verify(themeRepository).findById(themeId);
