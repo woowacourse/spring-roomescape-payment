@@ -1,0 +1,23 @@
+package roomescape.reservation.ui.dto;
+
+import roomescape.reservation.application.dto.ReservationSearchRequest;
+import roomescape.reservation.domain.ReservationDate;
+
+import java.time.LocalDate;
+
+public record ReservationSearchWebRequest(
+        Long themeId,
+        Long userId,
+        LocalDate dateFrom,
+        LocalDate dateTo
+) {
+
+    public ReservationSearchRequest toServiceRequest() {
+        return new ReservationSearchRequest(
+                themeId,
+                userId,
+                dateFrom != null ? ReservationDate.from(dateFrom) : null,
+                dateTo != null ? ReservationDate.from(dateTo) : null
+        );
+    }
+}
