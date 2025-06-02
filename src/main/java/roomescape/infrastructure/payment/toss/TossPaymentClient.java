@@ -2,14 +2,10 @@ package roomescape.infrastructure.payment.toss;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.time.Duration;
 import java.util.Base64;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.ExternalApiErrorException;
@@ -17,7 +13,6 @@ import roomescape.infrastructure.payment.PaymentClient;
 import roomescape.infrastructure.payment.dto.PaymentApproveRequest;
 import roomescape.infrastructure.payment.toss.dto.TossPaymentApproveErrorResponse;
 
-@Component
 public class TossPaymentClient implements PaymentClient {
 
     private final RestClient restClient;
@@ -25,17 +20,11 @@ public class TossPaymentClient implements PaymentClient {
     private final String secretKey;
 
     public TossPaymentClient(
-            RestClient.Builder restClientBuilder,
+            RestClient restClient,
             ObjectMapper objectMapper,
-            @Value("${payment.secret-key}") String secretKey
+            String secretKey
     ) {
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setConnectTimeout(Duration.ofSeconds(3));
-        factory.setReadTimeout(Duration.ofSeconds(30));
-        this.restClient = restClientBuilder
-                .baseUrl("https://api.tosspayments.com/")
-                .requestFactory(factory)
-                .build();
+        this.restClient = restClient;
         this.objectMapper = objectMapper;
         this.secretKey = secretKey;
     }

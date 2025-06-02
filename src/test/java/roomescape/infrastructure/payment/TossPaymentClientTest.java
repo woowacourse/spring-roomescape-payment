@@ -7,8 +7,11 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.web.client.RestClientBuilderConfigurer;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -32,24 +35,25 @@ class TossPaymentClientTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void 결제시간이_만료될_경우_예외가_발생한다() throws Exception {
+    void 결제_승인_요청_결과가_에러면_예외가_발생한다() throws Exception {
         // given
         TossPaymentApproveErrorResponse response = new TossPaymentApproveErrorResponse("code",
-                "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다.");
+                "결제 승인에 실패했습니다.");
         PaymentApproveRequest paymentApproveRequest = new TossPaymentApproveRequest("paymentKey", "1", 1000L);
         mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST)
                         .body(objectMapper.writeValueAsString(response)));
         // when
         assertThatThrownBy(() -> paymentClient.approvePayment(paymentApproveRequest))
-                .isInstanceOf(ExternalApiErrorException.class);
+                .isInstanceOf(ExternalApiErrorException.class)
+                .hasMessage("결제 승인에 실패했습니다.");
     }
 
     @Test
     void 잘못된_키로_실제_요청을_보내면_예외가_발생한다() {
         // given
         paymentClient = new TossPaymentClient(
-                new RestClientBuilderConfigurer().configure(RestClient.builder()),
+                new RestClientBuilderConfigurer().configure(RestClient.builder()).build(),
                 new Jackson2ObjectMapperBuilder().createXmlMapper(false).build(),
                 "invalidKey"
         );
@@ -57,5 +61,21 @@ class TossPaymentClientTest {
         // when
         assertThatThrownBy(() -> paymentClient.approvePayment(paymentApproveRequest))
                 .isInstanceOf(ExternalApiErrorException.class);
+    }
+
+    @TestConfiguration
+    public static class PaymentConfig {
+
+        @Bean
+        public TossPaymentClient tossPaymentClient(
+                RestClient.Builder restClientBuilder,
+                ObjectMapper objectMapper,
+                @Value("${payment.secret-key}") String secretKey
+        ) {
+            RestClient restClient = restClientBuilder
+                    .baseUrl("https://api.tosspayments.com/")
+                    .build();
+            return new TossPaymentClient(restClient, objectMapper, secretKey);
+        }
     }
 }
