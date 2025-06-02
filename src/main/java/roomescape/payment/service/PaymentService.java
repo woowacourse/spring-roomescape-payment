@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -81,6 +82,7 @@ public class PaymentService {
         }
     }
 
+    @Transactional
     public void savePayment(final Long reservationId, final PaymentRequest paymentRequest) {
         Reservation reservation = reservationRepository.findById(new ReservationId(reservationId))
                 .orElseThrow(() -> new EntityNotFoundException("해당 예약이 존재하지 않습니다."));
