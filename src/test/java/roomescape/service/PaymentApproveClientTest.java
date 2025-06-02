@@ -28,101 +28,79 @@ import roomescape.service.payment.PaymentApproveClient;
 })
 class PaymentApproveClientTest {
 
+    private static final String PAYMENT_KEY = "5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1";
+    private static final String ORDER_ID = "a4CWyWY5m89PNh7xJwhk1";
+    private static final int AMOUNT = 1000;
+    private static final String CONFIRM_ENDPOINT = "/v1/payments/confirm";
+
     @Autowired
     private PaymentApproveClient paymentApproveClient;
 
     @InjectWireMock
-    WireMockServer wireMock;
+    private WireMockServer wireMock;
 
     @Test
     @DisplayName("외부 API를 통하여 결제 승인을 요청한다.")
-    void approveTest() {
+    void approvePaymentSuccessfully() {
         // given
-        wireMock.stubFor(post("/v1/payments/confirm")
-                .willReturn(okJson(successResponse())));
+        wireMock.stubFor(post(CONFIRM_ENDPOINT)
+                .willReturn(okJson(createSuccessResponse())));
 
         // when
-        final PaymentSuccessResponse response = paymentApproveClient.approvePayment(
-                "5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1",
-                "a4CWyWY5m89PNh7xJwhk1",
-                1000
-        );
+        PaymentSuccessResponse response = paymentApproveClient.approvePayment(PAYMENT_KEY, ORDER_ID, AMOUNT);
 
         // then
-        assertThat(response.paymentKey()).isEqualTo("5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1");
+        assertThat(response.paymentKey()).isEqualTo(PAYMENT_KEY);
     }
 
     @Test
     @DisplayName("외부 API를 통해 결제 승인을 요청했지만 에러 반환받음")
-    void approveFailureTest() {
+    void approvePaymentWithError() {
         // given
-        String errorCode = """
-                {
-                  "code": "NOT_FOUND_PAYMENT",
-                  "message": "존재하지 않는 결제 입니다."
-                }
-                """;
-        wireMock.stubFor(post("/v1/payments/confirm")
-                .willReturn(jsonResponse(errorCode, 400)));
+        String errorMessage = "존재하지 않는 결제 입니다.";
+        wireMock.stubFor(post(CONFIRM_ENDPOINT)
+                .willReturn(jsonResponse(createErrorResponse("NOT_FOUND_PAYMENT", errorMessage), 400)));
 
-        // when, then
-        assertThatThrownBy(() -> paymentApproveClient.approvePayment(
-                "5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1",
-                "a4CWyWY5m89PNh7xJwhk1",
-                1000
-        ))
+        // when & then
+        assertThatThrownBy(() -> paymentApproveClient.approvePayment(PAYMENT_KEY, ORDER_ID, AMOUNT))
                 .isInstanceOf(PaymentException.class)
-                .hasMessageContaining("존재하지 않는 결제 입니다.");
+                .hasMessageContaining(errorMessage);
     }
 
     @Test
     @DisplayName("외부 API를 통해 결제 승인을 요청했지만 민감한 에러 반환받음")
-    void approveSensitiveFailureTest() {
+    void approvePaymentWithSensitiveError() {
         // given
-        String errorCode = """
-                {
-                  "code": "INVALID_API_KEY",
-                  "message": "잘못된 시크릿키 연동 정보 입니다."
-                }
-                """;
-        wireMock.stubFor(post("/v1/payments/confirm")
-                .willReturn(jsonResponse(errorCode, 400)));
+        wireMock.stubFor(post(CONFIRM_ENDPOINT)
+                .willReturn(jsonResponse(createErrorResponse("INVALID_API_KEY", "잘못된 시크릿키 연동 정보 입니다."), 400)));
 
-        // when, then
-        assertThatThrownBy(() -> paymentApproveClient.approvePayment(
-                "5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1",
-                "a4CWyWY5m89PNh7xJwhk1",
-                1000
-        ))
+        // when & then
+        assertThatThrownBy(() -> paymentApproveClient.approvePayment(PAYMENT_KEY, ORDER_ID, AMOUNT))
                 .isInstanceOf(PaymentException.class)
                 .hasMessageContaining(PaymentException.SENSITIVE_EXCEPTION_MESSAGE);
     }
 
     @Test
-    @DisplayName("타임아웃 테스트 추가")
-    void timeoutTest() {
+    @DisplayName("타임아웃 발생 시 RestClientException이 발생한다")
+    void approvePaymentWithTimeout() {
         // given
-        wireMock.stubFor(post("/v1/payments/confirm")
+        wireMock.stubFor(post(CONFIRM_ENDPOINT)
                 .willReturn(aResponse()
                         .withStatus(HttpStatus.GATEWAY_TIMEOUT.value())
                         .withFixedDelay(30000)));
 
-        // when, then
-        assertThatThrownBy(() -> paymentApproveClient.approvePayment(
-                "5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1",
-                "a4CWyWY5m89PNh7xJwhk1",
-                1000
-        ))
+        // when & then
+        assertThatThrownBy(() -> paymentApproveClient.approvePayment(PAYMENT_KEY, ORDER_ID, AMOUNT))
                 .isInstanceOf(RestClientException.class);
     }
 
-    private String successResponse() {
+    private String createSuccessResponse() {
         return """
                 {
                   "mId": "tosspayments",
                   "lastTransactionKey": "9C62B18EEF0DE3EB7F4422EB6D14BC6E",
-                  "paymentKey": "5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1",
-                  "orderId": "a4CWyWY5m89PNh7xJwhk1",
+                  "paymentKey": "%s",
+                  "orderId": "%s",
                   "orderName": "토스 티셔츠 외 2건",
                   "taxExemptionAmount": 0,
                   "status": "DONE",
@@ -142,7 +120,7 @@ class PaymentApproveClientTest {
                     "cardType": "신용",
                     "ownerType": "개인",
                     "acquireStatus": "READY",
-                    "amount": 1000
+                    "amount": %d
                   },
                   "virtualAccount": null,
                   "transfer": null,
@@ -166,11 +144,11 @@ class PaymentApproveClientTest {
                     "url": "https://dashboard.tosspayments.com/receipt/redirection?transactionId=tviva20240213121757MvuS8&ref=PX"
                   },
                   "checkout": {
-                    "url": "https://api.tosspayments.com/v1/payments/5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1/checkout"
+                    "url": "https://api.tosspayments.com/v1/payments/%s/checkout"
                   },
                   "currency": "KRW",
-                  "totalAmount": 1000,
-                  "balanceAmount": 1000,
+                  "totalAmount": %d,
+                  "balanceAmount": %d,
                   "suppliedAmount": 909,
                   "vat": 91,
                   "taxFreeAmount": 0,
@@ -178,6 +156,15 @@ class PaymentApproveClientTest {
                   "method": "카드",
                   "version": "2022-11-16"
                 }
-                """;
+                """.formatted(PAYMENT_KEY, ORDER_ID, AMOUNT, PAYMENT_KEY, AMOUNT, AMOUNT);
+    }
+
+    private String createErrorResponse(String code, String message) {
+        return """
+                {
+                  "code": "%s",
+                  "message": "%s"
+                }
+                """.formatted(code, message);
     }
 }

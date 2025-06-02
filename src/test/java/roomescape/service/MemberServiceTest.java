@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.TestPropertySource;
 import roomescape.config.JpaConfig;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
@@ -25,10 +24,6 @@ import roomescape.repository.impl.MemberRepositoryImpl;
 import roomescape.repository.jpa.MemberJpaRepository;
 import roomescape.service.member.MemberService;
 
-@TestPropertySource(properties = {
-        "spring.sql.init.mode=never",          // SQL 스크립트 실행 중지
-        "spring.jpa.hibernate.ddl-auto=create-drop",  // Hibernate DDL 자동 생성 비활성화
-})
 @Import(JpaConfig.class)
 @DataJpaTest
 class MemberServiceTest {

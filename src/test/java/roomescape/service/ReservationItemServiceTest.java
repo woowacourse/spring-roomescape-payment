@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
-import org.springframework.test.context.TestPropertySource;
 import roomescape.domain.reservationitem.ReservationItem;
 import roomescape.domain.reservationitem.ReservationItemRepository;
 import roomescape.domain.reservationitem.ReservationTheme;
@@ -27,10 +26,6 @@ import roomescape.service.reservation.ReservationItemService;
 
 @SpringBootTest
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
-@TestPropertySource(properties = {
-        "spring.sql.init.mode=never",
-        "spring.jpa.hibernate.ddl-auto=create-drop"
-})
 class ReservationItemServiceTest {
 
     @Autowired
