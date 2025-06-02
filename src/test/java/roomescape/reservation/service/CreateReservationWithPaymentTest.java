@@ -8,10 +8,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchProperties;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.client.RestClient;
 import roomescape.auth.service.dto.LoginMember;
 import roomescape.common.exception.DuplicatedException;
 import roomescape.common.exception.EntityNotFoundException;
@@ -201,5 +203,13 @@ public class CreateReservationWithPaymentTest {
                         () -> reservationService.createWithPayment(reservationWithPaymentRequest, LoginMember.of(member)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("과거 날짜의 예약은 생성할 수 없습니다.");
+    }
+
+    @Test
+    void test(){
+        // given
+
+        // when
+        // then
     }
 }
