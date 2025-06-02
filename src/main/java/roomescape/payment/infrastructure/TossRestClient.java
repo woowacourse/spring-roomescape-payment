@@ -16,7 +16,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.UnknownHttpStatusCodeException;
 import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.payment.exception.custom.PaymentBadRequestException;
@@ -43,14 +42,15 @@ public class TossRestClient {
     }
 
     @Retryable(
-            retryFor = { ResourceAccessException.class, HttpServerErrorException.class},
-            noRetryFor = { HttpClientErrorException.class, UnknownHttpStatusCodeException.class },
+            retryFor = {ResourceAccessException.class, HttpServerErrorException.class},
+            noRetryFor = HttpClientErrorException.class,
             backoff = @Backoff(delay = 2_000, multiplier = 2)
     )
-    public TossPaymentResponse confirm(final TossPaymentRequest tossPaymentRequest) {
+    public TossPaymentResponse confirm(final TossPaymentRequest tossPaymentRequest, final String idempotencyKey) {
         return restClient.post()
                 .uri("/v1/payments/confirm")
                 .header("Authorization", authHeaderValue)
+                .header("Idempotency-Key", idempotencyKey)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .body(tossPaymentRequest)
@@ -59,7 +59,9 @@ public class TossRestClient {
     }
 
     @Recover
-    public TossPaymentResponse recover(final ResourceAccessException ex, final TossPaymentRequest req) {
+    public TossPaymentResponse recover(final ResourceAccessException ex,
+                                       final TossPaymentRequest req,
+                                       final String idempotencyKey) {
         Throwable cause = ex.getCause();
         if (cause instanceof SocketTimeoutException) {
             log.error("토스 결제 confirm 요청 타임아웃", ex);
@@ -73,7 +75,9 @@ public class TossRestClient {
     }
 
     @Recover
-    public TossPaymentResponse recover(HttpServerErrorException ex, TossPaymentRequest req) {
+    public TossPaymentResponse recover(final HttpServerErrorException ex,
+                                       final TossPaymentRequest req,
+                                       final String idempotencyKey) {
         final HttpStatusCode status = ex.getStatusCode();
         log.error("토스 결제 서버 오류: {} {}", status.value(), status, ex);
         if (status.value() == HttpStatus.INTERNAL_SERVER_ERROR.value()) {
@@ -83,7 +87,9 @@ public class TossRestClient {
     }
 
     @Recover
-    public TossPaymentResponse recover(HttpClientErrorException ex, TossPaymentRequest req) {
+    public TossPaymentResponse recover(final HttpClientErrorException ex,
+                                       final TossPaymentRequest req,
+                                       final String idempotencyKey) {
         HttpStatusCode status = ex.getStatusCode();
         log.error("토스 결제 클라이언트 오류: {} {}", status.value(), status, ex);
         if (status.value() == HttpStatus.UNAUTHORIZED.value()) {

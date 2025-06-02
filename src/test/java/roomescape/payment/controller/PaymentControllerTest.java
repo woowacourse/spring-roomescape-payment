@@ -1,7 +1,9 @@
 package roomescape.payment.controller;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -21,14 +23,17 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.web.client.HttpClientErrorException;
 import roomescape.IntegrationTest;
 import roomescape.auth.infrastructure.jwt.JwtTokenProvider;
 import roomescape.payment.dto.ReservationPaymentRequest;
 import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;
-import roomescape.payment.exception.PaymentTimeoutException;
+import roomescape.payment.exception.custom.PaymentBadRequestException;
+import roomescape.payment.exception.custom.PaymentException;
+import roomescape.payment.exception.custom.PaymentServerException;
+import roomescape.payment.exception.custom.PaymentTimeoutException;
 import roomescape.payment.infrastructure.TossRestClient;
+import roomescape.payment.util.IdempotencyKeyGenerator;
 
 @Sql("/data.sql")
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
@@ -68,9 +73,10 @@ class PaymentControllerTest extends IntegrationTest {
         String orderId = "a4CWyWY5m89PNh7xJwhk1";
         Long amount = 1000L;
         TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount);
+        String idempotencyKey = IdempotencyKeyGenerator.generate();
 
         // when
-        TossPaymentResponse response = tossRestClient.confirm(request);
+        TossPaymentResponse response = tossRestClient.confirm(request, idempotencyKey);
 
         // then
         SoftAssertions.assertSoftly(soft -> {
@@ -93,11 +99,12 @@ class PaymentControllerTest extends IntegrationTest {
         String orderId = "a4CWyWY5m89PNh7xJwhk1";
         Long amount = 1000L;
         TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount);
+        String idempotencyKey = IdempotencyKeyGenerator.generate();
 
         // when
         // then
-        assertThatThrownBy(() -> tossRestClient.confirm(request))
-                .isInstanceOf(HttpClientErrorException.class);
+        assertThatThrownBy(() -> tossRestClient.confirm(request, idempotencyKey))
+                .isInstanceOf(PaymentBadRequestException.class);
     }
 
     @Test
@@ -116,9 +123,11 @@ class PaymentControllerTest extends IntegrationTest {
         String orderId = "a4CWyWY5m89PNh7xJwhk1";
         Long amount = 1000L;
         TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount);
+        String idempotencyKey = IdempotencyKeyGenerator.generate();
+
 
         // when
-        TossPaymentResponse response = tossRestClient.confirm(request);
+        TossPaymentResponse response = tossRestClient.confirm(request, idempotencyKey);
 
         // then
         SoftAssertions.assertSoftly(soft -> {
@@ -143,10 +152,11 @@ class PaymentControllerTest extends IntegrationTest {
         String orderId = "a4CWyWY5m89PNh7xJwhk1";
         Long amount = 1000L;
         TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount);
+        String idempotencyKey = IdempotencyKeyGenerator.generate();
 
         // when
         // then
-        assertThatThrownBy(() -> tossRestClient.confirm(request))
+        assertThatThrownBy(() -> tossRestClient.confirm(request, idempotencyKey))
                 .isInstanceOf(PaymentTimeoutException.class);
     }
 
@@ -176,6 +186,73 @@ class PaymentControllerTest extends IntegrationTest {
                 .when().post("/payments")
                 .then().log().all()
                 .statusCode(201);
+    }
+
+    @Test
+    void 결제_승인_서버_오류_예외_처리() {
+        // given
+        wireMockServer.stubFor(post(urlEqualTo("/v1/payments/confirm"))
+                .willReturn(aResponse()
+                        .withStatus(500)
+                ));
+        TossPaymentRequest request = new TossPaymentRequest("test_key", "orderId", 1000L);
+        String idempotencyKey = IdempotencyKeyGenerator.generate();
+
+        // when
+        // then
+        assertThatThrownBy(() -> tossRestClient.confirm(request, idempotencyKey))
+                .isInstanceOf(PaymentServerException.class)
+                .hasMessageContaining("결제 시스템에 문제가 발생했습니다");
+    }
+
+    @Test
+    void 결제_승인_알수없는_상태코드_예외_처리() {
+        // given
+        wireMockServer.stubFor(post(urlEqualTo("/v1/payments/confirm"))
+                .willReturn(aResponse()
+                        .withStatus(599)
+                ));
+
+        TossPaymentRequest request = new TossPaymentRequest("test_key", "orderId", 1000L);
+        String idempotencyKey = IdempotencyKeyGenerator.generate();
+
+        // when
+        // then
+        assertThatThrownBy(() -> tossRestClient.confirm(request, idempotencyKey))
+                .isInstanceOf(PaymentException.class);
+    }
+
+    @Test
+    void 멱등키_동일할_때_두번_호출하면_헤더가_전달되고_응답도_일관되는지_확인() {
+        // given
+        String paymentKey = "test_key";
+        String orderId = "a4CWyWY5m89PNh7xJwhk1";
+        Long amount = 1000L;
+        TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount);
+        String idempotencyKey = IdempotencyKeyGenerator.generate();
+
+        wireMockServer.stubFor(post(urlEqualTo("/v1/payments/confirm"))
+                .withHeader("Idempotency-Key", equalTo(idempotencyKey))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(createNormalBody())
+                ));
+
+        // when
+        TossPaymentResponse response1 = tossRestClient.confirm(request, idempotencyKey);
+        TossPaymentResponse response2 = tossRestClient.confirm(request, idempotencyKey);
+
+        // then
+        SoftAssertions.assertSoftly(soft -> {
+            assertThat(response1.paymentKey()).isEqualTo("test_key");
+            assertThat(response1.status()).isEqualTo("DONE");
+
+            assertThat(response2.paymentKey()).isEqualTo("test_key");
+            assertThat(response2.status()).isEqualTo("DONE");
+        });
+        wireMockServer.verify(2, postRequestedFor(urlEqualTo("/v1/payments/confirm"))
+                .withHeader("Idempotency-Key", equalTo(idempotencyKey)));
     }
 
     private String createNormalBody() {

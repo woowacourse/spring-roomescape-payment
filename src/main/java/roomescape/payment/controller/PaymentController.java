@@ -12,7 +12,6 @@ import roomescape.auth.dto.LoginMember;
 import roomescape.payment.dto.ReservationPaymentRequest;
 import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;
-import roomescape.payment.infrastructure.TossRestClient;
 import roomescape.payment.service.PaymentService;
 
 @RestController
@@ -20,7 +19,6 @@ import roomescape.payment.service.PaymentService;
 @RequestMapping("/payments")
 public class PaymentController {
 
-    private final TossRestClient tossRestClient;
     private final PaymentService paymentService;
 
     @PostMapping("/confirm/tossPay")
@@ -30,7 +28,7 @@ public class PaymentController {
                 request.orderId(),
                 request.amount()
         );
-        return tossRestClient.confirm(tossPaymentRequest);
+        return paymentService.confirm(tossPaymentRequest);
     }
 
     @PostMapping

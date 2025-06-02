@@ -7,7 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.ReservationPaymentRequest;
+import roomescape.payment.dto.TossPaymentRequest;
+import roomescape.payment.dto.TossPaymentResponse;
+import roomescape.payment.infrastructure.TossRestClient;
 import roomescape.payment.repository.PaymentRepository;
+import roomescape.payment.util.IdempotencyKeyGenerator;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
@@ -19,6 +23,12 @@ public class PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final ReservationService reservationService;
+    private final TossRestClient restClient;
+
+    public TossPaymentResponse confirm(final TossPaymentRequest tossPaymentRequest) {
+        final String idempotencyKey = IdempotencyKeyGenerator.generate();
+        return restClient.confirm(tossPaymentRequest, idempotencyKey);
+    }
 
     @Transactional
     public void savePayment(final ReservationPaymentRequest request, final LoginMember loginMember) {
