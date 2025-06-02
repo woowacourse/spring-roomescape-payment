@@ -21,11 +21,11 @@ public class DataCleaner {
     private final PaymentJpaRepository paymentJpaRepository;
 
     public void clean() {
+        paymentJpaRepository.deleteAll();
         reservationJpaRepository.deleteAll();
         reservationItemJpaRepository.deleteAll();
         memberJpaRepository.deleteAll();
         reservationTimeJpaRepository.deleteAll();
         reservationThemeJpaRepository.deleteAll();
-        paymentJpaRepository.deleteAll();
     }
 }

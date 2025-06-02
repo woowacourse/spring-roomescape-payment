@@ -138,8 +138,8 @@ class ReservationServiceTest extends ServiceTest {
         @DisplayName("회원 ID로만 필터링하면 해당 회원의 모든 예약이 조회된다")
         void filterByMemberIdOnly() {
             // given
-            Member member1 = insertMember("이메일", "비밀번호", "이름1", MemberRole.USER);
-            Member member2 = insertMember("이메일", "비밀번호", "이름2", MemberRole.USER);
+            Member member1 = insertMember("이메일1", "비밀번호", "이름1", MemberRole.USER);
+            Member member2 = insertMember("이메일2", "비밀번호", "이름2", MemberRole.USER);
             ReservationTheme theme = insertReservationTheme("테마", "설명", "썸네일");
             ReservationTime time = insertReservationTime(TIME1);
             ReservationItem item = insertReservationItem(DATE1, time, theme);
@@ -286,8 +286,8 @@ class ReservationServiceTest extends ServiceTest {
         @DisplayName("회원 ID와 테마 ID로 필터링하면 해당 회원의 해당 테마 예약만 조회된다")
         void filterByMemberIdAndThemeId() {
             // given
-            Member member1 = insertMember("이메일", "비밀번호", "이름1", MemberRole.USER);
-            Member member2 = insertMember("이메일", "비밀번호", "이름2", MemberRole.USER);
+            Member member1 = insertMember("이메일1", "비밀번호", "이름1", MemberRole.USER);
+            Member member2 = insertMember("이메일2", "비밀번호", "이름2", MemberRole.USER);
             ReservationTheme theme1 = insertReservationTheme("테마1", "설명", "썸네일");
             ReservationTheme theme2 = insertReservationTheme("테마2", "설명", "썸네일");
             ReservationTime time = insertReservationTime(TIME1);
@@ -310,8 +310,8 @@ class ReservationServiceTest extends ServiceTest {
         @DisplayName("모든 필터 조건을 적용하면 모든 조건을 만족하는 예약만 조회된다")
         void filterByAllConditions() {
             // given
-            Member member1 = insertMember("이메일", "비밀번호", "이름1", MemberRole.USER);
-            Member member2 = insertMember("이메일", "비밀번호", "이름2", MemberRole.USER);
+            Member member1 = insertMember("이메일1", "비밀번호", "이름1", MemberRole.USER);
+            Member member2 = insertMember("이메일2", "비밀번호", "이름2", MemberRole.USER);
             ReservationTheme theme1 = insertReservationTheme("테마1", "설명", "썸네일");
             ReservationTheme theme2 = insertReservationTheme("테마2", "설명", "썸네일");
             ReservationTime time = insertReservationTime(TIME1);
@@ -338,8 +338,8 @@ class ReservationServiceTest extends ServiceTest {
         @DisplayName("모든 파라미터가 null이면, 모든 예약이 조회된다")
         void filterWithAllNullParameters() {
             // given
-            Member member1 = insertMember("이메일", "비밀번호", "이름1", MemberRole.USER);
-            Member member2 = insertMember("이메일", "비밀번호", "이름2", MemberRole.USER);
+            Member member1 = insertMember("이메일1", "비밀번호", "이름1", MemberRole.USER);
+            Member member2 = insertMember("이메일2", "비밀번호", "이름2", MemberRole.USER);
             ReservationTheme theme1 = insertReservationTheme("테마1", "설명", "썸네일");
             ReservationTheme theme2 = insertReservationTheme("테마2", "설명", "썸네일");
             ReservationTime time = insertReservationTime(TIME1);
@@ -393,7 +393,7 @@ class ReservationServiceTest extends ServiceTest {
     void saveReservationWaiting() {
         // given
         Member member1 = insertMember("member1@example.com", "password1", "Member 1", MemberRole.USER);
-        Member member2 = insertMember("member1@example.com", "password1", "Member 1", MemberRole.USER);
+        Member member2 = insertMember("member2@example.com", "password1", "Member 1", MemberRole.USER);
         ReservationTheme theme = insertReservationTheme("Theme 1", "Description 1", "Thumbnail 1");
         ReservationTime time = insertReservationTime(TIME1);
         reservationService.addReservation(new CreateReservationRequest(member1.getId(), DATE1, theme.getId(), time.getId()));
@@ -468,8 +468,8 @@ class ReservationServiceTest extends ServiceTest {
     @DisplayName("확정 예약의 priority는 0이다.")
     void acceptedReservationHasPriorityZero() {
         // given
-        Member member1 = insertMember("이메일", "비밀번호", "이름1", MemberRole.USER);
-        Member member2 = insertMember("이메일", "비밀번호", "이름2", MemberRole.USER);
+        Member member1 = insertMember("이메일1", "비밀번호", "이름1", MemberRole.USER);
+        Member member2 = insertMember("이메일2", "비밀번호", "이름2", MemberRole.USER);
         ReservationTheme theme = insertReservationTheme("테마1", "설명", "썸네일");
         ReservationTime time = insertReservationTime(TIME1);
         ReservationItem item = insertReservationItem(DATE1, time, theme);
@@ -491,9 +491,9 @@ class ReservationServiceTest extends ServiceTest {
     @DisplayName("대기 예약의 priority는 앞선 예약 수에 따라 결정된다.")
     void pendingReservationPriorityTest() {
         // given
-        Member member1 = insertMember("이메일", "비밀번호", "이름1", MemberRole.USER);
-        Member member2 = insertMember("이메일", "비밀번호", "이름2", MemberRole.USER);
-        Member member3 = insertMember("이메일", "비밀번호", "이름3", MemberRole.USER);
+        Member member1 = insertMember("이메일1", "비밀번호", "이름1", MemberRole.USER);
+        Member member2 = insertMember("이메일2", "비밀번호", "이름2", MemberRole.USER);
+        Member member3 = insertMember("이메일3", "비밀번호", "이름3", MemberRole.USER);
         ReservationTheme theme = insertReservationTheme("테마1", "설명", "썸네일");
         ReservationTime time = insertReservationTime(TIME1);
         ReservationItem item = insertReservationItem(DATE1, time, theme);
@@ -515,8 +515,8 @@ class ReservationServiceTest extends ServiceTest {
     @DisplayName("확정 예약 삭제 후 다음 대기 예약이 확정되면 priority가 0으로 변경된다.")
     void priorityChangesAfterReservationDeletion() {
         // given
-        Member member1 = insertMember("이메일", "비밀번호", "이름1", MemberRole.USER);
-        Member member2 = insertMember("이메일", "비밀번호", "이름2", MemberRole.USER);
+        Member member1 = insertMember("이메일1", "비밀번호", "이름1", MemberRole.USER);
+        Member member2 = insertMember("이메일2", "비밀번호", "이름2", MemberRole.USER);
         ReservationTheme theme = insertReservationTheme("테마1", "설명", "썸네일");
         ReservationTime time = insertReservationTime(TIME1);
         ReservationItem item = insertReservationItem(DATE1, time, theme);

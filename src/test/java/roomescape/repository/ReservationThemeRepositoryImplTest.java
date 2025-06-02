@@ -3,6 +3,8 @@ package roomescape.repository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import roomescape.domain.member.Member;
+import roomescape.domain.member.MemberRole;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationitem.ReservationItem;
 import roomescape.domain.reservationitem.ReservationTheme;
@@ -66,6 +68,7 @@ class ReservationThemeRepositoryImplTest extends RepositoryTest {
     @Test
     void findWeeklyThemeOrderByCountDesc() {
         // given
+        Member member = insertMember("email@email.com", "password", "돔푸", MemberRole.USER);
         ReservationTheme theme1 = insertReservationTheme("테마1", "설명", "썸네일");
         ReservationTheme theme2 = insertReservationTheme("테마2", "설명", "썸네일");
         ReservationTheme theme3 = insertReservationTheme("테마3", "설명", "썸네일");
@@ -84,16 +87,16 @@ class ReservationThemeRepositoryImplTest extends RepositoryTest {
         ReservationItem item7 = insertReservationItem(LocalDate.now().plusDays(3), time2, theme3);
         ReservationItem item8 = insertReservationItem(LocalDate.now().plusDays(3), time3, theme3);
 
-        insertReservation(null, item1, ReservationStatus.ACCEPTED);
-        insertReservation(null, item2, ReservationStatus.ACCEPTED);
-        insertReservation(null, item3, ReservationStatus.ACCEPTED);
+        insertReservation(member, item1, ReservationStatus.ACCEPTED);
+        insertReservation(member, item2, ReservationStatus.ACCEPTED);
+        insertReservation(member, item3, ReservationStatus.ACCEPTED);
 
-        insertReservation(null, item4, ReservationStatus.ACCEPTED);
-        insertReservation(null, item5, ReservationStatus.ACCEPTED);
+        insertReservation(member, item4, ReservationStatus.ACCEPTED);
+        insertReservation(member, item5, ReservationStatus.ACCEPTED);
 
-        insertReservation(null, item6, ReservationStatus.ACCEPTED);
-        insertReservation(null, item7, ReservationStatus.ACCEPTED);
-        insertReservation(null, item8, ReservationStatus.ACCEPTED);
+        insertReservation(member, item6, ReservationStatus.ACCEPTED);
+        insertReservation(member, item7, ReservationStatus.ACCEPTED);
+        insertReservation(member, item8, ReservationStatus.ACCEPTED);
 
         // when
         final List<ReservationTheme> weeklyThemeOrderByCountDesc = themeRepository.findWeeklyThemeOrderByCountDesc(
