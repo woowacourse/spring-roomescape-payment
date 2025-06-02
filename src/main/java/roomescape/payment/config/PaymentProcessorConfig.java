@@ -9,12 +9,12 @@ import roomescape.payment.processor.toss.TossPaymentProcessor;
 import roomescape.payment.processor.toss.TossPaymentProcessorErrorHandler;
 
 @Configuration
-public class RestClientConfig {
+public class PaymentProcessorConfig {
 
     private final ObjectMapper objectMapper;
     private final String secretKey;
 
-    public RestClientConfig(
+    public PaymentProcessorConfig(
             @Value("${payment.toss.secret-key}") final String secretKey,
             final ObjectMapper objectMapper
     ) {
@@ -25,6 +25,7 @@ public class RestClientConfig {
     @Bean
     public TossPaymentProcessor tossPaymentProcessor() {
         final RestClient restClient = RestClient.builder()
+            .baseUrl("https://api.tosspayments.com/v1/payments")
                 .defaultStatusHandler(new TossPaymentProcessorErrorHandler(objectMapper))
                 .build();
 

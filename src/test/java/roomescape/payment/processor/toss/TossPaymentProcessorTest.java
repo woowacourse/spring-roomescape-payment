@@ -40,10 +40,10 @@ class TossPaymentProcessorTest {
                 "orderId",
                 "paymentKey"
         );
-        final String uri = "https://api.tosspayments.com/v1/payments/confirm";
+        final String confirmUri = "/confirm";
 
         when(mockTestRestClient.post()
-                .uri(uri)
+                .uri(confirmUri)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Basic " + ENCODED_SECRET_KEY)
                 .body(request)

@@ -20,10 +20,10 @@ public class TossPaymentProcessor {
     public TossPaymentConfirmResponse processPayment(
             final TossPaymentConfirmRequest request
     ) {
-        final String uri = "https://api.tosspayments.com/v1/payments/confirm";
+        final String confirmUri = "/confirm";
 
         return restClient.post()
-                .uri(uri)
+                .uri(confirmUri)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header("Authorization", "Basic " + secretKey)
                 .body(request)

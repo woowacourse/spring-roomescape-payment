@@ -25,7 +25,7 @@ class TossPaymentProcessorIntegrationTest {
         final RestClient restClient = builder.build();
         final TossPaymentProcessor processor = new TossPaymentProcessor("SecretKey", restClient);
 
-        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+        server.expect(requestTo("/confirm"))
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body("""
@@ -51,7 +51,7 @@ class TossPaymentProcessorIntegrationTest {
         final RestClient restClient = builder.build();
         final TossPaymentProcessor processor = new TossPaymentProcessor("SecretKey", restClient);
 
-        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+        server.expect(requestTo("/confirm"))
                 .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body("""
