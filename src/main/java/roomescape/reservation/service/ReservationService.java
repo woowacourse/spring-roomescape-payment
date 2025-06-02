@@ -2,7 +2,6 @@ package roomescape.reservation.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.RoomEscapeInformation;
 import roomescape.reservation.domain.WaitingReservation;
 import roomescape.reservation.dto.AdminReservationRequest;
-import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSearchRequest;
@@ -111,19 +109,7 @@ public class ReservationService {
         }
     }
 
-    public List<MyReservationResponse> findMyReservations(final LoginMember loginMember) {
-        final Member member = findMemberById(loginMember.id());
-        final List<MyReservationResponse> bookedReservations = reservationRepository.findByMember(member).stream()
-                .map(MyReservationResponse::from)
-                .toList();
-        final List<MyReservationResponse> waitingReservations = waitingReservationRepository.findWaitingReservationByMember(
-                        member).stream()
-                .map(MyReservationResponse::from)
-                .toList();
-        return Stream.concat(bookedReservations.stream(), waitingReservations.stream())
-                .toList();
-    }
-
+    // FIXME: 위치 변경 -> waitingService로
     public List<ReservationResponse> findAllWaitingReservation() {
         final List<WaitingReservation> waitingReservationReservations = waitingReservationRepository.findAll();
         return waitingReservationReservations.stream().map(ReservationResponse::new).toList();

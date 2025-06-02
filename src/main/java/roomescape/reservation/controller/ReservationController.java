@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoginMember;
-import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSearchRequest;
@@ -60,10 +59,5 @@ public class ReservationController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteReservation(@PathVariable final Long id) {
         reservationService.deleteById(id);
-    }
-
-    @GetMapping("/mine")
-    public List<MyReservationResponse> findMyReservations(final LoginMember loginMember) {
-        return reservationService.findMyReservations(loginMember);
     }
 }

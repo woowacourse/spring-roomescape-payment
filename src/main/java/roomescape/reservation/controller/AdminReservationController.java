@@ -49,6 +49,6 @@ public class AdminReservationController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteWaitingReservation(@PathVariable @NotNull final Long id) {
-        waitingReservationService.deleteById(id);
+        waitingReservationService.denyWaitingByIdForAdmin(id);
     }
 }

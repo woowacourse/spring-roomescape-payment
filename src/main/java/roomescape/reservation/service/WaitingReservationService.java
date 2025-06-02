@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.exception.NotFoundException;
+import roomescape.exception.ReservationException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.RoomEscapeInformation;
@@ -40,14 +41,35 @@ public class WaitingReservationService {
     }
 
     @Transactional
-    public void deleteById(final Long id) {
-        final WaitingReservation waitingReservation = waitingReservationRepository.findById(id)
-                .orElse(null);
-        if (waitingReservation == null) {
-            return;
+    public void denyWaitingByIdForAdmin(Long waitingId) {
+        WaitingReservation waiting = getWaitingById(waitingId);
+        waitingReservationRepository.delete(waiting);
+        deleteRoomEscapeInfoIfEmpty(waiting.getRoomEscapeInformation());
+    }
+
+    @Transactional
+    public void cancelWaitingByIdForMember(Long waitingId, LoginMember loginMember) {
+        WaitingReservation waiting = getWaitingById(waitingId);
+        validateCancelPermission(loginMember, waiting);
+
+        waitingReservationRepository.delete(waiting);
+        deleteRoomEscapeInfoIfEmpty(waiting.getRoomEscapeInformation());
+    }
+
+    private void validateCancelPermission(LoginMember loginMember, WaitingReservation waiting) {
+        boolean notSameMember = !waiting.isOwnedBy(loginMember.id());
+        if (notSameMember) {
+            throw new ReservationException("자신의 예약만 삭제할 수 있습니다.");
         }
-        final Long infoId = waitingReservation.getRoomEscapeInformation().getId();
-        waitingReservationRepository.delete(waitingReservation);
+    }
+
+    private WaitingReservation getWaitingById(Long waitingId) {
+        return waitingReservationRepository.findById(waitingId)
+                .orElseThrow(() -> new NotFoundException("Waiting을 찾지 못했습니다, waitingId: " + waitingId));
+    }
+
+    private void deleteRoomEscapeInfoIfEmpty(RoomEscapeInformation roomEscapeInformation) {
+        Long infoId = roomEscapeInformation.getId();
 
         boolean hasBooked = reservationRepository.existsByRoomEscapeInformationId(infoId);
         boolean hasWaiting = waitingReservationRepository.existsByRoomEscapeInformationId(infoId);

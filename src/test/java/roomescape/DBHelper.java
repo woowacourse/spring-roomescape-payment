@@ -48,8 +48,12 @@ public class DBHelper {
         if(waiting.getRoomEscapeInformation().getTheme().getId() == null) {
             em.persist(waiting.getRoomEscapeInformation().getTheme());
         }
-
-        em.persist(waiting);
+        if(waiting.getRoomEscapeInformation().getId() == null) {
+            em.persist(waiting.getRoomEscapeInformation());
+        }
+        if(waiting.getId() == null) {
+            em.persist(waiting);
+        }
         em.flush();
 
         return waiting;

@@ -3,7 +3,8 @@ package roomescape.reservation.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import roomescape.reservation.domain.Reservation;
+import java.util.List;
+import roomescape.reservation.repository.dto.MemberRegistrationProjection;
 
 public record MyReservationResponse(
         Long reservationId,
@@ -11,37 +12,22 @@ public record MyReservationResponse(
         @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
         @JsonFormat(pattern = "HH:mm") LocalTime time,
         String status,
-        Long rank
+        int rank
 ) {
-
-    public MyReservationResponse(final Reservation reservation, final ReservationStatusForResponse status) {
-        this(
-                reservation.getId(),
-                reservation.getRoomEscapeInformation().getTheme().getName(),
-                reservation.getRoomEscapeInformation().getDate(),
-                reservation.getRoomEscapeInformation().getTime().getStartAt(),
-                status.getOutput(),
-                null
+    public static MyReservationResponse from(MemberRegistrationProjection projection) {
+        return new MyReservationResponse(
+                projection.getId(),
+                projection.getThemeName(),
+                projection.getDate(),
+                projection.getTime(),
+                RegistrationStatus.from(projection.getType()).getOutput(),
+                projection.getRank()
         );
     }
 
-    public MyReservationResponse(final WaitingReservationWithRank waitingReservationWithRank,
-                                 ReservationStatusForResponse status) {
-        this(
-                waitingReservationWithRank.reservationId(),
-                waitingReservationWithRank.theme(),
-                waitingReservationWithRank.date(),
-                waitingReservationWithRank.time(),
-                status.getOutput(),
-                waitingReservationWithRank.rank()
-        );
-    }
-
-    public static MyReservationResponse from(Reservation reservation) {
-        return new MyReservationResponse(reservation, ReservationStatusForResponse.BOOKED);
-    }
-
-    public static MyReservationResponse from(WaitingReservationWithRank waiting) {
-        return new MyReservationResponse(waiting, ReservationStatusForResponse.WAITING);
+    public static List<MyReservationResponse> from(List<MemberRegistrationProjection> projections) {
+        return projections.stream()
+                .map(MyReservationResponse::from)
+                .toList();
     }
 }

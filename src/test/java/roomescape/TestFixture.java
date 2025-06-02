@@ -9,6 +9,7 @@ import roomescape.member.domain.MemberRole;
 import roomescape.member.domain.Password;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.RoomEscapeInformation;
+import roomescape.reservation.domain.WaitingReservation;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 
@@ -22,6 +23,10 @@ public class TestFixture {
 
     public static Member createDefaultMember_1() {
         return createMember("회원1", "test1@email.com", "1234");
+    }
+
+    public static Member createMemberByName(String name) {
+        return createMember(name, name + "@email.com", "1234");
     }
 
     public static Member createMember(String name, String email, String password) {
@@ -72,6 +77,13 @@ public class TestFixture {
         return createReservationOf(member, DEFAULT_DATE, time, theme);
     }
 
+    public static Reservation createReservationOf(Member member, RoomEscapeInformation roomEscapeInformation) {
+        return Reservation.builder()
+                .member(member)
+                .roomEscapeInformation(roomEscapeInformation)
+                .build();
+    }
+
     public static Reservation createReservationOf(Member member, LocalDate date, ReservationTime time, Theme theme) {
         return Reservation.builder()
                 .member(member)
@@ -81,6 +93,33 @@ public class TestFixture {
                         .time(time)
                         .theme(theme)
                         .build())
+                .build();
+    }
+
+    public static WaitingReservation createWaitingOf(Member member, RoomEscapeInformation roomEscapeInformation) {
+        return WaitingReservation.builder()
+                .member(member)
+                .roomEscapeInformation(roomEscapeInformation)
+                .build();
+    }
+
+    public static WaitingReservation createWaitingOf(Member member, LocalDate date, ReservationTime time, Theme theme) {
+        return WaitingReservation.builder()
+                .member(member)
+                .roomEscapeInformation(RoomEscapeInformation.builder()
+                        .id(null)
+                        .date(date)
+                        .time(time)
+                        .theme(theme)
+                        .build())
+                .build();
+    }
+
+    public static RoomEscapeInformation createRoomEscapeInformation(LocalDate date, ReservationTime time, Theme theme) {
+        return RoomEscapeInformation.builder()
+                .date(date)
+                .time(time)
+                .theme(theme)
                 .build();
     }
 

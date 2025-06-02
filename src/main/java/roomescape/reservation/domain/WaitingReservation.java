@@ -41,4 +41,8 @@ public class WaitingReservation extends BaseTimeEntity {
         this.roomEscapeInformation = roomEscapeInformation;
         this.member = member;
     }
+
+    public boolean isOwnedBy(Long memberId) {
+        return this.member.getId().equals(memberId);
+    }
 }

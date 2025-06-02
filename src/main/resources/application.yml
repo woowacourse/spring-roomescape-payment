@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: local
   h2:
     console:
       enabled: true
@@ -31,5 +33,4 @@ toss-payment:
   read-timeout: 5000
 logging:
   level:
-    org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace

@@ -8,17 +8,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import roomescape.exception.ReservationException;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 
@@ -61,12 +58,12 @@ public class RoomEscapeInformation {
         this.theme = theme;
     }
 
-    @PrePersist
-    private void validateFutureOrPresent() {
-        final LocalDateTime reservationDateTime = LocalDateTime.of(date, time.getStartAt());
-        final LocalDateTime currentDateTime = LocalDateTime.now();
-        if (reservationDateTime.isBefore(currentDateTime)) {
-            throw new ReservationException("예약은 현재 시간 이후로 가능합니다.");
-        }
-    }
+//    @PrePersist
+//    private void validateFutureOrPresent() {
+//        final LocalDateTime reservationDateTime = LocalDateTime.of(date, time.getStartAt());
+//        final LocalDateTime currentDateTime = LocalDateTime.now();
+//        if (reservationDateTime.isBefore(currentDateTime)) {
+//            throw new ReservationException("예약은 현재 시간 이후로 가능합니다.");
+//        }
+//    }
 }

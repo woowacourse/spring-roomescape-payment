@@ -99,6 +99,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (STATIC_RESOURCES.stream().anyMatch(path::startsWith)) {
             return true;
         }
-        return WHITELIST.stream().anyMatch(path::equals);
+        return WHITELIST.stream().anyMatch(path::startsWith);
     }
 }

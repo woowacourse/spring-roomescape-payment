@@ -137,7 +137,7 @@ class WaitingReservationServiceTest {
         waitingReservationRepository.save(waitingReservation);
 
         // when
-        service.deleteById(waitingReservation.getId());
+        service.denyWaitingByIdForAdmin(waitingReservation.getId());
 
         // then
         assertThat(waitingReservationRepository.findById(waitingReservation.getId())).isEmpty();
