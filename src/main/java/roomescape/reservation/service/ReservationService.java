@@ -113,7 +113,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse create(final ReservationCreateRequest request, final PaymentRequest paymentRequest) {
+    public ReservationResponse createWithPayment(final ReservationCreateRequest request, final PaymentRequest paymentRequest) {
         validateReservationCreate(request);
 
         Reservation reservation = getReservation(request, request.loginMember());
@@ -121,6 +121,8 @@ public class ReservationService {
         paymentService.confirm(paymentRequest);
 
         Reservation savedReservation = reservationRepository.save(reservation);
+        paymentService.savePayment(savedReservation.getId(), paymentRequest);
+
         return ReservationResponse.from(savedReservation);
     }
 

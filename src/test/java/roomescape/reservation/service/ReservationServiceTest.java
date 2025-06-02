@@ -1,5 +1,6 @@
 package roomescape.reservation.service;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -163,7 +164,7 @@ class ReservationServiceTest {
                 .andRespond(MockRestResponseCreators.withSuccess());
 
         // when
-        ReservationResponse result = reservationService.create(requestDto, paymentRequest);
+        ReservationResponse result = reservationService.createWithPayment(requestDto, paymentRequest);
 
         // then
         SoftAssertions softAssertions = new SoftAssertions();
@@ -175,6 +176,7 @@ class ReservationServiceTest {
                         savedTheme.getThumbnail()));
 
         softAssertions.assertAll();
+        assertThat(paymentRepository.findAll()).hasSize(1);
     }
 
     @DisplayName("해당 날짜, 시간, 테마에 예약 대기가 존재하는 상황에서 예약을 생성할 수 없다.")
