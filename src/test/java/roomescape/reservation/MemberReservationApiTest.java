@@ -3,7 +3,6 @@ package roomescape.reservation;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -61,7 +60,7 @@ public class MemberReservationApiTest {
 
     @Test
     void 예약을_추가한다() {
-        when(paymentService.addPayment(any(), anyLong()))
+        when(paymentService.addPayment(any()))
             .thenReturn(mock(Payment.class));
 
         final MemberReservationRequest request = createRequest(LocalDate.now().plusDays(1), 1L, 1L);
@@ -104,7 +103,7 @@ public class MemberReservationApiTest {
 
     @Test
     void 과거날짜로_예약을_하면_에러를_반환한다() {
-        when(paymentService.addPayment(any(), anyLong()))
+        when(paymentService.addPayment(any()))
             .thenReturn(mock(Payment.class));
 
         final MemberReservationRequest request = createRequest(LocalDate.now().minusDays(10), 1L,
@@ -123,7 +122,7 @@ public class MemberReservationApiTest {
 
     @Test
     void 중복된_시간에_예약을_하면_에러가_발생한다() {
-        when(paymentService.addPayment(any(), anyLong()))
+        when(paymentService.addPayment(any()))
             .thenReturn(mock(Payment.class));
 
         final MemberReservationRequest request1 = createRequest(

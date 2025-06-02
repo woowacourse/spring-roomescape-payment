@@ -1,11 +1,9 @@
 package roomescape.payment.application.dto;
 
-import java.time.LocalDate;
+import roomescape.reservation.domain.Reservation;
 
 public record PaymentRequest(
-    LocalDate date,
-    Long timeId,
-    Long themeId,
+    Reservation reservation,
     String paymentKey,
     String orderId,
     Long amount

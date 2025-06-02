@@ -3,7 +3,6 @@ package roomescape.reservation.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -54,7 +53,7 @@ class ReservationServiceTest {
         // given
         final MemberReservationRequest request = createRequest(LocalDate.now().plusDays(1), 1L, 1L);
 
-        when(paymentService.addPayment(any(), anyLong()))
+        when(paymentService.addPayment(any()))
             .thenReturn(mock(Payment.class));
 
         // when & then

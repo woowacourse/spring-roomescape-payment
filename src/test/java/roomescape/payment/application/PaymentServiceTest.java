@@ -5,7 +5,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,7 +17,8 @@ import roomescape.payment.application.dto.TossConfirmResponse;
 import roomescape.payment.application.dto.TossConfirmResponse.EasyPayInfo;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentInfo;
-import roomescape.reservation.application.dto.MemberReservationRequest;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.repository.ReservationRepository;
 
 @ActiveProfiles("test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -31,16 +31,16 @@ class PaymentServiceTest {
     @Autowired
     private PaymentService paymentService;
 
+    @Autowired
+    private ReservationRepository reservationRepository;
+
     @Test
     void 결제_저장_테스트() {
         // given
         PaymentInfo paymentInfo = new PaymentInfo("key", "orderId", 1000L);
-        MemberReservationRequest request = createRequest(
-            LocalDate.of(2030, 3, 3),
-            1L, 1L, paymentInfo);
+        Reservation reservation = reservationRepository.findById(1L).get();
         PaymentRequest paymentRequest = new PaymentRequest(
-            request.date(), request.timeId(), request.themeId(), request.paymentKey(),
-            request.orderId(), request.amount()
+            reservation, paymentInfo.getPaymentKey(), paymentInfo.getOrderId(), paymentInfo.getAmount()
         );
         TossConfirmRequest tossConfirmRequest = new TossConfirmRequest(paymentRequest.paymentKey(),
             paymentRequest.orderId(), paymentRequest.amount());
@@ -53,19 +53,13 @@ class PaymentServiceTest {
             .thenReturn(tossConfirmResponse);
 
         // when
-        Payment payment = paymentService.addPayment(paymentRequest, 1L);
+        Payment payment = paymentService.addPayment(paymentRequest);
 
         // then
         assertAll(
             () -> assertThat(payment.getId()).isNotNull(),
             () -> assertThat(payment.getPaymentInfo().equals(paymentInfo))
         );
-    }
-
-    private MemberReservationRequest createRequest(LocalDate now, Long timeId, Long themeId,
-        PaymentInfo paymentInfo) {
-        return new MemberReservationRequest(now, timeId, themeId, paymentInfo.getPaymentKey(),
-            paymentInfo.getOrderId(), paymentInfo.getAmount());
     }
 }
 

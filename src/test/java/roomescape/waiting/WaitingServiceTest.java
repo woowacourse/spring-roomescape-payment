@@ -3,7 +3,6 @@ package roomescape.waiting;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -57,7 +56,7 @@ public class WaitingServiceTest {
             1L, 1L
         );
 
-        when(paymentService.addPayment(any(), anyLong()))
+        when(paymentService.addPayment(any()))
             .thenReturn(mock(Payment.class));
         reservationService.addMemberReservation(memberReservationRequest, 1L);
 

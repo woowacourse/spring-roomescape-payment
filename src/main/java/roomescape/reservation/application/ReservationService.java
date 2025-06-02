@@ -12,8 +12,6 @@ import roomescape.common.exception.impl.ConflictException;
 import roomescape.common.exception.impl.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
-import roomescape.payment.application.PaymentService;
-import roomescape.payment.application.dto.PaymentRequest;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.AvailableReservationTimeResponse;
 import roomescape.reservation.application.dto.MemberReservationRequest;
@@ -36,21 +34,19 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
-    private final PaymentService paymentService;
 
     public ReservationService(
         final ReservationRepository reservationRepository,
         final ReservationTimeRepository reservationTimeRepository,
         final ThemeRepository themeRepository,
         final MemberRepository memberRepository,
-        final WaitingRepository waitingRepository,
-        final PaymentService paymentService) {
+        final WaitingRepository waitingRepository
+    ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
-        this.paymentService = paymentService;
     }
 
     public List<ReservationResponse> findAll() {
@@ -61,18 +57,57 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse addMemberReservation(final MemberReservationRequest request,
-        final Long memberId) {
-        paymentService.addPayment(
-            new PaymentRequest(request.date(), request.timeId(), request.themeId(),
-                request.paymentKey(), request.orderId(), request.amount()), memberId);
-        return addReservation(request.timeId(), request.themeId(), memberId, request.date());
+    public ReservationResponse addMemberReservation(
+        final MemberReservationRequest request, final Long memberId) {
+        Reservation reservation = addReservation(
+            request.timeId(), request.themeId(), memberId, request.date());
+        return ReservationResponse.of(reservation);
     }
 
     @Transactional
     public ReservationResponse addAdminReservation(final AdminReservationRequest request) {
-        return addReservation(request.timeId(), request.themeId(), request.memberId(),
+        Reservation reservation = addReservation(
+            request.timeId(),
+            request.themeId(),
+            request.memberId(),
             request.date());
+        return ReservationResponse.of(reservation);
+    }
+
+    private Reservation addReservation(final Long timeId, final Long themeId,
+        final Long memberId,
+        final LocalDate date) {
+        final ReservationTime reservationTime = getReservationTime(timeId);
+        final Theme theme = getTheme(themeId);
+        final Member member = getMember(memberId);
+
+        final List<Reservation> sameTimeReservations = reservationRepository.findByDateAndThemeId(
+            date,
+            themeId);
+
+        validateIsBooked(sameTimeReservations, reservationTime, theme);
+        validatePastDateTime(date, reservationTime.getStartAt());
+
+        final Reservation reservation = new Reservation(date, reservationTime, theme, member);
+        return reservationRepository.save(reservation);
+    }
+
+    private void validateIsBooked(final List<Reservation> sameTimeReservations,
+        final ReservationTime reservationTime,
+        final Theme theme) {
+        final boolean isBooked = sameTimeReservations.stream()
+            .anyMatch(reservation -> reservation.hasConflictWith(reservationTime, theme));
+        if (isBooked) {
+            throw new ConflictException("해당 테마 이용시간이 겹칩니다.");
+        }
+    }
+
+    private void validatePastDateTime(final LocalDate date, final LocalTime time) {
+        final LocalDateTime now = LocalDateTime.now();
+        final LocalDateTime reservationDateTime = LocalDateTime.of(date, time);
+        if (reservationDateTime.isBefore(now)) {
+            throw new BadRequestException("현재보다 과거의 날짜로 예약 할 수 없습니다.");
+        }
     }
 
     @Transactional
@@ -126,43 +161,6 @@ public class ReservationService {
         return reservations.stream()
             .map(MyReservation::from)
             .toList();
-    }
-
-    private ReservationResponse addReservation(final Long timeId, final Long themeId,
-        final Long memberId,
-        final LocalDate date) {
-        final ReservationTime reservationTime = getReservationTime(timeId);
-        final Theme theme = getTheme(themeId);
-        final Member member = getMember(memberId);
-
-        final List<Reservation> sameTimeReservations = reservationRepository.findByDateAndThemeId(
-            date,
-            themeId);
-
-        validateIsBooked(sameTimeReservations, reservationTime, theme);
-        validatePastDateTime(date, reservationTime.getStartAt());
-
-        final Reservation reservation = new Reservation(date, reservationTime, theme, member);
-        final Reservation saved = reservationRepository.save(reservation);
-        return ReservationResponse.of(saved);
-    }
-
-    private void validateIsBooked(final List<Reservation> sameTimeReservations,
-        final ReservationTime reservationTime,
-        final Theme theme) {
-        final boolean isBooked = sameTimeReservations.stream()
-            .anyMatch(reservation -> reservation.hasConflictWith(reservationTime, theme));
-        if (isBooked) {
-            throw new ConflictException("해당 테마 이용시간이 겹칩니다.");
-        }
-    }
-
-    private void validatePastDateTime(final LocalDate date, final LocalTime time) {
-        final LocalDateTime now = LocalDateTime.now();
-        final LocalDateTime reservationDateTime = LocalDateTime.of(date, time);
-        if (reservationDateTime.isBefore(now)) {
-            throw new BadRequestException("현재보다 과거의 날짜로 예약 할 수 없습니다.");
-        }
     }
 
     private List<AvailableReservationTimeResponse> getAvailableReservationTimeResponses(

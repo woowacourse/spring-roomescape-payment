@@ -8,12 +8,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import java.time.LocalDate;
+import jakarta.persistence.OneToOne;
 import java.util.Objects;
-import roomescape.member.domain.Member;
-import roomescape.reservation.domain.ReservationTime;
-import roomescape.theme.domain.Theme;
+import roomescape.reservation.domain.Reservation;
 
 @Entity
 public class Payment {
@@ -22,16 +19,8 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Member member;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private ReservationTime reservationTime;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Theme theme;
-
-    private LocalDate date;
+    @OneToOne(fetch = FetchType.LAZY)
+    private Reservation reservation;
 
     @Embedded
     private PaymentInfo paymentInfo;
@@ -42,22 +31,17 @@ public class Payment {
     protected Payment() {
     }
 
-    public Payment(final Long id, final Member member, final ReservationTime reservationTime,
-        final Theme theme, final LocalDate date, final PaymentInfo paymentInfo,
+    public Payment(final Long id, final Reservation reservation, final PaymentInfo paymentInfo,
         final PaymentGateway paymentGateway) {
         this.id = id;
-        this.member = member;
-        this.reservationTime = reservationTime;
-        this.theme = theme;
-        this.date = date;
+        this.reservation = reservation;
         this.paymentInfo = paymentInfo;
         this.paymentGateway = paymentGateway;
     }
 
-    public Payment(final Member member, final ReservationTime reservationTime,
-        final Theme theme, final LocalDate date, final PaymentInfo paymentInfo,
+    public Payment(final Reservation reservation, final PaymentInfo paymentInfo,
         final PaymentGateway paymentGateway) {
-        this(null, member, reservationTime, theme, date, paymentInfo, paymentGateway);
+        this(null, reservation, paymentInfo, paymentGateway);
     }
 
     public Long getId() {
