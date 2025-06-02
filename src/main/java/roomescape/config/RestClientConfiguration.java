@@ -33,13 +33,12 @@ public class RestClientConfiguration {
                 .defaultStatusHandler(HttpStatusCode::is4xxClientError, (req, res) -> {
                     RestClientErrorResponse restClientErrorResponse = objectMapper.readValue(res.getBody(), RestClientErrorResponse.class);
                     if (restClientErrorResponse.isInvisibleError()) {
-                        throw new PaymentConfirmServerException(restClientErrorResponse.getMessage());
+                        throw new PaymentConfirmServerException();
                     }
                     throw new PaymentConfirmClientException(restClientErrorResponse.getMessage());
                 })
                 .defaultStatusHandler(HttpStatusCode::is5xxServerError, (req, res) -> {
-                    RestClientErrorResponse restClientErrorResponse = objectMapper.readValue(res.getBody(), RestClientErrorResponse.class);
-                    throw new PaymentConfirmClientException(restClientErrorResponse.getMessage());
+                    throw new PaymentConfirmServerException();
                 })
                 .build();
     }
