@@ -1,0 +1,25 @@
+spring:
+  sql:
+    init:
+      mode: never
+  datasource:
+    url: jdbc:h2:mem:database-test
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+    open-in-view: false
+
+api:
+  toss:
+    connection-try-count: 3
+    connection-timeout-millis: 1000
+    read-timeout-millis: 1000
+    base-url: "https://api.tosspayments.com"
+    confirm-uri: "/v1/payments/confirm"
+    widget-secret-key: "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:"
