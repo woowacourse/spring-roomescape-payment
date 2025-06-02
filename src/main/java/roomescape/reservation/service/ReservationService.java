@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.InvalidReservationException;
 import roomescape.common.util.DateTime;
@@ -12,6 +13,7 @@ import roomescape.member.domain.MemberRepository;
 import roomescape.payment.domain.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
@@ -44,6 +46,7 @@ public class ReservationService {
         this.paymentRepository = paymentRepository;
     }
 
+    @Transactional
     public ReservationResponse createReservation(final ReservationRequest request, final Long memberId) {
         ReservationTime time = reservationTimeRepository.findById(request.timeId())
                 .orElseThrow(() -> new InvalidReservationException("존재하지 않는 시간입니다."));
@@ -52,7 +55,7 @@ public class ReservationService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new InvalidReservationException("존재 하지 않는 유저입니다."));
 
-        Reservation reservation = Reservation.createWithoutId(dateTime.now(), member, request.date(), time, theme);
+        Reservation reservation = Reservation.createWithoutId(dateTime.now(), member, request.date(), time, theme, ReservationStatus.PENDING);
 
         if (reservationRepository.existsByDateAndTimeStartAtAndThemeId(
                 reservation.getDate(),
@@ -108,7 +111,8 @@ public class ReservationService {
                 firstWaiting.getMember(),
                 firstWaiting.getDate(),
                 firstWaiting.getTime(),
-                firstWaiting.getTheme()
+                firstWaiting.getTheme(),
+                ReservationStatus.PENDING
         );
         reservationRepository.save(newReservation);
 
@@ -142,5 +146,19 @@ public class ReservationService {
                 waiting.getTime().getId(),
                 waiting.getCreatedAt()
         ) + 1;
+    }
+
+    @Transactional
+    public void confirm(Long id) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new InvalidReservationException("해당 예약이 존재하지 않습니다."));
+        reservation.confirm();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void cancel(Long id) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new InvalidReservationException("해당 예약이 존재하지 않습니다."));
+        reservation.cancel();
     }
 }

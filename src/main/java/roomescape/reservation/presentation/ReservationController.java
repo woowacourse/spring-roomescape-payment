@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.client.TossPaymentClient;
 import roomescape.client.dto.request.TossPaymentConfirmRequest;
-import roomescape.client.dto.response.TossPaymentResponse;
 import roomescape.common.argumentResolver.Login;
 import roomescape.common.exceptionHandler.dto.ExceptionResponse;
 import roomescape.member.dto.request.LoginMember;
@@ -67,9 +66,7 @@ public class ReservationController {
                 request.amount(),
                 request.paymentKey()
         );
-
-        TossPaymentResponse tossPaymentResponse = tossPaymentClient.confirmPayment(confirmRequest);
-        ReservationResponse response = reservationPaymentFacade.createReservationAndSavePayment(request, loginMember, tossPaymentResponse);
+        ReservationResponse response = reservationPaymentFacade.createReservationAndSavePayment(request, loginMember, confirmRequest);
 
         URI locationUri = URI.create(RESERVATION_BASE_URL + SLASH + response.id());
         return ResponseEntity.created(locationUri).body(response);

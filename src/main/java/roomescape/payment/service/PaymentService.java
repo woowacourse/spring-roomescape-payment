@@ -20,6 +20,7 @@ public class PaymentService {
         this.reservationRepository = reservationRepository;
     }
 
+    @Transactional
     public Payment save(TossPaymentResponse response, long reservationId) {
         Reservation byId = reservationRepository.findById(reservationId)
                 .orElseThrow();

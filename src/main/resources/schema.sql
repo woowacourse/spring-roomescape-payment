@@ -38,6 +38,7 @@ CREATE TABLE reservation
     member_id BIGINT,
     time_id BIGINT,
     theme_id BIGINT,
+    status VARCHAR,
     PRIMARY KEY (id),
     FOREIGN KEY (time_id) REFERENCES reservation_time (id),
     FOREIGN KEY (theme_id) REFERENCES theme (id),
