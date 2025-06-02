@@ -26,6 +26,11 @@ public class TestAuthController {
         return memberInfo;
     }
 
+    @GetMapping("/test/login-member-required-false")
+    public MemberInfo loginMemberRequiredFalse(@LoginMember(required = false) MemberInfo memberInfo) {
+        return memberInfo;
+    }
+
     @GetMapping("/admin/test")
     public void adminPath() {
     }

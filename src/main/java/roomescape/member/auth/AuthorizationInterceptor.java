@@ -26,11 +26,11 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        final String token = jwtTokenExtractor.extractTokenFromCookie(request.getCookies());
-        final MemberInfo memberInfo = jwtTokenExtractor.extractMemberInfoFromToken(token);
-
         if (handlerMethod.hasMethodAnnotation(RoleRequired.class)) {
-            RoleRequired roleRequired = handlerMethod.getMethodAnnotation(RoleRequired.class);
+            final String token = jwtTokenExtractor.extractTokenFromCookie(request.getCookies());
+            final MemberInfo memberInfo = jwtTokenExtractor.extractMemberInfoFromToken(token);
+
+            final RoleRequired roleRequired = handlerMethod.getMethodAnnotation(RoleRequired.class);
             validateRole(roleRequired.value(), memberInfo);
         }
 

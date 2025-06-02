@@ -151,11 +151,18 @@ class AuthTest {
                             """));
         }
 
-        @DisplayName("@LoginMember를 붙었는데 로그인하지 않았다면 예외가 발생한다.")
+        @DisplayName("로그인하지 않은 유저가 @LoginMember(required = true)에 접근할 수 없다.")
         @Test
-        void loginMemberOrThrow() throws Exception {
+        void loginMemberForUserOrThrowIfRequiredTrue() throws Exception {
             mockMvc.perform(get("/test/login-member"))
-                    .andExpect(status().isUnauthorized());
+                    .andExpect(status().isForbidden());
+        }
+
+        @DisplayName("로그인하지 않은 유저가 @LoginMember(required = false)에 접근할 수 있다.")
+        @Test
+        void loginMemberForUserOrThrowIfRequiredFalse() throws Exception {
+            mockMvc.perform(get("/test/login-member-required-false"))
+                    .andExpect(status().isOk());
         }
     }
 
