@@ -54,7 +54,7 @@ public class RoleInterceptor implements HandlerInterceptor {
             throw new UnAuthorizedException("토큰이 존재하지 않습니다.");
         }
         MemberRole actualRole = jwtProvider.getRole(token);
-        if (memberRole != actualRole) {
+        if (memberRole == MemberRole.ADMIN && actualRole == MemberRole.REGULAR) {
             throw new ForbiddenException("접근할 수 없습니다.");
         }
         return true;
