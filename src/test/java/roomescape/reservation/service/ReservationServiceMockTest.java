@@ -26,6 +26,7 @@ import roomescape.member.domain.MemberRepository;
 import roomescape.member.domain.Role;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
@@ -201,13 +202,13 @@ class ReservationServiceMockTest {
 
         Reservation reservation1 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2024, 10, 6),
-                reservationTime1, theme1);
+                reservationTime1, theme1, ReservationStatus.PENDING);
         Reservation reservation2 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2024, 10, 7),
-                reservationTime1, theme2);
+                reservationTime1, theme2, ReservationStatus.PENDING);
         Reservation reservation3 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2024, 10, 8),
-                reservationTime1, theme2);
+                reservationTime1, theme2, ReservationStatus.PENDING);
 
         return List.of(reservation1, reservation2, reservation3);
     }

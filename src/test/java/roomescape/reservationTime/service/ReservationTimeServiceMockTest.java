@@ -17,6 +17,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.reservationTime.domain.ReservationTimeRepository;
 import roomescape.reservationTime.dto.request.TimeConditionRequest;
@@ -62,7 +63,8 @@ class ReservationTimeServiceMockTest {
                                         LocalDateTime.of(2025, 9, 25, 10, 0),
                                         member1, localDate,
                                         ReservationTime.createWithoutId(LocalTime.of(10, 0)),
-                                        Theme.createWithoutId("a", "a", "a"))
+                                        Theme.createWithoutId("a", "a", "a"),
+                                        ReservationStatus.PENDING)
                         )
                 );
         Mockito.when(reservationTimeRepository.findAll())

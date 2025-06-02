@@ -15,6 +15,7 @@ import roomescape.fixture.TestFixture;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationPeriod;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 
@@ -133,19 +134,19 @@ public class JpaThemeRepositoryTest {
                 LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2000, 11, 2),
                 savedTime1,
-                savedTheme2);
+                savedTheme2, ReservationStatus.PENDING);
 
         Reservation reservation2 = Reservation.createWithoutId(
                 LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2000, 11, 3),
                 savedTime2,
-                savedTheme1);
+                savedTheme1, ReservationStatus.PENDING);
 
         Reservation reservation3 = Reservation.createWithoutId(
                 LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2000, 11, 3),
                 savedTime1,
-                savedTheme2);
+                savedTheme2, ReservationStatus.PENDING);
 
         em.persist(reservation1);
         em.persist(reservation2);
@@ -188,19 +189,19 @@ public class JpaThemeRepositoryTest {
         Reservation reservation1 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2000, 11, 2),
                 reservationTime1,
-                theme1);
+                theme1, ReservationStatus.PENDING);
         Reservation reservation2 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2000, 11, 3),
                 reservationTime2,
-                theme1);
+                theme1, ReservationStatus.PENDING);
         Reservation reservation3 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2000, 11, 3),
                 reservationTime1,
-                theme2);
+                theme2, ReservationStatus.PENDING);
         Reservation reservation4 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2000, 11, 4),
                 reservationTime1,
-                theme2);
+                theme2, ReservationStatus.PENDING);
         em.persist(reservation1);
         em.persist(reservation2);
         em.persist(reservation3);
@@ -244,19 +245,19 @@ public class JpaThemeRepositoryTest {
         Reservation reservation1 = Reservation.createWithoutId(
                 LocalDateTime.of(1999, 11, 2, 20, 10), member, LocalDate.of(2000, 11, 2),
                 reservationTime1,
-                theme1);
+                theme1, ReservationStatus.PENDING);
         Reservation reservation2 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2000, 11, 3),
                 reservationTime2,
-                theme1);
+                theme1, ReservationStatus.PENDING);
         Reservation reservation3 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2000, 11, 3),
                 reservationTime1,
-                theme2);
+                theme2, ReservationStatus.PENDING);
         Reservation reservation4 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2000, 11, 4),
                 reservationTime1,
-                theme2);
+                theme2, ReservationStatus.PENDING);
         em.persist(reservation1);
         em.persist(reservation2);
         em.persist(reservation3);
