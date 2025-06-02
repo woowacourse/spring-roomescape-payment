@@ -52,7 +52,7 @@ class ReservationServiceTest {
     private final LocalDateTime now = LocalDateTime.now();
 
     private final RestClient.Builder testBuilder = RestClient.builder()
-            .baseUrl("https://api.tosspayments.com");
+            .baseUrl("https://api.tosspayments.com/v1/payments/confirm");
 
     private MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
     @Autowired

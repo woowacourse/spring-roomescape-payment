@@ -31,8 +31,6 @@ import roomescape.reservation.repository.ReservationRepository;
 @Service
 public class PaymentService {
 
-    private static final String PAYMENTS_CONFIRM_ENDPOINT = "https://api.tosspayments.com/v1/payments/confirm";
-
     private final PaymentRepository paymentRepository;
     private final ReservationRepository reservationRepository;
     private final RestClient restClient;
@@ -41,6 +39,9 @@ public class PaymentService {
     @Value("${toss.payment.secret-key}")
     private String secretKey;
 
+    @Value("${toss.payment.endpoint.confirm}")
+    private String confirmEndpoint;
+
     public PaymentService(
             final PaymentRepository paymentRepository,
             final ReservationRepository reservationRepository,
@@ -48,8 +49,7 @@ public class PaymentService {
     ) {
         this.paymentRepository = paymentRepository;
         this.reservationRepository = reservationRepository;
-        this.restClient = builder.baseUrl(PAYMENTS_CONFIRM_ENDPOINT)
-                .build();
+        this.restClient = builder.build();
         this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
@@ -58,7 +58,7 @@ public class PaymentService {
         byte[] secretKeyBytes = secretKeyWithColon.getBytes(StandardCharsets.UTF_8);
 
         restClient.post()
-                .uri(PAYMENTS_CONFIRM_ENDPOINT)
+                .uri(confirmEndpoint)
                 .header(HttpHeaders.AUTHORIZATION, "Basic " + Base64.getEncoder().encodeToString(secretKeyBytes))
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(request)

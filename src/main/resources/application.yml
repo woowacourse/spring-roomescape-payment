@@ -2,6 +2,13 @@ spring:
   profiles:
     default: local
 
+toss:
+  payment:
+    base-url: https://api.tosspayments.com/v1/payments
+    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+    endpoint:
+      confirm: /confirm
+
 ---
 
 spring:
@@ -34,10 +41,6 @@ security:
       secret-key: Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E=
       expire-length: 36000000 # 60 minutes
 
-toss:
-  payment:
-    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
-
 ---
 
 spring:
@@ -69,7 +72,3 @@ security:
     token:
       secret-key: Yn2kjibddFAWtnPJ2AFlL8WXmohJMCvigQggaEypa5E=
       expire-length: 36000000 # 60 minutes
-
-toss:
-  payment:
-    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
