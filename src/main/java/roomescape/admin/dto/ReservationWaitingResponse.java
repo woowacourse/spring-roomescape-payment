@@ -2,9 +2,9 @@ package roomescape.admin.dto;
 
 import java.time.LocalDate;
 import roomescape.member.dto.MemberResponse;
-import roomescape.reservation.domain.Waiting;
-import roomescape.reservation.dto.ReservationTimeResponse;
 import roomescape.theme.dto.ThemeResponse;
+import roomescape.time.dto.ReservationTimeResponse;
+import roomescape.waiting.domain.Waiting;
 
 public record ReservationWaitingResponse(
         Long id,

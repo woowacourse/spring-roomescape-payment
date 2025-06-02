@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Status;
-import roomescape.reservation.domain.Waiting;
+import roomescape.waiting.domain.Waiting;
 
 public record ReservationMineResponse(
         Long id,

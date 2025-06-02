@@ -8,20 +8,19 @@ import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 import roomescape.common.exception.DataExistException;
-import roomescape.fake.FakeMemberRepository;
-import roomescape.fake.FakeReservationRepository;
-import roomescape.fake.FakeReservationTimeRepository;
-import roomescape.fake.FakeThemeRepository;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepositoryInterface;
+import roomescape.member.repository.fake.FakeMemberRepository;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.repository.reservation.ReservationRepositoryInterface;
-import roomescape.reservation.repository.time.ReservationTimeRepositoryInterface;
+import roomescape.reservation.repository.ReservationRepositoryInterface;
+import roomescape.reservation.repository.fake.FakeReservationRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepositoryInterface;
-import roomescape.theme.service.theme.ThemeService;
+import roomescape.theme.repository.fake.FakeThemeRepository;
+import roomescape.time.domain.ReservationTime;
+import roomescape.time.repository.ReservationTimeRepositoryInterface;
+import roomescape.time.repository.fake.FakeReservationTimeRepository;
 
 class ThemeServiceTest {
 

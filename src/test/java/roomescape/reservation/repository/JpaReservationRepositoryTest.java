@@ -11,11 +11,10 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.JpaMemberRepository;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.repository.reservation.JpaReservationRepository;
-import roomescape.reservation.repository.time.JpaReservationTimeRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
+import roomescape.time.domain.ReservationTime;
+import roomescape.time.repository.JpaReservationTimeRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

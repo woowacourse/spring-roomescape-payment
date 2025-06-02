@@ -16,10 +16,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.auth.jwt.JwtTokenProvider;
 import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.TossPaymentConfirmRequest;
 import roomescape.payment.processor.PaymentType;
-import roomescape.payment.processor.toss.TossPaymentConfirmRequest;
 import roomescape.payment.processor.toss.TossPaymentProcessor;
-import roomescape.reservation.dto.AvailableReservationTimeResponse;
+import roomescape.time.dto.AvailableReservationTimeResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;

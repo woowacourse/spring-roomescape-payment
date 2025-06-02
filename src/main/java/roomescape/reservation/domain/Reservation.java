@@ -10,9 +10,10 @@ import java.time.LocalDate;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import roomescape.common.exception.ReservationException;
 import roomescape.member.domain.Member;
+import roomescape.reservation.exception.ReservationException;
 import roomescape.theme.domain.Theme;
+import roomescape.time.domain.ReservationTime;
 
 @Getter
 @ToString
@@ -23,7 +24,7 @@ public class Reservation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     private LocalDate date;
 
     @ManyToOne(fetch = FetchType.LAZY)

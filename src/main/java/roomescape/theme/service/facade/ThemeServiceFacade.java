@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.dto.ThemeRequest;
 import roomescape.theme.dto.ThemeResponse;
-import roomescape.theme.service.theme.ThemeService;
+import roomescape.theme.service.ThemeService;
 
 @RequiredArgsConstructor
 @Service

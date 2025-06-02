@@ -13,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.dto.PaymentConfirmResponse;
+import roomescape.payment.dto.TossPaymentConfirmRequest;
+import roomescape.payment.dto.TossPaymentConfirmResponse;
 
 import static org.mockito.Mockito.when;
 

@@ -2,7 +2,6 @@ package roomescape.payment.dto;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import roomescape.payment.processor.toss.TossPaymentConfirmRequest;
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,

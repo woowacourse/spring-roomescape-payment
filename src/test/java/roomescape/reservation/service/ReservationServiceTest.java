@@ -5,26 +5,25 @@ import java.time.LocalTime;
 import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import roomescape.common.exception.DataExistException;
 import roomescape.common.exception.PastDateException;
-import roomescape.fake.FakeMemberRepository;
-import roomescape.fake.FakeReservationRepository;
-import roomescape.fake.FakeReservationTimeRepository;
-import roomescape.fake.FakeThemeRepository;
-import roomescape.fake.FakeWaitingRepository;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepositoryInterface;
+import roomescape.member.repository.fake.FakeMemberRepository;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.dto.AvailableReservationTime;
-import roomescape.reservation.repository.reservation.ReservationRepositoryInterface;
-import roomescape.reservation.repository.time.ReservationTimeRepositoryInterface;
-import roomescape.reservation.repository.waiting.WaitingRepositoryInterface;
-import roomescape.reservation.service.reservation.ReservationService;
+import roomescape.reservation.exception.ReservationNotAllowedException;
+import roomescape.reservation.repository.ReservationRepositoryInterface;
+import roomescape.reservation.repository.fake.FakeReservationRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepositoryInterface;
+import roomescape.theme.repository.fake.FakeThemeRepository;
+import roomescape.time.domain.ReservationTime;
+import roomescape.time.repository.ReservationTimeRepositoryInterface;
+import roomescape.time.repository.fake.FakeReservationTimeRepository;
+import roomescape.waiting.domain.Waiting;
+import roomescape.waiting.repository.WaitingRepositoryInterface;
+import roomescape.waiting.repository.fake.FakeWaitingRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -252,7 +251,7 @@ class ReservationServiceTest {
         // when & then
         Assertions.assertThatThrownBy(
                         () -> reservationService.save(member, date, savedTime.getId(), savedTheme.getId()))
-                .isInstanceOf(DataExistException.class);
+                .isInstanceOf(ReservationNotAllowedException.class);
     }
 
     @Test
@@ -287,7 +286,7 @@ class ReservationServiceTest {
                                 "1234",
                                 Role.USER
                         ), date, savedTime.getId(), savedTheme.getId()))
-                .isInstanceOf(DataExistException.class);
+                .isInstanceOf(ReservationNotAllowedException.class);
     }
 
     @Test

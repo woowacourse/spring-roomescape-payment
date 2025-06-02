@@ -9,10 +9,10 @@ import roomescape.admin.dto.AdminReservationRequest;
 import roomescape.admin.dto.AdminReservationResponse;
 import roomescape.admin.dto.ReservationSearchRequest;
 import roomescape.admin.dto.ReservationWaitingResponse;
-import roomescape.admin.service.reservation.AdminReservationService;
-import roomescape.admin.service.waiting.AdminWaitingService;
+import roomescape.admin.service.AdminReservationService;
+import roomescape.admin.service.AdminWaitingService;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.Waiting;
+import roomescape.waiting.domain.Waiting;
 
 @Service
 @RequiredArgsConstructor

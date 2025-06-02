@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.payment.dto.PaymentConfirmResponse;
+import roomescape.payment.dto.TossPaymentConfirmRequest;
+import roomescape.payment.dto.TossPaymentConfirmResponse;
 import roomescape.payment.processor.PaymentType;
-import roomescape.payment.processor.toss.TossPaymentConfirmRequest;
-import roomescape.payment.processor.toss.TossPaymentConfirmResponse;
 import roomescape.payment.processor.toss.TossPaymentProcessor;
 
 import static org.mockito.ArgumentMatchers.any;

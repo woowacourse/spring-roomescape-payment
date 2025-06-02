@@ -4,7 +4,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import roomescape.auth.exception.AccessDeniedException;
+import roomescape.member.exception.MemberException;
 import roomescape.payment.exception.PaymentException;
+import roomescape.reservation.exception.ReservationException;
+import roomescape.reservation.exception.ReservationNotAllowedException;
+import roomescape.theme.exception.ThemeException;
+import roomescape.waiting.exception.WaitingException;
+import roomescape.waiting.exception.WaitingNotAllowedException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -26,12 +33,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
-    @ExceptionHandler({SaveException.class, WaitingNotAllowedException.class, ReservationNotAllowedException.class})
-    public ResponseEntity<String> handleSaveException(final SaveException e) {
+    @ExceptionHandler({WaitingNotAllowedException.class, ReservationNotAllowedException.class})
+    public ResponseEntity<String> handleSaveException(final ReservationNotAllowedException e) {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(e.getMessage());
     }
 
-    @ExceptionHandler({MissingTokenExcpetion.class, InvalidTokenException.class})
+    @ExceptionHandler({MissingTokenExcpetion.class})
     public ResponseEntity<String> handleMissingTokenException(final MissingTokenExcpetion e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }

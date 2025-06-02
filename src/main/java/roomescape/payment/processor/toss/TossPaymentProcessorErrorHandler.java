@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.ResponseErrorHandler;
-import roomescape.common.exception.TossPaymentException;
+import roomescape.payment.processor.toss.exception.TossPaymentException;
 
 public class TossPaymentProcessorErrorHandler implements ResponseErrorHandler {
 

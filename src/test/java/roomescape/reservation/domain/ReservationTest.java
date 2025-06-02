@@ -4,10 +4,11 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import roomescape.common.exception.ReservationException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
+import roomescape.reservation.exception.ReservationException;
 import roomescape.theme.domain.Theme;
+import roomescape.time.domain.ReservationTime;
 
 class ReservationTest {
 

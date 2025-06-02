@@ -11,16 +11,16 @@ import roomescape.member.domain.Member;
 import roomescape.member.service.MemberService;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.Waiting;
-import roomescape.reservation.dto.AvailableReservationTimeRequest;
-import roomescape.reservation.dto.AvailableReservationTimeResponse;
 import roomescape.reservation.dto.CreateReservationRequest;
 import roomescape.reservation.dto.CreateReservationResponse;
-import roomescape.reservation.dto.CreateWaitingRequest;
-import roomescape.reservation.dto.CreateWaitingResponse;
 import roomescape.reservation.dto.ReservationMineResponse;
-import roomescape.reservation.service.reservation.ReservationService;
-import roomescape.reservation.service.waiting.ReservationWaitingService;
+import roomescape.reservation.service.ReservationService;
+import roomescape.time.dto.AvailableReservationTimeRequest;
+import roomescape.time.dto.AvailableReservationTimeResponse;
+import roomescape.waiting.domain.Waiting;
+import roomescape.waiting.dto.CreateWaitingRequest;
+import roomescape.waiting.dto.CreateWaitingResponse;
+import roomescape.waiting.service.ReservationWaitingService;
 
 @RequiredArgsConstructor
 @Service

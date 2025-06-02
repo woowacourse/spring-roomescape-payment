@@ -4,10 +4,10 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import roomescape.auth.jwt.JwtTokenProvider;
 import roomescape.common.exception.DataNotFoundException;
-import roomescape.fake.FakeMemberRepository;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepositoryInterface;
+import roomescape.member.repository.fake.FakeMemberRepository;
 
 public class AuthServiceTest {
 

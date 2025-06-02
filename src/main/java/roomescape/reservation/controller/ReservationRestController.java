@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoginMember;
-import roomescape.reservation.dto.AvailableReservationTimeRequest;
-import roomescape.reservation.dto.AvailableReservationTimeResponse;
 import roomescape.reservation.dto.CreateReservationRequest;
 import roomescape.reservation.dto.CreateReservationResponse;
-import roomescape.reservation.dto.CreateWaitingRequest;
-import roomescape.reservation.dto.CreateWaitingResponse;
 import roomescape.reservation.dto.ReservationMineResponse;
 import roomescape.reservation.service.facade.ReservationServiceFacade;
+import roomescape.time.dto.AvailableReservationTimeRequest;
+import roomescape.time.dto.AvailableReservationTimeResponse;
+import roomescape.waiting.dto.CreateWaitingRequest;
+import roomescape.waiting.dto.CreateWaitingResponse;
 
 @RestController
 @RequiredArgsConstructor

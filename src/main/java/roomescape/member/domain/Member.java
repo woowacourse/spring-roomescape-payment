@@ -9,7 +9,7 @@ import jakarta.persistence.Id;
 import java.util.regex.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import roomescape.common.exception.MemberException;
+import roomescape.member.exception.MemberException;
 
 @Getter
 @NoArgsConstructor

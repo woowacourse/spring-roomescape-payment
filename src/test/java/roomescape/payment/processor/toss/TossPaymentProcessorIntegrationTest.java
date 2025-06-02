@@ -7,7 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
-import roomescape.common.exception.TossPaymentException;
+import roomescape.payment.dto.TossPaymentConfirmRequest;
+import roomescape.payment.processor.toss.exception.TossPaymentException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
