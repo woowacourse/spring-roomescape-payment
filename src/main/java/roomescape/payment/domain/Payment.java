@@ -1,11 +1,13 @@
 package roomescape.payment.domain;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 import roomescape.reservation.domain.Reservation;
@@ -16,17 +18,22 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String orderId;
 
+    @Column(nullable = false, unique = true)
     private String paymentKey;
 
     private LocalDateTime paymentDateTime;
 
+    @Column(nullable = false)
     private Long amount;
 
+    @Column(nullable = false)
     private PaymentStatus status;
 
     @OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
     private Reservation reservation;
 
     public Payment(String orderId, String paymentKey, LocalDateTime paymentDateTime, Long amount, PaymentStatus status, Reservation reservation) {
