@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.ExternalApiErrorException;
 import roomescape.infrastructure.payment.dto.PaymentApproveErrorResponse;
@@ -40,13 +41,17 @@ public class TossPaymentClient {
 
     public void approvePayment(PaymentApproveRequest paymentApproveRequest) {
         String encodedSecretKey = Base64.getEncoder().encodeToString((secretKey + ":").getBytes());
-        restClient.post()
-                .uri("v1/payments/confirm")
-                .body(paymentApproveRequest)
-                .header("Authorization", "Basic " + encodedSecretKey)
-                .retrieve()
-                .onStatus(HttpStatusCode::isError, (this::handleError))
-                .toBodilessEntity();
+        try {
+            restClient.post()
+                    .uri("v1/payments/confirm")
+                    .body(paymentApproveRequest)
+                    .header("Authorization", "Basic " + encodedSecretKey)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::isError, (this::handleError))
+                    .toBodilessEntity();
+        } catch (ResourceAccessException exception) {
+            throw new ExternalApiErrorException("토스 결제 승인에 대한 시간 초과가 발생했습니다.");
+        }
     }
 
     private void handleError(HttpRequest request, ClientHttpResponse response) {
