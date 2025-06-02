@@ -36,7 +36,7 @@ public class ReservationCreateService {
         final Member member = memberService.getByEmail(loginMember.email());
         final Schedule schedule = scheduleService.getByDateAndTimeIdAndThemeId(request.date(), request.timeId(), request.themeId());
         final Order order = getOrder(request, member, schedule);
-        final Reservation reservation = saveReservation(schedule, member, request.orderId());
+        final Reservation reservation = saveReservation(schedule, member, order);
         ReservationResponse response = ReservationResponse.from(reservation);
 
         try {
@@ -62,10 +62,10 @@ public class ReservationCreateService {
         return order;
     }
 
-    private Reservation saveReservation(final Schedule schedule, final Member member, final String orderId) {
+    private Reservation saveReservation(final Schedule schedule, final Member member, final Order order) {
         validatePast(schedule);
         validateDuplication(schedule);
-        final Reservation notSavedReservation = new Reservation(member, schedule, ReservationStatus.PENDING, orderId);
+        final Reservation notSavedReservation = new Reservation(member, schedule, ReservationStatus.PENDING, order);
         return reservationRepository.save(notSavedReservation);
     }
 

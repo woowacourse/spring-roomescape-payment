@@ -39,9 +39,9 @@ public class ReservationTimeApiTest {
 
     @BeforeEach
     void setUp() {
-        jdbcTemplate.update("DELETE FROM orders");
-        jdbcTemplate.update("DELETE FROM schedule");
         jdbcTemplate.update("DELETE FROM reservation");
+        jdbcTemplate.update("DELETE FROM schedule");
+        jdbcTemplate.update("DELETE FROM orders");
         jdbcTemplate.update("DELETE FROM reservation_time");
         jdbcTemplate.update("DELETE FROM theme");
         jdbcTemplate.update("ALTER TABLE reservation ALTER COLUMN id RESTART WITH 1");

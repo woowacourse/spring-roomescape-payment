@@ -38,8 +38,9 @@ public class ThemeApiTest {
 
     @BeforeEach
     void setUp() {
-        jdbcTemplate.update("DELETE FROM schedule");
         jdbcTemplate.update("DELETE FROM reservation");
+        jdbcTemplate.update("DELETE FROM orders");
+        jdbcTemplate.update("DELETE FROM schedule");
         jdbcTemplate.update("DELETE FROM reservation_time");
         jdbcTemplate.update("DELETE FROM theme");
         jdbcTemplate.update("ALTER TABLE schedule ALTER COLUMN id RESTART WITH 1");
