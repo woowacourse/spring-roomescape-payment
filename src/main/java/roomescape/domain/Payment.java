@@ -38,11 +38,18 @@ public class Payment {
     }
 
     private Payment(Long id, String orderId, String paymentKey, Long amount, Reservation reservation) {
+        validateAmountNotNegative(amount);
         this.id = id;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.amount = amount;
         this.reservation = reservation;
+    }
+
+    private void validateAmountNotNegative(final Long amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("결제 금액은 음수가 될 수 없습니다.");
+        }
     }
 
     public static Payment createWithoutId(String orderId, String paymentKey, Long amount, Reservation reservation) {
