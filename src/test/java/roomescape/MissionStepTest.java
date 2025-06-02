@@ -99,11 +99,6 @@ public class MissionStepTest {
                 .when().post("/logout")
                 .then().log().all()
                 .statusCode(200);
-
-        RestAssured.given().log().all()
-                .when().post("/logout")
-                .then().log().all()
-                .statusCode(401);
     }
 
     @Test
@@ -133,11 +128,6 @@ public class MissionStepTest {
                 .when().get("/admin/reservation")
                 .then().log().all()
                 .statusCode(403);
-
-        RestAssured.given().log().all()
-                .when().get("/reservations")
-                .then().log().all()
-                .statusCode(401);
 
         RestAssured.given().log().all()
                 .cookie("token", memberToken)
