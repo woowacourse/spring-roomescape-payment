@@ -1,8 +1,11 @@
 package roomescape.service.reservation;
 
+import static roomescape.global.exception.roomescape.RoomEscapeErrorStatus.ALREADY_EXIST_RESERVATION_THEME;
+import static roomescape.global.exception.roomescape.RoomEscapeErrorStatus.CANNOT_DELETE_THEME_WITH_RESERVATIONS;
+import static roomescape.global.exception.roomescape.RoomEscapeErrorStatus.NON_EXIST_RESERVATION_THEME;
+
 import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -12,6 +15,7 @@ import roomescape.domain.reservationitem.ReservationTime;
 import roomescape.dto.request.ReservationThemeRequest;
 import roomescape.dto.response.ReservationThemeResponse;
 import roomescape.dto.response.ReservationTimeWithAvailabilityResponse;
+import roomescape.global.exception.roomescape.RoomEscapeException;
 
 @RequiredArgsConstructor
 @Service
@@ -68,18 +72,18 @@ public class ReservationThemeService {
         try {
             reservationThemeRepository.deleteById(theme.getId());
         } catch (DataIntegrityViolationException e) {
-            throw new IllegalArgumentException("[ERROR] 예약이 존재해 테마를 삭제할 수 없습니다.");
+            throw new RoomEscapeException(CANNOT_DELETE_THEME_WITH_RESERVATIONS);
         }
     }
 
     public ReservationTheme getThemeById(long id) {
         return reservationThemeRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 테마입니다."));
+                .orElseThrow(() -> new RoomEscapeException(NON_EXIST_RESERVATION_THEME));
     }
 
     private void validateUniqueThemes(final ReservationTheme reservationTheme) {
         if (reservationThemeRepository.existsByName(reservationTheme.getName())) {
-            throw new IllegalArgumentException("[ERROR] 이미 존재하는 테마 입니다.");
+            throw new RoomEscapeException(ALREADY_EXIST_RESERVATION_THEME);
         }
     }
 }

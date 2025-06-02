@@ -1,8 +1,10 @@
 package roomescape.service.reservation;
 
+import static roomescape.global.exception.roomescape.RoomEscapeErrorStatus.ALREADY_EXIST_RESERVATION_TIME;
+import static roomescape.global.exception.roomescape.RoomEscapeErrorStatus.CANNOT_DELETE_TIME_WITH_RESERVATIONS;
+
 import java.time.LocalTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,8 @@ import roomescape.domain.reservationitem.ReservationTime;
 import roomescape.domain.reservationitem.ReservationTimeRepository;
 import roomescape.dto.request.ReservationTimeRequest;
 import roomescape.dto.response.ReservationTimeResponse;
+import roomescape.global.exception.roomescape.RoomEscapeErrorStatus;
+import roomescape.global.exception.roomescape.RoomEscapeException;
 
 @RequiredArgsConstructor
 @Service
@@ -29,13 +33,13 @@ public class ReservationTimeService {
         try {
             reservationTimeRepository.deleteById(reservationTime.getId());
         } catch (DataIntegrityViolationException e) {
-            throw new IllegalArgumentException("[ERROR] 이미 예약이 존재해 시간을 삭제할 수 없습니다.");
+            throw new RoomEscapeException(CANNOT_DELETE_TIME_WITH_RESERVATIONS);
         }
     }
 
     public ReservationTime getReservationTimeById(long id) {
         return reservationTimeRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하는 시간이 없습니다."));
+                .orElseThrow(() -> new RoomEscapeException(RoomEscapeErrorStatus.NON_EXIST_RESERVATION_TIME));
     }
 
     public List<ReservationTimeResponse> findReservationTimesInfo() {
@@ -50,7 +54,7 @@ public class ReservationTimeService {
     private void validateUniqueReservationTime(final ReservationTime reservationTime) {
         final LocalTime startAt = reservationTime.getStartAt();
         if (reservationTimeRepository.existsByStartAt(startAt)) {
-            throw new IllegalArgumentException("[ERROR] 이미 존재하는 예약 시간 입니다.");
+            throw new RoomEscapeException(ALREADY_EXIST_RESERVATION_TIME);
         }
     }
 }

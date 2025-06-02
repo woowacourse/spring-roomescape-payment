@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +22,8 @@ import roomescape.dto.request.ReservationThemeRequest;
 import roomescape.dto.request.ReservationTimeRequest;
 import roomescape.dto.response.MyPageReservationResponse;
 import roomescape.dto.response.ReservationResponse;
+import roomescape.global.exception.roomescape.RoomEscapeErrorStatus;
+import roomescape.global.exception.roomescape.RoomEscapeException;
 import roomescape.service.member.MemberService;
 import roomescape.service.reservation.ReservationService;
 import roomescape.service.reservation.ReservationThemeService;
@@ -138,12 +139,12 @@ class ReservationServiceTest {
 
         // when, then
         assertAll(
-                () -> assertThatThrownBy(
-                        () -> reservationService.addReservation(createReservationRequest1)
-                ).isInstanceOf(NoSuchElementException.class),
-                () -> assertThatThrownBy(
-                        () -> reservationService.addReservation(createReservationRequest2)
-                ).isInstanceOf(NoSuchElementException.class)
+                () -> assertThatThrownBy(() -> reservationService.addReservation(createReservationRequest1))
+                        .isInstanceOf(RoomEscapeException.class)
+                        .hasMessage(RoomEscapeErrorStatus.NON_EXIST_RESERVATION_THEME.errorMessage),
+                () -> assertThatThrownBy(() -> reservationService.addReservation(createReservationRequest2))
+                        .isInstanceOf(RoomEscapeException.class)
+                        .hasMessage(RoomEscapeErrorStatus.NON_EXIST_RESERVATION_TIME.errorMessage)
         );
     }
 
@@ -167,12 +168,12 @@ class ReservationServiceTest {
 
         // when, then
         assertAll(
-                () -> assertThatThrownBy(
-                        () -> reservationService.addReservation(createReservationRequest1)
-                ).isInstanceOf(IllegalArgumentException.class),
-                () -> assertThatThrownBy(
-                        () -> reservationService.addReservation(createReservationRequest2)
-                ).isInstanceOf(IllegalArgumentException.class)
+                () -> assertThatThrownBy(() -> reservationService.addReservation(createReservationRequest1))
+                        .isInstanceOf(RoomEscapeException.class)
+                        .hasMessage(RoomEscapeErrorStatus.INVALID_RESERVATION_ITEM.errorMessage),
+                () -> assertThatThrownBy(() -> reservationService.addReservation(createReservationRequest2))
+                        .isInstanceOf(RoomEscapeException.class)
+                        .hasMessage(RoomEscapeErrorStatus.INVALID_RESERVATION_ITEM.errorMessage)
         );
     }
 
@@ -651,6 +652,7 @@ class ReservationServiceTest {
         // when, then
         assertThatThrownBy(() -> reservationService.addReservation(
                 new CreateReservationRequest(memberId1, tomorrow, themeId1, timeId)
-        )).isInstanceOf(IllegalArgumentException.class);
+        )).isInstanceOf(RoomEscapeException.class)
+                .hasMessage(RoomEscapeErrorStatus.RESERVED_TIME.errorMessage);
     }
 }

@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import java.util.NoSuchElementException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +18,10 @@ import roomescape.dto.request.LoginRequest;
 import roomescape.dto.request.MemberRegisterRequest;
 import roomescape.dto.response.MemberRegisterResponse;
 import roomescape.global.PasswordEncoder;
+import roomescape.global.exception.authentication.AuthenticationErrorStatus;
+import roomescape.global.exception.authentication.AuthenticationException;
+import roomescape.global.exception.roomescape.RoomEscapeErrorStatus;
+import roomescape.global.exception.roomescape.RoomEscapeException;
 import roomescape.repository.impl.MemberRepositoryImpl;
 import roomescape.repository.jpa.MemberJpaRepository;
 import roomescape.service.auth.AuthService;
@@ -72,7 +75,8 @@ class AuthServiceTest {
 
         // when, then
         assertThatThrownBy(() -> authService.authenticate(loginRequest))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(RoomEscapeException.class)
+                .hasMessage(RoomEscapeErrorStatus.NON_EXIST_MEMBER.errorMessage);
     }
 
     @Test
@@ -84,7 +88,8 @@ class AuthServiceTest {
 
         // when, then
         assertThatThrownBy(() -> authService.authenticate(loginRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(AuthenticationException.class)
+                .hasMessage(AuthenticationErrorStatus.PASSWORD_DOES_NOT_MATCH.errorMessage);
     }
 
     @Test

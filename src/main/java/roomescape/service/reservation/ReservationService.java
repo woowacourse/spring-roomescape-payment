@@ -1,8 +1,13 @@
 package roomescape.service.reservation;
 
+import static roomescape.global.exception.roomescape.RoomEscapeErrorStatus.ALREADY_EXIST_RESERVATION;
+import static roomescape.global.exception.roomescape.RoomEscapeErrorStatus.NON_EXIST_RESERVATION;
+import static roomescape.global.exception.roomescape.RoomEscapeErrorStatus.ONLY_PENDING_RESERVATION_CAN_BE_DENIED;
+import static roomescape.global.exception.roomescape.RoomEscapeErrorStatus.RESERVED_TIME;
+import static roomescape.global.exception.roomescape.RoomEscapeErrorStatus.WAITING_RESERVATION_REQUIRES_EXISTING;
+
 import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +22,7 @@ import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.response.MyPageReservationResponse;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.WaitingReservationResponse;
+import roomescape.global.exception.roomescape.RoomEscapeException;
 import roomescape.service.member.MemberService;
 
 @RequiredArgsConstructor
@@ -73,17 +79,17 @@ public class ReservationService {
         final boolean reservationExists = reservationItemService.isExistReservationItem(date, time, theme);
 
         if (requiresExistingReservation && !reservationExists) {
-            throw new IllegalArgumentException("[ERROR] 대기 예약은 기존 예약이 있을 때만 가능합니다.");
+            throw new RoomEscapeException(WAITING_RESERVATION_REQUIRES_EXISTING);
         }
 
         if (!requiresExistingReservation && reservationExists) {
-            throw new IllegalArgumentException("[ERROR] 이미 예약된 시간입니다.");
+            throw new RoomEscapeException(RESERVED_TIME);
         }
     }
 
     private void validateDuplicateReservation(final Member member, final ReservationItem reservationItem) {
         if (reservationRepository.existsByMemberAndReservationItem(member, reservationItem)) {
-            throw new IllegalArgumentException("[ERROR] 이미 예약을 등록하였습니다.");
+            throw new RoomEscapeException(ALREADY_EXIST_RESERVATION);
         }
     }
 
@@ -139,10 +145,10 @@ public class ReservationService {
     @Transactional
     public void denyPendingReservation(Long reservationId) {
         Reservation waitingReservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 예약입니다."));
+                .orElseThrow(() -> new RoomEscapeException(NON_EXIST_RESERVATION));
 
         if (waitingReservation.getReservationStatus() != ReservationStatus.PENDING) {
-            throw new IllegalArgumentException("[ERROR] 대기 상태의 예약만 거절할 수 있습니다.");
+            throw new RoomEscapeException(ONLY_PENDING_RESERVATION_CAN_BE_DENIED);
         }
 
         waitingReservation.changeStatusToDenied();
@@ -151,7 +157,7 @@ public class ReservationService {
     @Transactional
     public void removeReservation(Long reservationId) {
         Reservation targetReservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 예약입니다."));
+                .orElseThrow(() -> new RoomEscapeException(NON_EXIST_RESERVATION));
 
         if (targetReservation.getReservationStatus() == ReservationStatus.PENDING) {
             deleteReservationOnly(targetReservation);

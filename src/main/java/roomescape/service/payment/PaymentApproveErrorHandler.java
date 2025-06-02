@@ -5,21 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.ResponseErrorHandler;
+import roomescape.global.exception.payment.PaymentException;
+import roomescape.global.exception.payment.TossPaymentErrorCode;
 
 public class PaymentApproveErrorHandler implements ResponseErrorHandler {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    private final List<String> sensitiveErrorCodes = List.of(
-            "INVALID_API_KEY",
-            "UNAPPROVED_ORDER_ID",
-            "UNAUTHORIZED_KEY",
-            "INCORRECT_BASIC_AUTH_FORMAT");
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
@@ -31,15 +26,10 @@ public class PaymentApproveErrorHandler implements ResponseErrorHandler {
         byte[] bodyBytes = StreamUtils.copyToByteArray(response.getBody());
         JsonNode jsonNode = objectMapper.readTree(new ByteArrayInputStream(bodyBytes));
         final String code = extractMessage(jsonNode, "code");
-        if (isSensitiveError(code)) {
-            throw new IllegalStateException("[ERROR] 결제 승인 중 예외가 발생하였습니다.");
-        }
-        final String errMessage = extractMessage(jsonNode, "message");
-        throw new IllegalStateException("[ERROR] " + errMessage);
-    }
+        final String errorMessage = extractMessage(jsonNode, "message");
 
-    private boolean isSensitiveError(String code) {
-        return sensitiveErrorCodes.contains(code);
+        final TossPaymentErrorCode tossPaymentErrorCode = TossPaymentErrorCode.findTossPaymentErrorCode(code);
+        throw new PaymentException(tossPaymentErrorCode, errorMessage);
     }
 
     private String extractMessage(JsonNode jsonNode, String key) {

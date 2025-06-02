@@ -19,6 +19,8 @@ import roomescape.dto.request.MemberRegisterRequest;
 import roomescape.dto.response.MemberRegisterResponse;
 import roomescape.dto.response.MemberResponse;
 import roomescape.global.PasswordEncoder;
+import roomescape.global.exception.roomescape.RoomEscapeErrorStatus;
+import roomescape.global.exception.roomescape.RoomEscapeException;
 import roomescape.repository.impl.MemberRepositoryImpl;
 import roomescape.repository.jpa.MemberJpaRepository;
 import roomescape.service.member.MemberService;
@@ -68,7 +70,8 @@ class MemberServiceTest {
         // when, then
         final MemberRegisterRequest duplicateEmailMemberRegisterRequest = new MemberRegisterRequest("test", "test", "히포");
         assertThatThrownBy(() -> memberService.addMember(duplicateEmailMemberRegisterRequest))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class)
+                .hasMessage(RoomEscapeErrorStatus.ALREADY_EXIST_EMAIL.errorMessage);
     }
 
     @DisplayName("모든 사용자를 조회한다")

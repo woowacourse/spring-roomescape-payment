@@ -1,7 +1,9 @@
 package roomescape.service.member;
 
+import static roomescape.global.exception.roomescape.RoomEscapeErrorStatus.ALREADY_EXIST_EMAIL;
+import static roomescape.global.exception.roomescape.RoomEscapeErrorStatus.NON_EXIST_MEMBER;
+
 import java.util.List;
-import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.domain.member.Member;
@@ -11,6 +13,7 @@ import roomescape.dto.request.MemberRegisterRequest;
 import roomescape.dto.response.MemberRegisterResponse;
 import roomescape.dto.response.MemberResponse;
 import roomescape.global.PasswordEncoder;
+import roomescape.global.exception.roomescape.RoomEscapeException;
 
 @RequiredArgsConstructor
 @Service
@@ -21,7 +24,6 @@ public class MemberService {
 
     public MemberRegisterResponse addMember(final MemberRegisterRequest request) {
         validateDuplicateEmail(request.email());
-        validateDuplicateName(request.name());
         final Member newMember = Member.builder()
                 .email(request.email())
                 .name(request.name())
@@ -39,23 +41,17 @@ public class MemberService {
 
     public Member getMemberById(final long id) {
         return memberRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 사용자가 존재하지 않습니다."));
+                .orElseThrow(() -> new RoomEscapeException(NON_EXIST_MEMBER));
     }
 
     public Member getMemberByEmail(final String email) {
         return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 사용자가 존재하지 않습니다."));
+                .orElseThrow(() -> new RoomEscapeException(NON_EXIST_MEMBER));
     }
 
     private void validateDuplicateEmail(final String email) {
         if (memberRepository.existByEmail(email)) {
-            throw new IllegalArgumentException("[ERROR] 이미 존재하는 이메일 입니다.");
-        }
-    }
-
-    private void validateDuplicateName(final String name) {
-        if (memberRepository.existByName(name)) {
-            throw new IllegalArgumentException("[ERROR] 이미 존재하는 이름 입니다.");
+            throw new RoomEscapeException(ALREADY_EXIST_EMAIL);
         }
     }
 }

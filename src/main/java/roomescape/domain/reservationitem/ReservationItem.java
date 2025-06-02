@@ -1,5 +1,7 @@
 package roomescape.domain.reservationitem;
 
+import static roomescape.global.exception.roomescape.RoomEscapeErrorStatus.INVALID_RESERVATION_ITEM;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import roomescape.global.exception.roomescape.RoomEscapeException;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -44,7 +47,7 @@ public class ReservationItem {
         final LocalDateTime now = LocalDateTime.now();
         final LocalDateTime dateTime = LocalDateTime.of(date, time.getStartAt());
         if (dateTime.isBefore(now) || dateTime.isEqual(now)) {
-            throw new IllegalArgumentException("[ERROR] 예약시간은 과거일 수 없습니다.");
+            throw new RoomEscapeException(INVALID_RESERVATION_ITEM);
         }
     }
 }

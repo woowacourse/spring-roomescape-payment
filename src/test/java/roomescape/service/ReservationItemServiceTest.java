@@ -21,6 +21,8 @@ import roomescape.domain.reservationitem.ReservationTheme;
 import roomescape.domain.reservationitem.ReservationThemeRepository;
 import roomescape.domain.reservationitem.ReservationTime;
 import roomescape.domain.reservationitem.ReservationTimeRepository;
+import roomescape.global.exception.roomescape.RoomEscapeErrorStatus;
+import roomescape.global.exception.roomescape.RoomEscapeException;
 import roomescape.service.reservation.ReservationItemService;
 
 @SpringBootTest
@@ -106,9 +108,11 @@ class ReservationItemServiceTest {
         // when, then
         assertAll(
                 () -> assertThatThrownBy(() -> reservationItemService.createReservationItemIfNotExist(timeBeforeMinute.toLocalDate(), reservationTimeBeforeMinute, theme))
-                        .isInstanceOf(IllegalArgumentException.class),
+                        .isInstanceOf(RoomEscapeException.class)
+                        .hasMessage(RoomEscapeErrorStatus.INVALID_RESERVATION_ITEM.errorMessage),
                 () -> assertThatThrownBy(() -> reservationItemService.createReservationItemIfNotExist(yesterday, time, theme))
-                        .isInstanceOf(IllegalArgumentException.class)
+                        .isInstanceOf(RoomEscapeException.class)
+                        .hasMessage(RoomEscapeErrorStatus.INVALID_RESERVATION_ITEM.errorMessage)
         );
     }
 

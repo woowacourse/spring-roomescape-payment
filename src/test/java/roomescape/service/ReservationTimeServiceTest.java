@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,8 @@ import roomescape.dto.response.MemberRegisterResponse;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationThemeResponse;
 import roomescape.dto.response.ReservationTimeResponse;
+import roomescape.global.exception.roomescape.RoomEscapeErrorStatus;
+import roomescape.global.exception.roomescape.RoomEscapeException;
 import roomescape.service.member.MemberService;
 import roomescape.service.reservation.ReservationService;
 import roomescape.service.reservation.ReservationThemeService;
@@ -79,14 +80,15 @@ class ReservationTimeServiceTest {
     }
 
     @Test
-    @DisplayName("예약 시간이 예약에 사용되고 있다면 예외가 발생한다")
+    @DisplayName("존재하지 않는 예약 시간을 삭제 시 예외가 발생한다.")
     void removeReferencedReservationTimeTest() {
         // given
         Long id = 1L;
 
         // when, then
         assertThatThrownBy(() -> reservationTimeService.removeReservationTime(id))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(RoomEscapeException.class)
+                .hasMessage(RoomEscapeErrorStatus.NON_EXIST_RESERVATION_TIME.errorMessage);
     }
 
     @Test
@@ -120,6 +122,7 @@ class ReservationTimeServiceTest {
 
         // when, then
         assertThatThrownBy(() -> reservationTimeService.removeReservationTime(time.id()))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class)
+                .hasMessage(RoomEscapeErrorStatus.CANNOT_DELETE_TIME_WITH_RESERVATIONS.errorMessage);
     }
 }

@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +23,8 @@ import roomescape.dto.response.MemberRegisterResponse;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationThemeResponse;
 import roomescape.dto.response.ReservationTimeResponse;
+import roomescape.global.exception.roomescape.RoomEscapeErrorStatus;
+import roomescape.global.exception.roomescape.RoomEscapeException;
 import roomescape.service.member.MemberService;
 import roomescape.service.reservation.ReservationService;
 import roomescape.service.reservation.ReservationThemeService;
@@ -97,7 +98,8 @@ class ReservationThemeServiceTest {
 
         //when & then
         assertThatThrownBy(() -> reservationThemeService.removeReservationTheme(id))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(RoomEscapeException.class)
+                .hasMessage(RoomEscapeErrorStatus.NON_EXIST_RESERVATION_THEME.errorMessage);
 
     }
 
@@ -129,6 +131,7 @@ class ReservationThemeServiceTest {
 
         // when, then
         assertThatThrownBy(() -> reservationThemeService.removeReservationTheme(theme.id()))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RoomEscapeException.class)
+                .hasMessage(RoomEscapeErrorStatus.CANNOT_DELETE_THEME_WITH_RESERVATIONS.errorMessage);
     }
 }
