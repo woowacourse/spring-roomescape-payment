@@ -3,7 +3,6 @@ package roomescape.booking.reservation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.booking.reservation.dto.AdminReservationRequest;
@@ -44,7 +43,7 @@ public class ReservationCreateService {
             TossPaymentConfirmCommand confirmCommand = tossPaymentConfirmCommandFactory.toPaymentConfirmCommand(request);
             tossPaymentAdapter.confirmPayment(confirmCommand);
         } catch (Exception e) {
-            reservation.markStatusAsCanceled();
+            log.error("결제 승인 실패", e);
             throw e;
         }
 
@@ -70,8 +69,7 @@ public class ReservationCreateService {
         return reservationRepository.save(notSavedReservation);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    protected void confirmReservation(final Order order, final Reservation reservation) {
+    private void confirmReservation(final Order order, final Reservation reservation) {
         order.markAsPaid();
         reservation.markStatusAsConfirmed();
     }

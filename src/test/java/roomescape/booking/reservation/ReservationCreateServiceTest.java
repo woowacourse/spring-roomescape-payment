@@ -132,7 +132,7 @@ public class ReservationCreateServiceTest {
             }).isInstanceOf(ReservationConflictException.class);
         }
 
-        @DisplayName("결제 승인 API가 실패한다면 예약이 취소되고 예외가 발생한다.")
+        @DisplayName("결제 승인 API가 실패한다면 예외가 발생한다.")
         @Test
         void create3() {
             // given
@@ -149,11 +149,8 @@ public class ReservationCreateServiceTest {
                     .willReturn(new TossPaymentConfirmCommand(request.orderId(), request.amount(), request.paymentKey()));
 
             // when & then
-            assertAll(
-                    () -> assertThatThrownBy(() -> reservationCreateService.create(request, loginMember))
-                            .isInstanceOf(PaymentException.class),
-                    () -> assertThat(reservation.getReservationStatus()).isEqualTo(ReservationStatus.CANCELED)
-            );
+            assertThatThrownBy(() -> reservationCreateService.create(request, loginMember))
+                    .isInstanceOf(PaymentException.class);
         }
     }
 
