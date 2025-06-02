@@ -1,19 +1,24 @@
 package roomescape.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.RestClientException;
-import roomescape.dto.ErrorResponse;
+import roomescape.dto.exception.ErrorResponse;
 import roomescape.exception.AccessDeniedException;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.NotFoundException;
-import roomescape.exception.TossPaymentException;
+import roomescape.exception.TossPaymentClientException;
+import roomescape.exception.TossPaymentServerException;
 import roomescape.exception.UnauthorizedException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex) {
@@ -51,21 +56,23 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleUnexpected(Exception ex) {
-        ErrorResponse errorResponse = new ErrorResponse(
-                ex.getMessage(),
-                HttpStatus.INTERNAL_SERVER_ERROR);
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @ExceptionHandler(TossPaymentException.class)
-    public ResponseEntity<ErrorResponse> handleTossPaymentException(TossPaymentException ex) {
+    @ExceptionHandler(TossPaymentClientException.class)
+    public ResponseEntity<ErrorResponse> handleTossPaymentException(TossPaymentClientException ex) {
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getMessage(),
                 HttpStatus.BAD_REQUEST
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(TossPaymentServerException.class)
+    public ResponseEntity<ErrorResponse> handleTossPaymentException(TossPaymentServerException ex) {
+        LOG.error("토스 서버에서 에러가 발생했습니다.", ex);
+        ErrorResponse errorResponse = new ErrorResponse(
+                "결제 중 서버 에러가 발생했습니다.",
+                HttpStatus.INTERNAL_SERVER_ERROR
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(RestClientException.class)
@@ -75,5 +82,13 @@ public class GlobalExceptionHandler {
                 HttpStatus.BAD_REQUEST
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleUnexpected(Exception ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getMessage(),
+                HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

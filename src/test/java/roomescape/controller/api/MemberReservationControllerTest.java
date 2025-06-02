@@ -3,6 +3,7 @@ package roomescape.controller.api;
 import io.restassured.RestAssured;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
+import roomescape.fixture.InitDatabaseHelper;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
@@ -33,6 +35,13 @@ class MemberReservationControllerTest {
     ReservationTimeRepository reservationTimeRepository;
     @Autowired
     JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    InitDatabaseHelper dbHelper;
+
+    @BeforeEach
+    void setUp() {
+        dbHelper.clear();
+    }
 
     @DisplayName("자신의 예약 정보를 불러올 수 있다")
     @Test

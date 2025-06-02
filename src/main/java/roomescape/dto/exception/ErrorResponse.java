@@ -1,4 +1,4 @@
-package roomescape.dto;
+package roomescape.dto.exception;
 
 import java.time.LocalDateTime;
 import org.springframework.http.HttpStatus;

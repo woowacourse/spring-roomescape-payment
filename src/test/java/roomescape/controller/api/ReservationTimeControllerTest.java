@@ -8,12 +8,15 @@ import io.restassured.http.ContentType;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.dto.time.ReservationTimeCreateRequest;
+import roomescape.fixture.InitDatabaseHelper;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -32,6 +35,14 @@ class ReservationTimeControllerTest {
     @Nested
     @DisplayName("예약시간 생성")
     class ReservationTimePostTest {
+
+        @Autowired
+        InitDatabaseHelper dbHelper;
+
+        @BeforeEach
+        void setUp() {
+            dbHelper.clear();
+        }
 
         @DisplayName("Time 입력 테스트")
         @Test
@@ -105,6 +116,14 @@ class ReservationTimeControllerTest {
     @Nested
     @DisplayName("예약시간 삭제")
     class DeleteReservationTimeTest {
+
+        @Autowired
+        InitDatabaseHelper dbHelper;
+
+        @BeforeEach
+        void setUp() {
+            dbHelper.clear();
+        }
 
         @DisplayName("저장된 Id 제거 테스트")
         @Test

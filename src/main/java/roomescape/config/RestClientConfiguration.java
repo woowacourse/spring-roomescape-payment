@@ -37,7 +37,8 @@ public class RestClientConfiguration {
         return RestClient.builder()
                 .requestFactory(clientFactory)
                 .baseUrl(baseUrl)
-                .defaultHeader("Authorization", authorizationHeader);
+                .defaultHeader("Authorization", authorizationHeader)
+                .defaultStatusHandler(new TossPaymentExceptionHandler());
     }
 
     @Bean
