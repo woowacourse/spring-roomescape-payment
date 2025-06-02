@@ -1,7 +1,7 @@
 package roomescape.payment.processor.toss;
 
 import java.util.Base64;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestClient;
 
 public class TossPaymentProcessor {
@@ -24,8 +24,7 @@ public class TossPaymentProcessor {
 
         return restClient.post()
                 .uri(confirmUri)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Basic " + secretKey)
+                .header(HttpHeaders.AUTHORIZATION, "Basic " + secretKey)
                 .body(request)
                 .retrieve()
                 .body(TossPaymentConfirmResponse.class);
