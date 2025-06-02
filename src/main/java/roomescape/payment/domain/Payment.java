@@ -2,6 +2,8 @@ package roomescape.payment.domain;
 
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.util.Objects;
 
@@ -9,6 +11,10 @@ import java.util.Objects;
 public class Payment {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Embedded
     private PaymentKey paymentKey;
 
     @Embedded
@@ -31,15 +37,16 @@ public class Payment {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Payment payment)) {
+    public final boolean equals(final Object o) {
+        if (!(o instanceof final Payment payment)) {
             return false;
         }
-        return Objects.equals(paymentKey, payment.paymentKey);
+
+        return Objects.equals(id, payment.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(paymentKey);
+        return Objects.hashCode(id);
     }
 }
