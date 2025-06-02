@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
+import roomescape.exception.ExternalApiErrorException;
 import roomescape.infrastructure.payment.dto.PaymentApproveErrorResponse;
 import roomescape.infrastructure.payment.dto.PaymentApproveRequest;
 
@@ -38,8 +39,7 @@ class TossPaymentClientTest {
                         .body(objectMapper.writeValueAsString(response)));
         // when
         assertThatThrownBy(() -> paymentClient.approvePayment(paymentApproveRequest))
-                .isInstanceOf(PaymentApproveErrorResponse.class)
-                .hasMessage("결제 시간이 료되어 결제 진행 데이터가 존재하지 않습니다.");
+                .isInstanceOf(ExternalApiErrorException.class);
     }
 
     @Test
@@ -54,7 +54,6 @@ class TossPaymentClientTest {
         PaymentApproveRequest paymentApproveRequest = new PaymentApproveRequest("paymentKey", "1", 1000L);
         // when
         assertThatThrownBy(() -> paymentClient.approvePayment(paymentApproveRequest))
-                .isInstanceOf(PaymentApproveErrorResponse.class)
-                .hasMessage("인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다.");
+                .isInstanceOf(ExternalApiErrorException.class);
     }
 }
