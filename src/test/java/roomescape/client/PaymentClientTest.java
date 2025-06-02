@@ -48,7 +48,12 @@ public class PaymentClientTest {
         mockRestServiceServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withBadRequest()
-                        .body("{\"code\":\"INVALID_API_KEY\",\"message\":\"잘못된 시크릿키 연동 정보 입니다.\"}")
+                        .body("""
+                                {
+                                    "code":"INVALID_API_KEY",
+                                    "message":"잘못된 시크릿키 연동 정보 입니다."
+                                }
+                        """)
                         .contentType(MediaType.APPLICATION_JSON));
 
 
@@ -68,7 +73,12 @@ public class PaymentClientTest {
         mockRestServiceServer.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withResourceNotFound()
-                        .body("{\"code\":\"NOT_FOUND_PAYMENT_SESSION\",\"message\":\"결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다.\"}")
+                        .body("""
+                                {
+                                    "code":"NOT_FOUND_PAYMENT_SESSION",
+                                    "message":"결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다."
+                                }
+                        """)
                         .contentType(MediaType.APPLICATION_JSON));
 
 
