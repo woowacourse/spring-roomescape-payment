@@ -55,7 +55,7 @@ class ReservationServiceIntegrationTest extends BaseTest {
     private ReservationTime time;
     private String paymentKey;
     private String orderId;
-    private Long amount;
+    private long amount;
 
     @BeforeEach
     void setUp() {
@@ -66,7 +66,7 @@ class ReservationServiceIntegrationTest extends BaseTest {
         time = reservationTimeRepository.save(ReservationTime.from(LocalTime.of(13, 0)));
         paymentKey = null;
         orderId = null;
-        amount = null;
+        amount = 0;
     }
 
     @Test

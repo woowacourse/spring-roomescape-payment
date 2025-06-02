@@ -65,7 +65,7 @@ class ReservationServiceTest extends BaseTest {
     private Reservation r1;
     private String paymentKey;
     private String orderId;
-    private Long amount;
+    private long amount;
 
     @BeforeEach
     void setUp() {
@@ -76,7 +76,7 @@ class ReservationServiceTest extends BaseTest {
         r1 = Reservation.of(LocalDate.of(2999, 5, 11), time1, theme1, member, LocalDateTime.now(clock));
         paymentKey = null;
         orderId = null;
-        amount = null;
+        amount = 0;
     }
 
     @Test
