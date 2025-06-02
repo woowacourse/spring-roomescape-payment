@@ -3,18 +3,17 @@ package roomescape.service;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import roomescape.domain.member.Member;
+import org.springframework.mock.web.MockHttpSession;
 import roomescape.dto.request.LoginRequest;
 import roomescape.dto.request.MemberRegisterRequest;
-import roomescape.dto.response.MemberRegisterResponse;
 import roomescape.service.auth.AuthService;
 import roomescape.service.member.MemberService;
 import roomescape.test_util.ServiceTest;
 
+import javax.naming.AuthenticationException;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 class AuthServiceTest extends ServiceTest {
 
@@ -25,18 +24,17 @@ class AuthServiceTest extends ServiceTest {
 
     @Test
     @DisplayName("사용자의 이메일, 비밀번호를 확인한 후 사용자의 아이디를 반환한다.")
-    void authenticateTest() {
+    void authenticateTest() throws AuthenticationException {
         // given
         memberService.addMember(new MemberRegisterRequest("test@test.com", "testPassword", "test"));
         final LoginRequest loginRequest = new LoginRequest("test@test.com", "testPassword");
+        MockHttpSession session = new MockHttpSession();
 
         // when
-        final Long memberId = authService.authenticate(loginRequest);
+        authService.authenticate(loginRequest, session);
 
         // then
-        final Member saved = memberService.getMemberById(memberId);
-        assertThat(saved.getEmail()).isEqualTo("test@test.com");
-        assertThat(saved.getName()).isEqualTo("test");
+        assertThat(session.getAttribute("id")).isNotNull();
     }
 
     @Test
@@ -47,7 +45,7 @@ class AuthServiceTest extends ServiceTest {
         final LoginRequest loginRequest = new LoginRequest("wrongEmail@test.com", "testPassword");
 
         // when, then
-        assertThatThrownBy(() -> authService.authenticate(loginRequest))
+        assertThatThrownBy(() -> authService.authenticate(loginRequest, new MockHttpSession()))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -59,28 +57,7 @@ class AuthServiceTest extends ServiceTest {
         final LoginRequest loginRequest = new LoginRequest("test@test.com", "wrongPassword");
 
         // when, then
-        assertThatThrownBy(() -> authService.authenticate(loginRequest))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    @DisplayName("세션 아이디를 업데이트 한다")
-    void updateSessoinId() {
-        // given
-        final MemberRegisterResponse response = memberService.addMember(
-                new MemberRegisterRequest("test@test.com", "testPassword", "test")
-        );
-        final Member member = memberService.getMemberById(response.id());
-        final String sessionIdBefore = member.getSessionId();
-
-        // when
-        authService.updateSessionIdByMemberId(member.getId(), "hello");
-
-        // then
-        final Member memberAfterChanged = memberService.getMemberById(response.id());
-        assertAll(
-                () -> assertThat(sessionIdBefore).isNull(),
-                () -> assertThat(memberAfterChanged.getSessionId()).isEqualTo("hello")
-        );
+        assertThatThrownBy(() -> authService.authenticate(loginRequest, new MockHttpSession()))
+                .isInstanceOf(AuthenticationException.class);
     }
 }
