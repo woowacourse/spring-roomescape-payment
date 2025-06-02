@@ -22,10 +22,10 @@ public class Reservation {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private Member member;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private Schedule schedule;
 
     @Enumerated(EnumType.STRING)

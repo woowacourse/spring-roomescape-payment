@@ -9,6 +9,8 @@ import roomescape.schedule.Schedule;
 
 import java.util.Objects;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -25,10 +27,10 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private Member member;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private Schedule schedule;
 
     public Order(final String id, final Long amount, final PaymentStatus paymentStatus, final Member member, final Schedule schedule) {

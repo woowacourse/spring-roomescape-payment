@@ -11,6 +11,8 @@ import roomescape.theme.Theme;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import static jakarta.persistence.FetchType.LAZY;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,10 +28,10 @@ public class Schedule {
 
     private LocalDate date;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private ReservationTime reservationTime;
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     private Theme theme;
 
     public Schedule(final LocalDate date, final ReservationTime reservationTime, final Theme theme) {
