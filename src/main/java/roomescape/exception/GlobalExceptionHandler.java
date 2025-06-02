@@ -20,11 +20,12 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(exception = IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
+    @ExceptionHandler(exception = PaymentException.class)
+    public ResponseEntity<ErrorResponse> handleClientPaymentException(PaymentException e) {
         ErrorResponse response = ErrorResponse.from(e.getMessage());
 
-        return ResponseEntity.badRequest().body(response);
+        return ResponseEntity.status(BAD_REQUEST)
+                .body(response);
     }
 
     @ExceptionHandler(exception = UnauthorizedException.class)
@@ -43,22 +44,6 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
-    @ExceptionHandler(exception = PaymentException.class)
-    public ResponseEntity<ErrorResponse> handleClientPaymentException(PaymentException e) {
-        ErrorResponse response = ErrorResponse.from(e.getMessage());
-
-        return ResponseEntity.status(BAD_REQUEST)
-                .body(response);
-    }
-
-    @ExceptionHandler(exception = Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(Exception e) {
-        ErrorResponse response = ErrorResponse.from("문제가 발생하였습니다.");
-
-        return ResponseEntity.status(INTERNAL_SERVER_ERROR)
-                .body(response);
-    }
-
     @ExceptionHandler(exception = MethodArgumentNotValidException.class)
     public ResponseEntity<List<ErrorResponse>> handleValidationException(MethodArgumentNotValidException e) {
         List<ErrorResponse> responses = createValidationErrorMessage(e.getBindingResult());
@@ -72,5 +57,20 @@ public class GlobalExceptionHandler {
                 .map(ObjectError::getDefaultMessage)
                 .map(ErrorResponse::from)
                 .toList();
+    }
+
+    @ExceptionHandler(exception = IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
+        ErrorResponse response = ErrorResponse.from(e.getMessage());
+
+        return ResponseEntity.badRequest().body(response);
+    }
+
+    @ExceptionHandler(exception = Exception.class)
+    public ResponseEntity<ErrorResponse> handleException(Exception e) {
+        ErrorResponse response = ErrorResponse.from("문제가 발생하였습니다.");
+
+        return ResponseEntity.status(INTERNAL_SERVER_ERROR)
+                .body(response);
     }
 }
