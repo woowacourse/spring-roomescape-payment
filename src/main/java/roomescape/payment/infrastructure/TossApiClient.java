@@ -44,7 +44,7 @@ public class TossApiClient implements ApiClient {
             }
             throw new TossPaymentClientException(response.message());
         } catch (HttpServerErrorException e) {
-            throw new TossPaymentServerException("토스 서버로 문의해주세요");
+            throw new TossPaymentServerException("결제 서버에 문제가 발생했습니다. 잠시 후 다시 시도하거나 다른 결제 수단을 이용하세요");
         }
     }
 
