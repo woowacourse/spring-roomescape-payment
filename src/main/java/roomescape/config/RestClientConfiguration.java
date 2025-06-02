@@ -27,7 +27,8 @@ public class RestClientConfiguration {
 
         return RestClient.builder()
                 .requestFactory(clientFactory)
-                .baseUrl(baseUrl);
+                .baseUrl(baseUrl)
+                .defaultStatusHandler(new TossPaymentExceptionHandler());
     }
 
     @Bean

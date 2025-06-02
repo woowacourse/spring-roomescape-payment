@@ -38,7 +38,7 @@ class ReservationPaymentServiceTest {
     private static MockWebServer mockWebServer;
 
     @Autowired
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper;
 
     @Autowired
     private ReservationPaymentService reservationPaymentService;
