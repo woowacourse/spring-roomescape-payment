@@ -20,8 +20,7 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
 
     @Override
     public Object resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer,
-                                  final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory)
-            throws Exception {
+                                  final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory) {
         final HttpServletRequest request = ((ServletWebRequest) webRequest).getRequest();
         final HttpSession session = request.getSession();
         final Object attribute = session.getAttribute("id");
