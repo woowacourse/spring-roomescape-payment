@@ -29,12 +29,12 @@ class ReservationThemeServiceTest extends ServiceTest {
 
     @Test
     @DisplayName("모든 테마를 다 가져온다.")
-    void findReservationThemesTest() {
+    void getAllTest() {
         // given
         insertReservationTheme("테마", "설명", "썸네일");
 
         // when
-        final List<ReservationThemeResponse> result = reservationThemeService.findReservationThemes();
+        final List<ReservationThemeResponse> result = reservationThemeService.getAll();
 
         // then
         assertAll(
@@ -47,7 +47,7 @@ class ReservationThemeServiceTest extends ServiceTest {
     }
 
     @Test
-    void findPopularThemes() {
+    void getPopulars() {
     }
 
     @Test
@@ -57,7 +57,7 @@ class ReservationThemeServiceTest extends ServiceTest {
         final ReservationThemeRequest request = new ReservationThemeRequest("테마", "설명", "썸네일");
 
         // when
-        final ReservationThemeResponse result = reservationThemeService.addReservationTheme(request);
+        final ReservationThemeResponse result = reservationThemeService.save(request);
 
         // then
         assertAll(
@@ -75,7 +75,7 @@ class ReservationThemeServiceTest extends ServiceTest {
         final long id = 1L;
 
         // when, then
-        assertThatThrownBy(() -> reservationThemeService.removeReservationTheme(id))
+        assertThatThrownBy(() -> reservationThemeService.remove(id))
                 .isInstanceOf(NoSuchElementException.class);
 
     }
@@ -87,7 +87,7 @@ class ReservationThemeServiceTest extends ServiceTest {
         ReservationTheme savedTheme = insertReservationTheme("테마", "설명", "썸네일");
 
         // when, then
-        assertThatCode(() -> reservationThemeService.removeReservationTheme(savedTheme.getId()))
+        assertThatCode(() -> reservationThemeService.remove(savedTheme.getId()))
                 .doesNotThrowAnyException();
     }
 
@@ -102,7 +102,7 @@ class ReservationThemeServiceTest extends ServiceTest {
         insertReservation(member, item, ReservationStatus.PENDING);
 
         // when, then
-        assertThatThrownBy(() -> reservationThemeService.removeReservationTheme(theme.getId()))
+        assertThatThrownBy(() -> reservationThemeService.remove(theme.getId()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

@@ -28,48 +28,34 @@ public class ReservationController {
     private final ReservationService reservationService;
     private final ReservingService reservingService;
 
-    @GetMapping("/reservations")
-    public ResponseEntity<List<MyPageReservationResponse>> getMyReservations(LoginInfo loginInfo) {
-        List<MyPageReservationResponse> response = reservationService.getReservationsByMemberId(loginInfo.memberId());
-        return ResponseEntity.ok(response);
-    }
-
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> reserve(
             @RequestBody @Valid ReservationRequest request,
             LoginInfo loginInfo
     ) {
-        ReservationResponse response = reservingService.reserve(
-                request.date(),
-                request.themeId(),
-                request.timeId(),
-                request.paymentKey(),
-                request.orderId(),
-                request.amount(),
-                loginInfo.memberId()
-        );
-
+        ReservationResponse response = reservingService.reserve(request.date(), request.themeId(), request.timeId(), request.paymentKey(), request.orderId(), request.amount(), loginInfo.memberId());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/reservations/pending")
-    public ResponseEntity<ReservationResponse> addPendingReservation(
+    public ResponseEntity<ReservationResponse> addPending(
             @RequestBody @Valid ReservationPendingRequest request,
             LoginInfo loginInfo
     ) {
-        CreateReservationRequest createReservationRequest = new CreateReservationRequest(
-                loginInfo.memberId(),
-                request.date(),
-                request.themeId(),
-                request.timeId()
-        );
+        CreateReservationRequest createReservationRequest = new CreateReservationRequest(loginInfo.memberId(), request.date(), request.themeId(), request.timeId());
         ReservationResponse response = reservationService.pending(createReservationRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @GetMapping("/reservations")
+    public ResponseEntity<List<MyPageReservationResponse>> getMines(LoginInfo loginInfo) {
+        List<MyPageReservationResponse> response = reservationService.getAllBy(loginInfo.memberId());
+        return ResponseEntity.ok(response);
+    }
+
     @DeleteMapping("/reservations/{reservationId}")
-    public ResponseEntity<Void> removeReservation(@PathVariable long reservationId) {
-        reservationService.removeReservation(reservationId);
+    public ResponseEntity<Void> remove(@PathVariable long reservationId) {
+        reservationService.remove(reservationId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

@@ -20,14 +20,14 @@ public class AdminReservationTimeController {
     private final ReservationTimeService reservationTimeService;
 
     @PostMapping("/admin/times")
-    public ResponseEntity<ReservationTimeResponse> reservationTimeAdd(@RequestBody @Valid ReservationTimeRequest request) {
-        ReservationTimeResponse response = reservationTimeService.addReservationTime(request);
+    public ResponseEntity<ReservationTimeResponse> save(@RequestBody @Valid ReservationTimeRequest request) {
+        ReservationTimeResponse response = reservationTimeService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/admin/times/{timeId}")
-    public ResponseEntity<Void> reservationTimeRemove(@PathVariable long timeId) {
-        reservationTimeService.removeReservationTime(timeId);
+    public ResponseEntity<Void> remove(@PathVariable long timeId) {
+        reservationTimeService.remove(timeId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

@@ -22,7 +22,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public void authenticate(final LoginRequest loginRequest, final HttpSession session) throws AuthenticationException {
+    public void login(final LoginRequest loginRequest, final HttpSession session) throws AuthenticationException {
         final Member member = memberHelper.getMemberByEmail(loginRequest.email());
 
         if (!passwordEncoder.matches(loginRequest.password(), member.getPassword())) {

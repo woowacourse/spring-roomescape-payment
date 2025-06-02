@@ -34,7 +34,7 @@ public class MemberService {
     }
 
     @Transactional(readOnly = true)
-    public List<MemberResponse> getAllMembers() {
+    public List<MemberResponse> getAll() {
         return memberRepository.findAll().stream()
                 .map(MemberResponse::from)
                 .toList();

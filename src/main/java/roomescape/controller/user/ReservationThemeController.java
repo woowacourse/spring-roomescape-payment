@@ -17,14 +17,14 @@ public class ReservationThemeController {
     private final ReservationThemeService reservationThemeService;
 
     @GetMapping("/themes")
-    public ResponseEntity<List<ReservationThemeResponse>> reservationThemeList() {
-        List<ReservationThemeResponse> response = reservationThemeService.findReservationThemes();
+    public ResponseEntity<List<ReservationThemeResponse>> getAll() {
+        List<ReservationThemeResponse> response = reservationThemeService.getAll();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/themes/ranking")
-    public ResponseEntity<List<ReservationThemeResponse>> reservationThemeRankingList() {
-        List<ReservationThemeResponse> response = reservationThemeService.findPopularThemes();
+    public ResponseEntity<List<ReservationThemeResponse>> getPopulars() {
+        List<ReservationThemeResponse> response = reservationThemeService.getPopulars();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

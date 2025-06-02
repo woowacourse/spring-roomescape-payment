@@ -5,44 +5,44 @@ import roomescape.domain.reservation.Reservation;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public record WaitingReservationResponse(
+public record PendingReservationResponse(
         Long id,
-        WaitingReservationMemberSlot member,
-        WaitingReservationThemeSlot theme,
-        WaitingReservationTimeSlot time,
+        PendingReservationMemberSlot member,
+        PendingReservationThemeSlot theme,
+        PendingReservationTimeSlot time,
         LocalDate date
 ) {
 
-    public record WaitingReservationMemberSlot(
+    public record PendingReservationMemberSlot(
             Long memberId,
             String name
     ) {
     }
 
-    public record WaitingReservationThemeSlot(
+    public record PendingReservationThemeSlot(
             Long themeId,
             String themeName
     ) {
     }
 
-    public record WaitingReservationTimeSlot(
+    public record PendingReservationTimeSlot(
             Long timeId,
             LocalTime startAt
     ) {
     }
 
-    public static WaitingReservationResponse from(Reservation reservation) {
-        return new WaitingReservationResponse(
+    public static PendingReservationResponse from(Reservation reservation) {
+        return new PendingReservationResponse(
                 reservation.getId(),
-                new WaitingReservationMemberSlot(
+                new PendingReservationMemberSlot(
                         reservation.getMember().getId(),
                         reservation.getMember().getName()
                 ),
-                new WaitingReservationThemeSlot(
+                new PendingReservationThemeSlot(
                         reservation.getReservationItem().getTheme().getId(),
                         reservation.getReservationItem().getTheme().getName()
                 ),
-                new WaitingReservationTimeSlot(
+                new PendingReservationTimeSlot(
                         reservation.getReservationItem().getTime().getId(),
                         reservation.getReservationItem().getTime().getStartAt()
                 ),

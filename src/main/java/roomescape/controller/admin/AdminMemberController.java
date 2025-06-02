@@ -17,8 +17,8 @@ public class AdminMemberController {
     private final MemberService memberService;
 
     @GetMapping("/admin/members")
-    public ResponseEntity<List<MemberResponse>> getAllMembers() {
-        List<MemberResponse> response = memberService.getAllMembers();
+    public ResponseEntity<List<MemberResponse>> getAll() {
+        List<MemberResponse> response = memberService.getAll();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

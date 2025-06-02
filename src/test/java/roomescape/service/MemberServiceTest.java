@@ -50,13 +50,13 @@ class MemberServiceTest extends ServiceTest {
 
     @DisplayName("모든 사용자를 조회한다")
     @Test
-    void getAllMembers() {
+    void getAll() {
         // given
         final MemberRegisterRequest memberRegisterRequest = new MemberRegisterRequest("test", "test", "차니");
         memberService.register(memberRegisterRequest);
 
         // when
-        final List<MemberResponse> expected = memberService.getAllMembers();
+        final List<MemberResponse> expected = memberService.getAll();
 
         // then
         assertThat(expected).hasSize(1);

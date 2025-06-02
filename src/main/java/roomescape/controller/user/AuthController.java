@@ -37,7 +37,7 @@ public class AuthController {
 
     @PostMapping("/auth/login")
     public ResponseEntity<Void> login(@RequestBody @Valid LoginRequest loginRequest, HttpSession session) throws AuthenticationException {
-        authService.authenticate(loginRequest, session);
+        authService.login(loginRequest, session);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

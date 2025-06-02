@@ -11,8 +11,8 @@ import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationitem.ReservationItem;
 import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.response.MyPageReservationResponse;
+import roomescape.dto.response.PendingReservationResponse;
 import roomescape.dto.response.ReservationResponse;
-import roomescape.dto.response.WaitingReservationResponse;
 import roomescape.service.helper.MemberHelper;
 import roomescape.service.helper.PaymentHelper;
 import roomescape.service.helper.ReservationItemHelper;
@@ -31,7 +31,7 @@ public class ReservationService {
     private final PaymentHelper paymentHelper;
 
     @Transactional
-    public ReservationResponse addReservation(final CreateReservationRequest request) {
+    public ReservationResponse save(final CreateReservationRequest request) {
         return createReservation(request, ReservationStatus.ACCEPTED, false);
     }
 
@@ -81,7 +81,7 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReservationResponse> getFilteredReservations(
+    public List<ReservationResponse> getAllFiltered(
             final Long memberId,
             final Long themeId,
             final LocalDate dateFrom,
@@ -99,15 +99,15 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<WaitingReservationResponse> getAllWaitingReservations() {
-        List<Reservation> waitingReservations = reservationRepository.findByReservationStatusOrderByIdDesc(ReservationStatus.PENDING);
-        return waitingReservations.stream()
-                .map(WaitingReservationResponse::from)
+    public List<PendingReservationResponse> getAllPendings() {
+        List<Reservation> pendingReservations = reservationRepository.findByReservationStatusOrderByIdDesc(ReservationStatus.PENDING);
+        return pendingReservations.stream()
+                .map(PendingReservationResponse::from)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<MyPageReservationResponse> getReservationsByMemberId(Long memberId) {
+    public List<MyPageReservationResponse> getAllBy(Long memberId) {
         final Member member = memberHelper.getById(memberId);
         List<Reservation> myReservations = reservationRepository.findByMemberId(member.getId());
         return myReservations.stream()
@@ -132,19 +132,19 @@ public class ReservationService {
     }
 
     @Transactional
-    public void denyPendingReservation(Long reservationId) {
-        Reservation waitingReservation = reservationRepository.findById(reservationId)
+    public void denyPending(Long reservationId) {
+        Reservation pendingReservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 예약입니다."));
 
-        if (waitingReservation.getReservationStatus() != ReservationStatus.PENDING) {
+        if (pendingReservation.getReservationStatus() != ReservationStatus.PENDING) {
             throw new IllegalArgumentException("[ERROR] 대기 상태의 예약만 거절할 수 있습니다.");
         }
 
-        waitingReservation.changeStatusToDenied();
+        pendingReservation.changeStatusToDenied();
     }
 
     @Transactional
-    public void removeReservation(Long reservationId) {
+    public void remove(Long reservationId) {
         Reservation targetReservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 예약입니다."));
 

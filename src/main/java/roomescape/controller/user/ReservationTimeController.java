@@ -21,17 +21,17 @@ public class ReservationTimeController {
     private final ReservationTimeService reservationTimeService;
 
     @GetMapping("/times")
-    public ResponseEntity<List<ReservationTimeResponse>> reservationTimeList() {
-        List<ReservationTimeResponse> response = reservationTimeService.findReservationTimesInfo();
+    public ResponseEntity<List<ReservationTimeResponse>> getAll() {
+        List<ReservationTimeResponse> response = reservationTimeService.getAll();
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/times/{themeId}/available")
-    public ResponseEntity<List<ReservationTimeWithAvailabilityResponse>> reservationTimeOfTheme(
+    public ResponseEntity<List<ReservationTimeWithAvailabilityResponse>> getAvailables(
             @PathVariable long themeId,
             @RequestParam LocalDate date
     ) {
-        List<ReservationTimeWithAvailabilityResponse> response = reservationTimeService.findReservationTimeOfTheme(themeId, date);
+        List<ReservationTimeWithAvailabilityResponse> response = reservationTimeService.getAllWithAvailabilityBy(themeId, date);
         return ResponseEntity.ok(response);
     }
 }

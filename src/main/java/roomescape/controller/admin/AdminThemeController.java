@@ -19,14 +19,14 @@ public class AdminThemeController {
     private final ReservationThemeService reservationThemeService;
 
     @PostMapping("/admin/themes")
-    public ResponseEntity<ReservationThemeResponse> reservationThemeAdd(@RequestBody ReservationThemeRequest request) {
-        ReservationThemeResponse response = reservationThemeService.addReservationTheme(request);
+    public ResponseEntity<ReservationThemeResponse> save(@RequestBody ReservationThemeRequest request) {
+        ReservationThemeResponse response = reservationThemeService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @DeleteMapping("/admin/themes/{themeId}")
-    public ResponseEntity<Void> reservationThemeRemove(@PathVariable long themeId) {
-        reservationThemeService.removeReservationTheme(themeId);
+    public ResponseEntity<Void> remove(@PathVariable long themeId) {
+        reservationThemeService.remove(themeId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

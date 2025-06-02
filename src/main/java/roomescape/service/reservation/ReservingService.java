@@ -32,7 +32,7 @@ public class ReservingService {
                 themeId,
                 timeId
         );
-        final ReservationResponse reservationResponse = reservationService.addReservation(createReservationRequest);
+        final ReservationResponse reservationResponse = reservationService.save(createReservationRequest);
         paymentService.approveAndSave(paymentKey, orderId, amount, reservationResponse.id());
         return reservationResponse;
     }

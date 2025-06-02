@@ -23,7 +23,7 @@ public class ReservationTimeService {
     private final ReservationItemHelper itemHelper;
 
     @Transactional
-    public ReservationTimeResponse addReservationTime(final ReservationTimeRequest request) {
+    public ReservationTimeResponse save(final ReservationTimeRequest request) {
         ReservationTime reservationTime = new ReservationTime(request.startAt());
         validateUniqueReservationTime(reservationTime);
         ReservationTime saved = reservationTimeRepository.save(reservationTime);
@@ -37,19 +37,14 @@ public class ReservationTimeService {
         }
     }
 
-    @Transactional
-    public void removeReservationTime(final long id) {
-        if (!reservationTimeRepository.existsById(id)) {
-            throw new NoSuchElementException("[ERROR] 존재하지 않는 테마입니다.");
-        }
-        if (!reservationTimeRepository.isAvailableToRemove(id)) {
-            throw new IllegalArgumentException("[ERROR] 예약이 존재해 테마를 삭제할 수 없습니다.");
-        }
-        reservationTimeRepository.deleteById(id);
+    @Transactional(readOnly = true)
+    public List<ReservationTimeResponse> getAll() {
+        return reservationTimeRepository.findAll().stream()
+                .map(ReservationTimeResponse::from).toList();
     }
 
     @Transactional(readOnly = true)
-    public List<ReservationTimeWithAvailabilityResponse> findReservationTimeOfTheme(long themeId, LocalDate date) {
+    public List<ReservationTimeWithAvailabilityResponse> getAllWithAvailabilityBy(long themeId, LocalDate date) {
         List<ReservationTime> availableReservationTime = reservationTimeRepository.findAll();
         return availableReservationTime.stream()
                 .map(reservationTime -> {
@@ -59,9 +54,14 @@ public class ReservationTimeService {
                 ).toList();
     }
 
-    @Transactional(readOnly = true)
-    public List<ReservationTimeResponse> findReservationTimesInfo() {
-        return reservationTimeRepository.findAll().stream()
-                .map(ReservationTimeResponse::from).toList();
+    @Transactional
+    public void remove(final long id) {
+        if (!reservationTimeRepository.existsById(id)) {
+            throw new NoSuchElementException("[ERROR] 존재하지 않는 테마입니다.");
+        }
+        if (!reservationTimeRepository.isAvailableToRemove(id)) {
+            throw new IllegalArgumentException("[ERROR] 예약이 존재해 테마를 삭제할 수 없습니다.");
+        }
+        reservationTimeRepository.deleteById(id);
     }
 }

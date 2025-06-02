@@ -49,7 +49,7 @@ class ReservationServiceTest extends ServiceTest {
         final CreateReservationRequest createReservationRequest = new CreateReservationRequest(member.getId(), date, theme.getId(), time.getId());
 
         // when
-        ReservationResponse reservationResponse = reservationService.addReservation(createReservationRequest);
+        ReservationResponse reservationResponse = reservationService.save(createReservationRequest);
 
         // then
         assertAll(
@@ -82,9 +82,9 @@ class ReservationServiceTest extends ServiceTest {
 
         // when, then
         assertAll(
-                () -> assertThatThrownBy(() -> reservationService.addReservation(request1))
+                () -> assertThatThrownBy(() -> reservationService.save(request1))
                         .isInstanceOf(NoSuchElementException.class),
-                () -> assertThatThrownBy(() -> reservationService.addReservation(request2))
+                () -> assertThatThrownBy(() -> reservationService.save(request2))
                         .isInstanceOf(NoSuchElementException.class)
         );
     }
@@ -106,7 +106,7 @@ class ReservationServiceTest extends ServiceTest {
         );
 
         // when, then
-        assertThatThrownBy(() -> reservationService.addReservation(request))
+        assertThatThrownBy(() -> reservationService.save(request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -127,7 +127,7 @@ class ReservationServiceTest extends ServiceTest {
             insertReservation(member2, item, ReservationStatus.PENDING);
 
             // when
-            List<ReservationResponse> result = reservationService.getFilteredReservations(member1.getId(), null, null, null);
+            List<ReservationResponse> result = reservationService.getAllFiltered(member1.getId(), null, null, null);
 
             // then
             assertThat(result).hasSize(2).extracting(ReservationResponse::id)
@@ -138,7 +138,7 @@ class ReservationServiceTest extends ServiceTest {
         @DisplayName("존재하지 않는 회원 ID로 필터링하면 빈 결과가 반환된다")
         void filterByNonExistingMemberId() {
             // when
-            List<ReservationResponse> result = reservationService.getFilteredReservations(999L, null, null, null);
+            List<ReservationResponse> result = reservationService.getAllFiltered(999L, null, null, null);
 
             // then
             assertThat(result).isEmpty();
@@ -159,7 +159,7 @@ class ReservationServiceTest extends ServiceTest {
             insertReservation(member, item2, ReservationStatus.PENDING);
 
             // when
-            List<ReservationResponse> result = reservationService.getFilteredReservations(null, theme1.getId(), null, null);
+            List<ReservationResponse> result = reservationService.getAllFiltered(null, theme1.getId(), null, null);
 
             // then
             assertThat(result).hasSize(2).extracting(ReservationResponse::id)
@@ -170,7 +170,7 @@ class ReservationServiceTest extends ServiceTest {
         @DisplayName("존재하지 않는 테마 ID로 필터링하면 빈 결과가 반환된다")
         void filterByNonExistingThemeId() {
             // when
-            List<ReservationResponse> result = reservationService.getFilteredReservations(null, 999L, null, null);
+            List<ReservationResponse> result = reservationService.getAllFiltered(null, 999L, null, null);
 
             // then
             assertThat(result).isEmpty();
@@ -190,7 +190,7 @@ class ReservationServiceTest extends ServiceTest {
             Reservation reservation = insertReservation(member, item2, ReservationStatus.PENDING);
 
             // when
-            List<ReservationResponse> result = reservationService.getFilteredReservations(null, null, DATE2, null);
+            List<ReservationResponse> result = reservationService.getAllFiltered(null, null, DATE2, null);
 
             // then
             assertThat(result).hasSize(1).extracting(ReservationResponse::id)
@@ -211,7 +211,7 @@ class ReservationServiceTest extends ServiceTest {
             insertReservation(member, item2, ReservationStatus.PENDING);
 
             // when
-            List<ReservationResponse> result = reservationService.getFilteredReservations(null, null, null, DATE1);
+            List<ReservationResponse> result = reservationService.getAllFiltered(null, null, null, DATE1);
 
             // then
             assertThat(result).hasSize(1).extracting(ReservationResponse::id)
@@ -233,7 +233,7 @@ class ReservationServiceTest extends ServiceTest {
             insertReservation(member, item3, ReservationStatus.PENDING);
 
             // when
-            List<ReservationResponse> result = reservationService.getFilteredReservations(null, null, DATE1, DATE2);
+            List<ReservationResponse> result = reservationService.getAllFiltered(null, null, DATE1, DATE2);
 
             // then
             assertThat(result).hasSize(2).extracting(ReservationResponse::id)
@@ -255,7 +255,7 @@ class ReservationServiceTest extends ServiceTest {
             insertReservation(member, item3, ReservationStatus.PENDING);
 
             // when
-            List<ReservationResponse> result = reservationService.getFilteredReservations(null, null, LocalDate.now().plusDays(10), LocalDate.now().plusDays(15));
+            List<ReservationResponse> result = reservationService.getAllFiltered(null, null, LocalDate.now().plusDays(10), LocalDate.now().plusDays(15));
 
             // then
             assertThat(result).isEmpty();
@@ -278,7 +278,7 @@ class ReservationServiceTest extends ServiceTest {
             insertReservation(member2, item2, ReservationStatus.PENDING);
 
             // when
-            List<ReservationResponse> result = reservationService.getFilteredReservations(member1.getId(), theme1.getId(), null, null);
+            List<ReservationResponse> result = reservationService.getAllFiltered(member1.getId(), theme1.getId(), null, null);
 
             // then
             assertThat(result).hasSize(1).extracting(ReservationResponse::id)
@@ -305,7 +305,7 @@ class ReservationServiceTest extends ServiceTest {
             insertReservation(member2, item3, ReservationStatus.PENDING);
 
             // when
-            List<ReservationResponse> result = reservationService.getFilteredReservations(
+            List<ReservationResponse> result = reservationService.getAllFiltered(
                     member1.getId(), theme1.getId(), DATE2, DATE3);
 
             // then
@@ -333,7 +333,7 @@ class ReservationServiceTest extends ServiceTest {
             Reservation r6 = insertReservation(member2, item3, ReservationStatus.PENDING);
 
             // when
-            List<ReservationResponse> result = reservationService.getFilteredReservations(null, null, null, null);
+            List<ReservationResponse> result = reservationService.getAllFiltered(null, null, null, null);
 
             // then
             assertThat(result).hasSize(6).extracting(ReservationResponse::id)
@@ -344,7 +344,7 @@ class ReservationServiceTest extends ServiceTest {
         @DisplayName("조건에 맞는 예약이 없는 경우 빈 목록이 반환된다")
         void returnsEmptyListWhenNoReservationsMatch() {
             // when
-            List<ReservationResponse> result = reservationService.getFilteredReservations(1L, 1L, DATE2, DATE3);
+            List<ReservationResponse> result = reservationService.getAllFiltered(1L, 1L, DATE2, DATE3);
 
             // then
             assertThat(result).isEmpty();
@@ -361,7 +361,7 @@ class ReservationServiceTest extends ServiceTest {
         final CreateReservationRequest createReservationRequest = new CreateReservationRequest(member.getId(), DATE1, theme.getId(), time.getId());
 
         // when
-        final ReservationResponse reservation = reservationService.addReservation(createReservationRequest);
+        final ReservationResponse reservation = reservationService.save(createReservationRequest);
 
         // then
         assertThat(reservation.status()).isEqualTo(ReservationStatus.ACCEPTED.description);
@@ -369,13 +369,13 @@ class ReservationServiceTest extends ServiceTest {
 
     @Test
     @DisplayName("존재하는 예약 항목이라면 새로운 에약을 대기 상태로 생성한다.")
-    void saveReservationWaiting() {
+    void saveReservationPending() {
         // given
         Member member1 = insertMember("member1@example.com", "password1", "Member 1", MemberRole.USER);
         Member member2 = insertMember("member2@example.com", "password1", "Member 1", MemberRole.USER);
         ReservationTheme theme = insertReservationTheme("Theme 1", "Description 1", "Thumbnail 1");
         ReservationTime time = insertReservationTime(TIME1);
-        reservationService.addReservation(new CreateReservationRequest(member1.getId(), DATE1, theme.getId(), time.getId()));
+        reservationService.save(new CreateReservationRequest(member1.getId(), DATE1, theme.getId(), time.getId()));
 
         final CreateReservationRequest request = new CreateReservationRequest(member2.getId(), DATE1, theme.getId(), time.getId());
 
@@ -395,13 +395,13 @@ class ReservationServiceTest extends ServiceTest {
         ReservationTheme theme = insertReservationTheme("Theme 1", "Description 1", "Thumbnail 1");
         ReservationTime time = insertReservationTime(TIME1);
 
-        ReservationResponse acceptedReservation = reservationService.addReservation(new CreateReservationRequest(member1.getId(), DATE1, theme.getId(), time.getId()));
+        ReservationResponse acceptedReservation = reservationService.save(new CreateReservationRequest(member1.getId(), DATE1, theme.getId(), time.getId()));
         ReservationResponse pendingReservation = reservationService.pending(new CreateReservationRequest(member2.getId(), DATE1, theme.getId(), time.getId()));
 
         int beforeCount = countReservation();
 
         // when
-        reservationService.removeReservation(pendingReservation.id());
+        reservationService.remove(pendingReservation.id());
 
         // then
         List<Reservation> remainingReservations = getAllReservations();
@@ -422,13 +422,13 @@ class ReservationServiceTest extends ServiceTest {
         ReservationTheme theme = insertReservationTheme("Theme 1", "Description 1", "Thumbnail 1");
         ReservationTime time = insertReservationTime(TIME1);
 
-        ReservationResponse acceptedReservation = reservationService.addReservation(new CreateReservationRequest(member1.getId(), DATE1, theme.getId(), time.getId()));
+        ReservationResponse acceptedReservation = reservationService.save(new CreateReservationRequest(member1.getId(), DATE1, theme.getId(), time.getId()));
         ReservationResponse pendingReservation = reservationService.pending(new CreateReservationRequest(member2.getId(), DATE1, theme.getId(), time.getId()));
 
         int beforeCount = countReservation();
 
         // when
-        reservationService.removeReservation(acceptedReservation.id());
+        reservationService.remove(acceptedReservation.id());
 
         // then
         List<Reservation> remainingReservations = getAllReservations();
@@ -456,7 +456,7 @@ class ReservationServiceTest extends ServiceTest {
         insertPayment("paymentKey", 10000, acceptedReservation);
 
         // when
-        List<MyPageReservationResponse> myReservations = reservationService.getReservationsByMemberId(member1.getId());
+        List<MyPageReservationResponse> myReservations = reservationService.getAllBy(member1.getId());
 
         // then
         assertThat(myReservations).anyMatch(reservation ->
@@ -480,7 +480,7 @@ class ReservationServiceTest extends ServiceTest {
         Reservation pendingReservation = insertReservation(member3, item, ReservationStatus.PENDING);
 
         // when
-        List<MyPageReservationResponse> myReservations = reservationService.getReservationsByMemberId(member3.getId());
+        List<MyPageReservationResponse> myReservations = reservationService.getAllBy(member3.getId());
 
         // then
         assertThat(myReservations).anyMatch(reservation ->
@@ -502,17 +502,17 @@ class ReservationServiceTest extends ServiceTest {
         Reservation pendingReservation = insertReservation(member2, item, ReservationStatus.PENDING);
 
         // before
-        List<MyPageReservationResponse> beforeMyReservation = reservationService.getReservationsByMemberId(member2.getId());
+        List<MyPageReservationResponse> beforeMyReservation = reservationService.getAllBy(member2.getId());
         assertThat(beforeMyReservation).anyMatch(reservation ->
                 reservation.reservationId().equals(pendingReservation.getId()) &&
                 reservation.priority() == 1
         );
 
         // when
-        reservationService.removeReservation(acceptedReservation.getId());
+        reservationService.remove(acceptedReservation.getId());
 
         // after
-        List<MyPageReservationResponse> afterMyReservation = reservationService.getReservationsByMemberId(member2.getId());
+        List<MyPageReservationResponse> afterMyReservation = reservationService.getAllBy(member2.getId());
         assertThat(afterMyReservation).anyMatch(reservation ->
                 reservation.reservationId().equals(pendingReservation.getId()) &&
                 reservation.priority() == 0
@@ -530,7 +530,7 @@ class ReservationServiceTest extends ServiceTest {
         insertReservation(member, item, ReservationStatus.ACCEPTED);
 
         // when, then
-        assertThatThrownBy(() -> reservationService.addReservation(new CreateReservationRequest(member.getId(), DATE1, theme.getId(), time.getId())))
+        assertThatThrownBy(() -> reservationService.save(new CreateReservationRequest(member.getId(), DATE1, theme.getId(), time.getId())))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }
