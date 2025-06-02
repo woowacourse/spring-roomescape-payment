@@ -48,12 +48,9 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse createReservation(final ReservationRequest request, final TossPaymentConfirmRequest paymentConfirmRequest, final Long memberId) {
-        ReservationTime time = reservationTimeRepository.findById(request.timeId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 시간입니다."));
-        Theme theme = themeRepository.findById(request.themeId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 테마입니다."));
-        Member findMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+        ReservationTime time = findReservationTime(request.timeId());
+        Theme theme = findTheme(request.themeId());
+        Member findMember = findMember(memberId);
 
         Reservation reservation = Reservation.createWithoutId(dateTime.now(), findMember, request.date(), time, theme);
 
@@ -74,12 +71,9 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse createReservationWithoutPayment(final ReservationRequest request, final Long memberId) {
-        ReservationTime time = reservationTimeRepository.findById(request.timeId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 시간입니다."));
-        Theme theme = themeRepository.findById(request.themeId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 테마입니다."));
-        Member findMember = memberRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+        ReservationTime time = findReservationTime(request.timeId());
+        Theme theme = findTheme(request.themeId());
+        Member findMember = findMember(memberId);
 
         Reservation reservation = Reservation.createWithoutId(dateTime.now(), findMember, request.date(), time, theme);
 
@@ -94,6 +88,21 @@ public class ReservationService {
         Reservation save = reservationRepository.save(reservation);
 
         return ReservationResponse.from(save);
+    }
+
+    private ReservationTime findReservationTime(final long timeId){
+        return reservationTimeRepository.findById(timeId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 시간입니다."));
+    }
+
+    private Theme findTheme(final long themeId){
+        return themeRepository.findById(themeId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 테마입니다."));
+    }
+
+    private Member findMember(final long memberId){
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
     }
 
     @Transactional(readOnly = true)
@@ -112,8 +121,7 @@ public class ReservationService {
 
     @Transactional
     public void deleteReservationById(final Long id) {
-        Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
+        Reservation reservation = findReservation(id);
 
         reservationRepository.deleteById(id);
 
@@ -126,7 +134,11 @@ public class ReservationService {
         if (!waitings.isEmpty()) {
             approveWaiting(waitings);
         }
+    }
 
+    private Reservation findReservation(final Long reservationId) {
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
     }
 
     private void approveWaiting(final List<Waiting> waitings) {
