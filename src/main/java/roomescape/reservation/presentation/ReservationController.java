@@ -69,8 +69,6 @@ public class ReservationController {
         );
 
         TossPaymentResponse tossPaymentResponse = tossPaymentClient.confirmPayment(confirmRequest);
-//        ReservationResponse response = reservationService.createReservation(request, loginMember.id());
-//        paymentService.save(tossPaymentResponse, response.id());
         ReservationResponse response = reservationPaymentFacade.createReservationAndSavePayment(request, loginMember, tossPaymentResponse);
 
         URI locationUri = URI.create(RESERVATION_BASE_URL + SLASH + response.id());

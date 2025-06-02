@@ -7,36 +7,26 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+import static roomescape.fixture.MockServerTestFixture.BASE_URL;
+import static roomescape.fixture.MockServerTestFixture.BUILDER;
+import static roomescape.fixture.MockServerTestFixture.SERVER;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.RestClient;
 import roomescape.client.dto.request.TossPaymentConfirmRequest;
 import roomescape.client.dto.response.TossPaymentResponse;
 import roomescape.common.exception.PaymentException;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-@RestClientTest(value = TossPaymentClient.class)
 class TossPaymentClientTest {
 
-    @Autowired
-    private TossPaymentClient tossPaymentClient;
+    private final TossPaymentClient tossPaymentClient = new TossPaymentClient(BUILDER.build());
 
-    @Autowired
-    private MockRestServiceServer mockRestServiceServer;
-
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        public RestClient restClient(RestClient.Builder builder) {
-            return builder.build();
-        }
+    @BeforeEach
+    void setUp() {
+        SERVER.reset();
     }
 
     @Test
@@ -64,7 +54,6 @@ class TossPaymentClientTest {
 
         // then
         assertThat(actual).isEqualTo(expected);
-
     }
 
     @Test
@@ -80,7 +69,6 @@ class TossPaymentClientTest {
         // when & then
         assertThatThrownBy(() -> tossPaymentClient.confirmPayment(request))
                 .isInstanceOf(PaymentException.class);
-
     }
 
     @Test
@@ -96,9 +84,7 @@ class TossPaymentClientTest {
         // when & then
         assertThatThrownBy(() -> tossPaymentClient.confirmPayment(request))
                 .isInstanceOf(PaymentException.class);
-
     }
-
 
     private void setUpSuccess() {
         String expectedResponse = """
@@ -114,7 +100,7 @@ class TossPaymentClientTest {
                 } 
                 """;
 
-        mockRestServiceServer.expect(requestTo("/payments/confirm"))
+        SERVER.expect(requestTo(BASE_URL + "/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(expectedResponse, MediaType.APPLICATION_JSON));
     }
@@ -126,7 +112,7 @@ class TossPaymentClientTest {
                 "message":"서버 에러로 결제 실패."
                 }
                 """;
-        mockRestServiceServer.expect(requestTo("/payments/confirm"))
+        SERVER.expect(requestTo(BASE_URL + "/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withServerError()
                         .contentType(MediaType.APPLICATION_JSON)
@@ -140,7 +126,7 @@ class TossPaymentClientTest {
                 "message":"클라이언트 에러로 결제 실패."
                 }
                 """;
-        mockRestServiceServer.expect(requestTo("/payments/confirm"))
+        SERVER.expect(requestTo(BASE_URL + "/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withBadRequest()
                         .contentType(MediaType.APPLICATION_JSON)

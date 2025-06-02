@@ -16,11 +16,9 @@ import roomescape.common.exception.PaymentException;
 public class TossPaymentClient {
 
     private final RestClient tossRestClient;
-    private final ObjectMapper objectMapper;
 
-    public TossPaymentClient(RestClient tossRestClient, ObjectMapper objectMapper) {
+    public TossPaymentClient(RestClient tossRestClient) {
         this.tossRestClient = tossRestClient;
-        this.objectMapper = objectMapper;
     }
 
     public TossPaymentResponse confirmPayment(TossPaymentConfirmRequest request) {
@@ -40,7 +38,8 @@ public class TossPaymentClient {
     private void handleTossPaymentException(ClientHttpResponse res) throws IOException {
         try {
             String errorBody = new String(res.getBody().readAllBytes(), StandardCharsets.UTF_8);
-            TossErrorResponse errorResponse = objectMapper.readValue(errorBody, TossErrorResponse.class);
+            ObjectMapper mapper = new ObjectMapper();
+            TossErrorResponse errorResponse = mapper.readValue(errorBody, TossErrorResponse.class);
             HttpStatusCode statusCode = res.getStatusCode();
             throw new PaymentException(statusCode, "결제 실패 : " + errorResponse.message());
         } catch (Exception e) {
