@@ -14,12 +14,16 @@ import roomescape.service.PaymentClientService;
 public class RestClientConfiguration {
     @Value("${toss.base-url}")
     private String baseUrl;
+    @Value("${rest-client.connect-timeout}")
+    private int connectTimeoutThreshold;
+    @Value("${rest-client.read-timeout}")
+    private int readTimeoutThreshold;
 
     @Bean
     public RestClient.Builder restClientBuilder() {
         var clientFactory = new HttpComponentsClientHttpRequestFactory();
-        clientFactory.setConnectTimeout(5000);
-        clientFactory.setReadTimeout(5000);
+        clientFactory.setConnectTimeout(connectTimeoutThreshold);
+        clientFactory.setReadTimeout(readTimeoutThreshold);
 
         return RestClient.builder()
                 .requestFactory(clientFactory)
