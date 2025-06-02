@@ -14,15 +14,14 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean supportsParameter(final MethodParameter parameter) {
-        return parameter.getParameterType().equals(Long.class);
+        return parameter.getParameterType().equals(LoginInfo.class);
     }
 
     @Override
-    public Object resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer,
-                                  final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory)
-            throws Exception {
+    public Object resolveArgument(final MethodParameter parameter, final ModelAndViewContainer mavContainer, final NativeWebRequest webRequest, final WebDataBinderFactory binderFactory) {
         final HttpServletRequest request = ((ServletWebRequest) webRequest).getRequest();
         final HttpSession session = request.getSession();
-        return session.getAttribute("id");
+        Object memberId = session.getAttribute("id");
+        return LoginInfo.fromObject(memberId);
     }
 }

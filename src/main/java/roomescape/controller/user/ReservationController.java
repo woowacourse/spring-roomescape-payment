@@ -15,6 +15,7 @@ import roomescape.dto.request.ReservationPendingRequest;
 import roomescape.dto.request.ReservationRequest;
 import roomescape.dto.response.MyPageReservationResponse;
 import roomescape.dto.response.ReservationResponse;
+import roomescape.global.LoginInfo;
 import roomescape.service.reservation.ReservationService;
 import roomescape.service.reservation.ReservingService;
 
@@ -28,15 +29,15 @@ public class ReservationController {
     private final ReservingService reservingService;
 
     @GetMapping("/reservations")
-    public ResponseEntity<List<MyPageReservationResponse>> getMyReservations(long memberId) {
-        List<MyPageReservationResponse> response = reservationService.getReservationsByMemberId(memberId);
+    public ResponseEntity<List<MyPageReservationResponse>> getMyReservations(LoginInfo loginInfo) {
+        List<MyPageReservationResponse> response = reservationService.getReservationsByMemberId(loginInfo.memberId());
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> reserve(
             @RequestBody @Valid ReservationRequest request,
-            long memberId
+            LoginInfo loginInfo
     ) {
         ReservationResponse response = reservingService.reserve(
                 request.date(),
@@ -45,7 +46,7 @@ public class ReservationController {
                 request.paymentKey(),
                 request.orderId(),
                 request.amount(),
-                memberId
+                loginInfo.memberId()
         );
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -54,10 +55,10 @@ public class ReservationController {
     @PostMapping("/reservations/pending")
     public ResponseEntity<ReservationResponse> addPendingReservation(
             @RequestBody @Valid ReservationPendingRequest request,
-            Long memberId
+            LoginInfo loginInfo
     ) {
         CreateReservationRequest createReservationRequest = new CreateReservationRequest(
-                memberId,
+                loginInfo.memberId(),
                 request.date(),
                 request.themeId(),
                 request.timeId()
