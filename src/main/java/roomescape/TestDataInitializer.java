@@ -2,6 +2,7 @@ package roomescape;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRole;
@@ -29,6 +30,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Component
+@Profile("local")
 public class TestDataInitializer {
 
     private static final String THUMBNAIL_URL = "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg";

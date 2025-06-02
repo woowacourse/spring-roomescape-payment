@@ -14,6 +14,8 @@ spring:
     hibernate:
       ddl-auto: create
     defer-datasource-initialization: true
+  profiles:
+    active: local
 toss:
   payments:
     base-url: https://api.tosspayments.com
