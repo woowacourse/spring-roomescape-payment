@@ -6,13 +6,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import roomescape.payment.service.TossPaymentService;
-import roomescape.payment.service.dto.ConfirmPaymentRequest;
-import roomescape.payment.service.dto.ConfirmPaymentResponse;
+import roomescape.infrastructure.TossPaymentClient;
+import roomescape.infrastructure.dto.request.ConfirmPaymentRequest;
+import roomescape.infrastructure.dto.response.ConfirmPaymentResponse;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -27,7 +28,7 @@ import static org.hamcrest.Matchers.is;
 class ReservationControllerTest {
 
     @MockitoBean
-    private TossPaymentService mockTossPaymentService = Mockito.mock(TossPaymentService.class);
+    private TossPaymentClient mockTossPaymentClient = Mockito.mock(TossPaymentClient.class);
 
     @DisplayName("어드민 페이지로 접근할 수 있다.")
     @Test
@@ -58,7 +59,7 @@ class ReservationControllerTest {
     void test3() {
         ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
         ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
-        Mockito.when(mockTossPaymentService.postConfirmPayment(paymentRequest)).thenReturn(paymentResponse);
+        Mockito.when(mockTossPaymentClient.postConfirmPayment(paymentRequest)).thenReturn(ResponseEntity.ok(paymentResponse));
 
 
         addReservationTime("10:00");
@@ -92,7 +93,7 @@ class ReservationControllerTest {
     void test4() {
         ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
         ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
-        Mockito.when(mockTossPaymentService.postConfirmPayment(paymentRequest)).thenReturn(paymentResponse);
+        Mockito.when(mockTossPaymentClient.postConfirmPayment(paymentRequest)).thenReturn(ResponseEntity.ok(paymentResponse));
 
         int timeId = addReservationTime("10:00");
         int themeId = addTheme();
@@ -120,7 +121,7 @@ class ReservationControllerTest {
     void test5() {
         ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
         ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
-        Mockito.when(mockTossPaymentService.postConfirmPayment(paymentRequest)).thenReturn(paymentResponse);
+        Mockito.when(mockTossPaymentClient.postConfirmPayment(paymentRequest)).thenReturn(ResponseEntity.ok(paymentResponse));
 
         String tokenValue = getAdminLoginTokenValue();
         int themeId = addTheme();
@@ -147,7 +148,7 @@ class ReservationControllerTest {
     void notExistThemeId() {
         ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
         ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
-        Mockito.when(mockTossPaymentService.postConfirmPayment(paymentRequest)).thenReturn(paymentResponse);
+        Mockito.when(mockTossPaymentClient.postConfirmPayment(paymentRequest)).thenReturn(ResponseEntity.ok(paymentResponse));
 
         String tokenValue = getAdminLoginTokenValue();
         int timeId = addReservationTime("10:00");
@@ -174,7 +175,7 @@ class ReservationControllerTest {
     void test6() {
         ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
         ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
-        Mockito.when(mockTossPaymentService.postConfirmPayment(paymentRequest)).thenReturn(paymentResponse);
+        Mockito.when(mockTossPaymentClient.postConfirmPayment(paymentRequest)).thenReturn(ResponseEntity.ok(paymentResponse));
 
         int timeId = addReservationTime("10:00");
         int themeId = addTheme();
@@ -219,7 +220,7 @@ class ReservationControllerTest {
     void test9() {
         ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
         ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
-        Mockito.when(mockTossPaymentService.postConfirmPayment(paymentRequest)).thenReturn(paymentResponse);
+        Mockito.when(mockTossPaymentClient.postConfirmPayment(paymentRequest)).thenReturn(ResponseEntity.ok(paymentResponse));
 
         int timeId1 = addReservationTime("10:00");
         int timeId2 = addReservationTime("11:00");

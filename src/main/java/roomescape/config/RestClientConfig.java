@@ -17,7 +17,7 @@ public class RestClientConfig {
     private String secretKey;
 
     @Bean
-    public RestClient tossPaymentClient() {
+    public RestClient tossPaymentRestClient() {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setReadTimeout(10000);
 

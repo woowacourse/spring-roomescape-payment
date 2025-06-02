@@ -1,4 +1,4 @@
-package roomescape.payment.service.dto;
+package roomescape.infrastructure.dto;
 
 public record PaymentFailure(
         String code,

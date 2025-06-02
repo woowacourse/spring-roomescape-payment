@@ -9,14 +9,15 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.auth.service.dto.LoginMember;
+import roomescape.infrastructure.TossPaymentClient;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
-import roomescape.payment.service.TossPaymentService;
-import roomescape.payment.service.dto.ConfirmPaymentRequest;
-import roomescape.payment.service.dto.ConfirmPaymentResponse;
+import roomescape.infrastructure.dto.request.ConfirmPaymentRequest;
+import roomescape.infrastructure.dto.response.ConfirmPaymentResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.service.dto.request.ReservationWithPaymentRequest;
@@ -48,7 +49,7 @@ public class CreateReservationWithPaymentTest {
     private CreateReservationService reservationService;
 
     @MockitoBean
-    private TossPaymentService mockTossPaymentService = Mockito.mock(TossPaymentService.class);
+    private TossPaymentClient mockTossPaymentClient = Mockito.mock(TossPaymentClient.class);
 
     @BeforeEach
     void setup() {
@@ -63,7 +64,7 @@ public class CreateReservationWithPaymentTest {
         // given
         ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
         ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
-        Mockito.when(mockTossPaymentService.postConfirmPayment(paymentRequest)).thenReturn(paymentResponse);
+        Mockito.when(mockTossPaymentClient.postConfirmPayment(paymentRequest)).thenReturn(ResponseEntity.ok(paymentResponse));
 
         LocalDate date = now.plusDays(1).toLocalDate();
         ReservationWithPaymentRequest reservationWithPaymentRequest = new ReservationWithPaymentRequest(
