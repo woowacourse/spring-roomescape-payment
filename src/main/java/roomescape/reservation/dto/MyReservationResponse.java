@@ -11,7 +11,9 @@ public record MyReservationResponse(
         String theme,
         LocalDate date,
         @JsonFormat(pattern = "HH:mm") LocalTime time,
-        ReservationStatusResponse status
+        ReservationStatusResponse status,
+        String paymentKey,
+        Long amount
 ) {
 
     public MyReservationResponse(final Reservation reservation) {
@@ -19,7 +21,10 @@ public record MyReservationResponse(
                 reservation.getThemeName().getValue(),
                 reservation.getDate(),
                 reservation.getStartAt(),
-                new ReservationStatusResponse(ReservationStatus.RESERVED, 0L));
+                new ReservationStatusResponse(ReservationStatus.RESERVED, 0L),
+                reservation.getPayment().getPaymentKey().getValue(),
+                reservation.getPayment().getAmount().getValue()
+        );
     }
 
     public MyReservationResponse(final WaitingWithRank waitingWithRank) {
@@ -27,6 +32,9 @@ public record MyReservationResponse(
                 waitingWithRank.getThemeName().getValue(),
                 waitingWithRank.getDate(),
                 waitingWithRank.getStartAt(),
-                new ReservationStatusResponse(ReservationStatus.WAITING, waitingWithRank.getRank()));
+                new ReservationStatusResponse(ReservationStatus.WAITING, waitingWithRank.getRank()),
+                null,
+                null
+        );
     }
 }

@@ -123,6 +123,10 @@ public class Reservation {
         return time.getStartAt();
     }
 
+    public Payment getPayment() {
+        return payment;
+    }
+
     @Override
     public final boolean equals(final Object o) {
         if (!(o instanceof final Reservation that)) {
