@@ -1,4 +1,4 @@
-package roomescape.controller;
+package roomescape.integration;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -11,19 +11,24 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import roomescape.member.dto.LoginRequest;
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-class ReservationTimeControllerTest {
+class ReservationTimeIntegrationTest {
 
-    private String sessionId;
+    @LocalServerPort
+    int port;
+
+    String sessionId;
 
     @BeforeEach
     void setUp() {
+        RestAssured.port = port;
         final LoginRequest loginRequest = new LoginRequest("admin@email.com", "1234");
         sessionId = RestAssured.given().contentType(ContentType.JSON)
                 .body(loginRequest)

@@ -1,27 +1,38 @@
-package roomescape.controller;
+package roomescape.integration;
+
+import static org.hamcrest.Matchers.greaterThan;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import roomescape.member.dto.LoginRequest;
+import roomescape.payment.FakePaymentRestClientConfig;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-class ReservationControllerTest {
+@Import(FakePaymentRestClientConfig.class)
+class ReservationIntegrationTest {
 
-    private String sessionId;
+    @LocalServerPort
+    int port;
+
+    String sessionId;
 
     @BeforeEach
     void setUp() {
+        RestAssured.port = port;
+
         final LoginRequest loginRequest = new LoginRequest("admin@email.com", "1234");
         sessionId = RestAssured.given().contentType(ContentType.JSON)
                 .body(loginRequest)
@@ -30,6 +41,37 @@ class ReservationControllerTest {
                 .then()
                 .extract().cookie("JSESSIONID");
     }
+
+    @DisplayName("예약 승인 요청 시 결제 및 예약 저장을 한다")
+    @Test
+    void addReservation() {
+        Map<String, Object> params = Map.of(
+                "memberId", "1",
+                "date", LocalDate.now().plusDays(1).toString(),
+                "themeId", "1",
+                "timeId", "1",
+                "paymentKey", "test",
+                "orderId", "test",
+                "amount", 1000,
+                "paymentType", "NORMAL"
+        );
+
+        RestAssured.given().log().all()
+                .sessionId(sessionId)
+                .contentType(ContentType.JSON)
+                .body(params)
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(201);
+
+        RestAssured.given().log().all()
+                .sessionId(sessionId)
+                .when().get("/reservations")
+                .then().log().all()
+                .statusCode(200)
+                .body("size()", greaterThan(0));
+    }
+
 
     @Nested
     class FailureTest {
@@ -66,7 +108,6 @@ class ReservationControllerTest {
                     .statusCode(400);
         }
 
-        @Disabled
         @DisplayName("같은 날짜 및 시간 예약이 존재하면 400 Bad Request를 던진다")
         @Test
         void reservationAddDuplicatedTest() {
@@ -81,7 +122,6 @@ class ReservationControllerTest {
                     "amount", 1000,
                     "paymentType", "NORMAL"
             );
-
 
             RestAssured.given().log().all()
                     .contentType(ContentType.JSON)
