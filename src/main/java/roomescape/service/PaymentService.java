@@ -19,10 +19,10 @@ public class PaymentService {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    public PaymentService
-            (@Qualifier("tossClient") RestClient restClient,
-             ObjectMapper objectMapper
-            ) {
+    public PaymentService(
+            @Qualifier("tossClient") RestClient restClient,
+            ObjectMapper objectMapper
+    ) {
         this.restClient = restClient;
         this.objectMapper = objectMapper;
     }

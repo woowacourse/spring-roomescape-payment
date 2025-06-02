@@ -38,17 +38,22 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
 
-    public ReservationService(MemberRepository memberRepository,
-                              ReservationRepository reservationRepository,
-                              ReservationTimeRepository reservationTimeRepository,
-                              ThemeRepository themeRepository) {
+    public ReservationService(
+            MemberRepository memberRepository,
+            ReservationRepository reservationRepository,
+            ReservationTimeRepository reservationTimeRepository,
+            ThemeRepository themeRepository
+    ) {
         this.memberRepository = memberRepository;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
     }
 
-    public ReservationResponse addReservation(AddReservationRequest request, LoginMemberRequest loginMemberRequest) {
+    public ReservationResponse addReservation(
+            AddReservationRequest request,
+            LoginMemberRequest loginMemberRequest
+    ) {
         Reservation reservation = createReservation(loginMemberRequest.id(), request.themeId(), request.date(),
                 request.timeId(), ReservationStatus.RESERVED);
         return ReservationResponse.from(reservation);
@@ -60,8 +65,10 @@ public class ReservationService {
         return ReservationResponse.from(reservation);
     }
 
-    public ReservationWaitResponse addWaitReservation(CreateWaitReservationRequest request,
-                                                      LoginMemberRequest loginMemberRequest) {
+    public ReservationWaitResponse addWaitReservation(
+            CreateWaitReservationRequest request,
+            LoginMemberRequest loginMemberRequest
+    ) {
         Reservation reservation = createReservation(loginMemberRequest.id(), request.themeId(), request.date(),
                 request.timeId(),
                 ReservationStatus.WAIT);
@@ -92,11 +99,13 @@ public class ReservationService {
         waitReservation.cancel();
     }
 
-    private Reservation createReservation(long memberId,
-                                          long themeId,
-                                          LocalDate date,
-                                          long timeId,
-                                          ReservationStatus status) {
+    private Reservation createReservation(
+            long memberId,
+            long themeId,
+            LocalDate date,
+            long timeId,
+            ReservationStatus status
+    ) {
         Member member = memberRepository.findFetchById(memberId)
                 .orElseThrow(() -> new InvalidMemberException("존재하지 않는 멤버 ID입니다."));
         ReservationTime reservationTime = reservationTimeRepository.findById(timeId)
