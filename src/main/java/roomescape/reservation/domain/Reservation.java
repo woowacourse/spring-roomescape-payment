@@ -65,5 +65,4 @@ public class Reservation {
             throw new IllegalArgumentException("[ERROR] 예약시간은 과거일 수 없습니다.");
         }
     }
-
 }

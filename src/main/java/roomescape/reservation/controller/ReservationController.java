@@ -27,28 +27,30 @@ public class ReservationController {
         this.reservationService = reservationService;
     }
 
-    @GetMapping("/reservations")
-    public ResponseEntity<List<ReservationResponse>> reservationList() {
-        return ResponseEntity.status(HttpStatus.OK).body(reservationService.getAllReservations());
-    }
-
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> addReservation(
-            @RequestBody @Valid final ReservationPaymentRequest request,
-            final Long memberId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.addReservation(memberId, request));
-    }
-
-    @DeleteMapping("/reservations/{id}")
-    public ResponseEntity<Void> removeReservation(@PathVariable(name = "id") long id) {
-        reservationService.removeReservation(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            @Valid @RequestBody ReservationPaymentRequest request,
+            Long memberId) {
+        ReservationResponse response = reservationService.addReservation(memberId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/admin/reservations")
-    public ResponseEntity<ReservationResponse> addReservationForAdmin(@RequestBody AdminReservationPaymentRequest request) {
-        ReservationResponse response = reservationService.addReservation(request.memberId(), ReservationPaymentRequest.from(request));
+    public ResponseEntity<ReservationResponse> addReservationForAdmin(
+            @RequestBody AdminReservationPaymentRequest request) {
+        ReservationResponse response = reservationService.addReservationByAdmin(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/reservations")
+    public ResponseEntity<List<ReservationResponse>> getAllReservations() {
+        return ResponseEntity.status(HttpStatus.OK).body(reservationService.getAllReservations());
+    }
+
+    @GetMapping("/members/reservations")
+    public ResponseEntity<List<MyPageReservationResponse>> getMyReservations(Long memberId) {
+        List<MyPageReservationResponse> response = reservationService.getMyPageReservations(memberId);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/admin/reservations")
@@ -56,15 +58,18 @@ public class ReservationController {
             @RequestParam(required = false, name = "memberId") Long memberId,
             @RequestParam(required = false, name = "themeId") Long themeId,
             @RequestParam(required = false, name = "dateFrom") LocalDate dateFrom,
-            @RequestParam(required = false, name = "dateTo") LocalDate dateTo
-    ) {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(reservationService.getFilteredReservations(memberId, themeId, dateFrom, dateTo));
+            @RequestParam(required = false, name = "dateTo") LocalDate dateTo) {
+        List<ReservationResponse> response = reservationService.getFilteredReservations(
+                memberId,
+                themeId,
+                dateFrom,
+                dateTo);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/members/reservations")
-    public ResponseEntity<List<MyPageReservationResponse>> getMyReservationsForUser(Long memberId) {
-        List<MyPageReservationResponse> reservations = reservationService.getReservationsByMemberId(memberId);
-        return ResponseEntity.ok(reservations);
+    @DeleteMapping("/reservations/{id}")
+    public ResponseEntity<Void> removeReservation(@PathVariable(name = "id") Long id) {
+        reservationService.removeReservation(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
