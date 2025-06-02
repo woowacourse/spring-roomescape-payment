@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.common.exception.BadRequestException;
 import roomescape.common.exception.InternalServerErrorException;
+import roomescape.infrastructure.dto.PaymentFailure;
 import roomescape.infrastructure.dto.request.ConfirmPaymentRequest;
 import roomescape.infrastructure.dto.response.ConfirmPaymentResponse;
-import roomescape.infrastructure.dto.PaymentFailure;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,7 +28,7 @@ public class TossPaymentClient {
     }
 
     // TODO: 결제 실패시 환불
-    @Retryable(retryFor = {InternalServerErrorException.class})
+    @Retryable
     public ResponseEntity<ConfirmPaymentResponse> postConfirmPayment(ConfirmPaymentRequest paymentRequest) {
         UUID idempotencyKey = UUID.randomUUID();
         return restClient.post()
