@@ -13,11 +13,17 @@ VALUES ('레벨1 탈출', '우테코 레벨1을 탈출하는 내용입니다.', 
        ('레벨2 탈출', '우테코 레벨2를 탈출하는 내용입니다.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg'),
        ('레벨3 탈출', '우테코 레벨3을 탈출하는 내용입니다.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
 
-INSERT INTO RESERVATION (user_id, date, time_slot_id, theme_id)
-VALUES (2, '2025-05-05', 1, 1),
-       (2, '2025-05-06', 1, 1),
-       (2, '2025-05-07', 1, 1);
+INSERT INTO PAYMENT (payment_key, order_id, order_name, amount)
+VALUES ('payment_key_test_1', 'ROOM_ESCAPE_test_1', '방탈출 예약 결제 1건', 1000),
+       ('payment_key_test_2', 'ROOM_ESCAPE_test_2', '방탈출 예약 결제 1건', 1000),
+       ('payment_key_test_3', 'ROOM_ESCAPE_test_3', '방탈출 예약 결제 1건', 1100);
+
+
+INSERT INTO RESERVATION (user_id, date, time_slot_id, theme_id, payment_id)
+VALUES (2, CURRENT_DATE + 3, 1, 1, 1),
+       (2, CURRENT_DATE + 2, 1, 1, 2),
+       (2, CURRENT_DATE + 1, 1, 1, 3);
 
 INSERT INTO WAITING (user_id, date, time_slot_id, theme_id)
-VALUES (1, '2025-05-05', 1, 1),
-       (3, '2025-05-05', 1, 1);
+VALUES (1, CURRENT_DATE + 3, 1, 1),
+       (3, CURRENT_DATE + 3, 1, 1);
