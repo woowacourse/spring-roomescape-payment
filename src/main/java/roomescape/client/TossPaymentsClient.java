@@ -16,9 +16,11 @@ import roomescape.global.exception.custom.TossPaymentsException;
 public class TossPaymentsClient {
 
     private final RestClient restClient;
+    private final ObjectMapper objectMapper;
 
-    public TossPaymentsClient(final RestClient restClient) {
+    public TossPaymentsClient(final RestClient restClient, final ObjectMapper objectMapper) {
         this.restClient = restClient;
+        this.objectMapper = objectMapper;
     }
 
     public PaymentsConfirmResponse confirmPayments(final PaymentsConfirmRequest request) {
@@ -32,8 +34,7 @@ public class TossPaymentsClient {
     }
 
     private void handlerTossPaymentsException(ClientHttpResponse res) throws IOException {
-        final ObjectMapper objectMapper = new ObjectMapper().configure(
-                DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         final TossErrorResponse errorResponse = objectMapper.readValue(res.getBody(),
                 TossErrorResponse.class);
         throw new TossPaymentsException(res.getStatusCode(), errorResponse.message());

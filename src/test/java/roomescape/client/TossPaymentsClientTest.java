@@ -12,6 +12,7 @@ import static roomescape.fixture.ServerClientFixture.SERVER;
 import static roomescape.fixture.ServerClientFixture.TEST_BUILDER;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,7 @@ import roomescape.global.exception.custom.TossPaymentsException;
 
 class TossPaymentsClientTest {
 
-    private final TossPaymentsClient paymentsClient = new TossPaymentsClient(TEST_BUILDER.build());
+    private final TossPaymentsClient paymentsClient = new TossPaymentsClient(TEST_BUILDER.build(), new ObjectMapper());
 
     @BeforeEach
     void setUp() {

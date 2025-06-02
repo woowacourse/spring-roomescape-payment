@@ -1,5 +1,6 @@
 package roomescape.client.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -13,11 +14,14 @@ public class ClientConfig {
 
     private final String secretKey;
     private final String baseUrl;
+    private final ObjectMapper objectMapper;
 
     public ClientConfig(@Value("${toss.payments.secret-key}") final String secretKey,
-                        @Value("${toss.payments.url}") final String baseUrl) {
+                        @Value("${toss.payments.url}") final String baseUrl,
+                        final ObjectMapper objectMapper) {
         this.secretKey = secretKey;
         this.baseUrl = baseUrl;
+        this.objectMapper = objectMapper;
     }
 
     @Bean
@@ -30,7 +34,8 @@ public class ClientConfig {
                         .baseUrl(baseUrl)
                         .requestFactory(requestFactory)
                         .defaultHeader("Authorization", getBasicAuthorizationValue())
-                        .build()
+                        .build(),
+                objectMapper
         );
     }
 
