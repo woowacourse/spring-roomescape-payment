@@ -1,6 +1,7 @@
 package roomescape.payment.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -18,7 +19,7 @@ public class TossPaymentClient {
     private final RestClient tossRestClient;
     private final ObjectMapper objectMapper;
 
-    public TossPaymentClient(final RestClient tossRestClient, final ObjectMapper objectMapper) {
+    public TossPaymentClient(@Qualifier("tossRestClient")  final RestClient tossRestClient, final ObjectMapper objectMapper) {
         this.tossRestClient = tossRestClient;
         this.objectMapper = objectMapper;
     }
