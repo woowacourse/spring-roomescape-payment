@@ -1,8 +1,6 @@
 package roomescape.e2e;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.is;
-import static roomescape.fixture.IntegrationFixture.ADMIN_EMAIL;
 import static roomescape.fixture.IntegrationFixture.FUTURE_DATE_TEXT;
 import static roomescape.fixture.IntegrationFixture.PASSWORD;
 import static roomescape.fixture.IntegrationFixture.REGULAR2_EMAIL;
@@ -32,6 +30,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.common.security.dto.request.LoginRequest;
+import roomescape.fixture.IntegrationFixture;
 import roomescape.payment.application.client.PaymentClient;
 import roomescape.payment.domain.PaymentType;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
@@ -77,14 +76,7 @@ public class RegularTest {
         createReservationTime();
         createTheme("추리");
         createRegularReservation(1L);
-        String adminToken = loginAndGetAuthToken(ADMIN_EMAIL, PASSWORD);
-
-        RestAssured.given().log().all()
-                .cookie(TOKEN, adminToken)
-                .when().get("/admin/reservations")
-                .then().log().all()
-                .statusCode(200)
-                .body("size()", is(1));
+        IntegrationFixture.findReservation();
     }
 
     @Test
@@ -177,10 +169,13 @@ public class RegularTest {
     @Test
     void approvePayment() {
         createReservation();
+        long reservationId = IntegrationFixture.findReservation();
         String paymentKey = "PAYMENT_KEY";
         String orderId = "ORDER_ID";
         long amount = 5000L;
-        PaymentRequest paymentRequest = new PaymentRequest(paymentKey, orderId, amount, PaymentType.NORMAL);
+
+        PaymentRequest paymentRequest = new PaymentRequest(paymentKey, orderId, amount, PaymentType.NORMAL,
+                reservationId);
         PaymentApproveRequest paymentApproveRequest = PaymentApproveRequest.from(paymentRequest);
         PaymentApproveResponse paymentApproveResponse = new PaymentApproveResponse(paymentKey, orderId, amount);
         Mockito.when(paymentClient.approvePayment(paymentApproveRequest)).thenReturn(paymentApproveResponse);

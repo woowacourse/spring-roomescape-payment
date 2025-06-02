@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 import roomescape.common.config.TestConfig;
 import roomescape.common.security.application.MyPasswordEncoder;
@@ -63,6 +64,9 @@ class ThemeApplicationServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+
     private ThemeDataService themeDataService;
 
     private ReservationTimeDataService reservationTimeDataService;
@@ -76,7 +80,6 @@ class ThemeApplicationServiceTest {
     private ReservationTimeApplicationService reservationTimeApplicationService;
 
     private ConfirmedReservationApplicationService confirmedReservationApplicationService;
-
 
     @BeforeEach
     void setUp() {
@@ -94,7 +97,7 @@ class ThemeApplicationServiceTest {
         reservationTimeDataService = new ReservationTimeDataService(reservationTimeRepository,
                 reservationSlotDataService);
         confirmedReservationApplicationService = new ConfirmedReservationApplicationService(reservationSlotDataService,
-                reservationTimeDataService, themeDataService, memberDataService, reservationDataService);
+                reservationTimeDataService, themeDataService, memberDataService, reservationDataService, applicationEventPublisher);
     }
 
     @Test
@@ -121,7 +124,7 @@ class ThemeApplicationServiceTest {
         SignUpWebResponse signup = memberApplicationService.signup(new SignupWebRequest("Mint", "password", "mint"));
         confirmedReservationApplicationService.create(
                 new ConfirmedReservationCreateRequest(FUTURE_DATE, reservationTimeWebResponse.id(),
-                        themeWebResponse.id(), signup.id(), LocalDateTime.now()));
+                        themeWebResponse.id(), signup.id(), LocalDateTime.now(), null));
 
         // when & then
         Assertions.assertThatThrownBy(() -> themeApplicationService.delete(themeWebResponse.id()))

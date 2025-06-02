@@ -14,7 +14,8 @@ class ConfirmedReservationCreateWebRequestTest {
                 () -> new ConfirmedReservationCreateWebRequest(
                         null,
                         1L,
-                        1L
+                        1L,
+                        null
                 )
         ).hasMessageContaining("날짜는 반드시 입력해야합니다.");
     }
@@ -25,7 +26,8 @@ class ConfirmedReservationCreateWebRequestTest {
                 () -> new ConfirmedReservationCreateWebRequest(
                         LocalDate.parse("2025-12-25"),
                         null,
-                        1L
+                        1L,
+                        null
                 )
         ).hasMessageContaining("timeId는 반드시 입력해야합니다.");
     }
@@ -36,6 +38,7 @@ class ConfirmedReservationCreateWebRequestTest {
                 () -> new ConfirmedReservationCreateWebRequest(
                         LocalDate.parse("2025-12-25"),
                         1L,
+                        null,
                         null
                 )
         ).hasMessageContaining("themeId는 반드시 입력해야합니다.");
@@ -47,7 +50,8 @@ class ConfirmedReservationCreateWebRequestTest {
                 () -> new ConfirmedReservationCreateWebRequest(
                         LocalDate.parse("2025-12"),
                         1L,
-                        1L
+                        1L,
+                        null
                 )
         );
     }

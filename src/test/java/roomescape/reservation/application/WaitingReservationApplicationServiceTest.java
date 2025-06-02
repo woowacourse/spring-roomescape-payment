@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 import roomescape.common.config.TestConfig;
 import roomescape.fixture.TestFixture;
@@ -56,6 +57,9 @@ class WaitingReservationApplicationServiceTest {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+
     private Long timeId;
     private Long themeId;
     private Long memberId;
@@ -76,7 +80,7 @@ class WaitingReservationApplicationServiceTest {
                 reservationSlotDataService, memberDataService, reservationDataService);
         ConfirmedReservationApplicationService confirmedReservationApplicationService = new ConfirmedReservationApplicationService(
                 reservationSlotDataService, reservationTimeDataService, themeDataService, memberDataService,
-                reservationDataService);
+                reservationDataService, applicationEventPublisher);
 
         timeId = reservationTimeRepository.save(new ReservationTime(LocalTime.of(9, 0))).getId();
         themeId = themeRepository.save(TestFixture.makeTheme()).getId();
@@ -85,7 +89,7 @@ class WaitingReservationApplicationServiceTest {
                 .getId();
         reservationId = confirmedReservationApplicationService.create(
                 new ConfirmedReservationCreateRequest(FUTURE_DATE, timeId, themeId, memberId,
-                        afterOneHour)).id();
+                        afterOneHour, null)).id();
     }
 
     @Test

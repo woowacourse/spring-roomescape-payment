@@ -92,7 +92,7 @@ class PaymentClientTest {
     void 결제_승인_요청을_보내고_응답을_파싱할_수_있다() {
         // Given
         PaymentApproveRequest request = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID,
-                50_000L);
+                50_000L, null);
 
         // When
         PaymentApproveResponse response = paymentClient.approvePayment(request);

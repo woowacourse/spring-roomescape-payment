@@ -8,7 +8,8 @@ public record AdminReservationSlotCreateWebRequest(
         LocalDate date,
         Long timeId,
         Long themeId,
-        Long memberId
+        Long memberId,
+        String orderId
 ) {
     public AdminReservationSlotCreateWebRequest {
         if (date == null) {

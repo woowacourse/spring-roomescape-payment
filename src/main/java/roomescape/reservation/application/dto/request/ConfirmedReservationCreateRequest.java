@@ -7,15 +7,15 @@ import roomescape.reservation.presentation.dto.request.AdminReservationSlotCreat
 import roomescape.reservation.presentation.dto.request.ConfirmedReservationCreateWebRequest;
 
 public record ConfirmedReservationCreateRequest(LocalDate reservationDate, Long timeId, Long themeId, Long memberId,
-                                                LocalDateTime reservationDateTime) {
+                                                LocalDateTime reservationDateTime, String orderId) {
     public static ConfirmedReservationCreateRequest of(
             final ConfirmedReservationCreateWebRequest request, final MemberInfo memberInfo) {
         return new ConfirmedReservationCreateRequest(request.date(),
-                request.timeId(), request.themeId(), memberInfo.id(), LocalDateTime.now());
+                request.timeId(), request.themeId(), memberInfo.id(), LocalDateTime.now(), request.orderId());
     }
 
     public static ConfirmedReservationCreateRequest of(final AdminReservationSlotCreateWebRequest request) {
         return new ConfirmedReservationCreateRequest(request.date(),
-                request.timeId(), request.themeId(), request.memberId(), LocalDateTime.now());
+                request.timeId(), request.themeId(), request.memberId(), LocalDateTime.now(), request.orderId());
     }
 }

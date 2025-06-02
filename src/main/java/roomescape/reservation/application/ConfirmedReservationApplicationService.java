@@ -1,6 +1,7 @@
 package roomescape.reservation.application;
 
 import java.util.List;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.application.MemberDataService;
@@ -8,6 +9,7 @@ import roomescape.member.domain.Member;
 import roomescape.reservation.application.dto.request.ConfirmedReservationByCriteriaWebRequest;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
 import roomescape.reservation.application.dto.request.ReservationCreateWebRequest;
+import roomescape.reservation.application.event.ReservationPromoteEvent;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.presentation.dto.response.ConfirmedReservationWebResponse;
 import roomescape.reservationslot.application.ReservationSlotDataService;
@@ -27,17 +29,20 @@ public class ConfirmedReservationApplicationService {
     private final ThemeDataService themeDataService;
     private final MemberDataService memberDataService;
     private final ReservationDataService reservationDataService;
+    private final ApplicationEventPublisher eventPublisher;
 
     public ConfirmedReservationApplicationService(final ReservationSlotDataService reservationSlotDataService,
                                                   final ReservationTimeDataService reservationTimeDataService,
                                                   final ThemeDataService themeDataService,
                                                   final MemberDataService memberDataService,
-                                                  final ReservationDataService slotReservationDataService) {
+                                                  final ReservationDataService reservationDataService,
+                                                  final ApplicationEventPublisher eventPublisher) {
         this.reservationSlotDataService = reservationSlotDataService;
         this.reservationTimeDataService = reservationTimeDataService;
         this.themeDataService = themeDataService;
         this.memberDataService = memberDataService;
-        this.reservationDataService = slotReservationDataService;
+        this.reservationDataService = reservationDataService;
+        this.eventPublisher = eventPublisher;
     }
 
     public ConfirmedReservationWebResponse create(final ConfirmedReservationCreateRequest request) {
@@ -47,7 +52,7 @@ public class ConfirmedReservationApplicationService {
         ReservationSlot slot = createReservationSlot(
                 new ReservationCreateWebRequest(request.reservationDate(), request.timeId(), request.themeId()));
         Member member = memberDataService.getById(request.memberId());
-        slot.addReservation(member, request.reservationDateTime());
+        slot.addConfirmedReservation(member, request.reservationDateTime(), request.orderId());
         ReservationSlot savedSlot = reservationSlotDataService.save(slot);
 
         return ConfirmedReservationWebResponse.of(savedSlot);
@@ -71,8 +76,16 @@ public class ConfirmedReservationApplicationService {
 
     public void cancel(final Long reservationId) {
         Reservation reservation = reservationDataService.getById(reservationId);
-        cleanupEmptyReservationSlot(reservation.getReservationSlot().getId());
+        ReservationSlot reservationSlot = reservation.getReservationSlot();
+        cleanupEmptyReservationSlot(reservationSlot.getId());
         reservationDataService.deleteById(reservationId);
+        List<Reservation> reservations = reservationSlot.getReservations();
+        reservations.remove(reservation);
+
+        if (!reservations.isEmpty()) {
+            Reservation highestPriorityReservation = reservationSlot.findHighestPriorityReservation();
+            eventPublisher.publishEvent(new ReservationPromoteEvent(highestPriorityReservation.getId()));
+        }
     }
 
     private ReservationSlot createReservationSlot(final ReservationCreateWebRequest reservationCreateWebRequest) {

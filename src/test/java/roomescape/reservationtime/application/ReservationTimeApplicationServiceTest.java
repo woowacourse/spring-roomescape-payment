@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Import;
 import roomescape.common.config.TestConfig;
 import roomescape.fixture.TestFixture;
@@ -61,6 +62,9 @@ class ReservationTimeApplicationServiceTest {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+
     @BeforeEach
     void setUp() {
         ReservationSlotDataService reservationSlotDataService = new ReservationSlotDataService(
@@ -74,7 +78,8 @@ class ReservationTimeApplicationServiceTest {
         member = memberRepository.save(member);
         ReservationDataService slotReservationDataService = new ReservationDataService(reservationRepository);
         confirmedReservationApplicationService = new ConfirmedReservationApplicationService(reservationSlotDataService,
-                reservationTimeDataService, themeDataService, memberDataService, slotReservationDataService);
+                reservationTimeDataService, themeDataService, memberDataService, slotReservationDataService,
+                applicationEventPublisher);
     }
 
     @Test
@@ -125,7 +130,7 @@ class ReservationTimeApplicationServiceTest {
         reservationTimeApplicationService.create(new ReservationTimeCreateWebRequest(LocalTime.of(12, 0)));
         confirmedReservationApplicationService.create(
                 new ConfirmedReservationCreateRequest(FUTURE_DATE, reservationTimeWebResponse.id(), theme.getId(),
-                        member.getId(), afterOneHour));
+                        member.getId(), afterOneHour, null));
 
         // when
         List<AvailableReservationTimeWebResponse> availableReservationTimes = reservationTimeApplicationService.findAvailable(
@@ -156,7 +161,7 @@ class ReservationTimeApplicationServiceTest {
                 new ReservationTimeCreateWebRequest(LocalTime.now()));
         confirmedReservationApplicationService.create(
                 new ConfirmedReservationCreateRequest(FUTURE_DATE, reservationTimeWebResponse.id(),
-                        theme.getId(), member.getId(), afterOneHour));
+                        theme.getId(), member.getId(), afterOneHour, null));
 
         // when & then
         assertThatThrownBy(() -> reservationTimeApplicationService.removeById(reservationTimeWebResponse.id()))

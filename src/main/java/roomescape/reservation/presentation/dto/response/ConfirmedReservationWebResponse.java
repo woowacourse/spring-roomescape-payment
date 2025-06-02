@@ -12,14 +12,16 @@ public record ConfirmedReservationWebResponse(
         MemberWebResponse member,
         LocalDate date,
         ReservationTimeWebResponse time,
-        ThemeWebResponse theme
+        ThemeWebResponse theme,
+        String orderId
 ) {
     public static ConfirmedReservationWebResponse of(ReservationSlot reservationSlot) {
-        Reservation confirmedReservation = reservationSlot.findConfirmedReservation();
+        Reservation confirmedReservation = reservationSlot.findHighestPriorityReservation();
         return new ConfirmedReservationWebResponse(confirmedReservation.getId(),
-                MemberWebResponse.from(reservationSlot.findConfirmedMember()), reservationSlot.getDate(),
+                MemberWebResponse.from(reservationSlot.findHighestPriorityMember()), reservationSlot.getDate(),
                 ReservationTimeWebResponse.from(reservationSlot.getTime()),
-                ThemeWebResponse.from(reservationSlot.getTheme())
+                ThemeWebResponse.from(reservationSlot.getTheme()),
+                confirmedReservation.getOrderId()
         );
     }
 }

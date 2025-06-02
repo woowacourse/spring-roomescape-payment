@@ -4,11 +4,14 @@ import static org.hamcrest.Matchers.is;
 import static roomescape.fixture.TestFixture.FUTURE_DATE;
 
 import io.restassured.RestAssured;
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.http.MediaType;
 import roomescape.common.security.dto.request.LoginRequest;
+import roomescape.reservation.presentation.dto.response.ConfirmedReservationWebResponse;
 import roomescape.reservationslot.presentation.dto.response.ReservationResponse;
 
 public class IntegrationFixture {
@@ -109,5 +112,19 @@ public class IntegrationFixture {
                 .extract()
                 .as(ReservationResponse.class);
         return reservationResponse;
+    }
+
+    public static long findReservation() {
+        String token = loginAndGetAuthToken(ADMIN_EMAIL, PASSWORD);
+        List<ConfirmedReservationWebResponse> responses = RestAssured.given().log().all()
+                .cookie(TOKEN, token)
+                .when().get("/admin/reservations")
+                .then().log().all()
+                .statusCode(200)
+                .body("size()", is(1))
+                .extract()
+                .as(new TypeRef<>() {
+                });
+        return responses.getFirst().id();
     }
 }

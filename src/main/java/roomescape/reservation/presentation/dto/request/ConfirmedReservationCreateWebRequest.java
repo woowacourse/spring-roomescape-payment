@@ -7,7 +7,8 @@ public record ConfirmedReservationCreateWebRequest(
         @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate date,
         Long timeId,
-        Long themeId
+        Long themeId,
+        String orderId
 ) {
     public ConfirmedReservationCreateWebRequest {
         if (date == null) {

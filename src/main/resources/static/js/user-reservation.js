@@ -193,47 +193,6 @@ function onReservationButtonClick(event, paymentWidget) {
     }
 }
 
-async function fetchReservationPayment(paymentData) {
-    /*
-    TODO: [1단계]
-        - 자신의 예약 API request에 맞게 reservationPaymentRequest 필드명 수정
-        - 내 서버 URL에 맞게 reservationURL 변경
-        - 예약 결제 실패 시, 사용자가 실패 사유를 알 수 있도록 alert 에서 에러 메시지 수정
-    */
-    // 결제 요청 완료 후 suceessUrl
-    const paymentRequest = {
-        paymentKey: paymentData.paymentKey,
-        orderId: paymentData.orderId,
-        amount: paymentData.amount,
-        paymentType: paymentData.paymentType,
-    }
-
-    // TODO : 결제 승인 api
-    const reservationURL = "/payments/approve";
-    fetch(reservationURL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(paymentRequest),
-    }).then(async response => {
-        if (!response.ok) {
-            return response.json().then(async errorBody => {
-                let errorMessage = JSON.stringify(errorBody.message);
-                console.error("예약 결제 실패 : " + errorMessage);
-                window.alert(errorMessage);
-            });
-        } else {
-            response.json().then(successBody => {
-                console.log("예약 결제 성공 : " + JSON.stringify(successBody));
-                window.location.reload();
-            });
-        }
-    }).catch(error => {
-        console.error(error.message);
-    });
-}
-
 async function fetchReservation(paymentData, reservationData) {
     const reservationRequest = {
         date: reservationData.date,
@@ -258,8 +217,44 @@ async function fetchReservation(paymentData, reservationData) {
         } else {
             response.json().then(successBody => {
                 console.log("예약 생성 성공 : " + JSON.stringify(successBody));
-                window.alert("예약이 생성되었습니다.");
+                window.alert("결제 단계로 이동합니다.");
+                reservationData.reservationId = successBody.id;
                 fetchReservationPayment(paymentData, reservationData);
+            });
+        }
+    }).catch(error => {
+        console.error(error.message);
+    });
+}
+
+async function fetchReservationPayment(paymentData, reservationData) {
+    const paymentRequest = {
+        paymentKey: paymentData.paymentKey,
+        orderId: paymentData.orderId,
+        amount: paymentData.amount,
+        paymentType: paymentData.paymentType,
+        reservationId: reservationData.reservationId
+    }
+
+    const reservationURL = "/payments/approve";
+    fetch(reservationURL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(paymentRequest),
+    }).then(async response => {
+        if (!response.ok) {
+            return response.json().then(async errorBody => {
+                let errorMessage = JSON.stringify(errorBody.message);
+                console.error("예약 결제 실패 : " + errorMessage);
+                window.alert(errorMessage);
+            });
+        } else {
+            response.json().then(successBody => {
+                console.log("예약 결제 성공 : " + JSON.stringify(successBody));
+                window.alert("예약 성공하였습니다.");
+                window.location.reload();
             });
         }
     }).catch(error => {

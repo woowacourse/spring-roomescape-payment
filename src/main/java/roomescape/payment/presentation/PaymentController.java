@@ -11,7 +11,6 @@ import roomescape.member.domain.MemberRole;
 import roomescape.payment.application.PaymentService;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
 import roomescape.payment.presentation.dto.request.PaymentRequest;
-
 import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
 
 @RestController
@@ -27,7 +26,8 @@ public class PaymentController {
     @RequireRole(MemberRole.REGULAR)
     @PostMapping("/approve")
     public ResponseEntity<PaymentApproveResponse> approvePayment(@RequestBody PaymentRequest paymentRequest) {
-        PaymentApproveResponse paymentApproveResponse = paymentService.approvePayment(PaymentApproveRequest.from(paymentRequest));
+        PaymentApproveResponse paymentApproveResponse = paymentService.approvePayment(
+                PaymentApproveRequest.from(paymentRequest));
         return ResponseEntity.ok().body(paymentApproveResponse);
     }
 }
