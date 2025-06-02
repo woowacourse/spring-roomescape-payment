@@ -1,18 +1,15 @@
 package roomescape.application.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import roomescape.dto.LoginMember;
 import roomescape.dto.response.MemberReservationResponseDto;
 import roomescape.dto.response.ReservationTicketResponseDto;
@@ -29,9 +26,7 @@ import roomescape.model.Waiting;
 import roomescape.persistence.repository.ReservationTicketRepository;
 import roomescape.persistence.repository.ReservationTimeRepository;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class ReservationTicketServiceTest {
+class ReservationTicketServiceTest extends ServiceTest {
 
     @Autowired
     ReservationTicketService reservationTicketService;
@@ -56,23 +51,23 @@ class ReservationTicketServiceTest {
     void test3() {
         // given
         Member member = saveMember(1L);
-        Theme theme = saveTheme(1L);
+        Theme theme = saveTheme("공포 테마");
         ReservationTime time = saveTime(LocalTime.of(10, 0));
         LocalDate date = LocalDate.now().plusDays(1);
 
         LoginMember loginMember = new LoginMember(member.getId(), member.getName(),
-            member.getEmail(), member.getRole());
+                member.getEmail(), member.getRole());
 
         ReservationTicket reservationTicket = reservationTicketRepository.save(
-            new ReservationTicket(
-                new Reservation(
-                    LocalDate.now().plusDays(1),
-                    time,
-                    theme,
-                    member,
-                    LocalDate.now()
+                new ReservationTicket(
+                        new Reservation(
+                                LocalDate.now().plusDays(1),
+                                time,
+                                theme,
+                                member,
+                                LocalDate.now()
+                        )
                 )
-            )
         );
 
         // when
@@ -87,34 +82,29 @@ class ReservationTicketServiceTest {
     @Test
     void test6() {
         //given
-        ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 30));
-        ReservationTime savedReservationTime = reservationTimeRepository.save(reservationTime);
-
-        Theme theme = new Theme("테마", "공포", "image");
-        Theme savedTheme = themeJpaRepository.save(theme);
-
-        Member member = new Member("도기", "email@gamil.com", "password", Role.ADMIN);
-        Member savedMember = memberJpaRepository.save(member);
+        ReservationTime reservationTime = saveTime(LocalTime.of(12, 30));
+        Theme theme = saveTheme("테마");
+        Member member = saveMember(1L);
 
         ReservationTicket reservationTicket = new ReservationTicket(
-            new Reservation(LocalDate.now().plusDays(1), savedReservationTime, savedTheme,
-                savedMember, LocalDate.now()));
+                new Reservation(LocalDate.now().plusDays(1), reservationTime, theme,
+                        member, LocalDate.now()));
         ReservationTicket savedReservationTicket = reservationTicketRepository.save(
-            reservationTicket);
+                reservationTicket);
 
-        LoginMember loginMember = new LoginMember(savedMember);
+        LoginMember loginMember = new LoginMember(member);
 
         //when
         List<MemberReservationResponseDto> response = reservationTicketService.getReservationsOfMember(
-            loginMember);
+                loginMember);
 
         List<MemberReservationResponseDto> comparedResponse = List.of(
-            new MemberReservationResponseDto(savedReservationTicket));
+                new MemberReservationResponseDto(savedReservationTicket));
 
         //then
         assertAll(
-            () -> assertThat(response).hasSize(1),
-            () -> assertThat(response).isEqualTo(comparedResponse)
+                () -> assertThat(response).hasSize(1),
+                () -> assertThat(response).isEqualTo(comparedResponse)
         );
     }
 
@@ -122,46 +112,40 @@ class ReservationTicketServiceTest {
     @Test
     void test7() {
         //given
-        String emailOfAdministrator = "email@gmail.com";
-        Member administrator = memberJpaRepository.save(
-            new Member("이름", emailOfAdministrator, "password", Role.ADMIN));
-        Member user = memberJpaRepository.save(
-            new Member("사용자", "user@gmail.com", "password", Role.USER));
-
-        Theme theme = themeJpaRepository.save(new Theme("새로운 테마", "새로운 설명", "썸네일"));
-        ReservationTime reservationTime = reservationTimeRepository.save(
-            new ReservationTime(LocalTime.of(12, 30)));
+        Member user = saveMember(1L);
+        Theme theme = saveTheme("테마");
+        ReservationTime reservationTime = saveTime(LocalTime.of(12, 30));
 
         Waiting firstWaiting = waitingJpaRepository.save(new Waiting(
-            LocalDateTime.now(),
-            new Reservation(
-                LocalDate.now().plusDays(1),
-                reservationTime,
-                theme,
-                user,
-                LocalDate.now()
-            )
+                LocalDateTime.now(),
+                new Reservation(
+                        LocalDate.now().plusDays(1),
+                        reservationTime,
+                        theme,
+                        user,
+                        LocalDate.now()
+                )
         ));
 
         Waiting secondWaiting = waitingJpaRepository.save(new Waiting(
-            LocalDateTime.now().plusHours(1),
-            new Reservation(
-                LocalDate.now().plusDays(1),
-                reservationTime,
-                theme,
-                user,
-                LocalDate.now()
-            )
+                LocalDateTime.now().plusHours(1),
+                new Reservation(
+                        LocalDate.now().plusDays(1),
+                        reservationTime,
+                        theme,
+                        user,
+                        LocalDate.now()
+                )
         ));
 
         ReservationTicket reservationTicket = reservationTicketRepository.save(
-            new ReservationTicket(new Reservation(
-                LocalDate.now().plusDays(1),
-                reservationTime,
-                theme,
-                user,
-                LocalDate.now()
-            )));
+                new ReservationTicket(new Reservation(
+                        LocalDate.now().plusDays(1),
+                        reservationTime,
+                        theme,
+                        user,
+                        LocalDate.now()
+                )));
 
         // when
         reservationTicketService.cancelReservation(reservationTicket.getId());
@@ -169,16 +153,16 @@ class ReservationTicketServiceTest {
         // then
         List<ReservationTicket> allReservationTickets = reservationTicketRepository.findAll();
         Optional<ReservationTicket> foundReservation = allReservationTickets.stream()
-            .filter(reservation1 -> reservation1.getReservationTime().getId()
-                .equals(reservationTime.getId()))
-            .filter(reservation1 -> reservation1.getTheme().getId().equals(theme.getId()))
-            .filter(reservation1 -> reservation1.getMember().getId().equals(user.getId()))
-            .findAny();
+                .filter(reservation1 -> reservation1.getReservationTime().getId()
+                        .equals(reservationTime.getId()))
+                .filter(reservation1 -> reservation1.getTheme().getId().equals(theme.getId()))
+                .filter(reservation1 -> reservation1.getMember().getId().equals(user.getId()))
+                .findAny();
 
         assertAll(
-            () -> assertThat(waitingJpaRepository.findAll()).doesNotContain(firstWaiting),
-            () -> assertThat(allReservationTickets).doesNotContain(reservationTicket),
-            () -> assertThat(foundReservation).isPresent()
+                () -> assertThat(waitingJpaRepository.findAll()).doesNotContain(firstWaiting),
+                () -> assertThat(allReservationTickets).doesNotContain(reservationTicket),
+                () -> assertThat(foundReservation).isPresent()
         );
     }
 
@@ -189,11 +173,9 @@ class ReservationTicketServiceTest {
         return member;
     }
 
-    private Theme saveTheme(Long tmp) {
-        Theme theme = new Theme("이름" + tmp, "설명" + tmp, "썸네일" + tmp);
-        themeJpaRepository.save(theme);
-
-        return theme;
+    private Theme saveTheme(String name) {
+        Theme theme = new Theme(name, "description", "image");
+        return themeJpaRepository.save(theme);
     }
 
     private ReservationTime saveTime(LocalTime reservationTime) {

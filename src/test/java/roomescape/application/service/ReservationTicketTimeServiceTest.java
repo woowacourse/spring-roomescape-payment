@@ -3,66 +3,68 @@ package roomescape.application.service;
 import java.time.LocalTime;
 import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import roomescape.dto.request.ReservationTimeRegisterDto;
 import roomescape.dto.response.ReservationTimeResponseDto;
-import roomescape.persistence.repository.ReservationTicketRepository;
+import roomescape.infrastructure.db.ReservationTimeJpaRepository;
+import roomescape.model.ReservationTime;
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-class ReservationTicketTimeServiceTest {
+class ReservationTicketTimeServiceTest extends ServiceTest {
 
     @Autowired
     ReservationTimeService reservationTimeService;
 
     @Autowired
-    ReservationTicketRepository reservationTicketRepository;
+    ReservationTimeJpaRepository reservationTimeJpaRepository;
 
     @Test
-    @DisplayName("시간을 삭제한다")
+    @DisplayName("시간을 저장한다")
     void test1() {
         // given
         ReservationTimeRegisterDto request = new ReservationTimeRegisterDto(LocalTime.of(15, 0).toString());
 
         // when
-        ReservationTimeResponseDto resaponse = reservationTimeService.saveTime(request);
+        ReservationTimeResponseDto response = reservationTimeService.saveTime(request);
 
         // then
-        assertThat(resaponse.id()).isNotNull();
-        assertThat(resaponse.startAt()).isEqualTo(LocalTime.of(15, 0));
+        assertAll(
+                () -> assertThat(response.id()).isNotNull(),
+                () -> assertThat(response.startAt()).isEqualTo(LocalTime.of(15, 0))
+        );
     }
 
     @Test
     @DisplayName("모든 시간을 조회한다")
     void test2() {
         // when
+        saveTime(LocalTime.of(10, 0));
+        saveTime(LocalTime.of(14, 0));
+        saveTime(LocalTime.of(18, 0));
+
         List<ReservationTimeResponseDto> times = reservationTimeService.getAllTimes();
 
         // then
-        assertThat(times).hasSize(3);
-        assertThat(times).extracting("startAt")
-                .containsExactlyInAnyOrder(
-                        LocalTime.of(10, 0),
-                        LocalTime.of(14, 0),
-                        LocalTime.of(18, 0));
+        assertAll(
+                () -> assertThat(times).hasSize(3),
+                () -> assertThat(times).extracting("startAt")
+                        .containsExactlyInAnyOrder(
+                                LocalTime.of(10, 0),
+                                LocalTime.of(14, 0),
+                                LocalTime.of(18, 0))
+        );
     }
 
     @Test
     @DisplayName("시간을 삭제한다")
     void test3() {
         // given
-        ReservationTimeResponseDto saved = reservationTimeService.saveTime(
-                new ReservationTimeRegisterDto(LocalTime.of(15, 0).toString())
-        );
+        ReservationTime reservationTime = saveTime(LocalTime.of(15, 0));
 
         // when
-        reservationTimeService.deleteTime(saved.id());
+        reservationTimeService.deleteTime(reservationTime.getId());
 
         // then
         List<LocalTime> times = reservationTimeService.getAllTimes().stream()
@@ -70,6 +72,11 @@ class ReservationTicketTimeServiceTest {
                 .toList();
 
         assertThat(times).doesNotContain(LocalTime.of(15, 0));
+    }
+
+    private ReservationTime saveTime(LocalTime reservationTime) {
+        ReservationTime time = new ReservationTime(reservationTime);
+        return reservationTimeJpaRepository.save(time);
     }
 
 }

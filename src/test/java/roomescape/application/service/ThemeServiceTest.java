@@ -6,21 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import roomescape.dto.request.ThemeRegisterDto;
 import roomescape.dto.response.ThemeResponseDto;
+import roomescape.infrastructure.db.ThemeJpaRepository;
 import roomescape.model.Theme;
-import roomescape.persistence.repository.MemberRepository;
-import roomescape.persistence.repository.ReservationTicketRepository;
-import roomescape.persistence.repository.ReservationTimeRepository;
 import roomescape.persistence.repository.ThemeRepository;
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-class ThemeServiceTest {
+class ThemeServiceTest extends ServiceTest {
 
     @Autowired
     ThemeService themeService;
@@ -29,17 +21,25 @@ class ThemeServiceTest {
     ThemeRepository themeRepository;
 
     @Autowired
-    ReservationTicketRepository reservationTicketRepository;
-
-    @Autowired
-    MemberRepository memberRepository;
-
-    @Autowired
-    ReservationTimeRepository reservationTimeRepository;
+    ThemeJpaRepository themeJpaRepository;
 
     @DisplayName("모든 테마를 조회할 수 있다.")
     @Test
     void test1() {
+        // given
+        List<String> names = List.of(
+                "공포의 저택",
+                "미스터리 학교",
+                "마법사의 방",
+                "우주선 탈출",
+                "탐정 사무소",
+                "사라진 유물",
+                "지하 감옥",
+                "해적의 보물",
+                "유령 열차",
+                "저주받은 인형"
+        );
+        names.forEach(this::saveTheme);
 
         //when
         List<ThemeResponseDto> responses = themeService.getAllThemes();
@@ -91,11 +91,10 @@ class ThemeServiceTest {
     @Test
     void test3() {
         // given
-        Theme theme = new Theme("테마", "설명", "이미지");
-        Theme savedTheme = themeRepository.save(theme);
+        Theme theme = saveTheme("테마");
 
         // when
-        themeService.deleteTheme(savedTheme.getId());
+        themeService.deleteTheme(theme.getId());
 
         // then
         List<Theme> themes = themeRepository.findAll();
@@ -104,6 +103,13 @@ class ThemeServiceTest {
                 .map(Theme::getId)
                 .toList();
 
-        assertThat(actual).doesNotContain(savedTheme.getId());
+        assertThat(actual).doesNotContain(theme.getId());
+    }
+
+    private Theme saveTheme(String name) {
+        Theme theme = new Theme(name, "description", "image");
+        themeJpaRepository.save(theme);
+
+        return theme;
     }
 }

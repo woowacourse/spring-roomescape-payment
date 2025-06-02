@@ -12,10 +12,6 @@ import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.application.facade.ReservationTicketPaymentService;
 import roomescape.common.exception.DuplicatedException;
@@ -41,9 +37,7 @@ import roomescape.model.TossPayment;
 import roomescape.persistence.repository.ReservationTicketRepository;
 import roomescape.persistence.repository.ReservationTimeRepository;
 
-@SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-public class ReservationTicketPaymentServiceTest {
+public class ReservationTicketPaymentServiceTest extends ServiceTest {
 
     @Autowired
     ReservationTicketPaymentService reservationTicketPaymentService;
