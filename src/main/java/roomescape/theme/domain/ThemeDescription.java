@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.Size;
 import java.util.Objects;
+import roomescape.global.exception.BadRequestException;
 
 @Embeddable
 public record ThemeDescription(
@@ -16,7 +17,7 @@ public record ThemeDescription(
     public ThemeDescription(final String description) {
         this.description = Objects.requireNonNull(description, "description은 null일 수 없습니다.");
         if (description.length() > MAX_DESCRIPTION_LENGTH) {
-            throw new IllegalStateException("description은 " + MAX_DESCRIPTION_LENGTH + "자 이내여야 합니다.");
+            throw new BadRequestException("description은 " + MAX_DESCRIPTION_LENGTH + "자 이내여야 합니다.");
         }
     }
 }

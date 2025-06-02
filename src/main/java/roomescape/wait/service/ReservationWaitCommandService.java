@@ -3,6 +3,7 @@ package roomescape.wait.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.AccessDeniedException;
+import roomescape.global.exception.BadRequestException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.reservation.domain.Reservation;
@@ -35,7 +36,7 @@ public class ReservationWaitCommandService {
             final Member member
     ) {
         if (!reservationQueryService.existsReservation(schedule)) {
-            throw new IllegalStateException("해당 일정에 예약이 없어서 예약 대기가 불가능합니다.");
+            throw new BadRequestException("해당 일정에 예약이 없어서 예약 대기가 불가능합니다.");
         }
         return reservationWaitRepository.save(new ReservationWait(null, member, schedule));
     }
@@ -44,7 +45,7 @@ public class ReservationWaitCommandService {
     public Reservation approveReservationWait(final ReservationWait wait) {
         ReservationSchedule schedule = wait.getSchedule();
         if (reservationQueryService.existsReservation(schedule)) {
-            throw new IllegalStateException("예약 대기를 승인하려면 해당 예약 일정에 예약이 없어야 합니다.");
+            throw new BadRequestException("예약 대기를 승인하려면 해당 예약 일정에 예약이 없어야 합니다.");
         }
         Reservation savedReservation = reservationCommandService.createReservation(schedule, wait.getMember());
         reservationWaitRepository.deleteById(wait.getId());

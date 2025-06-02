@@ -1,9 +1,9 @@
 package roomescape.time.service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.global.exception.NotFoundException;
 import roomescape.schedule.domain.ReservationDate;
 import roomescape.schedule.repository.ReservationScheduleRepository;
 import roomescape.theme.domain.Theme;
@@ -27,7 +27,7 @@ public class TimeQueryService {
 
     public ReservationTime getReservationTime(final Long id) {
         return reservationTimeRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("예약 시간을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("예약 시간을 찾을 수 없습니다."));
     }
 
     public List<AvailableReservationTime> findAvailableReservationTimes(

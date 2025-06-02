@@ -5,6 +5,7 @@ import static roomescape.common.Constant.FIXED_CLOCK;
 
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
+import roomescape.global.exception.BadRequestException;
 import roomescape.reservation.domain.ReservationDateTime;
 import roomescape.schedule.domain.ReservationDate;
 import roomescape.time.domain.ReservationTime;
@@ -18,7 +19,7 @@ class ReservationDateTimeTest {
         ReservationTime pastTime = new ReservationTime(1L, now.toLocalTime().minusHours(1));
 
         assertThatThrownBy(() -> new ReservationDateTime(today, pastTime, FIXED_CLOCK))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @Test

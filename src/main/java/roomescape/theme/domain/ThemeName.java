@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.Size;
 import java.util.Objects;
+import roomescape.global.exception.BadRequestException;
 
 @Embeddable
 public record ThemeName(
@@ -16,10 +17,10 @@ public record ThemeName(
     public ThemeName(final String name) {
         this.name = Objects.requireNonNull(name, "name은 null일 수 없습니다.");
         if (name.isBlank()) {
-            throw new IllegalStateException("name은 공백일 수 없습니다.");
+            throw new BadRequestException("name은 공백일 수 없습니다.");
         }
         if (name.length() > MAX_NAME_LENGTH) {
-            throw new IllegalStateException("name은 " + MAX_NAME_LENGTH + "자 이내여야 합니다.");
+            throw new BadRequestException("name은 " + MAX_NAME_LENGTH + "자 이내여야 합니다.");
         }
     }
 }

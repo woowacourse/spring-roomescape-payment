@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import roomescape.global.exception.BadRequestException;
 import roomescape.member.domain.MemberName;
 
 class MemberNameTest {
@@ -24,7 +25,7 @@ class MemberNameTest {
     void 유저_이름이_5자_초과면_예외가_발생한다(String name) {
         // when & then
         assertThatThrownBy(() -> new MemberName(name))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @ParameterizedTest

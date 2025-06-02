@@ -3,6 +3,7 @@ package roomescape.unit.domain.theme;
 import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
+import roomescape.global.exception.BadRequestException;
 import roomescape.theme.domain.ThemeName;
 
 class ThemeNameTest {
@@ -16,13 +17,13 @@ class ThemeNameTest {
     @Test
     void 공백이면_예외를_던진다() {
         assertThatThrownBy(() -> new ThemeName(" "))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @Test
     void 여섯_글자_이상이면_예외를_던진다() {
         assertThatThrownBy(() -> new ThemeName("여섯글자이상"))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @Test

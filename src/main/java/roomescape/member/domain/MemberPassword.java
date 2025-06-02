@@ -5,6 +5,7 @@ import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.Size;
 import java.util.Objects;
 import java.util.regex.Pattern;
+import roomescape.global.exception.BadRequestException;
 
 @Embeddable
 public record MemberPassword(
@@ -22,12 +23,9 @@ public record MemberPassword(
     private static final int MINIMUM_LETTER_COUNT = 5;
 
     public MemberPassword(final String password) {
-        this.password = Objects.requireNonNull(password, "password은 null일 수 없습니다.");
-        if (password.isBlank()) {
-            throw new IllegalStateException("비밀번호는 공백일 수 없습니다.");
-        }
-        if (password.length() > MAXIMUM_PASSWORD_LENGTH) {
-            throw new IllegalStateException("비밀번호는 30자를 초과할 수 없습니다.");
+        this.password = Objects.requireNonNull(password, "비밀번호가 유효하지 않습니다.");
+        if (password.isBlank() || password.length() > MAXIMUM_PASSWORD_LENGTH) {
+            throw new BadRequestException("비밀번호가 유효하지 않습니다.");
         }
         validatePasswordPattern(password);
     }
@@ -37,16 +35,10 @@ public record MemberPassword(
         long specialCharCount = SPECIAL_CHAR_PATTERN.matcher(password).results().count();
         long letterCount = LETTER_PATTERN.matcher(password).results().count();
 
-        if (digitCount < MINIMUM_DIGIT_COUNT) {
-            throw new IllegalStateException("비밀번호에는 숫자가 최소 2자 이상 포함되어야 합니다. (현재: " + digitCount + ")");
-        }
-
-        if (specialCharCount < MINIMUM_SPECIAL_CHAR_COUNT) {
-            throw new IllegalStateException("비밀번호에는 특수문자가 최소 1자 이상 포함되어야 합니다. (현재: " + specialCharCount + ")");
-        }
-
-        if (letterCount < MINIMUM_LETTER_COUNT) {
-            throw new IllegalStateException("비밀번호에는 영문자가 최소 5자 이상 포함되어야 합니다. (현재: " + letterCount + ")");
+        if (digitCount < MINIMUM_DIGIT_COUNT
+                || specialCharCount < MINIMUM_SPECIAL_CHAR_COUNT
+                || letterCount < MINIMUM_LETTER_COUNT) {
+            throw new BadRequestException("비밀번호가 유효하지 않습니다.");
         }
     }
 }

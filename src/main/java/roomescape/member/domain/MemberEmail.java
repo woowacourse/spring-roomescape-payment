@@ -5,6 +5,7 @@ import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.Size;
 import java.util.Objects;
 import java.util.regex.Pattern;
+import roomescape.global.exception.BadRequestException;
 
 @Embeddable
 public record MemberEmail(
@@ -21,15 +22,15 @@ public record MemberEmail(
         this.email = Objects.requireNonNull(email, "email은 null이 아니어야 합니다.");
 
         if (email.isBlank()) {
-            throw new IllegalStateException("email은 공백일 수 없습니다.");
+            throw new BadRequestException("email은 공백일 수 없습니다.");
         }
 
         if (!EMAIL_PATTERN.matcher(email).matches()) {
-            throw new IllegalStateException("올바른 이메일 형식이 아닙니다: " + email);
+            throw new BadRequestException("올바른 이메일 형식이 아닙니다: " + email);
         }
 
         if (email.length() > MAXIMUM_EMAIL_LENGTH) {
-            throw new IllegalStateException("email은 40자 이하여야 합니다.");
+            throw new BadRequestException("email은 40자 이하여야 합니다.");
         }
     }
 }

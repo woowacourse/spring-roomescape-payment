@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.GlobalConfig;
 import roomescape.global.config.ClockConfig;
+import roomescape.global.exception.BadRequestException;
 import roomescape.integration.fixture.ReservationScheduleDbFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberEmail;
@@ -83,7 +84,7 @@ class ReservationTimeServiceTest {
 
         // when & then
         assertThatThrownBy(() -> service.createReservationTime(request))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @Test
@@ -135,6 +136,6 @@ class ReservationTimeServiceTest {
 
         // when & then
         assertThatThrownBy(() -> service.deleteReservationTimeById(time.getId()))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 }

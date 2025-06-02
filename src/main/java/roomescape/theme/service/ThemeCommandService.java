@@ -2,6 +2,7 @@ package roomescape.theme.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.global.exception.BadRequestException;
 import roomescape.reservation.service.ReservationQueryService;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeDescription;
@@ -26,7 +27,7 @@ public class ThemeCommandService {
     @Transactional
     public void deleteThemeById(final Long themeId) {
         if (reservationQueryService.existsReservationInTheme(themeId)) {
-            throw new IllegalStateException("이미 예약이 존재해서 테마를 삭제할 수 없습니다.");
+            throw new BadRequestException("예약이 존재하여 테마를 삭제할 수 없습니다.");
         }
         themeRepository.deleteById(themeId);
     }

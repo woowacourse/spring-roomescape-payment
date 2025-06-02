@@ -2,10 +2,10 @@ package roomescape.reservation.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.global.exception.NotFoundException;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationSpecifications;
@@ -26,7 +26,7 @@ public class ReservationQueryService {
 
     public Reservation getReservation(final Long id) {
         return reservationRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("예약을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("예약을 찾을 수 없습니다."));
     }
 
     public List<Reservation> findAllMyReservation(final Long memberId) {

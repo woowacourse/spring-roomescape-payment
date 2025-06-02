@@ -1,9 +1,9 @@
 package roomescape.reservation.service;
 
 
-import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.global.exception.BadRequestException;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.PaymentInfo;
 import roomescape.reservation.domain.Reservation;
@@ -31,7 +31,7 @@ public class ReservationCommandService {
     @Transactional
     public Reservation createReservation(final ReservationSchedule schedule, final Member member) {
         if (reservationRepository.findByScheduleId(schedule.getId()).isPresent()) {
-            throw new NoSuchElementException("이미 해당 일정에 예약이 존재합니다.");
+            throw new BadRequestException("이미 해당 일정에 예약이 존재합니다.");
         }
         return reservationRepository.save(new Reservation(null, member, schedule));
     }
@@ -43,7 +43,7 @@ public class ReservationCommandService {
             final PaymentInfo paymentInfo
     ) {
         if (reservationRepository.findByScheduleId(schedule.getId()).isPresent()) {
-            throw new NoSuchElementException("이미 해당 일정에 예약이 존재합니다.");
+            throw new BadRequestException("이미 해당 일정에 예약이 존재합니다.");
         }
         PaymentInfo confirmPaymentInfo = paymentApiClient.paymentReservation(PaymentConfirmRequest.from(paymentInfo));
         return reservationRepository.save(new Reservation(

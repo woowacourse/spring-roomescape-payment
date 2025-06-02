@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import roomescape.global.exception.BadRequestException;
 import roomescape.member.domain.MemberEmail;
 
 class MemberEmailTest {
@@ -28,7 +29,7 @@ class MemberEmailTest {
     void 이메일_형식이_아니면_예외가_발생한다(String email) {
         // when & then
         assertThatThrownBy(() -> new MemberEmail(email))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @ParameterizedTest
@@ -39,7 +40,7 @@ class MemberEmailTest {
     void 이메일이_40자_초과면_예외가_발생한다(String email) {
         // when & then
         assertThatThrownBy(() -> new MemberEmail(email))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @ParameterizedTest

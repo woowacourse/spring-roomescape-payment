@@ -3,6 +3,7 @@ package roomescape.unit.domain.theme;
 import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
+import roomescape.global.exception.BadRequestException;
 import roomescape.theme.domain.ThemeDescription;
 
 class ThemeDescriptionTest {
@@ -17,7 +18,7 @@ class ThemeDescriptionTest {
     void 삼십일자_이상이면_예외를_던진다() {
         String longText = "1234567890123456789012345678901";
         assertThatThrownBy(() -> new ThemeDescription(longText))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @Test

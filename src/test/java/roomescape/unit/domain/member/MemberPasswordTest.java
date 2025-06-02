@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import roomescape.global.exception.BadRequestException;
 import roomescape.member.domain.MemberPassword;
 
 class MemberPasswordTest {
@@ -24,7 +25,7 @@ class MemberPasswordTest {
     void 비밀번호가_30자를_초과하면_예외가_발생한다(String password) {
         // when & then
         assertThatThrownBy(() -> new MemberPassword(password))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @ParameterizedTest
@@ -36,7 +37,7 @@ class MemberPasswordTest {
     void 올바르지_않은_형식의_비밀번호는_예외를_발생한다(String password) {
         // when & then
         assertThatThrownBy(() -> new MemberPassword(password))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @ParameterizedTest

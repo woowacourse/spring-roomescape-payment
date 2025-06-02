@@ -3,6 +3,7 @@ package roomescape.unit.domain.theme;
 import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
+import roomescape.global.exception.BadRequestException;
 import roomescape.theme.domain.ThemeThumbnail;
 
 class ThemeThumbnailTest {
@@ -17,7 +18,7 @@ class ThemeThumbnailTest {
     void 오십일자_이상이면_예외를_던진다() {
         String longUrl = "https://example.com/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.jpg";
         assertThatThrownBy(() -> new ThemeThumbnail(longUrl))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @Test

@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.GlobalConfig;
 import roomescape.global.exception.AccessDeniedException;
+import roomescape.global.exception.BadRequestException;
 import roomescape.integration.fixture.MemberDbFixture;
 import roomescape.integration.fixture.ReservationDbFixture;
 import roomescape.integration.fixture.ReservationScheduleDbFixture;
@@ -100,7 +101,7 @@ class ReservationWaitServiceTest {
 
         // when & then
         assertThatThrownBy(() -> service.createReservationWait(request, member.getId()))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @Test
@@ -127,7 +128,7 @@ class ReservationWaitServiceTest {
 
         // when & then
         assertThatThrownBy(() -> service.approveReservationWait(wait.getId()))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @Test

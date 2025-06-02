@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import roomescape.global.converter.CustomResponseMapper;
-import roomescape.global.dto.ExternalApiErrorResponse;
+import roomescape.global.exception.ErrorCode;
 import roomescape.global.exception.ExternalApiException;
 
 @Component
@@ -43,7 +43,7 @@ public class CustomRestClient {
                     .body(responseType);
         } catch (RestClientResponseException e) {
             String responseBody = e.getResponseBodyAsString();
-            throw new ExternalApiException(new ExternalApiErrorResponse(
+            throw new ExternalApiException(new ErrorCode(
                     HttpStatus.valueOf(e.getStatusCode().value()),
                     customResponseMapper.convertJsonToErrorResponse(responseBody, errorResponseType).getMessage()
             ));

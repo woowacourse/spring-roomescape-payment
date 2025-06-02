@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
-import net.bytebuddy.agent.builder.AgentBuilder.CircularityLock.Global;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.GlobalConfig;
-import roomescape.global.config.ClockConfig;
+import roomescape.global.exception.BadRequestException;
+import roomescape.global.exception.NotFoundException;
 import roomescape.integration.fixture.MemberDbFixture;
 import roomescape.integration.fixture.ReservationDbFixture;
 import roomescape.integration.fixture.ReservationScheduleDbFixture;
@@ -159,14 +159,14 @@ class ReservationServiceTest {
         );
 
         assertThatThrownBy(() -> service.createReservation(request, member.getId()))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(NotFoundException.class);
     }
 
     @Test
     void 이미_예약된_시간이면_예외가_발생한다() {
         ReservationTime time = reservationTimeDbFixture.예약시간_10시();
         Theme theme = themeDbFixture.공포();
-        ReservationSchedule schedule = reservationScheduleDbFixture.예약_일정_25_4_22(time, theme);
+        ReservationSchedule schedule = reservationScheduleDbFixture.예약_일정_오늘(time, theme);
         Member member = memberDbFixture.leehyeonsu4888_지메일_gustn111느낌표두개();
         reservationRepository.save(new Reservation(null, member, schedule));
 
@@ -180,7 +180,7 @@ class ReservationServiceTest {
         );
 
         assertThatThrownBy(() -> service.createReservation(request, member.getId()))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @Test
@@ -207,7 +207,7 @@ class ReservationServiceTest {
         );
 
         assertThatThrownBy(() -> service.createReservation(request, member.getId()))
-                .isInstanceOf(NoSuchElementException.class);
+                .isInstanceOf(NotFoundException.class);
     }
 
     @Test

@@ -3,6 +3,7 @@ package roomescape.reservation.domain;
 import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import roomescape.global.exception.BadRequestException;
 import roomescape.schedule.domain.ReservationDate;
 import roomescape.time.domain.ReservationTime;
 
@@ -34,7 +35,7 @@ public class ReservationDateTime {
         LocalDateTime now = LocalDateTime.now(clock);
 
         if (reservationDateTime.isBefore(now)) {
-            throw new IllegalStateException("현재 시간 이후로만 예약할 수 있습니다.");
+            throw new BadRequestException("현재 시간 이후로만 예약할 수 있습니다.");
         }
     }
 

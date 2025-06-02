@@ -3,10 +3,10 @@ package roomescape.theme.service;
 
 import java.time.Clock;
 import java.util.List;
-import java.util.NoSuchElementException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.global.exception.NotFoundException;
 import roomescape.theme.domain.DateRange;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
@@ -39,6 +39,6 @@ public class ThemeQueryService {
 
     public Theme getById(final Long id) {
         return themeRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("해당 테마가 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException("해당 테마가 존재하지 않습니다."));
     }
 }

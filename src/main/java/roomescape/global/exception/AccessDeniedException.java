@@ -1,8 +1,10 @@
 package roomescape.global.exception;
 
-public class AccessDeniedException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class AccessDeniedException extends BusinessException {
     
     public AccessDeniedException(final String message) {
-        super(message);
+        super(new ErrorCode(HttpStatus.FORBIDDEN, message));
     }
 }

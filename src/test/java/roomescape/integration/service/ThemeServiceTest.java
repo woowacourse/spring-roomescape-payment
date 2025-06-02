@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.GlobalConfig;
 import roomescape.global.config.ClockConfig;
+import roomescape.global.exception.BadRequestException;
 import roomescape.integration.fixture.MemberDbFixture;
 import roomescape.integration.fixture.ReservationDateFixture;
 import roomescape.integration.fixture.ReservationDbFixture;
@@ -146,7 +147,7 @@ class ThemeServiceTest {
 
         // when & then
         assertThatThrownBy(() -> themeService.deleteThemeById(theme.getId()))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @Test
