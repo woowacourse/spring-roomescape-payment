@@ -47,11 +47,7 @@ public class ReservationCreateService {
             throw e;
         }
 
-        try {
-            confirmReservation(order, reservation);
-        } catch (Exception e) {
-            log.error("결제 상태 업데이트 실패", e);
-        }
+        confirmReservation(order, reservation);
         return response;
     }
 
@@ -70,8 +66,12 @@ public class ReservationCreateService {
     }
 
     private void confirmReservation(final Order order, final Reservation reservation) {
-        order.markAsPaid();
-        reservation.markStatusAsConfirmed();
+        try {
+            order.markAsPaid();
+            reservation.markStatusAsConfirmed();
+        } catch (Exception e) {
+            log.error("결제 상태 업데이트 실패", e);
+        }
     }
 
     private void validatePast(final Schedule schedule) {
