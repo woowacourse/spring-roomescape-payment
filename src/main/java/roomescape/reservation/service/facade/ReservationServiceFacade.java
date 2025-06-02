@@ -37,14 +37,14 @@ public class ReservationServiceFacade {
         final int amount = request.tossPaymentRequest().amount();
         final String orderId = request.tossPaymentRequest().orderId();
         final String paymentKey = request.tossPaymentRequest().paymentKey();
-        paymentService.processPayment(amount, orderId, paymentKey);
 
         final Member member = memberService.findMemberByEmail(loginMember.email());
         final LocalDate date = request.date();
         final Long timeId = request.timeId();
         final Long themeId = request.themeId();
-
         final Reservation savedReservation = reservationService.save(member, date, timeId, themeId);
+
+        paymentService.processPayment(amount, orderId, paymentKey);
 
         return CreateReservationResponse.from(savedReservation);
     }
