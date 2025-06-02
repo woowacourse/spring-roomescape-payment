@@ -38,7 +38,7 @@ class ReservationSlotTest {
     @Test
     void addReservation_whenValidRequest_returnReservations() {
         // given
-        reservationSlot.addReservation(member, NOW_DATETIME);
+        reservationSlot.addWaitingReservation(member, NOW_DATETIME, null);
 
         // when & then
         assertThat(reservationSlot.getReservations()).hasSize(1);
@@ -46,33 +46,33 @@ class ReservationSlotTest {
 
     @Test
     void addReservation_whenPastDate_throwsException() {
-        assertThatThrownBy(() -> reservationSlot.addReservation(member,
-                LocalDateTime.of(FUTURE_DATE.plusDays(1), LocalTime.of(11, 0))))
+        assertThatThrownBy(() -> reservationSlot.addWaitingReservation(member,
+                LocalDateTime.of(FUTURE_DATE.plusDays(1), LocalTime.of(11, 0)), null))
                 .isInstanceOf(InvalidReservationSlotException.class)
                 .hasMessageContaining("예약 시간이 현재 시간보다 이전일 수 없습니다.");
     }
 
     @Test
     void addReservation_whenAlreadyReserved_throwsException() {
-        reservationSlot.addReservation(member,
-                LocalDateTime.of(NOW_DATE, LocalTime.of(11, 0)));
+        reservationSlot.addWaitingReservation(member,
+                LocalDateTime.of(NOW_DATE, LocalTime.of(11, 0)), null);
 
-        assertThatThrownBy(() -> reservationSlot.addReservation(member,
-                LocalDateTime.of(NOW_DATE, LocalTime.of(11, 0))))
+        assertThatThrownBy(() -> reservationSlot.addWaitingReservation(member,
+                LocalDateTime.of(NOW_DATE, LocalTime.of(11, 0)), null))
                 .isInstanceOf(ReservationDuplicatedException.class)
                 .hasMessageContaining("해당 멤버는 이미 예약 중입니다.");
     }
 
     @Test
-    void findConfirmedMember_whenReservationsExist_returnsConfirmedMember() {
+    void findConfirmedMember_whenReservationsExist_returnsHighestPriorityMember() {
         // given
         LocalDateTime reservationTime = LocalDateTime.of(NOW_DATE, LocalTime.of(10, 0));
         Member member2 = new Member("Free", "free@gmail.com", "password", MemberRole.REGULAR);
         ReflectionTestUtils.setField(member2, "id", 4L);
-        reservationSlot.addReservation(member2, reservationTime);
+        reservationSlot.addWaitingReservation(member2, reservationTime, null);
 
         // when & then
-        assertThat(reservationSlot.findConfirmedMember()).isEqualTo(member);
+        assertThat(reservationSlot.findHighestPriorityMember()).isEqualTo(member);
     }
 
     @Test
@@ -81,11 +81,11 @@ class ReservationSlotTest {
         Member member1 = new Member("Free", "free@gmail.com", "password", MemberRole.REGULAR);
         ReflectionTestUtils.setField(member1, "id", 4L);
         LocalDateTime reservationTime = LocalDateTime.of(NOW_DATE, LocalTime.of(11, 0));
-        Reservation reservation1 = reservationSlot.addReservation(member1, reservationTime);
+        Reservation reservation1 = reservationSlot.addWaitingReservation(member1, reservationTime, null);
         ReflectionTestUtils.setField(reservation1, "id", 1L);
         Member member2 = new Member("Free", "free@gmail.com", "password", MemberRole.REGULAR);
         ReflectionTestUtils.setField(member1, "id", 5L);
-        Reservation reservation2 = reservationSlot.addReservation(member2, reservationTime);
+        Reservation reservation2 = reservationSlot.addWaitingReservation(member2, reservationTime, null);
         ReflectionTestUtils.setField(reservation2, "id", 2L);
 
         // when & then
@@ -100,7 +100,7 @@ class ReservationSlotTest {
         // given
         Member member1 = new Member("Free", "free@gmail.com", "password", MemberRole.REGULAR);
         ReflectionTestUtils.setField(member1, "id", 4L);
-        Reservation reservation = new Reservation(member1, reservationSlot);
+        Reservation reservation = new Reservation(member1, reservationSlot, null);
 
         // when & then
         assertThatThrownBy(() -> reservationSlot.findRank(reservation))
@@ -109,20 +109,20 @@ class ReservationSlotTest {
     }
 
     @Test
-    void findConfirmedReservation_whenValidParameters_returnReservation() {
+    void findHighestPriorityReservation_whenValidParameters_returnReservation() {
         // given
-        Reservation reservation = reservationSlot.addReservation(member, NOW_DATETIME);
+        Reservation reservation = reservationSlot.addWaitingReservation(member, NOW_DATETIME, null);
 
         // when & then
-        assertThat(reservationSlot.findConfirmedReservation()).isEqualTo(reservation);
+        assertThat(reservationSlot.findHighestPriorityReservation()).isEqualTo(reservation);
     }
 
     @Test
-    void findConfirmedReservation_whenReservationsNotExist_throwsException() {
+    void findHighestPriorityReservation_whenReservationsNotExist_throwsException() {
         // given
 
         // when & then
-        assertThatThrownBy(reservationSlot::findConfirmedReservation)
+        assertThatThrownBy(reservationSlot::findHighestPriorityReservation)
                 .isInstanceOf(ReservationNotFoundException.class)
                 .hasMessageContaining("예약이 존재하지 않습니다.");
     }

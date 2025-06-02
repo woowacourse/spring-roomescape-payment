@@ -64,15 +64,23 @@ public class ReservationSlot {
     protected ReservationSlot() {
     }
 
-    public Reservation addReservation(final Member member, final LocalDateTime now) {
+    public Reservation addWaitingReservation(final Member member, final LocalDateTime now, final String orderId) {
         validateDateTime(date, time.getStartAt(), now);
         validateMemberNotReserved(member);
-        Reservation reservation = new Reservation(member, this);
+        Reservation reservation = new Reservation(member, this, orderId);
         reservations.add(reservation);
         return reservation;
     }
 
-    public Member findConfirmedMember() {
+    public Reservation addConfirmedReservation(final Member member, final LocalDateTime now, final String orderId) {
+        validateDateTime(date, time.getStartAt(), now);
+        validateMemberNotReserved(member);
+        Reservation reservation = Reservation.createFirstReservation(member, this, orderId);
+        reservations.add(reservation);
+        return reservation;
+    }
+
+    public Member findHighestPriorityMember() {
         return reservations.stream()
                 .sorted(Comparator.comparing(Reservation::getCreatedAt))
                 .map(Reservation::getMember)
@@ -87,7 +95,7 @@ public class ReservationSlot {
                 .count();
     }
 
-    public Reservation findConfirmedReservation() {
+    public Reservation findHighestPriorityReservation() {
         if (reservations.isEmpty()) {
             throw new ReservationNotFoundException("예약이 존재하지 않습니다.");
         }
