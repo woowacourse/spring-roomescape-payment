@@ -15,7 +15,7 @@ public class ReservationPaymentService {
     private final PaymentClientService paymentClientService;
     private final PaymentService paymentService;
     private final AuthorizationHeaderProvider authorizationHeaderProvider = new AuthorizationHeaderProvider();
-    @Value("toss.secret-key")
+    @Value("${toss.secret-key}")
     private String secretKey;
 
     public ReservationPaymentService(ReservationService reservationService, PaymentClientService paymentClientService,
