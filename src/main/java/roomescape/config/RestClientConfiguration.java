@@ -1,21 +1,12 @@
 package roomescape.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
-import roomescape.config.dto.RestClientErrorResponse;
-import roomescape.exception.PaymentConfirmClientException;
-import roomescape.exception.PaymentConfirmServerException;
 
 @Configuration
 public class RestClientConfiguration {
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Bean
     public RestClient.Builder restClientBuilder() {

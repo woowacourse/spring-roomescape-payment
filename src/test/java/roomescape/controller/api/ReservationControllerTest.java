@@ -76,6 +76,7 @@ public class ReservationControllerTest {
         loginToken = jwtTokenProvider.createToken(member);
         cookie = new Cookie("token", loginToken);
         when(memberQueryService.findMemberById(any(Long.class))).thenReturn(member);
+        when(jwtTokenProvider.extractRole(any())).thenReturn(Role.ADMIN);
     }
 
     @DisplayName("Reservation 목록 내용 갯수를 검사한다")
