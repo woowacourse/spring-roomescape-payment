@@ -7,6 +7,11 @@ import roomescape.reservation.presentation.dto.ReservationRequest;
 public class StubPaymentClient implements PaymentClient {
     @Override
     public TossPaymentResponse approve(final ReservationRequest reservationRequest) {
-        return null;
+        return new TossPaymentResponse(
+                "test",
+                "testOrderId",
+                1000,
+                "NORMAL",
+                "2025-01-01T00:00:00+09:00");
     }
 }
