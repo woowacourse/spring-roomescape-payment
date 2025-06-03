@@ -3,6 +3,8 @@ package roomescape.service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
@@ -18,6 +20,7 @@ import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationStatusResponse;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.NotFoundException;
+import roomescape.exception.aspect.ReservationLogging;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
@@ -27,6 +30,8 @@ import roomescape.repository.WaitingRepository;
 @Service
 @Transactional
 public class ReservationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ReservationService.class);
 
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -79,6 +84,7 @@ public class ReservationService {
                 .toList();
     }
 
+    @ReservationLogging
     public ReservationResponse addReservation(long memberId, ReservationCreationContent request) {
         Member member = getMemberById(memberId);
         Theme theme = getThemeById(request.themeId());
@@ -95,9 +101,13 @@ public class ReservationService {
     }
 
     @Transactional
+    @ReservationLogging
     public ReservationResponse addReservation(long memberId,
                                               ReservationCreationContent reservationCreationContent,
                                               PaymentHistoryCreationContent paymentHistoryCreationContent) {
+        logger.info("[유저 정보] memberId= {} \n [예약 요청] : {} \n [결제 정보]: {}", memberId, reservationCreationContent,
+                paymentHistoryCreationContent);
+
         Member member = getMemberById(memberId);
         Theme theme = getThemeById(reservationCreationContent.themeId());
         ReservationTime time = getReservationTimeById(reservationCreationContent.timeId());
@@ -111,12 +121,12 @@ public class ReservationService {
 
         PaymentResult paymentResult = paymentService.pay(paymentHistoryCreationContent);
 
-        Reservation reservation = Reservation.createWithoutId(reservationCreationContent.date(), time, theme, member,
+        Reservation newReservation = Reservation.createWithoutId(reservationCreationContent.date(), time, theme, member,
                 paymentResult);
-
-        Reservation savedReservation = reservationRepository.save(reservation);
+        Reservation savedReservation = reservationRepository.save(newReservation);
         return new ReservationResponse(savedReservation);
     }
+
 
     public void deleteReservationById(long reservationId) {
         Reservation reservation = getReservationById(reservationId);

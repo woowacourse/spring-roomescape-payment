@@ -1,11 +1,11 @@
 package roomescape.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.PaymentHistory;
 import roomescape.domain.PaymentResult;
 import roomescape.dto.business.PaymentHistoryCreationContent;
+import roomescape.exception.aspect.ReservationLogging;
 import roomescape.repository.PaymentHistoryRepository;
 import roomescape.repository.PaymentResultRepository;
 import roomescape.utility.PaymentClient;
@@ -25,19 +25,22 @@ public class PaymentService {
         this.paymentResultRepository = paymentResultRepository;
     }
 
+    @ReservationLogging
     public PaymentResult pay(PaymentHistoryCreationContent content) {
         return requestPay(content);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW, timeout = 3)
+    @Transactional
     public void writePaymentHistory(PaymentHistoryCreationContent content) {
         PaymentHistory paymentHistory = PaymentHistory.createWithoutId(content.orderId(),
                 content.paymentKey(), content.paymentType());
         paymentHistoryRepository.save(paymentHistory);
     }
 
+    @ReservationLogging
     private PaymentResult requestPay(PaymentHistoryCreationContent content) {
-        PaymentResult payResult = paymentClient.pay(content.paymentKey(), content.orderId(), content.amount());
+        PaymentResult payResult = paymentClient.pay(content.paymentKey(), content.orderId(), content.amount(),
+                content.paymentType());
         return paymentResultRepository.save(payResult);
     }
 }
