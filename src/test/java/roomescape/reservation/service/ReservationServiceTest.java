@@ -7,19 +7,17 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
 import static roomescape.constant.TestData.RESERVATION_COUNT;
 
+import jakarta.transaction.Transactional;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
-
-import jakarta.transaction.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.exception.NotFoundException;
 import roomescape.exception.PaymentClientException;
@@ -28,12 +26,14 @@ import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.BaseTest;
 import roomescape.reservation.client.PaymentClient;
+import roomescape.reservation.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Status;
 import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSearchRequest;
+import roomescape.reservation.repository.PaymentRepository;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
@@ -43,9 +43,6 @@ import roomescape.theme.repository.ThemeRepository;
 @Sql("/data.sql")
 @Transactional
 class ReservationServiceTest extends BaseTest {
-
-    // @Autowired
-    // private MockRestServiceServer server;
 
     @Autowired
     private ReservationRepository reservationRepository;
@@ -62,26 +59,27 @@ class ReservationServiceTest extends BaseTest {
     @Autowired
     private PaymentClient paymentClient;
 
+    @Autowired
+    private PaymentRepository paymentRepo;
+
     private Clock clock = Clock.systemDefaultZone();
     private ReservationService service;
     private ReservationTime time1;
     private Theme theme1;
     private Member member;
     private Reservation r1;
-    private String paymentKey;
-    private String orderId;
-    private Long amount;
+    private Payment payment1;
 
     @BeforeEach
     void setUp() {
-        service = new ReservationService(clock, paymentClient, reservationRepository, timeRepo, themeRepo, memberRepo);
+        service = new ReservationService(clock, paymentClient, reservationRepository,
+                timeRepo, themeRepo, memberRepo, paymentRepo);
         time1 = ReservationTime.from(LocalTime.of(14, 0));
         theme1 = Theme.of("테마1", "설명1", "썸네일1");
         member = Member.withDefaultRole("member", "mem@naver.com", "1234");
-        r1 = Reservation.of(LocalDate.of(2999, 5, 11), time1, theme1, member, LocalDateTime.now(clock));
-        paymentKey = null;
-        orderId = null;
-        amount = null;
+        payment1 = Payment.from("order_01", "key_01", 100L);
+        r1 = Reservation.of(LocalDate.of(2999, 5, 11), time1, theme1, member,
+                LocalDateTime.now(clock), payment1);
     }
 
     @Test
@@ -100,8 +98,9 @@ class ReservationServiceTest extends BaseTest {
         timeRepo.save(time1);
         themeRepo.save(theme1);
         memberRepo.save(member);
+        paymentRepo.save(payment1);
         ReservationRequest request = new ReservationRequest(LocalDate.of(2000, 10, 8), theme1.getId(), time1.getId(),
-                paymentKey, orderId, amount);
+                payment1.getPaymentKey(), payment1.getOrderId(), payment1.getAmount());
         final LoginMember loginMember = new LoginMember(member.getId(), member.getName(), member.getEmail(),
                 member.getRole());
 
@@ -118,11 +117,12 @@ class ReservationServiceTest extends BaseTest {
         timeRepo.save(time1);
         themeRepo.save(theme1);
         memberRepo.save(member);
+        paymentRepo.save(payment1);
         final LoginMember loginMember = new LoginMember(member.getId(), member.getName(), member.getEmail(),
                 member.getRole());
 
         ReservationRequest req = new ReservationRequest(LocalDate.of(2999, 4, 21), theme1.getId(), time1.getId(),
-                paymentKey, orderId, amount);
+                payment1.getPaymentKey(), payment1.getOrderId(), payment1.getAmount());
 
         // when
         ReservationResponse result = service.saveReservation(req, loginMember);
@@ -157,11 +157,12 @@ class ReservationServiceTest extends BaseTest {
         timeRepo.save(time1);
         themeRepo.save(theme1);
         memberRepo.save(member);
+        paymentRepo.save(payment1);
         final LoginMember loginMember = new LoginMember(member.getId(), member.getName(), member.getEmail(),
                 member.getRole());
 
         ReservationRequest req = new ReservationRequest(LocalDate.of(2999, 4, 21), theme1.getId(), time1.getId(),
-                paymentKey, orderId, amount);
+                payment1.getPaymentKey(), payment1.getOrderId(), payment1.getAmount());
 
         // when then
         assertThatCode(() -> service.saveReservation(req, loginMember))
@@ -176,6 +177,7 @@ class ReservationServiceTest extends BaseTest {
         memberRepo.save(member);
         timeRepo.save(time1);
         themeRepo.save(theme1);
+        paymentRepo.save(payment1);
         reservationRepository.save(r1);
         service.deleteReservation(r1.getId());
 
@@ -201,16 +203,51 @@ class ReservationServiceTest extends BaseTest {
         memberRepo.save(member);
         timeRepo.save(time1);
         themeRepo.save(theme1);
-        reservationRepository.save(Reservation.of(LocalDate.of(2999, 5, 1), time1, theme1, member,
-                LocalDateTime.now(clock)));
-        reservationRepository.save(Reservation.of(LocalDate.of(2999, 5, 2), time1, theme1, member,
-                LocalDateTime.now(clock)));
-        reservationRepository.save(Reservation.of(LocalDate.of(2999, 5, 3), time1, theme1, member,
-                LocalDateTime.now(clock)));
-        reservationRepository.save(Reservation.of(LocalDate.of(2999, 5, 4), time1, theme1, member,
-                LocalDateTime.now(clock)));
-        final LoginMember loginMember = new LoginMember(member.getId(), member.getName(), member.getEmail(),
-                member.getRole());
+
+        Payment payment2 = Payment.from("order_02", "key_02", 20L);
+        Payment payment3 = Payment.from("order_03", "key_03", 30L);
+        Payment payment4 = Payment.from("order_04", "key_04", 40L);
+
+        paymentRepo.save(payment1);
+        paymentRepo.save(payment2);
+        paymentRepo.save(payment3);
+        paymentRepo.save(payment4);
+
+        reservationRepository.save(Reservation.of(
+                LocalDate.of(2999, 5, 1),
+                time1,
+                theme1,
+                member,
+                LocalDateTime.now(clock),
+                payment1
+        ));
+        reservationRepository.save(Reservation.of(
+                LocalDate.of(2999, 5, 2),
+                time1,
+                theme1,
+                member,
+                LocalDateTime.now(clock),
+                payment2
+        ));
+        reservationRepository.save(Reservation.of(
+                LocalDate.of(2999, 5, 3),
+                time1,
+                theme1,
+                member,
+                LocalDateTime.now(clock),
+                payment3
+        ));
+        reservationRepository.save(Reservation.of(
+                LocalDate.of(2999, 5, 4),
+                time1,
+                theme1,
+                member,
+                LocalDateTime.now(clock),
+                payment4
+        ));
+
+        final LoginMember loginMember = new LoginMember(member.getId(), member.getName(),
+                member.getEmail(), member.getRole());
 
         // when
         List<MyReservationResponse> myReservations = service.findMyReservations(loginMember);
@@ -241,9 +278,11 @@ class ReservationServiceTest extends BaseTest {
         memberRepo.save(member);
         timeRepo.save(time1);
         themeRepo.save(theme1);
+        paymentRepo.save(payment1);
+
         LocalDate date = LocalDate.now().plusDays(1);
         ReservationRequest request = new ReservationRequest(date, theme1.getId(), time1.getId(),
-                paymentKey, orderId, amount);
+                payment1.getPaymentKey(), payment1.getOrderId(), payment1.getAmount());
         LoginMember loginMember = new LoginMember(member.getId(), member.getName(), member.getEmail(),
                 member.getRole());
 
@@ -266,9 +305,10 @@ class ReservationServiceTest extends BaseTest {
         memberRepo.save(member);
         timeRepo.save(time1);
         themeRepo.save(theme1);
-        LocalDate date = LocalDate.now().minusDays(1);
+        paymentRepo.save(payment1);
+
         ReservationRequest request = new ReservationRequest(LocalDate.of(2000, 10, 8), theme1.getId(), time1.getId(),
-                paymentKey, orderId, amount);
+                payment1.getPaymentKey(), payment1.getOrderId(), payment1.getAmount());
         LoginMember loginMember = new LoginMember(member.getId(), member.getName(), member.getEmail(),
                 member.getRole());
 
@@ -286,11 +326,14 @@ class ReservationServiceTest extends BaseTest {
         memberRepo.save(member);
         timeRepo.save(time1);
         themeRepo.save(theme1);
+        paymentRepo.save(payment1);
+
         LocalDate date = LocalDate.now().plusDays(1);
         ReservationRequest waitingRequest1 = new ReservationRequest(date, theme1.getId(), time1.getId(),
-                paymentKey, orderId, amount);
+                payment1.getPaymentKey(), payment1.getOrderId(), payment1.getAmount());
         ReservationRequest waitingRequest2 = new ReservationRequest(date, theme1.getId(), time1.getId(),
-                paymentKey, orderId, amount);
+                payment1.getPaymentKey(), payment1.getOrderId(), payment1.getAmount());
+
         Member member2 = Member.withDefaultRole("member", "mem2@naver.com", "1234");
         memberRepo.save(member2);
         LoginMember loginMember = new LoginMember(member.getId(), member.getName(), member.getEmail(),

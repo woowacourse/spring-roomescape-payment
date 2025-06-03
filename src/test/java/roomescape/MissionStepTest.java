@@ -3,6 +3,8 @@ package roomescape;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -11,23 +13,21 @@ import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
-
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.BaseTest;
 import roomescape.reservation.controller.ReservationController;
+import roomescape.reservation.domain.Payment;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.ReservationResponse;
+import roomescape.reservation.repository.PaymentRepository;
 import roomescape.reservation.repository.ReservationStatusRepository;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
@@ -53,6 +53,9 @@ class MissionStepTest extends BaseTest {
     @Autowired
     private ReservationStatusRepository reservationStatusRepository;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     @BeforeEach
     void setUp() {
         jdbcTemplate.update("""
@@ -65,6 +68,8 @@ class MissionStepTest extends BaseTest {
                 ALTER TABLE theme ALTER COLUMN id RESTART WITH 1;
                 TRUNCATE TABLE member;
                 ALTER TABLE member ALTER COLUMN id RESTART WITH 1;
+                TRUNCATE TABLE payment;
+                ALTER TABLE payment ALTER COLUMN id RESTART WITH 1;
                 SET REFERENTIAL_INTEGRITY TRUE;
                 """);
         memberRepository.save(Member.withRole("name", "admin@naver.com", "1234", MemberRole.ADMIN));
@@ -127,16 +132,16 @@ class MissionStepTest extends BaseTest {
     void 삼단계_유저_예약() {
         // given
         Map<String, String> params = new HashMap<>();
-        LocalDate now = LocalDate.now();
-        LocalDate localDate = now.plusDays(1);
+        LocalDate localDate = LocalDate.now().plusDays(1);
         params.put("date", localDate.toString());
         reservationTimeRepository.save(ReservationTime.from(LocalTime.of(10, 00)));
         themeRepository.save(Theme.of("name", "desc", "thumb"));
         params.put("timeId", "1");
         params.put("themeId", "1");
-        params.put("paymentKey", "aaa");
         params.put("orderId", "aaa");
-        params.put("amount", "1000");
+        params.put("paymentKey", "key");
+        params.put("amount", "100");
+
         Map<String, String> adminUser = Map.of("email", "admin@naver.com", "password", "1234");
         String token = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -201,6 +206,7 @@ class MissionStepTest extends BaseTest {
         reservationTimeRepository.save(ReservationTime.from(LocalTime.of(10, 00)));
         themeRepository.save(Theme.of("name", "desc", "thumb"));
         reservationStatusRepository.save(ReservationStatus.booked());
+        paymentRepository.save(Payment.from("order_id_test", "payment_key_test", 100L));
 
         Map<String, String> adminUser = Map.of("email", "admin@naver.com", "password", "1234");
         String token = RestAssured.given().log().all()
@@ -212,8 +218,8 @@ class MissionStepTest extends BaseTest {
                 .extract()
                 .cookie("token");
         jdbcTemplate.update(
-                "INSERT INTO reservation (date, time_id, theme_id, member_id, status_id) VALUES (?, ?, ?, ?, ?)",
-                "2023-08-05", 1, 1, 1, 1);
+                "INSERT INTO reservation (date, time_id, theme_id, member_id, status_id, payment_id) VALUES (?, ?, ?, ?, ?, ?)",
+                "2023-08-05", 1, 1, 1, 1, 1);
 
         // when
         // then
@@ -242,6 +248,7 @@ class MissionStepTest extends BaseTest {
                 .statusCode(200)
                 .extract()
                 .cookie("token");
+
         Map<String, String> params = new HashMap<>();
         params.put("date", "2999-08-05");
         params.put("timeId", "1");
@@ -250,14 +257,6 @@ class MissionStepTest extends BaseTest {
         params.put("orderId", "aaa");
         params.put("amount", "1000");
 
-        /**
-         *         @NotNull @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
-         *         @NotNull Long themeId,
-         *         @NotNull Long timeId,
-         *         @NotNull String paymentKey,
-         *         @NotNull String orderId,
-         *         @NotNull Long amount
-         */
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(params)
@@ -299,6 +298,7 @@ class MissionStepTest extends BaseTest {
         // given
         reservationTimeRepository.save(ReservationTime.from(LocalTime.of(10, 00)));
         themeRepository.save(Theme.of("name", "desc", "thumb"));
+        paymentRepository.save(Payment.from("test_order_id", "test_payment_key", 100L));
 
         Map<String, String> adminUser = Map.of("email", "admin@naver.com", "password", "1234");
         String token = RestAssured.given().log().all()
@@ -309,22 +309,14 @@ class MissionStepTest extends BaseTest {
                 .statusCode(200)
                 .extract()
                 .cookie("token");
+        
         Map<String, Object> reservation = new HashMap<>();
         reservation.put("date", "2999-08-05");
         reservation.put("timeId", 1);
-        reservation.put("themeId", "1");
-        reservation.put("paymentKey", "aaa");
-        reservation.put("orderId", "aaa");
-        reservation.put("amount", 1000);
-
-        /**
-         *         @NotNull @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
-         *         @NotNull Long themeId,
-         *         @NotNull Long timeId,
-         *         @NotNull String paymentKey,
-         *         @NotNull String orderId,
-         *         @NotNull Long amount
-         */
+        reservation.put("themeId", 1);
+        reservation.put("paymentKey", "test_payment_key");
+        reservation.put("orderId", "test_order_id");
+        reservation.put("amount", 100L);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

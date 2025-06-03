@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,11 +17,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
-
 import roomescape.exception.ReservationException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.repository.MemberRepository;
+import roomescape.reservation.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
@@ -45,8 +44,10 @@ class ReservationRepositoryTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    private Clock clock = Clock.systemDefaultZone();
+    @Autowired
+    private PaymentRepository paymentRepository;
 
+    private Clock clock = Clock.systemDefaultZone();
     private LocalDate date;
     private ReservationTime time1;
     private ReservationTime time2;
@@ -54,6 +55,11 @@ class ReservationRepositoryTest {
     private Theme theme2;
     private Member member1;
     private Member member2;
+    private Payment payment1;
+    private Payment payment2;
+    private Payment payment3;
+    private Payment payment4;
+    private Payment payment5;
 
     @BeforeEach
     void setUp() {
@@ -64,6 +70,12 @@ class ReservationRepositoryTest {
         theme2 = Theme.of("테마2", "설명2", "썸네일2");
         member1 = Member.withRole("유저1", "user1@naver.com", "pwd", MemberRole.MEMBER);
         member2 = Member.withRole("유저2", "user2@naver.com", "pwd", MemberRole.MEMBER);
+
+        payment1 = Payment.from("test_order_id", "test_payment_key", 10000L);
+        payment2 = Payment.from("test_order_id", "test_payment_key", 20000L);
+        payment3 = Payment.from("test_order_id", "test_payment_key", 30000L);
+        payment4 = Payment.from("test_order_id", "test_payment_key", 40000L);
+        payment5 = Payment.from("test_order_id", "test_payment_key", 50000L);
     }
 
     @Test
@@ -75,8 +87,15 @@ class ReservationRepositoryTest {
         themeRepository.save(theme2);
         memberRepository.save(member1);
         memberRepository.save(member2);
-        Reservation reservation1 = Reservation.of(date, time1, theme1, member1, LocalDateTime.now(clock));
-        Reservation reservation2 = Reservation.of(date, time2, theme2, member2, LocalDateTime.now(clock));
+
+        paymentRepository.save(payment1);
+        paymentRepository.save(payment2);
+        paymentRepository.save(payment3);
+        paymentRepository.save(payment4);
+        paymentRepository.save(payment5);
+
+        Reservation reservation1 = Reservation.of(date, time1, theme1, member1, LocalDateTime.now(clock), payment4);
+        Reservation reservation2 = Reservation.of(date, time2, theme2, member2, LocalDateTime.now(clock), payment5);
         repository.save(reservation1);
         repository.save(reservation2);
 
@@ -98,9 +117,16 @@ class ReservationRepositoryTest {
         LocalDate date2 = LocalDate.of(2999, 7, 2);
         LocalDate date3 = LocalDate.of(2999, 7, 3);
 
-        repository.save(Reservation.of(date1, time1, theme1, member1, LocalDateTime.now(clock)));
-        repository.save(Reservation.of(date2, time1, theme1, member1, LocalDateTime.now(clock)));
-        repository.save(Reservation.of(date3, time1, theme1, member1, LocalDateTime.now(clock)));
+        paymentRepository.save(payment1);
+        paymentRepository.save(payment2);
+        paymentRepository.save(payment3);
+
+        repository.save(
+                Reservation.of(date1, time1, theme1, member1, LocalDateTime.now(clock), payment1));
+        repository.save(
+                Reservation.of(date2, time1, theme1, member1, LocalDateTime.now(clock), payment2));
+        repository.save(
+                Reservation.of(date3, time1, theme1, member1, LocalDateTime.now(clock), payment3));
 
         // when
         List<Reservation> reservations = repository.findByCriteria(null, null, date2, null);
@@ -127,11 +153,22 @@ class ReservationRepositoryTest {
         memberRepository.save(member1);
         memberRepository.save(member2);
 
-        repository.save(Reservation.of(date1, time1, theme1, member1, LocalDateTime.now(clock)));
-        repository.save(Reservation.of(date2, time1, theme1, member1, LocalDateTime.now(clock)));
-        repository.save(Reservation.of(date3, time1, theme1, member1, LocalDateTime.now(clock)));
-        repository.save(Reservation.of(date4, time1, theme1, member2, LocalDateTime.now(clock)));
-        repository.save(Reservation.of(date5, time1, theme1, member2, LocalDateTime.now(clock)));
+        paymentRepository.save(payment1);
+        paymentRepository.save(payment2);
+        paymentRepository.save(payment3);
+        paymentRepository.save(payment4);
+        paymentRepository.save(payment5);
+
+        repository.save(
+                Reservation.of(date1, time1, theme1, member1, LocalDateTime.now(clock), payment1));
+        repository.save(
+                Reservation.of(date2, time1, theme1, member1, LocalDateTime.now(clock), payment2));
+        repository.save(
+                Reservation.of(date3, time1, theme1, member1, LocalDateTime.now(clock), payment3));
+        repository.save(
+                Reservation.of(date4, time1, theme1, member2, LocalDateTime.now(clock), payment4));
+        repository.save(
+                Reservation.of(date5, time1, theme1, member2, LocalDateTime.now(clock), payment5));
 
         // when
         List<Reservation> reservations = repository.findByCriteria(null, member1.getId(), null, null);
@@ -151,12 +188,15 @@ class ReservationRepositoryTest {
         LocalDate today = LocalDate.now();
         LocalTime oneMinuteLater = LocalTime.now().plusMinutes(1);
         ReservationTime futureTime = ReservationTime.from(oneMinuteLater);
+        LocalDateTime currentDateTime = LocalDateTime.now(clock);
 
         reservationTimeRepository.save(time1);
         themeRepository.save(theme1);
         memberRepository.save(member1);
         reservationTimeRepository.save(futureTime);
-        final Reservation booked = Reservation.of(today, futureTime, theme1, member1, LocalDateTime.now(clock));
+        paymentRepository.save(payment1);
+
+        final Reservation booked = Reservation.of(today, futureTime, theme1, member1, currentDateTime, payment1);
 
         // when
         // then
@@ -168,12 +208,14 @@ class ReservationRepositoryTest {
         // given
         Theme defaultTheme = Theme.of("테마", "설명", "썸네일");
         Member defaultMember = Member.withRole("member", "member@naver.com", "1234", MemberRole.MEMBER);
+        Payment defaultPayment = Payment.from("order_01", "key_01", 100L);
+
         LocalDate today = LocalDate.now();
         LocalTime oneMinuteBefore = LocalTime.now().minusMinutes(1);
         ReservationTime pastTime = ReservationTime.from(oneMinuteBefore);
         // when
         ThrowableAssert.ThrowingCallable throwingCallable = () -> Reservation.of(today, pastTime, defaultTheme,
-                defaultMember, LocalDateTime.now(clock));
+                defaultMember, LocalDateTime.now(clock), defaultPayment);
 
         // then
         assertThatThrownBy(throwingCallable)
