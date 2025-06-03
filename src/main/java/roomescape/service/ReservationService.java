@@ -4,7 +4,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.*;
 import roomescape.domain.repository.*;
+import roomescape.dto.PaymentRequest;
 import roomescape.dto.request.ReservationCondition;
+import roomescape.dto.request.ReservationCreateRequest;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationWithStatusResponse;
 import roomescape.exception.*;
@@ -22,17 +24,17 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentClient paymentClient;
 
-    public ReservationService(ReservationRepository reservationRepository,
-                              ReservationTimeRepository reservationTimeRepository,
-                              ThemeRepository themeRepository,
-                              MemberRepository memberRepository,
-                              WaitingRepository waitingRepository) {
+    public ReservationService(ReservationRepository reservationRepository, ReservationTimeRepository reservationTimeRepository,
+                              ThemeRepository themeRepository, MemberRepository memberRepository, WaitingRepository waitingRepository,
+                              PaymentClient paymentClient) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentClient = paymentClient;
     }
 
     @Transactional(readOnly = true)
@@ -80,20 +82,19 @@ public class ReservationService {
         return ReservationResponse.from(savedReservation);
     }
 
-    public ReservationResponse createReservationForMember(Long memberId,
-                                                          Long timeId,
-                                                          Long themeId,
-                                                          LocalDate date) {
+    public ReservationResponse createReservationForMember(Long memberId, ReservationCreateRequest request) {
+        PaymentRequest paymentRequest = new PaymentRequest(request.amount(), request.paymentKey(), request.orderId());
+        paymentClient.postPaymentInfo(paymentRequest);
 
-        ReservationTime reservationTime = reservationTimeRepository.findById(timeId)
+        ReservationTime reservationTime = reservationTimeRepository.findById(request.timeId())
                 .orElseThrow(ReservationTimeNotFoundException::new);
-        Theme theme = themeRepository.findById(themeId).orElseThrow(ThemeNotFoundException::new);
+        Theme theme = themeRepository.findById(request.themeId()).orElseThrow(ThemeNotFoundException::new);
         Member member = memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
 
-        Reservation reservation = Reservation.createWithoutId(member, date, reservationTime, theme);
+        Reservation reservation = Reservation.createWithoutId(member, request.date(), reservationTime, theme);
 
         reservation.validateDateTime();
-        validateDuplicate(date, reservationTime, theme);
+        validateDuplicate(request.date(), reservationTime, theme);
 
         Reservation savedReservation = reservationRepository.save(reservation);
         return ReservationResponse.from(savedReservation);

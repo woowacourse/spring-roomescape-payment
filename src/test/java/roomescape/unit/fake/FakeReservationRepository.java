@@ -101,7 +101,7 @@ public class FakeReservationRepository implements ReservationRepository {
                     .filter(reservation -> reservation.getMember().getId().equals(condition.memberId()))
                     .toList();
         }
-        if ( (condition.dateFrom() != null) && (condition.dateTo() != null)) {
+        if ((condition.dateFrom() != null) && (condition.dateTo() != null)) {
             filteredReservations = filteredReservations.stream()
                     .filter(reservation -> reservation.getDate().plusDays(1).isAfter(condition.dateFrom()))
                     .filter(reservation -> reservation.getDate().minusDays(1).isBefore(condition.dateTo()))
@@ -115,5 +115,9 @@ public class FakeReservationRepository implements ReservationRepository {
         return reservations.stream()
                 .filter(reservation -> reservation.getMember().getId().equals(memberId))
                 .toList();
+    }
+
+    public void clear() {
+        reservations.clear();
     }
 }

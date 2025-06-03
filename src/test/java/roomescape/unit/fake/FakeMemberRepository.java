@@ -48,4 +48,9 @@ public class FakeMemberRepository implements MemberRepository {
     public List<Member> getMembers() {
         return members;
     }
+
+
+    public void clear() {
+        members.clear();
+    }
 }

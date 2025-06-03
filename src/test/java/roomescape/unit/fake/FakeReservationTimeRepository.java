@@ -1,12 +1,13 @@
 package roomescape.unit.fake;
 
+import roomescape.domain.ReservationTime;
+import roomescape.domain.repository.ReservationRepository;
+import roomescape.domain.repository.ReservationTimeRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.repository.ReservationRepository;
-import roomescape.domain.repository.ReservationTimeRepository;
 
 public class FakeReservationTimeRepository implements ReservationTimeRepository {
 
@@ -41,5 +42,9 @@ public class FakeReservationTimeRepository implements ReservationTimeRepository 
         return reservationTimes.stream()
                 .filter(reservationTime -> reservationTime.getId().equals(id))
                 .findFirst();
+    }
+
+    public void clear() {
+        reservationTimes.clear();
     }
 }

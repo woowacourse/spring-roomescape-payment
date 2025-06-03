@@ -1,12 +1,13 @@
 package roomescape.unit.fake;
 
+import roomescape.domain.Theme;
+import roomescape.domain.repository.ThemeRepository;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
-import roomescape.domain.Theme;
-import roomescape.domain.repository.ThemeRepository;
 
 public class FakeThemeRepository implements ThemeRepository {
 
@@ -50,4 +51,9 @@ public class FakeThemeRepository implements ThemeRepository {
     public Optional<Theme> findById(Long id) {
         return fakeThemes.stream().filter(theme -> theme.getId().equals(id)).findFirst();
     }
+
+    public void clear() {
+        fakeThemes.clear();
+    }
+
 }

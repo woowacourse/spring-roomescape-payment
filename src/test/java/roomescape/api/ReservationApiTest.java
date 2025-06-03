@@ -70,6 +70,7 @@ public class ReservationApiTest {
         reservation.put("date", "2026-08-05");
         reservation.put("timeId", time.getId());
         reservation.put("themeId", theme.getId());
+        reservation.put("paymentType", "normal");
         reservation.put("paymentKey", "1");
         reservation.put("orderId", "1");
         reservation.put("amount", 1000);

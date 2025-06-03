@@ -1,5 +1,8 @@
 package roomescape.unit.fake;
 
+import roomescape.domain.*;
+import roomescape.domain.repository.WaitingRepository;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -7,12 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
-import roomescape.domain.Member;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Theme;
-import roomescape.domain.Waiting;
-import roomescape.domain.WaitingWithRank;
-import roomescape.domain.repository.WaitingRepository;
 
 public class FakeWaitingRepository implements WaitingRepository {
 
@@ -125,5 +122,9 @@ public class FakeWaitingRepository implements WaitingRepository {
                         w.getReservationTime().getId().equals(waiting.getReservationTime().getId()) &&
                         w.getCreateAt().isBefore(waiting.getCreateAt()))
                 .count() + 1;
+    }
+
+    public void clear() {
+        store.clear();
     }
 }

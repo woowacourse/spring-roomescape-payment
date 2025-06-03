@@ -1,13 +1,8 @@
 package roomescape.api;
 
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,6 +10,12 @@ import org.springframework.test.annotation.DirtiesContext;
 import roomescape.auth.Role;
 import roomescape.domain.Member;
 import roomescape.domain.repository.MemberRepository;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -41,7 +42,6 @@ public class MemberApiTest {
     void 회원가입_성공() {
         // given
         Map<String, Object> memberRequest = new HashMap<>();
-        memberRequest.put("date", "2026-08-05");
         memberRequest.put("name", "name1");
         memberRequest.put("email", "email@domain.com");
         memberRequest.put("password", "password1");

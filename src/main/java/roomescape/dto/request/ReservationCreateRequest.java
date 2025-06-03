@@ -1,6 +1,7 @@
 package roomescape.dto.request;
 
 import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDate;
 
 public record ReservationCreateRequest(
@@ -8,6 +9,7 @@ public record ReservationCreateRequest(
         @NotNull Long timeId,
         @NotNull Long themeId,
         @NotNull String paymentKey,
+        @NotNull String paymentType,
         @NotNull String orderId,
         @NotNull int amount
 ) {
