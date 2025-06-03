@@ -34,7 +34,7 @@ public class PaymentClient {
     public TossPaymentApproveResponse approvePayment(final PaymentApproveRequest paymentApproveRequest) {
         return restClient.post()
                 .uri(paymentClientProperties.getConfirmApi())
-                .header(AUTHORIZATION, BASIC + encode(encodingSecretKey))
+                .header(AUTHORIZATION, BASIC + encodingSecretKey)
                 .body(paymentApproveRequest)
                 .retrieve()
                 .onStatus(paymentApproveExceptionHandler)

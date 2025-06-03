@@ -1,5 +1,6 @@
 package roomescape.common.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +26,7 @@ public class PaymentClientConfig {
     }
 
     @Bean
-    PaymentApproveExceptionHandler paymentApproveExceptionHandler() {
-        return new PaymentApproveExceptionHandler();
+    PaymentApproveExceptionHandler paymentApproveExceptionHandler(ObjectMapper objectMapper) {
+        return new PaymentApproveExceptionHandler(objectMapper);
     }
 }
