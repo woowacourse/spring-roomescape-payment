@@ -3,6 +3,7 @@ package roomescape.infrastructure.payment.toss;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Base64;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
@@ -36,7 +37,7 @@ public class TossPaymentClient implements PaymentClient {
             restClient.post()
                     .uri("v1/payments/confirm")
                     .body(paymentApproveRequest)
-                    .header("Authorization", "Basic " + encodedSecretKey)
+                    .header(HttpHeaders.AUTHORIZATION, "Basic " + encodedSecretKey)
                     .retrieve()
                     .onStatus(HttpStatusCode::isError, this::handleError)
                     .toBodilessEntity();
