@@ -37,7 +37,7 @@ public class TossRestClientConfiguration {
 
     private ClientHttpRequestFactorySettings createRequestSettings() {
         return ClientHttpRequestFactorySettings.defaults()
-                .withConnectTimeout(Duration.ofSeconds(2))
-                .withReadTimeout(Duration.ofSeconds(3));
+                .withConnectTimeout(Duration.ofSeconds(1))
+                .withReadTimeout(Duration.ofSeconds(5));
     }
 }
