@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClient.Builder;
+import org.springframework.web.client.support.RestClientAdapter;
+import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 import roomescape.infrastructure.payment.toss.TossPaymentWithRestClient;
 import roomescape.infrastructure.payment.toss.exception.PaymentExceptionHandler;
 
@@ -24,14 +27,34 @@ public class TestPaymentConfig {
 
     @Bean
     public TossPaymentWithRestClient tossPaymentWithRestClient(RestClient.Builder builder) {
-        return new TossPaymentWithRestClient(builder
-                .baseUrl("https://api.tosspayments.com/v1/payments")
-                .defaultHeader(AUTHORIZATION_HEADER, AUTHORIZATION_SCHEME + encodeSecretKey())
-                .defaultStatusHandler(new PaymentExceptionHandler(mapper))
-                .build());
+        RestClient restClient = createRestClient(builder);
+
+        return createTossPaymentWithRestClient(restClient);
     }
 
+    public TossPaymentWithRestClient createTossPaymentWithRestClient(RestClient client) {
+        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builder()
+                .exchangeAdapter(RestClientAdapter.create(client))
+                .build();
+
+        return factory.createClient(TossPaymentWithRestClient.class);
+    }
+
+    private RestClient createRestClient(Builder builder) {
+        return builder
+                .baseUrl("https://api.tosspayments.com/v1/payments")
+                .defaultStatusHandler(new PaymentExceptionHandler(mapper))
+                .requestInterceptor((request, body, execution) -> {
+                    if (request.getURI().getPath().contains("/confirm")) {
+                        request.getHeaders().add(AUTHORIZATION_HEADER, AUTHORIZATION_SCHEME + encodeSecretKey());
+                    }
+                    return execution.execute(request, body);
+                })
+                .build();
+    }
+
+
     private String encodeSecretKey() {
-        return Base64.getEncoder().encodeToString("test-secret".getBytes());
+        return Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 }
