@@ -8,19 +8,19 @@ import org.springframework.web.client.RestClient;
 import roomescape.payment.global.domain.dto.PaymentRequestDto;
 import roomescape.payment.global.exception.InvalidPaymentException;
 import roomescape.payment.toss.domain.TossErrorResponse;
-import roomescape.payment.toss.domain.TossPayment;
+import roomescape.payment.global.domain.Payment;
 
 @Component
-public class TossRestClient {
+public class TossPaymentRestClient {
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public TossRestClient(RestClient tossPayRestClient) {
+    public TossPaymentRestClient(RestClient tossPayRestClient) {
         this.restClient = tossPayRestClient;
     }
 
-    public TossPayment confirmPayment(PaymentRequestDto requestDto) {
+    public Payment confirmPayment(PaymentRequestDto requestDto) {
 
         return restClient.post()
                 .uri("/v1/payments/confirm")
@@ -35,7 +35,7 @@ public class TossRestClient {
                             throw new InvalidPaymentException(error.message(), status);
                         }
                 )
-                .toEntity(TossPayment.class)
+                .toEntity(Payment.class)
                 .getBody();
     }
 }

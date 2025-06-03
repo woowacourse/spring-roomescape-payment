@@ -1,4 +1,4 @@
-package roomescape.payment.toss.domain;
+package roomescape.payment.global.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -6,7 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-public class TossPayment {
+public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,10 +17,10 @@ public class TossPayment {
 
     private String paymentType;
 
-    protected TossPayment() {
+    protected Payment() {
     }
 
-    public TossPayment(String paymentKey, String orderId, int amount, String paymentType) {
+    public Payment(String paymentKey, String orderId, int amount, String paymentType) {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
