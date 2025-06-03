@@ -38,7 +38,7 @@ public class TossPaymentClient implements PaymentClient {
                     .body(paymentApproveRequest)
                     .header("Authorization", "Basic " + encodedSecretKey)
                     .retrieve()
-                    .onStatus(HttpStatusCode::isError, (this::handleError))
+                    .onStatus(HttpStatusCode::isError, this::handleError)
                     .toBodilessEntity();
         } catch (ResourceAccessException exception) {
             throw new ExternalApiErrorException("토스 결제 승인에 대한 시간 초과가 발생했습니다.");
