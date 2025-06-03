@@ -1,8 +1,10 @@
 package roomescape.infrastructure;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
 import roomescape.common.exception.BadRequestException;
 import roomescape.common.exception.InternalServerErrorException;
@@ -30,7 +32,7 @@ public class TossPaymentClient {
     }
 
     // TODO: 결제 실패시 환불
-    @Retryable
+    @Retryable(retryFor = {HttpServerErrorException.class})
     public ResponseEntity<ConfirmPaymentResponse> postConfirmPayment(ConfirmPaymentRequest paymentRequest, UUID idempotencyKey) {
         return restClient.post()
                 .uri("/confirm")
