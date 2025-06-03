@@ -1,8 +1,8 @@
-package roomescape.config.dto;
+package roomescape.client.dto;
 
 import java.util.Set;
 
-public class RestClientErrorResponse {
+public class TossServerErrorResponse {
     private static final Set<String> INVISIBLE_CLIENT_ERROR_CODE = Set.of(
             "INVALID_API_KEY",
             "INVALID_AUTHORIZE_AUTH",
@@ -14,12 +14,12 @@ public class RestClientErrorResponse {
     private String code;
     private String message;
 
-    public RestClientErrorResponse(String code, String message) {
+    public TossServerErrorResponse(String code, String message) {
         this.code = code;
         this.message = message;
     }
 
-    protected RestClientErrorResponse() {
+    protected TossServerErrorResponse() {
     }
 
     public boolean isInvisibleError() {

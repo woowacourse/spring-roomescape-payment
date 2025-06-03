@@ -1,12 +1,11 @@
 package roomescape.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.config.dto.RestClientErrorResponse;
+import roomescape.client.dto.TossServerErrorResponse;
 import roomescape.dto.reservation.TossPaymentConfirmRequestDto;
 
 import java.util.Base64;
@@ -29,11 +28,12 @@ public class PaymentClient {
         this.objectMapper = objectMapper;
         this.restClient = restClient.mutate()
                 .defaultStatusHandler(HttpStatusCode::is4xxClientError, (req, res) -> {
-                    RestClientErrorResponse restClientErrorResponse = objectMapper.readValue(res.getBody(), RestClientErrorResponse.class);
-                    if (restClientErrorResponse.isInvisibleError()) {
+                    TossServerErrorResponse tossServerErrorResponse = this.objectMapper.readValue(
+                            res.getBody(), TossServerErrorResponse.class);
+                    if (tossServerErrorResponse.isInvisibleError()) {
                         throw new PaymentConfirmServerException();
                     }
-                    throw new PaymentConfirmClientException(restClientErrorResponse.getMessage());
+                    throw new PaymentConfirmClientException(tossServerErrorResponse.getMessage());
                 })
                 .defaultStatusHandler(HttpStatusCode::is5xxServerError, (req, res) -> {
                     throw new PaymentConfirmServerException();
