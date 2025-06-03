@@ -16,7 +16,7 @@ import roomescape.common.exception.NotFoundException;
 import roomescape.config.RestClientConfig;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
-import roomescape.infrastructure.TossPaymentClient;
+import roomescape.payment.infrastructure.TossPaymentClient;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.service.dto.request.ReservationCreateRequest;
 import roomescape.reservation.service.dto.response.ReservationResponse;

@@ -1,16 +1,15 @@
-package roomescape.infrastructure;
+package roomescape.payment.infrastructure;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
 import roomescape.common.exception.BadRequestException;
 import roomescape.common.exception.InternalServerErrorException;
-import roomescape.infrastructure.dto.PaymentFailure;
-import roomescape.infrastructure.dto.request.ConfirmPaymentRequest;
-import roomescape.infrastructure.dto.response.ConfirmPaymentResponse;
+import roomescape.payment.infrastructure.dto.PaymentFailure;
+import roomescape.payment.infrastructure.dto.request.ConfirmPaymentRequest;
+import roomescape.payment.infrastructure.dto.response.ConfirmPaymentResponse;
 
 import java.util.List;
 import java.util.UUID;

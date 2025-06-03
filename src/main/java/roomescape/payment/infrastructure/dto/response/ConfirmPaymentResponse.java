@@ -1,6 +1,6 @@
-package roomescape.infrastructure.dto.response;
+package roomescape.payment.infrastructure.dto.response;
 
-import roomescape.infrastructure.dto.PaymentFailure;
+import roomescape.payment.infrastructure.dto.PaymentFailure;
 
 public record ConfirmPaymentResponse(
         Integer totalAmount,
