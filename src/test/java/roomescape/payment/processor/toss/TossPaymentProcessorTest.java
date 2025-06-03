@@ -4,29 +4,25 @@ import java.util.Base64;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.client.RestClient;
 
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
 class TossPaymentProcessorTest {
 
     private static final String SECRET_KEY = "SecretKey";
     private static final String ENCODED_SECRET_KEY = Base64.getEncoder()
             .encodeToString((SECRET_KEY + ":base64").getBytes());
 
-    @Autowired
-    @Qualifier("testTossPaymentProcessor")
-    private TossPaymentProcessor paymentProcessor;
+    private final TossPaymentProcessor paymentProcessor;
 
-    @Autowired
-    private RestClient mockTestRestClient;
+    private final RestClient mockTestRestClient;
+
+    public TossPaymentProcessorTest() {
+        mockTestRestClient = Mockito.mock(RestClient.class);
+        paymentProcessor = new TossPaymentProcessor(SECRET_KEY, mockTestRestClient);
+    }
 
     @Test
     void 토스_결제_요청에_따른_반환_확인() {
@@ -40,35 +36,22 @@ class TossPaymentProcessorTest {
                 "orderId",
                 "paymentKey"
         );
-        final String confirmUri = "/confirm";
 
-        when(mockTestRestClient.post()
-                .uri(confirmUri)
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Basic " + ENCODED_SECRET_KEY)
-                .body(request)
-                .retrieve()
-                .body(TossPaymentConfirmResponse.class)
-        ).thenReturn(expected);
+        RestClient.RequestBodyUriSpec uriSpec = Mockito.mock(RestClient.RequestBodyUriSpec.class);
+        RestClient.RequestBodySpec bodySpec = Mockito.mock(RestClient.RequestBodySpec.class);
+        RestClient.ResponseSpec responseSpec = Mockito.mock(RestClient.ResponseSpec.class);
+
+        when(mockTestRestClient.post()).thenReturn(uriSpec);
+        when(uriSpec.uri("/confirm")).thenReturn(bodySpec);
+        when(bodySpec.header(HttpHeaders.AUTHORIZATION, "Basic " + ENCODED_SECRET_KEY)).thenReturn(bodySpec);
+        when(bodySpec.body(request)).thenReturn(bodySpec);
+        when(bodySpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.body(TossPaymentConfirmResponse.class)).thenReturn(expected);
 
         // when
         final TossPaymentConfirmResponse actual = paymentProcessor.processPayment(request);
 
         // then
         Assertions.assertThat(actual).isEqualTo(expected);
-    }
-
-    @TestConfiguration
-    static class TestTossPaymentConfig {
-
-        @Bean
-        public RestClient mockTestRestClient() {
-            return Mockito.mock(RestClient.class, Mockito.RETURNS_DEEP_STUBS);
-        }
-
-        @Bean(name = "testTossPaymentProcessor")
-        public TossPaymentProcessor paymentProcessor(final RestClient mockTestRestClient) {
-            return new TossPaymentProcessor(SECRET_KEY, mockTestRestClient);
-        }
     }
 }
