@@ -33,19 +33,19 @@ public class Reservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     private Long userId;
 
     @Embedded
     @AttributeOverride(
             name = ReservationDate.Fields.value,
-            column = @Column(name = Fields.date))
+            column = @Column(name = Fields.date, nullable = false))
     private ReservationDate date;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private ReservationTime time;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Theme theme;
 
     private Reservation(final Long userId,

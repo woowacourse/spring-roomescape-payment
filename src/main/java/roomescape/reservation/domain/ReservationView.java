@@ -55,17 +55,18 @@ public class ReservationView {
     @Column
     private String compositeId;
 
-    @Column
+    @Column(nullable = false)
     private Long userId;
 
     @Embedded
-    @AttributeOverride(name = ReservationDate.Fields.value, column = @Column(name = Fields.date))
+    @AttributeOverride(name = ReservationDate.Fields.value,
+            column = @Column(name = Fields.date, nullable = false))
     private ReservationDate date;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private ReservationTime time;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Theme theme;
 
     @Enumerated(EnumType.STRING)

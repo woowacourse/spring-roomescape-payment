@@ -29,10 +29,10 @@ public class WaitingReservation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(name = "waiting_order")
+    @Column(name = "waiting_order", nullable = false)
     private int waitingOrder;
 
     @Embedded
@@ -41,10 +41,10 @@ public class WaitingReservation {
             column = @Column(name = Reservation.Fields.date))
     private ReservationDate date;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private ReservationTime time;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Theme theme;
 
     private WaitingReservation(final Long userId,

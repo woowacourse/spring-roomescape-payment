@@ -33,26 +33,26 @@ public class User {
     @Embedded
     @AttributeOverride(
             name = UserName.Fields.value,
-            column = @Column(name = Fields.name)
+            column = @Column(name = Fields.name, nullable = false)
     )
     private UserName name;
 
     @Embedded
     @AttributeOverride(
             name = Email.Fields.value,
-            column = @Column(name = Fields.email)
+            column = @Column(name = Fields.email, nullable = false)
     )
     private Email email;
 
     @Embedded
     @AttributeOverride(
             name = Password.Fields.encodedValue,
-            column = @Column(name = Fields.password)
+            column = @Column(name = Fields.password, nullable = false)
     )
     private Password password;
 
     @Enumerated(value = EnumType.STRING)
-    @Column(name = Fields.role)
+    @Column(name = Fields.role, nullable = false)
     private UserRole role;
 
     private User(final UserName name, final Email email, final Password password, final UserRole role) {

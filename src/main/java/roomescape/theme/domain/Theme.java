@@ -29,19 +29,19 @@ public class Theme {
     @Embedded
     @AttributeOverride(
             name = ThemeName.Fields.value,
-            column = @Column(name = Fields.name))
+            column = @Column(name = Fields.name, nullable = false))
     private ThemeName name;
 
     @Embedded
     @AttributeOverride(
             name = ThemeDescription.Fields.value,
-            column = @Column(name = Fields.description))
+            column = @Column(name = Fields.description, nullable = false))
     private ThemeDescription description;
 
     @Embedded
     @AttributeOverride(
             name = ThemeThumbnail.Fields.value,
-            column = @Column(name = Fields.thumbnail))
+            column = @Column(name = Fields.thumbnail, nullable = false))
     private ThemeThumbnail thumbnail;
 
     public Theme(final Long id,
