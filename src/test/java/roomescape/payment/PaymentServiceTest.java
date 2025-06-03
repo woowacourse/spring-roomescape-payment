@@ -1,0 +1,103 @@
+package roomescape.payment;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
+import roomescape.fixture.MemberFixture;
+import roomescape.member.domain.Member;
+import roomescape.member.domain.repository.MemberRepository;
+import roomescape.member.infrastructure.MemberRepositoryAdapter;
+import roomescape.payment.application.PaymentService;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.infrastructure.PaymentRepositoryAdapter;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationDate;
+import roomescape.reservation.domain.ReservationSpec;
+import roomescape.reservation.domain.repository.ReservationRepository;
+import roomescape.reservation.infrastructure.ReservationRepositoryAdapter;
+import roomescape.reservationTime.domain.ReservationTime;
+import roomescape.reservationTime.domain.respository.ReservationTimeRepository;
+import roomescape.reservationTime.infrastructure.ReservationTimeRepositoryAdapter;
+import roomescape.theme.domain.Theme;
+import roomescape.theme.domain.repository.ThemeRepository;
+import roomescape.theme.infrastructure.ThemeRepositoryAdapter;
+
+@ExtendWith(MockitoExtension.class)
+@ActiveProfiles("test")
+@DataJpaTest
+@Import({
+        PaymentService.class,
+        PaymentRepositoryAdapter.class,
+        ReservationRepositoryAdapter.class,
+        ThemeRepositoryAdapter.class,
+        ReservationTimeRepositoryAdapter.class,
+        MemberRepositoryAdapter.class
+})
+public class PaymentServiceTest {
+    @Autowired
+    private PaymentService paymentService;
+    @Autowired
+    private ReservationRepository reservationRepository;
+    @Autowired
+    private ThemeRepository themeRepository;
+    @Autowired
+    private MemberRepository memberRepository;
+    @Autowired
+    private ReservationTimeRepository timeRepository;
+
+    @DisplayName("결제 저장 - 성공")
+    @Test
+    void create_success() {
+        // given
+        // 결제 paymentKey 설정
+        String key = "qwer1234";
+        // 가격 설정
+        BigDecimal amount = BigDecimal.valueOf(1000L);
+        // given
+        // 회원 생성 및 저장
+        Member member = MemberFixture.createMember("에드", "ed@example.com", "password123");
+        memberRepository.save(member);
+        Long memberId = member.getId();
+
+        // 오전 10시 예약 시간 생성 및 저장
+        ReservationTime time = new ReservationTime(LocalTime.of(10, 0));
+        timeRepository.save(time);
+
+        // 테마 생성 및 저장
+        Theme theme = new Theme("테마", "설명", "썸네일");
+        themeRepository.save(theme);
+
+        // 내일 날짜로 예약 날짜 설정
+        LocalDate date = LocalDate.now().plusDays(1);
+        // 예약 스펙 생성 (날짜, 시간, 테마)
+        ReservationSpec spec = new ReservationSpec(new ReservationDate(date), time, theme);
+
+        // 회원으로 예약 생성 및 저장
+        Reservation reservation = new Reservation(member, spec);
+        reservationRepository.save(reservation);
+        Reservation paymentReservation = reservationRepository.save(reservation);
+        // 결제 객체 생성
+        Payment payment = new Payment(key, amount, paymentReservation);
+
+        // when
+        Payment resultPayment = paymentService.save(payment);
+
+        // then
+        assertThat(resultPayment).isNotNull();
+        assertThat(resultPayment.getId()).isNotNull();
+        assertThat(resultPayment.getPaymentKey()).isEqualTo(key);
+        assertThat(resultPayment.getAmount()).isEqualByComparingTo(amount);
+        assertThat(resultPayment.getReservation()).isEqualTo(paymentReservation);
+    }
+
+}
