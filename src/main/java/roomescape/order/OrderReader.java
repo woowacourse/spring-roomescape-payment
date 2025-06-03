@@ -1,11 +1,11 @@
 package roomescape.order;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import roomescape.exception.custom.reason.order.OrderNotFoundException;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class OrderReader {
 
     private final OrderRepository orderRepository;

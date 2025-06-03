@@ -1,7 +1,7 @@
 package roomescape.booking.reservation;
 
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/reservations")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ReservationController {
 
     private final ReservationService reservationService;

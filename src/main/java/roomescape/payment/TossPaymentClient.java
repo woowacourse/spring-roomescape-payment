@@ -1,6 +1,6 @@
 package roomescape.payment;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +12,7 @@ import roomescape.payment.dto.PaymentConfirmRequest;
 import java.util.Base64;
 
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TossPaymentClient {
 
     private static final String TEST_WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:";

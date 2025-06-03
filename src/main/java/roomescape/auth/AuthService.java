@@ -1,6 +1,6 @@
 package roomescape.auth;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.auth.dto.LoginRequest;
 import roomescape.exception.custom.reason.auth.AuthNotExistsEmailException;
@@ -9,7 +9,7 @@ import roomescape.member.Member;
 import roomescape.member.MemberRepository;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthService {
 
     private final MemberRepository memberRepository;

@@ -1,6 +1,6 @@
 package roomescape.config;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -11,7 +11,7 @@ import roomescape.auth.AuthorizationAdminInterceptor;
 import java.util.List;
 
 @Configuration
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class WebMvcConfiguration implements WebMvcConfigurer {
 
     private final AuthenticationPrincipalArgumentResolver authenticationPrincipalArgumentResolver;

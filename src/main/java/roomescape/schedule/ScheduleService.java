@@ -1,6 +1,6 @@
 package roomescape.schedule;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.custom.reason.schedule.ScheduleConflictException;
@@ -15,7 +15,7 @@ import roomescape.theme.ThemeService;
 import java.time.LocalDate;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;

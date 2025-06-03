@@ -1,6 +1,6 @@
 package roomescape.booking.waiting;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.booking.waiting.dto.WaitingResponse;
@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/admin/waitings")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AdminWaitingController {
 
     private final WaitingService waitingService;

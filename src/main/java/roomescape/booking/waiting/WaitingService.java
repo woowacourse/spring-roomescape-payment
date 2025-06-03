@@ -1,6 +1,6 @@
 package roomescape.booking.waiting;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
@@ -12,7 +12,7 @@ import roomescape.schedule.Schedule;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class WaitingService {
 
     private final WaitingRepository waitingRepository;

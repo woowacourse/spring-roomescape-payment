@@ -1,7 +1,7 @@
 package roomescape.theme;
 
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.theme.dto.ThemeRequest;
@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/themes")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ThemeController {
 
     private final ThemeService themeService;

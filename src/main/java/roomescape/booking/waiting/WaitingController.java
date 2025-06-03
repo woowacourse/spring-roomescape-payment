@@ -1,7 +1,7 @@
 package roomescape.booking.waiting;
 
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +12,7 @@ import roomescape.booking.waiting.dto.WaitingResponse;
 
 @RestController
 @RequestMapping("/waitings")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class WaitingController {
 
     private final WaitingService waitingService;

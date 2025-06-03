@@ -1,10 +1,10 @@
 package roomescape.auth;
 
 import io.jsonwebtoken.Claims;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import roomescape.member.MemberRole;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class TokenBody {
 
     private final Claims claims;

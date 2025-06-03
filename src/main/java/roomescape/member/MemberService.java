@@ -1,6 +1,6 @@
 package roomescape.member;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.custom.reason.member.MemberEmailConflictException;
@@ -11,7 +11,7 @@ import roomescape.member.dto.MemberResponse;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class MemberService {
 
     private final MemberRepository memberRepository;

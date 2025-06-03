@@ -1,7 +1,7 @@
 package roomescape.order;
 
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.auth.dto.LoginMember;
 import roomescape.member.Member;
@@ -11,7 +11,7 @@ import roomescape.schedule.Schedule;
 import roomescape.schedule.ScheduleService;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class OrderService {
 
     private final ScheduleService scheduleService;

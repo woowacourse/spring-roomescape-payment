@@ -1,7 +1,7 @@
 package roomescape.auth;
 
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ import roomescape.auth.dto.LoginRequest;
 import roomescape.auth.dto.LoginResponse;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthController {
 
     private static final String TOKEN_NAME = "token";
