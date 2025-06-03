@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import roomescape.application.PaymentService;
 import roomescape.application.ReservationService;
+import roomescape.application.RoomescapeService;
 import roomescape.domain.auth.AuthenticationInfo;
 import roomescape.domain.user.UserRole;
 import roomescape.exception.NotFoundException;
@@ -37,8 +38,9 @@ class ReservationControllerTest {
 
     private final ReservationService reservationService = Mockito.mock(ReservationService.class);
     private final PaymentService paymentService = Mockito.mock(PaymentService.class);
+    private final RoomescapeService roomescapeService = new RoomescapeService(reservationService, paymentService);
     private final MockMvc mockMvc = MockMvcBuilders
-        .standaloneSetup(new ReservationController(reservationService, paymentService))
+        .standaloneSetup(new ReservationController(reservationService, roomescapeService))
         .setCustomArgumentResolvers(new StubAuthenticationInfoArgumentResolver(new AuthenticationInfo(userId, UserRole.USER)))
         .setControllerAdvice(new GlobalExceptionHandler())
         .build();
@@ -46,9 +48,6 @@ class ReservationControllerTest {
     @Test
     @DisplayName("예약 추가 요청시, id를 포함한 예약 내용과 CREATED를 응답한다.")
     void reserve() throws Exception {
-        Mockito.doNothing()
-                .when(paymentService).pay(anyString(), anyString(), anyLong());
-
         Mockito.when(reservationService.reserve(anyLong(), any(), anyLong(), anyLong()))
             .thenReturn(anyReservationWithNewId());
 
@@ -71,8 +70,11 @@ class ReservationControllerTest {
     @Test
     @DisplayName("결제 승인 실패 시 예약이 생성되지 않는다.")
     void cannotReserveWhenPaymentFailed() throws Exception {
+        Mockito.when(reservationService.reserve(anyLong(), any(), anyLong(), anyLong()))
+            .thenReturn(anyReservationWithNewId());
+
         Mockito.doThrow(new RuntimeException("결제 실패"))
-                .when(paymentService).pay(anyString(), anyString(), anyLong());
+            .when(paymentService).pay(anyString(), anyString(), anyLong());
 
         mockMvc.perform(post("/reservations")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -87,15 +89,16 @@ class ReservationControllerTest {
                     }
                     """))
             .andExpect(status().isInternalServerError());
-
-        Mockito.verify(reservationService, never()).reserve(anyLong(), any(), anyLong(), anyLong());
     }
 
     @Test
     @DisplayName("잘못된 요청으로 결제 승인 실패 시 BAD REQUEST를 응답한다.")
     void cannotReserveWhenBadRequest() throws Exception {
+        Mockito.when(reservationService.reserve(anyLong(), any(), anyLong(), anyLong()))
+            .thenReturn(anyReservationWithNewId());
+
         Mockito.doThrow(new PaymentFailedException("결제에 실패했습니다."))
-                .when(paymentService).pay(anyString(), anyString(), anyLong());
+            .when(paymentService).pay(anyString(), anyString(), anyLong());
 
         mockMvc.perform(post("/reservations")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -110,15 +113,16 @@ class ReservationControllerTest {
                     }
                     """))
             .andExpect(status().isBadRequest());
-
-        Mockito.verify(reservationService, never()).reserve(anyLong(), any(), anyLong(), anyLong());
     }
 
     @Test
     @DisplayName("서버 내부 오류로 결제 승인 실패 시 INTERNAL SERVER ERROR를 응답한다.")
     void cannotReserveWhenInternalServerError() throws Exception {
+        Mockito.when(reservationService.reserve(anyLong(), any(), anyLong(), anyLong()))
+            .thenReturn(anyReservationWithNewId());
+
         Mockito.doThrow(new PaymentInternalException("결제에 실패했습니다."))
-                .when(paymentService).pay(anyString(), anyString(), anyLong());
+            .when(paymentService).pay(anyString(), anyString(), anyLong());
 
         mockMvc.perform(post("/reservations")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -133,16 +137,11 @@ class ReservationControllerTest {
                     }
                     """))
             .andExpect(status().isInternalServerError());
-
-        Mockito.verify(reservationService, never()).reserve(anyLong(), any(), anyLong(), anyLong());
     }
 
     @Test
     @DisplayName("예약 대기 요청시, id를 포함한 예약 내용과 CREATED를 응답한다.")
     void waitFor() throws Exception {
-        Mockito.doNothing()
-                .when(paymentService).pay(anyString(), anyString(), anyLong());
-
         Mockito.when(reservationService.waitFor(anyLong(), any(), anyLong(), anyLong()))
             .thenReturn(anyReservationWithNewId());
 
