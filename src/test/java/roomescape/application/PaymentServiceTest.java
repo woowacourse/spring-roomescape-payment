@@ -14,8 +14,8 @@ import roomescape.domain.payment.PaymentConfirmation;
 import roomescape.domain.payment.PaymentDetails;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
-import roomescape.domain.payment.PaymentStatus;
-import roomescape.domain.payment.PaymentStatusCode;
+import roomescape.domain.payment.TransactionStatus;
+import roomescape.domain.payment.TransactionStatusCode;
 import roomescape.exception.PaymentFailedException;
 import roomescape.exception.PaymentInternalException;
 
@@ -40,10 +40,10 @@ class PaymentServiceTest {
     @ParameterizedTest
     @DisplayName("결제 실패 시 예외가 발생한다.")
     @MethodSource("failToPaySource")
-    void failToPay(final PaymentStatusCode code, final Class<?> expectedException) {
+    void failToPay(final TransactionStatusCode code, final Class<?> expectedException) {
         // given
         var request = new PaymentRequest("a", "1", 1000);
-        var paymentDetails = new PaymentDetails(PaymentStatus.fail(code, "결제 실패"));
+        var paymentDetails = new PaymentDetails(TransactionStatus.fail(code, "결제 실패"));
 
         Mockito.when(paymentProvider.confirm(request)).thenReturn(paymentDetails);
 
@@ -53,9 +53,9 @@ class PaymentServiceTest {
 
     private static Stream<Arguments> failToPaySource() {
         return Stream.of(
-            Arguments.of(PaymentStatusCode.FAILED_PAYMENT, PaymentFailedException.class),
-            Arguments.of(PaymentStatusCode.INVALID_AUTH_CREDENTIALS, PaymentInternalException.class),
-            Arguments.of(PaymentStatusCode.FAILED_INTERNAL_PROCESSING, PaymentInternalException.class)
+            Arguments.of(TransactionStatusCode.FAILED_PAYMENT, PaymentFailedException.class),
+            Arguments.of(TransactionStatusCode.INVALID_AUTH_CREDENTIALS, PaymentInternalException.class),
+            Arguments.of(TransactionStatusCode.FAILED_INTERNAL_PROCESSING, PaymentInternalException.class)
         );
     }
 }

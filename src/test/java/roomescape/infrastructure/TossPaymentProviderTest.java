@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static roomescape.domain.payment.PaymentStatusCode.FAILED_INTERNAL_PROCESSING;
-import static roomescape.domain.payment.PaymentStatusCode.INVALID_AUTH_CREDENTIALS;
+import static roomescape.domain.payment.TransactionStatusCode.FAILED_INTERNAL_PROCESSING;
+import static roomescape.domain.payment.TransactionStatusCode.INVALID_AUTH_CREDENTIALS;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
@@ -22,7 +22,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
-import roomescape.domain.payment.PaymentStatusCode;
+import roomescape.domain.payment.TransactionStatusCode;
 
 @RestClientTest(PaymentProvider.class)
 @Import(TossPaymentConfig.class)
@@ -75,14 +75,14 @@ class TossPaymentProviderTest {
         assertAll(
             () -> assertThat(paymentDetails.confirmation()).isNotNull(),
             () -> assertThat(paymentDetails.isFailed()).isFalse(),
-            () -> assertThat(paymentDetails.status().code()).isEqualTo(PaymentStatusCode.SUCCEEDED_PAYMENT)
+            () -> assertThat(paymentDetails.status().code()).isEqualTo(TransactionStatusCode.SUCCEEDED_PAYMENT)
         );
     }
 
     @ParameterizedTest
     @DisplayName("결제 승인 실패하면 실패에 관한 결제 세부사항을 얻는다")
     @MethodSource("confirmPaymentFailedSource")
-    void confirmPaymentFailed(final String response, final PaymentStatusCode expectedStatusCode) {
+    void confirmPaymentFailed(final String response, final TransactionStatusCode expectedStatusCode) {
         // given
         var request = new PaymentRequest("a", "1", 1000);
 

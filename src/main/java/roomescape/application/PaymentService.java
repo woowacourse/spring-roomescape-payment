@@ -5,7 +5,8 @@ import org.springframework.stereotype.Service;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.domain.payment.PaymentStatus;
-import roomescape.domain.payment.PaymentStatusCode;
+import roomescape.domain.payment.TransactionStatus;
+import roomescape.domain.payment.TransactionStatusCode;
 import roomescape.exception.PaymentFailedException;
 import roomescape.exception.PaymentInternalException;
 
@@ -24,8 +25,8 @@ public class PaymentService {
         }
     }
 
-    private void throwPaymentException(final PaymentStatus status) {
-        if (PaymentStatusCode.FAILED_PAYMENT.equals(status.code())) {
+    private void throwPaymentException(final TransactionStatus status) {
+        if (TransactionStatusCode.FAILED_PAYMENT.equals(status.code())) {
             throw new PaymentFailedException(status.message());
         }
         throw new PaymentInternalException(status.message());

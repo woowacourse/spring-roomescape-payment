@@ -1,8 +1,8 @@
 package roomescape.infrastructure;
 
-import static roomescape.domain.payment.PaymentStatusCode.FAILED_INTERNAL_PROCESSING;
-import static roomescape.domain.payment.PaymentStatusCode.FAILED_PAYMENT;
-import static roomescape.domain.payment.PaymentStatusCode.INVALID_AUTH_CREDENTIALS;
+import static roomescape.domain.payment.TransactionStatusCode.FAILED_INTERNAL_PROCESSING;
+import static roomescape.domain.payment.TransactionStatusCode.FAILED_PAYMENT;
+import static roomescape.domain.payment.TransactionStatusCode.INVALID_AUTH_CREDENTIALS;
 
 import java.io.IOException;
 import java.util.Map;
@@ -13,14 +13,14 @@ import roomescape.domain.payment.PaymentConfirmation;
 import roomescape.domain.payment.PaymentDetails;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
-import roomescape.domain.payment.PaymentStatus;
-import roomescape.domain.payment.PaymentStatusCode;
+import roomescape.domain.payment.TransactionStatus;
+import roomescape.domain.payment.TransactionStatusCode;
 
 public class TossPaymentProvider implements PaymentProvider {
 
     private final RestClient tossRestClient;
     private final String authorizationValue;
-    private final Map<String, PaymentStatusCode> tossFailureCodes;
+    private final Map<String, TransactionStatusCode> tossFailureCodes;
 
     public TossPaymentProvider(final RestClient.Builder builder, final String authorizationValue) {
         this.tossRestClient = builder.build();
@@ -49,12 +49,12 @@ public class TossPaymentProvider implements PaymentProvider {
         return new PaymentDetails(status);
     }
 
-    private PaymentStatus convertToStatus(final FailureResponse tossResponse) {
+    private TransactionStatus convertToStatus(final FailureResponse tossResponse) {
         var failureCode = tossFailureCodes.getOrDefault(tossResponse.code(), FAILED_PAYMENT);
-        return PaymentStatus.fail(failureCode, tossResponse.message());
+        return TransactionStatus.fail(failureCode, tossResponse.message());
     }
 
-    private Map<String, PaymentStatusCode> initializeFailureCode() {
+    private Map<String, TransactionStatusCode> initializeFailureCode() {
         return Map.ofEntries(
                 Map.entry("INVALID_API_KEY", INVALID_AUTH_CREDENTIALS),
                 Map.entry("UNAUTHORIZED_KEY", INVALID_AUTH_CREDENTIALS),

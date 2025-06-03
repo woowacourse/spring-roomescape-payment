@@ -2,14 +2,14 @@ package roomescape.domain.payment;
 
 public record PaymentDetails(
         PaymentConfirmation confirmation,
-        PaymentStatus status
+        TransactionStatus status
 ) {
 
     public PaymentDetails(final PaymentConfirmation confirmation) {
-        this(confirmation, PaymentStatus.succeed());
+        this(confirmation, TransactionStatus.succeed());
     }
 
-    public PaymentDetails(final PaymentStatus status) {
+    public PaymentDetails(final TransactionStatus status) {
         this(null, status);
     }
 
