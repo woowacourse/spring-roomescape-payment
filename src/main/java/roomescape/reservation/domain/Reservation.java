@@ -59,40 +59,37 @@ public class Reservation {
         allocateOrderId(orderId);
     }
 
-    public static Reservation createFirstReservation(final Member member, final ReservationSlot reservationSlot,
-                                                     final String orderId) {
-        Reservation reservation = new Reservation(member, reservationSlot, orderId);
-        reservation.setReservationStatus(ReservationStatus.PENDING_PAYMENT);
-        return reservation;
-    }
-
     protected Reservation() {
     }
 
     public boolean isReserved() {
-        return reservationSlot.findHighestPriorityMember().equals(member);
+        return reservationSlot.findHighestPriorityReservation().equals(this);
+    }
+
+    public boolean isFailed() {
+        return this.reservationStatus == ReservationStatus.FAILED;
     }
 
     public void waitForPayment() {
         if (this.reservationStatus != ReservationStatus.REQUESTED) {
             throw new ReservationStatusException("결제 대기 상태로 변경 불가능합니다.");
         }
-        this.reservationStatus = ReservationStatus.PENDING_PAYMENT;
     }
 
     public void confirm(final Payment payment) {
-        if (this.reservationStatus != ReservationStatus.PENDING_PAYMENT) {
+        if (this.reservationStatus == ReservationStatus.CONFIRMED) {
             throw new ReservationStatusException("확정할 수 없는 상태입니다.");
         }
         this.reservationStatus = ReservationStatus.CONFIRMED;
         this.payment = payment;
     }
 
-    public void paymentFailed() {
-        if (this.reservationStatus != ReservationStatus.PENDING_PAYMENT) {
+    public void paymentFailed(final Payment payment) {
+        if (this.reservationStatus != ReservationStatus.REQUESTED) {
             throw new ReservationStatusException("취소할 수 없는 상태입니다.");
         }
         this.reservationStatus = ReservationStatus.FAILED;
+        this.payment = payment;
     }
 
     private void allocateOrderId(final String orderId) {
@@ -138,6 +135,14 @@ public class Reservation {
 
     public void setReservationStatus(final ReservationStatus reservationStatus) {
         this.reservationStatus = reservationStatus;
+    }
+
+    public ReservationStatus getReservationStatus() {
+        return reservationStatus;
+    }
+
+    public Payment getPayment() {
+        return payment;
     }
 }
 

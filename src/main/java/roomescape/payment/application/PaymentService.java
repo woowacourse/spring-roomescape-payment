@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import roomescape.payment.application.client.PaymentClient;
 import roomescape.payment.application.infrastructure.PaymentRepository;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentType;
 import roomescape.payment.exception.PaymentApproveException;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
 import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
@@ -25,13 +26,15 @@ public class PaymentService {
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
-    public PaymentApproveResponse approvePayment(final PaymentApproveRequest paymentApproveRequest) {
+    public PaymentApproveResponse approvePayment(final PaymentApproveRequest request) {
+        Payment payment = new Payment(request.paymentKey(), request.orderId(), request.amount(), PaymentType.NORMAL);
+        Payment savedPayment = paymentRepository.save(payment);
         try {
-            PaymentApproveResponse paymentApproveResponse = paymentClient.approvePayment(paymentApproveRequest);
-            applicationEventPublisher.publishEvent(PaymentApprovedEvent.from(paymentApproveRequest));
+            PaymentApproveResponse paymentApproveResponse = paymentClient.approvePayment(request);
+            applicationEventPublisher.publishEvent(PaymentApprovedEvent.from(request, savedPayment));
             return paymentApproveResponse;
         } catch (PaymentApproveException e) {
-            applicationEventPublisher.publishEvent(PaymentFailedEvent.from(paymentApproveRequest));
+            applicationEventPublisher.publishEvent(PaymentFailedEvent.from(request, savedPayment));
             throw e;
         }
     }
