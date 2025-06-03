@@ -1,0 +1,30 @@
+spring:
+  h2:
+    console:
+      enabled: true
+  http:
+    client:
+      read-timeout: 30000
+      connect-timeout: 3000
+  sql:
+    init:
+      data-locations: classpath:init_data.sql
+
+  datasource:
+    url: jdbc:h2:mem:database
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: create
+    defer-datasource-initialization: true
+    open-in-view: false
+
+secret:
+  jwt-key: regjeoigjroigji3j2io3io4h2bjasbdjaksbdkjqu3hu23hru3rhashudhausdhas
+  jwt-expiration: 3600_000
+  toss-payment-key: Basic dGVzdF9nc2tfZG9jc19PYVB6OEw1S2RtUVhrelJ6M3k0N0JNdzY6
+

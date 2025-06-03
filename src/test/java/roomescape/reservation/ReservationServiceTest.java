@@ -1,0 +1,1199 @@
+package roomescape.reservation;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.only;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import roomescape.domain.auth.dto.LoginMember;
+import roomescape.domain.reservation.ReservationService;
+import roomescape.infrastructure.reservation.TossPaymentManager;
+import roomescape.infrastructure.common.TimeManager;
+import roomescape.domain.reservation.dto.payment.PaymentRequest;
+import roomescape.exception.custom.reason.payment.PaymentConfirmException;
+import roomescape.exception.custom.reason.reservation.ReservationConflictException;
+import roomescape.exception.custom.reason.reservation.ReservationNotExistsMemberException;
+import roomescape.exception.custom.reason.reservation.ReservationNotExistsPendingException;
+import roomescape.exception.custom.reason.reservation.ReservationNotExistsThemeException;
+import roomescape.exception.custom.reason.reservation.ReservationNotExistsTimeException;
+import roomescape.exception.custom.reason.reservation.ReservationNotFoundException;
+import roomescape.exception.custom.reason.reservation.ReservationPastDateException;
+import roomescape.exception.custom.reason.reservation.ReservationPastTimeException;
+import roomescape.domain.member.Member;
+import roomescape.domain.member.MemberRole;
+import roomescape.infrastructure.member.MemberRepositoryImpl;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationDate;
+import roomescape.domain.reservation.ReservationStatus;
+import roomescape.domain.reservation.dto.AdminFilterReservationRequest;
+import roomescape.domain.reservation.dto.AdminReservationRequest;
+import roomescape.domain.reservation.dto.MineReservationResponse;
+import roomescape.domain.reservation.dto.ReservationPaymentRequest;
+import roomescape.domain.reservation.dto.ReservationRequest;
+import roomescape.domain.reservation.dto.ReservationResponse;
+import roomescape.domain.reservation.ReservationRepository;
+import roomescape.infrastructure.reservation.ReservationRepositoryImpl;
+import roomescape.domain.reservationtime.ReservationTime;
+import roomescape.domain.reservationtime.ReservationTimeRepository;
+import roomescape.infrastructure.reservationtime.ReservationTimeRepositoryImpl;
+import roomescape.domain.theme.Theme;
+import roomescape.infrastructure.theme.ThemeRepositoryImpl;
+
+@DataJpaTest
+@Sql(scripts = "classpath:/initialize_database.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Import({
+        MemberRepositoryImpl.class,
+        ThemeRepositoryImpl.class,
+        ReservationTimeRepositoryImpl.class,
+        ReservationRepositoryImpl.class,
+        ReservationService.class
+})
+@Transactional(propagation = Propagation.SUPPORTS)
+public class ReservationServiceTest {
+
+    @MockitoSpyBean
+    private final ReservationRepository reservationRepository;
+    @MockitoBean
+    private final TossPaymentManager paymentManager;
+    @MockitoBean
+    private final TimeManager timeManager;
+    private final ReservationService reservationService;
+
+    private final ReservationTimeRepository reservationTimeRepository;
+    private final ThemeRepositoryImpl themeRepositoryFacade;
+    private final MemberRepositoryImpl memberRepositoryFacade;
+
+    @Autowired
+    public ReservationServiceTest(
+            final ReservationRepository reservationRepository,
+            final ReservationService reservationService,
+            final TossPaymentManager paymentManager,
+            final TimeManager timeManager,
+
+            final ReservationTimeRepository reservationTimeRepository,
+            final ThemeRepositoryImpl themeRepositoryFacade,
+            final MemberRepositoryImpl memberRepositoryFacade
+    ) {
+        this.reservationRepository = reservationRepository;
+        this.paymentManager = paymentManager;
+        this.reservationService = reservationService;
+        this.timeManager = timeManager;
+
+        this.reservationTimeRepository = reservationTimeRepository;
+        this.themeRepositoryFacade = themeRepositoryFacade;
+        this.memberRepositoryFacade = memberRepositoryFacade;
+
+    }
+
+    @Nested
+    @DisplayName("예약 생성")
+    class Create {
+
+        @DisplayName("reservation request를 생성하면 response 값을 반환한다.")
+        @Test
+        void create() {
+            // given
+            // given - database
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+            final Theme theme = new Theme("야당", "야당당", "123");
+
+            memberRepositoryFacade.save(member);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
+            final ReservationPaymentRequest request = new ReservationPaymentRequest(
+                    new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
+                    new PaymentRequest("BOOSTA-ORDER-001", "dummy-payment-key", 10000L, "CARD")
+            );
+            final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
+
+            // when
+            final ReservationResponse actual = reservationService.create(request, loginMember);
+
+            // then
+            assertSoftly(s -> {
+                s.assertThat(actual.id()).isNotNull();
+                s.assertThat(actual.theme().name()).isEqualTo("야당");
+                s.assertThat(actual.theme().description()).isEqualTo("야당당");
+                s.assertThat(actual.theme().thumbnail()).isEqualTo("123");
+                s.assertThat(actual.date()).isEqualTo(LocalDate.of(2025, 12, 30));
+                s.assertThat(actual.time().startAt()).isEqualTo(LocalTime.of(12, 40));
+                s.assertThat(actual.member().name()).isEqualTo("boogie");
+            });
+        }
+
+        @DisplayName("테마가 존재하지 않으면 예외가 발생한다.")
+        @Test
+        void create1() {
+            // given
+            // given - database
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+
+            memberRepositoryFacade.save(member);
+            reservationTimeRepository.save(reservationTime);
+
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
+            final ReservationPaymentRequest request = new ReservationPaymentRequest(
+                new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
+                new PaymentRequest("BOOSTA-ORDER-002", "dummy-payment-key", 10000L, "CARD")
+            );
+            final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
+
+            // when & then
+            assertThatThrownBy(() -> {
+                reservationService.create(request, loginMember);
+            }).isInstanceOf(ReservationNotExistsThemeException.class);
+        }
+
+        @DisplayName("시간이 존재하지 않으면 예외가 발생한다.")
+        @Test
+        void create2() {
+            // given
+            // given - database
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final Theme theme = new Theme("야당", "야당당", "123");
+            memberRepositoryFacade.save(member);
+            themeRepositoryFacade.save(theme);
+
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
+            final ReservationPaymentRequest request = new ReservationPaymentRequest(
+                new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
+                new PaymentRequest("BOOSTA-ORDER-003", "dummy-payment-key", 10000L, "CARD")
+            );
+            final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
+
+            // when & then
+            assertThatThrownBy(() -> {
+                reservationService.create(request, loginMember);
+            }).isInstanceOf(ReservationNotExistsTimeException.class);
+        }
+
+        @DisplayName("멤버가 존재하지 않으면 예외가 발생한다.")
+        @Test
+        void create6() {
+            // given
+            // given - database
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+            final Theme theme = new Theme("야당", "야당당", "123");
+
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
+            final ReservationPaymentRequest request = new ReservationPaymentRequest(
+                new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
+                new PaymentRequest("BOOSTA-ORDER-004", "dummy-payment-key", 10000L, "CARD")
+            );
+            final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
+
+            // when & then
+            assertThatThrownBy(() -> {
+                reservationService.create(request, loginMember);
+            }).isInstanceOf(ReservationNotExistsMemberException.class);
+        }
+
+        @DisplayName("이미 해당 시간, 날짜, 테마에 PENDING 상태의 예약이 존재한다면 예외가 발생한다.")
+        @Test
+        void create3() {
+            // given
+            // given - database
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+            final Theme theme = new Theme("야당", "야당당", "123");
+
+            final LocalDateTime currentDateTime = LocalDateTime.of(2025, 12, 25, 12, 40);
+            final ReservationDate reservationDate = ReservationDate.of(LocalDate.of(2025, 12, 30),
+                    currentDateTime.toLocalDate());
+            final Reservation reservation = Reservation.of(reservationDate, member, reservationTime, theme,
+                    ReservationStatus.PENDING, currentDateTime);
+
+            memberRepositoryFacade.save(member);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+            reservationRepository.save(reservation);
+
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(currentDateTime);
+
+            // given - request
+            final ReservationPaymentRequest request = new ReservationPaymentRequest(
+                new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
+                new PaymentRequest("BOOSTA-ORDER-005", "dummy-payment-key", 10000L, "CARD")
+            );
+            final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
+
+            // when & then
+            assertThatThrownBy(() -> {
+                reservationService.create(request, loginMember);
+            }).isInstanceOf(ReservationConflictException.class);
+        }
+
+        @DisplayName("과거 날짜로 예약하려면 예외가 발생한다.")
+        @Test
+        void create4() {
+            // given
+            // given - database
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+            final Theme theme = new Theme("야당", "야당당", "123");
+            memberRepositoryFacade.save(member);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
+            final ReservationPaymentRequest request = new ReservationPaymentRequest(
+                new ReservationRequest(LocalDate.of(2025, 11, 30), 1L, 1L),
+                new PaymentRequest("BOOSTA-ORDER-006", "dummy-payment-key", 10000L, "CARD")
+            );
+            final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
+
+            // when & then
+            assertThatThrownBy(() -> {
+                reservationService.create(request, loginMember);
+            }).isInstanceOf(ReservationPastDateException.class);
+        }
+
+        @DisplayName("오늘의 지나간 시간으로 예약하려고하면 예외가 발생한다.")
+        @Test
+        void create5() {
+            // given
+            // given - database
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 39));
+            final Theme theme = new Theme("야당", "야당당", "123");
+
+            memberRepositoryFacade.save(member);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
+            final ReservationPaymentRequest request = new ReservationPaymentRequest(
+                new ReservationRequest(LocalDate.of(2025, 12, 1), 1L, 1L),
+                new PaymentRequest("BOOSTA-ORDER-007", "dummy-payment-key", 10000L, "CARD")
+            );
+            final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
+
+            // when & then
+            assertThatThrownBy(() -> {
+                reservationService.create(request, loginMember);
+            }).isInstanceOf(ReservationPastTimeException.class);
+        }
+
+        @DisplayName("reservation을 생성하고, 결제 요청 API를 호출한다.")
+        @Test
+        void create7() {
+            // given
+            // given - database
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+            final Theme theme = new Theme("야당", "야당당", "123");
+
+            memberRepositoryFacade.save(member);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
+            final ReservationPaymentRequest request = new ReservationPaymentRequest(
+                    new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
+                    new PaymentRequest("BOOSTA-ORDER-001", "dummy-payment-key", 10000L, "CARD")
+            );
+            final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
+
+            // when
+            reservationService.create(request, loginMember);
+
+            // then
+            then(paymentManager).should(only()).confirmPayment(request.paymentRequest());
+        }
+
+        @DisplayName("예약 생성 시, 결제 요청 API가 실패하면 예외가 발생한다.")
+        @Test
+        void create8() {
+            // given
+            // given - database
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+            final Theme theme = new Theme("야당", "야당당", "123");
+
+            memberRepositoryFacade.save(member);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+
+            // given - request
+            final ReservationPaymentRequest request = new ReservationPaymentRequest(
+                    new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
+                    new PaymentRequest("BOOSTA-ORDER-001", "dummy-payment-key", 10000L, "CARD")
+            );
+            final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
+
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+            doThrow(PaymentConfirmException.class)
+                    .when(paymentManager).confirmPayment(request.paymentRequest());
+
+            // when & then
+            assertThatThrownBy(() -> {
+                reservationService.create(request, loginMember);
+            }).isInstanceOf(PaymentConfirmException.class);
+        }
+
+        @DisplayName("결제 실패 시 DB 롤백이 발생해야 한다.")
+        @Test
+        void rollbackOccursWhenPaymentFails() {
+            // given
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+            final Theme theme = new Theme("야당", "야당당", "123");
+            memberRepositoryFacade.save(member);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+
+            final ReservationPaymentRequest request = new ReservationPaymentRequest(
+                    new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
+                    new PaymentRequest("BOOSTA-ORDER-ROLLBACK", "fail-payment-key", 10000L, "CARD")
+            );
+            final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
+
+            doThrow(PaymentConfirmException.class)
+                    .when(paymentManager).confirmPayment(request.paymentRequest());
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // when
+            assertThatThrownBy(() -> reservationService.create(request, loginMember))
+                    .isInstanceOf(PaymentConfirmException.class);
+
+            // then
+            assertThat(reservationRepository.findAll()).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("admin을 위한 예약 생성")
+    class CreateForAdmin {
+
+        @DisplayName("reservation request를 생성하면 response 값을 반환한다.")
+        @Test
+        void create() {
+            // given
+            // given - database
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(22, 40));
+            final Theme theme = new Theme("야당", "야당당", "123");
+
+            memberRepositoryFacade.save(member);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - reequest
+            final AdminReservationRequest request = new AdminReservationRequest(
+                    LocalDate.of(2025, 12, 30), 1L, 1L, 1L);
+
+            // when
+            final ReservationResponse actual = reservationService.createForAdmin(request);
+
+            // then
+            assertSoftly(s -> {
+                s.assertThat(actual.id()).isNotNull();
+                s.assertThat(actual.theme().name()).isEqualTo("야당");
+                s.assertThat(actual.theme().description()).isEqualTo("야당당");
+                s.assertThat(actual.theme().thumbnail()).isEqualTo("123");
+                s.assertThat(actual.date()).isEqualTo(LocalDate.of(2025, 12, 30));
+                s.assertThat(actual.time().startAt()).isEqualTo(LocalTime.of(22, 40));
+                s.assertThat(actual.member().name()).isEqualTo("boogie");
+            });
+        }
+
+        @DisplayName("테마가 존재하지 않으면 예외가 발생한다.")
+        @Test
+        void create1() {
+            // given
+            // given - database
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+
+            memberRepositoryFacade.save(member);
+            reservationTimeRepository.save(reservationTime);
+
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
+            final AdminReservationRequest request = new AdminReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L, 1L);
+
+            // when & then
+            assertThatThrownBy(() -> {
+                reservationService.createForAdmin(request);
+            }).isInstanceOf(ReservationNotExistsThemeException.class);
+        }
+
+        @DisplayName("시간이 존재하지 않으면 예외가 발생한다.")
+        @Test
+        void create2() {
+            // given
+            // given - database
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final Theme theme = new Theme("야당", "야당당", "123");
+
+            memberRepositoryFacade.save(member);
+            themeRepositoryFacade.save(theme);
+
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
+            final AdminReservationRequest request = new AdminReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L, 1L);
+
+            // when & then
+            assertThatThrownBy(() -> {
+                reservationService.createForAdmin(request);
+            }).isInstanceOf(ReservationNotExistsTimeException.class);
+        }
+
+        @DisplayName("멤버가 존재하지 않으면 예외가 발생한다.")
+        @Test
+        void create6() {
+            // given
+            // given - database
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+            final Theme theme = new Theme("야당", "야당당", "123");
+
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
+            final AdminReservationRequest request = new AdminReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L, 1L);
+
+            // when & then
+            assertThatThrownBy(() -> {
+                reservationService.createForAdmin(request);
+            }).isInstanceOf(ReservationNotExistsMemberException.class);
+        }
+
+        @DisplayName("이미 해당 시간, 날짜, 테마에 PENDING 상태의 예약이 존재한다면 예외가 발생한다.")
+        @Test
+        void create3() {
+            // given
+            // given - database
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+            final Theme theme = new Theme("야당", "야당당", "123");
+            final LocalDateTime currentDateTime = LocalDateTime.of(2025, 12, 25, 12, 0);
+            final ReservationDate reservationDate = ReservationDate.of(LocalDate.of(2025, 12, 30),
+                    currentDateTime.toLocalDate());
+            final Reservation reservation = Reservation.of(reservationDate, member, reservationTime, theme,
+                    ReservationStatus.PENDING, currentDateTime);
+
+            memberRepositoryFacade.save(member);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+            reservationRepository.save(reservation);
+
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
+            final AdminReservationRequest request = new AdminReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L, 1L);
+
+            // when & then
+            assertThatThrownBy(() -> {
+                reservationService.createForAdmin(request);
+            }).isInstanceOf(ReservationConflictException.class);
+        }
+
+        @DisplayName("과거 날짜로 예약하려면 예외가 발생한다.")
+        @Test
+        void create4() {
+            // given
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+            final Theme theme = new Theme("야당", "야당당", "123");
+
+            memberRepositoryFacade.save(member);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
+            final AdminReservationRequest request = new AdminReservationRequest(LocalDate.of(2025, 11, 30), 1L, 1L,
+                    1L);
+
+            // when & then
+            assertThatThrownBy(() -> {
+                reservationService.createForAdmin(request);
+            }).isInstanceOf(ReservationPastDateException.class);
+        }
+
+        @DisplayName("오늘의 지나간 시간으로 예약하려고하면 예외가 발생한다.")
+        @Test
+        void create5() {
+            // given
+            // given - database
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 39));
+            final Theme theme = new Theme("야당", "야당당", "123");
+
+            memberRepositoryFacade.save(member);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+
+            // given - stubbing
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+
+            // given - request
+            final AdminReservationRequest request = new AdminReservationRequest(LocalDate.of(2025, 12, 1), 1L, 1L, 1L);
+
+            // when & then
+            assertThatThrownBy(() -> {
+                reservationService.createForAdmin(request);
+            }).isInstanceOf(ReservationPastTimeException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("예약 모두 조회")
+    class ReadAll {
+
+        @DisplayName("reservation이 없다면 빈 컬렉션을 조회한다.")
+        @Test
+        void readAll1() {
+            // given
+            // when
+            final List<ReservationResponse> allReservation = reservationService.readAll();
+
+            // then
+            assertThat(allReservation).isEmpty();
+        }
+
+        @DisplayName("존재하는 reservation들을 모두 조회한다.")
+        @Test
+        void readAll2() {
+            // given
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+            final Theme theme = new Theme("야당", "야당당", "123");
+            final LocalDateTime currentDateTime = LocalDateTime.of(2025, 12, 25, 12, 0);
+            final ReservationDate reservationDate = ReservationDate.of(LocalDate.of(2025, 12, 30),
+                    currentDateTime.toLocalDate());
+            final Reservation reservation = Reservation.of(reservationDate, member, reservationTime, theme,
+                    ReservationStatus.PENDING, currentDateTime);
+
+            memberRepositoryFacade.save(member);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+            reservationRepository.save(reservation);
+
+            // when
+            final List<ReservationResponse> actual = reservationService.readAll();
+
+            // then
+            assertThat(actual).hasSize(1);
+        }
+
+    }
+
+    @Nested
+    @DisplayName("예약 멤버 id, 테마 id, 날짜 범위 기준 조회")
+    class ReadAllByMemberAndThemeAndDateRange {
+
+        @DisplayName("조건에 맞는 예약이 없다면 빈 컬렉션을 반환한다")
+        @Test
+        void readAllByMemberAndThemeAndDateRange1() {
+            // given
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final Theme theme = new Theme("야당", "야당당", "123");
+
+            memberRepositoryFacade.save(member);
+            themeRepositoryFacade.save(theme);
+
+            final AdminFilterReservationRequest request = new AdminFilterReservationRequest(
+                    1L, 1L,
+                    LocalDate.of(2024, 1, 1),
+                    LocalDate.of(2024, 12, 31)
+            );
+
+            // when
+            final List<ReservationResponse> responses = reservationService.readAllByMemberAndThemeAndDateRange(request);
+
+            // then
+            assertThat(responses).isEmpty();
+        }
+
+        @DisplayName("조건에 맞는 예약들을 모두 조회한다")
+        @Test
+        void readAllByMemberAndThemeAndDateRange2() {
+            // given
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+            final Theme theme = new Theme("야당", "야당당", "123");
+            final LocalDateTime currentDateTime = LocalDateTime.of(2025, 11, 25, 12, 0);
+            final ReservationDate minReservationDate = ReservationDate.of(LocalDate.of(2025, 12, 1),
+                    currentDateTime.toLocalDate());
+            final Reservation minReservation = Reservation.of(minReservationDate, member, reservationTime, theme,
+                    ReservationStatus.PENDING, currentDateTime);
+
+            final ReservationDate maxReservationDate = ReservationDate.of(LocalDate.of(2025, 12, 30),
+                    currentDateTime.toLocalDate());
+            final Reservation maxReservation = Reservation.of(maxReservationDate, member, reservationTime, theme,
+                    ReservationStatus.PENDING, currentDateTime);
+
+            memberRepositoryFacade.save(member);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+            reservationRepository.save(minReservation);
+            reservationRepository.save(maxReservation);
+
+            final AdminFilterReservationRequest request = new AdminFilterReservationRequest(
+                    1L, 1L,
+                    LocalDate.of(2025, 1, 1),
+                    LocalDate.of(2025, 12, 31)
+            );
+
+            // when
+            final List<ReservationResponse> responses =
+                    reservationService.readAllByMemberAndThemeAndDateRange(request);
+
+            // then
+            assertThat(responses).hasSize(2);
+        }
+    }
+
+    @Nested
+    @DisplayName("예약 삭제")
+    class Delete {
+
+        @DisplayName("주어진 id에 해당하는 reservation 삭제한다.")
+        @Test
+        void delete1() {
+            // given
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+            final Theme theme = new Theme("야당", "야당당", "123");
+
+            final LocalDateTime currentDateTime = LocalDateTime.of(2025, 12, 25, 12, 0);
+            final ReservationDate reservationDate = ReservationDate.of(LocalDate.of(2025, 12, 30),
+                    currentDateTime.toLocalDate());
+            final Reservation reservation = Reservation.of(reservationDate, member, reservationTime, theme,
+                    ReservationStatus.PENDING, currentDateTime);
+
+            memberRepositoryFacade.save(member);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+            reservationRepository.save(reservation);
+
+            // when
+            reservationService.deleteById(1L);
+
+            // then
+            then(reservationRepository).should().deleteById(1L);
+        }
+
+        @DisplayName("주어진 id에 해당하는 reservation이 없다면 예외가 발생한다.")
+        @Test
+        void delete2() {
+            // given
+            // when & then
+            assertThatThrownBy(() -> {
+                reservationService.deleteById(1L);
+            }).isInstanceOf(ReservationNotFoundException.class);
+        }
+
+
+        @DisplayName("member의 예약을 모두 조회한다.")
+        @Test
+        void readAllReservation() {
+            // given
+            final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
+            final MineReservationResponse expected = new MineReservationResponse(
+                    1L, "테마", LocalDate.of(2025, 12, 30),
+                    LocalTime.of(12, 40), "예약", 0L
+            );
+
+            final Member member = new Member(loginMember.email(), "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+            final Theme theme = new Theme("테마", "설명", "썸네일");
+            final LocalDateTime currentDateTime = LocalDateTime.of(2025, 12, 25, 12, 0);
+            final ReservationDate reservationDate = ReservationDate.of(LocalDate.of(2025, 12, 30),
+                    currentDateTime.toLocalDate());
+            final Reservation reservation = Reservation.of(reservationDate, member, reservationTime, theme,
+                    ReservationStatus.PENDING, currentDateTime);
+
+            memberRepositoryFacade.save(member);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+            reservationRepository.save(reservation);
+
+            // when
+            final List<MineReservationResponse> actual = reservationService.readAllMine(loginMember);
+
+            // then
+            assertThat(actual)
+                    .contains(expected)
+                    .hasSize(1);
+        }
+
+        @DisplayName("이메일의 member가 존재하지 않는다면, 예외가 발생한다.")
+        @Test
+        void readAllReservation1() {
+            // given
+            final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
+
+            // when & then
+            assertThatThrownBy(() -> {
+                reservationService.readAllMine(loginMember);
+            }).isInstanceOf(ReservationNotExistsMemberException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("reservation waiting 생성")
+    class createWaiting {
+
+        @DisplayName("정상 생성 테스트")
+        @Test
+        void create1() {
+            // given
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+            final Theme theme = new Theme("야당", "야당당", "123");
+            final LocalDateTime currentDateTime = LocalDateTime.of(2025, 12, 25, 12, 0);
+            final ReservationDate reservationDate = ReservationDate.of(LocalDate.of(2025, 12, 30),
+                    currentDateTime.toLocalDate());
+
+            final Member anotherMember = new Member("xxxx", "pass", "아서", MemberRole.MEMBER);
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+
+            final Reservation reservation = Reservation.of(reservationDate, anotherMember, reservationTime, theme,
+                    ReservationStatus.PENDING, currentDateTime);
+
+            memberRepositoryFacade.save(member);
+            memberRepositoryFacade.save(anotherMember);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+            reservationRepository.save(reservation);
+
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 1, 12, 40));
+            final ReservationPaymentRequest request = new ReservationPaymentRequest(
+                new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
+                new PaymentRequest("BOOSTA-ORDER-008", "dummy-payment-key", 10000L, "CARD")
+            );
+            final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
+
+            // when
+            final ReservationResponse actual = reservationService.createWaiting(request.reservationRequest(), loginMember);
+
+            // then
+            assertSoftly(s -> {
+                s.assertThat(actual.id()).isNotNull();
+                s.assertThat(actual.theme().name()).isEqualTo("야당");
+                s.assertThat(actual.theme().description()).isEqualTo("야당당");
+                s.assertThat(actual.theme().thumbnail()).isEqualTo("123");
+                s.assertThat(actual.date()).isEqualTo(LocalDate.of(2025, 12, 30));
+                s.assertThat(actual.time().startAt()).isEqualTo(LocalTime.of(12, 40));
+                s.assertThat(actual.member().name()).isEqualTo("boogie");
+            });
+        }
+
+        @DisplayName("member가 존재하지 않으면 예외가 발생한다.")
+        @Test
+        void create2() {
+            // given
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+            final Theme theme = new Theme("야당", "야당당", "123");
+            final Member anotherMember = new Member("xxxx", "pass", "아서", MemberRole.MEMBER);
+            final LocalDateTime currentDateTime = LocalDateTime.of(2025, 12, 25, 12, 0);
+            final ReservationDate reservationDate = ReservationDate.of(LocalDate.of(2025, 12, 30),
+                    currentDateTime.toLocalDate());
+            final Reservation reservation = Reservation.of(reservationDate, anotherMember, reservationTime, theme,
+                    ReservationStatus.PENDING, currentDateTime);
+
+            reservationTimeRepository.save(reservationTime);
+            memberRepositoryFacade.save(anotherMember);
+            themeRepositoryFacade.save(theme);
+            reservationRepository.save(reservation);
+
+            final ReservationRequest request = new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L);
+            final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
+
+            // when & then
+            assertThatThrownBy(() -> {
+                reservationService.createWaiting(request, loginMember);
+            }).isInstanceOf(ReservationNotExistsMemberException.class);
+
+        }
+
+        @DisplayName("reservation time이 존재하지 않는다면 예외가 발생한다.")
+        @Test
+        void create3() {
+            // given
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final Theme theme = new Theme("야당", "야당당", "123");
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 41));
+            final Member anotherMember = new Member("xxxx", "pass", "아서", MemberRole.MEMBER);
+            final LocalDateTime currentDateTime = LocalDateTime.of(2025, 12, 25, 12, 0);
+            final ReservationDate reservationDate = ReservationDate.of(LocalDate.of(2025, 12, 30),
+                    currentDateTime.toLocalDate());
+            final Reservation reservation = Reservation.of(reservationDate, anotherMember, reservationTime, theme,
+                    ReservationStatus.PENDING, currentDateTime);
+
+            reservationTimeRepository.save(reservationTime);
+            memberRepositoryFacade.save(member);
+            memberRepositoryFacade.save(anotherMember);
+            themeRepositoryFacade.save(theme);
+            reservationRepository.save(reservation);
+
+            final ReservationRequest request = new ReservationRequest(LocalDate.of(2025, 12, 30), 2L, 1L);
+            final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
+
+            // when & then
+            assertThatThrownBy(() -> {
+                reservationService.createWaiting(request, loginMember);
+            }).isInstanceOf(ReservationNotExistsTimeException.class);
+
+        }
+
+        @DisplayName("theme가 존재하지 않는다면 예외가 발생한다.")
+        @Test
+        void create4() {
+            // given
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+            final Theme theme = new Theme("야당", "야당당", "123");
+            final Member anotherMember = new Member("xxxx", "pass", "아서", MemberRole.MEMBER);
+            final LocalDateTime currentDateTime = LocalDateTime.of(2025, 12, 25, 12, 0);
+            final ReservationDate reservationDate = ReservationDate.of(LocalDate.of(2025, 12, 30),
+                    currentDateTime.toLocalDate());
+            final Reservation reservation = Reservation.of(reservationDate, anotherMember, reservationTime, theme,
+                    ReservationStatus.PENDING, currentDateTime);
+
+            themeRepositoryFacade.save(theme);
+            memberRepositoryFacade.save(member);
+            memberRepositoryFacade.save(anotherMember);
+            reservationTimeRepository.save(reservationTime);
+            reservationRepository.save(reservation);
+
+            final ReservationRequest request = new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 2L);
+            final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
+
+            // when & then
+            assertThatThrownBy(() -> {
+                reservationService.createWaiting(request, loginMember);
+            }).isInstanceOf(ReservationNotExistsThemeException.class);
+        }
+
+        @DisplayName("이미 해당 시간, 날짜, 테마에 같은 멤버 pending 예약이 존재한다면 예외가 발생한다.")
+        @Test
+        void create5() {
+            // given
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+            final Theme theme = new Theme("야당", "야당당", "123");
+            final LocalDateTime currentDateTime = LocalDateTime.of(2025, 12, 25, 12, 0);
+            final ReservationDate reservationDate = ReservationDate.of(LocalDate.of(2025, 12, 30),
+                    currentDateTime.toLocalDate());
+            final Reservation reservation = Reservation.of(reservationDate, member, reservationTime, theme,
+                    ReservationStatus.PENDING, currentDateTime);
+
+            memberRepositoryFacade.save(member);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+            reservationRepository.save(reservation);
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 25, 12, 0));
+
+            final ReservationRequest request = new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L);
+            final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
+
+            // when
+            assertThatThrownBy(() -> {
+                reservationService.createWaiting(request, loginMember);
+            }).isInstanceOf(ReservationConflictException.class);
+        }
+
+        @DisplayName("이미 해당 시간, 날짜, 테마에 pending 상태의 예약이 존재하지 않는다면 예외가 발생한다.")
+        @Test
+        void create6() {
+            // given
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+            final Theme theme = new Theme("야당", "야당당", "123");
+
+            memberRepositoryFacade.save(member);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 30, 12, 40));
+
+            final ReservationRequest request = new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L);
+            final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
+
+            // when
+            assertThatThrownBy(() -> {
+                reservationService.createWaiting(request, loginMember);
+            }).isInstanceOf(ReservationNotExistsPendingException.class);
+        }
+
+        @DisplayName("과거 날짜로 예약하면, 예외가 발생한다.")
+        @Test
+        void create7() {
+            // given
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+            final Theme theme = new Theme("야당", "야당당", "123");
+
+            final Member anotherMember = new Member("xxxx", "pass", "아서", MemberRole.MEMBER);
+            final LocalDateTime currentDateTime = LocalDateTime.of(2025, 12, 1, 12, 0);
+            final ReservationDate reservationDate = ReservationDate.of(LocalDate.of(2025, 12, 30),
+                    currentDateTime.toLocalDate());
+            final Reservation reservation = Reservation.of(reservationDate, anotherMember, reservationTime, theme,
+                    ReservationStatus.PENDING, currentDateTime);
+
+            memberRepositoryFacade.save(member);
+            memberRepositoryFacade.save(anotherMember);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+            reservationRepository.save(reservation);
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 25, 12, 40));
+
+            final ReservationRequest request = new ReservationRequest(LocalDate.of(2024, 12, 30), 1L, 1L);
+            final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
+
+            // when
+            assertThatThrownBy(() -> {
+                reservationService.createWaiting(request, loginMember);
+            }).isInstanceOf(ReservationPastDateException.class);
+        }
+
+        @DisplayName("오늘 날짜에 지난 시간으로 예약하면, 예외가 발생한다.")
+        @Test
+        void create8() {
+            // given
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 30));
+            final Theme theme = new Theme("야당", "야당당", "123");
+
+            final Member anotherMember = new Member("xxxx", "pass", "아서", MemberRole.MEMBER);
+            final LocalDateTime currentDateTime = LocalDateTime.of(2025, 11, 30, 12, 30);
+            final ReservationDate reservationDate = ReservationDate.of(LocalDate.of(2025, 11, 30),
+                    currentDateTime.toLocalDate());
+            final Reservation reservation = Reservation.of(reservationDate, anotherMember, reservationTime, theme,
+                    ReservationStatus.PENDING, currentDateTime);
+
+            memberRepositoryFacade.save(member);
+            memberRepositoryFacade.save(anotherMember);
+
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+            reservationRepository.save(reservation);
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 11, 30, 12, 31));
+
+            final ReservationRequest request = new ReservationRequest(LocalDate.of(2025, 11, 30), 1L, 1L);
+            final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
+
+            // when
+            assertThatThrownBy(() -> {
+                reservationService.createWaiting(request, loginMember);
+            }).isInstanceOf(ReservationPastTimeException.class);
+        }
+
+        @DisplayName("오늘 날짜에 미래 시간으로 예약하면 정상적으로 생성된다.")
+        @Test
+        void create9() {
+            // given
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.now().plusMinutes(1).withNano(0));
+            final Theme theme = new Theme("야당", "야당당", "123");
+
+            final Member anotherMember = new Member("xxxx", "pass", "아서", MemberRole.MEMBER);
+            final LocalDateTime currentDateTime = LocalDateTime.of(2024, 12, 30, 12, 40);
+            final ReservationDate reservationDate = ReservationDate.of(LocalDate.of(2025, 12, 30),
+                    currentDateTime.toLocalDate());
+            final Reservation reservation = Reservation.of(reservationDate, anotherMember, reservationTime, theme,
+                    ReservationStatus.PENDING, currentDateTime);
+            given(timeManager.todayCurrentTime())
+                    .willReturn(LocalDateTime.of(2025, 12, 30, 12, 40));
+
+            memberRepositoryFacade.save(member);
+            memberRepositoryFacade.save(anotherMember);
+
+            memberRepositoryFacade.save(member);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+            reservationRepository.save(reservation);
+
+            final ReservationPaymentRequest request = new ReservationPaymentRequest(
+                new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
+                new PaymentRequest("BOOSTA-ORDER-016", "dummy-payment-key", 10000L, "CARD")
+            );
+            final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
+
+            // when
+            final ReservationResponse actual = reservationService.createWaiting(request.reservationRequest(), loginMember);
+
+            // then
+            assertSoftly(s -> {
+                s.assertThat(actual.id()).isNotNull();
+                s.assertThat(actual.theme().name()).isEqualTo("야당");
+                s.assertThat(actual.theme().description()).isEqualTo("야당당");
+                s.assertThat(actual.theme().thumbnail()).isEqualTo("123");
+                s.assertThat(actual.date()).isEqualTo(LocalDate.of(2025, 12, 30));
+                s.assertThat(actual.time().startAt()).isEqualTo(reservationTime.getStartAt());
+                s.assertThat(actual.member().name()).isEqualTo("boogie");
+            });
+
+        }
+
+        @DisplayName("pending 상태의 예약을 삭제하면 대기중인 다음 순번의 예약이 pending 상태로 변경된다.")
+        @Test
+        void create10() {
+            // given
+            final Member pendingMember = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final Member waitingMember = new Member("email1", "pass", "boogie", MemberRole.MEMBER);
+            final Member waitingMember1 = new Member("email2", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.now().plusMinutes(1));
+            final Theme theme = new Theme("야당", "야당당", "123");
+            final LocalDateTime currentDateTime = LocalDateTime.of(2025, 12, 25, 12, 0);
+            final ReservationDate reservationDate = ReservationDate.of(LocalDate.of(2025, 12, 30),
+                    currentDateTime.toLocalDate());
+            final Reservation pendingReservation = Reservation.of(reservationDate, pendingMember, reservationTime, theme,
+                    ReservationStatus.PENDING, currentDateTime);
+            final Reservation waitingReservation = Reservation.of(reservationDate, waitingMember, reservationTime,
+                    theme,
+                    ReservationStatus.WAITING, currentDateTime);
+            final Reservation waitingReservation1 = Reservation.of(reservationDate, waitingMember1, reservationTime,
+                    theme,
+                    ReservationStatus.WAITING, currentDateTime);
+
+            memberRepositoryFacade.save(pendingMember);
+            memberRepositoryFacade.save(waitingMember);
+            memberRepositoryFacade.save(waitingMember1);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+            reservationRepository.save(pendingReservation);
+            reservationRepository.save(waitingReservation);
+            reservationRepository.save(waitingReservation1);
+
+            // when
+            reservationService.deleteById(1L);
+
+            // then
+            final Reservation actual1 = reservationRepository.findById(2L).get();
+            assertThat(actual1.getReservationStatus()).isEqualTo(ReservationStatus.PENDING);
+
+            final Reservation actual2 = reservationRepository.findById(3L).get();
+            assertThat(actual2.getReservationStatus()).isEqualTo(ReservationStatus.WAITING);
+
+
+        }
+
+    }
+
+    @Nested
+    @DisplayName("존재하는 예약 대기를 모두 조회한다.")
+    class ReadAllWaiting {
+
+        @DisplayName("예약 대기를 모두 조회한다.")
+        @Test
+        void readAllWaitingByMember() {
+            // given
+            final Member member = new Member("email", "pass", "boogie", MemberRole.MEMBER);
+            final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
+            final Theme theme = new Theme("야당", "야당당", "123");
+            final LocalDateTime currentDateTime = LocalDateTime.of(2025, 12, 25, 12, 0);
+            final ReservationDate reservationDate = ReservationDate.of(LocalDate.of(2025, 12, 30),
+                    currentDateTime.toLocalDate());
+            final Reservation reservation = Reservation.of(reservationDate, member, reservationTime, theme,
+                    ReservationStatus.WAITING, currentDateTime);
+
+            memberRepositoryFacade.save(member);
+            reservationTimeRepository.save(reservationTime);
+            themeRepositoryFacade.save(theme);
+            reservationRepository.save(reservation);
+
+            // when
+            final List<ReservationResponse> actual = reservationService.readAllWaiting();
+
+            // then
+            assertThat(actual).hasSize(1);
+        }
+
+        @DisplayName("예약 대기가 비어 있다면 빈 컬렉션을 응답한다.")
+        @Test
+        void readAllWaitingByMember1() {
+            // given
+            // when
+            final List<ReservationResponse> actual = reservationService.readAllWaiting();
+
+            // then
+            assertThat(actual).isEmpty();
+        }
+    }
+}
