@@ -3,16 +3,16 @@ package roomescape.payment.service;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import roomescape.payment.TossRestClient;
-import roomescape.payment.domain.TossPayment;
+import roomescape.payment.domain.client.TossRestClient;
 import roomescape.payment.domain.dto.PaymentRequestDto;
+import roomescape.payment.domain.dto.PaymentResponseDto;
 import roomescape.payment.exception.InvalidPaymentException;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class PaymentServiceTest {
+public class TossPaymentServiceTest {
 
     private final TossRestClient mockRestClient = mock(TossRestClient.class);
 
@@ -20,14 +20,14 @@ public class PaymentServiceTest {
     void 결제_승인_요청시_200_OK() {
         PaymentRequestDto dto = new PaymentRequestDto("paymentKey", "orderId", 1000, "NORMAL");
 
-        TossPayment dummyPayment = new TossPayment("paymentKey", "orderId", 1000, "NORMAL");
+        PaymentResponseDto dummyPaymentDto = new PaymentResponseDto("paymentKey", "orderId", 1000);
         when(mockRestClient.confirmPayment(any(PaymentRequestDto.class)))
-                .thenReturn(dummyPayment);
+                .thenReturn(dummyPaymentDto);
 
-        PaymentService paymentService = new PaymentService(mockRestClient);
+        TossPaymentService tossPaymentService = new TossPaymentService(mockRestClient);
 
         Assertions.assertThatCode(
-                () -> paymentService.approve(dto)
+                () -> tossPaymentService.approve(dto)
         ).doesNotThrowAnyException();
     }
 
@@ -38,10 +38,10 @@ public class PaymentServiceTest {
         when(mockRestClient.confirmPayment(any(PaymentRequestDto.class)))
                 .thenThrow(new InvalidPaymentException(HttpStatus.BAD_REQUEST));
 
-        PaymentService paymentService = new PaymentService(mockRestClient);
+        TossPaymentService tossPaymentService = new TossPaymentService(mockRestClient);
 
         Assertions.assertThatThrownBy(
-                () -> paymentService.approve(dto)
+                () -> tossPaymentService.approve(dto)
         ).isInstanceOf(InvalidPaymentException.class);
     }
 }

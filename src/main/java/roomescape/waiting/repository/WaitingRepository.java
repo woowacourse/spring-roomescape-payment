@@ -1,14 +1,15 @@
 package roomescape.waiting.repository;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import roomescape.user.domain.User;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.domain.WaitingWithRank;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 public interface WaitingRepository extends JpaRepository<Waiting, Long> {
 
@@ -29,7 +30,7 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
     @Query(value = """
     SELECT * FROM waiting w
     WHERE w.date = :date
-      AND w.reservation_time_id = :timeId
+      AND w.time_id = :timeId
       AND w.theme_id = :themeId
     ORDER BY w.id ASC
     LIMIT 1

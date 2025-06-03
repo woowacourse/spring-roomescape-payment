@@ -7,28 +7,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.client.ResourceAccessException;
 import roomescape.payment.domain.dto.PaymentRequestDto;
-import roomescape.payment.exception.InvalidPaymentException;
 
 @TestPropertySource(properties = {
-        "toss.payment.secret-key=tosstasstosstasstoss"
+        "payment.properties.toss.base-url=https://baseurlisinvalid"
 })
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class PaymentServiceInvalidSecretKeyTest {
+public class TossPaymentServiceInvalidBaseUrlTest {
 
     @Autowired
-    private PaymentService paymentService;
+    private TossPaymentService tossPaymentService;
 
-    @DisplayName("secretKey가 유효하지 않을 때 예외 발생 : InvalidPaymentException")
+    @DisplayName("잘못된 baseUrl로 요청했을 때 예외 발생")
     @Test
-    void approve_throwsException_byInvalidSecretKey() {
+    void approve_throwsException_byInvalidBaseUrl() {
         // given
         PaymentRequestDto dto = new PaymentRequestDto("paymentKey", "orderId", 1000, "NORMAL");
 
         // when & then
         Assertions.assertThatThrownBy(
-                        () -> paymentService.approve(dto)
-                ).isInstanceOf(InvalidPaymentException.class)
-                .hasMessageContaining("인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다.");
+                () -> tossPaymentService.approve(dto)
+        ).isInstanceOf(ResourceAccessException.class);
     }
 }
