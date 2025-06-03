@@ -83,7 +83,7 @@ public class ReservationTicketPaymentServiceTest extends ServiceTest {
                 "DONE", "paymentKey", "orderId"
         );
 
-        when(tossPaymentWithRestClient.requestConfirmation(any(TossPaymentConfirmDto.class)))
+        when(tossPaymentWithRestClient.requestConfirmation(any(TossPaymentConfirmDto.class), any(String.class)))
                 .thenReturn(tossPaymentConfirmResponseDto);
 
         // when
@@ -121,7 +121,7 @@ public class ReservationTicketPaymentServiceTest extends ServiceTest {
                 "ABORTED", "paymentKey", "orderId"
         );
 
-        when(tossPaymentWithRestClient.requestConfirmation(any(TossPaymentConfirmDto.class)))
+        when(tossPaymentWithRestClient.requestConfirmation(any(TossPaymentConfirmDto.class), any(String.class)))
                 .thenReturn(tossPaymentConfirmResponseDto);
 
         // when & then
@@ -164,7 +164,7 @@ public class ReservationTicketPaymentServiceTest extends ServiceTest {
                 "DONE", "paymentKey", "orderId"
         );
 
-        when(tossPaymentWithRestClient.requestConfirmation(any(TossPaymentConfirmDto.class)))
+        when(tossPaymentWithRestClient.requestConfirmation(any(TossPaymentConfirmDto.class), any(String.class)))
                 .thenReturn(tossPaymentConfirmResponseDto);
 
         // when && then
@@ -197,7 +197,7 @@ public class ReservationTicketPaymentServiceTest extends ServiceTest {
                 "DONE", "paymentKey", "orderId"
         );
 
-        when(tossPaymentWithRestClient.requestConfirmation(any(TossPaymentConfirmDto.class)))
+        when(tossPaymentWithRestClient.requestConfirmation(any(TossPaymentConfirmDto.class), any(String.class)))
                 .thenReturn(tossPaymentConfirmResponseDto);
 
         // when && then

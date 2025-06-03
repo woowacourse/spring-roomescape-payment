@@ -1,15 +1,14 @@
 package roomescape.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Duration;
 import java.util.Base64;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClient.Builder;
-import org.springframework.web.client.support.RestClientAdapter;
-import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 import roomescape.infrastructure.payment.toss.TossPaymentWithRestClient;
 import roomescape.infrastructure.payment.toss.exception.PaymentExceptionHandler;
 
@@ -27,21 +26,7 @@ public class PaymentConfig {
 
     @Bean
     public TossPaymentWithRestClient tossPaymentWithRestClient(RestClient.Builder builder) {
-        RestClient restClient = createRestClient(builder);
-
-        return createTossPaymentWithRestClient(restClient);
-    }
-
-    public TossPaymentWithRestClient createTossPaymentWithRestClient(RestClient client) {
-        HttpServiceProxyFactory factory = HttpServiceProxyFactory.builder()
-                .exchangeAdapter(RestClientAdapter.create(client))
-                .build();
-
-        return factory.createClient(TossPaymentWithRestClient.class);
-    }
-
-    private RestClient createRestClient(Builder builder) {
-        return builder
+        return new TossPaymentWithRestClient(builder
                 .baseUrl("https://api.tosspayments.com/v1/payments")
                 .defaultStatusHandler(new PaymentExceptionHandler(mapper))
                 .requestInterceptor((request, body, execution) -> {
@@ -50,7 +35,15 @@ public class PaymentConfig {
                     }
                     return execution.execute(request, body);
                 })
-                .build();
+                .requestFactory(createRequestFactory())
+                .build());
+    }
+
+    private static SimpleClientHttpRequestFactory createRequestFactory() {
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(Duration.ofSeconds(5));
+        requestFactory.setReadTimeout(Duration.ofSeconds(30));
+        return requestFactory;
     }
 
     private String encodeSecretKey() {

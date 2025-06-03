@@ -1,6 +1,8 @@
 package roomescape.application.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,10 +22,15 @@ public class TossPaymentService {
     private final TossPaymentRepository tossPaymentRepository;
     private final TossPaymentWithHttpClient tossPaymentWithHttpClient;
 
+    @Retryable(
+            maxAttempts = 2,
+            backoff = @Backoff(delay = 1_000)
+    )
     @Transactional(propagation = Propagation.REQUIRED)
     public void processPayment(
             TossPaymentRequestDto tossPaymentRequestDto,
-            ReservationTicket reservationTicket) {
+            ReservationTicket reservationTicket,
+            String requestKey) {
         TossPayment tossPayment = new TossPayment(
                 tossPaymentRequestDto.paymentKey(),
                 tossPaymentRequestDto.orderId(),
@@ -38,7 +45,7 @@ public class TossPaymentService {
         );
 
         TossPaymentConfirmResponseDto tossPaymentConfirmResponseDto = tossPaymentWithHttpClient.requestConfirmation(
-                tossPaymentConfirmDto);
+                tossPaymentConfirmDto, requestKey);
 
         if (!tossPaymentConfirmResponseDto.status().equals("DONE")) {
             throw new PaymentClientException("승인되지 않은 결제 내역입니다.");

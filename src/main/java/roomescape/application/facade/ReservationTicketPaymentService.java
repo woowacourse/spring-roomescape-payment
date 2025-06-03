@@ -1,6 +1,7 @@
 package roomescape.application.facade;
 
 import jakarta.transaction.Transactional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.application.service.ReservationTicketService;
@@ -24,8 +25,10 @@ public class ReservationTicketPaymentService {
         ReservationTicket reservationTicket = reservationTicketService.saveReservation(
                 reservationTicketPaymentWithTossRequestDto.reservationTicketRegisterDto(),
                 loginMember);
+
+        String requestKey = UUID.randomUUID().toString();
         tossPaymentService.processPayment(reservationTicketPaymentWithTossRequestDto.tossPaymentRequestDto(),
-                reservationTicket);
+                reservationTicket, requestKey);
 
         return new ReservationTicketResponseDto(reservationTicket);
     }

@@ -57,7 +57,7 @@ class PaymentExceptionHandlerTest {
         TossPaymentConfirmDto requestDto = new TossPaymentConfirmDto("sample-key", "order-123",
                 10000L);
         assertThatThrownBy(
-                () -> tossPaymentWithRestClient.requestConfirmation(requestDto)).isInstanceOf(
+                () -> tossPaymentWithRestClient.requestConfirmation(requestDto, "")).isInstanceOf(
                 PaymentServerException.class);
 
     }
@@ -89,7 +89,7 @@ class PaymentExceptionHandlerTest {
         TossPaymentConfirmDto requestDto = new TossPaymentConfirmDto("sample-key", "order-123",
                 10000L);
         assertThatThrownBy(
-                () -> tossPaymentWithRestClient.requestConfirmation(requestDto)).isInstanceOf(
+                () -> tossPaymentWithRestClient.requestConfirmation(requestDto, "")).isInstanceOf(
                 PaymentClientException.class);
 
     }
@@ -121,7 +121,7 @@ class PaymentExceptionHandlerTest {
         TossPaymentConfirmDto requestDto = new TossPaymentConfirmDto("sample-key", "order-123",
                 10000L);
         assertThatThrownBy(
-                () -> tossPaymentWithRestClient.requestConfirmation(requestDto)).isInstanceOf(
+                () -> tossPaymentWithRestClient.requestConfirmation(requestDto, "")).isInstanceOf(
                 PaymentServerException.class);
 
     }

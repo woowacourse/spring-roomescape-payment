@@ -213,7 +213,7 @@ class ReservationTicketAcceptanceTest {
                 "DONE", "paymentKey", "orderId"
         );
 
-        when(tossPaymentWithRestClient.requestConfirmation(any(TossPaymentConfirmDto.class)))
+        when(tossPaymentWithRestClient.requestConfirmation(any(TossPaymentConfirmDto.class), any(String.class)))
                 .thenReturn(tossPaymentConfirmResponseDto);
 
         // when & then
