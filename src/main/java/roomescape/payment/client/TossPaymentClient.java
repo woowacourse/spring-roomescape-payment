@@ -20,6 +20,7 @@ import roomescape.payment.exception.PaymentNetworkException;
 import roomescape.payment.exception.PaymentUnauthorizedException;
 
 import java.io.IOException;
+import java.util.function.Supplier;
 
 @Component
 @RequiredArgsConstructor
@@ -29,15 +30,20 @@ public class TossPaymentClient implements PaymentClient {
     private final RestClient restClient;
 
     public PaymentResult confirmPayment(final PaymentRequest request) {
+        return executeWithExceptionHandling(() ->
+                restClient.post()
+                        .uri("/v1/payments/confirm")
+                        .body(request)
+                        .retrieve()
+                        .onStatus(HttpStatusCode::is4xxClientError, this::handle4xxError)
+                        .onStatus(HttpStatusCode::is5xxServerError, this::handle5xxError)
+                        .body(PaymentResult.class)
+        );
+    }
 
+    private <T> T executeWithExceptionHandling(Supplier<T> operation) {
         try {
-            return restClient.post()
-                    .uri("/v1/payments/confirm")
-                    .body(request)
-                    .retrieve()
-                    .onStatus(HttpStatusCode::is4xxClientError, this::handle4xxError)
-                    .onStatus(HttpStatusCode::is5xxServerError, this::handle5xxError)
-                    .body(PaymentResult.class);
+            return operation.get();
         } catch (ResourceAccessException e) {
             throw new PaymentNetworkException(e);
         } catch (HttpMessageNotReadableException e) {
