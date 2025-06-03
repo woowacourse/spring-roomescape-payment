@@ -8,7 +8,6 @@ import roomescape.auth.AuthRequired;
 public class UserPageController {
 
     @GetMapping("/")
-    @AuthRequired
     public String getPopularPage() {
         return "index";
     }
