@@ -16,10 +16,17 @@ public class RestClientConfig {
     @Value("${api.toss.secret-key}")
     private String secretKey;
 
+    @Value("${api.toss.timeout.connection}")
+    private int connectionTimeout;
+
+    @Value("${api.toss.timeout.read}")
+    private int readTimeout;
+
     @Bean
     public RestClient tossPaymentRestClient() {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setReadTimeout(15_000);
+        requestFactory.setConnectTimeout(connectionTimeout);
+        requestFactory.setReadTimeout(readTimeout);
 
         return RestClient.builder()
                 .baseUrl(tossPaymentBaseUrl)
