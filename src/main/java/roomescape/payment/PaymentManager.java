@@ -1,4 +1,4 @@
-package roomescape.common;
+package roomescape.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
@@ -9,8 +9,6 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
-import roomescape.common.dto.PaymentError;
-import roomescape.common.dto.PaymentRequest;
 import roomescape.exception.custom.reason.payment.PaymentConfirmException;
 
 // toss pg사 이용

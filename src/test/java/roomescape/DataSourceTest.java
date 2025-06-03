@@ -21,7 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import roomescape.common.PaymentManager;
+import roomescape.payment.PaymentManager;
 import roomescape.reservation.dto.ReservationResponse;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)

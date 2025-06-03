@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
-import roomescape.common.PaymentManager;
+import roomescape.payment.PaymentManager;
 import roomescape.common.TimeManager;
 import roomescape.exception.custom.reason.reservation.ReservationConflictException;
 import roomescape.exception.custom.reason.reservation.ReservationNotExistsMemberException;

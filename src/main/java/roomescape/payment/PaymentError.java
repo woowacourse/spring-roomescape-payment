@@ -1,4 +1,4 @@
-package roomescape.common.dto;
+package roomescape.payment;
 
 public record PaymentError(
         String code,
