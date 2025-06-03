@@ -53,8 +53,7 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse createUserReservationAndPayment(final ReservationRequest reservationRequest, final Long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new NoSuchElementException("유저 정보를 찾을 수 없습니다."));
+        Member member = findMemberById(memberId);
 
         Payment payment = paymentService.processPaymentRequest(reservationRequest);
         return createPaidReservation(reservationRequest, member, payment);
