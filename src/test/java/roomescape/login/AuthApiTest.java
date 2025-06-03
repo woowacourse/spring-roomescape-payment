@@ -82,7 +82,7 @@ public class AuthApiTest {
             .asString();
 
         // then
-        assertThat(message).isEqualTo("회원 정보가 존재하지 않습니다.");
+        assertThat(message).isEqualTo("잘못된 요청입니다.");
     }
 
     @Test
