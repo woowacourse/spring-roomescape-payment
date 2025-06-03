@@ -8,12 +8,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.ActiveProfiles;
@@ -21,7 +21,6 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.web.client.RestClient;
-
 import roomescape.auth.dto.LoginMember;
 import roomescape.common.exception.custom.AlreadyInUseException;
 import roomescape.common.exception.custom.EntityNotFoundException;
@@ -29,21 +28,21 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.time.domain.ReservationTime;
-import roomescape.theme.domain.Theme;
-import roomescape.reservation.waiting.domain.Waiting;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.response.BookedReservationTimeResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
-import roomescape.theme.dto.response.ThemeResponse;
 import roomescape.reservation.payment.dto.request.PaymentRequest;
 import roomescape.reservation.payment.repository.PaymentRepository;
 import roomescape.reservation.payment.service.PaymentService;
 import roomescape.reservation.repository.ReservationRepository;
+import roomescape.reservation.time.domain.ReservationTime;
 import roomescape.reservation.time.repository.ReservationTimeRepository;
-import roomescape.theme.repository.ThemeRepository;
+import roomescape.reservation.waiting.domain.Waiting;
 import roomescape.reservation.waiting.repository.WaitingRepository;
+import roomescape.theme.domain.Theme;
+import roomescape.theme.dto.response.ThemeResponse;
+import roomescape.theme.repository.ThemeRepository;
 
 @ActiveProfiles("test")
 @DataJpaTest
@@ -67,12 +66,15 @@ class ReservationServiceTest {
     private WaitingRepository waitingRepository;
     @Autowired
     private PaymentRepository paymentRepository;
+    @Value("${toss.payment.secret-key}")
+    private String secretKey;
+
     private PaymentService paymentService;
     private ReservationService reservationService;
 
     @BeforeEach
     void setUp() {
-        paymentService = new PaymentService(paymentRepository, reservationRepository, testBuilder);
+        paymentService = new PaymentService(paymentRepository, reservationRepository, testBuilder, secretKey);
         reservationService = new ReservationService(
                 paymentService, reservationRepository, reservationTimeRepository,
                 themeRepository, memberRepository, waitingRepository);

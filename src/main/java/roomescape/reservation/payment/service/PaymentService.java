@@ -1,10 +1,11 @@
 package roomescape.reservation.payment.service;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
@@ -12,10 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import roomescape.common.exception.custom.EntityNotFoundException;
 import roomescape.common.exception.custom.PaymentBadRequestException;
 import roomescape.common.exception.custom.PaymentServerException;
@@ -37,20 +34,20 @@ public class PaymentService {
     private final ReservationRepository reservationRepository;
     private final RestClient restClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    @Value("${toss.payment.secret-key}")
-    private String secretKey;
+    private final String secretKey;
 
     public PaymentService(
             final PaymentRepository paymentRepository,
             final ReservationRepository reservationRepository,
-            final RestClient.Builder builder
+            final RestClient.Builder builder,
+            @Value("${toss.payment.secret-key}") final String secretKey
     ) {
         this.paymentRepository = paymentRepository;
         this.reservationRepository = reservationRepository;
         this.restClient = builder.baseUrl(PAYMENTS_CONFIRM_ENDPOINT)
                 .build();
         this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        this.secretKey = secretKey;
     }
 
     public void confirm(final PaymentRequest request) {
@@ -70,7 +67,6 @@ public class PaymentService {
     private void handleError(final ClientHttpResponse res) {
         try (InputStream is = res.getBody()) {
             TossPaymentErrorResponse errorResponse = objectMapper.readValue(is, TossPaymentErrorResponse.class);
-            objectMapper.readValue(is, TossPaymentErrorResponse.class);
 
             String errorCode = errorResponse.code();
             if (InternalServerErrorCode.contains(errorCode)) {
