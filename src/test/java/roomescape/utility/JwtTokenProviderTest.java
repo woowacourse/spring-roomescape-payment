@@ -11,6 +11,7 @@ import roomescape.domain.Member;
 import roomescape.domain.Role;
 import roomescape.dto.business.AccessTokenContent;
 import roomescape.exception.UnauthorizedException;
+import roomescape.external.auth.JwtTokenProvider;
 
 class JwtTokenProviderTest {
 

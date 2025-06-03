@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.RestClient;
 import roomescape.domain.PaymentResult;
-import roomescape.utility.PaymentClient;
-import roomescape.utility.TossPaymentClient;
+import roomescape.external.payment.PaymentClient;
+import roomescape.external.payment.TossPaymentClient;
 
 @Disabled
 class PaymentApiTest {

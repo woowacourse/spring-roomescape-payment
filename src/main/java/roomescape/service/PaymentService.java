@@ -6,9 +6,9 @@ import roomescape.domain.PaymentHistory;
 import roomescape.domain.PaymentResult;
 import roomescape.dto.business.PaymentHistoryCreationContent;
 import roomescape.exception.aspect.ReservationLogging;
+import roomescape.external.payment.PaymentClient;
 import roomescape.repository.PaymentHistoryRepository;
 import roomescape.repository.PaymentResultRepository;
-import roomescape.utility.PaymentClient;
 
 @Service
 @Transactional

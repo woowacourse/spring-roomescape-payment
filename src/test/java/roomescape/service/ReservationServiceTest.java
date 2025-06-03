@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import roomescape.config.RoomescapeLockInitializer;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
@@ -37,6 +38,7 @@ import roomescape.repository.PaymentHistoryRepository;
 import roomescape.repository.PaymentResultRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
+import roomescape.repository.RoomescapeLockRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.repository.WaitingRepository;
 import roomescape.utility.PaymentClientStub;
@@ -60,6 +62,8 @@ class ReservationServiceTest {
     private PaymentResultRepository paymentResultRepository;
     @Autowired
     private ReservationTimeRepository timeRepository;
+    @Autowired
+    private RoomescapeLockRepository roomescapeLockRepository;
 
     private ReservationService reservationService;
     private ReservationTime reservationTime;
@@ -67,9 +71,15 @@ class ReservationServiceTest {
     private Member member;
     private PaymentService paymentService;
     private PaymentClientStub paymentClient;
+    private RoomescapeLockService roomescapeLockService;
+    @Autowired
+    private RoomescapeLockInitializer roomescapeLockInitializer;
 
     @BeforeEach
     void setup() {
+        roomescapeLockService = new RoomescapeLockService(roomescapeLockRepository,
+                new RoomescapeLockInitializer(roomescapeLockRepository));
+
         paymentClient = new PaymentClientStub();
         paymentService = new PaymentService(paymentHistoryRepository, paymentClient, paymentResultRepository);
         reservationService = new ReservationService(
@@ -78,7 +88,8 @@ class ReservationServiceTest {
                 themeRepository,
                 memberRepository,
                 waitingRepository,
-                paymentService);
+                paymentService,
+                roomescapeLockService);
 
         reservationTime = entityManager.persist(
                 ReservationTime.createWithoutId(LocalTime.of(10, 0)));

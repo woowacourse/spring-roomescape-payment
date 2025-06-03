@@ -9,9 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import roomescape.exception.PaymentException;
-import roomescape.utility.PaymentClient;
+import roomescape.external.payment.PaymentClient;
+import roomescape.external.payment.TossPaymentClient;
 import roomescape.utility.PaymentClientStub;
-import roomescape.utility.TossPaymentClient;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 class PaymentApiTest {

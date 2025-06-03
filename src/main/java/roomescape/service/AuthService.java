@@ -8,7 +8,7 @@ import roomescape.dto.request.LoginRequest;
 import roomescape.dto.response.AccessTokenResponse;
 import roomescape.exception.LoginFailException;
 import roomescape.repository.MemberRepository;
-import roomescape.utility.JwtTokenProvider;
+import roomescape.external.auth.JwtTokenProvider;
 
 @Service
 @Transactional

@@ -39,11 +39,12 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
     private final PaymentService paymentService;
+    private final RoomescapeLockService roomescapeLockService;
 
     public ReservationService(
             ReservationRepository reservationRepository, ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository, MemberRepository memberRepository, WaitingRepository waitingRepository,
-            PaymentService paymentService
+            PaymentService paymentService, RoomescapeLockService roomescapeLockService
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
@@ -51,6 +52,7 @@ public class ReservationService {
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
         this.paymentService = paymentService;
+        this.roomescapeLockService = roomescapeLockService;
     }
 
     public List<ReservationResponse> findAllReservations() {
@@ -114,6 +116,7 @@ public class ReservationService {
 
         validateDuplicateReservation(theme, reservationCreationContent.date(), time);
 
+        roomescapeLockService.doPersistenceLock();
         Reservation validateReservation = Reservation.createWithoutIdAndPaymentHistory(
                 reservationCreationContent.date(), time,
                 theme, member);

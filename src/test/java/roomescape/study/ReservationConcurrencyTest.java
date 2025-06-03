@@ -31,7 +31,7 @@ import roomescape.repository.ThemeRepository;
 import roomescape.service.ReservationService;
 
 @SpringBootTest
-class ReservationConcurrencyProblemProofTest {
+class ReservationConcurrencyTest {
 
     @Autowired
     private PlatformTransactionManager transactionManager;

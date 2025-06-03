@@ -7,8 +7,8 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import roomescape.config.interceptor.RoleCheckInterceptor;
 import roomescape.config.resolver.LoginMemberArgumentResolver;
-import roomescape.utility.CookieUtility;
-import roomescape.utility.JwtTokenProvider;
+import roomescape.external.auth.CookieUtility;
+import roomescape.external.auth.JwtTokenProvider;
 
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {

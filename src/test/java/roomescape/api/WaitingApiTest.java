@@ -24,12 +24,12 @@ import roomescape.domain.Theme;
 import roomescape.domain.Waiting;
 import roomescape.dto.business.AccessTokenContent;
 import roomescape.dto.request.WaitingCreationRequest;
+import roomescape.external.auth.JwtTokenProvider;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.repository.WaitingRepository;
-import roomescape.utility.JwtTokenProvider;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class WaitingApiTest {

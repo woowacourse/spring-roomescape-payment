@@ -21,8 +21,8 @@ import roomescape.dto.business.AccessTokenContent;
 import roomescape.dto.request.LoginRequest;
 import roomescape.exception.NotFoundException;
 import roomescape.exception.UnauthorizedException;
-import roomescape.utility.CookieUtility;
-import roomescape.utility.JwtTokenProvider;
+import roomescape.external.auth.CookieUtility;
+import roomescape.external.auth.JwtTokenProvider;
 
 class LoginMemberArgumentResolverTest {
 

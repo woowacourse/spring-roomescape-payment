@@ -3,6 +3,7 @@ package roomescape.utility;
 import org.springframework.web.client.RestClientException;
 import roomescape.domain.PaymentResult;
 import roomescape.exception.PaymentException;
+import roomescape.external.payment.PaymentClient;
 
 public class PaymentClientStub implements PaymentClient {
 

@@ -17,8 +17,8 @@ import roomescape.domain.Role;
 import roomescape.dto.business.AccessTokenContent;
 import roomescape.exception.ForbiddenException;
 import roomescape.exception.NotFoundException;
-import roomescape.utility.CookieUtility;
-import roomescape.utility.JwtTokenProvider;
+import roomescape.external.auth.CookieUtility;
+import roomescape.external.auth.JwtTokenProvider;
 
 class RoleCheckInterceptorTest {
 
