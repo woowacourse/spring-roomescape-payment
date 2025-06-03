@@ -139,7 +139,7 @@ public class ReservationService {
 
     private Reservation findReservation(final Long reservationId) {
         return reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 예약입니다."));
     }
 
     private void approveWaiting(final List<Waiting> waitings) {
