@@ -6,8 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
-import roomescape.payment.PaymentManager;
-import roomescape.common.TimeManager;
 import roomescape.exception.custom.reason.reservation.ReservationConflictException;
 import roomescape.exception.custom.reason.reservation.ReservationNotExistsMemberException;
 import roomescape.exception.custom.reason.reservation.ReservationNotExistsPendingException;
@@ -16,6 +14,7 @@ import roomescape.exception.custom.reason.reservation.ReservationNotExistsTimeEx
 import roomescape.exception.custom.reason.reservation.ReservationNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.PaymentManager;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.domain.ReservationStatus;
@@ -40,7 +39,7 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final PaymentManager paymentManager;
-    private final TimeManager timeManager;
+    private final ReservationTimeManager timeManager;
 
     @Transactional
     public ReservationResponse create(final ReservationPaymentRequest request, final LoginMember loginMember) {

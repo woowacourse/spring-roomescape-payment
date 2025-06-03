@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import jakarta.validation.Valid;
 import lombok.Builder;
 import lombok.extern.jackson.Jacksonized;
-import roomescape.payment.PaymentRequest;
+import roomescape.payment.dto.PaymentRequest;
 
 @Builder
 @Jacksonized

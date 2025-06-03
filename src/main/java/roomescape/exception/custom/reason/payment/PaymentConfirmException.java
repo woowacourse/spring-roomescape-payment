@@ -1,6 +1,6 @@
 package roomescape.exception.custom.reason.payment;
 
-import roomescape.payment.PaymentError;
+import roomescape.payment.dto.PaymentError;
 import roomescape.exception.custom.status.BadRequestException;
 
 public class PaymentConfirmException extends BadRequestException {

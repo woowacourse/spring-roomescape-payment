@@ -21,7 +21,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.common.TimeManager;
+import roomescape.infrastructure.TimeManager;
 import roomescape.exception.custom.reason.theme.ThemeNotFoundException;
 import roomescape.exception.custom.reason.theme.ThemeUsedException;
 import roomescape.member.domain.Member;

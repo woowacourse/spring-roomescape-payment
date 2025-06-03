@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.custom.reason.payment.PaymentConfirmException;
+import roomescape.payment.dto.PaymentError;
+import roomescape.payment.dto.PaymentRequest;
 
 // toss pg사 이용
 @Component

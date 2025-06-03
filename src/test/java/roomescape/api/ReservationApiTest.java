@@ -26,7 +26,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.payment.PaymentManager;
-import roomescape.payment.PaymentError;
+import roomescape.payment.dto.PaymentError;
 import roomescape.exception.custom.reason.payment.PaymentConfirmException;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
