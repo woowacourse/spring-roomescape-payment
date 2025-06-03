@@ -1,0 +1,108 @@
+package roomescape.payment.infrastructure.toss.client;
+
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.math.BigDecimal;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestClient;
+import roomescape.common.exception.ExternalApiException;
+import roomescape.payment.application.dto.PaymentApprovalRequest;
+
+class TossPaymentClientTest {
+    private final RestClient.Builder testBuilder = RestClient.builder()
+            .baseUrl("https://api.tosspayments.com");
+    private final String orderId = "test";
+    private final BigDecimal amount = BigDecimal.valueOf(1000);
+    private final String paymentKey = "test";
+    private final MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
+    private final TossPaymentClient tossPaymentClient = new TossPaymentClient(testBuilder.build(), new ObjectMapper());
+
+    @BeforeEach
+    void setUp() {
+        server.reset();
+    }
+
+    @DisplayName("결제 승인 API 호출 - 성공")
+    @Test
+    void approve_success() {
+        // given
+        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess());
+
+        // when & then
+        assertDoesNotThrow(() -> tossPaymentClient.approve(new PaymentApprovalRequest(orderId, amount, paymentKey)));
+    }
+
+    @DisplayName("결제 승인 API 호출 - 400에러이면서 메세지 노출이 가능한 경우 ExternalApiException 발생")
+    @Test
+    void approve_400ErrorWithMessage() {
+        String expectedBody = """
+                {
+                  "code": "NOT_FOUND_PAYMENT",
+                  "message": "존재하지 않는 결제 입니다."
+                }
+                """;
+
+        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(
+                        withStatus(HttpStatus.BAD_REQUEST).body(expectedBody).contentType(MediaType.APPLICATION_JSON));
+
+        assertThatCode(() -> tossPaymentClient.approve(new PaymentApprovalRequest(orderId, amount, paymentKey)))
+                .isInstanceOf(ExternalApiException.class);
+    }
+
+    @DisplayName("결제 승인 API 호출 - 400에러이면서 메세지 노출이 불가능한 경우 defalut 메세지 설정")
+    @Test
+    void approve_400ErrorWithoutMessage() {
+        String expectedBody = """
+                {
+                  "code": "INVALID_API_KEY",
+                  "message": "일치하지 않는 키입니다"
+                }
+                """;
+
+        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(
+                        withStatus(HttpStatus.BAD_REQUEST).body(expectedBody).contentType(MediaType.APPLICATION_JSON));
+
+        assertThatCode(() -> tossPaymentClient.approve(new PaymentApprovalRequest(orderId, amount, paymentKey)))
+                .isInstanceOf(ExternalApiException.class)
+                .hasMessageContaining("결제 승인에 오류가 발생하였습니다. 관리자에게 문의하세요");
+    }
+
+    @DisplayName("결제 승인 API 호출 - 500에러의 경우 ExternalApiException 발생")
+    @Test
+    void approve_500Error() {
+        String expectedBody = """
+                {
+                  "code": "NOT_FOUND_PAYMENT",
+                  "message": "존재하지 않는 결제 입니다."
+                }
+                """;
+
+        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(
+                        withStatus(HttpStatus.INTERNAL_SERVER_ERROR).body(expectedBody)
+                                .contentType(MediaType.APPLICATION_JSON));
+
+        assertThatCode(() -> tossPaymentClient.approve(new PaymentApprovalRequest(orderId, amount, paymentKey)))
+                .isInstanceOf(ExternalApiException.class);
+    }
+
+}
