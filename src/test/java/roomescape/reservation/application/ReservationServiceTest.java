@@ -2,9 +2,6 @@ package roomescape.reservation.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -15,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.member.application.dto.MemberResponse;
-import roomescape.payment.application.PaymentService;
-import roomescape.payment.domain.Payment;
 import roomescape.reservation.application.dto.AvailableReservationTimeResponse;
 import roomescape.reservation.application.dto.MemberReservationRequest;
 import roomescape.reservation.application.dto.MyReservation;
@@ -36,9 +30,6 @@ class ReservationServiceTest {
     @Autowired
     private ReservationService reservationService;
 
-    @MockitoBean
-    private PaymentService paymentService;
-
     @Autowired
     private WaitingService waitingService;
 
@@ -52,10 +43,6 @@ class ReservationServiceTest {
     void 예약을_추가한다() {
         // given
         final MemberReservationRequest request = createRequest(LocalDate.now().plusDays(1), 1L, 1L);
-
-        when(paymentService.addPayment(any()))
-            .thenReturn(mock(Payment.class));
-
         // when & then
         assertThat(reservationService.addMemberReservation(request, 1L)).isEqualTo(
             new ReservationResponse(

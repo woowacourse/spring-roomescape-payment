@@ -1,9 +1,7 @@
 package roomescape.payment.application.dto;
 
-import roomescape.reservation.domain.Reservation;
-
 public record PaymentRequest(
-    Reservation reservation,
+    Long reservationId,
     String paymentKey,
     String orderId,
     Long amount
