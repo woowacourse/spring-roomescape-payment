@@ -9,7 +9,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import roomescape.common.response.ApiResponse;
-import roomescape.payment.infrastructure.toss.exception.TossException;
 
 @Slf4j
 @ControllerAdvice
@@ -32,8 +31,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
-    @ExceptionHandler(TossException.class)
-    public ResponseEntity<ApiResponse<?>> handleTossException(TossException e) {
+    @ExceptionHandler(ExternalApiException.class)
+    public ResponseEntity<ApiResponse<?>> handleTossException(ExternalApiException e) {
         return ResponseEntity.status(e.getStatus()).body(ApiResponse.createError(e.getMessage()));
     }
 

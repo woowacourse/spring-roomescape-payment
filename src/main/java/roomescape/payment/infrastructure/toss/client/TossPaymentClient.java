@@ -7,13 +7,14 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import roomescape.common.exception.ExternalApiException;
 import roomescape.payment.application.dto.PaymentApprovalRequest;
 import roomescape.payment.infrastructure.toss.exception.TossErrorResponse;
-import roomescape.payment.infrastructure.toss.exception.TossInternalException;
-import roomescape.payment.infrastructure.toss.exception.TossPaymentApprovalFailedException;
 
 @Component
 public class TossPaymentClient {
+    public static final String DEFAULT_ERROR_MESSAGE = "결제 승인에 오류가 발생하였습니다. 관리자에게 문의하세요";
+    private static final String SERVICE_NAME = "Toss";
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
@@ -36,18 +37,27 @@ public class TossPaymentClient {
     private void handle4xxError(ClientHttpResponse response) {
         TossErrorResponse errorResponse = parseErrorResponse(response);
         if (errorResponse.hasNonUserFacingMessage()) {
-            throw new TossInternalException();
+            throw new ExternalApiException(
+                    SERVICE_NAME,
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    errorResponse.code(),
+                    DEFAULT_ERROR_MESSAGE
+            );
         }
-        throw new TossPaymentApprovalFailedException(
+        throw new ExternalApiException(
+                SERVICE_NAME,
                 HttpStatus.BAD_REQUEST,
+                errorResponse.code(),
                 errorResponse.message()
         );
     }
 
     private void handle5xxError(ClientHttpResponse response) {
         TossErrorResponse errorResponse = parseErrorResponse(response);
-        throw new TossPaymentApprovalFailedException(
+        throw new ExternalApiException(
+                SERVICE_NAME,
                 HttpStatus.INTERNAL_SERVER_ERROR,
+                errorResponse.code(),
                 errorResponse.message()
         );
     }
@@ -56,7 +66,12 @@ public class TossPaymentClient {
         try {
             return objectMapper.readValue(response.getBody(), TossErrorResponse.class);
         } catch (Exception e) {
-            throw new TossInternalException();
+            throw new ExternalApiException(
+                    SERVICE_NAME,
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "PARSE_FAILED",
+                    "Toss 응답 파싱 실패"
+            );
         }
     }
 }
