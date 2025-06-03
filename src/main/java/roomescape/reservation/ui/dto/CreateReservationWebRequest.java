@@ -1,11 +1,11 @@
 package roomescape.reservation.ui.dto;
 
+import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.experimental.FieldNameConstants;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.validate.Validator;
-
-import java.time.LocalDate;
+import roomescape.payment.dto.PaymentRequest;
 
 @FieldNameConstants(level = AccessLevel.PRIVATE)
 public record CreateReservationWebRequest(LocalDate date,
@@ -26,11 +26,7 @@ public record CreateReservationWebRequest(LocalDate date,
                 date,
                 timeId,
                 themeId,
-                userId,
-                paymentKey,
-                orderId,
-                amount,
-                paymentType
+                userId
         );
     }
 
@@ -45,5 +41,9 @@ public record CreateReservationWebRequest(LocalDate date,
                 .validateNotNull(Fields.amount, amount, DomainTerm.PAYMENT_AMOUNT.label())
                 .validateNotNull(Fields.paymentType, paymentType, DomainTerm.PAYMENT_TYPE.label());
 
+    }
+
+    public PaymentRequest toPaymentRequest() {
+        return new PaymentRequest(paymentKey, amount, orderId, paymentType);
     }
 }

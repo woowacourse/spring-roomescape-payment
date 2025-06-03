@@ -5,7 +5,6 @@ import lombok.experimental.FieldNameConstants;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.validate.Validator;
 import roomescape.payment.exception.PaymentApiException;
-import roomescape.reservation.ui.dto.CreateReservationWithUserIdWebRequest;
 
 @FieldNameConstants(level = AccessLevel.PRIVATE)
 
@@ -18,7 +17,7 @@ public record PaymentResult(String paymentKey,
         validate(paymentKey, orderId, amount, paymentType);
     }
 
-    public void verifyPayment(CreateReservationWithUserIdWebRequest request, PaymentResult paymentResult) {
+    public void verifyPayment(PaymentRequest request, PaymentResult paymentResult) {
         if (!(paymentResult.orderId().equals(request.orderId())
                 && paymentResult.paymentKey().equals(request.paymentKey())
                 && paymentResult.amount() == request.amount())) {

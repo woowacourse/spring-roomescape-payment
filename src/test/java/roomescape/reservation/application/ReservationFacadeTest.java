@@ -24,6 +24,7 @@ import roomescape.common.domain.DomainTerm;
 import roomescape.common.domain.Email;
 import roomescape.common.exception.NotFoundException;
 import roomescape.payment.client.TossPaymentClient;
+import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResult;
 import roomescape.reservation.application.dto.MyReservationsResponse;
 import roomescape.reservation.application.service.ReservationCommandService;
@@ -199,16 +200,38 @@ class ReservationFacadeTest {
     void create() {
         //given
         CreateReservationWithUserIdWebRequest request = createCreateRequest();
-        PaymentResult response = new PaymentResult(request.paymentKey(),
-                request.amount(),
-                request.orderId(),
+
+        Reservation reservation = createReservation(1L);
+        given(userQueryService.getById(any())).willReturn(createUser(1L));
+        given(reservationCommandService.create(any())).willReturn(reservation);
+        //when
+        ReservationResponse result = reservationFacade.create(request);
+
+        //then
+        assertThat(result).isNotNull();
+        then(reservationCommandService).should(times(1)).create(any());
+    }
+
+    @Test
+    @DisplayName("결제를 포함한 예약을 성공적으로 생성한다")
+    void createWithPayment() {
+        //given
+        CreateReservationWithUserIdWebRequest request = createCreateRequest();
+        PaymentRequest paymentRequest = new PaymentRequest("paymentKey",
+                0,
+                "orderId",
                 "DONE");
+        PaymentResult response = new PaymentResult("paymentKey",
+                0,
+                "orderId",
+                "DONE");
+
         Reservation reservation = createReservation(1L);
         given(userQueryService.getById(any())).willReturn(createUser(1L));
         given(reservationCommandService.create(any())).willReturn(reservation);
         given(tossPaymentClient.confirmPayment(any())).willReturn(response);
         //when
-        ReservationResponse result = reservationFacade.create(request);
+        ReservationResponse result = reservationFacade.createWithPayment(request, paymentRequest);
 
         //then
         assertThat(result).isNotNull();
@@ -361,8 +384,7 @@ class ReservationFacadeTest {
 
     private CreateReservationWithUserIdWebRequest createCreateRequest() {
         return new CreateReservationWithUserIdWebRequest(
-                LocalDate.now().plusDays(1),
-                1L, 1L, 1L, "paymentKey", "orderId", 0, "DONE"
+                LocalDate.now().plusDays(1), 1L, 1L, 1L
         );
     }
 }

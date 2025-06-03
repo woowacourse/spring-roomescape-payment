@@ -90,18 +90,23 @@ public class ReservationFacadeImpl implements ReservationFacade {
 
     @Override
     @Transactional
-    public ReservationResponse create(final CreateReservationWithUserIdWebRequest request) {
-        final User user = userQueryService.getById(request.userId());
+    public ReservationResponse createWithPayment(final CreateReservationWithUserIdWebRequest reservationRequest,
+                                                 final PaymentRequest paymentRequest) {
+        final User user = userQueryService.getById(reservationRequest.userId());
         final Reservation reservation = reservationCommandService.create(
-                request.toServiceRequest());
+                reservationRequest.toServiceRequest());
 
-        PaymentResult paymentResult = paymentClient.confirmPayment(
-                new PaymentRequest(request.paymentKey(),
-                        request.amount(),
-                        request.orderId(),
-                        request.paymentType())
-        );
-        paymentResult.verifyPayment(request, paymentResult);
+        PaymentResult paymentResult = paymentClient.confirmPayment(paymentRequest);
+        paymentResult.verifyPayment(paymentRequest, paymentResult);
+
+        return ReservationResponse.from(reservation, user);
+    }
+
+    @Override
+    public ReservationResponse create(CreateReservationWithUserIdWebRequest reservationRequest) {
+        final User user = userQueryService.getById(reservationRequest.userId());
+        final Reservation reservation = reservationCommandService.create(
+                reservationRequest.toServiceRequest());
 
         return ReservationResponse.from(reservation, user);
     }

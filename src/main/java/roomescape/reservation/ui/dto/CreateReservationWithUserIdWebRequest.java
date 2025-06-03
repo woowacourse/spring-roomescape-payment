@@ -12,15 +12,11 @@ import roomescape.reservation.domain.ReservationDate;
 public record CreateReservationWithUserIdWebRequest(LocalDate date,
                                                     Long timeId,
                                                     Long themeId,
-                                                    Long userId,
-                                                    String paymentKey,
-                                                    String orderId,
-                                                    int amount,
-                                                    String paymentType
+                                                    Long userId
 ) {
 
     public CreateReservationWithUserIdWebRequest {
-        validate(date, timeId, themeId, userId, paymentKey, orderId, amount, paymentType);
+        validate(date, timeId, themeId, userId);
     }
 
     public CreateReservationServiceRequest toServiceRequest() {
@@ -32,16 +28,11 @@ public record CreateReservationWithUserIdWebRequest(LocalDate date,
         );
     }
 
-    private void validate(final LocalDate date, final Long timeId, final Long themeId, final Long userId,
-                          final String paymentKey, final String orderId, final int amount, final String paymentType) {
+    private void validate(final LocalDate date, final Long timeId, final Long themeId, final Long userId) {
         Validator.of(CreateReservationWithUserIdWebRequest.class)
                 .validateNotNull(Fields.date, date, DomainTerm.RESERVATION_DATE.label())
                 .validateNotNull(Fields.timeId, timeId, DomainTerm.RESERVATION_TIME_ID.label())
                 .validateNotNull(Fields.themeId, themeId, DomainTerm.THEME_ID.label())
-                .validateNotNull(Fields.userId, userId, DomainTerm.USER_ID.label())
-                .validateNotNull(Fields.paymentKey, paymentKey, DomainTerm.PAYMENT_KEY.label())
-                .validateNotNull(Fields.orderId, orderId, DomainTerm.PAYMENT_ORDER_ID.label())
-                .validateNotNull(Fields.amount, amount, DomainTerm.PAYMENT_AMOUNT.label())
-                .validateNotNull(Fields.paymentType, paymentType, DomainTerm.PAYMENT_TYPE.label());
+                .validateNotNull(Fields.userId, userId, DomainTerm.USER_ID.label());
     }
 }
