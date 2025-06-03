@@ -90,8 +90,8 @@ class TossPaymentClientTest {
                 .expect(requestTo(API_URL))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withResourceNotFound()
-                        .body(expectedResponse)
-                        .contentType(MediaType.APPLICATION_JSON));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(expectedResponse));
 
         // when // then
         assertThatThrownBy(() -> paymentClient.confirmPayment(request))
@@ -110,7 +110,7 @@ class TossPaymentClientTest {
         ConfirmPaymentRequest request = new ConfirmPaymentRequest(paymentKey, orderId, amount, paymentType);
         String expectedResponse = """
                 {
-                    "code": %s,
+                    "code": "%s",
                     "message": "에러 메시지"
                 }
                 """.formatted(tossErrorCode.name());
@@ -119,8 +119,8 @@ class TossPaymentClientTest {
                 .expect(requestTo(API_URL))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withResourceNotFound()
-                        .body(expectedResponse)
-                        .contentType(MediaType.APPLICATION_JSON));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(expectedResponse));
 
         // when // then
         assertThatThrownBy(() -> paymentClient.confirmPayment(request))

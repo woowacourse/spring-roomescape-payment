@@ -59,6 +59,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                          and rw.status = :status
                          and rw.createAt <= r.createAt))
             from Reservation r
+            join fetch r.member
+            join fetch r.reservationTime
+            join fetch r.theme
+            join fetch r.payment
             where r.member.id = :memberId
             """)
     List<ReservationWithRank> findReservationWithRank(@Param("memberId") Long memberId,

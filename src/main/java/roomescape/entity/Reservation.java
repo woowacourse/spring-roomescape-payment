@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -45,6 +46,9 @@ public class Reservation {
     @Enumerated(value = EnumType.STRING)
     private ReservationStatus status;
 
+    @OneToOne(mappedBy = "reservation")
+    private Payment payment;
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createAt;
@@ -57,20 +61,15 @@ public class Reservation {
                        LocalDate date,
                        ReservationTime reservationTime,
                        Theme theme,
-                       ReservationStatus status) {
+                       ReservationStatus status,
+                       Payment payment) {
         this.id = id;
         this.member = member;
         this.date = date;
         this.reservationTime = reservationTime;
         this.theme = theme;
         this.status = status;
-    }
-
-    public Reservation(LocalDate date,
-                       ReservationTime reservationTime,
-                       Theme theme,
-                       ReservationStatus status) {
-        this(null, null, date, reservationTime, theme, status);
+        this.payment = payment;
     }
 
     public Reservation(Member member,
@@ -78,7 +77,7 @@ public class Reservation {
                        ReservationTime reservationTime,
                        Theme theme,
                        ReservationStatus status) {
-        this(null, member, date, reservationTime, theme, status);
+        this(null, member, date, reservationTime, theme, status, null);
     }
 
     public long calculateWaitRank(List<Reservation> allReservations) {
@@ -118,6 +117,11 @@ public class Reservation {
         this.status = ReservationStatus.RESERVED;
     }
 
+    public void payForReservation(Payment payment) {
+        this.payment = payment;
+        payment.setReservation(this);
+    }
+
     public Long getId() {
         return id;
     }
@@ -152,6 +156,10 @@ public class Reservation {
 
     public ReservationStatus getStatus() {
         return status;
+    }
+
+    public Payment getPayment() {
+        return payment;
     }
 
     protected void setMember(Member member) {

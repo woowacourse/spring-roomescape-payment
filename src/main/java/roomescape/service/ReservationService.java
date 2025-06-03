@@ -47,10 +47,9 @@ public class ReservationService {
         this.themeRepository = themeRepository;
     }
 
-    public ReservationResponse addReservation(AddReservationRequest request, LoginMemberRequest loginMemberRequest) {
-        Reservation reservation = createReservation(loginMemberRequest.id(), request.themeId(), request.date(),
+    public Reservation addReservation(AddReservationRequest request, LoginMemberRequest loginMemberRequest) {
+        return createReservation(loginMemberRequest.id(), request.themeId(), request.date(),
                 request.timeId(), ReservationStatus.RESERVED);
-        return ReservationResponse.from(reservation);
     }
 
     public ReservationResponse addReservationByAdmin(AdminCreateReservationRequest request) {

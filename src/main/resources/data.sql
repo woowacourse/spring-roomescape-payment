@@ -6,6 +6,8 @@ DELETE
 FROM theme;
 DELETE
 FROM member;
+DELETE
+FROM payment;
 
 -- member 데이터
 INSERT INTO member(name, email, password, role)
@@ -37,3 +39,12 @@ VALUES (1, DATEADD('DAY', -1, CURRENT_DATE), 1, 1, 'RESERVED', DATEADD('DAY', -1
        (1, '2025-07-01', 1, 1, 'RESERVED', '2025-05-20 10:15:00'),
        (2, '2025-07-01', 1, 1, 'WAIT', '2025-05-21 08:00:00'),
        (3, '2025-07-01', 1, 1, 'WAIT', '2025-05-21 08:01:00');
+
+INSERT INTO payment(order_id, payment_key, amount, reservation_id)
+VALUES ('orderId1', 'paymentKey1', 1000, 1),
+        ('orderId2', 'paymentKey2', 1000, 2),
+        ('orderId3', 'paymentKey3', 1000, 3),
+        ('orderId4', 'paymentKey4', 1000, 4),
+        ('orderId5', 'paymentKey5', 1000, 5),
+        ('orderId6', 'paymentKey6', 1000, 6),
+        ('orderId7', 'paymentKey7', 1000, 7);

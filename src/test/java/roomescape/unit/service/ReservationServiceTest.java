@@ -74,8 +74,9 @@ class ReservationServiceTest {
     @Test
     void 예약_전체를_조회할_수_있다() {
         //given
-        Reservation reservation = new Reservation(1L, member, LocalDate.now(), time, theme, ReservationStatus.RESERVED);
-        Reservation reservation2 = new Reservation(2L, new Member(2L, "test2", "test2@email.com", "1234", Role.USER),
+        Reservation reservation = new Reservation(member, LocalDate.now(), time, theme, ReservationStatus.RESERVED);
+        Reservation reservation2 = new Reservation(
+                new Member("test2", "test2@email.com", "1234", Role.USER),
                 LocalDate.now(), time, theme, ReservationStatus.RESERVED);
 
         when(reservationRepository.findAll())
@@ -103,20 +104,21 @@ class ReservationServiceTest {
                 .thenReturn(Optional.of(theme));
 
         //when
-        ReservationResponse actual = reservationService.addReservation(request, loginMemberRequest);
+        Reservation actual = reservationService.addReservation(request, loginMemberRequest);
 
         //then
         assertAll(
-                () -> assertThat(actual.time()).isEqualTo(time.getStartAt()),
-                () -> assertThat(actual.themeName()).isEqualTo(theme.getName()),
-                () -> assertThat(actual.name()).isEqualTo(member.getName())
+                () -> assertThat(actual.getStartAt()).isEqualTo(time.getStartAt()),
+                () -> assertThat(actual.getThemeName()).isEqualTo(theme.getName()),
+                () -> assertThat(actual.getName()).isEqualTo(member.getName())
         );
     }
 
     @Test
     void 예약을_삭제할_수_있다() {
         //given
-        Reservation reservation = new Reservation(LocalDate.of(3000, 1, 1), time, theme, ReservationStatus.RESERVED);
+        Reservation reservation = new Reservation(member, LocalDate.of(3000, 1, 1), time, theme,
+                ReservationStatus.RESERVED);
 
         when(reservationRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(reservation));
@@ -163,8 +165,12 @@ class ReservationServiceTest {
         when(themeRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(theme));
 
-        Reservation reservation2 = new Reservation(2L, new Member(2L, "test2", "test2@email.com", "1234", Role.USER),
-                LocalDate.now(), time, theme, ReservationStatus.RESERVED);
+        Reservation reservation2 = new Reservation(
+                new Member(2L, "test2", "test2@email.com", "1234", Role.USER),
+                LocalDate.now(),
+                time,
+                theme,
+                ReservationStatus.RESERVED);
 
         AddReservationRequest request = new AddReservationRequest(date, time.getId(), theme.getId());
 
@@ -178,7 +184,9 @@ class ReservationServiceTest {
                 reservation2.getTheme().getName(),
                 reservation2.getDate(),
                 reservation2.getStartAt(),
-                reservation2.getStatus().renderText(0));
+                reservation2.getStatus().renderText(0),
+                "",
+                1000);
 
         assertAll(
                 () -> assertThat(actual).hasSize(1),
@@ -213,7 +221,8 @@ class ReservationServiceTest {
     @Test
     void 예약_대기를_삭제할_수_있다() {
         //given
-        Reservation reservation = new Reservation(LocalDate.of(3000, 1, 1), time, theme, ReservationStatus.WAIT);
+        Reservation reservation = new Reservation(member, LocalDate.of(3000, 1, 1), time, theme,
+                ReservationStatus.WAIT);
 
         when(reservationRepository.findById(any(Long.class)))
                 .thenReturn(Optional.of(reservation));

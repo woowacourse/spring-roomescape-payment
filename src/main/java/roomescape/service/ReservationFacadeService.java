@@ -11,6 +11,7 @@ import roomescape.dto.request.LoginMemberRequest;
 import roomescape.dto.response.MyReservationResponse;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationWaitResponse;
+import roomescape.entity.Reservation;
 
 @Service
 @Transactional
@@ -27,12 +28,12 @@ public class ReservationFacadeService {
     public ReservationResponse addReservation(CreateReservationRequest request,
                                               LoginMemberRequest loginMemberRequest) {
         AddReservationRequest addReservationRequest = AddReservationRequest.from(request);
-        ReservationResponse response = reservationService.addReservation(addReservationRequest, loginMemberRequest);
+        Reservation reservation = reservationService.addReservation(addReservationRequest, loginMemberRequest);
 
         ConfirmPaymentRequest confirmPaymentRequest = ConfirmPaymentRequest.from(request);
-        paymentService.confirmPayment(confirmPaymentRequest);
+        paymentService.confirmPayment(confirmPaymentRequest, reservation);
 
-        return response;
+        return ReservationResponse.from(reservation);
     }
 
     public List<ReservationResponse> findAllReservation() {
