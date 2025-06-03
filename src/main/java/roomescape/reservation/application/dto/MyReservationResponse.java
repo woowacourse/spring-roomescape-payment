@@ -1,10 +1,13 @@
 package roomescape.reservation.application.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.waiting.domain.WaitingWithRank;
 
@@ -13,20 +16,36 @@ public record MyReservationResponse(
         String theme,
         LocalDate date,
         LocalTime time,
-        String status
+        String status,
+        String paymentKey,
+        BigDecimal amount
 ) {
     public static final String RESERVED = "예약";
     public static final String WAITING = "번째 예약 대기";
 
-    public static List<MyReservationResponse> of(List<Reservation> reservations, List<WaitingWithRank> waitings) {
+    public static List<MyReservationResponse> of(
+            List<Reservation> reservations,
+            List<WaitingWithRank> waitings,
+            Map<Long, Payment> payments) {
         List<MyReservationResponse> reservationResponses = reservations.stream()
-                .map(reservation ->
-                        new MyReservationResponse(
-                                reservation.getId(),
-                                reservation.getTheme().getName(),
-                                reservation.getDate(),
-                                reservation.getTime().getStartAt(),
-                                RESERVED))
+                .map(reservation -> {
+                    Payment payment = payments.get(reservation.getId());
+                    String paymentKey = null;
+                    BigDecimal amount = null;
+                    if (payment != null) {
+                        paymentKey = payment.getPaymentKey();
+                        amount = payment.getAmount();
+                    }
+                    return new MyReservationResponse(
+                            reservation.getId(),
+                            reservation.getTheme().getName(),
+                            reservation.getDate(),
+                            reservation.getTime().getStartAt(),
+                            RESERVED,
+                            paymentKey,
+                            amount
+                    );
+                })
                 .toList();
 
         List<MyReservationResponse> waitingResponses = waitings.stream()
@@ -36,7 +55,10 @@ public record MyReservationResponse(
                                 waiting.getTheme().getName(),
                                 waiting.getDate(),
                                 waiting.getTime().getStartAt(),
-                                waiting.getRank() + WAITING))
+                                waiting.getRank() + WAITING,
+                                null,
+                                null)
+                )
                 .toList();
 
         return Stream.concat(reservationResponses.stream(), waitingResponses.stream())

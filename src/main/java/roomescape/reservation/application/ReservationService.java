@@ -3,7 +3,9 @@ package roomescape.reservation.application;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -59,7 +61,18 @@ public class ReservationService {
         List<Reservation> reservations = reservationRepository.findAllByMemberId(memberId);
         List<Waiting> myWaitings = waitingRepository.findByMemberId(memberId);
         List<WaitingWithRank> rankedWaitings = getWaitingWithRanks(myWaitings);
-        return MyReservationResponse.of(reservations, rankedWaitings);
+        Map<Long, Payment> reservationIdToPayment = findPaymentsGroupedByReservationId(memberId);
+
+        return MyReservationResponse.of(reservations, rankedWaitings, reservationIdToPayment);
+    }
+
+    private Map<Long, Payment> findPaymentsGroupedByReservationId(Long memberId) {
+        List<Payment> myPayments = paymentService.findAllByMemberId(memberId);
+        return myPayments.stream()
+                .collect(Collectors.toMap(
+                        payment -> payment.getReservation().getId(),
+                        payment -> payment
+                ));
     }
 
     private List<WaitingWithRank> getWaitingWithRanks(List<Waiting> myWaitings) {

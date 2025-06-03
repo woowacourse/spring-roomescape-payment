@@ -47,7 +47,8 @@ function render(apiResponse) {
      */
       row.insertCell(4).textContent = '';
       row.insertCell(5).textContent = item.paymentKey;
-      row.insertCell(6).textContent = item.amount;Add comment        }
+      row.insertCell(6).textContent = item.amount;
+      }
     });
 }
 
