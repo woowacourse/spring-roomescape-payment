@@ -11,10 +11,10 @@ import roomescape.payment.dto.response.PaymentResponse;
 import roomescape.payment.exception.TossPaymentClientException;
 import roomescape.payment.exception.TossPaymentServerException;
 import roomescape.payment.exception.TossServerErrorCode;
-import roomescape.payment.service.ApiClient;
+import roomescape.payment.service.PaymentApiClient;
 
 @Component
-public class TossApiClient implements ApiClient {
+public class TossApiClient implements PaymentApiClient {
 
     private static final String SECRET_KEY_SUFFIX = ":";
     private static final String AUTHORIZATION_HEADER = "Basic ";
