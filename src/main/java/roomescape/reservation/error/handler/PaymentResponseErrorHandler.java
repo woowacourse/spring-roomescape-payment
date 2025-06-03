@@ -24,14 +24,18 @@ public class PaymentResponseErrorHandler implements ResponseErrorHandler {
     @Override
     public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
         if (response.getStatusCode().is4xxClientError()) {
-            InputStream inputStream = response.getBody();
-            PaymentErrorResponse paymentErrorResponse = parseErrorResponse(inputStream);
+            PaymentErrorResponse paymentErrorResponse = parseErrorResponse(response);
             throw new PaymentClientException(response.getStatusCode(), paymentErrorResponse);
         }
         if (response.getStatusCode().is5xxServerError()) {
-            InputStream inputStream = response.getBody();
-            PaymentErrorResponse paymentErrorResponse = parseErrorResponse(inputStream);
+            PaymentErrorResponse paymentErrorResponse = parseErrorResponse(response);
             throw new PaymentServerException(response.getStatusCode(), paymentErrorResponse);
+        }
+    }
+
+    private PaymentErrorResponse parseErrorResponse(ClientHttpResponse response) throws IOException {
+        try (InputStream inputStream = response.getBody()) {
+            return parseErrorResponse(inputStream);
         }
     }
 
