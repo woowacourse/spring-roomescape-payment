@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.DuplicatedException;
 import roomescape.dto.LoginMember;
@@ -35,7 +36,7 @@ public class ReservationTicketService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRED)
     public ReservationTicket saveReservation(
             ReservationTicketRegisterDto reservationTicketRegisterDto,
             LoginMember loginMember) {

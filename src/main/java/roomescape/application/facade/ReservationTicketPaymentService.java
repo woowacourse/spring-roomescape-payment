@@ -1,5 +1,6 @@
 package roomescape.application.facade;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.application.service.ReservationTicketService;
@@ -16,6 +17,7 @@ public class ReservationTicketPaymentService {
     private final ReservationTicketService reservationTicketService;
     private final TossPaymentService tossPaymentService;
 
+    @Transactional
     public ReservationTicketResponseDto saveReservationWithTossPaymentGateWay(
             ReservationTicketPaymentWithTossRequestDto reservationTicketPaymentWithTossRequestDto,
             LoginMember loginMember) {
