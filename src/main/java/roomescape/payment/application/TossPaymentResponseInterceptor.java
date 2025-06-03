@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+import roomescape.common.exception.impl.DeserializationException;
 import roomescape.common.exception.impl.TossPaymentErrorException;
 import roomescape.payment.application.dto.TossErrorResponse;
 
@@ -40,7 +41,7 @@ public class TossPaymentResponseInterceptor implements ClientHttpRequestIntercep
         try (InputStream errorBody = bodyStream) {
             return objectMapper.readValue(errorBody, TossErrorResponse.class);
         } catch (Exception e) {
-            throw new RuntimeException("Error parsing Toss error", e);
+            throw new DeserializationException("Error parsing Toss error", e);
         }
     }
 }
