@@ -10,17 +10,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
+import roomescape.common.config.TimeoutProperties;
+import roomescape.common.config.TossPaymentsProperties;
 import roomescape.common.exception.PaymentException;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.toss.TossPaymentClient;
 import roomescape.payment.toss.TossPaymentError;
 
 @RestClientTest({PaymentService.class, TossPaymentClient.class})
+@EnableConfigurationProperties({TossPaymentsProperties.class, TimeoutProperties.class})
 class TossPaymentServiceTest {
 
     @Autowired

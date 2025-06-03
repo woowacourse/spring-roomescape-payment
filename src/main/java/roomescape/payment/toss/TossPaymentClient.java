@@ -5,9 +5,9 @@ import static org.springframework.web.client.RestClient.Builder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Base64.Encoder;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import roomescape.common.config.TossPaymentsProperties;
 import roomescape.payment.PaymentClient;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.payment.dto.PaymentConfirmResponse;
@@ -20,15 +20,12 @@ public class TossPaymentClient implements PaymentClient {
 
     private RestClient restClient;
 
-    public TossPaymentClient(
-            @Value("${toss.base-url}") String baseUrl,
-            @Value("${pay.toss.secret-key}") String secretKey,
-            Builder restClientBuilder) {
-        restClient = restClientBuilder
+    public TossPaymentClient(TossPaymentsProperties properties, Builder restClientBuilder) {
+            restClient = restClientBuilder
                 .defaultStatusHandler(new TossPaymentErrorHandler())
-                .defaultHeader("Authorization", getAuthorization(secretKey))
+                .defaultHeader("Authorization", getAuthorization(properties.getSecretKey()))
                 .defaultHeader("Content-Type", "application/json")
-                .baseUrl(baseUrl)
+                .baseUrl(properties.getBaseUrl())
                 .build();
     }
 

@@ -24,3 +24,11 @@ spring:
   sql:
     init:
       mode: never
+
+pay:
+  toss:
+    secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+    base-url: https://api.tosspayments.com/v1/payments/confirm
+    timeout:
+      connection: 2000
+      read: 8000
