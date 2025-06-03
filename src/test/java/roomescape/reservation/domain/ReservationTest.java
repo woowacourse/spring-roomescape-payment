@@ -10,11 +10,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationDate;
+import roomescape.domain.reservation.ReservationStatus;
 import roomescape.exception.custom.reason.reservation.ReservationPastTimeException;
-import roomescape.member.domain.Member;
-import roomescape.member.domain.MemberRole;
-import roomescape.reservationtime.domain.ReservationTime;
-import roomescape.theme.domain.Theme;
+import roomescape.domain.member.Member;
+import roomescape.domain.member.MemberRole;
+import roomescape.domain.reservationtime.ReservationTime;
+import roomescape.domain.theme.Theme;
 
 class ReservationTest {
 

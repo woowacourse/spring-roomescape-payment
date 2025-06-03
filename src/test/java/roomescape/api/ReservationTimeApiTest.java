@@ -20,10 +20,10 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
-import roomescape.reservationtime.dto.ReservationTimeRequest;
+import roomescape.domain.reservationtime.dto.ReservationTimeRequest;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class ReservationTimeApiTest {
+class ReservationTimeApiTest {
 
     private final JdbcTemplate jdbcTemplate;
     private final int port;

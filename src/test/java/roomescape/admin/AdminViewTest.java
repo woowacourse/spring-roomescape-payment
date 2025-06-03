@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
-import roomescape.auth.PasswordEncoder;
+import roomescape.infrastructure.auth.PasswordEncoder;
 
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)

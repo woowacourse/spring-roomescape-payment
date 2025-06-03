@@ -10,13 +10,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
-import roomescape.auth.dto.LoginRequest;
+import roomescape.domain.auth.dto.LoginRequest;
+import roomescape.domain.auth.AuthService;
 import roomescape.exception.custom.reason.auth.AuthNotExistsEmailException;
 import roomescape.exception.custom.reason.auth.AuthNotValidPasswordException;
-import roomescape.member.domain.Member;
-import roomescape.member.repository.MemberRepository;
-import roomescape.member.repository.MemberRepositoryImpl;
-import roomescape.member.domain.MemberRole;
+import roomescape.domain.member.Member;
+import roomescape.domain.member.MemberRepository;
+import roomescape.infrastructure.auth.JwtProvider;
+import roomescape.infrastructure.auth.PasswordEncoder;
+import roomescape.infrastructure.member.MemberRepositoryImpl;
+import roomescape.domain.member.MemberRole;
 
 @DataJpaTest
 @Sql(scripts = "classpath:/initialize_database.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)

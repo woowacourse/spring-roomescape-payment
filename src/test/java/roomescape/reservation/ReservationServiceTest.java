@@ -23,10 +23,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.auth.dto.LoginMember;
-import roomescape.payment.PaymentManager;
-import roomescape.infrastructure.TimeManager;
-import roomescape.payment.dto.PaymentRequest;
+import roomescape.domain.auth.dto.LoginMember;
+import roomescape.domain.reservation.ReservationService;
+import roomescape.infrastructure.reservation.TossPaymentManager;
+import roomescape.infrastructure.common.TimeManager;
+import roomescape.domain.reservation.dto.payment.PaymentRequest;
 import roomescape.exception.custom.reason.payment.PaymentConfirmException;
 import roomescape.exception.custom.reason.reservation.ReservationConflictException;
 import roomescape.exception.custom.reason.reservation.ReservationNotExistsMemberException;
@@ -36,25 +37,25 @@ import roomescape.exception.custom.reason.reservation.ReservationNotExistsTimeEx
 import roomescape.exception.custom.reason.reservation.ReservationNotFoundException;
 import roomescape.exception.custom.reason.reservation.ReservationPastDateException;
 import roomescape.exception.custom.reason.reservation.ReservationPastTimeException;
-import roomescape.member.domain.Member;
-import roomescape.member.domain.MemberRole;
-import roomescape.member.repository.MemberRepositoryImpl;
-import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationDate;
-import roomescape.reservation.domain.ReservationStatus;
-import roomescape.reservation.dto.AdminFilterReservationRequest;
-import roomescape.reservation.dto.AdminReservationRequest;
-import roomescape.reservation.dto.MineReservationResponse;
-import roomescape.reservation.dto.ReservationPaymentRequest;
-import roomescape.reservation.dto.ReservationRequest;
-import roomescape.reservation.dto.ReservationResponse;
-import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservation.repository.ReservationRepositoryImpl;
-import roomescape.reservationtime.domain.ReservationTime;
-import roomescape.reservationtime.repository.ReservationTimeRepository;
-import roomescape.reservationtime.repository.ReservationTimeRepositoryImpl;
-import roomescape.theme.domain.Theme;
-import roomescape.theme.repository.ThemeRepositoryImpl;
+import roomescape.domain.member.Member;
+import roomescape.domain.member.MemberRole;
+import roomescape.infrastructure.member.MemberRepositoryImpl;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationDate;
+import roomescape.domain.reservation.ReservationStatus;
+import roomescape.domain.reservation.dto.AdminFilterReservationRequest;
+import roomescape.domain.reservation.dto.AdminReservationRequest;
+import roomescape.domain.reservation.dto.MineReservationResponse;
+import roomescape.domain.reservation.dto.ReservationPaymentRequest;
+import roomescape.domain.reservation.dto.ReservationRequest;
+import roomescape.domain.reservation.dto.ReservationResponse;
+import roomescape.domain.reservation.ReservationRepository;
+import roomescape.infrastructure.reservation.ReservationRepositoryImpl;
+import roomescape.domain.reservationtime.ReservationTime;
+import roomescape.domain.reservationtime.ReservationTimeRepository;
+import roomescape.infrastructure.reservationtime.ReservationTimeRepositoryImpl;
+import roomescape.domain.theme.Theme;
+import roomescape.infrastructure.theme.ThemeRepositoryImpl;
 
 @DataJpaTest
 @Sql(scripts = "classpath:/initialize_database.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -71,7 +72,7 @@ public class ReservationServiceTest {
     @MockitoSpyBean
     private final ReservationRepository reservationRepository;
     @MockitoBean
-    private final PaymentManager paymentManager;
+    private final TossPaymentManager paymentManager;
     @MockitoBean
     private final TimeManager timeManager;
     private final ReservationService reservationService;
@@ -84,7 +85,7 @@ public class ReservationServiceTest {
     public ReservationServiceTest(
             final ReservationRepository reservationRepository,
             final ReservationService reservationService,
-            final PaymentManager paymentManager,
+            final TossPaymentManager paymentManager,
             final TimeManager timeManager,
 
             final ReservationTimeRepository reservationTimeRepository,

@@ -9,10 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.jdbc.core.JdbcTemplate;
-import roomescape.reservation.ReservationController;
+import roomescape.controller.ReservationController;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class LayeredArchitectureTest {
+class LayeredArchitectureTest {
 
     private final ReservationController reservationController;
 

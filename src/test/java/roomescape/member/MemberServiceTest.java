@@ -14,14 +14,15 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.jdbc.Sql;
-import roomescape.auth.PasswordEncoder;
+import roomescape.infrastructure.auth.PasswordEncoder;
+import roomescape.domain.member.MemberService;
 import roomescape.exception.custom.reason.member.MemberEmailConflictException;
-import roomescape.member.domain.Member;
-import roomescape.member.domain.MemberRole;
-import roomescape.member.dto.MemberRequest;
-import roomescape.member.dto.MemberResponse;
-import roomescape.member.repository.MemberRepository;
-import roomescape.member.repository.MemberRepositoryImpl;
+import roomescape.domain.member.Member;
+import roomescape.domain.member.MemberRole;
+import roomescape.domain.member.dto.MemberRequest;
+import roomescape.domain.member.dto.MemberResponse;
+import roomescape.domain.member.MemberRepository;
+import roomescape.infrastructure.member.MemberRepositoryImpl;
 
 @DataJpaTest
 @Sql(scripts = "classpath:/initialize_database.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)

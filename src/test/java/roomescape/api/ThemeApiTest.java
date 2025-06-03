@@ -19,10 +19,10 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
-import roomescape.theme.dto.ThemeRequest;
+import roomescape.domain.theme.dto.ThemeRequest;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class ThemeApiTest {
+class ThemeApiTest {
 
     private final JdbcTemplate jdbcTemplate;
     private final int port;

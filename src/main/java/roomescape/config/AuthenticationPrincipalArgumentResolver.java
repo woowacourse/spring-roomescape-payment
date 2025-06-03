@@ -10,9 +10,10 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import roomescape.auth.JwtProvider;
-import roomescape.auth.TokenBody;
-import roomescape.auth.dto.LoginMember;
+import roomescape.controller.AuthenticationPrincipal;
+import roomescape.infrastructure.auth.JwtProvider;
+import roomescape.domain.auth.TokenBody;
+import roomescape.domain.auth.dto.LoginMember;
 import roomescape.exception.custom.reason.auth.AuthNotExistsCookieException;
 import roomescape.exception.custom.reason.auth.AuthNotValidTokenException;
 
