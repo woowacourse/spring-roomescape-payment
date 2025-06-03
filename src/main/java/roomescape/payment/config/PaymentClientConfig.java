@@ -25,16 +25,13 @@ public class PaymentClientConfig {
             @Value("${toss.payment.secret-key}") String secretKey,
             @Value("${toss.payment.auth-scheme}") String authScheme,
             @Value("${toss.payment.timeout.connect}") int connectTimeout,
-            @Value("${toss.payment.timeout.read}") int readTimeout) {
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
-        String authorizations = authScheme + " " + new String(encodedBytes);
-
+            @Value("${toss.payment.timeout.read}") int readTimeout
+    ) {
         return RestClient.builder()
                 .baseUrl(baseUrl)
                 .requestFactory(createRequestFactory(connectTimeout, readTimeout))
                 .defaultHeader("Content-Type", "application/json")
-                .defaultHeader("Authorization", authorizations)
+                .defaultHeader("Authorization", createAuthorization(secretKey, authScheme))
                 .requestInterceptor(loggingInterceptor())
                 .build();
     }
@@ -44,6 +41,12 @@ public class PaymentClientConfig {
         requestFactory.setConnectTimeout(Duration.ofSeconds(connectTimeout));
         requestFactory.setReadTimeout(Duration.ofSeconds(readTimeout));
         return requestFactory;
+    }
+
+    private String createAuthorization(final String secretKey, final String authScheme) {
+        Base64.Encoder encoder = Base64.getEncoder();
+        byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
+        return authScheme + " " + new String(encodedBytes);
     }
 
     private ClientHttpRequestInterceptor loggingInterceptor() {
