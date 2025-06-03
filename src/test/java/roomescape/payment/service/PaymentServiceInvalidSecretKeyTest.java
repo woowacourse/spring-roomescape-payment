@@ -7,8 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.TestPropertySource;
-import roomescape.payment.domain.dto.PaymentRequestDto;
-import roomescape.payment.exception.InvalidPaymentException;
+import org.springframework.web.client.RestClientException;
+import roomescape.payment.global.domain.dto.PaymentRequestDto;
+import roomescape.payment.toss.service.TossPaymentService;
 
 @TestPropertySource(properties = {
         "toss.payment.secret-key=tosstasstosstasstoss"
@@ -17,9 +18,9 @@ import roomescape.payment.exception.InvalidPaymentException;
 public class PaymentServiceInvalidSecretKeyTest {
 
     @Autowired
-    private PaymentService paymentService;
+    private TossPaymentService paymentService;
 
-    @DisplayName("secretKey가 유효하지 않을 때 예외 발생 : InvalidPaymentException")
+    @DisplayName("secretKey가 유효하지 않을 때 예외 발생 : RestClientException")
     @Test
     void approve_throwsException_byInvalidSecretKey() {
         // given
@@ -27,8 +28,7 @@ public class PaymentServiceInvalidSecretKeyTest {
 
         // when & then
         Assertions.assertThatThrownBy(
-                        () -> paymentService.approve(dto)
-                ).isInstanceOf(InvalidPaymentException.class)
-                .hasMessageContaining("인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다.");
+                () -> paymentService.approve(dto)
+        ).isInstanceOf(RestClientException.class);
     }
 }

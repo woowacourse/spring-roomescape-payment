@@ -8,7 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.ResourceAccessException;
-import roomescape.payment.domain.dto.PaymentRequestDto;
+import roomescape.payment.global.domain.dto.PaymentRequestDto;
+import roomescape.payment.toss.service.TossPaymentService;
 
 @TestPropertySource(properties = {
         "toss.payment.base-url=https://baseurlisinvalid"
@@ -17,7 +18,7 @@ import roomescape.payment.domain.dto.PaymentRequestDto;
 public class PaymentServiceInvalidBaseUrlTest {
 
     @Autowired
-    private PaymentService paymentService;
+    private TossPaymentService paymentService;
 
     @DisplayName("잘못된 baseUrl로 요청했을 때 예외 발생")
     @Test

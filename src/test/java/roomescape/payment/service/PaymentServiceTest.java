@@ -9,10 +9,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.HttpStatus;
-import roomescape.payment.TossRestClient;
-import roomescape.payment.domain.TossPayment;
-import roomescape.payment.domain.dto.PaymentRequestDto;
-import roomescape.payment.exception.InvalidPaymentException;
+import roomescape.payment.global.domain.dto.PaymentRequestDto;
+import roomescape.payment.global.exception.InvalidPaymentException;
+import roomescape.payment.toss.TossRestClient;
+import roomescape.payment.toss.domain.TossPayment;
+import roomescape.payment.toss.service.TossPaymentService;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class PaymentServiceTest {
@@ -26,7 +27,7 @@ public class PaymentServiceTest {
         when(mockRestClient.confirmPayment(any(PaymentRequestDto.class)))
                 .thenReturn(dummyPayment);
 
-        PaymentService paymentService = new PaymentService(mockRestClient);
+        TossPaymentService paymentService = new TossPaymentService(mockRestClient);
 
         Assertions.assertThatCode(
                 () -> paymentService.approve(dto)
@@ -41,7 +42,7 @@ public class PaymentServiceTest {
         when(mockRestClient.confirmPayment(any(PaymentRequestDto.class)))
                 .thenThrow(new InvalidPaymentException(HttpStatus.BAD_REQUEST));
 
-        PaymentService paymentService = new PaymentService(mockRestClient);
+        TossPaymentService paymentService = new TossPaymentService(mockRestClient);
 
         Assertions.assertThatThrownBy(
                 () -> paymentService.approve(dto)

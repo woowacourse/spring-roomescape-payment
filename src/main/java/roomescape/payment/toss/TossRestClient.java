@@ -1,13 +1,13 @@
 package roomescape.payment.toss;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.nio.charset.StandardCharsets;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.global.domain.dto.PaymentRequestDto;
 import roomescape.payment.global.exception.InvalidPaymentException;
+import roomescape.payment.toss.domain.TossErrorResponse;
 import roomescape.payment.toss.domain.TossPayment;
 
 @Component
@@ -25,15 +25,17 @@ public class TossRestClient {
         return restClient.post()
                 .uri("/v1/payments/confirm")
                 .body(requestDto)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer test")
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
-                    String error = new String(res.getBody().readAllBytes(), StandardCharsets.UTF_8);
-                    throw new InvalidPaymentException(error, (HttpStatus) res.getStatusCode());
-                })
-                .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
-                    String error = new String(res.getBody().readAllBytes(), StandardCharsets.UTF_8);
-                    throw new InvalidPaymentException(error, (HttpStatus) res.getStatusCode());
-                })
-                .body(TossPayment.class);
+                .onStatus(
+                        statusCode -> statusCode.is4xxClientError() || statusCode.is5xxServerError(),
+                        (req, res) -> {
+                            TossErrorResponse error = objectMapper.readValue(res.getBody(), TossErrorResponse.class);
+                            HttpStatus status = HttpStatus.valueOf(res.getStatusCode().value());
+                            throw new InvalidPaymentException(error.message(), status);
+                        }
+                )
+                .toEntity(TossPayment.class)
+                .getBody();
     }
 }
