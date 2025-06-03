@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResponse;
+import roomescape.payment.dto.PaymentResult;
 import roomescape.payment.exception.PaymentApiException;
 
 class PaymentClientMockWebServerTest {
@@ -47,7 +47,7 @@ class PaymentClientMockWebServerTest {
     void confirmPayment() throws Exception {
         // given
         PaymentRequest request = new PaymentRequest("paymentKey123", 1000, "orderId123", "paymentType");
-        PaymentResponse expectedResponse = new PaymentResponse("paymentKey123", 1000, "orderId123", "DONE");
+        PaymentResult expectedResponse = new PaymentResult("paymentKey123", 1000, "orderId123", "DONE");
 
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(200)
@@ -55,7 +55,7 @@ class PaymentClientMockWebServerTest {
                 .addHeader("Content-Type", "application/json"));
 
         // when
-        PaymentResponse result = paymentClinet.confirmPayment(request);
+        PaymentResult result = paymentClinet.confirmPayment(request);
 
         // then
         assertThat(result).isEqualTo(expectedResponse);
@@ -85,9 +85,8 @@ class PaymentClientMockWebServerTest {
         // then
         assertThatThrownBy(() -> paymentClinet.confirmPayment(request))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("결제 확인에 실패했습니다.")
-                .hasMessageContaining("인증 실패")
-                .hasMessageContaining("invalidKey");
+                .hasMessageContaining("결제 인가/인증이 실패하였습니다.")
+                .hasMessageContaining("인증 실패");
     }
 
     @Test
@@ -106,7 +105,7 @@ class PaymentClientMockWebServerTest {
         // then
         assertThatThrownBy(() -> paymentClinet.confirmPayment(request))
                 .isInstanceOf(PaymentApiException.class)
-                .hasMessageContaining("결제 Api가 실패하였습니다.")
+                .hasMessageContaining("결제 승인이 실패하였습니다.")
                 .hasMessageContaining("잘못된 요청")
                 .hasMessageContaining("BAD_REQUEST");
     }

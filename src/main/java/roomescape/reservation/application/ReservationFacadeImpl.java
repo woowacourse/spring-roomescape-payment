@@ -10,8 +10,7 @@ import roomescape.common.domain.DomainTerm;
 import roomescape.common.exception.DuplicateException;
 import roomescape.payment.client.PaymentClient;
 import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResponse;
-import roomescape.payment.exception.PaymentApiException;
+import roomescape.payment.dto.PaymentResult;
 import roomescape.reservation.application.dto.AvailableReservationTimeServiceRequest;
 import roomescape.reservation.application.dto.CreateReservationServiceRequest;
 import roomescape.reservation.application.dto.MyReservationsResponse;
@@ -96,14 +95,13 @@ public class ReservationFacadeImpl implements ReservationFacade {
         final Reservation reservation = reservationCommandService.create(
                 request.toServiceRequest());
 
-        PaymentResponse paymentResponse = paymentClient.confirmPayment(
+        PaymentResult paymentResult = paymentClient.confirmPayment(
                 new PaymentRequest(request.paymentKey(),
                         request.amount(),
                         request.orderId(),
                         request.paymentType())
         );
-
-        validatePayment(request, paymentResponse);
+        paymentResult.verifyPayment(request, paymentResult);
 
         return ReservationResponse.from(reservation, user);
     }
@@ -167,13 +165,5 @@ public class ReservationFacadeImpl implements ReservationFacade {
         final Long userId = waitingReservationQueryService.findUserIdById(waitingId);
         waitingReservationCommandService.delete(waitingId);
         reservationCommandService.updateUserId(id, userId);
-    }
-
-    private void validatePayment(CreateReservationWithUserIdWebRequest request, PaymentResponse paymentResponse) {
-        if (paymentResponse.orderId().equals(request.orderId())
-                && paymentResponse.paymentKey().equals(request.paymentKey())
-                && paymentResponse.amount() == request.amount()) {
-            throw new PaymentApiException();
-        }
     }
 }

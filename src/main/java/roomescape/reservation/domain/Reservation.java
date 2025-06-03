@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,8 +20,6 @@ import roomescape.reservation.exception.PastDateReservationException;
 import roomescape.reservation.exception.PastTimeReservationException;
 import roomescape.theme.domain.Theme;
 import roomescape.time.domain.ReservationTime;
-
-import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -82,10 +81,10 @@ public class Reservation {
         return new Reservation(userId, date, time, theme);
     }
 
-    private static void validate(final Long userId,
-                                 final ReservationDate date,
-                                 final ReservationTime time,
-                                 final Theme theme) {
+    private void validate(final Long userId,
+                          final ReservationDate date,
+                          final ReservationTime time,
+                          final Theme theme) {
         Validator.of(Reservation.class)
                 .validateNotNull(Fields.userId, userId, DomainTerm.USER_ID.label())
                 .validateNotNull(Fields.date, date, DomainTerm.RESERVATION_DATE.label())
@@ -93,7 +92,7 @@ public class Reservation {
                 .validateNotNull(Fields.theme, theme, DomainTerm.THEME.label());
     }
 
-    private static void validate(final Long id) {
+    private void validate(final Long id) {
         Validator.of(Reservation.class)
                 .validateNotNull(Fields.id, id, DomainTerm.RESERVATION_ID.label());
     }

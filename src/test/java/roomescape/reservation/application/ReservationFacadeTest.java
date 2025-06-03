@@ -24,6 +24,7 @@ import roomescape.common.domain.DomainTerm;
 import roomescape.common.domain.Email;
 import roomescape.common.exception.NotFoundException;
 import roomescape.payment.client.TossPaymentClient;
+import roomescape.payment.dto.PaymentResult;
 import roomescape.reservation.application.dto.MyReservationsResponse;
 import roomescape.reservation.application.service.ReservationCommandService;
 import roomescape.reservation.application.service.ReservationQueryService;
@@ -198,10 +199,14 @@ class ReservationFacadeTest {
     void create() {
         //given
         CreateReservationWithUserIdWebRequest request = createCreateRequest();
+        PaymentResult response = new PaymentResult(request.paymentKey(),
+                request.amount(),
+                request.orderId(),
+                "DONE");
         Reservation reservation = createReservation(1L);
         given(userQueryService.getById(any())).willReturn(createUser(1L));
         given(reservationCommandService.create(any())).willReturn(reservation);
-        given(tossPaymentClient.confirmPayment(any())).willReturn(null);
+        given(tossPaymentClient.confirmPayment(any())).willReturn(response);
         //when
         ReservationResponse result = reservationFacade.create(request);
 
@@ -357,7 +362,7 @@ class ReservationFacadeTest {
     private CreateReservationWithUserIdWebRequest createCreateRequest() {
         return new CreateReservationWithUserIdWebRequest(
                 LocalDate.now().plusDays(1),
-                1L, 1L, 1L, "", "", 0, ""
+                1L, 1L, 1L, "paymentKey", "orderId", 0, "DONE"
         );
     }
 }

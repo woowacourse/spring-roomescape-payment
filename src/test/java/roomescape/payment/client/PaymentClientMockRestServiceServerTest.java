@@ -21,8 +21,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.payment.client.config.TestPaymentConfiguration;
 import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResponse;
+import roomescape.payment.dto.PaymentResult;
 import roomescape.payment.exception.PaymentApiException;
+import roomescape.payment.exception.PaymentApiUnauthorizedException;
 
 @RestClientTest(TossPaymentClient.class)
 @Import(TestPaymentConfiguration.class)
@@ -46,7 +47,7 @@ class PaymentClientMockRestServiceServerTest {
     void confirmPayment() throws Exception {
         // given
         PaymentRequest request = getRequest("paymentKey123");
-        PaymentResponse expectedResponse = new PaymentResponse("paymentKey123", 1000, "orderId123", "DONE");
+        PaymentResult expectedResponse = new PaymentResult("paymentKey123", 1000, "orderId123", "DONE");
 
         mockServer.expect(requestTo(URL + PATH))
                 .andExpect(method(HttpMethod.POST))
@@ -59,14 +60,14 @@ class PaymentClientMockRestServiceServerTest {
                         .body(objectMapper.writeValueAsString(expectedResponse)));
 
         // when
-        PaymentResponse result = paymentClient.confirmPayment(request);
+        PaymentResult result = paymentClient.confirmPayment(request);
 
         // then
         assertThat(result).isEqualTo(expectedResponse);
         assertThat(result.paymentKey()).isEqualTo("paymentKey123");
         assertThat(result.amount()).isEqualTo(1000);
         assertThat(result.orderId()).isEqualTo("orderId123");
-        assertThat(result.status()).isEqualTo("DONE");
+        assertThat(result.paymentType()).isEqualTo("DONE");
 
         mockServer.verify();
     }
@@ -77,7 +78,7 @@ class PaymentClientMockRestServiceServerTest {
         // given
         String invalidKey = "invalidKey";
         PaymentRequest request = getRequest(invalidKey);
-        String errorResponse = "{\"message\":\"인증 실패\"}";
+        String errorResponse = "{\"code\":\"BAD_REQUEST\",\"message\":\"인증 실패\"}";
 
         mockServer.expect(requestTo(URL + PATH))
                 .andExpect(method(HttpMethod.POST))
@@ -89,10 +90,9 @@ class PaymentClientMockRestServiceServerTest {
         // when
         // then
         assertThatThrownBy(() -> paymentClient.confirmPayment(request))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("결제 확인에 실패했습니다.")
-                .hasMessageContaining("인증 실패")
-                .hasMessageContaining(invalidKey);
+                .isInstanceOf(PaymentApiUnauthorizedException.class)
+                .hasMessageContaining("결제 인가/인증이 실패하였습니다.")
+                .hasMessageContaining("인증 실패");
 
         mockServer.verify();
     }
@@ -114,7 +114,7 @@ class PaymentClientMockRestServiceServerTest {
         // then
         assertThatThrownBy(() -> paymentClient.confirmPayment(request))
                 .isInstanceOf(PaymentApiException.class)
-                .hasMessageContaining("결제 Api가 실패하였습니다.")
+                .hasMessageContaining("결제 승인이 실패하였습니다.")
                 .hasMessageContaining("잘못된 요청")
                 .hasMessageContaining("BAD_REQUEST");
 
@@ -138,7 +138,7 @@ class PaymentClientMockRestServiceServerTest {
         // then
         assertThatThrownBy(() -> paymentClient.confirmPayment(request))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("파싱에 실패했습니다.");
+                .hasMessage("Json 파싱에 실패했습니다.500 Internal Server Error: \"invalid json\"");
 
         mockServer.verify();
     }

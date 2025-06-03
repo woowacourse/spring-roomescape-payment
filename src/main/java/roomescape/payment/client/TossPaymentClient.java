@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResponse;
+import roomescape.payment.dto.PaymentResult;
 import roomescape.payment.exception.PaymentApiException;
 import roomescape.payment.exception.PaymentApiUnauthorizedException;
 
@@ -20,14 +20,14 @@ public class TossPaymentClient implements PaymentClient {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private final RestClient restClient;
 
-    public PaymentResponse confirmPayment(final PaymentRequest request) {
+    public PaymentResult confirmPayment(final PaymentRequest request) {
 
         try {
             return restClient.post()
                     .uri("/v1/payments/confirm")
                     .body(request)
                     .retrieve()
-                    .body(PaymentResponse.class);
+                    .body(PaymentResult.class);
         } catch (RestClientResponseException e) {
             handleException(e, request.paymentKey());
         }
@@ -41,7 +41,7 @@ public class TossPaymentClient implements PaymentClient {
             String errorMessage = jsonNode.get("message").asText();
 
             if (e.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-                throw new PaymentApiUnauthorizedException("결제 확인에 실패했습니다. " + errorMessage + " - 결제 키: " + paymentKey);
+                throw new PaymentApiUnauthorizedException(errorMessage);
             }
             throw new PaymentApiException(responseBody, errorMessage, e.getStatusCode());
         } catch (JsonProcessingException parseException) {

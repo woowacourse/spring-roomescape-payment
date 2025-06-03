@@ -1,0 +1,36 @@
+package roomescape.payment.dto;
+
+import lombok.AccessLevel;
+import lombok.experimental.FieldNameConstants;
+import roomescape.common.domain.DomainTerm;
+import roomescape.common.validate.Validator;
+import roomescape.payment.exception.PaymentApiException;
+import roomescape.reservation.ui.dto.CreateReservationWithUserIdWebRequest;
+
+@FieldNameConstants(level = AccessLevel.PRIVATE)
+
+public record PaymentResult(String paymentKey,
+                            int amount,
+                            String orderId,
+                            String paymentType) {
+
+    public PaymentResult {
+        validate(paymentKey, orderId, amount, paymentType);
+    }
+
+    public void verifyPayment(CreateReservationWithUserIdWebRequest request, PaymentResult paymentResult) {
+        if (!(paymentResult.orderId().equals(request.orderId())
+                && paymentResult.paymentKey().equals(request.paymentKey())
+                && paymentResult.amount() == request.amount())) {
+            throw new PaymentApiException(this);
+        }
+    }
+
+    private void validate(final String paymentKey, final String orderId, final int amount, final String paymentType) {
+        Validator.of(PaymentResult.class)
+                .validateNotNull(Fields.paymentKey, paymentKey, DomainTerm.PAYMENT_KEY.label())
+                .validateNotNull(Fields.orderId, orderId, DomainTerm.PAYMENT_ORDER_ID.label())
+                .validateNotNull(Fields.amount, amount, DomainTerm.PAYMENT_AMOUNT.label())
+                .validateNotNull(Fields.paymentType, paymentType, DomainTerm.PAYMENT_TYPE.label());
+    }
+}

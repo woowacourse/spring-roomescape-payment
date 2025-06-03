@@ -87,11 +87,11 @@ public class WaitingReservation {
         return new WaitingReservation(userId, waitingOrder, date, time, theme);
     }
 
-    private static void validate(final Long userId,
-                                 final int waitingOrder,
-                                 final ReservationDate date,
-                                 final ReservationTime time,
-                                 final Theme theme
+    private void validate(final Long userId,
+                          final int waitingOrder,
+                          final ReservationDate date,
+                          final ReservationTime time,
+                          final Theme theme
     ) {
         Validator.of(WaitingReservation.class)
                 .validateNotNull(Fields.userId, userId, DomainTerm.USER_ID.label())
@@ -101,7 +101,7 @@ public class WaitingReservation {
                 .validateNotNull(Fields.theme, theme, DomainTerm.THEME.label());
     }
 
-    private static void validate(final Long id) {
+    private void validate(final Long id) {
         Validator.of(WaitingReservation.class)
                 .validateNotNull(Fields.id, id, DomainTerm.RESERVATION_ID.label());
     }

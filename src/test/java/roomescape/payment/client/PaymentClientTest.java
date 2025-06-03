@@ -18,7 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResponse;
+import roomescape.payment.dto.PaymentResult;
 import roomescape.payment.exception.PaymentApiException;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,7 +35,7 @@ class PaymentClientTest {
     void confirmPayment() {
         // given
         PaymentRequest request = new PaymentRequest("paymentKey123", 1000, "orderId123", "paymentType");
-        PaymentResponse expectedResponse = new PaymentResponse("paymentKey123", 1000, "orderId123", "DONE");
+        PaymentResult expectedResponse = new PaymentResult("paymentKey123", 1000, "orderId123", "DONE");
 
         RequestBodyUriSpec uriSpec = mock(RequestBodyUriSpec.class);
         RequestBodySpec bodySpec = mock(RequestBodySpec.class);
@@ -45,9 +45,9 @@ class PaymentClientTest {
         when(uriSpec.uri("/v1/payments/confirm")).thenReturn(bodySpec);
         when(bodySpec.body(request)).thenReturn(bodySpec);
         when(bodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(PaymentResponse.class)).thenReturn(expectedResponse);
+        when(responseSpec.body(PaymentResult.class)).thenReturn(expectedResponse);
 
-        PaymentResponse result = paymentClinet.confirmPayment(request);
+        PaymentResult result = paymentClinet.confirmPayment(request);
 
         // then
         assertThat(result).isEqualTo(expectedResponse);
@@ -77,14 +77,13 @@ class PaymentClientTest {
         when(uriSpec.uri("/v1/payments/confirm")).thenReturn(bodySpec);
         when(bodySpec.body(request)).thenReturn(bodySpec);
         when(bodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(PaymentResponse.class)).thenThrow(exception);
+        when(responseSpec.body(PaymentResult.class)).thenThrow(exception);
 
         // When & Then
         assertThatThrownBy(() -> paymentClinet.confirmPayment(request))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("결제 확인에 실패했습니다.")
-                .hasMessageContaining("인증 실패")
-                .hasMessageContaining("invalidKey");
+                .hasMessageContaining("결제 인가/인증이 실패하였습니다.")
+                .hasMessageContaining("인증 실패");
     }
 
     @Test
@@ -111,12 +110,12 @@ class PaymentClientTest {
         when(uriSpec.uri("/v1/payments/confirm")).thenReturn(bodySpec);
         when(bodySpec.body(request)).thenReturn(bodySpec);
         when(bodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(PaymentResponse.class)).thenThrow(exception);
+        when(responseSpec.body(PaymentResult.class)).thenThrow(exception);
 
         // When & Then
         assertThatThrownBy(() -> paymentClinet.confirmPayment(request))
                 .isInstanceOf(PaymentApiException.class)
-                .hasMessageContaining("결제 Api가 실패하였습니다.")
+                .hasMessageContaining("결제 승인이 실패하였습니다.")
                 .hasMessageContaining("잘못된 요청")
                 .hasMessageContaining("BAD_REQUEST");
     }
@@ -145,7 +144,7 @@ class PaymentClientTest {
         when(uriSpec.uri("/v1/payments/confirm")).thenReturn(bodySpec);
         when(bodySpec.body(request)).thenReturn(bodySpec);
         when(bodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(PaymentResponse.class)).thenThrow(exception);
+        when(responseSpec.body(PaymentResult.class)).thenThrow(exception);
 
         // When & Then
         assertThatThrownBy(() -> paymentClinet.confirmPayment(request))
