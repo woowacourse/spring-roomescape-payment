@@ -22,7 +22,7 @@ public record PaymentHistoryCreationContent(
     public String toString() {
         return "PaymentHistoryCreationContent{" +
                 "orderId='" + orderId + '\'' +
-                ", paymentKey='" + paymentKey + '\'' +
+                ", paymentKey=[masked]'" + '\'' +
                 ", paymentType='" + paymentType + '\'' +
                 ", amount=" + amount +
                 '}';
