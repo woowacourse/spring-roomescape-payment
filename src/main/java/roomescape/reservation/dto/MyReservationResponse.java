@@ -1,10 +1,8 @@
 package roomescape.reservation.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import roomescape.reservation.domain.Reservation;
 
 public record MyReservationResponse(
@@ -12,7 +10,10 @@ public record MyReservationResponse(
         String theme,
         @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
         @JsonFormat(pattern = "HH:mm") LocalTime time,
-        String status
+        String status,
+        String orderId,
+        String paymentKey,
+        Long amount
 ) {
 
     public MyReservationResponse(final Reservation reservation) {
@@ -21,7 +22,10 @@ public record MyReservationResponse(
                 reservation.getTheme().getName(),
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
-                convertToReservationStatusMessage(reservation)
+                convertToReservationStatusMessage(reservation),
+                getOrderId(reservation),
+                getPaymentKey(reservation),
+                getAmount(reservation)
         );
     }
 
@@ -32,5 +36,26 @@ public record MyReservationResponse(
         }
         status.append(reservation.getReservationStatus().getStatus().getOutput());
         return status.toString();
+    }
+
+    private static String getOrderId(Reservation reservation) {
+        if (reservation.getPayment() == null) {
+            return null;
+        }
+        return reservation.getPayment().getOrderId();
+    }
+
+    private static String getPaymentKey(Reservation reservation) {
+        if (reservation.getPayment() == null) {
+            return null;
+        }
+        return reservation.getPayment().getPaymentKey();
+    }
+
+    private static Long getAmount(Reservation reservation) {
+        if (reservation.getPayment() == null) {
+            return null;
+        }
+        return reservation.getPayment().getAmount();
     }
 }
