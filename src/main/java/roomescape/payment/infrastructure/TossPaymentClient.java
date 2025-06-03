@@ -1,5 +1,6 @@
 package roomescape.payment.infrastructure;
 
+import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.HttpStatus.GATEWAY_TIMEOUT;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.UnknownContentTypeException;
 import roomescape.exception.payment.PaymentException;
 import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.domain.PaymentInfo;
@@ -44,7 +46,15 @@ public class TossPaymentClient implements PaymentClient {
                     .retrieve()
                     .toBodilessEntity();
         } catch (ResourceAccessException e) {
-            throw new PaymentException(GATEWAY_TIMEOUT, "토스 결제 승인 API가 응답하지 않습니다.");
+            throw new PaymentException(
+                    GATEWAY_TIMEOUT,
+                    "토스 결제 승인 API가 응답하지 않습니다."
+            );
+        } catch (UnknownContentTypeException e) {
+            throw new PaymentException(
+                    UNSUPPORTED_MEDIA_TYPE,
+                    "토스 결제 승인 API의 응답 형식이 올바르지 않습니다."
+            );
         }
     }
 
