@@ -7,7 +7,7 @@ import roomescape.exception.business.InvalidCreateArgumentException;
 
 @Embeddable
 public record ThemeName(
-        @Column(name = "theme_name")
+        @Column(name = "name")
         String value
 ) {
     private static final int MAX_LENGTH = 20;

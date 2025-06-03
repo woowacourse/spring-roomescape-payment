@@ -11,19 +11,19 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.LoginInfo;
+import roomescape.business.model.entity.Member;
 import roomescape.business.model.entity.Reservation;
-import roomescape.business.model.entity.ReservationTime;
 import roomescape.business.model.entity.Theme;
-import roomescape.business.model.entity.User;
+import roomescape.business.model.entity.TimeSlot;
 import roomescape.business.model.entity.Waiting;
 import roomescape.business.model.vo.Id;
 import roomescape.business.model.vo.ReservationDate;
 import roomescape.exception.business.DuplicatedException;
 import roomescape.exception.business.NotFoundException;
+import roomescape.infrastructure.MemberRepository;
 import roomescape.infrastructure.ReservationRepository;
 import roomescape.infrastructure.ReservationTimeRepository;
 import roomescape.infrastructure.ThemeRepository;
-import roomescape.infrastructure.UserRepository;
 import roomescape.infrastructure.WaitingRepository;
 import roomescape.infrastructure.payment.PaymentClient;
 import roomescape.infrastructure.payment.toss.dto.TossPaymentApproveRequest;
@@ -37,7 +37,7 @@ import roomescape.presentation.dto.response.ReservationResponse;
 @Transactional
 public class ReservationService {
 
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
@@ -45,15 +45,15 @@ public class ReservationService {
     private final PaymentClient paymentClient;
 
     public ReservationResponse addAndGet(LoginInfo loginInfo, ReservationRequest request) {
-        User user = userRepository.findById(Id.create(loginInfo.id()))
+        Member member = memberRepository.findById(Id.create(loginInfo.id()))
                 .orElseThrow(() -> new NotFoundException(USER_NOT_EXIST));
-        ReservationTime reservationTime = reservationTimeRepository.findById(Id.create(request.timeId()))
+        TimeSlot timeSlot = reservationTimeRepository.findById(Id.create(request.timeId()))
                 .orElseThrow(() -> new NotFoundException(RESERVATION_NOT_EXIST));
         Theme theme = themeRepository.findById(Id.create(request.themeId()))
                 .orElseThrow(() -> new NotFoundException(THEME_NOT_EXIST));
 
-        validateDuplicatedReservation(request.date(), reservationTime, theme);
-        Reservation reservation = Reservation.create(user, request.date(), reservationTime, theme);
+        validateDuplicatedReservation(request.date(), timeSlot, theme);
+        Reservation reservation = Reservation.create(member, request.date(), timeSlot, theme);
         reservationRepository.save(reservation);
         paymentClient.approvePayment(
                 new TossPaymentApproveRequest(request.paymentKey(), request.orderId(), request.amount()));
@@ -61,22 +61,21 @@ public class ReservationService {
     }
 
     public ReservationResponse addAndGetWithoutPayment(AdminReservationRequest request) {
-        User user = userRepository.findById(Id.create(request.userId()))
+        Member member = memberRepository.findById(Id.create(request.userId()))
                 .orElseThrow(() -> new NotFoundException(USER_NOT_EXIST));
-        ReservationTime reservationTime = reservationTimeRepository.findById(Id.create(request.timeId()))
+        TimeSlot timeSlot = reservationTimeRepository.findById(Id.create(request.timeId()))
                 .orElseThrow(() -> new NotFoundException(RESERVATION_NOT_EXIST));
         Theme theme = themeRepository.findById(Id.create(request.themeId()))
                 .orElseThrow(() -> new NotFoundException(THEME_NOT_EXIST));
 
-        validateDuplicatedReservation(request.date(), reservationTime, theme);
-        Reservation reservation = Reservation.create(user, request.date(), reservationTime, theme);
+        validateDuplicatedReservation(request.date(), timeSlot, theme);
+        Reservation reservation = Reservation.create(member, request.date(), timeSlot, theme);
         reservationRepository.save(reservation);
         return ReservationResponse.from(reservation);
     }
 
-    private void validateDuplicatedReservation(LocalDate date, ReservationTime reservationTime, Theme theme) {
-        if (reservationRepository.existsByDate_ValueAndTime_StartTime_ValueAndThemeId(date,
-                reservationTime.startTimeValue(),
+    private void validateDuplicatedReservation(LocalDate date, TimeSlot timeSlot, Theme theme) {
+        if (reservationRepository.existsByDate_ValueAndTimeSlot_StartAtAndThemeId(date, timeSlot.getStartAt(),
                 theme.getId())) {
             throw new DuplicatedException(RESERVATION_DUPLICATED);
         }
@@ -97,7 +96,7 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(Id.create(id))
                 .orElseThrow(() -> new NotFoundException(RESERVATION_NOT_EXIST));
         reservationRepository.delete(reservation);
-        ReservationTime time = reservation.getTime();
+        TimeSlot time = reservation.getTimeSlot();
         ReservationDate date = reservation.getDate();
         waitingRepository.findFirstByDateAndTimeAndThemeOrderById(date, time, reservation.getTheme())
                 .ifPresent(this::promoteWaitingToReservation);

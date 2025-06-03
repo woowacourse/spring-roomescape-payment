@@ -5,7 +5,6 @@ import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
@@ -22,13 +21,12 @@ import roomescape.business.model.vo.UserRole;
 @EqualsAndHashCode(of = "id")
 @Getter
 @Entity
-@Table(name = "users")
-public class User {
+public class Member {
 
     @EmbeddedId
     private final Id id;
     @Enumerated(EnumType.STRING)
-    private UserRole userRole;
+    private UserRole role;
     @Embedded
     private UserName name;
     @Embedded
@@ -36,17 +34,17 @@ public class User {
     @Embedded
     private Password password;
 
-    protected User() {
+    protected Member() {
         id = Id.issue();
     }
 
-    public static User create(final String name, final String email, final String password) {
-        return new User(Id.issue(), UserRole.USER, new UserName(name), new Email(email), Password.encode(password));
+    public static Member create(final String name, final String email, final String password) {
+        return new Member(Id.issue(), UserRole.USER, new UserName(name), new Email(email), Password.encode(password));
     }
 
-    public static User restore(final String id, final String userRole, final String name, final String email,
-                               final String password) {
-        return new User(Id.create(id), UserRole.valueOf(userRole), new UserName(name), new Email(email),
+    public static Member restore(final String id, final String userRole, final String name, final String email,
+                                 final String password) {
+        return new Member(Id.create(id), UserRole.valueOf(userRole), new UserName(name), new Email(email),
                 Password.plain(password));
     }
 

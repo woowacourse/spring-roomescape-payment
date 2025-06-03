@@ -23,17 +23,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.auth.LoginInfo;
+import roomescape.business.model.entity.Member;
 import roomescape.business.model.entity.Reservation;
-import roomescape.business.model.entity.ReservationTime;
 import roomescape.business.model.entity.Theme;
-import roomescape.business.model.entity.User;
+import roomescape.business.model.entity.TimeSlot;
 import roomescape.business.model.vo.Id;
 import roomescape.exception.business.DuplicatedException;
 import roomescape.exception.business.NotFoundException;
+import roomescape.infrastructure.MemberRepository;
 import roomescape.infrastructure.ReservationRepository;
 import roomescape.infrastructure.ReservationTimeRepository;
 import roomescape.infrastructure.ThemeRepository;
-import roomescape.infrastructure.UserRepository;
 import roomescape.infrastructure.payment.PaymentClient;
 import roomescape.infrastructure.payment.dto.PaymentApproveRequest;
 import roomescape.presentation.dto.request.AdminReservationRequest;
@@ -48,7 +48,7 @@ import roomescape.presentation.dto.response.UserResponse;
 class ReservationServiceTest {
 
     @Mock
-    private UserRepository userRepository;
+    private MemberRepository memberRepository;
 
     @Mock
     private ReservationRepository reservationRepository;
@@ -77,14 +77,14 @@ class ReservationServiceTest {
         String userIdValue = "nonexistent-id";
         Id userId = Id.create(userIdValue);
         AdminReservationRequest request = new AdminReservationRequest(date, timeId, themeId, userIdValue);
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+        when(memberRepository.findById(userId)).thenReturn(Optional.empty());
 
         // when, then
         assertThatThrownBy(
                 () -> sut.addAndGetWithoutPayment(request))
                 .isInstanceOf(NotFoundException.class);
 
-        verify(userRepository).findById(userId);
+        verify(memberRepository).findById(userId);
         verifyNoInteractions(reservationTimeRepository);
         verifyNoInteractions(themeRepository);
         verifyNoInteractions(reservationRepository);
@@ -98,16 +98,16 @@ class ReservationServiceTest {
         String themeId = "theme-id";
         String userId = "user-id";
         AdminReservationRequest request = new AdminReservationRequest(date, timeId, themeId, userId);
-        User user = User.restore(userId, "USER", "Test User", "test@example.com", "password");
+        Member member = Member.restore(userId, "USER", "Test User", "test@example.com", "password");
 
-        when(userRepository.findById(Id.create(userId))).thenReturn(Optional.of(user));
+        when(memberRepository.findById(Id.create(userId))).thenReturn(Optional.of(member));
         when(reservationTimeRepository.findById(Id.create(timeId))).thenReturn(Optional.empty());
 
         // when, then
         assertThatThrownBy(() -> sut.addAndGetWithoutPayment(request))
                 .isInstanceOf(NotFoundException.class);
 
-        verify(userRepository).findById(Id.create(userId));
+        verify(memberRepository).findById(Id.create(userId));
         verify(reservationTimeRepository).findById(Id.create(timeId));
         verifyNoInteractions(themeRepository);
         verifyNoInteractions(reservationRepository);
@@ -124,18 +124,18 @@ class ReservationServiceTest {
         Id themeId = Id.create(themeIdValue);
         Id userId = Id.create(userIdValue);
         AdminReservationRequest request = new AdminReservationRequest(date, timeIdValue, themeIdValue, userIdValue);
-        User user = User.restore(userIdValue, "USER", "Test User", "test@example.com", "password");
-        ReservationTime reservationTime = ReservationTime.restore(timeIdValue, LocalTime.of(10, 0));
+        Member member = Member.restore(userIdValue, "USER", "Test User", "test@example.com", "password");
+        TimeSlot timeSlot = TimeSlot.restore(timeIdValue, LocalTime.of(10, 0));
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(reservationTimeRepository.findById(timeId)).thenReturn(Optional.of(reservationTime));
+        when(memberRepository.findById(userId)).thenReturn(Optional.of(member));
+        when(reservationTimeRepository.findById(timeId)).thenReturn(Optional.of(timeSlot));
         when(themeRepository.findById(themeId)).thenReturn(Optional.empty());
 
         // when, then
         assertThatThrownBy(() -> sut.addAndGetWithoutPayment(request))
                 .isInstanceOf(NotFoundException.class);
 
-        verify(userRepository).findById(userId);
+        verify(memberRepository).findById(userId);
         verify(reservationTimeRepository).findById(timeId);
         verify(themeRepository).findById(themeId);
         verifyNoInteractions(reservationRepository);
@@ -152,14 +152,14 @@ class ReservationServiceTest {
         Id themeId = Id.create(themeIdValue);
         Id userId = Id.create(userIdValue);
         AdminReservationRequest request = new AdminReservationRequest(date, timeIdValue, themeIdValue, userIdValue);
-        User user = User.restore(userIdValue, "USER", "Test User", "test@example.com", "password");
-        ReservationTime reservationTime = ReservationTime.restore(timeIdValue, LocalTime.of(10, 0));
+        Member member = Member.restore(userIdValue, "USER", "Test User", "test@example.com", "password");
+        TimeSlot timeSlot = TimeSlot.restore(timeIdValue, LocalTime.of(10, 0));
         Theme theme = Theme.restore(themeIdValue, "Test Theme", "Description", "thumbnail.jpg");
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(reservationTimeRepository.findById(timeId)).thenReturn(Optional.of(reservationTime));
+        when(memberRepository.findById(userId)).thenReturn(Optional.of(member));
+        when(reservationTimeRepository.findById(timeId)).thenReturn(Optional.of(timeSlot));
         when(themeRepository.findById(themeId)).thenReturn(Optional.of(theme));
-        when(reservationRepository.existsByDate_ValueAndTime_StartTime_ValueAndThemeId(eq(date), any(LocalTime.class),
+        when(reservationRepository.existsByDate_ValueAndTimeSlot_StartAtAndThemeId(eq(date), any(LocalTime.class),
                 eq(theme.getId())))
                 .thenReturn(true);
 
@@ -167,10 +167,10 @@ class ReservationServiceTest {
         assertThatThrownBy(() -> sut.addAndGetWithoutPayment(request))
                 .isInstanceOf(DuplicatedException.class);
 
-        verify(userRepository).findById(userId);
+        verify(memberRepository).findById(userId);
         verify(reservationTimeRepository).findById(timeId);
         verify(themeRepository).findById(themeId);
-        verify(reservationRepository).existsByDate_ValueAndTime_StartTime_ValueAndThemeId(eq(date),
+        verify(reservationRepository).existsByDate_ValueAndTimeSlot_StartAtAndThemeId(eq(date),
                 any(LocalTime.class), eq(theme.getId()));
         verify(reservationRepository, never()).save(any(Reservation.class));
     }
@@ -187,19 +187,19 @@ class ReservationServiceTest {
         ReservationCondition condition = new ReservationCondition(themeIdValue, userIdValue, dateFrom,
                 dateTo);
 
-        User user1 = User.restore("user-id-1", "USER", "User One", "user1@example.com", "password1");
-        User user2 = User.restore("user-id-2", "USER", "User Two", "user2@example.com", "password2");
-        ReservationTime time1 = ReservationTime.restore("time-id-1", LocalTime.of(10, 0));
-        ReservationTime time2 = ReservationTime.restore("time-id-2", LocalTime.of(14, 0));
+        Member member1 = Member.restore("user-id-1", "USER", "User One", "user1@example.com", "password1");
+        Member member2 = Member.restore("user-id-2", "USER", "User Two", "user2@example.com", "password2");
+        TimeSlot time1 = TimeSlot.restore("time-id-1", LocalTime.of(10, 0));
+        TimeSlot time2 = TimeSlot.restore("time-id-2", LocalTime.of(14, 0));
         Theme theme1 = Theme.restore("theme-id-1", "Theme One", "Description One", "thumbnail1.jpg");
         Theme theme2 = Theme.restore("theme-id-2", "Theme Two", "Description Two", "thumbnail2.jpg");
         List<Reservation> reservationData = Arrays.asList(
-                Reservation.restore("reservation-id-1", user1, dateFrom, time1, theme1),
-                Reservation.restore("reservation-id-2", user2, dateFrom.plusDays(1), time2, theme2));
+                Reservation.restore("reservation-id-1", member1, dateFrom, time1, theme1),
+                Reservation.restore("reservation-id-2", member2, dateFrom.plusDays(1), time2, theme2));
         List<ReservationResponse> expectedReservations = Arrays.asList(
-                new ReservationResponse("reservation-id-1", UserResponse.from(user1),
+                new ReservationResponse("reservation-id-1", UserResponse.from(member1),
                         dateFrom, ReservationTimeResponse.from(time1), ThemeResponse.from(theme1)),
-                new ReservationResponse("reservation-id-2", UserResponse.from(user2),
+                new ReservationResponse("reservation-id-2", UserResponse.from(member2),
                         dateFrom.plusDays(1), ReservationTimeResponse.from(time2),
                         ThemeResponse.from(theme2))
         );
@@ -226,17 +226,17 @@ class ReservationServiceTest {
         Id themeId = Id.create(themeIdValue);
         Id userId = Id.create(userIdValue);
 
-        User user = User.restore(userIdValue, "USER", "Test User", "test@example.com", "password");
-        ReservationTime reservationTime = ReservationTime.restore(timeIdValue, LocalTime.of(10, 0));
+        Member member = Member.restore(userIdValue, "USER", "Test User", "test@example.com", "password");
+        TimeSlot timeSlot = TimeSlot.restore(timeIdValue, LocalTime.of(10, 0));
         Theme theme = Theme.restore(themeIdValue, "Test Theme", "Description", "thumbnail.jpg");
-        LoginInfo loginInfo = new LoginInfo(userIdValue, user.getUserRole());
+        LoginInfo loginInfo = new LoginInfo(userIdValue, member.getRole());
         ReservationRequest reservationRequest = new ReservationRequest(date, timeIdValue, themeIdValue, "paymentKey",
                 "orderId", 1000L, "paymentType");
 
-        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(reservationTimeRepository.findById(timeId)).thenReturn(Optional.of(reservationTime));
+        when(memberRepository.findById(userId)).thenReturn(Optional.of(member));
+        when(reservationTimeRepository.findById(timeId)).thenReturn(Optional.of(timeSlot));
         when(themeRepository.findById(themeId)).thenReturn(Optional.of(theme));
-        when(reservationRepository.existsByDate_ValueAndTime_StartTime_ValueAndThemeId(eq(date),
+        when(reservationRepository.existsByDate_ValueAndTimeSlot_StartAtAndThemeId(eq(date),
                 eq(LocalTime.of(10, 0)), eq(theme.getId())))
                 .thenReturn(false);
         doNothing().when(paymentClient).approvePayment(any(PaymentApproveRequest.class));
@@ -246,10 +246,10 @@ class ReservationServiceTest {
 
         // then
         assertThat(result).isNotNull();
-        verify(userRepository).findById(userId);
+        verify(memberRepository).findById(userId);
         verify(reservationTimeRepository).findById(timeId);
         verify(themeRepository).findById(themeId);
-        verify(reservationRepository).existsByDate_ValueAndTime_StartTime_ValueAndThemeId(eq(date),
+        verify(reservationRepository).existsByDate_ValueAndTimeSlot_StartAtAndThemeId(eq(date),
                 any(LocalTime.class), eq(theme.getId()));
         InOrder inOrder = inOrder(paymentClient, reservationRepository);
         inOrder.verify(reservationRepository).save(any(Reservation.class));

@@ -11,26 +11,26 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.AuthRequired;
 import roomescape.auth.Role;
 import roomescape.business.model.vo.UserRole;
-import roomescape.business.service.UserService;
+import roomescape.business.service.MemberService;
 import roomescape.presentation.dto.request.RegisterRequest;
 import roomescape.presentation.dto.response.UserResponse;
 
 @RestController
 @RequiredArgsConstructor
-public class UserApiController {
+public class MemberApiController {
 
-    private final UserService userService;
+    private final MemberService memberService;
 
     @GetMapping("/members")
     @AuthRequired
     @Role(UserRole.ADMIN)
     public List<UserResponse> getUsers() {
-        return userService.getAll();
+        return memberService.getAll();
     }
 
     @PostMapping("/members")
     public ResponseEntity<UserResponse> register(@RequestBody RegisterRequest request) {
-        final UserResponse response = userService.register(request);
+        final UserResponse response = memberService.register(request);
         return ResponseEntity.created(URI.create("/members")).body(response);
     }
 }

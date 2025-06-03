@@ -9,7 +9,7 @@ import roomescape.exception.business.InvalidCreateArgumentException;
 
 @Embeddable
 public record StartTime(
-        @Column(name = "start_time")
+        @Column(name = "start_at")
         LocalTime value
 ) {
     private static final LocalTime START_TIME = LocalTime.of(10, 0);

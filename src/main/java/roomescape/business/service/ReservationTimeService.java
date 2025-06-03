@@ -10,7 +10,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.business.model.entity.ReservationTime;
+import roomescape.business.model.entity.TimeSlot;
 import roomescape.business.model.vo.Id;
 import roomescape.exception.business.DuplicatedException;
 import roomescape.exception.business.InvalidCreateArgumentException;
@@ -31,26 +31,26 @@ public class ReservationTimeService {
     private final ReservationRepository reservationRepository;
 
     public ReservationTimeResponse addAndGet(final ReservationTimeRequest request) {
-        ReservationTime reservationTime = ReservationTime.create(request.startAtToLocalTime());
-        validateNoDuplication(reservationTime);
-        validateTimeInterval(reservationTime);
+        TimeSlot timeSlot = TimeSlot.create(request.startAtToLocalTime());
+        validateNoDuplication(timeSlot);
+        validateTimeInterval(timeSlot);
 
-        reservationTimeRepository.save(reservationTime);
-        return ReservationTimeResponse.from(reservationTime);
+        reservationTimeRepository.save(timeSlot);
+        return ReservationTimeResponse.from(timeSlot);
     }
 
 
-    private void validateNoDuplication(final ReservationTime reservationTime) {
-        boolean isExist = reservationTimeRepository.existsByStartTime_Value(reservationTime.startTimeValue());
+    private void validateNoDuplication(final TimeSlot timeSlot) {
+        boolean isExist = reservationTimeRepository.existsByStartAt(timeSlot.getStartAt());
         if (isExist) {
             throw new DuplicatedException(RESERVATION_TIME_ALREADY_EXIST);
         }
     }
 
-    private void validateTimeInterval(final ReservationTime reservationTime) {
-        boolean existInInterval = reservationTimeRepository.existsByStartTime_ValueBetween(
-                reservationTime.startInterval(),
-                reservationTime.endInterval());
+    private void validateTimeInterval(final TimeSlot timeSlot) {
+        boolean existInInterval = reservationTimeRepository.existsByStartAtBetween(
+                timeSlot.startInterval(),
+                timeSlot.endInterval());
         if (existInInterval) {
             throw new InvalidCreateArgumentException(RESERVATION_TIME_INTERVAL_INVALID);
         }
@@ -73,7 +73,7 @@ public class ReservationTimeService {
 
     public void delete(final String themeIdValue) {
         Id timeId = Id.create(themeIdValue);
-        if (reservationRepository.existsByTimeId(timeId)) {
+        if (reservationRepository.existsByTimeSlotId(timeId)) {
             throw new RelatedEntityExistException(RESERVED_RESERVATION_TIME);
         }
         if (!reservationTimeRepository.existsById(timeId)) {

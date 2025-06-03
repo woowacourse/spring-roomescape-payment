@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import roomescape.auth.AuthToken;
 import roomescape.auth.LoginInfo;
-import roomescape.business.model.entity.User;
+import roomescape.business.model.entity.Member;
 import roomescape.business.model.vo.UserRole;
 import roomescape.exception.auth.AuthenticationException;
 
@@ -33,10 +33,10 @@ public class JJWTJwtUtil implements JwtUtil {
     }
 
     @Override
-    public AuthToken createToken(final User user) {
+    public AuthToken createToken(final Member member) {
         String tokenValue = Jwts.builder()
-                .subject(user.getId().value())
-                .claim(USER_ROLE_CLAIM_NAME, user.getUserRole().name())
+                .subject(member.getId().value())
+                .claim(USER_ROLE_CLAIM_NAME, member.getRole().name())
                 .expiration(calculateExp())
                 .signWith(key)
                 .compact();

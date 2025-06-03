@@ -9,7 +9,7 @@ import roomescape.exception.business.InvalidCreateArgumentException;
 
 @Embeddable
 public record UserName(
-        @Column(name = "user_name")
+        @Column(name = "name")
         String value
 ) {
     private static final int MAX_LENGTH = 10;

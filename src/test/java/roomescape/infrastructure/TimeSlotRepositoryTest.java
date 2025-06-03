@@ -15,14 +15,14 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import roomescape.business.model.entity.ReservationTime;
+import roomescape.business.model.entity.TimeSlot;
 import roomescape.business.model.vo.Id;
 import roomescape.presentation.dto.response.ReservationTimeResponseWithBooked;
 import roomescape.test_util.JpaTestUtil;
 
 @DataJpaTest
 @Import(JpaTestUtil.class)
-class ReservationTimeRepositoryTest {
+class TimeSlotRepositoryTest {
 
     private static final LocalTime TIME1 = LocalTime.of(10, 0);
     private static final LocalTime TIME2 = LocalTime.of(15, 0);
@@ -31,8 +31,8 @@ class ReservationTimeRepositoryTest {
     private final JpaTestUtil testUtil;
 
     @Autowired
-    ReservationTimeRepositoryTest(ReservationTimeRepository sut,
-                                  JpaTestUtil testUtil) {
+    TimeSlotRepositoryTest(ReservationTimeRepository sut,
+                           JpaTestUtil testUtil) {
         this.sut = sut;
         this.testUtil = testUtil;
     }
@@ -44,7 +44,7 @@ class ReservationTimeRepositoryTest {
 
     @Test
     void 예약_시간을_저장할_수_있다() {
-        assertThatCode(() -> sut.save(ReservationTime.create(TIME1)))
+        assertThatCode(() -> sut.save(TimeSlot.create(TIME1)))
                 .doesNotThrowAnyException();
     }
 
@@ -58,7 +58,7 @@ class ReservationTimeRepositoryTest {
         testUtil.insertReservationTime(timeId2, TIME2);
 
         // when
-        final List<ReservationTime> result = sut.findAll();
+        final List<TimeSlot> result = sut.findAll();
 
         // then
         assertThat(result.size()).isEqualTo(2);
@@ -100,13 +100,13 @@ class ReservationTimeRepositoryTest {
         testUtil.insertReservationTime(timeId, TIME1);
 
         // when
-        final Optional<ReservationTime> result = sut.findById(Id.create(timeId));
+        final Optional<TimeSlot> result = sut.findById(Id.create(timeId));
 
         // then
         assertThat(result.isPresent()).isTrue();
-        final ReservationTime reservationTime = result.get();
-        assertThat(reservationTime.getId().value()).isEqualTo(timeId);
-        assertThat(reservationTime.getStartTime().value()).isEqualTo(TIME1);
+        final TimeSlot timeSlot = result.get();
+        assertThat(timeSlot.getId().value()).isEqualTo(timeId);
+        assertThat(timeSlot.getStartAt()).isEqualTo(TIME1);
     }
 
     @Test
@@ -129,7 +129,7 @@ class ReservationTimeRepositoryTest {
         testUtil.insertReservationTime(timeId, TIME1);
 
         // when
-        final boolean result = sut.existsByStartTime_Value(TIME1);
+        final boolean result = sut.existsByStartAt(TIME1);
 
         // then
         assertThat(result).isTrue();
@@ -143,7 +143,7 @@ class ReservationTimeRepositoryTest {
         testUtil.insertReservationTime(timeId, LocalTime.of(10, minute));
 
         // when
-        final boolean result = sut.existsByStartTime_ValueBetween(LocalTime.of(10, 0), LocalTime.of(10, 30));
+        final boolean result = sut.existsByStartAtBetween(LocalTime.of(10, 0), LocalTime.of(10, 30));
 
         // then
         assertThat(result).isTrue();

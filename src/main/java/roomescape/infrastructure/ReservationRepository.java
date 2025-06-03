@@ -13,9 +13,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Id> {
     @Query("""
             SELECT DISTINCT r
               FROM Reservation r
-              JOIN FETCH r.time rt
+              JOIN FETCH r.timeSlot rt
               JOIN FETCH r.theme t
-              JOIN FETCH r.user u
+              JOIN FETCH r.member u
              WHERE (:themeId  IS NULL OR t.id = :themeId)
                AND (:userId   IS NULL OR u.id = :userId)
                AND (:dateFrom IS NULL OR r.date.value >= :dateFrom)
@@ -23,9 +23,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Id> {
             """)
     List<Reservation> findAllReservationWithFilter(Id themeId, Id userId, LocalDate dateFrom, LocalDate dateTo);
 
-    boolean existsByTimeId(Id timeId);
+    boolean existsByTimeSlotId(Id timeId);
 
     boolean existsByThemeId(Id themeId);
 
-    boolean existsByDate_ValueAndTime_StartTime_ValueAndThemeId(LocalDate date, LocalTime time, Id themeId);
+    boolean existsByDate_ValueAndTimeSlot_StartAtAndThemeId(LocalDate date, LocalTime time, Id themeId);
 }

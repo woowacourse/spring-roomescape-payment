@@ -4,27 +4,27 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import roomescape.business.model.entity.Member;
 import roomescape.business.model.entity.Reservation;
-import roomescape.business.model.entity.ReservationTime;
 import roomescape.business.model.entity.Theme;
-import roomescape.business.model.entity.User;
+import roomescape.business.model.entity.TimeSlot;
 import roomescape.business.model.vo.Id;
+import roomescape.infrastructure.MemberRepository;
 import roomescape.infrastructure.ReservationRepository;
 import roomescape.infrastructure.ReservationTimeRepository;
 import roomescape.infrastructure.ThemeRepository;
-import roomescape.infrastructure.UserRepository;
 
 @Component
 public class JpaTestUtil {
 
     private final ReservationRepository reservationDao;
     private final ReservationTimeRepository timeDao;
-    private final UserRepository userDao;
+    private final MemberRepository userDao;
     private final ThemeRepository themeDao;
 
     @Autowired
     public JpaTestUtil(ReservationRepository reservationDao, ReservationTimeRepository timeDao,
-                       UserRepository userDao, ThemeRepository themeDao) {
+                       MemberRepository userDao, ThemeRepository themeDao) {
         this.reservationDao = reservationDao;
         this.timeDao = timeDao;
         this.userDao = userDao;
@@ -32,19 +32,19 @@ public class JpaTestUtil {
     }
 
     public void insertUser(final String id, final String name) {
-        userDao.save(User.restore(id, "USER", name, name + "@email.com", "password123"));
+        userDao.save(Member.restore(id, "USER", name, name + "@email.com", "password123"));
     }
 
     public void insertReservation(final String id, final LocalDate date, final String timeId, final String themeId,
                                   final String userId) {
-        User user = userDao.findById(Id.create(userId)).get();
-        ReservationTime time = timeDao.findById(Id.create(timeId)).get();
+        Member member = userDao.findById(Id.create(userId)).get();
+        TimeSlot time = timeDao.findById(Id.create(timeId)).get();
         Theme theme = themeDao.findById(Id.create(themeId)).get();
-        reservationDao.save(Reservation.restore(id, user, date, time, theme));
+        reservationDao.save(Reservation.restore(id, member, date, time, theme));
     }
 
     public void insertReservationTime(final String id, final LocalTime time) {
-        timeDao.save(ReservationTime.restore(id, time));
+        timeDao.save(TimeSlot.restore(id, time));
     }
 
     public void insertTheme(final String id, final String name) {

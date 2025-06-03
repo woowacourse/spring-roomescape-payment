@@ -11,7 +11,7 @@ import roomescape.exception.business.InvalidCreateArgumentException;
 
 @Embeddable
 public record ReservationDate(
-        @Column(name = "reservation_date")
+        @Column(name = "date")
         LocalDate value
 ) {
     private static final int INTERVAL_FROM_NOW = 7;

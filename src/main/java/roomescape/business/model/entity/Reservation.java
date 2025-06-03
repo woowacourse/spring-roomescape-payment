@@ -4,7 +4,6 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -19,20 +18,19 @@ import roomescape.business.model.vo.ReservationDate;
 @EqualsAndHashCode(of = "id")
 @Getter
 @Entity
-@Table(name = "reservation")
 public class Reservation {
 
     @EmbeddedId
     private final Id id;
 
     @ManyToOne
-    private User user;
+    private Member member;
 
     @Embedded
     private ReservationDate date;
 
     @ManyToOne
-    private ReservationTime time;
+    private TimeSlot timeSlot;
 
     @ManyToOne
     private Theme theme;
@@ -41,17 +39,17 @@ public class Reservation {
         id = Id.issue();
     }
 
-    public static Reservation create(final User user, final LocalDate date, final ReservationTime time,
+    public static Reservation create(final Member member, final LocalDate date, final TimeSlot time,
                                      final Theme theme) {
-        return new Reservation(Id.issue(), user, ReservationDate.create(date), time, theme);
+        return new Reservation(Id.issue(), member, ReservationDate.create(date), time, theme);
     }
 
-    public static Reservation restore(final String id, final User user, final LocalDate date,
-                                      final ReservationTime time, final Theme theme) {
-        return new Reservation(Id.create(id), user, ReservationDate.restore(date), time, theme);
+    public static Reservation restore(final String id, final Member member, final LocalDate date,
+                                      final TimeSlot time, final Theme theme) {
+        return new Reservation(Id.create(id), member, ReservationDate.restore(date), time, theme);
     }
 
     public boolean isSameReserver(final String userId) {
-        return user.isSameUser(userId);
+        return member.isSameUser(userId);
     }
 }

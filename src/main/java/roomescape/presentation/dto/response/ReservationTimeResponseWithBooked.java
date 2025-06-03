@@ -1,14 +1,14 @@
 package roomescape.presentation.dto.response;
 
 import java.time.LocalTime;
-import roomescape.business.model.entity.ReservationTime;
+import roomescape.business.model.entity.TimeSlot;
 
 public record ReservationTimeResponseWithBooked(
         String id,
         LocalTime startAt,
         boolean alreadyBooked
 ) {
-    public static ReservationTimeResponseWithBooked of(ReservationTime time, boolean alreadyBooked) {
-        return new ReservationTimeResponseWithBooked(time.getId().value(), time.getStartTime().value(), alreadyBooked);
+    public static ReservationTimeResponseWithBooked of(TimeSlot time, boolean alreadyBooked) {
+        return new ReservationTimeResponseWithBooked(time.getId().value(), time.getStartAt(), alreadyBooked);
     }
 }

@@ -10,19 +10,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import roomescape.business.model.entity.User;
+import roomescape.business.model.entity.Member;
 import roomescape.business.model.vo.Id;
 import roomescape.test_util.JpaTestUtil;
 
 @DataJpaTest
 @Import(JpaTestUtil.class)
-class UserRepositoryTest {
+class MemberRepositoryTest {
 
-    private final UserRepository sut;
+    private final MemberRepository sut;
     private final JpaTestUtil testUtil;
 
     @Autowired
-    UserRepositoryTest(UserRepository sut, JpaTestUtil testUtil) {
+    MemberRepositoryTest(MemberRepository sut, JpaTestUtil testUtil) {
         this.sut = sut;
         this.testUtil = testUtil;
     }
@@ -35,10 +35,10 @@ class UserRepositoryTest {
     @Test
     void 사용자를_저장하고_조회할_수_있다() {
         // given
-        final User user = User.create("테스트유저", "test@example.com", "password123");
+        final Member member = Member.create("테스트유저", "test@example.com", "password123");
 
         // when, then
-        assertThatCode(() -> sut.save(user))
+        assertThatCode(() -> sut.save(member))
                 .doesNotThrowAnyException();
     }
 
@@ -49,7 +49,7 @@ class UserRepositoryTest {
         testUtil.insertUser("2", "유저이");
 
         // when
-        final List<User> result = sut.findAll();
+        final List<Member> result = sut.findAll();
 
         // then
         assertThat(result).hasSize(2);
@@ -63,20 +63,20 @@ class UserRepositoryTest {
         testUtil.insertUser("1", "유저일");
 
         // when
-        final Optional<User> result = sut.findById(Id.create("1"));
+        final Optional<Member> result = sut.findById(Id.create("1"));
 
         // then
         assertThat(result).isPresent();
-        final User user = result.get();
-        assertThat(user.getId().value()).isEqualTo("1");
-        assertThat(user.getName().value()).isEqualTo("유저일");
-        assertThat(user.getEmail().value()).isEqualTo("유저일@email.com");
+        final Member member = result.get();
+        assertThat(member.getId().value()).isEqualTo("1");
+        assertThat(member.getName().value()).isEqualTo("유저일");
+        assertThat(member.getEmail().value()).isEqualTo("유저일@email.com");
     }
 
     @Test
     void 존재하지_않는_ID로_사용자를_조회하면_빈_Optional을_반환한다() {
         // when
-        final Optional<User> result = sut.findById(Id.create("999"));
+        final Optional<Member> result = sut.findById(Id.create("999"));
 
         // then
         assertThat(result).isEmpty();
@@ -90,19 +90,19 @@ class UserRepositoryTest {
         testUtil.insertUser("1", name);
 
         // when
-        final Optional<User> result = sut.findByEmail_Value(email);
+        final Optional<Member> result = sut.findByEmail_Value(email);
 
         // then
         assertThat(result).isPresent();
-        final User user = result.get();
-        assertThat(user.getName().value()).isEqualTo(name);
-        assertThat(user.getEmail().value()).isEqualTo(email);
+        final Member member = result.get();
+        assertThat(member.getName().value()).isEqualTo(name);
+        assertThat(member.getEmail().value()).isEqualTo(email);
     }
 
     @Test
     void 존재하지_않는_이메일로_사용자를_조회하면_빈_Optional을_반환한다() {
         // when
-        final Optional<User> result = sut.findByEmail_Value("nonexistent@email.com");
+        final Optional<Member> result = sut.findByEmail_Value("nonexistent@email.com");
 
         // then
         assertThat(result).isEmpty();

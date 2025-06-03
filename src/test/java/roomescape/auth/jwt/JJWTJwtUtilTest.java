@@ -12,7 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import roomescape.auth.AuthToken;
 import roomescape.auth.LoginInfo;
-import roomescape.business.model.entity.User;
+import roomescape.business.model.entity.Member;
 import roomescape.business.model.vo.UserRole;
 import roomescape.exception.auth.AuthenticationException;
 
@@ -32,10 +32,10 @@ class JJWTJwtUtilTest {
     @Test
     void 유효한_사용자정보로_토큰을_생성한다() {
         // given
-        User user = User.restore("1", UserRole.USER.name(), "dompoo", "dompoo@email.com", "password");
+        Member member = Member.restore("1", UserRole.USER.name(), "dompoo", "dompoo@email.com", "password");
 
         // when
-        AuthToken authToken = sut.createToken(user);
+        AuthToken authToken = sut.createToken(member);
 
         // then
         assertThat(authToken).isNotNull();
@@ -88,10 +88,10 @@ class JJWTJwtUtilTest {
     @Test
     void 어드민_역할의_토큰을_생성하고_검증한다() {
         // given
-        User user = User.restore("1", UserRole.ADMIN.name(), "dompoo", "dompoo@email.com", "password");
+        Member member = Member.restore("1", UserRole.ADMIN.name(), "dompoo", "dompoo@email.com", "password");
 
         // when
-        AuthToken authToken = sut.createToken(user);
+        AuthToken authToken = sut.createToken(member);
         LoginInfo loginInfo = sut.validateAndResolveToken(authToken);
 
         // then

@@ -8,7 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import roomescape.exception.business.InvalidCreateArgumentException;
 
-class ReservationTimeTest {
+class TimeSlotTest {
 
     @Nested
     class 생성_테스트 {
@@ -16,7 +16,7 @@ class ReservationTimeTest {
         @ParameterizedTest
         @CsvSource({"09:59", "23:01"})
         void 예약_가능한_시간이_아닐_때_예약하면_예외가_발생한다(String timeStrValue) {
-            assertThatThrownBy(() -> ReservationTime.create(LocalTime.parse(timeStrValue)))
+            assertThatThrownBy(() -> TimeSlot.create(LocalTime.parse(timeStrValue)))
                     .isInstanceOf(InvalidCreateArgumentException.class);
         }
     }

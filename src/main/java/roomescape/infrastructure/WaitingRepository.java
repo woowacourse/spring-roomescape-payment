@@ -5,8 +5,8 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import roomescape.business.model.entity.ReservationTime;
 import roomescape.business.model.entity.Theme;
+import roomescape.business.model.entity.TimeSlot;
 import roomescape.business.model.entity.Waiting;
 import roomescape.business.model.vo.Id;
 import roomescape.business.model.vo.ReservationDate;
@@ -27,9 +27,9 @@ public interface WaitingRepository extends JpaRepository<Waiting, Id> {
                     )
                 )
                 FROM Waiting w
-                WHERE w.user.id = :userId
+                WHERE w.member.id = :userId
             """)
     List<WaitingWithRankReponse> findByUserIdWithRank(@Param("userId") Id userId);
 
-    Optional<Waiting> findFirstByDateAndTimeAndThemeOrderById(ReservationDate date, ReservationTime time, Theme theme);
+    Optional<Waiting> findFirstByDateAndTimeAndThemeOrderById(ReservationDate date, TimeSlot time, Theme theme);
 }

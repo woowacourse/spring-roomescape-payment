@@ -15,21 +15,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.business.model.entity.User;
+import roomescape.business.model.entity.Member;
 import roomescape.exception.business.InvalidCreateArgumentException;
 import roomescape.exception.business.NotFoundException;
-import roomescape.infrastructure.UserRepository;
+import roomescape.infrastructure.MemberRepository;
 import roomescape.presentation.dto.request.RegisterRequest;
 import roomescape.presentation.dto.response.UserResponse;
 
 @ExtendWith(MockitoExtension.class)
-class UserServiceTest {
+class MemberServiceTest {
 
     @Mock
-    private UserRepository userRepository;
+    private MemberRepository memberRepository;
 
     @InjectMocks
-    private UserService sut;
+    private MemberService sut;
 
     @Test
     void 사용자_등록이_성공적으로_이루어진다() {
@@ -39,14 +39,14 @@ class UserServiceTest {
         String password = "password123";
         RegisterRequest request = new RegisterRequest(name, email, password);
 
-        when(userRepository.existsByEmail_Value(email)).thenReturn(false);
+        when(memberRepository.existsByEmail_Value(email)).thenReturn(false);
 
         // when
         sut.register(request);
 
         // then
-        verify(userRepository).existsByEmail_Value(email);
-        verify(userRepository).save(any(User.class));
+        verify(memberRepository).existsByEmail_Value(email);
+        verify(memberRepository).save(any(Member.class));
     }
 
     @Test
@@ -56,31 +56,31 @@ class UserServiceTest {
         String email = "test@example.com";
         String password = "password123";
         RegisterRequest request = new RegisterRequest(name, email, password);
-        when(userRepository.existsByEmail_Value(email)).thenReturn(true);
+        when(memberRepository.existsByEmail_Value(email)).thenReturn(true);
 
         // when, then
         assertThatThrownBy(() -> sut.register(request))
                 .isInstanceOf(InvalidCreateArgumentException.class);
 
-        verify(userRepository).existsByEmail_Value(email);
-        verify(userRepository, never()).save(any(User.class));
+        verify(memberRepository).existsByEmail_Value(email);
+        verify(memberRepository, never()).save(any(Member.class));
     }
 
     @Test
     void 이메일로_사용자를_조회할_수_있다() {
         // given
         String email = "test@example.com";
-        User userData = User.restore("user-id", "USER", "Test User", email, "password123");
+        Member memberData = Member.restore("user-id", "USER", "Test User", email, "password123");
         UserResponse expectedUser = new UserResponse("user-id", "Test User", email);
 
-        when(userRepository.findByEmail_Value(email)).thenReturn(Optional.of(userData));
+        when(memberRepository.findByEmail_Value(email)).thenReturn(Optional.of(memberData));
 
         // when
         UserResponse result = sut.getByEmail(email);
 
         // then
         assertThat(result).isEqualTo(expectedUser);
-        verify(userRepository).findByEmail_Value(email);
+        verify(memberRepository).findByEmail_Value(email);
     }
 
     @Test
@@ -88,34 +88,34 @@ class UserServiceTest {
         // given
         String email = "nonexistent@example.com";
 
-        when(userRepository.findByEmail_Value(email)).thenReturn(Optional.empty());
+        when(memberRepository.findByEmail_Value(email)).thenReturn(Optional.empty());
 
         // when, then
         assertThatThrownBy(() -> sut.getByEmail(email))
                 .isInstanceOf(NotFoundException.class);
 
-        verify(userRepository).findByEmail_Value(email);
+        verify(memberRepository).findByEmail_Value(email);
     }
 
     @Test
     void 모든_사용자를_조회할_수_있다() {
         // given
-        List<User> userData = Arrays.asList(
-                User.restore("user-id-1", "USER", "User One", "user1@example.com", "password1"),
-                User.restore("user-id-2", "USER", "User Two", "user2@example.com", "password2")
+        List<Member> memberData = Arrays.asList(
+                Member.restore("user-id-1", "USER", "User One", "user1@example.com", "password1"),
+                Member.restore("user-id-2", "USER", "User Two", "user2@example.com", "password2")
         );
         List<UserResponse> expectedUsers = Arrays.asList(
                 new UserResponse("user-id-1", "User One", "user1@example.com"),
                 new UserResponse("user-id-2", "User Two", "user2@example.com")
         );
 
-        when(userRepository.findAll()).thenReturn(userData);
+        when(memberRepository.findAll()).thenReturn(memberData);
 
         // when
         List<UserResponse> result = sut.getAll();
 
         // then
         assertThat(result).isEqualTo(expectedUsers);
-        verify(userRepository).findAll();
+        verify(memberRepository).findAll();
     }
 }

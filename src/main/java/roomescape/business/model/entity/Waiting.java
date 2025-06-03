@@ -28,13 +28,13 @@ public class Waiting {
     private final Id id;
 
     @ManyToOne
-    private User user;
+    private Member member;
 
     @Embedded
     private ReservationDate date;
 
     @ManyToOne
-    private ReservationTime time;
+    private TimeSlot time;
 
     @ManyToOne
     private Theme theme;
@@ -46,18 +46,18 @@ public class Waiting {
         createdAt = LocalDateTime.now();
     }
 
-    public static Waiting create(final User user, final LocalDate date, final ReservationTime time,
+    public static Waiting create(final Member member, final LocalDate date, final TimeSlot time,
                                  final Theme theme) {
-        return new Waiting(Id.issue(), user, ReservationDate.create(date), time, theme, LocalDateTime.now());
+        return new Waiting(Id.issue(), member, ReservationDate.create(date), time, theme, LocalDateTime.now());
     }
 
-    public static Waiting restore(final String id, final User user, final LocalDate date,
-                                  final ReservationTime time, final Theme theme, final LocalDateTime createdAt) {
-        return new Waiting(Id.create(id), user, ReservationDate.restore(date), time, theme,
+    public static Waiting restore(final String id, final Member member, final LocalDate date,
+                                  final TimeSlot time, final Theme theme, final LocalDateTime createdAt) {
+        return new Waiting(Id.create(id), member, ReservationDate.restore(date), time, theme,
                 createdAt.truncatedTo(ChronoUnit.MILLIS));
     }
 
     public Reservation convertToReservation() {
-        return Reservation.create(user, date.value(), time, theme);
+        return Reservation.create(member, date.value(), time, theme);
     }
 }

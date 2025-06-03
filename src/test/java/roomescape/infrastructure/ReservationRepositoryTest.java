@@ -13,10 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import roomescape.business.model.entity.Member;
 import roomescape.business.model.entity.Reservation;
-import roomescape.business.model.entity.ReservationTime;
 import roomescape.business.model.entity.Theme;
-import roomescape.business.model.entity.User;
+import roomescape.business.model.entity.TimeSlot;
 import roomescape.business.model.vo.Id;
 import roomescape.test_util.JpaTestUtil;
 
@@ -34,16 +34,17 @@ class ReservationRepositoryTest {
 
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
-    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
 
     @Autowired
     ReservationRepositoryTest(ReservationRepository sut,
                               ReservationTimeRepository reservationTimeRepository,
-                              ThemeRepository themeRepository, UserRepository userRepository, JpaTestUtil testUtil) {
+                              ThemeRepository themeRepository, MemberRepository memberRepository,
+                              JpaTestUtil testUtil) {
         this.sut = sut;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
-        this.userRepository = userRepository;
+        this.memberRepository = memberRepository;
         this.testUtil = testUtil;
     }
 
@@ -55,16 +56,16 @@ class ReservationRepositoryTest {
     @Test
     void 예약을_저장할_수_있다() {
         // given
-        final ReservationTime time = ReservationTime.create(TIME);
+        final TimeSlot time = TimeSlot.create(TIME);
         final Theme theme = Theme.create("호러", "", "");
-        final User user = User.create("돔푸", "dompoo@email.com", "password");
+        final Member member = Member.create("돔푸", "dompoo@email.com", "password");
         reservationTimeRepository.save(time);
         themeRepository.save(theme);
-        userRepository.save(user);
+        memberRepository.save(member);
 
         // when, then
         assertThatCode(
-                () -> sut.save(Reservation.create(user, DATE1, time, theme)))
+                () -> sut.save(Reservation.create(member, DATE1, time, theme)))
                 .doesNotThrowAnyException();
     }
 
@@ -164,7 +165,7 @@ class ReservationRepositoryTest {
         final List<Reservation> result = sut.findAllReservationWithFilter(null, Id.create(userId2), null, null);
         // then
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getUser().getName().value()).isEqualTo("레몬");
+        assertThat(result.get(0).getMember().getName().value()).isEqualTo("레몬");
     }
 
     @Test
@@ -238,7 +239,7 @@ class ReservationRepositoryTest {
         assertThat(result).hasSize(2);
         assertThat(result).extracting(r -> r.getId().value()).containsExactlyInAnyOrder(reservationId1, reservationId2);
     }
-    
+
     @Test
     void 여러_필터를_함께_적용할_수_있다() {
         // given
@@ -267,7 +268,7 @@ class ReservationRepositoryTest {
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getId().value()).isEqualTo(reservationId2);
         assertThat(result.get(0).getTheme().getId().value()).isEqualTo(themeId1);
-        assertThat(result.get(0).getUser().getName().value()).isEqualTo("레몬");
+        assertThat(result.get(0).getMember().getName().value()).isEqualTo("레몬");
     }
 
     @Test
@@ -300,7 +301,7 @@ class ReservationRepositoryTest {
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getId().value()).isEqualTo(reservationId2);
         assertThat(result.get(0).getTheme().getId().value()).isEqualTo(themeId1);
-        assertThat(result.get(0).getUser().getName().value()).isEqualTo("레몬");
+        assertThat(result.get(0).getMember().getName().value()).isEqualTo("레몬");
         assertThat(result.get(0).getDate().value()).isEqualTo(DATE2);
     }
 
@@ -325,7 +326,7 @@ class ReservationRepositoryTest {
         final Reservation reservation = result.get();
         assertThat(reservation.getId().value()).isEqualTo(reservationId);
         assertThat(reservation.getDate().value()).isEqualTo(DATE1);
-        assertThat(reservation.getTime().getId().value()).isEqualTo(timeId);
+        assertThat(reservation.getTimeSlot().getId().value()).isEqualTo(timeId);
         assertThat(reservation.getTheme().getId().value()).isEqualTo(themeId);
     }
 
@@ -363,7 +364,7 @@ class ReservationRepositoryTest {
         testUtil.insertReservation(reservationId, DATE1, timeId, themeId, userId);
 
         // when
-        final boolean result = sut.existsByTimeId(Id.create(timeId));
+        final boolean result = sut.existsByTimeSlotId(Id.create(timeId));
 
         // then
         assertThat(result).isTrue();
@@ -404,7 +405,7 @@ class ReservationRepositoryTest {
         Theme theme = Theme.restore(themeId, "호러", "", "");
 
         // when
-        final boolean result = sut.existsByDate_ValueAndTime_StartTime_ValueAndThemeId(DATE1, TIME, theme.getId());
+        final boolean result = sut.existsByDate_ValueAndTimeSlot_StartAtAndThemeId(DATE1, TIME, theme.getId());
 
         // then
         assertThat(result).isTrue();

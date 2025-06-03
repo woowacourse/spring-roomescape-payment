@@ -6,21 +6,21 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import roomescape.business.model.entity.ReservationTime;
+import roomescape.business.model.entity.TimeSlot;
 import roomescape.business.model.vo.Id;
 import roomescape.presentation.dto.response.ReservationTimeResponseWithBooked;
 
-public interface ReservationTimeRepository extends JpaRepository<ReservationTime, Id> {
+public interface ReservationTimeRepository extends JpaRepository<TimeSlot, Id> {
 
     @Query("""
             SELECT new roomescape.presentation.dto.response.ReservationTimeResponseWithBooked(
                         rt.id.id,
-                        rt.startTime.value,
+                        rt.startAt,
                         CASE WHEN r.id IS NOT NULL THEN TRUE ELSE FALSE END AS already_booked
                     )
-             FROM ReservationTime rt
+             FROM TimeSlot rt
              LEFT JOIN Reservation r
-               ON rt.id = r.time
+               ON rt.id = r.timeSlot
                AND r.date.value = :date
                AND r.theme.id = :themeId
             """)
@@ -29,7 +29,7 @@ public interface ReservationTimeRepository extends JpaRepository<ReservationTime
             @Param("themeId") Id themeId
     );
 
-    boolean existsByStartTime_ValueBetween(LocalTime startInclusive, LocalTime endExclusive);
+    boolean existsByStartAtBetween(LocalTime startInclusive, LocalTime endExclusive);
 
-    boolean existsByStartTime_Value(LocalTime createTime);
+    boolean existsByStartAt(LocalTime createTime);
 }

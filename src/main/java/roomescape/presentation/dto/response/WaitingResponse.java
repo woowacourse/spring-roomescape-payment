@@ -13,7 +13,7 @@ public record WaitingResponse(
     public static WaitingResponse from(Waiting waiting) {
         return new WaitingResponse(
                 waiting.getId().value(),
-                UserResponse.from(waiting.getUser()),
+                UserResponse.from(waiting.getMember()),
                 waiting.getDate().value(),
                 ReservationTimeResponse.from(waiting.getTime()),
                 ThemeResponse.from(waiting.getTheme())
