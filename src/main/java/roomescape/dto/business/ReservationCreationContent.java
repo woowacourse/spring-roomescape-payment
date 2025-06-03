@@ -22,4 +22,13 @@ public record ReservationCreationContent(
     public ReservationCreationContent(Waiting waiting) {
         this(waiting.getTheme().getId(), waiting.getDate(), waiting.getTime().getId());
     }
+
+    @Override
+    public String toString() {
+        return "ReservationCreationContent{" +
+                "themeId=" + themeId +
+                ", date=" + date +
+                ", timeId=" + timeId +
+                '}';
+    }
 }

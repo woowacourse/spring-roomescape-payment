@@ -36,7 +36,7 @@ class PaymentApiTest {
 
     @Test
     void whenPaymentIsCorrectThenSuccess() {
-        assertThat(realPaymentClient.pay(orderId, paymentKey, amount))
+        assertThat(realPaymentClient.pay(orderId, paymentKey, amount, "normal"))
                 .isEqualTo(PaymentResult.createWithoutId(orderId, paymentKey, null, amount));
 
     }

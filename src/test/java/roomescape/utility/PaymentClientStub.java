@@ -6,19 +6,18 @@ import roomescape.exception.PaymentException;
 
 public class PaymentClientStub implements PaymentClient {
 
-    private PaymentResult paymentResult = PaymentResult.createWithoutId("askdkasrwe", "sdfa132", "asdfasdf", 1L);
     private String errorCase = null;
     private boolean occurRestClientError;
 
     @Override
-    public PaymentResult pay(String paymentKey, String orderId, long amount) {
+    public PaymentResult pay(String paymentKey, String orderId, long amount, String paymentType) {
         if (occurRestClientError) {
             throw new RestClientException("restclienterror");
         }
         if (errorCase != null) {
             throw new PaymentException(errorCase);
         }
-        return paymentResult;
+        return PaymentResult.createWithoutId("askdkasrwe", "sdfa132", "asdfasdf", 1L);
     }
 
     public void clearErrorCase() {
@@ -27,10 +26,6 @@ public class PaymentClientStub implements PaymentClient {
 
     public void setErrorCase(String errorCase) {
         this.errorCase = errorCase;
-    }
-
-    public void setPaymentResult(PaymentResult paymentResult) {
-        this.paymentResult = paymentResult;
     }
 
     public void setOccurRestClientError(boolean occurRestClientError) {

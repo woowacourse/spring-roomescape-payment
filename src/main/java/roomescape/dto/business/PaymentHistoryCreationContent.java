@@ -17,4 +17,14 @@ public record PaymentHistoryCreationContent(
     public PaymentHistoryCreationContent(WaitingCreationRequest request) {
         this(request.orderId(), request.paymentKey(), request.paymentType(), request.amount());
     }
+
+    @Override
+    public String toString() {
+        return "PaymentHistoryCreationContent{" +
+                "orderId='" + orderId + '\'' +
+                ", paymentKey='" + paymentKey + '\'' +
+                ", paymentType='" + paymentType + '\'' +
+                ", amount=" + amount +
+                '}';
+    }
 }
