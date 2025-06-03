@@ -26,7 +26,7 @@ class PaymentErrorHandlerTest {
     private ClientHttpResponse clientHttpResponse;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final PaymentErrorHandler paymentErrorHandler = new PaymentErrorHandler(objectMapper);
+    private final PaymentErrorHandler paymentErrorHandler = new PaymentErrorHandler();
 
     @ParameterizedTest
     @ValueSource(ints = {400, 401, 498, 499, 500, 501, 598, 599})
