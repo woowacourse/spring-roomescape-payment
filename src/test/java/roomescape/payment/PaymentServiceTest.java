@@ -2,6 +2,7 @@ package roomescape.payment;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -99,5 +100,44 @@ public class PaymentServiceTest {
         assertThat(resultPayment.getAmount()).isEqualByComparingTo(amount);
         assertThat(resultPayment.getReservation()).isEqualTo(paymentReservation);
     }
+
+    @DisplayName("회원 ID로 결제 목록 조회 - 성공")
+    @Test
+    void findAllByMemberId_success() {
+        // given
+        Member member = MemberFixture.createMember("루카", "luca@example.com", "secure123");
+        memberRepository.save(member);
+        Long memberId = member.getId();
+
+        ReservationTime time1 = new ReservationTime(LocalTime.of(10, 0));
+        ReservationTime time2 = new ReservationTime(LocalTime.of(14, 0));
+        timeRepository.save(time1);
+        timeRepository.save(time2);
+
+        Theme theme = new Theme("미스터리룸", "공포 테마", "thumbnail.jpg");
+        themeRepository.save(theme);
+
+        ReservationSpec spec1 = new ReservationSpec(new ReservationDate(LocalDate.now().plusDays(1)), time1, theme);
+        ReservationSpec spec2 = new ReservationSpec(new ReservationDate(LocalDate.now().plusDays(2)), time2, theme);
+
+        Reservation reservation1 = reservationRepository.save(new Reservation(member, spec1));
+        Reservation reservation2 = reservationRepository.save(new Reservation(member, spec2));
+
+        Payment payment1 = new Payment("payKey-1", BigDecimal.valueOf(1500), reservation1);
+        Payment payment2 = new Payment("payKey-2", BigDecimal.valueOf(2000), reservation2);
+
+        paymentService.save(payment1);
+        paymentService.save(payment2);
+
+        // when
+        List<Payment> result = paymentService.findAllByMemberId(memberId);
+
+        // then
+        assertThat(result).hasSize(2);
+        assertThat(result)
+                .extracting(Payment::getPaymentKey)
+                .containsExactlyInAnyOrder("payKey-1", "payKey-2");
+    }
+
 
 }
