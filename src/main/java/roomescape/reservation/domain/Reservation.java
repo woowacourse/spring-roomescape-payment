@@ -8,7 +8,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.Clock;
 import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -62,7 +61,7 @@ public class Reservation extends BaseTimeEntity {
         return registrationSlot.getTheme();
     }
 
-    public boolean isPast(Clock clock) {
-        return registrationSlot.isPast(clock);
+    public boolean isPast() {
+        return registrationSlot.isPast();
     }
 }

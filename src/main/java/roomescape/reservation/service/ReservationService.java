@@ -5,11 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.NotFoundException;
-import roomescape.exception.ReservationException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.RegistrationSlot;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationPolicy;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSearchRequest;
 import roomescape.reservation.repository.ReservationRepository;
@@ -24,6 +24,8 @@ import roomescape.theme.repository.ThemeRepository;
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
+    private final ReservationPolicy reservationPolicy;
+
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
@@ -55,9 +57,7 @@ public class ReservationService {
     private void validateCanRegistration(Reservation reservation) {
         boolean existsSameSlot = reservationRepository.existsSameSlot(
                 reservation.getDate(), reservation.getTime().getId(), reservation.getTheme().getId());
-        if (existsSameSlot) {
-            throw new ReservationException("이미 해당 날짜에 예약이 존재합니다.");
-        }
+        reservationPolicy.validateReservationAvailable(reservation, existsSameSlot);
     }
 
     @Transactional

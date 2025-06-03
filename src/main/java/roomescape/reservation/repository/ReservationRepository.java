@@ -33,4 +33,15 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         )
     """)
     boolean existsSameSlot(LocalDate date, Long timeId, Long themeId);
+
+    @Query("""
+    SELECT EXISTS (
+        SELECT 1 FROM Reservation r
+        WHERE r.member.id = :memberId
+          AND r.registrationSlot.theme.id = :themeId
+          AND r.registrationSlot.time.id = :timeId
+          AND r.registrationSlot.date = :date
+        )
+    """)
+    boolean memberHasReservationAtSlot(Long memberId, Long themeId, Long timeId, LocalDate date);
 }

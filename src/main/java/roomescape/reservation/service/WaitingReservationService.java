@@ -12,6 +12,7 @@ import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.RegistrationSlot;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.WaitingReservation;
+import roomescape.reservation.domain.WaitingValidator;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.WaitingReservationResponse;
 import roomescape.reservation.repository.ReservationRepository;
@@ -26,9 +27,10 @@ import roomescape.theme.repository.ThemeRepository;
 @RequiredArgsConstructor
 public class WaitingReservationService {
 
+    private final WaitingValidator waitingValidator;
     private final WaitingReservationRepository waitingReservationRepository;
-    private final ReservationRepository reservationRepository;
 
+    private final ReservationRepository reservationRepository;
     private final MemberRepository memberRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
@@ -43,37 +45,25 @@ public class WaitingReservationService {
         final Member member = getMemberById(command.memberId());
         final ReservationTime time = getTimeById(command.timeId());
         final Theme theme = getThemeById(command.themeId());
-
         final WaitingReservation waitingReservation = WaitingReservation.builder()
                 .member(member)
                 .registrationSlot(new RegistrationSlot(time, theme, command.date()))
                 .build();
-        return new WaitingReservationResponse(waitingReservationRepository.save(waitingReservation));
+        waitingValidator.validateCanWaiting(waitingReservation);
+        WaitingReservation saved = waitingReservationRepository.save(waitingReservation);
+
+        return new WaitingReservationResponse(saved);
     }
 
     @Transactional
     public void approveWaitingReservation(final Long id) {
         final WaitingReservation waitingReservation = getWaitingById(id);
 
-        validateCanWaiting(waitingReservation);
+        waitingValidator.validateCanWaitingApprove(waitingReservation);
         Reservation approvedReservation = waitingReservation.approveToReservation();
 
         waitingReservationRepository.deleteById(waitingReservation.getId());
         reservationRepository.save(approvedReservation);
-    }
-
-    private void validateCanWaiting(WaitingReservation waitingReservation) {
-        if (existsAlreadyInSlot(waitingReservation)) {
-            throw new ReservationException("이미 해당 날짜에 예약이 존재합니다.");
-        }
-    }
-
-    private boolean existsAlreadyInSlot(WaitingReservation waitingReservation) {
-        return reservationRepository.existsSameSlot(
-                waitingReservation.getDate(),
-                waitingReservation.getTime().getId(),
-                waitingReservation.getTheme().getId()
-        );
     }
 
     @Transactional

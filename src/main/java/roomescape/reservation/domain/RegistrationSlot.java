@@ -5,7 +5,6 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
@@ -42,8 +41,8 @@ public class RegistrationSlot {
         this.date = date;
     }
 
-    public boolean isPast(Clock clock) {
-        LocalDateTime now = LocalDateTime.now(clock);
+    public boolean isPast() {
+        LocalDateTime now = LocalDateTime.now();
         LocalDateTime bookingDateTime = LocalDateTime.of(date, time.getStartAt());
         return bookingDateTime.isBefore(now);
     }

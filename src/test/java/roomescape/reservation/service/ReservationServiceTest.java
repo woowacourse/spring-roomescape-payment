@@ -13,8 +13,8 @@ import java.util.List;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.DBHelper;
 import roomescape.auth.dto.LoginMember;
 import roomescape.member.domain.Member;
@@ -27,8 +27,8 @@ import roomescape.reservation.service.dto.CreateRegistrationCommand;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 
-@DataJpaTest
-@Import({ReservationService.class, WaitingReservationService.class, DBHelper.class})
+@SpringBootTest
+@Transactional
 class ReservationServiceTest {
 
     @Autowired
