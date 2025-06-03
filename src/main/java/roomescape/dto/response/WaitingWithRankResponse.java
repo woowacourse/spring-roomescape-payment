@@ -15,13 +15,13 @@ public record WaitingWithRankResponse(
 
     public WaitingWithRankResponse(WaitingWithRank waitingWithRank) {
         this(
-                waitingWithRank.id(),
-                waitingWithRank.date(),
-                new ThemeProfileResponse(waitingWithRank.theme()),
-                new ReservationTimeResponse(waitingWithRank.time()),
-                new MemberProfileResponse(waitingWithRank.member()),
-                waitingWithRank.rank(),
-                waitingWithRank.paymentResultResponse()
+                waitingWithRank.getId(),
+                waitingWithRank.getDate(),
+                new ThemeProfileResponse(waitingWithRank.getTheme()),
+                new ReservationTimeResponse(waitingWithRank.getTime()),
+                new MemberProfileResponse(waitingWithRank.getMember()),
+                waitingWithRank.getRank(),
+                waitingWithRank.getPaymentResultResponse()
         );
     }
 }

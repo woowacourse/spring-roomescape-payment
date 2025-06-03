@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.jdbc.core.JdbcTemplate;
 import roomescape.domain.Member;
+import roomescape.domain.PaymentResult;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Role;
 import roomescape.domain.Theme;
@@ -30,6 +31,8 @@ class WaitingRepositoryTest {
     private TestEntityManager entityManager;
     @Autowired
     private WaitingRepository waitingRepository;
+    @Autowired
+    private PaymentResultRepository paymentResultRepository;
 
     @DisplayName("회원의 예약 대기 목록을 순번과 함께 구할 수 있다.")
     @Test
@@ -63,7 +66,7 @@ class WaitingRepositoryTest {
         assertAll(
                 () -> assertThat(waitingWithRankings).hasSize(1),
                 () -> assertThat(waitingWithRankings)
-                        .extracting(WaitingWithRank::rank)
+                        .extracting(WaitingWithRank::getRank)
                         .containsExactly(2L)
         );
     }
@@ -103,7 +106,11 @@ class WaitingRepositoryTest {
                     Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
             Member member = entityManager.persist(
                     Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "qwer1234!"));
-            entityManager.persist(Waiting.createWithoutIdWithoutPayment(NEXT_DAY, theme, time, member));
+            PaymentResult paymentResult = paymentResultRepository.save(
+                    PaymentResult.createWithoutId("orderId" + member.getId(), "paymentKey" + member.getId(), "NORMAL",
+                            10000L)
+            );
+            entityManager.persist(Waiting.createWithoutId(NEXT_DAY, theme, time, member, paymentResult));
 
             entityManager.flush();
 
@@ -129,10 +136,16 @@ class WaitingRepositoryTest {
                 Member.createWithoutId(Role.GENERAL, "회원", "member1@test.com", "qwer1234!"));
         Member secondMember = entityManager.persist(
                 Member.createWithoutId(Role.GENERAL, "회원", "member2@test.com", "qwer1234!"));
+        PaymentResult paymentResult1 = paymentResultRepository.save(
+                PaymentResult.createWithoutId("orderId1", "paymentKey1", "NORMAL", 10000L)
+        );
         Waiting firstWaiting = entityManager.persist(
-                Waiting.createWithoutIdWithoutPayment(NEXT_DAY, theme, time, firstMember));
+                Waiting.createWithoutId(NEXT_DAY, theme, time, firstMember, paymentResult1));
+        PaymentResult paymentResult2 = paymentResultRepository.save(
+                PaymentResult.createWithoutId("orderId2", "paymentKey2", "NORMAL", 10000L)
+        );
         entityManager.persist(
-                Waiting.createWithoutIdWithoutPayment(NEXT_DAY, theme, time, secondMember));
+                Waiting.createWithoutId(NEXT_DAY, theme, time, secondMember, paymentResult2));
 
         // when
         Optional<Waiting> findWaiting = waitingRepository.findFirstWaiting(theme.getId(), NEXT_DAY, time.getId());
