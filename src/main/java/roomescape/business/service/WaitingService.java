@@ -1,7 +1,5 @@
 package roomescape.business.service;
 
-import static roomescape.exception.ErrorCode.RESERVATION_DUPLICATED;
-
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +11,6 @@ import roomescape.business.model.entity.TimeSlot;
 import roomescape.business.model.entity.Waiting;
 import roomescape.business.model.vo.Id;
 import roomescape.exception.ErrorCode;
-import roomescape.exception.business.DuplicatedException;
 import roomescape.exception.business.NotFoundException;
 import roomescape.infrastructure.MemberRepository;
 import roomescape.infrastructure.ReservationRepository;
@@ -43,11 +40,6 @@ public class WaitingService {
         Theme theme = themeRepository.findById(Id.create(request.themeId()))
                 .orElseThrow(() -> new NotFoundException(ErrorCode.THEME_NOT_EXIST));
 
-        if (reservationRepository.existsByDate_ValueAndTimeSlot_StartAtAndThemeId(request.date(),
-                time.getStartAt(),
-                theme.getId())) {
-            throw new DuplicatedException(RESERVATION_DUPLICATED);
-        }
         Waiting waiting = Waiting.create(member, request.date(), time, theme);
         waitingRepository.save(waiting);
         return WaitingResponse.from(waiting);

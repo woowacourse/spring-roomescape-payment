@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
     document.getElementById('wait-button').addEventListener('click', onWaitButtonClick);
+
     function onReservationButtonClickWithPaymentWidget(event) {
         onReservationButtonClick(event, paymentWidget);
     }
@@ -168,7 +169,6 @@ function onReservationButtonClick(event, paymentWidget) {
             date: selectedDate,
             themeId: selectedThemeId,
             timeId: selectedTimeId,
-            reservationStatus: "RESERVED"
         };
         const generateRandomString = () =>
             window.btoa(Math.random()).slice(0, 20);
@@ -242,10 +242,9 @@ function onWaitButtonClick() {
             date: selectedDate,
             themeId: selectedThemeId,
             timeId: selectedTimeId,
-            reservationStatus: "WAITING"
         };
 
-        fetch('/reservations', {
+        fetch('/waitings', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
