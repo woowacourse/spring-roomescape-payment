@@ -152,6 +152,6 @@ class ReservationServiceTest {
     }
 
     private MemberReservationRequest createRequest(LocalDate now, Long timeId, Long themeId) {
-        return new MemberReservationRequest(now, timeId, themeId, "key", "orderId", 1000L);
+        return new MemberReservationRequest(now, timeId, themeId);
     }
 }

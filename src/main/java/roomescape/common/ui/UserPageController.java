@@ -15,4 +15,9 @@ public class UserPageController {
     public String myReservationDashBoard() {
         return "reservation-mine";
     }
+
+    @GetMapping("/payment")
+    public String paymentPage() {
+        return "payment";
+    }
 }
