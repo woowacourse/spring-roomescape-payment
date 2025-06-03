@@ -39,30 +39,25 @@ public class Reservation extends TimeStamp {
     }
 
     public Reservation(final Long id, final Member member, final Theme theme, final LocalDate date,
-                       final ReservationTime reservationTime) {
+                       final ReservationTime reservationTime, final Payment payment) {
         this.id = id;
         this.member = member;
         this.reservationInfo = new ReservationInfo(
                 theme, date, reservationTime
         );
+        this.payment = payment;
     }
 
     public Reservation(final Member member, final Theme theme, final LocalDate date,
-                       final ReservationTime reservationTime) {
-        this(null, member, theme, date, reservationTime);
+                       final ReservationTime reservationTime, final Payment payment) {
+        this(null, member, theme, date, reservationTime, payment);
     }
 
     public Reservation(final Member member, final ReservationInfo reservationInfo) {
         this.id = null;
         this.member = member;
         this.reservationInfo = reservationInfo;
-    }
-
-    public Reservation(final Member member, final ReservationInfo reservationInfo, final Payment payment) {
-        this.id = null;
-        this.member = member;
-        this.reservationInfo = reservationInfo;
-        this.payment = payment;
+        this.payment = null;
     }
 
     public Long getId() {

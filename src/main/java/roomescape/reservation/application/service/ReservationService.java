@@ -14,7 +14,6 @@ import roomescape.member.domain.repository.MemberRepository;
 import roomescape.payment.application.service.PaymentService;
 import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationInfo;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.Waiting;
@@ -54,44 +53,51 @@ public class ReservationService {
     @Transactional
     public ReservationResponse createUserReservationAndPayment(final ReservationRequest reservationRequest, final Long memberId) {
         Member member = findMemberById(memberId);
+        Reservation unpaidReservation = makeUnpaidReservation(reservationRequest.getTimeId(), reservationRequest.getThemeId(), reservationRequest.getDate(), member);
+        validateIsPast(unpaidReservation.getDate(), unpaidReservation.getReservationTime());
 
         Payment payment = paymentService.processPaymentRequest(reservationRequest);
-        return createPaidReservation(reservationRequest, member, payment);
+
+        return createPaidReservation(unpaidReservation, member, payment);
     }
 
-    private ReservationResponse createPaidReservation(final ReservationRequest reservationRequest, final Member member, final Payment payment) {
-        ReservationTime reservationTime = getReservationTime(reservationRequest.getTimeId());
-        Theme theme = getTheme(reservationRequest.getThemeId());
-        validateReservationDateTime(reservationRequest.getDate(), reservationTime);
-
-        final Reservation reservation = new Reservation(
+    private ReservationResponse createPaidReservation(final Reservation reservation, final Member member, final Payment payment) {
+        final Reservation paidReservation = new Reservation(
                 member,
-                new ReservationInfo(
-                        theme,
-                        reservationRequest.getDate(),
-                        reservationTime
-                ),
+                reservation.getTheme(),
+                reservation.getDate(),
+                reservation.getReservationTime(),
                 payment
         );
 
-        return new ReservationResponse(reservationRepository.save(reservation));
+        return createReservation(paidReservation);
     }
 
     @Transactional
     public ReservationResponse createAdminReservation(final AdminReservationRequest adminReservationRequest) {
         Member member = findMemberById(adminReservationRequest.getMemberId());
 
-        return createReservation(
+        Reservation unpaidReservation = makeUnpaidReservation(
                 adminReservationRequest.getTimeId(),
                 adminReservationRequest.getThemeId(),
                 adminReservationRequest.getDate(),
                 member
         );
+
+        return createReservation(unpaidReservation);
+    }
+
+    private Reservation makeUnpaidReservation(final Long timeId, final Long themeId, final LocalDate date, final Member member) {
+        ReservationTime reservationTime = getReservationTime(timeId);
+        Theme theme = getTheme(themeId);
+        validateIsDuplicate(date, reservationTime);
+
+        return new Reservation(member, theme, date, reservationTime, null);
     }
 
     @Transactional(readOnly = true)
-    public List<ReservationResponse> getReservations(Long memberId, Long themeId, LocalDate dateFrom,
-                                                     LocalDate dateTo) {
+    public List<ReservationResponse> getReservations(final Long memberId, final Long themeId, final LocalDate dateFrom,
+                                                     final LocalDate dateTo) {
 
         if (dateFrom != null && dateTo != null && dateFrom.isAfter(dateTo)) {
             throw new IllegalArgumentException("dateFrom은 dateTo보다 이전이어야 합니다.");
@@ -144,22 +150,11 @@ public class ReservationService {
         });
     }
 
-    private ReservationResponse createReservation(Long timeId, Long themeId, LocalDate date, Member member) {
-        ReservationTime reservationTime = getReservationTime(timeId);
-        Theme theme = getTheme(themeId);
-        validateReservationDateTime(date, reservationTime);
-
-        final Reservation reservation = new Reservation(
-                member,
-                theme,
-                date,
-                reservationTime
-        );
-
+    private ReservationResponse createReservation(final Reservation reservation) {
         return new ReservationResponse(reservationRepository.save(reservation));
     }
 
-    private ReservationTime getReservationTime(Long timeId) {
+    private ReservationTime getReservationTime(final Long timeId) {
         return reservationTimeRepository.findById(timeId)
                 .orElseThrow(() -> new NoSuchElementException("예약 시간 정보를 찾을 수 없습니다."));
     }
@@ -169,14 +164,9 @@ public class ReservationService {
                 .orElseThrow(() -> new NoSuchElementException("테마 정보를 찾을 수 없습니다."));
     }
 
-    private void validateReservationDateTime(LocalDate reservationDate, ReservationTime reservationTime) {
+    private void validateIsPast(final LocalDate reservationDate, final ReservationTime reservationTime) {
         final LocalDateTime reservationDateTime = LocalDateTime.of(reservationDate, reservationTime.getStartAt());
 
-        validateIsPast(reservationDateTime);
-        validateIsDuplicate(reservationDate, reservationTime);
-    }
-
-    private static void validateIsPast(LocalDateTime reservationDateTime) {
         if (reservationDateTime.isBefore(LocalDateTime.now())) {
             throw new DateTimeException("지난 일시에 대한 예약 생성은 불가능합니다.");
         }
