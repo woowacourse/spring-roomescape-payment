@@ -30,6 +30,9 @@ public class PaymentClientTest {
     @Autowired
     private RestClient.Builder restClientBuilder;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     private PaymentClient paymentClient;
 
     private MockRestServiceServer mockRestServiceServer;
@@ -38,7 +41,7 @@ public class PaymentClientTest {
     void setUp() {
         mockRestServiceServer = MockRestServiceServer.bindTo(restClientBuilder).build();
         RestClient testRestClient = restClientBuilder.build();
-        paymentClient = new PaymentClient(testRestClient);
+        paymentClient = new PaymentClient(objectMapper, testRestClient);
     }
 
     @DisplayName("잘못된 시크릿키로 결제 승인 요청시 500에러가 반환된다.")

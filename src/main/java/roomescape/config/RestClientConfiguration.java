@@ -30,16 +30,6 @@ public class RestClientConfiguration {
 
         return restClientBuilder()
                 .requestFactory(factory)
-                .defaultStatusHandler(HttpStatusCode::is4xxClientError, (req, res) -> {
-                    RestClientErrorResponse restClientErrorResponse = objectMapper.readValue(res.getBody(), RestClientErrorResponse.class);
-                    if (restClientErrorResponse.isInvisibleError()) {
-                        throw new PaymentConfirmServerException();
-                    }
-                    throw new PaymentConfirmClientException(restClientErrorResponse.getMessage());
-                })
-                .defaultStatusHandler(HttpStatusCode::is5xxServerError, (req, res) -> {
-                    throw new PaymentConfirmServerException();
-                })
                 .build();
     }
 }
