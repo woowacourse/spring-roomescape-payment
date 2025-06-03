@@ -37,7 +37,7 @@ public class WaitingController {
 
     @RequireRole(MemberRole.USER)
     @DeleteMapping("/waiting/{id}")
-    public ResponseEntity<Void> deleteReservations(
+    public ResponseEntity<Void> deleteWaiting(
             @PathVariable("id") Long id
     ) {
         waitingService.delete(id);
@@ -46,7 +46,7 @@ public class WaitingController {
 
     @RequireRole(MemberRole.USER)
     @PostMapping("/waiting")
-    public ResponseEntity<ReservationResponse> createReservation(
+    public ResponseEntity<ReservationResponse> createWaiting(
             @RequestBody ReservationRequest request,
             UserInfo userInfo
     ) {
