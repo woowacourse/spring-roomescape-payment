@@ -25,6 +25,7 @@ public class ReservationDataService {
     public List<MyReservationResponse> findReservationsByMemberId(final Long memberId) {
         return reservationRepository.findByMemberId(memberId)
                 .stream()
+                .filter(reservation -> !reservation.isFailed())
                 .map(MyReservationResponse::from)
                 .toList();
     }

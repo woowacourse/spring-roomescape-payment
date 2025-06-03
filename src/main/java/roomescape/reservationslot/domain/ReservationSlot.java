@@ -20,12 +20,12 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.exception.ReservationDuplicatedException;
 import roomescape.reservation.exception.ReservationNotFoundException;
 import roomescape.reservationslot.exception.InvalidReservationSlotException;
-import roomescape.reservationslot.exception.ReservationSlotNotFoundException;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 
@@ -66,40 +66,41 @@ public class ReservationSlot {
 
     public Reservation addWaitingReservation(final Member member, final LocalDateTime now, final String orderId) {
         validateDateTime(date, time.getStartAt(), now);
-        validateMemberNotReserved(member);
+        validateMemberNotConfirmed(member);
         Reservation reservation = new Reservation(member, this, orderId);
         reservations.add(reservation);
         return reservation;
     }
 
-    public Reservation addConfirmedReservation(final Member member, final LocalDateTime now, final String orderId) {
+    public Reservation addReservation(final Member member, final LocalDateTime now, final String orderId) {
         validateDateTime(date, time.getStartAt(), now);
-        validateMemberNotReserved(member);
-        Reservation reservation = Reservation.createFirstReservation(member, this, orderId);
+        validateMemberNotConfirmed(member);
+        Reservation reservation = new Reservation(member, this, orderId);
         reservations.add(reservation);
         return reservation;
     }
 
-    public Member findHighestPriorityMember() {
+    public Optional<Member> findHighestPriorityMember() {
         return reservations.stream()
+                .filter(reservation -> !reservation.isFailed())
                 .sorted(Comparator.comparing(Reservation::getCreatedAt))
                 .map(Reservation::getMember)
-                .findFirst()
-                .orElseThrow(() -> new ReservationSlotNotFoundException("현재 예약한 멤버가 없습니다."));
+                .findFirst();
     }
 
     public long findRank(final Reservation reservation) {
         validateReservationExists(reservation);
         return reservations.stream()
+                .filter(r -> !r.isFailed())
                 .filter(r -> r.getCreatedAt().isBefore(reservation.getCreatedAt()))
                 .count();
     }
 
     public Reservation findHighestPriorityReservation() {
-        if (reservations.isEmpty()) {
-            throw new ReservationNotFoundException("예약이 존재하지 않습니다.");
-        }
-        return reservations.getFirst();
+        return reservations.stream()
+                .filter(r -> !r.isFailed())
+                .findFirst()
+                .orElseThrow(() -> new ReservationNotFoundException("예약이 존재하지 않습니다."));
     }
 
     private void validateDateTime(LocalDate date, LocalTime time, LocalDateTime now) {
@@ -108,8 +109,9 @@ public class ReservationSlot {
         }
     }
 
-    private void validateMemberNotReserved(final Member member) {
+    private void validateMemberNotConfirmed(final Member member) {
         boolean memberExists = reservations.stream()
+                .filter(reservation -> !reservation.isFailed())
                 .anyMatch(reservation -> reservation.getMember().getId().equals(member.getId()));
         if (memberExists) {
             throw new ReservationDuplicatedException("해당 멤버는 이미 예약 중입니다.");

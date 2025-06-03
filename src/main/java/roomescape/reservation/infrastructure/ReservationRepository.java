@@ -25,6 +25,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                 FROM Reservation r2
                 GROUP BY r2.reservationSlot.id
               )             
+              AND r.reservationStatus != 'FAILED'
             ORDER BY rs.id, r.createdAt asc 
             """)
     List<Reservation> findFirstByCriteria(Long themeId, LocalDate startDate,
