@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,7 +33,14 @@ public class Payment {
     @Column(nullable = false)
     private String paymentType;
 
+    @OneToOne
+    private Reservation reservation;
+
     public Payment(String paymentKey, String orderId, Long amount, String paymentType) {
-        this(null, paymentKey, orderId, amount, paymentType);
+        this(null, paymentKey, orderId, amount, paymentType, null);
+    }
+
+    public Payment(String paymentKey, String orderId, Long amount, String paymentType, Reservation reservation) {
+        this(null, paymentKey, orderId, amount, paymentType, reservation);
     }
 }

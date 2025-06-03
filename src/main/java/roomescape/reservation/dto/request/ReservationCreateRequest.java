@@ -3,6 +3,7 @@ package roomescape.reservation.dto.request;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import roomescape.reservation.entity.Payment;
+import roomescape.reservation.entity.Reservation;
 
 public record ReservationCreateRequest(
         @NotNull LocalDate date,
@@ -14,7 +15,7 @@ public record ReservationCreateRequest(
         @NotNull String paymentType
 ) {
 
-    public Payment toPayment() {
-        return new Payment(paymentKey, orderId, amount, paymentType);
+    public Payment toPayment(Reservation reservation) {
+        return new Payment(paymentKey, orderId, amount, paymentType, reservation);
     }
 }

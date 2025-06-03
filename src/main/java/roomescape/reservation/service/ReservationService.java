@@ -47,7 +47,7 @@ public class ReservationService {
 
     public ReservationCreateResponse createReservation(Long memberId, ReservationCreateRequest request) {
         Reservation saved = create(memberId, request.timeId(), request.themeId(), request.date());
-        paymentService.create(request.toPayment());
+        paymentService.create(request.toPayment(saved));
         return ReservationCreateResponse.from(saved);
     }
 
