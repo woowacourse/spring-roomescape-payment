@@ -33,9 +33,9 @@ class MemberControllerTest {
     @Autowired
     private ThemeTestDataConfig themeTestDataConfig;
 
-    private static LocalDate date;
-    private static User memberStatic;
-    private static TokenResponseDto memberTokenResponseDto;
+    private LocalDate date;
+    private User memberStatic;
+    private TokenResponseDto memberTokenResponseDto;
 
     @BeforeEach
     public void setUp(@Autowired AuthService authService,

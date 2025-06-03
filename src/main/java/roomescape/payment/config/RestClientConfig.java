@@ -4,6 +4,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.global.auth.util.AuthUtil;
 
@@ -25,9 +26,14 @@ public class RestClientConfig {
     @Bean
     public Map<String, RestClient> builders() {
         Map<String, RestClient> clients = new HashMap<>();
+
         paymentProperties.getProperties().forEach(
                 (vendorName, vendor) -> {
+                    SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+                    factory.setConnectTimeout(vendor.getConnectTimeout());
+                    factory.setReadTimeout(vendor.getReadTimeout());
                     RestClient client = RestClient.builder()
+                            .requestFactory(factory)
                             .baseUrl(vendor.getBaseUrl())
                             .defaultHeader(HttpHeaders.AUTHORIZATION, AuthUtil.encodeBasicAuth(vendor.getSecretKey()))
                             .defaultHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)

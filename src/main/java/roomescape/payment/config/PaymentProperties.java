@@ -17,8 +17,10 @@ public class PaymentProperties {
     @Getter
     @AllArgsConstructor
     public static class Vendor {
-        private String secretKey;
-        private String baseUrl;
+        private final String secretKey;
+        private final String baseUrl;
+        private final int connectTimeout;
+        private final int readTimeout;
     }
 }
 
