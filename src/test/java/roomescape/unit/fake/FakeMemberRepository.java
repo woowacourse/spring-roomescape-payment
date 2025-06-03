@@ -1,11 +1,12 @@
 package roomescape.unit.fake;
 
+import roomescape.domain.Member;
+import roomescape.domain.repository.MemberRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
-import roomescape.domain.Member;
-import roomescape.domain.repository.MemberRepository;
 
 public class FakeMemberRepository implements MemberRepository {
 
@@ -37,6 +38,11 @@ public class FakeMemberRepository implements MemberRepository {
     @Override
     public Optional<Member> findByEmail(String email) {
         return members.stream().filter(member -> member.getEmail().equals(email)).findFirst();
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return members.stream().anyMatch(member -> member.getEmail().equals(email));
     }
 
     public List<Member> getMembers() {

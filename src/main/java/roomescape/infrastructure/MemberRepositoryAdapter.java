@@ -1,10 +1,11 @@
 package roomescape.infrastructure;
 
-import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Repository;
 import roomescape.domain.Member;
 import roomescape.domain.repository.MemberRepository;
+
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class MemberRepositoryAdapter implements MemberRepository {
@@ -33,4 +34,11 @@ public class MemberRepositoryAdapter implements MemberRepository {
     public Optional<Member> findByEmail(String email) {
         return jpaMemberRepository.findByEmail(email);
     }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        return jpaMemberRepository.existsByEmail(email);
+    }
+
+
 }
