@@ -6,11 +6,13 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.admin.domain.dto.AdminReservationRequestDto;
@@ -26,6 +28,10 @@ import roomescape.user.domain.User;
         {MemberTestDataConfig.class, ThemeTestDataConfig.class, ReservationTimeTestDataConfig.class,})
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 class MemberControllerTest {
+
+    @LocalServerPort
+    private int port;
+
 
     @Autowired
     private ReservationTimeTestDataConfig reservationTimeTestDataConfig;
@@ -46,6 +52,11 @@ class MemberControllerTest {
 
         memberTokenResponseDto = authService.login(
                 AuthFixture.createTokenRequestDto(memberStatic.getEmail(), memberStatic.getPassword()));
+    }
+
+    @BeforeEach
+    void configureRestAssured() {
+        RestAssured.port = port;
     }
 
     @DisplayName("유저의 예약 리스트 조회 기능 : 성공 시 200 OK 반환")
