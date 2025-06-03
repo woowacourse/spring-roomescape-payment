@@ -3,9 +3,9 @@ package roomescape.payment.exception;
 import org.springframework.http.HttpStatus;
 import roomescape.common.exception.base.BusinessException;
 
-public class PaymentApiUnauthorizedException extends BusinessException {
+public class PaymentUnauthorizedException extends BusinessException {
 
-    public PaymentApiUnauthorizedException(final String message) {
+    public PaymentUnauthorizedException(final String message) {
         super(buildLogMessage(message), buildUserMessage());
     }
 

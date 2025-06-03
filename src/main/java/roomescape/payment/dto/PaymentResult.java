@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldNameConstants;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.validate.Validator;
-import roomescape.payment.exception.PaymentApiException;
 
 @FieldNameConstants(level = AccessLevel.PRIVATE)
 
@@ -17,12 +16,10 @@ public record PaymentResult(String paymentKey,
         validate(paymentKey, orderId, amount, paymentType);
     }
 
-    public void verifyPayment(PaymentRequest request, PaymentResult paymentResult) {
-        if (!(paymentResult.orderId().equals(request.orderId())
+    public boolean verifyPayment(PaymentRequest request, PaymentResult paymentResult) {
+        return paymentResult.orderId().equals(request.orderId())
                 && paymentResult.paymentKey().equals(request.paymentKey())
-                && paymentResult.amount() == request.amount())) {
-            throw new PaymentApiException(this);
-        }
+                && paymentResult.amount() == request.amount();
     }
 
     private void validate(final String paymentKey, final String orderId, final int amount, final String paymentType) {

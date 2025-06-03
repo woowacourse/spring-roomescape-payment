@@ -15,7 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResult;
-import roomescape.payment.exception.PaymentApiException;
+import roomescape.payment.exception.PaymentException;
 
 class PaymentClientMockWebServerTest {
 
@@ -104,7 +104,7 @@ class PaymentClientMockWebServerTest {
         // when
         // then
         assertThatThrownBy(() -> paymentClinet.confirmPayment(request))
-                .isInstanceOf(PaymentApiException.class)
+                .isInstanceOf(PaymentException.class)
                 .hasMessageContaining("Payment 결제 승인 API 호출 실패했습니다.")
                 .hasMessageContaining("잘못된 요청")
                 .hasMessageContaining("BAD_REQUEST");

@@ -97,7 +97,9 @@ public class ReservationFacadeImpl implements ReservationFacade {
                 reservationRequest.toServiceRequest());
 
         PaymentResult paymentResult = paymentClient.confirmPayment(paymentRequest);
-        paymentResult.verifyPayment(paymentRequest, paymentResult);
+        if (!paymentResult.verifyPayment(paymentRequest, paymentResult)) {
+            throw new IllegalArgumentException("결제 요청이 잘못되었습니다. 관리자에게 문의해주세요.");
+        }
 
         return ReservationResponse.from(reservation, user);
     }
