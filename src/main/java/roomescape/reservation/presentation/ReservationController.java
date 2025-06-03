@@ -31,7 +31,7 @@ public class ReservationController {
 
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> getReservations(
-            @ModelAttribute ReservationConditionRequest request) {
+            @ModelAttribute final ReservationConditionRequest request) {
         List<ReservationResponse> response = reservationService.getReservations(request);
         return ResponseEntity.ok(response);
     }
@@ -48,7 +48,7 @@ public class ReservationController {
                 request.paymentKey()
         );
 
-        ReservationResponse response = reservationService.createReservation(request, confirmRequest, loginMember.id());
+        ReservationResponse response = reservationService.createReservation(request, loginMember.id());
 
         URI locationUri = URI.create(RESERVATION_BASE_URL + SLASH + response.id());
         return ResponseEntity.created(locationUri).body(response);

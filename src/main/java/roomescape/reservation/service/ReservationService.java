@@ -47,7 +47,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse createReservation(final ReservationRequest request, final TossPaymentConfirmRequest paymentConfirmRequest, final Long memberId) {
+    public ReservationResponse createReservation(final ReservationRequest request, final Long memberId) {
         ReservationTime time = findReservationTime(request.timeId());
         Theme theme = findTheme(request.themeId());
         Member findMember = findMember(memberId);
@@ -62,9 +62,10 @@ public class ReservationService {
             throw new IllegalArgumentException("이미 예약이 존재합니다.");
         }
 
-        Reservation save = reservationRepository.save(reservation);
+        TossPaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(request.orderId(), request.amount(), request.paymentKey());
 
-        TossPaymentResponse paymentResponse = paymentService.confirm(paymentConfirmRequest);
+        Reservation save = reservationRepository.save(reservation);
+        TossPaymentResponse paymentResponse = paymentService.confirm(tossPaymentConfirmRequest);
         paymentService.save(paymentResponse, save.getId());
         return ReservationResponse.from(save);
     }
