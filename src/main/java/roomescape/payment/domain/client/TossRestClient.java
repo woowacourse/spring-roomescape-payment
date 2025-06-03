@@ -1,30 +1,28 @@
-package roomescape.payment;
+package roomescape.payment.domain.client;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.domain.TossPayment;
 import roomescape.payment.domain.dto.PaymentRequestDto;
+import roomescape.payment.domain.dto.PaymentResponseDto;
 import roomescape.payment.exception.InvalidPaymentException;
 
 import java.nio.charset.StandardCharsets;
 
-@Component
+@Component("tossApiClient")
 public class TossRestClient {
 
-    private final RestClient restClient;
-    private final String confirmPaymentPath;
+    private final RestClient tossRestClient;
 
-    public TossRestClient(RestClient tossPayRestClient, @Value("${toss.payment.payment-confirm-uri}") String confirmPaymentPath) {
-        this.restClient = tossPayRestClient;
-        this.confirmPaymentPath = confirmPaymentPath;
+    public TossRestClient(@Qualifier("tossRestClient") RestClient tossRestClient) {
+        this.tossRestClient = tossRestClient;
     }
 
-    public TossPayment confirmPayment(PaymentRequestDto requestDto) {
-        return restClient.post()
-                .uri(confirmPaymentPath)
+    public PaymentResponseDto confirmPayment(PaymentRequestDto requestDto) {
+        return tossRestClient.post()
+                .uri("/v1/payments/confirm")
                 .body(requestDto)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
@@ -32,6 +30,6 @@ public class TossRestClient {
                     HttpStatus httpStatus = HttpStatus.valueOf(res.getStatusCode().value());
                     throw new InvalidPaymentException(body, httpStatus);
                 })
-                .body(TossPayment.class);
+                .body(PaymentResponseDto.class);
     }
 }
