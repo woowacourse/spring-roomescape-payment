@@ -14,7 +14,6 @@ import roomescape.waiting.dto.ReservationWaitingRequest;
 import roomescape.waiting.dto.ReservationWaitingResponse;
 import roomescape.waiting.service.ReservationWaitingService;
 
-
 @SpringBootTest
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 class ReservationWaitingServiceTest {

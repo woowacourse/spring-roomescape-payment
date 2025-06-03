@@ -3,7 +3,7 @@ package roomescape.payment.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import roomescape.payment.PaymentClient;
+import roomescape.payment.TossPaymentClient;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;
@@ -15,12 +15,12 @@ import roomescape.reservation.domain.Reservation;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
-    private final PaymentClient paymentClient;
+    private final TossPaymentClient tossPaymentClient;
 
     @Transactional
     public void approvePayment(String orderId, String paymentKey, Long amount, Reservation reservation) {
         TossPaymentRequest request = new TossPaymentRequest(orderId, paymentKey, amount);
-        TossPaymentResponse response = paymentClient.requestPaymentApprove(request);
+        TossPaymentResponse response = tossPaymentClient.requestPaymentApprove(request);
         Payment payment = new Payment(
                 reservation,
                 response.orderId(),

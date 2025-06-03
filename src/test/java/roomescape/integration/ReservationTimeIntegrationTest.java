@@ -12,13 +12,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.ActiveProfiles;
 import roomescape.member.dto.LoginRequest;
+import roomescape.payment.FakePaymentRestClientConfig;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
+@Import(FakePaymentRestClientConfig.class)
+@ActiveProfiles("test")
 class ReservationTimeIntegrationTest {
 
     @LocalServerPort
@@ -53,14 +58,18 @@ class ReservationTimeIntegrationTest {
                     .statusCode(HttpStatus.BAD_REQUEST.value());
         }
 
-        @Disabled
         @DisplayName("이미 예약이 된 시간을 삭제하여 예외가 발생한다")
         @Test
         void reservationTimeRemoveTest() {
-            Map<String, String> params = Map.of(
-                    "date", LocalDate.now().plusDays(2).toString(),
+            Map<String, Object> params = Map.of(
+                    "memberId", "1",
+                    "date", LocalDate.now().plusDays(1).toString(),
+                    "themeId", "1",
                     "timeId", "1",
-                    "themeId", "1"
+                    "paymentKey", "test",
+                    "orderId", "test",
+                    "amount", 1000,
+                    "paymentType", "NORMAL"
             );
 
             RestAssured.given().log().all()

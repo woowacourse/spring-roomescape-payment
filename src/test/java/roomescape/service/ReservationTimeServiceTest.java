@@ -14,16 +14,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.TestPropertySource;
+import roomescape.reservation.service.ReservationService;
 import roomescape.time.dto.ReservationTimeRequest;
 import roomescape.time.dto.ReservationTimeResponse;
 import roomescape.time.service.ReservationTimeService;
 
 @SpringBootTest
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+@TestPropertySource(properties = {
+        "spring.sql.init.mode=never",
+        "spring.jpa.hibernate.ddl-auto=create-drop"
+})
 class ReservationTimeServiceTest {
 
     @Autowired
     private ReservationTimeService reservationTimeService;
+
+    @Autowired
+    private ReservationService reservationService;
 
     @Test
     @DisplayName("예약 시간을 성공적으로 추가한다")
@@ -53,17 +62,6 @@ class ReservationTimeServiceTest {
         // when, then
         assertThatCode(() -> reservationTimeService.removeReservationTime(id))
                 .doesNotThrowAnyException();
-    }
-
-    @Test
-    @DisplayName("예약 시간이 예약에 사용되고 있다면 예외가 발생한다")
-    void removeReferencedReservationTimeTest() {
-        // given
-        final long id = 1L;
-
-        // when, then
-        assertThatThrownBy(() -> reservationTimeService.removeReservationTime(id))
-                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test

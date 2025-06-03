@@ -5,12 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.InternalServerException;
-import roomescape.payment.PaymentClient;
+import roomescape.payment.TossPaymentClient;
 import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;
 
 @RequiredArgsConstructor
-public class TossPaymentRestClient implements PaymentClient {
+public class TossPaymentRestClient implements TossPaymentClient {
 
     private final RestClient restClient;
 

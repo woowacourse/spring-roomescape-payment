@@ -1,6 +1,6 @@
 package roomescape.payment.toss;
 
-record TossPaymentErrorResponse(
+public record TossPaymentErrorResponse(
         String code,
         String message
 ) {

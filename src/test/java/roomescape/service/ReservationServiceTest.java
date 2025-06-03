@@ -35,6 +35,7 @@ import roomescape.time.service.ReservationTimeService;
         "spring.jpa.hibernate.ddl-auto=create-drop"
 })
 @Import(FakePaymentRestClientConfig.class)
+@ActiveProfiles("test")
 class ReservationServiceTest {
 
     @Autowired
