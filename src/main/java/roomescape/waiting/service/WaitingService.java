@@ -92,7 +92,6 @@ public class WaitingService {
 
     private void validateAvailableWaiting(ReservationSlot reservationSlot, LoginMember loginMember) {
         validateReserved(reservationSlot);
-        validateDuplicateReservation(reservationSlot, loginMember);
         validateDuplicateWaiting(reservationSlot, loginMember);
     }
 

@@ -84,8 +84,6 @@ class WaitingServiceTest {
         //given
         when(reservationRepository.existsByReservationSlot(reservationSlot))
                 .thenReturn(true);
-        when(reservationRepository.existsByReservationSlotAndMemberId(any(), anyLong()))
-                .thenReturn(false);
         when(waitingRepository.existsByReservationSlotAndMemberId(any(), anyLong()))
                 .thenReturn(false);
 
@@ -128,26 +126,6 @@ class WaitingServiceTest {
     }
 
     @Test
-    @DisplayName("중복된 본인의 예약이 존재한다면 예외를 던진다.")
-    void cantCreateWaitingWhenAlreadyReserved() {
-        //given
-        when(reservationSlotRepository.findByDateAndTimeIdAndThemeId(any(), any(), any()))
-                .thenReturn(Optional.of(reservationSlot));
-        when(reservationRepository.existsByReservationSlot(any()))
-                .thenReturn(true);
-        when(reservationRepository.existsByReservationSlotAndMemberId(any(), anyLong()))
-                .thenReturn(true);
-        when(memberRepository.findById(anyLong()))
-                .thenReturn(Optional.of(member));
-
-        var request = new WaitingCreateRequest(date, time.getId(), theme.getId());
-
-        //when & then
-        assertThatThrownBy(() -> waitingService.createWaiting(loginMember, request))
-                .isInstanceOf(BadRequestException.class);
-    }
-
-    @Test
     @DisplayName("중복된 본인의 예약 대기가 존재한다면 예외를 던진다.")
     void cantCreateWaitingWhenAlreadyWaiting() {
         //given
@@ -157,8 +135,6 @@ class WaitingServiceTest {
                 .thenReturn(Optional.of(member));
         when(reservationRepository.existsByReservationSlot(any()))
                 .thenReturn(true);
-        when(reservationRepository.existsByReservationSlotAndMemberId(any(), anyLong()))
-                .thenReturn(false);
         when(waitingRepository.existsByReservationSlotAndMemberId(any(), anyLong()))
                 .thenReturn(true);
 
