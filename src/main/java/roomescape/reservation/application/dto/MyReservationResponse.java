@@ -8,7 +8,13 @@ import java.util.stream.Stream;
 import roomescape.reservation.domain.Reservation;
 import roomescape.waiting.domain.WaitingWithRank;
 
-public record MyReservationResponse(Long id, String theme, LocalDate date, LocalTime time, String status) {
+public record MyReservationResponse(
+        Long id,
+        String theme,
+        LocalDate date,
+        LocalTime time,
+        String status
+) {
     public static final String RESERVED = "예약";
     public static final String WAITING = "번째 예약 대기";
 

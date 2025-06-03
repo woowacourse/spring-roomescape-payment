@@ -13,7 +13,9 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.member.exception.MemberNotFoundException;
 import roomescape.payment.application.PaymentApprovalService;
+import roomescape.payment.application.PaymentService;
 import roomescape.payment.application.dto.PaymentApprovalRequest;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.exception.InvalidPaymentAmountException;
 import roomescape.payment.exception.PaymentSessionExpiredException;
 import roomescape.reservation.application.dto.AdminReservationRequest;
@@ -51,6 +53,7 @@ public class ReservationService {
     private final WaitingRepository waitingRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final PaymentApprovalService paymentApprovalService;
+    private final PaymentService paymentService;
 
     public List<MyReservationResponse> findAllByMemberId(Long memberId) {
         List<Reservation> reservations = reservationRepository.findAllByMemberId(memberId);
@@ -90,19 +93,19 @@ public class ReservationService {
             throw new InvalidPaymentAmountException();
         }
 
-        ReservationResponse response = create(memberId, request.date(), request.timeId(), request.themeId());
-
         paymentApprovalService.approvePayment(new PaymentApprovalRequest(orderId, amount, request.paymentKey()));
+        Reservation reservation = create(memberId, request.date(), request.timeId(), request.themeId());
+        paymentService.save(new Payment(request.paymentKey(), request.amount(), reservation));
 
-        return response;
+        return ReservationResponse.from(reservation);
     }
 
     @Transactional
     public ReservationResponse createByAdmin(AdminReservationRequest request) {
-        return create(request.memberId(), request.date(), request.timeId(), request.themeId());
+        return ReservationResponse.from(create(request.memberId(), request.date(), request.timeId(), request.themeId()));
     }
 
-    private ReservationResponse create(Long memberId, LocalDate dateInput, Long timeId, Long themeId) {
+    private Reservation create(Long memberId, LocalDate dateInput, Long timeId, Long themeId) {
         Member member = memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
 
         ReservationDate date = new ReservationDate(dateInput);
@@ -115,7 +118,7 @@ public class ReservationService {
         validateDuplicated(spec);
 
         Reservation reservation = new Reservation(member, spec);
-        return ReservationResponse.from(reservationRepository.save(reservation));
+        return reservationRepository.save(reservation);
     }
 
     private void validateDuplicated(ReservationSpec spec) {

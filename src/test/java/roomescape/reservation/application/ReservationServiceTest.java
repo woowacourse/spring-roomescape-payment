@@ -21,6 +21,8 @@ import roomescape.member.domain.repository.MemberRepository;
 import roomescape.member.exception.MemberNotFoundException;
 import roomescape.member.infrastructure.MemberRepositoryAdapter;
 import roomescape.payment.application.FakePaymentApprovalService;
+import roomescape.payment.application.PaymentService;
+import roomescape.payment.infrastructure.PaymentRepositoryAdapter;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.AdminReservationSearchRequest;
 import roomescape.reservation.application.dto.MyReservationResponse;
@@ -55,7 +57,9 @@ import roomescape.waiting.infrastructure.WaitingRepositoryAdapter;
         ReservationTimeRepositoryAdapter.class,
         ThemeRepositoryAdapter.class,
         WaitingRepositoryAdapter.class,
-        FakePaymentApprovalService.class
+        FakePaymentApprovalService.class,
+        PaymentService.class,
+        PaymentRepositoryAdapter.class
 })
 class ReservationServiceTest {
 
@@ -75,6 +79,8 @@ class ReservationServiceTest {
     private ThemeRepository themeRepository;
     @Autowired
     private WaitingRepository waitingRepository;
+    @Autowired
+    private PaymentService paymentService;
 
     @DisplayName("회원 ID로 예약과 대기를 조회한다")
     @Test
