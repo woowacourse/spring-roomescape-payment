@@ -2,6 +2,7 @@ package roomescape.reservation.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import roomescape.reservation.dto.response.ReservationByMemberResponse;
 import roomescape.reservation.dto.response.ReservationCreateResponse;
 import roomescape.reservation.dto.response.ReservationReadFilteredResponse;
 import roomescape.reservation.dto.response.ReservationReadResponse;
+import roomescape.reservation.entity.Payment;
 import roomescape.reservation.entity.Reservation;
 import roomescape.reservation.entity.ReservationSlot;
 import roomescape.reservation.entity.ReservationTime;
@@ -28,7 +30,6 @@ import roomescape.reservation.repository.ReservationSlotRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.theme.entity.Theme;
 import roomescape.theme.repository.ThemeRepository;
-import roomescape.waiting.entity.WaitingWithRank;
 import roomescape.waiting.service.WaitingService;
 
 @Service
@@ -93,10 +94,10 @@ public class ReservationService {
     public List<ReservationByMemberResponse> getReservationsByMember(LoginMember loginMember) {
         Member member = getMemberById(loginMember.id());
 
-        List<Reservation> reservations = reservationRepository.findAllByMember(member);
-        List<WaitingWithRank> waitingWithRanks = waitingService.getWaitingWithRanksByMemberId(loginMember.id());
-
-        return ReservationByMemberResponse.of(reservations, waitingWithRanks);
+        List<ReservationByMemberResponse> responses = new ArrayList<>();
+        responses.addAll(findReservationsWithPaymentByMember(member));
+        responses.addAll(waitingService.findWaitingWithRanksByMember(member));
+        return responses;
     }
 
     public void deleteReservation(Long id) {
@@ -106,6 +107,16 @@ public class ReservationService {
                     reservationRepository.flush();
                     waitingService.changeWaitingToReservation(reservation.getReservationSlot());
                 });
+    }
+
+    private List<ReservationByMemberResponse> findReservationsWithPaymentByMember(Member member) {
+        List<Reservation> reservations = reservationRepository.findAllByMember(member);
+        return reservations.stream()
+                .map(reservation -> {
+                    Payment payment = paymentService.findByReservation(reservation);
+                    return ReservationByMemberResponse.from(reservation, payment);
+                })
+                .toList();
     }
 
     private void validateDateTime(Reservation reservation) {

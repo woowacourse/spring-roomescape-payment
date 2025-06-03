@@ -9,6 +9,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static roomescape.helper.TestFixture.PAYMENT;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -311,8 +312,10 @@ class ReservationServiceTest {
                 .thenReturn(Optional.of(member));
         when(reservationRepository.findAllByMember(member))
                 .thenReturn(inDbReservations);
-        when(waitingService.getWaitingWithRanksByMemberId(anyLong()))
+        when(waitingService.findWaitingWithRanksByMember(any()))
                 .thenReturn(List.of());
+        when(paymentService.findByReservation(any()))
+                .thenReturn(PAYMENT);
 
         // when
         var response = reservationService.getReservationsByMember(loginMember);

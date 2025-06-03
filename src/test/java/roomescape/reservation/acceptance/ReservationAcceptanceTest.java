@@ -4,6 +4,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static roomescape.helper.TestFixture.PAYMENT;
 
 import io.restassured.RestAssured;
 import java.time.LocalDate;
@@ -215,8 +217,10 @@ class ReservationAcceptanceTest {
                 1000L,
                 "NORMAL"
         );
-
         TestHelper.postWithToken("/reservations", reservationRequest, token);
+
+        when(paymentService.findByReservation(any()))
+                .thenReturn(PAYMENT);
 
         // when & then
         TestHelper.getWithToken("/reservations/mine", token)

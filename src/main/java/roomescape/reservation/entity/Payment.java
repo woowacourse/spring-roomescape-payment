@@ -36,10 +36,6 @@ public class Payment {
     @OneToOne
     private Reservation reservation;
 
-    public Payment(String paymentKey, String orderId, Long amount, String paymentType) {
-        this(null, paymentKey, orderId, amount, paymentType, null);
-    }
-
     public Payment(String paymentKey, String orderId, Long amount, String paymentType, Reservation reservation) {
         this(null, paymentKey, orderId, amount, paymentType, reservation);
     }

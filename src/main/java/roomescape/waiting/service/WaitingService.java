@@ -10,6 +10,7 @@ import roomescape.global.error.exception.ForbiddenException;
 import roomescape.global.error.exception.NotFoundException;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.reservation.dto.response.ReservationByMemberResponse;
 import roomescape.reservation.entity.Reservation;
 import roomescape.reservation.entity.ReservationSlot;
 import roomescape.reservation.repository.ReservationRepository;
@@ -51,6 +52,13 @@ public class WaitingService {
         return waitingRepository.findAll()
                 .stream()
                 .map(WaitingReadResponse::from)
+                .toList();
+    }
+
+    public List<ReservationByMemberResponse> findWaitingWithRanksByMember(Member member) {
+        List<WaitingWithRank> waitingWithRanks = getWaitingWithRanksByMemberId(member.getId());
+        return waitingWithRanks.stream()
+                .map(ReservationByMemberResponse::from)
                 .toList();
     }
 

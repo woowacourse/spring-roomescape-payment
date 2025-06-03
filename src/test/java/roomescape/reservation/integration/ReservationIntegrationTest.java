@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static roomescape.helper.TestFixture.PAYMENT;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -315,6 +317,8 @@ class ReservationIntegrationTest {
                 "NORMAL"
         );
         reservationService.createReservation(member.getId(), request);
+        when(paymentService.findByReservation(any()))
+                .thenReturn(PAYMENT);
 
         var loginMember = new LoginMember(member.getId(), member.getName(), member.getRole());
 
