@@ -147,7 +147,8 @@ class ReservationServiceTest extends BaseTest {
         // given
         server.reset();
         server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
-                .andRespond(withBadRequest());
+                .andRespond(withBadRequest()
+                        .body("{\"code\":\"ERROR\",\"message\":\"결제 승인이 실패했습니다.\"}"));
 
         timeRepo.save(time1);
         themeRepo.save(theme1);
