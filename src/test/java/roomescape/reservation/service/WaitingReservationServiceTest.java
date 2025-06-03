@@ -16,34 +16,15 @@ import roomescape.auth.dto.LoginMember;
 import roomescape.exception.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
-import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.dto.WaitingReservationRequest;
 import roomescape.reservation.dto.WaitingReservationResponse;
-import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservation.repository.WaitingReservationRepository;
+import roomescape.reservation.service.dto.CreateRegistrationCommand;
 import roomescape.reservationtime.domain.ReservationTime;
-import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
-import roomescape.theme.repository.ThemeRepository;
 
 @DataJpaTest
 @Import({WaitingReservationService.class, DBHelper.class})
 class WaitingReservationServiceTest {
-
-    @Autowired
-    private WaitingReservationRepository waitingReservationRepository;
-
-    @Autowired
-    private ReservationRepository reservationRepository;
-
-    @Autowired
-    private MemberRepository memberRepository;
-
-    @Autowired
-    private ReservationTimeRepository reservationTimeRepository;
-
-    @Autowired
-    private ThemeRepository themeRepository;
 
     @Autowired
     private WaitingReservationService service;
@@ -65,7 +46,9 @@ class WaitingReservationServiceTest {
         LoginMember loginMember = LoginMember.from(member);
 
         // when
-        WaitingReservationResponse response = service.registerWaitingReservation(request, loginMember);
+        WaitingReservationResponse response = service.registerWaitingReservation(
+                new CreateRegistrationCommand(loginMember.id(), request.date(), request.timeId(), request.themeId())
+        );
 
         // then
         SoftAssertions.assertSoftly(soft -> {
@@ -90,7 +73,9 @@ class WaitingReservationServiceTest {
         LoginMember nonExistentMember = new LoginMember(9999L, "존재안함", "none@example.com", MemberRole.MEMBER);
 
         // when & then
-        assertThatThrownBy(() -> service.registerWaitingReservation(request, nonExistentMember))
+        assertThatThrownBy(() -> service.registerWaitingReservation(
+                new CreateRegistrationCommand(nonExistentMember.id(), request.date(), request.timeId(), request.themeId())
+        ))
                 .isInstanceOf(NotFoundException.class)
                 .hasMessage("존재하지 않는 멤버입니다.");
     }

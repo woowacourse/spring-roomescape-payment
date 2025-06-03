@@ -32,5 +32,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
           AND r.registrationSlot.theme.id = :themeId
         )
     """)
-    boolean existsSameRegistrationSlot(LocalDate date, Long timeId, Long themeId);
+    boolean existsSameSlot(LocalDate date, Long timeId, Long themeId);
 }

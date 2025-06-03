@@ -23,6 +23,7 @@ import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSearchRequest;
 import roomescape.reservation.repository.ReservationRepository;
+import roomescape.reservation.service.dto.CreateRegistrationCommand;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 
@@ -83,7 +84,9 @@ class ReservationServiceTest {
         LoginMember loginMember = LoginMember.from(member);
 
         // when
-        ReservationResponse result = service.resisterReservation(request, loginMember);
+        ReservationResponse result = service.registerReservation(
+                new CreateRegistrationCommand(loginMember.id(), DEFAULT_DATE, time.getId(), theme.getId())
+        );
 
         // then
         SoftAssertions.assertSoftly(soft -> {

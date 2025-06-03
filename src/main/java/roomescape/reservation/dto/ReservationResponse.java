@@ -2,6 +2,7 @@ package roomescape.reservation.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
+import java.util.List;
 import roomescape.member.dto.MemberResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.WaitingReservation;
@@ -26,6 +27,12 @@ public record ReservationResponse(
         );
     }
 
+    public static List<ReservationResponse> fromReservations(final List<Reservation> reservations) {
+        return reservations.stream()
+                .map(ReservationResponse::new)
+                .toList();
+    }
+
     public ReservationResponse(final WaitingReservation waitingReservation) {
         this(
                 waitingReservation.getId(),
@@ -34,5 +41,11 @@ public record ReservationResponse(
                 new ThemeResponse(waitingReservation.getTheme()),
                 new MemberResponse(waitingReservation.getMember())
         );
+    }
+
+    public static List<ReservationResponse> fromWaitings(final List<WaitingReservation> waitingReservations) {
+        return waitingReservations.stream()
+                .map(ReservationResponse::new)
+                .toList();
     }
 }

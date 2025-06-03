@@ -1,9 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    /*
-    TODO: [4단계] 예약 대기 관리 기능
-          예약 대기 목록 조회 endpoint 설정
-     */
-    fetch('/admin/reservations/waiting') // 내 예약 목록 조회 API 호출
+
+    fetch('/admin/waitings') // 내 예약 목록 조회 API 호출
         .then(response => {
             if (response.status === 200) return response.json();
             throw new Error('Read failed');
@@ -19,10 +16,6 @@ function render(data) {
     data.forEach(item => {
         const row = tableBody.insertRow();
 
-        /*
-        TODO: [4단계] 예약 대기 관리 기능
-              예약 대기 목록 조회 response 명세에 맞춰 값 설정
-         */
         const id = item.id;
         const name = item.member.name;
         const theme = item.theme.name;
@@ -46,11 +39,7 @@ function approve(event) {
     const row = event.target.closest('tr');
     const id = row.cells[0].textContent;
 
-    /*
-    TODO: [4단계] 예약 대기 목록 관리 기능
-          예약 대기 승인 API 호출
-     */
-    const endpoint = `/admin/reservations/${id}`;
+    const endpoint = `/admin/waitings/${id}`;
     return fetch(endpoint, {
         method: 'PATCH'
     }).then(response => {
@@ -67,7 +56,7 @@ function deny(event) {
     TODO: [4단계] 예약 대기 목록 관리 기능
           예약 대기 거절 API 호출
      */
-    const endpoint = `/admin/reservations/${id}`;
+    const endpoint = `/admin/waitings/${id}`;
     return fetch(endpoint, {
         method: 'DELETE'
     }).then(response => {

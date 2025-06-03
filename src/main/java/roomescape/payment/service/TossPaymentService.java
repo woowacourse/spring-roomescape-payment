@@ -17,7 +17,9 @@ import roomescape.payment.infrastructure.TossRestClient;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.ReservationResponse;
+import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.service.ReservationService;
+import roomescape.reservation.service.dto.CreateRegistrationCommand;
 
 @Slf4j
 @Service
@@ -26,6 +28,8 @@ public class TossPaymentService implements PaymentService{
 
     private final TossRestClient tossRestClient;
     private final PaymentRepository paymentRepository;
+    private final ReservationRepository reservationRepository;
+
     private final ReservationService reservationService;
 
     @Transactional
@@ -34,9 +38,11 @@ public class TossPaymentService implements PaymentService{
         log.debug("ReservationPaymentRequest: {}", request);
         log.debug("LoginMember: {}", loginMember);
 
-        final ReservationResponse reservationResponse = reservationService.resisterReservation(
-                request.toReservationRequest(), loginMember);
-        final Reservation reservation = reservationService.findById(reservationResponse.id());
+        final ReservationResponse reservationResponse = reservationService.registerReservation(
+                new CreateRegistrationCommand(loginMember.id(), request.date(), request.timeId(), request.themeId())
+        );
+        final Reservation reservation = reservationRepository.findById(reservationResponse.id())
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 예약입니다, id:" + reservationResponse.id()));
         log.debug("Reservation ID: {}", reservation.getId());
 
         final Payment payment = createPayment(request, reservation);
