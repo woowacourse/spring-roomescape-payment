@@ -8,7 +8,7 @@ api:
     secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
     timeout:
       read: 15000
-      connection: 3000
+      connection: 1000
 
 ---
 
