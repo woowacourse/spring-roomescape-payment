@@ -2,7 +2,6 @@ package roomescape.payment.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
@@ -19,6 +18,8 @@ import roomescape.payment.exception.PaymentException;
 import roomescape.payment.exception.PaymentInternalServerException;
 import roomescape.payment.exception.PaymentNetworkException;
 import roomescape.payment.exception.PaymentUnauthorizedException;
+
+import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor

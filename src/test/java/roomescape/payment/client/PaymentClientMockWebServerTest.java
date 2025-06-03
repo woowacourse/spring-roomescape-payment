@@ -1,8 +1,5 @@
 package roomescape.payment.client;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -16,6 +13,9 @@ import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResult;
 import roomescape.payment.exception.PaymentException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PaymentClientMockWebServerTest {
 

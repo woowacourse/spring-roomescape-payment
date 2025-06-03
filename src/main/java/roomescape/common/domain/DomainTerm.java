@@ -18,7 +18,6 @@ public enum DomainTerm {
     // 예약 & 예약 대기 도메인
     RESERVATION_VIEW_ID("예약 조회 식별자"),
 
-
     // Payment 도메인
     PAYMENT("결제"),
     PAYMENT_KEY("결제 키"),

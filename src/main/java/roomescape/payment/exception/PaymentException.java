@@ -21,7 +21,6 @@ public class PaymentException extends BusinessException {
         return message;
     }
 
-
     @Override
     public HttpStatus getHttpStatus() {
         return status;

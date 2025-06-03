@@ -1,11 +1,12 @@
 package roomescape.reservation.ui.dto;
 
-import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.experimental.FieldNameConstants;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.validate.Validator;
 import roomescape.payment.dto.PaymentRequest;
+
+import java.time.LocalDate;
 
 @FieldNameConstants(level = AccessLevel.PRIVATE)
 public record CreateReservationWebRequest(LocalDate date,

@@ -5,7 +5,6 @@ import roomescape.common.exception.base.BusinessException;
 
 public class PaymentInternalServerException extends BusinessException {
 
-
     public PaymentInternalServerException(final String errorMessage, String message) {
         super(buildLogMessage(errorMessage), buildUserMessage(message));
     }
@@ -17,7 +16,6 @@ public class PaymentInternalServerException extends BusinessException {
     private static String buildUserMessage(final String message) {
         return message + "관리자에게 문의하세요.";
     }
-
 
     @Override
     public HttpStatus getHttpStatus() {

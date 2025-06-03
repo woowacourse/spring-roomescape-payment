@@ -6,7 +6,6 @@ import roomescape.common.exception.base.BusinessException;
 
 public class PaymentNetworkException extends BusinessException {
 
-
     public PaymentNetworkException(final ResourceAccessException e) {
         super(buildLogMessage(e.getMessage()), buildUserMessage(e));
     }

@@ -1,8 +1,5 @@
 package roomescape.payment.config;
 
-import java.nio.charset.StandardCharsets;
-import java.time.Duration;
-import java.util.Base64;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +8,10 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
+
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.util.Base64;
 
 @Slf4j
 @Configuration
