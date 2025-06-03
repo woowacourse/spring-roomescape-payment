@@ -33,7 +33,7 @@ public class Member extends TimeStamp {
     @Enumerated(value = EnumType.STRING)
     private Role role;
 
-    public Member() {
+    protected Member() {
     }
 
     public Member(Long id, String email, String password, String name, Role role) {

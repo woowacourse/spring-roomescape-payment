@@ -35,7 +35,7 @@ public class Reservation extends TimeStamp {
     @OneToOne
     private Payment payment;
 
-    public Reservation() {
+    protected Reservation() {
     }
 
     public Reservation(final Long id, final Member member, final Theme theme, final LocalDate date,

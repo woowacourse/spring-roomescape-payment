@@ -27,7 +27,7 @@ public class Theme extends TimeStamp {
     @Column(nullable = false)
     private String thumbnail;
 
-    public Theme() {
+    protected Theme() {
     }
 
     public Theme(Long id, String name, String description, String thumbnail) {
