@@ -45,7 +45,7 @@ import static org.mockito.Mockito.mock;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class ReservationFacadePaymentIntegrationTest {
+class ReservationFacadeIntegrationTest {
 
     @Autowired
     private ReservationFacade reservationFacade;
