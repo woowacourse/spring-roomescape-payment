@@ -5,17 +5,17 @@ import roomescape.business.model.entity.Reservation;
 
 public record ReservationResponse(
         String id,
-        UserResponse user,
+        MemberResponse user,
         LocalDate date,
-        ReservationTimeResponse time,
+        TimeSlotResponse time,
         ThemeResponse theme
 ) {
     public static ReservationResponse from(Reservation reservation) {
         return new ReservationResponse(
                 reservation.getId().value(),
-                UserResponse.from(reservation.getMember()),
+                MemberResponse.from(reservation.getMember()),
                 reservation.getDate().value(),
-                ReservationTimeResponse.from(reservation.getTimeSlot()),
+                TimeSlotResponse.from(reservation.getTimeSlot()),
                 ThemeResponse.from(reservation.getTheme())
         );
     }

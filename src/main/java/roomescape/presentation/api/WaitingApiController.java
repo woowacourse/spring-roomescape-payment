@@ -18,7 +18,7 @@ import roomescape.business.model.vo.UserRole;
 import roomescape.business.service.WaitingService;
 import roomescape.presentation.dto.request.WaitingRequest;
 import roomescape.presentation.dto.response.WaitingResponse;
-import roomescape.presentation.dto.response.WaitingWithRankReponse;
+import roomescape.presentation.dto.response.WaitingWithRankResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -51,7 +51,7 @@ public class WaitingApiController {
 
     @GetMapping("/waitings/me")
     @AuthRequired
-    public List<WaitingWithRankReponse> getMyReservations(LoginInfo loginInfo) {
+    public List<WaitingWithRankResponse> getMyReservations(LoginInfo loginInfo) {
         return waitingService.getMyWaitings(loginInfo.id());
     }
 }

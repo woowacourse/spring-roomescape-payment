@@ -13,7 +13,7 @@ import roomescape.exception.business.InvalidCreateArgumentException;
 import roomescape.exception.business.NotFoundException;
 import roomescape.infrastructure.MemberRepository;
 import roomescape.presentation.dto.request.RegisterRequest;
-import roomescape.presentation.dto.response.UserResponse;
+import roomescape.presentation.dto.response.MemberResponse;
 
 @Service
 @Transactional
@@ -22,34 +22,34 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    public UserResponse register(RegisterRequest request) {
+    public MemberResponse register(RegisterRequest request) {
         if (memberRepository.existsByEmail_Value(request.email())) {
             throw new InvalidCreateArgumentException(EMAIL_DUPLICATED);
         }
         Member member = Member.create(request.name(), request.email(), request.password());
         memberRepository.save(member);
-        return UserResponse.from(member);
+        return MemberResponse.from(member);
     }
 
     @Transactional(readOnly = true)
-    public UserResponse getById(final String userIdValue) {
+    public MemberResponse getById(final String userIdValue) {
         Member member = memberRepository.findById(Id.create(userIdValue))
                 .orElseThrow(() -> new NotFoundException(USER_NOT_EXIST));
-        return UserResponse.from(member);
+        return MemberResponse.from(member);
     }
 
     @Transactional(readOnly = true)
-    public UserResponse getByEmail(final String email) {
+    public MemberResponse getByEmail(final String email) {
         Member member = memberRepository.findByEmail_Value(email)
                 .orElseThrow(() -> new NotFoundException(USER_NOT_EXIST));
-        return UserResponse.from(member);
+        return MemberResponse.from(member);
     }
 
     @Transactional(readOnly = true)
-    public List<UserResponse> getAll() {
+    public List<MemberResponse> getAll() {
         return memberRepository.findAll()
                 .stream()
-                .map(UserResponse::from)
+                .map(MemberResponse::from)
                 .toList();
     }
 }

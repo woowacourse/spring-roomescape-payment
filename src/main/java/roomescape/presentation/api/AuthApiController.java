@@ -13,7 +13,7 @@ import roomescape.auth.LoginInfo;
 import roomescape.business.service.AuthService;
 import roomescape.business.service.MemberService;
 import roomescape.presentation.dto.request.LoginRequest;
-import roomescape.presentation.dto.response.UserResponse;
+import roomescape.presentation.dto.response.MemberResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,8 +30,8 @@ public class AuthApiController {
 
     @GetMapping("/login/check")
     @AuthRequired
-    public ResponseEntity<UserResponse> check(LoginInfo loginInfo) {
-        UserResponse response = memberService.getById(loginInfo.id());
+    public ResponseEntity<MemberResponse> check(LoginInfo loginInfo) {
+        MemberResponse response = memberService.getById(loginInfo.id());
         return ResponseEntity.ok(response);
     }
 }

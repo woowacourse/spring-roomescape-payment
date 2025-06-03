@@ -10,12 +10,12 @@ import roomescape.business.model.entity.TimeSlot;
 import roomescape.business.model.entity.Waiting;
 import roomescape.business.model.vo.Id;
 import roomescape.business.model.vo.ReservationDate;
-import roomescape.presentation.dto.response.WaitingWithRankReponse;
+import roomescape.presentation.dto.response.WaitingWithRankResponse;
 
 public interface WaitingRepository extends JpaRepository<Waiting, Id> {
 
     @Query("""
-                SELECT new roomescape.presentation.dto.response.WaitingWithRankReponse(
+                SELECT new roomescape.presentation.dto.response.WaitingWithRankResponse(
                     w,
                     (
                         SELECT COUNT(w2) + 1L
@@ -29,7 +29,7 @@ public interface WaitingRepository extends JpaRepository<Waiting, Id> {
                 FROM Waiting w
                 WHERE w.member.id = :userId
             """)
-    List<WaitingWithRankReponse> findByUserIdWithRank(@Param("userId") Id userId);
+    List<WaitingWithRankResponse> findByUserIdWithRank(@Param("userId") Id userId);
 
     Optional<Waiting> findFirstByDateAndTimeAndThemeOrderById(ReservationDate date, TimeSlot time, Theme theme);
 }

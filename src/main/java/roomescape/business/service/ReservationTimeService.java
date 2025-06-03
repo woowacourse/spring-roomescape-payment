@@ -19,8 +19,8 @@ import roomescape.exception.business.RelatedEntityExistException;
 import roomescape.infrastructure.ReservationRepository;
 import roomescape.infrastructure.ReservationTimeRepository;
 import roomescape.presentation.dto.request.ReservationTimeRequest;
-import roomescape.presentation.dto.response.ReservationTimeResponse;
 import roomescape.presentation.dto.response.ReservationTimeResponseWithBooked;
+import roomescape.presentation.dto.response.TimeSlotResponse;
 
 @Service
 @Transactional
@@ -30,13 +30,13 @@ public class ReservationTimeService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ReservationRepository reservationRepository;
 
-    public ReservationTimeResponse addAndGet(final ReservationTimeRequest request) {
+    public TimeSlotResponse addAndGet(final ReservationTimeRequest request) {
         TimeSlot timeSlot = TimeSlot.create(request.startAtToLocalTime());
         validateNoDuplication(timeSlot);
         validateTimeInterval(timeSlot);
 
         reservationTimeRepository.save(timeSlot);
-        return ReservationTimeResponse.from(timeSlot);
+        return TimeSlotResponse.from(timeSlot);
     }
 
 
@@ -57,10 +57,10 @@ public class ReservationTimeService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReservationTimeResponse> getAll() {
+    public List<TimeSlotResponse> getAll() {
         return reservationTimeRepository.findAll()
                 .stream()
-                .map(ReservationTimeResponse::from)
+                .map(TimeSlotResponse::from)
                 .toList();
     }
 

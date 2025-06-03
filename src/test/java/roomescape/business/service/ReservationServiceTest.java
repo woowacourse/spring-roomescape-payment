@@ -39,10 +39,10 @@ import roomescape.infrastructure.payment.dto.PaymentApproveRequest;
 import roomescape.presentation.dto.request.AdminReservationRequest;
 import roomescape.presentation.dto.request.ReservationCondition;
 import roomescape.presentation.dto.request.ReservationRequest;
+import roomescape.presentation.dto.response.MemberResponse;
 import roomescape.presentation.dto.response.ReservationResponse;
-import roomescape.presentation.dto.response.ReservationTimeResponse;
 import roomescape.presentation.dto.response.ThemeResponse;
-import roomescape.presentation.dto.response.UserResponse;
+import roomescape.presentation.dto.response.TimeSlotResponse;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationServiceTest {
@@ -197,10 +197,10 @@ class ReservationServiceTest {
                 Reservation.restore("reservation-id-1", member1, dateFrom, time1, theme1),
                 Reservation.restore("reservation-id-2", member2, dateFrom.plusDays(1), time2, theme2));
         List<ReservationResponse> expectedReservations = Arrays.asList(
-                new ReservationResponse("reservation-id-1", UserResponse.from(member1),
-                        dateFrom, ReservationTimeResponse.from(time1), ThemeResponse.from(theme1)),
-                new ReservationResponse("reservation-id-2", UserResponse.from(member2),
-                        dateFrom.plusDays(1), ReservationTimeResponse.from(time2),
+                new ReservationResponse("reservation-id-1", MemberResponse.from(member1),
+                        dateFrom, TimeSlotResponse.from(time1), ThemeResponse.from(theme1)),
+                new ReservationResponse("reservation-id-2", MemberResponse.from(member2),
+                        dateFrom.plusDays(1), TimeSlotResponse.from(time2),
                         ThemeResponse.from(theme2))
         );
 

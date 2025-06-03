@@ -13,7 +13,7 @@ import roomescape.auth.Role;
 import roomescape.business.model.vo.UserRole;
 import roomescape.business.service.MemberService;
 import roomescape.presentation.dto.request.RegisterRequest;
-import roomescape.presentation.dto.response.UserResponse;
+import roomescape.presentation.dto.response.MemberResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,13 +24,13 @@ public class MemberApiController {
     @GetMapping("/members")
     @AuthRequired
     @Role(UserRole.ADMIN)
-    public List<UserResponse> getUsers() {
+    public List<MemberResponse> getUsers() {
         return memberService.getAll();
     }
 
     @PostMapping("/members")
-    public ResponseEntity<UserResponse> register(@RequestBody RegisterRequest request) {
-        final UserResponse response = memberService.register(request);
+    public ResponseEntity<MemberResponse> register(@RequestBody RegisterRequest request) {
+        final MemberResponse response = memberService.register(request);
         return ResponseEntity.created(URI.create("/members")).body(response);
     }
 }

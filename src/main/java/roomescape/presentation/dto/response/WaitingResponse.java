@@ -5,17 +5,17 @@ import roomescape.business.model.entity.Waiting;
 
 public record WaitingResponse(
         String id,
-        UserResponse user,
+        MemberResponse user,
         LocalDate date,
-        ReservationTimeResponse time,
+        TimeSlotResponse time,
         ThemeResponse theme
 ) {
     public static WaitingResponse from(Waiting waiting) {
         return new WaitingResponse(
                 waiting.getId().value(),
-                UserResponse.from(waiting.getMember()),
+                MemberResponse.from(waiting.getMember()),
                 waiting.getDate().value(),
-                ReservationTimeResponse.from(waiting.getTime()),
+                TimeSlotResponse.from(waiting.getTime()),
                 ThemeResponse.from(waiting.getTheme())
         );
     }

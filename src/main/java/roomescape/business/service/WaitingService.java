@@ -19,7 +19,7 @@ import roomescape.infrastructure.ThemeRepository;
 import roomescape.infrastructure.WaitingRepository;
 import roomescape.presentation.dto.request.WaitingRequest;
 import roomescape.presentation.dto.response.WaitingResponse;
-import roomescape.presentation.dto.response.WaitingWithRankReponse;
+import roomescape.presentation.dto.response.WaitingWithRankResponse;
 
 @Service
 @AllArgsConstructor
@@ -61,7 +61,7 @@ public class WaitingService {
     }
 
 
-    public List<WaitingWithRankReponse> getMyWaitings(String userId) {
+    public List<WaitingWithRankResponse> getMyWaitings(String userId) {
         Member member = memberRepository.findById(Id.create(userId))
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_EXIST));
         return waitingRepository.findByUserIdWithRank(member.getId());

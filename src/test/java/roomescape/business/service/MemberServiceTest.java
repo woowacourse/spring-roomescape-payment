@@ -20,7 +20,7 @@ import roomescape.exception.business.InvalidCreateArgumentException;
 import roomescape.exception.business.NotFoundException;
 import roomescape.infrastructure.MemberRepository;
 import roomescape.presentation.dto.request.RegisterRequest;
-import roomescape.presentation.dto.response.UserResponse;
+import roomescape.presentation.dto.response.MemberResponse;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceTest {
@@ -71,12 +71,12 @@ class MemberServiceTest {
         // given
         String email = "test@example.com";
         Member memberData = Member.restore("user-id", "USER", "Test User", email, "password123");
-        UserResponse expectedUser = new UserResponse("user-id", "Test User", email);
+        MemberResponse expectedUser = new MemberResponse("user-id", "Test User", email);
 
         when(memberRepository.findByEmail_Value(email)).thenReturn(Optional.of(memberData));
 
         // when
-        UserResponse result = sut.getByEmail(email);
+        MemberResponse result = sut.getByEmail(email);
 
         // then
         assertThat(result).isEqualTo(expectedUser);
@@ -104,15 +104,15 @@ class MemberServiceTest {
                 Member.restore("user-id-1", "USER", "User One", "user1@example.com", "password1"),
                 Member.restore("user-id-2", "USER", "User Two", "user2@example.com", "password2")
         );
-        List<UserResponse> expectedUsers = Arrays.asList(
-                new UserResponse("user-id-1", "User One", "user1@example.com"),
-                new UserResponse("user-id-2", "User Two", "user2@example.com")
+        List<MemberResponse> expectedUsers = Arrays.asList(
+                new MemberResponse("user-id-1", "User One", "user1@example.com"),
+                new MemberResponse("user-id-2", "User Two", "user2@example.com")
         );
 
         when(memberRepository.findAll()).thenReturn(memberData);
 
         // when
-        List<UserResponse> result = sut.getAll();
+        List<MemberResponse> result = sut.getAll();
 
         // then
         assertThat(result).isEqualTo(expectedUsers);

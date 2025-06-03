@@ -25,8 +25,8 @@ import roomescape.exception.business.RelatedEntityExistException;
 import roomescape.infrastructure.ReservationRepository;
 import roomescape.infrastructure.ReservationTimeRepository;
 import roomescape.presentation.dto.request.ReservationTimeRequest;
-import roomescape.presentation.dto.response.ReservationTimeResponse;
 import roomescape.presentation.dto.response.ReservationTimeResponseWithBooked;
+import roomescape.presentation.dto.response.TimeSlotResponse;
 
 @ExtendWith(MockitoExtension.class)
 class TimeSlotServiceTest {
@@ -51,7 +51,7 @@ class TimeSlotServiceTest {
                 any(LocalTime.class))).thenReturn(false);
 
         // when
-        ReservationTimeResponse result = sut.addAndGet(request);
+        TimeSlotResponse result = sut.addAndGet(request);
 
         // then
         assertThat(result).isNotNull();
@@ -106,15 +106,15 @@ class TimeSlotServiceTest {
                 TimeSlot.restore("time-id-2", LocalTime.of(14, 0))
         );
 
-        List<ReservationTimeResponse> expectedTimes = List.of(
-                new ReservationTimeResponse("time-id-1", LocalTime.of(10, 0)),
-                new ReservationTimeResponse("time-id-2", LocalTime.of(14, 0))
+        List<TimeSlotResponse> expectedTimes = List.of(
+                new TimeSlotResponse("time-id-1", LocalTime.of(10, 0)),
+                new TimeSlotResponse("time-id-2", LocalTime.of(14, 0))
         );
 
         when(reservationTimeRepository.findAll()).thenReturn(dataTimes);
 
         // when
-        List<ReservationTimeResponse> result = sut.getAll();
+        List<TimeSlotResponse> result = sut.getAll();
 
         // then
         assertThat(result).isEqualTo(expectedTimes);

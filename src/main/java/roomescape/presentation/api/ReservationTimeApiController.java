@@ -18,8 +18,8 @@ import roomescape.auth.Role;
 import roomescape.business.model.vo.UserRole;
 import roomescape.business.service.ReservationTimeService;
 import roomescape.presentation.dto.request.ReservationTimeRequest;
-import roomescape.presentation.dto.response.ReservationTimeResponse;
 import roomescape.presentation.dto.response.ReservationTimeResponseWithBooked;
+import roomescape.presentation.dto.response.TimeSlotResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,15 +30,15 @@ public class ReservationTimeApiController {
     @PostMapping("/times")
     @AuthRequired
     @Role(UserRole.ADMIN)
-    public ResponseEntity<ReservationTimeResponse> createReservationTime(
+    public ResponseEntity<TimeSlotResponse> createReservationTime(
             @RequestBody @Valid ReservationTimeRequest request) {
-        ReservationTimeResponse response = reservationTimeService.addAndGet(request);
+        TimeSlotResponse response = reservationTimeService.addAndGet(request);
         return ResponseEntity.created(URI.create("/times/" + response.id())).body(response);
     }
 
     @GetMapping("/times")
     @AuthRequired
-    public List<ReservationTimeResponse> getAllReservationTime() {
+    public List<TimeSlotResponse> getAllReservationTime() {
         return reservationTimeService.getAll();
     }
 
