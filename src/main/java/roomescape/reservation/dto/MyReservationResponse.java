@@ -12,7 +12,9 @@ public record MyReservationResponse(
         String theme,
         @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
         @JsonFormat(pattern = "HH:mm") LocalTime time,
-        String status
+        String status,
+        String paymentKey,
+        Long amount
 ) {
 
     public MyReservationResponse(final Reservation reservation) {
@@ -21,7 +23,9 @@ public record MyReservationResponse(
                 reservation.getTheme().getName(),
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
-                convertToReservationStatusMessage(reservation)
+                convertToReservationStatusMessage(reservation),
+                reservation.getPayment() != null ? reservation.getPayment().getPaymentKey() : null,
+                reservation.getPayment() != null ? reservation.getPayment().getAmount() : null
         );
     }
 

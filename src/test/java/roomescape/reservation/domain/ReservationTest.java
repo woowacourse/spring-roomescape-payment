@@ -61,7 +61,7 @@ class ReservationTest {
         LocalDate today = LocalDate.now();
         LocalTime later = LocalTime.now().plusMinutes(5);
         ReservationTime rt = ReservationTime.from(later);
-        Reservation reservation = Reservation.of(today, rt, defaultTheme, defaultMember, LocalDateTime.now(clock));
+        Reservation reservation = Reservation.booked(today, rt, defaultTheme, defaultMember, LocalDateTime.now(clock));
 
         // when
         // then
@@ -79,25 +79,25 @@ class ReservationTest {
         // then
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThatThrownBy(
-                            () -> Reservation.of(null, reservationTime, theme, member, LocalDateTime.now(clock)))
+                            () -> Reservation.booked(null, reservationTime, theme, member, LocalDateTime.now(clock)))
                     .isInstanceOf(NullPointerException.class);
             softly.assertThatThrownBy(
-                            () -> Reservation.of(localDate, null, theme, member, LocalDateTime.now(clock)))
+                            () -> Reservation.booked(localDate, null, theme, member, LocalDateTime.now(clock)))
                     .isInstanceOf(NullPointerException.class);
             softly.assertThatThrownBy(
-                            () -> Reservation.of(localDate, reservationTime, null, member,
+                            () -> Reservation.booked(localDate, reservationTime, null, member,
                                     LocalDateTime.now(clock)))
                     .isInstanceOf(NullPointerException.class);
-            softly.assertThatThrownBy(() -> Reservation.of(null, reservationTime, theme, member,
+            softly.assertThatThrownBy(() -> Reservation.booked(null, reservationTime, theme, member,
                             LocalDateTime.now(clock)))
                     .isInstanceOf(NullPointerException.class);
-            softly.assertThatThrownBy(() -> Reservation.of(localDate, null, theme, member,
+            softly.assertThatThrownBy(() -> Reservation.booked(localDate, null, theme, member,
                             LocalDateTime.now(clock)))
                     .isInstanceOf(NullPointerException.class);
-            softly.assertThatThrownBy(() -> Reservation.of(localDate, reservationTime, null, member,
+            softly.assertThatThrownBy(() -> Reservation.booked(localDate, reservationTime, null, member,
                             LocalDateTime.now(clock)))
                     .isInstanceOf(NullPointerException.class);
-            softly.assertThatThrownBy(() -> Reservation.of(localDate, reservationTime, theme, null,
+            softly.assertThatThrownBy(() -> Reservation.booked(localDate, reservationTime, theme, null,
                             LocalDateTime.now(clock)))
                     .isInstanceOf(NullPointerException.class);
         });
@@ -110,7 +110,7 @@ class ReservationTest {
         LocalDateTime currentDateTime = LocalDateTime.now();
 
         // when
-        Reservation reservation = Reservation.of(date, time, theme, member, currentDateTime);
+        Reservation reservation = Reservation.booked(date, time, theme, member, currentDateTime);
         Reservation savedReservation = reservationRepository.save(reservation);
 
         // then
@@ -130,7 +130,7 @@ class ReservationTest {
 
         // when & then
         assertThatThrownBy(() -> 
-            Reservation.of(date, time, theme, member, currentDateTime)
+            Reservation.booked(date, time, theme, member, currentDateTime)
         )
         .isInstanceOf(ReservationException.class)
         .hasMessage("예약은 현재 시간 이후로 가능합니다.");

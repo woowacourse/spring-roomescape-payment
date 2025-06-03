@@ -95,7 +95,7 @@ class AdminReservationControllerTest {
     void 관리자_예약_취소_성공() throws Exception {
         // given
         LocalDateTime currentDateTime = LocalDateTime.now();
-        Reservation reservation = Reservation.of(
+        Reservation reservation = Reservation.booked(
                 LocalDate.now().plusDays(1),
                 time,
                 theme,
@@ -166,7 +166,7 @@ class AdminReservationControllerTest {
         // given
         LocalDate date = LocalDate.now().plusDays(1);
         LocalDateTime currentDateTime = LocalDateTime.now();
-        Reservation reservation = Reservation.of(
+        Reservation reservation = Reservation.booked(
                 date,
                 time,
                 theme,

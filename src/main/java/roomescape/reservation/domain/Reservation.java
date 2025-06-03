@@ -51,6 +51,9 @@ public class Reservation {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private ReservationStatus reservationStatus;
 
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "reservation")
+    private Payment payment;
+
     @Builder
     private Reservation(
             final Long id,
@@ -59,7 +62,8 @@ public class Reservation {
             @NonNull final Theme theme,
             @NonNull final Member member,
             @NonNull final ReservationStatus reservationStatus,
-            @NonNull final LocalDateTime currentDateTime
+            @NonNull final LocalDateTime currentDateTime,
+            final Payment payment
     ) {
         this.id = id;
         this.date = date;
@@ -67,10 +71,11 @@ public class Reservation {
         this.theme = theme;
         this.member = member;
         this.reservationStatus = reservationStatus;
+        this.payment = payment;
         validateFutureOrPresent(currentDateTime);
     }
 
-    public static Reservation of(
+    public static Reservation booked(
             final LocalDate date,
             final ReservationTime reservationTime,
             final Theme theme,
@@ -116,5 +121,10 @@ public class Reservation {
 
     public boolean isBooked() {
         return reservationStatus.getStatus() == Status.BOOKED;
+    }
+
+    public void pay(Payment payment) {
+        this.payment = payment;
+        payment.setReservation(this);
     }
 }
