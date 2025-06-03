@@ -23,6 +23,6 @@ spring:
 
 payment:
   api:
-    base-url: https://api.tosspayments.com
+    base-url: https://api.tosspayments.com/v1/payments
   auth:
     scheme: Basic

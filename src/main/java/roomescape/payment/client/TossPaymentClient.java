@@ -32,7 +32,7 @@ public class TossPaymentClient implements PaymentClient {
     public PaymentResult confirmPayment(final PaymentRequest request) {
         return executeWithExceptionHandling(() ->
                 restClient.post()
-                        .uri("/v1/payments/confirm")
+                        .uri("/confirm")
                         .body(request)
                         .retrieve()
                         .onStatus(HttpStatusCode::is4xxClientError, this::handle4xxError)
