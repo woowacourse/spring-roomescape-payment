@@ -15,10 +15,12 @@ import java.util.UUID;
 
 @Component
 public class TossPaymentClient {
-    private static final List<String> IGNORE_CODES = List.of(
+    private static final List<String> INTERNAL_ERROR_CODES = List.of(
             "INCORRECT_BASIC_AUTH_FORMAT",
             "INVALID_API_KEY",
-            "INVALID_AUTHORIZE_AUTH"
+            "INVALID_AUTHORIZE_AUTH",
+            "INVALID_IDEMPOTENCY_KEY",
+            "IDEMPOTENT_REQUEST_PROCESSING"
     );
 
     private final RestClient restClient;
@@ -59,7 +61,7 @@ public class TossPaymentClient {
             return false;
         }
         PaymentFailure failure = response.getBody().failure();
-        return !IGNORE_CODES.contains(failure.code());
+        return !INTERNAL_ERROR_CODES.contains(failure.code());
     }
 
     private boolean is5xxResponse(ResponseEntity<ConfirmPaymentResponse> response) {
@@ -67,6 +69,6 @@ public class TossPaymentClient {
             return false;
         }
         PaymentFailure failure = response.getBody().failure();
-        return IGNORE_CODES.contains(failure.code());
+        return INTERNAL_ERROR_CODES.contains(failure.code());
     }
 }
