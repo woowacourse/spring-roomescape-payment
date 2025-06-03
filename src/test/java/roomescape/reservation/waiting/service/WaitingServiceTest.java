@@ -7,14 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-
 import roomescape.auth.dto.LoginMember;
 import roomescape.common.exception.custom.AlreadyInUseException;
 import roomescape.common.exception.custom.EntityNotFoundException;
@@ -22,15 +20,15 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.time.domain.ReservationTime;
-import roomescape.theme.domain.Theme;
-import roomescape.reservation.waiting.domain.Waiting;
 import roomescape.reservation.dto.request.WaitingCreateRequest;
 import roomescape.reservation.dto.response.WaitingResponse;
 import roomescape.reservation.repository.ReservationRepository;
+import roomescape.reservation.time.domain.ReservationTime;
 import roomescape.reservation.time.repository.ReservationTimeRepository;
-import roomescape.theme.repository.ThemeRepository;
+import roomescape.reservation.waiting.domain.Waiting;
 import roomescape.reservation.waiting.repository.WaitingRepository;
+import roomescape.theme.domain.Theme;
+import roomescape.theme.repository.ThemeRepository;
 
 @ActiveProfiles("test")
 @DataJpaTest
@@ -52,7 +50,7 @@ class WaitingServiceTest {
 
     @DisplayName("예약 대기를 생성한다.")
     @Test
-    void createWaiting() {
+    void create() {
         // given
         LocalDate date = getTomorrow();
         Theme theme = themeRepository.save(new Theme("테마1", "테마1", "www.x.com"));
@@ -65,7 +63,7 @@ class WaitingServiceTest {
                 new WaitingCreateRequest(date, time.getId(), theme.getId(), LoginMember.of(waitingMember));
 
         // when
-        WaitingResponse response = waitingService.createWaiting(request);
+        WaitingResponse response = waitingService.create(request);
 
         // then
         assertAll(
@@ -90,16 +88,16 @@ class WaitingServiceTest {
 
         WaitingCreateRequest request =
                 new WaitingCreateRequest(date, time.getId(), theme.getId(), LoginMember.of(waitingMember));
-        waitingService.createWaiting(request);
+        waitingService.create(request);
 
         // when & then
-        assertThatThrownBy(() -> waitingService.createWaiting(request))
+        assertThatThrownBy(() -> waitingService.create(request))
                 .isInstanceOf(AlreadyInUseException.class);
     }
 
     @DisplayName("예약이 존재하지 않으면 예약 대기를 생성할 수 없다.")
     @Test
-    void createWaitingInNonExistsReservation() {
+    void createInNonExistsReservation() {
         // given
         LocalDate date = getTomorrow();
         Theme theme = themeRepository.save(new Theme("테마1", "테마1", "www.x.com"));
@@ -110,13 +108,13 @@ class WaitingServiceTest {
                 new WaitingCreateRequest(date, time.getId(), theme.getId(), LoginMember.of(member));
 
         // when & then
-        assertThatThrownBy(() -> waitingService.createWaiting(request))
+        assertThatThrownBy(() -> waitingService.create(request))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
     @DisplayName("자신이 예약한 경우 예약 대기를 생성할 수 없다.")
     @Test
-    void createWaitingIn() {
+    void createIn() {
         // given
         LocalDate date = getTomorrow();
         Theme theme = themeRepository.save(new Theme("테마1", "테마1", "www.x.com"));
@@ -128,7 +126,7 @@ class WaitingServiceTest {
                 new WaitingCreateRequest(date, time.getId(), theme.getId(), LoginMember.of(member));
 
         // when & then
-        assertThatThrownBy(() -> waitingService.createWaiting(request))
+        assertThatThrownBy(() -> waitingService.create(request))
                 .isInstanceOf(AlreadyInUseException.class);
     }
 

@@ -165,7 +165,7 @@ class ReservationServiceTest {
                 .andRespond(MockRestResponseCreators.withSuccess());
 
         // when
-        ReservationResponse result = reservationService.create(requestDto, paymentRequest);
+        ReservationResponse result = reservationService.createWithPayment(requestDto, paymentRequest);
 
         // then
         SoftAssertions softAssertions = new SoftAssertions();

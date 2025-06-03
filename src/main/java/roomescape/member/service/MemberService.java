@@ -1,11 +1,9 @@
 package roomescape.member.service;
 
+import jakarta.validation.Valid;
 import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import jakarta.validation.Valid;
 import roomescape.common.exception.custom.EntityNotFoundException;
 import roomescape.member.domain.Email;
 import roomescape.member.domain.Member;
@@ -24,18 +22,6 @@ public class MemberService {
         this.memberRepository = memberRepository;
     }
 
-    public Member findMemberByEmailAndPassword(final String email, final String password) {
-        return memberRepository.findByEmailAndPassword(new Email(email), new Password(password))
-                .orElseThrow(() -> new EntityNotFoundException("이메일 또는 패스워드가 잘못 되었습니다."));
-    }
-
-    public List<MemberResponse> findAll() {
-        return memberRepository.findAll()
-                .stream()
-                .map(MemberResponse::fromEntity)
-                .toList();
-    }
-
     @Transactional
     public void create(final @Valid MemberCreateRequest request) {
         final Member member = new Member(
@@ -45,5 +31,17 @@ public class MemberService {
                 Role.MEMBER
         );
         memberRepository.save(member);
+    }
+
+    public Member getMemberByEmailAndPassword(final String email, final String password) {
+        return memberRepository.findByEmailAndPassword(new Email(email), new Password(password))
+                .orElseThrow(() -> new EntityNotFoundException("이메일 또는 패스워드가 잘못 되었습니다."));
+    }
+
+    public List<MemberResponse> getAll() {
+        return memberRepository.findAll()
+                .stream()
+                .map(MemberResponse::fromEntity)
+                .toList();
     }
 }

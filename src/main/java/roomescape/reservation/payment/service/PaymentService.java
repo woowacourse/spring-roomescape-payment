@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
 import roomescape.common.exception.custom.EntityNotFoundException;
 import roomescape.common.exception.custom.PaymentClientException;
@@ -50,6 +51,19 @@ public class PaymentService {
         this.secretKey = secretKey;
     }
 
+    @Transactional
+    public void create(final Long reservationId, final PaymentRequest paymentRequest) {
+        Reservation reservation = reservationRepository.findById(new ReservationId(reservationId))
+                .orElseThrow(() -> new EntityNotFoundException("해당 예약이 존재하지 않습니다."));
+
+        paymentRepository.save(new Payment(
+                paymentRequest.paymentKey(),
+                paymentRequest.orderId(),
+                paymentRequest.amount(),
+                reservation
+        ));
+    }
+
     public void confirm(final PaymentRequest request) {
         String secretKeyWithColon = secretKey + ":";
         byte[] secretKeyBytes = secretKeyWithColon.getBytes(StandardCharsets.UTF_8);
@@ -76,17 +90,5 @@ public class PaymentService {
         } catch (IOException e) {
             throw new RuntimeException("결제 에러 응답 파싱 실패", e);
         }
-    }
-
-    public void savePayment(final Long reservationId, final PaymentRequest paymentRequest) {
-        Reservation reservation = reservationRepository.findById(new ReservationId(reservationId))
-                .orElseThrow(() -> new EntityNotFoundException("해당 예약이 존재하지 않습니다."));
-
-        paymentRepository.save(new Payment(
-                paymentRequest.paymentKey(),
-                paymentRequest.orderId(),
-                paymentRequest.amount(),
-                reservation
-        ));
     }
 }

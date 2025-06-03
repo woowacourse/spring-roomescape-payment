@@ -1,9 +1,9 @@
 package roomescape.reservation.controller;
 
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import jakarta.validation.Valid;
 import roomescape.auth.dto.LoginMember;
 import roomescape.reservation.dto.request.FilteringReservationRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
@@ -68,8 +66,8 @@ public class ReservationController {
                         loginMember
                 );
         PaymentRequest paymentRequest = new PaymentRequest(request.paymentKey(), request.orderId(), request.amount());
-        ReservationResponse response = reservationService.create(createRequest, paymentRequest);
-        paymentService.savePayment(response.id(), paymentRequest);
+        ReservationResponse response = reservationService.createWithPayment(createRequest, paymentRequest);
+        paymentService.create(response.id(), paymentRequest);
 
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
@@ -87,7 +85,7 @@ public class ReservationController {
             @ModelAttribute @Valid final FilteringReservationRequest request
     ) {
         final List<ReservationResponse> reservationResponses =
-                reservationService.findReservationByFiltering(request);
+                reservationService.getFilteredReservations(request);
 
         return ResponseEntity.ok(reservationResponses);
     }

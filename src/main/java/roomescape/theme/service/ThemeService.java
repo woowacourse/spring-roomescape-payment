@@ -2,17 +2,15 @@ package roomescape.theme.service;
 
 import java.time.LocalDate;
 import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import roomescape.common.exception.custom.AlreadyInUseException;
 import roomescape.common.exception.custom.EntityNotFoundException;
+import roomescape.reservation.repository.ReservationRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeId;
 import roomescape.theme.dto.request.ThemeRequest;
 import roomescape.theme.dto.response.ThemeResponse;
-import roomescape.reservation.repository.ReservationRepository;
 import roomescape.theme.repository.ThemeRepository;
 
 @Service
@@ -29,28 +27,17 @@ public class ThemeService {
         this.reservationRepository = reservationRepository;
     }
 
-    public List<ThemeResponse> getAll() {
-        return themeRepository.findAll()
-                .stream()
-                .map(ThemeResponse::from)
-                .toList();
-    }
-
     @Transactional
     public ThemeResponse create(final ThemeRequest request) {
         Theme theme = themeRepository.save(request.toEntity());
         return ThemeResponse.from(theme);
     }
 
-    @Transactional
-    public void delete(final Long id) {
-        if (reservationRepository.existsByThemeId(new ThemeId(id))) {
-            throw new AlreadyInUseException("Theme with id " + id + " is already in use");
-        }
-        if (!themeRepository.existsById(new ThemeId(id))) {
-            throw new EntityNotFoundException("존재하지 않는 테마입니다.");
-        }
-        themeRepository.deleteById(new ThemeId(id));
+    public List<ThemeResponse> getAll() {
+        return themeRepository.findAll()
+                .stream()
+                .map(ThemeResponse::from)
+                .toList();
     }
 
     public List<ThemeResponse> getPopularThemes() {
@@ -64,5 +51,16 @@ public class ThemeService {
                 .stream()
                 .map(ThemeResponse::from)
                 .toList();
+    }
+
+    @Transactional
+    public void delete(final Long id) {
+        if (reservationRepository.existsByThemeId(new ThemeId(id))) {
+            throw new AlreadyInUseException("Theme with id " + id + " is already in use");
+        }
+        if (!themeRepository.existsById(new ThemeId(id))) {
+            throw new EntityNotFoundException("존재하지 않는 테마입니다.");
+        }
+        themeRepository.deleteById(new ThemeId(id));
     }
 }

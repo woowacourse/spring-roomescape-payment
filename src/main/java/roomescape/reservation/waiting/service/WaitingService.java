@@ -4,27 +4,25 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import roomescape.common.exception.custom.AlreadyInUseException;
 import roomescape.common.exception.custom.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberId;
 import roomescape.member.repository.MemberRepository;
-import roomescape.reservation.time.domain.ReservationTime;
-import roomescape.reservation.time.domain.ReservationTimeId;
-import roomescape.theme.domain.Theme;
-import roomescape.theme.domain.ThemeId;
-import roomescape.reservation.waiting.domain.Waiting;
-import roomescape.reservation.waiting.domain.WaitingId;
 import roomescape.reservation.dto.request.WaitingCreateRequest;
 import roomescape.reservation.dto.response.WaitingResponse;
 import roomescape.reservation.repository.ReservationRepository;
+import roomescape.reservation.time.domain.ReservationTime;
+import roomescape.reservation.time.domain.ReservationTimeId;
 import roomescape.reservation.time.repository.ReservationTimeRepository;
-import roomescape.theme.repository.ThemeRepository;
+import roomescape.reservation.waiting.domain.Waiting;
+import roomescape.reservation.waiting.domain.WaitingId;
 import roomescape.reservation.waiting.repository.WaitingRepository;
+import roomescape.theme.domain.Theme;
+import roomescape.theme.domain.ThemeId;
+import roomescape.theme.repository.ThemeRepository;
 
 @Service
 public class WaitingService {
@@ -49,15 +47,8 @@ public class WaitingService {
         this.reservationRepository = reservationRepository;
     }
 
-    public List<WaitingResponse> getAll() {
-        return waitingRepository.findAll()
-                .stream()
-                .map(WaitingResponse::from)
-                .toList();
-    }
-
     @Transactional
-    public WaitingResponse createWaiting(final WaitingCreateRequest request) {
+    public WaitingResponse create(final WaitingCreateRequest request) {
         if (canCreateReservation(request)) {
             throw new EntityNotFoundException("예약이 존재하지 않습니다.");
         }
@@ -74,6 +65,30 @@ public class WaitingService {
 
         Waiting savedWaiting = waitingRepository.save(waiting);
         return WaitingResponse.from(savedWaiting);
+    }
+
+    public List<WaitingResponse> getAll() {
+        return waitingRepository.findAll()
+                .stream()
+                .map(WaitingResponse::from)
+                .toList();
+    }
+
+    private void validateDateTime(final LocalDateTime now, final LocalDate date, final LocalTime time) {
+        LocalDateTime reservationDateTime = LocalDateTime.of(date, time);
+
+        if (now.isAfter(reservationDateTime)) {
+            throw new IllegalArgumentException("이미 지난 예약 시간입니다.");
+        }
+    }
+
+    @Transactional
+    public void deleteWaiting(final Long id) {
+        WaitingId waitingId = new WaitingId(id);
+        if (!waitingRepository.existsById(waitingId)) {
+            throw new EntityNotFoundException("존재하지 않는 예약 대기입니다.");
+        }
+        waitingRepository.deleteById(waitingId);
     }
 
     private boolean hasAlreadyWaiting(final WaitingCreateRequest request) {
@@ -126,22 +141,5 @@ public class WaitingService {
         MemberId memberId = new MemberId(request.loginMember().id());
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new EntityNotFoundException("등록되지 않은 회원입니다."));
-    }
-
-    private void validateDateTime(final LocalDateTime now, final LocalDate date, final LocalTime time) {
-        LocalDateTime reservationDateTime = LocalDateTime.of(date, time);
-
-        if (now.isAfter(reservationDateTime)) {
-            throw new IllegalArgumentException("이미 지난 예약 시간입니다.");
-        }
-    }
-
-    @Transactional
-    public void deleteWaiting(final Long id) {
-        WaitingId waitingId = new WaitingId(id);
-        if (!waitingRepository.existsById(waitingId)) {
-            throw new EntityNotFoundException("존재하지 않는 예약 대기입니다.");
-        }
-        waitingRepository.deleteById(waitingId);
     }
 }

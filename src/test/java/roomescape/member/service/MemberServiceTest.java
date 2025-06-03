@@ -11,7 +11,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-
 import roomescape.common.exception.custom.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
@@ -28,12 +27,12 @@ class MemberServiceTest {
 
     @DisplayName("이메일과 패스워드를 알려주면 일치하는 사용자를 찾아온다.")
     @Test
-    void findMemberByEmailAndPassword() {
+    void getMemberByEmailAndPassword() {
         String email = "if@posty.com";
         String password = "12345678";
         memberRepository.save(new Member("이프", email, password, Role.MEMBER));
 
-        Member findMember = memberService.findMemberByEmailAndPassword(email, password);
+        Member findMember = memberService.getMemberByEmailAndPassword(email, password);
 
         assertAll(
                 () -> assertThat(findMember.getEmail()).isEqualTo(email),
@@ -49,7 +48,7 @@ class MemberServiceTest {
         String password = "12345678";
         memberRepository.save(new Member("이프", email, password, Role.MEMBER));
 
-        assertThatThrownBy(() -> memberService.findMemberByEmailAndPassword(unmatchedEmail, unmatchedPassword))
+        assertThatThrownBy(() -> memberService.getMemberByEmailAndPassword(unmatchedEmail, unmatchedPassword))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 }
