@@ -1,10 +1,13 @@
 package roomescape.reservation.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.admin.domain.dto.SearchReservationRequestDto;
-import roomescape.payment.domain.dto.PaymentRequestDto;
-import roomescape.payment.service.PaymentService;
+import roomescape.payment.global.domain.dto.PaymentRequestDto;
+import roomescape.payment.global.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.dto.ReservationInfo;
 import roomescape.reservation.domain.dto.ReservationRequestDto;
@@ -22,10 +25,6 @@ import roomescape.theme.repository.ThemeRepository;
 import roomescape.user.domain.User;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.repository.WaitingRepository;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)

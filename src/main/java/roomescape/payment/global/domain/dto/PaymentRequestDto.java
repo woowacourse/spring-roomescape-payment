@@ -1,4 +1,4 @@
-package roomescape.payment.domain.dto;
+package roomescape.payment.global.domain.dto;
 
 import roomescape.reservation.domain.dto.ReservationWithPaymentDto;
 

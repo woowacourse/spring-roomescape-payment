@@ -1,9 +1,7 @@
 package roomescape.global.config;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,14 +12,14 @@ import org.springframework.web.client.RestClient;
 
 
 @Configuration
-public class TossRestClientConfig {
+public class RestClientConfig {
 
     private final String secretKey;
     private final String baseUrl;
     private final int connectTimeout;
     private final int readTimeout;
 
-    public TossRestClientConfig(@Value("${toss.payment.secret-key}") String secretKey, @Value("${toss.payment.base-url}") String baseUrl, @Value("${toss.payment.connect-timeout}") int connectTimeout, @Value("${toss.payment.read-timeout}") int readTimeout) {
+    public RestClientConfig(@Value("${toss.payment.secret-key}") String secretKey, @Value("${toss.payment.base-url}") String baseUrl, @Value("${toss.payment.connect-timeout}") int connectTimeout, @Value("${toss.payment.read-timeout}") int readTimeout) {
         this.secretKey = secretKey;
         this.baseUrl = baseUrl;
         this.connectTimeout = connectTimeout;
@@ -31,8 +29,8 @@ public class TossRestClientConfig {
     @Bean
     public RestClient restClient() {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(Duration.ofSeconds(connectTimeout));
-        requestFactory.setReadTimeout(Duration.ofSeconds(readTimeout));
+        requestFactory.setConnectTimeout(connectTimeout);
+        requestFactory.setReadTimeout(readTimeout);
 
         String basicAuthValue = encodeBasicAuth(secretKey);
 
@@ -40,7 +38,6 @@ public class TossRestClientConfig {
                 .baseUrl(baseUrl)
                 .requestFactory(requestFactory)
                 .defaultHeader(HttpHeaders.AUTHORIZATION, basicAuthValue)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 .build();
     }
 

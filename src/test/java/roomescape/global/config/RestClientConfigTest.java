@@ -26,7 +26,7 @@ import org.springframework.web.client.RestClientException;
         "toss.payment.connect-timeout=1",
         "toss.payment.read-timeout=2"
 })
-class TossRestClientConfigTest {
+class RestClientConfigTest {
 
     private MockWebServer mockWebServer;
     private RestClient restClient;
@@ -36,7 +36,7 @@ class TossRestClientConfigTest {
         mockWebServer = new MockWebServer();
         mockWebServer.start();
 
-        TossRestClientConfig config = new TossRestClientConfig(
+        RestClientConfig config = new RestClientConfig(
                 "test_sk_secret",
                 String.format("http://localhost:%s", mockWebServer.getPort()),
                 1,

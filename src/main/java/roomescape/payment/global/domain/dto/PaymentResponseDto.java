@@ -1,6 +1,6 @@
-package roomescape.payment.domain.dto;
+package roomescape.payment.global.domain.dto;
 
-import roomescape.payment.domain.TossPayment;
+import roomescape.payment.toss.domain.TossPayment;
 
 public record PaymentResponseDto(String orderId, int amount, String paymentKey) {
 

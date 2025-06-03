@@ -1,4 +1,4 @@
-package roomescape.payment.exception;
+package roomescape.payment.global.exception;
 
 import org.springframework.http.HttpStatus;
 
