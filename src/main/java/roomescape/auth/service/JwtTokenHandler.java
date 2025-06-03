@@ -14,7 +14,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import roomescape.common.exception.AuthenticationException;
+import roomescape.common.exception.custom.AuthenticationException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 

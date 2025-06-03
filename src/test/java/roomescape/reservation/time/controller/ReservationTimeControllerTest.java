@@ -1,4 +1,4 @@
-package roomescape.reservation.controller;
+package roomescape.reservation.time.controller;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;

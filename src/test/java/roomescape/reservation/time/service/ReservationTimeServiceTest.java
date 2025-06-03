@@ -1,4 +1,4 @@
-package roomescape.reservation.service;
+package roomescape.reservation.time.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -16,8 +16,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-import roomescape.common.exception.AlreadyInUseException;
-import roomescape.common.exception.EntityNotFoundException;
+import roomescape.common.exception.custom.AlreadyInUseException;
+import roomescape.common.exception.custom.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
@@ -29,7 +29,6 @@ import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.time.repository.ReservationTimeRepository;
 import roomescape.theme.repository.ThemeRepository;
-import roomescape.reservation.time.service.ReservationTimeService;
 
 @ActiveProfiles("test")
 @DataJpaTest

@@ -16,9 +16,9 @@ import org.springframework.web.client.RestClient;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import roomescape.common.exception.EntityNotFoundException;
-import roomescape.common.exception.PaymentBadRequestException;
-import roomescape.common.exception.PaymentServerException;
+import roomescape.common.exception.custom.EntityNotFoundException;
+import roomescape.common.exception.custom.PaymentBadRequestException;
+import roomescape.common.exception.custom.PaymentServerException;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationId;
 import roomescape.reservation.payment.domain.Payment;
@@ -70,6 +70,7 @@ public class PaymentService {
     private void handleError(final ClientHttpResponse res) {
         try (InputStream is = res.getBody()) {
             TossPaymentErrorResponse errorResponse = objectMapper.readValue(is, TossPaymentErrorResponse.class);
+            objectMapper.readValue(is, TossPaymentErrorResponse.class);
 
             String errorCode = errorResponse.code();
             if (InternalServerErrorCode.contains(errorCode)) {
