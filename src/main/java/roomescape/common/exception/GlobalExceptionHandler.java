@@ -13,6 +13,7 @@ import roomescape.common.exception.impl.ForbiddenException;
 import roomescape.common.exception.impl.NotFoundException;
 import roomescape.common.exception.impl.TossConfirmException;
 import roomescape.common.exception.impl.UnauthorizedException;
+import roomescape.payment.exception.TossErrorCode;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -29,6 +30,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handle(final TossConfirmException e) {
         log.error(
             "toss api exception : " + "code : " + e.getCode() + ", message :" + e.getMessage());
+
+        if (TossErrorCode.canSendTossMessage(e.getCode())) {
+            return new ResponseEntity<>(e.getMessage(), e.getStatus());
+        }
         return new ResponseEntity<>("서버 내부에 오류가 발생했습니다.", e.getStatus());
     }
 
