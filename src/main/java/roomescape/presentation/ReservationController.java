@@ -1,35 +1,31 @@
 package roomescape.presentation;
 
 import jakarta.validation.Valid;
-import java.net.URI;
-import java.util.List;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import roomescape.auth.Authenticated;
 import roomescape.domain.PaymentInfo;
 import roomescape.dto.PaymentRequest;
 import roomescape.dto.request.ReservationCreateRequest;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationWithStatusResponse;
+import roomescape.service.PaymentClient;
 import roomescape.service.ReservationService;
+
+import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/reservations")
 public class ReservationController {
 
     private final ReservationService reservationService;
-    private final PaymentClientController paymentClientController;
+    private final PaymentClient paymentClient;
 
     public ReservationController(final ReservationService reservationService,
-                                 final PaymentClientController paymentClientController) {
+                                 final PaymentClient paymentClient) {
         this.reservationService = reservationService;
-        this.paymentClientController = paymentClientController;
+        this.paymentClient = paymentClient;
     }
 
     @PostMapping
@@ -37,7 +33,7 @@ public class ReservationController {
             @Authenticated Long memberId,
             @Valid @RequestBody ReservationCreateRequest request) {
         PaymentRequest paymentRequest = new PaymentRequest(request.amount(), request.paymentKey(), request.orderId());
-        PaymentInfo paymentInfo = paymentClientController.postPaymentInfo(paymentRequest);
+        PaymentInfo paymentInfo = paymentClient.postPaymentInfo(paymentRequest);
 
         ReservationResponse reservationResponse = reservationService.createReservationForMember(
                 memberId, request.timeId(), request.themeId(), request.date());

@@ -12,7 +12,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.domain.PaymentInfo;
 import roomescape.dto.PaymentRequest;
 import roomescape.exception.FilteredPaymentException;
-import roomescape.presentation.PaymentClientController;
+import roomescape.service.PaymentClient;
 
 import java.util.Base64;
 
@@ -23,7 +23,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-public class PaymentClientControllerTest {
+public class PaymentClientTest {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -33,7 +33,7 @@ public class PaymentClientControllerTest {
 
     private MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
 
-    private PaymentClientController clientController = new PaymentClientController(testBuilder.build());
+    private PaymentClient clientController = new PaymentClient(testBuilder.build(), MAPPER);
 
     @Test
     void 결제_요청_응답을_확인한다() throws Exception {

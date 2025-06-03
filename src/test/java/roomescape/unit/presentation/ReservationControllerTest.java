@@ -15,8 +15,8 @@ import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationTimeResponse;
 import roomescape.dto.response.ReservationWithStatusResponse;
 import roomescape.infrastructure.JwtTokenProvider;
-import roomescape.presentation.PaymentClientController;
 import roomescape.presentation.ReservationController;
+import roomescape.service.PaymentClient;
 import roomescape.service.ReservationService;
 
 import java.time.LocalDate;
@@ -39,7 +39,7 @@ class ReservationControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private PaymentClientController paymentClientController;
+    private PaymentClient paymentClient;
 
     @MockitoBean
     private ReservationService reservationService;
@@ -54,7 +54,7 @@ class ReservationControllerTest {
         ReservationResponse response = new ReservationResponse(1L, "memberName1", LocalDate.of(2025, 1, 1),
                 new ReservationTimeResponse(1L, LocalTime.of(9, 0)), "themeName1");
         PaymentInfo paymentInfo = new PaymentInfo("1", 1000);
-        given(paymentClientController.postPaymentInfo(any())).willReturn(paymentInfo);
+        given(paymentClient.postPaymentInfo(any())).willReturn(paymentInfo);
         given(reservationService.createReservationForMember(1L, request.timeId(), request.themeId(), request.date())).willReturn(
                 response);
         given(tokenProvider.extractSubject("accessToken")).willReturn("1");

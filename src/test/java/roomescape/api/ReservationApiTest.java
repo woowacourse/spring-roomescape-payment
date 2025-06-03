@@ -1,17 +1,7 @@
 package roomescape.api;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.ArgumentMatchers.any;
-
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
@@ -22,13 +12,18 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.auth.Role;
 import roomescape.domain.*;
-import roomescape.domain.repository.MemberRepository;
-import roomescape.domain.repository.ReservationRepository;
-import roomescape.domain.repository.ReservationTimeRepository;
-import roomescape.domain.repository.ThemeRepository;
-import roomescape.domain.repository.WaitingRepository;
+import roomescape.domain.repository.*;
 import roomescape.infrastructure.JwtTokenProvider;
-import roomescape.presentation.PaymentClientController;
+import roomescape.service.PaymentClient;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -56,7 +51,7 @@ public class ReservationApiTest {
     private JwtTokenProvider tokenProvider;
 
     @MockitoBean
-    private PaymentClientController paymentClientController;
+    private PaymentClient paymentClient;
 
     @BeforeEach
     void setUpRestAssuredPort() {
@@ -80,7 +75,7 @@ public class ReservationApiTest {
         reservation.put("amount", 1000);
 
         PaymentInfo paymentInfo = new PaymentInfo("1", 1000);
-        BDDMockito.given(paymentClientController.postPaymentInfo(any())).willReturn(paymentInfo);
+        BDDMockito.given(paymentClient.postPaymentInfo(any())).willReturn(paymentInfo);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

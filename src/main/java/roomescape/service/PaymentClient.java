@@ -1,4 +1,4 @@
-package roomescape.presentation;
+package roomescape.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,15 +12,16 @@ import roomescape.exception.PaymentException;
 import java.util.List;
 
 @Component
-public class PaymentClientController {
+public class PaymentClient {
 
     private static final List<String> CODES = List.of("INVALID_API_KEY", "UNAUTHORIZED_KEY", "INCORRECT_BASIC_AUTH_FORMAT");
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private final RestClient restClient;
+    private final ObjectMapper objectMapper;
 
-    public PaymentClientController(final RestClient restClient) {
+    public PaymentClient(RestClient restClient, ObjectMapper objectMapper) {
         this.restClient = restClient;
+        this.objectMapper = objectMapper;
     }
 
     public PaymentInfo postPaymentInfo(PaymentRequest paymentRequest) {
@@ -30,7 +31,7 @@ public class PaymentClientController {
                 .retrieve()
                 .onStatus(status ->
                         status.is4xxClientError() || status.is5xxServerError(), (request, response) -> {
-                    JsonNode node = OBJECT_MAPPER.readTree(response.getBody());
+                    JsonNode node = objectMapper.readTree(response.getBody());
                     String message = node.get("message").asText();
                     String code = node.get("code").asText();
                     if (CODES.contains(code)) {
