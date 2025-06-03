@@ -1,5 +1,6 @@
-package roomescape.domain.waiting;
+package roomescape.domain.reservation.waiting;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,7 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import roomescape.domain.common.BaseReservation;
+import roomescape.domain.reservation.Reservation;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.user.User;
@@ -22,20 +23,14 @@ import roomescape.exception.BusinessRuleViolationException;
 @Getter
 @ToString
 @Entity
-public class Waiting extends BaseReservation {
+@DiscriminatorValue("WAITING")
+public class Waiting extends Reservation {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @EqualsAndHashCode.Include
-    private Long id;
-
-    private Waiting(final Long id,
-                    final User user,
+    private Waiting(final User user,
                     final LocalDate date,
                     final TimeSlot timeSlot,
                     final Theme theme) {
         super(date, timeSlot, theme, user);
-        this.id = id;
     }
 
     public static Waiting register(final User user,
@@ -43,7 +38,7 @@ public class Waiting extends BaseReservation {
                                    final TimeSlot timeSlot,
                                    final Theme theme) {
 
-        Waiting waiting = new Waiting(null, user, date, timeSlot, theme);
+        Waiting waiting = new Waiting(user, date, timeSlot, theme);
         validateNotPastDateTime(date, timeSlot);
         return waiting;
     }

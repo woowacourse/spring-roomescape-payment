@@ -13,8 +13,8 @@ import org.springframework.test.context.ActiveProfiles;
 import roomescape.domain.user.User;
 import roomescape.domain.user.UserRepository;
 import roomescape.domain.user.UserRole;
-import roomescape.domain.waiting.Waiting;
-import roomescape.domain.waiting.WaitingRepository;
+import roomescape.domain.reservation.waiting.Waiting;
+import roomescape.domain.reservation.waiting.WaitingRepository;
 import roomescape.exception.AlreadyExistedException;
 import roomescape.exception.BusinessRuleViolationException;
 import roomescape.exception.NotFoundException;
@@ -124,7 +124,7 @@ class WaitingServiceIntegrationTest {
     @DisplayName("대기를 삭제할 수 있다.")
     void removeById() {
         // given
-        var waitingId = 1L;
+        var waitingId = 4L;
 
         // when
         service.removeById(waitingId);

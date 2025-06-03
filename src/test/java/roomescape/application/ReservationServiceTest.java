@@ -4,9 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static roomescape.fixture.PaymentFixture.CREATE_PAYMENT_1;
@@ -14,7 +11,6 @@ import static roomescape.fixture.ReservationFixture.CREATE_RESERVATION_OF;
 import static roomescape.fixture.ThemeFixture.CREATE_THEME_1;
 import static roomescape.fixture.TimeSlotFixture.CREATE_TIME_SLOT_1;
 import static roomescape.fixture.UserFixture.CREATE_USER_1;
-import static roomescape.fixture.WaitingFixture.CREATE_WAITING_OF;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -25,18 +21,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
+import roomescape.application.event.ReservationCancelledEvent;
 import roomescape.application.request.PaymentInfo;
 import roomescape.domain.payment.Payment;
-import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.reservation.reserved.Reserved;
+import roomescape.domain.reservation.reserved.ReservedRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.timeslot.TimeSlotRepository;
 import roomescape.domain.user.User;
 import roomescape.domain.user.UserRepository;
-import roomescape.domain.waiting.Waiting;
-import roomescape.domain.waiting.WaitingRepository;
 import roomescape.exception.AlreadyExistedException;
 import roomescape.exception.NotFoundException;
 
@@ -44,10 +40,7 @@ import roomescape.exception.NotFoundException;
 class ReservationServiceTest {
 
     @Mock
-    ReservationRepository reservationRepository;
-
-    @Mock
-    WaitingRepository waitingRepository;
+    ReservedRepository reservationRepository;
 
     @Mock
     TimeSlotRepository timeSlotRepository;
@@ -119,7 +112,7 @@ class ReservationServiceTest {
             when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
             when(timeSlotRepository.findById(timeSlot.getId())).thenReturn(Optional.of(timeSlot));
             when(themeRepository.findById(theme.getId())).thenReturn(Optional.of(theme));
-            when(reservationRepository.save(Reservation.register(user, date, timeSlot, theme)))
+            when(reservationRepository.save(Reserved.register(user, date, timeSlot, theme)))
                     .thenReturn(CREATE_RESERVATION_OF(1L, user, date, timeSlot, theme));
 
             PaymentInfo paymentInfo = new PaymentInfo("payment_key_1", "order_id_1", 10000L);
@@ -127,7 +120,7 @@ class ReservationServiceTest {
             when(paymentService.savePayment(paymentInfo)).thenReturn(payment);
 
             // when
-            Reservation savedReservation = reservationService.saveReservationWithPurchase(
+            Reserved savedReservation = reservationService.saveReservationWithPurchase(
                     user.getId(), date, timeSlot.getId(), theme.getId(), paymentInfo);
 
             // then
@@ -142,7 +135,7 @@ class ReservationServiceTest {
                     () -> verify(timeSlotRepository).findById(timeSlot.getId()),
                     () -> verify(themeRepository).findById(theme.getId()),
                     () -> verify(paymentService).savePayment(any()),
-                    () -> verify(reservationRepository).save(any(Reservation.class))
+                    () -> verify(reservationRepository).save(any(Reserved.class))
             );
         }
     }
@@ -160,17 +153,17 @@ class ReservationServiceTest {
             TimeSlot timeSlot = CREATE_TIME_SLOT_1();
             Theme theme = CREATE_THEME_1();
             LocalDate date = LocalDate.now().plusDays(1);
-            Reservation reservation = CREATE_RESERVATION_OF(1L, user, date, timeSlot, theme);
+            Reserved reserved = CREATE_RESERVATION_OF(1L, user, date, timeSlot, theme);
 
             when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
             when(timeSlotRepository.findById(timeSlot.getId())).thenReturn(Optional.of(timeSlot));
             when(themeRepository.findById(theme.getId())).thenReturn(Optional.of(theme));
 
-            when(reservationRepository.save(Reservation.register(user, date, timeSlot, theme)))
-                    .thenReturn(reservation);
+            when(reservationRepository.save(Reserved.register(user, date, timeSlot, theme)))
+                    .thenReturn(reserved);
 
             // when
-            Reservation savedReservation = reservationService.saveReservationWithoutPurchase(user.getId(), date,
+            Reserved savedReservation = reservationService.saveReservationWithoutPurchase(user.getId(), date,
                     timeSlot.getId(), theme.getId());
 
             // then
@@ -184,7 +177,7 @@ class ReservationServiceTest {
                     () -> verify(userRepository).findById(user.getId()),
                     () -> verify(timeSlotRepository).findById(timeSlot.getId()),
                     () -> verify(themeRepository).findById(theme.getId()),
-                    () -> verify(reservationRepository).save(any(Reservation.class))
+                    () -> verify(reservationRepository).save(any(Reserved.class))
             );
         }
     }
@@ -219,9 +212,9 @@ class ReservationServiceTest {
             LocalDate date = LocalDate.now().plusDays(1);
             TimeSlot timeSlot = CREATE_TIME_SLOT_1();
             Theme theme = CREATE_THEME_1();
-            Reserved reservation = CREATE_RESERVATION_OF(removeId, user, date, timeSlot, theme);
+            Reserved reserved = CREATE_RESERVATION_OF(removeId, user, date, timeSlot, theme);
 
-            when(reservationRepository.findById(removeId)).thenReturn(Optional.of(reservation));
+            when(reservationRepository.findById(removeId)).thenReturn(Optional.of(reserved));
 
             // when
             reservationService.removeById(removeId);

@@ -7,7 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.reservation.reserved.ReservedRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.InUseException;
@@ -19,7 +19,7 @@ public class ThemeService {
 
     private static final int MAX_THEME_FETCH_COUNT = 5;
 
-    private final ReservationRepository reservationRepository;
+    private final ReservedRepository reservationRepository;
     private final ThemeRepository themeRepository;
 
     @Transactional

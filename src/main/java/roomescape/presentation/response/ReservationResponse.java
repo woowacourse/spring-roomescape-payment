@@ -2,7 +2,7 @@ package roomescape.presentation.response;
 
 import java.time.LocalDate;
 import java.util.List;
-import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.reserved.Reserved;
 
 public record ReservationResponse(
         long id,
@@ -13,7 +13,7 @@ public record ReservationResponse(
 ) {
 
     public static List<ReservationResponse> fromReservations(
-            final List<Reservation> reservations
+            final List<Reserved> reservations
     ) {
         return reservations.stream()
                 .map(ReservationResponse::fromReservation)
@@ -21,7 +21,7 @@ public record ReservationResponse(
     }
 
     public static ReservationResponse fromReservation(
-            final Reservation reservation
+            final Reserved reservation
     ) {
         return new ReservationResponse(
                 reservation.getId(),

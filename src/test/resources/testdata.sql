@@ -19,11 +19,11 @@ VALUES ('payment_key_test_1', 'ROOM_ESCAPE_test_1', '방탈출 예약 결제 1�
        ('payment_key_test_3', 'ROOM_ESCAPE_test_3', '방탈출 예약 결제 1건', 1100);
 
 
-INSERT INTO RESERVATION (user_id, date, time_slot_id, theme_id, payment_id)
-VALUES (2, CURRENT_DATE + 3, 1, 1, 1),
-       (2, CURRENT_DATE + 2, 1, 1, 2),
-       (2, CURRENT_DATE + 1, 1, 1, 3);
+INSERT INTO RESERVATION (user_id, date, time_slot_id, theme_id, payment_id, reservation_type)
+VALUES (2, CURRENT_DATE + 3, 1, 1, 1, 'RESERVED'),
+       (2, CURRENT_DATE + 2, 1, 1, 2, 'RESERVED'),
+       (2, CURRENT_DATE + 1, 1, 1, 3, 'RESERVED');
 
-INSERT INTO WAITING (user_id, date, time_slot_id, theme_id)
-VALUES (1, CURRENT_DATE + 3, 1, 1),
-       (3, CURRENT_DATE + 3, 1, 1);
+INSERT INTO RESERVATION (user_id, date, time_slot_id, theme_id, reservation_type)
+VALUES (1, CURRENT_DATE + 3, 1, 1, 'WAITING'),
+       (3, CURRENT_DATE + 3, 1, 1, 'WAITING');

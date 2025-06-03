@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.application.WaitingService;
 import roomescape.domain.user.User;
-import roomescape.domain.waiting.Waiting;
+import roomescape.domain.reservation.waiting.Waiting;
 import roomescape.presentation.auth.Authenticated;
 import roomescape.presentation.request.CreateWaitingRequest;
 import roomescape.presentation.response.WaitingResponse;

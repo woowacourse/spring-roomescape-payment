@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.application.ReservationService;
-import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationSearchFilter;
+import roomescape.domain.reservation.reserved.Reserved;
+import roomescape.domain.reservation.reserved.ReservationSearchFilter;
 import roomescape.domain.user.User;
 import roomescape.presentation.auth.Authenticated;
 import roomescape.presentation.request.CreateReservationAdminRequest;
@@ -36,7 +36,7 @@ public class ReservationController {
     @ResponseStatus(CREATED)
     public ReservationResponse createReservationWithUserPrivileges(@Authenticated final User user,
                                                                    @RequestBody @Valid final CreateReservationRequest request) {
-        Reservation reservation = reservationService.saveReservationWithPurchase(user.getId(), request.date(),
+        Reserved reservation = reservationService.saveReservationWithPurchase(user.getId(), request.date(),
                 request.timeId(), request.themeId(), request.toPaymentInfo());
 
         return ReservationResponse.fromReservation(reservation);
@@ -46,7 +46,7 @@ public class ReservationController {
     @ResponseStatus(CREATED)
     public ReservationResponse createReservationWithAdminPrivileges(
             @RequestBody @Valid final CreateReservationAdminRequest request) {
-        Reservation reservation = reservationService.saveReservationWithoutPurchase(request.userId(), request.date(),
+        Reserved reservation = reservationService.saveReservationWithoutPurchase(request.userId(), request.date(),
                 request.timeId(), request.themeId());
 
         return ReservationResponse.fromReservation(reservation);
@@ -59,7 +59,7 @@ public class ReservationController {
             @RequestParam(name = "dateFrom", required = false) final LocalDate dateFrom,
             @RequestParam(name = "dateTo", required = false) final LocalDate dateTo) {
         ReservationSearchFilter searchFilter = new ReservationSearchFilter(themeId, userId, dateFrom, dateTo);
-        List<Reservation> reservations = reservationService.findReservationsByFilter(searchFilter);
+        List<Reserved> reservations = reservationService.findReservationsByFilter(searchFilter);
 
         return ReservationResponse.fromReservations(reservations);
     }

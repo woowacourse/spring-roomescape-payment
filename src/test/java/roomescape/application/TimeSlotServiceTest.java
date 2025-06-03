@@ -27,8 +27,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.reservation.reserved.Reserved;
+import roomescape.domain.reservation.reserved.ReservedRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.timeslot.AvailableTimeSlot;
 import roomescape.domain.timeslot.TimeSlot;
@@ -41,7 +41,7 @@ import roomescape.exception.NotFoundException;
 public class TimeSlotServiceTest {
 
     @Mock
-    ReservationRepository reservationRepository;
+    ReservedRepository reservationRepository;
 
     @Mock
     TimeSlotRepository timeSlotRepository;
@@ -133,9 +133,9 @@ public class TimeSlotServiceTest {
             );
         }
 
-        private List<Reservation> toDummyReservation(LocalDate date, List<TimeSlot> timeSlots, Theme theme) {
+        private List<Reserved> toDummyReservation(LocalDate date, List<TimeSlot> timeSlots, Theme theme) {
             return timeSlots.stream()
-                    .map(timeSlot -> Reservation.register(mock(User.class), date, timeSlot, theme))
+                    .map(timeSlot -> Reserved.register(mock(User.class), date, timeSlot, theme))
                     .toList();
         }
     }

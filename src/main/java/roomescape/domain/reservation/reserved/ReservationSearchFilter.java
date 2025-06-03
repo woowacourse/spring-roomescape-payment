@@ -1,4 +1,4 @@
-package roomescape.domain.reservation;
+package roomescape.domain.reservation.reserved;
 
 import jakarta.annotation.Nullable;
 import java.time.LocalDate;

@@ -1,4 +1,4 @@
-package roomescape.domain.waiting;
+package roomescape.domain.reservation.waiting;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -13,7 +13,7 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
     Optional<Waiting> findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(LocalDate date, long timeSlotId, long themeId);
 
     @Query("""
-                SELECT new roomescape.domain.waiting.WaitingWithRank(
+                SELECT new roomescape.domain.reservation.waiting.WaitingWithRank(
                     w,
                     (
                         SELECT COUNT(w2)

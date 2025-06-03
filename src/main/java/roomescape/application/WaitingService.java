@@ -9,11 +9,13 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.event.ReservationCancelledEvent;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
+import roomescape.domain.reservation.reserved.Reserved;
+import roomescape.domain.reservation.reserved.ReservedRepository;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.timeslot.TimeSlotRepository;
 import roomescape.domain.user.User;
-import roomescape.domain.waiting.Waiting;
-import roomescape.domain.waiting.WaitingRepository;
+import roomescape.domain.reservation.waiting.Waiting;
+import roomescape.domain.reservation.waiting.WaitingRepository;
 import roomescape.exception.AlreadyExistedException;
 import roomescape.exception.BusinessRuleViolationException;
 import roomescape.exception.NotFoundException;
@@ -23,7 +25,7 @@ import roomescape.exception.NotFoundException;
 public class WaitingService {
 
     private final WaitingRepository waitingRepository;
-    private final ReservationRepository reservationRepository;
+    private final ReservedRepository reservedRepository;
     private final TimeSlotRepository timeSlotRepository;
     private final ThemeRepository themeRepository;
 
@@ -84,7 +86,7 @@ public class WaitingService {
                                             final long themeId,
                                             final long userId) {
         boolean isAlreadyReserved =
-                reservationRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(date, timeSlotId, themeId, userId);
+                reservedRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(date, timeSlotId, themeId, userId);
 
         if (isAlreadyReserved) {
             throw new BusinessRuleViolationException("해당 테마의 시간대에 이미 예약되어 있습니다.");

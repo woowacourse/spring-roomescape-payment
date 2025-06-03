@@ -6,8 +6,8 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.reservation.reserved.Reserved;
+import roomescape.domain.reservation.reserved.ReservedRepository;
 import roomescape.domain.timeslot.AvailableTimeSlot;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.timeslot.TimeSlotRepository;
@@ -18,7 +18,7 @@ import roomescape.exception.NotFoundException;
 @RequiredArgsConstructor
 public class TimeSlotService {
 
-    private final ReservationRepository reservationRepository;
+    private final ReservedRepository reservationRepository;
     private final TimeSlotRepository timeSlotRepository;
 
     @Transactional
@@ -68,10 +68,10 @@ public class TimeSlotService {
     }
 
     private List<TimeSlot> findReservedTimeSlots(LocalDate date, long themeId) {
-        List<Reservation> reservations = reservationRepository.findByDateAndThemeId(date, themeId);
+        List<Reserved> reservations = reservationRepository.findByDateAndThemeId(date, themeId);
 
         return reservations.stream()
-                .map(Reservation::getTimeSlot)
+                .map(Reserved::getTimeSlot)
                 .toList();
     }
 }

@@ -5,7 +5,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.user.User;
-import roomescape.domain.waiting.Waiting;
+import roomescape.domain.reservation.waiting.Waiting;
 
 public class WaitingFixture {
 

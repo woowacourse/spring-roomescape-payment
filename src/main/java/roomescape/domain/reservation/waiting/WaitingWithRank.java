@@ -1,4 +1,4 @@
-package roomescape.domain.waiting;
+package roomescape.domain.reservation.waiting;
 
 import lombok.Getter;
 

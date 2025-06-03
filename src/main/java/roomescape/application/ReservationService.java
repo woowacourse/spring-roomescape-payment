@@ -2,24 +2,21 @@ package roomescape.application;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.event.ReservationCancelledEvent;
 import roomescape.application.request.PaymentInfo;
-import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationRepository;
-import roomescape.domain.reservation.ReservationSearchFilter;
+import roomescape.domain.reservation.reserved.Reserved;
+import roomescape.domain.reservation.reserved.ReservedRepository;
+import roomescape.domain.reservation.reserved.ReservationSearchFilter;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.timeslot.TimeSlotRepository;
 import roomescape.domain.user.User;
 import roomescape.domain.user.UserRepository;
-import roomescape.domain.waiting.Waiting;
-import roomescape.domain.waiting.WaitingRepository;
 import roomescape.exception.AlreadyExistedException;
 import roomescape.exception.NotFoundException;
 import roomescape.infrastructure.ReservationSpecifications;
@@ -28,8 +25,7 @@ import roomescape.infrastructure.ReservationSpecifications;
 @RequiredArgsConstructor
 public class ReservationService {
 
-    private final ReservationRepository reservationRepository;
-    private final WaitingRepository waitingRepository;
+    private final ReservedRepository reservedRepository;
     private final TimeSlotRepository timeSlotRepository;
     private final ThemeRepository themeRepository;
     private final UserRepository userRepository;
@@ -38,54 +34,59 @@ public class ReservationService {
     
 
     @Transactional
-    public Reservation saveReservationWithPurchase(final long userId, final LocalDate date, final long timeId,
-                                                   final long themeId, final PaymentInfo paymentInfo) {
-        Reservation reservation = registerReservation(userId, date, timeId, themeId);
-        reservation.registerPayment(paymentService.savePayment(paymentInfo));
+    public Reserved saveReservationWithPurchase(final long userId, final LocalDate date, final long timeId,
+                                                final long themeId, final PaymentInfo paymentInfo) {
+        Reserved reserved = registerReservation(userId, date, timeId, themeId);
+        reserved.registerPayment(paymentService.savePayment(paymentInfo));
 
-        return reservation;
+        return reserved;
     }
 
     @Transactional
-    public Reservation saveReservationWithoutPurchase(final long userId, final LocalDate date, final long timeId,
-                                                      final long themeId) {
+    public Reserved saveReservationWithoutPurchase(final long userId, final LocalDate date, final long timeId,
+                                                   final long themeId) {
         return registerReservation(userId, date, timeId, themeId);
     }
 
     @Transactional(readOnly = true)
-    public List<Reservation> findReservationsByFilter(ReservationSearchFilter filter) {
-        return reservationRepository.findAll(ReservationSpecifications.byFilter(filter));
+    public List<Reserved> findReservationsByFilter(ReservationSearchFilter filter) {
+        return reservedRepository.findAll(ReservationSpecifications.byFilter(filter));
+    }
+
+    @Transactional(readOnly = true)
+    public Reserved findById(final long id) {
+        return reservedRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 예약입니다."));
     }
 
     @Transactional
     public void removeById(final long id) {
-        Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 예약입니다."));
+        Reserved reserved = findById(id);
 
         eventPublisher.publishEvent(
                 new ReservationCancelledEvent(
                         this,
-                        reservation.getDate(),
-                        reservation.getTimeSlot().getId(),
-                        reservation.getTheme().getId()
+                        reserved.getDate(),
+                        reserved.getTimeSlot().getId(),
+                        reserved.getTheme().getId()
                 )
         );
 
-        reservationRepository.deleteById(id);
+        reservedRepository.deleteById(id);
     }
 
-    private Reservation registerReservation(final long userId, final LocalDate date, final long timeId,
-                                            final long themeId) {
+    private Reserved registerReservation(final long userId, final LocalDate date, final long timeId,
+                                         final long themeId) {
         User user = getUserById(userId);
         TimeSlot timeSlot = getTimeSlotById(timeId);
         Theme theme = getThemeById(themeId);
         validateDuplicateReservation(date, timeSlot, theme);
 
-        return reservationRepository.save(Reservation.register(user, date, timeSlot, theme));
+        return reservedRepository.save(Reserved.register(user, date, timeSlot, theme));
     }
 
     private void validateDuplicateReservation(final LocalDate date, final TimeSlot timeSlot, final Theme theme) {
-        boolean hasDuplicatedReservation = reservationRepository.existsByDateAndTimeSlotIdAndThemeId(date,
+        boolean hasDuplicatedReservation = reservedRepository.existsByDateAndTimeSlotIdAndThemeId(date,
                 timeSlot.getId(), theme.getId());
 
         if (hasDuplicatedReservation) {

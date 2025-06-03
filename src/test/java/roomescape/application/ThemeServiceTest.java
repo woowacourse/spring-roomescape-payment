@@ -21,7 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
-import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.reservation.reserved.ReservedRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.InUseException;
@@ -31,7 +31,7 @@ import roomescape.exception.NotFoundException;
 public class ThemeServiceTest {
 
     @Mock
-    ReservationRepository reservationRepository;
+    ReservedRepository reservationRepository;
 
     @Mock
     ThemeRepository themeRepository;

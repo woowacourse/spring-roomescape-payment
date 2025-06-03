@@ -26,17 +26,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.domain.payment.Payment;
-import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.reservation.reserved.Reserved;
+import roomescape.domain.reservation.reserved.ReservedRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.user.User;
 import roomescape.domain.user.UserRepository;
-import roomescape.domain.waiting.WaitingRepository;
-import roomescape.domain.waiting.WaitingWithRank;
+import roomescape.domain.reservation.waiting.WaitingRepository;
+import roomescape.domain.reservation.waiting.WaitingWithRank;
 import roomescape.exception.AlreadyExistedException;
 import roomescape.exception.NotFoundException;
-import roomescape.presentation.response.UserReservedRecordsResponse;
+import roomescape.presentation.response.UserReservationRecordsResponse;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -45,7 +45,7 @@ public class UserServiceTest {
     UserRepository userRepository;
 
     @Mock
-    ReservationRepository reservationRepository;
+    ReservedRepository reservationRepository;
 
     @Mock
     WaitingRepository waitingRepository;
@@ -131,7 +131,7 @@ public class UserServiceTest {
             Payment payment = CREATE_PAYMENT_1();
             LocalDate date = LocalDate.now().plusDays(1);
 
-            List<Reservation> reservations = List.of(
+            List<Reserved> reservations = List.of(
                     CREATE_RESERVATION_OF(1L, user, date, timeSlot1, theme1, payment)
             );
 
@@ -139,16 +139,16 @@ public class UserServiceTest {
                     new WaitingWithRank(CREATE_WAITING_OF(1L, user, date, timeSlot2, theme2), 2)
             );
 
-            List<UserReservedRecordsResponse> expectedResponses = new ArrayList<>();
-            expectedResponses.addAll(UserReservedRecordsResponse.fromReservations(reservations));
-            expectedResponses.addAll(UserReservedRecordsResponse.fromWaitingsWithRank(waitings));
+            List<UserReservationRecordsResponse> expectedResponses = new ArrayList<>();
+            expectedResponses.addAll(UserReservationRecordsResponse.fromReservations(reservations));
+            expectedResponses.addAll(UserReservationRecordsResponse.fromWaitingsWithRank(waitings));
 
             when(userRepository.existsById(userId)).thenReturn(true);
             when(reservationRepository.findByUserId(userId)).thenReturn(reservations);
             when(waitingRepository.findWaitingWithRankByUserId(userId)).thenReturn(waitings);
 
             // when
-            List<UserReservedRecordsResponse> actualResponses = userService.findTotalRecordByUserId(userId);
+            List<UserReservationRecordsResponse> actualResponses = userService.findTotalRecordByUserId(userId);
 
             // then
             assertAll(

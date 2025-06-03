@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import roomescape.presentation.response.WaitingResponse;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -53,17 +54,19 @@ class WaitingControllerTest {
                 .then().statusCode(200)
                 .extract().response().getDetailedCookies().getValue("token");
 
-        RestAssured.given().log().all()
+        WaitingResponse response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .cookie("token", token) // 쿠키로 인증 정보 전달
                 .body(RESERVATION_BODY)
                 .when().post("/waitings")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value())
-                .body("date", Matchers.equalTo("3000-03-17"));
+                .body("date", Matchers.equalTo("3000-03-17"))
+                .extract()
+                .body().as(WaitingResponse.class);
 
         RestAssured.given().log().all()
-                .when().delete("/waitings/1")
+                .when().delete("/waitings/" + response.id())
                 .then().log().all()
                 .statusCode(HttpStatus.NO_CONTENT.value());
     }

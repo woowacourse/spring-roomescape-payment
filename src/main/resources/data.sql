@@ -41,17 +41,17 @@ VALUES
     ( 12, 'payment_key_test_12', 'ROOM_ESCAPE_test_12', '방탈출 예약 결제 1건', 2000);
 
 
-INSERT INTO RESERVATION (user_id, date, time_slot_id, theme_id, payment_id)
-VALUES 
-       (2, CURRENT_DATE - 5, 1, 3, 1),
-       (3, CURRENT_DATE - 5, 5, 3, 2),
-       (2, CURRENT_DATE - 4, 1, 3, 3),
-       (3, CURRENT_DATE - 4, 2, 2, 4),
-       (2, CURRENT_DATE - 3, 3, 3, 5),
-       (3, CURRENT_DATE - 3, 5, 2, 6),
-       (2, CURRENT_DATE - 2, 1, 2, 7),
-       (3, CURRENT_DATE - 2, 3, 1, 8),
-       (2, CURRENT_DATE - 1, 2, 4, 9),
-       (3, CURRENT_DATE - 1, 4, 5, 10),
-       (2, CURRENT_DATE, 3, 6, 11),
-       (3, CURRENT_DATE, 5, 6, 12);
+INSERT INTO RESERVATION (user_id, date, time_slot_id, theme_id, payment_id, reservation_type)
+VALUES
+    (2, CURRENT_DATE - 5, 1, 3, 1, 'RESERVED'),
+    (3, CURRENT_DATE - 5, 5, 3, 2, 'RESERVED'),
+    (2, CURRENT_DATE - 4, 1, 3, 3, 'RESERVED'),
+    (3, CURRENT_DATE - 4, 2, 2, 4, 'RESERVED'),
+    (2, CURRENT_DATE - 3, 3, 3, 5, 'RESERVED'),
+    (3, CURRENT_DATE - 3, 5, 2, 6, 'RESERVED'),
+    (2, CURRENT_DATE - 2, 1, 2, 7, 'RESERVED'),
+    (3, CURRENT_DATE - 2, 3, 1, 8, 'RESERVED'),
+    (2, CURRENT_DATE - 1, 2, 4, 9, 'RESERVED'),
+    (3, CURRENT_DATE - 1, 4, 5, 10, 'RESERVED'),
+    (2, CURRENT_DATE, 3, 6, 11, 'RESERVED'),
+    (3, CURRENT_DATE, 5, 6, 12, 'RESERVED');

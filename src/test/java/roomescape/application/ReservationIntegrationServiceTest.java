@@ -11,9 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationRepository;
-import roomescape.domain.reservation.ReservationSearchFilter;
+import roomescape.domain.reservation.reserved.Reserved;
+import roomescape.domain.reservation.reserved.ReservedRepository;
+import roomescape.domain.reservation.reserved.ReservationSearchFilter;
 import roomescape.exception.AlreadyExistedException;
 import roomescape.exception.BusinessRuleViolationException;
 
@@ -26,7 +26,7 @@ class ReservationIntegrationServiceTest {
     private ReservationService service;
 
     @Autowired
-    private ReservationRepository reservationRepository;
+    private ReservedRepository reservedRepository;
 
     @Test
     @DisplayName("예약을 추가할 수 있다.")
@@ -35,10 +35,10 @@ class ReservationIntegrationServiceTest {
         var tomorrow = LocalDate.now().plusDays(1);
 
         // when
-        Reservation reserved = service.saveReservationWithoutPurchase(2L, tomorrow, 2L, 2L);
+        Reserved reserved = service.saveReservationWithoutPurchase(2L, tomorrow, 2L, 2L);
 
         // then
-        var reservations = reservationRepository.findAll();
+        var reservations = reservedRepository.findAll();
         assertThat(reservations).contains(reserved);
     }
 
@@ -96,7 +96,7 @@ class ReservationIntegrationServiceTest {
         service.removeById(1L);
 
         // then
-        var reservations = reservationRepository.findAll();
+        var reservations = reservedRepository.findAll();
         assertThat(reservations.getFirst().getId()).isEqualTo(2L);
     }
 }

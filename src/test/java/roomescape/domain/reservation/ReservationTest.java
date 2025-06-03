@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
+import roomescape.domain.reservation.reserved.Reserved;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.user.User;
@@ -28,7 +29,7 @@ class ReservationTest {
         var pastDate = LocalDate.now().minusDays(1);
 
         // when & then
-        assertThatThrownBy(() -> Reservation.register(user, pastDate, timeSlot, theme))
+        assertThatThrownBy(() -> Reserved.register(user, pastDate, timeSlot, theme))
                 .isInstanceOf(BusinessRuleViolationException.class)
                 .hasMessage("이전 날짜로 예약할 수 없습니다.");
     }
@@ -43,7 +44,7 @@ class ReservationTest {
         var theme = createTheme();
 
         // when & then
-        assertThatThrownBy(() -> Reservation.register(user, date, timeSlot, theme))
+        assertThatThrownBy(() -> Reserved.register(user, date, timeSlot, theme))
                 .isInstanceOf(BusinessRuleViolationException.class)
                 .hasMessage("사용자 정보는 null일 수 없습니다.");
     }
@@ -58,7 +59,7 @@ class ReservationTest {
         var theme = createTheme();
 
         // when & then
-        assertThatThrownBy(() -> Reservation.register(user, date, timeSlot, theme))
+        assertThatThrownBy(() -> Reserved.register(user, date, timeSlot, theme))
                 .isInstanceOf(BusinessRuleViolationException.class)
                 .hasMessage("예약 날짜는 null일 수 없습니다.");
     }
@@ -73,7 +74,7 @@ class ReservationTest {
         var theme = createTheme();
 
         // when & then
-        assertThatThrownBy(() -> Reservation.register(user, date, timeSlot, theme))
+        assertThatThrownBy(() -> Reserved.register(user, date, timeSlot, theme))
                 .isInstanceOf(BusinessRuleViolationException.class)
                 .hasMessage("시간 정보는 null일 수 없습니다.");
     }
@@ -88,7 +89,7 @@ class ReservationTest {
         var timeSlot = createTimeSlot();
 
         // when & then
-        assertThatThrownBy(() -> Reservation.register(user, date, timeSlot, theme))
+        assertThatThrownBy(() -> Reserved.register(user, date, timeSlot, theme))
                 .isInstanceOf(BusinessRuleViolationException.class)
                 .hasMessage("테마 정보는 null일 수 없습니다.");
     }
@@ -103,15 +104,15 @@ class ReservationTest {
         var theme = createTheme();
 
         // when
-        Reservation reservation = Reservation.register(user, date, timeSlot, theme);
+        Reserved reserved = Reserved.register(user, date, timeSlot, theme);
 
         // then
         assertAll(
-                () -> assertThat(reservation).isNotNull(),
-                () -> assertThat(reservation.getUser()).isEqualTo(user),
-                () -> assertThat(reservation.getDate()).isEqualTo(date),
-                () -> assertThat(reservation.getTimeSlot()).isEqualTo(timeSlot),
-                () -> assertThat(reservation.getTheme()).isEqualTo(theme)
+                () -> assertThat(reserved).isNotNull(),
+                () -> assertThat(reserved.getUser()).isEqualTo(user),
+                () -> assertThat(reserved.getDate()).isEqualTo(date),
+                () -> assertThat(reserved.getTimeSlot()).isEqualTo(timeSlot),
+                () -> assertThat(reserved.getTheme()).isEqualTo(theme)
         );
 
     }
