@@ -11,6 +11,7 @@ import roomescape.auth.jwt.JwtUtil;
 import roomescape.business.model.entity.User;
 import roomescape.exception.auth.AuthenticationException;
 import roomescape.infrastructure.UserRepository;
+import roomescape.presentation.dto.request.LoginRequest;
 
 @Service
 @Transactional
@@ -20,11 +21,11 @@ public class AuthService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
-    public AuthToken authenticate(final String email, final String password) {
-        final User user = userRepository.findByEmail_Value(email)
+    public AuthToken authenticate(LoginRequest request) {
+        final User user = userRepository.findByEmail_Value(request.email())
                 .orElseThrow(() -> new AuthenticationException(INVALID_EMAIL));
 
-        if (!user.isPasswordCorrect(password)) {
+        if (!user.isPasswordCorrect(request.password())) {
             throw new AuthenticationException(INVALID_PASSWORD);
         }
 

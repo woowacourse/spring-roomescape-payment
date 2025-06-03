@@ -32,7 +32,7 @@ public class ReservationTimeApiController {
     @Role(UserRole.ADMIN)
     public ResponseEntity<ReservationTimeResponse> createReservationTime(
             @RequestBody @Valid ReservationTimeRequest request) {
-        ReservationTimeResponse response = reservationTimeService.addAndGet(request.startAtToLocalTime());
+        ReservationTimeResponse response = reservationTimeService.addAndGet(request);
         return ResponseEntity.created(URI.create("/times/" + response.id())).body(response);
     }
 

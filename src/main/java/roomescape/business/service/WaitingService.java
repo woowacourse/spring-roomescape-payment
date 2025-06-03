@@ -2,11 +2,11 @@ package roomescape.business.service;
 
 import static roomescape.exception.ErrorCode.RESERVATION_DUPLICATED;
 
-import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.auth.LoginInfo;
 import roomescape.business.model.entity.ReservationTime;
 import roomescape.business.model.entity.Theme;
 import roomescape.business.model.entity.User;
@@ -20,6 +20,7 @@ import roomescape.infrastructure.ReservationTimeRepository;
 import roomescape.infrastructure.ThemeRepository;
 import roomescape.infrastructure.UserRepository;
 import roomescape.infrastructure.WaitingRepository;
+import roomescape.presentation.dto.request.WaitingRequest;
 import roomescape.presentation.dto.response.WaitingResponse;
 import roomescape.presentation.dto.response.WaitingWithRankReponse;
 
@@ -34,20 +35,20 @@ public class WaitingService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final WaitingRepository waitingRepository;
 
-    public WaitingResponse createWaiting(final LocalDate date, final String timeIdValue, final String themeIdValue,
-                                         final String userIdValue) {
-        User user = userRepository.findById(Id.create(userIdValue))
+    public WaitingResponse createWaiting(LoginInfo loginInfo, WaitingRequest request) {
+        User user = userRepository.findById(Id.create(loginInfo.id()))
                 .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_EXIST));
-        ReservationTime time = reservationTimeRepository.findById(Id.create(timeIdValue))
+        ReservationTime time = reservationTimeRepository.findById(Id.create(request.timeId()))
                 .orElseThrow(() -> new NotFoundException(ErrorCode.RESERVATION_TIME_NOT_EXIST));
-        Theme theme = themeRepository.findById(Id.create(themeIdValue))
+        Theme theme = themeRepository.findById(Id.create(request.themeId()))
                 .orElseThrow(() -> new NotFoundException(ErrorCode.THEME_NOT_EXIST));
 
-        if (reservationRepository.existsByDate_ValueAndTime_StartTime_ValueAndThemeId(date, time.startTimeValue(),
+        if (reservationRepository.existsByDate_ValueAndTime_StartTime_ValueAndThemeId(request.date(),
+                time.startTimeValue(),
                 theme.getId())) {
             throw new DuplicatedException(RESERVATION_DUPLICATED);
         }
-        Waiting waiting = Waiting.create(user, date, time, theme);
+        Waiting waiting = Waiting.create(user, request.date(), time, theme);
         waitingRepository.save(waiting);
         return WaitingResponse.from(waiting);
     }

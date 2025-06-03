@@ -16,6 +16,7 @@ import roomescape.exception.business.NotFoundException;
 import roomescape.exception.business.RelatedEntityExistException;
 import roomescape.infrastructure.ReservationRepository;
 import roomescape.infrastructure.ThemeRepository;
+import roomescape.presentation.dto.request.ThemeCreateRequest;
 import roomescape.presentation.dto.response.ThemeResponse;
 
 @Service
@@ -30,8 +31,8 @@ public class ThemeService {
     private final ThemeRepository themeRepository;
     private final ReservationRepository reservationRepository;
 
-    public ThemeResponse addAndGet(final String name, final String description, final String thumbnail) {
-        Theme theme = Theme.create(name, description, thumbnail);
+    public ThemeResponse addAndGet(ThemeCreateRequest request) {
+        Theme theme = Theme.create(request.name(), request.description(), request.thumbnail());
         themeRepository.save(theme);
         return ThemeResponse.from(theme);
     }

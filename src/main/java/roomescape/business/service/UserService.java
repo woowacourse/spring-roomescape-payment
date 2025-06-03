@@ -12,6 +12,7 @@ import roomescape.business.model.vo.Id;
 import roomescape.exception.business.InvalidCreateArgumentException;
 import roomescape.exception.business.NotFoundException;
 import roomescape.infrastructure.UserRepository;
+import roomescape.presentation.dto.request.RegisterRequest;
 import roomescape.presentation.dto.response.UserResponse;
 
 @Service
@@ -21,11 +22,11 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public UserResponse register(final String name, final String email, final String password) {
-        if (userRepository.existsByEmail_Value(email)) {
+    public UserResponse register(RegisterRequest request) {
+        if (userRepository.existsByEmail_Value(request.email())) {
             throw new InvalidCreateArgumentException(EMAIL_DUPLICATED);
         }
-        User user = User.create(name, email, password);
+        User user = User.create(request.name(), request.email(), request.password());
         userRepository.save(user);
         return UserResponse.from(user);
     }

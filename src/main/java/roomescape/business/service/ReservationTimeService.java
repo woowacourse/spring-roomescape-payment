@@ -6,7 +6,6 @@ import static roomescape.exception.ErrorCode.RESERVATION_TIME_INTERVAL_INVALID;
 import static roomescape.exception.ErrorCode.RESERVED_RESERVATION_TIME;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +18,7 @@ import roomescape.exception.business.NotFoundException;
 import roomescape.exception.business.RelatedEntityExistException;
 import roomescape.infrastructure.ReservationRepository;
 import roomescape.infrastructure.ReservationTimeRepository;
+import roomescape.presentation.dto.request.ReservationTimeRequest;
 import roomescape.presentation.dto.response.ReservationTimeResponse;
 import roomescape.presentation.dto.response.ReservationTimeResponseWithBooked;
 
@@ -30,8 +30,8 @@ public class ReservationTimeService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ReservationRepository reservationRepository;
 
-    public ReservationTimeResponse addAndGet(final LocalTime time) {
-        ReservationTime reservationTime = ReservationTime.create(time);
+    public ReservationTimeResponse addAndGet(final ReservationTimeRequest request) {
+        ReservationTime reservationTime = ReservationTime.create(request.startAtToLocalTime());
         validateNoDuplication(reservationTime);
         validateTimeInterval(reservationTime);
 

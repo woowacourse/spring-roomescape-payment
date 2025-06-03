@@ -24,7 +24,7 @@ public class AuthApiController {
 
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody @Valid LoginRequest request) {
-        AuthToken authToken = authService.authenticate(request.email(), request.password());
+        AuthToken authToken = authService.authenticate(request);
         return ResponseEntity.noContent().headers(authToken.toHttpHeaders()).build();
     }
 

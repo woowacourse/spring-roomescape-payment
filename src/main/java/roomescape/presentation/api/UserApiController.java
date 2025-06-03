@@ -30,7 +30,7 @@ public class UserApiController {
 
     @PostMapping("/members")
     public ResponseEntity<UserResponse> register(@RequestBody RegisterRequest request) {
-        final UserResponse response = userService.register(request.name(), request.email(), request.password());
+        final UserResponse response = userService.register(request);
         return ResponseEntity.created(URI.create("/members")).body(response);
     }
 }

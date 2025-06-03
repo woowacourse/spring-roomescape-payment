@@ -19,6 +19,7 @@ import roomescape.auth.jwt.JwtUtil;
 import roomescape.business.model.entity.User;
 import roomescape.exception.auth.AuthenticationException;
 import roomescape.infrastructure.UserRepository;
+import roomescape.presentation.dto.request.LoginRequest;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -40,12 +41,12 @@ class AuthServiceTest {
         String encodedPassword = new BCryptPasswordEncoder().encode(password);
         User user = User.restore("user-id", "USER", "Test User", email, encodedPassword);
         AuthToken expectedAuth = mock(AuthToken.class);
-
+        LoginRequest request = new LoginRequest(email, password);
         when(userRepository.findByEmail_Value(email)).thenReturn(Optional.of(user));
         when(jwtUtil.createToken(user)).thenReturn(expectedAuth);
 
         // when
-        AuthToken result = sut.authenticate(email, password);
+        AuthToken result = sut.authenticate(request);
 
         // then
         assertThat(result).isEqualTo(expectedAuth);
@@ -58,11 +59,11 @@ class AuthServiceTest {
         // given
         String email = "nonexistent@example.com";
         String password = "password123";
-
+        LoginRequest request = new LoginRequest(email, password);
         when(userRepository.findByEmail_Value(email)).thenReturn(Optional.empty());
 
         // when, then
-        assertThatThrownBy(() -> sut.authenticate(email, password))
+        assertThatThrownBy(() -> sut.authenticate(request))
                 .isInstanceOf(AuthenticationException.class);
 
         verify(userRepository).findByEmail_Value(email);
@@ -74,6 +75,7 @@ class AuthServiceTest {
         // given
         String email = "test@example.com";
         String wrongPassword = "wrongPassword";
+        LoginRequest request = new LoginRequest(email, wrongPassword);
         String correctPassword = "correctPassword";
         String encodedPassword = new BCryptPasswordEncoder().encode(correctPassword);
         User user = User.restore("user-id", "USER", "Test User", email, encodedPassword);
@@ -81,7 +83,7 @@ class AuthServiceTest {
         when(userRepository.findByEmail_Value(email)).thenReturn(Optional.of(user));
 
         // when, then
-        assertThatThrownBy(() -> sut.authenticate(email, wrongPassword))
+        assertThatThrownBy(() -> sut.authenticate(request))
                 .isInstanceOf(AuthenticationException.class);
 
         verify(userRepository).findByEmail_Value(email);

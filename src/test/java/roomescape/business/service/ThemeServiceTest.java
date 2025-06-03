@@ -22,6 +22,7 @@ import roomescape.exception.business.NotFoundException;
 import roomescape.exception.business.RelatedEntityExistException;
 import roomescape.infrastructure.ReservationRepository;
 import roomescape.infrastructure.ThemeRepository;
+import roomescape.presentation.dto.request.ThemeCreateRequest;
 import roomescape.presentation.dto.response.ThemeResponse;
 
 @ExtendWith(MockitoExtension.class)
@@ -42,9 +43,9 @@ class ThemeServiceTest {
         String name = "주홍색 연구";
         String description = "셜록 홈즈의 첫 번째 사건";
         String thumbnail = "thumbnail.jpg";
-
+        ThemeCreateRequest request = new ThemeCreateRequest(name, description, thumbnail);
         // when
-        ThemeResponse result = sut.addAndGet(name, description, thumbnail);
+        ThemeResponse result = sut.addAndGet(request);
 
         // then
         assertThat(result).isNotNull();

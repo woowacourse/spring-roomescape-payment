@@ -24,6 +24,7 @@ import roomescape.exception.business.NotFoundException;
 import roomescape.exception.business.RelatedEntityExistException;
 import roomescape.infrastructure.ReservationRepository;
 import roomescape.infrastructure.ReservationTimeRepository;
+import roomescape.presentation.dto.request.ReservationTimeRequest;
 import roomescape.presentation.dto.response.ReservationTimeResponse;
 import roomescape.presentation.dto.response.ReservationTimeResponseWithBooked;
 
@@ -43,13 +44,14 @@ class ReservationTimeServiceTest {
     void 예약_시간을_추가하고_반환한다() {
         // given
         LocalTime time = LocalTime.of(10, 0);
+        ReservationTimeRequest request = new ReservationTimeRequest(String.valueOf(time));
 
         when(reservationTimeRepository.existsByStartTime_Value(time)).thenReturn(false);
         when(reservationTimeRepository.existsByStartTime_ValueBetween(any(LocalTime.class),
                 any(LocalTime.class))).thenReturn(false);
 
         // when
-        ReservationTimeResponse result = sut.addAndGet(time);
+        ReservationTimeResponse result = sut.addAndGet(request);
 
         // then
         assertThat(result).isNotNull();
@@ -63,11 +65,12 @@ class ReservationTimeServiceTest {
     void 중복된_시간으로_예약_시간_추가_시_예외가_발생한다() {
         // given
         LocalTime time = LocalTime.of(10, 0);
+        ReservationTimeRequest request = new ReservationTimeRequest(String.valueOf(time));
 
         when(reservationTimeRepository.existsByStartTime_Value(time)).thenReturn(true);
 
         // when, then
-        assertThatThrownBy(() -> sut.addAndGet(time))
+        assertThatThrownBy(() -> sut.addAndGet(request))
                 .isInstanceOf(DuplicatedException.class);
 
         verify(reservationTimeRepository).existsByStartTime_Value(time);
@@ -80,13 +83,14 @@ class ReservationTimeServiceTest {
     void 시간_간격이_겹치는_예약_시간_추가_시_예외가_발생한다() {
         // given
         LocalTime time = LocalTime.of(10, 0);
+        ReservationTimeRequest request = new ReservationTimeRequest(String.valueOf(time));
 
         when(reservationTimeRepository.existsByStartTime_Value(time)).thenReturn(false);
         when(reservationTimeRepository.existsByStartTime_ValueBetween(any(LocalTime.class),
                 any(LocalTime.class))).thenReturn(true);
 
         // when, then
-        assertThatThrownBy(() -> sut.addAndGet(time))
+        assertThatThrownBy(() -> sut.addAndGet(request))
                 .isInstanceOf(InvalidCreateArgumentException.class);
 
         verify(reservationTimeRepository).existsByStartTime_Value(time);

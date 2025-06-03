@@ -22,6 +22,7 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import roomescape.auth.LoginInfo;
 import roomescape.business.model.entity.Reservation;
 import roomescape.business.model.entity.ReservationTime;
 import roomescape.business.model.entity.Theme;
@@ -35,6 +36,9 @@ import roomescape.infrastructure.ThemeRepository;
 import roomescape.infrastructure.UserRepository;
 import roomescape.infrastructure.payment.PaymentClient;
 import roomescape.infrastructure.payment.dto.PaymentApproveRequest;
+import roomescape.presentation.dto.request.AdminReservationRequest;
+import roomescape.presentation.dto.request.ReservationCondition;
+import roomescape.presentation.dto.request.ReservationRequest;
 import roomescape.presentation.dto.response.ReservationResponse;
 import roomescape.presentation.dto.response.ReservationTimeResponse;
 import roomescape.presentation.dto.response.ThemeResponse;
@@ -72,12 +76,12 @@ class ReservationServiceTest {
         String themeId = "theme-id";
         String userIdValue = "nonexistent-id";
         Id userId = Id.create(userIdValue);
-
+        AdminReservationRequest request = new AdminReservationRequest(date, timeId, themeId, userIdValue);
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // when, then
         assertThatThrownBy(
-                () -> sut.addAndGetWithoutPayment(date, timeId, themeId, userIdValue))
+                () -> sut.addAndGetWithoutPayment(request))
                 .isInstanceOf(NotFoundException.class);
 
         verify(userRepository).findById(userId);
@@ -93,14 +97,14 @@ class ReservationServiceTest {
         String timeId = "nonexistent-time-id";
         String themeId = "theme-id";
         String userId = "user-id";
-
+        AdminReservationRequest request = new AdminReservationRequest(date, timeId, themeId, userId);
         User user = User.restore(userId, "USER", "Test User", "test@example.com", "password");
 
         when(userRepository.findById(Id.create(userId))).thenReturn(Optional.of(user));
         when(reservationTimeRepository.findById(Id.create(timeId))).thenReturn(Optional.empty());
 
         // when, then
-        assertThatThrownBy(() -> sut.addAndGetWithoutPayment(date, timeId, themeId, userId))
+        assertThatThrownBy(() -> sut.addAndGetWithoutPayment(request))
                 .isInstanceOf(NotFoundException.class);
 
         verify(userRepository).findById(Id.create(userId));
@@ -119,7 +123,7 @@ class ReservationServiceTest {
         Id timeId = Id.create(timeIdValue);
         Id themeId = Id.create(themeIdValue);
         Id userId = Id.create(userIdValue);
-
+        AdminReservationRequest request = new AdminReservationRequest(date, timeIdValue, themeIdValue, userIdValue);
         User user = User.restore(userIdValue, "USER", "Test User", "test@example.com", "password");
         ReservationTime reservationTime = ReservationTime.restore(timeIdValue, LocalTime.of(10, 0));
 
@@ -128,7 +132,7 @@ class ReservationServiceTest {
         when(themeRepository.findById(themeId)).thenReturn(Optional.empty());
 
         // when, then
-        assertThatThrownBy(() -> sut.addAndGetWithoutPayment(date, timeIdValue, themeIdValue, userIdValue))
+        assertThatThrownBy(() -> sut.addAndGetWithoutPayment(request))
                 .isInstanceOf(NotFoundException.class);
 
         verify(userRepository).findById(userId);
@@ -147,7 +151,7 @@ class ReservationServiceTest {
         Id timeId = Id.create(timeIdValue);
         Id themeId = Id.create(themeIdValue);
         Id userId = Id.create(userIdValue);
-
+        AdminReservationRequest request = new AdminReservationRequest(date, timeIdValue, themeIdValue, userIdValue);
         User user = User.restore(userIdValue, "USER", "Test User", "test@example.com", "password");
         ReservationTime reservationTime = ReservationTime.restore(timeIdValue, LocalTime.of(10, 0));
         Theme theme = Theme.restore(themeIdValue, "Test Theme", "Description", "thumbnail.jpg");
@@ -160,7 +164,7 @@ class ReservationServiceTest {
                 .thenReturn(true);
 
         // when, then
-        assertThatThrownBy(() -> sut.addAndGetWithoutPayment(date, timeIdValue, themeIdValue, userIdValue))
+        assertThatThrownBy(() -> sut.addAndGetWithoutPayment(request))
                 .isInstanceOf(DuplicatedException.class);
 
         verify(userRepository).findById(userId);
@@ -178,9 +182,10 @@ class ReservationServiceTest {
         String userIdValue = "user-id";
         Id themeId = Id.create(themeIdValue);
         Id userId = Id.create(userIdValue);
-
         LocalDate dateFrom = LocalDate.now();
         LocalDate dateTo = LocalDate.now().plusDays(7);
+        ReservationCondition condition = new ReservationCondition(themeIdValue, userIdValue, dateFrom,
+                dateTo);
 
         User user1 = User.restore("user-id-1", "USER", "User One", "user1@example.com", "password1");
         User user2 = User.restore("user-id-2", "USER", "User Two", "user2@example.com", "password2");
@@ -188,7 +193,6 @@ class ReservationServiceTest {
         ReservationTime time2 = ReservationTime.restore("time-id-2", LocalTime.of(14, 0));
         Theme theme1 = Theme.restore("theme-id-1", "Theme One", "Description One", "thumbnail1.jpg");
         Theme theme2 = Theme.restore("theme-id-2", "Theme Two", "Description Two", "thumbnail2.jpg");
-
         List<Reservation> reservationData = Arrays.asList(
                 Reservation.restore("reservation-id-1", user1, dateFrom, time1, theme1),
                 Reservation.restore("reservation-id-2", user2, dateFrom.plusDays(1), time2, theme2));
@@ -204,7 +208,7 @@ class ReservationServiceTest {
                 .thenReturn(reservationData);
 
         // when
-        List<ReservationResponse> result = sut.findAllReservations(themeIdValue, userIdValue, dateFrom, dateTo);
+        List<ReservationResponse> result = sut.findAllReservations(condition);
 
         // then
         assertThat(result).isEqualTo(expectedReservations);
@@ -225,6 +229,9 @@ class ReservationServiceTest {
         User user = User.restore(userIdValue, "USER", "Test User", "test@example.com", "password");
         ReservationTime reservationTime = ReservationTime.restore(timeIdValue, LocalTime.of(10, 0));
         Theme theme = Theme.restore(themeIdValue, "Test Theme", "Description", "thumbnail.jpg");
+        LoginInfo loginInfo = new LoginInfo(userIdValue, user.getUserRole());
+        ReservationRequest reservationRequest = new ReservationRequest(date, timeIdValue, themeIdValue, "paymentKey",
+                "orderId", 1000L, "paymentType");
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(reservationTimeRepository.findById(timeId)).thenReturn(Optional.of(reservationTime));
@@ -235,8 +242,7 @@ class ReservationServiceTest {
         doNothing().when(paymentClient).approvePayment(any(PaymentApproveRequest.class));
 
         // when
-        ReservationResponse result = sut.addAndGet(date, timeIdValue, themeIdValue, userIdValue, "paymentKey",
-                "orderId", 1000L);
+        ReservationResponse result = sut.addAndGet(loginInfo, reservationRequest);
 
         // then
         assertThat(result).isNotNull();

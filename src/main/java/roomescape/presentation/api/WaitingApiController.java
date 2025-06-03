@@ -16,7 +16,7 @@ import roomescape.auth.LoginInfo;
 import roomescape.auth.Role;
 import roomescape.business.model.vo.UserRole;
 import roomescape.business.service.WaitingService;
-import roomescape.presentation.dto.request.ReservationRequest;
+import roomescape.presentation.dto.request.WaitingRequest;
 import roomescape.presentation.dto.response.WaitingResponse;
 import roomescape.presentation.dto.response.WaitingWithRankReponse;
 
@@ -28,10 +28,9 @@ public class WaitingApiController {
 
     @PostMapping("/waitings")
     @AuthRequired
-    public ResponseEntity<WaitingResponse> createReservation(@RequestBody @Valid ReservationRequest request,
+    public ResponseEntity<WaitingResponse> createReservation(@RequestBody @Valid WaitingRequest request,
                                                              LoginInfo loginInfo) {
-        WaitingResponse response = waitingService.createWaiting(request.date(), request.timeId(), request.themeId(),
-                loginInfo.id());
+        WaitingResponse response = waitingService.createWaiting(loginInfo, request);
         return ResponseEntity.created(URI.create("/reservations")).body(response);
     }
 

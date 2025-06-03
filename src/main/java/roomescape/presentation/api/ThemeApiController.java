@@ -28,7 +28,7 @@ public class ThemeApiController {
     @AuthRequired
     @Role(UserRole.ADMIN)
     public ResponseEntity<ThemeResponse> add(@RequestBody @Valid ThemeCreateRequest request) {
-        ThemeResponse response = themeService.addAndGet(request.name(), request.description(), request.thumbnail());
+        ThemeResponse response = themeService.addAndGet(request);
         return ResponseEntity.created(URI.create("/themes/" + response.id())).body(response);
     }
 

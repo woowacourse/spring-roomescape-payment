@@ -19,6 +19,7 @@ import roomescape.business.model.entity.User;
 import roomescape.exception.business.InvalidCreateArgumentException;
 import roomescape.exception.business.NotFoundException;
 import roomescape.infrastructure.UserRepository;
+import roomescape.presentation.dto.request.RegisterRequest;
 import roomescape.presentation.dto.response.UserResponse;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,11 +37,12 @@ class UserServiceTest {
         String name = "테스트유저";
         String email = "test@example.com";
         String password = "password123";
+        RegisterRequest request = new RegisterRequest(name, email, password);
 
         when(userRepository.existsByEmail_Value(email)).thenReturn(false);
 
         // when
-        sut.register(name, email, password);
+        sut.register(request);
 
         // then
         verify(userRepository).existsByEmail_Value(email);
@@ -53,11 +55,11 @@ class UserServiceTest {
         String name = "테스트유저";
         String email = "test@example.com";
         String password = "password123";
-
+        RegisterRequest request = new RegisterRequest(name, email, password);
         when(userRepository.existsByEmail_Value(email)).thenReturn(true);
 
         // when, then
-        assertThatThrownBy(() -> sut.register(name, email, password))
+        assertThatThrownBy(() -> sut.register(request))
                 .isInstanceOf(InvalidCreateArgumentException.class);
 
         verify(userRepository).existsByEmail_Value(email);
