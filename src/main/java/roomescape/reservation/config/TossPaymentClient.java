@@ -9,14 +9,9 @@ import roomescape.reservation.dto.PaymentApprovalRequest;
 public class TossPaymentClient implements PaymentClient {
 
     private final RestClient restClient;
-    private final PaymentErrorHandler errorHandler;
 
-    public TossPaymentClient(
-            RestClient restClient,
-            PaymentErrorHandler errorHandler
-    ) {
+    public TossPaymentClient(RestClient restClient) {
         this.restClient = restClient;
-        this.errorHandler = errorHandler;
     }
 
     @Override
@@ -24,7 +19,6 @@ public class TossPaymentClient implements PaymentClient {
         return restClient.post().uri("/confirm")
                 .body(request)
                 .retrieve()
-                .onStatus(errorHandler)
                 .toBodilessEntity();
     }
 }

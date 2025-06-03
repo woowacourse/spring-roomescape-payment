@@ -14,9 +14,15 @@ import org.springframework.web.client.RestClient;
 public class TossRestClientConfiguration {
 
     private final TossPaymentInterceptor tossPaymentInterceptor;
+    private final TossServerErrorHandler tossServerErrorHandler;
+    private final TossClientErrorHandler tossClientErrorHandler;
 
-    public TossRestClientConfiguration(TossPaymentInterceptor tossPaymentInterceptor) {
+    public TossRestClientConfiguration(TossPaymentInterceptor tossPaymentInterceptor,
+                                       TossServerErrorHandler tossServerErrorHandler,
+                                       TossClientErrorHandler tossClientErrorHandler) {
         this.tossPaymentInterceptor = tossPaymentInterceptor;
+        this.tossServerErrorHandler = tossServerErrorHandler;
+        this.tossClientErrorHandler = tossClientErrorHandler;
     }
 
     @Bean
@@ -26,6 +32,8 @@ public class TossRestClientConfiguration {
                 .baseUrl("https://api.tosspayments.com/v1/payments")
                 .requestInterceptor(tossPaymentInterceptor)
                 .requestFactory(requestFactory)
+                .defaultStatusHandler(tossServerErrorHandler)
+                .defaultStatusHandler(tossClientErrorHandler)
                 .build();
     }
 

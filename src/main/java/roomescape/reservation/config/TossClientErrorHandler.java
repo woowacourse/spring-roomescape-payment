@@ -6,23 +6,21 @@ import java.io.IOException;
 import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
 import roomescape.exception.PaymentClientException;
 import roomescape.exception.RoomescapeException;
 
-@Component
 @Slf4j
-public class PaymentErrorHandler implements ResponseErrorHandler {
+@Component
+public class TossClientErrorHandler implements ResponseErrorHandler {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
-        HttpStatusCode statusCode = response.getStatusCode();
-        return statusCode.is4xxClientError() || statusCode.is5xxServerError();
+        return response.getStatusCode().is4xxClientError();
     }
 
     @Override
@@ -49,5 +47,6 @@ public class PaymentErrorHandler implements ResponseErrorHandler {
             String code,
             String message
     ) {
+
     }
 }
