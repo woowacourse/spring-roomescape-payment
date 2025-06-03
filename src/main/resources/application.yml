@@ -21,8 +21,10 @@ spring:
   config:
     import: optional:classpath:application-secret.yml
 
-payment:
-  api:
+toss:
+  payment:
     base-url: https://api.tosspayments.com/v1/payments
-  auth:
-    scheme: Basic
+    auth-scheme: Basic
+    timeout:
+      connect: 4
+      read: 34

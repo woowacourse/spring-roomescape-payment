@@ -25,10 +25,12 @@ spring:
 jwt:
   secret: test-jwt-secret-key-for-testing-only
 
-payment:
-  secret:
-    key: test-payment-key-not-real
-  api:
+
+toss:
+  payment:
     base-url: test-payment-url-not-real
-  auth:
-    scheme: Basic
+    auth-scheme: Basic
+    timeout:
+      connect: 4
+      read: 34
+    secret-key: test-payment-key-not-real

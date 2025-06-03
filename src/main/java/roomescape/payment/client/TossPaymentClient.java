@@ -1,7 +1,7 @@
 package roomescape.payment.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
@@ -22,11 +22,19 @@ import java.io.InputStream;
 import java.util.function.Supplier;
 
 @Component
-@RequiredArgsConstructor
 public class TossPaymentClient implements PaymentClient {
 
-    private final ObjectMapper mapper;
+    @Qualifier("tossPaymentRestClient")
     private final RestClient restClient;
+
+    private final ObjectMapper mapper;
+
+    public TossPaymentClient(@Qualifier("tossPaymentRestClient") RestClient restClient,
+                             ObjectMapper mapper
+    ) {
+        this.restClient = restClient;
+        this.mapper = mapper;
+    }
 
     public PaymentResult confirmPayment(final PaymentRequest request) {
         return executeWithExceptionHandling(() ->

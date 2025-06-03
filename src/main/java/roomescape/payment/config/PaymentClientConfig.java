@@ -1,6 +1,7 @@
 package roomescape.payment.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,35 +18,31 @@ import java.util.Base64;
 @Configuration
 public class PaymentClientConfig {
 
-    private static final int CONNECT_TIMEOUT_SECONDS = 3;
-    private static final int READ_TIMEOUT_SECONDS = 33;
-
-    @Value("${payment.api.base-url}")
-    private String baseUrl;
-    @Value("${payment.auth.scheme}")
-    private String authScheme;
-    @Value("${payment.secret.key}")
-    private String secretKey;
-
     @Bean
-    public RestClient getRestClient() {
+    @Qualifier("tossPaymentRestClient")
+    public RestClient tossPaymentRestClient(
+            @Value("${toss.payment.base-url}") String baseUrl,
+            @Value("${toss.payment.secret-key}") String secretKey,
+            @Value("${toss.payment.auth-scheme}") String authScheme,
+            @Value("${toss.payment.timeout.connect}") int connectTimeout,
+            @Value("${toss.payment.timeout.read}") int readTimeout) {
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((secretKey + ":").getBytes(StandardCharsets.UTF_8));
         String authorizations = authScheme + " " + new String(encodedBytes);
 
         return RestClient.builder()
                 .baseUrl(baseUrl)
-                .requestFactory(createRequestFactory())
+                .requestFactory(createRequestFactory(connectTimeout, readTimeout))
                 .defaultHeader("Content-Type", "application/json")
                 .defaultHeader("Authorization", authorizations)
                 .requestInterceptor(loggingInterceptor())
                 .build();
     }
 
-    private SimpleClientHttpRequestFactory createRequestFactory() {
+    private SimpleClientHttpRequestFactory createRequestFactory(final int connectTimeout, final int readTimeout) {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(Duration.ofSeconds(CONNECT_TIMEOUT_SECONDS));
-        requestFactory.setReadTimeout(Duration.ofSeconds(READ_TIMEOUT_SECONDS));
+        requestFactory.setConnectTimeout(Duration.ofSeconds(connectTimeout));
+        requestFactory.setReadTimeout(Duration.ofSeconds(readTimeout));
         return requestFactory;
     }
 

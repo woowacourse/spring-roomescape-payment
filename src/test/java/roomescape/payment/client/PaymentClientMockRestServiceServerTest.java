@@ -36,7 +36,7 @@ class PaymentClientMockRestServiceServerTest {
     @Autowired
     private PaymentClient paymentClient;
 
-    @Value("${payment.api.base-url}")
+    @Value("${toss.payment.base-url}")
     private String URL;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
