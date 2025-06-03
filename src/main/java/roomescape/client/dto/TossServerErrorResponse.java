@@ -1,0 +1,36 @@
+package roomescape.client.dto;
+
+import java.util.Set;
+
+public class TossServerErrorResponse {
+    private static final Set<String> INVISIBLE_CLIENT_ERROR_CODE = Set.of(
+            "INVALID_API_KEY",
+            "INVALID_AUTHORIZE_AUTH",
+            "UNAPPROVED_ORDER_ID",
+            "UNAUTHORIZED_KEY",
+            "INCORRECT_BASIC_AUTH_FORMAT"
+    );
+
+    private String code;
+    private String message;
+
+    public TossServerErrorResponse(String code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+
+    protected TossServerErrorResponse() {
+    }
+
+    public boolean isInvisibleError() {
+        return INVISIBLE_CLIENT_ERROR_CODE.contains(code);
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+}
