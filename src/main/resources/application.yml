@@ -1,0 +1,20 @@
+spring:
+  h2:
+    console:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:database
+    username: sa
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    defer-datasource-initialization: true
+toss:
+  payments:
+    base-url: https://api.tosspayments.com
+    widget-secret-key: test_sk_nRQoOaPz8LK6ZxMR2BZNry47BMw6
