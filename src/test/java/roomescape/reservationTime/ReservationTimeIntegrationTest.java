@@ -16,6 +16,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.common.exceptionHandler.dto.ExceptionResponse;
 
@@ -37,7 +38,7 @@ public class ReservationTimeIntegrationTest {
         RestAssured.given().log().all()
                 .when().get("/times")
                 .then().log().all()
-                .statusCode(200)
+                .statusCode(HttpStatus.OK.value())
                 .body("size()", is(0));
     }
 
@@ -52,7 +53,7 @@ public class ReservationTimeIntegrationTest {
                 .body(params)
                 .when().post("/times")
                 .then().log().all()
-                .statusCode(201);
+                .statusCode(HttpStatus.CREATED.value());
         // when & then
         RestAssured.given().log().all()
                 .when().delete("/times/1")
@@ -73,7 +74,7 @@ public class ReservationTimeIntegrationTest {
                 .body(reservationTime)
                 .when().post("/times")
                 .then().log().all()
-                .statusCode(400)
+                .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract()
                 .response();
         // then
@@ -95,7 +96,7 @@ public class ReservationTimeIntegrationTest {
                 .body(reservationTime)
                 .when().post("/times")
                 .then().log().all()
-                .statusCode(400)
+                .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract()
                 .response();
         // then

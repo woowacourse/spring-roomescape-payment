@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.common.exceptionHandler.dto.ExceptionResponse;
 
@@ -47,7 +48,7 @@ public class ReservationIntegrationTest {
                 .body(reservation)
                 .when().post("/reservations")
                 .then().log().all()
-                .statusCode(400)
+                .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract()
                 .response();
         // then
@@ -70,7 +71,7 @@ public class ReservationIntegrationTest {
                 .body(reservation)
                 .when().post("/reservations")
                 .then().log().all()
-                .statusCode(400)
+                .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract()
                 .response();
         // then
@@ -93,7 +94,7 @@ public class ReservationIntegrationTest {
                 .body(reservation)
                 .when().post("/reservations")
                 .then().log().all()
-                .statusCode(401)
+                .statusCode(HttpStatus.UNAUTHORIZED.value())
                 .extract()
                 .response();
         // then
@@ -107,6 +108,6 @@ public class ReservationIntegrationTest {
         RestAssured.given().log().all()
                 .when().get("/reservation-mine")
                 .then().log().all()
-                .statusCode(200);
+                .statusCode(HttpStatus.OK.value());
     }
 }

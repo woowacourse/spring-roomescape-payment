@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -28,7 +29,7 @@ public class AdminIntegrationTest {
         RestAssured.given().log().all()
                 .when().get("/admin")
                 .then().log().all()
-                .statusCode(200);
+                .statusCode(HttpStatus.OK.value());
     }
 
     @DisplayName("/admin/reservation 요청 시 html 정상 응답과 예약 목록을 요청한다.")
@@ -37,12 +38,13 @@ public class AdminIntegrationTest {
         RestAssured.given().log().all()
                 .when().get("/admin/reservation")
                 .then().log().all()
-                .statusCode(200);
+                .statusCode(HttpStatus.OK.value());
+
 
         RestAssured.given().log().all()
                 .when().get("/reservations")
                 .then().log().all()
-                .statusCode(200)
+                .statusCode(HttpStatus.OK.value())
                 .body("size()", is(0));
     }
 }

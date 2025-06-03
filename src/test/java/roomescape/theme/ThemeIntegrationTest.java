@@ -16,6 +16,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.common.exceptionHandler.dto.ExceptionResponse;
 import roomescape.theme.dto.response.ThemeResponse;
@@ -38,7 +39,7 @@ public class ThemeIntegrationTest {
         RestAssured.given().log().all()
                 .when().get("/themes")
                 .then().log().all()
-                .statusCode(200)
+                .statusCode(HttpStatus.OK.value())
                 .body("size()", is(0));
     }
 
@@ -56,7 +57,7 @@ public class ThemeIntegrationTest {
                 .body(params)
                 .when().post("/themes")
                 .then().log().all()
-                .statusCode(201)
+                .statusCode(HttpStatus.CREATED.value())
                 .extract()
                 .response();
         // then
@@ -67,7 +68,7 @@ public class ThemeIntegrationTest {
         RestAssured.given().log().all()
                 .when().delete("/themes/1")
                 .then().log().all()
-                .statusCode(204);
+                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
     @DisplayName("테마 이름이 null 또는 빈 상태로 생성 요청 시 400 응답을 준다.")
@@ -86,7 +87,7 @@ public class ThemeIntegrationTest {
                 .body(params)
                 .when().post("/themes")
                 .then().log().all()
-                .statusCode(400)
+                .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract()
                 .response();
         // then
@@ -109,7 +110,7 @@ public class ThemeIntegrationTest {
                 .body(params)
                 .when().post("/themes")
                 .then().log().all()
-                .statusCode(400)
+                .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract()
                 .response();
         // then
@@ -132,7 +133,7 @@ public class ThemeIntegrationTest {
                 .body(params)
                 .when().post("/themes")
                 .then().log().all()
-                .statusCode(400)
+                .statusCode(HttpStatus.BAD_REQUEST.value())
                 .extract()
                 .response();
         // then
