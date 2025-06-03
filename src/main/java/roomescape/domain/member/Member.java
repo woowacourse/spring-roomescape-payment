@@ -32,6 +32,7 @@ public class Member {
     private String name;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private MemberRole role;
 
     protected Member() {
