@@ -1,0 +1,60 @@
+package roomescape.payment.infrastructure;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import org.apache.hc.core5.http.HttpHeaders;
+import org.springframework.web.client.RestClient;
+import roomescape.payment.infrastructure.dto.TossPaymentErrorResponse;
+import roomescape.payment.infrastructure.dto.TossPaymentRequest;
+import roomescape.payment.application.service.PaymentClient;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.presentation.dto.PaymentRequest;
+import roomescape.reservation.presentation.dto.ReservationRequest;
+
+public class TossPaymentClient implements PaymentClient {
+
+    private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+
+    private final RestClient restClient;
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public TossPaymentClient(final RestClient restClient) {
+        this.restClient = restClient;
+    }
+
+    @Override
+    public Payment approve(PaymentRequest paymentRequest) {
+        TossPaymentRequest tossPaymentRequest = new TossPaymentRequest(
+                paymentRequest.getAmount(),
+                paymentRequest.getOrderId(),
+                paymentRequest.getPaymentKey()
+        );
+
+        return restClient.post()
+                .uri("/payments/confirm")
+                .header(HttpHeaders.AUTHORIZATION, encodeSecretKey())
+                .body(tossPaymentRequest)
+                .retrieve()
+                .onStatus(
+                        status -> status.value() != 200,
+                        (req, res) -> {
+                            try (InputStream body = res.getBody()) {
+                                TossPaymentErrorResponse errorResponse = objectMapper.readValue(body, TossPaymentErrorResponse.class);
+                                throw new PaymentException(errorResponse, res.getStatusCode(), tossPaymentRequest.getOrderId());
+                            } catch (IOException e) {
+                                throw new RuntimeException("에러 응답 파싱 처리에 실패했습니다", e);
+                            }
+                        }
+                )
+                .body(Payment.class);
+    }
+
+    private static String encodeSecretKey() {
+        String credentials = TossPaymentClient.SECRET_KEY + ":";
+        String base64Credentials = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
+        return "Basic " + base64Credentials;
+    }
+}
