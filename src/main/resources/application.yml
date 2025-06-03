@@ -26,6 +26,7 @@ security:
     token:
       secret-key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIiLCJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjJ9.ih1aovtQShabQ7l0cINw4k1fagApg3qLWiB8Kt59Lno
       expire-length: 99999999999
+
 logging:
   level:
     org.hibernate.SQL: debug
@@ -33,4 +34,6 @@ logging:
 
 payment:
   toss:
+    base-url: https://api.tosspayments.com/v1/payments
+    approval-url: /confirm
     auth-token: Basic dGVzdF9nc2tfZG9jc19PYVB6OEw1S2RtUVhrelJ6M3k0N0JNdzY6

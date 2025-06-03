@@ -1,6 +1,7 @@
 package roomescape.reservation.config;
 
 import java.time.Duration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.http.client.ClientHttpRequestFactoryBuilder;
 import org.springframework.boot.http.client.ClientHttpRequestFactorySettings;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,9 @@ public class TossRestClientConfiguration {
     private final TossServerErrorHandler tossServerErrorHandler;
     private final TossClientErrorHandler tossClientErrorHandler;
 
+    @Value("${payment.toss.base-url}")
+    private String baseUrl;
+
     public TossRestClientConfiguration(TossPaymentInterceptor tossPaymentInterceptor,
                                        TossServerErrorHandler tossServerErrorHandler,
                                        TossClientErrorHandler tossClientErrorHandler) {
@@ -29,7 +33,7 @@ public class TossRestClientConfiguration {
     public RestClient restClient() {
         ClientHttpRequestFactory requestFactory = createRequestFactory(createRequestSettings());
         return RestClient.builder()
-                .baseUrl("https://api.tosspayments.com/v1/payments")
+                .baseUrl(baseUrl)
                 .requestInterceptor(tossPaymentInterceptor)
                 .requestFactory(requestFactory)
                 .defaultStatusHandler(tossServerErrorHandler)
