@@ -1,11 +1,5 @@
 package roomescape.unit.infrastructure;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +10,14 @@ import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.dto.request.ReservationCondition;
-import roomescape.infrastructure.JpaMemberRepository;
-import roomescape.infrastructure.JpaReservationRepository;
-import roomescape.infrastructure.JpaReservationTimeRepository;
-import roomescape.infrastructure.JpaThemeRepository;
-import roomescape.infrastructure.ReservationRepositoryAdaptor;
+import roomescape.infrastructure.*;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataJpaTest
 @Sql(value =
@@ -188,10 +185,10 @@ class ReservationRepositoryAdaptorTest {
     void 특정_조건으로_예약_조회() {
         //given
         ReservationCondition condition = new ReservationCondition(
-                Optional.empty(),
-                Optional.of(member1.getId()),
-                Optional.of(LocalDate.now().minusDays(4)),
-                Optional.of(LocalDate.now()));
+                null,
+                member1.getId(),
+                LocalDate.now().minusDays(4),
+                LocalDate.now());
 
         //when & then
         List<Reservation> reservations = reservationRepositoryAdaptor.findByCondition(condition);

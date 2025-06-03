@@ -1,16 +1,17 @@
 package roomescape.unit.fake;
 
+import roomescape.domain.Reservation;
+import roomescape.domain.ReservationTime;
+import roomescape.domain.Theme;
+import roomescape.domain.repository.ReservationRepository;
+import roomescape.dto.request.ReservationCondition;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Theme;
-import roomescape.domain.repository.ReservationRepository;
-import roomescape.dto.request.ReservationCondition;
 
 public class FakeReservationRepository implements ReservationRepository {
 
@@ -90,20 +91,20 @@ public class FakeReservationRepository implements ReservationRepository {
     public List<Reservation> findByCondition(ReservationCondition condition) {
         List<Reservation> filteredReservations = new ArrayList<>(reservations);
 
-        if (condition.themeId().isPresent()) {
+        if (condition.themeId() != null) {
             filteredReservations = filteredReservations.stream()
-                    .filter(reservation -> reservation.getTheme().getId().equals(condition.themeId().get()))
+                    .filter(reservation -> reservation.getTheme().getId().equals(condition.themeId()))
                     .toList();
         }
-        if (condition.memberId().isPresent()) {
+        if (condition.memberId() != null) {
             filteredReservations = filteredReservations.stream()
-                    .filter(reservation -> reservation.getMember().getId().equals(condition.memberId().get()))
+                    .filter(reservation -> reservation.getMember().getId().equals(condition.memberId()))
                     .toList();
         }
-        if (condition.dateFrom().isPresent() && condition.dateTo().isPresent()) {
+        if ( (condition.dateFrom() != null) && (condition.dateTo() != null)) {
             filteredReservations = filteredReservations.stream()
-                    .filter(reservation -> reservation.getDate().plusDays(1).isAfter(condition.dateFrom().get()))
-                    .filter(reservation -> reservation.getDate().minusDays(1).isBefore(condition.dateTo().get()))
+                    .filter(reservation -> reservation.getDate().plusDays(1).isAfter(condition.dateFrom()))
+                    .filter(reservation -> reservation.getDate().minusDays(1).isBefore(condition.dateTo()))
                     .toList();
         }
         return filteredReservations;
