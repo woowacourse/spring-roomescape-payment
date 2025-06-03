@@ -14,7 +14,7 @@ public class PaymentUnauthorizedException extends BusinessException {
     }
 
     private static String buildUserMessage() {
-        return "서버 내부 오류가 발생했습니다.";
+        return "서버 내부 오류가 발생했습니다. 관리자에게 문의해주세요.";
     }
 
     @Override

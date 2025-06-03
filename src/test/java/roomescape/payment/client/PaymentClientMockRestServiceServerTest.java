@@ -25,7 +25,7 @@ import roomescape.payment.dto.PaymentResult;
 import roomescape.payment.exception.PaymentException;
 import roomescape.payment.exception.PaymentUnauthorizedException;
 
-@RestClientTest(TossPaymentClient.class)
+@RestClientTest(PaymentClient.class)
 @Import(TestPaymentConfiguration.class)
 class PaymentClientMockRestServiceServerTest {
 
