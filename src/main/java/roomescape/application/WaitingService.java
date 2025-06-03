@@ -21,8 +21,8 @@ import roomescape.exception.NotFoundException;
 @RequiredArgsConstructor
 public class WaitingService {
 
-    private final ReservationRepository reservationRepository;
     private final WaitingRepository waitingRepository;
+    private final ReservationRepository reservationRepository;
     private final TimeSlotRepository timeSlotRepository;
     private final ThemeRepository themeRepository;
 

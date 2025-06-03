@@ -2,147 +2,243 @@ package roomescape.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static roomescape.fixture.ThemeFixture.CREATE_THEME_1;
+import static roomescape.fixture.TimeSlotFixture.CREATE_TIME_SLOT_1;
+import static roomescape.fixture.UserFixture.CREATE_USER_1;
+import static roomescape.fixture.WaitingFixture.CREATE_WAITING_OF;
 
 import java.time.LocalDate;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.theme.Theme;
+import roomescape.domain.theme.ThemeRepository;
+import roomescape.domain.timeslot.TimeSlot;
+import roomescape.domain.timeslot.TimeSlotRepository;
 import roomescape.domain.user.User;
-import roomescape.domain.user.UserRepository;
-import roomescape.domain.user.UserRole;
 import roomescape.domain.waiting.Waiting;
 import roomescape.domain.waiting.WaitingRepository;
 import roomescape.exception.AlreadyExistedException;
 import roomescape.exception.BusinessRuleViolationException;
 import roomescape.exception.NotFoundException;
 
-@ActiveProfiles("test")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-class WaitingServiceTest {
+@ExtendWith(MockitoExtension.class)
+public class WaitingServiceTest {
 
-    @Autowired
-    private WaitingService service;
+    @Mock
+    WaitingRepository waitingRepository;
 
-    @Autowired
-    private WaitingRepository waitingRepository;
+    @Mock
+    ReservationRepository reservationRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    @Mock
+    TimeSlotRepository timeSlotRepository;
 
-    @Test
-    @DisplayName("대기를 등록할 수 있다.")
-    void saveWaiting() {
-        // given
-        var user = userRepository.findById(2L).orElseThrow();
-        var date = LocalDate.of(3000, 5, 8);
-        var timeSlotId = 1L;
-        var themeId = 1L;
+    @Mock
+    ThemeRepository themeRepository;
 
-        // when
-        Waiting created = service.saveWaiting(user, date, timeSlotId, themeId);
+    @InjectMocks
+    WaitingService waitingService;
 
-        // then
-        var waitings = waitingRepository.findAll();
-        assertThat(waitings).contains(created);
+    @Nested
+    @DisplayName("예약 대기를 저장한다.")
+    class SaveWaiting {
+
+        @Test
+        @DisplayName("해당하는 ID의 예약 시간 슬롯이 존재하지 않으면 예외를 던진다.")
+        void saveWaiting_WhenTimeSlotNotExists_ThenThrowException() {
+            // given
+            Long timeId = 1L;
+            Theme theme = CREATE_THEME_1();
+            User user = CREATE_USER_1();
+            LocalDate date = LocalDate.now().plusDays(1);
+
+            when(timeSlotRepository.findById(timeId)).thenReturn(Optional.empty());
+
+            // when & then
+            assertAll(
+                    () -> assertThatThrownBy(() -> waitingService.saveWaiting(user, date, timeId, theme.getId()))
+                            .isInstanceOf(NotFoundException.class)
+                            .hasMessage("존재하지 않는 타임 슬롯입니다."),
+                    () -> verify(timeSlotRepository).findById(timeId)
+            );
+        }
+
+        @Test
+        @DisplayName("해당하는 ID의 테마가 존재하지 않으면 예외를 던진다.")
+        void saveWaiting_WhenThemeNotExists_ThenThrowException() {
+            // given
+            TimeSlot timeSlot = CREATE_TIME_SLOT_1();
+            Theme theme = CREATE_THEME_1();
+            User user = CREATE_USER_1();
+            LocalDate date = LocalDate.now().plusDays(1);
+
+            when(timeSlotRepository.findById(timeSlot.getId())).thenReturn(Optional.of(timeSlot));
+            when(themeRepository.findById(theme.getId())).thenReturn(Optional.empty());
+
+            // when & then
+            assertAll(
+                    () -> assertThatThrownBy(
+                            () -> waitingService.saveWaiting(user, date, timeSlot.getId(), theme.getId()))
+                            .isInstanceOf(NotFoundException.class)
+                            .hasMessage("존재하지 않는 테마입니다."),
+                    () -> verify(timeSlotRepository).findById(timeSlot.getId()),
+                    () -> verify(themeRepository).findById(theme.getId())
+            );
+        }
+
+        @Test
+        @DisplayName("날짜, 시간, 테마에 해당하는 예약 대기가 이미 존재하면 예외를 던진다.")
+        void saveWaiting_WhenWaitingExists_ThenThrowException() {
+            // given
+            TimeSlot timeSlot = CREATE_TIME_SLOT_1();
+            Theme theme = CREATE_THEME_1();
+            User user = CREATE_USER_1();
+            LocalDate date = LocalDate.now().plusDays(1);
+
+            when(timeSlotRepository.findById(timeSlot.getId())).thenReturn(Optional.of(timeSlot));
+            when(themeRepository.findById(theme.getId())).thenReturn(Optional.of(theme));
+
+            when(waitingRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(date, timeSlot.getId(), theme.getId(),
+                    user.getId()))
+                    .thenReturn(true);
+
+            // when & then
+            assertAll(
+                    () -> assertThatThrownBy(
+                            () -> waitingService.saveWaiting(user, date, timeSlot.getId(), theme.getId()))
+                            .isInstanceOf(AlreadyExistedException.class)
+                            .hasMessage("이미 예약 대기한 내역이 있습니다."),
+                    () -> verify(timeSlotRepository).findById(timeSlot.getId()),
+                    () -> verify(themeRepository).findById(theme.getId()),
+                    () -> verify(waitingRepository).existsByDateAndTimeSlotIdAndThemeIdAndUserId(date, timeSlot.getId(),
+                            theme.getId(), user.getId())
+            );
+        }
+
+        @Test
+        @DisplayName("날짜, 시간, 테마에 해당하는 예약이 이미 존재하면 예외를 던진다.")
+        void saveWaiting_WhenReservationExists_ThenThrowException() {
+            // given
+            TimeSlot timeSlot = CREATE_TIME_SLOT_1();
+            Theme theme = CREATE_THEME_1();
+            User user = CREATE_USER_1();
+            LocalDate date = LocalDate.now().plusDays(1);
+
+            when(timeSlotRepository.findById(timeSlot.getId())).thenReturn(Optional.of(timeSlot));
+            when(themeRepository.findById(theme.getId())).thenReturn(Optional.of(theme));
+
+            when(waitingRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(date, timeSlot.getId(), theme.getId(),
+                    user.getId()))
+                    .thenReturn(false);
+            when(reservationRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(date, timeSlot.getId(),
+                    theme.getId(), user.getId()))
+                    .thenReturn(true);
+
+            // when & then
+            assertAll(
+                    () -> assertThatThrownBy(
+                            () -> waitingService.saveWaiting(user, date, timeSlot.getId(), theme.getId()))
+                            .isInstanceOf(BusinessRuleViolationException.class)
+                            .hasMessage("해당 테마의 시간대에 이미 예약되어 있습니다."),
+                    () -> verify(timeSlotRepository).findById(timeSlot.getId()),
+                    () -> verify(themeRepository).findById(theme.getId()),
+                    () -> verify(waitingRepository).existsByDateAndTimeSlotIdAndThemeIdAndUserId(date, timeSlot.getId(),
+                            theme.getId(), user.getId()),
+                    () -> verify(reservationRepository).existsByDateAndTimeSlotIdAndThemeIdAndUserId(date,
+                            timeSlot.getId(), theme.getId(), user.getId())
+            );
+        }
+
+        @Test
+        @DisplayName("예약 대기를 성공적으로 저장한다.")
+        void saveWaiting() {
+            // given
+            TimeSlot timeSlot = CREATE_TIME_SLOT_1();
+            Theme theme = CREATE_THEME_1();
+            User user = CREATE_USER_1();
+            LocalDate date = LocalDate.now().plusDays(1);
+            Waiting waiting = CREATE_WAITING_OF(1L, user, date, timeSlot, theme);
+
+            when(timeSlotRepository.findById(timeSlot.getId())).thenReturn(Optional.of(timeSlot));
+            when(themeRepository.findById(theme.getId())).thenReturn(Optional.of(theme));
+
+            when(waitingRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(date, timeSlot.getId(), theme.getId(),
+                    user.getId()))
+                    .thenReturn(false);
+            when(reservationRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(date, timeSlot.getId(),
+                    theme.getId(), user.getId()))
+                    .thenReturn(false);
+
+            when(waitingRepository.save(Waiting.register(user, date, timeSlot, theme)))
+                    .thenReturn(waiting);
+
+            // when & then
+            assertAll(
+                    () -> assertThat(waitingService.saveWaiting(user, date, timeSlot.getId(), theme.getId())).isEqualTo(
+                            waiting),
+                    () -> verify(timeSlotRepository).findById(timeSlot.getId()),
+                    () -> verify(themeRepository).findById(theme.getId()),
+                    () -> verify(waitingRepository).existsByDateAndTimeSlotIdAndThemeIdAndUserId(date, timeSlot.getId(),
+                            theme.getId(), user.getId()),
+                    () -> verify(reservationRepository).existsByDateAndTimeSlotIdAndThemeIdAndUserId(date,
+                            timeSlot.getId(), theme.getId(), user.getId()),
+                    () -> verify(waitingRepository).save(any(Waiting.class))
+            );
+        }
     }
 
-    @Test
-    @DisplayName("이미 대기한 내역이 있는 경우 예외가 발생한다.")
-    void saveWaiting_WhenAlreadyExists() {
-        // given
-        var user = User.ofExisting(3L, "사용자3", UserRole.USER, "user3@email.com", "password3");
-        var date = LocalDate.of(2025, 5, 5);
-        var timeSlotId = 1L;
-        var themeId = 1L;
+    @Nested
+    @DisplayName("예약 대기를 제거한다.")
+    class RemoveById {
 
-        // when & then
-        assertThatThrownBy(() -> service.saveWaiting(user, date, timeSlotId, themeId))
-                .isInstanceOf(AlreadyExistedException.class)
-                .hasMessage("이미 예약 대기한 내역이 있습니다.");
+        @Test
+        @DisplayName("해당하는 ID의 예약 대기가 존재하지 않으면 예외를 던진다.")
+        void removeById_WhenWaitingNotExists_ThenThrowException() {
+            // given
+            Long removeId = 1L;
+
+            when(waitingRepository.existsById(removeId)).thenReturn(false);
+
+            // when & then
+            assertAll(
+                    () -> assertThatThrownBy(() -> waitingService.removeById(removeId))
+                            .isInstanceOf(NotFoundException.class)
+                            .hasMessage("존재하지 않는 예약 대기입니다."),
+                    () -> verify(waitingRepository).existsById(removeId),
+                    () -> verify(waitingRepository, times(0)).deleteById(removeId)
+            );
+        }
+
+        @Test
+        @DisplayName("예약 대기를 정상적으로 삭제한다.")
+        void removeById() {
+            // given
+            Long removeId = 1L;
+
+            when(waitingRepository.existsById(removeId)).thenReturn(true);
+
+            // when
+            waitingService.removeById(removeId);
+
+            // then
+            assertAll(
+                    () -> verify(waitingRepository).existsById(removeId),
+                    () -> verify(waitingRepository).deleteById(removeId)
+            );
+        }
     }
 
-    @Test
-    @DisplayName("이미 예약한 내역이 있는 경우 예외가 발생한다.")
-    void saveWaiting_WhenAlreadyReserved() {
-        // given
-        var user = userRepository.findById(2L).orElseThrow();
-        var date = LocalDate.of(2025, 5, 5);
-        var timeSlotId = 1L;
-        var themeId = 1L;
 
-        // when & then
-        assertThatThrownBy(() -> service.saveWaiting(user, date, timeSlotId, themeId))
-                .isInstanceOf(BusinessRuleViolationException.class)
-                .hasMessage("해당 테마의 시간대에 이미 예약되어 있습니다.");
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 시간대로 대기 등록 시 예외가 발생한다.")
-    void saveWaiting_WhenTimeSlotNotFound() {
-        // given
-        var user = userRepository.findById(2L).orElseThrow();
-        var date = LocalDate.of(2025, 5, 8);
-        var invalidTimeSlotId = 999L;
-        var themeId = 1L;
-
-        // when & then
-        assertThatThrownBy(() -> service.saveWaiting(user, date, invalidTimeSlotId, themeId))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage("존재하지 않는 타임 슬롯입니다.");
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 테마로 대기 등록 시 예외가 발생한다.")
-    void saveWaiting_WhenThemeNotFound() {
-        // given
-        var user = userRepository.findById(2L).orElseThrow();
-        var date = LocalDate.of(2025, 5, 8);
-        var timeSlotId = 1L;
-        var invalidThemeId = 999L;
-
-        // when & then
-        assertThatThrownBy(() -> service.saveWaiting(user, date, timeSlotId, invalidThemeId))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage("존재하지 않는 테마입니다.");
-    }
-
-    @Test
-    @DisplayName("모든 대기를 조회할 수 있다.")
-    void findAllWaitings() {
-        // when
-        var waitings = service.findAllWaitings();
-
-        // then
-        assertThat(waitings).hasSize(2);
-    }
-
-    @Test
-    @DisplayName("대기를 삭제할 수 있다.")
-    void removeById() {
-        // given
-        var waitingId = 1L;
-
-        // when
-        service.removeById(waitingId);
-
-        // then
-        var waitings = service.findAllWaitings();
-        assertThat(waitings).hasSize(1);
-    }
-
-    @Test
-    @DisplayName("존재하지 않는 대기 삭제 시 예외가 발생한다.")
-    void removeById_WhenWaitingNotFound() {
-        // given
-        var invalidWaitingId = 999L;
-
-        // when & then
-        assertThatThrownBy(() -> service.removeById(invalidWaitingId))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage("존재하지 않는 예약 대기입니다.");
-    }
 }

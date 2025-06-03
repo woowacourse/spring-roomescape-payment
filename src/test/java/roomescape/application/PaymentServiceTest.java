@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,38 +33,45 @@ class PaymentServiceTest {
     @InjectMocks
     private PaymentService paymentService;
 
-    @Test
-    @DisplayName("결제 승인 요청이 성공하면 결제 정보를 저장하고 반환한다")
-    void savePayment_Success() {
-        // given
-        PaymentInfo paymentInfo = new PaymentInfo("test_payment_key", "test_order_id", 1000);
-        PaymentClientResponse response = new PaymentClientResponse("test_payment_key", "test_order_id", "테스트 결제", 1000);
+    @Nested
+    @DisplayName("결제 정보를 저장한다.")
+    class SavePayment {
 
-        when(paymentClient.confirmPayment(paymentInfo)).thenReturn(response);
-        when(paymentRepository.save(any(Payment.class))).thenReturn(
-                Payment.register(response.paymentKey(), response.orderId(), response.orderName(), response.amount()));
+        @Test
+        @DisplayName("결제 승인 요청이 성공하면 결제 정보를 저장하고 반환한다")
+        void savePayment_Success() {
+            // given
+            PaymentInfo paymentInfo = new PaymentInfo("test_payment_key", "test_order_id", 1000);
+            PaymentClientResponse response = new PaymentClientResponse("test_payment_key", "test_order_id", "테스트 결제",
+                    1000);
 
-        // when
-        Payment savedPayment = paymentService.savePayment(paymentInfo);
+            when(paymentClient.confirmPayment(paymentInfo)).thenReturn(response);
+            when(paymentRepository.save(any(Payment.class))).thenReturn(
+                    Payment.register(response.paymentKey(), response.orderId(), response.orderName(),
+                            response.amount()));
 
-        // then
-        assertAll(() -> assertThat(savedPayment.getPaymentKey()).isEqualTo(paymentInfo.paymentKey()),
-                () -> assertThat(savedPayment.getOrderId()).isEqualTo(paymentInfo.orderId()),
-                () -> assertThat(savedPayment.getAmount()).isEqualTo(paymentInfo.amount()));
+            // when
+            Payment savedPayment = paymentService.savePayment(paymentInfo);
+
+            // then
+            assertAll(() -> assertThat(savedPayment.getPaymentKey()).isEqualTo(paymentInfo.paymentKey()),
+                    () -> assertThat(savedPayment.getOrderId()).isEqualTo(paymentInfo.orderId()),
+                    () -> assertThat(savedPayment.getAmount()).isEqualTo(paymentInfo.amount()));
+        }
+
+        @Test
+        @DisplayName("결제 승인 요청이 실패하면 PaymentException이 발생한다")
+        void savePayment_Failure() {
+            // given
+            PaymentInfo paymentInfo = new PaymentInfo("test_payment_key", "test_order_id", 1000);
+            TossPaymentException expectedException = new TossPaymentException(TossPaymentErrorCode.REJECT_CARD_PAYMENT);
+
+            when(paymentClient.confirmPayment(paymentInfo)).thenThrow(expectedException);
+
+            // when & then
+            assertThatThrownBy(() -> paymentService.savePayment(paymentInfo)).isInstanceOf(TossPaymentException.class)
+                    .hasFieldOrPropertyWithValue("errorCode", TossPaymentErrorCode.REJECT_CARD_PAYMENT)
+                    .hasMessageContaining("한도초과 혹은 잔액부족");
+        }
     }
-
-    @Test
-    @DisplayName("결제 승인 요청이 실패하면 PaymentException이 발생한다")
-    void savePayment_Failure() {
-        // given
-        PaymentInfo paymentInfo = new PaymentInfo("test_payment_key", "test_order_id", 1000);
-        TossPaymentException expectedException = new TossPaymentException(TossPaymentErrorCode.REJECT_CARD_PAYMENT);
-
-        when(paymentClient.confirmPayment(paymentInfo)).thenThrow(expectedException);
-
-        // when & then
-        assertThatThrownBy(() -> paymentService.savePayment(paymentInfo)).isInstanceOf(TossPaymentException.class)
-                .hasFieldOrPropertyWithValue("errorCode", TossPaymentErrorCode.REJECT_CARD_PAYMENT)
-                .hasMessageContaining("한도초과 혹은 잔액부족");
-    }
-} 
+}
