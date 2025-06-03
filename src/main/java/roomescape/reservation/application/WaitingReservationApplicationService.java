@@ -33,7 +33,7 @@ public class WaitingReservationApplicationService {
         ReservationSlot slot = reservationSlotDataService.getReservationSlotByDateAndTimeAndTheme(createRequest.date(),
                 createRequest.timeId(), createRequest.themeId());
         Member member = memberDataService.getById(createRequest.memberId());
-        Reservation reservation = slot.addWaitingReservation(member, LocalDateTime.now(), null);
+        Reservation reservation = slot.addReservation(member, LocalDateTime.now(), null);
         reservationDataService.save(reservation);
 
         return ReservationResponse.from(reservation);

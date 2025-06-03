@@ -30,7 +30,6 @@ import roomescape.reservation.application.event.TestEventPublisher;
 import roomescape.reservation.infrastructure.ReservationRepository;
 import roomescape.reservation.presentation.dto.response.ConfirmedReservationWebResponse;
 import roomescape.reservationslot.application.ReservationSlotDataService;
-import roomescape.reservationslot.exception.ReservationSlotDuplicatedException;
 import roomescape.reservationslot.infrastructure.ReservationSlotRepository;
 import roomescape.reservationslot.presentation.dto.response.MyReservationResponse;
 import roomescape.reservationtime.application.ReservationTimeDataService;
@@ -121,16 +120,6 @@ class ConfirmedReservationApplicationServiceTest {
                 () -> assertThat(response.date()).isEqualTo(tomorrow),
                 () -> assertThat(response.time().startAt()).isEqualTo(LocalTime.of(9, 0))
         );
-    }
-
-    @Test
-    void create_whenDuplicateTimeSlot_throwsReservationSlotDuplicatedException() {
-        assertThatThrownBy(
-                () -> confirmedReservationApplicationService.create(
-                        new ConfirmedReservationCreateRequest(FUTURE_DATE, timeId, themeId, memberId, afterOneHour,
-                                null)))
-                .isInstanceOf(ReservationSlotDuplicatedException.class)
-                .hasMessageContaining("해당 시간에 이미 예약 슬롯이 존재합니다.");
     }
 
     @Test

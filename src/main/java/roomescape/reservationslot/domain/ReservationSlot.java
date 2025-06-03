@@ -64,14 +64,6 @@ public class ReservationSlot {
     protected ReservationSlot() {
     }
 
-    public Reservation addWaitingReservation(final Member member, final LocalDateTime now, final String orderId) {
-        validateDateTime(date, time.getStartAt(), now);
-        validateMemberNotConfirmed(member);
-        Reservation reservation = new Reservation(member, this, orderId);
-        reservations.add(reservation);
-        return reservation;
-    }
-
     public Reservation addReservation(final Member member, final LocalDateTime now, final String orderId) {
         validateDateTime(date, time.getStartAt(), now);
         validateMemberNotConfirmed(member);

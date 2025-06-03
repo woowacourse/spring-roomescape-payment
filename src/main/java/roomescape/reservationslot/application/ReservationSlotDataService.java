@@ -3,7 +3,6 @@ package roomescape.reservationslot.application;
 import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 import roomescape.reservationslot.domain.ReservationSlot;
-import roomescape.reservationslot.exception.ReservationSlotDuplicatedException;
 import roomescape.reservationslot.exception.ReservationSlotNotFoundException;
 import roomescape.reservationslot.infrastructure.ReservationSlotRepository;
 
@@ -31,12 +30,6 @@ public class ReservationSlotDataService {
                 .orElseThrow(() -> new ReservationSlotNotFoundException("해당 시간의 예약 슬롯이 존재하지 않습니다."));
     }
 
-    public void validateReservationSlotNotExists(final LocalDate date, final Long timeId, final Long themeId) {
-        if (reservationSlotRepository.existsByDateAndTimeIdAndThemeId(date, timeId, themeId)) {
-            throw new ReservationSlotDuplicatedException("해당 시간에 이미 예약 슬롯이 존재합니다.");
-        }
-    }
-
     public boolean existsByTimeId(final Long timeId) {
         return reservationSlotRepository.existsByTimeId(timeId);
     }
@@ -51,5 +44,9 @@ public class ReservationSlotDataService {
 
     public void deleteById(Long id) {
         reservationSlotRepository.deleteById(id);
+    }
+
+    public boolean existsByDateAndTimeIdAndThemeId(final LocalDate date, final Long timeId, final Long themeId) {
+        return reservationSlotRepository.existsByDateAndTimeIdAndThemeId(date, timeId, themeId);
     }
 }

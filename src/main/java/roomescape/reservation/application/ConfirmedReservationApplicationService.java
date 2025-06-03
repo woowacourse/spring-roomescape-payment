@@ -1,5 +1,6 @@
 package roomescape.reservation.application;
 
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -8,7 +9,6 @@ import roomescape.member.application.MemberDataService;
 import roomescape.member.domain.Member;
 import roomescape.reservation.application.dto.request.ConfirmedReservationByCriteriaWebRequest;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
-import roomescape.reservation.application.dto.request.ReservationCreateWebRequest;
 import roomescape.reservation.application.event.ReservationPromoteEvent;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.presentation.dto.response.ConfirmedReservationWebResponse;
@@ -46,13 +46,10 @@ public class ConfirmedReservationApplicationService {
     }
 
     public ConfirmedReservationWebResponse create(final ConfirmedReservationCreateRequest request) {
-        reservationSlotDataService.validateReservationSlotNotExists(request.reservationDate(), request.timeId(),
-                request.themeId());
-
-        ReservationSlot slot = createReservationSlot(
-                new ReservationCreateWebRequest(request.reservationDate(), request.timeId(), request.themeId()));
+        ReservationSlot slot = getOrCreateReservationSlot(
+                request.reservationDate(), request.timeId(), request.themeId());
         Member member = memberDataService.getById(request.memberId());
-        slot.addConfirmedReservation(member, request.reservationDateTime(), request.orderId());
+        slot.addReservation(member, request.reservationDateTime(), request.orderId());
         ReservationSlot savedSlot = reservationSlotDataService.save(slot);
 
         return ConfirmedReservationWebResponse.of(savedSlot);
@@ -88,10 +85,13 @@ public class ConfirmedReservationApplicationService {
         }
     }
 
-    private ReservationSlot createReservationSlot(final ReservationCreateWebRequest reservationCreateWebRequest) {
-        ReservationTime time = reservationTimeDataService.getById(reservationCreateWebRequest.timeId());
-        Theme theme = themeDataService.getById(reservationCreateWebRequest.themeId());
-        return new ReservationSlot(reservationCreateWebRequest.date(), time, theme);
+    private ReservationSlot getOrCreateReservationSlot(final LocalDate date, final Long timeId, final Long themeId) {
+        if (reservationSlotDataService.existsByDateAndTimeIdAndThemeId(date, timeId, themeId)) {
+            return reservationSlotDataService.getReservationSlotByDateAndTimeAndTheme(date, timeId, themeId);
+        }
+        ReservationTime time = reservationTimeDataService.getById(timeId);
+        Theme theme = themeDataService.getById(themeId);
+        return new ReservationSlot(date, time, theme);
     }
 
     private void cleanupEmptyReservationSlot(final Long slotId) {

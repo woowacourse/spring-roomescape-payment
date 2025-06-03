@@ -62,14 +62,14 @@ class ReservationRepositoryTest {
         theme = themeRepository.save(TestFixture.makeTheme());
 
         reservationSlot = new ReservationSlot(FUTURE_DATE, reservationTime, theme);
-        reservationSlot.addWaitingReservation(member, NOW_DATETIME, null);
+        reservationSlot.addReservation(member, NOW_DATETIME, null);
         reservationSlotRepository.save(reservationSlot);
     }
 
     @Test
     void findFirstByCriteria_whenConditionNull_returnFirstReservationsGroupBySlot() {
         // given
-        reservationSlot.addWaitingReservation(member2, NOW_DATETIME, null);
+        reservationSlot.addReservation(member2, NOW_DATETIME, null);
         Theme theme2 = themeRepository.save(new Theme("논리", "셜록 논리 게임 with Vector", "image.png"));
         ReservationTime reservationTime2 = new ReservationTime(LocalTime.of(11, 0));
         reservationTime2 = reservationTimeRepository.save(reservationTime2);
@@ -87,7 +87,7 @@ class ReservationRepositoryTest {
     @Test
     void findFirstByCriteria_whenConditionExist_returnFirstReservationsGroupBySlot() {
         // given
-        reservationSlot.addWaitingReservation(member2, NOW_DATETIME, null);
+        reservationSlot.addReservation(member2, NOW_DATETIME, null);
         Theme theme2 = themeRepository.save(new Theme("논리", "셜록 논리 게임 with Vector", "image.png"));
         ReservationTime reservationTime2 = new ReservationTime(LocalTime.of(11, 0));
         reservationTime2 = reservationTimeRepository.save(reservationTime2);
@@ -121,7 +121,7 @@ class ReservationRepositoryTest {
     @Test
     void findAllWaitingReservations_whenValidRequest_returnWaitingReservations() {
         // Given
-        Reservation reservation = reservationSlot.addWaitingReservation(member2, NOW_DATETIME, null);
+        Reservation reservation = reservationSlot.addReservation(member2, NOW_DATETIME, null);
 
         // When
         List<Reservation> reservations = reservationRepository.findAllWaitingReservations();

@@ -26,7 +26,7 @@ public class TestFixture {
     public static ReservationSlot makeConfirmedReservation(final LocalDate date, final ReservationTime reservationTime,
                                                            final Member member, final Theme theme) {
         ReservationSlot reservationSlot = new ReservationSlot(date, reservationTime, theme);
-        reservationSlot.addWaitingReservation(member, NOW_DATETIME, null);
+        reservationSlot.addReservation(member, NOW_DATETIME, null);
         return reservationSlot;
     }
 
