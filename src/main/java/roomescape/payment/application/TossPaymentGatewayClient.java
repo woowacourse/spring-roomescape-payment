@@ -39,6 +39,7 @@ public class TossPaymentGatewayClient {
             .baseUrl(properties.getBaseUrl())
             .defaultHeader(AUTHORIZATION, encodeSecretKey(properties.getSecretKey()))
             .defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+            .requestInterceptor(new TossPaymentResponseInterceptor(objectMapper))
             .build();
         this.objectMapper = objectMapper;
     }
@@ -56,25 +57,6 @@ public class TossPaymentGatewayClient {
             .accept(APPLICATION_JSON)
             .body(request)
             .retrieve()
-            .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
-                TossErrorResponse error = deserializeError(res.getBody());
-                throw new TossConfirmException(HttpStatus.BAD_REQUEST, error.code(),
-                    error.message());
-            })
-            .onStatus(HttpStatusCode::is5xxServerError, (req, res) -> {
-                TossErrorResponse error = deserializeError(res.getBody());
-                throw new TossConfirmException(HttpStatus.INTERNAL_SERVER_ERROR, error.code(),
-                    error.message());
-            })
             .body(TossConfirmResponse.class);
-    }
-
-    private TossErrorResponse deserializeError(final InputStream bodyStream) {
-        try {
-            String body = StreamUtils.copyToString(bodyStream, StandardCharsets.UTF_8);
-            return objectMapper.readValue(body, TossErrorResponse.class);
-        } catch (Exception e) {
-            throw new RuntimeException("Error deserializing Toss error response", e);
-        }
     }
 }
