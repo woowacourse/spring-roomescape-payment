@@ -21,8 +21,6 @@ public class TossPaymentClient implements PaymentClient {
     private final String secretKey;
     private final RestClient restClient;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     public TossPaymentClient(
             final String confirmUrl,
             final String secretKey,
