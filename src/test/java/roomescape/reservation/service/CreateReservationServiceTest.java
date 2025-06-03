@@ -13,9 +13,9 @@ import roomescape.auth.service.dto.LoginMember;
 import roomescape.common.exception.BadRequestException;
 import roomescape.common.exception.ConflictException;
 import roomescape.common.exception.NotFoundException;
-import roomescape.config.RestClientConfig;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
+import roomescape.config.PaymentRestClientConfig;
 import roomescape.payment.infrastructure.TossPaymentClient;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.service.dto.request.ReservationCreateRequest;
@@ -33,7 +33,7 @@ import static org.assertj.core.api.SoftAssertions.assertSoftly;
 
 @ActiveProfiles("test")
 @DataJpaTest
-@Import({CreateReservationService.class, RestClientConfig.class, TossPaymentClient.class})
+@Import({CreateReservationService.class, PaymentRestClientConfig.class, TossPaymentClient.class})
 class CreateReservationServiceTest {
 
     private final LocalDateTime now = LocalDateTime.now();

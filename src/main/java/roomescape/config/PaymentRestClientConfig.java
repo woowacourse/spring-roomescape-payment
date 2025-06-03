@@ -6,9 +6,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
+import roomescape.common.AuthHeaderEncoder;
 
 @Configuration
-public class RestClientConfig {
+public class PaymentRestClientConfig {
 
     @Value("${api.toss.url}")
     private String tossPaymentBaseUrl;
