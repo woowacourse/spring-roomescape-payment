@@ -1,6 +1,8 @@
 package roomescape.service;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
@@ -22,6 +24,8 @@ import roomescape.repository.WaitingRepository;
 @Service
 @Transactional
 public class WaitingService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ReservationService.class);
 
     private final WaitingRepository waitingRepository;
     private final ThemeRepository themeRepository;
@@ -55,6 +59,8 @@ public class WaitingService {
     @Transactional
     public WaitingResponse addWaiting(WaitingCreationContent content,
                                       PaymentHistoryCreationContent paymentHistoryCreationContent) {
+        logger.info("[유저 정보] memberId= {} \n [예약 대기 요청] : {} \n [결제 정보]: {}", content.memberId(), content,
+                paymentHistoryCreationContent);
         Theme theme = getThemeById(content.themeId());
         ReservationTime time = getTimeById(content.timeId());
         Member member = getMemberById(content.memberId());
