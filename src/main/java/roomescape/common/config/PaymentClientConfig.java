@@ -2,8 +2,11 @@ package roomescape.common.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.client.RestClientCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.common.properties.PaymentClientProperties;
 import roomescape.payment.exception.handler.PaymentExceptionHandler;
@@ -21,12 +24,27 @@ public class PaymentClientConfig {
     @Bean
     public RestClient restClient(RestClient.Builder restClientBuilder) {
         return restClientBuilder
-                .baseUrl(paymentClientProperties.getBaseUrl())
                 .build();
     }
 
     @Bean
-    PaymentExceptionHandler paymentApproveExceptionHandler(ObjectMapper objectMapper) {
+    public RestClientCustomizer restClientCustomizer() {
+        return (restClientBuilder) -> {
+            restClientBuilder.requestFactory(clientHttpRequestFactory())
+                    .baseUrl(paymentClientProperties.getBaseUrl());
+        };
+    }
+
+    @Bean
+    public ClientHttpRequestFactory clientHttpRequestFactory() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(2000);
+        factory.setReadTimeout(30000);
+        return factory;
+    }
+
+    @Bean
+    public PaymentExceptionHandler paymentApproveExceptionHandler(ObjectMapper objectMapper) {
         return new PaymentExceptionHandler(objectMapper);
     }
 }
