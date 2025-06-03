@@ -10,7 +10,7 @@ import org.springframework.web.client.RestClient.Builder;
 public class RestClientConfig {
 
     @Bean
-    public Builder restClientBuilder(TossPaymentsProperties tossPaymentsProperties) {
+    public Builder tossRestClientBuilder(TossPaymentsProperties tossPaymentsProperties) {
         final SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(tossPaymentsProperties.getConnectionTimeout());
         factory.setReadTimeout(tossPaymentsProperties.getReadTimeout());

@@ -1,7 +1,4 @@
 spring:
-  profiles:
-    active: auth,pay
-
   thymeleaf:
     cache: false
     prefix: classpath:/templates/

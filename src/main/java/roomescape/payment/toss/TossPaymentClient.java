@@ -15,13 +15,10 @@ import roomescape.payment.dto.PaymentConfirmResponse;
 @Component
 public class TossPaymentClient implements PaymentClient {
 
-    private static final String AUTHORIZATION_PREFIX = "Basic ";
-    private static final String AUTHORIZATION_DELIMITER = ":";
-
     private RestClient restClient;
 
-    public TossPaymentClient(TossPaymentsProperties properties, Builder restClientBuilder) {
-            restClient = restClientBuilder
+    public TossPaymentClient(TossPaymentsProperties properties, Builder tossRestClientBuilder) {
+            restClient = tossRestClientBuilder
                 .defaultStatusHandler(new TossPaymentErrorHandler())
                 .defaultHeader("Authorization", getAuthorization(properties.getSecretKey()))
                 .defaultHeader("Content-Type", "application/json")
@@ -38,7 +35,7 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     private String getAuthorization(String secretKey) {
-        return AUTHORIZATION_PREFIX + encodeToBase64((secretKey + AUTHORIZATION_DELIMITER));
+        return "Basic " + encodeToBase64((secretKey + ":"));
     }
 
     private String encodeToBase64(String value) {
