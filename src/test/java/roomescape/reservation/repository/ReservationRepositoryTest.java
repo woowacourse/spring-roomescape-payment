@@ -3,6 +3,7 @@ package roomescape.reservation.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,10 +14,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 import roomescape.config.TestConfig;
 import roomescape.member.domain.Member;
+import roomescape.member.domain.MemberRole;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.infrastructure.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationInfo;
 import roomescape.reservation.fixture.TestFixture;
+import roomescape.reservation.repository.dto.ReservationWithPayment;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.dto.response.AvailableReservationTimeResponse;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
@@ -26,7 +31,7 @@ import roomescape.theme.repository.ThemeRepository;
 @DataJpaTest
 @Import(TestConfig.class)
 @TestPropertySource(properties = {
-    "spring.sql.init.mode=never"
+        "spring.sql.init.mode=never"
 })
 class ReservationRepositoryTest {
 
@@ -34,6 +39,9 @@ class ReservationRepositoryTest {
 
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Autowired
     private ThemeRepository themeRepository;
@@ -56,7 +64,7 @@ class ReservationRepositoryTest {
         reservationTime = reservationTimeRepository.save(ReservationTime.withUnassignedId(LocalTime.of(10, 0)));
         theme = themeRepository.save(TestFixture.makeTheme(1L));
         reservationRepository.save(
-                new Reservation(member,new ReservationInfo( futureDate, reservationTime, theme)));
+                new Reservation(member, new ReservationInfo(futureDate, reservationTime, theme)));
     }
 
     @Test
@@ -69,7 +77,8 @@ class ReservationRepositoryTest {
         Reservation reservation2 = new Reservation(member, new ReservationInfo(futureDate, reservationTime2, theme2));
         reservationRepository.save(reservation2);
 
-        List<Reservation> filteredReservations = reservationRepository.findByInfoThemeIdAndMemberIdAndInfoDateBetween(theme.getId(),
+        List<Reservation> filteredReservations = reservationRepository.findByInfoThemeIdAndMemberIdAndInfoDateBetween(
+                theme.getId(),
                 member.getId(), futureDate,
                 futureDate.plusDays(1));
 
@@ -92,10 +101,10 @@ class ReservationRepositoryTest {
 
     @Test
     void existsByInfoDateAndInfoTimeIdAndInfoThemeId_shouldReturnTrue() {
-        boolean existsByDateAndTimeIdAndThemeId = reservationRepository.existsByInfoDateAndInfoTimeIdAndInfoThemeId(futureDate,
+        boolean existsByDateAndTimeIdAndThemeId = reservationRepository.existsByInfoDateAndInfoTimeIdAndInfoThemeId(
+                futureDate,
                 reservationTime.getId(),
-                theme.getId())
-                ;
+                theme.getId());
 
         assertThat(existsByDateAndTimeIdAndThemeId).isTrue();
     }
@@ -116,5 +125,51 @@ class ReservationRepositoryTest {
                 futureDate, theme.getId());
 
         assertThat(bookedTimesByDateAndThemeId.size()).isEqualTo(3);
+    }
+
+    @Test
+    void findReservationWithPaymentByMemberId_test() {
+        ReservationTime reservationTime2 = reservationTimeRepository.save(
+                ReservationTime.withUnassignedId(LocalTime.of(11, 0)));
+        ReservationTime reservationTime3 = reservationTimeRepository.save(
+                ReservationTime.withUnassignedId(LocalTime.of(12, 0)));
+        Member newMember = new Member("cogi", "cogi@gmail.com", "password", MemberRole.USER);
+        memberRepository.save(newMember);
+        Reservation reservation = new Reservation(member, new ReservationInfo(futureDate, reservationTime2, theme));
+        reservationRepository.save(reservation);
+        reservationRepository.save(
+                new Reservation(newMember, new ReservationInfo(futureDate, reservationTime3, theme)));
+        Payment payment = Payment.createPaymentWithoutId("a", "a", 1000, LocalDateTime.now(), reservation);
+        paymentRepository.save(payment);
+
+        List<ReservationWithPayment> reservationWithPayments = reservationRepository.findReservationWithPaymentByMemberId(
+                member.getId());
+
+        assertThat(reservationWithPayments).hasSize(2);
+        assertThat(reservationWithPayments.get(0).getPayment()).isEmpty();
+        assertThat(reservationWithPayments.get(1).getPayment()).isPresent();
+    }
+
+    @Test
+    void findReservationWithPaymentByMemberId_test2() {
+        ReservationTime reservationTime2 = reservationTimeRepository.save(
+                ReservationTime.withUnassignedId(LocalTime.of(11, 0)));
+        ReservationTime reservationTime3 = reservationTimeRepository.save(
+                ReservationTime.withUnassignedId(LocalTime.of(12, 0)));
+        Member newMember = new Member("cogi", "cogi@gmail.com", "password", MemberRole.USER);
+        memberRepository.save(newMember);
+        Reservation reservation = new Reservation(newMember, new ReservationInfo(futureDate, reservationTime2, theme));
+        reservationRepository.save(reservation);
+        reservationRepository.save(
+                new Reservation(member, new ReservationInfo(futureDate, reservationTime3, theme)));
+        Payment payment = Payment.createPaymentWithoutId("a", "a", 1000, LocalDateTime.now(), reservation);
+        paymentRepository.save(payment);
+
+        List<ReservationWithPayment> reservationWithPayments = reservationRepository.findReservationWithPaymentByMemberId(
+                newMember.getId());
+
+        assertThat(reservationWithPayments).hasSize(1);
+        assertThat(reservationWithPayments.get(0).getPayment()).isPresent();
+        assertThat(reservationWithPayments.get(0).getReservation().getMember().getName()).isEqualTo("cogi");
     }
 }

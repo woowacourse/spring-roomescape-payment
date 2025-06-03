@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.repository.dto.ReservationWithPayment;
 import roomescape.reservationtime.dto.response.AvailableReservationTimeResponse;
 
 public interface JpaReservationRepository extends ListCrudRepository<Reservation, Long>, ReservationRepository {
@@ -68,6 +69,22 @@ public interface JpaReservationRepository extends ListCrudRepository<Reservation
     List<AvailableReservationTimeResponse> findBookedTimesByDateAndThemeId(
             @Param("date") LocalDate date,
             @Param("themeId") Long themeId
+    );
+
+    @Query(
+            """
+            SELECT new roomescape.reservation.repository.dto.ReservationWithPayment(r,p)
+            FROM Reservation r
+            JOIN FETCH r.info.theme
+            JOIN FETCH r.info.time
+            LEFT JOIN Payment p
+                ON r.id = p.reservation.id
+            WHERE r.member.id = :memberId
+            """
+
+    )
+    List<ReservationWithPayment> findReservationWithPaymentByMemberId(
+            @Param("memberId") Long memberId
     );
 
     @EntityGraph(attributePaths = {"member", "info.theme", "info.time"})

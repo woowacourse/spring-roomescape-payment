@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.repository.dto.ReservationWithPayment;
 import roomescape.reservationtime.dto.response.AvailableReservationTimeResponse;
 
 public interface ReservationRepository {
@@ -21,6 +22,8 @@ public interface ReservationRepository {
 
     List<AvailableReservationTimeResponse> findBookedTimesByDateAndThemeId(LocalDate date,
                                                                            Long themeId);
+
+    List<ReservationWithPayment> findReservationWithPaymentByMemberId(Long memberId);
 
     List<Reservation> findByMemberId(Long id);
 
