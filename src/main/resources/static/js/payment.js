@@ -1,96 +1,79 @@
-document.addEventListener('DOMContentLoaded', () => {
+function getReservationIdFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("reservationId");
+}
 
-  // ------  결제위젯 초기화 ------
-  // @docs https://docs.tosspayments.com/reference/widget-sdk#sdk-설치-및-초기화
-  // @docs https://docs.tosspayments.com/reference/widget-sdk#renderpaymentmethods선택자-결제-금액-옵션
+document.addEventListener('DOMContentLoaded', () => {
   const paymentAmount = 1000;
   const widgetClientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
   const paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS);
+
   paymentWidget.renderPaymentMethods(
       "#payment-method",
-      {value: paymentAmount},
-      {variantKey: "DEFAULT"}
+      { value: paymentAmount },
+      { variantKey: "DEFAULT" }
   );
 
-  function onReservationButtonClickWithPaymentWidget(event) {
+  const reserveButton = document.getElementById("payment-button");
+  reserveButton.addEventListener("click", (event) => {
     onReservationButtonClick(event, paymentWidget);
-  }
+  });
 });
 
 function onReservationButtonClick(event, paymentWidget) {
-  const selectedDate = document.getElementById("datepicker").value;
-  const selectedThemeId = document.querySelector('.theme-slot.active')?.getAttribute('data-theme-id');
-  const selectedTimeId = document.querySelector('.time-slot.active')?.getAttribute('data-time-id');
+  const reservationId = getReservationIdFromUrl();
 
-  if (selectedDate && selectedThemeId && selectedTimeId) {
-    const reservationData = {
-      date: selectedDate,
-      themeId: selectedThemeId,
-      timeId: selectedTimeId
-    };
-    const generateRandomString = () =>
-        window.btoa(Math.random()).slice(0, 20);
-    /*
-    TODO: [1단계]
-          - orderIdPrefix 를 자신만의 prefix로 변경
-    */
-    // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
-    // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
-    const orderIdPrefix = "WTEST";
-    paymentWidget.requestPayment({
-      orderId: orderIdPrefix + generateRandomString(),
-      orderName: "테스트 방탈출 예약 결제 1건",
-      amount: 1000,
-    }).then(function (data) {
-      console.debug(data);
-      fetchReservationPayment(data, reservationData);
-    }).catch(function (error) {
-      // TOSS 에러 처리: 에러 목록을 확인하세요
-      // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
-      alert(error.code + " :" + error.message + "/ orderId : " + err.orderId);
-    });
-  } else {
-    alert("Please select a date, theme, and time before making a reservation.");
+  if (!reservationId) {
+    alert("예약 ID가 없습니다.");
+    return;
   }
+
+  const generateRandomString = () => window.btoa(Math.random()).slice(0, 20);
+  const orderIdPrefix = "WTEST";
+
+  paymentWidget.requestPayment({
+    orderId: orderIdPrefix + generateRandomString(),
+    orderName: "테스트 방탈출 예약 결제 1건",
+    amount: 1000,
+  })
+  .then(data => {
+    console.debug("결제 완료 응답:", data);
+    fetchReservationPayment(data, reservationId);
+  })
+  .catch(error => {
+    alert(error.code + " :" + error.message);
+  });
 }
 
-async function fetchReservationPayment(paymentData, reservationData) {
-
+async function fetchReservationPayment(paymentData, reservationId) {
   const reservationPaymentRequest = {
-    reservationId: reservationData.id,
+    reservationId: Number(reservationId), // Long 타입으로 변환
     paymentKey: paymentData.paymentKey,
     orderId: paymentData.orderId,
     amount: paymentData.amount,
-  }
+  };
 
-  const reservationURL = "/reservations";
-  fetch(reservationURL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(reservationPaymentRequest),
-  }).then(response => {
+  const reservationURL = "/payment";
+
+  try {
+    const response = await fetch(reservationURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(reservationPaymentRequest),
+    });
+
     if (!response.ok) {
-      return response.json().then(errorBody => {
-        console.error("예약 결제 실패 : " + JSON.stringify(errorBody));
-        window.alert("예약 결제 실패 메시지");
-      });
-    } else {
-      response.json().then(successBody => {
-        console.log("예약 결제 성공 : " + JSON.stringify(successBody));
-        window.location.reload();
-      });
+      const errorBody = await response.json();
+      console.error("예약 결제 실패:", errorBody);
+      alert("예약 결제 실패: " + (errorBody.message || "알 수 없는 오류"));
+      return;
     }
-  }).catch(error => {
-    console.error(error.message);
-  });
-}
 
-function requestRead(endpoint) {
-  return fetch(endpoint)
-  .then(response => {
-    if (response.status === 200) return response.json();
-    throw new Error('Read failed');
-  });
+    const successBody = await response.json();
+    console.log("예약 결제 성공:", successBody);
+    alert("예약 결제가 성공적으로 완료되었습니다!");
+  } catch (error) {
+    console.error("예약 결제 중 오류:", error);
+    alert("예약 결제 중 오류가 발생했습니다.");
+  }
 }
