@@ -35,7 +35,7 @@ class PaymentClientMockWebServerTest {
                 .baseUrl(mockWebServer.url("/").toString())
                 .build();
 
-        paymentClient = new TossPaymentClient(restClient);
+        paymentClient = new TossPaymentClient(objectMapper, restClient);
     }
 
     @AfterEach

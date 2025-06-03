@@ -25,7 +25,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class TossPaymentClient implements PaymentClient {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private final ObjectMapper mapper;
     private final RestClient restClient;
 
     public PaymentResult confirmPayment(final PaymentRequest request) {
@@ -52,7 +52,7 @@ public class TossPaymentClient implements PaymentClient {
     private void handle4xxError(final HttpRequest request, final ClientHttpResponse response) {
         try {
             String responseBody = new String(response.getBody().readAllBytes());
-            JsonNode jsonNode = MAPPER.readTree(responseBody);
+            JsonNode jsonNode = mapper.readTree(responseBody);
             String errorMessage = jsonNode.get("message").asText();
 
             if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
