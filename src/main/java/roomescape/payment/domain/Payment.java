@@ -73,11 +73,11 @@ public class Payment {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Payment waiting = (Payment) o;
-        if (id == null || waiting.id == null) {
+        Payment payment = (Payment) o;
+        if (id == null || payment.id == null) {
             return false;
         }
-        return Objects.equals(id, waiting.id);
+        return Objects.equals(id, payment.id);
     }
 
     @Override
