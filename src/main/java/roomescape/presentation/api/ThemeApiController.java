@@ -39,7 +39,6 @@ public class ThemeApiController {
     }
 
     @GetMapping("/themes/popular")
-    @AuthRequired
     public List<ThemeResponse> getPopularThemes() {
         return themeService.getPopular();
     }
