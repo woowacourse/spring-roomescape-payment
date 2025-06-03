@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
@@ -22,10 +23,9 @@ import org.springframework.web.client.RestClientException;
 
 @SpringBootTest
 @TestPropertySource(properties = {
-        "toss.payment.secret-key=test_sk_secret",
-        "toss.payment.connect-timeout=1",
-        "toss.payment.read-timeout=2"
+        "toss.payment.secret-key=test_sk_secret"
 })
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class RestClientConfigTest {
 
     private MockWebServer mockWebServer;
@@ -39,8 +39,8 @@ class RestClientConfigTest {
         RestClientConfig config = new RestClientConfig(
                 "test_sk_secret",
                 String.format("http://localhost:%s", mockWebServer.getPort()),
-                1,
-                2);
+                1000,
+                2000);
         restClient = config.restClient();
     }
 
