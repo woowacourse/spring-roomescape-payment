@@ -12,11 +12,10 @@ import roomescape.member.repository.MemberRepository;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentStatus;
 import roomescape.payment.repository.PaymentRepository;
+import roomescape.reservation.domain.RegistrationSlot;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.RoomEscapeInformation;
 import roomescape.reservation.domain.WaitingReservation;
 import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservation.repository.RoomEscapeInformationRepository;
 import roomescape.reservation.repository.WaitingReservationRepository;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
@@ -33,60 +32,53 @@ public class SampleReservationInitializer implements CommandLineRunner {
     private final MemberRepository memberRepository;
     private final ReservationTimeRepository timeRepository;
     private final ThemeRepository themeRepository;
-    private final RoomEscapeInformationRepository roomEscapeInformationRepository;
     private final PaymentRepository paymentRepository;
 
     @Transactional
     @Override
     public void run(String... args) {
-        System.out.println("======================================");
-        LocalDate baseDate = LocalDate.now().minusDays(5);
+        LocalDate baseDate = LocalDate.now().minusDays(3);
 
-        saveInformation(baseDate, 1L, 1L);
-        saveInformation(baseDate, 1L, 2L);
-        saveInformation(baseDate, 1L, 3L);
-        saveInformation(baseDate, 1L, 4L);
-        saveInformation(baseDate, 1L, 5L);
-        saveInformation(baseDate.plusDays(1), 1L, 1L);
-        saveInformation(baseDate.plusDays(2), 1L, 1L);
-        saveInformation(baseDate.plusDays(3), 1L, 1L);
-        saveInformation(baseDate.plusDays(4), 1L, 1L);
+        saveReservation(3L, baseDate, 3L, 9L);
+        saveReservation(7L, baseDate, 9L, 7L);
+        saveReservation(2L, baseDate.minusDays(1), 2L, 16L);
+        saveReservation(9L, baseDate.plusDays(3), 3L, 19L);
+        saveReservation(5L, baseDate.plusDays(2), 10L, 5L);
+        saveReservation(1L, baseDate, 9L, 16L);
+        saveReservation(6L, baseDate.minusDays(1), 7L, 20L);
+        saveReservation(4L, baseDate.plusDays(2), 7L, 11L);
+        saveReservation(8L, baseDate.plusDays(3), 7L, 13L);
+        saveReservation(10L, baseDate, 5L, 4L);
+        saveReservation(2L, baseDate.plusDays(1), 4L, 2L);
+        saveReservation(5L, baseDate.plusDays(4), 8L, 15L);
+        saveReservation(9L, baseDate.plusDays(5), 1L, 7L);
+        saveReservation(7L, baseDate.minusDays(1), 6L, 11L);
+        saveReservation(1L, baseDate.plusDays(4), 2L, 5L);
+        saveReservation(3L, baseDate.plusDays(3), 10L, 18L);
+        saveReservation(6L, baseDate.plusDays(2), 5L, 20L);
+        saveReservation(8L, baseDate.plusDays(1), 9L, 3L);
+        saveReservation(4L, baseDate.plusDays(5), 7L, 7L);
+        saveReservation(10L, baseDate.plusDays(4), 11L, 13L);
 
-        saveReservation(1L, 2L);
-        saveReservation(2L, 3L);
-        saveReservation(3L, 4L);
-        saveReservation(4L, 5L);
-        saveReservation(1L, 6L);
-        saveReservation(2L, 7L);
-        saveReservation(3L, 8L);
-        saveReservation(4L, 9L);
-
-        saveReservation(2L, 1L);
-        saveWaiting(1L, 1L);
-        saveWaiting(3L, 1L);
-        saveWaiting(4L, 1L);
+        saveReservation(2L, baseDate, 1L, 1L);
+        saveWaiting(1L, baseDate, 1L, 1L);
+        saveWaiting(3L, baseDate, 1L, 1L);
+        saveWaiting(4L, baseDate, 1L, 1L);
+        saveWaiting(5L, baseDate, 1L, 1L);
     }
 
-    private void saveInformation(LocalDate date, Long timeId, Long themeId) {
-        ReservationTime time = timeRepository.findById(timeId)
-                .orElseThrow(() -> new IllegalArgumentException("timeId 찾기 오류, timeId: " + timeId));
-        Theme theme = themeRepository.findById(themeId)
-                .orElseThrow(() -> new IllegalArgumentException("themeId 찾기 오류, themeId: " + themeId));
+    private void saveReservation(Long memberId, LocalDate date, Long timeId, Long themeId) {
+        Member member = memberRepository.findById(memberId).orElseThrow();
+        ReservationTime time = timeRepository.findById(timeId).orElseThrow();
+        Theme theme = themeRepository.findById(themeId).orElseThrow();
 
-        RoomEscapeInformation info = RoomEscapeInformation.builder()
+        RegistrationSlot registrationSlot = RegistrationSlot.builder()
+                .theme(theme)
                 .date(date)
                 .time(time)
-                .theme(theme)
                 .build();
-        roomEscapeInformationRepository.save(info);
-    }
 
-    private void saveReservation(Long memberId, Long infoId) {
-        Member member = memberRepository.findById(memberId).get();
-        Reservation reservation = Reservation.builder()
-                .member(member)
-                .roomEscapeInformation(roomEscapeInformationRepository.findById(infoId).get())
-                .build();
+        Reservation reservation = Reservation.createNew(member, registrationSlot);
         reservationRepository.save(reservation);
 
         Payment payment = Payment.builder()
@@ -100,11 +92,21 @@ public class SampleReservationInitializer implements CommandLineRunner {
         paymentRepository.save(payment);
     }
 
-    private void saveWaiting(Long memberId, Long infoId) {
-        WaitingReservation waiting = WaitingReservation.builder()
-                .member(memberRepository.findById(memberId).get())
-                .roomEscapeInformation(roomEscapeInformationRepository.findById(infoId).get())
+    private void saveWaiting(Long memberId, LocalDate date, Long timeId, Long themeId) {
+        Member member = memberRepository.findById(memberId).orElseThrow();
+        ReservationTime time = timeRepository.findById(timeId).orElseThrow();
+        Theme theme = themeRepository.findById(themeId).orElseThrow();
+
+        RegistrationSlot registrationSlot = RegistrationSlot.builder()
+                .theme(theme)
+                .date(date)
+                .time(time)
                 .build();
-        waitingRepository.save(waiting);
+
+        WaitingReservation waitingReservation = WaitingReservation.builder()
+                .member(member)
+                .registrationSlot(registrationSlot)
+                .build();
+        waitingRepository.save(waitingReservation);
     }
 }

@@ -5,18 +5,17 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
     @Query("""
             select r from Reservation r
-            join fetch r.roomEscapeInformation re
-            where (:themeId is null or re.theme.id = :themeId)
+            join fetch r.registrationSlot bs
+            where (:themeId is null or bs.theme.id = :themeId)
               and (:memberId is null or r.member.id = :memberId)
-              and (:localDateFrom is null or re.date >= :localDateFrom)
-              and (:localDateTo is null or re.date <= :localDateTo)
+              and (:localDateFrom is null or bs.date >= :localDateFrom)
+              and (:localDateTo is null or bs.date <= :localDateTo)
             """)
     List<Reservation> findByCriteria(
             @Param("themeId") Long themeId,
@@ -25,7 +24,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("localDateTo") LocalDate localDateTo
     );
 
-    List<Reservation> findByMember(final Member member);
-
-    boolean existsByRoomEscapeInformationId(Long roomEscapeInformationId);
+    @Query("""
+    SELECT EXISTS (
+        SELECT 1 FROM Reservation r
+        WHERE r.registrationSlot.date = :date
+          AND r.registrationSlot.time.id = :timeId
+          AND r.registrationSlot.theme.id = :themeId
+        )
+    """)
+    boolean existsSameRegistrationSlot(LocalDate date, Long timeId, Long themeId);
 }

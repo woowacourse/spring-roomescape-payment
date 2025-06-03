@@ -7,8 +7,8 @@ import java.time.LocalTime;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.domain.Password;
+import roomescape.reservation.domain.RegistrationSlot;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.RoomEscapeInformation;
 import roomescape.reservation.domain.WaitingReservation;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
@@ -77,49 +77,17 @@ public class TestFixture {
         return createReservationOf(member, DEFAULT_DATE, time, theme);
     }
 
-    public static Reservation createReservationOf(Member member, RoomEscapeInformation roomEscapeInformation) {
-        return Reservation.builder()
-                .member(member)
-                .roomEscapeInformation(roomEscapeInformation)
-                .build();
-    }
-
     public static Reservation createReservationOf(Member member, LocalDate date, ReservationTime time, Theme theme) {
         return Reservation.builder()
                 .member(member)
-                .roomEscapeInformation(RoomEscapeInformation.builder()
-                        .id(null)
-                        .date(date)
-                        .time(time)
-                        .theme(theme)
-                        .build())
-                .build();
-    }
-
-    public static WaitingReservation createWaitingOf(Member member, RoomEscapeInformation roomEscapeInformation) {
-        return WaitingReservation.builder()
-                .member(member)
-                .roomEscapeInformation(roomEscapeInformation)
+                .registrationSlot(new RegistrationSlot(time, theme, date))
                 .build();
     }
 
     public static WaitingReservation createWaitingOf(Member member, LocalDate date, ReservationTime time, Theme theme) {
         return WaitingReservation.builder()
                 .member(member)
-                .roomEscapeInformation(RoomEscapeInformation.builder()
-                        .id(null)
-                        .date(date)
-                        .time(time)
-                        .theme(theme)
-                        .build())
-                .build();
-    }
-
-    public static RoomEscapeInformation createRoomEscapeInformation(LocalDate date, ReservationTime time, Theme theme) {
-        return RoomEscapeInformation.builder()
-                .date(date)
-                .time(time)
-                .theme(theme)
+                .registrationSlot(new RegistrationSlot(time, theme, date))
                 .build();
     }
 

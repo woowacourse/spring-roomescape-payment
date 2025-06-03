@@ -1,28 +1,47 @@
-INSERT INTO reservation_time(start_at)
-VALUES ('10:00');
-INSERT INTO reservation_time(start_at)
-VALUES ('11:00');
-INSERT INTO reservation_time(start_at)
-VALUES ('12:00');
-INSERT INTO reservation_time(start_at)
-VALUES ('13:00');
+-- reservation_time 테이블에 대한 INSERT
+INSERT INTO reservation_time(start_at) VALUES ('12:00');
+INSERT INTO reservation_time(start_at) VALUES ('13:00');
+INSERT INTO reservation_time(start_at) VALUES ('14:00');
+INSERT INTO reservation_time(start_at) VALUES ('15:00');
+INSERT INTO reservation_time(start_at) VALUES ('16:00');
+INSERT INTO reservation_time(start_at) VALUES ('17:00');
+INSERT INTO reservation_time(start_at) VALUES ('18:00');
+INSERT INTO reservation_time(start_at) VALUES ('19:00');
+INSERT INTO reservation_time(start_at) VALUES ('20:00');
+INSERT INTO reservation_time(start_at) VALUES ('21:00');
+INSERT INTO reservation_time(start_at) VALUES ('22:00');
 
-INSERT INTO theme(name, description, thumbnail)
-VALUES ('이름1', '설명1', '썸네일1');
-INSERT INTO theme(name, description, thumbnail)
-VALUES ('이름2', '설명2', '썸네일2');
-INSERT INTO theme(name, description, thumbnail)
-VALUES ('이름3', '설명3', '썸네일3');
-INSERT INTO theme(name, description, thumbnail)
-VALUES ('이름4', '설명4', '썸네일4');
-INSERT INTO theme(name, description, thumbnail)
-VALUES ('이름5', '설명5', '썸네일5');
+-- themeName 테이블에 대한 INSERT
+INSERT INTO theme(name, description, thumbnail) VALUES ('The Haunted Mansion', 'Solve the mysteries of the haunted mansion to escape.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
+INSERT INTO theme(name, description, thumbnail) VALUES ('Secret Agent Mission', 'Complete your secret agent mission before time runs out.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
+INSERT INTO theme(name, description, thumbnail) VALUES ('Pirate''s Treasure', 'Find the hidden pirate''s treasure in this thrilling adventure.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
+INSERT INTO theme(name, description, thumbnail) VALUES ('Alien Invasion', 'Defend Earth from an alien invasion and escape safely.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
+INSERT INTO theme(name, description, thumbnail) VALUES ('Mystery of the Pharaoh', 'Uncover the secrets of the ancient pharaoh''s tomb.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
+INSERT INTO theme(name, description, thumbnail) VALUES ('Escape from the Asylum', 'Escape the asylum by solving puzzles and clues.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
+INSERT INTO theme(name, description, thumbnail) VALUES ('The Lost City', 'Discover the secrets of the lost city and find your way out.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
+INSERT INTO theme(name, description, thumbnail) VALUES ('Time Travel Trouble', 'Fix the timeline and escape the time travel trouble.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
+INSERT INTO theme(name, description, thumbnail) VALUES ('Zombie Apocalypse', 'Survive the zombie apocalypse and find a safe exit.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
+INSERT INTO theme(name, description, thumbnail) VALUES ('The Enchanted Forest', 'Navigate through the enchanted forest to find your way out.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
+INSERT INTO theme(name, description, thumbnail) VALUES ('The Bank Heist', 'Plan and execute the perfect bank heist to escape.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
+INSERT INTO theme(name, description, thumbnail) VALUES ('Spy School', 'Graduate from spy school by completing challenging missions.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
+INSERT INTO theme(name, description, thumbnail) VALUES ('The Cursed Jewel', 'Break the curse of the jewel and escape the danger.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
+INSERT INTO theme(name, description, thumbnail) VALUES ('Space Station Escape', 'Escape the malfunctioning space station before it''s too late.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
+INSERT INTO theme(name, description, thumbnail) VALUES ('The Wizard''s Tower', 'Climb the wizard''s tower and solve magical puzzles.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
+INSERT INTO theme(name, description, thumbnail) VALUES ('The Secret Laboratory', 'Escape the secret laboratory filled with experiments gone wrong.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
+INSERT INTO theme(name, description, thumbnail) VALUES ('The Forgotten Dungeon', 'Find your way out of the forgotten dungeon.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
+INSERT INTO theme(name, description, thumbnail) VALUES ('The Vampire''s Lair', 'Escape the vampire''s lair before dawn.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
+INSERT INTO theme(name, description, thumbnail) VALUES ('The Arctic Expedition', 'Survive the harsh conditions of the arctic expedition.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
+INSERT INTO theme(name, description, thumbnail) VALUES ('The Wild West', 'Escape the wild west town before the showdown.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
 
-INSERT INTO member(name, email, password, role)
-VALUES ('운영진', 'admin@naver.com', '1234', 'ADMIN');
-INSERT INTO member(name, email, password, role)
-VALUES ('홍길동', 'member2@naver.com', '1234', 'MEMBER');
-INSERT INTO member(name, email, password, role)
-VALUES ('멍구', 'member3@naver.com', '1234', 'MEMBER');
-INSERT INTO member(name, email, password, role)
-VALUES ('새로이', 'member4@naver.com', '1234', 'MEMBER');
+-- member 테이블에 대한 INSERT
+INSERT INTO member(name, role, email, password) VALUES ('admin', 'ADMIN', 'admin@email.com', 'password');
+INSERT INTO member (name, role, email, password) VALUES ('Alice', 'MEMBER', 'alice@example.com', 'password');
+INSERT INTO member (name, role, email, password) VALUES ('Bob', 'MEMBER', 'bob@example.com', 'password');
+INSERT INTO member (name, role, email, password) VALUES ('Charlie', 'MEMBER', 'charlie@example.com', 'password');
+INSERT INTO member (name, role, email, password) VALUES ('David', 'MEMBER', 'david@example.com', 'password');
+INSERT INTO member (name, role, email, password) VALUES ('Eve', 'MEMBER', 'eve@example.com', 'password');
+INSERT INTO member (name, role, email, password) VALUES ('Frank', 'MEMBER', 'frank@example.com', 'password');
+INSERT INTO member (name, role, email, password) VALUES ('Grace', 'MEMBER', 'grace@example.com', 'password');
+INSERT INTO member (name, role, email, password) VALUES ('Heidi', 'MEMBER', 'heidi@example.com', 'password');
+INSERT INTO member (name, role, email, password) VALUES ('Ivan', 'MEMBER', 'ivan@example.com', 'password');
+INSERT INTO member (name, role, email, password) VALUES ('Judy', 'MEMBER', 'judy@example.com', 'password');

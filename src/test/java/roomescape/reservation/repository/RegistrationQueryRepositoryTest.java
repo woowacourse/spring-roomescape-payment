@@ -6,7 +6,6 @@ import static roomescape.TestFixture.DEFAULT_DATE;
 import static roomescape.TestFixture.createDefaultTheme;
 import static roomescape.TestFixture.createMemberByName;
 import static roomescape.TestFixture.createReservationOf;
-import static roomescape.TestFixture.createRoomEscapeInformation;
 import static roomescape.TestFixture.createTimeAt_10;
 import static roomescape.TestFixture.createWaitingOf;
 
@@ -20,7 +19,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import roomescape.DBHelper;
 import roomescape.member.domain.Member;
-import roomescape.reservation.domain.RoomEscapeInformation;
 import roomescape.reservation.repository.dto.MemberRegistrationProjection;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
@@ -47,17 +45,15 @@ class RegistrationQueryRepositoryTest {
         Member member3 = createMemberByName("member3");
         ReservationTime time = createTimeAt_10();
         Theme theme = createDefaultTheme();
-        RoomEscapeInformation roomEscapeInformation1 = createRoomEscapeInformation(DEFAULT_DATE, time, theme);
 
-        dbHelper.insertReservation(createReservationOf(member2, roomEscapeInformation1));
-        dbHelper.insertWaiting(createWaitingOf(member, roomEscapeInformation1));
+        dbHelper.insertReservation(createReservationOf(member2, DEFAULT_DATE, time, theme));
+        dbHelper.insertWaiting(createWaitingOf(member, DEFAULT_DATE, time, theme));
         dbHelper.insertReservation(createReservationOf(member, DEFAULT_DATE.plusDays(1), time, theme));
         dbHelper.insertReservation(createReservationOf(member, DEFAULT_DATE.plusDays(2), time, theme));
 
-        RoomEscapeInformation roomEscapeInformation2 = createRoomEscapeInformation(DEFAULT_DATE.plusDays(3), time, theme);
-        dbHelper.insertWaiting(createWaitingOf(member2, roomEscapeInformation2));
-        dbHelper.insertWaiting(createWaitingOf(member3, roomEscapeInformation2));
-        dbHelper.insertWaiting(createWaitingOf(member, roomEscapeInformation2));
+        dbHelper.insertWaiting(createWaitingOf(member2, DEFAULT_DATE.plusDays(3), time, theme));
+        dbHelper.insertWaiting(createWaitingOf(member3, DEFAULT_DATE.plusDays(3), time, theme));
+        dbHelper.insertWaiting(createWaitingOf(member, DEFAULT_DATE.plusDays(3), time, theme));
 
         // when
         List<MemberRegistrationProjection> registrationsData =

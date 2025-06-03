@@ -19,9 +19,9 @@ public record ReservationResponse(
     public ReservationResponse(final Reservation reservation) {
         this(
                 reservation.getId(),
-                reservation.getRoomEscapeInformation().getDate(),
-                new ReservationTimeResponse(reservation.getRoomEscapeInformation().getTime()),
-                new ThemeResponse(reservation.getRoomEscapeInformation().getTheme()),
+                reservation.getDate(),
+                new ReservationTimeResponse(reservation.getTime()),
+                new ThemeResponse(reservation.getTheme()),
                 new MemberResponse(reservation.getMember())
         );
     }
@@ -29,9 +29,9 @@ public record ReservationResponse(
     public ReservationResponse(final WaitingReservation waitingReservation) {
         this(
                 waitingReservation.getId(),
-                waitingReservation.getRoomEscapeInformation().getDate(),
-                new ReservationTimeResponse(waitingReservation.getRoomEscapeInformation().getTime()),
-                new ThemeResponse(waitingReservation.getRoomEscapeInformation().getTheme()),
+                waitingReservation.getDate(),
+                new ReservationTimeResponse(waitingReservation.getTime()),
+                new ThemeResponse(waitingReservation.getTheme()),
                 new MemberResponse(waitingReservation.getMember())
         );
     }

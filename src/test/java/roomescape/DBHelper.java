@@ -17,39 +17,39 @@ public class DBHelper {
     @PersistenceContext
     private EntityManager em;
 
-    public Long insertReservation(Reservation reservation) {
+    public Reservation insertReservation(Reservation reservation) {
         if(reservation.getMember().getId() == null) {
             em.persist(reservation.getMember());
         }
-        if(reservation.getRoomEscapeInformation().getTime().getId() == null) {
-            em.persist(reservation.getRoomEscapeInformation().getTime());
+        if(reservation.getTime().getId() == null) {
+            em.persist(reservation.getTime());
         }
-        if(reservation.getRoomEscapeInformation().getTheme().getId() == null) {
-            em.persist(reservation.getRoomEscapeInformation().getTheme());
+        if(reservation.getTheme().getId() == null) {
+            em.persist(reservation.getTheme());
         }
-        if(reservation.getRoomEscapeInformation().getId() == null) {
-            em.persist(reservation.getRoomEscapeInformation());
+        if(reservation.getId() == null) {
+            em.persist(reservation);
         }
         if(reservation.getId() == null) {
             em.persist(reservation);
         }
         em.flush();
 
-        return reservation.getId();
+        return reservation;
     }
 
     public WaitingReservation insertWaiting(WaitingReservation waiting) {
         if(waiting.getMember().getId() == null) {
             em.persist(waiting.getMember());
         }
-        if(waiting.getRoomEscapeInformation().getTime().getId() == null) {
-            em.persist(waiting.getRoomEscapeInformation().getTime());
+        if(waiting.getTime().getId() == null) {
+            em.persist(waiting.getTime());
         }
-        if(waiting.getRoomEscapeInformation().getTheme().getId() == null) {
-            em.persist(waiting.getRoomEscapeInformation().getTheme());
+        if(waiting.getTheme().getId() == null) {
+            em.persist(waiting.getTheme());
         }
-        if(waiting.getRoomEscapeInformation().getId() == null) {
-            em.persist(waiting.getRoomEscapeInformation());
+        if(waiting.getId() == null) {
+            em.persist(waiting);
         }
         if(waiting.getId() == null) {
             em.persist(waiting);
@@ -59,25 +59,22 @@ public class DBHelper {
         return waiting;
     }
 
-    public void insertMember(Member member) {
+    public Member insertMember(Member member) {
         em.persist(member);
         em.flush();
+        return member;
     }
 
-    public void insertTime(ReservationTime reservationTime) {
+    public ReservationTime insertTime(ReservationTime reservationTime) {
         em.persist(reservationTime);
         em.flush();
+        return reservationTime;
     }
 
-    public void insertTheme(Theme theme) {
+    public Theme insertTheme(Theme theme) {
         em.persist(theme);
         em.flush();
-    }
 
-    public void prepareForBooking(Member member, ReservationTime time, Theme theme) {
-        insertMember(member);
-        insertTime(time);
-        insertTheme(theme);
-        em.flush();
+        return theme;
     }
 }

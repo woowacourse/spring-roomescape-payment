@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.ReservationException;
-import roomescape.reservation.repository.RoomEscapeInformationRepository;
+import roomescape.reservation.repository.RegistrationQueryRepository;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.dto.ReservationTimeRequest;
 import roomescape.reservationtime.dto.ReservationTimeResponse;
@@ -16,7 +16,7 @@ import roomescape.reservationtime.repository.ReservationTimeRepository;
 public class ReservationTimeService {
 
     private final ReservationTimeRepository reservationTimeRepository;
-    private final RoomEscapeInformationRepository roomEscapeInformationRepository;
+    private final RegistrationQueryRepository registrationQueryRepository;
 
     public ReservationTimeResponse saveTime(final ReservationTimeRequest request) {
         final ReservationTime reservationTime = reservationTimeRepository.save(ReservationTime.from(request.startAt()));
@@ -32,7 +32,7 @@ public class ReservationTimeService {
 
     @Transactional
     public void delete(final Long id) {
-        if (roomEscapeInformationRepository.existsByTimeId(id)) {
+        if (registrationQueryRepository.existsByTimeId(id)) {
             throw new ReservationException("해당 시간으로 예약된 건이 존재합니다.");
         }
         reservationTimeRepository.deleteById(id);
