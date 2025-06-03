@@ -1,17 +1,16 @@
 package roomescape.user.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import java.util.HashSet;
-import java.util.Set;
-import roomescape.reservation.domain.Reservation;
+import jakarta.persistence.Table;
 
-@Entity(name = "users")
+@Entity
+@Table(name = "users")
 public class User {
 
     @Id
@@ -19,9 +18,16 @@ public class User {
     private Long id;
 
     @Enumerated(value = EnumType.STRING)
+    @Column(name = "role", nullable = false)
     private Role role;
+
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @Column(name = "email", nullable = false)
     private String email;
+
+    @Column(name = "password", nullable = false)
     private String password;
 
     protected User() {

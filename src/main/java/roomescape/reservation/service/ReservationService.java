@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.admin.domain.dto.SearchReservationRequestDto;
 import roomescape.payment.domain.dto.PaymentRequestDto;
-import roomescape.payment.service.PaymentService;
+import roomescape.payment.service.TossPaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.dto.ReservationInfo;
 import roomescape.reservation.domain.dto.ReservationRequestDto;
@@ -35,16 +35,16 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final WaitingRepository waitingRepository;
-    private final PaymentService paymentService;
+    private final TossPaymentService tossPaymentService;
 
     public ReservationService(ReservationRepository repository,
                               ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository,
-                              WaitingRepository waitingRepository, PaymentService paymentService) {
+                              WaitingRepository waitingRepository, TossPaymentService tossPaymentService) {
         this.repository = repository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.waitingRepository = waitingRepository;
-        this.paymentService = paymentService;
+        this.tossPaymentService = tossPaymentService;
     }
 
     public List<ReservationResponseDto> findAll() {
@@ -68,7 +68,7 @@ public class ReservationService {
         Reservation reservation = convertReservation(reservationRequestDto, user);
         validateDuplicateDateTime(reservation);
         PaymentRequestDto paymentRequestDto = convertPaymentRequestDto(requestDto);
-        paymentService.approve(paymentRequestDto);
+        tossPaymentService.approve(paymentRequestDto);
         Reservation savedReservation = repository.save(reservation);
         return convertReservationResponseDto(savedReservation);
     }

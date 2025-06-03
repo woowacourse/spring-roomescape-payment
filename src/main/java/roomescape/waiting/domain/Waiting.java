@@ -1,35 +1,40 @@
 package roomescape.waiting.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDate;
+import jakarta.persistence.Table;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 import roomescape.user.domain.User;
 
+import java.time.LocalDate;
+
 @Entity
+@Table(name = "waiting")
 public class Waiting {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "date", nullable = false)
     private LocalDate date;
 
     @ManyToOne
-    @JoinColumn(name = "reservation_time_id")
+    @JoinColumn(name = "time_id", nullable = false)
     private ReservationTime time;
 
     @ManyToOne
-    @JoinColumn(name = "theme_id")
+    @JoinColumn(name = "theme_id", nullable = false)
     private Theme theme;
 
     @ManyToOne
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", nullable = false)
     private User member;
 
     protected Waiting() {

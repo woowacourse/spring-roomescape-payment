@@ -1,5 +1,6 @@
 package roomescape.reservation.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -7,29 +8,43 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import jakarta.persistence.Table;
 import roomescape.reservation.exception.InvalidReservationTimeException;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 import roomescape.user.domain.User;
 import roomescape.waiting.domain.Waiting;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Entity
+@Table(name = "reservation")
 public class Reservation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "date", nullable = false)
     private LocalDate date;
+
+    @Column(name = "status", nullable = false)
     @Enumerated(value = EnumType.STRING)
     private ReservationStatus status;
+
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "time_id", nullable = false)
     private ReservationTime reservationTime;
+
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "theme_id", nullable = false)
     private Theme theme;
+
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     protected Reservation() {

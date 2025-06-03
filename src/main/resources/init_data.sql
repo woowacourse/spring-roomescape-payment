@@ -47,7 +47,7 @@ INSERT INTO users(role, name, email, password)
 VALUES ('ROLE_MEMBER', 'name', 'user@email.com', 'password'),
        ('ROLE_ADMIN', '어드민', 'admin@email.com', 'password2');
 
-INSERT INTO reservation(date, status, reservation_time_id, theme_id, user_id)
+INSERT INTO reservation(date, status, time_id, theme_id, user_id)
 VALUES
 -- theme_id 1에 1개 예약
 ('2025-05-21', 'BOOKED', 1, 1, 1),
@@ -166,7 +166,7 @@ VALUES
 ('2025-05-21', 'BOOKED', 8, 13, 1),
 ('2025-05-21', 'BOOKED', 8, 13, 1);
 
-INSERT INTO waiting(date, reservation_time_id, theme_id, member_id)
+INSERT INTO waiting(date, time_id, theme_id, member_id)
 VALUES
 ('2025-05-24', 1, 2, 1),
 ('2025-05-24', 2, 2, 1);
