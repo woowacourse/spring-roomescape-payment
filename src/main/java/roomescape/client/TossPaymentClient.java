@@ -22,16 +22,12 @@ import java.util.Base64;
 import java.util.Set;
 
 @Component
-public class TossPaymentClient implements PaymentClient{
+public class TossPaymentClient {
 
     private static final String BASE_URL = "https://api.tosspayments.com";
-    private static final String PAYMENT_CONFIRM_URL = "/v1/payments/confirm";
-    private static final String BASIC = "Basic ";
     private static final String KEY_MESSAGE = "message";
     private static final String KEY_CODE = "code";
 
-    @Value("${toss.payment.confirm.secretKey}")
-    private String PAYMENT_CONFIRM_SECRET_KEY;
     @Value("${toss.payment.confirm.connect-timeout}")
     private int CONNECT_TIMEOUT_MILLIS;
     @Value("${toss.payment.confirm.read-timeout}")
@@ -46,22 +42,9 @@ public class TossPaymentClient implements PaymentClient{
     );
 
     private final ObjectMapper objectMapper;
-    private final RestClient restClient;
 
     public TossPaymentClient(ObjectMapper objectMapper) {
-        this.restClient = buildRestClient();
         this.objectMapper = objectMapper;
-    }
-
-    public Payment confirmPayment(PaymentConfirmDto requestDto) {
-        return restClient.post()
-                .uri(PAYMENT_CONFIRM_URL)
-                .header(HttpHeaders.AUTHORIZATION, BASIC +
-                        Base64.getEncoder().encodeToString(PAYMENT_CONFIRM_SECRET_KEY.getBytes()))
-                .body(requestDto)
-                .accept(MediaType.APPLICATION_JSON)
-                .retrieve()
-                .body(Payment.class);
     }
 
     public RestClient buildRestClient() {
@@ -71,6 +54,13 @@ public class TossPaymentClient implements PaymentClient{
                 .defaultStatusHandler(HttpStatusCode::is4xxClientError, this::handleClientError)
                 .defaultStatusHandler(HttpStatusCode::is5xxServerError, this::handleServerError)
                 .build();
+    }
+
+    private HttpComponentsClientHttpRequestFactory getRequestFactory() {
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        factory.setConnectTimeout(Duration.ofMillis(CONNECT_TIMEOUT_MILLIS));
+        factory.setReadTimeout(Duration.ofMillis(READ_TIMEOUT_MILLIS));
+        return factory;
     }
 
     private void handleClientError(HttpRequest request, ClientHttpResponse response) throws IOException {
@@ -83,13 +73,6 @@ public class TossPaymentClient implements PaymentClient{
 
     private void handleServerError(HttpRequest request, ClientHttpResponse response) throws IOException {
         throw new PaymentConfirmServerException(parseErrorResponse(response));
-    }
-
-    private HttpComponentsClientHttpRequestFactory getRequestFactory() {
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setConnectTimeout(Duration.ofMillis(CONNECT_TIMEOUT_MILLIS));
-        factory.setReadTimeout(Duration.ofMillis(READ_TIMEOUT_MILLIS));
-        return factory;
     }
 
     private TossErrorResponse parseErrorResponse(ClientHttpResponse response) throws IOException {
