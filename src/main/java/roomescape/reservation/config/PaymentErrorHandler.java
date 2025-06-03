@@ -11,12 +11,12 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
 import roomescape.exception.PaymentClientException;
+import roomescape.exception.RoomescapeException;
 
 @Component
 @Slf4j
 public class PaymentErrorHandler implements ResponseErrorHandler {
 
-    private static final String SERVER_ERROR_MESSAGE = "서버의 문제가 발생했습니다.";
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Override
@@ -37,11 +37,11 @@ public class PaymentErrorHandler implements ResponseErrorHandler {
         } catch (JsonProcessingException e) {
             log.error("Payment API Json 에러 - URL: {}, Method: {}, Status: {}",
                     url, method, response.getStatusCode(), e);
-            throw new PaymentClientException(SERVER_ERROR_MESSAGE);
+            throw new RoomescapeException();
         } catch (IOException e) {
             log.error("Payment API 처리 중 예상치 못한 에러 발생 - URL: {}, Method: {}, Status: {}",
                     url, method, response.getStatusCode(), e);
-            throw new PaymentClientException(SERVER_ERROR_MESSAGE);
+            throw new RoomescapeException();
         }
     }
 
