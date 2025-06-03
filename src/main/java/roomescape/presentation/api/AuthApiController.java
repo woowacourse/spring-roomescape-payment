@@ -2,6 +2,8 @@ package roomescape.presentation.api;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,5 +35,15 @@ public class AuthApiController {
     public ResponseEntity<MemberResponse> check(LoginInfo loginInfo) {
         MemberResponse response = memberService.getById(loginInfo.id());
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        ResponseCookie cookie = ResponseCookie.from("authToken")
+                .httpOnly(true)
+                .maxAge(0)
+                .path("/")
+                .build();
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).build();
     }
 }
