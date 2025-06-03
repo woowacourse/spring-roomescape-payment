@@ -1,13 +1,17 @@
 insert into member (id, name, email, password, role)
-values ('1', '짱구', 'email1@domain.com', 'email1', 'USER');
+values ('1', '짱구', 'email1@domain.com', '$2a$10$YhpY6/Ob2HtUbfUTzw66TupYcxmbMnhHLpLAXwuxAiYN2r0.sGJKq', 'USER');
 insert into member (id, name, email, password, role)
-values ('2', '아마', 'email2@domain.com', 'email2', 'USER');
+values ('2', '아마', 'email2@domain.com', '$2a$10$YhpY6/Ob2HtUbfUTzw66TupYcxmbMnhHLpLAXwuxAiYN2r0.sGJKq', 'USER');
 insert into member (id, name, email, password, role)
-values ('3', '포라', 'email3@domain.com', 'email3', 'USER');
+values ('3', '포라', 'email3@domain.com', '$2a$10$YhpY6/Ob2HtUbfUTzw66TupYcxmbMnhHLpLAXwuxAiYN2r0.sGJKq', 'USER');
 insert into member (id, name, email, password, role)
-values ('4', '한스', 'email4@domain.com', 'email4', 'USER');
+values ('4', '한스', 'email4@domain.com', '$2a$10$YhpY6/Ob2HtUbfUTzw66TupYcxmbMnhHLpLAXwuxAiYN2r0.sGJKq', 'USER');
 insert into member (id, name, email, password, role)
-values ('5', '관리자', 'admin@domain.com', 'admin', 'USER');
+values ('5', '띠용', 'email5@domain.com', '$2a$10$YhpY6/Ob2HtUbfUTzw66TupYcxmbMnhHLpLAXwuxAiYN2r0.sGJKq', 'USER');
+insert into member (id, name, email, password, role)
+values ('6', '오리', 'email6@domain.com', '$2a$10$YhpY6/Ob2HtUbfUTzw66TupYcxmbMnhHLpLAXwuxAiYN2r0.sGJKq', 'USER');
+insert into member (id, name, email, password, role)
+values ('7', '관리자', 'admin@domain.com', '$2a$10$YhpY6/Ob2HtUbfUTzw66TupYcxmbMnhHLpLAXwuxAiYN2r0.sGJKq', 'USER');
 
 insert into theme (id, name, description, thumbnail)
 values ('1', '콜러', '나는 기억을 잃었다.',
