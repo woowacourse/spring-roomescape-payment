@@ -41,13 +41,6 @@ public class ReservationController {
             @RequestBody final ReservationRequest request,
             @Login final LoginMember loginMember
     ) {
-
-        TossPaymentConfirmRequest confirmRequest = new TossPaymentConfirmRequest(
-                request.orderId(),
-                request.amount(),
-                request.paymentKey()
-        );
-
         ReservationResponse response = reservationService.createReservation(request, loginMember.id());
 
         URI locationUri = URI.create(RESERVATION_BASE_URL + SLASH + response.id());
