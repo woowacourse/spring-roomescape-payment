@@ -24,6 +24,8 @@ import roomescape.fixture.TestFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.member.domain.Role;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
@@ -59,6 +61,8 @@ class ReservationServiceMockTest {
     private MemberRepository memberRepository;
     @Mock
     private WaitingRepository waitingRepository;
+    @Mock
+    private PaymentRepository paymentRepository;
     @Mock
     private DateTime dateTime;
 
@@ -115,6 +119,9 @@ class ReservationServiceMockTest {
         Reservation reservation = mock(Reservation.class);
         when(reservationRepository.findById(1L))
                 .thenReturn(Optional.of(reservation));
+        Payment payment = mock(Payment.class);
+        when(paymentRepository.findByReservationId(1L))
+                .thenReturn(Optional.of(payment));
         // when
         reservationService.deleteReservationById(1L);
         // then
