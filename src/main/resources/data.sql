@@ -30,7 +30,7 @@ VALUES ('Admin', 'admin@gmail.com', '$2a$10$lsczSamG1eaxq1KE2ivIpek7hOx.uNkDILI5
        ('Carol', 'carol@gmail.com', '$2a$10$lsczSamG1eaxq1KE2ivIpek7hOx.uNkDILI5nQPqaWyiUQtay6Msa', 'REGULAR'),
        ('Dave', 'dave@example.com', '$2a$10$lsczSamG1eaxq1KE2ivIpek7hOx.uNkDILI5nQPqaWyiUQtay6Msa', 'REGULAR'),
        ('Eve', 'eve@example.com', '$2a$10$lsczSamG1eaxq1KE2ivIpek7hOx.uNkDILI5nQPqaWyiUQtay6Msa', 'REGULAR'),
-       ('Frank', 'frank@example.com', '$2a$10$hKDVYxLefVHV/vtuPhWD3OigtRyOykRLDdUAp80Z1crSoS1lFqF.W', 'REGULAR'),
+       ('Frank', 'frank@gmail.com', '$2a$10$lsczSamG1eaxq1KE2ivIpek7hOx.uNkDILI5nQPqaWyiUQtay6Msa', 'REGULAR'),
        ('Grace', 'grace@example.com', '$2a$10$hKDVYxLefVHV/vtuPhWD3OigtRyOykRLDdUAp80Z1crSoS1lFqF.W', 'REGULAR'),
        ('Heidi', 'heidi@example.com', '$2a$10$hKDVYxLefVHV/vtuPhWD3OigtRyOykRLDdUAp80Z1crSoS1lFqF.W', 'REGULAR'),
        ('Ivan', 'ivan@example.com', '$2a$10$hKDVYxLefVHV/vtuPhWD3OigtRyOykRLDdUAp80Z1crSoS1lFqF.W', 'REGULAR'),
@@ -98,7 +98,7 @@ VALUES
     (2, 7, '2025-05-09 12:00:00', 'REQUESTED'),   -- Eve
 
     -- ReservationSlot ID 3 (논리, 5/10, 14:00) - Frank(현재)
-    (3, 8, '2025-05-09 12:30:00', 'CONFIRMED'),   -- Frank
+    (3, 8, '2025-05-09 12:30:00', 'FAILED'),   -- Frank
 
     -- ReservationSlot ID 4 (논리, 5/10, 16:00) - Grace(현재), Heidi(대기)
     (4, 9, '2025-05-09 13:00:00', 'CONFIRMED'),   -- Grace
