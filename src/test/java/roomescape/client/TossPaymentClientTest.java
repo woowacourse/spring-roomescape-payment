@@ -1,7 +1,6 @@
 package roomescape.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
@@ -15,8 +14,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import roomescape.client.dto.request.TossPaymentConfirmRequest;
+import roomescape.client.dto.response.TossErrorResponse;
 import roomescape.client.dto.response.TossPaymentResponse;
-import roomescape.common.exception.PaymentException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -66,11 +65,19 @@ class TossPaymentClientTest {
                 1000L,
                 "paymentKey"
         );
+
+        TossErrorResponse expected = new TossErrorResponse(
+                "INVALID_API_KEY",
+                "잘못된 시크릿키 연동 정보 입니다."
+        );
         setUpServerError();
 
-        // when & then
-        assertThatThrownBy(() -> tossPaymentClient.confirmPayment(request))
-                .isInstanceOf(PaymentException.class);
+        // when
+        ResponseEntity<TossPaymentResponse> actual = tossPaymentClient.confirmPayment(request);
+
+        // then
+        assertThat(actual.getBody().failure()).isNotNull();
+        assertThat(actual.getBody().failure()).isEqualTo(expected);
     }
 
     @Test
@@ -81,11 +88,18 @@ class TossPaymentClientTest {
                 1000L,
                 "paymentKey"
         );
+        TossErrorResponse expected = new TossErrorResponse(
+                "INVALID_CARD",
+                "유효하지 않은 카드입니다."
+        );
         setUpClientError();
 
-        // when & then
-        assertThatThrownBy(() -> tossPaymentClient.confirmPayment(request))
-                .isInstanceOf(PaymentException.class);
+        // when
+        ResponseEntity<TossPaymentResponse> actual = tossPaymentClient.confirmPayment(request);
+
+        // then
+        assertThat(actual.getBody().failure()).isNotNull();
+        assertThat(actual.getBody().failure()).isEqualTo(expected);
     }
 
     private void setUpSuccess() {
@@ -95,7 +109,6 @@ class TossPaymentClientTest {
                   "orderId": "MC4xNTU3MDQ1MDk3Njkx",
                   "orderName": "토스 티셔츠 외 2건",
                   "status": "DONE",
-                  "requestedAt": null,
                   "method": "간편결제",
                   "totalAmount": 1000,
                   "card": null,
@@ -114,26 +127,38 @@ class TossPaymentClientTest {
                   "paymentKey": "tgen_20250528204823hWav3",
                   "orderId": "MC4xNTU3MDQ1MDk3Njkx",
                   "orderName": "토스 티셔츠 외 2건",
-                  "status": "DONE",
-                  "requestedAt": null,
+                  "status": "ABORTED",
                   "method": "간편결제",
                   "totalAmount": 1000,
                   "card": null,
-                  "failure" // todo
-                } 
+                  "failure": {
+                    "code": "INVALID_API_KEY",
+                    "message": "잘못된 시크릿키 연동 정보 입니다."
+                    } 
+                }
                 """;
         SERVER.expect(requestTo(BASE_URL + "/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withServerError()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(expectedError));
+                        .body(expectedError)
+                        .header("status", "500"));
     }
 
     private void setUpClientError() {
         String expectedError = """
                 {
-                "code": "FAILED",
-                "message":"클라이언트 에러로 결제 실패."
+                  "paymentKey": "tgen_20250528204823hWav3",
+                  "orderId": "MC4xNTU3MDQ1MDk3Njkx",
+                  "orderName": "토스 티셔츠 외 2건",
+                  "status": "ABORTED",
+                  "method": "간편결제",
+                  "totalAmount": 1000,
+                  "card": null,
+                  "failure": {
+                    "code": "INVALID_CARD",
+                    "message": "유효하지 않은 카드입니다."
+                    } 
                 }
                 """;
         SERVER.expect(requestTo(BASE_URL + "/payments/confirm"))

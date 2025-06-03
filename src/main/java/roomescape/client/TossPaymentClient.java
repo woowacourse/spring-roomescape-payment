@@ -1,8 +1,12 @@
 package roomescape.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClient;
 import roomescape.client.dto.request.TossPaymentConfirmRequest;
 import roomescape.client.dto.response.TossErrorResponse;
@@ -13,6 +17,7 @@ import roomescape.common.exception.PaymentException;
 @Component
 public class TossPaymentClient {
 
+    private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.class);
     private final RestClient tossRestClient;
 
     private static final List<String> IGNORABLE_CODE = List.of(
@@ -27,11 +32,24 @@ public class TossPaymentClient {
     }
 
     public ResponseEntity<TossPaymentResponse> confirmPayment(TossPaymentConfirmRequest request) {
-        return tossRestClient.post()
-                .uri("/payments/confirm")
-                .body(request)
-                .retrieve()
-                .toEntity(TossPaymentResponse.class);
+        try {
+            return tossRestClient.post()
+                    .uri("/payments/confirm")
+                    .body(request)
+                    .retrieve()
+                    .toEntity(TossPaymentResponse.class);
+        } catch (HttpStatusCodeException e) {
+            String rawResponse = e.getResponseBodyAsString();
+            log.error("Toss 서버 에러 응답: {}", rawResponse);
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                TossPaymentResponse errorBody = mapper.readValue(e.getResponseBodyAsString(), TossPaymentResponse.class);
+                return ResponseEntity.status(e.getStatusCode()).body(errorBody);
+            } catch (Exception parseError) {
+                log.error("json 파싱 실패: {}", parseError.getMessage());
+                throw new InternalServerException();
+            }
+        }
     }
 
     public void handleTosPamentException(ResponseEntity<TossPaymentResponse> response) {
@@ -47,19 +65,6 @@ public class TossPaymentClient {
             }
             throw new PaymentException(response.getStatusCode(), "결제 실패 : " + failure.message());
         }
+        throw new InternalServerException();
     }
-//
-//    private void handleTossPaymentException(ClientHttpResponse res) throws IOException {
-//        try {
-//            String errorBody = new String(res.getBody().readAllBytes(), StandardCharsets.UTF_8);
-//            ObjectMapper mapper = new ObjectMapper();
-//            TossErrorResponse errorResponse = mapper.readValue(errorBody, TossErrorResponse.class);
-//            if (IGNORABLE_CODE.contains(errorResponse.code())) {
-//                throw new InternalServerException();
-//            }
-//            throw new PaymentException(res.getStatusCode(), "결제 실패 : " + errorResponse.message());
-//        } catch (Exception e) {
-//            throw new PaymentException(res.getStatusCode(), "결제 실패 : " + e.getMessage());
-//        }
-//    }
 }
