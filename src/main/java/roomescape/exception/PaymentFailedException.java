@@ -13,12 +13,12 @@ public class PaymentFailedException extends RuntimeException {
         return cause == Cause.CLIENT_ERROR;
     }
 
-    public boolean causedByServer() {
-        return cause == Cause.SERVER_ERROR;
+    public boolean causedByInternalServer() {
+        return cause == Cause.INTERNAL_SERVER_ERROR;
     }
 
     public boolean causedByExternalServer() {
-        return cause == Cause.EXTERNAL_ERROR;
+        return cause == Cause.EXTERNAL_SERVER_ERROR;
     }
 
     public static PaymentFailedException byClient(final String message) {
@@ -26,16 +26,16 @@ public class PaymentFailedException extends RuntimeException {
     }
 
     public static PaymentFailedException byServer() {
-        return new PaymentFailedException(Cause.SERVER_ERROR, "일시적인 서버 오류로 결제에 실패했습니다.");
+        return new PaymentFailedException(Cause.INTERNAL_SERVER_ERROR, "일시적인 서버 오류로 결제에 실패했습니다.");
     }
 
     public static PaymentFailedException byExternalServer() {
-        return new PaymentFailedException(Cause.EXTERNAL_ERROR, "선택한 결제 수단의 서버에서의 오류로 결제에 실패했습니다.");
+        return new PaymentFailedException(Cause.EXTERNAL_SERVER_ERROR, "선택한 결제 수단의 서버에서의 오류로 결제에 실패했습니다.");
     }
 
     private enum Cause {
         CLIENT_ERROR,
-        SERVER_ERROR,
-        EXTERNAL_ERROR
+        INTERNAL_SERVER_ERROR,
+        EXTERNAL_SERVER_ERROR
     }
 }

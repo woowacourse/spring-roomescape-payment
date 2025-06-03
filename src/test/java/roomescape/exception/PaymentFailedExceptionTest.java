@@ -1,6 +1,7 @@
 package roomescape.exception;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,15 +20,23 @@ class PaymentFailedExceptionTest {
     void causedByClient() {
         var exception = PaymentFailedException.byClient("결제 실패");
 
-        assertThat(exception.causedByClient()).isTrue();
+        assertAll(
+            () -> assertThat(exception.causedByClient()).isTrue(),
+            () -> assertThat(exception.causedByInternalServer()).isFalse(),
+            () -> assertThat(exception.causedByExternalServer()).isFalse()
+        );
     }
 
     @Test
-    @DisplayName("예외 발생 원인이 서버에게 있는 지 알 수 있다.")
-    void causedByServer() {
+    @DisplayName("예외 발생 원인이 내부 서버에게 있는 지 알 수 있다.")
+    void causedByInternalServer() {
         var exception = PaymentFailedException.byServer();
 
-        assertThat(exception.causedByServer()).isTrue();
+        assertAll(
+            () -> assertThat(exception.causedByClient()).isFalse(),
+            () -> assertThat(exception.causedByInternalServer()).isTrue(),
+            () -> assertThat(exception.causedByExternalServer()).isFalse()
+        );
     }
 
     @Test
@@ -35,6 +44,10 @@ class PaymentFailedExceptionTest {
     void causedByExternalServer() {
         var exception = PaymentFailedException.byExternalServer();
 
-        assertThat(exception.causedByExternalServer()).isTrue();
+        assertAll(
+            () -> assertThat(exception.causedByClient()).isFalse(),
+            () -> assertThat(exception.causedByInternalServer()).isFalse(),
+            () -> assertThat(exception.causedByExternalServer()).isTrue()
+        );
     }
 }
