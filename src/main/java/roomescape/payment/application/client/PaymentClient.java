@@ -20,6 +20,7 @@ public class PaymentClient {
     private final RestClient restClient;
     private final PaymentApproveExceptionHandler paymentApproveExceptionHandler;
     private final PaymentClientProperties paymentClientProperties;
+    private final String encodingSecretKey;
 
     public PaymentClient(final RestClient restClient,
                          final PaymentApproveExceptionHandler paymentApproveExceptionHandler,
@@ -27,19 +28,20 @@ public class PaymentClient {
         this.restClient = restClient;
         this.paymentApproveExceptionHandler = paymentApproveExceptionHandler;
         this.paymentClientProperties = paymentClientProperties;
+        this.encodingSecretKey = encode(paymentClientProperties.getSecretKey() + COLON);
     }
 
     public TossPaymentApproveResponse approvePayment(final PaymentApproveRequest paymentApproveRequest) {
         return restClient.post()
                 .uri(paymentClientProperties.getConfirmApi())
-                .header(AUTHORIZATION, BASIC + toBase64(paymentClientProperties.getSecretKey() + COLON))
+                .header(AUTHORIZATION, BASIC + encode(encodingSecretKey))
                 .body(paymentApproveRequest)
                 .retrieve()
                 .onStatus(paymentApproveExceptionHandler)
                 .body(TossPaymentApproveResponse.class);
     }
 
-    private String toBase64(String rawText) {
-        return Base64.getEncoder().encodeToString(rawText.getBytes());
+    private String encode(String text) {
+        return Base64.getEncoder().encodeToString(text.getBytes());
     }
 }
