@@ -1,20 +1,35 @@
 package roomescape.reservation.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.auth.sign.password.Password;
 import roomescape.common.domain.Email;
+import roomescape.payment.client.PaymentClient;
+import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.dto.PaymentResult;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.WaitingReservation;
 import roomescape.reservation.domain.WaitingReservationRepository;
 import roomescape.reservation.ui.dto.AvailableReservationTimeWebResponse;
+import roomescape.reservation.ui.dto.CreateReservationWithUserIdWebRequest;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeDescription;
 import roomescape.theme.domain.ThemeName;
@@ -27,15 +42,9 @@ import roomescape.user.domain.UserName;
 import roomescape.user.domain.UserRepository;
 import roomescape.user.domain.UserRole;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-class ReservationFacadeIntegrationTest {
+class ReservationFacadePaymentIntegrationTest {
 
     @Autowired
     private ReservationFacade reservationFacade;
@@ -57,6 +66,9 @@ class ReservationFacadeIntegrationTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @MockitoBean
+    private PaymentClient paymentClient;
 
     private User user;
     private Theme theme;
@@ -144,16 +156,72 @@ class ReservationFacadeIntegrationTest {
                 .isEqualTo(waitingReservation.getUserId());
     }
 
-    private int countReservations() {
-        return jdbcTemplate.queryForObject("SELECT COUNT(*) FROM reservations", Integer.class);
-    }
+    @Nested
+    @DisplayName("예약 생성 및 결제 시 트랜잭션 롤백 테스트 ")
+    class CreateWithMockPaymentClient {
 
-    private int countUsers() {
-        return jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users", Integer.class);
-    }
+        @Test
+        @DisplayName("결제 검증 실패 시, 예약이 데이터베이스에 저장되지 않는다")
+        void createWithPaymentWhenPaymentVerificationFails() {
+            // given
+            CreateReservationWithUserIdWebRequest reservationRequest = createReservationRequest();
 
-    private void clearAllUsers() {
-        jdbcTemplate.update("DELETE FROM reservations WHERE user_id = ?", user.getId());
-        jdbcTemplate.update("DELETE FROM users");
+            PaymentRequest paymentRequest = mock(PaymentRequest.class);
+            PaymentResult paymentResult = mock(PaymentResult.class);
+            given(paymentClient.confirmPayment(any())).willReturn(paymentResult);
+
+            given(paymentResult.verifyPayment(paymentRequest, paymentResult))
+                    .willReturn(false);
+
+            int initialReservationCount = countReservations();
+
+            // when
+            // then
+            assertThatThrownBy(() ->
+                    reservationFacade.createWithPayment(reservationRequest, paymentRequest))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("결제 요청이 잘못되었습니다. 관리자에게 문의해주세요.");
+
+            int finalReservationCount = countReservations();
+            assertThat(finalReservationCount).isEqualTo(initialReservationCount);
+
+            assertThat(reservationRepository.findAllByUserId(user.getId())).isEmpty();
+        }
+
+        @Test
+        @DisplayName("결제 클라이언트 호출 자체가 실패하는 경우에도 예약이 롤백된다")
+        void createWithPaymentWhenPaymentClientThrowsException() {
+            CreateReservationWithUserIdWebRequest reservationRequest = createReservationRequest();
+            PaymentRequest paymentRequest = mock(PaymentRequest.class);
+
+            given(paymentClient.confirmPayment(any()))
+                    .willThrow(new RuntimeException("결제 서비스와의 연결에 실패했습니다"));
+
+            int initialReservationCount = countReservations();
+
+            // when
+            // then
+            assertThatThrownBy(() ->
+                    reservationFacade.createWithPayment(reservationRequest, paymentRequest))
+                    .isInstanceOf(RuntimeException.class)
+                    .hasMessage("결제 서비스와의 연결에 실패했습니다");
+
+            int finalReservationCount = countReservations();
+            assertThat(finalReservationCount).isEqualTo(initialReservationCount);
+            assertThat(reservationRepository.findAllByUserId(user.getId())).isEmpty();
+        }
+
+        private CreateReservationWithUserIdWebRequest createReservationRequest() {
+            return new CreateReservationWithUserIdWebRequest(
+                    LocalDate.now().plusDays(1),
+                    time.getId(),
+                    theme.getId(),
+                    user.getId()
+            );
+        }
+
+        private int countReservations() {
+            return jdbcTemplate.queryForObject("SELECT COUNT(*) FROM reservations", Integer.class);
+        }
     }
 }
