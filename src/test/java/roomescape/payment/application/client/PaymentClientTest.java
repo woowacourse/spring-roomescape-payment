@@ -14,7 +14,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.common.config.PaymentClientConfig;
 import roomescape.common.properties.PaymentClientProperties;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
-import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
+import roomescape.payment.presentation.dto.response.TossPaymentApproveResponse;
 
 @Import({PaymentClientConfig.class})
 @RestClientTest(value = PaymentClient.class)
@@ -95,7 +95,7 @@ class PaymentClientTest {
                 50_000L, null);
 
         // When
-        PaymentApproveResponse response = paymentClient.approvePayment(request);
+        TossPaymentApproveResponse response = paymentClient.approvePayment(request);
 
         // Then
         SoftAssertions.assertSoftly(softAssertions -> {

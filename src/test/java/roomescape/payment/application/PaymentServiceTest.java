@@ -28,6 +28,7 @@ import roomescape.payment.domain.PaymentType;
 import roomescape.payment.exception.PaymentApproveException;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
 import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
+import roomescape.payment.presentation.dto.response.TossPaymentApproveResponse;
 import roomescape.reservation.application.ConfirmedReservationApplicationService;
 import roomescape.reservation.application.ReservationDataService;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
@@ -117,15 +118,17 @@ class PaymentServiceTest {
         long amount = 5000L;
         PaymentApproveRequest paymentApproveRequest = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID, amount,
                 reservationId);
-        PaymentApproveResponse paymentApproveResponse = new PaymentApproveResponse(PAYMENT_KEY, ORDER_ID, amount);
+        TossPaymentApproveResponse paymentApproveResponse = new TossPaymentApproveResponse(PAYMENT_KEY, ORDER_ID,
+                amount);
         when(paymentClient.approvePayment(any(PaymentApproveRequest.class))).thenReturn(paymentApproveResponse);
+        PaymentApproveResponse expected = new PaymentApproveResponse(ORDER_ID, amount);
 
         // when
         PaymentApproveResponse actual = paymentService.approvePayment(paymentApproveRequest);
 
         // then
         SoftAssertions.assertSoftly(softAssertions -> {
-            softAssertions.assertThat(actual).isEqualTo(paymentApproveResponse);
+            softAssertions.assertThat(actual).isEqualTo(expected);
             softAssertions.assertThat(eventPublisher.hasEvent(PaymentApprovedEvent.class)).isTrue();
             softAssertions.assertThat(eventPublisher.getEventsOfType(PaymentApprovedEvent.class)).hasSize(1);
         });

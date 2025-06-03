@@ -9,6 +9,7 @@ import roomescape.payment.domain.PaymentType;
 import roomescape.payment.exception.PaymentApproveException;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
 import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
+import roomescape.payment.presentation.dto.response.TossPaymentApproveResponse;
 import roomescape.reservation.application.event.PaymentApprovedEvent;
 import roomescape.reservation.application.event.PaymentFailedEvent;
 
@@ -29,10 +30,11 @@ public class PaymentService {
     public PaymentApproveResponse approvePayment(final PaymentApproveRequest request) {
         Payment payment = new Payment(request.paymentKey(), request.orderId(), request.amount(), PaymentType.NORMAL);
         Payment savedPayment = paymentRepository.save(payment);
+
         try {
-            PaymentApproveResponse paymentApproveResponse = paymentClient.approvePayment(request);
+            TossPaymentApproveResponse tossPaymentApproveResponse = paymentClient.approvePayment(request);
             applicationEventPublisher.publishEvent(PaymentApprovedEvent.from(request, savedPayment));
-            return paymentApproveResponse;
+            return PaymentApproveResponse.from(tossPaymentApproveResponse);
         } catch (PaymentApproveException e) {
             applicationEventPublisher.publishEvent(PaymentFailedEvent.from(request, savedPayment));
             throw e;

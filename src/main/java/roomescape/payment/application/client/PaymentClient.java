@@ -7,7 +7,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.common.properties.PaymentClientProperties;
 import roomescape.payment.exception.handler.PaymentApproveExceptionHandler;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
-import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
+import roomescape.payment.presentation.dto.response.TossPaymentApproveResponse;
 
 @Component
 @EnableConfigurationProperties(PaymentClientProperties.class)
@@ -29,14 +29,14 @@ public class PaymentClient {
         this.paymentClientProperties = paymentClientProperties;
     }
 
-    public PaymentApproveResponse approvePayment(final PaymentApproveRequest paymentApproveRequest) {
+    public TossPaymentApproveResponse approvePayment(final PaymentApproveRequest paymentApproveRequest) {
         return restClient.post()
                 .uri(paymentClientProperties.getConfirmApi())
                 .header(AUTHORIZATION, BASIC + toBase64(paymentClientProperties.getSecretKey() + COLON))
                 .body(paymentApproveRequest)
                 .retrieve()
                 .onStatus(paymentApproveExceptionHandler)
-                .body(PaymentApproveResponse.class);
+                .body(TossPaymentApproveResponse.class);
     }
 
     private String toBase64(String rawText) {

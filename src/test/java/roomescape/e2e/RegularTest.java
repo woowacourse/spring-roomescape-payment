@@ -35,7 +35,7 @@ import roomescape.payment.application.client.PaymentClient;
 import roomescape.payment.domain.PaymentType;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
 import roomescape.payment.presentation.dto.request.PaymentRequest;
-import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
+import roomescape.payment.presentation.dto.response.TossPaymentApproveResponse;
 import roomescape.reservationslot.presentation.dto.response.MyReservationResponse;
 import roomescape.reservationslot.presentation.dto.response.ReservationResponse;
 
@@ -177,10 +177,10 @@ public class RegularTest {
         PaymentRequest paymentRequest = new PaymentRequest(paymentKey, orderId, amount, PaymentType.NORMAL,
                 reservationId);
         PaymentApproveRequest paymentApproveRequest = PaymentApproveRequest.from(paymentRequest);
-        PaymentApproveResponse paymentApproveResponse = new PaymentApproveResponse(paymentKey, orderId, amount);
+        TossPaymentApproveResponse paymentApproveResponse = new TossPaymentApproveResponse(paymentKey, orderId, amount);
         Mockito.when(paymentClient.approvePayment(paymentApproveRequest)).thenReturn(paymentApproveResponse);
 
-        PaymentApproveResponse response = RestAssured.given().log().all()
+        TossPaymentApproveResponse response = RestAssured.given().log().all()
                 .cookie(TOKEN, REGULAR_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(paymentRequest)
@@ -188,6 +188,6 @@ public class RegularTest {
                 .then().log().all()
                 .statusCode(200)
                 .extract()
-                .as(PaymentApproveResponse.class);
+                .as(TossPaymentApproveResponse.class);
     }
 }
