@@ -1,7 +1,8 @@
 spring:
   profiles:
     active: local
-
+  jpa:
+    defer-datasource-initialization: true
   h2:
     console:
       enabled: true  # H2 콘솔 활성화
