@@ -8,7 +8,7 @@ import roomescape.common.exception.custom.AlreadyInUseException;
 import roomescape.common.exception.custom.AuthenticationException;
 import roomescape.common.exception.custom.EntityNotFoundException;
 import roomescape.common.exception.custom.LoginFailException;
-import roomescape.common.exception.custom.PaymentBadRequestException;
+import roomescape.common.exception.custom.PaymentClientException;
 import roomescape.common.exception.dto.ErrorResponse;
 
 @ControllerAdvice
@@ -21,8 +21,8 @@ public class ExceptionHandlerAdvice {
                 .body(new ErrorResponse("ILLEGAL_ARGUMENT", e.getMessage()));
     }
 
-    @ExceptionHandler(PaymentBadRequestException.class)
-    public ResponseEntity<ErrorResponse> handlePaymentBadRequestException(final PaymentBadRequestException e) {
+    @ExceptionHandler(PaymentClientException.class)
+    public ResponseEntity<ErrorResponse> handlePaymentBadRequestException(final PaymentClientException e) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse("PAYMENT_BAD_REQUEST", e.getMessage()));

@@ -1,4 +1,4 @@
-package roomescape.reservation.payment.exception;
+package roomescape.reservation.payment.error;
 
 public enum ClientErrorCode {
     ALREADY_PROCESSED_PAYMENT("이미 처리된 결제 입니다."),

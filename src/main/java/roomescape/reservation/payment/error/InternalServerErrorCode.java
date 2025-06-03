@@ -1,4 +1,4 @@
-package roomescape.reservation.payment.exception;
+package roomescape.reservation.payment.error;
 
 import java.util.Arrays;
 

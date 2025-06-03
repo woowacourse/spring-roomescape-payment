@@ -14,14 +14,14 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import roomescape.common.exception.custom.EntityNotFoundException;
-import roomescape.common.exception.custom.PaymentBadRequestException;
+import roomescape.common.exception.custom.PaymentClientException;
 import roomescape.common.exception.custom.PaymentServerException;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationId;
 import roomescape.reservation.payment.domain.Payment;
 import roomescape.reservation.payment.dto.request.PaymentRequest;
 import roomescape.reservation.payment.dto.response.TossPaymentErrorResponse;
-import roomescape.reservation.payment.exception.InternalServerErrorCode;
+import roomescape.reservation.payment.error.InternalServerErrorCode;
 import roomescape.reservation.payment.repository.PaymentRepository;
 import roomescape.reservation.repository.ReservationRepository;
 
@@ -72,7 +72,7 @@ public class PaymentService {
             if (InternalServerErrorCode.contains(errorCode)) {
                 throw new PaymentServerException(errorResponse.message());
             }
-            throw new PaymentBadRequestException(errorResponse.message());
+            throw new PaymentClientException(errorResponse.message());
         } catch (IOException e) {
             throw new RuntimeException("결제 에러 응답 파싱 실패", e);
         }
