@@ -1,13 +1,14 @@
-package roomescape.payment.toss.service;
+package roomescape.payment.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.ResourceAccessException;
+import roomescape.payment.client.TossPaymentClient;
 import roomescape.payment.exception.PaymentTemporaryException;
-import roomescape.payment.toss.dto.TossPaymentRequest;
-import roomescape.payment.toss.dto.TossPaymentResponse;
+import roomescape.payment.dto.TossPaymentRequest;
+import roomescape.payment.dto.TossPaymentResponse;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +24,7 @@ public class TossPaymentService {
 
     @Retryable(retryFor = {PaymentTemporaryException.class, ResourceAccessException.class},
             maxAttempts = 2, backoff = @Backoff(delay = 500))
-    public TossPaymentResponse getPayment(TossPaymentRequest paymentRequest) {
-        return tossPaymentClient.getPaymentConfirm(paymentRequest);
+    public TossPaymentResponse getPayment(String paymentKey) {
+        return tossPaymentClient.getPayment(paymentKey);
     }
 }

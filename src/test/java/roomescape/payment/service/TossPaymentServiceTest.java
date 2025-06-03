@@ -1,4 +1,4 @@
-package roomescape.payment.toss.service;
+package roomescape.payment.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -13,8 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.payment.exception.PaymentTemporaryException;
-import roomescape.payment.toss.dto.TossPaymentRequest;
-import roomescape.payment.toss.dto.TossPaymentResponse;
+import roomescape.payment.client.TossPaymentClient;
+import roomescape.payment.dto.TossPaymentRequest;
+import roomescape.payment.dto.TossPaymentResponse;
 
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)

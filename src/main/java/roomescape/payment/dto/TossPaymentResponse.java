@@ -1,4 +1,4 @@
-package roomescape.payment.toss.dto;
+package roomescape.payment.dto;
 
 public record TossPaymentResponse(String orderId) {
 }

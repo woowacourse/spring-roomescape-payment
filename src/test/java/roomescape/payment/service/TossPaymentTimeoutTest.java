@@ -1,9 +1,8 @@
-package roomescape.payment.toss.service;
+package roomescape.payment.service;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import okhttp3.mockwebserver.MockResponse;
@@ -16,7 +15,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.ResourceAccessException;
-import roomescape.payment.toss.dto.TossPaymentRequest;
+import roomescape.payment.client.TossPaymentClient;
+import roomescape.payment.dto.TossPaymentRequest;
 
 @ActiveProfiles("timeout")
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)

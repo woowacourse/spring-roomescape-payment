@@ -1,4 +1,4 @@
-package roomescape.payment.toss.interceptor;
+package roomescape.payment.interceptor;
 
 import java.util.Arrays;
 

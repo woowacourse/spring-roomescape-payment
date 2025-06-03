@@ -1,4 +1,4 @@
-package roomescape.payment.toss.service;
+package roomescape.payment.service;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
@@ -21,11 +21,12 @@ import org.springframework.http.MediaType;
 import roomescape.payment.exception.PaymentProcessException;
 import roomescape.payment.exception.PaymentServerException;
 import roomescape.payment.exception.PaymentTemporaryException;
-import roomescape.payment.toss.config.TestTossPaymentConfig;
-import roomescape.payment.toss.config.TossPaymentConfigProperties;
-import roomescape.payment.toss.dto.TossPaymentRequest;
-import roomescape.payment.toss.dto.TossPaymentResponse;
-import roomescape.payment.toss.interceptor.TossPaymentResponseInterceptor;
+import roomescape.payment.client.TossPaymentClient;
+import roomescape.payment.config.TestTossPaymentConfig;
+import roomescape.payment.config.TossPaymentConfigProperties;
+import roomescape.payment.dto.TossPaymentRequest;
+import roomescape.payment.dto.TossPaymentResponse;
+import roomescape.payment.interceptor.TossPaymentResponseInterceptor;
 
 
 @RestClientTest(TossPaymentClient.class)

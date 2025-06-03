@@ -1,4 +1,4 @@
-package roomescape.payment.toss.config;
+package roomescape.payment.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Base64;
@@ -9,8 +9,8 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
-import roomescape.payment.toss.interceptor.TossPaymentResponseInterceptor;
-import roomescape.payment.toss.service.TossPaymentClient;
+import roomescape.payment.interceptor.TossPaymentResponseInterceptor;
+import roomescape.payment.client.TossPaymentClient;
 
 @Configuration
 @ConfigurationPropertiesScan

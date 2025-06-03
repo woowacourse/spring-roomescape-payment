@@ -1,4 +1,4 @@
-package roomescape.payment.toss.service;
+package roomescape.payment.service;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,7 +6,8 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
-import roomescape.payment.toss.config.TestTossPaymentConfig;
+import roomescape.payment.client.TossPaymentClient;
+import roomescape.payment.config.TestTossPaymentConfig;
 
 public abstract class TossPaymentMockSupport {
 

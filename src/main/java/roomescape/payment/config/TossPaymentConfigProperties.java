@@ -1,4 +1,4 @@
-package roomescape.payment.toss.config;
+package roomescape.payment.config;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
