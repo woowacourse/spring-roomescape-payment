@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -21,14 +22,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.domain.reservation.ReservationRepository;
+import roomescape.application.event.ReservationCancelledEvent;
+import roomescape.domain.reservation.reserved.Reserved;
+import roomescape.domain.reservation.reserved.ReservedRepository;
+import roomescape.domain.reservation.waiting.Waiting;
+import roomescape.domain.reservation.waiting.WaitingRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.timeslot.TimeSlotRepository;
 import roomescape.domain.user.User;
-import roomescape.domain.waiting.Waiting;
-import roomescape.domain.waiting.WaitingRepository;
 import roomescape.exception.AlreadyExistedException;
 import roomescape.exception.BusinessRuleViolationException;
 import roomescape.exception.NotFoundException;
@@ -40,7 +43,7 @@ public class WaitingServiceTest {
     WaitingRepository waitingRepository;
 
     @Mock
-    ReservationRepository reservationRepository;
+    ReservedRepository reservationRepository;
 
     @Mock
     TimeSlotRepository timeSlotRepository;
@@ -240,5 +243,65 @@ public class WaitingServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("예약 취소 이벤트 처리")
+    class HandleReservationCancelled {
 
+        @Test
+        @DisplayName("예약 취소 이벤트 발생 시 대기 목록이 있으면 다음 대기자를 예약으로 전환한다")
+        void handleReservationCancelled_WithWaiting() {
+            // given
+            User user = CREATE_USER_1();
+            LocalDate date = LocalDate.now().plusDays(1);
+            TimeSlot timeSlot = CREATE_TIME_SLOT_1();
+            Theme theme = CREATE_THEME_1();
+            Waiting waiting = CREATE_WAITING_OF(1L, user, date, timeSlot, theme);
+            ReservationCancelledEvent event = new ReservationCancelledEvent(
+                    this, date, timeSlot.getId(), theme.getId()
+            );
+
+            when(waitingRepository.findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(
+                    date, timeSlot.getId(), theme.getId()))
+                    .thenReturn(Optional.of(waiting));
+
+            // when
+            waitingService.handleReservationCancelled(event);
+
+            // then
+            assertAll(
+                    () -> verify(waitingRepository, times(1))
+                            .findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(date, timeSlot.getId(), theme.getId()),
+                    () -> verify(reservationRepository, times(1)).save(any(Reserved.class)),
+                    () -> verify(waitingRepository, times(1)).deleteById(waiting.getId())
+            );
+        }
+
+        @Test
+        @DisplayName("예약 취소 이벤트 발생 시 대기 목록이 없으면 아무 작업도 하지 않는다")
+        void handleReservationCancelled_WithoutWaiting() {
+            // given
+            LocalDate date = LocalDate.now().plusDays(1);
+            TimeSlot timeSlot = CREATE_TIME_SLOT_1();
+            Theme theme = CREATE_THEME_1();
+            ReservationCancelledEvent event = new ReservationCancelledEvent(
+                    this, date, timeSlot.getId(), theme.getId()
+            );
+
+            when(waitingRepository.findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(
+                    date, timeSlot.getId(), theme.getId()))
+                    .thenReturn(Optional.empty());
+
+            // when
+            waitingService.handleReservationCancelled(event);
+
+            // then
+            assertAll(
+                    () -> verify(waitingRepository, times(1))
+                            .findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(date, timeSlot.getId(), theme.getId()),
+                    () -> verify(reservationRepository, never()).save(any(Reserved.class)),
+                    () -> verify(waitingRepository, never()).deleteById(any(Long.class))
+            );
+
+        }
+    }
 }

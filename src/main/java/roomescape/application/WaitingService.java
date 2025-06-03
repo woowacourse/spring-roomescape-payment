@@ -3,9 +3,10 @@ package roomescape.application;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.reservation.ReservationRepository;
+import roomescape.application.event.ReservationCancelledEvent;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
 import roomescape.domain.timeslot.TimeSlot;
@@ -51,6 +52,19 @@ public class WaitingService {
         validateWaitingExists(id);
 
         waitingRepository.deleteById(id);
+    }
+
+    @EventListener
+    @Transactional
+    public void handleReservationCancelled(ReservationCancelledEvent event) {
+
+        waitingRepository.findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(
+                event.getDate(), event.getTimeSlotId(), event.getThemeId())
+        .ifPresent(nextWaiting -> {
+            Reserved approvedReservation = Reserved.fromWaiting(nextWaiting);
+            reservedRepository.save(approvedReservation);
+            waitingRepository.deleteById(nextWaiting.getId());
+        });
     }
 
     private void validateDuplicateWaiting(final LocalDate date,

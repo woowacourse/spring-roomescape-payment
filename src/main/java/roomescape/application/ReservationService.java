@@ -4,8 +4,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.application.event.ReservationCancelledEvent;
 import roomescape.application.request.PaymentInfo;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
@@ -32,6 +34,8 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final UserRepository userRepository;
     private final PaymentService paymentService;
+    private final ApplicationEventPublisher eventPublisher;
+    
 
     @Transactional
     public Reservation saveReservationWithPurchase(final long userId, final LocalDate date, final long timeId,
@@ -58,7 +62,14 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 예약입니다."));
 
-        approveNextWaitingIfExists(reservation);
+        eventPublisher.publishEvent(
+                new ReservationCancelledEvent(
+                        this,
+                        reservation.getDate(),
+                        reservation.getTimeSlot().getId(),
+                        reservation.getTheme().getId()
+                )
+        );
 
         reservationRepository.deleteById(id);
     }
@@ -92,16 +103,5 @@ public class ReservationService {
 
     private Theme getThemeById(final long themeId) {
         return themeRepository.findById(themeId).orElseThrow(() -> new NotFoundException("존재하지 않는 테마입니다."));
-    }
-
-    private void approveNextWaitingIfExists(Reservation reservation) {
-        Optional<Waiting> nextWaitingOpt = waitingRepository.findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(
-                reservation.getDate(), reservation.getTimeSlot().getId(), reservation.getTheme().getId());
-
-        nextWaitingOpt.ifPresent(nextWaiting -> {
-            Reservation approvedReservation = Reservation.fromWaiting(nextWaiting);
-            reservationRepository.save(approvedReservation);
-            waitingRepository.deleteById(nextWaiting.getId());
-        });
     }
 }

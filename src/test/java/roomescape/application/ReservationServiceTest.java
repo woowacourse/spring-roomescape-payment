@@ -61,6 +61,9 @@ class ReservationServiceTest {
     @Mock
     PaymentService paymentService;
 
+    @Mock
+    ApplicationEventPublisher eventPublisher;
+
     @InjectMocks
     ReservationService reservationService;
 
@@ -208,63 +211,25 @@ class ReservationServiceTest {
         }
 
         @Test
-        @DisplayName("예약 삭제 시 예약 대기가 존재하면 예약으로 추가하고 예약 대기가 삭제된다.")
-        void removeById_WhenWaitingExists_ThenApproveNextWaiting() {
+        @DisplayName("예약 삭제 시 이벤트가 발행된다.")
+        void removeById_PublishesEvent() {
             // given
             Long removeId = 1L;
             User user = CREATE_USER_1();
             LocalDate date = LocalDate.now().plusDays(1);
             TimeSlot timeSlot = CREATE_TIME_SLOT_1();
             Theme theme = CREATE_THEME_1();
-            Waiting waiting = CREATE_WAITING_OF(1L, user, date, timeSlot, theme);
+            Reserved reservation = CREATE_RESERVATION_OF(removeId, user, date, timeSlot, theme);
 
-            when(reservationRepository.findById(removeId)).thenReturn(
-                    Optional.of(CREATE_RESERVATION_OF(removeId, user, date, timeSlot, theme)));
-
-            when(waitingRepository.findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(date, timeSlot.getId(),
-                    theme.getId()))
-                    .thenReturn(Optional.of(waiting));
-
-            doNothing().when(waitingRepository).deleteById(removeId);
+            when(reservationRepository.findById(removeId)).thenReturn(Optional.of(reservation));
 
             // when
             reservationService.removeById(removeId);
 
             // then
             assertAll(
-                    () -> verify(waitingRepository).findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(date,
-                            timeSlot.getId(), theme.getId()),
-                    () -> verify(reservationRepository).save(Reservation.fromWaiting(waiting)),
-                    () -> verify(waitingRepository).deleteById(waiting.getId())
-            );
-        }
-
-        @Test
-        @DisplayName("예약 삭제 시 예약 대기가 존재하지 않으면 예약을 삭제한다.")
-        void removeById_WhenWaitingEmpty() {
-            // given
-            Long removeId = 1L;
-            User user = CREATE_USER_1();
-            LocalDate date = LocalDate.now().plusDays(1);
-            TimeSlot timeSlot = CREATE_TIME_SLOT_1();
-            Theme theme = CREATE_THEME_1();
-
-            when(reservationRepository.findById(removeId)).thenReturn(
-                    Optional.of(CREATE_RESERVATION_OF(removeId, user, date, timeSlot, theme)));
-
-            when(waitingRepository.findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(date, timeSlot.getId(),
-                    theme.getId()))
-                    .thenReturn(Optional.empty());
-
-            // when
-            reservationService.removeById(removeId);
-
-            // then
-            assertAll(
-                    () -> verify(waitingRepository).findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(date,
-                            timeSlot.getId(), theme.getId()),
-                    () -> verify(reservationRepository, never()).save(any(Reservation.class)),
-                    () -> verify(waitingRepository, never()).deleteById(anyLong())
+                    () -> verify(eventPublisher).publishEvent(any(ReservationCancelledEvent.class)),
+                    () -> verify(reservationRepository).deleteById(removeId)
             );
         }
     }
