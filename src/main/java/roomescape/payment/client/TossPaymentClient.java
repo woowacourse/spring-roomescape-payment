@@ -3,7 +3,6 @@ package roomescape.payment.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpRequest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -16,7 +15,7 @@ import roomescape.payment.dto.PaymentResult;
 import roomescape.payment.exception.PaymentException;
 import roomescape.payment.exception.PaymentInternalServerException;
 import roomescape.payment.exception.PaymentNetworkException;
-import roomescape.payment.exception.PaymentUnauthorizedException;
+import roomescape.payment.exception.TossPaymentErrorCodeForServer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +34,7 @@ public class TossPaymentClient implements PaymentClient {
                         .uri("/confirm")
                         .body(request)
                         .retrieve()
-                        .onStatus(HttpStatusCode::isError, this::handleError)
+                        .onStatus(HttpStatusCode::isError, this::handleResponseError)
                         .body(PaymentResult.class)
         );
     }
@@ -46,19 +45,18 @@ public class TossPaymentClient implements PaymentClient {
         } catch (ResourceAccessException e) {
             throw new PaymentNetworkException(e);
         } catch (HttpMessageNotReadableException e) {
-            throw new PaymentInternalServerException(e.getMessage(), "결제 응답을 처리할 수 없습니다.");
+            throw new PaymentInternalServerException(e.getMessage(), "결제 승인 응답을 처리할 수 없습니다.");
         } catch (IllegalArgumentException e) {
-            throw new PaymentInternalServerException(e.getMessage(), "결제 요청이 올바르지 않습니다.");
+            throw new PaymentInternalServerException(e.getMessage(), "결제 승인 요청이 올바르지 않습니다.");
         } catch (RestClientException e) {
-            throw new PaymentInternalServerException(e.getMessage(), "결제 처리 중 오류가 발생했습니다.");
+            throw new PaymentInternalServerException(e.getMessage());
         }
     }
 
-    private void handleError(final HttpRequest request, final ClientHttpResponse response) throws IOException {
+    private void handleResponseError(final HttpRequest request, final ClientHttpResponse response) throws IOException {
         TossPaymentErrorResponse errorResponse = getTossPaymentErrorResponse(response);
-
-        if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-            throw new PaymentUnauthorizedException(errorResponse.code);
+        if (TossPaymentErrorCodeForServer.contains(errorResponse.code)) {
+            throw new PaymentInternalServerException(errorResponse.code);
         }
         throw new PaymentException(errorResponse.code, errorResponse.message, response.getStatusCode());
     }
@@ -69,8 +67,8 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     private record TossPaymentErrorResponse(
-            String message,
-            String code
+            String code,
+            String message
     ) {
 
     }

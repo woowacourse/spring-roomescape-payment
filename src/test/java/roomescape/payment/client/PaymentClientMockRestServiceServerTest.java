@@ -14,7 +14,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.payment.client.config.TestPaymentConfiguration;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResult;
-import roomescape.payment.exception.PaymentUnauthorizedException;
+import roomescape.payment.exception.PaymentInternalServerException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -72,12 +72,12 @@ class PaymentClientMockRestServiceServerTest {
     }
 
     @Test
-    @DisplayName("UNAUTHORIZED 예외 발생 시 PaymentUnauthorizedException을 던진다")
-    void confirmPayment_whenUnauthorized() {
+    @DisplayName("서버 에러 코드에 해당하는 예외 발생 시 PaymentInternalServerException 던진다")
+    void confirmPayment_whenErrorCodeForServer() {
         // given
         String invalidKey = "invalidKey";
         PaymentRequest request = getRequest(invalidKey);
-        String errorResponse = "{\"code\":\"UNAUTHORIZED\",\"message\":\"인증 실패\"}";
+        String errorResponse = "{\"code\":\"UNAUTHORIZED_KEY\",\"message\":\"인증 실패\"}";
 
         mockServer.expect(requestTo(URL + PATH))
                 .andExpect(method(HttpMethod.POST))
@@ -89,9 +89,9 @@ class PaymentClientMockRestServiceServerTest {
         // when
         // then
         assertThatThrownBy(() -> paymentClient.confirmPayment(request))
-                .isInstanceOf(PaymentUnauthorizedException.class)
-                .hasMessageContaining("결제 인가/인증이 실패하였습니다.")
-                .hasMessageContaining("인증 실패");
+                .isInstanceOf(PaymentInternalServerException.class)
+                .hasMessageContaining("결제 승인 API 호출 실패했습니다.")
+                .hasMessageContaining("UNAUTHORIZED_KEY");
 
         mockServer.verify();
     }

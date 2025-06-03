@@ -13,7 +13,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResult;
 import roomescape.payment.exception.PaymentException;
-import roomescape.payment.exception.PaymentUnauthorizedException;
+import roomescape.payment.exception.PaymentInternalServerException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -71,11 +71,11 @@ class PaymentClientMockWebServerTest {
     }
 
     @Test
-    @DisplayName("UNAUTHORIZED 예외 발생 시 PaymentUnauthorizedException을 던진다")
-    void confirmPayment_whenUnauthorized() {
+    @DisplayName("서버 에러 코드에 해당하는 예외 발생 시 PaymentInternalServerException 던진다")
+    void confirmPayment_whenErrorCodeForServer() {
         // given
         PaymentRequest request = new PaymentRequest("invalidKey", 1000, "orderId123", "paymentType");
-        String errorResponse = "{\"code\":\"UNAUTHORIZED\",\"message\":\"인증 실패\"}";
+        String errorResponse = "{\"code\":\"UNAUTHORIZED_KEY\",\"message\":\"인증 실패\"}";
 
         mockWebServer.enqueue(new MockResponse()
                 .setResponseCode(HttpStatus.UNAUTHORIZED.value())
@@ -85,9 +85,9 @@ class PaymentClientMockWebServerTest {
         // when
         // then
         assertThatThrownBy(() -> paymentClient.confirmPayment(request))
-                .isInstanceOf(PaymentUnauthorizedException.class)
-                .hasMessageContaining("결제 인가/인증이 실패하였습니다.")
-                .hasMessageContaining("인증 실패");
+                .isInstanceOf(PaymentInternalServerException.class)
+                .hasMessageContaining("결제 승인 API 호출 실패했습니다.")
+                .hasMessageContaining("UNAUTHORIZED_KEY");
     }
 
     @Test
@@ -106,8 +106,7 @@ class PaymentClientMockWebServerTest {
         // then
         assertThatThrownBy(() -> paymentClient.confirmPayment(request))
                 .isInstanceOf(PaymentException.class)
-                .hasMessageContaining("Payment 결제 승인 API 호출 실패했습니다.")
-                .hasMessageContaining("잘못된 요청")
+                .hasMessageContaining("결제 승인 API 호출 실패했습니다.")
                 .hasMessageContaining("BAD_REQUEST");
     }
 

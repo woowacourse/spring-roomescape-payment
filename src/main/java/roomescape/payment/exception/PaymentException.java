@@ -14,7 +14,7 @@ public class PaymentException extends BusinessException {
     }
 
     private static String buildLogMessage(final String message) {
-        return "Payment 결제 승인 API 호출 실패했습니다. " + message;
+        return "결제 승인 API 호출 실패했습니다. " + message;
     }
 
     private static String buildUserMessage(final String message) {
