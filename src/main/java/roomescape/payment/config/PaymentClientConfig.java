@@ -1,6 +1,7 @@
 package roomescape.payment.config;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Base64;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,11 +9,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
 @Slf4j
 @Configuration
 public class PaymentClientConfig {
+
+    private static final int CONNECT_TIMEOUT_SECONDS = 4;
+    private static final int READ_TIMEOUT_SECONDS = 32;
 
     @Value("${payment.api.base-url}")
     private String baseUrl;
@@ -29,10 +34,18 @@ public class PaymentClientConfig {
 
         return RestClient.builder()
                 .baseUrl(baseUrl)
+                .requestFactory(createRequestFactory())
                 .defaultHeader("Content-Type", "application/json")
                 .defaultHeader("Authorization", authorizations)
                 .requestInterceptor(loggingInterceptor())
                 .build();
+    }
+
+    private SimpleClientHttpRequestFactory createRequestFactory() {
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(Duration.ofSeconds(CONNECT_TIMEOUT_SECONDS));
+        requestFactory.setReadTimeout(Duration.ofSeconds(READ_TIMEOUT_SECONDS));
+        return requestFactory;
     }
 
     private ClientHttpRequestInterceptor loggingInterceptor() {
