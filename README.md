@@ -55,19 +55,231 @@
 
 > 결제 서버에 연결이 실패하였습니다. 이 현상이 지속되는 경우 어드민에게 문의해주세요.
 
-### 타임아웃시 실패 에러가 뜨더라도 토스 서버에 성공이 뜨는 경우에도 한번 더 체크하는 기능
+# 예약 API 문서
 
-- 토스 서버에서 제공해주는게 있는지 확인하기
-  (지금은 내가 결제 기능 구현하는게아니니 구현방식은 신경쓰지않아도 된다.)
+## 목차
 
-### 락 설계
+- [1. 모든 예약 조회](#1-모든-예약-조회)
+- [2. 필터를 사용한 예약 검색](#2-필터를-사용한-예약-검색)
+- [3. 회원의 모든 예약 상태 조회](#3-회원의-모든-예약-상태-조회)
+- [4. 관리자에 의한 예약 추가](#4-관리자에-의한-예약-추가)
+- [5. 회원에 의한 예약 추가](#5-회원에-의한-예약-추가)
+- [6. 예약 삭제](#6-예약-삭제)
 
-- 예약이 동시에 발생하는 경우 -> 예약 상태가 2명이상 존재하면 안됨
+---
 
-  쓰레드로 테스트하는데 repository에 member 저장했는데 없다고뜸
+## 1. 모든 예약 조회
 
-아, 이제 문제가 보입니다. 스레드에서 멤버를 조회할 때 데이터가 보이지 않는 것이 문제입니다. 이는 트랜잭션 격리 수준과 관련이 있습니다.
-테스트 코드를 다음과 같이 수정해보겠습니다:
+### 요청
 
-connection 점유 문제
-10개를 점유한뒤에 Transactional required new 하는경우에 문제가 생김 (커넥션 데드락)
+```http
+GET /reservations
+```
+
+### 권한
+
+- `ADMIN` 권한 필요
+
+### 설명
+
+모든 예약 정보를 조회합니다.
+
+### 응답
+
+```json
+[
+  {
+    "id": "Long",
+    "memberId": "Long",
+    "themeId": "Long",
+    "date": "LocalDate",
+    "timeId": "Long"
+  }
+]
+```
+
+---
+
+## 2. 필터를 사용한 예약 검색
+
+### 요청
+
+```http
+GET /reservations?memberId={memberId}&themeId={themeId}&from={from}&to={to}
+```
+
+### 파라미터
+
+| 파라미터     | 타입        | 설명    |
+|----------|-----------|-------|
+| memberId | Long      | 회원 ID |
+| themeId  | Long      | 테마 ID |
+| from     | LocalDate | 시작 날짜 |
+| to       | LocalDate | 종료 날짜 |
+
+### 권한
+
+- `ADMIN` 권한 필요
+
+### 설명
+
+특정 필터를 사용하여 예약을 검색합니다.
+
+### 응답
+
+```json
+[
+  {
+    "id": "Long",
+    "memberId": "Long",
+    "themeId": "Long",
+    "date": "LocalDate",
+    "timeId": "Long"
+  }
+]
+```
+
+---
+
+## 3. 회원의 모든 예약 상태 조회
+
+### 요청
+
+```http
+GET /reservations/state
+```
+
+### 권한
+
+- `GENERAL` 권한 필요
+
+### 설명
+
+회원의 모든 예약 상태를 조회합니다.
+
+### 응답
+
+```json
+{
+  "status": "String"
+}
+```
+
+---
+
+## 4. 관리자에 의한 예약 추가
+
+### 요청
+
+```http
+POST /reservations
+```
+
+### 권한
+
+- `ADMIN` 권한 필요
+
+### 설명
+
+관리자가 예약을 추가합니다.
+
+### 요청 본문
+
+```json
+{
+  "memberId": "Long",
+  "themeId": "Long",
+  "date": "LocalDate",
+  "timeId": "Long"
+}
+```
+
+### 응답
+
+```json
+{
+  "id": "Long",
+  "memberId": "Long",
+  "themeId": "Long",
+  "date": "LocalDate",
+  "timeId": "Long"
+}
+```
+
+---
+
+## 5. 회원에 의한 예약 추가
+
+### 요청
+
+```http
+POST /reservations/mine
+```
+
+### 권한
+
+- `GENERAL` 권한 필요
+
+### 설명
+
+회원이 예약을 추가합니다.
+
+### 요청 본문
+
+```json
+{
+  "themeId": "Long",
+  "date": "LocalDate",
+  "timeId": "Long",
+  "orderId": "String",
+  "paymentKey": "String",
+  "paymentType": "String",
+  "amount": "Integer"
+}
+```
+
+### 응답
+
+```json
+{
+  "id": "Long",
+  "memberId": "Long",
+  "themeId": "Long",
+  "date": "LocalDate",
+  "timeId": "Long"
+}
+```
+
+---
+
+## 6. 예약 삭제
+
+### 요청
+
+```http
+DELETE /reservations/{reservationId}
+```
+
+### 파라미터
+
+| 파라미터          | 타입   | 설명    |
+|---------------|------|-------|
+| reservationId | Long | 예약 ID |
+
+### 권한
+
+- `ADMIN` 권한 필요
+
+### 설명
+
+특정 예약을 삭제합니다.
+
+### 응답
+
+- 상태 코드: 204 No Content
+
+---
+
+# ERD
+
+![img.png](img.png)
