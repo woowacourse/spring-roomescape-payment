@@ -105,7 +105,7 @@ class PaymentClientMockWebServerTest {
         // then
         assertThatThrownBy(() -> paymentClinet.confirmPayment(request))
                 .isInstanceOf(PaymentApiException.class)
-                .hasMessageContaining("결제 승인이 실패하였습니다.")
+                .hasMessageContaining("Payment 결제 승인 API 호출 실패했습니다.")
                 .hasMessageContaining("잘못된 요청")
                 .hasMessageContaining("BAD_REQUEST");
     }

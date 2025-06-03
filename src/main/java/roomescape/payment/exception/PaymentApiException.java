@@ -15,16 +15,21 @@ public class PaymentApiException extends BusinessException {
     }
 
     public PaymentApiException(final PaymentResult result) {
-        super(buildLogMessage(result), buildUserMessage("서버 내 결제 처리 오류입니다."));
+        super(buildLogMessage(result), buildUserMessage("결제 승인 요청에 실패했습니다. 관리자에게 문의하세요."));
+        this.status = HttpStatus.valueOf(500);
+    }
+
+    public PaymentApiException() {
+        super(buildLogMessage(""), buildUserMessage("결제 승인 요청에 실패했습니다. 관리자에게 문의하세요."));
         this.status = HttpStatus.valueOf(500);
     }
 
     private static String buildLogMessage(final String message) {
-        return "결제 승인이 실패하였습니다. " + message;
+        return "Payment 결제 승인 API 호출 실패했습니다. " + message;
     }
 
     private static String buildLogMessage(final PaymentResult result) {
-        return "잘못된 결제 요청입니다. " + result.orderId() +
+        return "Payment 결제 승인 API 호출 실패했습니다. " + result.orderId() +
                 ", " + result.paymentKey() +
                 ", " + result.amount() +
                 ", " + result.paymentType();

@@ -16,8 +16,8 @@ import org.springframework.web.client.RestClient;
 @Configuration
 public class PaymentClientConfig {
 
-    private static final int CONNECT_TIMEOUT_SECONDS = 4;
-    private static final int READ_TIMEOUT_SECONDS = 32;
+    private static final int CONNECT_TIMEOUT_SECONDS = 3;
+    private static final int READ_TIMEOUT_SECONDS = 33;
 
     @Value("${payment.api.base-url}")
     private String baseUrl;

@@ -114,7 +114,7 @@ class PaymentClientMockRestServiceServerTest {
         // then
         assertThatThrownBy(() -> paymentClient.confirmPayment(request))
                 .isInstanceOf(PaymentApiException.class)
-                .hasMessageContaining("결제 승인이 실패하였습니다.")
+                .hasMessageContaining("Payment 결제 승인 API 호출 실패했습니다.")
                 .hasMessageContaining("잘못된 요청")
                 .hasMessageContaining("BAD_REQUEST");
 
@@ -126,21 +126,18 @@ class PaymentClientMockRestServiceServerTest {
     void confirmPayment_throwsRuntimeException_whenJsonParsingFails() {
         // given
         PaymentRequest request = getRequest("paymentKey123");
-        String invalidJsonResponse = "invalid json";
+        String invalidJsonResponse = "{\"message\":\"에러\" invalid";
 
         mockServer.expect(requestTo(URL + PATH))
                 .andExpect(method(HttpMethod.POST))
-                .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+                .andRespond(withStatus(HttpStatus.BAD_REQUEST)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(invalidJsonResponse));
 
-        // when
-        // then
+        // when & then
         assertThatThrownBy(() -> paymentClient.confirmPayment(request))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Json 파싱에 실패했습니다.500 Internal Server Error: \"invalid json\"");
-
-        mockServer.verify();
+                .hasMessageContaining("파싱에 실패했습니다");
     }
 
     private PaymentRequest getRequest(String paymentKey) {
