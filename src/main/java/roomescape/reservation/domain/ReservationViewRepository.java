@@ -1,6 +1,4 @@
-package roomescape.reservation.infrastructure.entity;
-
-import roomescape.reservation.domain.ReservationDate;
+package roomescape.reservation.domain;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package roomescape.reservation.infrastructure.entity;
+package roomescape.reservation.domain;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
@@ -18,8 +18,6 @@ import org.hibernate.annotations.Subselect;
 import org.hibernate.annotations.Synchronize;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.validate.Validator;
-import roomescape.reservation.domain.ReservationDate;
-import roomescape.reservation.domain.ReservationStatus;
 import roomescape.theme.domain.Theme;
 import roomescape.time.domain.ReservationTime;
 
