@@ -25,7 +25,6 @@ import roomescape.payment.config.TossPaymentProperties;
 @EnableConfigurationProperties(TossPaymentProperties.class)
 public class TossPaymentGatewayClient {
 
-    private static final String BASE_URL = "https://api.tosspayments.com";
     private static final String CONFIRM_ENDPOINT = "/v1/payments/confirm";
 
     private final RestClient restClient;
@@ -37,7 +36,7 @@ public class TossPaymentGatewayClient {
         final TossPaymentProperties properties
     ) {
         this.restClient = restClientBuilder
-            .baseUrl(BASE_URL)
+            .baseUrl(properties.getBaseUrl())
             .defaultHeader(AUTHORIZATION, encodeSecretKey(properties.getSecretKey()))
             .defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
             .build();
