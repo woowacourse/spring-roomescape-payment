@@ -1,5 +1,7 @@
 package roomescape.reservation.dto.response;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import roomescape.reservation.domain.Waiting;
 
 public class WaitingWithRank {
@@ -13,6 +15,22 @@ public class WaitingWithRank {
 
     public Waiting getWaiting() {
         return waiting;
+    }
+
+    public String getThemeName() {
+        return waiting.getThemeName();
+    }
+
+    public LocalDate getDate() {
+        return waiting.getDate();
+    }
+
+    public LocalTime getStartAt() {
+        return waiting.getStartAt();
+    }
+
+    public Long getWaitingId() {
+        return waiting.getId();
     }
 
     public Long getRank() {
