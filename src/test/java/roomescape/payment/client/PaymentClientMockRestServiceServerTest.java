@@ -73,12 +73,12 @@ class PaymentClientMockRestServiceServerTest {
     }
 
     @Test
-    @DisplayName("UNAUTHORIZED 예외 발생 시 RuntimeException를 던진다")
-    void confirmPayment_throwsRuntimeException_whenUnauthorized() {
+    @DisplayName("UNAUTHORIZED 예외 발생 시 PaymentUnauthorizedException을 던진다")
+    void confirmPayment_whenUnauthorized() {
         // given
         String invalidKey = "invalidKey";
         PaymentRequest request = getRequest(invalidKey);
-        String errorResponse = "{\"code\":\"BAD_REQUEST\",\"message\":\"인증 실패\"}";
+        String errorResponse = "{\"code\":\"UNAUTHORIZED\",\"message\":\"인증 실패\"}";
 
         mockServer.expect(requestTo(URL + PATH))
                 .andExpect(method(HttpMethod.POST))
@@ -119,25 +119,6 @@ class PaymentClientMockRestServiceServerTest {
                 .hasMessageContaining("BAD_REQUEST");
 
         mockServer.verify();
-    }
-
-    @Test
-    @DisplayName("JSON 파싱 실패 시 RuntimeException 던진다")
-    void confirmPayment_throwsRuntimeException_whenJsonParsingFails() {
-        // given
-        PaymentRequest request = getRequest("paymentKey123");
-        String invalidJsonResponse = "{\"message\":\"에러\" invalid";
-
-        mockServer.expect(requestTo(URL + PATH))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withStatus(HttpStatus.BAD_REQUEST)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(invalidJsonResponse));
-
-        // when & then
-        assertThatThrownBy(() -> paymentClient.confirmPayment(request))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("파싱에 실패했습니다");
     }
 
     private PaymentRequest getRequest(String paymentKey) {

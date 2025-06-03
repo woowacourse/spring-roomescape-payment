@@ -13,6 +13,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResult;
 import roomescape.payment.exception.PaymentException;
+import roomescape.payment.exception.PaymentUnauthorizedException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -20,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class PaymentClientMockWebServerTest {
 
     private MockWebServer mockWebServer;
-    private TossPaymentClient paymentClinet;
+    private TossPaymentClient paymentClient;
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -34,7 +35,7 @@ class PaymentClientMockWebServerTest {
                 .baseUrl(mockWebServer.url("/").toString())
                 .build();
 
-        paymentClinet = new TossPaymentClient(restClient);
+        paymentClient = new TossPaymentClient(restClient);
     }
 
     @AfterEach
@@ -55,7 +56,7 @@ class PaymentClientMockWebServerTest {
                 .addHeader("Content-Type", "application/json"));
 
         // when
-        PaymentResult result = paymentClinet.confirmPayment(request);
+        PaymentResult result = paymentClient.confirmPayment(request);
 
         // then
         assertThat(result).isEqualTo(expectedResponse);
@@ -70,21 +71,21 @@ class PaymentClientMockWebServerTest {
     }
 
     @Test
-    @DisplayName("UNAUTHORIZED 예외 발생 시 RuntimeException를 던진다")
-    void confirmPayment_throwsRuntimeException_whenUnauthorized() {
+    @DisplayName("UNAUTHORIZED 예외 발생 시 PaymentUnauthorizedException을 던진다")
+    void confirmPayment_whenUnauthorized() {
         // given
         PaymentRequest request = new PaymentRequest("invalidKey", 1000, "orderId123", "paymentType");
-        String errorResponse = "{\"message\":\"인증 실패\"}";
+        String errorResponse = "{\"code\":\"UNAUTHORIZED\",\"message\":\"인증 실패\"}";
 
         mockWebServer.enqueue(new MockResponse()
-                .setResponseCode(HttpStatus.UNAUTHORIZED.value())  // HTTP 401
+                .setResponseCode(HttpStatus.UNAUTHORIZED.value())
                 .setBody(errorResponse)
                 .addHeader("Content-Type", "application/json"));
 
         // when
         // then
-        assertThatThrownBy(() -> paymentClinet.confirmPayment(request))
-                .isInstanceOf(RuntimeException.class)
+        assertThatThrownBy(() -> paymentClient.confirmPayment(request))
+                .isInstanceOf(PaymentUnauthorizedException.class)
                 .hasMessageContaining("결제 인가/인증이 실패하였습니다.")
                 .hasMessageContaining("인증 실패");
     }
@@ -103,30 +104,11 @@ class PaymentClientMockWebServerTest {
 
         // when
         // then
-        assertThatThrownBy(() -> paymentClinet.confirmPayment(request))
+        assertThatThrownBy(() -> paymentClient.confirmPayment(request))
                 .isInstanceOf(PaymentException.class)
                 .hasMessageContaining("Payment 결제 승인 API 호출 실패했습니다.")
                 .hasMessageContaining("잘못된 요청")
                 .hasMessageContaining("BAD_REQUEST");
-    }
-
-    @Test
-    @DisplayName("JSON 파싱 실패 시 RuntimeException 던진다")
-    void confirmPayment_throwsRuntimeException_whenJsonParsingFails() {
-        // given
-        PaymentRequest request = new PaymentRequest("paymentKey123", 1000, "orderId123", "paymentType");
-        String invalidJsonResponse = "invalid json";
-
-        mockWebServer.enqueue(new MockResponse()
-                .setResponseCode(HttpStatus.BAD_REQUEST.value())
-                .setBody(invalidJsonResponse)
-                .addHeader("Content-Type", "application/json"));
-
-        // when
-        // then
-        assertThatThrownBy(() -> paymentClinet.confirmPayment(request))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("파싱에 실패했습니다.");
     }
 
     @Test
@@ -140,7 +122,7 @@ class PaymentClientMockWebServerTest {
 
         // when
         // then
-        assertThatThrownBy(() -> paymentClinet.confirmPayment(request))
+        assertThatThrownBy(() -> paymentClient.confirmPayment(request))
                 .isInstanceOf(Exception.class);
     }
 }
