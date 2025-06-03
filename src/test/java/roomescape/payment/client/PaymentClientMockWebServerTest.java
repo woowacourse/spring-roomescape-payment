@@ -62,7 +62,7 @@ class PaymentClientMockWebServerTest {
         assertThat(result).isEqualTo(expectedResponse);
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
-        assertThat(recordedRequest.getPath()).isEqualTo("/v1/payments/confirm");
+        assertThat(recordedRequest.getPath()).isEqualTo("/confirm");
         assertThat(recordedRequest.getMethod()).isEqualTo("POST");
 
         PaymentRequest actual = objectMapper.readValue(

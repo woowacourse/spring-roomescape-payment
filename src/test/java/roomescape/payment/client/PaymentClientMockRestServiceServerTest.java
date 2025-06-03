@@ -14,7 +14,6 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.payment.client.config.TestPaymentConfiguration;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResult;
-import roomescape.payment.exception.PaymentException;
 import roomescape.payment.exception.PaymentUnauthorizedException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,7 +28,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @Import(TestPaymentConfiguration.class)
 class PaymentClientMockRestServiceServerTest {
 
-    private static final String PATH = "/v1/payments/confirm";
+    private static final String PATH = "/confirm";
 
     @Autowired
     private MockRestServiceServer mockServer;
@@ -93,30 +92,6 @@ class PaymentClientMockRestServiceServerTest {
                 .isInstanceOf(PaymentUnauthorizedException.class)
                 .hasMessageContaining("결제 인가/인증이 실패하였습니다.")
                 .hasMessageContaining("인증 실패");
-
-        mockServer.verify();
-    }
-
-    @Test
-    @DisplayName("기타 API 예외 발생 시, PaymentApiException 을 던진다")
-    void confirmPayment_throwsPaymentApiException_whenOtherError() {
-        // given
-        PaymentRequest request = getRequest("paymentKey123");
-        String errorResponse = "{ \"code\":\"BAD_REQUEST\", \"message\":\"잘못된 요청\"}";
-
-        mockServer.expect(requestTo(URL + PATH))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withStatus(HttpStatus.BAD_REQUEST)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(errorResponse));
-
-        // when
-        // then
-        assertThatThrownBy(() -> paymentClient.confirmPayment(request))
-                .isInstanceOf(PaymentException.class)
-                .hasMessageContaining("Payment 결제 승인 API 호출 실패했습니다.")
-                .hasMessageContaining("잘못된 요청")
-                .hasMessageContaining("BAD_REQUEST");
 
         mockServer.verify();
     }

@@ -1,6 +1,5 @@
 package roomescape.payment.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpRequest;
@@ -20,6 +19,7 @@ import roomescape.payment.exception.PaymentNetworkException;
 import roomescape.payment.exception.PaymentUnauthorizedException;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.function.Supplier;
 
 @Component
@@ -35,8 +35,7 @@ public class TossPaymentClient implements PaymentClient {
                         .uri("/confirm")
                         .body(request)
                         .retrieve()
-                        .onStatus(HttpStatusCode::is4xxClientError, this::handle4xxError)
-                        .onStatus(HttpStatusCode::is5xxServerError, this::handle5xxError)
+                        .onStatus(HttpStatusCode::isError, this::handleError)
                         .body(PaymentResult.class)
         );
     }
@@ -55,22 +54,24 @@ public class TossPaymentClient implements PaymentClient {
         }
     }
 
-    private void handle4xxError(final HttpRequest request, final ClientHttpResponse response) {
-        try {
-            String responseBody = new String(response.getBody().readAllBytes());
-            JsonNode jsonNode = mapper.readTree(responseBody);
-            String errorMessage = jsonNode.get("message").asText();
+    private void handleError(final HttpRequest request, final ClientHttpResponse response) throws IOException {
+        TossPaymentErrorResponse errorResponse = getTossPaymentErrorResponse(response);
 
-            if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-                throw new PaymentUnauthorizedException(errorMessage);
-            }
-            throw new PaymentException(responseBody, errorMessage, response.getStatusCode());
-        } catch (IOException e) {
-            throw new RuntimeException("파싱에 실패했습니다." + e.getMessage());
+        if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+            throw new PaymentUnauthorizedException(errorResponse.code);
         }
+        throw new PaymentException(errorResponse.code, errorResponse.message, response.getStatusCode());
     }
 
-    private void handle5xxError(final HttpRequest request, final ClientHttpResponse response) {
-        throw new PaymentInternalServerException("서버 에러가 발생했습니다.", "결제 요청 시간을 초과했습니다.");
+    private TossPaymentErrorResponse getTossPaymentErrorResponse(final ClientHttpResponse response) throws IOException {
+        InputStream inputStream = response.getBody();
+        return mapper.readValue(inputStream, TossPaymentErrorResponse.class);
+    }
+
+    private record TossPaymentErrorResponse(
+            String message,
+            String code
+    ) {
+
     }
 }
