@@ -1,4 +1,4 @@
-package roomescape.config;
+package roomescape.common;
 
 import java.util.Base64;
 import java.util.function.Function;
