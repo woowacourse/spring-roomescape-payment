@@ -29,7 +29,6 @@ dependencies {
 
     runtimeOnly 'com.h2database:h2'
 
-    testImplementation 'com.github.tomakehurst:wiremock-jre8:2.35.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.rest-assured:rest-assured:5.3.1'
 }
