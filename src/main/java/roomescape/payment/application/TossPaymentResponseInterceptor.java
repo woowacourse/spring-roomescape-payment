@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
-import roomescape.common.exception.impl.TossConfirmException;
+import roomescape.common.exception.impl.TossPaymentErrorException;
 import roomescape.payment.application.dto.TossErrorResponse;
 
 public class TossPaymentResponseInterceptor implements ClientHttpRequestInterceptor {
@@ -25,12 +25,12 @@ public class TossPaymentResponseInterceptor implements ClientHttpRequestIntercep
         final byte[] body,
         final ClientHttpRequestExecution execution
     ) throws IOException {
-        final ClientHttpResponse response = execution.execute(request, body);
-        final HttpStatus status = (HttpStatus) response.getStatusCode();
+        ClientHttpResponse response = execution.execute(request, body);
+        HttpStatus status = (HttpStatus) response.getStatusCode();
 
         if (status.isError()) {
-            final TossErrorResponse error = parseErrorResponse(response.getBody());
-            throw new TossConfirmException(status, error.code(), error.message());
+            TossErrorResponse error = parseErrorResponse(response.getBody());
+            throw new TossPaymentErrorException(status, error.code(), error.message());
         }
 
         return response;

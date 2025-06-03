@@ -16,7 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.response.DefaultResponseCreator;
-import roomescape.common.exception.impl.TossConfirmException;
+import roomescape.common.exception.impl.TossPaymentErrorException;
 import roomescape.payment.application.dto.TossConfirmRequest;
 import roomescape.payment.application.dto.TossConfirmResponse;
 import roomescape.payment.application.dto.TossErrorResponse;
@@ -63,9 +63,9 @@ class TossPaymentGatewayClientTest {
             .andRespond(withJsonError(HttpStatus.BAD_REQUEST, errorResponse));
 
         assertThatThrownBy(() -> tossPaymentGatewayClient.processPaymentConfirm(request))
-            .isInstanceOf(TossConfirmException.class)
+            .isInstanceOf(TossPaymentErrorException.class)
             .satisfies(e -> {
-                TossConfirmException ex = (TossConfirmException) e;
+                TossPaymentErrorException ex = (TossPaymentErrorException) e;
                 assertAll(
                     () -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST),
                     () -> assertThat(ex.getCode()).isEqualTo("INVALID_REQUEST"),
@@ -83,9 +83,9 @@ class TossPaymentGatewayClientTest {
             .andRespond(withJsonError(HttpStatus.INTERNAL_SERVER_ERROR, errorResponse));
 
         assertThatThrownBy(() -> tossPaymentGatewayClient.processPaymentConfirm(request))
-            .isInstanceOf(TossConfirmException.class)
+            .isInstanceOf(TossPaymentErrorException.class)
             .satisfies(e -> {
-                TossConfirmException ex = (TossConfirmException) e;
+                TossPaymentErrorException ex = (TossPaymentErrorException) e;
                 assertAll(
                     () -> assertThat(ex.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR),
                     () -> assertThat(ex.getCode()).isEqualTo("SERVER_ERROR"),

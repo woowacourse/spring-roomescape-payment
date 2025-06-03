@@ -6,19 +6,13 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestClient;
-import roomescape.common.exception.impl.TossConfirmException;
 import roomescape.payment.application.dto.TossConfirmRequest;
 import roomescape.payment.application.dto.TossConfirmResponse;
-import roomescape.payment.application.dto.TossErrorResponse;
 import roomescape.payment.config.TossPaymentProperties;
 
 @Component
@@ -28,7 +22,6 @@ public class TossPaymentGatewayClient {
     private static final String CONFIRM_ENDPOINT = "/v1/payments/confirm";
 
     private final RestClient restClient;
-    private final ObjectMapper objectMapper;
 
     public TossPaymentGatewayClient(
         final RestClient.Builder restClientBuilder,
@@ -41,7 +34,6 @@ public class TossPaymentGatewayClient {
             .defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
             .requestInterceptor(new TossPaymentResponseInterceptor(objectMapper))
             .build();
-        this.objectMapper = objectMapper;
     }
 
     private String encodeSecretKey(final String secretKey) {
