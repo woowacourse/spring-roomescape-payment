@@ -1,19 +1,29 @@
 package roomescape.payment.application.client;
 
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.common.config.PaymentClientConfig;
 import roomescape.common.properties.PaymentClientProperties;
+import roomescape.payment.exception.PaymentClientException;
+import roomescape.payment.exception.PaymentForbiddenException;
+import roomescape.payment.exception.PaymentServerException;
+import roomescape.payment.exception.PaymentUnauthorizedException;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
+import roomescape.payment.presentation.dto.response.TossErrorResponse;
 import roomescape.payment.presentation.dto.response.TossPaymentApproveResponse;
 
 @Import({PaymentClientConfig.class})
@@ -81,16 +91,21 @@ class PaymentClientTest {
     @Autowired
     private PaymentClientProperties paymentClientProperties;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private String url;
+
     @BeforeEach
     void setUp() {
-        String baseUrl = paymentClientProperties.getBaseUrl();
-        mockServer.expect(requestTo(baseUrl + paymentClientProperties.getConfirmApi()))
-                .andRespond(withSuccess(EXPECTED_RESULT, MediaType.APPLICATION_JSON));
+        url = paymentClientProperties.getBaseUrl() + paymentClientProperties.getConfirmApi();
     }
 
     @Test
     void 결제_승인_요청을_보내고_응답을_파싱할_수_있다() {
         // Given
+        mockServer.expect(requestTo(url))
+                .andRespond(withSuccess(EXPECTED_RESULT, MediaType.APPLICATION_JSON));
         PaymentApproveRequest request = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID,
                 50_000L, null);
 
@@ -104,5 +119,77 @@ class PaymentClientTest {
             softAssertions.assertThat(response.orderId()).isEqualTo(ORDER_ID);
             softAssertions.assertThat(response.totalAmount()).isEqualTo(50000);
         });
+    }
+
+    @Test
+    void approvePayment_whenUnauthorizedRequest_throwsException() throws JsonProcessingException {
+        // Given
+        PaymentApproveRequest request = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID,
+                50_000L, null);
+        String errorMessage = "인증에 실패했습니다.";
+        String errorResponse = objectMapper.writerWithDefaultPrettyPrinter()
+                .writeValueAsString(new TossErrorResponse(errorMessage));
+        mockServer.expect(requestTo(url))
+                .andRespond(withStatus(HttpStatus.UNAUTHORIZED)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(errorResponse));
+
+        // When
+        Assertions.assertThatThrownBy(() -> paymentClient.approvePayment(request))
+                .isInstanceOf(PaymentUnauthorizedException.class);
+    }
+
+    @Test
+    void approvePayment_whenForbiddenRequest_throwsException() throws JsonProcessingException {
+        // Given
+        PaymentApproveRequest request = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID,
+                50_000L, null);
+        String errorMessage = "허용되지 않은 요청입니다.";
+        String errorResponse = objectMapper.writerWithDefaultPrettyPrinter()
+                .writeValueAsString(new TossErrorResponse(errorMessage));
+        mockServer.expect(requestTo(url))
+                .andRespond(withStatus(HttpStatus.FORBIDDEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(errorResponse));
+
+        // When
+        Assertions.assertThatThrownBy(() -> paymentClient.approvePayment(request))
+                .isInstanceOf(PaymentForbiddenException.class);
+    }
+
+    @Test
+    void approvePayment_whenInvalidClientRequest_throwsException() throws JsonProcessingException {
+        // Given
+        PaymentApproveRequest request = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID,
+                50_000L, null);
+        String errorMessage = "잘못된 요청입니다.";
+        String errorResponse = objectMapper.writerWithDefaultPrettyPrinter()
+                .writeValueAsString(new TossErrorResponse(errorMessage));
+        mockServer.expect(requestTo(url))
+                .andRespond(withStatus(HttpStatus.BAD_REQUEST)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(errorResponse));
+
+        // When
+        Assertions.assertThatThrownBy(() -> paymentClient.approvePayment(request))
+                .isInstanceOf(PaymentClientException.class);
+    }
+
+    @Test
+    void approvePayment_whenInvalidServerRequest_throwsException() throws JsonProcessingException {
+        // Given
+        PaymentApproveRequest request = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID,
+                50_000L, null);
+        String errorMessage = "내부 시스템 처리 작업이 실패했습니다. 잠시 후 다시 시도해주세요.";
+        String errorResponse = objectMapper.writerWithDefaultPrettyPrinter()
+                .writeValueAsString(new TossErrorResponse(errorMessage));
+        mockServer.expect(requestTo(url))
+                .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(errorResponse));
+
+        // When
+        Assertions.assertThatThrownBy(() -> paymentClient.approvePayment(request))
+                .isInstanceOf(PaymentServerException.class);
     }
 }

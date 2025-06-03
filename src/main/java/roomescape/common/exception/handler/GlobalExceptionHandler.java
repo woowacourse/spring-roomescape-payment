@@ -11,7 +11,10 @@ import roomescape.common.exception.NotFoundException;
 import roomescape.common.exception.ValidationException;
 import roomescape.common.security.exception.ForbiddenException;
 import roomescape.common.security.exception.UnAuthorizedException;
-import roomescape.payment.exception.PaymentApproveException;
+import roomescape.payment.exception.PaymentClientException;
+import roomescape.payment.exception.PaymentForbiddenException;
+import roomescape.payment.exception.PaymentServerException;
+import roomescape.payment.exception.PaymentUnauthorizedException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -51,8 +54,23 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
-    @ExceptionHandler(PaymentApproveException.class)
-    public ResponseEntity<String> handlePaymentApproveException(PaymentApproveException e) {
-        return ResponseEntity.status(e.getHttpStatusCode()).body(e.getMessage());
+    @ExceptionHandler(PaymentClientException.class)
+    public ResponseEntity<String> handlePaymentApproveException(PaymentClientException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler(PaymentUnauthorizedException.class)
+    public ResponseEntity<String> handlePaymentUnauthorizedException(PaymentUnauthorizedException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+    }
+
+    @ExceptionHandler(PaymentForbiddenException.class)
+    public ResponseEntity<String> handlePaymentForbiddenException(PaymentForbiddenException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+    }
+
+    @ExceptionHandler(PaymentServerException.class)
+    public ResponseEntity<String> handlePaymentServerException(PaymentServerException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
 }

@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
 import roomescape.common.properties.PaymentClientProperties;
-import roomescape.payment.exception.handler.PaymentApproveExceptionHandler;
+import roomescape.payment.exception.handler.PaymentExceptionHandler;
 
 @Configuration
 @EnableConfigurationProperties(PaymentClientProperties.class)
@@ -26,7 +26,7 @@ public class PaymentClientConfig {
     }
 
     @Bean
-    PaymentApproveExceptionHandler paymentApproveExceptionHandler(ObjectMapper objectMapper) {
-        return new PaymentApproveExceptionHandler(objectMapper);
+    PaymentExceptionHandler paymentApproveExceptionHandler(ObjectMapper objectMapper) {
+        return new PaymentExceptionHandler(objectMapper);
     }
 }

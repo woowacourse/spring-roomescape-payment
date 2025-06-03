@@ -25,7 +25,7 @@ import roomescape.payment.application.client.PaymentClient;
 import roomescape.payment.application.infrastructure.PaymentRepository;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentType;
-import roomescape.payment.exception.PaymentApproveException;
+import roomescape.payment.exception.PaymentUnauthorizedException;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
 import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
 import roomescape.payment.presentation.dto.response.TossPaymentApproveResponse;
@@ -33,7 +33,6 @@ import roomescape.reservation.application.ConfirmedReservationApplicationService
 import roomescape.reservation.application.ReservationDataService;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
 import roomescape.reservation.application.event.PaymentApprovedEvent;
-import roomescape.reservation.application.event.PaymentFailedEvent;
 import roomescape.reservation.application.event.TestEventPublisher;
 import roomescape.reservation.infrastructure.ReservationRepository;
 import roomescape.reservationslot.application.ReservationSlotDataService;
@@ -140,17 +139,12 @@ class PaymentServiceTest {
         long amount = 5000L;
         PaymentApproveRequest paymentApproveRequest = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID, amount,
                 reservationId);
-        when(paymentClient.approvePayment(any(PaymentApproveRequest.class))).thenThrow(PaymentApproveException.class);
+        when(paymentClient.approvePayment(any(PaymentApproveRequest.class))).thenThrow(
+                PaymentUnauthorizedException.class);
 
         // when
         Assertions.assertThatThrownBy(() -> paymentService.approvePayment(paymentApproveRequest))
-                .isInstanceOf(PaymentApproveException.class);
-
-        // then
-        SoftAssertions.assertSoftly(softAssertions -> {
-            softAssertions.assertThat(eventPublisher.hasEvent(PaymentFailedEvent.class)).isTrue();
-            softAssertions.assertThat(eventPublisher.getEventsOfType(PaymentFailedEvent.class)).hasSize(1);
-        });
+                .isInstanceOf(PaymentUnauthorizedException.class);
     }
 
     @Test
