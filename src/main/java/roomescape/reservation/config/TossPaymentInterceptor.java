@@ -13,8 +13,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class TossPaymentInterceptor implements ClientHttpRequestInterceptor {
 
-    private static final String AUTH_HEADER_NAME = "Authorization";
-
     @Value("${payment.toss.auth-token}")
     private String token;
 
@@ -23,7 +21,7 @@ public class TossPaymentInterceptor implements ClientHttpRequestInterceptor {
             throws IOException {
         HttpHeaders headers = request.getHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add(AUTH_HEADER_NAME, token);
+        headers.add(HttpHeaders.AUTHORIZATION, token);
 
         return execution.execute(request, body);
     }
