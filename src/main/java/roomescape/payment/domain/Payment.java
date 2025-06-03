@@ -9,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
-import java.time.LocalDateTime;
 import roomescape.reservation.domain.Reservation;
 
 @Entity
@@ -24,8 +23,6 @@ public class Payment {
     @Column(nullable = false, unique = true)
     private String paymentKey;
 
-    private LocalDateTime paymentDateTime;
-
     @Column(nullable = false)
     private Long amount;
 
@@ -36,10 +33,10 @@ public class Payment {
     @JoinColumn(nullable = false)
     private Reservation reservation;
 
-    public Payment(String orderId, String paymentKey, LocalDateTime paymentDateTime, Long amount, PaymentStatus status, Reservation reservation) {
+    public Payment(Long id, String orderId, String paymentKey, Long amount, PaymentStatus status, Reservation reservation) {
+        this.id = id;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
-        this.paymentDateTime = paymentDateTime;
         this.amount = amount;
         this.status = status;
         this.reservation = reservation;
@@ -48,8 +45,12 @@ public class Payment {
     public Payment() {
     }
 
-    public void cancel() {
-        this.status = PaymentStatus.CANCEL;
+    public Payment(String orderId, String paymentKey, Long amount, PaymentStatus status, Reservation reservation) {
+        this(null, orderId, paymentKey, amount, status, reservation);
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getOrderId() {
@@ -60,9 +61,6 @@ public class Payment {
         return paymentKey;
     }
 
-    public LocalDateTime getPaymentDateTime() {
-        return paymentDateTime;
-    }
 
     public Long getAmount() {
         return amount;
@@ -74,5 +72,17 @@ public class Payment {
 
     public PaymentStatus getStatus() {
         return status;
+    }
+
+    public void confirm() {
+        this.status = PaymentStatus.DONE;
+    }
+
+    public void cancel() {
+        this.status = PaymentStatus.CANCEL;
+    }
+
+    public void removeReservation() {
+        this.reservation = null;
     }
 }

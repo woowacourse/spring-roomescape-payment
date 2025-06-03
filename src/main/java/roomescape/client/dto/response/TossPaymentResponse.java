@@ -10,7 +10,8 @@ public record TossPaymentResponse(
         OffsetDateTime approvedAt,
         String method,
         Long totalAmount,
-        CardInfo card
+        CardInfo card,
+        TossErrorResponse failure
 ) {
     public record CardInfo(
             String company,

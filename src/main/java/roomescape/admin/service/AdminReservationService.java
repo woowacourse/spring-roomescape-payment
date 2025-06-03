@@ -8,8 +8,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
-import roomescape.reservation.domain.ReservationStatus;
-import roomescape.reservation.dto.request.ReservationRequest;
+import roomescape.reservation.dto.request.ReservationWithPaymentRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.reservationTime.domain.ReservationTimeRepository;
@@ -34,7 +33,7 @@ public class AdminReservationService {
     }
 
     @Transactional
-    public ReservationResponse createReservation(final ReservationRequest request, final Long memberId) {
+    public ReservationResponse createReservation(final ReservationWithPaymentRequest request, final Long memberId) {
         ReservationTime time = reservationTimeRepository.findById(request.timeId())
                 .orElseThrow(() -> new InvalidReservationException("존재하지 않는 시간입니다."));
         Theme theme = themeRepository.findById(request.themeId())
@@ -42,7 +41,7 @@ public class AdminReservationService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new InvalidReservationException("존재 하지 않는 유저입니다."));
 
-        Reservation reservation = Reservation.createWithoutId(dateTime.now(), member, request.date(), time, theme, ReservationStatus.DONE);
+        Reservation reservation = Reservation.createWithoutId(dateTime.now(), member, request.date(), time, theme);
 
         if (reservationRepository.existsByDateAndTimeStartAtAndThemeId(
                 reservation.getDate(),

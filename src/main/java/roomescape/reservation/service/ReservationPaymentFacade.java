@@ -1,13 +1,15 @@
 package roomescape.reservation.service;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import roomescape.client.TossPaymentClient;
 import roomescape.client.dto.request.TossPaymentConfirmRequest;
 import roomescape.client.dto.response.TossPaymentResponse;
+import roomescape.common.exception.InternalServerException;
 import roomescape.member.dto.request.LoginMember;
 import roomescape.payment.service.PaymentService;
-import roomescape.reservation.dto.request.ReservationRequest;
-import roomescape.reservation.dto.response.ReservationResponse;
+import roomescape.reservation.dto.request.ReservationWithPaymentRequest;
+import roomescape.reservation.dto.response.ReservationWithPaymentResponse;
 
 @Service
 public class ReservationPaymentFacade {
@@ -22,24 +24,28 @@ public class ReservationPaymentFacade {
         this.tossPaymentClient = tossPaymentClient;
     }
 
-    public ReservationResponse createReservationAndSavePayment(
-            ReservationRequest request,
-            LoginMember loginMember,
-            TossPaymentConfirmRequest confirmRequest
+    public ReservationWithPaymentResponse createReservationAndSavePayment(
+            ReservationWithPaymentRequest request,
+            LoginMember loginMember
     ) {
-        ReservationResponse reservation = null;
-        try {
-            reservation = reservationService.createReservation(request, loginMember.id());
-            TossPaymentResponse response = tossPaymentClient.confirmPayment(confirmRequest);
-            paymentService.save(response, reservation.id());
+        TossPaymentConfirmRequest confirmRequest = new TossPaymentConfirmRequest(
+                request.orderId(),
+                request.amount(),
+                request.paymentKey()
+        );
+        ReservationWithPaymentResponse reservationWithPendingPayment = reservationService.createReservationWithPendingPayment(request, loginMember.id());
 
-            reservationService.confirm(reservation.id());
-            return reservation;
-        } catch (Exception e) {
-            if (reservation != null) {
-                reservationService.cancel(reservation.id());
-            }
+        ResponseEntity<TossPaymentResponse> response = tossPaymentClient.confirmPayment(confirmRequest);
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            paymentService.confirm(reservationWithPendingPayment.paymentId());
+            return reservationWithPendingPayment;
         }
-        throw new RuntimeException();
+
+        reservationService.deleteReservationById(reservationWithPendingPayment.id());
+        paymentService.cancel(reservationWithPendingPayment.paymentId());
+
+        tossPaymentClient.handleTosPamentException(response);
+        throw new InternalServerException();
     }
 }

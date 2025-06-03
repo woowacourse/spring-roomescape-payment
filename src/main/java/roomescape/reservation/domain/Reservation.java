@@ -1,8 +1,6 @@
 package roomescape.reservation.domain;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -35,18 +33,14 @@ public class Reservation {
     @ManyToOne(fetch = FetchType.LAZY)
     private Theme theme;
 
-    @Enumerated(EnumType.STRING)
-    private ReservationStatus status;
-
     protected Reservation() {
     }
 
-    public Reservation(Member member, LocalDate date, ReservationTime time, Theme theme, ReservationStatus status) {
+    public Reservation(Member member, LocalDate date, ReservationTime time, Theme theme) {
         this.member = member;
         this.date = date;
         this.time = time;
         this.theme = theme;
-        this.status = status;
     }
 
     public static Reservation createWithoutId(
@@ -54,11 +48,10 @@ public class Reservation {
             final Member member,
             final LocalDate reservationDate,
             final ReservationTime time,
-            final Theme theme,
-            final ReservationStatus status
+            final Theme theme
     ) {
         validateReservationDateTime(now, reservationDate, time);
-        return new Reservation(member, reservationDate, time, theme, status);
+        return new Reservation(member, reservationDate, time, theme);
     }
 
     private static void validateReservationDateTime(final LocalDateTime now, final LocalDate reservationDate,
@@ -98,6 +91,18 @@ public class Reservation {
         return member.getId();
     }
 
+    public Member getMember() {
+        return member;
+    }
+
+    public ReservationTime getTime() {
+        return time;
+    }
+
+    public Theme getTheme() {
+        return theme;
+    }
+
     public LocalTime getReservationTime() {
         return time.getStartAt();
     }
@@ -118,10 +123,6 @@ public class Reservation {
         return theme.getThumbnail();
     }
 
-    public ReservationStatus getStatus() {
-        return status;
-    }
-
     @Override
     public boolean equals(final Object object) {
         if (!(object instanceof Reservation that)) {
@@ -140,11 +141,4 @@ public class Reservation {
         return Objects.hashCode(getId());
     }
 
-    public void confirm() {
-        this.status = ReservationStatus.DONE;
-    }
-
-    public void cancel() {
-        this.status = ReservationStatus.CANCELED;
-    }
 }

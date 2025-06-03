@@ -20,9 +20,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import roomescape.client.TossPaymentTestConfig;
 import roomescape.common.config.ReservationConfig;
 import roomescape.member.dto.request.LoginMember;
-import roomescape.member.dto.response.ReservationMemberResponse;
-import roomescape.reservation.dto.request.ReservationRequest;
-import roomescape.reservation.dto.response.ReservationResponse;
+import roomescape.member.dto.response.MemberResponse;
+import roomescape.reservation.dto.request.ReservationWithPaymentRequest;
+import roomescape.reservation.dto.response.ReservationWithPaymentResponse;
 import roomescape.reservation.service.ReservationPaymentFacade;
 import roomescape.reservation.service.ReservationService;
 import roomescape.reservationTime.dto.response.ReservationTimeResponse;
@@ -51,7 +51,7 @@ class ReservationControllerTest {
     @Test
     void 결제_승인에_성공한다() throws Exception {
         // given
-        ReservationRequest reservationRequest = new ReservationRequest(
+        ReservationWithPaymentRequest reservationWithPaymentRequest = new ReservationWithPaymentRequest(
                 LocalDate.now(),
                 1L,
                 1L,
@@ -61,18 +61,19 @@ class ReservationControllerTest {
         );
         LoginMember loginMember = new LoginMember(1L, "포라");
 
-        ReservationResponse response = new ReservationResponse(
+        ReservationWithPaymentResponse response = new ReservationWithPaymentResponse(
                 1L,
-                new ReservationMemberResponse("포라"),
+                new MemberResponse(1L, "포라"),
                 LocalDate.now(),
                 new ReservationTimeResponse(1L, LocalTime.of(10, 0)),
-                new ThemeResponse(1L, "theme1", "des1", "thum1")
+                new ThemeResponse(1L, "theme1", "des1", "thum1"),
+                1L
         );
 
         // when
-        when(reservationPaymentFacade.createReservationAndSavePayment(any(), any(), any()))
+        when(reservationPaymentFacade.createReservationAndSavePayment(any(), any()))
                 .thenReturn(response);
-        String jsonContent = objectMapper.writeValueAsString(reservationRequest);
+        String jsonContent = objectMapper.writeValueAsString(reservationWithPaymentRequest);
 
         // then
         mockMvc.perform(post("/reservations")

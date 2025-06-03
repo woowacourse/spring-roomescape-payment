@@ -13,6 +13,7 @@ import static roomescape.fixture.MockServerTestFixture.SERVER;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import roomescape.client.dto.request.TossPaymentConfirmRequest;
 import roomescape.client.dto.response.TossPaymentResponse;
 import roomescape.common.exception.PaymentException;
@@ -40,6 +41,7 @@ class TossPaymentClientTest {
                 null,
                 "간편결제",
                 1000L,
+                null,
                 null
         );
 
@@ -50,10 +52,10 @@ class TossPaymentClientTest {
         );
         setUpSuccess();
         // when
-        TossPaymentResponse actual = tossPaymentClient.confirmPayment(request);
+        ResponseEntity<TossPaymentResponse> actual = tossPaymentClient.confirmPayment(request);
 
         // then
-        assertThat(actual).isEqualTo(expected);
+        assertThat(actual.getBody()).isEqualTo(expected);
     }
 
     @Test
@@ -96,7 +98,8 @@ class TossPaymentClientTest {
                   "requestedAt": null,
                   "method": "간편결제",
                   "totalAmount": 1000,
-                  "card": null
+                  "card": null,
+                  "failure": null
                 } 
                 """;
 
@@ -108,9 +111,16 @@ class TossPaymentClientTest {
     private void setUpServerError() {
         String expectedError = """
                 {
-                "code": "FAILED",
-                "message":"서버 에러로 결제 실패."
-                }
+                  "paymentKey": "tgen_20250528204823hWav3",
+                  "orderId": "MC4xNTU3MDQ1MDk3Njkx",
+                  "orderName": "토스 티셔츠 외 2건",
+                  "status": "DONE",
+                  "requestedAt": null,
+                  "method": "간편결제",
+                  "totalAmount": 1000,
+                  "card": null,
+                  "failure" // todo
+                } 
                 """;
         SERVER.expect(requestTo(BASE_URL + "/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))

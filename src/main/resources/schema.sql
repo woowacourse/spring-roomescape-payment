@@ -38,7 +38,6 @@ CREATE TABLE reservation
     member_id BIGINT,
     time_id BIGINT,
     theme_id BIGINT,
-    status VARCHAR,
     PRIMARY KEY (id),
     FOREIGN KEY (time_id) REFERENCES reservation_time (id),
     FOREIGN KEY (theme_id) REFERENCES theme (id),
@@ -48,7 +47,6 @@ CREATE TABLE reservation
 CREATE TABLE payment(
     id   BIGINT       NOT NULL AUTO_INCREMENT,
     order_id VARCHAR  NOT NULL,
-    payment_date_time TIMESTAMP NOT NULL,
     amount  BIGINT    NOT NULL,
     status  VARCHAR   NOT NULL,
     reservation_id  BIGINT NOT NULL,

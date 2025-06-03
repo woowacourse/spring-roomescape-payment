@@ -7,6 +7,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import roomescape.common.exception.InternalServerException;
 import roomescape.common.exception.InvalidReservationException;
 import roomescape.common.exception.PaymentException;
 import roomescape.common.exception.UnauthorizedException;
@@ -62,6 +63,14 @@ public class GlobalExceptionHandler {
     /**
      * 500 Internal Server Error
      */
+    @ExceptionHandler(value = InternalServerException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ExceptionResponse handleInternalServerException(
+            final HttpServletRequest request
+    ) {
+        return new ExceptionResponse(EXCEPTION_PREFIX + "예상치 못한 서버 오류입니다. 서버에 문의해주세요.", request.getRequestURI());
+    }
+
     @ExceptionHandler(value = IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ExceptionResponse handleIllegalArgumentException(

@@ -26,9 +26,8 @@ import roomescape.member.domain.MemberRepository;
 import roomescape.member.domain.Role;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
-import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
-import roomescape.reservation.dto.request.ReservationRequest;
+import roomescape.reservation.dto.request.ReservationWithPaymentRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservationTime.domain.ReservationTime;
@@ -104,8 +103,8 @@ class ReservationServiceMockTest {
                 eq(1L)))
                 .thenReturn(true);
         // when & then
-        ReservationRequest reservationRequest = new ReservationRequest(LocalDate.of(2024, 10, 6), 1L, 1L, "paymentKey", "orderId", 1000L);
-        assertThatThrownBy(() -> reservationService.createReservation(reservationRequest, 1L))
+        ReservationWithPaymentRequest reservationWithPaymentRequest = new ReservationWithPaymentRequest(LocalDate.of(2024, 10, 6), 1L, 1L, "paymentKey", "orderId", 1000L);
+        assertThatThrownBy(() -> reservationService.createReservationWithPendingPayment(reservationWithPaymentRequest, 1L))
                 .isInstanceOf(InvalidReservationException.class);
     }
 
@@ -126,7 +125,7 @@ class ReservationServiceMockTest {
     @DisplayName("조건이 없을 때는 모든 예약을 들고 온다.")
     void getAllReservations_test() {
         // given
-        List<Reservation> reservations = createReservations();
+        List<Reservation> reservations = createReservationsWithPendingPayment();
 
         ReservationResponse expected1 = ReservationResponse.from(reservations.get(0));
         ReservationResponse expected2 = ReservationResponse.from(reservations.get(1));
@@ -151,7 +150,7 @@ class ReservationServiceMockTest {
     @DisplayName("조건이 있을 경우 조건에 맞는 예약을 들고 온다.")
     void getConditionalReservations_test(Long memberId, Long themeId, LocalDate dateFrom, LocalDate dateTo) {
         // given
-        List<Reservation> reservations = createReservations();
+        List<Reservation> reservations = createReservationsWithPendingPayment();
 
         ReservationResponse expected1 = ReservationResponse.from(reservations.get(0));
         ReservationResponse expected2 = ReservationResponse.from(reservations.get(1));
@@ -174,7 +173,7 @@ class ReservationServiceMockTest {
     @DisplayName("본인 예약들을 dto로 변환한다.")
     void getMyReservations_dto_test() {
         // given
-        List<Reservation> reservations = createReservations();
+        List<Reservation> reservations = createReservationsWithPendingPayment();
         when(reservationRepository.findByMemberId(1L))
                 .thenReturn(reservations);
         List<Waiting> waitings = createWaitings();
@@ -192,7 +191,7 @@ class ReservationServiceMockTest {
         assertThat(responses).containsExactlyInAnyOrder(expected1, expected2, expected3, expected4);
     }
 
-    private List<Reservation> createReservations() {
+    private List<Reservation> createReservationsWithPendingPayment() {
         Theme theme1 = Theme.createWithoutId("테스트1", "설명", "localhost:8080");
         Theme theme2 = Theme.createWithoutId("테스트2", "설명", "localhost:8080");
 
@@ -202,13 +201,13 @@ class ReservationServiceMockTest {
 
         Reservation reservation1 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2024, 10, 6),
-                reservationTime1, theme1, ReservationStatus.PENDING);
+                reservationTime1, theme1);
         Reservation reservation2 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2024, 10, 7),
-                reservationTime1, theme2, ReservationStatus.PENDING);
+                reservationTime1, theme2);
         Reservation reservation3 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2024, 10, 8),
-                reservationTime1, theme2, ReservationStatus.PENDING);
+                reservationTime1, theme2);
 
         return List.of(reservation1, reservation2, reservation3);
     }

@@ -6,9 +6,13 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservationTime.dto.response.ReservationTimeResponse;
 import roomescape.theme.dto.response.ThemeResponse;
 
-public record ReservationResponse(Long id, ReservationMemberResponse member, LocalDate date,
-                                  ReservationTimeResponse time,
-                                  ThemeResponse theme) {
+public record ReservationResponse(
+        Long id,
+        ReservationMemberResponse member,
+        LocalDate date,
+        ReservationTimeResponse time,
+        ThemeResponse theme
+) {
     public static ReservationResponse from(final Reservation reservation) {
         return new ReservationResponse(
                 reservation.getId(),

@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.client.dto.request.TossPaymentConfirmRequest;
 import roomescape.common.argumentResolver.Login;
 import roomescape.common.exceptionHandler.dto.ExceptionResponse;
 import roomescape.member.dto.request.LoginMember;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
-import roomescape.reservation.dto.request.ReservationRequest;
+import roomescape.reservation.dto.request.ReservationWithPaymentRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
+import roomescape.reservation.dto.response.ReservationWithPaymentResponse;
 import roomescape.reservation.service.ReservationPaymentFacade;
 import roomescape.reservation.service.ReservationService;
 
@@ -50,17 +50,12 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponse> createReservation(
-            @RequestBody final ReservationRequest request,
+    public ResponseEntity<ReservationWithPaymentResponse> createReservation(
+            @RequestBody final ReservationWithPaymentRequest request,
             @Login final LoginMember loginMember
     ) {
 
-        TossPaymentConfirmRequest confirmRequest = new TossPaymentConfirmRequest(
-                request.orderId(),
-                request.amount(),
-                request.paymentKey()
-        );
-        ReservationResponse response = reservationPaymentFacade.createReservationAndSavePayment(request, loginMember, confirmRequest);
+        ReservationWithPaymentResponse response = reservationPaymentFacade.createReservationAndSavePayment(request, loginMember);
 
         URI locationUri = URI.create(RESERVATION_BASE_URL + SLASH + response.id());
         return ResponseEntity.created(locationUri).body(response);
