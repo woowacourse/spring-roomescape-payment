@@ -30,13 +30,13 @@ class PaymentServiceTest {
     @DisplayName("결제 성공 시 예외가 발생하지 않는다.")
     void pay() {
         // given
-        var request = new PaymentRequest("a", "1", 1000);
-        var paymentDetails = new PaymentExecutionResult(new PaymentConfirmation("a", "1", 1000, "DONE"));
+        var request = new PaymentRequest("a", "123456", 1000);
+        var paymentDetails = new PaymentExecutionResult(new PaymentConfirmation("a", "123456", 1000, "DONE"));
 
         Mockito.when(paymentProvider.confirm(request)).thenReturn(paymentDetails);
 
         // when & then
-        assertThatCode(() -> paymentService.pay("a", "1", 1000, 1)).doesNotThrowAnyException();
+        assertThatCode(() -> paymentService.pay("a", "123456", 1000, 1)).doesNotThrowAnyException();
     }
 
     @ParameterizedTest
@@ -44,13 +44,13 @@ class PaymentServiceTest {
     @MethodSource("failToPaySource")
     void failToPay(final TransactionStatusCode code, final Class<?> expectedException) {
         // given
-        var request = new PaymentRequest("a", "1", 1000);
+        var request = new PaymentRequest("a", "123456", 1000);
         var paymentDetails = new PaymentExecutionResult(TransactionStatus.fail(code, "결제 실패"));
 
         Mockito.when(paymentProvider.confirm(request)).thenReturn(paymentDetails);
 
         // when & then
-        assertThatThrownBy(() -> paymentService.pay("a", "1", 1000, 1)).isInstanceOf(expectedException);
+        assertThatThrownBy(() -> paymentService.pay("a", "123456", 1000, 1)).isInstanceOf(expectedException);
     }
 
     private static Stream<Arguments> failToPaySource() {
