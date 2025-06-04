@@ -1,12 +1,12 @@
 package roomescape.payment.application.client;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -134,7 +134,7 @@ class PaymentClientTest {
                         .body(errorResponse));
 
         // When
-        Assertions.assertThatThrownBy(() -> paymentClient.approvePayment(request))
+        assertThatThrownBy(() -> paymentClient.approvePayment(request))
                 .isInstanceOf(PaymentUnauthorizedException.class);
     }
 
@@ -151,7 +151,7 @@ class PaymentClientTest {
                         .body(errorResponse));
 
         // When
-        Assertions.assertThatThrownBy(() -> paymentClient.approvePayment(request))
+        assertThatThrownBy(() -> paymentClient.approvePayment(request))
                 .isInstanceOf(PaymentForbiddenException.class);
     }
 
@@ -169,7 +169,7 @@ class PaymentClientTest {
                         .body(errorResponse));
 
         // When
-        Assertions.assertThatThrownBy(() -> paymentClient.approvePayment(request))
+        assertThatThrownBy(() -> paymentClient.approvePayment(request))
                 .isInstanceOf(PaymentClientException.class);
     }
 
@@ -187,34 +187,7 @@ class PaymentClientTest {
                         .body(errorResponse));
 
         // When
-        Assertions.assertThatThrownBy(() -> paymentClient.approvePayment(request))
+        assertThatThrownBy(() -> paymentClient.approvePayment(request))
                 .isInstanceOf(PaymentServerException.class);
     }
-
-//    @Test
-//    void approvePayment_whenReadTimeout_throwsResourceAccessException() throws JsonProcessingException {
-//        // Given
-//        PaymentApproveRequest request = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID,
-//                50_000L, null);
-//        String errorMessage = "내부 시스템 처리 작업이 실패했습니다. 잠시 후 다시 시도해주세요.";
-//        String errorResponse = objectMapper.writerWithDefaultPrettyPrinter()
-//                .writeValueAsString(new TossErrorResponse(errorMessage));
-//        mockServer.expect(MockRestRequestMatchers.requestTo(url))
-//                .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
-//                .andRespond(clientHttpRequest -> {
-//                    try {
-//                        Thread.sleep(6000);
-//                        return MockRestResponseCreators.withSuccess(
-//                                        EXPECTED_RESULT, MediaType.APPLICATION_JSON)
-//                                .createResponse(clientHttpRequest);
-//                    } catch (InterruptedException e) {
-//                        Thread.currentThread().interrupt();
-//                        throw new RuntimeException("Interrupted during delay", e);
-//                    }
-//                });
-//
-//        // When
-//        Assertions.assertThatThrownBy(() -> paymentClient.approvePayment(request))
-//                .isInstanceOf(PaymentServerException.class);
-//    }
 }

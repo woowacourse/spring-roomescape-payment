@@ -2,11 +2,13 @@ package roomescape.common.exception.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.net.SocketTimeoutException;
 import java.time.format.DateTimeParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.ResourceAccessException;
 import roomescape.common.exception.DuplicatedException;
 import roomescape.common.exception.InUseException;
 import roomescape.common.exception.NotFoundException;
@@ -83,5 +85,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PaymentServerException.class)
     public ResponseEntity<String> handlePaymentServerException(PaymentServerException e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+
+    @ExceptionHandler(ResourceAccessException.class)
+    public ResponseEntity<String> handleResourceAccessException(ResourceAccessException e) {
+        if (e.getCause() instanceof SocketTimeoutException) {
+            return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).body("요청 시간이 초과되었습니다.");
+        }
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("서비스 연결에 문제가 발생하였습니다.");
     }
 }
