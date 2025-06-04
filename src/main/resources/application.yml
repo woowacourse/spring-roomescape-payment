@@ -3,13 +3,15 @@ spring:
     active: local
   jpa:
     defer-datasource-initialization: true
+    properties.hibernate.format_sql: true
+    hibernate.ddl-auto: create
   h2:
     console:
-      enabled: true  # H2 콘솔 활성화
+      enabled: true
       path: /h2-console
 
   datasource:
-    url: jdbc:h2:mem:database  # 인메모리 H2 DB 사용
+    url: jdbc:h2:mem:database
 
 jwt:
   secret: iwantcoffee-americano+ice-americano-is-best-i.love_it+yaho
@@ -20,4 +22,8 @@ payment.toss:
   timeout:
     connect: 3000
     read: 30000
-
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    orm.jdbc.bind: TRACE
+    org.springframework.transaction.interceptor: TRACE

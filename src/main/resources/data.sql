@@ -54,3 +54,13 @@ insert into reservation (id, theme_id, member_id, date, time_slot_id)
 values ('7', 4, 2, DATEADD('DAY', -1, CURRENT_DATE), 2);
 insert into reservation (id, theme_id, member_id, date, time_slot_id)
 values ('8', 5, 2, DATEADD('DAY', -2, CURRENT_DATE), 2);
+
+INSERT INTO payment (id, payment_key, amount, order_id, reservation_id, status)
+VALUES ('1', 'paymentKey1', 200000, 'orderId1', 1, 'DONE'),
+       ('2', 'paymentKey2', 200000, 'orderId2', 2, 'DONE'),
+       ('3', 'paymentKey3', 200000, 'orderId3', 3, 'DONE'),
+       ('4', 'paymentKey4', 200000, 'orderId4', 4, 'DONE'),
+       ('5', 'paymentKey5', 200000, 'orderId5', 5, 'DONE'),
+       ('6', 'paymentKey6', 200000, 'orderId6', 6, 'DONE'),
+       ('7', 'paymentKey7', 200000, 'orderId7', 7, 'DONE'),
+       ('8', 'paymentKey8', 200000, 'orderId8', 8, 'DONE');
