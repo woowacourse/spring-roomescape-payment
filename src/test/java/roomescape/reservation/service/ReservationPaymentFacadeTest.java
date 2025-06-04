@@ -38,7 +38,6 @@ import roomescape.theme.domain.Theme;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-//@DataJpaTest("")
 @Transactional
 @SpringBootTest
 @ActiveProfiles("test")
@@ -98,11 +97,6 @@ class ReservationPaymentFacadeTest {
     @MockitoBean
     private TossPaymentClient mockTossPaymentClient = Mockito.mock(TossPaymentClient.class);
 
-    @Autowired
-    private ReservationService reservationService;
-    @Autowired
-    private TossPaymentClient tossPaymentClient;
-
     @BeforeEach
     void setUp() {
         em.persist(theme);
@@ -146,7 +140,7 @@ class ReservationPaymentFacadeTest {
         Mockito.when(mockTossPaymentClient.confirmPayment(any(TossPaymentConfirmRequest.class)))
                 .thenReturn(ResponseEntity.status(400).body(TOSS_PAYMENT_400_ERROR_RESPONSE));
         doThrow(new PaymentException(HttpStatus.BAD_REQUEST, "결제 실패"))
-                .when(tossPaymentClient)
+                .when(mockTossPaymentClient)
                 .handleTosPamentException(any(ResponseEntity.class));
 
         ReservationWithPaymentRequest request = new ReservationWithPaymentRequest(
@@ -177,7 +171,7 @@ class ReservationPaymentFacadeTest {
         Mockito.when(mockTossPaymentClient.confirmPayment(any(TossPaymentConfirmRequest.class)))
                 .thenReturn(ResponseEntity.status(500).body(TOSS_PAYMENT_500_ERROR_RESPONSE));
         doThrow(new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 실패"))
-                .when(tossPaymentClient)
+                .when(mockTossPaymentClient)
                 .handleTosPamentException(any(ResponseEntity.class));
 
         ReservationWithPaymentRequest request = new ReservationWithPaymentRequest(
