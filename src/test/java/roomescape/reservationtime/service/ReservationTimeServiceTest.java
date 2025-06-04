@@ -19,6 +19,7 @@ import roomescape.global.auth.service.MyPasswordEncoder;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.member.service.MemberService;
+import roomescape.payment.infrastructure.PaymentRepository;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.fixture.TestFixture;
@@ -66,6 +67,9 @@ class ReservationTimeServiceTest {
     private MemberRepository memberRepository;
 
     @Autowired
+    private PaymentRepository paymentRepository;
+
+    @Autowired
     private WaitingRepository waitingRepository;
 
     @Mock
@@ -78,7 +82,7 @@ class ReservationTimeServiceTest {
         theme = themeRepository.save(theme);
         member = memberRepository.save(member);
         reservationFacadeService = new ReservationFacadeService(
-                new ReservationService(reservationRepository),
+                new ReservationService(reservationRepository, paymentRepository),
                 new WaitingService(waitingRepository),
                 new MemberService(memberRepository, new MyPasswordEncoder()),
                 new ThemeService(themeRepository, reservationRepository),

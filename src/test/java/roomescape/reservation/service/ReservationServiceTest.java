@@ -18,6 +18,7 @@ import roomescape.global.auth.dto.UserInfo;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.infrastructure.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationInfo;
 import roomescape.reservation.dto.response.ReservationResponse;
@@ -25,6 +26,7 @@ import roomescape.reservation.exception.ReservationNotFoundException;
 import roomescape.reservation.fixture.TestFixture;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.WaitingRepository;
+import roomescape.reservation.repository.dto.ReservationWithPayment;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
@@ -49,6 +51,9 @@ class ReservationServiceTest {
     private ReservationTimeRepository reservationTimeRepository;
 
     @Autowired
+    private PaymentRepository paymentRepository;
+
+    @Autowired
     private ThemeRepository themeRepository;
 
     @Autowired
@@ -61,7 +66,7 @@ class ReservationServiceTest {
 
     @BeforeEach
     void setUp() {
-        reservationService = new ReservationService(reservationRepository);
+        reservationService = new ReservationService(reservationRepository,paymentRepository);
 
         ReservationTime time2 = ReservationTime.withUnassignedId(LocalTime.of(9, 0));
         time = reservationTimeRepository.save(time2);
@@ -116,7 +121,7 @@ class ReservationServiceTest {
         Reservation reservation = Reservation.createUpcomingReservationWithUnassignedId(member, info);
         reservationRepository.save(reservation);
 
-        List<Reservation> result = reservationService.findMyReservations(
+        List<ReservationWithPayment> result = reservationService.findMyReservations(
                 new UserInfo(member.getId(), MemberRole.USER));
         assertThat(result).hasSize(1);
     }

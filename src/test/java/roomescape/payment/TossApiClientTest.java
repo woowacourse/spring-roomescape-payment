@@ -7,6 +7,8 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +45,7 @@ class TossApiClientTest {
     @Test
     void authPayment_success() {
         PaymentResponse expected = new PaymentResponse("tgen_20250528204823hWav3", "MC4xNTU3MDQ1MDk3Njkx", "NORMAL",
-                50000, "DONE", "2025-05-28T20:48:23+09:00");
+                50000, "DONE", OffsetDateTime.of(2025, 5, 28, 11, 48, 23, 0, ZoneOffset.UTC));
         setUpForSuccess();
         PaymentCommand paymentCommand = new PaymentCommand("tgen_20250528204823hWav3", "MC4xNTU3MDQ1MDk3Njkx",
                 50000, "NORMAL");
