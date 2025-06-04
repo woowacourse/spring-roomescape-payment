@@ -3,7 +3,6 @@ package roomescape.application;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.domain.reservation.ReservationRepository;
@@ -24,7 +23,7 @@ public class PaymentService {
         }
 
         var request = new PaymentRequest(paymentKey, orderId, amount);
-        var paymentConfirmation = paymentProvider.confirm(request);
-        reservation.confirm(new Payment(paymentConfirmation.paymentKey(), paymentConfirmation.totalAmount()));
+        var payment = paymentProvider.confirm(request);
+        reservation.confirm(payment);
     }
 }

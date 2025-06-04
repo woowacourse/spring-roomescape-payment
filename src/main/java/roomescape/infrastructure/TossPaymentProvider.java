@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
-import roomescape.domain.payment.PaymentConfirmation;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.exception.PaymentFailedException;
@@ -26,10 +26,10 @@ public class TossPaymentProvider implements PaymentProvider {
     private final RestTemplate restTemplate;
     private final TossApiProperties properties;
 
-    public PaymentConfirmation confirm(final PaymentRequest request) {
+    public Payment confirm(final PaymentRequest request) {
         for (int tried = 1; tried <= properties.connectionTryCount(); tried++) {
             try {
-                var successResponse = restTemplate.postForEntity(properties.confirmUri(), request, PaymentConfirmation.class);
+                var successResponse = restTemplate.postForEntity(properties.confirmUri(), request, Payment.class);
                 return successResponse.getBody();
 
             } catch (RestClientResponseException e) {

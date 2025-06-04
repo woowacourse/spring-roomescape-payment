@@ -10,7 +10,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import roomescape.domain.payment.PaymentConfirmation;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.domain.reservation.ReservationStatus;
@@ -32,8 +32,8 @@ class PaymentServiceTest extends ServiceTest {
         var pendingReservation = repositoryHelper.saveAnyReservation(ReservationStatus.PENDING);
 
         var request = new PaymentRequest("a", "1", 1000);
-        var confirmation = new PaymentConfirmation("a", "1", "order", 1000);
-        Mockito.when(paymentProvider.confirm(request)).thenReturn(confirmation);
+        var payment = new Payment("a",1000);
+        Mockito.when(paymentProvider.confirm(request)).thenReturn(payment);
 
         // when
         service.pay(pendingReservation.id(),"a", "1", 1000);
