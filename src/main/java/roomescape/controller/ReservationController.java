@@ -81,6 +81,17 @@ public class ReservationController {
         return ResponseEntity.created(location).body(response);
     }
 
+    @PatchMapping("/waiting/{reservationId}/confirm")
+    @CheckRole(value = {Role.ADMIN, Role.USER})
+    public ResponseEntity<ReservationResponse> confirmWaitReservation(@PathVariable("reservationId") Long reservationId,
+                                                                      @Valid @RequestBody ConfirmWaitReservationRequest request,
+                                                                      LoginMemberRequest loginMemberRequest) {
+        ReservationResponse response = reservationFacadeService.pendingToReserve(reservationId, request,
+                loginMemberRequest);
+
+        return ResponseEntity.ok(response);
+    }
+
     @DeleteMapping("/{id}")
     @CheckRole(value = {Role.ADMIN, Role.USER})
     public ResponseEntity<Void> deleteReservations(@PathVariable Long id) {
@@ -95,16 +106,5 @@ public class ReservationController {
         reservationFacadeService.deleteReservation(id);
 
         return ResponseEntity.noContent().build();
-    }
-
-    @PatchMapping("/waiting/{reservationId}/confirm")
-    @CheckRole(value = {Role.ADMIN, Role.USER})
-    public ResponseEntity<ReservationResponse> confirmWaitReservation(@PathVariable("reservationId") Long reservationId,
-                                                                      @Valid @RequestBody ConfirmWaitReservationRequest request,
-                                                                      LoginMemberRequest loginMemberRequest) {
-        ReservationResponse response = reservationFacadeService.pendingToReserve(reservationId, request,
-                loginMemberRequest);
-
-        return ResponseEntity.ok(response);
     }
 }

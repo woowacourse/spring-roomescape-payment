@@ -165,7 +165,7 @@ public class ReservationService {
                 .orElseThrow(() -> new InvalidReservationException("존재하지 않는 예약입니다."));
 
         if (!loginMemberRequest.id().equals(reservation.getMember().getId())) {
-            throw new InvalidMemberException("");
+            throw new InvalidMemberException("예약자 본인만 예약 확정 가능합니다.");
         }
 
         reservation.pendingToReserve();
