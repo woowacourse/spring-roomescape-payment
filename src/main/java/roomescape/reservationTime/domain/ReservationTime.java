@@ -1,10 +1,7 @@
 package roomescape.reservationTime.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+
 import java.time.LocalTime;
 import java.util.Objects;
 
@@ -41,6 +38,18 @@ public class ReservationTime {
 
     public boolean isBeforeTime(final LocalTime time) {
         return startAt.isBefore(time);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ReservationTime that)) return false;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 
     public Long getId() {
