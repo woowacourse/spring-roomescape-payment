@@ -25,7 +25,7 @@ public class PaymentApproveErrorHandler implements ResponseErrorHandler {
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
-        return response.getStatusCode().isError();
+        return response.getStatusCode().is4xxClientError();
     }
 
     @Override

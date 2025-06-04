@@ -9,14 +9,12 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestClientException;
 import org.wiremock.spring.EnableWireMock;
 import org.wiremock.spring.InjectWireMock;
-import roomescape.dto.response.PaymentSuccessResponse;
+import roomescape.dto.response.TossPaymentResponse;
 import roomescape.service.payment.PaymentApproveClient;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.jsonResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static org.assertj.core.api.Assertions.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @EnableWireMock
@@ -39,7 +37,7 @@ class PaymentApproveClientTest {
                 .willReturn(okJson(successResponse())));
 
         // when
-        final PaymentSuccessResponse response = paymentApproveClient.approvePayment(
+        final TossPaymentResponse response = paymentApproveClient.approvePayment(
                 "5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1",
                 "a4CWyWY5m89PNh7xJwhk1",
                 1000

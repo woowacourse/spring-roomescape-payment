@@ -7,7 +7,7 @@ import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
-import roomescape.dto.response.PaymentSuccessResponse;
+import roomescape.dto.response.TossPaymentResponse;
 
 import java.util.NoSuchElementException;
 
@@ -21,7 +21,7 @@ public class PaymentService {
 
     @Transactional
     public void approveAndSave(String paymentKey, String orderId, int amount, Long reservationId) {
-        final PaymentSuccessResponse response = paymentApproveClient.approvePayment(
+        final TossPaymentResponse response = paymentApproveClient.approvePayment(
                 paymentKey,
                 orderId,
                 amount
