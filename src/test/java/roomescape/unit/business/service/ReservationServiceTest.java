@@ -3,9 +3,8 @@ package roomescape.unit.business.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -18,9 +17,6 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InOrder;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.auth.LoginInfo;
 import roomescape.business.model.entity.Member;
@@ -28,16 +24,15 @@ import roomescape.business.model.entity.Reservation;
 import roomescape.business.model.entity.Theme;
 import roomescape.business.model.entity.TimeSlot;
 import roomescape.business.model.vo.Id;
+import roomescape.business.service.PaymentService;
 import roomescape.business.service.ReservationService;
-import roomescape.business.service.WaitingService;
 import roomescape.exception.business.DuplicatedException;
 import roomescape.exception.business.NotFoundException;
 import roomescape.infrastructure.MemberRepository;
 import roomescape.infrastructure.ReservationRepository;
 import roomescape.infrastructure.ReservationTimeRepository;
 import roomescape.infrastructure.ThemeRepository;
-import roomescape.infrastructure.payment.PaymentClient;
-import roomescape.infrastructure.payment.dto.PaymentApproveRequest;
+import roomescape.infrastructure.WaitingRepository;
 import roomescape.presentation.dto.request.AdminReservationRequest;
 import roomescape.presentation.dto.request.ReservationCondition;
 import roomescape.presentation.dto.request.ReservationRequest;
@@ -49,26 +44,24 @@ import roomescape.presentation.dto.response.TimeSlotResponse;
 @ExtendWith(MockitoExtension.class)
 class ReservationServiceTest {
 
-    @Mock
-    private MemberRepository memberRepository;
+    private final PaymentService paymentService = mock(PaymentService.class);
+    private final MemberRepository memberRepository = mock(MemberRepository.class);
+    private final ReservationRepository reservationRepository = mock(ReservationRepository.class);
+    private final ReservationTimeRepository reservationTimeRepository = mock(ReservationTimeRepository.class);
+    private final ThemeRepository themeRepository = mock(ThemeRepository.class);
+    private final WaitingRepository waitingRepository = mock(WaitingRepository.class);
+    private final ReservationService sut;
 
-    @Mock
-    private ReservationRepository reservationRepository;
-
-    @Mock
-    private ReservationTimeRepository reservationTimeRepository;
-
-    @Mock
-    private ThemeRepository themeRepository;
-
-    @Mock
-    private WaitingService waitingService;
-
-    @Mock
-    private PaymentClient paymentClient;
-
-    @InjectMocks
-    private ReservationService sut;
+    public ReservationServiceTest() {
+        this.sut = new ReservationService(
+                paymentService,
+                memberRepository,
+                reservationRepository,
+                reservationTimeRepository,
+                themeRepository,
+                waitingRepository
+        );
+    }
 
     @Test
     void 존재하지_않는_사용자_ID로_예약_시_예외가_발생한다() {
@@ -232,7 +225,7 @@ class ReservationServiceTest {
         TimeSlot timeSlot = TimeSlot.restore(timeIdValue, LocalTime.of(10, 0));
         Theme theme = Theme.restore(themeIdValue, "Test Theme", "Description", "thumbnail.jpg");
         LoginInfo loginInfo = new LoginInfo(userIdValue, member.getRole());
-        ReservationRequest reservationRequest = new ReservationRequest(date, timeIdValue, themeIdValue, "paymentKey",
+        ReservationRequest request = new ReservationRequest(date, timeIdValue, themeIdValue, "paymentKey",
                 "orderId", 1000L, "paymentType");
 
         when(memberRepository.findById(userId)).thenReturn(Optional.of(member));
@@ -241,20 +234,19 @@ class ReservationServiceTest {
         when(reservationRepository.existsByDate_ValueAndTimeSlot_StartAtAndThemeId(eq(date),
                 eq(LocalTime.of(10, 0)), eq(theme.getId())))
                 .thenReturn(false);
-        doNothing().when(paymentClient).approvePayment(any(PaymentApproveRequest.class));
-
+        when(reservationRepository.save(any(Reservation.class)))
+                .thenReturn(Reservation.restore("id", member, date, timeSlot, theme));
         // when
-        ReservationResponse result = sut.addAndGet(loginInfo, reservationRequest);
+        ReservationResponse result = sut.addAndGet(loginInfo, request);
 
         // then
-        assertThat(result).isNotNull();
+        assertThat(result.id()).isEqualTo("id");
+        assertThat(result.date()).isEqualTo(date);
         verify(memberRepository).findById(userId);
         verify(reservationTimeRepository).findById(timeId);
         verify(themeRepository).findById(themeId);
         verify(reservationRepository).existsByDate_ValueAndTimeSlot_StartAtAndThemeId(eq(date),
                 any(LocalTime.class), eq(theme.getId()));
-        InOrder inOrder = inOrder(paymentClient, reservationRepository);
-        inOrder.verify(reservationRepository).save(any(Reservation.class));
-        inOrder.verify(paymentClient).approvePayment(any(PaymentApproveRequest.class));
+        verify(reservationRepository).save(any(Reservation.class));
     }
 }
