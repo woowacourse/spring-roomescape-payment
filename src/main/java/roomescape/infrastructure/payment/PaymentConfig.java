@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.infrastructure.payment.toss.TossPaymentClient;
+import roomescape.infrastructure.payment.toss.TossPaymentProperties;
 
 @Configuration
 @EnableConfigurationProperties(value = TossPaymentProperties.class)

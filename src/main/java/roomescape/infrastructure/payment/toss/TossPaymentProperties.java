@@ -1,4 +1,4 @@
-package roomescape.infrastructure.payment;
+package roomescape.infrastructure.payment.toss;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
