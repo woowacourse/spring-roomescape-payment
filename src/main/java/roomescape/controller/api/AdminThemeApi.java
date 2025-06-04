@@ -1,6 +1,8 @@
 package roomescape.controller.api;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import roomescape.dto.request.ReservationThemeRequest;
@@ -11,11 +13,11 @@ public interface AdminThemeApi {
 
     @Operation(summary = "테마 추가")
     ResponseEntity<ReservationThemeResponse> save(
-            ReservationThemeRequest request
+            @RequestBody(required = true) ReservationThemeRequest request
     );
 
     @Operation(summary = "테마 삭제")
     ResponseEntity<Void> remove(
-            long themeId
+            @Parameter(required = true) long themeId
     );
 }

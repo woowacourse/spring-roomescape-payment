@@ -1,6 +1,8 @@
 package roomescape.controller.api;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
@@ -17,22 +19,22 @@ public interface MemberAuthApi {
 
     @Operation(summary = "회원가입")
     ResponseEntity<MemberRegisterResponse> register(
-            MemberRegisterRequest request
+            @RequestBody(required = true) MemberRegisterRequest request
     );
 
     @Operation(summary = "로그인")
     ResponseEntity<Void> login(
-            LoginRequest loginRequest,
-            HttpSession session
+            @RequestBody(required = true) LoginRequest loginRequest,
+            @Parameter(hidden = true) HttpSession session
     ) throws AuthenticationException;
 
     @Operation(summary = "로그인 정보 확인")
     ResponseEntity<LoginResponse> loginCheck(
-            LoginInfo loginInfo
+            @Parameter(hidden = true) LoginInfo loginInfo
     );
 
     @Operation(summary = "로그아웃")
     ResponseEntity<Void> logout(
-            HttpSession session
+            @Parameter(hidden = true) HttpSession session
     );
 }

@@ -1,6 +1,7 @@
 package roomescape.controller.api;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import roomescape.dto.response.ReservationTimeResponse;
@@ -17,7 +18,7 @@ public interface MemberTimeApi {
 
     @Operation(summary = "테마, 날짜의 예약 가능 시간 조회")
     ResponseEntity<List<ReservationTimeWithAvailabilityResponse>> getAvailables(
-            long themeId,
-            LocalDate date
+            @Parameter(required = true) long themeId,
+            @Parameter(required = true) LocalDate date
     );
 }

@@ -1,6 +1,8 @@
 package roomescape.controller.api;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import roomescape.dto.request.CreateReservationRequest;
@@ -15,15 +17,15 @@ public interface AdminReservationApi {
 
     @Operation(summary = "예약 추가")
     ResponseEntity<ReservationResponse> save(
-            CreateReservationRequest request
+            @RequestBody(required = true) CreateReservationRequest request
     );
 
     @Operation(summary = "예약 필터링 조회")
     ResponseEntity<List<ReservationResponse>> getAllByFilter(
-            Long memberId,
-            Long themeId,
-            LocalDate dateFrom,
-            LocalDate dateTo
+            @Parameter Long memberId,
+            @Parameter Long themeId,
+            @Parameter LocalDate dateFrom,
+            @Parameter LocalDate dateTo
     );
 
     @Operation(summary = "대기 예약 조회")
@@ -31,6 +33,6 @@ public interface AdminReservationApi {
 
     @Operation(summary = "대기 예약 거절")
     ResponseEntity<Void> denyPending(
-            long reservationId
+            @Parameter(required = true) long reservationId
     );
 }
