@@ -36,7 +36,7 @@ public class ReservationTime {
     }
 
     public boolean isSameTime(final ReservationTime time) {
-        return startAt.equals(time.startAt);
+        return getStartAt().equals(time.getStartAt());
     }
 
     public boolean isBeforeTime(final LocalTime time) {
