@@ -7,6 +7,15 @@ public record TossPaymentProperties(
         String baseUrl,
         String authScheme,
         String secretKey,
-        String confirmUri
+        String confirmPath
 ) {
+
+    @Override
+    public String secretKey() {
+        return secretKey + ":";
+    }
+
+    public String confirmUri() {
+        return baseUrl + confirmPath;
+    }
 }
