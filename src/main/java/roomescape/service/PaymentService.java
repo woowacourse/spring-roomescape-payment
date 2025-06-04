@@ -30,7 +30,6 @@ public class PaymentService {
         return requestPay(content);
     }
 
-    @Transactional
     public void writePaymentHistory(PaymentHistoryCreationContent content) {
         PaymentHistory paymentHistory = PaymentHistory.createWithoutId(content.orderId(),
                 content.paymentKey(), content.paymentType());

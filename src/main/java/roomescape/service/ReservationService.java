@@ -102,7 +102,6 @@ public class ReservationService {
         return new ReservationResponse(savedReservation);
     }
 
-    @Transactional
     @ReservationLogging
     public ReservationResponse addReservation(long memberId,
                                               ReservationCreationContent reservationCreationContent,
