@@ -13,7 +13,6 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import roomescape.infrastructure.error.exception.AuthInfoResolveException;
 import roomescape.infrastructure.error.exception.ForbiddenException;
 import roomescape.infrastructure.error.exception.JwtExtractException;
 import roomescape.infrastructure.error.exception.LoginAuthException;
@@ -70,12 +69,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiFailResponse> handlePaymentException(PaymentException e) {
         log.error("PaymentException", e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiFailResponse(e.getMessage()));
-    }
-
-    @ExceptionHandler(AuthInfoResolveException.class)
-    public ResponseEntity<ApiFailResponse> handleAuthInfoResolveException(AuthInfoResolveException e) {
-        log.error("AuthInfoResolveException", e);
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiFailResponse("인증 정보를 확인할 수 없습니다."));
     }
 
     @ExceptionHandler(UnauthorizedException.class)
