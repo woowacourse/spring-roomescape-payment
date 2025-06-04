@@ -165,43 +165,68 @@ function onReservationButtonClick(event, paymentWidget) {
       themeId: selectedThemeId,
       timeId: selectedTimeId
     };
-    const generateRandomString = () =>
-        window.btoa(Math.random()).slice(0, 20);
 
-    // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
-    // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
-    const orderIdPrefix = "poina";
-    paymentWidget.requestPayment({
-      orderId: orderIdPrefix + generateRandomString(),
-      orderName: "테스트 방탈출 예약 결제 1건",
-      amount: 1000,
-    }).then(function (data) {
-      console.debug(data);
-      fetchReservationPayment(data, reservationData);
-    }).catch(function (error) {
-      // TOSS 에러 처리: 에러 목록을 확인하세요
-      // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
-      alert(error.code + " :" + error.message + "/ orderId : " + error.orderId);
+    // 예약 생성 API 요청
+    fetch("/reservations", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(reservationData),
+    }).then(response => {
+      if (!response.ok) {
+        return response.json().then(errorBody => {
+          console.error("예약 실패 : " + JSON.stringify(errorBody));
+          window.alert(errorBody.message);
+        });
+      } else {
+        response.json().then(reservationSuccessBody => {
+          console.log("예약 성공 : " + JSON.stringify(reservationSuccessBody));
+          const reservationId = reservationSuccessBody.id;
+          // - 결제 요청 시작 -
+
+          // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
+          // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
+          const orderIdPrefix = "poina";
+          const generateRandomString = () => window.btoa(Math.random()).slice(0, 20);
+          paymentWidget.requestPayment({
+            orderId: orderIdPrefix + generateRandomString(),
+            orderName: "테스트 방탈출 예약 결제 1건",
+            amount: 1000,
+          }).then(function (data) {
+            console.debug(data);
+            // 결제 승인 요청
+            fetchReservationPayment(data, reservationId);
+
+          }).catch(function (error) {
+            // TOSS 에러 처리: 에러 목록을 확인하세요
+            // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
+            alert(error.code + " :" + error.message + "/ orderId : " + error.orderId);
+          });
+
+          // - 결제 요청 끝 -
+        });
+      }
+    }).catch(error => {
+      console.error(error.message);
     });
+
   } else {
     alert("Please select a date, theme, and time before making a reservation.");
   }
 }
 
-async function fetchReservationPayment(paymentData, reservationData) {
+async function fetchReservationPayment(paymentData, reservationId) {
 
   const reservationPaymentRequest = {
-    date: reservationData.date,
-    themeId: reservationData.themeId,
-    timeId: reservationData.timeId,
+    reservationId: reservationId,
     paymentKey: paymentData.paymentKey,
     orderId: paymentData.orderId,
     amount: paymentData.amount,
     paymentType: paymentData.paymentType,
   }
 
-  const reservationURL = "/reservations";
-  fetch(reservationURL, {
+  fetch("/payments/confirm", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -215,7 +240,8 @@ async function fetchReservationPayment(paymentData, reservationData) {
       });
     } else {
       response.json().then(successBody => {
-        console.log("예약 결제 성공 : " + JSON.stringify(successBody));
+        console.log("예약 결제 성공 : ");
+        // console.log("예약 결제 성공 : " + JSON.stringify(successBody));
         window.location.reload();
       });
     }
