@@ -4,12 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import roomescape.fixture.TestFixture;
 import roomescape.member.domain.Member;
@@ -31,7 +31,7 @@ public class JpaThemeRepositoryTest {
     private ThemeRepositoryImpl repository;
 
     @Autowired
-    private EntityManager em;
+    private TestEntityManager em;
 
     @Test
     @DisplayName("저장 후 아이디 반환 테스트")

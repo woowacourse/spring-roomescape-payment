@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.client.TossPaymentClient;
 import roomescape.client.dto.request.TossPaymentConfirmRequest;
@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test;
 
 @Transactional
 @SpringBootTest
-@TestPropertySource(properties = "spring.sql.init.mode=never")
+@ActiveProfiles("test")
 class ReservationPaymentFacadeTest {
 
     private final Theme theme = Theme.createWithoutId("재미난 테마", "우끼끼", "썸네일)");
@@ -83,10 +83,10 @@ class ReservationPaymentFacadeTest {
     );
 
     @PersistenceContext
-    EntityManager em;
+    private EntityManager em;
 
     @Autowired
-    ReservationPaymentFacade reservationPaymentFacade;
+    private ReservationPaymentFacade reservationPaymentFacade;
 
     @Autowired
     private ReservationRepository reservationRepository;

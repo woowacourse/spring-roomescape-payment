@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -12,6 +11,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.member.domain.Member;
@@ -35,7 +35,7 @@ class JpaReservationRepositoryTest {
     private ReservationRepositoryImpl repository;
 
     @Autowired
-    private EntityManager em;
+    private TestEntityManager em;
 
     private static Stream<Arguments> findByMemberIdAndThemeIdAndDate_test() {
         return Stream.of(
