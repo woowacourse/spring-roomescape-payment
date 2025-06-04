@@ -9,11 +9,11 @@ import roomescape.theme.domain.Theme;
 
 public interface RoomEscapeInformationRepository extends JpaRepository<RoomEscapeInformation, Long> {
 
-    boolean existsByDateAndTimeAndTheme(final LocalDate date, final ReservationTime time, final Theme theme);
-
     boolean existsByThemeId(final Long themeId);
 
     boolean existsByTimeId(final Long timeId);
 
-    Optional<RoomEscapeInformation> findByDateAndTimeIdAndThemeId(LocalDate date, Long timeId, Long themeId);
+    Optional<RoomEscapeInformation> findByDateAndTimeIdAndThemeId(final LocalDate date, final Long timeId, final Long themeId);
+
+    Optional<RoomEscapeInformation> findByDateAndTimeAndTheme(final LocalDate date, final ReservationTime time, final Theme theme);
 }

@@ -10,7 +10,6 @@ public record TossPaymentResponse(
         String status,
         Long totalAmount,
         EasyPay easyPay
-
 ) {
     private record EasyPay(String provider, Long amount, Long discountAmount) {
     }

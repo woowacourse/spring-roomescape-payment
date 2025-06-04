@@ -1,13 +1,9 @@
 package roomescape.reservation.repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import roomescape.member.domain.Member;
-import roomescape.reservation.domain.RoomEscapeInformation;
 import roomescape.reservation.domain.WaitingReservation;
 import roomescape.reservation.dto.WaitingReservationWithRank;
 
@@ -29,19 +25,7 @@ public interface WaitingReservationRepository extends JpaRepository<WaitingReser
             from WaitingReservation w
             where w.member = :member
             """)
-    List<WaitingReservationWithRank> findWaitingReservationByMember(@Param("member") Member member);
+    List<WaitingReservationWithRank> findWaitingReservationByMember(final Member member);
 
-    @EntityGraph(attributePaths = {
-            "roomEscapeInformation",
-            "roomEscapeInformation.theme",
-            "roomEscapeInformation.time"
-    })
-    List<WaitingReservation> findByMember(Member member);
-
-    long countByRoomEscapeInformationAndCreatedAtLessThanEqual(
-            RoomEscapeInformation roomEscapeInfo,
-            LocalDateTime createdAt
-    );
-
-    boolean existsByRoomEscapeInformationId(Long roomEscapeInformationId);
+    boolean existsByRoomEscapeInformationId(final Long roomEscapeInformationId);
 }
