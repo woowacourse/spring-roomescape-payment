@@ -32,42 +32,11 @@ class PaymentClientTest {
 
     private static final String EXPECTED_RESULT = """
                 {
-                  "mId": "tgen_docs",
-                  "lastTransactionKey": "txrd_a01jwb1h3jba2a1gnrqv9cr0f45",
                   "paymentKey": "tgen_20250528175227f6y46",
                   "orderId": "MC44NjE2MTQzMjcyMzM2",
                   "orderName": "토스 티셔츠 외 2건",
-                  "taxExemptionAmount": 0,
-                  "status": "DONE",
-                  "requestedAt": "2025-05-28T17:52:27+09:00",
-                  "approvedAt": "2025-05-28T17:53:17+09:00",
-                  "useEscrow": false,
-                  "cultureExpense": false,
-                  "card": null,
-                  "virtualAccount": null,
-                  "transfer": null,
-                  "mobilePhone": null,
-                  "giftCertificate": null,
-                  "cashReceipt": null,
-                  "cashReceipts": null,
-                  "discount": null,
-                  "cancels": null,
                   "secret": "ps_Z61JOxRQVEY4dQ1QR7ZwVW0X9bAq",
                   "type": "NORMAL",
-                  "easyPay": {
-                    "provider": "토스페이",
-                    "amount": 50000,
-                    "discountAmount": 0
-                  },
-                  "country": "KR",
-                  "failure": null,
-                  "isPartialCancelable": true,
-                  "receipt": {
-                    "url": "https://dashboard.tosspayments.com/receipt/redirection?transactionId=tgen_20250528175227f6y46&ref=PX"
-                  },
-                  "checkout": {
-                    "url": "https://api.tosspayments.com/v1/payments/tgen_20250528175227f6y46/checkout"
-                  },
                   "currency": "KRW",
                   "totalAmount": 50000,
                   "balanceAmount": 50000,
