@@ -5,16 +5,16 @@ values ('user@user.com', 'user', '유저', 'USER', CURRENT_TIME, CURRENT_TIME),
        ('admin@admin2.com', 'admin2', '어드민2', 'ADMIN', CURRENT_TIME, CURRENT_TIME);
 
 insert into theme (name, description, thumbnail, created_at, modified_at)
-values ('theme1', 'description', 'thumbnail', CURRENT_TIME, CURRENT_TIME),
-       ('theme2', 'description', 'thumbnail', CURRENT_TIME, CURRENT_TIME),
-       ('theme3', 'description', 'thumbnail', CURRENT_TIME, CURRENT_TIME),
-       ('theme4', 'description', 'thumbnail', CURRENT_TIME, CURRENT_TIME),
-       ('theme5', 'description', 'thumbnail', CURRENT_TIME, CURRENT_TIME),
-       ('theme6', 'description', 'thumbnail', CURRENT_TIME, CURRENT_TIME),
-       ('theme7', 'description', 'thumbnail', CURRENT_TIME, CURRENT_TIME),
-       ('theme8', 'description', 'thumbnail', CURRENT_TIME, CURRENT_TIME),
-       ('theme9', 'description', 'thumbnail', CURRENT_TIME, CURRENT_TIME),
-       ('theme10', 'description', 'thumbnail', CURRENT_TIME, CURRENT_TIME);
+values ('theme1', 'description', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg', CURRENT_TIME, CURRENT_TIME),
+       ('theme2', 'description', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg', CURRENT_TIME, CURRENT_TIME),
+       ('theme3', 'description', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg', CURRENT_TIME, CURRENT_TIME),
+       ('theme4', 'description', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg', CURRENT_TIME, CURRENT_TIME),
+       ('theme5', 'description', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg', CURRENT_TIME, CURRENT_TIME),
+       ('theme6', 'description', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg', CURRENT_TIME, CURRENT_TIME),
+       ('theme7', 'description', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg', CURRENT_TIME, CURRENT_TIME),
+       ('theme8', 'description', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg', CURRENT_TIME, CURRENT_TIME),
+       ('theme9', 'description', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg', CURRENT_TIME, CURRENT_TIME),
+       ('theme10', 'description', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg', CURRENT_TIME, CURRENT_TIME);
 
 -- 예약 시간
 insert into reservation_time (start_at, created_at, modified_at)
