@@ -215,11 +215,10 @@ async function fetchReservation(paymentData, reservationData) {
                 window.alert("예약 생성 실패 메시지");
             });
         } else {
-            response.json().then(successBody => {
+            response.json().then(async successBody => {
                 console.log("예약 생성 성공 : " + JSON.stringify(successBody));
-                window.alert("결제 단계로 이동합니다.");
                 reservationData.reservationId = successBody.id;
-                fetchReservationPayment(paymentData, reservationData);
+                await fetchReservationPayment(paymentData, reservationData);
             });
         }
     }).catch(error => {

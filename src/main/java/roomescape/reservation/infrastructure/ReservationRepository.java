@@ -34,6 +34,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("""
             SELECT r 
             FROM Reservation r 
+            LEFT JOIN FETCH r.payment p            
             JOIN FETCH r.reservationSlot rs            
             JOIN FETCH rs.time t 
             JOIN FETCH rs.theme th                   

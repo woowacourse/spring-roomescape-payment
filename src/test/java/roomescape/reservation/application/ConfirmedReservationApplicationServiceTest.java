@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.common.config.TestConfig;
 import roomescape.fixture.TestFixture;
 import roomescape.member.application.MemberDataService;
@@ -22,11 +23,17 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.exception.MemberNotFoundException;
 import roomescape.member.infrastructure.MemberRepository;
+import roomescape.payment.application.PaymentService;
+import roomescape.payment.application.client.PaymentClient;
+import roomescape.payment.application.infrastructure.PaymentRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentType;
 import roomescape.reservation.application.dto.request.ConfirmedReservationByCriteriaWebRequest;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
 import roomescape.reservation.application.dto.request.WaitingReservationCreateRequest;
 import roomescape.reservation.application.event.ReservationPromoteEvent;
 import roomescape.reservation.application.event.TestEventPublisher;
+import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.infrastructure.ReservationRepository;
 import roomescape.reservation.presentation.dto.response.ConfirmedReservationWebResponse;
 import roomescape.reservationslot.application.ReservationSlotDataService;
@@ -65,6 +72,12 @@ class ConfirmedReservationApplicationServiceTest {
     private ReservationRepository reservationRepository;
 
     @Autowired
+    private PaymentRepository paymentRepository;
+
+    @MockitoBean
+    private PaymentClient paymentClient;
+
+    @Autowired
     private TestEventPublisher eventPublisher;
 
     private Long timeId;
@@ -74,6 +87,8 @@ class ConfirmedReservationApplicationServiceTest {
     private Long reservationId;
 
     private WaitingReservationApplicationService waitingReservationApplicationService;
+
+    private PaymentService paymentService;
 
     @BeforeEach
     void setUp() {
@@ -90,6 +105,7 @@ class ConfirmedReservationApplicationServiceTest {
                 memberDataService, reservationDataService, eventPublisher);
         waitingReservationApplicationService = new WaitingReservationApplicationService(reservationSlotDataService,
                 memberDataService, reservationDataService);
+        paymentService = new PaymentService(paymentClient, paymentRepository, eventPublisher);
 
         timeId = reservationTimeRepository.save(new ReservationTime(LocalTime.of(9, 0))).getId();
         themeId = themeRepository.save(TestFixture.makeTheme()).getId();
@@ -235,10 +251,9 @@ class ConfirmedReservationApplicationServiceTest {
     @Test
     void findReservations_shouldReturnMemberReservationsByMemberId() {
         // given
-        Long themeId2 = themeRepository.save(new Theme("논리", "논리 게임 with Danny", "image.png")).getId();
-        confirmedReservationApplicationService.create(
-                new ConfirmedReservationCreateRequest(FUTURE_DATE, timeId, themeId2, memberId2,
-                        afterOneHour, null));
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
+        Payment payment = paymentService.save(new Payment("PAYMENT_KEY", "ORDER_ID", 5000L, PaymentType.NORMAL));
+        reservation.confirm(payment);
 
         // when
         List<MyReservationResponse> result = confirmedReservationApplicationService.findReservationsByMemberId(
@@ -248,6 +263,7 @@ class ConfirmedReservationApplicationServiceTest {
         SoftAssertions.assertSoftly(softAssertions -> {
                     softAssertions.assertThat(result).hasSize(1);
                     softAssertions.assertThat(result.getFirst().theme()).isEqualTo("추리");
+                    softAssertions.assertThat(result.getFirst().paymentKey()).isEqualTo("PAYMENT_KEY");
                 }
         );
     }
