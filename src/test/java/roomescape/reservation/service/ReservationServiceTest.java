@@ -3,6 +3,7 @@ package roomescape.reservation.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.springframework.test.web.client.ExpectedCount.manyTimes;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
 import static roomescape.constant.TestData.RESERVATION_COUNT;
@@ -146,7 +147,7 @@ class ReservationServiceTest extends BaseTest {
     void 결제_승인_실패_시_예약이_생성되지_않는다() {
         // given
         server.reset();
-        server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
+        server.expect(manyTimes(), requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andRespond(withBadRequest()
                         .body("{\"code\":\"ERROR\",\"message\":\"결제 승인이 실패했습니다.\"}"));
 
