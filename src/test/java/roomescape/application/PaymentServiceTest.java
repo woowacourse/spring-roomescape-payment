@@ -27,9 +27,6 @@ class PaymentServiceTest {
     @Mock
     private PaymentRepository paymentRepository;
 
-    @Mock
-    private ObjectMapper objectMapper;
-
     @InjectMocks
     private PaymentService paymentService;
 
