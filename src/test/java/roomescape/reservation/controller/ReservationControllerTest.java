@@ -10,6 +10,8 @@ import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
@@ -50,6 +52,26 @@ class ReservationControllerTest extends IntegrationTest {
 
     @Autowired
     MemberRepository memberRepository;
+
+    private String adminToken;
+
+    @BeforeEach
+    void setUp() {
+        // IntegrationTest에서 이미 RestAssured.port를 설정해주지 않는다면 필요합니다.
+        // RestAssured.port = port; // port가 IntegrationTest에 의해 주입되는 경우
+
+        // 테스트용 회원(admin) 로그인하여 token 쿠키를 발급받음
+        Map<String, String> adminUser = Map.of("email", "admin@naver.com", "password", "1234");
+        this.adminToken = RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(adminUser)
+                .when()
+                .post("/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .cookie("token");
+    }
 
     @Test
     void 유저_예약_생성_조회_삭제() {
@@ -106,86 +128,173 @@ class ReservationControllerTest extends IntegrationTest {
     }
 
 
+//    @Test
+//    void 여러건의_동일_조건에_대한_동시_요청이_들어올_때_하나의_예약만_생성된다() throws InterruptedException {
+//        int threadCount = 5;
+//        CountDownLatch latch = new CountDownLatch(threadCount);
+//
+//        final Member member = memberRepository.findByEmailAndPassword("admin@naver.com",
+//                        Password.createForMember("1234"))
+//                .orElseThrow();
+//
+//        ReservationTime time = timeRepository.save(ReservationTime.from(LocalTime.of(10, 0)));
+//        Theme theme1 = themeRepository.save(Theme.of("name", "desc", "thumb"));
+//        Theme theme2 = themeRepository.save(Theme.of("name2", "desc2", "thumb2"));
+//        Theme theme3 = themeRepository.save(Theme.of("name3", "desc3", "thumb3"));
+//
+//        Map<String, String> params = new HashMap<>();
+//        LocalDate localDate = LocalDate.of(2999, 1, 5);
+//        params.put("date", localDate.toString());
+//        params.put("timeId", time.getId().toString());
+//        params.put("themeId", theme1.getId().toString());
+//
+//        RoomEscapeInformation info1 = RoomEscapeInformation.builder()
+//                .date(localDate)
+//                .time(time)
+//                .theme(theme2)
+//                .build();
+//
+//        RoomEscapeInformation info2 = RoomEscapeInformation.builder()
+//                .date(localDate)
+//                .time(time)
+//                .theme(theme3)
+//                .build();
+//
+//        roomEscapeInformationRepository.save(info1);
+//        roomEscapeInformationRepository.save(info2);
+//
+//        reservationRepository.save(Reservation.builder()
+//                .roomEscapeInformation(info1)
+//                .member(member)
+//                .build()
+//        );
+//        reservationRepository.save(Reservation.builder()
+//                .roomEscapeInformation(info2)
+//                .member(member)
+//                .build()
+//        );
+//
+//        Map<String, String> adminUser = Map.of("email", "admin@naver.com", "password", "1234");
+//        String token = RestAssured.given().log().all()
+//                .contentType(ContentType.JSON)
+//                .body(adminUser)
+//                .when().post("/login")
+//                .then().log().all()
+//                .statusCode(200)
+//                .extract()
+//                .cookie("token");
+//
+//        // when
+//        for (int i = 0; i < threadCount; i++) {
+//            new Thread(() -> {
+//                try {
+//                    RestAssured.given()
+//                            .contentType(ContentType.JSON)
+//                            .cookie("token", token)
+//                            .body(params)
+//                            .when()
+//                            .post("/reservations");
+//                } finally {
+//                    latch.countDown();
+//                }
+//            }).start();
+//        }
+//
+//        latch.await();
+//
+//        // then
+//        Thread.sleep(1000);
+//
+//        long booked = reservationRepository.findByMember(member)
+//                .size();
+//
+//        assertThat(booked).isEqualTo(3); // 기존 2건 + 예약 1건 = 3건
+//    }
+
     @Test
+    @DisplayName("여러 건의 동시 요청이 들어올 때 하나의 예약만 생성된다")
     void 여러건의_동일_조건에_대한_동시_요청이_들어올_때_하나의_예약만_생성된다() throws InterruptedException {
         int threadCount = 5;
-        CountDownLatch latch = new CountDownLatch(threadCount);
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch doneLatch = new CountDownLatch(threadCount);
 
-        final Member member = memberRepository.findByEmailAndPassword("admin@naver.com",
+        // 이미 member.sql로 admin@naver.com 계정이 들어 있는 상태
+        Member member = memberRepository.findByEmailAndPassword("admin@naver.com",
                         Password.createForMember("1234"))
                 .orElseThrow();
 
-        ReservationTime time = timeRepository.save(ReservationTime.from(LocalTime.of(10, 0)));
+        // 예약 시간, 테마 3개 세팅
+        ReservationTime time1 = timeRepository.save(ReservationTime.from(LocalTime.of(10, 0)));
+        ReservationTime time2 = timeRepository.save(ReservationTime.from(LocalTime.of(10, 0)));
         Theme theme1 = themeRepository.save(Theme.of("name", "desc", "thumb"));
         Theme theme2 = themeRepository.save(Theme.of("name2", "desc2", "thumb2"));
         Theme theme3 = themeRepository.save(Theme.of("name3", "desc3", "thumb3"));
 
+        // 동시 요청 대상은 theme1 슬롯
         Map<String, String> params = new HashMap<>();
-        LocalDate localDate = LocalDate.of(2999, 1, 5);
-        params.put("date", localDate.toString());
-        params.put("timeId", time.getId().toString());
+        LocalDate targetDate1 = LocalDate.of(2999, 1, 5);
+        LocalDate targetDate2 = LocalDate.of(2999, 1, 5);
+        params.put("date", targetDate1.toString());
+        params.put("timeId", time1.getId().toString());
         params.put("themeId", theme1.getId().toString());
 
-        RoomEscapeInformation info1 = RoomEscapeInformation.builder()
-                .date(localDate)
-                .time(time)
+        // theme2, theme3에는 이미 예약 1건씩 선점
+        RoomEscapeInformation info2 = RoomEscapeInformation.builder()
+                .date(targetDate2)
+                .time(time2)
                 .theme(theme2)
                 .build();
+        RoomEscapeInformation saved2 = roomEscapeInformationRepository.save(info2);
+        reservationRepository.save(Reservation.builder()
+                .roomEscapeInformation(saved2)
+                .member(member)
+                .build());
 
-        RoomEscapeInformation info2 = RoomEscapeInformation.builder()
-                .date(localDate)
-                .time(time)
+        RoomEscapeInformation info3 = RoomEscapeInformation.builder()
+                .date(targetDate2)
+                .time(time2)
                 .theme(theme3)
                 .build();
-
-        roomEscapeInformationRepository.save(info1);
-        roomEscapeInformationRepository.save(info2);
-
+        RoomEscapeInformation saved3 = roomEscapeInformationRepository.save(info3);
         reservationRepository.save(Reservation.builder()
-                .roomEscapeInformation(info1)
+                .roomEscapeInformation(saved3)
                 .member(member)
-                .build()
-        );
-        reservationRepository.save(Reservation.builder()
-                .roomEscapeInformation(info2)
-                .member(member)
-                .build()
-        );
+                .build());
 
-        Map<String, String> adminUser = Map.of("email", "admin@naver.com", "password", "1234");
-        String token = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(adminUser)
-                .when().post("/login")
-                .then().log().all()
-                .statusCode(200)
-                .extract()
-                .cookie("token");
+        // 기존 예약 건수는 2건
+        long existingCount = reservationRepository.findByMember(member).size();
+        assertThat(existingCount).isEqualTo(2);
 
-        // when
+        // when: 5개의 스레드가 거의 동시에 예약 요청을 보냄
         for (int i = 0; i < threadCount; i++) {
             new Thread(() -> {
                 try {
+                    startLatch.await();
                     RestAssured.given()
+                            .cookie("token", adminToken)
                             .contentType(ContentType.JSON)
-                            .cookie("token", token)
                             .body(params)
                             .when()
-                            .post("/reservations");
+                            .post("/reservations")
+                            .then()
+                            .statusCode(201)
+                            .log().ifValidationFails();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 } finally {
-                    latch.countDown();
+                    doneLatch.countDown();
                 }
             }).start();
         }
+        // 모든 스레드가 준비된 후 동시에 실행
+        startLatch.countDown();
+        doneLatch.await();
 
-        latch.await();
+        // 잠시 대기하여 트랜잭션 커밋 및 락 해제 보장
+        Thread.sleep(500);
 
-        // then
-        Thread.sleep(1000);
-
-        long booked = reservationRepository.findByMember(member)
-                .size();
-
-        assertThat(booked).isEqualTo(3); // 기존 2건 + 예약 1건 = 3건
+        // then: 총 예약 건수가 3건이어야 함 (기존 2 + 신규 1)
+        long finalCount = reservationRepository.findByMember(member).size();
+        assertThat(finalCount).isEqualTo(3);
     }
 }

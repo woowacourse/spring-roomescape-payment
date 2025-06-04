@@ -4,12 +4,13 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.exception.NotFoundException;
 import roomescape.exception.ReservationException;
+import roomescape.lock.service.LockService;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
@@ -40,10 +41,22 @@ public class ReservationService {
     private final WaitingReservationRepository waitingReservationRepository;
     private final RoomEscapeInformationRepository roomEscapeInformationRepository;
 
+    private final LockService lockService;
+
+    private static Reservation generateReservationInstance(final Member member, final RoomEscapeInformation slot) {
+        return Reservation.builder()
+                .roomEscapeInformation(slot)
+                .member(member)
+                .build();
+    }
+
     public List<ReservationResponse> findReservationsByCriteria(final ReservationSearchRequest request) {
-        final List<Reservation> reservations = reservationRepository.findByCriteria(request.themeId(),
-                request.memberId(), request.dateFrom(),
-                request.dateTo());
+        final List<Reservation> reservations = reservationRepository.findByCriteria(
+                request.themeId(),
+                request.memberId(),
+                request.dateFrom(),
+                request.dateTo()
+        );
         return reservations.stream()
                 .map(ReservationResponse::new)
                 .toList();
@@ -58,7 +71,7 @@ public class ReservationService {
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 예약입니다."));
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public ReservationResponse resisterReservation(final ReservationRequest request, final LoginMember loginMember) {
         final ReservationTime reservationTime = findReservationTimeById(request.timeId());
         final Theme theme = findThemeById(request.themeId());
@@ -66,7 +79,7 @@ public class ReservationService {
         return saveReservationInternal(request.date(), reservationTime, theme, member);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public ReservationResponse saveAdminReservation(final AdminReservationRequest request) {
         final ReservationTime reservationTime = findReservationTimeById(request.timeId());
         final Theme theme = findThemeById(request.themeId());
@@ -80,18 +93,43 @@ public class ReservationService {
             final Theme theme,
             final Member member
     ) {
-        if (hasReservation(date, reservationTime, theme)) {
-            throw new ReservationException("이미 해당 날짜에 예약이 존재합니다.");
+        lockService.acquireLock(generateLockKey(date, reservationTime, theme));
+
+        final RoomEscapeInformation slot = generateSlot(date, reservationTime, theme);
+        if (isAlreadyBooked(date, reservationTime, theme)) {
+            throw new ReservationException("이미 예약이 존재합니다.");
         }
-        try {
-            final RoomEscapeInformation roomEscapeInformation = roomEscapeInformationRepository.save(
-                    RoomEscapeInformation.builder().date(date).time(reservationTime).theme(theme).build());
-            final Reservation reservation = reservationRepository.save(
-                    Reservation.builder().roomEscapeInformation(roomEscapeInformation).member(member).build());
-            return new ReservationResponse(reservation);
-        } catch (DataIntegrityViolationException e) {
-            throw new ReservationException("이미 예약이 되었습니다.");
-        }
+        final Reservation reservation = reservationRepository.save(generateReservationInstance(member, slot));
+        return new ReservationResponse(reservation);
+    }
+
+    private RoomEscapeInformation generateSlot(final LocalDate date, final ReservationTime reservationTime,
+                                               final Theme theme) {
+        return roomEscapeInformationRepository.findByDateAndTimeAndTheme(
+                        date, reservationTime, theme)
+                .orElseGet(() -> {
+                    final RoomEscapeInformation newSlot = RoomEscapeInformation.builder()
+                            .date(date)
+                            .theme(theme)
+                            .time(reservationTime)
+                            .build();
+                    return roomEscapeInformationRepository.save(newSlot);
+                });
+    }
+
+    private boolean isAlreadyBooked(final LocalDate date, final ReservationTime reservationTime, final Theme theme) {
+        return reservationRepository
+                .existsByRoomEscapeInformationDateAndRoomEscapeInformationTimeAndRoomEscapeInformationTheme(
+                        date, reservationTime, theme);
+    }
+
+    private String generateLockKey(final LocalDate date, final ReservationTime reservationTime, final Theme theme) {
+        return String.format(
+                "reservation_%s_%d_%d",
+                date.toString(),
+                reservationTime.getId(),
+                theme.getId()
+        );
     }
 
     @Transactional
@@ -104,8 +142,8 @@ public class ReservationService {
         final Long infoId = reservation.getRoomEscapeInformation().getId();
         reservationRepository.deleteById(id);
 
-        boolean hasBooked = reservationRepository.existsByRoomEscapeInformationId(infoId);
-        boolean hasWaiting = waitingReservationRepository.existsByRoomEscapeInformationId(infoId);
+        final boolean hasBooked = reservationRepository.existsByRoomEscapeInformationId(infoId);
+        final boolean hasWaiting = waitingReservationRepository.existsByRoomEscapeInformationId(infoId);
         if (!hasBooked && !hasWaiting) {
             roomEscapeInformationRepository.deleteById(infoId);
         }
@@ -133,19 +171,14 @@ public class ReservationService {
     public void approveWaitingReservation(final Long id) {
         final WaitingReservation waitingReservation = waitingReservationRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("예약 대기가 존재하지 않습니다."));
-        if (hasReservation(
-                waitingReservation.getRoomEscapeInformation().getDate(),
-                waitingReservation.getRoomEscapeInformation().getTime(),
-                waitingReservation.getRoomEscapeInformation().getTheme())
+        if (hasReservation(waitingReservation.getRoomEscapeInformation())
         ) {
             throw new ReservationException("이미 해당 날짜에 예약이 존재합니다.");
         }
         waitingReservationRepository.deleteById(waitingReservation.getId());
 
-        final Reservation reservation = Reservation.builder()
-                .roomEscapeInformation(waitingReservation.getRoomEscapeInformation())
-                .member(waitingReservation.getMember())
-                .build();
+        final Reservation reservation = generateReservationInstance(waitingReservation.getMember(),
+                waitingReservation.getRoomEscapeInformation());
         reservationRepository.save(reservation);
     }
 
@@ -162,7 +195,9 @@ public class ReservationService {
         return themeRepository.findById(themeId).orElseThrow(() -> new NotFoundException("존재하지 않는 테마입니다."));
     }
 
-    private boolean hasReservation(final LocalDate date, final ReservationTime time, final Theme theme) {
-        return roomEscapeInformationRepository.existsByDateAndTimeAndTheme(date, time, theme);
+    private boolean hasReservation(final RoomEscapeInformation roomEscapeInformation) {
+        return reservationRepository
+                .existsByRoomEscapeInformationDateAndRoomEscapeInformationTimeAndRoomEscapeInformationTheme(
+                        roomEscapeInformation.getDate(), roomEscapeInformation.getTime(), roomEscapeInformation.getTheme());
     }
 }

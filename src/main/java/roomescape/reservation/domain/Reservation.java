@@ -7,8 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,12 +16,6 @@ import roomescape.member.domain.Member;
 
 @Getter
 @Entity
-@Table(
-        uniqueConstraints = @UniqueConstraint(
-                name = "unique_reservation_per_time",
-                columnNames = {"room_escape_information_id"}
-        )
-)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Reservation extends BaseTimeEntity {
 

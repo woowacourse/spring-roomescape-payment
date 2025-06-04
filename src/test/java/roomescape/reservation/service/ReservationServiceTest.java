@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.auth.dto.LoginMember;
 import roomescape.exception.ReservationException;
+import roomescape.lock.service.LockService;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.domain.Password;
@@ -31,7 +32,7 @@ import roomescape.theme.domain.Theme;
 
 @DataJpaTest
 @Sql("/data.sql")
-@Import({ReservationService.class, WaitingReservationService.class})
+@Import({ReservationService.class, WaitingReservationService.class, LockService.class})
 class ReservationServiceTest {
 
     @Autowired
