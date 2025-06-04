@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @GetMapping("/reservations")
-    public List<UserReservationResponse> getAllReservationsByUser(final AuthenticationInfo authenticationInfo) {
+    public List<UserReservationResponse> getMyReservations(final AuthenticationInfo authenticationInfo) {
         var reservations = userService.getMyReservations(authenticationInfo.id());
         return UserReservationResponse.from(reservations);
     }

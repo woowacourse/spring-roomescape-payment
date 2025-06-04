@@ -2,6 +2,7 @@ package roomescape.presentation.rest;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static roomescape.TestFixtures.anyReservationWithNewId;
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import roomescape.application.UserService;
 import roomescape.domain.auth.AuthenticationInfo;
@@ -71,6 +71,6 @@ class UserControllerTest {
                     }
                     """))
             .andExpect(status().isOk())
-            .andDo(MockMvcResultHandlers.print());
+            .andDo(print());
     }
 }

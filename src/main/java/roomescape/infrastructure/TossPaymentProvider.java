@@ -29,8 +29,8 @@ public class TossPaymentProvider implements PaymentProvider {
     public Payment confirm(final PaymentRequest request) {
         for (int tried = 1; tried <= properties.connectionTryCount(); tried++) {
             try {
-                var successResponse = restTemplate.postForEntity(properties.confirmUri(), request, Payment.class);
-                return successResponse.getBody();
+                var successResponse = restTemplate.postForObject(properties.confirmUri(), request, TossSuccessResponse.class);
+                return new Payment(successResponse.paymentKey, successResponse.amount);
 
             } catch (RestClientResponseException e) {
                 var failResponse = readTossFailureResponse(e);
@@ -54,6 +54,7 @@ public class TossPaymentProvider implements PaymentProvider {
         }
     }
 
+    private record TossSuccessResponse(String paymentKey, long amount) {}
     private record TossFailureResponse(String code, String message) {}
 
     private PaymentFailedException newPaymentFailedException(final String tossCode, final String message) {

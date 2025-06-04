@@ -1,5 +1,6 @@
 package roomescape.presentation.response;
 
+import jakarta.annotation.Nullable;
 import java.time.LocalDate;
 import java.util.List;
 import roomescape.domain.reservation.ReservationWithOrder;
@@ -9,7 +10,8 @@ public record UserReservationResponse(
     LocalDate date,
     TimeSlotResponse time,
     ThemeResponse theme,
-    String status
+    String status,
+    @Nullable PaymentResponse payment
 ) {
 
     public static UserReservationResponse from(final ReservationWithOrder waiting) {
@@ -19,7 +21,8 @@ public record UserReservationResponse(
             reservation.date(),
             TimeSlotResponse.from(reservation.timeSlot()),
             ThemeResponse.from(reservation.theme()),
-            writeDescription(waiting)
+            writeDescription(waiting),
+            PaymentResponse.from(reservation.payment())
         );
     }
 
