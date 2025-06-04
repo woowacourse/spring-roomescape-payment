@@ -25,7 +25,7 @@ import roomescape.infrastructure.error.exception.TossPaymentException;
 @Component
 public class TossPaymentClient {
 
-    private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TossPaymentClient.class);
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
@@ -59,7 +59,7 @@ public class TossPaymentClient {
                     .toEntity(PaymentResponse.class)
                     .getBody();
         } catch (RestClientException e) {
-            log.warn("RestClient 토스 페이먼트 결제 승인 API 호출 실패", e);
+            LOGGER.warn("RestClient 토스 페이먼트 결제 승인 API 호출 실패", e);
             throw new TossPaymentException("잠시 후 다시 시도해주세요.");
         }
     }
@@ -74,14 +74,14 @@ public class TossPaymentClient {
             JsonNode node = objectMapper.readTree(clientHttpResponse.getBody());
             String code = node.path("code").asText();
             String message = node.path("message").asText();
-            log.warn("결제 승인 실패 - code: {}, message: {}", code, message);
+            LOGGER.warn("결제 승인 실패 - code: {}, message: {}", code, message);
             TossPaymentErrorCode tossPaymentErrorCode = getTossPaymentErrorCode(code);
             throw new TossPaymentException(tossPaymentErrorCode.getKoreanMessage());
         } catch (JsonProcessingException e) {
-            log.warn("토스 응답 처리 중 JSON 파싱 오류", e);
+            LOGGER.error("토스 응답 처리 중 JSON 파싱 오류", e);
             throw new TossPaymentException(TossPaymentErrorCode.SYSTEM_ERROR_MESSAGE);
         } catch (IOException e) {
-            log.error("토스 응답 처리 중 I/O 오류", e);
+            LOGGER.error("토스 응답 처리 중 I/O 오류", e);
             throw new TossPaymentException(TossPaymentErrorCode.SYSTEM_ERROR_MESSAGE);
         }
     }
@@ -90,7 +90,7 @@ public class TossPaymentClient {
         try {
             return TossPaymentErrorCode.fromCode(code);
         } catch (PaymentException e) {
-            log.warn("알 수 없는 결제 오류 코드: {}", code, e);
+            LOGGER.warn("알 수 없는 결제 오류 코드: {}", code, e);
             throw new TossPaymentException(TossPaymentErrorCode.SYSTEM_ERROR_MESSAGE);
         }
     }
