@@ -26,7 +26,7 @@ class PaymentServiceTest {
         Mockito.when(paymentProvider.confirm(request)).thenReturn(confirmation);
 
         // when & then
-        assertThatCode(() -> paymentService.pay("a", "1", 1000)).doesNotThrowAnyException();
+        assertThatCode(() -> paymentService.pay(99,"a", "1", 1000)).doesNotThrowAnyException();
     }
 
     @Test
@@ -38,7 +38,7 @@ class PaymentServiceTest {
         Mockito.when(paymentProvider.confirm(request)).thenThrow(PaymentFailedException.class);
 
         // when & then
-        assertThatThrownBy(() -> paymentService.pay("a", "1", 1000))
+        assertThatThrownBy(() -> paymentService.pay(99,"a", "1", 1000))
             .isInstanceOf(PaymentFailedException.class);
     }
 }

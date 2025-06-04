@@ -32,7 +32,7 @@ public class PaymentControllerTest {
     @Test
     @DisplayName("예약에 대한 결제 승인 요청시, OK를 응답한다.")
     void payReservation() throws Exception {
-        Mockito.doNothing().when(paymentService).pay(anyString(), anyString(), anyLong());
+        Mockito.doNothing().when(paymentService).pay(anyLong(), anyString(), anyString(), anyLong());
 
         mockMvc.perform(post("/payments/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -51,7 +51,7 @@ public class PaymentControllerTest {
     @DisplayName("잘못된 요청으로 결제 승인 실패 시 BAD REQUEST를 응답한다.")
     void cannotReserveWhenBadRequest() throws Exception {
         Mockito.doThrow(PaymentFailedException.byClient("결제 실패"))
-            .when(paymentService).pay(anyString(), anyString(), anyLong());
+            .when(paymentService).pay(anyLong(), anyString(), anyString(), anyLong());
 
         mockMvc.perform(post("/payments/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -70,7 +70,7 @@ public class PaymentControllerTest {
     @DisplayName("서버 내부 오류로 결제 승인 실패 시 INTERNAL SERVER ERROR를 응답한다.")
     void cannotReserveWhenInternalServerError() throws Exception {
         Mockito.doThrow(PaymentFailedException.byServer())
-            .when(paymentService).pay(anyString(), anyString(), anyLong());
+            .when(paymentService).pay(anyLong(), anyString(), anyString(), anyLong());
 
         mockMvc.perform(post("/payments/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -89,7 +89,7 @@ public class PaymentControllerTest {
     @DisplayName("외부 서버 오류로 결제 승인 실패 시 INTERNAL SERVER ERROR를 응답한다.")
     void cannotReserveWhenExternalServerError() throws Exception {
         Mockito.doThrow(PaymentFailedException.byExternalServer())
-            .when(paymentService).pay(anyString(), anyString(), anyLong());
+            .when(paymentService).pay(anyLong(), anyString(), anyString(), anyLong());
 
         mockMvc.perform(post("/payments/confirm")
                 .contentType(MediaType.APPLICATION_JSON)

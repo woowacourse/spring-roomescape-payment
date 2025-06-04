@@ -20,6 +20,6 @@ public class PaymentController {
     @PostMapping("/confirm")
     @ResponseStatus(HttpStatus.OK)
     public void payReservation(@RequestBody ReservationPaymentRequest request) {
-        service.pay(request.paymentKey(), request.orderId(), request.amount());
+        service.pay(request.reservationId(), request.paymentKey(), request.orderId(), request.amount());
     }
 }
