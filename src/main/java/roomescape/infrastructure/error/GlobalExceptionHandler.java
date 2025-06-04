@@ -94,6 +94,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiFailResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        LOGGER.error(buildLogEntry(ex).toLogMessage());
         String errorMessage = ex.getBindingResult()
                 .getAllErrors()
                 .stream()
@@ -104,6 +105,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiFailResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        LOGGER.error(buildLogEntry(ex).toLogMessage());
         if (ex.getCause() instanceof InvalidFormatException formatEx && formatEx.getTargetType() == LocalDate.class) {
             return ResponseEntity.badRequest().body(new ApiFailResponse("날짜는 yyyy-MM-dd 형식이어야 합니다."));
         }
