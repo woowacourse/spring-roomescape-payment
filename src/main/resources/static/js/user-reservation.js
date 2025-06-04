@@ -243,12 +243,11 @@ async function fetchReservationPayment(paymentData, reservationData) {
             "Content-Type": "application/json"
         },
         body: JSON.stringify(paymentRequest),
-    }).then(async response => {
+    }).then(response => {
         if (!response.ok) {
-            return response.json().then(async errorBody => {
-                let errorMessage = JSON.stringify(errorBody.message);
-                console.error("예약 결제 실패 : " + errorMessage);
-                window.alert(errorMessage);
+            return response.json().then(errorBody => {
+                console.log("예약 결제 실패 : " + JSON.stringify(errorBody));
+                window.alert(errorBody.message);
             });
         } else {
             response.json().then(successBody => {

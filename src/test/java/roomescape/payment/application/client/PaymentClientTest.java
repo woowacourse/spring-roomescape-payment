@@ -102,7 +102,7 @@ class PaymentClientTest {
     }
 
     @Test
-    void 결제_승인_요청을_보내고_응답을_파싱할_수_있다() {
+    void approvePayment_whenValidRequest_returnSuccessfully() {
         // Given
         mockServer.expect(requestTo(url))
                 .andRespond(withSuccess(EXPECTED_RESULT, MediaType.APPLICATION_JSON));
@@ -126,9 +126,8 @@ class PaymentClientTest {
         // Given
         PaymentApproveRequest request = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID,
                 50_000L, null);
-        String errorMessage = "인증에 실패했습니다.";
         String errorResponse = objectMapper.writerWithDefaultPrettyPrinter()
-                .writeValueAsString(new TossErrorResponse(errorMessage));
+                .writeValueAsString(new TossErrorResponse("UNAUTHORIZED_KEY", "인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다."));
         mockServer.expect(requestTo(url))
                 .andRespond(withStatus(HttpStatus.UNAUTHORIZED)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -144,9 +143,8 @@ class PaymentClientTest {
         // Given
         PaymentApproveRequest request = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID,
                 50_000L, null);
-        String errorMessage = "허용되지 않은 요청입니다.";
         String errorResponse = objectMapper.writerWithDefaultPrettyPrinter()
-                .writeValueAsString(new TossErrorResponse(errorMessage));
+                .writeValueAsString(new TossErrorResponse("REJECT_CARD_PAYMENT", "한도초과 혹은 잔액부족으로 결제에 실패했습니다."));
         mockServer.expect(requestTo(url))
                 .andRespond(withStatus(HttpStatus.FORBIDDEN)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -162,9 +160,9 @@ class PaymentClientTest {
         // Given
         PaymentApproveRequest request = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID,
                 50_000L, null);
-        String errorMessage = "잘못된 요청입니다.";
         String errorResponse = objectMapper.writerWithDefaultPrettyPrinter()
-                .writeValueAsString(new TossErrorResponse(errorMessage));
+                .writeValueAsString(
+                        new TossErrorResponse("NOT_FOUND_PAYMENT_SESSION", "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다."));
         mockServer.expect(requestTo(url))
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -180,9 +178,9 @@ class PaymentClientTest {
         // Given
         PaymentApproveRequest request = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID,
                 50_000L, null);
-        String errorMessage = "내부 시스템 처리 작업이 실패했습니다. 잠시 후 다시 시도해주세요.";
         String errorResponse = objectMapper.writerWithDefaultPrettyPrinter()
-                .writeValueAsString(new TossErrorResponse(errorMessage));
+                .writeValueAsString(
+                        new TossErrorResponse("UNKNOWN_PAYMENT_ERROR", "결제에 실패했어요. 같은 문제가 반복된다면 은행이나 카드사로 문의해주세요."));
         mockServer.expect(requestTo(url))
                 .andRespond(withStatus(HttpStatus.INTERNAL_SERVER_ERROR)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -192,4 +190,31 @@ class PaymentClientTest {
         Assertions.assertThatThrownBy(() -> paymentClient.approvePayment(request))
                 .isInstanceOf(PaymentServerException.class);
     }
+
+//    @Test
+//    void approvePayment_whenReadTimeout_throwsResourceAccessException() throws JsonProcessingException {
+//        // Given
+//        PaymentApproveRequest request = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID,
+//                50_000L, null);
+//        String errorMessage = "내부 시스템 처리 작업이 실패했습니다. 잠시 후 다시 시도해주세요.";
+//        String errorResponse = objectMapper.writerWithDefaultPrettyPrinter()
+//                .writeValueAsString(new TossErrorResponse(errorMessage));
+//        mockServer.expect(MockRestRequestMatchers.requestTo(url))
+//                .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
+//                .andRespond(clientHttpRequest -> {
+//                    try {
+//                        Thread.sleep(6000);
+//                        return MockRestResponseCreators.withSuccess(
+//                                        EXPECTED_RESULT, MediaType.APPLICATION_JSON)
+//                                .createResponse(clientHttpRequest);
+//                    } catch (InterruptedException e) {
+//                        Thread.currentThread().interrupt();
+//                        throw new RuntimeException("Interrupted during delay", e);
+//                    }
+//                });
+//
+//        // When
+//        Assertions.assertThatThrownBy(() -> paymentClient.approvePayment(request))
+//                .isInstanceOf(PaymentServerException.class);
+//    }
 }

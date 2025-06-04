@@ -33,15 +33,16 @@ public class PaymentExceptionHandler implements ResponseErrorHandler {
     public void handleError(final URI url, final HttpMethod method, final ClientHttpResponse response)
             throws IOException {
         TossErrorResponse errorResponse = objectMapper.readValue(response.getBody(), TossErrorResponse.class);
+        String code = errorResponse.code();
         String message = errorResponse.message();
         HttpStatusCode statusCode = response.getStatusCode();
         if (statusCode.is4xxClientError()) {
             switch (statusCode.value()) {
-                case 401 -> throw new PaymentUnauthorizedException(message);
-                case 403 -> throw new PaymentForbiddenException(message);
-                default -> throw new PaymentClientException(message);
+                case 401 -> throw new PaymentUnauthorizedException(code, message);
+                case 403 -> throw new PaymentForbiddenException(code, message);
+                default -> throw new PaymentClientException(code, message);
             }
         }
-        throw new PaymentServerException(message);
+        throw new PaymentServerException(code, message);
     }
 }

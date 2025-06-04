@@ -1,5 +1,7 @@
 package roomescape.common.exception.handler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.format.DateTimeParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,12 @@ import roomescape.payment.exception.PaymentUnauthorizedException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private final ObjectMapper objectMapper;
+
+    public GlobalExceptionHandler(final ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
 
     @ExceptionHandler(DateTimeParseException.class)
     public ResponseEntity<String> handleDateTimeParseException(DateTimeParseException e) {
@@ -55,18 +63,21 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(PaymentClientException.class)
-    public ResponseEntity<String> handlePaymentApproveException(PaymentClientException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    public ResponseEntity<String> handlePaymentClientException(PaymentClientException e)
+            throws JsonProcessingException {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(objectMapper.writeValueAsString(e));
     }
 
     @ExceptionHandler(PaymentUnauthorizedException.class)
-    public ResponseEntity<String> handlePaymentUnauthorizedException(PaymentUnauthorizedException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+    public ResponseEntity<String> handlePaymentUnauthorizedException(PaymentUnauthorizedException e)
+            throws JsonProcessingException {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(objectMapper.writeValueAsString(e));
     }
 
     @ExceptionHandler(PaymentForbiddenException.class)
-    public ResponseEntity<String> handlePaymentForbiddenException(PaymentForbiddenException e) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+    public ResponseEntity<String> handlePaymentForbiddenException(PaymentForbiddenException e)
+            throws JsonProcessingException {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(objectMapper.writeValueAsString(e));
     }
 
     @ExceptionHandler(PaymentServerException.class)

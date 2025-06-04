@@ -2,6 +2,7 @@ package roomescape.payment.application.client;
 
 import java.util.Base64;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.common.properties.PaymentClientProperties;
@@ -13,7 +14,6 @@ import roomescape.payment.presentation.dto.response.TossPaymentApproveResponse;
 @EnableConfigurationProperties(PaymentClientProperties.class)
 public class PaymentClient {
 
-    private static final String AUTHORIZATION = "Authorization";
     private static final String BASIC = "Basic ";
     private static final String COLON = ":";
 
@@ -34,7 +34,7 @@ public class PaymentClient {
     public TossPaymentApproveResponse approvePayment(final PaymentApproveRequest paymentApproveRequest) {
         return restClient.post()
                 .uri(paymentClientProperties.getConfirmApi())
-                .header(AUTHORIZATION, BASIC + encodingSecretKey)
+                .header(HttpHeaders.AUTHORIZATION, BASIC + encodingSecretKey)
                 .body(paymentApproveRequest)
                 .retrieve()
                 .onStatus(paymentExceptionHandler)
