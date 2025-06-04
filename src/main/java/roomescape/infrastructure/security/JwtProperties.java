@@ -6,21 +6,12 @@ import javax.crypto.SecretKey;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties("security.jwt.token")
-public class JwtProperties {
+public record JwtProperties(
+        String rawSecretKey,
+        Duration expireDuration
+) {
 
-    private final SecretKey secretKey;
-    private final Duration expireDuration;
-
-    public JwtProperties(String secretKey, Duration expireDuration) {
-        this.secretKey = Keys.hmacShaKeyFor(secretKey.getBytes());
-        this.expireDuration = expireDuration;
-    }
-
-    public SecretKey getSecretKey() {
-        return secretKey;
-    }
-
-    public Duration getExpireDuration() {
-        return expireDuration;
+    public SecretKey secretKey() {
+        return Keys.hmacShaKeyFor(rawSecretKey.getBytes());
     }
 }

@@ -17,30 +17,27 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
-import roomescape.application.payment.command.dto.PaymentCommand;
 import roomescape.application.payment.client.dto.PaymentResponse;
+import roomescape.application.payment.command.dto.PaymentCommand;
 import roomescape.infrastructure.error.exception.PaymentException;
 import roomescape.infrastructure.error.exception.TossPaymentException;
 
 @Component
 public class TossPaymentClient {
 
-    private static final String TOSS_PAYMENT_SERVER_URL = "https://api.tosspayments.com/v1/payments";
-    private static final String SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6:";
-    private static final String CONFIRM_URI = "/confirm";
-    private static final String AUTH_SCHEME = "Basic ";
-
     private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.class);
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
+    private final TossPaymentProperties tossPaymentProperties;
 
-    public TossPaymentClient(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    public TossPaymentClient(ObjectMapper objectMapper, TossPaymentProperties tossPaymentProperties) {
         this.restClient = RestClient.builder()
-                .baseUrl(TOSS_PAYMENT_SERVER_URL)
+                .baseUrl(tossPaymentProperties.baseUrl())
                 .requestFactory(createRequestFactory())
                 .build();
+        this.objectMapper = objectMapper;
+        this.tossPaymentProperties = tossPaymentProperties;
     }
 
     private SimpleClientHttpRequestFactory createRequestFactory() {
@@ -53,7 +50,7 @@ public class TossPaymentClient {
     public PaymentResponse approve(PaymentCommand command) {
         try {
             return restClient.post()
-                    .uri(CONFIRM_URI)
+                    .uri(tossPaymentProperties.confirmUri())
                     .header(HttpHeaders.AUTHORIZATION, createAuthorizationHeader())
                     .body(command)
                     .retrieve()
@@ -68,8 +65,8 @@ public class TossPaymentClient {
     }
 
     private String createAuthorizationHeader() {
-        String encoded = Base64.getEncoder().encodeToString(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
-        return AUTH_SCHEME + encoded;
+        String encoded = Base64.getEncoder().encodeToString(tossPaymentProperties.secretKey().getBytes(StandardCharsets.UTF_8));
+        return tossPaymentProperties.authScheme() + " " + encoded;
     }
 
     private void handle4xxError(HttpRequest httpRequest, ClientHttpResponse clientHttpResponse) {

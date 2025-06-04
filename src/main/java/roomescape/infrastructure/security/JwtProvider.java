@@ -23,18 +23,18 @@ public class JwtProvider {
 
     private TokenIssueRequest getTokenIssueRequest(Long identifier) {
         Instant currentInstant = clock.instant();
-        Instant expireInstant = currentInstant.plus(jwtProperties.getExpireDuration());
+        Instant expireInstant = currentInstant.plus(jwtProperties.expireDuration());
         Date currentDate = Date.from(currentInstant);
         Date expireDate = Date.from(expireInstant);
         return new TokenIssueRequest(
                 currentDate,
                 expireDate,
                 identifier,
-                jwtProperties.getSecretKey()
+                jwtProperties.secretKey()
         );
     }
 
     public Long extractIdentifier(AccessToken accessToken) {
-        return accessToken.extractMemberId(jwtProperties.getSecretKey());
+        return accessToken.extractMemberId(jwtProperties.secretKey());
     }
 }
