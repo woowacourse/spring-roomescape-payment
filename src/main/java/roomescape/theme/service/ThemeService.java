@@ -1,0 +1,65 @@
+package roomescape.theme.service;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import roomescape.common.exception.ConflictException;
+import roomescape.common.exception.NotFoundException;
+import roomescape.reservation.repository.ReservationRepository;
+import roomescape.theme.domain.Theme;
+import roomescape.theme.repository.ThemeRepository;
+import roomescape.theme.service.dto.request.ThemeRequest;
+import roomescape.theme.service.dto.response.ThemeResponse;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Service
+public class ThemeService {
+
+    private static final int START_DATE_OFFSET = 8;
+    private static final int END_DATE_OFFSET = 1;
+
+    private final ThemeRepository themeRepository;
+    private final ReservationRepository reservationRepository;
+
+    public ThemeService(final ThemeRepository themeRepository, final ReservationRepository reservationRepository) {
+        this.themeRepository = themeRepository;
+        this.reservationRepository = reservationRepository;
+    }
+
+    public List<ThemeResponse> getAll() {
+        return themeRepository.findAll()
+                .stream()
+                .map(ThemeResponse::from)
+                .toList();
+    }
+
+    public ThemeResponse create(final ThemeRequest request) {
+        Theme theme = themeRepository.save(request.toEntity());
+        return ThemeResponse.from(theme);
+    }
+
+    @Transactional
+    public void delete(final Long id) {
+        if (!themeRepository.existsById(id)) {
+            throw new NotFoundException("테마", id);
+        }
+        if (reservationRepository.existsByThemeId(id)) {
+            throw new ConflictException("사용 중인 테마는 삭제할 수 없습니다.");
+        }
+        themeRepository.deleteById(id);
+    }
+
+    public List<ThemeResponse> getPopularThemes() {
+        LocalDate now = LocalDate.now();
+
+        LocalDate startDate = now.minusDays(START_DATE_OFFSET);
+        LocalDate endDate = now.minusDays(END_DATE_OFFSET);
+        int popularThemeCount = 10;
+
+        return themeRepository.findTopByDateAndCount(startDate, endDate, popularThemeCount)
+                .stream()
+                .map(ThemeResponse::from)
+                .toList();
+    }
+}

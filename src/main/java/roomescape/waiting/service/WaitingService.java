@@ -1,0 +1,90 @@
+package roomescape.waiting.service;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import roomescape.auth.service.dto.LoginMember;
+import roomescape.common.exception.ForbiddenException;
+import roomescape.common.exception.NotFoundException;
+import roomescape.member.domain.Member;
+import roomescape.member.repository.MemberRepository;
+import roomescape.reservation.domain.ReservationTime;
+import roomescape.reservation.repository.ReservationTimeRepository;
+import roomescape.theme.domain.Theme;
+import roomescape.theme.repository.ThemeRepository;
+import roomescape.waiting.domain.Waiting;
+import roomescape.waiting.repository.WaitingRepository;
+import roomescape.waiting.service.dto.request.CreateWaitingRequest;
+import roomescape.waiting.service.dto.response.CreateWaitingResponse;
+import roomescape.waiting.service.dto.response.WaitingInfoResponse;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+public class WaitingService {
+
+    private final WaitingRepository waitingRepository;
+    private final ThemeRepository themeRepository;
+    private final ReservationTimeRepository timeRepository;
+    private final MemberRepository memberRepository;
+
+    public WaitingService(
+            WaitingRepository waitingRepository,
+            ThemeRepository themeRepository,
+            ReservationTimeRepository timeRepository,
+            MemberRepository memberRepository
+    ) {
+        this.waitingRepository = waitingRepository;
+        this.themeRepository = themeRepository;
+        this.timeRepository = timeRepository;
+        this.memberRepository = memberRepository;
+    }
+
+    public List<WaitingInfoResponse> findAll() {
+        return waitingRepository.findAll()
+                .stream()
+                .map(WaitingInfoResponse::from)
+                .toList();
+    }
+
+    public void delete(final Long id, LoginMember loginMember) {
+        Waiting waiting = getAuthorizedWaiting(id, loginMember);
+        waitingRepository.delete(waiting);
+    }
+
+    private Waiting getAuthorizedWaiting(final Long id, LoginMember loginMember) {
+        return switch (loginMember.role()) {
+            case ADMIN -> waitingRepository.findById(id)
+                    .orElseThrow(() -> new NotFoundException("존재하지 않는 대기 예약 건입니다."));
+            case MEMBER -> waitingRepository.findByIdAndMemberId(id, loginMember.id())
+                    .orElseThrow(() -> new ForbiddenException("삭제 권한이 없습니다."));
+        };
+    }
+
+    @Transactional
+    public CreateWaitingResponse createWaiting(CreateWaitingRequest request, LoginMember loginMember) {
+        Member member = getMember(loginMember.id());
+        ReservationTime time = getReservationTime(request.timeId());
+        Theme theme = getTheme(request.themeId());
+
+        Waiting waiting = new Waiting(request.date(), time, theme, member, LocalDateTime.now());
+        Waiting saved = waitingRepository.save(waiting);
+
+        return CreateWaitingResponse.from(saved);
+    }
+
+    private Member getMember(final Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new NotFoundException("등록되지 않은 회원입니다."));
+    }
+
+    private Theme getTheme(final Long themeId) {
+        return themeRepository.findById(themeId)
+                .orElseThrow(() -> new NotFoundException("테마", themeId));
+    }
+
+    private ReservationTime getReservationTime(final Long timeId) {
+        return timeRepository.findById(timeId)
+                .orElseThrow(() -> new NotFoundException("예약 시간", timeId));
+    }
+}
