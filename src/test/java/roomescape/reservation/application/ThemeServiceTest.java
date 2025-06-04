@@ -15,6 +15,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.reservation.application.service.ReservationTimeService;
 import roomescape.reservation.application.service.ThemeService;
 import roomescape.reservation.domain.Reservation;
@@ -39,6 +41,9 @@ class ThemeServiceTest {
 
     @Autowired
     private ReservationRepository reservationRepository;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Test
     @DisplayName("테마 추가 테스트")
@@ -123,13 +128,15 @@ class ThemeServiceTest {
         final ReservationTimeResponse reservationTime = reservationTimeService.createReservationTime(
                 reservationTimeRequest);
 
+        Payment payment = paymentRepository.save(new Payment());
+
         reservationRepository.save(new Reservation(
                 new Member(2L, "admin@admin.com", "admin", "어드민", Role.ADMIN),
                 new Theme(theme.getId(), "레벨3 탈출",
                         "우테코 레벨3를 탈출하는 내용입니다.",
                         "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"),
                 LocalDate.now().minusDays(3),
-                new ReservationTime(reservationTime.getId(), LocalTime.of(15, 40))
+                new ReservationTime(reservationTime.getId(), LocalTime.of(15, 40)), payment
         ));
 
         // when

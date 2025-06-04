@@ -13,6 +13,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.payment.application.service.PaymentService;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.payment.presentation.dto.PaymentRequest;
 import roomescape.reservation.presentation.dto.ReservationRequest;
 import roomescape.reservation.domain.Reservation;
@@ -37,18 +38,20 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentRepository paymentRepository;
 
     public ReservationService(final PaymentService paymentService, final WaitingRepository waitingRepository,
                               final ReservationRepository reservationRepository,
                               final ReservationTimeRepository reservationTimeRepository,
                               final ThemeRepository themeRepository,
-                              final MemberRepository memberRepository) {
+                              final MemberRepository memberRepository, final PaymentRepository paymentRepository) {
         this.paymentService = paymentService;
         this.waitingRepository = waitingRepository;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Transactional
@@ -85,7 +88,7 @@ public class ReservationService {
                 adminReservationRequest.getThemeId(),
                 adminReservationRequest.getDate(),
                 member,
-                null
+                paymentRepository.save(new Payment())
         );
     }
 
@@ -137,7 +140,8 @@ public class ReservationService {
         waiting.ifPresent(value -> {
             reservationRepository.save(new Reservation(
                     value.getMember(),
-                    value.getReservationInfo()
+                    value.getReservationInfo(),
+                    paymentRepository.save(new Payment())
             ));
 
             waitingRepository.delete(waiting.get());

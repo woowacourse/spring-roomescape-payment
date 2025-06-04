@@ -2,6 +2,8 @@ package roomescape.payment.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,19 +20,18 @@ public class Payment extends TimeStamp {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String paymentKey;
-
-    @Column(nullable = false)
     private String orderId;
-
-    @Column(nullable = false)
     private Integer amount;
-
-    @Column(nullable = false)
     private String paymentType;
 
+    @Column(nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    private PaymentStatus status;
+
     public Payment() {
+        this(null, null, null, null, null);
+        this.status = PaymentStatus.PENDING;
     }
 
     public Payment(final Long id, final String paymentKey, final String orderId, final Integer amount,
@@ -40,6 +41,7 @@ public class Payment extends TimeStamp {
         this.orderId = orderId;
         this.amount = amount;
         this.paymentType = paymentType;
+        this.status = PaymentStatus.COMPLETE;
     }
 
     public Payment(final String paymentKey, final String orderId, final Integer amount, final String paymentType) {
@@ -64,5 +66,9 @@ public class Payment extends TimeStamp {
 
     public String getPaymentType() {
         return paymentType;
+    }
+
+    public PaymentStatus getStatus() {
+        return status;
     }
 }
