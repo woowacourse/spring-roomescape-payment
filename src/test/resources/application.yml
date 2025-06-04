@@ -3,3 +3,6 @@ spring:
     init:
       mode: always
       data-locations:
+jwt:
+  secret: iwantcoffee-americano+ice-americano-is-best-i.love_it+yaho
+  expirationMinute: 15
