@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.ResourceAccessException;
 import roomescape.client.PaymentErrorResponse;
 import roomescape.exception.*;
 import roomescape.exception.dto.ApiErrorResponse;
@@ -70,12 +71,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PaymentConfirmServerException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ApiErrorResponse handlePaymentConfirmServerException(PaymentConfirmServerException ex) {
-        PaymentErrorResponse paymentErrorResponse = ex.getPaymentErrorResponse();
         log.error("예외 발생: ", ex);
         return new ApiErrorResponse(
                 "결제가 실패했습니다. 잠시 후 다시 시도해주세요.",
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
+    }
+
+    @ExceptionHandler(ResourceAccessException.class)
+    @ResponseStatus(HttpStatus.BAD_GATEWAY)
+    public ApiErrorResponse handleResourceAccessException(ResourceAccessException ex) {
+        log.error("예외 발생: ", ex);
+        return new ApiErrorResponse("외부 서비스에 문제가 발생했습니다.", HttpStatus.BAD_GATEWAY);
     }
 
     @ExceptionHandler(Exception.class)
