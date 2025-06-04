@@ -24,3 +24,9 @@ security:
       secret-key: s8R$kQz3nZ!L5pT7c@J#xM9vB1&uD6hE
       access:
         expire-length: 600000 # 10 분
+
+scheduler:
+  request:
+    time: 600 # 1분
+  valid:
+    period: 1s

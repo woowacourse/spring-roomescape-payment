@@ -1,8 +1,10 @@
 package roomescape.reservation.application;
 
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import roomescape.reservation.domain.PaymentStatus;
@@ -11,18 +13,20 @@ import roomescape.reservation.domain.Reservation;
 @Component
 public class ReservationScheduler {
 
-    private static final int REQUEST_TIME = 60_000;
-    private static final int VALID_RESERVATION_TIME_PERIOD = 15;
-
     private final ReservationService reservationService;
+    private final Duration validReservationTimePeriod;
 
-    public ReservationScheduler(ReservationService reservationService) {
+    public ReservationScheduler(
+        ReservationService reservationService,
+        @Value("${scheduler.valid.period}") Duration validReservationTimePeriod
+    ) {
         this.reservationService = reservationService;
+        this.validReservationTimePeriod = validReservationTimePeriod;
     }
 
-    @Scheduled(fixedRate = REQUEST_TIME)
+    @Scheduled(fixedRateString = "${scheduler.request.time}")
     public void checkReservationPaymentExpiredTime() {
-        LocalDateTime findTime = LocalDateTime.now().minusMinutes(VALID_RESERVATION_TIME_PERIOD);
+        LocalDateTime findTime = LocalDateTime.now().minus(validReservationTimePeriod);
         List<Reservation> reservations = reservationService.findByCreateTimeAndPaymentStatus(
             Timestamp.valueOf(findTime), PaymentStatus.PENDING);
         for (Reservation reservation : reservations) {
