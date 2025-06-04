@@ -1,13 +1,10 @@
 package roomescape.reservation.controller;
 
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoginMember;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
-import roomescape.reservation.dto.ReservationSearchRequest;
 import roomescape.reservation.service.ReservationService;
 import roomescape.reservation.service.dto.CreateRegistrationCommand;
 
@@ -28,12 +24,6 @@ import roomescape.reservation.service.dto.CreateRegistrationCommand;
 public class ReservationController {
 
     private final ReservationService reservationService;
-
-    @GetMapping
-    public List<ReservationResponse> findReservationsByCriteria(
-            @ModelAttribute final ReservationSearchRequest request) {
-        return reservationService.findReservationsByCriteria(request);
-    }
 
     @GetMapping("/{reservationId}")
     public ReservationResponse getReservationById(@PathVariable(value = "reservationId") Long reservationId) {
@@ -49,11 +39,5 @@ public class ReservationController {
         return reservationService.registerReservation(
                 new CreateRegistrationCommand(member.id(), request.date(), request.timeId(), request.themeId())
         );
-    }
-
-    @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteReservation(@PathVariable final Long id) {
-        reservationService.deleteById(id);
     }
 }

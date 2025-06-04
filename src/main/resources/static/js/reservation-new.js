@@ -1,5 +1,6 @@
 let isEditing = false;
 const RESERVATION_API_ENDPOINT = '/reservations';
+const ADMIN_RESERVATION_API_ENDPOINT = '/admin/reservations';
 const TIME_API_ENDPOINT = '/times';
 const THEME_API_ENDPOINT = '/themes';
 const timesOptions = [];
@@ -8,7 +9,7 @@ const themesOptions = [];
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('add-button').addEventListener('click', addInputRow);
 
-    requestRead(RESERVATION_API_ENDPOINT)
+    requestRead(ADMIN_RESERVATION_API_ENDPOINT)
         .then(render)
         .catch(error => console.error('Error fetching reservations:', error));
 
@@ -179,7 +180,7 @@ function requestDelete(id) {
         method: 'DELETE',
     };
 
-    return fetch(`${RESERVATION_API_ENDPOINT}/${id}`, requestOptions)
+    return fetch(`${ADMIN_RESERVATION_API_ENDPOINT}/${id}`, requestOptions)
         .then(response => {
             if (response.status !== 204) throw new Error('Delete failed');
         });
