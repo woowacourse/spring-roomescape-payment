@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 import roomescape.domain.payment.PaymentConfirmation;
-import roomescape.domain.payment.PaymentDetails;
+import roomescape.domain.payment.PaymentExecutionResult;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.payment.PaymentRequest;
@@ -31,7 +31,7 @@ class PaymentServiceTest {
     void pay() {
         // given
         var request = new PaymentRequest("a", "1", 1000);
-        var paymentDetails = new PaymentDetails(new PaymentConfirmation("a", "1", 1000, "DONE"));
+        var paymentDetails = new PaymentExecutionResult(new PaymentConfirmation("a", "1", 1000, "DONE"));
 
         Mockito.when(paymentProvider.confirm(request)).thenReturn(paymentDetails);
 
@@ -45,7 +45,7 @@ class PaymentServiceTest {
     void failToPay(final TransactionStatusCode code, final Class<?> expectedException) {
         // given
         var request = new PaymentRequest("a", "1", 1000);
-        var paymentDetails = new PaymentDetails(TransactionStatus.fail(code, "결제 실패"));
+        var paymentDetails = new PaymentExecutionResult(TransactionStatus.fail(code, "결제 실패"));
 
         Mockito.when(paymentProvider.confirm(request)).thenReturn(paymentDetails);
 

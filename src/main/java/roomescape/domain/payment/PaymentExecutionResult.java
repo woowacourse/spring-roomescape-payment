@@ -1,15 +1,15 @@
 package roomescape.domain.payment;
 
-public record PaymentDetails(
+public record PaymentExecutionResult(
         PaymentConfirmation confirmation,
         TransactionStatus status
 ) {
 
-    public PaymentDetails(final PaymentConfirmation confirmation) {
+    public PaymentExecutionResult(final PaymentConfirmation confirmation) {
         this(confirmation, TransactionStatus.succeed());
     }
 
-    public PaymentDetails(final TransactionStatus status) {
+    public PaymentExecutionResult(final TransactionStatus status) {
         this(null, status);
     }
 

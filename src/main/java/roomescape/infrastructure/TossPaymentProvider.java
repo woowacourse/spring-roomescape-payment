@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.RequestHeadersSpec.ConvertibleClientHttpResponse;
 import roomescape.domain.payment.PaymentConfirmation;
-import roomescape.domain.payment.PaymentDetails;
+import roomescape.domain.payment.PaymentExecutionResult;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.domain.payment.TransactionStatus;
@@ -29,7 +29,7 @@ public class TossPaymentProvider implements PaymentProvider {
     }
 
     @Override
-    public PaymentDetails confirm(final PaymentRequest paymentRequest) {
+    public PaymentExecutionResult confirm(final PaymentRequest paymentRequest) {
         var confirmUri = "/v1/payments/confirm";
         return tossRestClient.post()
                 .uri(confirmUri)
@@ -39,14 +39,14 @@ public class TossPaymentProvider implements PaymentProvider {
                 .exchange((request, response) -> convertToDetails(response));
     }
 
-    private PaymentDetails convertToDetails(final ConvertibleClientHttpResponse response) throws IOException {
+    private PaymentExecutionResult convertToDetails(final ConvertibleClientHttpResponse response) throws IOException {
         if (HttpStatus.OK == response.getStatusCode()) {
             var confirmation = response.bodyTo(PaymentConfirmation.class);
-            return new PaymentDetails(confirmation);
+            return new PaymentExecutionResult(confirmation);
         }
         var tossResponse = response.bodyTo(FailureResponse.class);
         var status = convertToStatus(tossResponse);
-        return new PaymentDetails(status);
+        return new PaymentExecutionResult(status);
     }
 
     private TransactionStatus convertToStatus(final FailureResponse tossResponse) {
