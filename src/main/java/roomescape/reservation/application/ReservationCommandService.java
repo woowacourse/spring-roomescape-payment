@@ -3,6 +3,7 @@ package roomescape.reservation.application;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +14,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.payment.application.PaymentService;
 import roomescape.payment.application.dto.PaymentDataRequest;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.MemberReservationRequest;
@@ -102,7 +104,8 @@ public class ReservationCommandService {
         if (!reservationRepository.existsById(id)) {
             throw new NotFoundException("존재하지 않는 예약입니다.");
         }
-        paymentRepository.deleteByReservationId(id);
+        final List<Payment> payments = paymentRepository.findAllByReservationId(id);
+        payments.forEach(Payment::removeReservation);
         reservationRepository.deleteById(id);
     }
 

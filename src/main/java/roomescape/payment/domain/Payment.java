@@ -81,4 +81,8 @@ public class Payment {
         }
         this.paymentStatus = PaymentStatus.FAILED;
     }
+
+    public void removeReservation() {
+        this.reservation = null;
+    }
 }

@@ -15,7 +15,6 @@ public record MyHistoryResponse(
         @JsonFormat(pattern = "HH:mm")
         LocalTime time,
         String status,
-        String paymentKey,
         BigDecimal amount
 ) {
 
@@ -26,7 +25,6 @@ public record MyHistoryResponse(
                 reservation.getDate(),
                 reservation.getStartAt(),
                 "예약",
-                payment.getPaymentKey(),
                 payment.getAmount()
         );
     }
@@ -38,7 +36,6 @@ public record MyHistoryResponse(
                 waiting.getDate(),
                 waiting.getStartAt(),
                 String.format("%d번째 예약대기", count + 1),
-                null,
                 null
         );
     }

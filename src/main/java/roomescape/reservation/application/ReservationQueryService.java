@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.impl.NotFoundException;
+import roomescape.payment.domain.PaymentStatus;
 import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.reservation.application.dto.AvailableReservationTimeResponse;
 import roomescape.reservation.application.dto.MyHistoryResponse;
@@ -82,7 +83,8 @@ public class ReservationQueryService {
 
         final List<Reservation> reservations = reservationRepository.findByMemberIdWithAssociations(memberId);
         reservations.forEach(reservation -> responses.add(
-                MyHistoryResponse.ofReservation(reservation, paymentRepository.findByReservation(reservation))));
+                MyHistoryResponse.ofReservation(reservation,
+                        paymentRepository.findByReservationAndPaymentStatus(reservation, PaymentStatus.SUCCESS))));
 
         final List<WaitingWithRank> waitingWithRanks = waitingRepository.findWaitingWithRankByMemberId(memberId);
         waitingWithRanks.forEach(waitingWithRank -> responses.add(
