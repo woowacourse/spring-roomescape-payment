@@ -5,10 +5,16 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.concurrent.Executor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
+import org.springframework.core.task.SyncTaskExecutor;
 import roomescape.application.reservation.command.DeleteReservationService;
 import roomescape.domain.member.Email;
 import roomescape.domain.member.Member;
@@ -44,6 +50,16 @@ class DeleteReservationEventListenerTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @TestConfiguration
+    static class TestConfig {
+
+        @Bean
+        @Primary
+        public Executor executor() {
+            return new SyncTaskExecutor();
+        }
+    }
+
     @DisplayName("예약이 삭제되면 가장 빠른 대기를 예약으로 자동 승인한다.")
     @Test
     void 예약_삭제시_가장_빠른_대기를_자동_승인한다() {
@@ -63,9 +79,6 @@ class DeleteReservationEventListenerTest {
 
         // when: 예약 삭제 → 이벤트 발행 → 자동 승인 기대
         deleteReservationService.cancelById(reservation.getId());
-
-        // 비동기 이벤트 처리 대기, TODO: 더 나은 방법으로 대기 처리
-        waitUntil(2);
 
         // then
         assertAll(
@@ -92,13 +105,5 @@ class DeleteReservationEventListenerTest {
         // then
         assertThat(reservationRepository.findById(reservation.getId()))
                 .isNotPresent();
-    }
-
-    private void waitUntil(int seconds) {
-        try {
-            Thread.sleep(seconds * 1_000L);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
     }
 }

@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.Waiting;
@@ -28,6 +29,7 @@ public class AutoWaitingPromotionService {
         this.clock = clock;
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void promote(LocalDate reservationDate, Long reservationTimeId, Long themeId) {
         validateExistsReservation(reservationDate, reservationTimeId, themeId);
         List<Waiting> waitings = getWaitings(reservationDate, reservationTimeId, themeId);
