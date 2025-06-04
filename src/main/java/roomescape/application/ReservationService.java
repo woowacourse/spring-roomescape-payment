@@ -38,7 +38,7 @@ public class ReservationService {
             throw new AlreadyExistedException("이미 예약된 날짜, 시간, 테마에 대한 예약은 불가능합니다.");
         }
 
-        return reserve(userId, schedule, ReservationStatus.RESERVED);
+        return reserve(userId, schedule, ReservationStatus.PENDING);
     }
 
     @Transactional
@@ -64,7 +64,7 @@ public class ReservationService {
     @Transactional
     public void removeById(final long id) {
         var reservation = reservationRepository.getById(id);
-        if (reservation.isReserved()) {
+        if (reservation.isConfirmed()) {
             confirmNextReservationInQueue(reservation);
         }
         reservationRepository.delete(reservation);

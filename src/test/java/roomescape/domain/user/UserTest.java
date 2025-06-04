@@ -41,7 +41,7 @@ class UserTest {
     void reserve() {
         // given
         var user = anyUserWithNewId();
-        var reservation = new Reservation(1L, user, schedule, ReservationStatus.RESERVED);
+        var reservation = new Reservation(1L, user, schedule, ReservationStatus.CONFIRMED);
 
         // when
         user.reserve(reservation);
@@ -55,7 +55,7 @@ class UserTest {
     void reserveDuplicateSchedule() {
         // given
         var user = anyUserWithNewId();
-        var reservation = new Reservation(1L, user, schedule, ReservationStatus.RESERVED);
+        var reservation = new Reservation(1L, user, schedule, ReservationStatus.CONFIRMED);
         user.reserve(reservation);
 
         var reservationWithDuplicatedSchedule = new Reservation(2L, user, schedule, ReservationStatus.WAITING);
@@ -85,9 +85,9 @@ class UserTest {
     void cancelReservationCanOnlyMine() {
         // given
         var user = anyUserWithNewId();
-        user.reserve(new Reservation(1L, user, schedule, ReservationStatus.RESERVED));
+        user.reserve(new Reservation(1L, user, schedule, ReservationStatus.CONFIRMED));
 
-        var othersReservation = new Reservation(2L, anyUserWithNewId(), schedule, ReservationStatus.RESERVED);
+        var othersReservation = new Reservation(2L, anyUserWithNewId(), schedule, ReservationStatus.CONFIRMED);
 
         // when & then
         assertThatThrownBy(() -> user.cancelReservation(othersReservation))

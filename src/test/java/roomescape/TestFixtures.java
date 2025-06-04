@@ -72,7 +72,7 @@ public class TestFixtures {
                 anyTimeSlotWithNewId(),
                 anyThemeWithNewId()
             ),
-            ReservationStatus.RESERVED
+            ReservationStatus.CONFIRMED
         );
     }
 }

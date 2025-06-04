@@ -81,7 +81,7 @@ class ReservationsTest {
             DUMMY_ID_GENERATOR.incrementAndGet(),
             user,
             RoomescapeSchedule.of(date, timeSlot, theme),
-            ReservationStatus.RESERVED
+            ReservationStatus.CONFIRMED
         );
     }
 
@@ -90,7 +90,7 @@ class ReservationsTest {
             DUMMY_ID_GENERATOR.incrementAndGet(),
             user,
             RoomescapeSchedule.of(date, timeSlot, theme),
-            ReservationStatus.RESERVED
+            ReservationStatus.CONFIRMED
         );
     }
 }

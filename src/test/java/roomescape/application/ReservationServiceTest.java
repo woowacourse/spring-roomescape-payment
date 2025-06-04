@@ -13,6 +13,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import roomescape.domain.RoomescapeSchedule;
+import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationSearchFilter;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationWithOrder;
@@ -135,17 +137,18 @@ class ReservationServiceTest extends ServiceTest {
     @DisplayName("예약을 삭제했을 때 뒤따르던 예약 대기가 있으면 첫번째 대기가 확정된다.")
     void removeByIdWithFollowingWaitings() {
         // given
-        var reserved = service.reserve(user.id(), tomorrow(), timeSlot.id(), theme.id());
+        var confirmedReservation = new Reservation(user, RoomescapeSchedule.of(tomorrow(), timeSlot, theme), ReservationStatus.CONFIRMED);
+        var first_confirmed = repositoryHelper.saveReservation(confirmedReservation);
 
         var user2 = repositoryHelper.saveAnyUser();
-        var waiting = service.waitFor(user2.id(), tomorrow(), timeSlot.id(), theme.id());
+        var second_waiting = service.waitFor(user2.id(), tomorrow(), timeSlot.id(), theme.id());
 
         // when
-        service.removeById(reserved.id());
+        service.removeById(first_confirmed.id());
 
         // then
-        var reloadedWaiting = repositoryHelper.findReservation(waiting.id());
-        assertThat(reloadedWaiting.status()).isEqualTo(ReservationStatus.RESERVED);
+        var second = repositoryHelper.findReservation(second_waiting.id());
+        assertThat(second.status()).isEqualTo(ReservationStatus.CONFIRMED);
     }
 
     @Test

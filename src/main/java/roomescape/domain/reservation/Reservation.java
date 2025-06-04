@@ -47,7 +47,7 @@ public class Reservation {
     }
 
     public Reservation(final User user, final RoomescapeSchedule schedule) {
-        this(0L, user, schedule, ReservationStatus.RESERVED);
+        this(0L, user, schedule, ReservationStatus.CONFIRMED);
     }
 
     public Reservation(final User user, final RoomescapeSchedule schedule, final ReservationStatus status) {
@@ -58,8 +58,8 @@ public class Reservation {
         return this.reservedSchedule.equals(reservation.reservedSchedule);
     }
 
-    public boolean isReserved() {
-        return this.status == ReservationStatus.RESERVED;
+    public boolean isConfirmed() {
+        return this.status == ReservationStatus.CONFIRMED;
     }
 
     public boolean isWaiting() {
@@ -67,10 +67,10 @@ public class Reservation {
     }
 
     public void confirm() {
-        if (isReserved()) {
+        if (isConfirmed()) {
             throw new IllegalStateException("이미 확정된 예약입니다.");
         }
-        this.status = ReservationStatus.RESERVED;
+        this.status = ReservationStatus.CONFIRMED;
     }
 
     public void cancel() {

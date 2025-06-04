@@ -95,7 +95,7 @@ class ReservationQueueTest {
             DUMMY_ID_GENERATOR.incrementAndGet(),
             user,
             schedule,
-            ReservationStatus.RESERVED
+            ReservationStatus.CONFIRMED
         );
     }
 }

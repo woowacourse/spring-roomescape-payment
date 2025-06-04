@@ -27,17 +27,17 @@ public class ReservationTest {
     @DisplayName("주어진 예약과 같은 방탈출 일정인 지 비교할 수 있다.")
     void sameScheduleWith() {
         var schedule = RoomescapeSchedule.of(date, timeSlot, theme);
-        var reservation1 = new Reservation(1L, user1, schedule, ReservationStatus.RESERVED);
-        var reservation2 = new Reservation(2L, user2, schedule, ReservationStatus.RESERVED);
+        var reservation1 = new Reservation(1L, user1, schedule, ReservationStatus.CONFIRMED);
+        var reservation2 = new Reservation(2L, user2, schedule, ReservationStatus.CONFIRMED);
 
         assertThat(reservation1.sameScheduleWith(reservation2)).isTrue();
     }
 
     @Test
     @DisplayName("예약이 확정 상태인 지 확인한다.")
-    void isReserved() {
-        var reservation = reservationOf(ReservationStatus.RESERVED);
-        assertThat(reservation.isReserved()).isTrue();
+    void isConfirmed() {
+        var reservation = reservationOf(ReservationStatus.CONFIRMED);
+        assertThat(reservation.isConfirmed()).isTrue();
     }
 
     @Test
@@ -70,13 +70,13 @@ public class ReservationTest {
         reservation.confirm();
 
         // then
-        assertThat(reservation.status()).isEqualTo(ReservationStatus.RESERVED);
+        assertThat(reservation.status()).isEqualTo(ReservationStatus.CONFIRMED);
     }
 
     @ParameterizedTest
-    @CsvSource({"RESERVED", "CANCELED"})
+    @CsvSource({"CONFIRMED", "CANCELED"})
     @DisplayName("대기 상태가 아닌 예약을 취소하려 하면 예외가 발생한다.")
-    void cancelNotWaitingReservation(ReservationStatus statusThatNotWaiting) {
+    void cancelNotWaitingReservation(final ReservationStatus statusThatNotWaiting) {
         var reservation = reservationOf(statusThatNotWaiting);
 
         assertThatThrownBy(reservation::cancel).isInstanceOf(BusinessRuleViolationException.class);
