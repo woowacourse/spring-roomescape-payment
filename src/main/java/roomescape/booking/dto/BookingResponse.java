@@ -2,9 +2,9 @@ package roomescape.booking.dto;
 
 import roomescape.booking.reservation.Reservation;
 import roomescape.booking.reservation.ReservationStatus;
-import roomescape.booking.reservation.reservationpayment.ReservationPayment;
-import roomescape.booking.reservation.reservationpayment.dto.ReservationPaymentResponse;
 import roomescape.booking.waiting.Waiting;
+import roomescape.reservationpayment.ReservationPayment;
+import roomescape.reservationpayment.dto.ReservationPaymentResponse;
 import roomescape.schedule.dto.ScheduleResponse;
 
 public record BookingResponse(

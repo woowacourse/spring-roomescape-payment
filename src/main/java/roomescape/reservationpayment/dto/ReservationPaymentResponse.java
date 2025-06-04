@@ -1,6 +1,6 @@
-package roomescape.booking.reservation.reservationpayment.dto;
+package roomescape.reservationpayment.dto;
 
-import roomescape.booking.reservation.reservationpayment.ReservationPayment;
+import roomescape.reservationpayment.ReservationPayment;
 
 public record ReservationPaymentResponse(
         String paymentKey,

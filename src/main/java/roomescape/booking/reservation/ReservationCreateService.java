@@ -6,19 +6,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.booking.reservation.dto.AdminReservationRequest;
-import roomescape.booking.reservation.dto.ReservationPaymentRequest;
+import roomescape.booking.reservation.dto.ReservationRequest;
 import roomescape.booking.reservation.dto.ReservationResponse;
-import roomescape.booking.reservation.reservationpayment.ReservationPayment;
-import roomescape.booking.reservation.reservationpayment.ReservationPaymentRepository;
 import roomescape.exception.custom.reason.reservation.ReservationConflictException;
 import roomescape.exception.custom.reason.reservation.ReservationPastDateException;
 import roomescape.member.Member;
 import roomescape.member.MemberService;
 import roomescape.order.Order;
 import roomescape.order.OrderReader;
-import roomescape.payment.TossPaymentAdapter;
-import roomescape.payment.dto.TossPaymentConfirmCommand;
-import roomescape.payment.dto.TossPaymentConfirmResponse;
+import roomescape.reservationpayment.ReservationPaymentService;
+import roomescape.reservationpayment.dto.ReservationPaymentRequest;
 import roomescape.schedule.Schedule;
 import roomescape.schedule.ScheduleService;
 
@@ -31,12 +28,10 @@ public class ReservationCreateService {
     private final ScheduleService scheduleService;
     private final MemberService memberService;
     private final OrderReader orderReader;
-    private final TossPaymentAdapter tossPaymentAdapter;
-    private final TossPaymentConfirmCommandFactory tossPaymentConfirmCommandFactory;
-    private final ReservationPaymentRepository reservationPaymentRepository;
+    private final ReservationPaymentService reservationPaymentService;
 
     @Transactional
-    public ReservationResponse create(final ReservationPaymentRequest request, final LoginMember loginMember) {
+    public ReservationResponse create(final ReservationRequest request, final LoginMember loginMember) {
         final Member member = memberService.getByEmail(loginMember.email());
         final Schedule schedule = scheduleService.getByDateAndTimeIdAndThemeId(request.date(), request.timeId(), request.themeId());
         validateOrder(request, member, schedule);
@@ -45,10 +40,11 @@ public class ReservationCreateService {
 
         reservation.markStatusAsConfirmed();
         confirmPayment(request, reservation);
+
         return response;
     }
 
-    private void validateOrder(final ReservationPaymentRequest request, final Member member, final Schedule schedule) {
+    private void validateOrder(final ReservationRequest request, final Member member, final Schedule schedule) {
         final Order order = orderReader.getById(request.orderId());
         order.validateOrderAndPaymentRequest(request.amount(), member, schedule);
     }
@@ -60,17 +56,9 @@ public class ReservationCreateService {
         return reservationRepository.save(notSavedReservation);
     }
 
-    private void confirmPayment(final ReservationPaymentRequest request, final Reservation reservation) {
-        TossPaymentConfirmResponse response;
-        try {
-            TossPaymentConfirmCommand confirmCommand = tossPaymentConfirmCommandFactory.toPaymentConfirmCommand(request);
-            response = tossPaymentAdapter.confirmPayment(confirmCommand);
-        } catch (Exception e) {
-            log.error("결제 승인 실패", e);
-            throw e;
-        }
-        ReservationPayment reservationPayment = new ReservationPayment(response.paymentKey(), response.totalAmount(), response.orderId(), reservation);
-        reservationPaymentRepository.save(reservationPayment);
+    private void confirmPayment(final ReservationRequest request, final Reservation reservation) {
+        ReservationPaymentRequest confirmRequest = new ReservationPaymentRequest(request.orderId(), request.amount(), request.paymentKey(), reservation);
+        reservationPaymentService.confirmPayment(confirmRequest);
     }
 
     private void validatePast(final Schedule schedule) {

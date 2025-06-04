@@ -8,10 +8,10 @@ import roomescape.booking.dto.BookingResponse;
 import roomescape.booking.reservation.Reservation;
 import roomescape.booking.reservation.ReservationService;
 import roomescape.booking.reservation.ReservationStatus;
-import roomescape.booking.reservation.reservationpayment.ReservationPayment;
-import roomescape.booking.reservation.reservationpayment.ReservationPaymentRepository;
 import roomescape.booking.waiting.Waiting;
 import roomescape.booking.waiting.WaitingService;
+import roomescape.reservationpayment.ReservationPayment;
+import roomescape.reservationpayment.ReservationPaymentRepository;
 import roomescape.schedule.Schedule;
 
 import java.util.List;

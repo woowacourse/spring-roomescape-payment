@@ -10,9 +10,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.auth.dto.LoginMember;
 import roomescape.booking.reservation.dto.AdminReservationRequest;
-import roomescape.booking.reservation.dto.ReservationPaymentRequest;
+import roomescape.booking.reservation.dto.ReservationRequest;
 import roomescape.booking.reservation.dto.ReservationResponse;
-import roomescape.booking.reservation.reservationpayment.ReservationPaymentRepository;
 import roomescape.exception.custom.reason.payment.PaymentException;
 import roomescape.exception.custom.reason.reservation.ReservationConflictException;
 import roomescape.member.Member;
@@ -20,9 +19,8 @@ import roomescape.member.MemberRole;
 import roomescape.member.MemberService;
 import roomescape.order.Order;
 import roomescape.order.OrderReader;
-import roomescape.payment.TossPaymentAdapter;
-import roomescape.payment.dto.TossPaymentConfirmCommand;
-import roomescape.payment.dto.TossPaymentConfirmResponse;
+import roomescape.reservationpayment.ReservationPaymentService;
+import roomescape.reservationpayment.dto.ReservationPaymentRequest;
 import roomescape.reservationtime.ReservationTime;
 import roomescape.schedule.Schedule;
 import roomescape.schedule.ScheduleService;
@@ -34,7 +32,6 @@ import java.time.LocalTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static roomescape.util.TestFactory.*;
@@ -51,11 +48,7 @@ public class ReservationCreateServiceTest {
     @Mock
     private OrderReader orderReader;
     @Mock
-    private TossPaymentAdapter paymentAdapter;
-    @Mock
-    private TossPaymentConfirmCommandFactory paymentConfirmCommandFactory;
-    @Mock
-    private ReservationPaymentRepository reservationPaymentRepository;
+    private ReservationPaymentService reservationPaymentService;
     @InjectMocks
     private ReservationCreateService reservationCreateService;
 
@@ -63,7 +56,7 @@ public class ReservationCreateServiceTest {
     @DisplayName("예약 생성")
     class Create {
 
-        private ReservationPaymentRequest request;
+        private ReservationRequest request;
         private LoginMember loginMember;
         private Member member;
         private Schedule schedule;
@@ -71,7 +64,7 @@ public class ReservationCreateServiceTest {
 
         @BeforeEach
         void setUp() {
-            request = new ReservationPaymentRequest(
+            request = new ReservationRequest(
                     LocalDate.now().plusDays(1),
                     1L,
                     1L,
@@ -103,10 +96,6 @@ public class ReservationCreateServiceTest {
             given(reservationRepository.save(
                     new Reservation(member, schedule)))
                     .willReturn(reservation);
-            given(paymentConfirmCommandFactory.toPaymentConfirmCommand(request))
-                    .willReturn(new TossPaymentConfirmCommand(request.orderId(), request.amount(), request.paymentKey()));
-            given(paymentAdapter.confirmPayment(any()))
-                    .willReturn(new TossPaymentConfirmResponse("tgen_202506041149294Z5D3", "SURFMAY_12345", 25000L));
 
             // when
             final ReservationResponse response = reservationCreateService.create(request, loginMember);
@@ -147,11 +136,10 @@ public class ReservationCreateServiceTest {
                     .willReturn(schedule);
             given(memberService.getByEmail(loginMember.email()))
                     .willReturn(member);
-            doThrow(new PaymentException("결제에 실패하였습니다.")).when(paymentAdapter).confirmPayment(new TossPaymentConfirmCommand(request.orderId(), request.amount(), request.paymentKey()));
+            ReservationPaymentRequest reservationPaymentRequest = new ReservationPaymentRequest(request.orderId(), request.amount(), request.paymentKey(), reservation);
+            doThrow(new PaymentException("결제에 실패하였습니다.")).when(reservationPaymentService).confirmPayment(reservationPaymentRequest);
             given(reservationRepository.save(new Reservation(member, schedule)))
                     .willReturn(reservation);
-            given(paymentConfirmCommandFactory.toPaymentConfirmCommand(request))
-                    .willReturn(new TossPaymentConfirmCommand(request.orderId(), request.amount(), request.paymentKey()));
 
             // when & then
             assertThatThrownBy(() -> reservationCreateService.create(request, loginMember))

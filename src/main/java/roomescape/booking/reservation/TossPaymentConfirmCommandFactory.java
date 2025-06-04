@@ -1,8 +1,8 @@
 package roomescape.booking.reservation;
 
 import org.springframework.stereotype.Component;
-import roomescape.booking.reservation.dto.ReservationPaymentRequest;
 import roomescape.payment.dto.TossPaymentConfirmCommand;
+import roomescape.reservationpayment.dto.ReservationPaymentRequest;
 
 @Component
 public class TossPaymentConfirmCommandFactory {

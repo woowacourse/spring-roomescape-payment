@@ -1,4 +1,4 @@
-package roomescape.booking.reservation.reservationpayment;
+package roomescape.reservationpayment;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
