@@ -11,6 +11,7 @@ import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentStatus;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.ReservationPaymentRequest;
+import roomescape.payment.dto.TossPaymentCancelRequest;
 import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.payment.exception.PaymentTimeoutException;
@@ -36,7 +37,7 @@ public class TossPaymentService implements PaymentService {
 
     @Transactional
     @Override
-    public void registerAndPayForReservation(final ReservationPaymentRequest request, final LoginMember loginMember) {
+    public void registerReservation(final ReservationPaymentRequest request, final LoginMember loginMember) {
         log.debug("ReservationPaymentRequest: {}", request);
         log.debug("LoginMember: {}", loginMember);
 
@@ -96,7 +97,7 @@ public class TossPaymentService implements PaymentService {
             validateCanConfirmStatus(payment);
             updatePaymentInfoAfterConfirm(payment, response);
         } catch (PaymentTimeoutException e) {
-            log.warn("결제 타임아웃 발생: {}", tossRequest);
+
             // 결제 상태 조회 후 결제 취소 API 호출 (필요 시 구현)
         } catch (TossPaymentException e) {
             payment.updateStatusTo(PaymentStatus.FAILED);
@@ -130,6 +131,32 @@ public class TossPaymentService implements PaymentService {
                 .status(PaymentStatus.NOT_PAID)
                 .build();
         paymentRepository.save(payment);
+    }
+
+    @Transactional
+    @Override
+    public void cancelPayment(Long reservationId) {
+        validateReservationExists(reservationId);
+        Payment payment = getPaymentByReservationId(reservationId);
+
+        TossPaymentCancelRequest cancelRequest = new TossPaymentCancelRequest("모종의 이유");
+        TossPaymentResponse cancelResponse = tossRestClient.cancel(payment.getPaymentKey(), cancelRequest);
+        validateCancelSuccess(cancelResponse);
+        payment.updateStatusTo(PaymentStatus.REFUNDED);
+    }
+
+    private void validateReservationExists(Long reservationId) {
+        if(reservationRepository.existsById(reservationId)) {
+            return;
+        }
+        throw new NotFoundException("존재하지 않는 예약입니다, id: " + reservationId);
+    }
+
+    private void validateCancelSuccess(TossPaymentResponse cancelResponse) {
+        if(cancelResponse.status().equals("CANCELED")){
+            return;
+        }
+        throw new TossPaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 취소 실패", true);
     }
 
     private Reservation getReservationById(Long id) {

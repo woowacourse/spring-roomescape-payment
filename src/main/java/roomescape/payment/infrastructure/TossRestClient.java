@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
+import roomescape.payment.dto.TossPaymentCancelRequest;
 import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.payment.exception.PaymentTimeoutException;
@@ -38,27 +39,39 @@ public class TossRestClient {
                 Base64.getEncoder().encodeToString((tossPaymentProperties.getWidgetSecretKey() + ":").getBytes(StandardCharsets.UTF_8));
     }
 
-    public TossPaymentResponse confirm(final TossPaymentRequest tossPaymentRequest) {
+    public TossPaymentResponse confirm(final TossPaymentRequest request) {
+        return postWithErrorHandling("/v1/payments/confirm", request);
+    }
+
+    public TossPaymentResponse cancel(final String paymentKey, final TossPaymentCancelRequest request) {
+        log.debug("cancel 중 🔥🔥🔥 paymentKey: {}", paymentKey);
+        return postWithErrorHandling("/v1/payments/{paymentKey}/cancel", request, paymentKey);
+    }
+
+    private <T> TossPaymentResponse postWithErrorHandling(String uri, T requestBody, Object... uriVariables) {
         try {
             return restClient.post()
-                    .uri("/v1/payments/confirm")
+                    .uri(uri, uriVariables)
                     .header("Authorization", authHeaderValue)
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
-                    .body(tossPaymentRequest)
+                    .body(requestBody)
                     .retrieve()
-                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                    .onStatus(
+                            status -> status.is4xxClientError() || status.is5xxServerError(),
                             (request, response) -> {
                                 TossErrorResponse tossErrorResponse = extractResponseFrom(response.getBody());
                                 boolean isServerError = isServerError(tossErrorResponse.code());
+                                log.error("토스 API error: {}", tossErrorResponse);
                                 throw new TossPaymentException(
                                         response.getStatusCode(), tossErrorResponse.message(), isServerError);
-                            })
+                            }
+                    )
                     .body(TossPaymentResponse.class);
         } catch (ResourceAccessException ex) {
             log.error("Resource Access Exception:", ex);
             if (ex.getCause() instanceof SocketTimeoutException) {
-                log.error("토스 결제 confirm 요청 타임아웃");
+                log.warn("토스 API 요청 타임아웃");
                 throw new PaymentTimeoutException("결제 시스템이 응답하지 않아 시간이 초과되었습니다.");
             }
             throw ex;

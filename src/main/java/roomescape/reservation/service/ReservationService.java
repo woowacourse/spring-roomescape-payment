@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.common.event.EventPublisher;
 import roomescape.exception.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
@@ -14,6 +15,7 @@ import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSearchRequest;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.service.dto.CreateRegistrationCommand;
+import roomescape.reservation.service.dto.ReservationDeleteEvent;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
@@ -23,6 +25,7 @@ import roomescape.theme.repository.ThemeRepository;
 @RequiredArgsConstructor
 public class ReservationService {
 
+    private final EventPublisher eventPublisher;
     private final ReservationRepository reservationRepository;
     private final ReservationPolicy reservationPolicy;
 
@@ -72,6 +75,7 @@ public class ReservationService {
             return;
         }
         reservation.delete();
+        eventPublisher.raise(new ReservationDeleteEvent(id));
     }
 
     private Member getMemberById(final Long id) {

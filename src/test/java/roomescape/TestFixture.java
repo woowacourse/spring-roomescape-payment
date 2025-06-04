@@ -9,6 +9,7 @@ import roomescape.member.domain.MemberRole;
 import roomescape.member.domain.Password;
 import roomescape.reservation.domain.RegistrationSlot;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.WaitingReservation;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
@@ -81,6 +82,7 @@ public class TestFixture {
         return Reservation.builder()
                 .member(member)
                 .registrationSlot(new RegistrationSlot(time, theme, date))
+                .reservationStatus(ReservationStatus.RESERVED)
                 .build();
     }
 

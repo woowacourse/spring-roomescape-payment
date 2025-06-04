@@ -24,7 +24,7 @@ public class PaymentController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/confirm/tossPay")
     public void createReservationAndConfirmPayment(@RequestBody @Valid final ReservationPaymentRequest request, final LoginMember loginMember) {
-        tossPaymentService.registerAndPayForReservation(request, loginMember);
+        tossPaymentService.registerReservation(request, loginMember);
         tossPaymentService.confirmPayment(request);
     }
 

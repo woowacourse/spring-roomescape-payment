@@ -8,21 +8,29 @@ import roomescape.exception.NotFoundException;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.repository.ReservationRepository;
+import roomescape.reservation.service.dto.ReservationDeleteEvent;
 import roomescape.reservation.service.dto.WaitingApprovedEvent;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class WaitingApprovedEventHandler {
+public class PaymentEventHandler {
 
     private final ReservationRepository reservationRepository;
     private final PaymentService paymentService;
 
     @EventListener(WaitingApprovedEvent.class)
-    public void handle(WaitingApprovedEvent event) {
+    public void handleWaitingApproved(WaitingApprovedEvent event) {
         Reservation reservation = reservationRepository.findById(event.reservationId())
                 .orElseThrow(() -> new NotFoundException("예약이 존재하지 않습니다, id: " + event.reservationId()));
 
         paymentService.saveNotPaidPayment(reservation);
+    }
+
+    @EventListener(ReservationDeleteEvent.class)
+    public void handleReservationDelete(ReservationDeleteEvent event) {
+        Reservation reservation = reservationRepository.findById(event.reservationId())
+                .orElseThrow(() -> new NotFoundException("예약이 존재하지 않습니다, id: " + event.reservationId()));
+        paymentService.cancelPayment(reservation.getId());
     }
 }
