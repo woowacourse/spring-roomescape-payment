@@ -22,8 +22,8 @@ public class ClientConfig {
     public RestClientCustomizer restClientCustomizer() {
         return restClientBuilder -> {
             SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-            factory.setConnectTimeout(5_000);
-            factory.setReadTimeout(5_000);
+            factory.setConnectTimeout(3_000);
+            factory.setReadTimeout(45_000);
 
             restClientBuilder.requestFactory(factory)
                     .baseUrl("https://api.tosspayments.com");
