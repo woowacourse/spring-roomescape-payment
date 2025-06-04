@@ -4,10 +4,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.common.argumentResolver.Login;
 import roomescape.member.dto.request.LoginMember;
-import roomescape.payment.client.dto.request.TossPaymentConfirmRequest;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
-import roomescape.reservation.dto.response.MyReservationResponse;
+import roomescape.reservation.dto.response.MyReservationAndWaitingResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
 
@@ -54,8 +53,8 @@ public class ReservationController {
     }
 
     @GetMapping("/mine")
-    public ResponseEntity<List<MyReservationResponse>> getMyReservations(@Login LoginMember loginMember) {
-        List<MyReservationResponse> myReservationResponses = reservationService.getMyReservations(loginMember.id());
+    public ResponseEntity<List<MyReservationAndWaitingResponse>> getMyReservations(@Login LoginMember loginMember) {
+        List<MyReservationAndWaitingResponse> myReservationResponses = reservationService.getMyReservations(loginMember.id());
         return ResponseEntity.ok().body(myReservationResponses);
     }
 }

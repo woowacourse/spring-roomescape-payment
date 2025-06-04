@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.common.exception.ClientPaymentException;
 import roomescape.common.exception.PaymentException;
-import roomescape.payment.client.dto.request.TossPaymentConfirmRequest;
-import roomescape.payment.client.dto.response.TossErrorResponse;
-import roomescape.payment.client.dto.response.TossPaymentResponse;
+import roomescape.payment.dto.request.TossPaymentConfirmRequest;
+import roomescape.payment.dto.response.TossErrorResponse;
+import roomescape.payment.dto.response.TossPaymentResponse;
 
 import java.nio.charset.StandardCharsets;
 
@@ -19,7 +19,7 @@ public class TossPaymentClient {
     private final RestClient tossRestClient;
     private final ObjectMapper objectMapper;
 
-    public TossPaymentClient(@Qualifier("tossRestClient")  final RestClient tossRestClient, final ObjectMapper objectMapper) {
+    public TossPaymentClient(@Qualifier("tossRestClient") final RestClient tossRestClient, final ObjectMapper objectMapper) {
         this.tossRestClient = tossRestClient;
         this.objectMapper = objectMapper;
     }

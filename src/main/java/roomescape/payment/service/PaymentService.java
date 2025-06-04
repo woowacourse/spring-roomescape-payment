@@ -3,10 +3,10 @@ package roomescape.payment.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.payment.client.TossPaymentClient;
-import roomescape.payment.client.dto.request.TossPaymentConfirmRequest;
-import roomescape.payment.client.dto.response.TossPaymentResponse;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentStatus;
+import roomescape.payment.dto.request.TossPaymentConfirmRequest;
+import roomescape.payment.dto.response.TossPaymentResponse;
 import roomescape.payment.infrastructure.JpaPaymentRepository;
 import roomescape.reservation.domain.ReservationRepository;
 
@@ -29,7 +29,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public Payment save(final TossPaymentResponse response) {
+    public Payment saveReservation(final TossPaymentResponse response) {
         Payment payment = new Payment(response.orderId(), response.approvedAt().toLocalDateTime(), response.totalAmount(), PaymentStatus.DONE, response.paymentKey());
         return paymentRepository.save(payment);
     }

@@ -37,6 +37,7 @@ CREATE TABLE payment(
     payment_date_time TIMESTAMP NOT NULL,
     amount  BIGINT    NOT NULL,
     status  VARCHAR   NOT NULL,
+    payment_key VARCHAR NOT NULL,
     PRIMARY KEY (id)
 );
 

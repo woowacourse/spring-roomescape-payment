@@ -4,7 +4,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.web.client.MockServerRestClientCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -13,8 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 import roomescape.common.exception.ClientPaymentException;
-import roomescape.payment.client.dto.request.TossPaymentConfirmRequest;
-import roomescape.payment.service.PaymentService;
+import roomescape.payment.dto.request.TossPaymentConfirmRequest;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -30,7 +28,7 @@ public class PaymentPaymentKeyTest {
     static class TestConfig {
 
         @Bean
-        public RestClient tossRestClient(MockServerRestClientCustomizer customizer){
+        public RestClient tossRestClient(MockServerRestClientCustomizer customizer) {
             String secretKey = "CURRENT_SECRET_KEY";
             String encodedAuth = Base64.getEncoder().encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
 
@@ -57,8 +55,8 @@ public class PaymentPaymentKeyTest {
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body("""
-                            { "message": "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다." }
-                        """));
+                                    { "message": "결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다." }
+                                """));
 
         TossPaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(
                 "orderId",

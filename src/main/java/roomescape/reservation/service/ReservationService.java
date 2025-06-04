@@ -5,15 +5,15 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.util.DateTime;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
-import roomescape.payment.client.dto.request.TossPaymentConfirmRequest;
-import roomescape.payment.client.dto.response.TossPaymentResponse;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.dto.request.TossPaymentConfirmRequest;
+import roomescape.payment.dto.response.TossPaymentResponse;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
-import roomescape.reservation.dto.response.MyReservationResponse;
+import roomescape.reservation.dto.response.MyReservationAndWaitingResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.reservationTime.domain.ReservationTimeRepository;
@@ -22,7 +22,6 @@ import roomescape.theme.domain.ThemeRepository;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.domain.WaitingRepository;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -63,7 +62,7 @@ public class ReservationService {
 
         TossPaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(request.orderId(), request.amount(), request.paymentKey());
         TossPaymentResponse paymentResponse = paymentService.confirm(tossPaymentConfirmRequest);
-        Payment savePayment = paymentService.save(paymentResponse);
+        Payment savePayment = paymentService.saveReservation(paymentResponse);
 
         Reservation reservation = Reservation.createWithoutId(dateTime.now(), findMember, request.date(), time, theme, savePayment);
         Reservation saveReservation = reservationRepository.save(reservation);
@@ -158,22 +157,21 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<MyReservationResponse> getMyReservations(final Long id) {
+    public List<MyReservationAndWaitingResponse> getMyReservations(final Long id) {
         List<Reservation> confirmedReservations = reservationRepository.findByMemberId(id);
-        List<MyReservationResponse> confirmedResponses = confirmedReservations.stream()
-                .map(MyReservationResponse::from)
+        List<MyReservationAndWaitingResponse> confirmedResponses = confirmedReservations.stream()
+                .map(MyReservationAndWaitingResponse::fromWaiting)
                 .toList();
 
         List<Waiting> waitingReservations = waitingRepository.findByMemberId(id);
-        List<MyReservationResponse> waitingResponses = waitingReservations.stream()
+        List<MyReservationAndWaitingResponse> waitingResponses = waitingReservations.stream()
                 .map(waiting -> {
                     long rank = calculateWaitingRank(waiting);
-                    return MyReservationResponse.fromWaiting(waiting, rank);
+                    return MyReservationAndWaitingResponse.fromWaiting(waiting, rank);
                 })
                 .toList();
 
         return Stream.concat(confirmedResponses.stream(), waitingResponses.stream())
-                .sorted(Comparator.comparing(MyReservationResponse::date))
                 .toList();
     }
 
