@@ -1,9 +1,11 @@
 package roomescape.reservation.domain.repository;
 
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import roomescape.reservation.domain.PaymentStatus;
 import roomescape.reservation.domain.Reservation;
 
 @Repository
@@ -24,4 +26,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         LocalDate date);
 
     List<Reservation> findByMemberId(Long memberId);
+
+    List<Reservation> findByCreatedAtBeforeAndPaymentStatus(Timestamp createdAtBefore, PaymentStatus paymentStatus);
 }

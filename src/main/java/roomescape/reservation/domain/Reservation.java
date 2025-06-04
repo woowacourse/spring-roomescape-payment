@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Objects;
@@ -35,6 +36,8 @@ public class Reservation {
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
+
+    private final Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
     protected Reservation() {
 
@@ -96,6 +99,10 @@ public class Reservation {
 
     public LocalTime getStartAt() {
         return time.getStartAt();
+    }
+
+    public Timestamp getCreatedAt() {
+        return createdAt;
     }
 
     public void changePaymentStatus(PaymentStatus paymentStatus) {
