@@ -1,12 +1,9 @@
 package roomescape.reservation.service;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import roomescape.auth.service.dto.LoginMember;
-import roomescape.common.exception.InternalServerErrorException;
 import roomescape.payment.infrastructure.TossPaymentClient;
 import roomescape.payment.infrastructure.dto.request.ConfirmPaymentRequest;
-import roomescape.payment.infrastructure.dto.response.ConfirmPaymentResponse;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.service.dto.request.ReservationWithPaymentRequest;
 import roomescape.reservation.service.dto.response.ReservationWithPaymentResponse;
@@ -35,20 +32,17 @@ public class CreateReservationWithPaymentService {
 
     public ReservationWithPaymentResponse create(ReservationWithPaymentRequest request, LoginMember loginMember) {
         ReservationWithPaymentResponse reservationWithPaymentResponse = createReservationService.createWithPendingPayment(request, loginMember);
-        ResponseEntity<ConfirmPaymentResponse> confirmPaymentResponse = tossPaymentClient.postConfirmPayment(
-                ConfirmPaymentRequest.from(request),
-                UUID.randomUUID()
-        );
-
-        if (confirmPaymentResponse.getStatusCode().is2xxSuccessful()) {
+        try {
+            tossPaymentClient.postConfirmPayment(
+                    ConfirmPaymentRequest.from(request),
+                    UUID.randomUUID()
+            );
             paymentService.completePayment(reservationWithPaymentResponse.paymentId());
             return reservationWithPaymentResponse;
+        } catch (Exception e) {
+            deleteReservationService.delete(reservationWithPaymentResponse.id(), loginMember);
+            paymentService.failedPayment(reservationWithPaymentResponse.paymentId());
+            throw e;
         }
-
-        deleteReservationService.delete(reservationWithPaymentResponse.id(), loginMember);
-        paymentService.failedPayment(reservationWithPaymentResponse.paymentId());
-
-        tossPaymentClient.validateResponse(confirmPaymentResponse);
-        throw new InternalServerErrorException();
     }
 }
