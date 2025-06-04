@@ -256,12 +256,12 @@ class ReservationServiceTest {
     }
 
     @Test
-    void 기존_예약_삭제_시_첫번째_대기가_예약된다() {
+    void 기존_예약_취소_시_첫번째_대기가_결제_대기_상태가_된다() {
         //given
-        Member reserved = new Member(1L, "reserved", "reserved", "1234", Role.USER);
+        Member reservedMember = new Member(1L, "reserved", "reserved", "1234", Role.USER);
         LocalDate date = LocalDate.of(3000, 1, 1);
 
-        Reservation reserve = reserved.reserve(date, time, theme, ReservationStatus.RESERVED);
+        Reservation reserve = reservedMember.reserve(date, time, theme, ReservationStatus.RESERVED);
         Reservation wait = member.reserve(date, time, theme, ReservationStatus.WAIT);
 
         when(reservationRepository.findById(any(Long.class)))
@@ -276,9 +276,9 @@ class ReservationServiceTest {
         //then
         Reservation first = member.getReservations().getFirst();
         assertAll(
-                () -> assertThat(first.getStatus()).isEqualTo(ReservationStatus.RESERVED),
+                () -> assertThat(first.getStatus()).isEqualTo(ReservationStatus.PENDING),
                 () -> assertThat(wait.getMember()).isEqualTo(member),
-                () -> assertThat(wait.getStatus()).isEqualTo(ReservationStatus.RESERVED)
+                () -> assertThat(wait.getStatus()).isEqualTo(ReservationStatus.PENDING)
         );
     }
 }
