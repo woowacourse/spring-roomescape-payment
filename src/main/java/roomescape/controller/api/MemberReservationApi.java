@@ -35,6 +35,6 @@ public interface MemberReservationApi {
 
     @Operation(summary = "내 예약 삭제")
     ResponseEntity<Void> remove(
-            @Parameter(required = true) long reservationId
+            @Parameter(example = "1", required = true) long reservationId
     );
 }

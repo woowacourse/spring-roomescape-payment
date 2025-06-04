@@ -18,6 +18,6 @@ public interface AdminThemeApi {
 
     @Operation(summary = "테마 삭제")
     ResponseEntity<Void> remove(
-            @Parameter(required = true) long themeId
+            @Parameter(example = "1", required = true) long themeId
     );
 }

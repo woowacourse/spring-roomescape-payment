@@ -22,10 +22,10 @@ public interface AdminReservationApi {
 
     @Operation(summary = "예약 필터링 조회")
     ResponseEntity<List<ReservationResponse>> getAllByFilter(
-            @Parameter Long memberId,
-            @Parameter Long themeId,
-            @Parameter LocalDate dateFrom,
-            @Parameter LocalDate dateTo
+            @Parameter(example = "1") Long memberId,
+            @Parameter(example = "1") Long themeId,
+            @Parameter(example = "2025-06-03") LocalDate dateFrom,
+            @Parameter(example = "2025-06-07") LocalDate dateTo
     );
 
     @Operation(summary = "대기 예약 조회")
@@ -33,6 +33,6 @@ public interface AdminReservationApi {
 
     @Operation(summary = "대기 예약 거절")
     ResponseEntity<Void> denyPending(
-            @Parameter(required = true) long reservationId
+            @Parameter(example = "1", required = true) long reservationId
     );
 }

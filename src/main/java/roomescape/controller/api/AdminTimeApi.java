@@ -18,6 +18,6 @@ public interface AdminTimeApi {
 
     @Operation(summary = "예약 시간 삭제")
     ResponseEntity<Void> remove(
-            @Parameter(required = true) long timeId
+            @Parameter(example = "1", required = true) long timeId
     );
 }

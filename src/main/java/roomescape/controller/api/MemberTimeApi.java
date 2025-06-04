@@ -18,7 +18,7 @@ public interface MemberTimeApi {
 
     @Operation(summary = "테마, 날짜의 예약 가능 시간 조회")
     ResponseEntity<List<ReservationTimeWithAvailabilityResponse>> getAvailables(
-            @Parameter(required = true) long themeId,
-            @Parameter(required = true) LocalDate date
+            @Parameter(example = "1", required = true) long themeId,
+            @Parameter(example = "2025-06-05", required = true) LocalDate date
     );
 }
