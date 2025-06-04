@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
+import roomescape.common.event.EventPublisher;
 import roomescape.exception.NotFoundException;
 import roomescape.exception.ReservationException;
 import roomescape.member.domain.Member;
@@ -18,6 +19,7 @@ import roomescape.reservation.dto.WaitingReservationResponse;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.WaitingReservationRepository;
 import roomescape.reservation.service.dto.CreateRegistrationCommand;
+import roomescape.reservation.service.dto.WaitingApprovedEvent;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
@@ -28,6 +30,7 @@ import roomescape.theme.repository.ThemeRepository;
 public class WaitingReservationService {
 
     private final WaitingValidator waitingValidator;
+    private final EventPublisher eventPublisher;
     private final WaitingReservationRepository waitingReservationRepository;
 
     private final ReservationRepository reservationRepository;
@@ -61,9 +64,10 @@ public class WaitingReservationService {
 
         waitingValidator.validateCanWaitingApprove(waitingReservation);
         Reservation approvedReservation = waitingReservation.approveToReservation();
+        reservationRepository.save(approvedReservation);
+        eventPublisher.raise(new WaitingApprovedEvent(approvedReservation));
 
         waitingReservationRepository.deleteById(waitingReservation.getId());
-        reservationRepository.save(approvedReservation);
     }
 
     @Transactional

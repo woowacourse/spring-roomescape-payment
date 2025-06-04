@@ -64,4 +64,8 @@ public class Reservation extends BaseTimeEntity {
     public boolean isPast() {
         return registrationSlot.isPast();
     }
+
+    public boolean isOwnedBy(Long memberId) {
+        return this.getMember().getId().equals(memberId);
+    }
 }

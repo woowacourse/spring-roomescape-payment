@@ -39,6 +39,12 @@ public class ReservationService {
         return ReservationResponse.fromReservations(reservations);
     }
 
+    public ReservationResponse getById(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 예약입니다, id: " + reservationId));
+        return new ReservationResponse(reservation);
+    }
+
     @Transactional
     public ReservationResponse registerReservation(CreateRegistrationCommand command) {
         final ReservationTime reservationTime = getReservationTimeById(command.timeId());

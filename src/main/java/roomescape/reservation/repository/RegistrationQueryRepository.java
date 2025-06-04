@@ -13,13 +13,14 @@ public interface RegistrationQueryRepository extends JpaRepository<Reservation, 
     @Query(value = """
         SELECT
             r.id AS id,
-            'BOOKED' AS type,
+            'BOOKED' AS reservationStatus,
             t.name AS themeName,
             r.date AS date,
             rt.start_at AS time,
             0 AS rank,
             p.payment_key AS paymentKey,
-            p.amount AS amount
+            p.amount AS amount,
+            p.payment_status AS paymentStatus
         FROM reservation r
         JOIN theme t ON r.theme_id = t.id
         JOIN reservation_time rt ON r.time_id = rt.id
@@ -30,7 +31,7 @@ public interface RegistrationQueryRepository extends JpaRepository<Reservation, 
 
         SELECT
             w.id AS id,
-            'WAITING' AS type,
+            'WAITING' AS reservationStatus,
             t.name AS themeName,
             w.date AS date,
             rt.start_at AS time,
@@ -46,7 +47,8 @@ public interface RegistrationQueryRepository extends JpaRepository<Reservation, 
                       )
             ) + 1 AS rank,
             '' AS paymentKey,
-            0 AS amount
+            0 AS amount,
+            null AS paymentStatus
         FROM waiting_reservation w
         JOIN theme t ON w.theme_id = t.id
         JOIN reservation_time rt ON w.time_id = rt.id

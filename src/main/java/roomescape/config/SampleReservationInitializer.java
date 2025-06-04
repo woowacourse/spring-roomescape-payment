@@ -37,7 +37,7 @@ public class SampleReservationInitializer implements CommandLineRunner {
     @Transactional
     @Override
     public void run(String... args) {
-        LocalDate baseDate = LocalDate.now().minusDays(3);
+        LocalDate baseDate = LocalDate.now().minusDays(6);
 
         saveReservation(3L, baseDate, 3L, 9L);
         saveReservation(7L, baseDate, 9L, 7L);
@@ -60,11 +60,12 @@ public class SampleReservationInitializer implements CommandLineRunner {
         saveReservation(4L, baseDate.plusDays(5), 7L, 7L);
         saveReservation(10L, baseDate.plusDays(4), 11L, 13L);
 
-        saveReservation(2L, baseDate, 1L, 1L);
-        saveWaiting(1L, baseDate, 1L, 1L);
-        saveWaiting(3L, baseDate, 1L, 1L);
-        saveWaiting(4L, baseDate, 1L, 1L);
-        saveWaiting(5L, baseDate, 1L, 1L);
+        LocalDate plusDate = LocalDate.now().plusDays(1);
+//        saveReservation(2L, plusDate, 1L, 1L);
+        saveWaiting(1L, plusDate, 1L, 1L);
+        saveWaiting(3L, plusDate, 1L, 1L);
+        saveWaiting(4L, plusDate, 1L, 1L);
+        saveWaiting(5L, plusDate, 1L, 1L);
     }
 
     private void saveReservation(Long memberId, LocalDate date, Long timeId, Long themeId) {

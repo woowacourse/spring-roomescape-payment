@@ -36,13 +36,12 @@ public class Payment {
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     private Reservation reservation;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String paymentKey;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true)
     private String orderId;
 
-    @Column(nullable = false)
     private Long amount;
 
     private String method;
@@ -59,9 +58,9 @@ public class Payment {
     public Payment(final Long id,
                    @NonNull final Member member,
                    @NonNull final Reservation reservation,
-                   @NonNull final String paymentKey,
-                   @NonNull final String orderId,
-                   @NonNull final Long amount,
+                   final String paymentKey,
+                   final String orderId,
+                   final Long amount,
                    @NonNull final PaymentStatus status) {
         this.id = id;
         this.member = member;
@@ -76,11 +75,22 @@ public class Payment {
         this.status = status;
     }
 
-    public void updateConfirmed(String method, String cardNumber, String cardApprovedNo, String easyPayProvider, String receiptUrl) {
+    public void updateConfirmed(String method, String cardNumber, String cardApprovedNo, String easyPayProvider,
+                                String receiptUrl) {
         this.method = method;
         this.cardNumber = cardNumber;
         this.cardApprovedNo = cardApprovedNo;
         this.easyPayProvider = easyPayProvider;
         this.receiptUrl = receiptUrl;
+    }
+
+    public boolean canConfirmPaymentStatus() {
+        return this.status == PaymentStatus.NOT_PAID || this.status == PaymentStatus.PENDING;
+    }
+
+    public void assignPaymentInformation(String paymentKey, String orderId, Long amount) {
+        this.paymentKey = paymentKey;
+        this.orderId = orderId;
+        this.amount = amount;
     }
 }

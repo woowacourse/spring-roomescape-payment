@@ -84,6 +84,13 @@ public class TestFixture {
                 .build();
     }
 
+    public static WaitingReservation createWaiting_1() {
+        Member member = createMember("대기회원1", "testWaiting1@email.com", "1234");
+        ReservationTime time = createTimeAt(LocalTime.of(10, 0));
+        Theme theme = createThemeByName("테마1");
+        return createWaitingOf(member, DEFAULT_DATE, time, theme);
+    }
+
     public static WaitingReservation createWaitingOf(Member member, LocalDate date, ReservationTime time, Theme theme) {
         return WaitingReservation.builder()
                 .member(member)

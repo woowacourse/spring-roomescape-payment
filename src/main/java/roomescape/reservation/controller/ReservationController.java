@@ -35,6 +35,11 @@ public class ReservationController {
         return reservationService.findReservationsByCriteria(request);
     }
 
+    @GetMapping("/{reservationId}")
+    public ReservationResponse getReservationById(@PathVariable(value = "reservationId") Long reservationId) {
+        return reservationService.getById(reservationId);
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ReservationResponse saveReservation(

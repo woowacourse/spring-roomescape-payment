@@ -2,9 +2,12 @@ package roomescape;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import java.util.UUID;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentStatus;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.WaitingReservation;
 import roomescape.reservationtime.domain.ReservationTime;
@@ -77,4 +80,19 @@ public class DBHelper {
 
         return theme;
     }
+
+    public Payment insertCompletedPayment(Reservation reservation) {
+        Payment payment = Payment.builder()
+                .status(PaymentStatus.COMPLETED)
+                .reservation(reservation)
+                .member(reservation.getMember())
+                .paymentKey("test-payment-key" + UUID.randomUUID().toString())
+                .orderId("test-orderId" + UUID.randomUUID().toString())
+                .build();
+        em.persist(payment);
+        em.flush();
+
+        return payment;
+    }
+
 }

@@ -1,12 +1,8 @@
 package roomescape.payment.dto;
 
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDate;
 
-public record ReservationPaymentRequest(
-        @NotNull LocalDate date,
-        @NotNull Long themeId,
-        @NotNull Long timeId,
+public record PaymentRequest(
         @NotNull String paymentKey,
         @NotNull String orderId,
         @NotNull Long amount,
