@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import roomescape.member.auth.vo.MemberInfo;
 import roomescape.member.domain.Member;
 import roomescape.member.service.usecase.MemberQueryUseCase;
-import roomescape.payment.controller.dto.PaymentVerificationWebRequest;
 import roomescape.payment.controller.dto.PaymentVerificationWebResponse;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentVerification;

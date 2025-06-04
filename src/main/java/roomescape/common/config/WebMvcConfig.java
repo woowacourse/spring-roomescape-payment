@@ -10,7 +10,6 @@ import roomescape.member.auth.AdminPageInterceptor;
 import roomescape.member.auth.AuthorizationInterceptor;
 import roomescape.member.auth.MemberInfoArgumentResolver;
 import roomescape.member.auth.jwt.JwtTokenExtractor;
-import roomescape.member.service.AuthService;
 
 @RequiredArgsConstructor
 @Configuration
