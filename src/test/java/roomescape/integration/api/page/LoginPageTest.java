@@ -15,7 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 import roomescape.common.RestAssuredTestBase;
-import roomescape.reservation.external.toss.TossPaymentResponse;
+import roomescape.reservation.external.toss.TossPaymentRequest;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @SuppressWarnings("NonAsciiCharacters")
@@ -50,7 +50,7 @@ class LoginPageTest extends RestAssuredTestBase {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(requestBody)
                     .retrieve()
-                    .body(TossPaymentResponse.class);
+                    .body(TossPaymentRequest.class);
             System.out.println("결제 확인 응답: " + response);
         } catch (RestClientResponseException e) {
             System.err.println("요청 실패: " + e.getResponseBodyAsString());
@@ -83,7 +83,7 @@ class LoginPageTest extends RestAssuredTestBase {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(requestBody)
                     .retrieve()
-                    .body(TossPaymentResponse.class);
+                    .body(TossPaymentRequest.class);
             System.out.println("결제 확인 응답: " + response);
         } catch (RestClientResponseException e) {
             System.err.println("요청 실패: " + e.getResponseBodyAsString());

@@ -5,11 +5,4 @@ public record TossPaymentRequest(
         Long amount,
         String orderId
 ) {
-    public static TossPaymentRequest from(TossPaymentResponse tossPaymentResponse) {
-        return new TossPaymentRequest(
-                tossPaymentResponse.paymentKey(),
-                tossPaymentResponse.totalAmount(),
-                tossPaymentResponse.orderId()
-        );
-    }
 }

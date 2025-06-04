@@ -9,7 +9,7 @@ import roomescape.reservation.controller.dto.AdminCreateReservationRequest;
 import roomescape.reservation.controller.dto.CreateReservationRequest;
 import roomescape.reservation.controller.dto.MyReservationResponse;
 import roomescape.reservation.controller.dto.ReservationResponse;
-import roomescape.reservation.external.toss.TossPaymentResponse;
+import roomescape.reservation.external.toss.TossPaymentRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.service.ReservationCommandService;
 import roomescape.reservation.service.ReservationQueryService;
@@ -53,9 +53,9 @@ public class ReservationService {
                 new ReservationDate(request.date())
         );
         Member member = memberQueryService.getById(memberId);
-        TossPaymentResponse tossPaymentResponse = request.toPaymentResponse();
+        TossPaymentRequest tossPaymentRequest = request.toPaymentRequest();
         Reservation reservation = reservationCommandService.createReservationWithPayment(schedule, member,
-                tossPaymentResponse);
+                tossPaymentRequest);
         return ReservationResponse.from(reservation);
     }
 

@@ -4,8 +4,8 @@ import java.time.Clock;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-import roomescape.fake.FakeTossPaymentService;
-import roomescape.reservation.external.toss.TossPaymentService;
+import roomescape.fake.FakeTossApiClient;
+import roomescape.reservation.external.toss.TossApiClient;
 
 @TestConfiguration
 public class GlobalConfig {
@@ -18,7 +18,7 @@ public class GlobalConfig {
 
     @Bean
     @Primary
-    public TossPaymentService testPaymentService() {
-        return new FakeTossPaymentService();
+    public TossApiClient testPaymentService() {
+        return new FakeTossApiClient();
     }
 }
