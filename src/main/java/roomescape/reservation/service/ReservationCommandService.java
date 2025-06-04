@@ -51,7 +51,6 @@ public class ReservationCommandService {
         }
         TossPaymentResponse tossPaymentResponse = tossApiClient.requestPayment(tossPaymentRequest);
         return reservationRepository.save(new Reservation(
-                null,
                 member,
                 schedule,
                 new OrderId(tossPaymentResponse.orderId()),

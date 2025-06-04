@@ -47,14 +47,12 @@ public class Reservation {
     }
 
     public Reservation(
-            final Long id,
             final Member member,
             final ReservationSchedule schedule,
             final OrderId orderId,
             final Amount amount,
             final PaymentKey paymentKey
     ) {
-        this.id = id;
         this.member = Objects.requireNonNull(member);
         this.schedule = Objects.requireNonNull(schedule);
         this.orderId = Objects.requireNonNull(orderId);
