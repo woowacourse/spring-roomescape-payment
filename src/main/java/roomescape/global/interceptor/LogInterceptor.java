@@ -23,6 +23,11 @@ public class LogInterceptor implements HandlerInterceptor {
                                 Exception ex) {
         String requestURI = request.getRequestURI();
         int status = response.getStatus();
-        log.info("[API RESPONSE] " + requestURI + ": " + status);
+
+        if (status >= 200 && status < 300) {
+            log.info("[API RESPONSE] " + requestURI + ": " + status);
+        } else {
+            log.warning("[API RESPONSE] " + requestURI + ": " + status);
+        }
     }
 }
