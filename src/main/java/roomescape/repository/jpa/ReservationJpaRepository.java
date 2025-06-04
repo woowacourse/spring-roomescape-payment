@@ -11,25 +11,10 @@ import roomescape.domain.reservationitem.ReservationItem;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface ReservationJpaRepository extends JpaRepository<Reservation, Long> {
-
-    @Query(value = """
-            SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END
-            FROM Reservation r
-            JOIN ReservationItem ri ON r.reservationItem = ri
-            WHERE ri.date = :date
-            AND ri.time.id = :timeId
-            AND ri.theme.id = :themeId
-            """)
-    boolean existsByDateAndTimeIdAndThemeId(
-            @Param("date") LocalDate date,
-            @Param("timeId") long timeId,
-            @Param("themeId") long themeId
-    );
-
+    
     @Query("""
             SELECT r
             FROM Reservation r
@@ -46,8 +31,6 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
     );
 
     boolean existsByMemberAndReservationItem(Member member, ReservationItem reservationItem);
-
-    Optional<Reservation> findFirstByReservationItemAndReservationStatusOrderByIdAsc(ReservationItem reservationItem, ReservationStatus reservationStatus);
 
     List<Reservation> findByReservationStatusOrderByIdDesc(ReservationStatus reservationStatus);
 

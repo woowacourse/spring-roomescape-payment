@@ -130,7 +130,7 @@ public class ReservationService {
             throw new IllegalArgumentException("[ERROR] 대기 상태의 예약만 거절할 수 있습니다.");
         }
 
-        pendingReservation.changeStatusToDenied();
+        pendingReservation.denyAndChangeNextReservationToNotPaid();
     }
 
     @Transactional
@@ -138,34 +138,7 @@ public class ReservationService {
         Reservation targetReservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 예약입니다."));
 
-        if (targetReservation.getReservationStatus() == ReservationStatus.PENDING) {
-            deleteReservationOnly(targetReservation);
-        } else if (targetReservation.getReservationStatus() == ReservationStatus.ACCEPTED) {
-            handleAcceptedReservationRemoval(targetReservation);
-        }
-    }
-
-    private void handleAcceptedReservationRemoval(Reservation targetReservation) {
-        ReservationItem reservationItem = targetReservation.getReservationItem();
-
-        reservationRepository.findFirstByReservationItemAndReservationStatusOrderByIdAsc(
-                reservationItem, ReservationStatus.PENDING
-        ).ifPresentOrElse(
-                nextReservation -> {
-                    nextReservation.changeStatusToNotPaid();
-                    reservationRepository.save(nextReservation);
-                    deleteReservationOnly(targetReservation);
-                },
-                () -> deleteReservationWithItem(targetReservation, reservationItem)
-        );
-    }
-
-    private void deleteReservationOnly(Reservation reservation) {
-        reservationRepository.deleteById(reservation.getId());
-    }
-
-    private void deleteReservationWithItem(Reservation reservation, ReservationItem reservationItem) {
-        reservationRepository.deleteById(reservation.getId());
-        itemHelper.delete(reservationItem);
+        targetReservation.denyAndChangeNextReservationToNotPaid();
+        reservationRepository.deleteById(targetReservation.getId());
     }
 }

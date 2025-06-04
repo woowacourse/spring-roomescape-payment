@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -57,5 +58,13 @@ public class ReservationItem {
 
     public int calculatePriorityOf(Reservation reservation) {
         return reservations.indexOf(reservation);
+    }
+
+    public Optional<Reservation> getNextReservationOf(Reservation reservation) {
+        int curIndex = reservations.indexOf(reservation);
+        if (curIndex >= reservations.size() - 1) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(reservations.get(curIndex + 1));
     }
 }

@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservationitem.ReservationItem;
 
+import java.util.Optional;
+
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -37,15 +39,16 @@ public class Reservation {
         reservationItem.addReservation(this);
     }
 
-    public void changeStatusToNotPaid() {
-        this.reservationStatus = ReservationStatus.NOT_PAID;
-    }
-
-    public void changeStatusToDenied() {
-        this.reservationStatus = ReservationStatus.DENIED;
-    }
-
     public int priority() {
         return reservationItem.calculatePriorityOf(this);
+    }
+
+    public void denyAndChangeNextReservationToNotPaid() {
+        Optional<Reservation> next = reservationItem.getNextReservationOf(this);
+        if (next.isPresent()) {
+            Reservation nextReservation = next.get();
+            nextReservation.reservationStatus = ReservationStatus.NOT_PAID;
+        }
+        this.reservationStatus = ReservationStatus.DENIED;
     }
 }

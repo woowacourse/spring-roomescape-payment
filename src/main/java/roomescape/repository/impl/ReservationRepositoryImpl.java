@@ -33,17 +33,6 @@ public class ReservationRepositoryImpl implements ReservationRepository {
     public void deleteById(final long id) {
         reservationJpaRepository.deleteById(id);
     }
-
-    @Override
-    public boolean existByDateAndTimeIdAndThemeId(final LocalDate date, final long timeId, final long themeId) {
-        return reservationJpaRepository.existsByDateAndTimeIdAndThemeId(date, timeId, themeId);
-    }
-
-    @Override
-    public Optional<Reservation> findFirstByReservationItemAndReservationStatusOrderByIdAsc(ReservationItem reservationItem,
-                                                                                            ReservationStatus reservationStatus) {
-        return reservationJpaRepository.findFirstByReservationItemAndReservationStatusOrderByIdAsc(reservationItem, reservationStatus);
-    }
     
     @Override
     public boolean existsByMemberAndReservationItem(Member member, ReservationItem reservationItem) {
