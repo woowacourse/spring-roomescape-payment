@@ -32,7 +32,8 @@ public enum ErrorCode {
     EMAIL_FORMAT_INVALID("이메일 형식이어야 합니다."),
 
     // 결제
-    PAYMENT_NOT_APPROVED("결제 승인이 거부되었습니다.");
+    PAYMENT_NOT_APPROVED("결제 승인이 거부되었습니다."),
+    INVALID_PAYMENT_AMOUNT("잘못된 결제 금액입니다.");
 
     private final String message;
 
