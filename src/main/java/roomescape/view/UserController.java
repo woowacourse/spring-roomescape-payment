@@ -12,34 +12,34 @@ public class UserController {
     @GetMapping("/reservation")
     public String reservation(
     ) {
-        return "/reservation";
+        return "reservation";
     }
 
     @Auth(Role.GUEST)
     @GetMapping("/login")
     public String login(
     ) {
-        return "/login";
+        return "login";
     }
 
     @Auth(Role.GUEST)
     @GetMapping("/signup")
     public String signUp(
     ) {
-        return "/signup";
+        return "signup";
     }
 
     @Auth(Role.GUEST)
     @GetMapping("/")
     public String index(
     ) {
-        return "/index";
+        return "index";
     }
 
     @Auth(Role.USER)
     @GetMapping("/reservation-mine")
     public String reservationMine(
     ) {
-        return "/reservation-mine";
+        return "reservation-mine";
     }
 }
