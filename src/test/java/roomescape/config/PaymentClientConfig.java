@@ -2,34 +2,29 @@ package roomescape.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.client.TossErrorResponse;
+import roomescape.client.TossPaymentClient;
 import roomescape.exception.PaymentConfirmClientException;
 import roomescape.exception.PaymentConfirmServerException;
 
 import java.io.IOException;
-import java.time.Duration;
+import java.util.Base64;
 import java.util.Set;
 
-@Configuration
-public class HttpClientConfiguration {
+@TestConfiguration
+public class PaymentClientConfig {
 
-    private static final String BASE_URL = "https://api.tosspayments.com";
+    public static final String BASIC = "Basic ";
     private static final String KEY_MESSAGE = "message";
     private static final String KEY_CODE = "code";
-
-    @Value("${toss.payment.confirm.connect-timeout}")
-    private int CONNECT_TIMEOUT_MILLIS;
-    @Value("${toss.payment.confirm.read-timeout}")
-    private int READ_TIMEOUT_MILLIS;
 
     private static final Set<String> INVISIBLE_CLIENT_ERROR_CODE = Set.of(
             "INVALID_API_KEY",
@@ -39,23 +34,28 @@ public class HttpClientConfiguration {
             "INCORRECT_BASIC_AUTH_FORMAT"
     );
 
-    @Autowired
-    private ObjectMapper objectMapper;
+    @Value("${security.toss.payment.secret-key}")
+    private String secretKey;
 
-    @Bean(value = "tossRestClient")
-    public RestClient tossRestClient(RestClient.Builder builder) {
-        return builder.requestFactory(getRequestFactory())
-                .baseUrl(BASE_URL)
-                .defaultStatusHandler(HttpStatusCode::is4xxClientError, this::handleClientError)
-                .defaultStatusHandler(HttpStatusCode::is5xxServerError, this::handleServerError)
-                .build();
+    private final ObjectMapper objectMapper;
+
+
+    public PaymentClientConfig(final ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
 
-    private HttpComponentsClientHttpRequestFactory getRequestFactory() {
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setConnectTimeout(Duration.ofMillis(CONNECT_TIMEOUT_MILLIS));
-        factory.setReadTimeout(Duration.ofMillis(READ_TIMEOUT_MILLIS));
-        return factory;
+    @Bean
+    public TossPaymentClient tossPaymentClient(RestClient.Builder builder) {
+        return new TossPaymentClient(builder
+                .baseUrl("https://api.tosspayments.com")
+                .defaultHeader(HttpHeaders.AUTHORIZATION, BASIC + encodeSecretKey())
+                .defaultStatusHandler(HttpStatusCode::is4xxClientError, this::handleClientError)
+                .defaultStatusHandler(HttpStatusCode::is5xxServerError, this::handleServerError)
+                .build());
+    }
+
+    private String encodeSecretKey() {
+        return Base64.getEncoder().encodeToString("test-secret".getBytes());
     }
 
     private void handleClientError(HttpRequest request, ClientHttpResponse response) throws IOException {
