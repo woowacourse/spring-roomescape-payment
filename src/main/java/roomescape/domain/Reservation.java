@@ -33,7 +33,7 @@ public class Reservation extends AuditedEntity {
     @JoinColumn(nullable = false)
     private Member member;
     @OneToOne(fetch = FetchType.LAZY)
-    private Payment paymentHistory;
+    private Payment payment;
 
     protected Reservation() {
     }
@@ -46,18 +46,18 @@ public class Reservation extends AuditedEntity {
         this.reservationTime = time;
         this.theme = theme;
         this.member = member;
-        this.paymentHistory = null;
+        this.payment = null;
     }
 
     public Reservation(
-            Long id, LocalDate date, ReservationTime time, Theme theme, Member member, Payment paymentHistory
+            Long id, LocalDate date, ReservationTime time, Theme theme, Member member, Payment payment
     ) {
         this.id = id;
         this.date = date;
         this.reservationTime = time;
         this.theme = theme;
         this.member = member;
-        this.paymentHistory = paymentHistory;
+        this.payment = payment;
     }
 
     public static Reservation createWithoutIdAndPaymentHistory(
@@ -96,6 +96,10 @@ public class Reservation extends AuditedEntity {
 
     public Member getMember() {
         return member;
+    }
+
+    public Payment getPayment() {
+        return payment;
     }
 
     @Override

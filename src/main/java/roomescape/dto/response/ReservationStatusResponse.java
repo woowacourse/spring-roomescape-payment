@@ -5,7 +5,7 @@ import roomescape.domain.Reservation;
 import roomescape.dto.business.WaitingWithRank;
 
 public record ReservationStatusResponse(
-        List<ReservationResponse> reservationResponses,
+        List<MineReservationResponse> reservationResponses,
         List<WaitingWithRankResponse> waitingWithRankResponses
 ) {
 
@@ -13,8 +13,8 @@ public record ReservationStatusResponse(
             List<Reservation> reservations,
             List<WaitingWithRank> waitingWithRanks
     ) {
-        List<ReservationResponse> reservationResponses =
-                reservations.stream().map(ReservationResponse::new).toList();
+        List<MineReservationResponse> reservationResponses =
+                reservations.stream().map(MineReservationResponse::new).toList();
         List<WaitingWithRankResponse> waitingResponses =
                 waitingWithRanks.stream().map(WaitingWithRankResponse::new).toList();
         return new ReservationStatusResponse(reservationResponses, waitingResponses);

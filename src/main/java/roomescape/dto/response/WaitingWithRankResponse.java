@@ -1,25 +1,28 @@
 package roomescape.dto.response;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import roomescape.dto.business.WaitingWithRank;
 
 public record WaitingWithRankResponse(
         Long id,
         LocalDate date,
-        ThemeProfileResponse theme,
-        ReservationTimeResponse time,
-        MemberProfileResponse member,
-        Long rank
+        String themeName,
+        LocalTime startAt,
+        Long rank,
+        String paymentKey,
+        Long amount
 ) {
 
     public WaitingWithRankResponse(WaitingWithRank waitingWithRank) {
         this(
-                waitingWithRank.id(),
-                waitingWithRank.date(),
-                new ThemeProfileResponse(waitingWithRank.theme()),
-                new ReservationTimeResponse(waitingWithRank.time()),
-                new MemberProfileResponse(waitingWithRank.member()),
-                waitingWithRank.rank()
+                waitingWithRank.getId(),
+                waitingWithRank.getDate(),
+                waitingWithRank.getTheme().getName(),
+                waitingWithRank.getTime().getStartAt(),
+                waitingWithRank.getRank(),
+                waitingWithRank.getPaymentKey(),
+                waitingWithRank.getAmount()
         );
     }
 }
