@@ -58,8 +58,8 @@ public class TossPaymentService implements PaymentService {
         return payment;
     }
 
-    public Payment await(final PaymentDataRequest request, final Reservation reservation) {
-        final Payment payment = Payment.await(request.orderId(), request.amount(), reservation);
+    public Payment await(final Reservation reservation) {
+        final Payment payment = Payment.await(null, reservation.getAmount(), reservation);
         return paymentRepository.save(payment);
     }
 

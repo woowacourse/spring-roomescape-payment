@@ -82,9 +82,16 @@ public class ReservationQueryService {
         final List<MyHistoryResponse> responses = new ArrayList<>();
 
         final List<Reservation> reservations = reservationRepository.findByMemberIdWithAssociations(memberId);
-        reservations.forEach(reservation -> responses.add(
-                MyHistoryResponse.ofReservation(reservation,
-                        paymentRepository.findByReservationAndPaymentStatus(reservation, PaymentStatus.SUCCESS))));
+        for (Reservation reservation : reservations) {
+            responses.add(
+                    MyHistoryResponse.ofReservation(reservation,
+                            paymentRepository.findByReservationAndPaymentStatusIn(
+                                    reservation,
+                                    List.of(PaymentStatus.AWAIT, PaymentStatus.SUCCESS)
+                            )
+                    )
+            );
+        }
 
         final List<WaitingWithRank> waitingWithRanks = waitingRepository.findWaitingWithRankByMemberId(memberId);
         waitingWithRanks.forEach(waitingWithRank -> responses.add(

@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentStatus;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Waiting;
 
@@ -24,7 +25,7 @@ public record MyHistoryResponse(
                 reservation.getThemeName(),
                 reservation.getDate(),
                 reservation.getStartAt(),
-                "예약",
+                generateStatus(payment.getPaymentStatus()),
                 payment.getAmount()
         );
     }
@@ -38,5 +39,12 @@ public record MyHistoryResponse(
                 String.format("%d번째 예약대기", count + 1),
                 null
         );
+    }
+
+    private static String generateStatus(final PaymentStatus paymentStatus) {
+        if (paymentStatus == PaymentStatus.AWAIT) {
+            return "결제대기";
+        }
+        return "예약";
     }
 }

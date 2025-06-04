@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.payment.application.dto.PaymentDataRequest;
 import roomescape.reservation.application.ReservationCommandService;
 import roomescape.reservation.application.ReservationQueryService;
 import roomescape.reservation.application.dto.AdminReservationRequest;
@@ -81,10 +80,9 @@ public class AdminReservationController {
 
     @PutMapping("/waitings/accept/{id}")
     public ResponseEntity<Void> acceptReservation(
-            @PathVariable("id") final Long id,
-            final PaymentDataRequest request
+            @PathVariable("id") final Long id
     ) {
-        reservationCommandService.acceptReservation(id, request);
+        reservationCommandService.acceptReservation(id);
         return ResponseEntity.ok().build();
     }
 }

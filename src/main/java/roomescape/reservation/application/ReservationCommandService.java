@@ -109,14 +109,14 @@ public class ReservationCommandService {
         reservationRepository.deleteById(id);
     }
 
-    public void acceptReservation(final Long id, final PaymentDataRequest request) {
+    public void acceptReservation(final Long id) {
         final Waiting waiting = getWaitingWithAssociations(id);
         validateIsBooked(waiting);
         waiting.accept();
         final Reservation reservation = new Reservation(waiting.getDate(), waiting.getTime(), waiting.getTheme(),
                 waiting.getMember());
         reservationRepository.save(reservation);
-        paymentService.await(request, reservation);
+        paymentService.await(reservation);
     }
 
     private void validatePastDateTime(final LocalDate date, final LocalTime time) {

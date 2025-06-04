@@ -23,6 +23,7 @@ import roomescape.payment.application.dto.PaymentDataRequest;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentStatus;
 import roomescape.reservation.domain.Reservation;
+import roomescape.theme.domain.Theme;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -127,15 +128,11 @@ class TossPaymentServiceTest {
     @Test
     void 결제_요청을_대기한다() {
         // given
-        final PaymentDataRequest paymentDataRequest = new PaymentDataRequest(
-                "dummy",
-                "dummy",
-                BigDecimal.valueOf(1000)
-        );
-        final Reservation reservation = new Reservation(1L, null, null, null, null);
+        final Theme theme = new Theme(1L, "dummy", "dummy", "dummy", BigDecimal.valueOf(10000));
+        final Reservation reservation = new Reservation(1L, null, null, theme, null);
 
         // when
-        final Payment payment = paymentService.await(paymentDataRequest, reservation);
+        final Payment payment = paymentService.await(reservation);
 
         // then
         assertThat(payment.getPaymentStatus()).isEqualTo(PaymentStatus.AWAIT);

@@ -15,6 +15,6 @@ public interface PaymentService {
             Reservation reservation
     );
 
-    Payment await(PaymentDataRequest request, Reservation reservation);
+    Payment await(Reservation reservation);
 
 }
