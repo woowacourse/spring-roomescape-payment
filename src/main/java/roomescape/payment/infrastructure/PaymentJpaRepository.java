@@ -9,8 +9,9 @@ import roomescape.payment.domain.Payment;
 public interface PaymentJpaRepository extends JpaRepository<Payment, Long> {
     @Query("""
                 SELECT p FROM Payment p
-                JOIN p.reservation r
-                WHERE r.member.id = :memberId
+                JOIN FETCH p.reservation r
+                JOIN FETCH r.member m
+                WHERE m.id = :memberId
             """)
     List<Payment> findAllByMemberId(@Param("memberId") Long memberId);
 }
