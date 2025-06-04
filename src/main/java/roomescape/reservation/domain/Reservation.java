@@ -1,14 +1,15 @@
 package roomescape.reservation.domain;
 
 import jakarta.persistence.*;
+import roomescape.member.domain.Member;
+import roomescape.payment.domain.Payment;
+import roomescape.reservationTime.domain.ReservationTime;
+import roomescape.theme.domain.Theme;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
-import roomescape.member.domain.Member;
-import roomescape.reservationTime.domain.ReservationTime;
-import roomescape.theme.domain.Theme;
 
 @Entity
 public class Reservation {
@@ -28,24 +29,26 @@ public class Reservation {
     @ManyToOne(fetch = FetchType.LAZY)
     private Theme theme;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    private Payment payment;
+
     protected Reservation() {
     }
 
-    private Reservation(final Member member, final LocalDate date,
-                        final ReservationTime time, final Theme theme
-    ) {
+    public Reservation(final Member member, final LocalDate date, final ReservationTime time, final Theme theme, final Payment payment) {
         this.member = member;
         this.date = date;
         this.time = time;
         this.theme = theme;
+        this.payment = payment;
     }
 
     public static Reservation createWithoutId(final LocalDateTime now, final Member member,
                                               final LocalDate reservationDate,
-                                              final ReservationTime time, final Theme theme
+                                              final ReservationTime time, final Theme theme, final Payment payment
     ) {
         validateReservationDateTime(now, reservationDate, time);
-        return new Reservation(member, reservationDate, time, theme);
+        return new Reservation(member, reservationDate, time, theme, payment);
     }
 
     private static void validateReservationDateTime(final LocalDateTime now, final LocalDate reservationDate,
@@ -63,6 +66,24 @@ public class Reservation {
 
     public boolean isSameTime(final ReservationTime time) {
         return this.time.isSameTime(time);
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        if (!(object instanceof Reservation that)) {
+            return false;
+        }
+
+        if (getId() == null && that.getId() == null) {
+            return false;
+        }
+
+        return Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId());
     }
 
     public Long getId() {
@@ -105,21 +126,7 @@ public class Reservation {
         return theme.getThumbnail();
     }
 
-    @Override
-    public boolean equals(final Object object) {
-        if (!(object instanceof Reservation that)) {
-            return false;
-        }
-
-        if (getId() == null && that.getId() == null) {
-            return false;
-        }
-
-        return Objects.equals(getId(), that.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(getId());
+    public Payment getPayment() {
+        return payment;
     }
 }

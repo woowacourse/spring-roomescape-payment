@@ -1,12 +1,15 @@
 package roomescape.payment.domain;
 
-import jakarta.persistence.*;
-import roomescape.reservation.domain.Reservation;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 import java.time.LocalDateTime;
 
 @Entity
 public class Payment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,15 +22,11 @@ public class Payment {
 
     private PaymentStatus status;
 
-    @OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    private Reservation reservation;
-
-    public Payment(final String orderId, final LocalDateTime paymentDateTime, final Long amount, final PaymentStatus status, Reservation reservation) {
+    public Payment(final String orderId, final LocalDateTime paymentDateTime, final Long amount, final PaymentStatus status) {
         this.orderId = orderId;
         this.paymentDateTime = paymentDateTime;
         this.amount = amount;
         this.status = status;
-        this.reservation = reservation;
     }
 
     public Payment() {
@@ -47,10 +46,6 @@ public class Payment {
 
     public Long getAmount() {
         return amount;
-    }
-
-    public Reservation getReservation() {
-        return reservation;
     }
 
     public PaymentStatus getStatus() {

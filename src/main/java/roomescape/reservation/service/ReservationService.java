@@ -7,6 +7,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.payment.client.dto.request.TossPaymentConfirmRequest;
 import roomescape.payment.client.dto.response.TossPaymentResponse;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
@@ -52,22 +53,21 @@ public class ReservationService {
         Theme theme = findTheme(request.themeId());
         Member findMember = findMember(memberId);
 
-        Reservation reservation = Reservation.createWithoutId(dateTime.now(), findMember, request.date(), time, theme);
-
         if (reservationRepository.existsByDateAndTimeStartAtAndThemeId(
-                reservation.getDate(),
-                reservation.getReservationTime(),
-                reservation.getThemeId()
+                request.date(),
+                time.getStartAt(),
+                theme.getId()
         )) {
             throw new IllegalArgumentException("이미 예약이 존재합니다.");
         }
 
         TossPaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(request.orderId(), request.amount(), request.paymentKey());
-
-        Reservation save = reservationRepository.save(reservation);
         TossPaymentResponse paymentResponse = paymentService.confirm(tossPaymentConfirmRequest);
-        paymentService.save(paymentResponse, save.getId());
-        return ReservationResponse.from(save);
+        Payment savePayment = paymentService.save(paymentResponse);
+
+        Reservation reservation = Reservation.createWithoutId(dateTime.now(), findMember, request.date(), time, theme, savePayment);
+        Reservation saveReservation = reservationRepository.save(reservation);
+        return ReservationResponse.from(saveReservation);
     }
 
     @Transactional
@@ -76,32 +76,31 @@ public class ReservationService {
         Theme theme = findTheme(request.themeId());
         Member findMember = findMember(memberId);
 
-        Reservation reservation = Reservation.createWithoutId(dateTime.now(), findMember, request.date(), time, theme);
-
         if (reservationRepository.existsByDateAndTimeStartAtAndThemeId(
-                reservation.getDate(),
-                reservation.getReservationTime(),
-                reservation.getThemeId()
+                request.date(),
+                time.getStartAt(),
+                theme.getId()
         )) {
             throw new IllegalArgumentException("이미 예약이 존재합니다.");
         }
 
-        Reservation save = reservationRepository.save(reservation);
+        Reservation reservation = Reservation.createWithoutId(dateTime.now(), findMember, request.date(), time, theme, null);
+        Reservation saveReservation = reservationRepository.save(reservation);
 
-        return ReservationResponse.from(save);
+        return ReservationResponse.from(saveReservation);
     }
 
-    private ReservationTime findReservationTime(final long timeId){
+    private ReservationTime findReservationTime(final long timeId) {
         return reservationTimeRepository.findById(timeId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 시간입니다."));
     }
 
-    private Theme findTheme(final long themeId){
+    private Theme findTheme(final long themeId) {
         return themeRepository.findById(themeId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 테마입니다."));
     }
 
-    private Member findMember(final long memberId){
+    private Member findMember(final long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
     }
@@ -150,7 +149,8 @@ public class ReservationService {
                 firstWaiting.getMember(),
                 firstWaiting.getDate(),
                 firstWaiting.getTime(),
-                firstWaiting.getTheme()
+                firstWaiting.getTheme(),
+                null
         );
         reservationRepository.save(newReservation);
 

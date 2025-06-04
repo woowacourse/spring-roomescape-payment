@@ -8,7 +8,6 @@ import roomescape.payment.client.dto.response.TossPaymentResponse;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentStatus;
 import roomescape.payment.infrastructure.JpaPaymentRepository;
-import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 
 @Service
@@ -30,11 +29,8 @@ public class PaymentService {
     }
 
     @Transactional
-    public Payment save(final TossPaymentResponse response, final long reservationId) {
-        Reservation findReservation = reservationRepository.findById(reservationId)
-                .orElseThrow();
-
-        Payment payment = new Payment(response.orderId(), response.approvedAt().toLocalDateTime(), response.totalAmount(), PaymentStatus.DONE, findReservation);
+    public Payment save(final TossPaymentResponse response) {
+        Payment payment = new Payment(response.orderId(), response.approvedAt().toLocalDateTime(), response.totalAmount(), PaymentStatus.DONE);
         return paymentRepository.save(payment);
     }
 }
