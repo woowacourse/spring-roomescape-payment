@@ -120,9 +120,14 @@ public class GlobalExceptionHandler {
     }
 
     private LogEntry buildLogEntry(Throwable ex) {
-        StackTraceElement origin = ex.getStackTrace()[0];
-        String className = origin.getClassName();
-        String methodName = origin.getMethodName();
+        StackTraceElement[] stackTrace = ex.getStackTrace();
+        if (stackTrace.length == 0) {
+            String className = "UnknownClass";
+            String methodName = "UnknownMethod";
+            return new ErrorLog(className, methodName, ex.getMessage(), ex);
+        }
+        String className = stackTrace[0].getClassName();
+        String methodName = stackTrace[0].getMethodName();
         return new ErrorLog(className, methodName, ex.getMessage(), ex);
     }
 }
