@@ -61,7 +61,7 @@ class DeleteWaitingServiceTest extends AbstractServiceIntegrationTest {
         Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
         ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
         reservationRepository.save(new Reservation(member, now.toLocalDate(), time, theme));
-        Reservation reservation = reservationRepository.findById(1L).orElseThrow();
+        Reservation reservation = reservationRepository.findByIdExcludingCanceled(1L).orElseThrow();
         Waiting waiting = new Waiting(member, reservation.getDate(), reservation.getTime(), reservation.getTheme());
         Long waitingId = waitingRepository.save(waiting).getId();
 
@@ -82,7 +82,7 @@ class DeleteWaitingServiceTest extends AbstractServiceIntegrationTest {
         Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
         ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
         reservationRepository.save(new Reservation(member, now.toLocalDate(), time, theme));
-        Reservation reservation = reservationRepository.findById(1L).orElseThrow();
+        Reservation reservation = reservationRepository.findByIdExcludingCanceled(1L).orElseThrow();
         Waiting waiting = new Waiting(member, reservation.getDate(), reservation.getTime(), reservation.getTheme());
         Long waitingId = waitingRepository.save(waiting).getId();
 
@@ -101,7 +101,7 @@ class DeleteWaitingServiceTest extends AbstractServiceIntegrationTest {
         Theme theme = themeRepository.save(new Theme("테마", "설명", "이미지"));
         ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
         reservationRepository.save(new Reservation(member, now.toLocalDate(), time, theme));
-        Reservation reservation = reservationRepository.findById(1L).orElseThrow();
+        Reservation reservation = reservationRepository.findByIdExcludingCanceled(1L).orElseThrow();
         Waiting waiting = new Waiting(member, reservation.getDate(), reservation.getTime(), reservation.getTheme());
         Long waitingId = waitingRepository.save(waiting).getId();
         long invalidMemberId = 999L;

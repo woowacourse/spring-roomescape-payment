@@ -11,14 +11,13 @@ import roomescape.domain.reservation.Reservation;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    @Override
     @Query("""
             SELECT r
             FROM Reservation r
             WHERE r.id = :reservationId
               AND r.status != 'CANCEL'
             """)
-    Optional<Reservation> findById(@Param("reservationId") Long reservationId);
+    Optional<Reservation> findByIdExcludingCanceled(@Param("reservationId") Long reservationId);
 
     @Query("""
             SELECT EXISTS (

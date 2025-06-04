@@ -104,7 +104,7 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
         Long id = createReservationService.reserve(command);
 
         // then
-        assertThat(reservationRepository.findById(id)).isPresent();
+        assertThat(reservationRepository.findByIdExcludingCanceled(id)).isPresent();
     }
 
     @Test
@@ -212,7 +212,7 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
         Long id = createReservationService.reserve(command);
 
         // then
-        assertThat(reservationRepository.findById(id)).isPresent();
+        assertThat(reservationRepository.findByIdExcludingCanceled(id)).isPresent();
     }
 
     @Test

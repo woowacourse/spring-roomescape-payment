@@ -103,7 +103,7 @@ class DeleteReservationEventListenerTest {
         deleteReservationService.cancelById(reservation.getId());
 
         // then
-        assertThat(reservationRepository.findById(reservation.getId()))
+        assertThat(reservationRepository.findByIdExcludingCanceled(reservation.getId()))
                 .isNotPresent();
     }
 }
