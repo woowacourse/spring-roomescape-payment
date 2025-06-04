@@ -13,8 +13,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -24,6 +24,7 @@ import org.springframework.web.client.RestClient;
 import roomescape.auth.dto.LoginMember;
 import roomescape.common.exception.custom.AlreadyInUseException;
 import roomescape.common.exception.custom.EntityNotFoundException;
+import roomescape.config.PaymentTestConfig;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
@@ -32,7 +33,9 @@ import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.response.BookedReservationTimeResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
+import roomescape.reservation.payment.domain.PaymentMethod;
 import roomescape.reservation.payment.dto.request.PaymentRequest;
+import roomescape.reservation.payment.gateway.PaymentGatewayResolver;
 import roomescape.reservation.payment.repository.PaymentRepository;
 import roomescape.reservation.payment.service.PaymentService;
 import roomescape.reservation.repository.ReservationRepository;
@@ -46,35 +49,41 @@ import roomescape.theme.repository.ThemeRepository;
 
 @ActiveProfiles("test")
 @DataJpaTest
+@Import(PaymentTestConfig.class)
 class ReservationServiceTest {
 
-    private final LocalDateTime now = LocalDateTime.now();
+    private static final LocalDateTime NOW = LocalDateTime.now();
 
     private final RestClient.Builder testBuilder = RestClient.builder()
             .baseUrl("https://api.tosspayments.com");
+    private final MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
+    private ReservationService reservationService;
 
-    private MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
     @Autowired
     private ReservationRepository reservationRepository;
+
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
+
     @Autowired
     private ThemeRepository themeRepository;
+
     @Autowired
     private MemberRepository memberRepository;
+
     @Autowired
     private WaitingRepository waitingRepository;
+
     @Autowired
     private PaymentRepository paymentRepository;
-    @Value("${toss.payment.secret-key}")
-    private String secretKey;
 
-    private PaymentService paymentService;
-    private ReservationService reservationService;
+    @Autowired
+    private PaymentGatewayResolver paymentGatewayResolver;
 
     @BeforeEach
     void setUp() {
-        paymentService = new PaymentService(paymentRepository, reservationRepository, testBuilder, secretKey);
+        PaymentService paymentService = new PaymentService(paymentRepository, reservationRepository,
+                paymentGatewayResolver);
         reservationService = new ReservationService(
                 paymentService, reservationRepository, reservationTimeRepository,
                 themeRepository, memberRepository, waitingRepository);
@@ -158,7 +167,7 @@ class ReservationServiceTest {
 
         ReservationCreateRequest requestDto =
                 new ReservationCreateRequest(date, timeId, themeId, LoginMember.of(savedMember));
-        PaymentRequest paymentRequest = new PaymentRequest("paymentKey", "orderId", 1_000L);
+        PaymentRequest paymentRequest = new PaymentRequest("paymentKey", "orderId", 1_000L, PaymentMethod.TOSS);
 
         server.expect(MockRestRequestMatchers.requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
@@ -235,8 +244,8 @@ class ReservationServiceTest {
         Member member = new Member("포스티", "test@test.com", "12341234", Role.MEMBER);
         Member savedMember = memberRepository.save(member);
 
-        LocalDate date = now.toLocalDate();
-        LocalTime pastTime = now.toLocalTime().minusMinutes(1);
+        LocalDate date = NOW.toLocalDate();
+        LocalTime pastTime = NOW.toLocalTime().minusMinutes(1);
 
         ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(pastTime));
         Long timeId = savedTime.getId();
@@ -270,7 +279,7 @@ class ReservationServiceTest {
     @DisplayName("존재하지 않는 테마 ID로 저장하면 예외를 반환한다.")
     @Test
     void notExistThemeId() {
-        LocalDate date = now.toLocalDate().plusDays(1);
+        LocalDate date = NOW.toLocalDate().plusDays(1);
 
         LocalTime time = LocalTime.of(8, 0);
         ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(time));
@@ -349,13 +358,16 @@ class ReservationServiceTest {
         LocalDate date = nextDay();
         LocalTime time1 = LocalTime.of(8, 0);
         LocalTime time2 = LocalTime.of(9, 0);
-        ReservationTime reservationTime1 = reservationTimeRepository.save(new ReservationTime(time1));
-        ReservationTime reservationTime2 = reservationTimeRepository.save(new ReservationTime(time2));
+        ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(time1));
+        reservationTimeRepository.save(new ReservationTime(time2));
+
         Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
         Long themeId = savedTheme.getId();
+
         Member member = new Member("포스티", "test@test.com", "12341234", Role.MEMBER);
         Member savedMember = memberRepository.save(member);
-        reservationRepository.save(new Reservation(savedMember, date, reservationTime1, savedTheme));
+
+        reservationRepository.save(new Reservation(savedMember, date, savedTime, savedTheme));
 
         // when
         List<BookedReservationTimeResponse> responses = reservationService.getSortedAvailableTimes(date, themeId);

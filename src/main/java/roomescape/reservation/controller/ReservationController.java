@@ -22,6 +22,7 @@ import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.BookedReservationTimeResponse;
 import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
+import roomescape.reservation.payment.domain.PaymentMethod;
 import roomescape.reservation.payment.dto.request.PaymentRequest;
 import roomescape.reservation.payment.service.PaymentService;
 import roomescape.reservation.service.ReservationService;
@@ -65,7 +66,8 @@ public class ReservationController {
                         new ReservationRequest(request.date(), request.timeId(), request.themeId()),
                         loginMember
                 );
-        PaymentRequest paymentRequest = new PaymentRequest(request.paymentKey(), request.orderId(), request.amount());
+        PaymentRequest paymentRequest = new PaymentRequest(request.paymentKey(), request.orderId(),
+                request.amount(), PaymentMethod.TOSS);
         ReservationResponse response = reservationService.createWithPayment(createRequest, paymentRequest);
         paymentService.create(response.id(), paymentRequest);
 

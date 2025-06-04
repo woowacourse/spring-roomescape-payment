@@ -1,54 +1,29 @@
 package roomescape.reservation.payment.service;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClient;
 import roomescape.common.exception.custom.EntityNotFoundException;
-import roomescape.common.exception.custom.PaymentClientException;
-import roomescape.common.exception.custom.PaymentServerException;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationId;
 import roomescape.reservation.payment.domain.Payment;
 import roomescape.reservation.payment.dto.request.PaymentRequest;
-import roomescape.reservation.payment.dto.response.TossPaymentErrorResponse;
-import roomescape.reservation.payment.error.InternalServerErrorCode;
+import roomescape.reservation.payment.gateway.PaymentGateway;
+import roomescape.reservation.payment.gateway.PaymentGatewayResolver;
 import roomescape.reservation.payment.repository.PaymentRepository;
 import roomescape.reservation.repository.ReservationRepository;
 
 @Service
 public class PaymentService {
 
-    private static final String PAYMENTS_CONFIRM_ENDPOINT = "https://api.tosspayments.com/v1/payments/confirm";
-
     private final PaymentRepository paymentRepository;
     private final ReservationRepository reservationRepository;
-    private final RestClient restClient;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private final String secretKey;
+    private final PaymentGatewayResolver resolver;
 
-    public PaymentService(
-            final PaymentRepository paymentRepository,
-            final ReservationRepository reservationRepository,
-            final RestClient.Builder builder,
-            @Value("${toss.payment.secret-key}") final String secretKey
-    ) {
+    public PaymentService(PaymentRepository paymentRepository, ReservationRepository reservationRepository,
+                          PaymentGatewayResolver resolver) {
         this.paymentRepository = paymentRepository;
         this.reservationRepository = reservationRepository;
-        this.restClient = builder.baseUrl(PAYMENTS_CONFIRM_ENDPOINT)
-                .build();
-        this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        this.secretKey = secretKey;
+        this.resolver = resolver;
     }
 
     @Transactional
@@ -64,31 +39,8 @@ public class PaymentService {
         ));
     }
 
-    public void confirm(final PaymentRequest request) {
-        String secretKeyWithColon = secretKey + ":";
-        byte[] secretKeyBytes = secretKeyWithColon.getBytes(StandardCharsets.UTF_8);
-
-        restClient.post()
-                .uri(PAYMENTS_CONFIRM_ENDPOINT)
-                .header(HttpHeaders.AUTHORIZATION, "Basic " + Base64.getEncoder().encodeToString(secretKeyBytes))
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(request)
-                .retrieve()
-                .onStatus(HttpStatusCode::isError, (req, res) -> handleError(res))
-                .toBodilessEntity();
-    }
-
-    private void handleError(final ClientHttpResponse res) {
-        try (InputStream is = res.getBody()) {
-            TossPaymentErrorResponse errorResponse = objectMapper.readValue(is, TossPaymentErrorResponse.class);
-
-            String errorCode = errorResponse.code();
-            if (InternalServerErrorCode.contains(errorCode)) {
-                throw new PaymentServerException(errorResponse.message());
-            }
-            throw new PaymentClientException(errorResponse.message());
-        } catch (IOException e) {
-            throw new RuntimeException("결제 에러 응답 파싱 실패", e);
-        }
+    public void confirm(final PaymentRequest paymentRequest) {
+        PaymentGateway paymentGateway = resolver.resolve(paymentRequest.method());
+        paymentGateway.confirm(paymentRequest);
     }
 }
