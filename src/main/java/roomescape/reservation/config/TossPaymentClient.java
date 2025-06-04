@@ -2,8 +2,12 @@ package roomescape.reservation.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import roomescape.exception.PaymentClientException;
+import roomescape.exception.RoomescapeException;
 import roomescape.reservation.dto.PaymentApprovalRequest;
 
 @Component
@@ -19,6 +23,10 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
+    @Retryable(
+            retryFor = {PaymentClientException.class, RoomescapeException.class},
+            backoff = @Backoff
+    )
     public ResponseEntity<Void> approvePayment(PaymentApprovalRequest request) {
         return restClient.post().uri(approvalUrl)
                 .body(request)
