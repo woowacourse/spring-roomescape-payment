@@ -6,7 +6,9 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.payment.application.dto.response.TossPaymentsResponse;
 import roomescape.payment.model.PaymentClient;
+import roomescape.payment.model.service.PaymentOperation;
 import roomescape.reservation.application.dto.request.CreateReservationServiceRequest;
 import roomescape.reservation.application.dto.response.ReservationServiceResponse;
 import roomescape.reservation.application.dto.response.UserReservationServiceResponse;
@@ -25,23 +27,25 @@ public class UserReservationService {
     private final ReservationRepository reservationRepository;
     private final ReservationWaitingRepository reservationWaitingRepository;
     private final ReservationOperation reservationOperation;
+    private final PaymentOperation paymentOperation;
     private final PaymentClient paymentClient;
 
     @Transactional
     public ReservationServiceResponse create(CreateReservationServiceRequest request) {
-        paymentClient.requestConfirm(request.toPaymentInfo());
         Reservation savedReservation = reservationOperation.reserve(request.toSchedule(), request.memberId());
+        TossPaymentsResponse tossPaymentsResponse = paymentClient.requestConfirm(request.toPaymentInfo());
+        paymentOperation.savePayment(tossPaymentsResponse.toEntity(savedReservation.getId()));
         return ReservationServiceResponse.from(savedReservation);
     }
 
     public List<UserReservationServiceResponse> getAllByMemberId(Long memberId) {
         List<Reservation> reservations = reservationRepository.findAllByMemberId(memberId);
-        List<ReservationWaitingWithRank> reservationWaitingWithRanks = reservationWaitingRepository.findAllWithRankByMemberId(
+        List<ReservationWaitingWithRank> waitingWithRanks = reservationWaitingRepository.findAllWithRankByMemberId(
                 memberId);
 
         List<UserReservationServiceResponse> responses = createUserReservationServiceResponse(
                 reservations,
-                reservationWaitingWithRanks
+                waitingWithRanks
         );
 
         return sortByDateTime(responses);

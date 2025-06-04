@@ -12,6 +12,7 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
 import roomescape.global.exception.ClientFailException.PaymentClientFailException;
+import roomescape.payment.application.dto.response.TossPaymentsResponse;
 import roomescape.payment.model.PaymentClient;
 import roomescape.reservation.model.vo.PaymentInfo;
 
@@ -24,15 +25,16 @@ public class TossPaymentRestClient implements PaymentClient {
     private final ObjectMapper objectMapper;
 
     @Override
-    public void requestConfirm(final PaymentInfo paymentInfo) {
-        restClient.post()
+    public TossPaymentsResponse requestConfirm(final PaymentInfo paymentInfo) {
+        return restClient.post()
                 .uri(confirmUrl)
                 .contentType(APPLICATION_JSON)
                 .body(paymentInfo)
                 .retrieve()
                 .onStatus(HttpStatusCode::is4xxClientError, handleClientError())
                 .onStatus(HttpStatusCode::is5xxServerError, handleServerError())
-                .toBodilessEntity();
+                .toEntity(TossPaymentsResponse.class)
+                .getBody();
     }
 
     private ErrorHandler handleClientError() {
