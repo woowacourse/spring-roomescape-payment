@@ -114,9 +114,9 @@ public class ReservationService {
         Theme theme = getThemeById(reservationCreationContent.themeId());
         ReservationTime time = getReservationTimeById(reservationCreationContent.timeId());
 
+        roomescapeLockService.doPersistenceLock();
         validateDuplicateReservation(theme, reservationCreationContent.date(), time);
 
-        roomescapeLockService.doPersistenceLock();
         Reservation validateReservation = Reservation.createWithoutIdAndPaymentHistory(
                 reservationCreationContent.date(), time,
                 theme, member);
