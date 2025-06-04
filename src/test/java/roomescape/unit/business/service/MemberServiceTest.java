@@ -1,4 +1,4 @@
-package roomescape.business.service;
+package roomescape.unit.business.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.business.model.entity.Member;
+import roomescape.business.service.MemberService;
 import roomescape.exception.business.InvalidCreateArgumentException;
 import roomescape.exception.business.NotFoundException;
 import roomescape.infrastructure.MemberRepository;

@@ -1,4 +1,4 @@
-package roomescape.auth.jwt;
+package roomescape.unit.auth.jwt;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import roomescape.auth.AuthToken;
 import roomescape.auth.LoginInfo;
+import roomescape.auth.jwt.JJWTJwtUtil;
 import roomescape.business.model.entity.Member;
 import roomescape.business.model.vo.UserRole;
 import roomescape.exception.auth.AuthenticationException;

@@ -1,4 +1,4 @@
-package roomescape.business.service;
+package roomescape.unit.business.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import roomescape.auth.AuthToken;
 import roomescape.auth.jwt.JwtUtil;
 import roomescape.business.model.entity.Member;
+import roomescape.business.service.AuthService;
 import roomescape.exception.auth.AuthenticationException;
 import roomescape.infrastructure.MemberRepository;
 import roomescape.presentation.dto.request.LoginRequest;

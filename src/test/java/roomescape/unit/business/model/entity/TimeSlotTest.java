@@ -1,4 +1,4 @@
-package roomescape.business.model.entity;
+package roomescape.unit.business.model.entity;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import roomescape.business.model.entity.TimeSlot;
 import roomescape.exception.business.InvalidCreateArgumentException;
 
 class TimeSlotTest {

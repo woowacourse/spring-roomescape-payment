@@ -1,4 +1,4 @@
-package roomescape.business.service;
+package roomescape.unit.business.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.business.model.entity.TimeSlot;
 import roomescape.business.model.vo.Id;
+import roomescape.business.service.ReservationTimeService;
 import roomescape.exception.business.DuplicatedException;
 import roomescape.exception.business.InvalidCreateArgumentException;
 import roomescape.exception.business.NotFoundException;

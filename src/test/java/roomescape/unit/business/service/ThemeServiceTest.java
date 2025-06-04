@@ -1,4 +1,4 @@
-package roomescape.business.service;
+package roomescape.unit.business.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
 import roomescape.business.model.entity.Theme;
 import roomescape.business.model.vo.Id;
+import roomescape.business.service.ThemeService;
 import roomescape.exception.business.NotFoundException;
 import roomescape.exception.business.RelatedEntityExistException;
 import roomescape.infrastructure.ReservationRepository;

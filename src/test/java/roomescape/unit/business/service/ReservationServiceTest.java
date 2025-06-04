@@ -1,4 +1,4 @@
-package roomescape.business.service;
+package roomescape.unit.business.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -28,6 +28,8 @@ import roomescape.business.model.entity.Reservation;
 import roomescape.business.model.entity.Theme;
 import roomescape.business.model.entity.TimeSlot;
 import roomescape.business.model.vo.Id;
+import roomescape.business.service.ReservationService;
+import roomescape.business.service.WaitingService;
 import roomescape.exception.business.DuplicatedException;
 import roomescape.exception.business.NotFoundException;
 import roomescape.infrastructure.MemberRepository;

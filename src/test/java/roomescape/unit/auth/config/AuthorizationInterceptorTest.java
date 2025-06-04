@@ -1,4 +1,4 @@
-package roomescape.auth.config;
+package roomescape.unit.auth.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -17,6 +17,7 @@ import org.springframework.web.method.HandlerMethod;
 import roomescape.auth.AuthToken;
 import roomescape.auth.LoginInfo;
 import roomescape.auth.Role;
+import roomescape.auth.config.AuthorizationInterceptor;
 import roomescape.auth.jwt.JwtUtil;
 import roomescape.business.model.vo.UserRole;
 import roomescape.exception.auth.AuthenticationException;

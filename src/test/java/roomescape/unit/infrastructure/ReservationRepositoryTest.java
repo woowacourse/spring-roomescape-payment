@@ -1,4 +1,4 @@
-package roomescape.infrastructure;
+package roomescape.unit.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -18,6 +18,10 @@ import roomescape.business.model.entity.Reservation;
 import roomescape.business.model.entity.Theme;
 import roomescape.business.model.entity.TimeSlot;
 import roomescape.business.model.vo.Id;
+import roomescape.infrastructure.MemberRepository;
+import roomescape.infrastructure.ReservationRepository;
+import roomescape.infrastructure.ReservationTimeRepository;
+import roomescape.infrastructure.ThemeRepository;
 import roomescape.test_util.JpaTestUtil;
 
 @DataJpaTest

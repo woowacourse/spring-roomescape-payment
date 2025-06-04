@@ -1,4 +1,4 @@
-package roomescape.business.model.entity;
+package roomescape.unit.business.model.entity;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -7,6 +7,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import roomescape.business.model.entity.Member;
+import roomescape.business.model.entity.Reservation;
+import roomescape.business.model.entity.Theme;
+import roomescape.business.model.entity.TimeSlot;
 import roomescape.exception.business.InvalidCreateArgumentException;
 
 class ReservationTest {

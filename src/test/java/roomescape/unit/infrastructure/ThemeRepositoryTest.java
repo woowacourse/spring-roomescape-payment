@@ -1,4 +1,4 @@
-package roomescape.infrastructure;
+package roomescape.unit.infrastructure;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Pageable;
 import roomescape.business.model.entity.Theme;
 import roomescape.business.model.vo.Id;
+import roomescape.infrastructure.ThemeRepository;
 import roomescape.test_util.JpaTestUtil;
 
 @DataJpaTest
