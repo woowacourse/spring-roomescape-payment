@@ -11,9 +11,9 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 # Java 설치 여부 확인 함수
 is_java_installed() {
   if command -v java >/dev/null 2>&1; then
-    return 1
-  else
     return 0
+  else
+    return 1
   fi
 }
 
@@ -41,9 +41,9 @@ is_up_to_date_with_remote() {
   REMOTE_HASH="$(git rev-parse "origin/$branch")"
 
   if [ "$LOCAL_HASH" = "$REMOTE_HASH" ]; then
-    return 1 # 최신
+    return 0 # 최신
   else
-    return 0 # 업데이트 필요
+    return 1 # 업데이트 필요
   fi
 }
 
