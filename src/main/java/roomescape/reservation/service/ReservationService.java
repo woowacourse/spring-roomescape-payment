@@ -68,16 +68,10 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse create(final ReservationCreateRequest request) {
-        if (isAlreadyBooked(request)) {
-            throw new AlreadyInUseException("이미 예약이 존재합니다.");
-        }
-        if (hasAlreadyWaiting(request)) {
-            throw new AlreadyInUseException("예약 대기가 존재해 예약을 생성할 수 없습니다.");
-        }
+        validateReservation(request);
 
-        Reservation reservation = getReservation(request, request.loginMember());
+        Reservation reservation = createReservation(request, request.loginMember());
         validateDateTime(LocalDateTime.now(), reservation.getDate(), reservation.getTime().getStartAt());
-
         Reservation savedReservation = reservationRepository.save(reservation);
 
         return ReservationResponse.from(savedReservation);
@@ -86,27 +80,23 @@ public class ReservationService {
     @Transactional
     public ReservationResponse createWithPayment(final ReservationCreateRequest request,
                                                  final PaymentRequest paymentRequest) {
-        if (isAlreadyBooked(request)) {
-            throw new AlreadyInUseException("이미 예약이 존재합니다.");
-        }
-        if (hasAlreadyWaiting(request)) {
-            throw new AlreadyInUseException("예약 대기가 존재해 예약을 생성할 수 없습니다.");
-        }
+        validateReservation(request);
 
-        Reservation reservation = getReservation(request, request.loginMember());
-        validateDateTime(LocalDateTime.now(), reservation.getDate(), reservation.getTime().getStartAt());
         paymentService.confirm(paymentRequest);
 
+        Reservation reservation = createReservation(request, request.loginMember());
+        validateDateTime(LocalDateTime.now(), reservation.getDate(), reservation.getTime().getStartAt());
         Reservation savedReservation = reservationRepository.save(reservation);
+
+        paymentService.create(savedReservation.getId(), paymentRequest);
+
         return ReservationResponse.from(savedReservation);
     }
 
-    private Reservation getReservation(final ReservationCreateRequest request, final LoginMember loginMember) {
+    private Reservation createReservation(final ReservationCreateRequest request, final LoginMember loginMember) {
         ReservationTime reservationTime = getReservationTime(request);
         Theme theme = getTheme(request);
-        MemberId memberId = new MemberId(loginMember.id());
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotFoundException("등록되지 않은 회원입니다."));
+        Member member = getMember(loginMember);
         return new Reservation(member, request.date(), reservationTime, theme);
     }
 
@@ -160,6 +150,15 @@ public class ReservationService {
         reservationRepository.deleteById(reservationId);
 
         approveFirstWaiting(reservation);
+    }
+
+    private void validateReservation(ReservationCreateRequest request) {
+        if (isAlreadyBooked(request)) {
+            throw new AlreadyInUseException("이미 예약이 존재합니다.");
+        }
+        if (hasAlreadyWaiting(request)) {
+            throw new AlreadyInUseException("예약 대기가 존재해 예약을 생성할 수 없습니다.");
+        }
     }
 
     private void validateDateTime(final LocalDateTime now, final LocalDate date, final LocalTime time) {
@@ -239,6 +238,12 @@ public class ReservationService {
         Long timeId = request.timeId();
         return reservationTimeRepository.findById(new ReservationTimeId(timeId))
                 .orElseThrow(() -> new EntityNotFoundException("reservationsTime not found id =" + timeId));
+    }
+
+    private Member getMember(LoginMember loginMember) {
+        MemberId memberId = new MemberId(loginMember.id());
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new EntityNotFoundException("등록되지 않은 회원입니다."));
     }
 
     private Set<ReservationTime> getAlreadyBookedTimes(final LocalDate date, final Long themeId) {

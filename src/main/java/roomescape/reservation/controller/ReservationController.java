@@ -61,15 +61,20 @@ public class ReservationController {
             @Valid @RequestBody final ReservationPaymentRequest request,
             final LoginMember loginMember
     ) {
-        ReservationCreateRequest createRequest =
-                ReservationCreateRequest.from(
-                        new ReservationRequest(request.date(), request.timeId(), request.themeId()),
-                        loginMember
-                );
-        PaymentRequest paymentRequest = new PaymentRequest(request.paymentKey(), request.orderId(),
-                request.amount(), PaymentMethod.TOSS);
+        ReservationCreateRequest createRequest = ReservationCreateRequest.from(
+                new ReservationRequest(
+                        request.date(),
+                        request.timeId(),
+                        request.themeId()
+                ), loginMember
+        );
+        PaymentRequest paymentRequest = new PaymentRequest(
+                request.paymentKey(),
+                request.orderId(),
+                request.amount(),
+                PaymentMethod.TOSS
+        );
         ReservationResponse response = reservationService.createWithPayment(createRequest, paymentRequest);
-        paymentService.create(response.id(), paymentRequest);
 
         return ResponseEntity.created(URI.create("/reservations/" + response.id()))
                 .body(response);
