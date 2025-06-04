@@ -44,4 +44,8 @@ public class Reservation {
     public void changeStatusToDenied() {
         this.reservationStatus = ReservationStatus.DENIED;
     }
+
+    public int priority() {
+        return reservationItem.calculatePriorityOf(this);
+    }
 }

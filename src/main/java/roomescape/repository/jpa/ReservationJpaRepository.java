@@ -18,27 +18,16 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
 
     @Query(value = """
             SELECT CASE WHEN COUNT(*) > 0 THEN true ELSE false END
-            FROM reservation r
-            JOIN reservation_item ri ON r.reservation_item_id = ri.id
-            WHERE ri.date = :date 
-            AND ri.time_id = :timeId 
-            AND ri.theme_id = :themeId
-            """, nativeQuery = true)
+            FROM Reservation r
+            JOIN ReservationItem ri ON r.reservationItem = ri
+            WHERE ri.date = :date
+            AND ri.time.id = :timeId
+            AND ri.theme.id = :themeId
+            """)
     boolean existsByDateAndTimeIdAndThemeId(
             @Param("date") LocalDate date,
             @Param("timeId") long timeId,
             @Param("themeId") long themeId
-    );
-
-    @Query("""
-            SELECT COUNT(r)
-            FROM Reservation r
-            WHERE r.reservationItem.id = :reservationItemId
-            AND r.id < :currentReservationId
-            """)
-    long countByReservationItemIdAndIdLessThan(
-            @Param("reservationItemId") Long reservationItemId,
-            @Param("currentReservationId") Long currentReservationId
     );
 
     @Query("""

@@ -54,4 +54,8 @@ public class ReservationItem {
     public void addReservation(Reservation reservation) {
         this.reservations.add(reservation);
     }
+
+    public int calculatePriorityOf(Reservation reservation) {
+        return reservations.indexOf(reservation);
+    }
 }

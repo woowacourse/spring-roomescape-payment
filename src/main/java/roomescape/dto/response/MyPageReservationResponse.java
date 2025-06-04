@@ -1,6 +1,5 @@
 package roomescape.dto.response;
 
-import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservationitem.ReservationItem;
 
@@ -17,7 +16,7 @@ public record MyPageReservationResponse(
         String paymentKey,
         Integer amount
 ) {
-    public static MyPageReservationResponse accepted(final Reservation reservation, final Payment payment) {
+    public static MyPageReservationResponse from(final Reservation reservation, final String paymentKey, final Integer amount) {
         ReservationItem item = reservation.getReservationItem();
 
         return new MyPageReservationResponse(
@@ -26,24 +25,9 @@ public record MyPageReservationResponse(
                 item.getDate(),
                 item.getTime().getStartAt(),
                 reservation.getReservationStatus().description,
-                0,
-                payment.getPaymentKey(),
-                payment.getAmount()
-        );
-    }
-
-    public static MyPageReservationResponse pending(final Reservation reservation, final int priority) {
-        ReservationItem item = reservation.getReservationItem();
-
-        return new MyPageReservationResponse(
-                reservation.getId(),
-                item.getTheme().getName(),
-                item.getDate(),
-                item.getTime().getStartAt(),
-                reservation.getReservationStatus().description,
-                priority,
-                null,
-                null
+                reservation.priority(),
+                paymentKey,
+                amount
         );
     }
 }

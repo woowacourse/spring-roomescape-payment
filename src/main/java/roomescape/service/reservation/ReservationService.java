@@ -114,21 +114,11 @@ public class ReservationService {
                 .map(reservation -> {
                     if (reservation.getReservationStatus() == ReservationStatus.ACCEPTED) {
                         Payment payment = paymentHelper.getByReservationId(reservation.getId());
-                        return MyPageReservationResponse.accepted(reservation, payment);
+                        return MyPageReservationResponse.from(reservation, payment.getPaymentKey(), payment.getAmount());
                     }
-                    final int priority = calculatePriority(reservation);
-                    return MyPageReservationResponse.pending(reservation, priority);
+                    return MyPageReservationResponse.from(reservation, null, null);
                 })
                 .toList();
-    }
-
-    private int calculatePriority(Reservation reservation) {
-        Long reservationItemId = reservation.getReservationItem().getId();
-        Long currentReservationId = reservation.getId();
-
-        return (int) reservationRepository.countByReservationItemIdAndIdLessThan(
-                reservationItemId, currentReservationId
-        );
     }
 
     @Transactional

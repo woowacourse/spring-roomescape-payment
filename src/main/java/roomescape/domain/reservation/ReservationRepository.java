@@ -1,6 +1,5 @@
 package roomescape.domain.reservation;
 
-import org.springframework.data.repository.query.Param;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservationitem.ReservationItem;
 
@@ -11,7 +10,7 @@ import java.util.Optional;
 public interface ReservationRepository {
 
     Optional<Reservation> findById(Long id);
-    
+
     Reservation save(final Reservation reservation);
 
     void deleteById(final long id);
@@ -27,12 +26,7 @@ public interface ReservationRepository {
 
     Optional<Reservation> findFirstByReservationItemAndReservationStatusOrderByIdAsc(ReservationItem reservationItem,
                                                                                      ReservationStatus reservationStatus);
-
-    long countByReservationItemIdAndIdLessThan(
-            @Param("reservationItemId") Long reservationItemId,
-            @Param("currentReservationId") Long currentReservationId
-    );
-
+    
     boolean existsByMemberAndReservationItem(Member member, ReservationItem reservationItem);
 
     List<Reservation> findByReservationStatusOrderByIdDesc(ReservationStatus reservationStatus);

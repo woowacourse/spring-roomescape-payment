@@ -44,12 +44,7 @@ public class ReservationRepositoryImpl implements ReservationRepository {
                                                                                             ReservationStatus reservationStatus) {
         return reservationJpaRepository.findFirstByReservationItemAndReservationStatusOrderByIdAsc(reservationItem, reservationStatus);
     }
-
-    @Override
-    public long countByReservationItemIdAndIdLessThan(Long reservationItemId, Long currentReservationId) {
-        return reservationJpaRepository.countByReservationItemIdAndIdLessThan(reservationItemId, currentReservationId);
-    }
-
+    
     @Override
     public boolean existsByMemberAndReservationItem(Member member, ReservationItem reservationItem) {
         return reservationJpaRepository.existsByMemberAndReservationItem(member, reservationItem);
