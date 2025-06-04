@@ -21,7 +21,7 @@ public class TossPaymentErrorResponseFilter implements ResponseErrorHandler {
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
-        return !response.getStatusCode().is2xxSuccessful();
+        return response.getStatusCode().isError();
     }
 
     @Override
