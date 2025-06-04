@@ -27,10 +27,6 @@ public final class LogAspect {
     public void controllerMethods() {
     }
 
-    @Pointcut("execution(* roomescape.infrastructure.error.*ExceptionHandler.*(..))")
-    public void exceptionHandlerMethods() {
-    }
-
     @Around("controllerMethods()")
     public Object logAroundControllerMethod(ProceedingJoinPoint joinPoint) throws Throwable {
         String className = joinPoint.getTarget().getClass().getSimpleName();
