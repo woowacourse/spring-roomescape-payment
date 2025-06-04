@@ -54,7 +54,7 @@ public class ReservationService {
         validateDuplicatedReservation(request.date(), timeSlot, theme);
         Reservation reservation = reservationRepository.save(
                 Reservation.create(member, request.date(), timeSlot, theme));
-        paymentService.pay(reservation, request.paymentKey(), request.orderId(), request.amount());
+        paymentService.approvePayment(reservation, request.paymentKey(), request.orderId(), request.amount());
         return ReservationResponse.from(reservation);
     }
 

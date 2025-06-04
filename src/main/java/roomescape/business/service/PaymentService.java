@@ -24,7 +24,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public void pay(Reservation reservation, String paymentKey, String orderId, Long amount) {
+    public void approvePayment(Reservation reservation, String paymentKey, String orderId, Long amount) {
         Payment payment = paymentRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("주문이 존재하지 않습니다."));
         payment.approve(paymentKey, amount, reservation);
