@@ -107,9 +107,13 @@ INSERT INTO member(email, password, name, role)
 VALUES ('asd@naver.com', '1234', '어드민', 'ADMIN');
 
 -- order
-INSERT INTO orders (id, amount, payment_key, payment_status, member_id, schedule_id)
-VALUES ('SURFMAY_12345', 25000, 'PK_12345', 'SUCCESS', 1, 1);
+INSERT INTO orders (id, amount, member_id, schedule_id)
+VALUES ('SURFMAY_12345', 25000, 1, 1);
 
 -- reservation
-INSERT INTO reservation (member_id, schedule_id, reservation_status, order_id)
-VALUES (1, 1, 'CONFIRMED', 'SURFMAY_12345');
+INSERT INTO reservation (member_id, schedule_id, reservation_status)
+VALUES (1, 1, 'CONFIRMED');
+
+-- reservation_payment
+INSERT INTO reservation_payment (payment_key, amount, order_id, reservation_id)
+VALUES ('pk_12345', 25000, 'SURFMAY_12345', 1);

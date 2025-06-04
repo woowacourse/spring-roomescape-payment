@@ -12,6 +12,7 @@ import roomescape.auth.dto.LoginMember;
 import roomescape.booking.reservation.dto.AdminReservationRequest;
 import roomescape.booking.reservation.dto.ReservationPaymentRequest;
 import roomescape.booking.reservation.dto.ReservationResponse;
+import roomescape.booking.reservation.reservationpayment.ReservationPaymentRepository;
 import roomescape.exception.custom.reason.payment.PaymentException;
 import roomescape.exception.custom.reason.reservation.ReservationConflictException;
 import roomescape.member.Member;
@@ -21,6 +22,7 @@ import roomescape.order.Order;
 import roomescape.order.OrderReader;
 import roomescape.payment.TossPaymentAdapter;
 import roomescape.payment.dto.TossPaymentConfirmCommand;
+import roomescape.payment.dto.TossPaymentConfirmResponse;
 import roomescape.reservationtime.ReservationTime;
 import roomescape.schedule.Schedule;
 import roomescape.schedule.ScheduleService;
@@ -32,6 +34,7 @@ import java.time.LocalTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static roomescape.util.TestFactory.*;
@@ -51,6 +54,8 @@ public class ReservationCreateServiceTest {
     private TossPaymentAdapter paymentAdapter;
     @Mock
     private TossPaymentConfirmCommandFactory paymentConfirmCommandFactory;
+    @Mock
+    private ReservationPaymentRepository reservationPaymentRepository;
     @InjectMocks
     private ReservationCreateService reservationCreateService;
 
@@ -100,6 +105,8 @@ public class ReservationCreateServiceTest {
                     .willReturn(reservation);
             given(paymentConfirmCommandFactory.toPaymentConfirmCommand(request))
                     .willReturn(new TossPaymentConfirmCommand(request.orderId(), request.amount(), request.paymentKey()));
+            given(paymentAdapter.confirmPayment(any()))
+                    .willReturn(new TossPaymentConfirmResponse("tgen_202506041149294Z5D3", "SURFMAY_12345", 25000L));
 
             // when
             final ReservationResponse response = reservationCreateService.create(request, loginMember);

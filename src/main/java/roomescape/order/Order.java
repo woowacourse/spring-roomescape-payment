@@ -25,8 +25,6 @@ public class Order {
 
     private Long amount;
 
-    private String paymentKey;
-
     @ManyToOne(fetch = LAZY)
     private Member member;
 
@@ -43,7 +41,7 @@ public class Order {
         this.schedule = schedule;
     }
 
-    public void validateOrder(final Long amount, final Member member, final Schedule schedule) {
+    public void validateOrderAndPaymentRequest(final Long amount, final Member member, final Schedule schedule) {
         if (!isAmount(amount)) {
             throw new IllegalArgumentException("주문 금액과 결제 금액이 일치하지 않아 결제를 할 수 없습니다.");
         }
@@ -53,13 +51,6 @@ public class Order {
         if (!isSchedule(schedule)) {
             throw new IllegalArgumentException("주문 스케줄과 결제 스케줄이 일치하지 않아 결제를 할 수 없습니다.");
         }
-    }
-
-    /**
-     * 결제 승인 요청 프로세스에서만 호출하는 메서드입니다.
-     */
-    public void updatePaymentKey(final String paymentKey) {
-        this.paymentKey = paymentKey;
     }
 
     private boolean isAmount(final Long amount) {

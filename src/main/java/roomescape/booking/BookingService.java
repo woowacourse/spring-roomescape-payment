@@ -8,6 +8,8 @@ import roomescape.booking.dto.BookingResponse;
 import roomescape.booking.reservation.Reservation;
 import roomescape.booking.reservation.ReservationService;
 import roomescape.booking.reservation.ReservationStatus;
+import roomescape.booking.reservation.reservationpayment.ReservationPayment;
+import roomescape.booking.reservation.reservationpayment.ReservationPaymentRepository;
 import roomescape.booking.waiting.Waiting;
 import roomescape.booking.waiting.WaitingService;
 import roomescape.schedule.Schedule;
@@ -21,6 +23,7 @@ public class BookingService {
 
     private final ReservationService reservationService;
     private final WaitingService waitingService;
+    private final ReservationPaymentRepository reservationPaymentRepository;
 
     @Transactional(readOnly = true)
     public List<BookingResponse> readAllByMember(final LoginMember loginMember) {
@@ -28,7 +31,10 @@ public class BookingService {
         List<Waiting> waitings = waitingService.findAllByEmail(loginMember.email());
 
         return Stream.concat(
-                reservations.stream().map(BookingResponse::of),
+                reservations.stream().map(reservation -> {
+                    ReservationPayment reservationPayment = reservationPaymentRepository.findByReservationId(reservation.getId());
+                    return BookingResponse.of(reservation, reservationPayment);
+                }),
                 waitings.stream().map((waiting) -> BookingResponse.of(waiting, waitingService.getRank(waiting) + 1))
         ).toList();
     }

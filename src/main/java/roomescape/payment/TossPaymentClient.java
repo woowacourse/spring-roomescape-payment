@@ -8,6 +8,7 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.custom.reason.payment.PaymentException;
 import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.TossPaymentConfirmResponse;
 
 import java.util.Base64;
 
@@ -22,18 +23,19 @@ public class TossPaymentClient {
     private final RestClient restClient;
     private final TossPaymentConfirmErrorHandler tossPaymentConfirmErrorHandler;
 
-    public void confirm(final PaymentConfirmRequest request) {
+    public TossPaymentConfirmResponse confirm(final PaymentConfirmRequest request) {
         try {
-            ResponseEntity<Void> response = restClient.post()
+            ResponseEntity<TossPaymentConfirmResponse> response = restClient.post()
                     .uri(URL_PREFIX + "/confirm")
                     .header("Authorization", "Basic " + ENCODED_SECRET_KEY)
                     .body(request)
                     .retrieve()
                     .onStatus(tossPaymentConfirmErrorHandler)
-                    .toBodilessEntity();
+                    .toEntity(TossPaymentConfirmResponse.class);
             if (response.getStatusCode() != HttpStatus.OK) {
                 throw new PaymentException("결제 승인에 실패하였습니다.");
             }
+            return response.getBody();
         } catch (PaymentException e) {
             throw e;
         } catch (ResourceAccessException e) {
