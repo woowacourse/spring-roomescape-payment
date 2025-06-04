@@ -18,14 +18,6 @@ public class ReservationPaymentQueryService {
     }
 
     public Map<Long, ReservationPaymentResponse> findPaymentsByMemberId(Long memberId) {
-        System.out.println(reservationPaymentRepository.findAllByReservation_Member_Id(memberId)
-                .stream()
-                .collect(
-                        Collectors.toMap(
-                                reservationPayment -> reservationPayment.getReservation().getId(),
-                                ReservationPaymentResponse::from
-                        )
-                ));
         return reservationPaymentRepository.findAllByReservation_Member_Id(memberId)
                 .stream()
                 .collect(
