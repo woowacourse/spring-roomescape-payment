@@ -4,7 +4,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import roomescape.config.JpaConfig;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRole;
 import roomescape.domain.payment.Payment;
@@ -24,7 +23,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @DataJpaTest
-@Import({JpaConfig.class, DataInserter.class, DataCleaner.class,
+@Import({DataInserter.class, DataCleaner.class,
         MemberRepositoryImpl.class,
         PaymentRepositoryImpl.class,
         ReservationItemRepositoryImpl.class,
