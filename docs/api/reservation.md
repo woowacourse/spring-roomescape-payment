@@ -10,12 +10,12 @@ content-type: application/json
 cookie: token={member-access-token}
 
 {
-    "date":"2024-03-01",
-    "themeId":1,
-    "timeId":1,
-    "paymentKey":"tgen_20240513184816ZSAZ9",
-    "orderId":"MC4wNDYzMzA0OTc2MDgy",
-    "amount":1000
+    "date": 2024-03-01",
+    "themeId": 1,
+    "timeId": 1,
+    "paymentKey": "tgen_20240513184816ZSAZ9",
+    "orderId": "MC4wNDYzMzA0OTc2MDgy",
+    "amount": 1000
 }
 ```
 
@@ -43,6 +43,12 @@ Content-Type: application/json
         "name": "레벨2 탈출",
         "description": "우테코 레벨2를 탈출하는 내용입니다.",
         "thumbnail": "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"
+    },
+    "payment" : {
+        "id": 1,
+        "paymentKey": "tgen_20240513184816ZSAZ9",
+        "orderId": "MC4wNDYzMzA0OTc2MDgy",
+        "amount": 1000 
     }
 }
 ```
@@ -54,7 +60,7 @@ Content-Type: application/json
 - 이미 예약이 존재하는 경우 400을 반환한다.
 - 지나간 시간/날짜에 예약 생성 할 경우 400을 반환한다.
 - 예약 요청 형식이 잘못됐을 경우 400을 반환한다.
-- 결제 실패 시 예약이 생성되지 않는다. 
+- 결제 실패 시 예약이 생성되지 않는다.
 - 예약 실패 시 결제 실패 사유를 반환한다.
 
 ## 어드민 예약 생성 API
@@ -197,7 +203,8 @@ Content-Type: application/json
         "status": {
             "type": "RESERVED",
             "rank" : 0
-        }
+        },
+        "amount": 1000
     },
     {
         "id": 2,
@@ -207,7 +214,8 @@ Content-Type: application/json
         "status": {
             "type": "RESERVED",
             "rank" : 0
-        }    
+        },
+        "amount": 1000
     },
     {
         "id": 3,
@@ -217,7 +225,8 @@ Content-Type: application/json
         "status": {
             "type": "WAITING",
             "rank" : 3
-        }
+        },
+        "amount": 1000
     }
 ]
 ```
