@@ -1,5 +1,6 @@
 package roomescape.reservation.presentation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,6 +24,7 @@ public class AdminWaitingController {
     }
 
     @Auth(Role.ADMIN)
+    @Operation(summary = "관리자 예약 대기 조회 API")
     @GetMapping
     public ResponseEntity<List<WaitingResponse>> getWaitings(
     ) {
@@ -32,6 +34,7 @@ public class AdminWaitingController {
     }
 
     @Auth(Role.ADMIN)
+    @Operation(summary = "관리자 예약 대기 승인 API")
     @DeleteMapping("/accept/{id}")
     public ResponseEntity<Void> acceptWaiting(
             final @PathVariable Long id
@@ -41,6 +44,7 @@ public class AdminWaitingController {
     }
 
     @Auth(Role.ADMIN)
+    @Operation(summary = "관리자 예약 대기 거절 API")
     @DeleteMapping("/reject/{id}")
     public ResponseEntity<Void> rejectWaiting(
             final @PathVariable Long id

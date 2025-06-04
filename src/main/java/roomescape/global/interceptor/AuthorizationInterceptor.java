@@ -33,7 +33,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         Method method = handlerMethod.getMethod();
 
         if (!method.isAnnotationPresent(Auth.class)) {
-            throw new IllegalArgumentException("인증 불가능한 상태입니다.");
+            return true;
         }
 
         Auth auth = method.getAnnotation(Auth.class);

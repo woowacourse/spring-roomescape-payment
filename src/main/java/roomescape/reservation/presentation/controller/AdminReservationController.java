@@ -1,5 +1,6 @@
 package roomescape.reservation.presentation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ public class AdminReservationController {
     }
 
     @Auth(Role.ADMIN)
+    @Operation(summary = "관리자 예약 추가 API")
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(
             final @RequestBody @Valid AdminReservationRequest adminReservationRequest

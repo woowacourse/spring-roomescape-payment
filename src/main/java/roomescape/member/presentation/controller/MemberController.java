@@ -1,5 +1,6 @@
 package roomescape.member.presentation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ public class MemberController {
     }
 
     @Auth(Role.GUEST)
+    @Operation(summary = "회원가입 API")
     @PostMapping("/signUp")
     public ResponseEntity<SignUpResponse> signUp(
             @RequestBody @Valid SignUpRequest signUpRequest
@@ -33,6 +35,7 @@ public class MemberController {
     }
 
     @Auth(Role.ADMIN)
+    @Operation(summary = "회원 조회 API")
     @GetMapping("/members")
     public ResponseEntity<List<MemberResponse>> getMembers(
     ) {

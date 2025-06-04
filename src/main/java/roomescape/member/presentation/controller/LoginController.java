@@ -1,5 +1,6 @@
 package roomescape.member.presentation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +29,7 @@ public class LoginController {
     }
 
     @Auth(Role.GUEST)
+    @Operation(summary = "로그인 API")
     @PostMapping
     public ResponseEntity<Void> login(
             @RequestBody @Valid TokenRequest tokenRequest
@@ -38,6 +40,7 @@ public class LoginController {
     }
 
     @Auth(Role.GUEST)
+    @Operation(summary = "로그인 확인 API")
     @GetMapping("/check")
     public ResponseEntity<MemberResponse> loginCheck(
             HttpServletRequest request

@@ -1,5 +1,7 @@
 package roomescape.reservation.presentation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -30,10 +32,11 @@ public class WaitingController {
     }
 
     @Auth(Role.USER)
+    @Operation(summary = "예약 대기 추가 API")
     @PostMapping
     public ResponseEntity<WaitingResponse> createWaiting(
             final @RequestBody @Valid WaitingRequest waitingRequest,
-            final @LoginMember Long memberId
+            final @Parameter(hidden = true) @LoginMember Long memberId
     ) {
         WaitingResponse waiting = waitingService.createWaiting(waitingRequest, memberId);
 
@@ -42,9 +45,10 @@ public class WaitingController {
     }
 
     @Auth(Role.USER)
+    @Operation(summary = "예약 대기 조회 API")
     @GetMapping
     public ResponseEntity<List<WaitingResponse>> getWaitings(
-            final @LoginMember Long memberId
+            final @Parameter(hidden = true) @LoginMember Long memberId
     ) {
         return ResponseEntity.ok().body(
                 waitingService.getWaitings(memberId)
@@ -52,6 +56,7 @@ public class WaitingController {
     }
 
     @Auth(Role.USER)
+    @Operation(summary = "예약 대기 삭제 API")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteWaiting(
             final @PathVariable Long id

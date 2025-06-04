@@ -1,5 +1,6 @@
 package roomescape.reservation.presentation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -29,6 +30,7 @@ public class ThemeController {
     }
 
     @Auth(Role.ADMIN)
+    @Operation(summary = "테마 추가 API")
     @PostMapping
     public ResponseEntity<ThemeResponse> createTheme(
             final @RequestBody @Valid ThemeRequest request
@@ -39,6 +41,7 @@ public class ThemeController {
     }
 
     @Auth(Role.USER)
+    @Operation(summary = "테마 조회 API")
     @GetMapping
     public ResponseEntity<List<ThemeResponse>> getThemes(
     ) {
@@ -48,6 +51,7 @@ public class ThemeController {
     }
 
     @Auth(Role.ADMIN)
+    @Operation(summary = "테마 삭제 API")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTheme(
             final @PathVariable Long id
@@ -58,6 +62,7 @@ public class ThemeController {
     }
 
     @Auth(Role.GUEST)
+    @Operation(summary = "인기 테마 조회 API")
     @GetMapping("/popular")
     public ResponseEntity<List<ThemeResponse>> getPopularThemes(
     ) {
