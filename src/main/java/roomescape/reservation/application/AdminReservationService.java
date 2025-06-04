@@ -71,6 +71,11 @@ public class AdminReservationService {
         final Optional<Waiting> optionalWaiting = waitingRepository.findFirstByReservationSlotOrderByCreatedAt(
                 reservation.getReservationSlot()
         );
+
+        if (reservation.getPaymentInfo() != null) {
+            reservation.getPaymentInfo().disconnectReservation();
+        }
+
         if (optionalWaiting.isPresent()) {
             final Waiting waiting = optionalWaiting.get();
             reservation.updateMember(waiting.getMember());

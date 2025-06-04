@@ -1,21 +1,25 @@
 package roomescape.reservation.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import roomescape.member.domain.Member;
+import roomescape.payment.domain.PaymentInfo;
 
 @Entity
 @Table(name = "reservations")
@@ -38,6 +42,9 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ReservationStatus status;
+
+    @OneToOne(mappedBy = "reservation", fetch = FetchType.LAZY)
+    private PaymentInfo paymentInfo;
 
     private Reservation(
             final ReservationSlot reservationSlot,
@@ -63,6 +70,7 @@ public class Reservation {
 
     public void updateMember(final Member member) {
         this.member = member;
+        this.paymentInfo = null;
     }
 
     private void validateReservationSlot(final ReservationSlot reservationSlot) {

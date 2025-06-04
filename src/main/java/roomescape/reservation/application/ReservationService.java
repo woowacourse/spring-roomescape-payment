@@ -54,7 +54,8 @@ public class ReservationService {
                 new PaymentInfo(
                         request.paymentKey(),
                         request.orderId(),
-                        request.amount()
+                        request.amount(),
+                        reservation
                 )
         );
 
@@ -93,6 +94,10 @@ public class ReservationService {
     public void deleteIfOwner(final Long reservationId, final Long memberId) {
         final Reservation reservation = reservationRepository.getById(reservationId);
         final Member member = memberRepository.getById(memberId);
+        PaymentInfo paymentInfo = reservation.getPaymentInfo();
+        if (paymentInfo != null) {
+            reservation.getPaymentInfo().disconnectReservation();
+        }
 
         if (!Objects.equals(reservation.getMember(), member)) {
             throw new AuthorizationException("본인이 아니면 삭제할 수 없습니다.");
