@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -25,11 +24,13 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import roomescape.infrastructure.reservation.TossPaymentManager;
+import org.springframework.test.context.jdbc.Sql;
 import roomescape.domain.reservation.dto.payment.PaymentError;
 import roomescape.exception.custom.reason.payment.PaymentConfirmException;
+import roomescape.infrastructure.reservation.TossPaymentManager;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+@Sql(scripts = "classpath:/initialize_database.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 class ReservationApiTest {
 
     private static final Map<String, String> RESERVATION_BODY = new HashMap<>();
@@ -77,18 +78,6 @@ class ReservationApiTest {
 
         AUTH_BODY.put("email", "asd@email.com");
         AUTH_BODY.put("password", "pass");
-    }
-
-    @BeforeEach
-    void setUp() {
-        jdbcTemplate.update("DELETE FROM reservation");
-        jdbcTemplate.update("DELETE FROM reservation_time");
-        jdbcTemplate.update("DELETE FROM theme");
-        jdbcTemplate.update("DELETE FROM member");
-        jdbcTemplate.update("ALTER TABLE reservation ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE reservation_time ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE theme ALTER COLUMN id RESTART WITH 1");
-        jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
     }
 
     @Nested
@@ -286,6 +275,8 @@ class ReservationApiTest {
             givenCreateReservationTime();
             givenCreateTheme();
             givenCreateReservation(cookie);
+
+            jdbcTemplate.update("DELETE FROM reservation_payment WHERE id=1");
 
             // when & then
             RestAssured.given().port(port).log().all()

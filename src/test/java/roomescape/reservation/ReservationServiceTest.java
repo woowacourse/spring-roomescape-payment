@@ -24,10 +24,23 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.auth.dto.LoginMember;
+import roomescape.domain.member.Member;
+import roomescape.domain.member.MemberRole;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationDate;
+import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationService;
-import roomescape.infrastructure.reservation.TossPaymentManager;
-import roomescape.infrastructure.common.TimeManager;
+import roomescape.domain.reservation.ReservationStatus;
+import roomescape.domain.reservation.dto.AdminFilterReservationRequest;
+import roomescape.domain.reservation.dto.AdminReservationRequest;
+import roomescape.domain.reservation.dto.MineReservationResponse;
+import roomescape.domain.reservation.dto.ReservationPaymentRequest;
+import roomescape.domain.reservation.dto.ReservationRequest;
+import roomescape.domain.reservation.dto.ReservationResponse;
 import roomescape.domain.reservation.dto.payment.PaymentRequest;
+import roomescape.domain.reservationtime.ReservationTime;
+import roomescape.domain.reservationtime.ReservationTimeRepository;
+import roomescape.domain.theme.Theme;
 import roomescape.exception.custom.reason.payment.PaymentConfirmException;
 import roomescape.exception.custom.reason.reservation.ReservationConflictException;
 import roomescape.exception.custom.reason.reservation.ReservationNotExistsMemberException;
@@ -37,24 +50,12 @@ import roomescape.exception.custom.reason.reservation.ReservationNotExistsTimeEx
 import roomescape.exception.custom.reason.reservation.ReservationNotFoundException;
 import roomescape.exception.custom.reason.reservation.ReservationPastDateException;
 import roomescape.exception.custom.reason.reservation.ReservationPastTimeException;
-import roomescape.domain.member.Member;
-import roomescape.domain.member.MemberRole;
+import roomescape.infrastructure.common.TimeManager;
 import roomescape.infrastructure.member.MemberRepositoryImpl;
-import roomescape.domain.reservation.Reservation;
-import roomescape.domain.reservation.ReservationDate;
-import roomescape.domain.reservation.ReservationStatus;
-import roomescape.domain.reservation.dto.AdminFilterReservationRequest;
-import roomescape.domain.reservation.dto.AdminReservationRequest;
-import roomescape.domain.reservation.dto.MineReservationResponse;
-import roomescape.domain.reservation.dto.ReservationPaymentRequest;
-import roomescape.domain.reservation.dto.ReservationRequest;
-import roomescape.domain.reservation.dto.ReservationResponse;
-import roomescape.domain.reservation.ReservationRepository;
+import roomescape.infrastructure.reservation.ReservationPaymentRepositoryImpl;
 import roomescape.infrastructure.reservation.ReservationRepositoryImpl;
-import roomescape.domain.reservationtime.ReservationTime;
-import roomescape.domain.reservationtime.ReservationTimeRepository;
+import roomescape.infrastructure.reservation.TossPaymentManager;
 import roomescape.infrastructure.reservationtime.ReservationTimeRepositoryImpl;
-import roomescape.domain.theme.Theme;
 import roomescape.infrastructure.theme.ThemeRepositoryImpl;
 
 @DataJpaTest
@@ -64,7 +65,8 @@ import roomescape.infrastructure.theme.ThemeRepositoryImpl;
         ThemeRepositoryImpl.class,
         ReservationTimeRepositoryImpl.class,
         ReservationRepositoryImpl.class,
-        ReservationService.class
+        ReservationService.class,
+        ReservationPaymentRepositoryImpl.class
 })
 @Transactional(propagation = Propagation.SUPPORTS)
 public class ReservationServiceTest {
@@ -771,23 +773,28 @@ public class ReservationServiceTest {
             // given
             final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
             final MineReservationResponse expected = new MineReservationResponse(
-                    1L, "테마", LocalDate.of(2025, 12, 30),
-                    LocalTime.of(12, 40), "예약", 0L
+                    2L, "테마", LocalDate.of(2025, 12, 30),
+                    LocalTime.of(12, 40), "대기", 1L, null, null
             );
 
             final Member member = new Member(loginMember.email(), "pass", "boogie", MemberRole.MEMBER);
+            final Member anotherMember = new Member("Asd@naver.com", "pass", "hista", MemberRole.MEMBER);
             final ReservationTime reservationTime = new ReservationTime(LocalTime.of(12, 40));
             final Theme theme = new Theme("테마", "설명", "썸네일");
             final LocalDateTime currentDateTime = LocalDateTime.of(2025, 12, 25, 12, 0);
             final ReservationDate reservationDate = ReservationDate.of(LocalDate.of(2025, 12, 30),
                     currentDateTime.toLocalDate());
-            final Reservation reservation = Reservation.of(reservationDate, member, reservationTime, theme,
+            final Reservation reservationByPending = Reservation.of(reservationDate, anotherMember, reservationTime, theme,
                     ReservationStatus.PENDING, currentDateTime);
+            final Reservation reservationByWaiting = Reservation.of(reservationDate, member, reservationTime, theme,
+                    ReservationStatus.WAITING, currentDateTime);
 
             memberRepositoryFacade.save(member);
+            memberRepositoryFacade.save(anotherMember);
             reservationTimeRepository.save(reservationTime);
             themeRepositoryFacade.save(theme);
-            reservationRepository.save(reservation);
+            reservationRepository.save(reservationByPending);
+            reservationRepository.save(reservationByWaiting);
 
             // when
             final List<MineReservationResponse> actual = reservationService.readAllMine(loginMember);

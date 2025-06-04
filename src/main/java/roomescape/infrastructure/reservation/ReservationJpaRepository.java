@@ -75,6 +75,7 @@ public interface ReservationJpaRepository extends JpaRepository<Reservation, Lon
                 JOIN FETCH r.member
                 JOIN FETCH r.reservationTime
             WHERE r.member = :member
+                AND r.reservationStatus = 'WAITING'
             ORDER BY r.id ASC
             """)
     List<WaitingRankReservation> findAllByMember(Member member);
