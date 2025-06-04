@@ -27,21 +27,20 @@ import roomescape.business.model.vo.Id;
 import roomescape.business.model.vo.ReservationStatus;
 import roomescape.exception.business.DuplicatedException;
 import roomescape.exception.business.NotFoundException;
-import roomescape.infrastructure.payment.TossPaymentClient;
 import roomescape.presentation.dto.response.ReservationResponse;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class ReservationService {
-    private final WaitingService waitingService;
 
-    private final UserRepository userRepository;
+    private final WaitingService waitingService;
+    private final PaymentService paymentService;
+
     private final ReservationRepository reservationRepository;
+    private final UserRepository userRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
-
-    private final TossPaymentClient paymentClient;
 
     public ReservationDto addAndGet(final ReservationSpecDto reservationSpecDto,
                                     final PaymentApproveDto paymentApproveDto) {
@@ -57,13 +56,11 @@ public class ReservationService {
             throw new DuplicatedException(RESERVATION_DUPLICATED);
         }
         Reservation reservation = Reservation.create(user, reservationSpecDto.date(), reservationTime, theme,
-                reservationStatus,
-                LocalDateTime.now());
+                reservationStatus, LocalDateTime.now());
         if (reservationStatus == ReservationStatus.RESERVED && paymentApproveDto != null) {
-            paymentClient.approvePayment(paymentApproveDto);
+            paymentService.pay(reservation, paymentApproveDto);
         }
         reservationRepository.save(reservation);
-        waitingService.updateWaitingReservations(reservation);
         return ReservationDto.fromEntity(reservation);
     }
 
@@ -72,21 +69,18 @@ public class ReservationService {
     }
 
     private Theme getTheme(String themeIdValue) {
-        Theme theme = themeRepository.findById(Id.create(themeIdValue))
+        return themeRepository.findById(Id.create(themeIdValue))
                 .orElseThrow(() -> new NotFoundException(THEME_NOT_EXIST));
-        return theme;
     }
 
     private ReservationTime getReservationTime(String timeIdValue) {
-        ReservationTime reservationTime = reservationTimeRepository.findById(Id.create(timeIdValue))
+        return reservationTimeRepository.findById(Id.create(timeIdValue))
                 .orElseThrow(() -> new NotFoundException(RESERVATION_NOT_EXIST));
-        return reservationTime;
     }
 
     private User getUser(String userIdValue) {
-        User user = userRepository.findById(Id.create(userIdValue))
+        return userRepository.findById(Id.create(userIdValue))
                 .orElseThrow(() -> new NotFoundException(USER_NOT_EXIST));
-        return user;
     }
 
     @Transactional(readOnly = true)

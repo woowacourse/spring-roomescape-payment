@@ -7,13 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import roomescape.business.dto.ReservationWithAheadDto;
 import roomescape.business.model.entity.Reservation;
 import roomescape.business.model.entity.ReservationTime;
 import roomescape.business.model.entity.Theme;
 import roomescape.business.model.vo.Id;
 import roomescape.business.model.vo.ReservationDate;
 import roomescape.business.model.vo.ReservationStatus;
-import roomescape.business.dto.ReservationWithAheadDto;
 
 public interface JpaReservationDao extends JpaRepository<Reservation, Id> {
 
@@ -40,7 +40,7 @@ public interface JpaReservationDao extends JpaRepository<Reservation, Id> {
                 SELECT new roomescape.business.dto.ReservationWithAheadDto(
                     r,
                     (
-                        SELECT COUNT(r2) + 1L
+                        SELECT COUNT(r2) + 0L
                         FROM Reservation r2
                         WHERE r2.theme      = r.theme
                           AND r2.date       = r.date

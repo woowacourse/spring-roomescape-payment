@@ -58,7 +58,7 @@ class ReservationServiceTest {
     private ThemeRepository themeRepository;
 
     @Mock
-    private WaitingService waitingService;
+    private PaymentService paymentService;
 
     @Mock
     private TossPaymentClient paymentClient;
@@ -258,21 +258,22 @@ class ReservationServiceTest {
         ReservationTime reservationTime = ReservationTime.restore(timeIdValue, LocalTime.of(10, 0));
         Theme theme = Theme.restore(themeIdValue, "Test Theme", "Description", "thumbnail.jpg");
 
+        PaymentApproveDto paymentApproveDto = PaymentApproveDto.of("paymentKey", "orderId", 1000L);
+
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(reservationTimeRepository.findById(timeId)).thenReturn(Optional.of(reservationTime));
         when(themeRepository.findById(themeId)).thenReturn(Optional.of(theme));
         when(reservationRepository.isDuplicateDateAndTimeAndTheme(eq(date), eq(LocalTime.of(10, 0)), eq(theme.getId())))
                 .thenReturn(false);
-        doNothing().when(waitingService).updateWaitingReservations(any(Reservation.class));
-        doNothing().when(paymentClient).approvePayment(any(PaymentApproveDto.class));
+        doNothing().when(paymentService).pay(any(Reservation.class), any(PaymentApproveDto.class));
 
         // when
         ReservationDto result = sut.addAndGet(ReservationSpecDto.of(date, timeIdValue, themeIdValue, userIdValue,
-                ReservationStatus.RESERVED), PaymentApproveDto.of("paymentKey", "orderId", 1000L));
+                ReservationStatus.RESERVED), paymentApproveDto);
 
         // then
         assertThat(result).isNotNull();
-        verify(paymentClient).approvePayment(any(PaymentApproveDto.class));
+        verify(paymentService).pay(any(Reservation.class), eq(paymentApproveDto));
         verify(userRepository).findById(userId);
         verify(reservationTimeRepository).findById(timeId);
         verify(themeRepository).findById(themeId);
@@ -298,7 +299,6 @@ class ReservationServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(reservationTimeRepository.findById(timeId)).thenReturn(Optional.of(reservationTime));
         when(themeRepository.findById(themeId)).thenReturn(Optional.of(theme));
-        doNothing().when(waitingService).updateWaitingReservations(any(Reservation.class));
 
         // when
         ReservationDto result = sut.addAndGet(ReservationSpecDto.of(date, timeIdValue, themeIdValue, userIdValue,
