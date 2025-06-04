@@ -38,8 +38,8 @@ public class ReservationController {
             final AuthenticationInfo authenticationInfo,
             @RequestBody @Valid final CreateReservationRequest request
     ) {
-        paymentService.pay(request.paymentKey(), request.orderId(), request.amount());
         var reservation = reservationService.reserve(authenticationInfo.id(), request.date(), request.timeId(), request.themeId());
+        paymentService.pay(request.paymentKey(), request.orderId(), request.amount());
         return ReservationResponse.from(reservation);
     }
 
