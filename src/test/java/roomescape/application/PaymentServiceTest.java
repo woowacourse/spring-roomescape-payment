@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import roomescape.domain.payment.PaymentConfirmation;
 import roomescape.domain.payment.PaymentDetails;
 import roomescape.domain.payment.PaymentProvider;
+import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.domain.payment.TransactionStatus;
 import roomescape.domain.payment.TransactionStatusCode;
@@ -22,19 +23,20 @@ import roomescape.exception.PaymentInternalException;
 class PaymentServiceTest {
 
     private final PaymentProvider paymentProvider = Mockito.mock(PaymentProvider.class);
-    private final PaymentService paymentService = new PaymentService(paymentProvider);
+    private final PaymentRepository paymentRepository = Mockito.mock(PaymentRepository.class);
+    private final PaymentService paymentService = new PaymentService(paymentProvider, paymentRepository);
 
     @Test
     @DisplayName("결제 성공 시 예외가 발생하지 않는다.")
     void pay() {
         // given
         var request = new PaymentRequest("a", "1", 1000);
-        var paymentDetails = new PaymentDetails(new PaymentConfirmation("a", "1", "order", 1000));
+        var paymentDetails = new PaymentDetails(new PaymentConfirmation("a", "1", 1000, "DONE"));
 
         Mockito.when(paymentProvider.confirm(request)).thenReturn(paymentDetails);
 
         // when & then
-        assertThatCode(() -> paymentService.pay("a", "1", 1000)).doesNotThrowAnyException();
+        assertThatCode(() -> paymentService.pay("a", "1", 1000, 1)).doesNotThrowAnyException();
     }
 
     @ParameterizedTest
@@ -48,7 +50,7 @@ class PaymentServiceTest {
         Mockito.when(paymentProvider.confirm(request)).thenReturn(paymentDetails);
 
         // when & then
-        assertThatThrownBy(() -> paymentService.pay("a", "1", 1000)).isInstanceOf(expectedException);
+        assertThatThrownBy(() -> paymentService.pay("a", "1", 1000, 1)).isInstanceOf(expectedException);
     }
 
     private static Stream<Arguments> failToPaySource() {

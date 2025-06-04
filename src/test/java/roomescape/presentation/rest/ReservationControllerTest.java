@@ -74,7 +74,7 @@ class ReservationControllerTest {
             .thenReturn(anyReservationWithNewId());
 
         Mockito.doThrow(new RuntimeException("결제 실패"))
-            .when(paymentService).pay(anyString(), anyString(), anyLong());
+            .when(paymentService).pay(anyString(), anyString(), anyLong(), anyLong());
 
         mockMvc.perform(post("/reservations")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -98,7 +98,7 @@ class ReservationControllerTest {
             .thenReturn(anyReservationWithNewId());
 
         Mockito.doThrow(new PaymentFailedException("결제에 실패했습니다."))
-            .when(paymentService).pay(anyString(), anyString(), anyLong());
+            .when(paymentService).pay(anyString(), anyString(), anyLong(), anyLong());
 
         mockMvc.perform(post("/reservations")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -122,7 +122,7 @@ class ReservationControllerTest {
             .thenReturn(anyReservationWithNewId());
 
         Mockito.doThrow(new PaymentInternalException("결제에 실패했습니다."))
-            .when(paymentService).pay(anyString(), anyString(), anyLong());
+            .when(paymentService).pay(anyString(), anyString(), anyLong(), anyLong());
 
         mockMvc.perform(post("/reservations")
                 .contentType(MediaType.APPLICATION_JSON)

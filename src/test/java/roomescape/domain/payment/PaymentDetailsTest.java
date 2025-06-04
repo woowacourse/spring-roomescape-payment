@@ -11,7 +11,7 @@ class PaymentDetailsTest {
     @Test
     @DisplayName("승인된 결제 세부사항을 생성한다.")
     void createWithConfirmation() {
-        var paymentConfirmation = new PaymentConfirmation("a", "1", "order", 1000);
+        var paymentConfirmation = new PaymentConfirmation("a", "1", 1000, "DONE");
 
         var paymentDetails = new PaymentDetails(paymentConfirmation);
 
