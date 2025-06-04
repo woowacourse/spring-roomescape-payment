@@ -1,9 +1,9 @@
-package roomescape.service.command;
+package roomescape.client;
 
 import roomescape.domain.payment.Payment;
 import roomescape.dto.reservation.PaymentConfirmDto;
 
-public interface PaymentService {
+public interface PaymentClient {
 
     Payment confirmPayment(PaymentConfirmDto requestDto);
 }
