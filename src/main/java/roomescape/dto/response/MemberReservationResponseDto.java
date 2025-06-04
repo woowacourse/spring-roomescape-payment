@@ -13,6 +13,17 @@ public record MemberReservationResponseDto(
         String paymentKey,
         Long amount
 ) {
+    public MemberReservationResponseDto(ReservationTicket reservationTicket) {
+        this(
+                reservationTicket.getId(),
+                reservationTicket.getTheme().getName(),
+                reservationTicket.getDate(),
+                reservationTicket.getReservationTime().getStartAt(),
+                null,
+                null
+        );
+    }
+
     public MemberReservationResponseDto(ReservationTicket reservationTicket, TossPayment tossPayment) {
         this(
                 reservationTicket.getId(),

@@ -15,6 +15,7 @@ import roomescape.dto.response.MemberReservationResponseDto;
 import roomescape.dto.response.ReservationTicketResponseDto;
 import roomescape.infrastructure.db.MemberJpaRepository;
 import roomescape.infrastructure.db.ThemeJpaRepository;
+import roomescape.infrastructure.db.TossPaymentJpaRepository;
 import roomescape.infrastructure.db.WaitingJpaRepository;
 import roomescape.model.Member;
 import roomescape.model.Reservation;
@@ -22,6 +23,7 @@ import roomescape.model.ReservationTicket;
 import roomescape.model.ReservationTime;
 import roomescape.model.Role;
 import roomescape.model.Theme;
+import roomescape.model.TossPayment;
 import roomescape.model.Waiting;
 import roomescape.persistence.repository.ReservationTicketRepository;
 import roomescape.persistence.repository.ReservationTimeRepository;
@@ -42,6 +44,9 @@ class ReservationTicketServiceTest extends ServiceTest {
 
     @Autowired
     WaitingJpaRepository waitingJpaRepository;
+
+    @Autowired
+    TossPaymentJpaRepository tossPaymentJpaRepository;
 
     @Autowired
     private ThemeJpaRepository themeJpaRepository;
@@ -91,6 +96,13 @@ class ReservationTicketServiceTest extends ServiceTest {
                         member, LocalDate.now()));
         ReservationTicket savedReservationTicket = reservationTicketRepository.save(
                 reservationTicket);
+        TossPayment savedTossPayment = tossPaymentJpaRepository.save(
+                new TossPayment(
+                        "paymentKey",
+                        "orderId",
+                        1000L,
+                        savedReservationTicket
+                ));
 
         LoginMember loginMember = new LoginMember(member);
 
@@ -99,7 +111,7 @@ class ReservationTicketServiceTest extends ServiceTest {
                 loginMember);
 
         List<MemberReservationResponseDto> comparedResponse = List.of(
-                new MemberReservationResponseDto(savedReservationTicket));
+                new MemberReservationResponseDto(savedReservationTicket, savedTossPayment));
 
         //then
         assertAll(
