@@ -7,12 +7,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.infrastructure.dto.TossPaymentErrorResponse;
-import roomescape.payment.infrastructure.dto.TossPaymentRequest;
 import roomescape.payment.application.service.PaymentClient;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.infrastructure.dto.TossPaymentErrorResponse;
+import roomescape.payment.infrastructure.dto.TossPaymentRequest;
 import roomescape.payment.presentation.dto.PaymentRequest;
-import roomescape.reservation.presentation.dto.ReservationRequest;
 
 public class TossPaymentClient implements PaymentClient {
 
@@ -42,8 +41,10 @@ public class TossPaymentClient implements PaymentClient {
                         status -> status.value() != 200,
                         (req, res) -> {
                             try (InputStream body = res.getBody()) {
-                                TossPaymentErrorResponse errorResponse = objectMapper.readValue(body, TossPaymentErrorResponse.class);
-                                throw new PaymentException(errorResponse, res.getStatusCode(), tossPaymentRequest.getOrderId());
+                                TossPaymentErrorResponse errorResponse = objectMapper.readValue(body,
+                                        TossPaymentErrorResponse.class);
+                                throw new PaymentException(errorResponse, res.getStatusCode(),
+                                        tossPaymentRequest.getOrderId());
                             } catch (IOException e) {
                                 throw new RuntimeException("에러 응답 파싱 처리에 실패했습니다", e);
                             }

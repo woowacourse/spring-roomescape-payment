@@ -56,22 +56,23 @@ public class ReservationService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchElementException("유저 정보를 찾을 수 없습니다."));
 
-        paymentService.approve(new PaymentRequest(
+        final Payment payment = paymentService.approve(new PaymentRequest(
                 reservationRequest.getPaymentKey(),
                 reservationRequest.getOrderId(),
                 reservationRequest.getAmount(),
                 reservationRequest.getPaymentType()
         ));
 
-        return createUserReservation(reservationRequest, member);
+        return createUserReservation(reservationRequest, member, payment);
     }
 
-    private ReservationResponse createUserReservation(final ReservationRequest reservationRequest, final Member member) {
+    private ReservationResponse createUserReservation(final ReservationRequest reservationRequest, final Member member, final Payment payment) {
         return createReservation(
                 reservationRequest.getTimeId(),
                 reservationRequest.getThemeId(),
                 reservationRequest.getDate(),
-                member
+                member,
+                payment
         );
     }
 
@@ -83,7 +84,8 @@ public class ReservationService {
                 adminReservationRequest.getTimeId(),
                 adminReservationRequest.getThemeId(),
                 adminReservationRequest.getDate(),
-                member
+                member,
+                null
         );
     }
 
@@ -142,7 +144,7 @@ public class ReservationService {
         });
     }
 
-    private ReservationResponse createReservation(Long timeId, Long themeId, LocalDate date, Member member) {
+    private ReservationResponse createReservation(Long timeId, Long themeId, LocalDate date, Member member, Payment payment) {
         ReservationTime reservationTime = getReservationTime(timeId);
         Theme theme = getTheme(themeId);
         validateReservationDateTime(date, reservationTime);
@@ -151,7 +153,8 @@ public class ReservationService {
                 member,
                 theme,
                 date,
-                reservationTime
+                reservationTime,
+                payment
         );
 
         return new ReservationResponse(reservationRepository.save(reservation));

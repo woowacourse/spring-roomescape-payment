@@ -10,6 +10,8 @@ public class ReservationResponse {
     private ThemeResponse theme;
     private LocalDate date;
     private ReservationTimeResponse time;
+    private String paymentKey;
+    private Integer amount;
 
     private ReservationResponse() {
     }
@@ -20,6 +22,8 @@ public class ReservationResponse {
         this.theme = new ThemeResponse(reservation.getTheme());
         this.date = reservation.getReservationInfo().getDate();
         this.time = new ReservationTimeResponse(reservation.getReservationTime());
+        this.paymentKey = reservation.getPayment().getPaymentKey();
+        this.amount = reservation.getPayment().getAmount();
     }
 
     public Long getId() {
@@ -40,5 +44,13 @@ public class ReservationResponse {
 
     public ThemeResponse getTheme() {
         return theme;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public Integer getAmount() {
+        return amount;
     }
 }
