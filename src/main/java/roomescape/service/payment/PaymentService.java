@@ -10,10 +10,11 @@ import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
-import roomescape.dto.response.TossPaymentResponse;
 
 import java.util.NoSuchElementException;
 import java.util.UUID;
+
+import static roomescape.dto.response.TossPaymentResponse.PaymentStatus;
 
 @RequiredArgsConstructor
 @Service
@@ -27,22 +28,24 @@ public class PaymentService {
 
     @Transactional
     public void approveAndSave(String paymentKey, String orderId, int amount, Long reservationId) {
-        final TossPaymentResponse response = approvePaymentSafely(paymentKey, orderId, amount);
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 예약입니다."));
-        paymentRepository.save(new Payment(response.paymentKey(), amount, reservation));
+        paymentRepository.save(new Payment(paymentKey, amount, reservation));
+        approvePaymentSafely(paymentKey, orderId, amount);
     }
 
-    private TossPaymentResponse approvePaymentSafely(String paymentKey, String orderId, int amount) {
+    private void approvePaymentSafely(String paymentKey, String orderId, int amount) {
         try {
-            return paymentApproveClient.approve(paymentKey, orderId, amount);
+            paymentApproveClient.approve(paymentKey, orderId, amount);
         } catch (RestClientException e) {
             // 결제 승인 요청 중 실패 -> 결제 승인 여부를 모르므로 결제 확인 요청
             int attempts = 0;
             while (attempts < 3) {
                 try {
                     attempts++;
-                    return paymentCheckClient.check(paymentKey);
+                    if (paymentCheckClient.checkStatus(paymentKey) == PaymentStatus.DONE) {
+                        return;
+                    }
                 } catch (HttpServerErrorException | ResourceAccessException ignored) {
                 }
             }

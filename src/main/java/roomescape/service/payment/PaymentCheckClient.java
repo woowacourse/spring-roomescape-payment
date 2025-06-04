@@ -31,12 +31,13 @@ public class PaymentCheckClient {
         this.paymentCheckUrl = paymentCheckUrl;
     }
 
-    public TossPaymentResponse check(String paymentKey) {
-        return restClient.get().uri(paymentCheckUrl, paymentKey)
+    public TossPaymentResponse.PaymentStatus checkStatus(String paymentKey) {
+        TossPaymentResponse response = restClient.get().uri(paymentCheckUrl, paymentKey)
                 .header("Authorization", getAuthorizations())
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .body(TossPaymentResponse.class);
+        return response.status();
     }
 
     private String getAuthorizations() {

@@ -7,7 +7,7 @@ public record TossPaymentResponse(
         int totalAmount,
         PaymentStatus status
 ) {
-    public static enum PaymentStatus {
+    public enum PaymentStatus {
         READY,
         IN_PROGRESS,
         WAITING_FOR_DEPOSIT,
