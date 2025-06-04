@@ -15,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import roomescape.common.exception.impl.BadRequestException;
 import roomescape.common.exception.impl.NotFoundException;
 import roomescape.payment.application.dto.PaymentDataRequest;
+import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.reservation.ReservationTestConfig;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.MemberReservationRequest;
@@ -29,6 +30,9 @@ class ReservationCommandServiceTest {
 
     @Autowired
     private ReservationCommandService reservationCommandService;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Test
     void 예약을_추가한다() {
@@ -69,7 +73,6 @@ class ReservationCommandServiceTest {
         assertThat(response.member().id()).isEqualTo(memberId);
     }
 
-
     @Test
     void 예약을_삭제한다() {
         assertThatCode(() -> reservationCommandService.deleteReservationById(8L))
@@ -89,9 +92,16 @@ class ReservationCommandServiceTest {
                 "dummy", "dummy", BigDecimal.valueOf(1000)
         );
 
-        reservationCommandService.deleteReservationById(8L);
+        reservationCommandService.addMemberWaiting(
+                new MemberWaitingRequest(
+                        LocalDate.now().plusDays(10),
+                        1L,
+                        1L
+                ),
+                1L
+        );
 
-        assertThatCode(() -> reservationCommandService.acceptReservation(2L, paymentDataRequest))
+        assertThatCode(() -> reservationCommandService.acceptReservation(4L, paymentDataRequest))
                 .doesNotThrowAnyException();
     }
 

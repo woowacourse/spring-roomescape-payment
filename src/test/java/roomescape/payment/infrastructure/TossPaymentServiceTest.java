@@ -54,7 +54,7 @@ class TossPaymentServiceTest {
         final Payment payment = paymentService.pay(paymentDataRequest, paymentConfirmRequest, reservation);
 
         // then
-        assertThat(payment.getStatus()).isEqualTo(PaymentStatus.SUCCESS);
+        assertThat(payment.getPaymentStatus()).isEqualTo(PaymentStatus.SUCCESS);
     }
 
     @Test
@@ -138,7 +138,7 @@ class TossPaymentServiceTest {
         final Payment payment = paymentService.await(paymentDataRequest, reservation);
 
         // then
-        assertThat(payment.getStatus()).isEqualTo(PaymentStatus.AWAIT);
+        assertThat(payment.getPaymentStatus()).isEqualTo(PaymentStatus.AWAIT);
     }
 
     @Test

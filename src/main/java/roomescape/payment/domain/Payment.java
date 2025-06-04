@@ -3,6 +3,7 @@ package roomescape.payment.domain;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,20 +29,26 @@ public class Payment {
 
     private BigDecimal amount;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Reservation reservation;
 
     @Enumerated(value = EnumType.STRING)
-    private PaymentStatus status;
+    private PaymentStatus paymentStatus;
 
-    private Payment(final Long id, final String orderId, final String paymentKey, final BigDecimal amount,
-                    final Reservation reservation, final PaymentStatus status) {
+    private Payment(
+            final Long id,
+            final String orderId,
+            final String paymentKey,
+            final BigDecimal amount,
+            final Reservation reservation,
+            final PaymentStatus paymentStatus
+    ) {
         this.id = id;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.amount = amount;
         this.reservation = reservation;
-        this.status = status;
+        this.paymentStatus = paymentStatus;
     }
 
     public static Payment pending(
@@ -62,16 +69,16 @@ public class Payment {
     }
 
     public void success() {
-        if (this.status != PaymentStatus.PENDING) {
+        if (this.paymentStatus != PaymentStatus.PENDING) {
             throw new IllegalStateException("결제 상태가 PENDING일 때만 성공으로 바꿀 수 있습니다.");
         }
-        this.status = PaymentStatus.SUCCESS;
+        this.paymentStatus = PaymentStatus.SUCCESS;
     }
 
     public void fail() {
-        if (this.status != PaymentStatus.PENDING) {
+        if (this.paymentStatus != PaymentStatus.PENDING) {
             throw new IllegalStateException("결제 상태가 PENDING일 때만 실패로 바꿀 수 있습니다.");
         }
-        this.status = PaymentStatus.FAILED;
+        this.paymentStatus = PaymentStatus.FAILED;
     }
 }

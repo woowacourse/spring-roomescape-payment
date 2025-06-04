@@ -86,7 +86,7 @@ class AdminReservationApiTest {
     void 예약을_성공적으로_삭제한다() {
         RestAssured.given().log().all()
                 .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
-                .when().delete("/admin/reservations/1")
+                .when().delete("/admin/reservations/8")
                 .then().log().all()
                 .statusCode(204);
     }

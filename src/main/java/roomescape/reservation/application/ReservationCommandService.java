@@ -13,6 +13,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.payment.application.PaymentService;
 import roomescape.payment.application.dto.PaymentDataRequest;
+import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.MemberReservationRequest;
 import roomescape.reservation.application.dto.MemberWaitingRequest;
@@ -37,6 +38,7 @@ public class ReservationCommandService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentRepository paymentRepository;
     private final PaymentService paymentService;
 
     public ReservationResponse addMemberReservation(
@@ -100,6 +102,7 @@ public class ReservationCommandService {
         if (!reservationRepository.existsById(id)) {
             throw new NotFoundException("존재하지 않는 예약입니다.");
         }
+        paymentRepository.deleteByReservationId(id);
         reservationRepository.deleteById(id);
     }
 
