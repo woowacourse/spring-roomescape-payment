@@ -57,10 +57,10 @@ public class ReservationTimeService {
     @Transactional
     public void remove(final long id) {
         if (!reservationTimeRepository.existsById(id)) {
-            throw new NoSuchElementException("[ERROR] 존재하지 않는 테마입니다.");
+            throw new NoSuchElementException("[ERROR] 존재하지 않는 예약 시간입니다.");
         }
         if (!reservationTimeRepository.isAvailableToRemove(id)) {
-            throw new IllegalArgumentException("[ERROR] 예약이 존재해 테마를 삭제할 수 없습니다.");
+            throw new IllegalArgumentException("[ERROR] 예약이 존재해 예약 시간을 삭제할 수 없습니다.");
         }
         reservationTimeRepository.deleteById(id);
     }

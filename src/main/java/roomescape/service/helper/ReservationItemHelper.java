@@ -3,14 +3,10 @@ package roomescape.service.helper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.reservationitem.ReservationItem;
-import roomescape.domain.reservationitem.ReservationItemRepository;
-import roomescape.domain.reservationitem.ReservationTheme;
-import roomescape.domain.reservationitem.ReservationThemeRepository;
-import roomescape.domain.reservationitem.ReservationTime;
-import roomescape.domain.reservationitem.ReservationTimeRepository;
+import roomescape.domain.reservationitem.*;
 
 import java.time.LocalDate;
+import java.util.NoSuchElementException;
 
 @RequiredArgsConstructor
 @Service
@@ -27,8 +23,10 @@ public class ReservationItemHelper {
     }
 
     private ReservationItem create(LocalDate date, long timeId, long themeId) {
-        final ReservationTime time = reservationTimeRepository.findById(timeId).orElseThrow();
-        final ReservationTheme theme = reservationThemeRepository.findById(themeId).orElseThrow();
+        final ReservationTime time = reservationTimeRepository.findById(timeId)
+                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 예약 시간입니다."));
+        final ReservationTheme theme = reservationThemeRepository.findById(themeId)
+                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 테마입니다."));
 
         final ReservationItem item = new ReservationItem(date, time, theme);
         return reservationItemRepository.save(item);
