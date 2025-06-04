@@ -73,14 +73,14 @@ public interface JpaReservationRepository extends ListCrudRepository<Reservation
 
     @Query(
             """
-            SELECT new roomescape.reservation.repository.dto.ReservationWithPayment(r,p)
-            FROM Reservation r
-            JOIN FETCH r.info.theme
-            JOIN FETCH r.info.time
-            LEFT JOIN Payment p
-                ON r.id = p.reservation.id
-            WHERE r.member.id = :memberId
-            """
+                    SELECT new roomescape.reservation.repository.dto.ReservationWithPayment(r,p)
+                    FROM Reservation r
+                    JOIN FETCH r.info.theme
+                    JOIN FETCH r.info.time
+                    LEFT JOIN Payment p
+                        ON r.id = p.reservation.id
+                    WHERE r.member.id = :memberId
+                    """
 
     )
     List<ReservationWithPayment> findReservationWithPaymentByMemberId(
