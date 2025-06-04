@@ -1,8 +1,5 @@
 package roomescape.reservation.domain;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,12 +10,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import roomescape.exception.ReservationException;
+import roomescape.global.exception.ReservationException;
 import roomescape.member.domain.Member;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
@@ -96,15 +95,15 @@ public class Reservation {
             final LocalDateTime currentDateTime,
             final Long rank
     ) {
-            return builder()
-                    .id(null)
-                    .date(date)
-                    .time(reservationTime)
-                    .theme(theme)
-                    .member(member)
-                    .currentDateTime(currentDateTime)
-                    .reservationStatus(ReservationStatus.waiting(rank))
-                    .build();
+        return builder()
+                .id(null)
+                .date(date)
+                .time(reservationTime)
+                .theme(theme)
+                .member(member)
+                .currentDateTime(currentDateTime)
+                .reservationStatus(ReservationStatus.waiting(rank))
+                .build();
     }
 
     private void validateFutureOrPresent(LocalDateTime currentDateTime) {

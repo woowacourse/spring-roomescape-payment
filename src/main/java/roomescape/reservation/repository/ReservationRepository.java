@@ -3,13 +3,11 @@ package roomescape.reservation.repository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import roomescape.exception.NotFoundException;
+import roomescape.global.exception.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
@@ -73,5 +71,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("theme") Theme theme
     );
 
-    boolean existsByDateAndTimeAndThemeAndMember(LocalDate date, ReservationTime reservationTime, Theme theme, Member member);
+    boolean existsByDateAndTimeAndThemeAndMember(LocalDate date, ReservationTime reservationTime, Theme theme,
+                                                 Member member);
 }

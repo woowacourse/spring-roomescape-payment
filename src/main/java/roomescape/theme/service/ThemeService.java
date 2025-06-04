@@ -3,11 +3,9 @@ package roomescape.theme.service;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import lombok.RequiredArgsConstructor;
-import roomescape.exception.ReservationException;
+import org.springframework.stereotype.Service;
+import roomescape.global.exception.ReservationException;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.dto.PopularThemeResponse;

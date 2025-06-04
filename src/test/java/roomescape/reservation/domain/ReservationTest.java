@@ -7,14 +7,12 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-
-import roomescape.exception.ReservationException;
+import roomescape.global.exception.ReservationException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.repository.MemberRepository;
@@ -49,7 +47,6 @@ class ReservationTest {
         theme = themeRepository.save(Theme.of("테마명", "테마 설명", "thumbnail.jpg"));
         time = reservationTimeRepository.save(ReservationTime.from(LocalTime.of(13, 0)));
     }
-
 
     private Theme defaultTheme = Theme.of("테마", "설명", "썸네일");
     private Member defaultMember = Member.withRole("member", "member@naver.com", "1234", MemberRole.MEMBER);
@@ -129,11 +126,11 @@ class ReservationTest {
         LocalDateTime currentDateTime = LocalDateTime.now();
 
         // when & then
-        assertThatThrownBy(() -> 
-            Reservation.of(date, time, theme, member, currentDateTime)
+        assertThatThrownBy(() ->
+                Reservation.of(date, time, theme, member, currentDateTime)
         )
-        .isInstanceOf(ReservationException.class)
-        .hasMessage("예약은 현재 시간 이후로 가능합니다.");
+                .isInstanceOf(ReservationException.class)
+                .hasMessage("예약은 현재 시간 이후로 가능합니다.");
     }
 
     @Test

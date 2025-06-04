@@ -1,11 +1,9 @@
 package roomescape.member.repository;
 
 import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import roomescape.exception.NotFoundException;
-import roomescape.exception.UnauthorizedException;
+import roomescape.global.exception.NotFoundException;
+import roomescape.global.exception.UnauthorizedException;
 import roomescape.member.domain.Member;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
@@ -15,7 +13,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     }
 
     Optional<Member> findByEmailAndPassword(final String email, final String password);
-
 
     default Member getByEmailAndPassword(final String email, final String password) {
         return findByEmailAndPassword(email, password)

@@ -3,7 +3,6 @@ package roomescape.auth.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -17,11 +16,10 @@ import roomescape.auth.dto.LoginCheckResponse;
 import roomescape.auth.dto.LoginRequest;
 import roomescape.auth.infrastructure.util.CookieManager;
 import roomescape.auth.service.AuthService;
-import roomescape.exception.UnauthorizedException;
+import roomescape.global.exception.UnauthorizedException;
 
 @RestController
 @RequiredArgsConstructor
-@Slf4j
 public class AuthController {
 
     private static final String COOKIE_TOKEN = "token";
@@ -31,16 +29,12 @@ public class AuthController {
 
     @PostMapping("/login")
     public void login(@RequestBody @Valid final LoginRequest request, final HttpServletResponse response) {
-        log.debug("로그인 시작");
 
-        final String token = authService.createToken(request);
-        log.debug("토큰 생성 완료");
+        String token = authService.createToken(request);
 
-        final ResponseCookie cookie = cookieManager.generateLoginCookie(token);
-        log.debug("쿠키 생성 완료");
+        ResponseCookie cookie = cookieManager.generateLoginCookie(token);
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-        log.debug("로그인 성공");
     }
 
     @PostMapping("/logout")

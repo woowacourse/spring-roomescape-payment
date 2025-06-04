@@ -1,14 +1,5 @@
 package roomescape.auth.infrastructure.jwt;
 
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
-
-import javax.crypto.SecretKey;
-
-import org.springframework.stereotype.Component;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwt;
@@ -19,9 +10,15 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Date;
+import javax.crypto.SecretKey;
+import org.springframework.stereotype.Component;
 import roomescape.auth.infrastructure.TokenProvider;
-import roomescape.exception.TokenCreationException;
-import roomescape.exception.UnauthorizedException;
+import roomescape.global.exception.TokenCreationException;
+import roomescape.global.exception.UnauthorizedException;
 
 @Component
 public class JwtTokenProvider implements TokenProvider {

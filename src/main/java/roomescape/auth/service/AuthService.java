@@ -1,21 +1,19 @@
 package roomescape.auth.service;
 
-import java.util.Optional;
-
-import org.springframework.stereotype.Service;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import roomescape.auth.dto.LoginCheckResponse;
 import roomescape.auth.dto.LoginMember;
 import roomescape.auth.dto.LoginRequest;
 import roomescape.auth.infrastructure.TokenProvider;
-import roomescape.exception.ForbiddenException;
-import roomescape.exception.NotFoundException;
-import roomescape.exception.UnauthorizedException;
+import roomescape.global.exception.ForbiddenException;
+import roomescape.global.exception.NotFoundException;
+import roomescape.global.exception.UnauthorizedException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 

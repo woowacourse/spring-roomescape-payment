@@ -1,6 +1,5 @@
 package roomescape.auth.infrastructure;
 
-
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
@@ -11,8 +10,8 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import roomescape.auth.dto.LoginMember;
 import roomescape.auth.service.AuthService;
-import roomescape.exception.NotFoundException;
-import roomescape.exception.UnauthorizedException;
+import roomescape.global.exception.NotFoundException;
+import roomescape.global.exception.UnauthorizedException;
 
 @Component
 @RequiredArgsConstructor

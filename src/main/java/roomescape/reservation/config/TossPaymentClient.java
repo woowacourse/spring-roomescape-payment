@@ -6,8 +6,8 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.exception.PaymentClientException;
-import roomescape.exception.RoomescapeException;
+import roomescape.global.exception.PaymentClientException;
+import roomescape.global.exception.RoomescapeException;
 import roomescape.reservation.dto.PaymentApprovalRequest;
 
 @Component

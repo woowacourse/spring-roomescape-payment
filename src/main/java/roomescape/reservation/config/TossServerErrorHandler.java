@@ -8,7 +8,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
-import roomescape.exception.RoomescapeException;
+import roomescape.global.exception.RoomescapeException;
 
 @Slf4j
 @Component

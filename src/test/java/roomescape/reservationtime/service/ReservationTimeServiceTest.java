@@ -11,12 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
-import roomescape.exception.ReservationException;
+import roomescape.global.exception.ReservationException;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.dto.ReservationTimeResponse;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
-
 
 @DataJpaTest
 @Sql("/data.sql")
@@ -70,7 +69,6 @@ class ReservationTimeServiceTest {
                 .doesNotContain(idToDelete);
     }
 
-
     @Test
     void 예약이_존재하는_시간을_삭제하지_못_한다() {
         // given
@@ -79,6 +77,5 @@ class ReservationTimeServiceTest {
         assertThatThrownBy(() -> service.delete(1L))
                 .isInstanceOf(ReservationException.class)
                 .hasMessage("해당 시간으로 예약된 건이 존재합니다.");
-
     }
 }
