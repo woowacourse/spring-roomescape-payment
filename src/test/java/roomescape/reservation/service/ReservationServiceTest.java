@@ -21,9 +21,9 @@ import roomescape.fake.FakeThemeDao;
 import roomescape.global.auth.LoginMember;
 import roomescape.global.exception.custom.BadRequestException;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.dto.CreateReservationWithMemberRequest;
+import roomescape.reservation.dto.AdminReservationCreateRequest;
+import roomescape.reservation.dto.AdminReservationResponse;
 import roomescape.reservation.dto.MyReservationResponse;
-import roomescape.reservation.dto.ReservationResponse;
 
 class ReservationServiceTest {
 
@@ -42,9 +42,9 @@ class ReservationServiceTest {
         reservationTimeDao.save(TIME);
         themeDao.save(THEME);
         fakeMemberDao.save(MEMBER);
-        CreateReservationWithMemberRequest request1 = new CreateReservationWithMemberRequest(
+        AdminReservationCreateRequest request1 = new AdminReservationCreateRequest(
                 TOMORROW, TIME.getId(), THEME.getId(), MEMBER.getId());
-        CreateReservationWithMemberRequest request2 = new CreateReservationWithMemberRequest(TOMORROW.plusDays(1),
+        AdminReservationCreateRequest request2 = new AdminReservationCreateRequest(TOMORROW.plusDays(1),
                 TIME.getId(), THEME.getId(), MEMBER.getId());
         reservationCommandService.createReservationByAdmin(request1);
         reservationCommandService.createReservationByAdmin(request2);
@@ -54,7 +54,7 @@ class ReservationServiceTest {
     @Nested
     class CreateReservationTest {
 
-        private static final CreateReservationWithMemberRequest REQUEST = new CreateReservationWithMemberRequest(
+        private static final AdminReservationCreateRequest REQUEST = new AdminReservationCreateRequest(
                 TOMORROW.plusDays(2),
                 TIME.getId(),
                 THEME.getId(),
@@ -65,7 +65,7 @@ class ReservationServiceTest {
         @Test
         void testCreate() {
             // when
-            ReservationResponse result = reservationCommandService.createReservationByAdmin(REQUEST);
+            AdminReservationResponse result = reservationCommandService.createReservationByAdmin(REQUEST);
             // then
             Reservation savedReservation = reservationDao.findById(3L).orElseThrow();
             assertAll(
@@ -108,7 +108,7 @@ class ReservationServiceTest {
         @Test
         void testValidateTime() {
             // given
-            CreateReservationWithMemberRequest request = new CreateReservationWithMemberRequest(TOMORROW, 2L,
+            AdminReservationCreateRequest request = new AdminReservationCreateRequest(TOMORROW, 2L,
                     THEME.getId(), MEMBER.getId());
             // when
             // then
@@ -121,7 +121,7 @@ class ReservationServiceTest {
         @Test
         void testValidateTheme() {
             // given
-            CreateReservationWithMemberRequest request = new CreateReservationWithMemberRequest(TOMORROW, TIME.getId(),
+            AdminReservationCreateRequest request = new AdminReservationCreateRequest(TOMORROW, TIME.getId(),
                     2L, MEMBER.getId());
             // when
             // then
@@ -135,7 +135,7 @@ class ReservationServiceTest {
         void testValidatePastTime() {
             // given
             LocalDate yesterday = LocalDate.now().minusDays(1);
-            CreateReservationWithMemberRequest request = new CreateReservationWithMemberRequest(yesterday, TIME.getId(),
+            AdminReservationCreateRequest request = new AdminReservationCreateRequest(yesterday, TIME.getId(),
                     THEME.getId(), MEMBER.getId());
             // when
             // then
@@ -150,7 +150,7 @@ class ReservationServiceTest {
     void testFindAll() {
         // given
         // when
-        List<ReservationResponse> reservations = reservationQueryService.getReservations();
+        List<AdminReservationResponse> reservations = reservationQueryService.findAllReservationsForAdmin();
         // then
         assertThat(reservations).hasSize(2);
     }
@@ -163,7 +163,7 @@ class ReservationServiceTest {
         // when
         reservationCommandService.cancelReservationById(1L);
         // then
-        assertThat(reservationQueryService.getReservations()).hasSize(1);
+        assertThat(reservationQueryService.findAllReservationsForAdmin()).hasSize(1);
     }
 
     @DisplayName("나의 예약 목록을 조회할 수 있다.")

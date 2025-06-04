@@ -10,9 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.global.auth.AuthMember;
 import roomescape.global.auth.LoginMember;
-import roomescape.reservation.dto.CreateReservationWithPaymentRequest;
+import roomescape.reservation.dto.AdminReservationResponse;
 import roomescape.reservation.dto.MyReservationResponse;
-import roomescape.reservation.dto.ReservationResponse;
+import roomescape.reservation.dto.UserReservationCreateRequest;
+import roomescape.reservation.dto.UserReservationResponse;
 import roomescape.reservation.service.ReservationCommandService;
 import roomescape.reservation.service.ReservationQueryService;
 
@@ -29,17 +30,18 @@ public class ReservationController {
     }
 
     @PostMapping("/reservations")
-    public ResponseEntity<ReservationResponse> create(
-            @RequestBody @Valid final CreateReservationWithPaymentRequest request,
+    public ResponseEntity<UserReservationResponse> create(
+            @RequestBody @Valid final UserReservationCreateRequest request,
             @AuthMember final LoginMember member
     ) {
-        final ReservationResponse response = reservationCommandService.createMyReservationWithPayments(request, member);
+        final UserReservationResponse response = reservationCommandService.createMyReservationByUser(
+                request, member);
         return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
     }
 
     @GetMapping("/reservations")
-    public ResponseEntity<List<ReservationResponse>> findAll() {
-        final List<ReservationResponse> responses = reservationQueryService.getReservations();
+    public ResponseEntity<List<AdminReservationResponse>> findAll() {
+        final List<AdminReservationResponse> responses = reservationQueryService.findAllReservationsForAdmin();
         return ResponseEntity.ok().body(responses);
     }
 

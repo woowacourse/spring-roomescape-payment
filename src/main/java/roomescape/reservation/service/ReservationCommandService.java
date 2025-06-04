@@ -13,9 +13,10 @@ import roomescape.member.repository.MemberRepository;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.dto.CreateReservationWithMemberRequest;
-import roomescape.reservation.dto.CreateReservationWithPaymentRequest;
-import roomescape.reservation.dto.ReservationResponse;
+import roomescape.reservation.dto.AdminReservationCreateRequest;
+import roomescape.reservation.dto.AdminReservationResponse;
+import roomescape.reservation.dto.UserReservationCreateRequest;
+import roomescape.reservation.dto.UserReservationResponse;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
@@ -48,8 +49,8 @@ public class ReservationCommandService {
     }
 
     @Transactional
-    public ReservationResponse createMyReservationWithPayments(final CreateReservationWithPaymentRequest request,
-                                                               final LoginMember loginMember) {
+    public UserReservationResponse createMyReservationByUser(final UserReservationCreateRequest request,
+                                                             final LoginMember loginMember) {
         final Member member = memberRepository.findById(loginMember.id())
                 .orElseThrow(() -> new UnauthorizedException("예약자를 찾을 수 없습니다."));
         final Payment payment = paymentService.confirmAndSavePayment(new PaymentsConfirmRequest(request));
@@ -61,10 +62,10 @@ public class ReservationCommandService {
                 payment
         );
         final Reservation savedReservation = reservationRepository.save(reservation);
-        return new ReservationResponse(savedReservation);
+        return new UserReservationResponse(savedReservation);
     }
 
-    public ReservationResponse createReservationByAdmin(final CreateReservationWithMemberRequest request) {
+    public AdminReservationResponse createReservationByAdmin(final AdminReservationCreateRequest request) {
         final Member member = memberRepository.findById(request.memberId())
                 .orElseThrow(() -> new BadRequestException("예약자를 찾을 수 없습니다."));
         final Reservation reservation = convertToReservation(
@@ -74,7 +75,7 @@ public class ReservationCommandService {
                 member
         );
         final Reservation savedReservation = reservationRepository.save(reservation);
-        return new ReservationResponse(savedReservation);
+        return new AdminReservationResponse(savedReservation);
     }
 
     public void cancelReservationById(final long id) {
