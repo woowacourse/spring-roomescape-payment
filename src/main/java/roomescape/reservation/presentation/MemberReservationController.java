@@ -17,13 +17,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.annotation.LoginMember;
-import roomescape.auth.dto.LoginMemberInfo;
-import roomescape.common.dto.ExceptionResponse;
-import roomescape.member.dto.MyReservationResponse;
-import roomescape.reservation.dto.ReservationRequest;
-import roomescape.reservation.dto.ReservationResponse;
-import roomescape.reservation.dto.WaitingResponse;
-import roomescape.reservation.service.ReservationService;
+import roomescape.auth.dto.info.LoginMemberInfo;
+import roomescape.common.dto.response.ExceptionResponse;
+import roomescape.reservation.dto.response.ReservationMineResponse;
+import roomescape.reservation.dto.request.ReservationRequest;
+import roomescape.reservation.dto.response.ReservationResponse;
+import roomescape.reservation.dto.response.WaitingResponse;
+import roomescape.reservation.application.ReservationService;
 
 @RestController
 public class MemberReservationController {
@@ -60,8 +60,8 @@ public class MemberReservationController {
     }
 
     @GetMapping("/reservations/me")
-    public ResponseEntity<List<MyReservationResponse>> getMyReservations(@LoginMember LoginMemberInfo loginMemberInfo) {
-        List<MyReservationResponse> response = reservationService.getMemberReservations(loginMemberInfo);
+    public ResponseEntity<List<ReservationMineResponse>> getMyReservations(@LoginMember LoginMemberInfo loginMemberInfo) {
+        List<ReservationMineResponse> response = reservationService.getMemberReservations(loginMemberInfo);
 
         return ResponseEntity.ok().body(response);
     }

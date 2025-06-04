@@ -17,7 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.dto.request.PaymentRequest;
 import roomescape.payment.exception.TossPaymentClientException;
 import roomescape.payment.exception.TossPaymentErrorHandler;
 import roomescape.payment.exception.TossPaymentServerException;

@@ -3,7 +3,7 @@ INSERT INTO theme (name, description, thumbnail) VALUES
     ('테마2', '무서움', '/image/default.jpg'),
     ('테마3', '놀라움', '/image/default.jpg');
 
-INSERT INTO reservation_time (start_at) VALUES
+INSERT INTO time_slot (start_at) VALUES
     ('10:00'),
     ('11:00'),
     ('12:00');

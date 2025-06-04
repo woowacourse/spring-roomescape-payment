@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.annotation.LoginAdmin;
-import roomescape.auth.dto.LoginAdminInfo;
-import roomescape.auth.dto.SearchCondition;
-import roomescape.reservation.dto.AdminReservationRequest;
-import roomescape.reservation.dto.ReservationRequest;
-import roomescape.reservation.dto.ReservationResponse;
-import roomescape.reservation.service.ReservationService;
+import roomescape.auth.dto.info.LoginAdminInfo;
+import roomescape.reservation.dto.ReservationSearchCondition;
+import roomescape.reservation.dto.request.ReservationAdminRequest;
+import roomescape.reservation.dto.request.ReservationRequest;
+import roomescape.reservation.dto.response.ReservationResponse;
+import roomescape.reservation.application.ReservationService;
 
 @RestController
 public class AdminReservationController {
@@ -34,7 +34,7 @@ public class AdminReservationController {
     }
 
     @PostMapping("/admin/reservations")
-    public ResponseEntity<ReservationResponse> createReservation(@RequestBody AdminReservationRequest request) {
+    public ResponseEntity<ReservationResponse> createReservation(@RequestBody ReservationAdminRequest request) {
         ReservationResponse response = reservationService.createReservation(
             new ReservationRequest(
                 request.date(),
@@ -49,7 +49,7 @@ public class AdminReservationController {
     }
 
     @GetMapping("/admin/reservations")
-    public ResponseEntity<List<ReservationResponse>> reservationFilter(@ModelAttribute SearchCondition condition) {
+    public ResponseEntity<List<ReservationResponse>> reservationFilter(@ModelAttribute ReservationSearchCondition condition) {
         List<ReservationResponse> responses = reservationService.searchReservationWithCondition(condition);
 
         return ResponseEntity.ok().body(responses);

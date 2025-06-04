@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import roomescape.auth.exception.ForbiddenException;
 import roomescape.auth.exception.UnauthorizedException;
-import roomescape.common.dto.ExceptionResponse;
+import roomescape.common.dto.response.ExceptionResponse;
 
 @RestControllerAdvice
 public class AuthExceptionHandler {

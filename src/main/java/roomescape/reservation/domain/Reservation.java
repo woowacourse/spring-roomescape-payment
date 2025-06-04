@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import roomescape.common.exception.BusinessException;
 import roomescape.member.domain.Member;
-import roomescape.reservation.infrastructure.StatusConverter;
-import roomescape.reservationTime.domain.ReservationTime;
+import roomescape.reservation.infrastructure.ReservationStatusConverter;
+import roomescape.timeslot.domain.TimeSlot;
 import roomescape.theme.domain.Theme;
 
 @Entity
@@ -25,7 +25,7 @@ public class Reservation {
     private LocalDate date;
 
     @ManyToOne
-    private ReservationTime time;
+    private TimeSlot time;
 
     @ManyToOne
     private Theme theme;
@@ -33,7 +33,7 @@ public class Reservation {
     @ManyToOne
     private Member member;
 
-    @Convert(converter = StatusConverter.class)
+    @Convert(converter = ReservationStatusConverter.class)
     private Status status;
 
     protected Reservation() {
@@ -41,7 +41,7 @@ public class Reservation {
 
     private Reservation(final Long id,
                         final LocalDate date,
-                        final ReservationTime time,
+                        final TimeSlot time,
                         final Theme theme,
                         final Member member,
                         final Status status
@@ -67,7 +67,7 @@ public class Reservation {
     }
 
     public static Reservation createWithoutId(final LocalDate date,
-                                              final ReservationTime time,
+                                              final TimeSlot time,
                                               final Theme theme,
                                               final Member member,
                                               final Status status
@@ -83,7 +83,7 @@ public class Reservation {
         return date.isEqual(dateTime.toLocalDate()) && time.isBefore(dateTime.toLocalTime());
     }
 
-    public boolean isSameTime(final ReservationTime time) {
+    public boolean isSameTime(final TimeSlot time) {
         return this.time.isEqual(time.getStartAt());
     }
 
@@ -103,7 +103,7 @@ public class Reservation {
         return date;
     }
 
-    public ReservationTime getTime() {
+    public TimeSlot getTime() {
         return time;
     }
 

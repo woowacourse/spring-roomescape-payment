@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.domain.PaymentClient;
-import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResponse;
+import roomescape.payment.dto.request.PaymentRequest;
+import roomescape.payment.dto.response.PaymentResponse;
 import roomescape.payment.exception.TossPaymentErrorHandler;
 
 public class TossPaymentClient implements PaymentClient {

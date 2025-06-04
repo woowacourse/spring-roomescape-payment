@@ -9,7 +9,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.ResourceAccessException;
-import roomescape.common.dto.ExceptionResponse;
+import roomescape.common.dto.response.ExceptionResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
