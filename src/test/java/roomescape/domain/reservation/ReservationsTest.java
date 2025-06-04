@@ -32,11 +32,13 @@ class ReservationsTest {
     @DisplayName("주어진 타임 슬롯들에 대해 예약되었는 지 여부를 확인한다.")
     void checkBookStatuses() {
         // given
-        var timeSlots = List.of(time1, time2, time3);
-        var reservations = new Reservations(List.of(reservationOf(time1), reservationOf(time2)));
+        var reservations = new Reservations(List.of(
+            reservationOf(time1),
+            reservationOf(time2)
+        ));
 
         // when
-        var bookStatuses = reservations.checkBookStatuses(timeSlots);
+        var bookStatuses = reservations.checkBookStatuses(List.of(time1, time2, time3));
 
         // then
         assertThat(bookStatuses).containsExactly(

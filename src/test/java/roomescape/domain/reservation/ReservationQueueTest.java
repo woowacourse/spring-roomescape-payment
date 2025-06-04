@@ -58,8 +58,9 @@ class ReservationQueueTest {
         var queue = new ReservationQueue(emptyList());
         var reservation = reservationOf(schedule, user1);
 
-        assertThatThrownBy(() -> queue.orderOf(reservation))
-            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(
+            () -> queue.orderOf(reservation)
+        ).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -68,8 +69,9 @@ class ReservationQueueTest {
         var queue = new ReservationQueue(emptyList());
         var reservation = reservationOf(otherSchedule, user1);
 
-        assertThatThrownBy(() -> queue.orderOf(reservation))
-            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(
+            () -> queue.orderOf(reservation)
+        ).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
