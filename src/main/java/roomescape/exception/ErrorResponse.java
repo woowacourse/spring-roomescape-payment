@@ -37,6 +37,15 @@ public record ErrorResponse(
         );
     }
 
+    public static ErrorResponse externalApiErrorResponse() {
+        return new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "",
+                "외부API 통신 과정에서 오류가 발생하였습니다."
+        );
+    }
+
     public ResponseEntity<ErrorResponse> toResponseEntity() {
         return ResponseEntity.status(status).body(this);
     }

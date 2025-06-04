@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ExternalApiErrorException.class)
     public ResponseEntity<ErrorResponse> handle(ExternalApiErrorException e) {
         logger.warn("Handled ExternalApiErrorException: {}", e.getMessage());
-        return ErrorResponse.securedResponse().toResponseEntity();
+        return ErrorResponse.externalApiErrorResponse().toResponseEntity();
     }
 
     @ExceptionHandler(Exception.class)
