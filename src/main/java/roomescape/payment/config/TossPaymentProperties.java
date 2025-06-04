@@ -7,10 +7,19 @@ public class TossPaymentProperties {
 
     private final String baseUrl;
     private final String secretKey;
+    private final int connectTimeout;
+    private final int readTimeout;
 
-    public TossPaymentProperties(final String baseUrl, final String secretKey) {
+    public TossPaymentProperties(
+        final String baseUrl,
+        final String secretKey,
+        final int connectTimeout,
+        final int readTimeout
+    ) {
         this.baseUrl = baseUrl;
         this.secretKey = secretKey;
+        this.connectTimeout = connectTimeout;
+        this.readTimeout = readTimeout;
     }
 
     public String getBaseUrl() {
@@ -19,5 +28,13 @@ public class TossPaymentProperties {
 
     public String getSecretKey() {
         return secretKey;
+    }
+
+    public int getConnectTimeout() {
+        return connectTimeout;
+    }
+
+    public int getReadTimeout() {
+        return readTimeout;
     }
 }

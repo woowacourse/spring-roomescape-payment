@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.application.dto.TossConfirmRequest;
@@ -29,11 +30,19 @@ public class TossPaymentGatewayClient {
         final TossPaymentProperties properties
     ) {
         this.restClient = restClientBuilder
+            .requestFactory(createTimeoutFactory(properties))
             .baseUrl(properties.getBaseUrl())
             .defaultHeader(AUTHORIZATION, encodeSecretKey(properties.getSecretKey()))
             .defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
             .defaultStatusHandler(new TossPaymentErrorHandler(objectMapper))
             .build();
+    }
+
+    private SimpleClientHttpRequestFactory createTimeoutFactory(final TossPaymentProperties properties) {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(properties.getConnectTimeout());
+        factory.setReadTimeout(properties.getReadTimeout());
+        return factory;
     }
 
     private String encodeSecretKey(final String secretKey) {

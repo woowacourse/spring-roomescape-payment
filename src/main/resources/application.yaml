@@ -23,13 +23,19 @@ spring:
         format_sql: true
     defer-datasource-initialization: true
 
+  http:
+    client:
+      read-timeout: 30000
+      connect-timeout: 3000
 security:
   jwt:
     token:
       secret-key: s8R$kQz3nZ!L5pT7c@J#xM9vB1&uD6hE
       access:
         expire-length: 600000 # 10 분
-        
+
 toss:
   base-url: https://api.tosspayments.com
   secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+  connect-timeout: 3000
+  read-timeout: 30000
