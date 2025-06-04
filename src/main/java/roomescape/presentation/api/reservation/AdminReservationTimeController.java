@@ -17,7 +17,7 @@ import roomescape.presentation.api.reservation.request.CreateReservationTimeRequ
 @RequestMapping("/admin/times")
 public class AdminReservationTimeController {
 
-    private static final String RESERVATION_TIMES_URL = "/times/%d";
+    private static final String RESERVATION_TIMES_URL_FORMAT = "/times/%d";
 
     private final CreateReservationTimeService createReservationTimeService;
     private final DeleteReservationTimeService deleteReservationTimeService;
@@ -32,7 +32,7 @@ public class AdminReservationTimeController {
     public ResponseEntity<Void> create(
             @Valid @RequestBody CreateReservationTimeRequest createReservationTImeRequest) {
         Long id = createReservationTimeService.register(createReservationTImeRequest.toCreateCommand());
-        return ResponseEntity.created(URI.create(RESERVATION_TIMES_URL.formatted(id)))
+        return ResponseEntity.created(URI.create(RESERVATION_TIMES_URL_FORMAT.formatted(id)))
                 .build();
     }
 

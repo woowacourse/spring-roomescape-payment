@@ -17,7 +17,7 @@ import roomescape.application.member.query.dto.MemberResult;
 @RequestMapping("/members")
 public class MemberController {
 
-    private static final String MEMBERS_URL = "/members/%d";
+    private static final String MEMBERS_URL_FORMAT = "/members/%d";
 
     private final CreateMemberService createMemberService;
     private final MemberQueryService memberQueryService;
@@ -30,7 +30,7 @@ public class MemberController {
     @PostMapping
     public ResponseEntity<Void> createMember(@Valid @RequestBody SignupRequest signupRequest) {
         Long id = createMemberService.register(signupRequest.toRegisterCommand());
-        return ResponseEntity.created(URI.create(MEMBERS_URL.formatted(id))).build();
+        return ResponseEntity.created(URI.create(MEMBERS_URL_FORMAT.formatted(id))).build();
     }
 
     @GetMapping

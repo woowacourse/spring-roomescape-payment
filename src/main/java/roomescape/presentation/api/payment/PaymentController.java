@@ -13,7 +13,7 @@ import roomescape.application.payment.command.CreatePaymentService;
 @RequestMapping("/payments")
 public class PaymentController {
 
-    private static final String PAYMENTS_URL = "/payments/%d";
+    private static final String PAYMENTS_URL_FORMAT = "/payments/%d";
 
     private final CreatePaymentService createPaymentService;
 
@@ -24,6 +24,6 @@ public class PaymentController {
     @PostMapping
     public ResponseEntity<Void> createPayment(@Valid @RequestBody CreatePaymentRequest createPaymentRequest) {
         Long id = createPaymentService.register(createPaymentRequest.toPaymentCommand());
-        return ResponseEntity.created(URI.create(PAYMENTS_URL.formatted(id))).build();
+        return ResponseEntity.created(URI.create(PAYMENTS_URL_FORMAT.formatted(id))).build();
     }
 }

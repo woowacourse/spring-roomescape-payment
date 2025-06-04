@@ -25,7 +25,7 @@ import roomescape.presentation.api.reservation.response.ReservationResponse;
 @RequestMapping("/admin/reservations")
 public class AdminReservationController {
 
-    private static final String RESERVATIONS_URL = "/reservations/%d";
+    private static final String RESERVATIONS_URL_FORMAT = "/reservations/%d";
 
     private final CreateReservationService createReservationService;
     private final DeleteReservationService deleteReservationService;
@@ -43,7 +43,7 @@ public class AdminReservationController {
     public ResponseEntity<Void> createReservation(
             @Valid @RequestBody CreateAdminReservationRequest createAdminReservationRequest) {
         Long id = createReservationService.reserve(createAdminReservationRequest.toCreateCommand());
-        return ResponseEntity.created(URI.create(RESERVATIONS_URL.formatted(id)))
+        return ResponseEntity.created(URI.create(RESERVATIONS_URL_FORMAT.formatted(id)))
                 .build();
     }
 

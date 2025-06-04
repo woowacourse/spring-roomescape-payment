@@ -17,7 +17,7 @@ import roomescape.presentation.api.reservation.request.CreateThemeRequest;
 @RequestMapping("/admin/themes")
 public class AdminThemeController {
 
-    private static final String THEMES_URL = "/themes/%d";
+    private static final String THEMES_URL_FORMAT = "/themes/%d";
 
     private final CreateThemeService createThemeService;
     private final DeleteThemeService deleteThemeService;
@@ -31,7 +31,7 @@ public class AdminThemeController {
     @PostMapping
     public ResponseEntity<Void> create(@Valid @RequestBody CreateThemeRequest createThemeRequest) {
         Long id = createThemeService.register(createThemeRequest.toCreateCommand());
-        return ResponseEntity.created(URI.create(THEMES_URL.formatted(id)))
+        return ResponseEntity.created(URI.create(THEMES_URL_FORMAT.formatted(id)))
                 .build();
     }
 
