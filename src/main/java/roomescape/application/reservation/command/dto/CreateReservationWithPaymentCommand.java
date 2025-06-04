@@ -1,6 +1,6 @@
 package roomescape.application.reservation.command.dto;
 
-import roomescape.application.payment.dto.PaymentCommand;
+import roomescape.application.payment.dto.TossPaymentCommand;
 
 import java.time.LocalDate;
 
@@ -19,7 +19,7 @@ public record CreateReservationWithPaymentCommand(
         return new CreateReservationCommand(date, timeId, themeId, memberId);
     }
 
-    public PaymentCommand toPaymentCommand() {
-        return new PaymentCommand(paymentKey, orderId, amount);
+    public TossPaymentCommand toPaymentCommand() {
+        return new TossPaymentCommand(paymentKey, orderId, amount);
     }
 }

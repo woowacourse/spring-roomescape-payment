@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
-class PaymentControllerTest {
+class TossTossPaymentControllerTest {
 
     @LocalServerPort
     int port;

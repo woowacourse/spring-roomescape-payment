@@ -9,23 +9,25 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import roomescape.domain.BaseEntity;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@EqualsAndHashCode(of = "id")
-public class Payment {
+public class TossPayment extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String paymentKey;
 
     private String orderId;
 
     private long amount;
 
-    public Payment(final String orderId, final Long amount) {
-        this(null, orderId, amount);
+    public TossPayment(
+            final String paymentKey,
+            final String orderId,
+            final long amount) {
+        this.paymentKey = paymentKey;
+        this.orderId = orderId;
+        this.amount = amount;
     }
 }

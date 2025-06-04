@@ -1,6 +1,6 @@
 package roomescape.application.payment.dto;
 
-public record PaymentValidationCommand(
+public record TossPaymentValidationCommand(
         String orderId,
         Long amount
 ) {

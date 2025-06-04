@@ -3,26 +3,26 @@ package roomescape.application.payment;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import roomescape.application.payment.dto.PaymentValidationCommand;
+import roomescape.application.payment.dto.TossPaymentValidationCommand;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 @SpringBootTest
-class PaymentValidatorTest {
+class TossPaymentValidatorTest {
 
     @Autowired
     private OrderAmountVerificationCache orderAmountVerificationCache;
 
     @Autowired
-    private PaymentValidator paymentValidator;
+    private TossPaymentValidator tossPaymentValidator;
 
     @Test
     void 결제_생성_서비스_테스트() {
         // given
-        final PaymentValidationCommand command = new PaymentValidationCommand("orderId", 10000L);
+        final TossPaymentValidationCommand command = new TossPaymentValidationCommand("orderId", 10000L);
 
         // when
-        paymentValidator.register(command);
+        tossPaymentValidator.register(command);
 
         // then
         assertThatCode(() -> orderAmountVerificationCache.check(command.orderId(), command.amount()))

@@ -8,20 +8,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.application.payment.PaymentValidator;
+import roomescape.application.payment.TossPaymentValidator;
+import roomescape.presentation.api.payment.dto.TossPaymentValidationRequest;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/payments")
-public class PaymentController {
+public class TossPaymentController {
 
     private static final String PAYMENTS_URL = "/payments/%d";
 
-    private final PaymentValidator paymentValidator;
+    private final TossPaymentValidator tossPaymentValidator;
 
     @PostMapping("/validation")
-    public ResponseEntity<Void> createValidation(@Valid @RequestBody final PaymentValidationRequest paymentValidationRequest) {
-        paymentValidator.register(paymentValidationRequest.toCommand());
+    public ResponseEntity<Void> createValidation(@Valid @RequestBody final TossPaymentValidationRequest paymentValidationRequest) {
+        tossPaymentValidator.register(paymentValidationRequest.toCommand());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

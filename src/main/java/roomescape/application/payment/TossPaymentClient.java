@@ -12,7 +12,7 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.application.payment.dto.PaymentCommand;
+import roomescape.application.payment.dto.TossPaymentCommand;
 import roomescape.infrastructure.error.exception.PaymentException;
 
 import java.io.IOException;
@@ -49,7 +49,7 @@ public class TossPaymentClient {
                 .build();
     }
 
-    public void approve(final PaymentCommand command) {
+    public void approve(final TossPaymentCommand command) {
         restClient.post()
                 .uri(CONFIRM_URI)
                 .header(HttpHeaders.AUTHORIZATION, createAuthorizationHeader())
