@@ -6,7 +6,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.theme.dto.ThemeResponse;
 import roomescape.time.dto.ReservationTimeResponse;
 
-public record ReservationResponse(
+public record AdminReservationResponse(
         Long id,
         MemberResponse member,
         LocalDate date,
@@ -14,7 +14,7 @@ public record ReservationResponse(
         ThemeResponse theme
 ) {
 
-    public ReservationResponse(final Reservation reservation) {
+    public AdminReservationResponse(final Reservation reservation) {
         this(
                 reservation.getId(),
                 new MemberResponse(reservation.getMember()),

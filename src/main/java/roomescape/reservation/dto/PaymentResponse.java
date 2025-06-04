@@ -10,6 +10,11 @@ public record PaymentResponse(
 ) {
 
     public PaymentResponse(final Payment payment) {
-        this(payment.getId(), payment.getPaymentKey().getValue(), null, payment.getAmount().getValue()); // TODO
+        this(
+                payment.getId(),
+                payment.getPaymentKey().getValue(),
+                payment.getOrderId().getValue(),
+                payment.getAmount().getValue()
+        );
     }
 }

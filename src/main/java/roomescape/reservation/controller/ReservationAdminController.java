@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.reservation.dto.CreateReservationWithMemberRequest;
-import roomescape.reservation.dto.ReservationResponse;
+import roomescape.reservation.dto.AdminReservationCreateRequest;
+import roomescape.reservation.dto.AdminReservationResponse;
 import roomescape.reservation.service.ReservationCommandService;
 import roomescape.reservation.service.ReservationQueryService;
 
@@ -32,20 +32,20 @@ public class ReservationAdminController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponse> createByAdmin(
-            @RequestBody @Valid final CreateReservationWithMemberRequest request) {
-        final ReservationResponse response = reservationCommandService.createReservationByAdmin(request);
+    public ResponseEntity<AdminReservationResponse> createByAdmin(
+            @RequestBody @Valid final AdminReservationCreateRequest request) {
+        final AdminReservationResponse response = reservationCommandService.createReservationByAdmin(request);
         return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
     }
 
     @GetMapping
-    public ResponseEntity<List<ReservationResponse>> findAll(
+    public ResponseEntity<List<AdminReservationResponse>> findAll(
             @RequestParam(value = "memberId") final Long memberId,
             @RequestParam(value = "themeId") final Long themeId,
             @RequestParam(value = "dateFrom") final LocalDate dateFrom,
             @RequestParam(value = "dateTo") final LocalDate dateTo
     ) {
-        final List<ReservationResponse> responses = reservationQueryService.getReservations(
+        final List<AdminReservationResponse> responses = reservationQueryService.findFilteredReservationsForAdmin(
                 memberId,
                 themeId,
                 dateFrom,
