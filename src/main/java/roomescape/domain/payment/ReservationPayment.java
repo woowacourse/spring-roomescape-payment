@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.util.Objects;
 import roomescape.domain.BaseEntity;
 import roomescape.domain.reservation.Reservation;
 
@@ -48,5 +49,19 @@ public class ReservationPayment extends BaseEntity {
 
     public Payment getPayment() {
         return payment;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ReservationPayment that = (ReservationPayment) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
     }
 }
