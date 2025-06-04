@@ -11,10 +11,12 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,10 +24,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.ResponseCreator;
+import org.springframework.web.client.RestTemplate;
 import roomescape.application.exception.PaymentException;
+import roomescape.infrastructure.config.RestTemplateConfig;
 import roomescape.presentation.dto.request.PaymentProcessRequest;
 
 @RestClientTest(TossPaymentRestClient.class)
+@Import(RestTemplateConfig.class)
 @TestPropertySource(properties = {
         "toss.payment.api.base-url=http://localhost:8080",
         "toss.payment.api.key=test_sk_key"
@@ -36,11 +41,17 @@ class TossPaymentRestClientTest {
     private TossPaymentRestClient tossPaymentRestClient;
 
     @Autowired
-    private MockRestServiceServer mockServer;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private RestTemplate restTemplate;
+
+    private MockRestServiceServer mockServer;
+
+    @BeforeEach
+    void setUp() {
+        mockServer = MockRestServiceServer.bindTo(restTemplate).build();
+    }
 
     @Test
     @DisplayName("결제 승인 요청 성공시 응답을 반환한다")
