@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URI;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.client.ClientHttpResponse;
@@ -14,9 +15,10 @@ import roomescape.exception.RoomescapeException;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class TossClientErrorHandler implements ResponseErrorHandler {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     public boolean hasError(ClientHttpResponse response) throws IOException {
@@ -30,7 +32,7 @@ public class TossClientErrorHandler implements ResponseErrorHandler {
             log.error("Payment API 에러 발생 - URL: {}, Method: {}, Status: {}, Response: {}",
                     url, method, response.getStatusCode(), responseBody);
 
-            Response errorResponse = MAPPER.readValue(responseBody, Response.class);
+            Response errorResponse = mapper.readValue(responseBody, Response.class);
             throw new PaymentClientException(errorResponse.message());
         } catch (JsonProcessingException e) {
             log.error("Payment API Json 에러 - URL: {}, Method: {}, Status: {}",
