@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('reserve-button').addEventListener('click', onReservationButtonClickWithPaymentWidget);
     document.getElementById('wait-button').addEventListener('click', onWaitButtonClick);
+
     function onReservationButtonClickWithPaymentWidget(event) {
         onReservationButtonClick(event, paymentWidget);
     }
@@ -71,9 +72,6 @@ function createSlot(type, text, id, booked) {
     div.setAttribute('data-' + type + '-id', id);
     if (type === 'time') {
         div.setAttribute('data-time-booked', booked);
-        // if (booked) {
-        //     div.classList.add('disabled');
-        // }
     }
     return div;
 }
@@ -183,25 +181,6 @@ function onReservationButtonClick(event, paymentWidget) {
             timeId: selectedTimeId,
         };
 
-        // fetch('/api/reservations', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify(reservationData)
-        // })
-        //     .then(response => {
-        //         if (!response.ok) throw new Error('Reservation failed');
-        //         return response.json();
-        //     })
-        //     .then(data => {
-        //         alert("Reservation successful!");
-        //         location.reload();
-        //     })
-        //     .catch(error => {
-        //         alert("An error occurred while making the reservation.");
-        //         console.error(error);
-        //     });
         const generateRandomString = () =>
             window.btoa(Math.random()).slice(0, 20);
         /*
