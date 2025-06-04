@@ -2,6 +2,7 @@ package roomescape.member.acceptance;
 
 import static org.hamcrest.Matchers.equalTo;
 
+import fixture.MemberFixture;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,35 +16,30 @@ import org.springframework.test.annotation.DirtiesContext;
 import roomescape.helper.TestHelper;
 import roomescape.member.dto.request.LoginRequest;
 import roomescape.member.entity.Member;
-import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class AuthAcceptanceTest {
 
-    private static final String DEFAULT_EMAIL = "miso@email.com";
-    private static final String DEFAULT_PASSWORD = "miso";
-    private static final String DEFAULT_NAME = "미소";
-
     @LocalServerPort
     private int port;
-
+    
     @Autowired
     private MemberRepository memberRepository;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        Member member = new Member(DEFAULT_NAME, DEFAULT_EMAIL, DEFAULT_PASSWORD, RoleType.ADMIN);
-        memberRepository.save(member);
     }
 
     @Test
     @DisplayName("로그인에 성공한다.")
     void login() {
         // given
-        var loginRequest = new LoginRequest(DEFAULT_EMAIL, DEFAULT_PASSWORD);
+        Member member = MemberFixture.createDefault();
+        memberRepository.save(member);
+        var loginRequest = new LoginRequest(member.getEmail(), member.getPassword());
 
         // when & then
         TestHelper.post("/auth/login", loginRequest)
@@ -56,7 +52,9 @@ class AuthAcceptanceTest {
     @DisplayName("로그인에 실패한다.")
     void loginFail() {
         // given
-        var loginRequest = new LoginRequest(DEFAULT_EMAIL, "wrong-password");
+        Member member = MemberFixture.createDefault();
+        memberRepository.save(member);
+        var loginRequest = new LoginRequest(member.getEmail(), member.getPassword() + "wrong");
 
         // when & then
         TestHelper.post("/auth/login", loginRequest)
@@ -68,7 +66,9 @@ class AuthAcceptanceTest {
     @DisplayName("로그아웃에 성공한다.")
     void logout() {
         // given
-        String token = TestHelper.login(DEFAULT_EMAIL, DEFAULT_PASSWORD);
+        Member member = MemberFixture.createDefault();
+        memberRepository.save(member);
+        String token = TestHelper.login(member.getEmail(), member.getPassword());
 
         // when & then
         TestHelper.postWithToken("/auth/logout", token)
@@ -85,15 +85,17 @@ class AuthAcceptanceTest {
     @DisplayName("로그인 상태를 체크한다.")
     void checkLogin() {
         // given
-        String token = TestHelper.login(DEFAULT_EMAIL, DEFAULT_PASSWORD);
+        Member member = MemberFixture.createDefault();
+        memberRepository.save(member);
+        String token = TestHelper.login(member.getEmail(), member.getPassword());
 
         // when & then
         TestHelper.getWithToken("/auth/check", token)
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("id", equalTo(1))
-                .body("name", equalTo(DEFAULT_NAME))
-                .body("role", equalTo("ADMIN"));
+                .body("name", equalTo(member.getName()))
+                .body("role", equalTo(member.getRole().getValue()));
     }
 
     @Test

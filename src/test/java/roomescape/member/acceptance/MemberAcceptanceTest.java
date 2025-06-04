@@ -3,6 +3,7 @@ package roomescape.member.acceptance;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
+import fixture.MemberFixture;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,10 +24,6 @@ import roomescape.member.repository.MemberRepository;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class MemberAcceptanceTest {
 
-    private static final String DEFAULT_EMAIL = "miso@email.com";
-    private static final String DEFAULT_PASSWORD = "miso";
-    private static final String DEFAULT_NAME = "미소";
-
     @LocalServerPort
     private int port;
 
@@ -36,44 +33,47 @@ class MemberAcceptanceTest {
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        Member member = new Member(DEFAULT_NAME, DEFAULT_EMAIL, DEFAULT_PASSWORD, RoleType.ADMIN);
-        memberRepository.save(member);
     }
 
     @Test
     @DisplayName("회원을 생성한다.")
     void createMember() {
         // given
-        var request = new MemberCreateRequest("테스트", "test@email.com", "password");
+        Member member = MemberFixture.createDefault();
+        var request = new MemberCreateRequest(member.getName(), member.getEmail(), member.getPassword());
 
         // when & then
         TestHelper.post("/members", request)
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .body("name", is("테스트"))
-                .body("email", is("test@email.com"))
-                .body("role", is("USER"));
+                .body("name", is(member.getName()))
+                .body("email", is(member.getEmail()))
+                .body("role", is(member.getRole().getValue()));
     }
 
     @Test
     @DisplayName("모든 회원을 조회한다.")
     void getAllMembers() {
         // given
-        TestHelper.login(DEFAULT_EMAIL, DEFAULT_PASSWORD);
+        Member member = MemberFixture.createDefault();
+        memberRepository.save(member);
+        TestHelper.login(member.getEmail(), member.getPassword());
 
         // when & then
         TestHelper.get("/members")
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("$", hasSize(1))
-                .body("[0].name", is(DEFAULT_NAME));
+                .body("[0].name", is(member.getName()));
     }
 
     @Test
     @DisplayName("회원을 삭제한다.")
     void deleteMember() {
         // given
-        String token = TestHelper.login(DEFAULT_EMAIL, DEFAULT_PASSWORD);
+        Member member = MemberFixture.create(RoleType.ADMIN);
+        memberRepository.save(member);
+        String token = TestHelper.login(member.getEmail(), member.getPassword());
 
         // when & then
         TestHelper.deleteWithToken("/members/" + 1, token)

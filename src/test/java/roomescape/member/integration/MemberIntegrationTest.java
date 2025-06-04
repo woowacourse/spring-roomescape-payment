@@ -3,6 +3,8 @@ package roomescape.member.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import fixture.MemberFixture;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,10 +50,8 @@ class MemberIntegrationTest {
     @DisplayName("모든 회원을 조회한다.")
     void getAllMembers() {
         // given
-        var member1 = new Member("미소", "miso@email.com", "password", RoleType.USER);
-        var member2 = new Member("브라운", "brown@email.com", "password", RoleType.USER);
-        memberRepository.save(member1);
-        memberRepository.save(member2);
+        List<Member> members = MemberFixture.createDefaultList(2);
+        memberRepository.saveAll(members);
 
         // when
         var responses = memberService.getAllMembers();
@@ -59,8 +59,8 @@ class MemberIntegrationTest {
         // then
         assertAll(
                 () -> assertThat(responses).hasSize(2),
-                () -> assertThat(responses.get(0).name()).isEqualTo("미소"),
-                () -> assertThat(responses.get(1).name()).isEqualTo("브라운")
+                () -> assertThat(responses.get(0).name()).isEqualTo(members.get(0).getName()),
+                () -> assertThat(responses.get(1).name()).isEqualTo(members.get(1).getName())
         );
     }
 
@@ -68,11 +68,11 @@ class MemberIntegrationTest {
     @DisplayName("회원을 삭제한다.")
     void deleteMember() {
         // given
-        var member = new Member("미소", "miso@email.com", "password", RoleType.USER);
-        var savedMember = memberRepository.save(member);
+        var member = MemberFixture.createDefault();
+        memberRepository.save(member);
 
         // when
-        memberService.deleteMember(savedMember.getId());
+        memberService.deleteMember(member.getId());
 
         // then
         var members = memberService.getAllMembers();
