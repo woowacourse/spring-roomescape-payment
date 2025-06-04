@@ -33,7 +33,6 @@ public class MockClientConfiguration {
                 .baseUrl("https://api.tosspayments.com/v1/payments")
                 .defaultStatusHandler(tossServerErrorHandler)
                 .defaultStatusHandler(tossClientErrorHandler)
-
                 .build();
     }
 
