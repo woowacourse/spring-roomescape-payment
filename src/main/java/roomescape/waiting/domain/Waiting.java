@@ -1,5 +1,7 @@
 package roomescape.waiting.domain;
 
+import static roomescape.reservation.domain.ReservationStatus.PENDING;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -60,7 +62,7 @@ public class Waiting {
 
     public Reservation convertToReservation() {
         return new Reservation(
-            this.getDate(), this.getReservationTime(), this.getTheme(), this.getMember()
+            this.getDate(), this.getReservationTime(), this.getTheme(), this.getMember(), PENDING
         );
     }
 

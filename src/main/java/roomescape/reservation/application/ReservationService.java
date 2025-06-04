@@ -1,5 +1,7 @@
 package roomescape.reservation.application;
 
+import static roomescape.reservation.domain.ReservationStatus.PENDING;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -88,7 +90,7 @@ public class ReservationService {
         validateIsBooked(sameTimeReservations, reservationTime, theme);
         validatePastDateTime(date, reservationTime.getStartAt());
 
-        final Reservation reservation = new Reservation(date, reservationTime, theme, member);
+        final Reservation reservation = new Reservation(date, reservationTime, theme, member, PENDING);
         return reservationRepository.save(reservation);
     }
 
