@@ -19,7 +19,6 @@ import roomescape.member.MemberRole;
 import roomescape.member.MemberService;
 import roomescape.order.Order;
 import roomescape.order.OrderReader;
-import roomescape.order.PaymentStatus;
 import roomescape.payment.TossPaymentAdapter;
 import roomescape.payment.dto.TossPaymentConfirmCommand;
 import roomescape.reservationtime.ReservationTime;
@@ -83,11 +82,11 @@ public class ReservationCreateServiceTest {
             reservation = reservationWithId(1L, new Reservation(member, schedule));
         }
 
-        @DisplayName("예약 생성 및 결제 승인 api 요청 성공 시, 예약 상태는 CONFIRMED, 주문의 결제 상태가 SUCCESS로 변경되고, response 값을 반환한다.")
+        @DisplayName("예약 생성 및 결제 승인 api 요청 성공 시, 예약 상태가 CONFIRMED이 되고, response 값을 반환한다.")
         @Test
         void create1() {
             // given
-            Order order = new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule);
+            Order order = new Order(request.orderId(), request.amount(), member, schedule);
             given(orderReader.getById(request.orderId()))
                     .willReturn(order);
             given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(), schedule.getTheme().getId()))
@@ -108,7 +107,6 @@ public class ReservationCreateServiceTest {
             // then
             assertAll(
                     () -> assertThat(reservation.getReservationStatus()).isEqualTo(ReservationStatus.CONFIRMED),
-                    () -> assertThat(order.getPaymentStatus()).isEqualTo(PaymentStatus.SUCCESS),
                     () -> assertThat(response).isEqualTo(ReservationResponse.from(reservation))
             );
         }
@@ -118,7 +116,7 @@ public class ReservationCreateServiceTest {
         void create2() {
             // given
             given(orderReader.getById(request.orderId()))
-                    .willReturn(new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule));
+                    .willReturn(new Order(request.orderId(), request.amount(), member, schedule));
             given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(), schedule.getTheme().getId()))
                     .willReturn(schedule);
             given(memberService.getByEmail(loginMember.email()))
@@ -137,7 +135,7 @@ public class ReservationCreateServiceTest {
         void create3() {
             // given
             given(orderReader.getById(request.orderId()))
-                    .willReturn(new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule));
+                    .willReturn(new Order(request.orderId(), request.amount(), member, schedule));
             given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(), schedule.getTheme().getId()))
                     .willReturn(schedule);
             given(memberService.getByEmail(loginMember.email()))

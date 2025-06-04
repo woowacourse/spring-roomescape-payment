@@ -39,7 +39,7 @@ public class ReservationCreateService {
         final Reservation reservation = saveReservation(schedule, member, order);
         ReservationResponse response = ReservationResponse.from(reservation);
 
-        confirmReservation(order, reservation);
+        reservation.markStatusAsConfirmed();
         confirmPayment(request);
         return response;
     }
@@ -56,11 +56,6 @@ public class ReservationCreateService {
         validateDuplication(schedule);
         final Reservation notSavedReservation = new Reservation(member, schedule, ReservationStatus.PENDING, order);
         return reservationRepository.save(notSavedReservation);
-    }
-
-    private void confirmReservation(final Order order, final Reservation reservation) {
-        order.markAsPaid();
-        reservation.markStatusAsConfirmed();
     }
 
     private void confirmPayment(final ReservationPaymentRequest request) {

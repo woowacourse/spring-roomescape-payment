@@ -26,7 +26,7 @@ public class OrderService {
                 orderCreateRequest.themeId()
         );
         final Member member = memberService.getByEmail(loginMember.email());
-        final Order order = new Order(orderCreateRequest.id(), orderCreateRequest.amount(), PaymentStatus.WAITING, member, schedule);
+        final Order order = new Order(orderCreateRequest.id(), orderCreateRequest.amount(), member, schedule);
         orderRepository.save(order);
     }
 }

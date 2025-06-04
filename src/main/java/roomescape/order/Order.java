@@ -1,6 +1,9 @@
 package roomescape.order;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,22 +27,18 @@ public class Order {
 
     private String paymentKey;
 
-    @Enumerated(EnumType.STRING)
-    private PaymentStatus paymentStatus;
-
     @ManyToOne(fetch = LAZY)
     private Member member;
 
     @ManyToOne(fetch = LAZY)
     private Schedule schedule;
 
-    public Order(final String id, final Long amount, final PaymentStatus paymentStatus, final Member member, final Schedule schedule) {
+    public Order(final String id, final Long amount, final Member member, final Schedule schedule) {
         if (!schedule.isAmountEqualTo(amount)) {
             throw new IllegalArgumentException("주문 금액이 스케줄의 가격과 다릅니다.");
         }
         this.id = id;
         this.amount = amount;
-        this.paymentStatus = paymentStatus;
         this.member = member;
         this.schedule = schedule;
     }
@@ -54,9 +53,6 @@ public class Order {
         if (!isSchedule(schedule)) {
             throw new IllegalArgumentException("주문 스케줄과 결제 스케줄이 일치하지 않아 결제를 할 수 없습니다.");
         }
-        if (this.paymentStatus != PaymentStatus.WAITING) {
-            throw new IllegalArgumentException("결제를 할 수 없는 상태입니다.");
-        }
     }
 
     /**
@@ -64,13 +60,6 @@ public class Order {
      */
     public void updatePaymentKey(final String paymentKey) {
         this.paymentKey = paymentKey;
-    }
-
-    /**
-     * 결제 승인 요청 프로세스에서만 호출하는 메서드입니다.
-     */
-    public void markAsPaid() {
-        this.paymentStatus = PaymentStatus.SUCCESS;
     }
 
     private boolean isAmount(final Long amount) {
