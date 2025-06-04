@@ -80,18 +80,6 @@ public class Member {
         return reservation;
     }
 
-    public void waitToReserve(LocalDate date, ReservationTime time, Theme theme) {
-        Reservation waitReservation = reservations.stream()
-                .filter(reservation -> reservation.getDate().equals(date)
-                        && reservation.getReservationTime().getId().equals(time.getId())
-                        && reservation.getTheme().getId().equals(theme.getId())
-                        && reservation.getStatus() == ReservationStatus.WAIT)
-                .findFirst()
-                .orElseThrow(() -> new InvalidReservationException("대기중인 예약이 없습니다"));
-
-        waitReservation.setStatus(ReservationStatus.RESERVED);
-    }
-
     private void validateDuplicateReservation(Reservation target) {
         boolean exist = reservations.stream()
                 .anyMatch(reservation ->
@@ -108,10 +96,16 @@ public class Member {
         reservation.isBefore(LocalDateTime.now());
     }
 
+    public void waitToPending(LocalDate date, ReservationTime time, Theme theme) {
+        Reservation waitReservation = reservations.stream()
+                .filter(reservation -> reservation.getDate().equals(date)
+                        && reservation.getReservationTime().getId().equals(time.getId())
+                        && reservation.getTheme().getId().equals(theme.getId())
+                        && reservation.getStatus() == ReservationStatus.WAIT)
+                .findFirst()
+                .orElseThrow(() -> new InvalidReservationException("대기중인 예약이 없습니다"));
 
-    public void removeReservation(Reservation reservation) {
-        reservations.remove(reservation);
-        reservation.setMember(null);
+        waitReservation.waitToPending();
     }
 
     public Long getId() {

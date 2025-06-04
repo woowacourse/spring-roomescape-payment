@@ -37,6 +37,18 @@ public class ReservationFacadeService {
         return ReservationResponse.from(reservation);
     }
 
+    public ReservationResponse pendingToReserve(Long reservationId,
+                                                ConfirmWaitReservationRequest request,
+                                                LoginMemberRequest loginMemberRequest) {
+
+        Reservation reservation = reservationService.pendingToReserve(reservationId, loginMemberRequest);
+
+        ConfirmPaymentRequest confirmPaymentRequest = ConfirmPaymentRequest.from(request);
+        paymentService.confirmPayment(confirmPaymentRequest, reservation);
+
+        return ReservationResponse.from(reservation);
+    }
+
     public List<ReservationResponse> findAllReservation() {
         return reservationService.findAllReserved();
     }

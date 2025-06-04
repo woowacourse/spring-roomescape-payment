@@ -30,7 +30,7 @@ a {
 .btn {
     padding: 11px 22px;
     border: none;
-    border-radius:  8px;
+    border-radius: 8px;
 
     background-color: #f2f4f6;
     color: #4e5968;
@@ -129,4 +129,33 @@ a {
 
 .color-grey {
     color: #b0b8c1;
+}
+
+.payment-sidebar {
+    position: fixed;
+    top: 0;
+    right: -600px;
+    width: 600px;
+    height: 100vh;
+    background-color: white;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s ease-in-out;
+    padding: 20px;
+    z-index: 1000;
+}
+
+.payment-sidebar.show {
+    right: 0;
+}
+
+.payment-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#payment-button {
+    margin-top: auto;
+    margin-bottom: 20px;
 }

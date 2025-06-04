@@ -81,7 +81,7 @@ public class ReservationService {
                 ReservationStatus.RESERVED);
         cancelTargetOptional.ifPresent(Reservation::cancel);
 
-        waitReservation.changeStatusWaitToReserve();
+        waitReservation.waitToPending();
     }
 
     public void rejectWaitReservationByAdmin(long waitReservationId) {
@@ -129,7 +129,7 @@ public class ReservationService {
             return;
         }
         Member member = targetMembers.getFirst();
-        member.waitToReserve(reservation.getDate(), reservation.getReservationTime(), reservation.getTheme());
+        member.waitToPending(reservation.getDate(), reservation.getReservationTime(), reservation.getTheme());
     }
 
     public List<MyReservationResponse> findAllReservationOfMember(Long memberId) {
@@ -157,5 +157,18 @@ public class ReservationService {
         return waitReservations.stream()
                 .map(ReservationWaitResponse::from)
                 .toList();
+    }
+
+    public Reservation pendingToReserve(Long reservationId,
+                                        LoginMemberRequest loginMemberRequest) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new InvalidReservationException("존재하지 않는 예약입니다."));
+
+        if (!loginMemberRequest.id().equals(reservation.getMember().getId())) {
+            throw new InvalidMemberException("");
+        }
+
+        reservation.pendingToReserve();
+        return reservation;
     }
 }

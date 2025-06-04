@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import roomescape.annotation.CheckRole;
+import roomescape.dto.request.ConfirmWaitReservationRequest;
 import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.request.CreateWaitReservationRequest;
 import roomescape.dto.request.LoginMemberRequest;
@@ -93,5 +95,16 @@ public class ReservationController {
         reservationFacadeService.deleteReservation(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/waiting/{reservationId}/confirm")
+    @CheckRole(value = {Role.ADMIN, Role.USER})
+    public ResponseEntity<ReservationResponse> confirmWaitReservation(@PathVariable("reservationId") Long reservationId,
+                                                                      @Valid @RequestBody ConfirmWaitReservationRequest request,
+                                                                      LoginMemberRequest loginMemberRequest) {
+        ReservationResponse response = reservationFacadeService.pendingToReserve(reservationId, request,
+                loginMemberRequest);
+
+        return ResponseEntity.ok(response);
     }
 }

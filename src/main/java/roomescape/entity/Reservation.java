@@ -104,22 +104,32 @@ public class Reservation {
     }
 
     public void cancel() {
-        if (member != null) {
-            member.removeReservation(this);
-        }
+        this.status = ReservationStatus.CANCELED;
     }
 
-    public void changeStatusWaitToReserve() {
-        if (member == null) {
-            throw new InvalidReservationException("Member 가 없는 대기 reservation은 예약으로 변경할 수 없습니다.");
+    public void waitToPending() {
+        if (this.status != ReservationStatus.WAIT) {
+            throw new InvalidReservationException("대기 중인 예약이 아닙니다.");
         }
 
-        this.status = ReservationStatus.RESERVED;
+        if (member == null) {
+            throw new InvalidReservationException("Member 가 없는 대기 reservation은 결제 대기로 변경할 수 없습니다.");
+        }
+
+        this.status = ReservationStatus.PENDING;
     }
 
     public void payForReservation(Payment payment) {
         this.payment = payment;
+        this.status = ReservationStatus.RESERVED;
         payment.setReservation(this);
+    }
+
+    public void pendingToReserve() {
+        if (this.status != ReservationStatus.PENDING) {
+            throw new InvalidReservationException("결제 대기중인 예약이 아닙니다.");
+        }
+        this.status = ReservationStatus.RESERVED;
     }
 
     public Long getId() {
@@ -160,10 +170,6 @@ public class Reservation {
 
     public Payment getPayment() {
         return payment;
-    }
-
-    protected void setMember(Member member) {
-        this.member = member;
     }
 
     protected void setStatus(ReservationStatus status) {
