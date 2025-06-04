@@ -52,7 +52,7 @@ public class ReservationService {
         Reservation reserved = reservationManager.reserved(reserveCommand);
 
         TossPaymentRequest paymentRequest = new TossPaymentRequest(request.paymentKey(), request.orderId(), request.amount());
-        TossPaymentResponse tossPaymentResponse = tossPaymentService.confirmPayment(paymentRequest);
+        tossPaymentService.confirmPayment(reserved, paymentRequest);
 
         return ReservationResponse.from(reserved);
     }
