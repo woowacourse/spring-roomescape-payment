@@ -47,3 +47,15 @@ INSERT INTO reservation_wait (member_id, reservation_date, time_id, theme_id)
 VALUES (3, CURRENT_DATE + 1, 1, 1);
 INSERT INTO reservation_wait (member_id, reservation_date, time_id, theme_id)
 VALUES (2, CURRENT_DATE + 1, 2, 2);
+
+-- Payment 데이터
+INSERT INTO payment (payment_key, order_id, amount)
+VALUES ('payment_key_1', 'order_1', 10000);
+INSERT INTO payment (payment_key, order_id, amount)
+VALUES ('payment_key_2', 'order_2', 10000);
+
+-- ReservationPayment 데이터
+INSERT INTO reservation_payment (payment_id, reservation_id)
+VALUES (1, 1);
+INSERT INTO reservation_payment (payment_id, reservation_id)
+VALUES (2, 2);

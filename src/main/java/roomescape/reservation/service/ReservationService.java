@@ -28,6 +28,7 @@ import roomescape.reservation.service.dto.AvailableReservationTimeServiceRequest
 import roomescape.reservation.service.dto.CreateReservationServiceRequest;
 import roomescape.reservation.service.usecase.ReservationCommandUseCase;
 import roomescape.reservation.service.usecase.ReservationPaymentCommandUseCase;
+import roomescape.reservation.service.usecase.ReservationPaymentQueryUseCase;
 import roomescape.reservation.service.usecase.ReservationQueryUseCase;
 import roomescape.reservation.service.usecase.ReservationWaitCommandUseCase;
 import roomescape.reservation.service.usecase.ReservationWaitQueryUseCase;
@@ -38,9 +39,12 @@ public class ReservationService {
 
     private final ReservationQueryUseCase reservationQueryUseCase;
     private final ReservationCommandUseCase reservationCommandUseCase;
+
     private final ReservationWaitQueryUseCase reservationWaitQueryUseCase;
     private final ReservationWaitCommandUseCase reservationWaitCommandUseCase;
+
     private final ReservationPaymentCommandUseCase reservationPaymentCommandUseCase;
+    private final ReservationPaymentQueryUseCase reservationPaymentQueryUseCase;
 
     private final PaymentService paymentService;
 
@@ -58,26 +62,18 @@ public class ReservationService {
 
     public List<ReservationWithStatusResponse> getWithReservationWaitByMemberId(final Long memberId) {
         final List<ReservationWithStatusResponse> allReservations = new ArrayList<>();
-        allReservations.addAll(getByMemberId(memberId));
-        allReservations.addAll(getReservationWaitByMemberId(memberId));
+
+        allReservations.addAll(
+                ReservationWithStatusResponse.fromReservationPayments(
+                        reservationPaymentQueryUseCase.getByMemberId(memberId)));
+
+        allReservations.addAll(
+                ReservationWithStatusResponse.fromReservationWaits(
+                        reservationWaitQueryUseCase.getByMemberId(memberId)));
 
         return allReservations.stream()
                 .sorted(Comparator.comparing(ReservationWithStatusResponse::getDate)
                         .thenComparing(ReservationWithStatusResponse::getTime))
-                .toList();
-    }
-
-    public List<ReservationWithStatusResponse> getByMemberId(final Long memberId) {
-        return reservationQueryUseCase.getByMemberId(memberId).stream()
-                .map(ReservationWithStatusResponse::from)
-                .toList();
-    }
-
-    public List<ReservationWithStatusResponse> getReservationWaitByMemberId(final Long memberId) {
-        return reservationWaitQueryUseCase.getByMemberId(memberId).stream()
-                .map(reservationWaitWithRank -> ReservationWithStatusResponse.of(
-                        reservationWaitWithRank.reservationWait(),
-                        reservationWaitWithRank.rank()))
                 .toList();
     }
 
