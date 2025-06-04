@@ -187,7 +187,7 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
                 amount,
                 "NORMAL"
         );
-        doThrow(new TossPaymentException("관리자에게 문의해주세요."))
+        doThrow(new TossPaymentException("결제 승인 요청에 실패했습니다. 관리자에게 문의해주세요."))
                 .when(tossPaymentClient)
                 .approve(command.getPaymentCommand());
 
@@ -195,7 +195,7 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
         // then
         assertThatCode(() -> createReservationService.reserve(command))
                 .isInstanceOf(PaymentException.class)
-                .hasMessage("관리자에게 문의해주세요.");
+                .hasMessage("결제 승인 요청에 실패했습니다. 관리자에게 문의해주세요.");
     }
 
     @Test
