@@ -2,14 +2,15 @@ package roomescape.presentation.response;
 
 import java.time.LocalDate;
 import java.util.List;
+import roomescape.domain.reservation.pendingpayment.PendingPayment;
 import roomescape.domain.reservation.reserved.Reserved;
 import roomescape.domain.reservation.waiting.WaitingWithRank;
 
 public record UserReservationRecordsResponse(long id, ThemeResponse theme, LocalDate date, TimeSlotResponse time,
                                              String status, PaymentResponse payment) {
 
-    public static List<UserReservationRecordsResponse> fromReservations(final List<Reserved> reservations) {
-        return reservations.stream().map(UserReservationRecordsResponse::fromReserved).toList();
+    public static List<UserReservationRecordsResponse> fromReserves(final List<Reserved> reserveds) {
+        return reserveds.stream().map(UserReservationRecordsResponse::fromReserved).toList();
     }
 
     private static UserReservationRecordsResponse fromReserved(final Reserved reserved) {
@@ -29,5 +30,15 @@ public record UserReservationRecordsResponse(long id, ThemeResponse theme, Local
                 waitingWithRank.getWaiting().getDate(),
                 TimeSlotResponse.fromTimeSlot(waitingWithRank.getWaiting().getTimeSlot()),
                 waitingWithRank.getRank() + "번째 예약대기", null);
+    }
+
+    public static List<UserReservationRecordsResponse> fromPendingPayment(final List<PendingPayment> pendingPayments) {
+        return pendingPayments.stream().map(UserReservationRecordsResponse::fromPendingPayment).toList();
+    }
+
+    private static UserReservationRecordsResponse fromPendingPayment(final PendingPayment pendingPayment) {
+        return new UserReservationRecordsResponse(pendingPayment.getId(),
+                ThemeResponse.fromTheme(pendingPayment.getTheme()), pendingPayment.getDate(),
+                TimeSlotResponse.fromTimeSlot(pendingPayment.getTimeSlot()), "결제 대기", null);
     }
 }

@@ -26,4 +26,6 @@ VALUES (2, CURRENT_DATE + 3, 1, 1, 1, 'RESERVED'),
 
 INSERT INTO RESERVATION (user_id, date, time_slot_id, theme_id, reservation_type)
 VALUES (1, CURRENT_DATE + 3, 1, 1, 'WAITING'),
-       (3, CURRENT_DATE + 3, 1, 1, 'WAITING');
+       (3, CURRENT_DATE + 3, 2, 1, 'WAITING'),
+       (2, CURRENT_DATE + 2, 1, 1, 'PENDING_PAYMENT');
+

@@ -5,12 +5,14 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.domain.reservation.pendingpayment.PendingPayment;
+import roomescape.domain.reservation.pendingpayment.PendingPaymentRepository;
 import roomescape.domain.reservation.reserved.Reserved;
 import roomescape.domain.reservation.reserved.ReservedRepository;
-import roomescape.domain.user.User;
-import roomescape.domain.user.UserRepository;
 import roomescape.domain.reservation.waiting.WaitingRepository;
 import roomescape.domain.reservation.waiting.WaitingWithRank;
+import roomescape.domain.user.User;
+import roomescape.domain.user.UserRepository;
 import roomescape.exception.AlreadyExistedException;
 import roomescape.exception.NotFoundException;
 import roomescape.presentation.response.UserReservationRecordsResponse;
@@ -20,7 +22,8 @@ import roomescape.presentation.response.UserReservationRecordsResponse;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final ReservedRepository reservationRepository;
+    private final ReservedRepository reservedRepository;
+    private final PendingPaymentRepository pendingPaymentRepository;
     private final WaitingRepository waitingRepository;
 
     @Transactional
@@ -39,18 +42,21 @@ public class UserService {
     @Transactional(readOnly = true)
     public List<UserReservationRecordsResponse> findTotalRecordByUserId(Long userId) {
         validateUserExists(userId);
-        List<Reserved> reservations = reservationRepository.findByUserId(userId);
+        List<Reserved> reserveds = reservedRepository.findByUserId(userId);
+        List<PendingPayment> pendingPayments = pendingPaymentRepository.findByUserId(userId);
         List<WaitingWithRank> waitings = waitingRepository.findWaitingWithRankByUserId(userId);
 
-        List<UserReservationRecordsResponse> reservedResponses =
-                UserReservationRecordsResponse.fromReservations(reservations);
-        List<UserReservationRecordsResponse> waitingResponses =
-                UserReservationRecordsResponse.fromWaitingsWithRank(waitings);
+        List<UserReservationRecordsResponse> reservedResponses = UserReservationRecordsResponse.fromReserves(reserveds);
+        List<UserReservationRecordsResponse> pendingPaymentResponses = UserReservationRecordsResponse.fromPendingPayment(
+                pendingPayments);
+        List<UserReservationRecordsResponse> waitingResponses = UserReservationRecordsResponse.fromWaitingsWithRank(
+                waitings);
 
-        List<UserReservationRecordsResponse> userReservationRecordsRespons = new ArrayList<>();
-        userReservationRecordsRespons.addAll(reservedResponses);
-        userReservationRecordsRespons.addAll(waitingResponses);
-        return userReservationRecordsRespons;
+        List<UserReservationRecordsResponse> userReservationRecordsResponse = new ArrayList<>();
+        userReservationRecordsResponse.addAll(reservedResponses);
+        userReservationRecordsResponse.addAll(pendingPaymentResponses);
+        userReservationRecordsResponse.addAll(waitingResponses);
+        return userReservationRecordsResponse;
     }
 
     private void validateEmailNotRegistered(String email) {

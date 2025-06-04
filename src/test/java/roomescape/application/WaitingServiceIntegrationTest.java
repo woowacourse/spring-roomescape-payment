@@ -10,13 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import roomescape.domain.reservation.waiting.Waiting;
+import roomescape.domain.reservation.waiting.WaitingRepository;
 import roomescape.domain.user.User;
 import roomescape.domain.user.UserRepository;
 import roomescape.domain.user.UserRole;
-import roomescape.domain.reservation.waiting.Waiting;
-import roomescape.domain.reservation.waiting.WaitingRepository;
 import roomescape.exception.AlreadyExistedException;
-import roomescape.exception.BusinessRuleViolationException;
 import roomescape.exception.NotFoundException;
 
 @ActiveProfiles("test")
@@ -56,13 +55,12 @@ class WaitingServiceIntegrationTest {
         // given
         var user = User.ofExisting(3L, "사용자3", UserRole.USER, "user3@email.com", "password3");
         var date = LocalDate.now().plusDays(3);
-        var timeSlotId = 1L;
+        var timeSlotId = 2L;
         var themeId = 1L;
 
         // when & then
-        assertThatThrownBy(() -> service.saveWaiting(user, date, timeSlotId, themeId))
-                .isInstanceOf(AlreadyExistedException.class)
-                .hasMessage("이미 예약 대기한 내역이 있습니다.");
+        assertThatThrownBy(() -> service.saveWaiting(user, date, timeSlotId, themeId)).isInstanceOf(
+                AlreadyExistedException.class).hasMessage("이미 해당 날짜, 시간, 테마에 대한 예약이 존재합니다.");
     }
 
     @Test
@@ -75,9 +73,8 @@ class WaitingServiceIntegrationTest {
         var themeId = 1L;
 
         // when & then
-        assertThatThrownBy(() -> service.saveWaiting(user, date, timeSlotId, themeId))
-                .isInstanceOf(BusinessRuleViolationException.class)
-                .hasMessage("해당 테마의 시간대에 이미 예약되어 있습니다.");
+        assertThatThrownBy(() -> service.saveWaiting(user, date, timeSlotId, themeId)).isInstanceOf(
+                AlreadyExistedException.class).hasMessage("이미 해당 날짜, 시간, 테마에 대한 예약이 존재합니다.");
     }
 
     @Test
@@ -90,9 +87,8 @@ class WaitingServiceIntegrationTest {
         var themeId = 1L;
 
         // when & then
-        assertThatThrownBy(() -> service.saveWaiting(user, date, invalidTimeSlotId, themeId))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage("존재하지 않는 타임 슬롯입니다.");
+        assertThatThrownBy(() -> service.saveWaiting(user, date, invalidTimeSlotId, themeId)).isInstanceOf(
+                NotFoundException.class).hasMessage("존재하지 않는 타임 슬롯입니다.");
     }
 
     @Test
@@ -105,9 +101,8 @@ class WaitingServiceIntegrationTest {
         var invalidThemeId = 999L;
 
         // when & then
-        assertThatThrownBy(() -> service.saveWaiting(user, date, timeSlotId, invalidThemeId))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage("존재하지 않는 테마입니다.");
+        assertThatThrownBy(() -> service.saveWaiting(user, date, timeSlotId, invalidThemeId)).isInstanceOf(
+                NotFoundException.class).hasMessage("존재하지 않는 테마입니다.");
     }
 
     @Test
@@ -141,8 +136,7 @@ class WaitingServiceIntegrationTest {
         var invalidWaitingId = 999L;
 
         // when & then
-        assertThatThrownBy(() -> service.removeById(invalidWaitingId))
-                .isInstanceOf(NotFoundException.class)
+        assertThatThrownBy(() -> service.removeById(invalidWaitingId)).isInstanceOf(NotFoundException.class)
                 .hasMessage("존재하지 않는 예약 대기입니다.");
     }
 }

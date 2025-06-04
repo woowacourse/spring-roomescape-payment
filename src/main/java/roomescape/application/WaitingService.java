@@ -7,17 +7,17 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.event.ReservationCancelledEvent;
+import roomescape.domain.reservation.ReservationRepository;
+import roomescape.domain.reservation.pendingpayment.PendingPayment;
+import roomescape.domain.reservation.pendingpayment.PendingPaymentRepository;
+import roomescape.domain.reservation.waiting.Waiting;
+import roomescape.domain.reservation.waiting.WaitingRepository;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.theme.ThemeRepository;
-import roomescape.domain.reservation.reserved.Reserved;
-import roomescape.domain.reservation.reserved.ReservedRepository;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.timeslot.TimeSlotRepository;
 import roomescape.domain.user.User;
-import roomescape.domain.reservation.waiting.Waiting;
-import roomescape.domain.reservation.waiting.WaitingRepository;
 import roomescape.exception.AlreadyExistedException;
-import roomescape.exception.BusinessRuleViolationException;
 import roomescape.exception.NotFoundException;
 
 @Service
@@ -25,20 +25,17 @@ import roomescape.exception.NotFoundException;
 public class WaitingService {
 
     private final WaitingRepository waitingRepository;
-    private final ReservedRepository reservedRepository;
+    private final ReservationRepository reservationRepository;
+    private final PendingPaymentRepository pendingPaymentRepository;
     private final TimeSlotRepository timeSlotRepository;
     private final ThemeRepository themeRepository;
 
     @Transactional
-    public Waiting saveWaiting(final User user,
-                               final LocalDate date,
-                               final long timeId,
-                               final long themeId) {
+    public Waiting saveWaiting(final User user, final LocalDate date, final long timeId, final long themeId) {
         TimeSlot timeSlot = getTimeSlotById(timeId);
         Theme theme = getThemeById(themeId);
 
-        validateDuplicateWaiting(date, timeSlot.getId(), theme.getId(), user.getId());
-        validateNotAlreadyReserved(date, timeSlot.getId(), theme.getId(), user.getId());
+        validateDuplicateReservation(date, timeSlot.getId(), theme.getId(), user.getId());
 
         Waiting waiting = Waiting.register(user, date, timeSlot, theme);
         return waitingRepository.save(waiting);
@@ -59,37 +56,21 @@ public class WaitingService {
     @EventListener
     @Transactional
     public void handleReservationCancelled(ReservationCancelledEvent event) {
-
-        waitingRepository.findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(
-                event.getDate(), event.getTimeSlotId(), event.getThemeId())
-        .ifPresent(nextWaiting -> {
-            Reserved approvedReservation = Reserved.fromWaiting(nextWaiting);
-            reservedRepository.save(approvedReservation);
+        waitingRepository.findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(event.getDate(), event.getTimeSlotId(),
+                event.getThemeId()).ifPresent(nextWaiting -> {
+            PendingPayment approvedReservation = PendingPayment.fromWaiting(nextWaiting);
+            pendingPaymentRepository.save(approvedReservation);
             waitingRepository.deleteById(nextWaiting.getId());
         });
     }
 
-    private void validateDuplicateWaiting(final LocalDate date,
-                                          final long timeSlotId,
-                                          final long themeId,
-                                          final long userId) {
-        boolean isWaitingExisted =
-                waitingRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(date, timeSlotId, themeId, userId);
+    private void validateDuplicateReservation(final LocalDate date, final Long timeSlotId, final Long themeId,
+                                              final Long userId) {
+        boolean hasDuplicatedReservation = reservationRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(date,
+                timeSlotId, themeId, userId);
 
-        if (isWaitingExisted) {
-            throw new AlreadyExistedException("이미 예약 대기한 내역이 있습니다.");
-        }
-    }
-
-    private void validateNotAlreadyReserved(final LocalDate date,
-                                            final long timeSlotId,
-                                            final long themeId,
-                                            final long userId) {
-        boolean isAlreadyReserved =
-                reservedRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(date, timeSlotId, themeId, userId);
-
-        if (isAlreadyReserved) {
-            throw new BusinessRuleViolationException("해당 테마의 시간대에 이미 예약되어 있습니다.");
+        if (hasDuplicatedReservation) {
+            throw new AlreadyExistedException("이미 해당 날짜, 시간, 테마에 대한 예약이 존재합니다.");
         }
     }
 

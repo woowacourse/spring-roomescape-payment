@@ -7,7 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static roomescape.fixture.PaymentFixture.CREATE_PAYMENT_1;
-import static roomescape.fixture.ReservationFixture.CREATE_RESERVATION_OF;
+import static roomescape.fixture.ReservedFixture.CREATE_RESERVED_OF;
 import static roomescape.fixture.ThemeFixture.CREATE_THEME_1;
 import static roomescape.fixture.ThemeFixture.CREATE_THEME_2;
 import static roomescape.fixture.TimeSlotFixture.CREATE_TIME_SLOT_1;
@@ -26,14 +26,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.domain.payment.Payment;
+import roomescape.domain.reservation.pendingpayment.PendingPaymentRepository;
 import roomescape.domain.reservation.reserved.Reserved;
 import roomescape.domain.reservation.reserved.ReservedRepository;
+import roomescape.domain.reservation.waiting.WaitingRepository;
+import roomescape.domain.reservation.waiting.WaitingWithRank;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.user.User;
 import roomescape.domain.user.UserRepository;
-import roomescape.domain.reservation.waiting.WaitingRepository;
-import roomescape.domain.reservation.waiting.WaitingWithRank;
 import roomescape.exception.AlreadyExistedException;
 import roomescape.exception.NotFoundException;
 import roomescape.presentation.response.UserReservationRecordsResponse;
@@ -49,6 +50,9 @@ public class UserServiceTest {
 
     @Mock
     WaitingRepository waitingRepository;
+
+    @Mock
+    PendingPaymentRepository pendingPaymentRepository;
 
     @InjectMocks
     UserService userService;
@@ -66,13 +70,10 @@ public class UserServiceTest {
             when(userRepository.existsByEmail(user.getEmail())).thenReturn(true);
 
             // when & then
-            assertAll(
-                    () -> assertThatThrownBy(
-                            () -> userService.saveUser(user.getEmail(), user.getPassword(), user.getName()))
-                            .isInstanceOf(AlreadyExistedException.class)
-                            .hasMessage("이미 해당 이메일로 가입된 사용자가 있습니다."),
-                    () -> verify(userRepository).existsByEmail(user.getEmail())
-            );
+            assertAll(() -> assertThatThrownBy(
+                            () -> userService.saveUser(user.getEmail(), user.getPassword(), user.getName())).isInstanceOf(
+                            AlreadyExistedException.class).hasMessage("이미 해당 이메일로 가입된 사용자가 있습니다."),
+                    () -> verify(userRepository).existsByEmail(user.getEmail()));
         }
 
         @Test
@@ -89,11 +90,9 @@ public class UserServiceTest {
             User savedUser = userService.saveUser(user.getEmail(), user.getPassword(), user.getName());
 
             // then
-            assertAll(
-                    () -> assertThat(savedUser).isEqualTo(user),
+            assertAll(() -> assertThat(savedUser).isEqualTo(user),
                     () -> verify(userRepository).existsByEmail(user.getEmail()),
-                    () -> verify(userRepository).save(any(User.class))
-            );
+                    () -> verify(userRepository).save(any(User.class)));
         }
     }
 
@@ -110,12 +109,9 @@ public class UserServiceTest {
             when(userRepository.existsById(userId)).thenReturn(false);
 
             // when & then
-            assertAll(
-                    () -> assertThatThrownBy(() -> userService.findTotalRecordByUserId(userId))
-                            .isInstanceOf(NotFoundException.class)
-                            .hasMessage("존재하지 않는 사용자입니다."),
-                    () -> verify(userRepository).existsById(userId)
-            );
+            assertAll(() -> assertThatThrownBy(() -> userService.findTotalRecordByUserId(userId)).isInstanceOf(
+                            NotFoundException.class).hasMessage("존재하지 않는 사용자입니다."),
+                    () -> verify(userRepository).existsById(userId));
         }
 
         @Test
@@ -131,33 +127,30 @@ public class UserServiceTest {
             Payment payment = CREATE_PAYMENT_1();
             LocalDate date = LocalDate.now().plusDays(1);
 
-            List<Reserved> reservations = List.of(
-                    CREATE_RESERVATION_OF(1L, user, date, timeSlot1, theme1, payment)
-            );
+            List<Reserved> reservations = List.of(CREATE_RESERVED_OF(1L, user, date, timeSlot1, theme1, payment));
 
             List<WaitingWithRank> waitings = List.of(
-                    new WaitingWithRank(CREATE_WAITING_OF(1L, user, date, timeSlot2, theme2), 2)
-            );
+                    new WaitingWithRank(CREATE_WAITING_OF(1L, user, date, timeSlot2, theme2), 2));
 
             List<UserReservationRecordsResponse> expectedResponses = new ArrayList<>();
-            expectedResponses.addAll(UserReservationRecordsResponse.fromReservations(reservations));
+            expectedResponses.addAll(UserReservationRecordsResponse.fromReserves(reservations));
             expectedResponses.addAll(UserReservationRecordsResponse.fromWaitingsWithRank(waitings));
 
             when(userRepository.existsById(userId)).thenReturn(true);
             when(reservationRepository.findByUserId(userId)).thenReturn(reservations);
             when(waitingRepository.findWaitingWithRankByUserId(userId)).thenReturn(waitings);
+            when(pendingPaymentRepository.findByUserId(userId)).thenReturn(List.of());
 
             // when
             List<UserReservationRecordsResponse> actualResponses = userService.findTotalRecordByUserId(userId);
 
             // then
-            assertAll(
-                    () -> assertThat(actualResponses).hasSize(expectedResponses.size()),
+            assertAll(() -> assertThat(actualResponses).hasSize(expectedResponses.size()),
                     () -> assertThat(actualResponses).containsExactlyInAnyOrderElementsOf(expectedResponses),
                     () -> verify(userRepository).existsById(userId),
                     () -> verify(reservationRepository).findByUserId(userId),
-                    () -> verify(waitingRepository).findWaitingWithRankByUserId(userId)
-            );
+                    () -> verify(waitingRepository).findWaitingWithRankByUserId(userId),
+                    () -> verify(pendingPaymentRepository).findByUserId(userId));
         }
     }
 }

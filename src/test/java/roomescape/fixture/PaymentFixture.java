@@ -48,4 +48,15 @@ public class PaymentFixture {
         ReflectionTestUtils.setField(payment, "id", 4L);
         return payment;
     }
+
+    public static Payment CREATE_PAYMENT_OF(Long id) {
+        Payment payment = Payment.register(
+                "payment_key_9999",
+                "order_id_9999",
+                "방탈출 패키지 1건",
+                99999L
+        );
+        ReflectionTestUtils.setField(payment, "id", id);
+        return payment;
+    }
 }
