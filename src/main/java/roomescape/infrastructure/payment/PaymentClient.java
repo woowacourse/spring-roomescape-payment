@@ -9,12 +9,11 @@ import roomescape.dto.request.PaymentRequest;
 public class PaymentClient {
 
     private final RestClient restClient;
-    private final paymentResponseErrorHandler paymentResponseErrorHandler;
+    private final PaymentResponseErrorHandler errorHandler;
 
-    public PaymentClient(final RestClient restClient,
-                         final paymentResponseErrorHandler paymentResponseErrorHandler) {
+    public PaymentClient(final RestClient restClient, final PaymentResponseErrorHandler errorHandler) {
         this.restClient = restClient;
-        this.paymentResponseErrorHandler = paymentResponseErrorHandler;
+        this.errorHandler = errorHandler;
     }
 
     public PaymentInfo postPaymentInfo(PaymentRequest paymentRequest) {
@@ -22,10 +21,7 @@ public class PaymentClient {
                 .uri("/v1/payments/confirm")
                 .body(paymentRequest)
                 .retrieve()
-                .onStatus(status ->
-                                status.is4xxClientError() || status.is5xxServerError(),
-                        (request, response) -> paymentResponseErrorHandler.handleError(response,
-                                response.getStatusCode()))
+                .onStatus(errorHandler)
                 .body(PaymentInfo.class);
     }
 }

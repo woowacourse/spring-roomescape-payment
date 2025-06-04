@@ -21,7 +21,7 @@ import roomescape.domain.PaymentInfo;
 import roomescape.dto.request.PaymentRequest;
 import roomescape.exception.FilteredPaymentException;
 import roomescape.infrastructure.payment.PaymentClient;
-import roomescape.infrastructure.payment.paymentResponseErrorHandler;
+import roomescape.infrastructure.payment.PaymentResponseErrorHandler;
 
 public class PaymentClientTest {
 
@@ -29,7 +29,7 @@ public class PaymentClientTest {
             .baseUrl("https://api.tosspayments.com")
             .defaultHeader("Authorization", String.format("%s %s", "Basic", Base64.getEncoder()));
 
-    private final paymentResponseErrorHandler paymentResponseErrorHandler = new paymentResponseErrorHandler();
+    private final PaymentResponseErrorHandler paymentResponseErrorHandler = new PaymentResponseErrorHandler();
 
     private MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
     private PaymentClient clientController = new PaymentClient(testBuilder.build(),
