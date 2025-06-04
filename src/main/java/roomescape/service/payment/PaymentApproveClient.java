@@ -12,6 +12,7 @@ import roomescape.dto.response.TossPaymentResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class PaymentApproveClient {
@@ -59,7 +60,7 @@ public class PaymentApproveClient {
         }
     }
 
-    private TossPaymentResponse approvePayment(Map<String, Object> requestBody) {
+    private TossPaymentResponse approvePayment(final Map<String, Object> requestBody) {
         return restClient.post().uri(paymentApproveUrl)
                 .header("Authorization", getAuthorizations())
                 .accept(MediaType.APPLICATION_JSON)
@@ -68,7 +69,7 @@ public class PaymentApproveClient {
                 .body(TossPaymentResponse.class);
     }
 
-    private TossPaymentResponse getPaymentOrElseCancel(String paymentKey) {
+    private TossPaymentResponse getPaymentOrElseCancel(final String paymentKey) {
         // 서버 에러 및 연결 에러 -> 재시도
         int attempts = 0;
         while (attempts < MAX_RETRY) {
@@ -80,12 +81,13 @@ public class PaymentApproveClient {
         }
 
         // 재시도 해도 실패 -> 안전하게 결제 취소
+        String idempotencyKey = UUID.randomUUID().toString();
         boolean cancelSuccess = false;
         attempts = 0;
         while (attempts < MAX_RETRY) {
             try {
                 attempts++;
-                cancelPayment(paymentKey);
+                cancelPayment(paymentKey, idempotencyKey);
                 cancelSuccess = true;
             } catch (HttpServerErrorException | ResourceAccessException ignored) {
             }
@@ -97,7 +99,7 @@ public class PaymentApproveClient {
         }
     }
 
-    private TossPaymentResponse checkPayment(String paymentKey) {
+    private TossPaymentResponse checkPayment(final String paymentKey) {
         return restClient.get().uri(paymentCheckUrl, paymentKey)
                 .header("Authorization", getAuthorizations())
                 .accept(MediaType.APPLICATION_JSON)
@@ -105,9 +107,10 @@ public class PaymentApproveClient {
                 .body(TossPaymentResponse.class);
     }
 
-    private void cancelPayment(String paymentKey) {
+    private void cancelPayment(final String paymentKey, final String idempotencyKey) {
         restClient.post().uri(paymentCancelUrl, paymentKey)
                 .header("Authorization", getAuthorizations())
+                .header("Idempotency-Key", idempotencyKey)
                 .accept(MediaType.APPLICATION_JSON)
                 .body(Map.of(
                         "cancelReason", "클라이언트 로직 문제"
