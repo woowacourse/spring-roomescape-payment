@@ -23,6 +23,7 @@ import roomescape.persistence.repository.MemberRepository;
 import roomescape.persistence.repository.ReservationTicketRepository;
 import roomescape.persistence.repository.ReservationTimeRepository;
 import roomescape.persistence.repository.ThemeRepository;
+import roomescape.persistence.repository.TossPaymentRepository;
 import roomescape.persistence.repository.WaitingRepository;
 import roomescape.persistence.vo.Period;
 
@@ -35,6 +36,7 @@ public class ReservationTicketService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final TossPaymentRepository tossPaymentRepository;
 
     @Transactional(propagation = Propagation.REQUIRED)
     public ReservationTicket saveReservation(
@@ -58,7 +60,8 @@ public class ReservationTicketService {
                 loginMember.id());
 
         return reservationTickets.stream()
-                .map(MemberReservationResponseDto::new)
+                .map(reservationTicket -> new MemberReservationResponseDto(reservationTicket,
+                        tossPaymentRepository.findForReservationTicket(reservationTicket)))
                 .toList();
     }
 

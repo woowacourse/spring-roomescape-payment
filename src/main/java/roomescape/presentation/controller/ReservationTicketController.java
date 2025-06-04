@@ -47,7 +47,8 @@ public class ReservationTicketController {
             @RequestBody @Valid ReservationTicketPaymentWithTossRequestDto reservationTicketPaymentWithTossRequestDto,
             LoginMember loginMember) {
 
-        return reservationTicketPaymentService.saveReservationWithTossPaymentGateWay(reservationTicketPaymentWithTossRequestDto, loginMember);
+        return reservationTicketPaymentService.saveReservationWithTossPaymentGateWay(
+                reservationTicketPaymentWithTossRequestDto, loginMember);
     }
 
     @DeleteMapping("/{id}")
