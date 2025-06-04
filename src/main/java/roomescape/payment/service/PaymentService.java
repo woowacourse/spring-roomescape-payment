@@ -30,7 +30,7 @@ public class PaymentService {
 
     @Transactional
     public Payment save(final TossPaymentResponse response) {
-        Payment payment = new Payment(response.orderId(), response.approvedAt().toLocalDateTime(), response.totalAmount(), PaymentStatus.DONE);
+        Payment payment = new Payment(response.orderId(), response.approvedAt().toLocalDateTime(), response.totalAmount(), PaymentStatus.DONE, response.paymentKey());
         return paymentRepository.save(payment);
     }
 }
