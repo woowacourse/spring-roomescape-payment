@@ -3,7 +3,6 @@ package roomescape.application.reservation.command;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.application.payment.PaymentValidator;
 import roomescape.application.payment.TossPaymentService;
 import roomescape.application.reservation.command.dto.CreateReservationCommand;
 import roomescape.application.reservation.command.dto.CreateReservationWithPaymentCommand;

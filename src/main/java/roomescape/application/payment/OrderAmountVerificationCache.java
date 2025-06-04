@@ -29,7 +29,7 @@ public class OrderAmountVerificationCache {
     }
 
     private Long get(final String key) {
-        if(cache.containsKey(key)) {
+        if (cache.containsKey(key)) {
             return cache.get(key);
         }
 
