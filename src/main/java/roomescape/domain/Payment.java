@@ -18,25 +18,25 @@ public class Payment extends AuditedEntity {
     @Column(nullable = false)
     private String paymentKey;
     @Column(nullable = false)
-    private String paymentType;
+    private Long amount;
 
     protected Payment() {
 
     }
 
-    public Payment(Long id, String orderId, String paymentKey, String paymentType) {
+    public Payment(Long id, String orderId, String paymentKey, Long amount) {
         this.id = id;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
-        this.paymentType = paymentType;
+        this.amount = amount;
     }
 
     public static Payment createWithoutId(
             String orderId,
             String paymentKey,
-            String paymentType
+            Long amount
     ) {
-        return new Payment(null, orderId, paymentKey, paymentType);
+        return new Payment(null, orderId, paymentKey, amount);
     }
 
     public Long getId() {
@@ -51,8 +51,8 @@ public class Payment extends AuditedEntity {
         return paymentKey;
     }
 
-    public String getPaymentType() {
-        return paymentType;
+    public Long getAmount() {
+        return amount;
     }
 
     @Override

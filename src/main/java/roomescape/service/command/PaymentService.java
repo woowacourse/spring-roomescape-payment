@@ -26,7 +26,7 @@ public class PaymentService {
     public Payment savePayment(PaymentHistoryCreationContent content) {
         PaymentResult paymentResult = requestPaymentAuthorization(content);
         Payment payment = Payment.createWithoutId(
-                paymentResult.orderId(), paymentResult.paymentKey(), content.paymentType());
+                paymentResult.orderId(), paymentResult.paymentKey(), paymentResult.totalAmount());
         return paymentRepository.save(payment);
     }
 
