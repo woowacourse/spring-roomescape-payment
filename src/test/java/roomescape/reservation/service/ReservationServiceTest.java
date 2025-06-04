@@ -24,7 +24,7 @@ import roomescape.common.exception.PaymentException;
 import roomescape.member.auth.vo.MemberInfo;
 import roomescape.member.domain.Role;
 import roomescape.payment.service.dto.PaymentConfirmResponse;
-import roomescape.payment.PaymentConfirmWebRequest;
+import roomescape.payment.controller.dto.PaymentConfirmWebRequest;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.controller.dto.CreateReservationWebRequest;
 import roomescape.reservation.controller.dto.CreateReservationWithPaymentWebRequest;
