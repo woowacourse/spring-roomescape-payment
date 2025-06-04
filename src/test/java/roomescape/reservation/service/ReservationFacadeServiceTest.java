@@ -22,6 +22,7 @@ import roomescape.member.domain.MemberRole;
 import roomescape.member.repository.MemberRepository;
 import roomescape.member.service.MemberService;
 import roomescape.payment.infrastructure.TossApiClient;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.request.PaymentRequest;
@@ -65,6 +66,9 @@ class ReservationFacadeServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     @Mock
     private TossApiClient tossApiClient;
 
@@ -81,7 +85,8 @@ class ReservationFacadeServiceTest {
                 new MemberService(memberRepository, new MyPasswordEncoder()),
                 new ThemeService(themeRepository, reservationRepository),
                 new ReservationTimeService(reservationTimeRepository, reservationRepository),
-                new PaymentService(tossApiClient)
+                new PaymentService(paymentRepository),
+                tossApiClient
         );
 
         ReservationTime time2 = ReservationTime.withUnassignedId(LocalTime.of(9, 0));
@@ -210,4 +215,4 @@ class ReservationFacadeServiceTest {
 
         assertThat(result).isEmpty();
     }
-} 
+}

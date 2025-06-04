@@ -12,6 +12,7 @@ import roomescape.payment.exception.TossPaymentClientException;
 import roomescape.payment.exception.TossPaymentServerException;
 import roomescape.payment.exception.TossServerErrorCode;
 import roomescape.payment.service.PaymentApiClient;
+import roomescape.reservation.dto.request.PaymentRequest;
 
 @Component
 public class TossApiClient implements PaymentApiClient {
@@ -26,14 +27,14 @@ public class TossApiClient implements PaymentApiClient {
         this.restClient = restClient;
     }
 
-    public PaymentResponse authPayment(final String paymentKey, final String orderId,
-                                       final Integer amount, final String paymentType) {
-        TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount, paymentType);
+    public PaymentResponse authPayment(final PaymentRequest request) {
+        TossPaymentRequest tossRequest = new TossPaymentRequest(request.paymentKey(), request.orderId(),
+                request.amount(), request.paymentType());
         try {
             return restClient.post()
                     .uri(PAYMENT_URL)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(request)
+                    .body(tossRequest)
                     .retrieve()
                     .toEntity(PaymentResponse.class)
                     .getBody();

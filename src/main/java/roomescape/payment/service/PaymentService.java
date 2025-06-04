@@ -1,19 +1,25 @@
 package roomescape.payment.service;
 
 import org.springframework.stereotype.Service;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.response.PaymentResponse;
+import roomescape.payment.repository.PaymentRepository;
+import roomescape.reservation.domain.Reservation;
 
 @Service
 public class PaymentService {
 
-    private final PaymentApiClient paymentApiClient;
+    private final PaymentRepository paymentRepository;
 
-    public PaymentService(final PaymentApiClient paymentApiClient) {
-        this.paymentApiClient = paymentApiClient;
+    public PaymentService(final PaymentRepository paymentRepository) {
+        this.paymentRepository = paymentRepository;
     }
 
-    public void payment(final String paymentKey, final String orderId,
-                        final Integer amount, final String paymentType) {
-        PaymentResponse paymentResponse = paymentApiClient.authPayment(paymentKey, orderId, amount, paymentType);
+
+    public void create(final PaymentResponse response, final Reservation reservation) {
+        Payment payment = new Payment(response.paymentKey(), response.orderId(), response.type(),
+                response.totalAmount(), response.status(), response.requestedAt());
+
+        paymentRepository.save(payment);
     }
 }
