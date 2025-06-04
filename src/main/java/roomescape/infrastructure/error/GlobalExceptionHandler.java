@@ -23,76 +23,78 @@ import roomescape.infrastructure.error.exception.ReservationTimeException;
 import roomescape.infrastructure.error.exception.ThemeException;
 import roomescape.infrastructure.error.exception.UnauthorizedException;
 import roomescape.infrastructure.error.exception.WaitingException;
+import roomescape.infrastructure.log.ErrorLog;
+import roomescape.infrastructure.log.LogEntry;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<ApiFailResponse> handleForbiddenException(ForbiddenException e) {
-        log.error("ForbiddenException", e);
+    public ResponseEntity<ApiFailResponse> handleForbiddenException(ForbiddenException ex) {
+        LOGGER.error(buildLogEntry(ex).toLogMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ApiFailResponse("접근권한이 없습니다."));
     }
 
     @ExceptionHandler(ReservationException.class)
-    public ResponseEntity<ApiFailResponse> handleReservationException(ReservationException e) {
-        log.error("ReservationException", e);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiFailResponse(e.getMessage()));
+    public ResponseEntity<ApiFailResponse> handleReservationException(ReservationException ex) {
+        LOGGER.error(buildLogEntry(ex).toLogMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiFailResponse(ex.getMessage()));
     }
 
     @ExceptionHandler(ReservationTimeException.class)
-    public ResponseEntity<ApiFailResponse> handleReservationTimeException(ReservationTimeException e) {
-        log.error("ReservationTimeException", e);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiFailResponse(e.getMessage()));
+    public ResponseEntity<ApiFailResponse> handleReservationTimeException(ReservationTimeException ex) {
+        LOGGER.error(buildLogEntry(ex).toLogMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiFailResponse(ex.getMessage()));
     }
 
     @ExceptionHandler(MemberException.class)
-    public ResponseEntity<ApiFailResponse> handleMemberException(MemberException e) {
-        log.error("MemberException", e);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiFailResponse(e.getMessage()));
+    public ResponseEntity<ApiFailResponse> handleMemberException(MemberException ex) {
+        LOGGER.error(buildLogEntry(ex).toLogMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiFailResponse(ex.getMessage()));
     }
 
     @ExceptionHandler(ThemeException.class)
-    public ResponseEntity<ApiFailResponse> handleThemeException(ThemeException e) {
-        log.error("ThemeException", e);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiFailResponse(e.getMessage()));
+    public ResponseEntity<ApiFailResponse> handleThemeException(ThemeException ex) {
+        LOGGER.error(buildLogEntry(ex).toLogMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiFailResponse(ex.getMessage()));
     }
 
     @ExceptionHandler(WaitingException.class)
-    public ResponseEntity<ApiFailResponse> handleWaitingException(WaitingException e) {
-        log.error("WaitingException", e);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiFailResponse(e.getMessage()));
+    public ResponseEntity<ApiFailResponse> handleWaitingException(WaitingException ex) {
+        LOGGER.error(buildLogEntry(ex).toLogMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiFailResponse(ex.getMessage()));
     }
 
     @ExceptionHandler(PaymentException.class)
-    public ResponseEntity<ApiFailResponse> handlePaymentException(PaymentException e) {
-        log.error("PaymentException", e);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiFailResponse(e.getMessage()));
+    public ResponseEntity<ApiFailResponse> handlePaymentException(PaymentException ex) {
+        LOGGER.error(buildLogEntry(ex).toLogMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiFailResponse(ex.getMessage()));
     }
 
     @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ApiFailResponse> handleAuthException(UnauthorizedException e) {
-        log.error("UnauthorizedException", e);
+    public ResponseEntity<ApiFailResponse> handleAuthException(UnauthorizedException ex) {
+        LOGGER.error(buildLogEntry(ex).toLogMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiFailResponse("인증에 실패했습니다."));
     }
 
     @ExceptionHandler(LoginAuthException.class)
-    public ResponseEntity<ApiFailResponse> handleLoginAuthException(LoginAuthException e) {
-        log.error("LoginAuthException", e);
+    public ResponseEntity<ApiFailResponse> handleLoginAuthException(LoginAuthException ex) {
+        LOGGER.error(buildLogEntry(ex).toLogMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(new ApiFailResponse("로그인에 실패했습니다. 아이디 또는 비밀번호를 다시 확인하세요"));
     }
 
     @ExceptionHandler(JwtExtractException.class)
-    public ResponseEntity<ApiFailResponse> handleJwtExtractException(JwtExtractException e) {
-        log.error("JwtExtractException", e);
+    public ResponseEntity<ApiFailResponse> handleJwtExtractException(JwtExtractException ex) {
+        LOGGER.error(buildLogEntry(ex).toLogMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiFailResponse("JWT 추출에 실패했습니다."));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiFailResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        String errorMessage = e.getBindingResult()
+    public ResponseEntity<ApiFailResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        String errorMessage = ex.getBindingResult()
                 .getAllErrors()
                 .stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
@@ -101,19 +103,26 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ApiFailResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-        if (e.getCause() instanceof InvalidFormatException formatEx && formatEx.getTargetType() == LocalDate.class) {
+    public ResponseEntity<ApiFailResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        if (ex.getCause() instanceof InvalidFormatException formatEx && formatEx.getTargetType() == LocalDate.class) {
             return ResponseEntity.badRequest().body(new ApiFailResponse("날짜는 yyyy-MM-dd 형식이어야 합니다."));
         }
-        if (e.getCause() instanceof InvalidFormatException formatEx && formatEx.getTargetType() == LocalTime.class) {
+        if (ex.getCause() instanceof InvalidFormatException formatEx && formatEx.getTargetType() == LocalTime.class) {
             return ResponseEntity.badRequest().body(new ApiFailResponse("시간은 HH:mm 형식이어야 합니다."));
         }
         return ResponseEntity.badRequest().body(new ApiFailResponse("잘못된 요청입니다."));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiFailResponse> handleException(Exception e) {
-        log.error("예상치 못한 에러 발생", e);
+    public ResponseEntity<ApiFailResponse> handleException(Exception ex) {
+        LOGGER.error(buildLogEntry(ex).toLogMessage());
         return ResponseEntity.internalServerError().body(new ApiFailResponse("예상치 못한 에러가 발생했습니다."));
+    }
+
+    private LogEntry buildLogEntry(Throwable ex) {
+        StackTraceElement origin = ex.getStackTrace()[0];
+        String className = origin.getClassName();
+        String methodName = origin.getMethodName();
+        return new ErrorLog(className, methodName, ex.getMessage(), ex);
     }
 }
