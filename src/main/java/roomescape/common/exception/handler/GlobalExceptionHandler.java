@@ -18,7 +18,6 @@ import roomescape.common.security.exception.UnAuthorizedException;
 import roomescape.payment.exception.PaymentClientException;
 import roomescape.payment.exception.PaymentForbiddenException;
 import roomescape.payment.exception.PaymentServerException;
-import roomescape.payment.exception.PaymentUnauthorizedException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -68,12 +67,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handlePaymentClientException(PaymentClientException e)
             throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(objectMapper.writeValueAsString(e));
-    }
-
-    @ExceptionHandler(PaymentUnauthorizedException.class)
-    public ResponseEntity<String> handlePaymentUnauthorizedException(PaymentUnauthorizedException e)
-            throws JsonProcessingException {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(objectMapper.writeValueAsString(e));
     }
 
     @ExceptionHandler(PaymentForbiddenException.class)

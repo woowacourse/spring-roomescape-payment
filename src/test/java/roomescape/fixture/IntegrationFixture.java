@@ -34,6 +34,13 @@ public class IntegrationFixture {
                 .cookie(TOKEN);
     }
 
+    public static void createReservationWithTimeAndTheme() {
+        createReservationTime();
+        createTheme("추리");
+        createRegularReservation(1L);
+        IntegrationFixture.findReservation();
+    }
+
     public static void createRegularReservation(final Long themeId) {
         String authToken = loginAndGetAuthToken(REGULAR_EMAIL, PASSWORD);
 

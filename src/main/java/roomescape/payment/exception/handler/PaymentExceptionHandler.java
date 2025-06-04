@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URI;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
@@ -11,7 +12,7 @@ import org.springframework.web.client.ResponseErrorHandler;
 import roomescape.payment.exception.PaymentClientException;
 import roomescape.payment.exception.PaymentForbiddenException;
 import roomescape.payment.exception.PaymentServerException;
-import roomescape.payment.exception.PaymentUnauthorizedException;
+import roomescape.payment.exception.TossUnrecoverableErrorCode;
 import roomescape.payment.presentation.dto.response.TossErrorResponse;
 
 @Component
@@ -35,13 +36,17 @@ public class PaymentExceptionHandler implements ResponseErrorHandler {
         TossErrorResponse errorResponse = objectMapper.readValue(response.getBody(), TossErrorResponse.class);
         String code = errorResponse.code();
         String message = errorResponse.message();
+        TossUnrecoverableErrorCode errorCode = TossUnrecoverableErrorCode.fromCode(code);
+        if (errorCode.isUnrecoverable()) {
+            throw new PaymentServerException(code, message);
+        }
+
         HttpStatusCode statusCode = response.getStatusCode();
         if (statusCode.is4xxClientError()) {
-            switch (statusCode.value()) {
-                case 401 -> throw new PaymentUnauthorizedException(code, message);
-                case 403 -> throw new PaymentForbiddenException(code, message);
-                default -> throw new PaymentClientException(code, message);
+            if (statusCode == HttpStatus.FORBIDDEN) {
+                throw new PaymentForbiddenException(code, message);
             }
+            throw new PaymentClientException(code, message);
         }
         throw new PaymentServerException(code, message);
     }

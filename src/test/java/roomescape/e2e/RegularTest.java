@@ -22,6 +22,7 @@ import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -36,6 +37,7 @@ import roomescape.payment.domain.PaymentType;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
 import roomescape.payment.presentation.dto.request.PaymentRequest;
 import roomescape.payment.presentation.dto.response.TossPaymentApproveResponse;
+import roomescape.reservation.application.event.TestEventPublisher;
 import roomescape.reservationslot.presentation.dto.response.MyReservationResponse;
 import roomescape.reservationslot.presentation.dto.response.ReservationResponse;
 
@@ -48,6 +50,9 @@ public class RegularTest {
 
     @MockitoBean
     private PaymentClient paymentClient;
+
+    @Autowired
+    private TestEventPublisher eventPublisher;
 
     @LocalServerPort
     private int port;
@@ -73,10 +78,7 @@ public class RegularTest {
 
     @Test
     void createReservation() {
-        createReservationTime();
-        createTheme("추리");
-        createRegularReservation(1L);
-        IntegrationFixture.findReservation();
+        IntegrationFixture.createReservationWithTimeAndTheme();
     }
 
     @Test
@@ -105,11 +107,11 @@ public class RegularTest {
 
     @Test
     void findMyReservations() {
-        createWaitingReservations();
-        String user2Token = loginAndGetAuthToken(REGULAR2_EMAIL, PASSWORD);
+        approvePayment();
+        String userToken = loginAndGetAuthToken(REGULAR_EMAIL, PASSWORD);
 
         List<MyReservationResponse> responses = RestAssured.given().log().all()
-                .cookie(TOKEN, user2Token)
+                .cookie(TOKEN, userToken)
                 .when().get("/my-reservations")
                 .then().log().all()
                 .statusCode(200)
@@ -119,7 +121,7 @@ public class RegularTest {
 
         SoftAssertions.assertSoftly(softAssertions -> {
             softAssertions.assertThat(responses.size()).isEqualTo(1);
-            softAssertions.assertThat(responses.getFirst().isReserved()).isFalse();
+            softAssertions.assertThat(responses.getFirst().isReserved()).isTrue();
         });
     }
 
@@ -168,7 +170,9 @@ public class RegularTest {
 
     @Test
     void approvePayment() {
-        createReservation();
+        createReservationTime();
+        createTheme("추리");
+        createRegularReservation(1L);
         long reservationId = IntegrationFixture.findReservation();
         String paymentKey = "PAYMENT_KEY";
         String orderId = "ORDER_ID";

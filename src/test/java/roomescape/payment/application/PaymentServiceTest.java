@@ -25,7 +25,7 @@ import roomescape.payment.application.client.PaymentClient;
 import roomescape.payment.application.infrastructure.PaymentRepository;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentType;
-import roomescape.payment.exception.PaymentUnauthorizedException;
+import roomescape.payment.exception.PaymentForbiddenException;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
 import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
 import roomescape.payment.presentation.dto.response.TossPaymentApproveResponse;
@@ -139,12 +139,11 @@ class PaymentServiceTest {
         long amount = 5000L;
         PaymentApproveRequest paymentApproveRequest = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID, amount,
                 reservationId);
-        when(paymentClient.approvePayment(any(PaymentApproveRequest.class))).thenThrow(
-                PaymentUnauthorizedException.class);
+        when(paymentClient.approvePayment(any(PaymentApproveRequest.class))).thenThrow(PaymentForbiddenException.class);
 
         // when
         Assertions.assertThatThrownBy(() -> paymentService.approvePayment(paymentApproveRequest))
-                .isInstanceOf(PaymentUnauthorizedException.class);
+                .isInstanceOf(PaymentForbiddenException.class);
     }
 
     @Test
