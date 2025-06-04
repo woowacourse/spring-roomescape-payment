@@ -177,7 +177,7 @@ class ReservationServiceTest {
                 MEMBER.getName().getValue()
         );
         // when
-        List<MyReservationResponse> myReservations = reservationQueryService.getMyReservations(loginMember);
+        List<MyReservationResponse> myReservations = reservationQueryService.findMyReservations(loginMember);
         // then
         assertThat(myReservations).hasSize(2);
     }

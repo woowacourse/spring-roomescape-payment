@@ -226,7 +226,6 @@ Content-Type: application/json
             "type": "WAITING",
             "rank" : 3
         },
-        "amount": 1000
     }
 ]
 ```

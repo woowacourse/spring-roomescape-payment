@@ -10,8 +10,7 @@ public record PaymentResponse(
 ) {
 
     public PaymentResponse(final Payment payment) {
-        this(
-                payment.getId(),
+        this(payment.getId(),
                 payment.getPaymentKey().getValue(),
                 payment.getOrderId().getValue(),
                 payment.getAmount().getValue()

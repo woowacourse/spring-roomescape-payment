@@ -46,7 +46,7 @@ public class ReservationQueryService {
                 .toList();
     }
 
-    public List<MyReservationResponse> getMyReservations(final LoginMember loginMember) {
+    public List<MyReservationResponse> findMyReservations(final LoginMember loginMember) {
         final List<MyReservationResponse> reservations = reservationRepository.findAllByMemberIdOrderByDateDesc(
                         loginMember.id()).stream()
                 .map(MyReservationResponse::new)

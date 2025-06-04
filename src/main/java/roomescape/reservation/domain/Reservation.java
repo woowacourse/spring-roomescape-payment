@@ -121,6 +121,13 @@ public class Reservation {
         return payment;
     }
 
+    public Long getAmount() {
+        if (getPayment() == null) {
+            return 0L;
+        }
+        return payment.getAmount().getValue();
+    }
+
     @Override
     public final boolean equals(final Object o) {
         if (!(o instanceof final Reservation that)) {
