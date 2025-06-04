@@ -1,4 +1,4 @@
-const PENDING_API_ENDPOINT = '/admin/reservations/pending';
+const PENDING_API_ENDPOINT = '/api/admin/reservations/pending';
 
 document.addEventListener('DOMContentLoaded', () => {
     fetch(PENDING_API_ENDPOINT)

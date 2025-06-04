@@ -10,21 +10,31 @@ import roomescape.dto.request.ReservationTimeRequest;
 import roomescape.dto.response.ReservationTimeResponse;
 import roomescape.service.reservation.ReservationTimeService;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
-public class AdminReservationTimeController implements AdminTimeApi {
+@RequestMapping("/api/admin")
+public class AdminTimeController implements AdminTimeApi {
 
     private final ReservationTimeService reservationTimeService;
 
     @Override
-    @PostMapping("/admin/times")
+    @PostMapping("/times")
     public ResponseEntity<ReservationTimeResponse> save(@RequestBody @Valid ReservationTimeRequest request) {
         ReservationTimeResponse response = reservationTimeService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Override
-    @DeleteMapping("/admin/times/{timeId}")
+    @GetMapping("/times")
+    public ResponseEntity<List<ReservationTimeResponse>> getAll() {
+        List<ReservationTimeResponse> response = reservationTimeService.getAll();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @Override
+    @DeleteMapping("/times/{timeId}")
     public ResponseEntity<Void> remove(@PathVariable long timeId) {
         reservationTimeService.remove(timeId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

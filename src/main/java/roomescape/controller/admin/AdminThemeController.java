@@ -11,19 +11,20 @@ import roomescape.service.reservation.ReservationThemeService;
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/api/admin")
 public class AdminThemeController implements AdminThemeApi {
 
     private final ReservationThemeService reservationThemeService;
 
     @Override
-    @PostMapping("/admin/themes")
+    @PostMapping("/themes")
     public ResponseEntity<ReservationThemeResponse> save(@RequestBody ReservationThemeRequest request) {
         ReservationThemeResponse response = reservationThemeService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Override
-    @DeleteMapping("/admin/themes/{themeId}")
+    @DeleteMapping("/themes/{themeId}")
     public ResponseEntity<Void> remove(@PathVariable long themeId) {
         reservationThemeService.remove(themeId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

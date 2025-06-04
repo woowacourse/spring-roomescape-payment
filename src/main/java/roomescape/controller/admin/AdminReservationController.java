@@ -16,19 +16,20 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/api/admin")
 public class AdminReservationController implements AdminReservationApi {
 
     private final ReservationService reservationService;
 
     @Override
-    @PostMapping("/admin/reservations")
+    @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> save(@RequestBody @Valid CreateReservationRequest request) {
         ReservationResponse response = reservationService.save(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Override
-    @GetMapping("/admin/reservations")
+    @GetMapping("/reservations")
     public ResponseEntity<List<ReservationResponse>> getAllByFilter(
             @RequestParam(required = false, name = "memberId") Long memberId,
             @RequestParam(required = false, name = "themeId") Long themeId,
@@ -40,14 +41,14 @@ public class AdminReservationController implements AdminReservationApi {
     }
 
     @Override
-    @GetMapping("/admin/reservations/pending")
+    @GetMapping("/reservations/pending")
     public ResponseEntity<List<PendingReservationResponse>> getAllPendings() {
         List<PendingReservationResponse> response = reservationService.getAllPendings();
         return ResponseEntity.ok(response);
     }
 
     @Override
-    @DeleteMapping("/admin/reservations/pending/{reservationId}/deny")
+    @DeleteMapping("/reservations/pending/{reservationId}/deny")
     public ResponseEntity<Void> denyPending(@PathVariable long reservationId) {
         reservationService.denyPending(reservationId);
         return ResponseEntity.ok().build();

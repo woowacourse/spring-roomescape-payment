@@ -1,4 +1,4 @@
-const MY_RESERVATION_API_ENDPOINT = '/reservations';
+const MY_RESERVATION_API_ENDPOINT = '/api/reservations';
 
 document.addEventListener('DOMContentLoaded', () => {
     fetch(MY_RESERVATION_API_ENDPOINT) // 내 예약 목록 조회 API 호출
@@ -51,7 +51,7 @@ function render(data) {
 }
 
 function requestDeleteWaiting(id) {
-    const endpoint = `/reservations/${id}`;
+    const endpoint = `/api/reservations/${id}`;
     return fetch(endpoint, {
         method: 'DELETE'
     }).then(response => {

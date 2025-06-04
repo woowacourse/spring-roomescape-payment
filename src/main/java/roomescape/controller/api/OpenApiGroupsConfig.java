@@ -11,7 +11,7 @@ public class OpenApiGroupsConfig {
     public GroupedOpenApi adminApi() {
         return GroupedOpenApi.builder()
                 .group("어드민 API")
-                .pathsToMatch("/admin/**")
+                .pathsToMatch("/api/admin/**")
                 .build();
     }
 
@@ -19,8 +19,8 @@ public class OpenApiGroupsConfig {
     public GroupedOpenApi userApi() {
         return GroupedOpenApi.builder()
                 .group("유저 API")
-                .pathsToMatch("/**")
-                .pathsToExclude("/admin/**")
+                .pathsToMatch("/api/**")
+                .pathsToExclude("/api/admin/**")
                 .build();
     }
 }

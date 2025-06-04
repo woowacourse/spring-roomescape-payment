@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import roomescape.dto.request.ReservationTimeRequest;
 import roomescape.dto.response.ReservationTimeResponse;
 
+import java.util.List;
+
 @Tag(name = "4. 예약 시간 관련 API")
 public interface AdminTimeApi {
 
@@ -15,6 +17,9 @@ public interface AdminTimeApi {
     ResponseEntity<ReservationTimeResponse> save(
             @RequestBody(required = true) ReservationTimeRequest request
     );
+
+    @Operation(summary = "모든 예약 시간 조회")
+    ResponseEntity<List<ReservationTimeResponse>> getAll();
 
     @Operation(summary = "예약 시간 삭제")
     ResponseEntity<Void> remove(

@@ -1,7 +1,7 @@
-const SIGNUP_API_ENDPOINT = '/auth/signup';
-const LOGIN_API_ENDPOINT = '/auth/login';
-const LOGOUT_API_ENDPOINT = '/auth/logout';
-const LOGIN_CHECK_API_ENDPOINT = '/auth/login/check';
+const SIGNUP_API_ENDPOINT = '/api/auth/signup';
+const LOGIN_API_ENDPOINT = '/api/auth/login';
+const LOGOUT_API_ENDPOINT = '/api/auth/logout';
+const LOGIN_CHECK_API_ENDPOINT = '/api/auth/login/check';
 
 document.addEventListener('DOMContentLoaded', function () {
     updateUIBasedOnLogin();
