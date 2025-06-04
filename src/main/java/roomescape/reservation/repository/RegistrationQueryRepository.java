@@ -13,7 +13,7 @@ public interface RegistrationQueryRepository extends JpaRepository<Reservation, 
     @Query(value = """
         SELECT
             r.id AS id,
-            'BOOKED' AS reservationStatus,
+            CAST(r.reservation_status AS VARCHAR) AS reservationStatus,
             t.name AS themeName,
             r.date AS date,
             rt.start_at AS time,

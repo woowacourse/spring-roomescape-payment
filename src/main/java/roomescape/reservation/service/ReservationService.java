@@ -50,10 +50,8 @@ public class ReservationService {
         final ReservationTime reservationTime = getReservationTimeById(command.timeId());
         final Theme theme = getThemeById(command.themeId());
         final Member member = getMemberById(command.memberId());
-        Reservation reservation = Reservation.builder()
-                .member(member)
-                .registrationSlot(new RegistrationSlot(reservationTime, theme, command.date()))
-                .build();
+        Reservation reservation = Reservation.createNew(
+                member, new RegistrationSlot(reservationTime, theme, command.date()));
 
         validateCanRegistration(reservation);
         final Reservation saved = reservationRepository.save(reservation);
@@ -73,7 +71,7 @@ public class ReservationService {
         if (reservation == null) {
             return;
         }
-        reservationRepository.deleteById(id);
+        reservation.delete();
     }
 
     private Member getMemberById(final Long id) {

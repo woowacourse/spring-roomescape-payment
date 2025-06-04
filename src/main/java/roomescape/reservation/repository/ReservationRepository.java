@@ -16,6 +16,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
               and (:memberId is null or r.member.id = :memberId)
               and (:localDateFrom is null or bs.date >= :localDateFrom)
               and (:localDateTo is null or bs.date <= :localDateTo)
+              and r.reservationStatus = 'RESERVED'
             """)
     List<Reservation> findByCriteria(
             @Param("themeId") Long themeId,
@@ -30,6 +31,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         WHERE r.registrationSlot.date = :date
           AND r.registrationSlot.time.id = :timeId
           AND r.registrationSlot.theme.id = :themeId
+          AND r.reservationStatus = 'RESERVED'
         )
     """)
     boolean existsSameSlot(LocalDate date, Long timeId, Long themeId);
@@ -41,6 +43,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
           AND r.registrationSlot.theme.id = :themeId
           AND r.registrationSlot.time.id = :timeId
           AND r.registrationSlot.date = :date
+          AND r.reservationStatus = 'RESERVED'
         )
     """)
     boolean memberHasReservationAtSlot(Long memberId, Long themeId, Long timeId, LocalDate date);

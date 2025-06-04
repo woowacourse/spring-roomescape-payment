@@ -34,14 +34,14 @@ INSERT INTO theme(name, description, thumbnail) VALUES ('The Arctic Expedition',
 INSERT INTO theme(name, description, thumbnail) VALUES ('The Wild West', 'Escape the wild west town before the showdown.', 'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
 
 -- member 테이블에 대한 INSERT
-INSERT INTO member(name, role, email, password) VALUES ('admin', 'ADMIN', 'admin@email.com', 'password');
-INSERT INTO member (name, role, email, password) VALUES ('Alice', 'MEMBER', 'alice@example.com', 'password');
-INSERT INTO member (name, role, email, password) VALUES ('Bob', 'MEMBER', 'bob@example.com', 'password');
-INSERT INTO member (name, role, email, password) VALUES ('Charlie', 'MEMBER', 'charlie@example.com', 'password');
-INSERT INTO member (name, role, email, password) VALUES ('David', 'MEMBER', 'david@example.com', 'password');
-INSERT INTO member (name, role, email, password) VALUES ('Eve', 'MEMBER', 'eve@example.com', 'password');
-INSERT INTO member (name, role, email, password) VALUES ('Frank', 'MEMBER', 'frank@example.com', 'password');
-INSERT INTO member (name, role, email, password) VALUES ('Grace', 'MEMBER', 'grace@example.com', 'password');
-INSERT INTO member (name, role, email, password) VALUES ('Heidi', 'MEMBER', 'heidi@example.com', 'password');
-INSERT INTO member (name, role, email, password) VALUES ('Ivan', 'MEMBER', 'ivan@example.com', 'password');
-INSERT INTO member (name, role, email, password) VALUES ('Judy', 'MEMBER', 'judy@example.com', 'password');
+INSERT INTO member(name, role, email, password) VALUES ('admin', 'ADMIN', 'admin@email.com', '1234');
+INSERT INTO member (name, role, email, password) VALUES ('Alice', 'MEMBER', 'alice@example.com', '1234');
+INSERT INTO member (name, role, email, password) VALUES ('Bob', 'MEMBER', 'bob@example.com', '1234');
+INSERT INTO member (name, role, email, password) VALUES ('Charlie', 'MEMBER', 'charlie@example.com', '1234');
+INSERT INTO member (name, role, email, password) VALUES ('David', 'MEMBER', 'david@example.com', '1234');
+INSERT INTO member (name, role, email, password) VALUES ('Eve', 'MEMBER', 'eve@example.com', '1234');
+INSERT INTO member (name, role, email, password) VALUES ('Frank', 'MEMBER', 'frank@example.com', '1234');
+INSERT INTO member (name, role, email, password) VALUES ('Grace', 'MEMBER', 'grace@example.com', '1234');
+INSERT INTO member (name, role, email, password) VALUES ('Heidi', 'MEMBER', 'heidi@example.com', '1234');
+INSERT INTO member (name, role, email, password) VALUES ('Ivan', 'MEMBER', 'ivan@example.com', '1234');
+INSERT INTO member (name, role, email, password) VALUES ('Judy', 'MEMBER', 'judy@example.com', '1234');

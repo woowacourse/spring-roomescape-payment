@@ -24,16 +24,15 @@ public record MyReservationResponse(
                 projection.getThemeName(),
                 projection.getDate(),
                 projection.getTime(),
-                ReservationStatus.from(projection.getReservationStatus()).getOutput(),
+                ReservationStatusResponse.from(projection.getReservationStatus()).getDescription(),
                 projection.getRank(),
                 projection.getPaymentKey(),
                 getAmount(projection),
-                //TODO: ReservationStatus와 같이 getOutput 형태로 고치기
-                getDescription(projection)
+                getPaymentStatus(projection)
         );
     }
 
-    private static String getDescription(MemberRegistrationProjection projection) {
+    private static String getPaymentStatus(MemberRegistrationProjection projection) {
         String paymentStatus = projection.getPaymentStatus();
         if(paymentStatus == null) {
             return "";
