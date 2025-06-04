@@ -13,7 +13,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.domain.reservation.reserved.Reserved;
 import roomescape.domain.reservation.reserved.ReservedRepository;
-import roomescape.domain.reservation.reserved.ReservationSearchFilter;
+import roomescape.domain.reservation.reserved.ReservedSearchFilter;
 import roomescape.exception.AlreadyExistedException;
 import roomescape.exception.BusinessRuleViolationException;
 
@@ -23,7 +23,7 @@ import roomescape.exception.BusinessRuleViolationException;
 class ReservationIntegrationServiceTest {
 
     @Autowired
-    private ReservationService service;
+    private ReservedService service;
 
     @Autowired
     private ReservedRepository reservedRepository;
@@ -35,7 +35,7 @@ class ReservationIntegrationServiceTest {
         var tomorrow = LocalDate.now().plusDays(1);
 
         // when
-        Reserved reserved = service.saveReservationWithoutPurchase(2L, tomorrow, 2L, 2L);
+        Reserved reserved = service.saveReservedWithoutPurchase(2L, tomorrow, 2L, 2L);
 
         // then
         var reservations = reservedRepository.findAll();
@@ -49,7 +49,7 @@ class ReservationIntegrationServiceTest {
         var tomorrow = LocalDate.now().plusDays(1);
 
         // when & then
-        assertThatCode(() -> service.saveReservationWithoutPurchase(2L, tomorrow, 2L, 2L)).doesNotThrowAnyException();
+        assertThatCode(() -> service.saveReservedWithoutPurchase(2L, tomorrow, 2L, 2L)).doesNotThrowAnyException();
     }
 
     @Test
@@ -59,7 +59,7 @@ class ReservationIntegrationServiceTest {
         var yesterday = LocalDate.now().minusDays(1);
 
         // when & then
-        assertThatThrownBy(() -> service.saveReservationWithoutPurchase(2L, yesterday, 2L, 2L)).isInstanceOf(
+        assertThatThrownBy(() -> service.saveReservedWithoutPurchase(2L, yesterday, 2L, 2L)).isInstanceOf(
                 BusinessRuleViolationException.class).hasMessage("이전 날짜로 예약할 수 없습니다.");
     }
 
@@ -73,20 +73,19 @@ class ReservationIntegrationServiceTest {
         var reservedTimeSlotId = 1L;
 
         // when & then
-        assertThatThrownBy(
-                () -> service.saveReservationWithoutPurchase(reservedUserId, reservedDate, reservedTimeSlotId,
-                        reservedThemeId)).isInstanceOf(AlreadyExistedException.class)
-                .hasMessage("이미 예약된 날짜, 시간, 테마에 대한 예약은 불가능합니다.");
+        assertThatThrownBy(() -> service.saveReservedWithoutPurchase(reservedUserId, reservedDate, reservedTimeSlotId,
+                reservedThemeId)).isInstanceOf(AlreadyExistedException.class)
+                .hasMessage("이미 해당 날짜, 시간, 테마에 대한 예약이 존재합니다.");
     }
 
     @Test
     @DisplayName("검색 필터로 예약을 조회할 수 있다.")
     void findReservationsByFilter() {
         // given
-        var filter = new ReservationSearchFilter(1L, 2L, LocalDate.now().plusDays(1), LocalDate.now().plusDays(2));
+        var filter = new ReservedSearchFilter(1L, 2L, LocalDate.now().plusDays(1), LocalDate.now().plusDays(2));
 
         // when & then
-        assertThat(service.findReservationsByFilter(filter)).hasSize(2);
+        assertThat(service.findReservedByFilter(filter)).hasSize(2);
     }
 
     @Test

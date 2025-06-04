@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 import roomescape.domain.reservation.reserved.Reserved;
-import roomescape.domain.reservation.reserved.ReservationSearchFilter;
+import roomescape.domain.reservation.reserved.ReservedSearchFilter;
 
-public class ReservationSpecifications {
-    public static Specification<Reserved> byFilter(final ReservationSearchFilter filter) {
+public class ReservedSpecifications {
+    public static Specification<Reserved> byFilter(final ReservedSearchFilter filter) {
         return (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
 

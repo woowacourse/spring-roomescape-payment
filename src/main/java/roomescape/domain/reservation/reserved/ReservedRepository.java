@@ -14,11 +14,7 @@ public interface ReservedRepository extends JpaRepository<Reserved, Long>, JpaSp
     @EntityGraph(attributePaths = {"timeSlot"})
     List<Reserved> findByDateAndThemeId(LocalDate date, long themeId);
 
-    boolean existsByDateAndTimeSlotIdAndThemeId(LocalDate date, long timeSlotId, long themeId);
-
     boolean existsByTimeSlotId(long timeSlotId);
 
     boolean existsByThemeId(long themeId);
-
-    boolean existsByDateAndTimeSlotIdAndThemeIdAndUserId(LocalDate date, long timeSlotId, long themeId, long userId);
 }

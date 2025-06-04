@@ -7,7 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static roomescape.fixture.PaymentFixture.CREATE_PAYMENT_1;
-import static roomescape.fixture.ReservationFixture.CREATE_RESERVATION_OF;
+import static roomescape.fixture.ReservedFixture.CREATE_RESERVED_OF;
 import static roomescape.fixture.ThemeFixture.CREATE_THEME_1;
 import static roomescape.fixture.TimeSlotFixture.CREATE_TIME_SLOT_1;
 import static roomescape.fixture.UserFixture.CREATE_USER_1;
@@ -25,6 +25,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import roomescape.application.event.ReservationCancelledEvent;
 import roomescape.application.request.PaymentInfo;
 import roomescape.domain.payment.Payment;
+import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.reserved.Reserved;
 import roomescape.domain.reservation.reserved.ReservedRepository;
 import roomescape.domain.theme.Theme;
@@ -37,10 +38,13 @@ import roomescape.exception.AlreadyExistedException;
 import roomescape.exception.NotFoundException;
 
 @ExtendWith(MockitoExtension.class)
-class ReservationServiceTest {
+class ReservedServiceTest {
 
     @Mock
-    ReservedRepository reservationRepository;
+    ReservedRepository reservedRepository;
+
+    @Mock
+    ReservationRepository reservationRepository;
 
     @Mock
     TimeSlotRepository timeSlotRepository;
@@ -58,7 +62,7 @@ class ReservationServiceTest {
     ApplicationEventPublisher eventPublisher;
 
     @InjectMocks
-    ReservationService reservationService;
+    ReservedService reservedService;
 
 
     @Nested
@@ -74,28 +78,18 @@ class ReservationServiceTest {
             Theme theme = CREATE_THEME_1();
             LocalDate date = LocalDate.now().plusDays(1);
 
-            when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
-            when(timeSlotRepository.findById(timeSlot.getId())).thenReturn(Optional.of(timeSlot));
-            when(themeRepository.findById(theme.getId())).thenReturn(Optional.of(theme));
-
-            when(reservationRepository.existsByDateAndTimeSlotIdAndThemeId(date, timeSlot.getId(), theme.getId()))
-                    .thenReturn(true);
+            when(reservationRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(date, timeSlot.getId(),
+                    theme.getId(), user.getId())).thenReturn(true);
 
             PaymentInfo paymentInfo = new PaymentInfo("payment_key_1", "order_id_1", 10000L);
 
             // when & then
-            assertAll(
-                    () -> assertThatThrownBy(
-                            () -> reservationService.saveReservationWithPurchase(user.getId(), date, timeSlot.getId(),
-                                    theme.getId(), paymentInfo))
-                            .isInstanceOf(AlreadyExistedException.class)
-                            .hasMessage("이미 예약된 날짜, 시간, 테마에 대한 예약은 불가능합니다."),
-                    () -> verify(userRepository).findById(user.getId()),
-                    () -> verify(timeSlotRepository).findById(timeSlot.getId()),
-                    () -> verify(themeRepository).findById(theme.getId()),
-                    () -> verify(reservationRepository).existsByDateAndTimeSlotIdAndThemeId(date, timeSlot.getId(),
-                            theme.getId())
-            );
+            assertAll(() -> assertThatThrownBy(
+                            () -> reservedService.saveReservedWithPurchase(user.getId(), date, timeSlot.getId(), theme.getId(),
+                                    paymentInfo)).isInstanceOf(AlreadyExistedException.class)
+                            .hasMessage("이미 해당 날짜, 시간, 테마에 대한 예약이 존재합니다."),
+                    () -> verify(reservationRepository).existsByDateAndTimeSlotIdAndThemeIdAndUserId(date,
+                            timeSlot.getId(), theme.getId(), user.getId()));
 
         }
 
@@ -112,20 +106,19 @@ class ReservationServiceTest {
             when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
             when(timeSlotRepository.findById(timeSlot.getId())).thenReturn(Optional.of(timeSlot));
             when(themeRepository.findById(theme.getId())).thenReturn(Optional.of(theme));
-            when(reservationRepository.save(Reserved.register(user, date, timeSlot, theme)))
-                    .thenReturn(CREATE_RESERVATION_OF(1L, user, date, timeSlot, theme));
+            when(reservedRepository.save(Reserved.register(user, date, timeSlot, theme))).thenReturn(
+                    CREATE_RESERVED_OF(1L, user, date, timeSlot, theme));
 
             PaymentInfo paymentInfo = new PaymentInfo("payment_key_1", "order_id_1", 10000L);
 
             when(paymentService.savePayment(paymentInfo)).thenReturn(payment);
 
             // when
-            Reserved savedReservation = reservationService.saveReservationWithPurchase(
-                    user.getId(), date, timeSlot.getId(), theme.getId(), paymentInfo);
+            Reserved savedReservation = reservedService.saveReservedWithPurchase(user.getId(), date, timeSlot.getId(),
+                    theme.getId(), paymentInfo);
 
             // then
-            assertAll(
-                    () -> assertThat(savedReservation.getUser()).isEqualTo(user),
+            assertAll(() -> assertThat(savedReservation.getUser()).isEqualTo(user),
                     () -> assertThat(savedReservation.getDate()).isEqualTo(date),
                     () -> assertThat(savedReservation.getTimeSlot()).isEqualTo(timeSlot),
                     () -> assertThat(savedReservation.getTheme()).isEqualTo(theme),
@@ -135,8 +128,7 @@ class ReservationServiceTest {
                     () -> verify(timeSlotRepository).findById(timeSlot.getId()),
                     () -> verify(themeRepository).findById(theme.getId()),
                     () -> verify(paymentService).savePayment(any()),
-                    () -> verify(reservationRepository).save(any(Reserved.class))
-            );
+                    () -> verify(reservedRepository).save(any(Reserved.class)));
         }
     }
 
@@ -153,22 +145,20 @@ class ReservationServiceTest {
             TimeSlot timeSlot = CREATE_TIME_SLOT_1();
             Theme theme = CREATE_THEME_1();
             LocalDate date = LocalDate.now().plusDays(1);
-            Reserved reserved = CREATE_RESERVATION_OF(1L, user, date, timeSlot, theme);
+            Reserved reserved = CREATE_RESERVED_OF(1L, user, date, timeSlot, theme);
 
             when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
             when(timeSlotRepository.findById(timeSlot.getId())).thenReturn(Optional.of(timeSlot));
             when(themeRepository.findById(theme.getId())).thenReturn(Optional.of(theme));
 
-            when(reservationRepository.save(Reserved.register(user, date, timeSlot, theme)))
-                    .thenReturn(reserved);
+            when(reservedRepository.save(Reserved.register(user, date, timeSlot, theme))).thenReturn(reserved);
 
             // when
-            Reserved savedReservation = reservationService.saveReservationWithoutPurchase(user.getId(), date,
+            Reserved savedReservation = reservedService.saveReservedWithoutPurchase(user.getId(), date,
                     timeSlot.getId(), theme.getId());
 
             // then
-            assertAll(
-                    () -> assertThat(savedReservation.getUser()).isEqualTo(user),
+            assertAll(() -> assertThat(savedReservation.getUser()).isEqualTo(user),
                     () -> assertThat(savedReservation.getDate()).isEqualTo(date),
                     () -> assertThat(savedReservation.getTimeSlot()).isEqualTo(timeSlot),
                     () -> assertThat(savedReservation.getTheme()).isEqualTo(theme),
@@ -177,8 +167,7 @@ class ReservationServiceTest {
                     () -> verify(userRepository).findById(user.getId()),
                     () -> verify(timeSlotRepository).findById(timeSlot.getId()),
                     () -> verify(themeRepository).findById(theme.getId()),
-                    () -> verify(reservationRepository).save(any(Reserved.class))
-            );
+                    () -> verify(reservedRepository).save(any(Reserved.class)));
         }
     }
 
@@ -192,15 +181,12 @@ class ReservationServiceTest {
         void removeById() {
             // given
             Long findId = 99L;
-            when(reservationRepository.findById(findId)).thenReturn(Optional.empty());
+            when(reservedRepository.findById(findId)).thenReturn(Optional.empty());
 
             // when & then
-            assertAll(
-                    () -> assertThatThrownBy(() -> reservationService.removeById(findId))
-                            .isInstanceOf(NotFoundException.class)
-                            .hasMessage("존재하지 않는 예약입니다."),
-                    () -> verify(reservationRepository).findById(findId)
-            );
+            assertAll(() -> assertThatThrownBy(() -> reservedService.removeById(findId)).isInstanceOf(
+                            NotFoundException.class).hasMessage("존재하지 않는 예약입니다."),
+                    () -> verify(reservedRepository).findById(findId));
         }
 
         @Test
@@ -212,18 +198,16 @@ class ReservationServiceTest {
             LocalDate date = LocalDate.now().plusDays(1);
             TimeSlot timeSlot = CREATE_TIME_SLOT_1();
             Theme theme = CREATE_THEME_1();
-            Reserved reserved = CREATE_RESERVATION_OF(removeId, user, date, timeSlot, theme);
+            Reserved reserved = CREATE_RESERVED_OF(removeId, user, date, timeSlot, theme);
 
-            when(reservationRepository.findById(removeId)).thenReturn(Optional.of(reserved));
+            when(reservedRepository.findById(removeId)).thenReturn(Optional.of(reserved));
 
             // when
-            reservationService.removeById(removeId);
+            reservedService.removeById(removeId);
 
             // then
-            assertAll(
-                    () -> verify(eventPublisher).publishEvent(any(ReservationCancelledEvent.class)),
-                    () -> verify(reservationRepository).deleteById(removeId)
-            );
+            assertAll(() -> verify(eventPublisher).publishEvent(any(ReservationCancelledEvent.class)),
+                    () -> verify(reservedRepository).deleteById(removeId));
         }
     }
 }

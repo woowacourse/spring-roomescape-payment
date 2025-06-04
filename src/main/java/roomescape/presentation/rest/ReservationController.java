@@ -14,59 +14,59 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.application.ReservationService;
+import roomescape.application.ReservedService;
 import roomescape.domain.reservation.reserved.Reserved;
-import roomescape.domain.reservation.reserved.ReservationSearchFilter;
+import roomescape.domain.reservation.reserved.ReservedSearchFilter;
 import roomescape.domain.user.User;
 import roomescape.presentation.auth.Authenticated;
 import roomescape.presentation.request.CreateReservationAdminRequest;
 import roomescape.presentation.request.CreateReservationRequest;
-import roomescape.presentation.response.ReservationResponse;
+import roomescape.presentation.response.ReservedResponse;
 
 @RestController
 public class ReservationController {
 
-    private final ReservationService reservationService;
+    private final ReservedService reservedService;
 
-    public ReservationController(final ReservationService reservationService) {
-        this.reservationService = reservationService;
+    public ReservationController(final ReservedService reservedService) {
+        this.reservedService = reservedService;
     }
 
     @PostMapping("/reservations")
     @ResponseStatus(CREATED)
-    public ReservationResponse createReservationWithUserPrivileges(@Authenticated final User user,
-                                                                   @RequestBody @Valid final CreateReservationRequest request) {
-        Reserved reservation = reservationService.saveReservationWithPurchase(user.getId(), request.date(),
-                request.timeId(), request.themeId(), request.toPaymentInfo());
+    public ReservedResponse createReservationWithUserPrivileges(@Authenticated final User user,
+                                                                @RequestBody @Valid final CreateReservationRequest request) {
+        Reserved reservation = reservedService.saveReservedWithPurchase(user.getId(), request.date(), request.timeId(),
+                request.themeId(), request.toPaymentInfo());
 
-        return ReservationResponse.fromReservation(reservation);
+        return ReservedResponse.fromReservation(reservation);
     }
 
     @PostMapping("/admin/reservations")
     @ResponseStatus(CREATED)
-    public ReservationResponse createReservationWithAdminPrivileges(
+    public ReservedResponse createReservationWithAdminPrivileges(
             @RequestBody @Valid final CreateReservationAdminRequest request) {
-        Reserved reservation = reservationService.saveReservationWithoutPurchase(request.userId(), request.date(),
+        Reserved reservation = reservedService.saveReservedWithoutPurchase(request.userId(), request.date(),
                 request.timeId(), request.themeId());
 
-        return ReservationResponse.fromReservation(reservation);
+        return ReservedResponse.fromReservation(reservation);
     }
 
     @GetMapping("/reservations")
-    public List<ReservationResponse> readAllReservations(
+    public List<ReservedResponse> readAllReservedReservations(
             @RequestParam(name = "themeId", required = false) final Long themeId,
             @RequestParam(name = "userId", required = false) final Long userId,
             @RequestParam(name = "dateFrom", required = false) final LocalDate dateFrom,
             @RequestParam(name = "dateTo", required = false) final LocalDate dateTo) {
-        ReservationSearchFilter searchFilter = new ReservationSearchFilter(themeId, userId, dateFrom, dateTo);
-        List<Reserved> reservations = reservationService.findReservationsByFilter(searchFilter);
+        ReservedSearchFilter searchFilter = new ReservedSearchFilter(themeId, userId, dateFrom, dateTo);
+        List<Reserved> reservations = reservedService.findReservedByFilter(searchFilter);
 
-        return ReservationResponse.fromReservations(reservations);
+        return ReservedResponse.fromReservations(reservations);
     }
 
     @DeleteMapping("/reservations/{id}")
     @ResponseStatus(NO_CONTENT)
     public void deleteReservationById(@PathVariable("id") final long id) {
-        reservationService.removeById(id);
+        reservedService.removeById(id);
     }
 }
