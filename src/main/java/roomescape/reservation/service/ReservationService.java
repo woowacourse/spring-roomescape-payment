@@ -29,6 +29,7 @@ import roomescape.reservation.service.converter.ReservationWaitConverter;
 import roomescape.reservation.service.dto.AvailableReservationTimeServiceRequest;
 import roomescape.reservation.service.dto.CreateReservationServiceRequest;
 import roomescape.reservation.service.usecase.ReservationCommandUseCase;
+import roomescape.reservation.service.usecase.ReservationPaymentCommandUseCase;
 import roomescape.reservation.service.usecase.ReservationQueryUseCase;
 import roomescape.reservation.service.usecase.ReservationWaitCommandUseCase;
 import roomescape.reservation.service.usecase.ReservationWaitQueryUseCase;
@@ -41,10 +42,9 @@ public class ReservationService {
     private final ReservationCommandUseCase reservationCommandUseCase;
     private final ReservationWaitQueryUseCase reservationWaitQueryUseCase;
     private final ReservationWaitCommandUseCase reservationWaitCommandUseCase;
+    private final ReservationPaymentCommandUseCase reservationPaymentCommandUseCase;
 
     private final PaymentService paymentService;
-
-    private final ReservationPaymentRepository reservationPaymentRepository;
 
     public List<ReservationWebResponse> getAll() {
         return ReservationConverter.toDto(
@@ -142,7 +142,7 @@ public class ReservationService {
                         request.createReservationWebRequest().themeId()
                 )
         );
-        reservationPaymentRepository.save(new ReservationPayment(payment, reservation));
+        reservationPaymentCommandUseCase.save(reservation, payment);
 
         return ReservationConverter.toDto(reservation);
     }
