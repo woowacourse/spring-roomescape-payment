@@ -26,5 +26,5 @@ toss:
     base-url: https://api.tosspayments.com/v1/payments
     auth-scheme: Basic
     timeout:
-      connect: 4
-      read: 34
+      connect: 2
+      read: 30
