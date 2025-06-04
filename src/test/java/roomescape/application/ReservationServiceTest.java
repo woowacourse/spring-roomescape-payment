@@ -20,10 +20,7 @@ import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.ReservationWithOrder;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.timeslot.TimeSlot;
-import roomescape.domain.user.Email;
-import roomescape.domain.user.Password;
 import roomescape.domain.user.User;
-import roomescape.domain.user.UserName;
 import roomescape.exception.AlreadyExistedException;
 import roomescape.exception.BusinessRuleViolationException;
 import roomescape.exception.NotFoundException;
@@ -140,32 +137,32 @@ class ReservationServiceTest extends ServiceTest {
         var confirmedReservation = new Reservation(user, RoomescapeSchedule.of(tomorrow(), timeSlot, theme), ReservationStatus.CONFIRMED);
         var first_confirmed = repositoryHelper.saveReservation(confirmedReservation);
 
-        var user2 = repositoryHelper.saveAnyUser();
-        var second_waiting = service.waitFor(user2.id(), tomorrow(), timeSlot.id(), theme.id());
+        var anotherUser = repositoryHelper.saveAnyUser();
+        var second_waiting = service.waitFor(anotherUser.id(), tomorrow(), timeSlot.id(), theme.id());
 
         // when
         service.removeById(first_confirmed.id());
 
         // then
-        var second = repositoryHelper.findReservation(second_waiting.id());
-        assertThat(second.status()).isEqualTo(ReservationStatus.PENDING);
+        var secondReservation = repositoryHelper.findReservation(second_waiting.id());
+        assertThat(secondReservation.status()).isEqualTo(ReservationStatus.PENDING);
     }
 
     @Test
     @DisplayName("예약 대기를 취소한다.")
     void cancelWaiting() {
         // given
-        var user2 = repositoryHelper.saveAnyUser();
+        var anotherUser = repositoryHelper.saveAnyUser();
+        service.reserve(anotherUser.id(), tomorrow(), timeSlot.id(), theme.id());
 
-        service.reserve(user.id(), tomorrow(), timeSlot.id(), theme.id());
-        var waited = service.waitFor(user2.id(), tomorrow(), timeSlot.id(), theme.id());
+        var waiting = service.waitFor(user.id(), tomorrow(), timeSlot.id(), theme.id());
 
         // when
-        service.cancelWaiting(user2.id(), waited.id());
+        service.cancelWaiting(user.id(), waiting.id());
 
         // then
         var reservations = user.reservations();
-        assertThat(reservations).doesNotContain(waited);
+        assertThat(reservations).doesNotContain(waiting);
     }
 
     @Test
@@ -206,14 +203,13 @@ class ReservationServiceTest extends ServiceTest {
     @DisplayName("다른 사용자의 예약 대기를 취소할 수 없다.")
     void cancelWaitingCanOnlyMine() {
         // given
-        User anotherUser = new User(new UserName("user2"), new Email("user2@email.com"), new Password("pw"));
-        repositoryHelper.saveUser(anotherUser);
+        service.reserve(user.id(), tomorrow(), timeSlot.id(), theme.id());
 
-        service.reserve(anotherUser.id(), tomorrow(), timeSlot.id(), theme.id());
-        var waited = service.waitFor(user.id(), tomorrow(), timeSlot.id(), theme.id());
+        var anotherUser = repositoryHelper.saveAnyUser();
+        var waitingByAnotherUser = service.waitFor(anotherUser.id(), tomorrow(), timeSlot.id(), theme.id());
 
         // when & then
-        assertThatThrownBy(() -> service.cancelWaiting(anotherUser.id(), waited.id()))
+        assertThatThrownBy(() -> service.cancelWaiting(user.id(), waitingByAnotherUser.id()))
             .isInstanceOf(NotFoundException.class);
     }
 
@@ -245,19 +241,18 @@ class ReservationServiceTest extends ServiceTest {
         var user1 = repositoryHelper.saveAnyUser();
         var user2 = repositoryHelper.saveAnyUser();
         var user3 = repositoryHelper.saveAnyUser();
-        repositoryHelper.flushAndClear();
 
         var reserved = service.reserve(user1.id(), tomorrow(), timeSlot.id(), theme.id());
-        var waited1 = service.waitFor(user2.id(), tomorrow(), timeSlot.id(), theme.id());
-        var waited2 = service.waitFor(user3.id(), tomorrow(), timeSlot.id(), theme.id());
+        var waiting1 = service.waitFor(user2.id(), tomorrow(), timeSlot.id(), theme.id());
+        var waiting2 = service.waitFor(user3.id(), tomorrow(), timeSlot.id(), theme.id());
 
         // when
         var waitings = service.findAllWaitings();
 
         // then
         assertThat(waitings).containsOnly(
-            new ReservationWithOrder(waited1, 1),
-            new ReservationWithOrder(waited2, 2)
+            new ReservationWithOrder(waiting1, 1),
+            new ReservationWithOrder(waiting2, 2)
         );
     }
 }

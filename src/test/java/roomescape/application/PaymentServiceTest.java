@@ -3,6 +3,7 @@ package roomescape.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,10 +31,7 @@ class PaymentServiceTest extends ServiceTest {
     void pay() {
         // given
         var pendingReservation = repositoryHelper.saveAnyReservation(ReservationStatus.PENDING);
-
-        var request = new PaymentRequest("a", "1", 1000);
-        var payment = new Payment("a",1000);
-        Mockito.when(paymentProvider.confirm(request)).thenReturn(payment);
+        stubPaymentProviderAlwaysSuccess();
 
         // when
         service.pay(pendingReservation.id(),"a", "1", 1000);
@@ -51,23 +49,39 @@ class PaymentServiceTest extends ServiceTest {
     void payNotPendingReservation() {
         // given
         var confirmedReservation = repositoryHelper.saveAnyReservation(ReservationStatus.CONFIRMED);
+        stubPaymentProviderAlwaysSuccess();
 
         // when & then
-        assertThatThrownBy(() -> service.pay(confirmedReservation.id(),"a", "1", 1000))
-            .isInstanceOf(PaymentFailedException.class);
+        assertThatThrownBy(
+            () -> service.pay(confirmedReservation.id(),"a", "1", 1000)
+        ).isInstanceOf(PaymentFailedException.class);
     }
 
     @Test
     @DisplayName("결제 실패 시 예외가 발생한다.")
     void failToPay() {
         // given
-        var reservation = repositoryHelper.saveAnyReservation(ReservationStatus.PENDING);
-
-        var request = new PaymentRequest("a", "1", 1000);
-        Mockito.when(paymentProvider.confirm(request)).thenThrow(PaymentFailedException.class);
+        var pendingReservation = repositoryHelper.saveAnyReservation(ReservationStatus.PENDING);
+        stubPaymentProviderAlwaysThrowsException();
 
         // when & then
-        assertThatThrownBy(() -> service.pay(reservation.id(),"a", "1", 1000))
-            .isInstanceOf(PaymentFailedException.class);
+        assertThatThrownBy(
+            () -> service.pay(pendingReservation.id(),"a", "1", 1000)
+        ).isInstanceOf(PaymentFailedException.class);
+    }
+
+    private void stubPaymentProviderAlwaysSuccess() {
+        Mockito
+            .when(paymentProvider.confirm(any()))
+            .thenAnswer(invocation -> {
+                var paymentRequest = invocation.getArgument(0, PaymentRequest.class);
+                return new Payment(paymentRequest.paymentKey(), paymentRequest.amount());
+            });
+    }
+
+    private void stubPaymentProviderAlwaysThrowsException() {
+        Mockito
+            .when(paymentProvider.confirm(any()))
+            .thenThrow(PaymentFailedException.class);
     }
 }

@@ -21,15 +21,12 @@ class UserServiceTest extends ServiceTest {
     @Test
     @DisplayName("사용자를 추가한다.")
     void registerUser() {
-        // given
-        var email = "user@email.com";
-        var password = "password";
-        var name = "user";
+        var registeredUser = service.register(
+            "user@email.com",
+            "password",
+            "user"
+        );
 
-        // when
-        var registeredUser = service.register(email, password, name);
-
-        // then
         var users = service.findAllUsers();
         assertThat(users).contains(registeredUser);
     }
