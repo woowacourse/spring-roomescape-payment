@@ -1,6 +1,5 @@
 package roomescape.reservationTime.service;
 
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.reservation.domain.Reservation;
@@ -11,6 +10,8 @@ import roomescape.reservationTime.dto.request.ReservationTimeRequest;
 import roomescape.reservationTime.dto.request.TimeConditionRequest;
 import roomescape.reservationTime.dto.response.ReservationTimeResponse;
 import roomescape.reservationTime.dto.response.TimeConditionResponse;
+
+import java.util.List;
 
 @Service
 public class ReservationTimeService {
@@ -60,7 +61,7 @@ public class ReservationTimeService {
     private TimeConditionResponse toTimeConditionResponse(final ReservationTime time,
                                                           final List<Reservation> reservations) {
         boolean hasTime = reservations.stream()
-                .anyMatch(reservation -> reservation.isSameTime(time));
+                .anyMatch(reservation -> reservation.getReservationTime().equals(time.getStartAt()));
         return new TimeConditionResponse(time.getId(), time.getStartAt(), hasTime);
     }
 }

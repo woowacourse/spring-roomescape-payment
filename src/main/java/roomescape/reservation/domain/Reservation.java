@@ -65,6 +65,8 @@ public class Reservation {
     }
 
     public boolean isSameTime(final ReservationTime time) {
+        System.out.println("this.time = " + this.time);
+        System.out.println("time = " + time);
         return this.time.isSameTime(time);
     }
 

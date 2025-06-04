@@ -160,7 +160,7 @@ public class ReservationService {
     public List<MyReservationAndWaitingResponse> getMyReservations(final Long id) {
         List<Reservation> confirmedReservations = reservationRepository.findByMemberId(id);
         List<MyReservationAndWaitingResponse> confirmedResponses = confirmedReservations.stream()
-                .map(MyReservationAndWaitingResponse::fromWaiting)
+                .map(MyReservationAndWaitingResponse::from)
                 .toList();
 
         List<Waiting> waitingReservations = waitingRepository.findByMemberId(id);
