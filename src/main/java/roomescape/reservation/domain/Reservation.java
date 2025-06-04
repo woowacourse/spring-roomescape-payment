@@ -34,7 +34,7 @@ public class Reservation {
     private Member member;
 
     @Enumerated(EnumType.STRING)
-    private ReservationStatus reservationStatus;
+    private PaymentStatus paymentStatus;
 
     protected Reservation() {
 
@@ -46,19 +46,19 @@ public class Reservation {
         final ReservationTime time,
         final Theme theme,
         final Member member,
-        final ReservationStatus reservationStatus
+        final PaymentStatus paymentStatus
     ) {
         this.id = id;
         this.date = date;
         this.time = time;
         this.theme = theme;
         this.member = member;
-        this.reservationStatus = reservationStatus;
+        this.paymentStatus = paymentStatus;
     }
 
     public Reservation(final LocalDate date, final ReservationTime time, final Theme theme,
-        final Member member, ReservationStatus reservationStatus) {
-        this(null, date, time, theme, member, reservationStatus);
+        final Member member, PaymentStatus paymentStatus) {
+        this(null, date, time, theme, member, paymentStatus);
     }
 
     public boolean hasConflictWith(final ReservationTime reservationTime, final Theme theme) {
@@ -98,8 +98,8 @@ public class Reservation {
         return time.getStartAt();
     }
 
-    public ReservationStatus getReservationStatus() {
-        return reservationStatus;
+    public void changePaymentStatus(PaymentStatus paymentStatus) {
+        this.paymentStatus = paymentStatus;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package roomescape.payment.application;
 
+import static roomescape.reservation.domain.PaymentStatus.SUCCESS;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.impl.NotFoundException;
@@ -42,6 +44,7 @@ public class PaymentService {
             new PaymentInfo(response.paymentKey(), response.orderId(), response.easyPay().amount()),
             PaymentGateway.TOSS_PAYMENTS);
         Payment saved = paymentRepository.save(payment);
+        reservation.changePaymentStatus(SUCCESS);
         return PaymentResponse.from(saved);
     }
 

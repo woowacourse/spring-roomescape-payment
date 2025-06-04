@@ -1,6 +1,6 @@
 package roomescape.reservation.application;
 
-import static roomescape.reservation.domain.ReservationStatus.PENDING;
+import static roomescape.reservation.domain.PaymentStatus.PENDING;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

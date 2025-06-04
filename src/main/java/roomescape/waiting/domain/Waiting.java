@@ -1,6 +1,6 @@
 package roomescape.waiting.domain;
 
-import static roomescape.reservation.domain.ReservationStatus.PENDING;
+import static roomescape.reservation.domain.PaymentStatus.PENDING;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
