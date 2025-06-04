@@ -8,6 +8,7 @@ import static roomescape.domain.payment.TransactionStatusCode.FAILED_INTERNAL_PR
 import static roomescape.domain.payment.TransactionStatusCode.INVALID_AUTH_CREDENTIALS;
 
 import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,19 +21,29 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
+import org.springframework.web.client.RestClient;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.domain.payment.TransactionStatusCode;
 import roomescape.infrastructure.toss.TossPaymentConfig;
+import roomescape.infrastructure.toss.TossPaymentProvider;
 
 @RestClientTest(PaymentProvider.class)
 @Import(TossPaymentConfig.class)
 class TossPaymentProviderTest {
 
     @Autowired
-    private MockRestServiceServer server;
+    private TossPaymentConfig config;
     @Autowired
+    private RestClient.Builder tossRestClientBuilder;
+    private MockRestServiceServer server;
     private PaymentProvider paymentProvider;
+
+    @BeforeEach
+    void setUp() {
+        server = MockRestServiceServer.bindTo(tossRestClientBuilder).build();
+        paymentProvider = new TossPaymentProvider(tossRestClientBuilder, config.createAuthorizationValue());
+    }
 
     @Test
     @DisplayName("결제 승인 API 스펙에 맞게 HTTP 요청을 보낸다.")

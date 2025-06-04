@@ -5,6 +5,8 @@ import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
 @Configuration
@@ -21,11 +23,24 @@ public class TossPaymentConfig {
     }
 
     @Bean
-    public TossPaymentProvider tossPaymentProvider(final RestClient.Builder builder) {
-        return new TossPaymentProvider(builder.baseUrl(TOSS_API_BASE_URL), createAuthorizationValue());
+    public RestClient.Builder tossRestClientBuilder() {
+        return RestClient.builder()
+                .requestFactory(requestFactory());
     }
 
-    private String createAuthorizationValue() {
+    private ClientHttpRequestFactory requestFactory() {
+        var factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(3000);
+        factory.setReadTimeout(30000);
+        return factory;
+    }
+
+    @Bean
+    public TossPaymentProvider tossPaymentProvider(final RestClient.Builder tossRestClientBuilder) {
+        return new TossPaymentProvider(tossRestClientBuilder.baseUrl(TOSS_API_BASE_URL), createAuthorizationValue());
+    }
+
+    public String createAuthorizationValue() {
         return AUTHORIZATION_PREFIX + encodeSecretKey();
     }
 
