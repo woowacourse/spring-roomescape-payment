@@ -58,7 +58,7 @@ public class TestFixtureE2e {
                 "DONE",
                 "2025-05-28T20:48:23+09:00"
         );
-        when(tossApiClient.authPayment(any(), any(), any(), any())).thenReturn(mockResponse);
+        when(tossApiClient.authPayment(any())).thenReturn(mockResponse);
     }
 
 
@@ -98,7 +98,8 @@ public class TestFixtureE2e {
                 .then().log().all()
                 .statusCode(201);
     }
-    public static void createTheme(final String name ) {
+
+    public static void createTheme(final String name) {
         Map<String, String> theme = new HashMap<>();
         theme.put("name", name);
         theme.put("description", "테마 설명");
@@ -106,7 +107,7 @@ public class TestFixtureE2e {
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .cookie(TOKEN, loginAndGetAuthToken(ADMIN_EMAIL,PASSWORD))
+                .cookie(TOKEN, loginAndGetAuthToken(ADMIN_EMAIL, PASSWORD))
                 .body(theme)
                 .when().post("/themes")
                 .then().log().all()
@@ -119,7 +120,7 @@ public class TestFixtureE2e {
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
-                .cookie(TOKEN, loginAndGetAuthToken(ADMIN_EMAIL,PASSWORD))
+                .cookie(TOKEN, loginAndGetAuthToken(ADMIN_EMAIL, PASSWORD))
                 .body(reservationTime)
                 .when().post("/times")
                 .then().log().all()
@@ -134,7 +135,7 @@ public class TestFixtureE2e {
                 .body("size()", is(size));
     }
 
-public static void createUserWaiting(final Long themeId) {
+    public static void createUserWaiting(final Long themeId) {
         String authToken = loginAndGetAuthToken(USER_EMAIL, PASSWORD);
 
         Map<String, Object> waiting = new HashMap<>();

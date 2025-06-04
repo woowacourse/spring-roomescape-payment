@@ -1,7 +1,7 @@
 package roomescape.e2e;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import io.restassured.RestAssured;
@@ -37,6 +37,7 @@ public class PaymentIntegrationTest {
     void setUp() {
         RestAssured.port = port;
     }
+
     @MockitoBean
     private TossApiClient tossApiClient;
 
@@ -48,7 +49,7 @@ public class PaymentIntegrationTest {
 
     @Test
     void tossPaymentClientException() {
-        when(tossApiClient.authPayment(eq("test_payment_key"), eq("test_order_id"), eq(50000), eq("CARD")))
+        when(tossApiClient.authPayment(any()))
                 .thenThrow(new TossPaymentClientException("결제 승인이 거절되었습니다."));
         String expected = "결제 승인이 거절되었습니다.";
         createTheme("테마1");
@@ -71,7 +72,7 @@ public class PaymentIntegrationTest {
 
     @Test
     void tossPaymentServerException() {
-        when(tossApiClient.authPayment(eq("test_payment_key"), eq("test_order_id"), eq(50000), eq("CARD")))
+        when(tossApiClient.authPayment(any()))
                 .thenThrow(new TossPaymentServerException("내부 시스템 처리 작업이 실패했습니다. 잠시 후 다시 시도해주세요."));
         String expected = "내부 시스템 처리 작업이 실패했습니다. 잠시 후 다시 시도해주세요.";
         createTheme("테마1");

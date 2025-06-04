@@ -15,14 +15,15 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
-import roomescape.payment.config.RestClientConfig;
+import roomescape.payment.config.PaymentRestClientConfig;
 import roomescape.payment.dto.response.PaymentResponse;
 import roomescape.payment.exception.TossPaymentClientException;
 import roomescape.payment.exception.TossPaymentServerException;
 import roomescape.payment.infrastructure.TossApiClient;
+import roomescape.reservation.dto.request.PaymentRequest;
 
 @RestClientTest(TossApiClient.class)
-@Import(RestClientConfig.class)
+@Import(PaymentRestClientConfig.class)
 class TossApiClientTest {
 
     @Autowired
@@ -31,14 +32,17 @@ class TossApiClientTest {
     @Autowired
     private MockRestServiceServer mockRestServiceServer;
 
+    private static final PaymentRequest paymentRequest = new PaymentRequest("tgen_20250528204823hWav3",
+            "MC4xNTU3MDQ1MDk3Njkx",
+            50000, "NORMAL");
+
     @Test
     void authPayment_success() {
         PaymentResponse expected = new PaymentResponse("tgen_20250528204823hWav3", "MC4xNTU3MDQ1MDk3Njkx", "NORMAL",
                 50000, "DONE", "2025-05-28T20:48:23+09:00");
         setUpForSuccess();
 
-        PaymentResponse paymentResponse = tossApiClient.authPayment("tgen_20250528204823hWav3", "MC4xNTU3MDQ1MDk3Njkx",
-                50000, "NORMAL");
+        PaymentResponse paymentResponse = tossApiClient.authPayment(paymentRequest);
 
         Assertions.assertThat(paymentResponse).isEqualTo(expected);
     }
@@ -46,8 +50,7 @@ class TossApiClientTest {
     @Test
     void authPayment_shouldReturnErrorWhenServerError() {
         setUpForServerError();
-        assertThatThrownBy(() -> tossApiClient.authPayment("tgen_20250528204823hWav3", "MC4xNTU3MDQ1MDk3Njkx",
-                50000, "NORMAL"))
+        assertThatThrownBy(() -> tossApiClient.authPayment(paymentRequest))
                 .isInstanceOf(TossPaymentServerException.class)
                 .hasMessageContaining("서비스에 문제가 발생했습니다. 잠시 후 다시 시도하거나 관리자에게 문의주세요. ");
     }
@@ -55,8 +58,7 @@ class TossApiClientTest {
     @Test
     void authPayment_shouldReturnErrorWhenTossServerError() {
         setUpForTossServerError();
-        assertThatThrownBy(() -> tossApiClient.authPayment("tgen_20250528204823hWav3", "MC4xNTU3MDQ1MDk3Njkx",
-                50000, "NORMAL"))
+        assertThatThrownBy(() -> tossApiClient.authPayment(paymentRequest))
                 .isInstanceOf(TossPaymentServerException.class)
                 .hasMessageContaining("결제 서버에 문제가 발생했습니다. 잠시 후 다시 시도하거나 다른 결제 수단을 이용하세요");
     }
@@ -64,8 +66,7 @@ class TossApiClientTest {
     @Test
     void authPayment_shouldReturnErrorWhenClientError() {
         setUpForClientError();
-        assertThatThrownBy(() -> tossApiClient.authPayment("tgen_20250528204823hWav3", "MC4xNTU3MDQ1MDk3Njkx",
-                50000, "NORMAL"))
+        assertThatThrownBy(() -> tossApiClient.authPayment(paymentRequest))
                 .isInstanceOf(TossPaymentClientException.class)
                 .hasMessageContaining("카드 사용이 거절되었습니다. 카드사 문의가 필요합니다.");
     }

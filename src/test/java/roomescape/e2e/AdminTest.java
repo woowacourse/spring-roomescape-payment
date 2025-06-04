@@ -64,7 +64,7 @@ public class AdminTest {
                 "DONE",
                 "2025-05-28T20:48:23+09:00"
         );
-        when(tossApiClient.authPayment(any(), any(), any(), any())).thenReturn(mockResponse);
+        when(tossApiClient.authPayment(any())).thenReturn(mockResponse);
     }
 
     @Test
