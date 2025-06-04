@@ -6,4 +6,7 @@ public record PaymentCommand(
         Long amount
 ) {
 
+    public PaymentValidationCommand toValidationCommand() {
+        return new PaymentValidationCommand(orderId, amount);
+    }
 }

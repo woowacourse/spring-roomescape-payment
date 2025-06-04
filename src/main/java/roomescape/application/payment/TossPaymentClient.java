@@ -38,17 +38,15 @@ public class TossPaymentClient {
             @Value("${toss-payment.secret-key}") final String secretKey) {
         this.objectMapper = objectMapper;
         this.secretKey = secretKey;
-        this.restClient = RestClient.builder()
-                .baseUrl(TOSS_PAYMENT_SERVER_URL)
-                .requestFactory(createRequestFactory())
-                .build();
-    }
 
-    private SimpleClientHttpRequestFactory createRequestFactory() {
         final SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(Duration.ofSeconds(30));
         requestFactory.setReadTimeout(Duration.ofSeconds(60));
-        return requestFactory;
+
+        this.restClient = RestClient.builder()
+                .baseUrl(TOSS_PAYMENT_SERVER_URL)
+                .requestFactory(requestFactory)
+                .build();
     }
 
     public void approve(final PaymentCommand command) {

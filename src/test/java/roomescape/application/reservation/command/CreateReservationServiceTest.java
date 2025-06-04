@@ -1,10 +1,10 @@
 package roomescape.application.reservation.command;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import roomescape.application.AbstractServiceIntegrationTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import roomescape.application.payment.OrderAmountVerificationCache;
 import roomescape.application.payment.TossPaymentClient;
 import roomescape.application.reservation.command.dto.CreateReservationCommand;
 import roomescape.application.reservation.command.dto.CreateReservationWithPaymentCommand;
@@ -12,8 +12,6 @@ import roomescape.domain.member.Email;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRole;
 import roomescape.domain.member.repository.MemberRepository;
-import roomescape.domain.payment.Payment;
-import roomescape.domain.payment.repository.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationTime;
 import roomescape.domain.reservation.Theme;
@@ -26,18 +24,18 @@ import roomescape.infrastructure.error.exception.ReservationException;
 import roomescape.infrastructure.error.exception.ReservationTimeException;
 import roomescape.infrastructure.error.exception.ThemeException;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
 
-class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
+@SpringBootTest
+class CreateReservationServiceTest {
 
     @Autowired
     private ThemeRepository themeRepository;
@@ -51,26 +49,17 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    @Mock
-    private PaymentRepository paymentRepository;
+    @Autowired
+    private Clock clock;
 
-    @Mock
-    private TossPaymentClient tossPaymentClient;
-
+    @Autowired
     private CreateReservationService createReservationService;
 
-    @BeforeEach
-    void setUp() {
-        createReservationService = new CreateReservationService(
-                reservationRepository,
-                reservationTimeRepository,
-                themeRepository,
-                memberRepository,
-                tossPaymentClient,
-                paymentRepository,
-                clock
-        );
-    }
+    @MockitoBean
+    private TossPaymentClient tossPaymentClient;
+
+    @Autowired
+    private OrderAmountVerificationCache orderAmountVerificationCache;
 
     @Test
     void 결제_이후_예약을_생성할_수_있다() {
@@ -80,6 +69,8 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
         final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
         final String orderId = "orderId";
         final long amount = 10_000L;
+
+        orderAmountVerificationCache.register(orderId, amount);
         final CreateReservationWithPaymentCommand command = new CreateReservationWithPaymentCommand(
                 LocalDate.now(clock).plusDays(1),
                 time.getId(),
@@ -90,8 +81,7 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
                 amount,
                 "NORMAL"
         );
-        doNothing().when(tossPaymentClient).approve(command.getPaymentCommand());
-        when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(new Payment(orderId, amount)));
+        doNothing().when(tossPaymentClient).approve(command.toPaymentCommand());
 
         // when
         final Long id = createReservationService.reserve(command);
@@ -108,6 +98,8 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
         final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
         final String orderId = "orderId";
         final long amount = 10_000L;
+        orderAmountVerificationCache.register(orderId, amount);
+
         final CreateReservationWithPaymentCommand command = new CreateReservationWithPaymentCommand(
                 LocalDate.now(clock).plusDays(1),
                 time.getId(),
@@ -118,8 +110,7 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
                 amount,
                 "NORMAL"
         );
-        doThrow(new PaymentException("toss payment server 예외")).when(tossPaymentClient).approve(command.getPaymentCommand());
-        when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(new Payment(orderId, amount)));
+        doThrow(new PaymentException("toss payment server 예외")).when(tossPaymentClient).approve(command.toPaymentCommand());
 
         // when
         // then
@@ -137,6 +128,9 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
         final String orderId = "orderId";
         final long amount = 10_000L;
         final long invalidAmount = amount + 1;
+
+        orderAmountVerificationCache.register(orderId, invalidAmount);
+
         final CreateReservationWithPaymentCommand command = new CreateReservationWithPaymentCommand(
                 LocalDate.now(clock).plusDays(1),
                 time.getId(),
@@ -147,8 +141,7 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
                 amount,
                 "NORMAL"
         );
-        doThrow(new PaymentException("toss payment server 예외")).when(tossPaymentClient).approve(command.getPaymentCommand());
-        when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.of(new Payment(orderId, invalidAmount)));
+        doThrow(new PaymentException("toss payment server 예외")).when(tossPaymentClient).approve(command.toPaymentCommand());
 
         // when
         // then
@@ -165,6 +158,7 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
         final ReservationTime time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(13, 0)));
         final String orderId = "orderId";
         final long amount = 10_000L;
+
         final CreateReservationWithPaymentCommand command = new CreateReservationWithPaymentCommand(
                 LocalDate.now(clock).plusDays(1),
                 time.getId(),
@@ -175,14 +169,13 @@ class CreateReservationServiceTest extends AbstractServiceIntegrationTest {
                 amount,
                 "NORMAL"
         );
-        doThrow(new PaymentException("toss payment server 예외")).when(tossPaymentClient).approve(command.getPaymentCommand());
-        when(paymentRepository.findByOrderId(orderId)).thenReturn(Optional.empty());
+        doThrow(new PaymentException("toss payment server 예외")).when(tossPaymentClient).approve(command.toPaymentCommand());
 
         // when
         // then
         assertThatCode(() -> createReservationService.reserve(command))
                 .isInstanceOf(PaymentException.class)
-                .hasMessage("존재하지 않는 결제입니다.");
+                .hasMessage("존재하지 않는 결제 정보입니다");
     }
 
     @Test

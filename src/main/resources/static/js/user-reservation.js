@@ -247,7 +247,7 @@ function onWaitButtonClick() {
 }
 
 async function fetchPreRequestPaymentData(orderId, amount) {
-    const paymentValidationURL = "/payments";
+    const paymentValidationURL = "/payments/validation";
     const paymentValidationRequest = {
         orderId: orderId,
         amount: amount

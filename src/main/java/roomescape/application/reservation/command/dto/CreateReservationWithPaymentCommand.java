@@ -19,7 +19,7 @@ public record CreateReservationWithPaymentCommand(
         return new CreateReservationCommand(date, timeId, themeId, memberId);
     }
 
-    public PaymentCommand getPaymentCommand() {
+    public PaymentCommand toPaymentCommand() {
         return new PaymentCommand(paymentKey, orderId, amount);
     }
 }

@@ -62,7 +62,7 @@ class ReservationControllerTest {
         // then
         assertAll(() -> {
             assertThat(response.statusCode()).isEqualTo(400);
-            assertThat(response.asString()).isEqualTo("{\"message\":\"존재하지 않는 결제입니다.\"}");
+            assertThat(response.asString()).isEqualTo("{\"message\":\"존재하지 않는 결제 정보입니다\"}");
         });
     }
 }

@@ -37,14 +37,13 @@ class PaymentControllerTest {
         final var response = RestAssured.given()
                 .contentType(ContentType.JSON)
                 .body(requestBody)
-                .post("/payments")
+                .post("/payments/validation")
                 .then()
                 .extract();
 
         // then
         assertAll(() -> {
             assertThat(response.statusCode()).isEqualTo(201);
-            assertThat(response.header("Location")).startsWith("/payments/");
         });
     }
 }
