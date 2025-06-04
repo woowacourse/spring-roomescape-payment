@@ -26,4 +26,5 @@ security:
     - /themes/**
 toss:
   secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
-  timeout: 3000
+  connectionTimeout: 3000
+  readTimeout: 30000

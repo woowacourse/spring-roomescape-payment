@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
-import roomescape.payment.config.PaymentRestClientConfig;
+import roomescape.config.TestPaymentRestClientConfig;
 import roomescape.payment.dto.response.PaymentResponse;
 import roomescape.payment.exception.TossPaymentClientException;
 import roomescape.payment.exception.TossPaymentServerException;
@@ -23,7 +23,7 @@ import roomescape.payment.infrastructure.TossApiClient;
 import roomescape.reservation.dto.request.PaymentRequest;
 
 @RestClientTest(TossApiClient.class)
-@Import(PaymentRestClientConfig.class)
+@Import(TestPaymentRestClientConfig.class)
 class TossApiClientTest {
 
     @Autowired
