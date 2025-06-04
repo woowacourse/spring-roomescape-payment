@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,5 +31,15 @@ public class PaymentVerification {
         this.orderId = orderId;
         this.amount = amount;
         this.member = member;
+    }
+
+    public boolean isSamePayment(
+            final String orderId,
+            final int amount,
+            final Long memberId
+    ) {
+        return Objects.equals(this.orderId, orderId)
+               && this.amount == amount
+               && Objects.equals(this.member.getId(), memberId);
     }
 }

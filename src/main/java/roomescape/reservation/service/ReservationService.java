@@ -6,8 +6,11 @@ import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.auth.vo.MemberInfo;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.service.PaymentService;
+import roomescape.payment.service.dto.CreatePaymentServiceRequest;
 import roomescape.reservation.controller.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.controller.dto.CreateReservationByAdminWebRequest;
 import roomescape.reservation.controller.dto.CreateReservationWebRequest;
@@ -18,7 +21,9 @@ import roomescape.reservation.controller.dto.ReservationWebResponse;
 import roomescape.reservation.controller.dto.ReservationWithStatusResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
+import roomescape.reservation.domain.ReservationPayment;
 import roomescape.reservation.domain.ReservationWait;
+import roomescape.reservation.repository.ReservationPaymentRepository;
 import roomescape.reservation.service.converter.ReservationConverter;
 import roomescape.reservation.service.converter.ReservationWaitConverter;
 import roomescape.reservation.service.dto.AvailableReservationTimeServiceRequest;
@@ -38,6 +43,8 @@ public class ReservationService {
     private final ReservationWaitCommandUseCase reservationWaitCommandUseCase;
 
     private final PaymentService paymentService;
+
+    private final ReservationPaymentRepository reservationPaymentRepository;
 
     public List<ReservationWebResponse> getAll() {
         return ReservationConverter.toDto(
@@ -107,18 +114,35 @@ public class ReservationService {
             final CreateReservationWithPaymentWebRequest request,
             final MemberInfo memberInfo
     ) {
-        // TODO : paymentId 등 결제정보를 예약 저장시 db에 저장할지 고려
-        paymentService.confirm(request.paymentConfirmWebRequest().toPaymentConfirmRequest());
+        paymentService.confirm(
+                request.paymentConfirmWebRequest().toPaymentConfirmRequest(),
+                memberInfo.id()
+        );
 
-        final CreateReservationWebRequest createReservationWebRequest = request.createReservationWebRequest();
+        return createReservationWithPayment(request, memberInfo);
+    }
+
+    @Transactional
+    public ReservationWebResponse createReservationWithPayment(
+            final CreateReservationWithPaymentWebRequest request,
+            final MemberInfo memberInfo
+    ) {
+        final Payment payment = paymentService.create(
+                new CreatePaymentServiceRequest(
+                        request.paymentConfirmWebRequest().paymentKey(),
+                        request.paymentConfirmWebRequest().orderId(),
+                        request.paymentConfirmWebRequest().amount()
+                )
+        );
         final Reservation reservation = reservationCommandUseCase.create(
                 new CreateReservationServiceRequest(
                         memberInfo.id(),
-                        createReservationWebRequest.date(),
-                        createReservationWebRequest.timeId(),
-                        createReservationWebRequest.themeId()
+                        request.createReservationWebRequest().date(),
+                        request.createReservationWebRequest().timeId(),
+                        request.createReservationWebRequest().themeId()
                 )
         );
+        reservationPaymentRepository.save(new ReservationPayment(payment, reservation));
 
         return ReservationConverter.toDto(reservation);
     }
@@ -160,5 +184,4 @@ public class ReservationService {
                 .map(ReservationConverter::toDto)
                 .toList();
     }
-
 }
