@@ -6,7 +6,10 @@ import roomescape.controller.annotation.AdminMember;
 import roomescape.controller.annotation.CurrentMember;
 import roomescape.dto.auth.LoginInfo;
 import roomescape.dto.payment.PaymentResponseDto;
-import roomescape.dto.reservation.*;
+import roomescape.dto.reservation.CreatedReservationResponseDto;
+import roomescape.dto.reservation.MemberReservationCreateRequestDto;
+import roomescape.dto.reservation.MyReservationResponseDto;
+import roomescape.dto.reservation.ReservationResponseDto;
 import roomescape.service.command.PaymentCommandService;
 import roomescape.service.command.ReservationCommandService;
 import roomescape.service.dto.ReservationCreateDto;
@@ -48,7 +51,7 @@ public class ReservationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CreatedReservationDto addReservation(
+    public CreatedReservationResponseDto addReservation(
             @CurrentMember LoginInfo loginInfo,
             @RequestBody MemberReservationCreateRequestDto requestDto
     ) {
@@ -57,6 +60,6 @@ public class ReservationController {
         ReservationResponseDto reservationDto = reservationCommandService.bookReservation(reservationCreateDto);
         PaymentResponseDto paymentDto = paymentCommandService.confirmPayment(requestDto.extractTossPaymentDto());
 
-        return CreatedReservationDto.from(reservationDto, paymentDto);
+        return CreatedReservationResponseDto.from(reservationDto, paymentDto);
     }
 }

@@ -18,12 +18,12 @@ import roomescape.dto.member.MemberNameResponseDto;
 import roomescape.dto.payment.PaymentResponseDto;
 import roomescape.dto.reservation.MemberReservationCreateRequestDto;
 import roomescape.dto.reservation.MyReservationResponseDto;
-import roomescape.dto.reservation.PaymentConfirmDto;
 import roomescape.dto.reservation.ReservationResponseDto;
 import roomescape.dto.theme.ThemeResponseDto;
 import roomescape.dto.time.ReservationTimeResponseDto;
 import roomescape.service.command.PaymentCommandService;
 import roomescape.service.command.ReservationCommandService;
+import roomescape.service.dto.PaymentConfirmDto;
 import roomescape.service.dto.ReservationCreateDto;
 import roomescape.service.query.MemberQueryService;
 import roomescape.service.query.ReservationQueryService;
@@ -129,7 +129,7 @@ public class ReservationControllerTest {
         when(reservationCommandService.bookReservation(reservationCreateDto))
                 .thenReturn(reservationResponseDto);
         when(paymentCommandService.confirmPayment(new PaymentConfirmDto(requestDto.paymentKey(), requestDto.orderId(), requestDto.amount())))
-                .thenReturn(new PaymentResponseDto(requestDto.orderId(), requestDto.amount()));
+                .thenReturn(new PaymentResponseDto(requestDto.paymentKey(), requestDto.orderId(), requestDto.amount()));
 
         mockMvc.perform(post("/reservations")
                         .contentType(MediaType.APPLICATION_JSON)

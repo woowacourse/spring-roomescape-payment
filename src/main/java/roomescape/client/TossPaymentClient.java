@@ -7,7 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.domain.payment.Payment;
-import roomescape.dto.reservation.PaymentConfirmDto;
+import roomescape.service.dto.PaymentConfirmDto;
 
 import java.util.Base64;
 
@@ -23,7 +23,7 @@ public class TossPaymentClient implements PaymentClient{
     @Qualifier("tossRestClient")
     private final RestClient restClient;
 
-    public TossPaymentClient(final RestClient restClient) {
+    public TossPaymentClient(RestClient restClient) {
         this.restClient = restClient;
     }
 

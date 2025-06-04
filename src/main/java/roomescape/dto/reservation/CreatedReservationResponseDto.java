@@ -8,7 +8,7 @@ import roomescape.dto.time.ReservationTimeResponseDto;
 
 import java.time.LocalDate;
 
-public record CreatedReservationDto(
+public record CreatedReservationResponseDto(
         Long id,
         MemberNameResponseDto member,
         @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
@@ -19,8 +19,8 @@ public record CreatedReservationDto(
         Long amount
 ) {
 
-    public static CreatedReservationDto from(ReservationResponseDto reservationDto, PaymentResponseDto paymentDto) {
-        return new CreatedReservationDto(
+    public static CreatedReservationResponseDto from(ReservationResponseDto reservationDto, PaymentResponseDto paymentDto) {
+        return new CreatedReservationResponseDto(
                 reservationDto.id(),
                 reservationDto.member(),
                 reservationDto.date(),
