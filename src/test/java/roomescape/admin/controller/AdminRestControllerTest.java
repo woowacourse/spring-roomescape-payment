@@ -13,7 +13,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.PaymentConfirmResponse;
 import roomescape.payment.dto.TossPaymentConfirmRequest;
+import roomescape.payment.dto.TossPaymentConfirmResponse;
 import roomescape.payment.processor.PaymentType;
 import roomescape.payment.processor.toss.TossPaymentProcessor;
 
@@ -109,9 +111,15 @@ class AdminRestControllerTest {
                 "orderId",
                 "paymentKey"
         );
-
+        final TossPaymentConfirmRequest parsedTossPaymentConfirmRequest = (TossPaymentConfirmRequest) tossPaymentConfirmRequest;
+        final PaymentConfirmResponse tossPaymentConfirmResponse = new TossPaymentConfirmResponse(
+                parsedTossPaymentConfirmRequest.orderId(),
+                parsedTossPaymentConfirmRequest.paymentKey(),
+                parsedTossPaymentConfirmRequest.amount()
+        );
         when(tossPaymentProcessor.supports(PaymentType.TOSS)).thenReturn(true);
-        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(null);
+        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(
+                tossPaymentConfirmResponse);
 
         final Map<String, Object> reservationParams = createReservationRequestJsonMap(
                 "2026-04-15",

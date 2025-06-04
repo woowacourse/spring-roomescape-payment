@@ -11,6 +11,7 @@ import roomescape.admin.dto.ReservationSearchRequest;
 import roomescape.admin.dto.ReservationWaitingResponse;
 import roomescape.admin.service.AdminReservationService;
 import roomescape.admin.service.AdminWaitingService;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.waiting.domain.Waiting;
 
@@ -20,6 +21,7 @@ public class AdminServiceFacade {
 
     private final AdminReservationService reservationService;
     private final AdminWaitingService waitingService;
+    private final PaymentService paymentService;
 
     @Transactional
     public AdminReservationResponse saveByAdmin(final AdminReservationRequest adminReservationRequest) {
@@ -28,14 +30,14 @@ public class AdminServiceFacade {
         final Long timeId = adminReservationRequest.timeId();
         final Long memberId = adminReservationRequest.memberId();
 
-        final Reservation savedReservation = reservationService.saveByAdmin(date, themeId, timeId, memberId);
+        final Reservation savedReservation = reservationService.save(date, themeId, timeId, memberId);
 
         return AdminReservationResponse.from(savedReservation);
     }
 
     @Transactional
     public void deleteWaitingById(final Long id) {
-        waitingService.deleteWaitingById(id);
+        waitingService.deleteById(id);
     }
 
     @Transactional(readOnly = true)
@@ -59,5 +61,24 @@ public class AdminServiceFacade {
         return waitingReservations.stream()
                 .map(ReservationWaitingResponse::from)
                 .toList();
+    }
+
+    @Transactional
+    public void deleteById(final Long reservationId) {
+        final Reservation reservation = reservationService.findById(reservationId);
+        paymentService.deleteByReservationId(reservationId);
+        reservationService.deleteById(reservationId);
+        boolean isExistWaiting = waitingService.existsByReservation(reservation);
+
+        if (isExistWaiting) {
+            final Waiting waiting = waitingService.findFirstByThemeAndDateAndTimeOrderByIdAsc(reservation);
+            reservationService.save(
+                    waiting.getDate(),
+                    waiting.getTheme().getId(),
+                    waiting.getTime().getId(),
+                    waiting.getMember().getId()
+            );
+            waitingService.deleteById(waiting.getId());
+        }
     }
 }

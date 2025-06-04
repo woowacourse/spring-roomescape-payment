@@ -16,7 +16,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
 import roomescape.auth.jwt.JwtTokenProvider;
 import roomescape.payment.dto.PaymentConfirmRequest;
+import roomescape.payment.dto.PaymentConfirmResponse;
 import roomescape.payment.dto.TossPaymentConfirmRequest;
+import roomescape.payment.dto.TossPaymentConfirmResponse;
 import roomescape.payment.processor.PaymentType;
 import roomescape.payment.processor.toss.TossPaymentProcessor;
 import roomescape.time.dto.AvailableReservationTimeResponse;
@@ -70,9 +72,15 @@ class ReservationRestControllerTest {
                 "orderId",
                 "paymentKey"
         );
-
+        final TossPaymentConfirmRequest parsedTossPaymentConfirmRequest = (TossPaymentConfirmRequest) tossPaymentConfirmRequest;
+        final PaymentConfirmResponse tossPaymentConfirmResponse = new TossPaymentConfirmResponse(
+                parsedTossPaymentConfirmRequest.orderId(),
+                parsedTossPaymentConfirmRequest.paymentKey(),
+                parsedTossPaymentConfirmRequest.amount()
+        );
         when(tossPaymentProcessor.supports(PaymentType.TOSS)).thenReturn(true);
-        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(null);
+        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(
+                tossPaymentConfirmResponse);
 
         final Map<String, Object> reservationParams = createReservationRequestJsonMap(
                 "2026-04-15",
@@ -90,43 +98,6 @@ class ReservationRestControllerTest {
                 .when().post("/reservations")
                 .then().log().all()
                 .statusCode(HttpStatus.CREATED.value());
-    }
-
-    @Test
-    void 예약_정보를_삭제한다() {
-        //given
-        final String payload = "wooga@gmail.com";
-        final String token = jwtTokenProvider.createToken(payload);
-        final PaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(
-                10000,
-                "orderId",
-                "paymentKey"
-        );
-
-        when(tossPaymentProcessor.supports(PaymentType.TOSS)).thenReturn(true);
-        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(null);
-
-        final Map<String, Object> reservationParams = createReservationRequestJsonMap(
-                "2026-04-15",
-                "1",
-                "1",
-                PaymentType.TOSS,
-                tossPaymentConfirmRequest
-        );
-
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", token)
-                .body(reservationParams)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value());
-
-        //when & then
-        RestAssured.given().log().all()
-                .when().delete("/reservations/1")
-                .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
     @Test
@@ -148,9 +119,15 @@ class ReservationRestControllerTest {
                 "orderId",
                 "paymentKey"
         );
-
+        final TossPaymentConfirmRequest parsedTossPaymentConfirmRequest = (TossPaymentConfirmRequest) tossPaymentConfirmRequest;
+        final PaymentConfirmResponse tossPaymentConfirmResponse = new TossPaymentConfirmResponse(
+                parsedTossPaymentConfirmRequest.orderId(),
+                parsedTossPaymentConfirmRequest.paymentKey(),
+                parsedTossPaymentConfirmRequest.amount()
+        );
         when(tossPaymentProcessor.supports(PaymentType.TOSS)).thenReturn(true);
-        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(null);
+        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(
+                tossPaymentConfirmResponse);
 
         final Map<String, Object> reservationParams = createReservationRequestJsonMap(
                 "2026-04-15",
@@ -185,9 +162,15 @@ class ReservationRestControllerTest {
                 "orderId",
                 "paymentKey"
         );
-
+        final TossPaymentConfirmRequest parsedTossPaymentConfirmRequest = (TossPaymentConfirmRequest) tossPaymentConfirmRequest;
+        final PaymentConfirmResponse tossPaymentConfirmResponse = new TossPaymentConfirmResponse(
+                parsedTossPaymentConfirmRequest.orderId(),
+                parsedTossPaymentConfirmRequest.paymentKey(),
+                parsedTossPaymentConfirmRequest.amount()
+        );
         when(tossPaymentProcessor.supports(PaymentType.TOSS)).thenReturn(true);
-        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(null);
+        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(
+                tossPaymentConfirmResponse);
 
         final Map<String, Object> reservationParams = createReservationRequestJsonMap(
                 "2026-04-15",
@@ -232,9 +215,15 @@ class ReservationRestControllerTest {
                 "orderId",
                 "paymentKey"
         );
-
+        final TossPaymentConfirmRequest parsedTossPaymentConfirmRequest = (TossPaymentConfirmRequest) tossPaymentConfirmRequest;
+        final PaymentConfirmResponse tossPaymentConfirmResponse = new TossPaymentConfirmResponse(
+                parsedTossPaymentConfirmRequest.orderId(),
+                parsedTossPaymentConfirmRequest.paymentKey(),
+                parsedTossPaymentConfirmRequest.amount()
+        );
         when(tossPaymentProcessor.supports(PaymentType.TOSS)).thenReturn(true);
-        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(null);
+        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(
+                tossPaymentConfirmResponse);
 
         final Map<String, Object> reservationParams = createReservationRequestJsonMap(
                 "2026-04-15",
@@ -271,9 +260,15 @@ class ReservationRestControllerTest {
                 "orderId",
                 "paymentKey"
         );
-
+        final TossPaymentConfirmRequest parsedTossPaymentConfirmRequest = (TossPaymentConfirmRequest) tossPaymentConfirmRequest;
+        final PaymentConfirmResponse tossPaymentConfirmResponse = new TossPaymentConfirmResponse(
+                parsedTossPaymentConfirmRequest.orderId(),
+                parsedTossPaymentConfirmRequest.paymentKey(),
+                parsedTossPaymentConfirmRequest.amount()
+        );
         when(tossPaymentProcessor.supports(PaymentType.TOSS)).thenReturn(true);
-        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(null);
+        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(
+                tossPaymentConfirmResponse);
 
         final Map<String, Object> reservationParams = createReservationRequestJsonMap(
                 "2026-04-15",
@@ -313,9 +308,15 @@ class ReservationRestControllerTest {
                 "orderId",
                 "paymentKey"
         );
-
+        final TossPaymentConfirmRequest parsedTossPaymentConfirmRequest = (TossPaymentConfirmRequest) tossPaymentConfirmRequest;
+        final PaymentConfirmResponse tossPaymentConfirmResponse = new TossPaymentConfirmResponse(
+                parsedTossPaymentConfirmRequest.orderId(),
+                parsedTossPaymentConfirmRequest.paymentKey(),
+                parsedTossPaymentConfirmRequest.amount()
+        );
         when(tossPaymentProcessor.supports(PaymentType.TOSS)).thenReturn(true);
-        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(null);
+        when(tossPaymentProcessor.processPayment(any(PaymentConfirmRequest.class))).thenReturn(
+                tossPaymentConfirmResponse);
 
         final Map<String, Object> reservationParams = createReservationRequestJsonMap(
                 "2026-04-15",

@@ -43,7 +43,8 @@ class TossPaymentProcessorTest {
         );
         final TossPaymentConfirmResponse expected = new TossPaymentConfirmResponse(
                 "orderId",
-                "paymentKey"
+                "paymentKey",
+                10000
         );
 
         when(mockTestRestClient.post()
