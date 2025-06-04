@@ -37,7 +37,7 @@ public class TossPaymentService implements PaymentService {
 
     @Transactional
     @Override
-    public void registerReservation(final ReservationPaymentRequest request, final LoginMember loginMember) {
+    public void saveReservationAndPayment(final ReservationPaymentRequest request, final LoginMember loginMember) {
         log.debug("ReservationPaymentRequest: {}", request);
         log.debug("LoginMember: {}", loginMember);
 
@@ -173,6 +173,6 @@ public class TossPaymentService implements PaymentService {
 
     private Payment getPaymentByReservationId(Long reservationId) {
         return paymentRepository.findByReservationId(reservationId)
-                .orElseThrow(() -> new NotFoundException("예약을 찾을 수 없습니다, id: " + reservationId));
+                .orElseThrow(() -> new NotFoundException("결제를 찾을 수 없습니다, reservationId: " + reservationId));
     }
 }

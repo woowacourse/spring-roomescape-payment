@@ -1,5 +1,6 @@
 package roomescape.payment.event;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -29,6 +30,8 @@ public class PaymentEventHandler {
 
     @EventListener(ReservationDeleteEvent.class)
     public void handleReservationDelete(ReservationDeleteEvent event) {
+        Optional<Reservation> byId = reservationRepository.findById(event.reservationId());
+        System.out.println("byId = " + byId);
         Reservation reservation = reservationRepository.findById(event.reservationId())
                 .orElseThrow(() -> new NotFoundException("예약이 존재하지 않습니다, id: " + event.reservationId()));
         paymentService.cancelPayment(reservation.getId());

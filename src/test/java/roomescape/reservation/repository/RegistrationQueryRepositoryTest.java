@@ -63,7 +63,7 @@ class RegistrationQueryRepositoryTest {
         SoftAssertions.assertSoftly(softly -> {
             assertThat(registrationsData).hasSize(4);
             assertThat(registrationsData).extracting(MemberRegistrationProjection::getReservationStatus)
-                    .containsExactly("WAITING", "BOOKED", "BOOKED", "WAITING");
+                    .containsExactly("WAITING", "RESERVED", "RESERVED", "WAITING");
             assertThat(registrationsData).extracting(MemberRegistrationProjection::getRank)
                     .containsExactly(1, 0, 0, 3);
             assertThat(registrationsData).extracting(MemberRegistrationProjection::getPaymentStatus)

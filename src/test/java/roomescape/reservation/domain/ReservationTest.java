@@ -35,6 +35,7 @@ class ReservationTest {
         Reservation reservation = Reservation.builder()
                 .member(defaultMember)
                 .registrationSlot(registrationSlot)
+                .reservationStatus(ReservationStatus.RESERVED)
                 .build();
 
         // when & then
@@ -57,6 +58,7 @@ class ReservationTest {
                 Reservation.builder()
                         .member(null)
                         .registrationSlot(registrationSlot)
+                        .reservationStatus(ReservationStatus.RESERVED)
                         .build();
             }).isInstanceOf(NullPointerException.class);
 
@@ -89,6 +91,7 @@ class ReservationTest {
         assertDoesNotThrow(() -> Reservation.builder()
                 .member(member)
                 .registrationSlot(registrationSlot)
+                .reservationStatus(ReservationStatus.RESERVED)
                 .build());
     }
 }

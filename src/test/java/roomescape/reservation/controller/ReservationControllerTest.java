@@ -1,6 +1,9 @@
 package roomescape.reservation.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static roomescape.TestFixture.DEFAULT_DATE;
 import static roomescape.TestFixture.createAdminMember;
 import static roomescape.TestFixture.createClaims;
@@ -13,13 +16,18 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.IntegrationTest;
 import roomescape.TestFixture;
 import roomescape.auth.infrastructure.jwt.JwtTokenProvider;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.dto.TossPaymentResponse;
+import roomescape.payment.infrastructure.TossRestClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
@@ -49,6 +57,9 @@ class ReservationControllerTest extends IntegrationTest {
 
     @Autowired
     JwtTokenProvider jwtTokenProvider;
+
+    @MockitoBean
+    TossRestClient tossRestClient;
 
     @Test
     void 유저_예약_생성_성공() {
@@ -106,6 +117,13 @@ class ReservationControllerTest extends IntegrationTest {
         String token = jwtTokenProvider.createToken(createClaims(adminMember));
 
         Reservation reservation = dbHelper.insertReservation(createReservation_1());
+        Payment payment = dbHelper.insertCompletedPayment(reservation);
+
+        TossPaymentResponse mockResponse = mock(TossPaymentResponse.class);
+        given(mockResponse.status()).willReturn("CANCELED");
+        String paymentKey = payment.getPaymentKey();
+        given(tossRestClient.cancel(ArgumentMatchers.eq(paymentKey), any()))
+                .willReturn(mockResponse);
 
         // when & then
         RestAssured.given().log().all()

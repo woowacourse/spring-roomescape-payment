@@ -6,7 +6,7 @@ import roomescape.reservation.domain.Reservation;
 
 public interface PaymentService {
 
-    void registerReservation(ReservationPaymentRequest request, LoginMember loginMember);
+    void saveReservationAndPayment(ReservationPaymentRequest request, LoginMember loginMember);
 
     void confirmPayment(ReservationPaymentRequest request);
 
