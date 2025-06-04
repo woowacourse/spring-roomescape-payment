@@ -4,9 +4,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.PaymentConfirmClientException;
 import roomescape.exception.PaymentConfirmServerException;
@@ -21,10 +23,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class PaymentConfirmTest {
 
+    public static final String CONNECT_TIMEOUT_TEST_URL = "http://10.255.255.1";
+    public static final String READ_TIMEOUT_TEST_URL = "https://httpstat.us/200?sleep=100000";
     @Autowired
     private PaymentCommandService paymentCommandService;
 
     @Autowired
+    @Qualifier("tossRestClient")
     private RestClient tossRestClient;
 
     @DisplayName("결제 예외 핸들링 테스트 - INVALID_API_KEY가 발생할 경우")
@@ -75,5 +80,27 @@ public class PaymentConfirmTest {
                         "wrongPaymentKey", "orderId", 1000L
                 ))
         ).isInstanceOf(PaymentConfirmClientException.class);
+    }
+
+    @DisplayName("Connect Timeout 테스트")
+    @Test
+    void connectTimeoutExceptionTest() {
+        assertThatThrownBy(
+                () -> tossRestClient.post()
+                        .uri(CONNECT_TIMEOUT_TEST_URL)
+                        .retrieve()
+                        .toBodilessEntity()
+        ).isInstanceOf(ResourceAccessException.class);
+    }
+
+    @DisplayName("Read Timeout 테스트")
+    @Test
+    void readTimeoutExceptionTest() {
+        assertThatThrownBy(
+                () -> tossRestClient.post()
+                        .uri(READ_TIMEOUT_TEST_URL)
+                        .retrieve()
+                        .toBodilessEntity()
+        ).isInstanceOf(ResourceAccessException.class);
     }
 }
