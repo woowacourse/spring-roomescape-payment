@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import fixture.ThemeFixture;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.global.error.exception.ConflictException;
 import roomescape.theme.dto.request.ThemeCreateRequest;
+import roomescape.theme.entity.Theme;
 import roomescape.theme.service.ThemeService;
 
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
@@ -25,10 +28,11 @@ class ThemeIntegrationTest {
     @DisplayName("테마를 생성한다.")
     void createTheme() {
         // given
+        Theme theme = ThemeFixture.createDefault();
         var request = new ThemeCreateRequest(
-                "미소",
-                "미소 테마",
-                "https://miso.com"
+                theme.getName(),
+                theme.getDescription(),
+                theme.getThumbnail()
         );
 
         // when
@@ -37,9 +41,9 @@ class ThemeIntegrationTest {
         // then
         assertAll(
                 () -> assertThat(response.id()).isEqualTo(1L),
-                () -> assertThat(response.name()).isEqualTo("미소"),
-                () -> assertThat(response.description()).isEqualTo("미소 테마"),
-                () -> assertThat(response.thumbnail()).isEqualTo("https://miso.com")
+                () -> assertThat(response.name()).isEqualTo(theme.getName()),
+                () -> assertThat(response.description()).isEqualTo(theme.getDescription()),
+                () -> assertThat(response.thumbnail()).isEqualTo(theme.getThumbnail())
         );
     }
 
@@ -47,17 +51,18 @@ class ThemeIntegrationTest {
     @DisplayName("중복되는 테마 이름이 있을 경우 생성할 수 없다.")
     void createThemeWithDuplicateName() {
         // given
+        Theme theme = ThemeFixture.createDefault();
         var request1 = new ThemeCreateRequest(
-                "미소",
-                "미소 테마",
-                "https://miso.com"
+                theme.getName(),
+                theme.getDescription(),
+                theme.getThumbnail()
         );
         themeService.createTheme(request1);
 
         var request2 = new ThemeCreateRequest(
-                "미소",
-                "미소 테마2",
-                "https://miso2.com"
+                theme.getName(),
+                theme.getDescription() + "diff",
+                theme.getThumbnail() + "diff"
         );
 
         // when & then
@@ -70,15 +75,16 @@ class ThemeIntegrationTest {
     @DisplayName("모든 테마를 조회한다.")
     void getAllThemes() {
         // given
+        List<Theme> themes = ThemeFixture.createDefaultList(2);
         var request1 = new ThemeCreateRequest(
-                "미소",
-                "미소 테마",
-                "https://miso.com"
+                themes.get(0).getName(),
+                themes.get(0).getDescription(),
+                themes.get(0).getThumbnail()
         );
         var request2 = new ThemeCreateRequest(
-                "우테코",
-                "우테코 테마",
-                "https://wooteco.com"
+                themes.get(1).getName(),
+                themes.get(1).getDescription(),
+                themes.get(1).getThumbnail()
         );
         themeService.createTheme(request1);
         themeService.createTheme(request2);
@@ -89,8 +95,8 @@ class ThemeIntegrationTest {
         // then
         assertAll(
                 () -> assertThat(responses).hasSize(2),
-                () -> assertThat(responses.get(0).name()).isEqualTo("미소"),
-                () -> assertThat(responses.get(1).name()).isEqualTo("우테코")
+                () -> assertThat(responses.get(0).name()).isEqualTo(themes.get(0).getName()),
+                () -> assertThat(responses.get(1).name()).isEqualTo(themes.get(1).getName())
         );
     }
 
@@ -98,15 +104,17 @@ class ThemeIntegrationTest {
     @DisplayName("인기 있는 테마를 조회한다.")
     void getPopularThemes() {
         // given
+        Theme theme1 = ThemeFixture.createDefault();
         var request1 = new ThemeCreateRequest(
-                "미소",
-                "미소 테마",
-                "https://miso.com"
+                theme1.getName(),
+                theme1.getDescription(),
+                theme1.getThumbnail()
         );
+        Theme theme2 = ThemeFixture.createDefault();
         var request2 = new ThemeCreateRequest(
-                "우테코",
-                "우테코 테마",
-                "https://wooteco.com"
+                theme2.getName(),
+                theme2.getDescription(),
+                theme2.getThumbnail()
         );
         themeService.createTheme(request1);
         themeService.createTheme(request2);
@@ -122,15 +130,16 @@ class ThemeIntegrationTest {
     @DisplayName("테마를 삭제한다.")
     void deleteTheme() {
         // given
+        Theme theme = ThemeFixture.createDefault();
         var request = new ThemeCreateRequest(
-                "미소",
-                "미소 테마",
-                "https://miso.com"
+                theme.getName(),
+                theme.getDescription(),
+                theme.getThumbnail()
         );
-        var theme = themeService.createTheme(request);
+        var createdTheme = themeService.createTheme(request);
 
         // when
-        themeService.deleteTheme(theme.id());
+        themeService.deleteTheme(createdTheme.id());
 
         // then
         assertThat(themeService.getAllThemes()).isEmpty();
