@@ -113,7 +113,7 @@ class ReservationControllerTest {
                 .statusCode(201);
     }
 
-    @DisplayName("존재하지 않는 예약 시간 ID 를 추가하면 예외를 반환한다.")
+    @DisplayName("존재하지 않는 예약 시간 ID를 추가하면 예외를 반환한다.")
     @Test
     void test5() {
         String tokenValue = getAdminLoginTokenValue();
@@ -136,7 +136,7 @@ class ReservationControllerTest {
                 .statusCode(404);
     }
 
-    @DisplayName("존재하지 않는 테마 ID 를 추가하면 예외를 반환한다.")
+    @DisplayName("존재하지 않는 테마 ID를 추가하면 예외를 반환한다.")
     @Test
     void notExistThemeId() {
         String tokenValue = getAdminLoginTokenValue();
@@ -235,6 +235,40 @@ class ReservationControllerTest {
                 .statusCode(200)
                 .body("size()", is(2))
                 .body("alreadyBooked", containsInAnyOrder(true, false));
+    }
+
+    @DisplayName("결제 승인 중 예외 발생 시 예약이 생성되지 않는다")
+    @Test
+    void test10() {
+        int timeId = addReservationTime("10:00");
+        int themeId = addTheme();
+        String tokenValue = getAdminLoginTokenValue();
+        Map<String, Object> reservationParams = Map.of(
+                "date", LocalDate.now().plusDays(1L),
+                "timeId", timeId,
+                "themeId", themeId,
+                "paymentKey", "paymentKey",
+                "orderId", "orderId",
+                "amount", 1_000L
+        );
+
+        Mockito.doThrow(new RuntimeException("결제 실패"))
+                .when(paymentService)
+                .confirm(any(PaymentRequest.class));
+
+        RestAssured.given()
+                .cookie("token", tokenValue)
+                .contentType(ContentType.JSON)
+                .body(reservationParams)
+                .when().post("/reservations")
+                .then()
+                .statusCode(500);
+
+        RestAssured.given()
+                .when().get("/reservations")
+                .then()
+                .statusCode(200)
+                .body("size()", is(0));
     }
 
     private String getAdminLoginTokenValue() {

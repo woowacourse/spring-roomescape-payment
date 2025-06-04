@@ -24,7 +24,6 @@ import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.payment.domain.PaymentMethod;
 import roomescape.reservation.payment.dto.request.PaymentRequest;
-import roomescape.reservation.payment.service.PaymentService;
 import roomescape.reservation.service.ReservationService;
 
 @RequestMapping("/reservations")
@@ -32,11 +31,9 @@ import roomescape.reservation.service.ReservationService;
 public class ReservationController {
 
     private final ReservationService reservationService;
-    private final PaymentService paymentService;
 
-    public ReservationController(final ReservationService reservationService, final PaymentService paymentService) {
+    public ReservationController(ReservationService reservationService) {
         this.reservationService = reservationService;
-        this.paymentService = paymentService;
     }
 
     @GetMapping

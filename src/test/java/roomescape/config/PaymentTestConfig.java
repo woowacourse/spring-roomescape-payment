@@ -3,8 +3,12 @@ package roomescape.config;
 import java.util.List;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import roomescape.common.exception.custom.PaymentClientException;
+import roomescape.common.exception.custom.PaymentServerException;
 import roomescape.reservation.payment.domain.PaymentMethod;
 import roomescape.reservation.payment.dto.request.PaymentRequest;
+import roomescape.reservation.payment.error.ClientErrorCode;
+import roomescape.reservation.payment.error.InternalServerErrorCode;
 import roomescape.reservation.payment.gateway.PaymentGateway;
 import roomescape.reservation.payment.gateway.PaymentGatewayResolver;
 
@@ -21,6 +25,12 @@ public class PaymentTestConfig {
 
             @Override
             public void confirm(PaymentRequest request) {
+                if (request.paymentKey().equals("server-error-key")) {
+                    throw new PaymentServerException(InternalServerErrorCode.UNAUTHORIZED_KEY.getMessage());
+                }
+                if (request.paymentKey().equals("already-processed-key")) {
+                    throw new PaymentClientException(ClientErrorCode.ALREADY_PROCESSED_PAYMENT.getMessage());
+                }
             }
         };
     }
