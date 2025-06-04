@@ -1,5 +1,6 @@
 package roomescape.member.ui;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,10 @@ import roomescape.member.application.dto.MemberResponse;
 public class MemberController {
     private final MemberService memberService;
 
+    @Operation(
+            summary = "회원 가입",
+            description = "회원 정보를 받아 새로운 회원을 등록합니다. 중복된 이메일은 등록할 수 없습니다."
+    )
     @PostMapping
     public ResponseEntity<ApiResponse<MemberResponse>> create(@Valid @RequestBody MemberRequest request) {
         MemberResponse response = memberService.create(request);

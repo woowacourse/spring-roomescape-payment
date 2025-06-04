@@ -1,5 +1,6 @@
 package roomescape.reservation.ui;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
@@ -27,6 +28,13 @@ public class ReservationController {
     private final ReservationService reservationService;
     private final SessionManager sessionManager;
 
+    @Operation(
+            summary = "예약 생성",
+            description = """
+            사용자가 사전 결제된 정보를 바탕으로 예약을 생성합니다.  
+            세션에서 결제 정보를 가져오며, 예약이 완료되면 세션 정보는 삭제됩니다.
+        """
+    )
     @PostMapping
     public ResponseEntity<ApiResponse<ReservationResponse>> create(
             @Valid @RequestBody UserReservationRequest request,
@@ -40,6 +48,10 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
 
+    @Operation(
+            summary = "내 예약 목록 조회",
+            description = "로그인한 사용자의 모든 예약을 조회합니다."
+    )
     @GetMapping
     public ResponseEntity<ApiResponse<List<MyReservationResponse>>> getAll(
             @LoginMemberId Long memberId
