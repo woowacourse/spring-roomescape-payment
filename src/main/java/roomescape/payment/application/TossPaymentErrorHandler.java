@@ -3,38 +3,34 @@ package roomescape.payment.application;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
-import org.springframework.http.HttpRequest;
+import java.net.URI;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.client.ClientHttpRequestExecution;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.web.client.ResponseErrorHandler;
 import roomescape.common.exception.impl.DeserializationException;
 import roomescape.common.exception.impl.TossPaymentErrorException;
 import roomescape.payment.application.dto.TossErrorResponse;
 
-public class TossPaymentResponseInterceptor implements ClientHttpRequestInterceptor {
+public class TossPaymentErrorHandler implements ResponseErrorHandler {
 
     private final ObjectMapper objectMapper;
 
-    public TossPaymentResponseInterceptor(final ObjectMapper objectMapper) {
+    public TossPaymentErrorHandler(final ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public ClientHttpResponse intercept(
-        final HttpRequest request,
-        final byte[] body,
-        final ClientHttpRequestExecution execution
-    ) throws IOException {
-        ClientHttpResponse response = execution.execute(request, body);
-        HttpStatus status = (HttpStatus) response.getStatusCode();
+    public boolean hasError(final ClientHttpResponse response) throws IOException {
+        return response.getStatusCode().isError();
+    }
 
-        if (status.isError()) {
-            TossErrorResponse error = parseErrorResponse(response.getBody());
-            throw new TossPaymentErrorException(status, error.code(), error.message());
-        }
+    @Override
+    public void handleError(final URI url, final HttpMethod method, final ClientHttpResponse response) throws IOException {
+        final HttpStatus status = (HttpStatus) response.getStatusCode();
+        final TossErrorResponse error = parseErrorResponse(response.getBody());
 
-        return response;
+        throw new TossPaymentErrorException(status, error.code(), error.message());
     }
 
     private TossErrorResponse parseErrorResponse(final InputStream bodyStream) {

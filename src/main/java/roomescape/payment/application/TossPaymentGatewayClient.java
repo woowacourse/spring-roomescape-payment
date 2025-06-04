@@ -32,7 +32,7 @@ public class TossPaymentGatewayClient {
             .baseUrl(properties.getBaseUrl())
             .defaultHeader(AUTHORIZATION, encodeSecretKey(properties.getSecretKey()))
             .defaultHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-            .requestInterceptor(new TossPaymentResponseInterceptor(objectMapper))
+            .defaultStatusHandler(new TossPaymentErrorHandler(objectMapper))
             .build();
     }
 
