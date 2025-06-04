@@ -34,7 +34,8 @@ public enum ErrorCode {
     // 결제
     PAYMENT_NOT_APPROVED("결제 승인이 거부되었습니다."),
     INVALID_PAYMENT_AMOUNT("잘못된 결제 금액입니다."),
-    PAYMENT_DUPLICATED("중복된 결제입니다.");
+    PAYMENT_DUPLICATED("중복된 결제입니다."),
+    PAYMENT_NOT_FOUND("존재하지 않는 결제입니다.");
 
     private final String message;
 
