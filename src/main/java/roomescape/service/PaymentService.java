@@ -1,5 +1,6 @@
 package roomescape.service;
 
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import roomescape.domain.PaymentClient;
 import roomescape.dto.request.ConfirmPaymentRequest;
@@ -31,5 +32,16 @@ public class PaymentService {
                 reservation);
         paymentRepository.save(payment);
         reservation.payForReservation(payment);
+    }
+
+    public void refundReservation(Long reservationId) {
+        Optional<Payment> paymentOptional = paymentRepository.findFetchByReservationId(reservationId);
+
+        if (paymentOptional.isEmpty()) {
+            return;
+        }
+
+        Payment payment = paymentOptional.get();
+        paymentClient.refund(payment);
     }
 }

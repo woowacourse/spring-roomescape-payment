@@ -105,8 +105,8 @@ public class ReservationService {
         return member.reserve(date, reservationTime, theme, status);
     }
 
-    public List<ReservationResponse> findAll() {
-        List<Reservation> reservations = reservationRepository.findAll();
+    public List<ReservationResponse> findAllReserved() {
+        List<Reservation> reservations = reservationRepository.findAllFetchByStatus(ReservationStatus.RESERVED);
         return reservations.stream()
                 .map(ReservationResponse::from)
                 .toList();

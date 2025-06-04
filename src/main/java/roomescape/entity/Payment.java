@@ -66,7 +66,7 @@ public class Payment {
         return reservation;
     }
 
-    public void setReservation(Reservation reservation) {
+    protected void setReservation(Reservation reservation) {
         this.reservation = reservation;
     }
 }

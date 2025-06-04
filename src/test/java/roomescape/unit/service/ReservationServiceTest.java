@@ -72,18 +72,18 @@ class ReservationServiceTest {
     }
 
     @Test
-    void 예약_전체를_조회할_수_있다() {
+    void 예약된_방탈출_데이터들을_조회할_수_있다() {
         //given
         Reservation reservation = new Reservation(member, LocalDate.now(), time, theme, ReservationStatus.RESERVED);
         Reservation reservation2 = new Reservation(
                 new Member("test2", "test2@email.com", "1234", Role.USER),
                 LocalDate.now(), time, theme, ReservationStatus.RESERVED);
 
-        when(reservationRepository.findAll())
+        when(reservationRepository.findAllFetchByStatus(any()))
                 .thenReturn(List.of(reservation, reservation2));
 
         //when
-        List<ReservationResponse> actual = reservationService.findAll();
+        List<ReservationResponse> actual = reservationService.findAllReserved();
 
         //then
         assertThat(actual).hasSize(2);
@@ -131,7 +131,7 @@ class ReservationServiceTest {
 
         //then
         assertThat(member.getReservations()).doesNotContain(reservation);
-        assertThat(reservation.getMember()).isNull();
+        assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.CANCELED);
     }
 
     @Test
@@ -232,7 +232,7 @@ class ReservationServiceTest {
 
         //then
         assertThat(member.getReservations()).doesNotContain(reservation);
-        assertThat(reservation.getMember()).isNull();
+        assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.CANCELED);
     }
 
     @Test

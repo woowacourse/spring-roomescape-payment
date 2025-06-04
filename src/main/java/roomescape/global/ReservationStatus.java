@@ -2,7 +2,10 @@ package roomescape.global;
 
 public enum ReservationStatus {
     RESERVED("예약"),
-    WAIT("%d 번째 예약대기");
+    WAIT("%d 번째 예약대기"),
+    PENDING("결제 대기"),
+    CANCELED("예약 취소"),
+    ;
 
     private final String text;
 

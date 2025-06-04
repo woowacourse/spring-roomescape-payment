@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.dto.request.AddReservationRequest;
 import roomescape.dto.request.ConfirmPaymentRequest;
+import roomescape.dto.request.ConfirmWaitReservationRequest;
 import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.request.CreateWaitReservationRequest;
 import roomescape.dto.request.LoginMemberRequest;
@@ -37,7 +38,7 @@ public class ReservationFacadeService {
     }
 
     public List<ReservationResponse> findAllReservation() {
-        return reservationService.findAll();
+        return reservationService.findAllReserved();
     }
 
     public List<MyReservationResponse> findAllReservationOfMember(LoginMemberRequest loginMemberRequest) {
@@ -51,5 +52,6 @@ public class ReservationFacadeService {
 
     public void deleteReservation(final Long id) {
         reservationService.deleteReservation(id);
+        paymentService.refundReservation(id);
     }
 }
