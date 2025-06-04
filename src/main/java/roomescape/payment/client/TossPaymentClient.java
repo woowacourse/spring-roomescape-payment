@@ -1,28 +1,24 @@
 package roomescape.payment.client;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClient.ResponseSpec.ErrorHandler;
+import roomescape.global.error.exception.BadRequestException;
+import roomescape.global.error.exception.ServerException;
 import roomescape.payment.dto.request.PaymentConfirmRequest;
 import roomescape.payment.dto.response.PaymentConfirmResponse;
+import roomescape.payment.dto.response.PaymentErrorResponse;
 
 @Component
 public class TossPaymentClient implements PaymentClient {
 
     private final RestClient restClient;
-    private final ErrorHandler paymentClientErrorHandler;
-    private final ErrorHandler paymentServerErrorHandler;
 
-    public TossPaymentClient(
-            @Qualifier("tossPaymentRestClient") RestClient restClient,
-            @Qualifier("paymentClientErrorHandler") ErrorHandler clientErrorHandler,
-            @Qualifier("paymentServerErrorHandler") ErrorHandler serverErrorHandler
-    ) {
+    public TossPaymentClient(@Qualifier("tossPaymentRestClient") RestClient restClient) {
         this.restClient = restClient;
-        this.paymentClientErrorHandler = clientErrorHandler;
-        this.paymentServerErrorHandler = serverErrorHandler;
     }
 
     // TODO: 테스트 고민..
@@ -32,8 +28,26 @@ public class TossPaymentClient implements PaymentClient {
         return restClient.post()
                 .body(new PaymentConfirmRequest(paymentKey, orderId, amount))
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, paymentClientErrorHandler)
-                .onStatus(HttpStatusCode::is5xxServerError, paymentServerErrorHandler)
+                .onStatus(HttpStatusCode::is4xxClientError, (request, response) -> {
+                            ObjectMapper objectMapper = new ObjectMapper()
+                                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                            PaymentErrorResponse paymentErrorResponse = objectMapper.readValue(
+                                    response.getBody(),
+                                    PaymentErrorResponse.class
+                            );
+                            throw new BadRequestException(paymentErrorResponse.message());
+                        }
+                )
+                .onStatus(HttpStatusCode::is5xxServerError, (request, response) -> {
+                            ObjectMapper objectMapper = new ObjectMapper()
+                                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+                            PaymentErrorResponse paymentErrorResponse = objectMapper.readValue(
+                                    response.getBody(),
+                                    PaymentErrorResponse.class
+                            );
+                            throw new ServerException(paymentErrorResponse.message());
+                        }
+                )
                 .body(PaymentConfirmResponse.class);
     }
 }
