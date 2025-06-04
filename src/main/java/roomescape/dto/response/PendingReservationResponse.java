@@ -1,32 +1,48 @@
 package roomescape.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.domain.reservation.Reservation;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 public record PendingReservationResponse(
-        Long id,
+        @Schema(example = "1")
+        long id,
+
         PendingReservationMemberSlot member,
+
         PendingReservationThemeSlot theme,
+
         PendingReservationTimeSlot time,
+
+        @Schema(example = "2025-06-05")
         LocalDate date
 ) {
 
     public record PendingReservationMemberSlot(
-            Long memberId,
+            @Schema(example = "1")
+            long memberId,
+
+            @Schema(example = "돔푸")
             String name
     ) {
     }
 
     public record PendingReservationThemeSlot(
-            Long themeId,
+            @Schema(example = "1")
+            long themeId,
+
+            @Schema(example = "주홍색 연구")
             String themeName
     ) {
     }
 
     public record PendingReservationTimeSlot(
-            Long timeId,
+            @Schema(example = "1")
+            long timeId,
+
+            @Schema(example = "15:00")
             LocalTime startAt
     ) {
     }

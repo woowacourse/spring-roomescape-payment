@@ -1,15 +1,25 @@
 package roomescape.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.domain.reservation.Reservation;
 
 import java.time.LocalDate;
 
 public record ReservationResponse(
+        @Schema(example = "1")
         long id,
+
+        @Schema(example = "돔푸")
         String name,
+
+        @Schema(example = "2025-06-05")
         LocalDate date,
+
         ReservationTimeResponse time,
+
         ReservationThemeResponse theme,
+
+        @Schema(examples = {"예약 확정", "결제 대기", "예약 대기", "예약 거절"})
         String status
 ) {
 
