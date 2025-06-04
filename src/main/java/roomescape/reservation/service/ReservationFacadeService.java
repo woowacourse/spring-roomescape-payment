@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.auth.dto.UserInfo;
 import roomescape.member.domain.Member;
 import roomescape.member.service.MemberService;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationInfo;
@@ -15,8 +17,10 @@ import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
+import roomescape.reservation.dto.response.ReservationResponseWithPayment;
 import roomescape.reservation.dto.response.WaitingWithRank;
 import roomescape.reservation.exception.ReservationAlreadyExistsException;
+import roomescape.reservation.repository.dto.ReservationWithPayment;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.service.ReservationTimeService;
 import roomescape.theme.domain.Theme;
@@ -47,7 +51,7 @@ public class ReservationFacadeService {
     }
 
     public List<MyReservationResponse> findMyReservations(final UserInfo userInfo) {
-        List<Reservation> myReservations = reservationService.findMyReservations(userInfo);
+        List<ReservationWithPayment> myReservations = reservationService.findMyReservations(userInfo);
         List<WaitingWithRank> waitingWithRanks = waitingService.findMyWaitingsWithRank(userInfo);
         return Stream.concat(myReservations.stream()
                         .map(MyReservationResponse::from),
@@ -59,30 +63,30 @@ public class ReservationFacadeService {
     public ReservationResponse createForAdmin(final ReservationRequest request,
                                               final Long memberId) {
         if (!reservationService.isReservationExists(request)) {
-            return createReservation(request, memberId);
+            return ReservationResponse.of(createReservation(request, memberId));
         }
         return createWaiting(request, memberId);
     }
 
-    public ReservationResponse create(final ReservationCreateRequest request, final Long memberId) {
+    @Transactional
+    public ReservationResponseWithPayment create(final ReservationCreateRequest request, final Long memberId) {
 
         if (!reservationService.isReservationExists(request.reservation())) {
-            paymentService.payment(request.payment());
-            return createReservation(request.reservation(), memberId);
+            Reservation reservation = createReservation(request.reservation(), memberId);
+            Payment payment = paymentService.payAndCreatePayment(request.payment(),reservation);
+            return ReservationResponseWithPayment.of(payment);
         }
         throw new ReservationAlreadyExistsException("이미 예약이 존재합니다.");
     }
 
-    private ReservationResponse createReservation(final ReservationRequest request, final Long memberId) {
-        reservationService.checkIfReservationExists(request);
+    private Reservation createReservation(final ReservationRequest request, final Long memberId) {
         ReservationTime time = reservationTimeService.findReservationTime(request.timeId());
         Theme theme = themeService.findTheme(request.themeId());
         Member member = memberService.findUserByMemberId(memberId);
         ReservationInfo reservationInfo = new ReservationInfo(request.date(), time, theme);
-        Reservation newReservation = reservationService.save(
+        return reservationService.save(
                 Reservation.createUpcomingReservationWithUnassignedId(member, reservationInfo)
         );
-        return ReservationResponse.of(newReservation);
     }
 
     public ReservationResponse createWaiting(final ReservationRequest request, final Long memberId) {

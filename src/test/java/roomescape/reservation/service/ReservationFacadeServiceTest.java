@@ -3,17 +3,21 @@ package roomescape.reservation.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.config.TestConfig;
 import roomescape.global.auth.dto.UserInfo;
 import roomescape.global.auth.service.MyPasswordEncoder;
@@ -21,14 +25,17 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.repository.MemberRepository;
 import roomescape.member.service.MemberService;
+import roomescape.payment.infrastructure.PaymentRepository;
 import roomescape.payment.infrastructure.TossApiClient;
+import roomescape.payment.infrastructure.dto.response.PaymentResponse;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.request.PaymentRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
-import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
+import roomescape.reservation.dto.response.MyReservationResponse;
+import roomescape.reservation.dto.response.ReservationResponseWithPayment;
 import roomescape.reservation.exception.ReservationAlreadyExistsException;
 import roomescape.reservation.fixture.TestFixture;
 import roomescape.reservation.repository.ReservationRepository;
@@ -65,8 +72,11 @@ class ReservationFacadeServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    @Mock
+    @MockitoBean
     private TossApiClient tossApiClient;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     private ReservationFacadeService reservationFacadeService;
     private ReservationTime time;
@@ -76,12 +86,12 @@ class ReservationFacadeServiceTest {
     @BeforeEach
     void setUp() {
         reservationFacadeService = new ReservationFacadeService(
-                new ReservationService(reservationRepository),
+                new ReservationService(reservationRepository, paymentRepository),
                 new WaitingService(waitingRepository),
                 new MemberService(memberRepository, new MyPasswordEncoder()),
                 new ThemeService(themeRepository, reservationRepository),
                 new ReservationTimeService(reservationTimeRepository, reservationRepository),
-                new PaymentService(tossApiClient)
+                new PaymentService(tossApiClient, paymentRepository)
         );
 
         ReservationTime time2 = ReservationTime.withUnassignedId(LocalTime.of(9, 0));
@@ -173,12 +183,49 @@ class ReservationFacadeServiceTest {
     }
 
     @Test
+    void findMyReservations_shouldReturnWithPaymentInfo() {
+        PaymentResponse mockResponse = new PaymentResponse(
+                "test_payment_key",
+                "test_order_id",
+                "CARD",
+                50000,
+                "DONE",
+                OffsetDateTime.of(2025, 5, 28, 20, 48, 23, 0, ZoneOffset.UTC)
+        );
+        Mockito.when(tossApiClient.authPayment(any()))
+                .thenReturn(mockResponse);
+        ReservationResponseWithPayment userReservationResponse = reservationFacadeService.create(
+                new ReservationCreateRequest(
+                        new ReservationRequest(futureDate, time.getId(), theme.getId()),
+                        new PaymentRequest("test_payment_key", "test_order_id", 50000, "CARD"))
+                , member.getId()
+        );
+        MyReservationResponse expected = new MyReservationResponse(
+                userReservationResponse.id(),
+                theme.getName(),
+                userReservationResponse.date(),
+                time.getStartAt(),
+                ReservationStatus.RESERVED.getName(),
+                "test_payment_key",
+                50000
+        );
+
+        List<MyReservationResponse> responses = reservationFacadeService.findMyReservations(
+                new UserInfo(member.getId(), MemberRole.USER));
+
+        assertThat(responses).hasSize(1);
+        assertThat(responses.get(0)).isEqualTo(expected);
+
+    }
+
+    @Test
     void deleteReservation_shouldPromoteFirstWaiting() {
         ReservationResponse reserved = reservationFacadeService.createForAdmin(
                 new ReservationRequest(futureDate, time.getId(), theme.getId()),
                 member.getId()
         );
-        ReservationResponse waiting = reservationFacadeService.createWaiting(
+
+        reservationFacadeService.createWaiting(
                 new ReservationRequest(futureDate, time.getId(), theme.getId()),
                 member.getId()
         );

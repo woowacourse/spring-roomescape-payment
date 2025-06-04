@@ -18,6 +18,7 @@ import roomescape.reservation.dto.request.AdminReservationRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
+import roomescape.reservation.dto.response.ReservationResponseWithPayment;
 import roomescape.reservation.service.ReservationFacadeService;
 import roomescape.reservation.service.ReservationService;
 
@@ -45,12 +46,12 @@ public class ReservationController {
 
     @RequireRole(MemberRole.USER)
     @PostMapping("/reservations")
-    public ResponseEntity<ReservationResponse> createReservation(
+    public ResponseEntity<ReservationResponseWithPayment> createReservation(
             @RequestBody ReservationCreateRequest request,
             UserInfo userInfo
     ) {
 
-        ReservationResponse dto = reservationFacadeService.create(request, userInfo.id());
+        ReservationResponseWithPayment dto = reservationFacadeService.create(request, userInfo.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
