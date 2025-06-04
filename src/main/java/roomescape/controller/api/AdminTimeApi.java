@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import roomescape.dto.request.ReservationTimeRequest;
 import roomescape.dto.response.ReservationTimeResponse;
 
-@Tag(name = "5. 어드민 전용 API")
+@Tag(name = "4. 예약 시간 관련 API")
 public interface AdminTimeApi {
 
     @Operation(summary = "예약 시간 추가")

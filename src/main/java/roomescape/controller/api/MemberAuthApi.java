@@ -14,7 +14,7 @@ import roomescape.global.LoginInfo;
 
 import javax.naming.AuthenticationException;
 
-@Tag(name = "0. 보안 관련 API")
+@Tag(name = "1. 보안 관련 API")
 public interface MemberAuthApi {
 
     @Operation(summary = "회원가입")

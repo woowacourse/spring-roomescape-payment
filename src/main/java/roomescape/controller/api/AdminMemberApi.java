@@ -7,7 +7,7 @@ import roomescape.dto.response.MemberResponse;
 
 import java.util.List;
 
-@Tag(name = "5. 어드민 전용 API")
+@Tag(name = "1. 멤버 관련 API")
 public interface AdminMemberApi {
 
     @Operation(summary = "모든 멤버 조회")

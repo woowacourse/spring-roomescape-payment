@@ -13,7 +13,7 @@ import roomescape.global.LoginInfo;
 
 import java.util.List;
 
-@Tag(name = "1. 예약 관련 API")
+@Tag(name = "2. 예약 관련 API")
 public interface MemberReservationApi {
 
     @Operation(summary = "결제 승인 및 예약")

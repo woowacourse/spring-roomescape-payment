@@ -12,7 +12,7 @@ import roomescape.dto.response.ReservationResponse;
 import java.time.LocalDate;
 import java.util.List;
 
-@Tag(name = "5. 어드민 전용 API")
+@Tag(name = "2. 예약 관련 API")
 public interface AdminReservationApi {
 
     @Operation(summary = "예약 추가")

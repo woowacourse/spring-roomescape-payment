@@ -10,7 +10,7 @@ import roomescape.dto.response.ReservationTimeWithAvailabilityResponse;
 import java.time.LocalDate;
 import java.util.List;
 
-@Tag(name = "3. 예약 시간 관련 API")
+@Tag(name = "4. 예약 시간 관련 API")
 public interface MemberTimeApi {
 
     @Operation(summary = "모든 예약 시간 조회")
