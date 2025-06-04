@@ -9,6 +9,9 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.EnumSource.Mode;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -115,7 +118,7 @@ class ReservationServiceTest {
     }
 
     @Test
-    void 예약을_삭제할_수_있다() {
+    void 예약을_취소할_수_있다() {
         //given
         Reservation reservation = new Reservation(member, LocalDate.of(3000, 1, 1), time, theme,
                 ReservationStatus.RESERVED);
@@ -219,7 +222,7 @@ class ReservationServiceTest {
     }
 
     @Test
-    void 예약_대기를_삭제할_수_있다() {
+    void 예약_대기를_취소할_수_있다() {
         //given
         Reservation reservation = new Reservation(member, LocalDate.of(3000, 1, 1), time, theme,
                 ReservationStatus.WAIT);
@@ -280,5 +283,22 @@ class ReservationServiceTest {
                 () -> assertThat(wait.getMember()).isEqualTo(member),
                 () -> assertThat(wait.getStatus()).isEqualTo(ReservationStatus.PENDING)
         );
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ReservationStatus.class, mode = Mode.EXCLUDE, names = {"PENDING"})
+    void 결제_대기가_아닌_예약을_확정_시도_시_예외가_발생한다(ReservationStatus status) {
+        //given
+        LocalDate date = LocalDate.of(3000, 1, 1);
+
+        Reservation reserved = member.reserve(date, time, theme, status);
+
+        when(reservationRepository.findById(any(Long.class)))
+                .thenReturn(Optional.of(reserved));
+
+        //when //then
+        assertThatThrownBy(() -> reservationService.pendingToReserve(member.getId(), loginMemberRequest))
+                .isInstanceOf(InvalidReservationException.class)
+                .hasMessageContaining("결제 대기중인 예약이 아닙니다.");
     }
 }
