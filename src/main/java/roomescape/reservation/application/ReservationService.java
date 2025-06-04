@@ -15,10 +15,12 @@ import roomescape.common.exception.impl.ConflictException;
 import roomescape.common.exception.impl.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.AvailableReservationTimeResponse;
 import roomescape.reservation.application.dto.MemberReservationRequest;
 import roomescape.reservation.application.dto.MyReservation;
+import roomescape.reservation.application.dto.MyReservationAndPaymentInfo;
 import roomescape.reservation.application.dto.ReservationResponse;
 import roomescape.reservation.domain.PaymentStatus;
 import roomescape.reservation.domain.Reservation;
@@ -164,10 +166,17 @@ public class ReservationService {
             .toList();
     }
 
-    public List<MyReservation> findByMemberId(final Long memberId) {
+    public List<MyReservationAndPaymentInfo> findByMemberId(final Long memberId) {
         final List<Reservation> reservations = reservationRepository.findByMemberId(memberId);
         return reservations.stream()
-            .map(MyReservation::from)
+            .map(reservation -> {
+                MyReservation myReservation = MyReservation.from(reservation);
+                Payment payment = reservation.getPayment();
+                if (payment == null) {
+                    return MyReservationAndPaymentInfo.from(myReservation, null);
+                }
+                return MyReservationAndPaymentInfo.from(myReservation, payment.getPaymentInfo());
+            })
             .toList();
     }
 

@@ -8,12 +8,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Objects;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberName;
+import roomescape.payment.domain.Payment;
 import roomescape.theme.domain.Theme;
 
 @Entity
@@ -36,6 +38,9 @@ public class Reservation {
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
+
+    @OneToOne(mappedBy = "reservation", fetch = FetchType.LAZY)
+    private Payment payment;
 
     private final Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
@@ -101,8 +106,8 @@ public class Reservation {
         return time.getStartAt();
     }
 
-    public Timestamp getCreatedAt() {
-        return createdAt;
+    public Payment getPayment() {
+        return payment;
     }
 
     public String getPaymentStatusName() {
