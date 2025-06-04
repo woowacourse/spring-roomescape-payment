@@ -9,7 +9,6 @@ import roomescape.domain.member.MemberRole;
 import roomescape.dto.request.MemberRegisterRequest;
 import roomescape.dto.response.MemberRegisterResponse;
 import roomescape.dto.response.MemberResponse;
-import roomescape.global.PasswordEncoder;
 
 import java.util.List;
 
@@ -18,7 +17,6 @@ import java.util.List;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public MemberRegisterResponse register(final MemberRegisterRequest request) {
@@ -27,7 +25,7 @@ public class MemberService {
         final Member newMember = Member.builder()
                 .email(request.email())
                 .name(request.name())
-                .password(passwordEncoder.encode(request.password()))
+                .password(request.password())
                 .role(MemberRole.USER)
                 .build();
         return MemberRegisterResponse.from(memberRepository.save(newMember));

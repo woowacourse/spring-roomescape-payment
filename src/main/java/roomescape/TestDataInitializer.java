@@ -12,13 +12,7 @@ import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservationitem.ReservationItem;
 import roomescape.domain.reservationitem.ReservationTheme;
 import roomescape.domain.reservationitem.ReservationTime;
-import roomescape.global.PasswordEncoder;
-import roomescape.repository.jpa.MemberJpaRepository;
-import roomescape.repository.jpa.PaymentJpaRepository;
-import roomescape.repository.jpa.ReservationItemJpaRepository;
-import roomescape.repository.jpa.ReservationJpaRepository;
-import roomescape.repository.jpa.ReservationThemeJpaRepository;
-import roomescape.repository.jpa.ReservationTimeJpaRepository;
+import roomescape.repository.jpa.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -41,14 +35,12 @@ public class TestDataInitializer {
     private final ReservationTimeJpaRepository timeRepository;
     private final ReservationThemeJpaRepository themeJpaRepository;
     private final PaymentJpaRepository paymentRepository;
-    private final PasswordEncoder encoder;
 
     @PostConstruct
     public void init() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchFieldException {
-        String password = encoder.encode("1234");
-        Member user1 = new Member("user1@email.com", password, "user1", MemberRole.USER);
-        Member user2 = new Member("user2@email.com", password, "user2", MemberRole.USER);
-        Member admin = new Member("admin@email.com", password, "admin", MemberRole.ADMIN);
+        Member user1 = new Member("user1@email.com", "1234", "user1", MemberRole.USER);
+        Member user2 = new Member("user2@email.com", "1234", "user2", MemberRole.USER);
+        Member admin = new Member("admin@email.com", "1234", "admin", MemberRole.ADMIN);
         memberRepository.saveAll(List.of(user1, user2, admin));
 
         ReservationTheme theme1 = new ReservationTheme("테마1", "설명", THUMBNAIL_URL);
