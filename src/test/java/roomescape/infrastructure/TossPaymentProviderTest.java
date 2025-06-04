@@ -23,6 +23,7 @@ import org.springframework.test.web.client.response.MockRestResponseCreators;
 import roomescape.domain.payment.PaymentProvider;
 import roomescape.domain.payment.PaymentRequest;
 import roomescape.domain.payment.TransactionStatusCode;
+import roomescape.infrastructure.toss.TossPaymentConfig;
 
 @RestClientTest(PaymentProvider.class)
 @Import(TossPaymentConfig.class)

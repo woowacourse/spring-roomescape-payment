@@ -1,4 +1,4 @@
-package roomescape.infrastructure;
+package roomescape.infrastructure.toss;
 
 import static roomescape.domain.payment.TransactionStatusCode.FAILED_INTERNAL_PROCESSING;
 import static roomescape.domain.payment.TransactionStatusCode.FAILED_PAYMENT;

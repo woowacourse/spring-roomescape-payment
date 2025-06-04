@@ -1,4 +1,4 @@
-package roomescape.infrastructure;
+package roomescape.infrastructure.toss;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
