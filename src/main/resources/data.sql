@@ -1,19 +1,19 @@
--- í…Œë§ˆ ë°ì´í„°
+-- Å×¸¶ µ¥ÀÌÅÍ
 INSERT INTO themes(name, description, thumbnail)
-VALUES ('ì¶”ë¦¬', 'ì…œë¡ with Danny', 'image/thumbnail.png'),
-       ('ê³µí¬', 'ì–´ë‘  ì†ì˜ ë¹„ëª…', 'image/thumbnail.png'),
-       ('ëª¨í—˜', 'ìƒì–´ë²„ë¦° ë„ì‹œ', 'image/thumbnail.png'),
-       ('SF', 'ìš°ì£¼ íƒˆì¶œ ë¯¸ì…˜', 'image/thumbnail.png'),
-       ('ê°ì„±', 'ì‹œê°„ì„ ê±·ëŠ” ì§‘', 'image/thumbnail.png'),
-       ('íŒíƒ€ì§€', 'ë§ˆë²•ì‚¬ì˜ ìœ ì‚°', 'image/thumbnail.png'),
-       ('ì—­ì‚¬', 'ê³ ë ¤ ì™•ì‹¤ì˜ ë¹„ë°€', 'image/thumbnail.png'),
-       ('ë²”ì£„', 'ì€í–‰ ê°•ë„ ì‚¬ê±´', 'image/thumbnail.png'),
-       ('ìŠ¤ë¦´ëŸ¬', 'ì ì… ì‘ì „', 'image/thumbnail.png'),
-       ('ì½”ë¯¸ë””', 'ì›ƒìŒ ì—°êµ¬ì†Œ', 'image/thumbnail.png'),
-       ('ë¡œë§¨ìŠ¤', 'ìƒì–´ë²„ë¦° í¸ì§€', 'image/thumbnail.png'),
-       ('ë…¼ë¦¬', 'í¼ì¦ ë§ˆìŠ¤í„°', 'image/thumbnail.png');
+VALUES ('Ãß¸®', '¼È·Ï with Danny', 'image/thumbnail.png'),
+       ('°øÆ÷', '¾îµÒ ¼ÓÀÇ ºñ¸í', 'image/thumbnail.png'),
+       ('¸ğÇè', 'ÀÒ¾î¹ö¸° µµ½Ã', 'image/thumbnail.png'),
+       ('SF', '¿ìÁÖ Å»Ãâ ¹Ì¼Ç', 'image/thumbnail.png'),
+       ('°¨¼º', '½Ã°£À» °È´Â Áı', 'image/thumbnail.png'),
+       ('ÆÇÅ¸Áö', '¸¶¹ı»çÀÇ À¯»ê', 'image/thumbnail.png'),
+       ('¿ª»ç', '°í·Á ¿Õ½ÇÀÇ ºñ¹Ğ', 'image/thumbnail.png'),
+       ('¹üÁË', 'ÀºÇà °­µµ »ç°Ç', 'image/thumbnail.png'),
+       ('½º¸±·¯', 'ÀáÀÔ ÀÛÀü', 'image/thumbnail.png'),
+       ('ÄÚ¹Ìµğ', '¿ôÀ½ ¿¬±¸¼Ò', 'image/thumbnail.png'),
+       ('·Î¸Ç½º', 'ÀÒ¾î¹ö¸° ÆíÁö', 'image/thumbnail.png'),
+       ('³í¸®', 'ÆÛÁñ ¸¶½ºÅÍ', 'image/thumbnail.png');
 
--- ì˜ˆì•½ ì‹œê°„ ë°ì´í„°
+-- ¿¹¾à ½Ã°£ µ¥ÀÌÅÍ
 INSERT INTO reservation_times(start_at)
 VALUES ('08:00'),
        ('12:00'),
@@ -21,7 +21,7 @@ VALUES ('08:00'),
        ('16:00'),
        ('18:00');
 
--- íšŒì› ë°ì´í„°
+-- È¸¿ø µ¥ÀÌÅÍ
 INSERT INTO members (name, email, password, member_role)
 VALUES ('Admin', 'admin@gmail.com', '$2a$10$lsczSamG1eaxq1KE2ivIpek7hOx.uNkDILI5nQPqaWyiUQtay6Msa', 'ADMIN'),
        ('Regular', 'user@gmail.com', '$2a$10$lsczSamG1eaxq1KE2ivIpek7hOx.uNkDILI5nQPqaWyiUQtay6Msa', 'REGULAR'),
@@ -53,112 +53,112 @@ VALUES ('Admin', 'admin@gmail.com', '$2a$10$lsczSamG1eaxq1KE2ivIpek7hOx.uNkDILI5
        ('Chloe', 'chloe@example.com', '$2a$10$hKDVYxLefVHV/vtuPhWD3OigtRyOykRLDdUAp80Z1crSoS1lFqF.W', 'REGULAR'),
        ('Daniel', 'daniel@example.com', '$2a$10$hKDVYxLefVHV/vtuPhWD3OigtRyOykRLDdUAp80Z1crSoS1lFqF.W', 'REGULAR');
 
--- ì˜ˆì•½ ìŠ¬ë¡¯ ë°ì´í„° (ReservationSlot) - ê° í…Œë§ˆë³„ ê³ ìœ í•œ ë‚ ì§œ/ì‹œê°„ ì¡°í•©
+-- ¿¹¾à ½½·Ô µ¥ÀÌÅÍ (ReservationSlot) - °¢ Å×¸¶º° °íÀ¯ÇÑ ³¯Â¥/½Ã°£ Á¶ÇÕ
 INSERT INTO reservation_slots(date, time_id, theme_id)
 VALUES
-    -- theme_id = 12 (ë…¼ë¦¬) - 2025-05-10 (5ê°œ ìŠ¬ë¡¯)
+    -- theme_id = 12 (³í¸®) - 2025-05-10 (5°³ ½½·Ô)
     ('2025-05-10', 1, 12), -- ID: 1 (08:00)
     ('2025-05-10', 2, 12), -- ID: 2 (12:00)
     ('2025-05-10', 3, 12), -- ID: 3 (14:00)
     ('2025-05-10', 4, 12), -- ID: 4 (16:00)
     ('2025-05-10', 5, 12), -- ID: 5 (18:00)
 
-    -- theme_id = 11 (ë¡œë§¨ìŠ¤) - 2025-05-10 (5ê°œ ìŠ¬ë¡¯)
+    -- theme_id = 11 (·Î¸Ç½º) - 2025-05-10 (5°³ ½½·Ô)
     ('2025-05-10', 1, 11), -- ID: 6 (08:00)
     ('2025-05-10', 2, 11), -- ID: 7 (12:00)
     ('2025-05-10', 3, 11), -- ID: 8 (14:00)
     ('2025-05-10', 4, 11), -- ID: 9 (16:00)
     ('2025-05-10', 5, 11), -- ID: 10 (18:00)
 
-    -- theme_id = 3 (ëª¨í—˜) - 2025-05-10 (4ê°œ ìŠ¬ë¡¯)
+    -- theme_id = 3 (¸ğÇè) - 2025-05-10 (4°³ ½½·Ô)
     ('2025-05-10', 1, 3),  -- ID: 11 (08:00)
     ('2025-05-10', 2, 3),  -- ID: 12 (12:00)
     ('2025-05-10', 3, 3),  -- ID: 13 (14:00)
     ('2025-05-10', 4, 3),  -- ID: 14 (16:00)
 
-    -- theme_id = 4 (SF) - 2025-05-11 (3ê°œ ìŠ¬ë¡¯)
+    -- theme_id = 4 (SF) - 2025-05-11 (3°³ ½½·Ô)
     ('2025-05-11', 1, 4),  -- ID: 15 (08:00)
     ('2025-05-11', 2, 4),  -- ID: 16 (12:00)
     ('2025-05-11', 3, 4),  -- ID: 17 (14:00)
 
-    -- theme_id = 5 (ê°ì„±) - 2025-05-11 (2ê°œ ìŠ¬ë¡¯)
+    -- theme_id = 5 (°¨¼º) - 2025-05-11 (2°³ ½½·Ô)
     ('2025-05-11', 1, 5),  -- ID: 18 (08:00)
     ('2025-05-11', 2, 5);  -- ID: 19 (12:00)
 
--- ì˜ˆì•½ ë°ì´í„° (Reservation) - ìˆ˜ì •ëœ ReservationSlot IDì— ë§ê²Œ ì¡°ì •
+-- ¿¹¾à µ¥ÀÌÅÍ (Reservation) - ¼öÁ¤µÈ ReservationSlot ID¿¡ ¸Â°Ô Á¶Á¤
 INSERT INTO reservations(reservation_slot_id, member_id, created_at)
 VALUES
-    -- ReservationSlot ID 1 (ë…¼ë¦¬, 5/10, 08:00) - Alice(í˜„ì¬), Bob(ëŒ€ê¸°), Carol(ëŒ€ê¸°)
+    -- ReservationSlot ID 1 (³í¸®, 5/10, 08:00) - Alice(ÇöÀç), Bob(´ë±â), Carol(´ë±â)
     (1, 3, '2025-05-09 10:00:00'),   -- Alice
     (1, 4, '2025-05-09 10:30:00'),   -- Bob
     (1, 5, '2025-05-09 11:00:00'),   -- Carol
 
-    -- ReservationSlot ID 2 (ë…¼ë¦¬, 5/10, 12:00) - Dave(í˜„ì¬), Eve(ëŒ€ê¸°)
+    -- ReservationSlot ID 2 (³í¸®, 5/10, 12:00) - Dave(ÇöÀç), Eve(´ë±â)
     (2, 6, '2025-05-09 11:30:00'),   -- Dave
     (2, 7, '2025-05-09 12:00:00'),   -- Eve
 
-    -- ReservationSlot ID 3 (ë…¼ë¦¬, 5/10, 14:00) - Frank(í˜„ì¬)
+    -- ReservationSlot ID 3 (³í¸®, 5/10, 14:00) - Frank(ÇöÀç)
     (3, 8, '2025-05-09 12:30:00'),   -- Frank
 
-    -- ReservationSlot ID 4 (ë…¼ë¦¬, 5/10, 16:00) - Grace(í˜„ì¬), Heidi(ëŒ€ê¸°)
+    -- ReservationSlot ID 4 (³í¸®, 5/10, 16:00) - Grace(ÇöÀç), Heidi(´ë±â)
     (4, 9, '2025-05-09 13:00:00'),   -- Grace
     (4, 10, '2025-05-09 13:30:00'),  -- Heidi
 
-    -- ReservationSlot ID 5 (ë…¼ë¦¬, 5/10, 18:00) - Ivan(í˜„ì¬), Judy(ëŒ€ê¸°), Mallory(ëŒ€ê¸°)
+    -- ReservationSlot ID 5 (³í¸®, 5/10, 18:00) - Ivan(ÇöÀç), Judy(´ë±â), Mallory(´ë±â)
     (5, 11, '2025-05-09 14:00:00'),  -- Ivan
     (5, 12, '2025-05-09 14:30:00'),  -- Judy
     (5, 13, '2025-05-09 15:00:00'),  -- Mallory
 
-    -- ReservationSlot ID 6 (ë¡œë§¨ìŠ¤, 5/10, 08:00) - Niaj(í˜„ì¬), Olivia(ëŒ€ê¸°)
+    -- ReservationSlot ID 6 (·Î¸Ç½º, 5/10, 08:00) - Niaj(ÇöÀç), Olivia(´ë±â)
     (6, 14, '2025-05-09 15:30:00'),  -- Niaj
     (6, 15, '2025-05-09 16:00:00'),  -- Olivia
 
-    -- ReservationSlot ID 7 (ë¡œë§¨ìŠ¤, 5/10, 12:00) - Peggy(í˜„ì¬)
+    -- ReservationSlot ID 7 (·Î¸Ç½º, 5/10, 12:00) - Peggy(ÇöÀç)
     (7, 16, '2025-05-09 16:30:00'),  -- Peggy
 
-    -- ReservationSlot ID 8 (ë¡œë§¨ìŠ¤, 5/10, 14:00) - Rupert(í˜„ì¬), Sybil(ëŒ€ê¸°)
+    -- ReservationSlot ID 8 (·Î¸Ç½º, 5/10, 14:00) - Rupert(ÇöÀç), Sybil(´ë±â)
     (8, 17, '2025-05-09 17:00:00'),  -- Rupert
     (8, 18, '2025-05-09 17:30:00'),  -- Sybil
 
-    -- ReservationSlot ID 9 (ë¡œë§¨ìŠ¤, 5/10, 16:00) - Trent(í˜„ì¬), Uma(ëŒ€ê¸°)
+    -- ReservationSlot ID 9 (·Î¸Ç½º, 5/10, 16:00) - Trent(ÇöÀç), Uma(´ë±â)
     (9, 19, '2025-05-09 18:00:00'),  -- Trent
     (9, 20, '2025-05-09 18:30:00'),  -- Uma
 
-    -- ReservationSlot ID 10 (ë¡œë§¨ìŠ¤, 5/10, 18:00) - Victor(í˜„ì¬)
+    -- ReservationSlot ID 10 (·Î¸Ç½º, 5/10, 18:00) - Victor(ÇöÀç)
     (10, 21, '2025-05-09 19:00:00'), -- Victor
 
-    -- ReservationSlot ID 11 (ëª¨í—˜, 5/10, 08:00) - Wendy(í˜„ì¬), Xander(ëŒ€ê¸°)
+    -- ReservationSlot ID 11 (¸ğÇè, 5/10, 08:00) - Wendy(ÇöÀç), Xander(´ë±â)
     (11, 22, '2025-05-09 19:30:00'), -- Wendy
     (11, 23, '2025-05-09 20:00:00'), -- Xander
 
-    -- ReservationSlot ID 12 (ëª¨í—˜, 5/10, 12:00) - Yvonne(í˜„ì¬), Zack(ëŒ€ê¸°)
+    -- ReservationSlot ID 12 (¸ğÇè, 5/10, 12:00) - Yvonne(ÇöÀç), Zack(´ë±â)
     (12, 24, '2025-05-09 20:30:00'), -- Yvonne
     (12, 25, '2025-05-09 21:00:00'), -- Zack
 
-    -- ReservationSlot ID 13 (ëª¨í—˜, 5/10, 14:00) - Amy(í˜„ì¬)
+    -- ReservationSlot ID 13 (¸ğÇè, 5/10, 14:00) - Amy(ÇöÀç)
     (13, 26, '2025-05-09 21:30:00'), -- Amy
 
-    -- ReservationSlot ID 14 (ëª¨í—˜, 5/10, 16:00) - Brian(í˜„ì¬), Chloe(ëŒ€ê¸°)
+    -- ReservationSlot ID 14 (¸ğÇè, 5/10, 16:00) - Brian(ÇöÀç), Chloe(´ë±â)
     (14, 27, '2025-05-09 22:00:00'), -- Brian
     (14, 28, '2025-05-09 22:30:00'), -- Chloe
 
-    -- 5ì›” 11ì¼ ì˜ˆì•½ë“¤
-    -- ReservationSlot ID 15 (SF, 5/11, 08:00) - Daniel(í˜„ì¬), Alice(ëŒ€ê¸°)
+    -- 5¿ù 11ÀÏ ¿¹¾àµé
+    -- ReservationSlot ID 15 (SF, 5/11, 08:00) - Daniel(ÇöÀç), Alice(´ë±â)
     (15, 29, '2025-05-10 10:00:00'), -- Daniel
-    (15, 3, '2025-05-10 10:30:00'),  -- Alice (ë‹¤ë¥¸ ì˜ˆì•½)
+    (15, 3, '2025-05-10 10:30:00'),  -- Alice (´Ù¸¥ ¿¹¾à)
 
-    -- ReservationSlot ID 16 (SF, 5/11, 12:00) - Bob(í˜„ì¬), Carol(ëŒ€ê¸°)
+    -- ReservationSlot ID 16 (SF, 5/11, 12:00) - Bob(ÇöÀç), Carol(´ë±â)
     (16, 4, '2025-05-10 11:00:00'),  -- Bob
     (16, 5, '2025-05-10 11:30:00'),  -- Carol
 
-    -- ReservationSlot ID 17 (SF, 5/11, 14:00) - Dave(í˜„ì¬), Eve(ëŒ€ê¸°), Frank(ëŒ€ê¸°)
+    -- ReservationSlot ID 17 (SF, 5/11, 14:00) - Dave(ÇöÀç), Eve(´ë±â), Frank(´ë±â)
     (17, 6, '2025-05-10 12:00:00'),  -- Dave
     (17, 7, '2025-05-10 12:30:00'),  -- Eve
     (17, 8, '2025-05-10 13:00:00'),  -- Frank
 
-    -- ReservationSlot ID 18 (ê°ì„±, 5/11, 08:00) - Grace(í˜„ì¬)
+    -- ReservationSlot ID 18 (°¨¼º, 5/11, 08:00) - Grace(ÇöÀç)
     (18, 9, '2025-05-10 13:30:00'),  -- Grace
 
-    -- ReservationSlot ID 19 (ê°ì„±, 5/11, 12:00) - Heidi(í˜„ì¬), Ivan(ëŒ€ê¸°)
+    -- ReservationSlot ID 19 (°¨¼º, 5/11, 12:00) - Heidi(ÇöÀç), Ivan(´ë±â)
     (19, 10, '2025-05-10 14:00:00'), -- Heidi
     (19, 11, '2025-05-10 14:30:00'); -- Ivan
