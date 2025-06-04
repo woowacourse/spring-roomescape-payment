@@ -11,9 +11,9 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 # Java 설치 여부 확인 함수
 is_java_installed() {
   if command -v java >/dev/null 2>&1; then
-    return 1
-  else
     return 0
+  else
+    return 1
   fi
 }
 
