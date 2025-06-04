@@ -1,5 +1,6 @@
 package roomescape.reservation.application.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -11,13 +12,27 @@ import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.waiting.domain.WaitingWithRank;
 
+@Schema(description = "내 예약 응답")
 public record MyReservationResponse(
+        @Schema(description = "예약 ID 또는 대기 ID")
         Long id,
+
+        @Schema(description = "테마 이름")
         String theme,
+
+        @Schema(description = "예약 날짜")
         LocalDate date,
+
+        @Schema(description = "예약 시간")
         LocalTime time,
+
+        @Schema(description = "예약 상태. '예약' 또는 'N번째 예약 대기'")
         String status,
+
+        @Schema(description = "결제 키. 예약이 아닌 대기일 경우 null")
         String paymentKey,
+
+        @Schema(description = "결제 금액. 예약이 아닌 대기일 경우 null")
         BigDecimal amount
 ) {
     public static final String RESERVED = "예약";
