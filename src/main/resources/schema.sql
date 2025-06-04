@@ -63,7 +63,6 @@ CREATE TABLE waiting
     member_id BIGINT,
     time_id BIGINT,
     theme_id BIGINT,
-    status VARCHAR(10) NOT NULL,
     created_at TIMESTAMP NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (time_id) REFERENCES reservation_time (id),
