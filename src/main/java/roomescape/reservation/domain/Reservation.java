@@ -105,6 +105,10 @@ public class Reservation {
         return createdAt;
     }
 
+    public String getPaymentStatusName() {
+        return paymentStatus.getName();
+    }
+
     public void changePaymentStatus(PaymentStatus paymentStatus) {
         this.paymentStatus = paymentStatus;
     }

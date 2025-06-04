@@ -61,6 +61,14 @@ function renderCombined(reservations, waitings) {
         requestDeleteWaiting(item.id).then(() => window.location.reload());
       };
       cancelCell.appendChild(cancelButton);
+    } else if (item.status.includes('결제 대기')) {
+      const payButton = document.createElement('button');
+      payButton.textContent = '결제';
+      payButton.className = 'btn btn-primary';
+      payButton.onclick = function () {
+        window.location.href = `/payment?id=${item.id}`;
+      };
+      cancelCell.appendChild(payButton);
     } else {
       cancelCell.textContent = '';
     }
