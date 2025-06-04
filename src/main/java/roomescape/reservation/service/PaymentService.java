@@ -26,4 +26,8 @@ public class PaymentService {
         return paymentRepository.findByReservationId(reservation.getId())
                 .orElseThrow(() -> new NotFoundException("결제 정보를 찾을 수 없습니다."));
     }
+
+    public boolean existsByReservation(Reservation reservation) {
+        return paymentRepository.existsByReservationId(reservation.getId());
+    }
 }

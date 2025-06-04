@@ -113,8 +113,11 @@ public class ReservationService {
         List<Reservation> reservations = reservationRepository.findAllByMember(member);
         return reservations.stream()
                 .map(reservation -> {
-                    Payment payment = paymentService.findByReservation(reservation);
-                    return ReservationByMemberResponse.from(reservation, payment);
+                    if (paymentService.existsByReservation(reservation)) {
+                        Payment payment = paymentService.findByReservation(reservation);
+                        return ReservationByMemberResponse.of(reservation, payment);
+                    }
+                    return ReservationByMemberResponse.from(reservation);
                 })
                 .toList();
     }

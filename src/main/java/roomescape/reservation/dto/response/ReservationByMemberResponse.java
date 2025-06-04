@@ -16,23 +16,7 @@ public record ReservationByMemberResponse(
         String paymentKey,
         Long amount
 ) {
-//    public static List<ReservationByMemberResponse> of(List<Reservation> reservations,
-//                                                       List<WaitingWithRank> waitingWithRanks) {
-//        List<ReservationByMemberResponse> responsesByReservation = reservations.stream()
-//                .map(ReservationByMemberResponse::from)
-//                .toList();
-//
-//        List<ReservationByMemberResponse> responsesByWaiting = waitingWithRanks.stream()
-//                .map(ReservationByMemberResponse::from)
-//                .toList();
-//
-//        List<ReservationByMemberResponse> responses = new ArrayList<>();
-//        responses.addAll(responsesByReservation);
-//        responses.addAll(responsesByWaiting);
-//        return responses;
-//    }
-
-    public static ReservationByMemberResponse from(Reservation reservation, Payment payment) {
+    public static ReservationByMemberResponse of(Reservation reservation, Payment payment) {
         return new ReservationByMemberResponse(
                 reservation.getId(),
                 reservation.getReservationSlot().getTheme().getName(),
@@ -41,6 +25,18 @@ public record ReservationByMemberResponse(
                 "예약",
                 payment.getPaymentKey(),
                 payment.getAmount()
+        );
+    }
+
+    public static ReservationByMemberResponse from(Reservation reservation) {
+        return new ReservationByMemberResponse(
+                reservation.getId(),
+                reservation.getReservationSlot().getTheme().getName(),
+                reservation.getReservationSlot().getDate(),
+                reservation.getReservationSlot().getTime().getStartAt(),
+                "예약",
+                "",
+                0L
         );
     }
 
