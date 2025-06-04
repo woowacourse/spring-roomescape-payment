@@ -1,27 +1,47 @@
 package roomescape.reservation.dto.response;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Optional;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.repository.dto.ReservationWithPayment;
 
 public record MyReservationResponse(Long reservationId,
                                     String theme,
-                                    String date,
-                                    String time,
-                                    String reservedStatus) {
+                                    LocalDate date,
+                                    LocalTime time,
+                                    String reservedStatus,
+                                    String paymentKey,
+                                    Integer amount) {
 
     public static MyReservationResponse from(final WaitingWithRank waitingWithRank) {
-        return new MyReservationResponse(waitingWithRank.getWaiting().getId(),
-                waitingWithRank.getWaiting().getInfo().getTheme().getName(),
-                waitingWithRank.getWaiting().getInfo().getDate().toString(),
-                waitingWithRank.getWaiting().getInfo().getTime().getStartAt().toString(),
-                waitingWithRank.getRank() + "번째 " + ReservationStatus.WAITING.getName());
+        return new MyReservationResponse(waitingWithRank.getWaitingId(),
+                waitingWithRank.getThemeName(),
+                waitingWithRank.getDate(),
+                waitingWithRank.getStartAt(),
+                waitingWithRank.getRank() + "번째 " + ReservationStatus.WAITING.getName(),
+                null,
+                null);
     }
 
+    public static MyReservationResponse from(final ReservationWithPayment reservationWithPayment) {
+        Reservation reservation = reservationWithPayment.getReservation();
+        Optional<Payment> findPayment = reservationWithPayment.getPayment();
+        String paymentKey = null;
+        Integer amount = null;
+        if (findPayment.isPresent()) {
+            Payment payment = findPayment.get();
+            paymentKey = payment.getPaymentKey();
+            amount = payment.getAmount();
+        }
 
-    public static MyReservationResponse from(final Reservation reservation) {
-        return new MyReservationResponse(reservation.getId(), reservation.getInfo().getTheme().getName(),
-                reservation.getInfo().getDate().toString(),
-                reservation.getInfo().getTime().getStartAt().toString(),
-                ReservationStatus.RESERVED.getName());
+        return new MyReservationResponse(reservation.getId(), reservation.getThemeName(),
+                reservation.getDate(),
+                reservation.getStartAt(),
+                ReservationStatus.RESERVED.getName(),
+                paymentKey,
+                amount);
     }
 }
