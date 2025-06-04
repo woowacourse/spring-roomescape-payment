@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.infrastructure.dto.TossPaymentErrorResponse;
 import roomescape.payment.infrastructure.dto.TossPaymentRequest;
@@ -40,9 +41,9 @@ public class TossPaymentClient implements PaymentClient {
                 .onStatus(
                         status -> status.value() != 200,
                         (req, res) -> {
-                                InputStream body = res.getBody();
-                                TossPaymentErrorResponse errorResponse = objectMapper.readValue(body, TossPaymentErrorResponse.class);
-                                throw new PaymentException(errorResponse, res.getStatusCode(), tossPaymentRequest.getOrderId());
+                            InputStream body = res.getBody();
+                            TossPaymentErrorResponse errorResponse = objectMapper.readValue(body, TossPaymentErrorResponse.class);
+                            handleErrorResponse(res.getStatusCode(), errorResponse);
                         }
                 )
                 .body(TossPaymentResponse.class);
@@ -52,5 +53,12 @@ public class TossPaymentClient implements PaymentClient {
         String credentials = this.SECRET_KEY + ":";
         String base64Credentials = Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
         return "Basic " + base64Credentials;
+    }
+
+    private void handleErrorResponse(HttpStatusCode statusCode, TossPaymentErrorResponse errorResponse) {
+        if (TossPaymentErrorMessage.contains(errorResponse.getCode())) {
+            throw new PaymentException(statusCode, "시스템 오류로 인해 결제가 실패하였습니다. 고객센터에 문의해주세요.");
+        }
+        throw new PaymentException(statusCode, errorResponse.getMessage());
     }
 }

@@ -1,7 +1,6 @@
 package roomescape.global.exception;
 
 import io.jsonwebtoken.JwtException;
-import java.net.SocketTimeoutException;
 import java.time.DateTimeException;
 import java.time.format.DateTimeParseException;
 import java.util.NoSuchElementException;
@@ -24,10 +23,9 @@ public class ExceptionController {
 
     @ExceptionHandler(PaymentException.class)
     public ResponseEntity<PaymentErrorResponse> handlePaymentException(PaymentException e) {
-        return ResponseEntity.status(e.getCode()).body(new PaymentErrorResponse(
-                e.getCode().toString(),
-                e.getMessage(),
-                e.getOrderId()
+        return ResponseEntity.status(e.getStatusCode()).body(new PaymentErrorResponse(
+                e.getStatusCode().toString(),
+                e.getMessage()
         ));
     }
 
@@ -35,8 +33,7 @@ public class ExceptionController {
     public ResponseEntity<PaymentErrorResponse> handleResourceAccessException(ResourceAccessException e) {
         return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).body(new PaymentErrorResponse(
                 HttpStatus.GATEWAY_TIMEOUT.toString(),
-                e.getMessage(),
-                null
+                e.getMessage()
         ));
     }
 
