@@ -1,12 +1,11 @@
 package roomescape.controller.user;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import roomescape.controller.api.MemberReservationApi;
 import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.request.ReservationPendingRequest;
 import roomescape.dto.request.ReservationRequest;
@@ -18,15 +17,14 @@ import roomescape.service.reservation.ReservingService;
 
 import java.util.List;
 
-@Tag(name = "1. 예약 관련 API")
 @RequiredArgsConstructor
 @RestController
-public class ReservationController {
+public class ReservationController implements MemberReservationApi {
 
     private final ReservationService reservationService;
     private final ReservingService reservingService;
 
-    @Operation(summary = "결제 승인 및 예약")
+    @Override
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> reserve(
             @RequestBody @Valid ReservationRequest request,
@@ -36,7 +34,7 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Operation(summary = "예약 대기")
+    @Override
     @PostMapping("/reservations/pending")
     public ResponseEntity<ReservationResponse> addPending(
             @RequestBody @Valid ReservationPendingRequest request,
@@ -47,14 +45,14 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Operation(summary = "내 예약 조회")
+    @Override
     @GetMapping("/reservations")
     public ResponseEntity<List<MyPageReservationResponse>> getMines(LoginInfo loginInfo) {
         List<MyPageReservationResponse> response = reservationService.getAllBy(loginInfo.memberId());
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "내 예약 삭제")
+    @Override
     @DeleteMapping("/reservations/{reservationId}")
     public ResponseEntity<Void> remove(@PathVariable long reservationId) {
         reservationService.remove(reservationId);
