@@ -31,4 +31,4 @@ host: localhost:8080
 ## 2단계 - 내 예약 페이지 변경
 - [ ] 내 예약 페이지에서 예약 정보 외에 결제 정보도 함께 볼 수 있도록 수정한다.
 - [ ] 필수로 확인할 수 있어야 하는 결제 정보는 `paymentKey`, 결제 금액이다.
-- [ ] 클라이언트 코드를 수정한다. [2단계 클라이언트 코드 커밋](https://github.com/woowacourse/spring-roomescape-member/commit/38b69424e37d267e555f2efed2de148d94b637ce)
+- [x] 클라이언트 코드를 수정한다. [2단계 클라이언트 코드 커밋](https://github.com/woowacourse/spring-roomescape-member/commit/38b69424e37d267e555f2efed2de148d94b637ce)
