@@ -1,5 +1,8 @@
 package roomescape.admin.controller;
 
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+import static org.mockito.Mockito.when;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
@@ -17,9 +20,6 @@ import roomescape.payment.processor.toss.TossPaymentConfirmResponse;
 import roomescape.payment.processor.toss.TossPaymentProcessor;
 import roomescape.reservation.dto.TossPaymentRequest;
 
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.mockito.Mockito.when;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @Sql("classpath:data.sql")
@@ -33,9 +33,9 @@ class AdminRestControllerTest {
     @BeforeEach
     void setUp() {
         adminToken = RestAssured.given()
-                .contentType(ContentType.JSON)
-                .body(Map.of("email", "yebink@email.com", "password", "1234"))
-                .when().post("/login").getCookie("token");
+            .contentType(ContentType.JSON)
+            .body(Map.of("email", "yebink@email.com", "password", "1234"))
+            .when().post("/login").getCookie("token");
     }
 
     @Test
@@ -49,64 +49,64 @@ class AdminRestControllerTest {
 
         // when & then
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", adminToken)
-                .body(params)
-                .when().post("/admin/reservations")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value());
+            .contentType(ContentType.JSON)
+            .cookie("token", adminToken)
+            .body(params)
+            .when().post("/admin/reservations")
+            .then().log().all()
+            .statusCode(HttpStatus.CREATED.value());
     }
 
     @Test
     void 어드민이_조건에_맞는_예약을_조회한다() {
         // given
         final String adminToken = RestAssured.given()
-                .contentType(ContentType.JSON)
-                .body(Map.of("email", "yebink@email.com", "password", "1234"))
-                .when().post("/login").getCookie("token");
+            .contentType(ContentType.JSON)
+            .body(Map.of("email", "yebink@email.com", "password", "1234"))
+            .when().post("/login").getCookie("token");
 
         final String dateFrom = LocalDate.now().minusDays(1).toString();
         final String dateTo = LocalDate.now().plusDays(1).toString();
 
         // when & then
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", adminToken)
-                .queryParam("themeId", 1)
-                .queryParam("memberId", 1)
-                .queryParam("dateFrom", dateFrom)
-                .queryParam("dateTo", dateTo)
-                .when().get("/admin/searchable-reservations")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .body("size()", greaterThanOrEqualTo(0));
+            .contentType(ContentType.JSON)
+            .cookie("token", adminToken)
+            .queryParam("themeId", 1)
+            .queryParam("memberId", 1)
+            .queryParam("dateFrom", dateFrom)
+            .queryParam("dateTo", dateTo)
+            .when().get("/admin/searchable-reservations")
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .body("size()", greaterThanOrEqualTo(0));
     }
 
     @Test
     void 어드민이_대기_정보를_조회한다() {
         // given
         final String adminToken = RestAssured.given()
-                .contentType(ContentType.JSON)
-                .body(Map.of("email", "yebink@email.com", "password", "1234"))
-                .when().post("/login").getCookie("token");
+            .contentType(ContentType.JSON)
+            .body(Map.of("email", "yebink@email.com", "password", "1234"))
+            .when().post("/login").getCookie("token");
 
         // when & then
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", adminToken)
-                .when().get("/admin/waitings")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .body("size()", greaterThanOrEqualTo(0));
+            .contentType(ContentType.JSON)
+            .cookie("token", adminToken)
+            .when().get("/admin/waitings")
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .body("size()", greaterThanOrEqualTo(0));
     }
 
     @Test
     void 어드민이_대기_거절한다() {
         // given
         final String adminToken = RestAssured.given()
-                .contentType(ContentType.JSON)
-                .body(Map.of("email", "yebink@email.com", "password", "1234"))
-                .when().post("/login").getCookie("token");
+            .contentType(ContentType.JSON)
+            .body(Map.of("email", "yebink@email.com", "password", "1234"))
+            .when().post("/login").getCookie("token");
 
         final TossPaymentRequest tossPaymentRequest = new TossPaymentRequest("paymentKey", "orderId", 10000);
         final TossPaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(
@@ -125,38 +125,38 @@ class AdminRestControllerTest {
         final Map<String, String> waitingParams = createWaitingRequestJsonMap("2026-04-15", "1", "1");
 
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", adminToken)
-                .body(reservationParams)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value());
+            .contentType(ContentType.JSON)
+            .cookie("token", adminToken)
+            .body(reservationParams)
+            .when().post("/reservations")
+            .then().log().all()
+            .statusCode(HttpStatus.CREATED.value());
 
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", adminToken)
-                .body(waitingParams)
-                .when().post("/reservations/waitings")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value());
+            .contentType(ContentType.JSON)
+            .cookie("token", adminToken)
+            .body(waitingParams)
+            .when().post("/reservations/waitings")
+            .then().log().all()
+            .statusCode(HttpStatus.CREATED.value());
 
         // when & then
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", adminToken)
-                .when().delete("/admin/waitings/1")
-                .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+            .contentType(ContentType.JSON)
+            .cookie("token", adminToken)
+            .when().delete("/admin/waitings/1")
+            .then().log().all()
+            .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
     private Map<String, String> createWaitingRequestJsonMap(
-            final String date,
-            final String theme,
-            final String time) {
+        final String date,
+        final String theme,
+        final String time) {
         return Map.of(
-                "date", date,
-                "theme", theme,
-                "time", time
+            "date", date,
+            "theme", theme,
+            "time", time
         );
     }
 

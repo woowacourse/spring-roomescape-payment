@@ -33,10 +33,10 @@ public class ReservationWaitingServiceTest {
     private final MemberRepositoryInterface memberRepository = new FakeMemberRepository();
     private final WaitingRepositoryInterface waitingRepository = new FakeWaitingRepository();
     private final ReservationWaitingService reservationWaitingService = new ReservationWaitingService(
-            reservationRepository,
-            reservationTimeRepository,
-            themeRepository,
-            waitingRepository
+        reservationRepository,
+        reservationTimeRepository,
+        themeRepository,
+        waitingRepository
     );
 
     @Test
@@ -53,14 +53,14 @@ public class ReservationWaitingServiceTest {
         final Theme savedTheme = themeRepository.save(new Theme(themeName, description, thumbnail));
 
         reservationRepository.save(
-                new Reservation(savedMember, date, savedTime, savedTheme)
+            new Reservation(savedMember, date, savedTime, savedTheme)
         );
         //when
         final Waiting savedWaiting = reservationWaitingService.createWaitingReservation(
-                savedMember,
-                date,
-                savedTime.getId(),
-                savedTheme.getId()
+            savedMember,
+            date,
+            savedTime.getId(),
+            savedTheme.getId()
         );
 
         //then
@@ -82,9 +82,9 @@ public class ReservationWaitingServiceTest {
 
         //when & then
         Assertions.assertThatThrownBy(
-                        () -> reservationWaitingService.createWaitingReservation(savedMember, date, savedTime.getId(),
-                                savedTheme.getId()))
-                .isInstanceOf(WaitingNotAllowedException.class);
+                () -> reservationWaitingService.createWaitingReservation(savedMember, date, savedTime.getId(),
+                    savedTheme.getId()))
+            .isInstanceOf(WaitingNotAllowedException.class);
     }
 
     @Test
@@ -129,7 +129,7 @@ public class ReservationWaitingServiceTest {
 
         // then
         Assertions.assertThat(waitingRepository.findByMember(savedMember))
-                .doesNotContain(savedWaiting);
+            .doesNotContain(savedWaiting);
     }
 
     @Test
@@ -137,7 +137,7 @@ public class ReservationWaitingServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> reservationWaitingService.deleteWaitingById(Long.MAX_VALUE))
-                .isInstanceOf(DataNotFoundException.class);
+            .isInstanceOf(DataNotFoundException.class);
     }
 
     @Test

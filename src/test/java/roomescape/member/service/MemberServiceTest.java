@@ -1,5 +1,7 @@
 package roomescape.member.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -8,8 +10,6 @@ import roomescape.fake.FakeMemberRepository;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepositoryInterface;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class MemberServiceTest {
 
@@ -34,7 +34,7 @@ public class MemberServiceTest {
 
         //when & then
         Assertions.assertThatThrownBy(
-                () -> memberService.findMemberByEmail(email)
+            () -> memberService.findMemberByEmail(email)
         ).isInstanceOf(DataNotFoundException.class);
     }
 

@@ -18,12 +18,12 @@ class ReservationTimeServiceTest {
 
     @ParameterizedTest
     @CsvSource(value = {
-            "20:00", "22:00"
+        "20:00", "22:00"
     })
     void 예약시간을_추가한다(final LocalTime startAt) {
         // when & then
         Assertions.assertThatCode(() -> reservationTime.save(startAt))
-                .doesNotThrowAnyException();
+            .doesNotThrowAnyException();
     }
 
     @Test
@@ -34,7 +34,7 @@ class ReservationTimeServiceTest {
 
         // when & then
         Assertions.assertThatCode(() -> reservationTime.deleteById(savedReservationTime.getId()))
-                .doesNotThrowAnyException();
+            .doesNotThrowAnyException();
     }
 
     @Test
@@ -45,6 +45,6 @@ class ReservationTimeServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> reservationTime.save(startAt))
-                .isInstanceOf(DataExistException.class);
+            .isInstanceOf(DataExistException.class);
     }
 }

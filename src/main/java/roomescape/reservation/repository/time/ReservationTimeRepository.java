@@ -21,7 +21,7 @@ public class ReservationTimeRepository implements ReservationTimeRepositoryInter
     @Override
     public ReservationTime findById(Long id) {
         return jpaReservationTimeRepository.findById(id)
-                .orElseThrow(() -> new DataNotFoundException("해당 예약 시간 데이터가 존재하지 않습니다. id = " + id));
+            .orElseThrow(() -> new DataNotFoundException("해당 예약 시간 데이터가 존재하지 않습니다. id = " + id));
     }
 
     @Override

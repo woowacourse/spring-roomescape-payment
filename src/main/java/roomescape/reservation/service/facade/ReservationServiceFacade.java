@@ -61,11 +61,11 @@ public class ReservationServiceFacade {
         final List<Waiting> waitings = reservationWaitingService.findWaitingByMember(member);
 
         return Stream.concat(
-                reservations.stream().map(ReservationMineResponse::from),
-                waitings.stream().map(waiting -> {
-                    final long rank = reservationWaitingService.getRankInWaiting(waiting);
-                    return ReservationMineResponse.from(waiting, rank);
-                })
+            reservations.stream().map(ReservationMineResponse::from),
+            waitings.stream().map(waiting -> {
+                final long rank = reservationWaitingService.getRankInWaiting(waiting);
+                return ReservationMineResponse.from(waiting, rank);
+            })
         ).toList();
     }
 
@@ -91,8 +91,8 @@ public class ReservationServiceFacade {
         final List<Reservation> reservations = reservationService.findAll();
 
         return reservations.stream()
-                .map(CreateReservationResponse::from)
-                .toList();
+            .map(CreateReservationResponse::from)
+            .toList();
     }
 
     @Transactional(readOnly = true)
@@ -102,12 +102,12 @@ public class ReservationServiceFacade {
         final Long themeId = request.themeId();
 
         return reservationService.findAvailableReservationTimes(date, themeId)
-                .stream()
-                .map(availableReservationTime -> new AvailableReservationTimeResponse(
-                        availableReservationTime.id(),
-                        availableReservationTime.startAt(),
-                        availableReservationTime.alreadyBooked()
-                ))
-                .toList();
+            .stream()
+            .map(availableReservationTime -> new AvailableReservationTimeResponse(
+                availableReservationTime.id(),
+                availableReservationTime.startAt(),
+                availableReservationTime.alreadyBooked()
+            ))
+            .toList();
     }
 }

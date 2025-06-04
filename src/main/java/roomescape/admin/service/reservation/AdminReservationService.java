@@ -50,7 +50,7 @@ public class AdminReservationService {
 
     private Member findMemberById(final Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new DataNotFoundException("해당 회원 데이터가 존재하지 않습니다. id = " + memberId));
+            .orElseThrow(() -> new DataNotFoundException("해당 회원 데이터가 존재하지 않습니다. id = " + memberId));
     }
 
     private void validateExistReservation(final LocalDate date, final ReservationTime reservationTime,

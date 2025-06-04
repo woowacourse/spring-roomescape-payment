@@ -139,8 +139,8 @@ public class JpaWaitingRepositoryTest {
 
         // when
         final Waiting foundWaiting = jpaWaitingRepository.findFirstByThemeAndDateAndTimeOrderByIdAsc(theme, date,
-                        reservationTime)
-                .orElseThrow();
+                reservationTime)
+            .orElseThrow();
 
         // then
         Assertions.assertThat(foundWaiting).isEqualTo(savedWaiting);

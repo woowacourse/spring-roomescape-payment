@@ -23,8 +23,8 @@ public class FakeMemberRepository implements MemberRepositoryInterface {
     @Override
     public Optional<Member> findByEmail(final String email) {
         return members.values().stream()
-                .filter(member -> member.getEmail().equals(email))
-                .findFirst();
+            .filter(member -> member.getEmail().equals(email))
+            .findFirst();
     }
 
     @Override
@@ -35,15 +35,15 @@ public class FakeMemberRepository implements MemberRepositoryInterface {
     @Override
     public Optional<String> findNameByEmail(final String email) {
         return members.values().stream()
-                .filter(member -> member.getEmail().equals(email))
-                .map(Member::getName)
-                .findFirst();
+            .filter(member -> member.getEmail().equals(email))
+            .map(Member::getName)
+            .findFirst();
     }
 
     @Override
     public boolean existsByEmailAndPassword(final String email, final String password) {
         return members.values().stream()
-                .anyMatch(member -> member.getEmail().equals(email) && member.getPassword().equals(password));
+            .anyMatch(member -> member.getEmail().equals(email) && member.getPassword().equals(password));
     }
 
     @Override

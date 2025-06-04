@@ -50,15 +50,15 @@ public class ReservationService {
 
         if (waitingRepository.existsByDateAndTimeAndTheme(date, time, theme)) {
             waitingRepository.findFirstByThemeAndDateAndTimeOrderByIdAsc(theme, date, time)
-                    .ifPresent(waiting -> {
-                        reservationRepository.save(new Reservation(
-                                waiting.getMember(),
-                                waiting.getDate(),
-                                waiting.getTime(),
-                                waiting.getTheme()
-                        ));
-                        waitingRepository.deleteById(waiting.getId());
-                    });
+                .ifPresent(waiting -> {
+                    reservationRepository.save(new Reservation(
+                        waiting.getMember(),
+                        waiting.getDate(),
+                        waiting.getTime(),
+                        waiting.getTheme()
+                    ));
+                    waitingRepository.deleteById(waiting.getId());
+                });
         }
 
         reservationRepository.deleteById(id);
@@ -78,9 +78,9 @@ public class ReservationService {
         for (ReservationTime reservationTime : reservationTimes) {
             reservationRepository.existsByDateAndTimeAndTheme(date, reservationTime, theme);
             availableReservationTimes.add(new AvailableReservationTime(
-                    reservationTime.getId(),
-                    reservationTime.getStartAt(),
-                    reservationRepository.existsByDateAndTimeAndTheme(date, reservationTime, theme))
+                reservationTime.getId(),
+                reservationTime.getStartAt(),
+                reservationRepository.existsByDateAndTimeAndTheme(date, reservationTime, theme))
             );
         }
 

@@ -22,7 +22,7 @@ public class AuthService {
         final String payload = jwtTokenProvider.getPayload(token);
 
         return memberRepository.findNameByEmail(payload)
-                .orElseThrow(() -> new DataNotFoundException("해당 회원 데이터가 존재하지 않습니다. email = " + payload));
+            .orElseThrow(() -> new DataNotFoundException("해당 회원 데이터가 존재하지 않습니다. email = " + payload));
     }
 
     @Transactional
@@ -38,7 +38,7 @@ public class AuthService {
     public void validateAdminByToken(final String token) {
         final String email = jwtTokenProvider.getPayload(token);
         final Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new DataNotFoundException("회원 정보가 없습니다."));
+            .orElseThrow(() -> new DataNotFoundException("회원 정보가 없습니다."));
 
         if (member.getRole() != Role.ADMIN) {
             throw new AccessDeniedException("관리자만 접근 가능합니다.");

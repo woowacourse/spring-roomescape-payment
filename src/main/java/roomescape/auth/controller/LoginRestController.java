@@ -25,13 +25,13 @@ public class LoginRestController {
 
     @PostMapping
     public ResponseEntity<LoginResponse> login(
-            @RequestBody final LoginRequest loginRequest,
-            final HttpServletResponse response
+        @RequestBody final LoginRequest loginRequest,
+        final HttpServletResponse response
     ) {
 
         final String accessToken = authService.createToken(
-                loginRequest.email(),
-                loginRequest.password()
+            loginRequest.email(),
+            loginRequest.password()
         );
 
         final Cookie cookie = new Cookie("token", accessToken);
@@ -45,7 +45,7 @@ public class LoginRestController {
 
     @GetMapping("/check")
     public ResponseEntity<LoginCheckResponse> checkLogin(
-            final HttpServletRequest request
+        final HttpServletRequest request
     ) {
 
         final Cookie[] cookies = request.getCookies();

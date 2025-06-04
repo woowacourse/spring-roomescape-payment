@@ -16,7 +16,7 @@ class ReservationTimeTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> new ReservationTime(time))
-                .isInstanceOf(ReservationException.class);
+            .isInstanceOf(ReservationException.class);
     }
 
     @ParameterizedTest
@@ -24,6 +24,6 @@ class ReservationTimeTest {
     void 영업시간이_아니면_예외가_발생한다(final LocalTime time) {
         // when & then
         Assertions.assertThatThrownBy(() -> new ReservationTime(time))
-                .isInstanceOf(ReservationException.class);
+            .isInstanceOf(ReservationException.class);
     }
 }

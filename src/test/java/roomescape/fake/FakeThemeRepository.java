@@ -15,7 +15,7 @@ public class FakeThemeRepository implements ThemeRepositoryInterface {
     @Override
     public boolean existsByName(final String name) {
         return themes.values().stream()
-                .anyMatch(theme -> theme.getName().equals(name));
+            .anyMatch(theme -> theme.getName().equals(name));
     }
 
     @Override

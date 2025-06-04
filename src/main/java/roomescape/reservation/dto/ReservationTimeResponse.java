@@ -5,14 +5,14 @@ import java.time.LocalTime;
 import roomescape.reservation.domain.ReservationTime;
 
 public record ReservationTimeResponse(
-        Long id,
-        @JsonFormat(pattern = "HH:mm") LocalTime startAt
+    Long id,
+    @JsonFormat(pattern = "HH:mm") LocalTime startAt
 ) {
 
     public static ReservationTimeResponse from(ReservationTime reservationTime) {
         return new ReservationTimeResponse(
-                reservationTime.getId(),
-                reservationTime.getStartAt()
+            reservationTime.getId(),
+            reservationTime.getStartAt()
         );
     }
 }

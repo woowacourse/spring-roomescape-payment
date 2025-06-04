@@ -1,5 +1,7 @@
 package roomescape.reservation.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -16,8 +18,6 @@ import roomescape.reservation.repository.reservation.JpaReservationRepository;
 import roomescape.reservation.repository.time.JpaReservationTimeRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 class JpaReservationRepositoryTest {
@@ -71,7 +71,7 @@ class JpaReservationRepositoryTest {
 
         // when
         final Reservation foundReservation = jpaReservationRepository.findById(savedReservation.getId())
-                .orElseThrow(IllegalArgumentException::new);
+            .orElseThrow(IllegalArgumentException::new);
 
         // then
         assertThat(foundReservation.getId()).isEqualTo(savedReservation.getId());
@@ -112,7 +112,7 @@ class JpaReservationRepositoryTest {
 
         // when
         final boolean exists = jpaReservationRepository.existsByDateAndTimeAndTheme(
-                LocalDate.of(2025, 12, 25), reservationTime, theme);
+            LocalDate.of(2025, 12, 25), reservationTime, theme);
 
         // then
         assertThat(exists).isTrue();
@@ -133,7 +133,7 @@ class JpaReservationRepositoryTest {
 
         // when
         final boolean exists = jpaReservationRepository.existsByDateAndTimeAndTheme(
-                LocalDate.of(2025, 11, 25), reservationTime, theme);
+            LocalDate.of(2025, 11, 25), reservationTime, theme);
 
         // then
         assertThat(exists).isFalse();
@@ -156,7 +156,7 @@ class JpaReservationRepositoryTest {
 
         // when
         final List<Reservation> reservations = jpaReservationRepository.findByThemeAndMemberAndDateBetween(
-                theme, member, LocalDate.of(2025, 12, 24), LocalDate.of(2025, 12, 27)
+            theme, member, LocalDate.of(2025, 12, 24), LocalDate.of(2025, 12, 27)
         );
 
         // then
@@ -188,7 +188,7 @@ class JpaReservationRepositoryTest {
 
         // when
         final List<Theme> popularThemes = jpaReservationRepository.findPopularThemesByReservationBetween(
-                LocalDate.of(2025, 12, 19), LocalDate.of(2025, 12, 26), PageRequest.of(0, 1));
+            LocalDate.of(2025, 12, 19), LocalDate.of(2025, 12, 26), PageRequest.of(0, 1));
 
         // then
         assertThat(popularThemes).containsExactly(theme2);

@@ -15,9 +15,9 @@ public class AdminRoleInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(
-            final HttpServletRequest request,
-            final HttpServletResponse response,
-            final Object handler) throws Exception {
+        final HttpServletRequest request,
+        final HttpServletResponse response,
+        final Object handler) throws Exception {
 
         final String token = extractTokenFromCookies(request.getCookies());
         authService.validateAdminByToken(token);

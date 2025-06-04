@@ -17,8 +17,8 @@ public class PaymentProcessorConfig {
     private final String secretKey;
 
     public PaymentProcessorConfig(
-            @Value("${payment.toss.secret-key}") final String secretKey,
-            final ObjectMapper objectMapper
+        @Value("${payment.toss.secret-key}") final String secretKey,
+        final ObjectMapper objectMapper
     ) {
         this.objectMapper = objectMapper;
         this.secretKey = secretKey;

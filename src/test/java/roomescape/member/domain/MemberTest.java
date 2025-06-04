@@ -76,12 +76,12 @@ public class MemberTest {
 
     @ParameterizedTest
     @CsvSource(value = {
-            "woogaemail.com",
-            "wooga+@.com",
-            "@wooga.com",
-            "wooga@wooga",
-            "wooga@wooga.",
-            "wooga@wooga.c"
+        "woogaemail.com",
+        "wooga+@.com",
+        "@wooga.com",
+        "wooga@wooga",
+        "wooga@wooga.",
+        "wooga@wooga.c"
     }, delimiter = ',')
     void 이메일_형식이_올바르지_않으면_예외가_발생한다(final String email) {
         // when & then

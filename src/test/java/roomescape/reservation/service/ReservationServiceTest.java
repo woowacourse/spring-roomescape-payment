@@ -1,5 +1,7 @@
 package roomescape.reservation.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -26,8 +28,6 @@ import roomescape.reservation.service.reservation.ReservationService;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepositoryInterface;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 class ReservationServiceTest {
 
     private final ReservationRepositoryInterface reservationRepository = new FakeReservationRepository();
@@ -36,10 +36,10 @@ class ReservationServiceTest {
     private final MemberRepositoryInterface memberRepository = new FakeMemberRepository();
     private final WaitingRepositoryInterface waitingRepository = new FakeWaitingRepository();
     private final ReservationService reservationService = new ReservationService(
-            reservationRepository,
-            reservationTimeRepository,
-            themeRepository,
-            waitingRepository
+        reservationRepository,
+        reservationTimeRepository,
+        themeRepository,
+        waitingRepository
     );
 
     @Test
@@ -63,21 +63,21 @@ class ReservationServiceTest {
         final ReservationTime savedReservationTime2 = reservationTimeRepository.save(new ReservationTime(time2));
 
         reservationRepository.save(
-                new Reservation(
-                        savedMember,
-                        date,
-                        savedReservationTime1,
-                        savedTheme
-                )
+            new Reservation(
+                savedMember,
+                date,
+                savedReservationTime1,
+                savedTheme
+            )
         );
 
         reservationRepository.save(
-                new Reservation(
-                        savedMember2,
-                        date2,
-                        savedReservationTime2,
-                        savedTheme
-                )
+            new Reservation(
+                savedMember2,
+                date2,
+                savedReservationTime2,
+                savedTheme
+            )
         );
 
         // when
@@ -103,8 +103,8 @@ class ReservationServiceTest {
 
         // when & then
         Assertions.assertThatCode(
-                        () -> reservationService.save(savedMember, date, savedTime.getId(), savedTheme.getId()))
-                .doesNotThrowAnyException();
+                () -> reservationService.save(savedMember, date, savedTime.getId(), savedTheme.getId()))
+            .doesNotThrowAnyException();
     }
 
     @Test
@@ -122,15 +122,15 @@ class ReservationServiceTest {
         final Theme savedTheme = themeRepository.save(new Theme(themeName, description, thumbnail));
 
         final Reservation savedReservation = reservationRepository.save(new Reservation(
-                savedMember,
-                date,
-                savedTime,
-                savedTheme
+            savedMember,
+            date,
+            savedTime,
+            savedTheme
         ));
 
         // when & then
         Assertions.assertThatCode(() -> reservationService.deleteById(savedReservation.getId()))
-                .doesNotThrowAnyException();
+            .doesNotThrowAnyException();
     }
 
     @Test
@@ -150,17 +150,17 @@ class ReservationServiceTest {
         final Theme savedTheme = themeRepository.save(new Theme(themeName, description, thumbnail));
 
         final Reservation savedReservation = reservationRepository.save(new Reservation(
-                savedMember,
-                date,
-                savedTime,
-                savedTheme
+            savedMember,
+            date,
+            savedTime,
+            savedTheme
         ));
 
         waitingRepository.save(new Waiting(
-                savedMember2,
-                savedTime,
-                savedTheme,
-                date
+            savedMember2,
+            savedTime,
+            savedTheme,
+            date
         ));
 
         // when
@@ -168,7 +168,7 @@ class ReservationServiceTest {
 
         // then
         Assertions.assertThat(reservationRepository.findByMember(savedMember2).getFirst().getMember())
-                .isEqualTo(savedMember2);
+            .isEqualTo(savedMember2);
     }
 
     @Test
@@ -186,10 +186,10 @@ class ReservationServiceTest {
         final Theme savedTheme = themeRepository.save(new Theme(themeName, description, thumbnail));
 
         reservationRepository.save(new Reservation(
-                savedMember,
-                date,
-                savedTime,
-                savedTheme
+            savedMember,
+            date,
+            savedTime,
+            savedTheme
         ));
 
         final LocalTime time2 = LocalTime.parse("21:00");
@@ -197,10 +197,10 @@ class ReservationServiceTest {
 
         // when
         final long count =
-                reservationService.findAvailableReservationTimes(date, savedTheme.getId())
-                        .stream()
-                        .filter(AvailableReservationTime::alreadyBooked)
-                        .count();
+            reservationService.findAvailableReservationTimes(date, savedTheme.getId())
+                .stream()
+                .filter(AvailableReservationTime::alreadyBooked)
+                .count();
 
         // then
         assertThat(count).isEqualTo(1);
@@ -222,8 +222,8 @@ class ReservationServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(
-                        () -> reservationService.save(member, date, savedTime.getId(), savedTheme.getId()))
-                .isInstanceOf(PastDateException.class);
+                () -> reservationService.save(member, date, savedTime.getId(), savedTheme.getId()))
+            .isInstanceOf(PastDateException.class);
     }
 
     @Test
@@ -241,18 +241,18 @@ class ReservationServiceTest {
         final Theme savedTheme = themeRepository.save(new Theme(themeName, description, thumbnail));
 
         reservationRepository.save(
-                new Reservation(
-                        member,
-                        date,
-                        savedTime,
-                        savedTheme
-                )
+            new Reservation(
+                member,
+                date,
+                savedTime,
+                savedTheme
+            )
         );
 
         // when & then
         Assertions.assertThatThrownBy(
-                        () -> reservationService.save(member, date, savedTime.getId(), savedTheme.getId()))
-                .isInstanceOf(DataExistException.class);
+                () -> reservationService.save(member, date, savedTime.getId(), savedTheme.getId()))
+            .isInstanceOf(DataExistException.class);
     }
 
     @Test
@@ -270,24 +270,24 @@ class ReservationServiceTest {
         final Theme savedTheme = themeRepository.save(new Theme(themeName, description, thumbnail));
 
         reservationRepository.save(
-                new Reservation(
-                        savedMember,
-                        date,
-                        savedTime,
-                        savedTheme
-                )
+            new Reservation(
+                savedMember,
+                date,
+                savedTime,
+                savedTheme
+            )
         );
 
         // when & then
         Assertions.assertThatThrownBy(() -> reservationService.save(
-                        new Member(
-                                2L,
-                                "WooGa",
-                                "bowook316@gmail.com",
-                                "1234",
-                                Role.USER
-                        ), date, savedTime.getId(), savedTheme.getId()))
-                .isInstanceOf(DataExistException.class);
+                new Member(
+                    2L,
+                    "WooGa",
+                    "bowook316@gmail.com",
+                    "1234",
+                    Role.USER
+                ), date, savedTime.getId(), savedTheme.getId()))
+            .isInstanceOf(DataExistException.class);
     }
 
     @Test
@@ -303,12 +303,12 @@ class ReservationServiceTest {
         final String thumbnail = "귀신사진";
         final Theme savedTheme = themeRepository.save(new Theme(themeName, description, thumbnail));
         reservationRepository.save(
-                new Reservation(
-                        savedMember,
-                        date,
-                        savedTime,
-                        savedTheme
-                )
+            new Reservation(
+                savedMember,
+                date,
+                savedTime,
+                savedTheme
+            )
         );
 
         // when

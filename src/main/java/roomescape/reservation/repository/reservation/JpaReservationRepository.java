@@ -13,12 +13,12 @@ import roomescape.theme.domain.Theme;
 public interface JpaReservationRepository extends CrudRepository<Reservation, Long> {
 
     @Query("""
-                SELECT r
-                FROM Reservation r
-                JOIN FETCH r.theme
-                JOIN FETCH r.member
-                JOIN FETCH r.time
-            """)
+            SELECT r
+            FROM Reservation r
+            JOIN FETCH r.theme
+            JOIN FETCH r.member
+            JOIN FETCH r.time
+        """)
     List<Reservation> findAll();
 
     boolean existsByDateAndTimeAndTheme(final LocalDate date, final ReservationTime time, final Theme theme);
@@ -28,21 +28,21 @@ public interface JpaReservationRepository extends CrudRepository<Reservation, Lo
                                                          final LocalDate dateTo);
 
     @Query("""
-                SELECT r.theme
-                FROM Reservation r
-                WHERE r.date >= :dateFrom AND r.date < :dateTo
-                GROUP BY r.theme
-                ORDER BY COUNT(r) DESC
-            """)
+            SELECT r.theme
+            FROM Reservation r
+            WHERE r.date >= :dateFrom AND r.date < :dateTo
+            GROUP BY r.theme
+            ORDER BY COUNT(r) DESC
+        """)
     List<Theme> findPopularThemesByReservationBetween(final LocalDate dateFrom, final LocalDate dateTo,
                                                       final PageRequest pageRequest);
 
     @Query("""
-                SELECT r
-                FROM Reservation r
-                JOIN FETCH r.time
-                JOIN FETCH r.theme
-                WHERE r.member = :member
-            """)
+            SELECT r
+            FROM Reservation r
+            JOIN FETCH r.time
+            JOIN FETCH r.theme
+            WHERE r.member = :member
+        """)
     List<Reservation> findByMember(final Member member);
 }

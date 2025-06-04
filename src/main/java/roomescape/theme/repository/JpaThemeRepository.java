@@ -25,7 +25,7 @@ public class JpaThemeRepository implements ThemeRepositoryInterface {
     @Override
     public Theme findById(final Long id) {
         return themeRepository.findById(id)
-                .orElseThrow(() -> new DataNotFoundException("해당 테마 데이터가 존재하지 않습니다. id = " + id));
+            .orElseThrow(() -> new DataNotFoundException("해당 테마 데이터가 존재하지 않습니다. id = " + id));
     }
 
     @Override

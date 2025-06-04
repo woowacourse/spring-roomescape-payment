@@ -48,8 +48,8 @@ public class AdminServiceFacade {
         final List<Reservation> reservations = reservationService.findByInFromTo(themeId, memberId, from, to);
 
         return reservations.stream()
-                .map(AdminReservationResponse::from)
-                .toList();
+            .map(AdminReservationResponse::from)
+            .toList();
     }
 
     @Transactional(readOnly = true)
@@ -57,7 +57,7 @@ public class AdminServiceFacade {
         final List<Waiting> waitingReservations = waitingService.findAllWaitingReservations();
 
         return waitingReservations.stream()
-                .map(ReservationWaitingResponse::from)
-                .toList();
+            .map(ReservationWaitingResponse::from)
+            .toList();
     }
 }

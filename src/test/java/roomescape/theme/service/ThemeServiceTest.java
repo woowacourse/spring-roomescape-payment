@@ -116,17 +116,17 @@ class ThemeServiceTest {
         memberRepository.save(member);
 
         final Reservation inlineReservation = new Reservation(member, LocalDate.now().minusDays(7), reservationTime,
-                theme1);
+            theme1);
         final Reservation outlineReservation = new Reservation(member, LocalDate.now().plusDays(10), reservationTime,
-                theme1);
+            theme1);
         final Reservation inlineReservation2 = new Reservation(member, LocalDate.now().minusDays(5), reservationTime,
-                theme1);
+            theme1);
         final Reservation inlineReservation3 = new Reservation(member, LocalDate.now().minusDays(4), reservationTime,
-                theme2);
+            theme2);
         final Reservation inlineReservation4 = new Reservation(member, LocalDate.now().minusDays(3), reservationTime,
-                theme2);
+            theme2);
         final Reservation inlineReservation5 = new Reservation(member, LocalDate.now().minusDays(5), reservationTime,
-                theme2);
+            theme2);
         reservationRepository.save(inlineReservation);
         reservationRepository.save(outlineReservation);
         reservationRepository.save(inlineReservation2);

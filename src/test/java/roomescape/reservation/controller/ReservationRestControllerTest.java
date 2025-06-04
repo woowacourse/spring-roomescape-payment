@@ -1,5 +1,9 @@
 package roomescape.reservation.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.when;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.lang.reflect.Field;
@@ -20,10 +24,6 @@ import roomescape.payment.processor.toss.TossPaymentConfirmResponse;
 import roomescape.payment.processor.toss.TossPaymentProcessor;
 import roomescape.reservation.dto.AvailableReservationTimeResponse;
 import roomescape.reservation.dto.TossPaymentRequest;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
@@ -51,11 +51,11 @@ class ReservationRestControllerTest {
 
         //when & then
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(params)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(HttpStatus.BAD_REQUEST.value());
+            .contentType(ContentType.JSON)
+            .body(params)
+            .when().post("/reservations")
+            .then().log().all()
+            .statusCode(HttpStatus.BAD_REQUEST.value());
     }
 
     @Test
@@ -80,12 +80,12 @@ class ReservationRestControllerTest {
 
         //when & then
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", token)
-                .body(params)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value());
+            .contentType(ContentType.JSON)
+            .cookie("token", token)
+            .body(params)
+            .when().post("/reservations")
+            .then().log().all()
+            .statusCode(HttpStatus.CREATED.value());
     }
 
     @Test
@@ -109,27 +109,27 @@ class ReservationRestControllerTest {
         setTossPaymentConfirm(tossPaymentConfirmRequest, null);
 
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", token)
-                .body(params)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value());
+            .contentType(ContentType.JSON)
+            .cookie("token", token)
+            .body(params)
+            .when().post("/reservations")
+            .then().log().all()
+            .statusCode(HttpStatus.CREATED.value());
 
         //when & then
         RestAssured.given().log().all()
-                .when().delete("/reservations/1")
-                .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+            .when().delete("/reservations/1")
+            .then().log().all()
+            .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
     @Test
     void 삭제할_예약_정보가_없는_경우_not_found를_반환한다() {
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .when().delete("/reservations/1")
-                .then().log().all()
-                .statusCode(HttpStatus.NOT_FOUND.value());
+            .contentType(ContentType.JSON)
+            .when().delete("/reservations/1")
+            .then().log().all()
+            .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
     @Test
@@ -153,18 +153,18 @@ class ReservationRestControllerTest {
         setTossPaymentConfirm(tossPaymentConfirmRequest, null);
 
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", token)
-                .body(params)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value());
+            .contentType(ContentType.JSON)
+            .cookie("token", token)
+            .body(params)
+            .when().post("/reservations")
+            .then().log().all()
+            .statusCode(HttpStatus.CREATED.value());
 
         RestAssured.given().log().all()
-                .when().get("/reservations")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .body("size()", is(1));
+            .when().get("/reservations")
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .body("size()", is(1));
     }
 
     @Test
@@ -188,26 +188,26 @@ class ReservationRestControllerTest {
         setTossPaymentConfirm(tossPaymentConfirmRequest, null);
 
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", token)
-                .body(params)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value());
+            .contentType(ContentType.JSON)
+            .cookie("token", token)
+            .body(params)
+            .when().post("/reservations")
+            .then().log().all()
+            .statusCode(HttpStatus.CREATED.value());
 
         final List<AvailableReservationTimeResponse> availableReservationTimeResponses =
-                RestAssured.given().log().all()
-                        .queryParam("date", "2026-04-15")
-                        .queryParam("themeId", "1")
-                        .when().get("/reservations/available-times")
-                        .then().log().all()
-                        .statusCode(HttpStatus.OK.value())
-                        .extract().jsonPath()
-                        .getList(".", AvailableReservationTimeResponse.class);
+            RestAssured.given().log().all()
+                .queryParam("date", "2026-04-15")
+                .queryParam("themeId", "1")
+                .when().get("/reservations/available-times")
+                .then().log().all()
+                .statusCode(HttpStatus.OK.value())
+                .extract().jsonPath()
+                .getList(".", AvailableReservationTimeResponse.class);
 
         final long count = availableReservationTimeResponses.stream()
-                .filter(AvailableReservationTimeResponse::alreadyBooked)
-                .count();
+            .filter(AvailableReservationTimeResponse::alreadyBooked)
+            .count();
 
         assertThat(count).isEqualTo(1);
     }
@@ -233,20 +233,20 @@ class ReservationRestControllerTest {
         setTossPaymentConfirm(tossPaymentConfirmRequest, null);
 
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", token)
-                .body(params)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value());
+            .contentType(ContentType.JSON)
+            .cookie("token", token)
+            .body(params)
+            .when().post("/reservations")
+            .then().log().all()
+            .statusCode(HttpStatus.CREATED.value());
 
         //when & then
         RestAssured.given().log().all()
-                .cookie("token", token)
-                .when().get("/reservations/mine")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .body("size()", is(1));
+            .cookie("token", token)
+            .when().get("/reservations/mine")
+            .then().log().all()
+            .statusCode(HttpStatus.OK.value())
+            .body("size()", is(1));
     }
 
     @Test
@@ -271,21 +271,21 @@ class ReservationRestControllerTest {
         final Map<String, String> waitingParams = createWaitingRequestJsonMap("2026-04-15", "1", "1");
 
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", token)
-                .body(reservationParams)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value());
+            .contentType(ContentType.JSON)
+            .cookie("token", token)
+            .body(reservationParams)
+            .when().post("/reservations")
+            .then().log().all()
+            .statusCode(HttpStatus.CREATED.value());
 
         //when & then
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", token)
-                .body(waitingParams)
-                .when().post("/reservations/waitings")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value());
+            .contentType(ContentType.JSON)
+            .cookie("token", token)
+            .body(waitingParams)
+            .when().post("/reservations/waitings")
+            .then().log().all()
+            .statusCode(HttpStatus.CREATED.value());
     }
 
     @Test
@@ -310,26 +310,26 @@ class ReservationRestControllerTest {
         final Map<String, String> waitingParams = createWaitingRequestJsonMap("2026-04-15", "1", "1");
 
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", token)
-                .body(reservationParams)
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value());
+            .contentType(ContentType.JSON)
+            .cookie("token", token)
+            .body(reservationParams)
+            .when().post("/reservations")
+            .then().log().all()
+            .statusCode(HttpStatus.CREATED.value());
 
         RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", token)
-                .body(waitingParams)
-                .when().post("/reservations/waitings")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value());
+            .contentType(ContentType.JSON)
+            .cookie("token", token)
+            .body(waitingParams)
+            .when().post("/reservations/waitings")
+            .then().log().all()
+            .statusCode(HttpStatus.CREATED.value());
 
         //when & then
         RestAssured.given().log().all()
-                .when().delete("/reservations/waitings/1")
-                .then().log().all()
-                .statusCode(HttpStatus.NO_CONTENT.value());
+            .when().delete("/reservations/waitings/1")
+            .then().log().all()
+            .statusCode(HttpStatus.NO_CONTENT.value());
     }
 
     @Test
@@ -351,9 +351,9 @@ class ReservationRestControllerTest {
         final String theme,
         final String time) {
         return Map.of(
-                "date", date,
-                "theme", theme,
-                "time", time
+            "date", date,
+            "theme", theme,
+            "time", time
         );
     }
 

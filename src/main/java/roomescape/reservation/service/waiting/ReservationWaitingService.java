@@ -30,17 +30,17 @@ public class ReservationWaitingService {
 
     @Transactional
     public Waiting createWaitingReservation(
-            final Member member,
-            final LocalDate date,
-            final Long timeId,
-            final Long themeId) {
+        final Member member,
+        final LocalDate date,
+        final Long timeId,
+        final Long themeId) {
 
         validatePastDate(date);
 
         final ReservationTime reservationTime = reservationTimeRepository.findById(timeId);
         final Theme theme = themeRepository.findById(themeId);
         final boolean reservationExists = reservationRepository.existsByDateAndTimeAndTheme(date, reservationTime,
-                theme);
+            theme);
 
         if (reservationExists) {
             final Waiting waiting = new Waiting(member, reservationTime, theme, date);
@@ -53,12 +53,12 @@ public class ReservationWaitingService {
     @Transactional
     public void deleteWaitingById(final Long id) {
         waitingRepository.findById(id)
-                .ifPresentOrElse(
-                        waiting -> waitingRepository.deleteById(id),
-                        () -> {
-                            throw new DataNotFoundException("해당 대기 데이터가 존재하지 않습니다. id = " + id);
-                        }
-                );
+            .ifPresentOrElse(
+                waiting -> waitingRepository.deleteById(id),
+                () -> {
+                    throw new DataNotFoundException("해당 대기 데이터가 존재하지 않습니다. id = " + id);
+                }
+            );
     }
 
     @Transactional(readOnly = true)
@@ -69,10 +69,10 @@ public class ReservationWaitingService {
     @Transactional(readOnly = true)
     public long getRankInWaiting(final Waiting waiting) {
         return waitingRepository.countBefore(
-                waiting.getTheme(),
-                waiting.getDate(),
-                waiting.getTime(),
-                waiting.getId()
+            waiting.getTheme(),
+            waiting.getDate(),
+            waiting.getTime(),
+            waiting.getId()
         ) + WAITING_COUNT;
     }
 
