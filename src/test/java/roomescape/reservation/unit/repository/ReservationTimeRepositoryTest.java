@@ -1,0 +1,114 @@
+package roomescape.reservation.unit.repository;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
+import jakarta.persistence.EntityManager;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import roomescape.member.entity.Member;
+import roomescape.member.entity.RoleType;
+import roomescape.payment.entity.Payment;
+import roomescape.reservation.entity.Reservation;
+import roomescape.reservation.entity.ReservationTime;
+import roomescape.reservation.repository.ReservationTimeRepository;
+import roomescape.theme.entity.Theme;
+
+@DataJpaTest
+@DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
+class ReservationTimeRepositoryTest {
+
+    @Autowired
+    private EntityManager entityManager;
+
+    @Autowired
+    private ReservationTimeRepository reservationTimeRepository;
+
+    @Test
+    @DisplayName("날짜와 테마 ID로 예약된 시간을 조회한다 - 미예약 시간은 조회되지 않는다")
+    void findAllReservedTimeByDateAndThemeId_whenThereAreUnreservedTimes() {
+        // given
+        ReservationTime reservationTime1 = new ReservationTime(LocalTime.of(10, 0));
+        entityManager.persist(reservationTime1);
+        ReservationTime reservationTime2 = new ReservationTime(LocalTime.of(11, 0));
+        entityManager.persist(reservationTime2);
+        ReservationTime reservationTime3 = new ReservationTime(LocalTime.of(12, 0));
+        entityManager.persist(reservationTime3);
+
+        Theme theme1 = new Theme("테마1", "설명1", "썸네일1");
+        entityManager.persist(theme1);
+
+        Member member1 = new Member("미소", "miso@email.com", "miso", RoleType.USER);
+        entityManager.persist(member1);
+
+        Payment payment1 = new Payment("paymentKey0001", "TESTOrder0001", 1000L, "NORMAL");
+        entityManager.persist(payment1);
+        Payment payment2 = new Payment("paymentKey0002", "TESTOrder0002", 1000L, "NORMAL");
+        entityManager.persist(payment2);
+
+        LocalDate date = LocalDate.now().plusDays(1);
+
+        Reservation reservation1 = new Reservation(date, reservationTime1, theme1, member1, payment1);
+        entityManager.persist(reservation1);
+        Reservation reservation2 = new Reservation(date, reservationTime2, theme1, member1, payment2);
+        entityManager.persist(reservation2);
+
+        // when
+        List<ReservationTime> reservationTimes =
+                reservationTimeRepository.findAllReservedTimeByDateAndThemeId(date, 1L);
+
+        // then
+        assertAll(
+                () -> assertThat(reservationTimes.size()).isEqualTo(2),
+                () -> assertThat(reservationTimes.get(0).getStartAt()).isEqualTo(reservationTime1.getStartAt()),
+                () -> assertThat(reservationTimes.get(1).getStartAt()).isEqualTo(reservationTime2.getStartAt())
+        );
+    }
+
+    @Test
+    @DisplayName("날짜와 테마 ID로 예약된 시간을 조회한다 - 다른 테마에 예약된 시간은 조회되지 않는다")
+    void findAllReservedTimeByDateAndThemeId_whenThereAreReservationsForDifferentTheme() {
+        // given
+        ReservationTime reservationTime1 = new ReservationTime(LocalTime.of(10, 0));
+        entityManager.persist(reservationTime1);
+        ReservationTime reservationTime2 = new ReservationTime(LocalTime.of(11, 0));
+        entityManager.persist(reservationTime2);
+
+        Theme theme1 = new Theme("테마1", "설명1", "썸네일1");
+        entityManager.persist(theme1);
+        Theme theme2 = new Theme("테마2", "설명2", "썸네일2");
+        entityManager.persist(theme2);
+
+        Member member1 = new Member("미소", "miso@email.com", "miso", RoleType.USER);
+        entityManager.persist(member1);
+
+        Payment payment1 = new Payment("paymentKey0001", "TESTOrder0001", 1000L, "NORMAL");
+        entityManager.persist(payment1);
+        Payment payment2 = new Payment("paymentKey0002", "TESTOrder0002", 1000L, "NORMAL");
+        entityManager.persist(payment2);
+
+        LocalDate date = LocalDate.now().plusDays(1);
+
+        Reservation reservation1 = new Reservation(date, reservationTime1, theme1, member1, payment1);
+        entityManager.persist(reservation1);
+        Reservation reservation2 = new Reservation(date, reservationTime2, theme2, member1, payment2);
+        entityManager.persist(reservation2);
+
+        // when
+        List<ReservationTime> reservationTimes =
+                reservationTimeRepository.findAllReservedTimeByDateAndThemeId(date, 1L);
+
+        // then
+        assertAll(
+                () -> assertThat(reservationTimes.size()).isEqualTo(1),
+                () -> assertThat(reservationTimes.get(0).getStartAt()).isEqualTo(reservationTime1.getStartAt())
+        );
+    }
+}
