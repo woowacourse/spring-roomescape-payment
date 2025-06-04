@@ -34,7 +34,7 @@ public class PaymentService {
     @Transactional
     public String createPayment(PaymentRequest request) {
         if (paymentRepository.existsByOrderId(request.orderId())) {
-            throw new DuplicatedException(ErrorCode.RESERVATION_DUPLICATED);
+            throw new DuplicatedException(ErrorCode.PAYMENT_DUPLICATED);
         }
         Payment payment = paymentRepository.save(Payment.create(request.orderId(), request.amount()));
         return payment.getId().id();
