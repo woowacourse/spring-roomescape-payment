@@ -6,24 +6,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestClient;
 import roomescape.business.dto.PaymentApproveDto;
 import roomescape.exception.PaymentApproveException;
 
-@Component
 public class TossPaymentClient {
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
     private final String secretKey;
 
-    public TossPaymentClient(
-            RestClient restClient,
-            ObjectMapper objectMapper,
-            @Value("${payment.secret-key}") String secretKey) {
-        this.restClient = restClient;
+    public TossPaymentClient(RestClient.Builder restClientBuilder, ObjectMapper objectMapper,
+                             @Value("${payment.secret-key}") String secretKey) {
+        this.restClient = restClientBuilder.build();
         this.objectMapper = objectMapper;
         this.secretKey = secretKey;
     }

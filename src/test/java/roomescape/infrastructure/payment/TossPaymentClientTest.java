@@ -19,16 +19,15 @@ import roomescape.infrastructure.payment.config.ClientConfig;
 
 @RestClientTest(value = {ClientConfig.class, TossPaymentClient.class})
 class TossPaymentClientTest {
+    @Autowired
+    private MockRestServiceServer mockServer;
 
     @Autowired
     private TossPaymentClient tossPaymentClient;
 
-    @Autowired
-    private MockRestServiceServer mockServer;
     @Value("${payment.secret-key}")
     private String secretKey;
 
-    // 올바른 클라이언트 연결 테스트
     @Test
     void 정상_결제_승인_요청() {
         // given
@@ -36,6 +35,7 @@ class TossPaymentClientTest {
         mockServer.expect(requestTo(approveUrl)).andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess());
 
+        // when & then
         Assertions.assertThatCode(
                         () -> tossPaymentClient.approvePayment(new PaymentApproveDto("paymentKey", "orderId", 1000L)))
                 .doesNotThrowAnyException();
@@ -46,7 +46,7 @@ class TossPaymentClientTest {
         // given
         tossPaymentClient = new TossPaymentClient(
                 RestClient.builder()
-                        .baseUrl("https://api.tosspayments.com").build()
+                        .baseUrl("https://api.tosspayments.com")
                 ,
                 new Jackson2ObjectMapperBuilder().createXmlMapper(false).build(), secretKey
         );
@@ -62,13 +62,13 @@ class TossPaymentClientTest {
         // given
         tossPaymentClient = new TossPaymentClient(
                 RestClient.builder()
-                        .baseUrl("https://api.tosspayments.com").build()
+                        .baseUrl("https://api.tosspayments.com")
                 ,
                 new Jackson2ObjectMapperBuilder().createXmlMapper(false).build(),
                 "invalid" + secretKey
         );
         PaymentApproveDto paymentApproveDto = new PaymentApproveDto("paymentKey", "1", 1000L);
-        // when
+        // when & then
         Assertions.assertThatThrownBy(() -> tossPaymentClient.approvePayment(paymentApproveDto))
                 .isInstanceOf(PaymentApproveException.class)
                 .hasMessage("인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다.");
