@@ -15,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.dto.request.AddReservationRequest;
-import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.request.CreateWaitReservationRequest;
 import roomescape.dto.request.LoginMemberRequest;
 import roomescape.dto.response.MyReservationResponse;
@@ -104,7 +103,7 @@ class ReservationServiceTest {
                 .thenReturn(Optional.of(theme));
 
         //when
-        ReservationResponse actual = reservationService.addReservation(request, loginMemberRequest);
+        ReservationResponse actual = reservationService.addReservationByMember(request, loginMemberRequest);
 
         //then
         assertAll(
@@ -148,7 +147,7 @@ class ReservationServiceTest {
                 .thenReturn(Optional.of(theme));
 
         //when & then
-        assertThatThrownBy(() -> reservationService.addReservation(
+        assertThatThrownBy(() -> reservationService.addReservationByMember(
                 new AddReservationRequest(targetDate, time.getId(), theme.getId()), loginMemberRequest))
                 .isInstanceOf(InvalidReservationException.class);
     }
@@ -169,7 +168,7 @@ class ReservationServiceTest {
 
         AddReservationRequest request = new AddReservationRequest(date, time.getId(), theme.getId());
 
-        reservationService.addReservation(request, loginMemberRequest);
+        reservationService.addReservationByMember(request, loginMemberRequest);
 
         //when
         List<MyReservationResponse> actual = reservationService.findAllReservationOfMember(1L);

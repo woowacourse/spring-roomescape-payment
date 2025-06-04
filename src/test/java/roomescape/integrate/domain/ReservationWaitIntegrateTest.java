@@ -113,7 +113,7 @@ public class ReservationWaitIntegrateTest {
         AddReservationRequest reservationRequest = new AddReservationRequest(
                 tomorrow, reservationTime.getId(), theme.getId());
         LoginMemberRequest loginMemberRequest = authService.getLoginMemberByToken(token);
-        reservationService.addReservation(reservationRequest, loginMemberRequest);
+        reservationService.addReservationByMember(reservationRequest, loginMemberRequest);
 
         CreateWaitReservationRequest waitRequest = new CreateWaitReservationRequest(tomorrow,
                 reservationTime.getId(), theme.getId());

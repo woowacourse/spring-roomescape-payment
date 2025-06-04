@@ -11,26 +11,32 @@ import org.springframework.web.client.RestClient;
 import roomescape.dto.request.ConfirmPaymentRequest;
 import roomescape.dto.response.ConfirmPaymentResponse;
 import roomescape.dto.response.PaymentErrorResponse;
+import roomescape.entity.Payment;
+import roomescape.entity.Reservation;
 import roomescape.exception.custom.PaymentException;
+import roomescape.repository.PaymentRepository;
 
 @Service
 public class PaymentService {
 
+    private final PaymentRepository paymentRepository;
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
     public PaymentService(
+            PaymentRepository paymentRepository,
             @Qualifier("tossClient") RestClient restClient,
             ObjectMapper objectMapper
     ) {
+        this.paymentRepository = paymentRepository;
         this.restClient = restClient;
         this.objectMapper = objectMapper;
     }
 
-    public ConfirmPaymentResponse confirmPayment(ConfirmPaymentRequest paymentRequest) {
+    public ConfirmPaymentResponse confirmPayment(ConfirmPaymentRequest paymentRequest, Reservation reservation) {
         String authorizations = getAuthorizationToken();
 
-        return restClient.post()
+        ConfirmPaymentResponse body = restClient.post()
                 .uri("/v1/payments/confirm")
                 .header("Authorization", authorizations)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -44,6 +50,11 @@ public class PaymentService {
                 }))
                 .toEntity(ConfirmPaymentResponse.class)
                 .getBody();
+
+        Payment payment = new Payment(body.orderId(), body.totalAmount(), body.paymentKey(), paymentRequest.paymentType(), reservation);
+        paymentRepository.save(payment);
+
+        return body;
     }
 
     private String getAuthorizationToken() {

@@ -24,17 +24,18 @@ import roomescape.dto.response.ReservationWaitResponse;
 import roomescape.global.Role;
 import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
+import roomescape.service.ReservingService;
 
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
 
     private final ReservationService reservationService;
-    private final PaymentService paymentService;
+    private final ReservingService reservingService;
 
-    public ReservationController(ReservationService reservationService, PaymentService paymentService) {
+    public ReservationController(ReservationService reservationService, ReservingService reservingService) {
         this.reservationService = reservationService;
-        this.paymentService = paymentService;
+        this.reservingService = reservingService;
     }
 
     @GetMapping
@@ -60,11 +61,7 @@ public class ReservationController {
             @RequestBody @Valid CreateReservationRequest request,
             LoginMemberRequest loginMemberRequest) {
 
-        ConfirmPaymentRequest confirmPaymentRequest = ConfirmPaymentRequest.from(request);
-        paymentService.confirmPayment(confirmPaymentRequest);
-
-        AddReservationRequest addReservationRequest = AddReservationRequest.from(request);
-        ReservationResponse response = reservationService.addReservation(addReservationRequest, loginMemberRequest);
+        ReservationResponse response = reservingService.reserveAndPay(request, loginMemberRequest);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
