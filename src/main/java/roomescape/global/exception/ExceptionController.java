@@ -19,7 +19,7 @@ import roomescape.payment.presentation.dto.PaymentErrorResponse;
 public class ExceptionController {
 
     private static final String PREFIX = "[ERROR] ";
-    private static final Logger log = LoggerFactory.getLogger(ExceptionController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionController.class);
 
     @ExceptionHandler(PaymentException.class)
     public ResponseEntity<PaymentErrorResponse> handlePaymentException(PaymentException e) {
@@ -61,7 +61,7 @@ public class ExceptionController {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
-        log.error("Unexpected error occurred", e);
+        LOGGER.error("Unexpected error occurred", e);
         return ResponseEntity.badRequest().body(PREFIX + "예상하지 못한 예외가 발생하였습니다. 상세 정보: " + e.getMessage());
     }
 }
