@@ -57,10 +57,10 @@ public class ReservationService {
         }
         Reservation reservation = Reservation.create(user, reservationSpecDto.date(), reservationTime, theme,
                 reservationStatus, LocalDateTime.now());
+        reservationRepository.save(reservation);
         if (reservationStatus == ReservationStatus.RESERVED && paymentApproveDto != null) {
             paymentService.pay(reservation, paymentApproveDto);
         }
-        reservationRepository.save(reservation);
         return ReservationDto.fromEntity(reservation);
     }
 

@@ -24,7 +24,7 @@ public class TossPaymentClient {
         this.secretKey = secretKey;
     }
 
-    public PaymentApproveDto approvePayment(PaymentApproveDto paymentApproveDto) {
+    public PaymentApproveResponseDto approvePayment(PaymentApproveDto paymentApproveDto) {
         String encodedSecretKey = Base64.getEncoder().encodeToString((secretKey + ":").getBytes());
         return restClient.post()
                 .uri("/v1/payments/confirm")
@@ -35,6 +35,6 @@ public class TossPaymentClient {
                     InputStream responseBodyStream = response.getBody();
                     String rawResponseBody = StreamUtils.copyToString(responseBodyStream, StandardCharsets.UTF_8);
                     throw objectMapper.readValue(rawResponseBody, PaymentApproveException.class);
-                }).body(PaymentApproveDto.class);
+                }).body(PaymentApproveResponseDto.class);
     }
 }

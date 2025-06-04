@@ -9,8 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import roomescape.business.dto.PaymentApproveDto;
 import roomescape.business.model.vo.Id;
+import roomescape.infrastructure.payment.PaymentApproveResponseDto;
 
 @ToString
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -38,9 +38,11 @@ public class Payment {
         return new Payment(Id.issue(), reservation, paymentKey, orderId, amount);
     }
 
-    public static Payment create(final Reservation reservation, final PaymentApproveDto paymentApproveDto) {
-        return new Payment(Id.issue(), reservation, paymentApproveDto.paymentKey(), paymentApproveDto.orderId(),
-                paymentApproveDto.amount());
+    public static Payment create(final Reservation reservation,
+                                 final PaymentApproveResponseDto paymentApproveResponseDto) {
+        return new Payment(Id.issue(), reservation, paymentApproveResponseDto.paymentKey(),
+                paymentApproveResponseDto.orderId(),
+                paymentApproveResponseDto.totalAmount());
     }
 
     public static Payment restore(final String id, final Reservation reservation, final String paymentKey,

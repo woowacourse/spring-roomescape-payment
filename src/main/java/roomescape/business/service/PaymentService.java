@@ -7,6 +7,7 @@ import roomescape.business.dto.PaymentApproveDto;
 import roomescape.business.model.entity.Payment;
 import roomescape.business.model.entity.Reservation;
 import roomescape.business.model.repository.PaymentRepository;
+import roomescape.infrastructure.payment.PaymentApproveResponseDto;
 import roomescape.infrastructure.payment.TossPaymentClient;
 
 @Service
@@ -18,7 +19,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
 
     public void pay(Reservation reservation, PaymentApproveDto paymentApproveDto) {
-        PaymentApproveDto paymentApproveResponseDto = paymentClient.approvePayment(paymentApproveDto);
+        PaymentApproveResponseDto paymentApproveResponseDto = paymentClient.approvePayment(paymentApproveDto);
         Payment payment = Payment.create(reservation, paymentApproveResponseDto);
         paymentRepository.save(payment);
     }
