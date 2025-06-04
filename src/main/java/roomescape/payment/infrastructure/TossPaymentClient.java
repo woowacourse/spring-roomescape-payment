@@ -75,5 +75,3 @@ public class TossPaymentClient implements PaymentClient {
                 .encodeToString((secretKey + ":").getBytes());
     }
 }
-
-
