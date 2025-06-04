@@ -1,5 +1,6 @@
 package roomescape.payment.ui;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,13 +13,14 @@ import roomescape.payment.application.dto.PaymentDataRequest;
 public class PaymentController {
 
     public static final String PAYMENT_DATA = "paymentData";
-    
+
     private final PaymentService paymentService;
 
     public PaymentController(final PaymentService paymentService) {
         this.paymentService = paymentService;
     }
 
+    @Operation(summary = "결제 데이터 저장 API")
     @PostMapping("/payments")
     public ResponseEntity<Void> savePaymentData(@RequestBody final PaymentDataRequest request, HttpSession session) {
         session.setAttribute(PAYMENT_DATA, request);

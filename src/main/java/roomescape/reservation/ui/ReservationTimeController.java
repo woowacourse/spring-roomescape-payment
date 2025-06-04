@@ -1,5 +1,6 @@
 package roomescape.reservation.ui;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -25,21 +26,22 @@ public class ReservationTimeController {
         this.reservationTimeService = reservationTimeService;
     }
 
+    @Operation(summary = "전체 이용시간 조회 API")
     @GetMapping
     public ResponseEntity<List<ReservationTimeResponse>> findAll() {
         return ResponseEntity.ok(reservationTimeService.findAll());
     }
 
+    @Operation(summary = "이용시간 추가 API")
     @PostMapping
     public ResponseEntity<ReservationTimeResponse> add(@Valid @RequestBody final ReservationTimeRequest requestDto) {
         return new ResponseEntity<>(reservationTimeService.add(requestDto), HttpStatus.CREATED);
     }
 
+    @Operation(summary = "이용시간 제거 API")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") final Long id) {
         reservationTimeService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
-
-
 }
