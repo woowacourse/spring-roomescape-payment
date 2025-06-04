@@ -5,11 +5,11 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public record LoginRequest(
-        @Schema(example = "dompoo@gmail.com")
+        @Schema(example = "user1@email.com")
         @NotBlank @Email
         String email,
 
-        @Schema(example = "password1234")
+        @Schema(example = "1234")
         @NotBlank
         String password
 ) {
