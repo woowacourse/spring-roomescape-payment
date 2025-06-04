@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import roomescape.application.PaymentService;
 import roomescape.application.ReservationService;
 import roomescape.domain.auth.AuthenticationInfo;
 import roomescape.domain.user.UserRole;
@@ -21,9 +20,8 @@ import roomescape.presentation.StubAuthenticationInfoArgumentResolver;
 class ReservationControllerAdminTest {
 
     private final ReservationService reservationService = Mockito.mock(ReservationService.class);
-    private final PaymentService paymentService = Mockito.mock(PaymentService.class);
     private final MockMvc mockMvc = MockMvcBuilders
-        .standaloneSetup(new ReservationController(reservationService, paymentService))
+        .standaloneSetup(new ReservationController(reservationService))
         .setCustomArgumentResolvers(new StubAuthenticationInfoArgumentResolver(new AuthenticationInfo(99L, UserRole.ADMIN)))
         .setControllerAdvice(new GlobalExceptionHandler())
         .build();

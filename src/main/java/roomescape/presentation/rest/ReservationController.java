@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.application.PaymentService;
 import roomescape.application.ReservationService;
 import roomescape.domain.auth.AuthenticationInfo;
 import roomescape.domain.reservation.ReservationSearchFilter;
@@ -30,7 +29,6 @@ import roomescape.presentation.response.ReservationResponse;
 public class ReservationController {
 
     private final ReservationService reservationService;
-    private final PaymentService paymentService;
 
     @PostMapping
     @ResponseStatus(CREATED)
@@ -39,7 +37,6 @@ public class ReservationController {
             @RequestBody @Valid final CreateReservationRequest request
     ) {
         var reservation = reservationService.reserve(authenticationInfo.id(), request.date(), request.timeId(), request.themeId());
-        paymentService.pay(request.paymentKey(), request.orderId(), request.amount());
         return ReservationResponse.from(reservation);
     }
 

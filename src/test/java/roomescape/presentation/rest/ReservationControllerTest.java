@@ -3,7 +3,6 @@ package roomescape.presentation.rest;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -21,14 +20,11 @@ import org.mockito.Mockito;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import roomescape.TestFixtures;
-import roomescape.application.PaymentService;
 import roomescape.application.ReservationService;
 import roomescape.domain.auth.AuthenticationInfo;
 import roomescape.domain.user.UserRole;
 import roomescape.exception.AlreadyExistedException;
 import roomescape.exception.NotFoundException;
-import roomescape.exception.PaymentFailedException;
 import roomescape.presentation.GlobalExceptionHandler;
 import roomescape.presentation.StubAuthenticationInfoArgumentResolver;
 
@@ -37,9 +33,8 @@ class ReservationControllerTest {
     private final long userId = 99L;
 
     private final ReservationService reservationService = Mockito.mock(ReservationService.class);
-    private final PaymentService paymentService = Mockito.mock(PaymentService.class);
     private final MockMvc mockMvc = MockMvcBuilders
-        .standaloneSetup(new ReservationController(reservationService, paymentService))
+        .standaloneSetup(new ReservationController(reservationService))
         .setCustomArgumentResolvers(new StubAuthenticationInfoArgumentResolver(new AuthenticationInfo(userId, UserRole.USER)))
         .setControllerAdvice(new GlobalExceptionHandler())
         .build();
@@ -47,9 +42,6 @@ class ReservationControllerTest {
     @Test
     @DisplayName("예약 추가 요청시, id를 포함한 예약 내용과 CREATED를 응답한다.")
     void reserve() throws Exception {
-        Mockito.doNothing()
-                .when(paymentService).pay(anyString(), anyString(), anyLong());
-
         Mockito.when(reservationService.reserve(anyLong(), any(), anyLong(), anyLong()))
             .thenReturn(anyReservationWithNewId());
 
@@ -70,35 +62,10 @@ class ReservationControllerTest {
     }
 
     @Test
-    @DisplayName("예약 검증 실패 시 결제를 시도하지 않는다.")
-    void cannotReserveWhenPaymentFailed() throws Exception {
-        Mockito.doThrow(new AlreadyExistedException("이미 예약된 방탈출 일정"))
-                .when(reservationService).reserve(anyLong(), any(), anyLong(), anyLong());
-
-        mockMvc.perform(post("/reservations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                        "date": "3000-03-17",
-                        "timeId": "1",
-                        "themeId": "1",
-                        "paymentKey": "a",
-                        "orderId": "1",
-                        "amount": 1000
-                    }
-                    """))
-            .andExpect(status().isConflict());
-
-        Mockito.verify(paymentService, never()).pay(anyString(), anyString(), anyLong());
-    }
-
-    @Test
-    @DisplayName("잘못된 요청으로 결제 승인 실패 시 BAD REQUEST를 응답한다.")
+    @DisplayName("예약 검증 실패 시 400대 상태 코드를 응답한다.")
     void cannotReserveWhenBadRequest() throws Exception {
         Mockito.when(reservationService.reserve(anyLong(), any(), anyLong(), anyLong()))
-                .thenReturn(TestFixtures.anyReservationWithNewId());
-        Mockito.doThrow(PaymentFailedException.byClient("결제 실패"))
-                .when(paymentService).pay(anyString(), anyString(), anyLong());
+                .thenThrow(new AlreadyExistedException("이미 예약된 일정입니다."));
 
         mockMvc.perform(post("/reservations")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -112,38 +79,12 @@ class ReservationControllerTest {
                         "amount": 1000
                     }
                     """))
-            .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("서버 내부 오류로 결제 승인 실패 시 INTERNAL SERVER ERROR를 응답한다.")
-    void cannotReserveWhenInternalServerError() throws Exception {
-        Mockito.when(reservationService.reserve(anyLong(), any(), anyLong(), anyLong()))
-            .thenReturn(TestFixtures.anyReservationWithNewId());
-        Mockito.doThrow(PaymentFailedException.byServer())
-                .when(paymentService).pay(anyString(), anyString(), anyLong());
-
-        mockMvc.perform(post("/reservations")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
-                    {
-                        "date": "3000-03-17",
-                        "timeId": "1",
-                        "themeId": "1",
-                        "paymentKey": "a",
-                        "orderId": "1",
-                        "amount": 1000
-                    }
-                    """))
-            .andExpect(status().isInternalServerError());
+            .andExpect(status().is4xxClientError());
     }
 
     @Test
     @DisplayName("예약 대기 요청시, id를 포함한 예약 내용과 CREATED를 응답한다.")
     void waitFor() throws Exception {
-        Mockito.doNothing()
-                .when(paymentService).pay(anyString(), anyString(), anyLong());
-
         Mockito.when(reservationService.waitFor(anyLong(), any(), anyLong(), anyLong()))
             .thenReturn(anyReservationWithNewId());
 
