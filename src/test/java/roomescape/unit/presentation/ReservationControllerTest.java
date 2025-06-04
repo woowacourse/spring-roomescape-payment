@@ -21,6 +21,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.auth.AuthorizationExtractor;
 import roomescape.domain.PaymentInfo;
+import roomescape.dto.request.PaymentRequest;
 import roomescape.dto.request.ReservationCreateRequest;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationTimeResponse;
@@ -59,11 +60,14 @@ class ReservationControllerTest {
                 1000);
         ReservationResponse response = new ReservationResponse(1L, "memberName1", LocalDate.of(2025, 1, 1),
                 new ReservationTimeResponse(1L, LocalTime.of(9, 0)), "themeName1");
+        PaymentRequest paymentRequest = new PaymentRequest(1000, "1", "1");
         PaymentInfo paymentInfo = new PaymentInfo("1", 1000);
+
         given(paymentService.createPaymentInfo(any())).willReturn(paymentInfo);
         given(reservationService.createReservationForMember(1L, request.timeId(), request.themeId(), request.date(),
-                paymentInfo)).willReturn(
-                response);
+                paymentInfo)).willReturn(response);
+        given(reservationService.processReservationForMember(1L, request.timeId(), request.themeId(), request.date(),
+                paymentRequest)).willReturn(response);
         given(tokenProvider.extractSubject("accessToken")).willReturn("1");
         // when & then
         mockMvc.perform(post("/api/reservations")

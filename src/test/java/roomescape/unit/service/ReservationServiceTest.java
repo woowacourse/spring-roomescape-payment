@@ -10,6 +10,7 @@ import java.util.Optional;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import roomescape.auth.Role;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
@@ -25,6 +26,7 @@ import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationWithStatusResponse;
 import roomescape.exception.ExistedReservationException;
 import roomescape.exception.ReservationNotFoundException;
+import roomescape.service.PaymentService;
 import roomescape.service.ReservationService;
 import roomescape.unit.fake.FakeMemberRepository;
 import roomescape.unit.fake.FakeReservationRepository;
@@ -39,6 +41,9 @@ class ReservationServiceTest {
     private ThemeRepository themeRepository;
     private MemberRepository memberRepository;
     private WaitingRepository waitingRepository;
+
+    @Mock
+    private PaymentService paymentService;
     private ReservationService reservationService;
 
     @BeforeEach
@@ -49,7 +54,7 @@ class ReservationServiceTest {
         memberRepository = new FakeMemberRepository();
         waitingRepository = new FakeWaitingRepository();
         reservationService = new ReservationService(reservationRepository, reservationTimeRepository, themeRepository,
-                memberRepository, waitingRepository);
+                memberRepository, waitingRepository, paymentService);
     }
 
     @Test
