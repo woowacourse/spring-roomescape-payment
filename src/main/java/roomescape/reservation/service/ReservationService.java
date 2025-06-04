@@ -4,20 +4,23 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import roomescape.global.auth.dto.UserInfo;
+import roomescape.payment.infrastructure.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
-import roomescape.reservation.exception.ReservationAlreadyExistsException;
 import roomescape.reservation.exception.ReservationNotFoundException;
 import roomescape.reservation.repository.ReservationRepository;
+import roomescape.reservation.repository.dto.ReservationWithPayment;
 
 @Service
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
+    private final PaymentRepository paymentRepository;
 
-    public ReservationService(final ReservationRepository reservationRepository) {
+    public ReservationService(final ReservationRepository reservationRepository, PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     public List<ReservationResponse> findReservations(final Long themeId, final Long memberId,
@@ -39,14 +42,8 @@ public class ReservationService {
     }
 
     public void delete(Long id) {
+        paymentRepository.deleteById(id);
         reservationRepository.deleteById(id);
-    }
-
-    public void checkIfReservationExists(final ReservationRequest request) {
-        boolean exists = isReservationExists(request);
-        if (exists) {
-            throw new ReservationAlreadyExistsException("해당 시간에 이미 예약이 존재합니다.");
-        }
     }
 
     public boolean isReservationExists(ReservationRequest request) {
@@ -54,8 +51,8 @@ public class ReservationService {
                 request.themeId());
     }
 
-    public List<Reservation> findMyReservations(final UserInfo userInfo) {
-        return reservationRepository.findByMemberId(userInfo.id());
+    public List<ReservationWithPayment> findMyReservations(final UserInfo userInfo) {
+        return reservationRepository.findReservationWithPaymentByMemberId(userInfo.id());
     }
 
     public Reservation save(final Reservation reservation) {
