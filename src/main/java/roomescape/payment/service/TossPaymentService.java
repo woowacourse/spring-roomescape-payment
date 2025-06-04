@@ -93,9 +93,9 @@ public class TossPaymentService implements PaymentService {
 
     private void confirmPaymentInternal(Payment payment, TossPaymentRequest tossRequest) {
         try {
-            TossPaymentResponse response = tossRestClient.confirm(tossRequest);
             validateCanConfirmStatus(payment);
-            updatePaymentInfoAfterConfirm(payment, response);
+            TossPaymentResponse response = tossRestClient.confirm(tossRequest);
+            updatePaymentInfoAfterConfirm(payment, response); //TODO: 에러 가능성이 있는가?
         } catch (PaymentTimeoutException e) {
 
             // 결제 상태 조회 후 결제 취소 API 호출 (필요 시 구현)
