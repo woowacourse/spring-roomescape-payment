@@ -20,10 +20,3 @@ INSERT INTO member (name, email, password, role)
 VALUES ('율무', 'ind07162@naver.com', 'asd', 'USER');
 INSERT INTO member (name, email, password, role)
 VALUES ('ADMIN', 'admin@naver.com', '1234', 'ADMIN');
-
-INSERT INTO waiting (member_id, date, time_id, theme_id, status, created_at)
-VALUES (2, '2026-05-28', 1, 1, 'PENDING', CURRENT_TIMESTAMP);
-INSERT INTO waiting (member_id, date, time_id, theme_id, status, created_at)
-VALUES (2, '2026-05-29', 1, 1, 'PENDING', CURRENT_TIMESTAMP);
-INSERT INTO waiting (member_id, date, time_id, theme_id, status, created_at)
-VALUES (3, '2026-05-28', 1, 1, 'PENDING', CURRENT_TIMESTAMP);

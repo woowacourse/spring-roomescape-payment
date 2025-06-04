@@ -18,7 +18,6 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
-import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.reservationTime.domain.ReservationTimeRepository;
@@ -92,8 +91,6 @@ class ReservationServiceMockTest {
                 .thenReturn(Optional.of(
                         Member.createWithoutId("멤버", "a", "1234", Role.USER)
                 ));
-        when(dateTime.now())
-                .thenReturn(LocalDateTime.of(2024, 9, 6, 19, 23));
         when(reservationRepository.existsByDateAndTimeStartAtAndThemeId(any(LocalDate.class), any(LocalTime.class),
                 eq(1L)))
                 .thenReturn(true);
@@ -164,28 +161,6 @@ class ReservationServiceMockTest {
         assertThat(responses.get(2)).isEqualTo(expected3);
     }
 
-    @Test
-    @DisplayName("본인 예약들을 dto로 변환한다.")
-    void getMyReservations_dto_test() {
-        // given
-        List<Reservation> reservations = createReservations();
-        when(reservationRepository.findByMemberId(1L))
-                .thenReturn(reservations);
-        List<Waiting> waitings = createWaitings();
-        when(waitingRepository.findByMemberId(1L))
-                .thenReturn(waitings);
-        MyReservationResponse expected1 = MyReservationResponse.from(reservations.get(0));
-        MyReservationResponse expected2 = MyReservationResponse.from(reservations.get(1));
-        MyReservationResponse expected3 = MyReservationResponse.from(reservations.get(2));
-        MyReservationResponse expected4 = MyReservationResponse.fromWaiting(waitings.get(0), 1L);
-
-        // when
-        List<MyReservationResponse> responses = reservationService.getMyReservations(1L);
-        // then
-        assertThat(responses).hasSize(4);
-        assertThat(responses).containsExactlyInAnyOrder(expected1, expected2, expected3, expected4);
-    }
-
     private List<Reservation> createReservations() {
         Theme theme1 = Theme.createWithoutId("테스트1", "설명", "localhost:8080");
         Theme theme2 = Theme.createWithoutId("테스트2", "설명", "localhost:8080");
@@ -196,13 +171,13 @@ class ReservationServiceMockTest {
 
         Reservation reservation1 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2024, 10, 6),
-                reservationTime1, theme1);
+                reservationTime1, theme1, null);
         Reservation reservation2 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2024, 10, 7),
-                reservationTime1, theme2);
+                reservationTime1, theme2, null);
         Reservation reservation3 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2024, 10, 8),
-                reservationTime1, theme2);
+                reservationTime1, theme2, null);
 
         return List.of(reservation1, reservation2, reservation3);
     }

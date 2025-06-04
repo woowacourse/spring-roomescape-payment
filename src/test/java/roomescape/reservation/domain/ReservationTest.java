@@ -1,22 +1,22 @@
 package roomescape.reservation.domain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.stream.Stream;
-import roomescape.member.domain.Member;
-import roomescape.member.domain.Role;
-import roomescape.reservationTime.domain.ReservationTime;
-import roomescape.theme.domain.Theme;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import roomescape.member.domain.Member;
+import roomescape.member.domain.Role;
+import roomescape.reservationTime.domain.ReservationTime;
+import roomescape.theme.domain.Theme;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ReservationTest {
 
@@ -37,7 +37,7 @@ class ReservationTest {
         ReservationTime reservationTime1 = ReservationTime.createWithoutId(LocalTime.of(20, 10));
         Theme theme = Theme.createWithoutId("a", "a", "a");
         Member member = Member.createWithoutId("a", "a", "a", Role.USER);
-        Reservation reservation = Reservation.createWithoutId(LocalDateTime.of(2025, 1, 1, 10, 0), member, LocalDate.of(2025, 11, 2), reservationTime1, theme);
+        Reservation reservation = Reservation.createWithoutId(LocalDateTime.of(2025, 1, 1, 10, 0), member, LocalDate.of(2025, 11, 2), reservationTime1, theme, null);
         // when
         ReservationTime reservationTime2 = ReservationTime.createWithId(2L, localTime);
         // then
@@ -54,7 +54,7 @@ class ReservationTest {
         Theme theme = Theme.createWithoutId("a", "a", "a");
         Member member = Member.createWithoutId("a", "a", "a", Role.USER);
         // when & then
-        assertThatThrownBy(() -> Reservation.createWithoutId(now, member, date, reservationTime, theme))
+        assertThatThrownBy(() -> Reservation.createWithoutId(now, member, date, reservationTime, theme, null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }
