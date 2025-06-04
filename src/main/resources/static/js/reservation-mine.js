@@ -74,7 +74,8 @@ function render(data) {
         row.insertCell(4).textContent = status;
 
         if (status.includes('예약대기')) { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드, 상태 값은 변경 가능
-            const cancelCell = row.insertCell(5);
+            row.insertCell(5).textContent = '';
+            const cancelCell = row.insertCell(6);
             const cancelButton = document.createElement('button');
             cancelButton.textContent = '취소';
             cancelButton.className = 'btn btn-danger';
@@ -82,11 +83,11 @@ function render(data) {
                 requestDeleteWaiting(item.id).then(() => window.location.reload());
             };
             cancelCell.appendChild(cancelButton);
-            row.insertCell(6).textContent = '';
             row.insertCell(7).textContent = '';
+            row.insertCell(8).textContent = '';
         } else if (status === '결제 대기') {
-            const pendingCell = row.insertCell(5);
             const pendingButton = document.createElement('button');
+            const pendingCell = row.insertCell(5);
             pendingButton.textContent = '예약 확정';
             pendingButton.className = 'btn btn-primary';
 
@@ -102,10 +103,12 @@ function render(data) {
             pendingCell.appendChild(pendingButton);
             row.insertCell(6).textContent = '';
             row.insertCell(7).textContent = '';
+            row.insertCell(8).textContent = '';
         } else { // 예약 완료 상태일 때
             row.insertCell(5).textContent = '';
-            row.insertCell(6).textContent = item.paymentKey;
-            row.insertCell(7).textContent = item.amount;
+            row.insertCell(6).textContent = '';
+            row.insertCell(7).textContent = item.paymentKey;
+            row.insertCell(8).textContent = item.amount;
         }
     });
 }
