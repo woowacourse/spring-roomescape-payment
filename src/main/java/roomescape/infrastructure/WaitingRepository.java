@@ -27,6 +27,9 @@ public interface WaitingRepository extends JpaRepository<Waiting, Id> {
                     )
                 )
                 FROM Waiting w
+                JOIN FETCH w.member
+                JOIN FETCH w.time
+                JOIN FETCH w.theme
                 WHERE w.member.id = :userId
             """)
     List<WaitingWithRankResponse> findByUserIdWithRank(@Param("userId") Id userId);

@@ -21,6 +21,7 @@ import roomescape.presentation.dto.request.AdminReservationRequest;
 import roomescape.presentation.dto.request.ReservationCondition;
 import roomescape.presentation.dto.request.ReservationRequest;
 import roomescape.presentation.dto.response.ReservationResponse;
+import roomescape.presentation.dto.response.ReservationWithPaymentResponse;
 
 @RestController
 @RequiredArgsConstructor
@@ -53,7 +54,7 @@ public class ReservationApiController {
 
     @GetMapping("/reservations/me")
     @AuthRequired
-    public List<ReservationResponse> getMyReservations(LoginInfo loginInfo) {
+    public List<ReservationWithPaymentResponse> getMyReservations(LoginInfo loginInfo) {
         return reservationService.getMyReservations(loginInfo.id());
     }
 

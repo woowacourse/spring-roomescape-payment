@@ -25,24 +25,23 @@ import roomescape.infrastructure.ReservationRepository;
 import roomescape.infrastructure.ReservationTimeRepository;
 import roomescape.infrastructure.ThemeRepository;
 import roomescape.infrastructure.WaitingRepository;
-import roomescape.infrastructure.payment.PaymentClient;
-import roomescape.infrastructure.payment.toss.dto.TossPaymentApproveRequest;
 import roomescape.presentation.dto.request.AdminReservationRequest;
 import roomescape.presentation.dto.request.ReservationCondition;
 import roomescape.presentation.dto.request.ReservationRequest;
 import roomescape.presentation.dto.response.ReservationResponse;
+import roomescape.presentation.dto.response.ReservationWithPaymentResponse;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class ReservationService {
 
+    private final PaymentService paymentService;
     private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final WaitingRepository waitingRepository;
-    private final PaymentClient paymentClient;
 
     public ReservationResponse addAndGet(LoginInfo loginInfo, ReservationRequest request) {
         Member member = memberRepository.findById(Id.create(loginInfo.id()))
@@ -53,10 +52,9 @@ public class ReservationService {
                 .orElseThrow(() -> new NotFoundException(THEME_NOT_EXIST));
 
         validateDuplicatedReservation(request.date(), timeSlot, theme);
-        Reservation reservation = Reservation.create(member, request.date(), timeSlot, theme);
-        reservationRepository.save(reservation);
-        paymentClient.approvePayment(
-                new TossPaymentApproveRequest(request.paymentKey(), request.orderId(), request.amount()));
+        Reservation reservation = reservationRepository.save(
+                Reservation.create(member, request.date(), timeSlot, theme));
+        paymentService.pay(reservation, request.paymentKey(), request.orderId(), request.amount());
         return ReservationResponse.from(reservation);
     }
 
@@ -109,11 +107,8 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReservationResponse> getMyReservations(final String userIdValue) {
+    public List<ReservationWithPaymentResponse> getMyReservations(final String userIdValue) {
         Id userId = Id.create(userIdValue);
-        return reservationRepository.findAllReservationWithFilter(null, userId, null, null)
-                .stream()
-                .map(ReservationResponse::from)
-                .toList();
+        return reservationRepository.findByMemberIdWithPayment(userId.id());
     }
 }
