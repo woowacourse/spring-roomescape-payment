@@ -17,6 +17,7 @@ import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ThemeRepository;
 import roomescape.domain.repository.WaitingRepository;
+import roomescape.dto.request.PaymentRequest;
 import roomescape.dto.request.ReservationCondition;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationWithStatusResponse;
@@ -27,7 +28,6 @@ import roomescape.exception.ReservationTimeNotFoundException;
 import roomescape.exception.ThemeNotFoundException;
 
 @Service
-@Transactional
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -35,17 +35,19 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentService paymentService;
 
-    public ReservationService(ReservationRepository reservationRepository,
-                              ReservationTimeRepository reservationTimeRepository,
-                              ThemeRepository themeRepository,
-                              MemberRepository memberRepository,
-                              WaitingRepository waitingRepository) {
+    public ReservationService(final ReservationRepository reservationRepository,
+                              final ReservationTimeRepository reservationTimeRepository,
+                              final ThemeRepository themeRepository,
+                              final MemberRepository memberRepository, final WaitingRepository waitingRepository,
+                              final PaymentService paymentService) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentService = paymentService;
     }
 
     @Transactional(readOnly = true)
@@ -77,15 +79,14 @@ public class ReservationService {
                 .toList();
     }
 
+    @Transactional
     public ReservationResponse createReservation(Long memberId, Long timeId, Long themeId, LocalDate date) {
-
         ReservationTime reservationTime = reservationTimeRepository.findById(timeId)
                 .orElseThrow(ReservationTimeNotFoundException::new);
         Theme theme = themeRepository.findById(themeId).orElseThrow(ThemeNotFoundException::new);
         Member member = memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
 
         Reservation reservation = Reservation.createWithoutId(member, date, reservationTime, theme);
-
         reservation.validateDateTime();
         validateDuplicate(date, reservationTime, theme);
 
@@ -93,26 +94,33 @@ public class ReservationService {
         return ReservationResponse.from(savedReservation);
     }
 
+    public ReservationResponse processReservationForMember(Long memberId,
+                                                           Long timeId,
+                                                           Long themeId,
+                                                           LocalDate date,
+                                                           PaymentRequest request) {
+        PaymentInfo paymentInfo = paymentService.createPaymentInfo(request);
+        return createReservationForMember(memberId, timeId, themeId, date, paymentInfo);
+    }
+
+    @Transactional
     public ReservationResponse createReservationForMember(Long memberId,
                                                           Long timeId,
                                                           Long themeId,
                                                           LocalDate date,
                                                           PaymentInfo paymentInfo) {
-
         ReservationTime reservationTime = reservationTimeRepository.findById(timeId)
                 .orElseThrow(ReservationTimeNotFoundException::new);
         Theme theme = themeRepository.findById(themeId).orElseThrow(ThemeNotFoundException::new);
         Member member = memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
 
         Reservation reservation = Reservation.createWithoutId(member, date, reservationTime, theme);
-
         reservation.validateDateTime();
         validateDuplicate(date, reservationTime, theme);
 
         Reservation savedReservation = reservationRepository.save(reservation);
         return ReservationResponse.from(savedReservation);
     }
-
 
     private void validateDuplicate(LocalDate date, ReservationTime time, Theme theme) {
         if (reservationRepository.findByDateAndReservationTimeAndTheme(date, time, theme).isPresent()) {
@@ -120,6 +128,7 @@ public class ReservationService {
         }
     }
 
+    @Transactional
     public void deleteReservationById(Long id) {
         Reservation reservation = reservationRepository.findById(id).orElseThrow(ReservationNotFoundException::new);
         reservationRepository.deleteById(id);
