@@ -32,17 +32,6 @@ public class PaymentService {
     }
 
     @Transactional
-    public void delete(long paymentId) {
-        Payment payment = paymentRepository.findById(paymentId)
-                .orElseThrow();
-        payment.cancel();
-    }
-
-    public Payment createPayment(Payment payment) {
-        return null;
-    }
-
-    @Transactional
     public void confirm(Long paymentId) {
         Payment payment = getPayment(paymentId);
         payment.confirm();

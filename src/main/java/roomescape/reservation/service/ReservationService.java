@@ -91,6 +91,7 @@ public class ReservationService {
 
     @Transactional
     public void deleteReservationById(final Long id) {
+        List<Reservation> reservations = reservationRepository.findAll();
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new InvalidReservationException("존재하지 않는 예약입니다."));
         Payment payment = paymentRepository.findByReservationId(id)

@@ -30,7 +30,7 @@ public class Payment {
     private PaymentStatus status;
 
     @OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false)
+    @JoinColumn
     private Reservation reservation;
 
     public Payment(Long id, String orderId, String paymentKey, Long amount, PaymentStatus status, Reservation reservation) {

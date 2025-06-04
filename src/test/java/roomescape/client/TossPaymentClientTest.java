@@ -21,7 +21,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class TossPaymentClientTest {
-
     private final TossPaymentClient tossPaymentClient = new TossPaymentClient(BUILDER.build());
 
     @BeforeEach
