@@ -8,19 +8,18 @@ import roomescape.dto.response.TossPaymentResponse;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Map;
 
 @Component
-public class PaymentApproveClient {
+public class PaymentCheckClient {
 
     private final RestClient restClient;
     private final String widgetSecretKey;
-    private final String paymentApproveUrl;
+    private final String paymentCheckUrl;
 
-    public PaymentApproveClient(
+    public PaymentCheckClient(
             @Value("${toss.payments.base-url}") String baseUrl,
             @Value("${toss.payments.widget-secret-key}") String widgetSecretKey,
-            @Value("${toss.payments.payment-approve-url}") String paymentApproveUrl,
+            @Value("${toss.payments.payment-check-url}") String paymentCheckUrl,
             TimeoutClientHttpRequestFactory requestFactory
     ) {
         this.restClient = RestClient.builder()
@@ -29,20 +28,13 @@ public class PaymentApproveClient {
                 .defaultStatusHandler(new PaymentApproveErrorHandler())
                 .build();
         this.widgetSecretKey = widgetSecretKey;
-        this.paymentApproveUrl = paymentApproveUrl;
+        this.paymentCheckUrl = paymentCheckUrl;
     }
 
-    public TossPaymentResponse approve(String paymentKey, String orderId, int amount) {
-        final Map<String, Object> requestBody = Map.of(
-                "amount", amount,
-                "orderId", orderId,
-                "paymentKey", paymentKey
-        );
-
-        return restClient.post().uri(paymentApproveUrl)
+    public TossPaymentResponse check(String paymentKey) {
+        return restClient.get().uri(paymentCheckUrl, paymentKey)
                 .header("Authorization", getAuthorizations())
                 .accept(MediaType.APPLICATION_JSON)
-                .body(requestBody)
                 .retrieve()
                 .body(TossPaymentResponse.class);
     }

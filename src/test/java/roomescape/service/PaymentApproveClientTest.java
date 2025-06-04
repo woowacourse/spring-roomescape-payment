@@ -37,7 +37,7 @@ class PaymentApproveClientTest {
                 .willReturn(okJson(successResponse())));
 
         // when
-        final TossPaymentResponse response = paymentApproveClient.approvePayment(
+        final TossPaymentResponse response = paymentApproveClient.approve(
                 "5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1",
                 "a4CWyWY5m89PNh7xJwhk1",
                 1000
@@ -61,7 +61,7 @@ class PaymentApproveClientTest {
                 .willReturn(jsonResponse(errorCode, 400)));
 
         // when, then
-        assertThatThrownBy(() -> paymentApproveClient.approvePayment(
+        assertThatThrownBy(() -> paymentApproveClient.approve(
                 "5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1",
                 "a4CWyWY5m89PNh7xJwhk1",
                 1000
@@ -84,7 +84,7 @@ class PaymentApproveClientTest {
                 .willReturn(jsonResponse(errorCode, 400)));
 
         // when, then
-        assertThatThrownBy(() -> paymentApproveClient.approvePayment(
+        assertThatThrownBy(() -> paymentApproveClient.approve(
                 "5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1",
                 "a4CWyWY5m89PNh7xJwhk1",
                 1000
@@ -101,7 +101,7 @@ class PaymentApproveClientTest {
                 .willReturn(aResponse().withFixedDelay(10000)));
 
         // when, then
-        assertThatThrownBy(() -> paymentApproveClient.approvePayment(
+        assertThatThrownBy(() -> paymentApproveClient.approve(
                 "5EnNZRJGvaBX7zk2yd8ydw26XvwXkLrx9POLqKQjmAw4b0e1",
                 "a4CWyWY5m89PNh7xJwhk1",
                 1000

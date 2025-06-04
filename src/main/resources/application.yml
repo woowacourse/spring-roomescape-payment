@@ -23,3 +23,6 @@ toss:
     payment-approve-url: /v1/payments/confirm
     payment-check-url: /v1/payments/{paymentKey}
     payment-cancel-url: /v1/payments/{paymentKey}/check
+http-client:
+  connect-timeout-millis: 5000
+  read-timeout-millis: 5000
