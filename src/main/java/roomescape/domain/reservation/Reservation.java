@@ -83,6 +83,10 @@ public class Reservation extends BaseEntity {
         return theme.getId().equals(themeId);
     }
 
+    public void cancel() {
+        this.status = ReservationStatus.CANCEL;
+    }
+
     public Long getId() {
         return id;
     }

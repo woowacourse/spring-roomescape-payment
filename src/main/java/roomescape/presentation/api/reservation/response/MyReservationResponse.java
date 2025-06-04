@@ -47,6 +47,7 @@ public record MyReservationResponse(
     private static String toDisplayStatus(ReservationStatus status) {
         return switch (status) {
             case RESERVE -> "예약";
+            case CANCEL -> "취소";
         };
     }
 
