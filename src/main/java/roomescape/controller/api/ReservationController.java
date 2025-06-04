@@ -58,7 +58,9 @@ public class ReservationController {
         ReservationCreateDto reservationCreateDto = new ReservationCreateDto(
                 requestDto.date(), requestDto.timeId(), requestDto.themeId(), loginInfo.id());
         ReservationResponseDto reservationDto = reservationCommandService.bookReservation(reservationCreateDto);
-        PaymentResponseDto paymentDto = paymentCommandService.confirmPayment(requestDto.extractTossPaymentDto());
+        PaymentResponseDto paymentDto = paymentCommandService.confirmPayment(
+                reservationDto.id(),
+                requestDto.extractTossPaymentDto());
 
         return CreatedReservationResponseDto.from(reservationDto, paymentDto);
     }

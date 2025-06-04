@@ -6,7 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.domain.payment.Payment;
+import roomescape.client.dto.PaymentConfirmResultDto;
 import roomescape.service.dto.PaymentConfirmDto;
 
 import java.util.Base64;
@@ -28,7 +28,7 @@ public class TossPaymentClient implements PaymentClient{
     }
 
     @Override
-    public Payment confirmPayment(PaymentConfirmDto requestDto) {
+    public PaymentConfirmResultDto confirmPayment(PaymentConfirmDto requestDto) {
         return restClient.post()
                 .uri(PAYMENT_CONFIRM_URL)
                 .header(HttpHeaders.AUTHORIZATION, BASIC +
@@ -36,6 +36,6 @@ public class TossPaymentClient implements PaymentClient{
                 .body(requestDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .body(Payment.class);
+                .body(PaymentConfirmResultDto.class);
     }
 }
