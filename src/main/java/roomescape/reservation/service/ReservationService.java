@@ -41,29 +41,6 @@ public class ReservationService {
         return reservationRepository.save(reservation);
     }
 
-    @Transactional
-    public void deleteById(final Long id) {
-        final Reservation reservation = reservationRepository.findById(id);
-        final Theme theme = reservation.getTheme();
-        final LocalDate date = reservation.getDate();
-        final ReservationTime time = reservation.getTime();
-
-        if (waitingRepository.existsByDateAndTimeAndTheme(date, time, theme)) {
-            waitingRepository.findFirstByThemeAndDateAndTimeOrderByIdAsc(theme, date, time)
-                    .ifPresent(waiting -> {
-                        reservationRepository.save(new Reservation(
-                                waiting.getMember(),
-                                waiting.getDate(),
-                                waiting.getTime(),
-                                waiting.getTheme()
-                        ));
-                        waitingRepository.deleteById(waiting.getId());
-                    });
-        }
-
-        reservationRepository.deleteById(id);
-    }
-
     @Transactional(readOnly = true)
     public List<Reservation> findAll() {
         return reservationRepository.findAll();

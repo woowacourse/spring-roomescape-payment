@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.member.domain.Member;
 import roomescape.member.service.MemberService;
+import roomescape.payment.entity.Payment;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.CreateReservationRequest;
@@ -35,7 +36,6 @@ public class ReservationServiceFacade {
     public CreateReservationResponse saveReservation(
             final CreateReservationRequest request,
             final LoginMember loginMember) {
-        paymentService.processPayment(request.paymentType(), request.paymentRequest());
 
         final Member member = memberService.findMemberByEmail(loginMember.email());
         final LocalDate date = request.date();
@@ -44,22 +44,22 @@ public class ReservationServiceFacade {
 
         final Reservation savedReservation = reservationService.save(member, date, timeId, themeId);
 
-        return CreateReservationResponse.from(savedReservation);
-    }
+        paymentService.processPayment(request.paymentType(), request.paymentRequest(), savedReservation);
 
-    @Transactional
-    public void deleteById(final Long id) {
-        reservationService.deleteById(id);
+        return CreateReservationResponse.from(savedReservation);
     }
 
     @Transactional(readOnly = true)
     public List<ReservationMineResponse> findMyReservations(final LoginMember loginMember) {
         final Member member = memberService.findMemberByEmail(loginMember.email());
-        final List<Reservation> reservations = reservationService.findByMember(member);
+        final List<Payment> payments = paymentService.findAll();
         final List<Waiting> waitings = reservationWaitingService.findWaitingByMember(member);
 
         return Stream.concat(
-                reservations.stream().map(ReservationMineResponse::from),
+                payments.stream().map(payment -> {
+                    final Reservation reservation = payment.getReservation();
+                    return ReservationMineResponse.from(reservation, payment);
+                }),
                 waitings.stream().map(waiting -> {
                     final long rank = reservationWaitingService.getRankInWaiting(waiting);
                     return ReservationMineResponse.from(waiting, rank);

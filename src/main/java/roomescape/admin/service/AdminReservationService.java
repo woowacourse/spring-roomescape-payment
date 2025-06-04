@@ -26,7 +26,7 @@ public class AdminReservationService {
     private final MemberRepositoryInterface memberRepository;
 
     @Transactional
-    public Reservation saveByAdmin(final LocalDate date, final Long themeId, final Long timeId, final Long memberId) {
+    public Reservation save(final LocalDate date, final Long themeId, final Long timeId, final Long memberId) {
         final ReservationTime reservationTime = reservationTimeRepository.findById(timeId);
         final Theme theme = themeRepository.findById(themeId);
         final Member member = findMemberById(memberId);
@@ -58,5 +58,13 @@ public class AdminReservationService {
         if (reservationRepository.existsByDateAndTimeAndTheme(date, reservationTime, theme)) {
             throw new ReservationNotAllowedException("이미 예약이 존재해 예약을 할 수 없습니다.");
         }
+    }
+
+    public void deleteById(final Long reservationId) {
+        reservationRepository.deleteById(reservationId);
+    }
+
+    public Reservation findById(final Long reservationId) {
+        return reservationRepository.findById(reservationId);
     }
 }

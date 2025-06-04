@@ -34,9 +34,16 @@ public class AdminRestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(adminReservationResponse);
     }
 
+    @DeleteMapping("/reservations/{id}")
+    public ResponseEntity<Void> deleteReservation(@PathVariable final Long id) {
+        adminService.deleteById(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/searchable-reservations")
     public ResponseEntity<List<AdminReservationResponse>> getReservationsBySearch(
-            @ModelAttribute ReservationSearchRequest searchRequest
+            @ModelAttribute final ReservationSearchRequest searchRequest
     ) {
         final List<AdminReservationResponse> searchedResponses = adminService.findByInFromTo(searchRequest);
 

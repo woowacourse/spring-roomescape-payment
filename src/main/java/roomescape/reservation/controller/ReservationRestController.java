@@ -42,13 +42,6 @@ public class ReservationRestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createReservationResponse);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReservation(@PathVariable final Long id) {
-        reservationServiceFacade.deleteById(id);
-
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping
     public ResponseEntity<List<CreateReservationResponse>> getReservations() {
         final List<CreateReservationResponse> createReservationResponse = reservationServiceFacade.findAll();
