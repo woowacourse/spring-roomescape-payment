@@ -2,6 +2,7 @@ package roomescape;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import roomescape.domain.RoomescapeSchedule;
 import roomescape.domain.reservation.Reservation;
@@ -74,5 +75,24 @@ public class TestFixtures {
             ),
             ReservationStatus.CONFIRMED
         );
+    }
+
+    public static Reservation anyReservationWithNewId(final ReservationStatus status) {
+        return new Reservation(
+            ID_GENERATOR.incrementAndGet(),
+            anyUserWithNewId(),
+            RoomescapeSchedule.forReserve(
+                anyDateAfterToday(),
+                anyTimeSlotWithNewId(),
+                anyThemeWithNewId()
+            ),
+            status
+        );
+    }
+
+    public static LocalDate anyDateAfterToday() {
+        var today = LocalDate.now();
+        var daysToAdd = new Random().nextInt(99999) + 1;
+        return today.plusDays(daysToAdd);
     }
 }

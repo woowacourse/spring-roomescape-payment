@@ -7,7 +7,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestComponent;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.domain.RoomescapeSchedule;
 import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.user.User;
@@ -72,6 +74,18 @@ public class TestRepositoryHelper {
     public Reservation saveReservation(final Reservation reservation) {
         em.persist(reservation);
         return em.find(Reservation.class, reservation.id());
+    }
+
+    public Reservation saveAnyReservation(final ReservationStatus status) {
+        return saveReservation(new Reservation(
+            saveAnyUser(),
+            RoomescapeSchedule.of(
+                TestFixtures.anyDateAfterToday(),
+                saveAnyTimeSlot(),
+                saveAnyTheme()
+            ),
+            status
+        ));
     }
 
     private List<String> lookUpTableNames() {

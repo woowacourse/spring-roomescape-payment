@@ -134,7 +134,7 @@ class ReservationServiceTest extends ServiceTest {
     }
 
     @Test
-    @DisplayName("예약을 삭제했을 때 뒤따르던 예약 대기가 있으면 첫번째 대기가 확정된다.")
+    @DisplayName("예약을 삭제했을 때 뒤따르던 예약 대기가 있으면 뒤따르던 대기를 보류시킨다.")
     void removeByIdWithFollowingWaitings() {
         // given
         var confirmedReservation = new Reservation(user, RoomescapeSchedule.of(tomorrow(), timeSlot, theme), ReservationStatus.CONFIRMED);
@@ -148,7 +148,7 @@ class ReservationServiceTest extends ServiceTest {
 
         // then
         var second = repositoryHelper.findReservation(second_waiting.id());
-        assertThat(second.status()).isEqualTo(ReservationStatus.CONFIRMED);
+        assertThat(second.status()).isEqualTo(ReservationStatus.PENDING);
     }
 
     @Test
