@@ -3,25 +3,27 @@ package roomescape.booking.dto;
 import roomescape.booking.reservation.Reservation;
 import roomescape.booking.reservation.ReservationStatus;
 import roomescape.booking.waiting.Waiting;
+import roomescape.order.dto.OrderResponse;
 import roomescape.schedule.dto.ScheduleResponse;
 
 public record BookingResponse(
         Long id,
         ScheduleResponse schedule,
-        String status
+        String status,
+        OrderResponse order
 ) {
 
     public static BookingResponse of(Reservation reservation) {
         if (reservation.getReservationStatus() == ReservationStatus.CONFIRMED) {
-            return new BookingResponse(reservation.getId(), ScheduleResponse.of(reservation.getSchedule()), "예약");
+            return new BookingResponse(reservation.getId(), ScheduleResponse.of(reservation.getSchedule()), "예약", OrderResponse.from(reservation.getOrder()));
         }
         if (reservation.getReservationStatus() == ReservationStatus.PROMOTED) {
-            return new BookingResponse(reservation.getId(), ScheduleResponse.of(reservation.getSchedule()), "결제 대기");
+            return new BookingResponse(reservation.getId(), ScheduleResponse.of(reservation.getSchedule()), "결제 대기", OrderResponse.from(reservation.getOrder()));
         }
-        return new BookingResponse(reservation.getId(), ScheduleResponse.of(reservation.getSchedule()), "결제 실패");
+        return new BookingResponse(reservation.getId(), ScheduleResponse.of(reservation.getSchedule()), "결제 실패", OrderResponse.from(reservation.getOrder()));
     }
 
     public static BookingResponse of(Waiting waiting, Long rank) {
-        return new BookingResponse(waiting.getId(), ScheduleResponse.of(waiting.getSchedule()), rank + "번째 예약대기");
+        return new BookingResponse(waiting.getId(), ScheduleResponse.of(waiting.getSchedule()), rank + "번째 예약대기", OrderResponse.createEmptyOrderResponse());
     }
 }

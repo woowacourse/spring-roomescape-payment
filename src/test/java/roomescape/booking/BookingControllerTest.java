@@ -70,8 +70,8 @@ class BookingControllerTest {
         given(jwtProvider.extractBody(any())).willReturn(new TokenBody(claims));
 
         List<BookingResponse> responses = List.of(
-                new BookingResponse(1L, null, "예약"),
-                new BookingResponse(2L, null, "1번째 예약대기")
+                new BookingResponse(1L, null, "예약", null),
+                new BookingResponse(2L, null, "1번째 예약대기", null)
         );
 
         given(bookingService.readAllByMember(any(LoginMember.class))).willReturn(responses);
