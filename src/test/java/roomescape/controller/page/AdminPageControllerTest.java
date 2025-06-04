@@ -2,20 +2,23 @@ package roomescape.controller.page;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.dto.auth.LoginRequestDto;
 import roomescape.repository.JpaMemberRepository;
 
+import java.util.Map;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@ActiveProfiles("test")
 class AdminPageControllerTest {
 
     @Autowired
@@ -25,10 +28,10 @@ class AdminPageControllerTest {
 
     @BeforeEach
     void setUp() {
-        memberRepository.save(new Member(null, "가이온", "hello@woowa.com", Role.USER, "password"));
-        memberRepository.save(new Member(null, "가이온1", "hello1@woowa.com", Role.ADMIN, "password"));
+        memberRepository.save(new Member(null, "가이온", "hello1@woowa.com", Role.USER, "password"));
+        memberRepository.save(new Member(null, "가이온1", "hello2@woowa.com", Role.ADMIN, "password"));
 
-        LoginRequestDto loginRequestDto = new LoginRequestDto("hello@woowa.com", "password");
+        LoginRequestDto loginRequestDto = new LoginRequestDto("hello1@woowa.com", "password");
         Map<String, String> cookies = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(loginRequestDto)
@@ -37,7 +40,7 @@ class AdminPageControllerTest {
 
         userToken = cookies.get("token");
 
-        LoginRequestDto loginRequestDto1 = new LoginRequestDto("hello1@woowa.com", "password");
+        LoginRequestDto loginRequestDto1 = new LoginRequestDto("hello2@woowa.com", "password");
         Map<String, String> cookies2 = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(loginRequestDto1)

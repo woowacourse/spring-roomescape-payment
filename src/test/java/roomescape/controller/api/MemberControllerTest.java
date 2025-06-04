@@ -1,7 +1,5 @@
 package roomescape.controller.api;
 
-import static org.hamcrest.Matchers.is;
-
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import roomescape.domain.member.Member;
@@ -20,10 +19,12 @@ import roomescape.domain.member.Role;
 import roomescape.dto.auth.SignUpRequestDto;
 import roomescape.util.JwtTokenProvider;
 
+import static org.hamcrest.Matchers.is;
+
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 @Sql(scripts = {"/test-data.sql"}, executionPhase = ExecutionPhase.BEFORE_TEST_CLASS)
-//@Transactional
+@ActiveProfiles("test")
 class MemberControllerTest {
 
     String loginToken;
