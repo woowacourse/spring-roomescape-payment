@@ -18,14 +18,14 @@ import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import roomescape.payment.exception.PaymentProcessException;
-import roomescape.payment.exception.PaymentServerException;
-import roomescape.payment.exception.PaymentTemporaryException;
 import roomescape.payment.client.TossPaymentClient;
 import roomescape.payment.config.TestTossPaymentConfig;
 import roomescape.payment.config.TossPaymentConfigProperties;
 import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;
+import roomescape.payment.exception.PaymentProcessException;
+import roomescape.payment.exception.PaymentServerException;
+import roomescape.payment.exception.PaymentTemporaryException;
 import roomescape.payment.interceptor.TossPaymentResponseInterceptor;
 
 
@@ -42,7 +42,7 @@ class TossPaymentClientTest extends TossPaymentMockSupport {
         String orderId = "orderId";
         Long amount = 10000L;
 
-        TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(orderId);
+        TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(orderId, paymentKey);
         TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount);
         String json = objectMapper.writeValueAsString(request);
 

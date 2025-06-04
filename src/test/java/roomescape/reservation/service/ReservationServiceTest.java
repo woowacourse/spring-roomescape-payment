@@ -2,15 +2,22 @@ package roomescape.reservation.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.awaitility.Awaitility.await;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.common.CleanUp;
 import roomescape.fixture.db.MemberDbFixture;
 import roomescape.fixture.db.ReservationDateTimeDbFixture;
@@ -20,10 +27,16 @@ import roomescape.fixture.entity.ReservationDateFixture;
 import roomescape.global.exception.InvalidArgumentException;
 import roomescape.global.exception.NotFoundException;
 import roomescape.member.domain.Member;
+import roomescape.payment.client.TossPaymentClient;
+import roomescape.payment.dto.TossPaymentResponse;
+import roomescape.payment.exception.PaymentServerException;
+import roomescape.reservation.controller.request.PaymentInfoRequest;
+import roomescape.reservation.controller.request.ReservePaymentRequest;
 import roomescape.reservation.controller.response.MyReservationResponse;
 import roomescape.reservation.controller.response.ReservationResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDateTime;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.exception.InAlreadyReservationException;
 import roomescape.reservation.exception.PastReservationException;
 import roomescape.reservation.repository.ReservationRepository;
@@ -50,6 +63,9 @@ class ReservationServiceTest {
     private ReservationDateTimeDbFixture reservationDateTimeDbFixture;
     @Autowired
     private CleanUp cleanUp;
+
+    @MockitoBean
+    private TossPaymentClient tossPaymentClient;
 
     @BeforeEach
     void setUp() {
@@ -79,7 +95,7 @@ class ReservationServiceTest {
         Theme theme = themeDbFixture.공포();
         Member reserver = memberDbFixture.유저1_생성();
         ReservationDateTime reservationDateTime = reservationDateTimeDbFixture.내일_열시();
-        Reservation reservation = Reservation.reserve(reserver, reservationDateTime, theme);
+        Reservation reservation = Reservation.reserved(reserver, reservationDateTime, theme);
         reservationRepository.save(reservation);
 
         ReserveCommand command = new ReserveCommand(reservation.getDate(), reservation.getTheme().getId(),
@@ -95,7 +111,8 @@ class ReservationServiceTest {
         ReservationDateTime reservationDateTime = reservationDateTimeDbFixture.내일_열시();
         Theme theme = themeDbFixture.공포();
 
-        Reservation reservation = reservationRepository.save(Reservation.reserve(reserver, reservationDateTime, theme));
+        Reservation reservation = reservationRepository.save(
+                Reservation.reserved(reserver, reservationDateTime, theme));
 
         reservationService.delete(reservation.getId());
 
@@ -153,7 +170,7 @@ class ReservationServiceTest {
         ReservationDateTime 내일_열시 = reservationDateTimeDbFixture.내일_열시();
 
         // 예약 등록
-        reservationRepository.save(Reservation.reserve(member, 내일_열시, theme));
+        reservationRepository.save(Reservation.reserved(member, 내일_열시, theme));
         // 대기 등록
         reservationRepository.save(Reservation.waiting(member, 내일_열시, theme));
 
@@ -176,8 +193,9 @@ class ReservationServiceTest {
         ReservationDateTime reservationDateTime = reservationDateTimeDbFixture.내일_열시();
         Theme theme = themeDbFixture.공포();
 
-        Reservation reservation1 = reservationRepository.save(Reservation.reserve(member1, reservationDateTime, theme));
-        reservationRepository.save(Reservation.reserve(member2, reservationDateTime, theme));
+        Reservation reservation1 = reservationRepository.save(
+                Reservation.reserved(member1, reservationDateTime, theme));
+        reservationRepository.save(Reservation.reserved(member2, reservationDateTime, theme));
 
         List<MyReservationResponse> myReservations = reservationService.getAllReservations(member1.getId());
 
@@ -211,7 +229,7 @@ class ReservationServiceTest {
                 유저1.getId()
         );
 
-        reservationRepository.save(Reservation.reserve(유저2, 내일_열시, 공포));
+        reservationRepository.save(Reservation.reserved(유저2, 내일_열시, 공포));
 
         // when
         ReservationResponse response = reservationService.waiting(command);
@@ -263,7 +281,7 @@ class ReservationServiceTest {
                 유저1.getId()
         );
 
-        reservationRepository.save(Reservation.reserve(유저1, 내일_열시, 공포));
+        reservationRepository.save(Reservation.reserved(유저1, 내일_열시, 공포));
 
         // when & then
         assertThatThrownBy(() -> reservationService.waiting(command))
@@ -304,7 +322,7 @@ class ReservationServiceTest {
 
         Member 유저2 = memberDbFixture.유저2_생성();
 
-        reservationRepository.save(Reservation.reserve(유저2, 과거_시간, 공포));
+        reservationRepository.save(Reservation.reserved(유저2, 과거_시간, 공포));
 
         // when & then
         assertThatThrownBy(() -> reservationService.waiting(command))
@@ -326,7 +344,7 @@ class ReservationServiceTest {
         );
 
         Member 유저2 = memberDbFixture.유저2_생성();
-        reservationRepository.save(Reservation.reserve(유저2, 내일_열시, 공포));
+        reservationRepository.save(Reservation.reserved(유저2, 내일_열시, 공포));
 
         reservationService.waiting(command);
 
@@ -350,11 +368,81 @@ class ReservationServiceTest {
 
         Member 유저2 = memberDbFixture.유저2_생성();
 
-        reservationRepository.save(Reservation.reserve(유저2, 내일_열시, 공포));
+        reservationRepository.save(Reservation.reserved(유저2, 내일_열시, 공포));
 
         // when & then
         assertThatThrownBy(() -> reservationService.waiting(command))
                 .isInstanceOf(InvalidArgumentException.class)
                 .hasMessage("존재하지 않는 멤버입니다.");
     }
+
+    @Test
+    void 예약을_하면_결제를_포함하여_처리한다() {
+        // given
+        Theme 공포 = themeDbFixture.공포();
+        ReservationDateTime 내일_열시 = reservationDateTimeDbFixture.내일_열시();
+        Member 유저2 = memberDbFixture.유저2_생성();
+
+        String paymentKey = "paymentKey";
+        String orderId = "orderId";
+        PaymentInfoRequest paymentInfoRequest = new PaymentInfoRequest(
+                paymentKey,
+                orderId,
+                10000L,
+                "NORMAL"
+        );
+        ReservePaymentRequest reservePaymentRequest = new ReservePaymentRequest(내일_열시.getDate(), 공포.getId(),
+                내일_열시.getReservationTime().getId(), paymentInfoRequest);
+
+        TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(orderId, paymentKey);
+
+        given(tossPaymentClient.getPaymentConfirm(any())).willReturn(tossPaymentResponse);
+        given(tossPaymentClient.getPayment(any())).willReturn(tossPaymentResponse);
+
+        // when
+        ReservationResponse result = reservationService.pending(reservePaymentRequest, 유저2.getId());
+
+        // then
+        await().atMost(1, TimeUnit.SECONDS)
+                .untilAsserted(() -> {
+                    Reservation reservation = reservationRepository.findById(result.id()).get();
+                    assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.RESERVED);
+                });
+
+        verify(tossPaymentClient, times(1)).getPayment(any());
+        verify(tossPaymentClient, times(1)).getPaymentConfirm(any());
+    }
+
+    @Test
+    void 결제가_실패할_수_있다() {
+        Theme 공포 = themeDbFixture.공포();
+        ReservationDateTime 내일_열시 = reservationDateTimeDbFixture.내일_열시();
+        Member 유저2 = memberDbFixture.유저2_생성();
+
+        String paymentKey = "paymentKey";
+        String orderId = "orderId";
+        PaymentInfoRequest paymentInfoRequest = new PaymentInfoRequest(
+                paymentKey,
+                orderId,
+                10000L,
+                "NORMAL"
+        );
+        ReservePaymentRequest reservePaymentRequest = new ReservePaymentRequest(내일_열시.getDate(), 공포.getId(),
+                내일_열시.getReservationTime().getId(), paymentInfoRequest);
+
+        TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(orderId, paymentKey);
+
+        given(tossPaymentClient.getPaymentConfirm(any())).willThrow(new PaymentServerException("결제 실패"));
+
+        // when
+        ReservationResponse result = reservationService.pending(reservePaymentRequest, 유저2.getId());
+
+        // then
+        await().atMost(1, TimeUnit.SECONDS)
+                .untilAsserted(() -> {
+                    Reservation reservation = reservationRepository.findById(result.id()).get();
+                    assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.PAYMENT_FAILED);
+                });
+    }
+
 }

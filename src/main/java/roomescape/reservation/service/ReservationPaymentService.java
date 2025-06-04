@@ -1,0 +1,43 @@
+package roomescape.reservation.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import roomescape.global.exception.NotFoundException;
+import roomescape.payment.domain.Orders;
+import roomescape.payment.repository.OrdersRepository;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.repository.ReservationRepository;
+
+@Service
+@RequiredArgsConstructor
+public class ReservationPaymentService {
+
+    private final ReservationRepository reservationRepository;
+    private final OrdersRepository ordersRepository;
+
+    @Transactional
+    public void paid(Long reservationId, String paymentKey) {
+        Reservation reservation = reservationRepository.findByIdAndStatus(reservationId,
+                ReservationStatus.PENDING_PAYMENT).orElseThrow(() -> new NotFoundException("예약을 찾을 수 없습니다."));
+
+        Orders orders = getOrders(paymentKey);
+
+        reservation.paid(orders);
+    }
+
+    @Transactional
+    public void failedPayment(Long id, String paymentKey) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("예약을 찾을 수 없습니다."));
+        Orders orders = getOrders(paymentKey);
+
+        reservation.failPayment(orders);
+    }
+
+    private Orders getOrders(String paymentKey) {
+        return ordersRepository.findByPaymentKey(paymentKey)
+                .orElseThrow(() -> new NotFoundException("주문을 찾을 수 없습니다."));
+    }
+}

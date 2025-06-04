@@ -27,7 +27,7 @@ public class ReservationTest {
 
     @Test
     void 대기상태가_아니면_예약상태로_전환시_예외가_발생한다() {
-        Reservation reservation = Reservation.reserve(member, reservationDateTime, theme);
+        Reservation reservation = Reservation.reserved(member, reservationDateTime, theme);
 
         assertThatThrownBy(reservation::changeReserved)
                 .isInstanceOf(InvalidStatusTransitionException.class);
@@ -35,7 +35,7 @@ public class ReservationTest {
 
     @Test
     void 예약상태에서_예약취소상태로_전환된다() {
-        Reservation reservation = Reservation.reserve(member, reservationDateTime, theme);
+        Reservation reservation = Reservation.reserved(member, reservationDateTime, theme);
 
         assertThatCode(reservation::cancelReservation)
                 .doesNotThrowAnyException();
@@ -59,7 +59,7 @@ public class ReservationTest {
 
     @Test
     void 대기상태가_아니면_대기취소시_예외가_발생한다() {
-        Reservation reservation = Reservation.reserve(member, reservationDateTime, theme);
+        Reservation reservation = Reservation.reserved(member, reservationDateTime, theme);
 
         assertThatThrownBy(reservation::cancelWaiting)
                 .isInstanceOf(InvalidStatusTransitionException.class);

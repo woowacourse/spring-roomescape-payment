@@ -10,15 +10,15 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.proxy.HibernateProxy;
 import roomescape.member.domain.Member;
+import roomescape.payment.domain.Orders;
 import roomescape.reservation.exception.InvalidStatusTransitionException;
 import roomescape.theme.domain.Theme;
 import roomescape.time.domain.ReservationTime;
@@ -40,6 +40,9 @@ public class Reservation {
     private Theme theme;
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
+    @OneToOne
+    @JoinColumn(name = "order_id")
+    private Orders orders;
 
     @Builder
     private Reservation(Member reserver, ReservationDateTime reservationDateTime, Theme theme,
@@ -50,8 +53,19 @@ public class Reservation {
         this.status = status;
     }
 
-    public static Reservation reserve(final Member reserver, final ReservationDateTime reservationDateTime,
+    public static Reservation pending(final Member reserver, final ReservationDateTime reservationDateTime,
                                       final Theme theme
+    ) {
+        return Reservation.builder()
+                .reserver(reserver)
+                .reservationDateTime(reservationDateTime)
+                .theme(theme)
+                .status(ReservationStatus.PENDING_PAYMENT)
+                .build();
+    }
+
+    public static Reservation reserved(final Member reserver, final ReservationDateTime reservationDateTime,
+                                       final Theme theme
     ) {
         return Reservation.builder()
                 .reserver(reserver)
@@ -100,6 +114,28 @@ public class Reservation {
         status = ReservationStatus.CANCELED;
     }
 
+    public void paid(Orders orders) {
+        if (orders == null) {
+            throw new IllegalArgumentException("주문 정보가 필요합니다.");
+        }
+
+        if (status != ReservationStatus.PENDING_PAYMENT) {
+            throw new InvalidStatusTransitionException("결제 대기 상태가 아닙니다.");
+        }
+
+        status = ReservationStatus.RESERVED;
+        this.orders = orders;
+    }
+
+    public void failPayment(Orders orders) {
+        if (status != ReservationStatus.PENDING_PAYMENT) {
+            throw new InvalidStatusTransitionException("결제 대기 상태가 아닙니다.");
+        }
+
+        status = ReservationStatus.PAYMENT_FAILED;
+        this.orders = orders;
+    }
+
     public String getReserverName() {
         return reserver.getName();
     }
@@ -122,33 +158,5 @@ public class Reservation {
 
     public Long getTimeId() {
         return reservationDateTime.getTimeId();
-    }
-
-    @Override
-    public final int hashCode() {
-        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer()
-                .getPersistentClass()
-                .hashCode() : getClass().hashCode();
-    }
-
-    @Override
-    public final boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null) {
-            return false;
-        }
-        Class<?> oEffectiveClass = o instanceof HibernateProxy
-                ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass()
-                : o.getClass();
-        Class<?> thisEffectiveClass = this instanceof HibernateProxy
-                ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass()
-                : this.getClass();
-        if (thisEffectiveClass != oEffectiveClass) {
-            return false;
-        }
-        Reservation that = (Reservation) o;
-        return getId() != null && Objects.equals(getId(), that.getId());
     }
 }

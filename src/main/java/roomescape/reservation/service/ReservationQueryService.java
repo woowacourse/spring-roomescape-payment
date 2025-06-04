@@ -17,7 +17,7 @@ import roomescape.reservation.repository.ReservationRepository;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class ReservedQueryService {
+public class ReservationQueryService {
 
     private static final ReservationStatus RESERVED = ReservationStatus.RESERVED;
 

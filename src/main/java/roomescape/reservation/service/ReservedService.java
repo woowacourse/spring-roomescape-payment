@@ -11,12 +11,12 @@ import roomescape.waiting.service.WaitingService;
 @RequiredArgsConstructor
 public class ReservedService {
 
-    private final ReservedQueryService reservedQueryService;
+    private final ReservationQueryService reservationQueryService;
     private final WaitingService waitingService;
 
     @Transactional
     public void cancel(Long id, Long userId) {
-        Reservation reserved = reservedQueryService.getReserved(id);
+        Reservation reserved = reservationQueryService.getReserved(id);
 
         if (!reserved.isOwner(userId)) {
             throw new NotAuthorizationException("해당 예약자가 아닙니다.");

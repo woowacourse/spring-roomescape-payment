@@ -17,7 +17,7 @@ public class ReservationDbFixture {
     private final ReservationRepository reservationRepository;
 
     public Reservation reserve() {
-        return reservationRepository.save(Reservation.reserve(
+        return reservationRepository.save(Reservation.reserved(
                 memberDbFixture.유저1_생성(),
                 new ReservationDateTime(ReservationDateFixture.예약날짜_내일, reservationTimeDbFixture.열시()),
                 themeDbFixture.공포())
@@ -26,6 +26,14 @@ public class ReservationDbFixture {
 
     public Reservation waiting() {
         return reservationRepository.save(Reservation.waiting(
+                memberDbFixture.유저1_생성(),
+                new ReservationDateTime(ReservationDateFixture.예약날짜_내일, reservationTimeDbFixture.열시()),
+                themeDbFixture.공포())
+        );
+    }
+
+    public Reservation pending() {
+        return reservationRepository.save(Reservation.pending(
                 memberDbFixture.유저1_생성(),
                 new ReservationDateTime(ReservationDateFixture.예약날짜_내일, reservationTimeDbFixture.열시()),
                 themeDbFixture.공포())

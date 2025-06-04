@@ -1,5 +1,7 @@
 package roomescape.reservation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -12,6 +14,7 @@ import io.restassured.http.ContentType;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +29,16 @@ import roomescape.config.AuthServiceTestConfig;
 import roomescape.fixture.db.MemberDbFixture;
 import roomescape.fixture.db.ReservationDateTimeDbFixture;
 import roomescape.fixture.db.ThemeDbFixture;
-import roomescape.payment.toss.dto.TossPaymentResponse;
-import roomescape.payment.toss.service.TossPaymentService;
+import roomescape.payment.client.TossPaymentClient;
+import roomescape.payment.dto.TossPaymentResponse;
+import roomescape.payment.service.TossPaymentService;
 import roomescape.reservation.controller.exception.ReservationExceptionHandler;
 import roomescape.reservation.controller.request.PaymentInfoRequest;
 import roomescape.reservation.controller.request.ReservePaymentRequest;
+import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDateTime;
+import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.repository.ReservationRepository;
 
 @Import({AuthServiceTestConfig.class, ReservationExceptionHandler.class})
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -55,8 +62,11 @@ class ReservationApiTest {
     @Autowired
     private ReservationDateTimeDbFixture reservationDateTimeDbFixture;
 
+    @Autowired
+    private ReservationRepository reservationRepository;
+
     @MockitoBean
-    private TossPaymentService tossPaymentService;
+    private TossPaymentClient tossPaymentClient;
 
     @BeforeEach
     void setUp() {
@@ -71,14 +81,62 @@ class ReservationApiTest {
         ReservationDateTime reservationDateTime = reservationDateTimeDbFixture.내일_열시();
         Long timeId = reservationDateTime.getReservationTime().getId();
 
-        TossPaymentResponse tossPaymentResponse = new TossPaymentResponse("orderId");
-        given(tossPaymentService.confirmPayment(any()))
+        String orderId = "orderId";
+        String paymentKey = "paymentKey";
+        TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(orderId, paymentKey);
+        given(tossPaymentClient.getPaymentConfirm(any()))
                 .willReturn(tossPaymentResponse);
-        given(tossPaymentService.getPayment(any()))
+        given(tossPaymentClient.getPayment(any()))
                 .willReturn(tossPaymentResponse);
 
         PaymentInfoRequest paymentInfoRequest = new PaymentInfoRequest(
-                "paymentKey",
+                paymentKey,
+                orderId,
+                10000L,
+                "NORMAL"
+        );
+
+        ReservePaymentRequest request = ReservePaymentRequest.builder()
+                .date(reservationDateTime.getDate())
+                .timeId(timeId)
+                .themeId(themeId)
+                .payment(paymentInfoRequest)
+                .build();
+
+        RestAssured.given().log().all()
+                .contentType(ContentType.JSON)
+                .cookie("token", StubTokenProvider.USER_STUB_TOKEN)
+                .body(objectMapper.writeValueAsString(request))
+                .when().post("/reservations")
+                .then().log().all()
+                .statusCode(201);
+
+        verify(tossPaymentClient, times(1)).getPaymentConfirm(any());
+
+        await().atMost(1, TimeUnit.SECONDS)
+                .untilAsserted(() ->{
+                    Reservation reservation = reservationRepository.findById(1L).get();
+                    assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.RESERVED);
+                });
+    }
+
+    @Test
+    void 결제_시_결제_정보가_맞지_않다면_예약_상태가_PAYMENT_FAILED로_변경한다() throws JsonProcessingException {
+        Long themeId = themeDbFixture.공포().getId();
+        ReservationDateTime reservationDateTime = reservationDateTimeDbFixture.내일_열시();
+        Long timeId = reservationDateTime.getReservationTime().getId();
+
+        String paymentKey = "paymentKey";
+        TossPaymentResponse tossPaymentResponse1 = new TossPaymentResponse("orderId1", paymentKey);
+        TossPaymentResponse tossPaymentResponse2 = new TossPaymentResponse("orderId2", paymentKey);
+
+        given(tossPaymentClient.getPaymentConfirm(any()))
+                .willReturn(tossPaymentResponse1);
+        given(tossPaymentClient.getPayment(any()))
+                .willReturn(tossPaymentResponse2);
+
+        PaymentInfoRequest paymentInfoRequest = new PaymentInfoRequest(
+                paymentKey,
                 "orderId",
                 10000L,
                 "NORMAL"
@@ -99,44 +157,11 @@ class ReservationApiTest {
                 .then().log().all()
                 .statusCode(201);
 
-        verify(tossPaymentService, times(1)).confirmPayment(any());
-    }
-
-    @Test
-    void 결졔_시_결제_정보가_맞지_않다면_예외를_반환한다() throws JsonProcessingException {
-        Long themeId = themeDbFixture.공포().getId();
-        ReservationDateTime reservationDateTime = reservationDateTimeDbFixture.내일_열시();
-        Long timeId = reservationDateTime.getReservationTime().getId();
-
-        TossPaymentResponse tossPaymentResponse1 = new TossPaymentResponse("orderId1");
-        TossPaymentResponse tossPaymentResponse2 = new TossPaymentResponse("orderId2");
-
-        given(tossPaymentService.confirmPayment(any()))
-                .willReturn(tossPaymentResponse1);
-        given(tossPaymentService.getPayment(any()))
-                .willReturn(tossPaymentResponse2);
-
-        PaymentInfoRequest paymentInfoRequest = new PaymentInfoRequest(
-                "paymentKey",
-                "orderId",
-                10000L,
-                "NORMAL"
-        );
-
-        ReservePaymentRequest request = ReservePaymentRequest.builder()
-                .date(reservationDateTime.getDate())
-                .timeId(timeId)
-                .themeId(themeId)
-                .payment(paymentInfoRequest)
-                .build();
-
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .cookie("token", StubTokenProvider.USER_STUB_TOKEN)
-                .body(objectMapper.writeValueAsString(request))
-                .when().post("/reservations")
-                .then().log().all()
-                .statusCode(502);
+        await().atMost(1, TimeUnit.SECONDS)
+                .untilAsserted(() ->{
+                    Reservation reservation = reservationRepository.findById(1L).get();
+                    assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.PAYMENT_FAILED);
+                });
     }
 
     @Test
@@ -196,6 +221,7 @@ class ReservationApiTest {
                 .then().log().all()
                 .statusCode(422);
     }
+
 
     private String formatDateTime(LocalDate localDate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");

@@ -3,13 +3,11 @@ package roomescape.reservation.service;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.InvalidArgumentException;
-import roomescape.payment.exception.PaymentServerException;
-import roomescape.payment.toss.dto.TossPaymentRequest;
-import roomescape.payment.toss.dto.TossPaymentResponse;
-import roomescape.payment.toss.service.TossPaymentService;
+import roomescape.payment.event.TossPaymentRequestedEvent;
 import roomescape.reservation.controller.request.ReservePaymentRequest;
 import roomescape.reservation.controller.response.MyReservationResponse;
 import roomescape.reservation.controller.response.ReservationResponse;
@@ -25,15 +23,15 @@ import roomescape.waiting.service.WaitingService;
 @Service
 public class ReservationService {
 
+    private final ApplicationEventPublisher eventPublisher;
     private final WaitingService waitingService;
     private final ReservationManager reservationManager;
     private final WaitingQueryService waitingQueryService;
-    private final ReservedQueryService reservedQueryService;
-    private final TossPaymentService tossPaymentService;
+    private final ReservationQueryService reservationQueryService;
 
     @Transactional
     public ReservationResponse reserve(ReserveCommand reserveCommand) {
-        Reservation reserved = reservationManager.reserved(reserveCommand);
+        Reservation reserved = reservationManager.reserve(reserveCommand);
 
         return ReservationResponse.from(reserved);
     }
@@ -41,37 +39,26 @@ public class ReservationService {
     @Transactional
     public ReservationResponse waiting(ReserveCommand reserveCommand) {
         validateAvailableWaiting(reserveCommand);
-
         Reservation waiting = reservationManager.waiting(reserveCommand);
 
         return ReservationResponse.from(waiting);
     }
 
     @Transactional
-    public ReservationResponse reserve(ReservePaymentRequest request, Long memberId) {
+    public ReservationResponse pending(ReservePaymentRequest request, Long memberId) {
         ReserveCommand reserveCommand = ReserveCommand.byPayment(request, memberId);
-        Reservation reserved = reservationManager.reserved(reserveCommand);
-        processPayment(request);
+        Reservation reserved = reservationManager.pending(reserveCommand);
+        eventPublisher.publishEvent(new TossPaymentRequestedEvent(reserved.getId(), request.payment()));
 
         return ReservationResponse.from(reserved);
     }
 
-    private void processPayment(ReservePaymentRequest request) {
-        TossPaymentRequest paymentRequest = TossPaymentRequest.from(request);
-        TossPaymentResponse tossConfirmPaymentResponse = tossPaymentService.confirmPayment(paymentRequest);
-        TossPaymentResponse tossPaymentResponse = tossPaymentService.getPayment(paymentRequest);
-
-        if (!tossConfirmPaymentResponse.orderId().equals(tossPaymentResponse.orderId())) {
-            throw new PaymentServerException("결제 서버에서 에러가 발생했습니다. 다시 시도해주세요.");
-        }
-    }
-
     private void validateAvailableWaiting(ReserveCommand reserveCommand) {
-        if (reservedQueryService.notExistsReserved(reserveCommand.date(), reserveCommand.timeId())) {
+        if (reservationQueryService.notExistsReserved(reserveCommand.date(), reserveCommand.timeId())) {
             throw new InvalidArgumentException("예약 대기를 할 수 없습니다!");
         }
 
-        if (reservedQueryService.existsReserved(reserveCommand.memberId(), reserveCommand.date(),
+        if (reservationQueryService.existsReserved(reserveCommand.memberId(), reserveCommand.date(),
                 reserveCommand.timeId())) {
             throw new InAlreadyReservationException("이미 예약한 사람입니다.");
         }
@@ -84,7 +71,7 @@ public class ReservationService {
 
     @Transactional
     public void delete(Long id) {
-        Reservation reservation = reservedQueryService.getReserved(id);
+        Reservation reservation = reservationQueryService.getReserved(id);
         waitingService.promoteFirstWaitingToReservation(reservation.getDate(), reservation.getTimeId());
         reservationManager.delete(reservation);
     }
@@ -93,7 +80,7 @@ public class ReservationService {
     public List<MyReservationResponse> getAllReservations(Long memberId) {
         List<MyReservationResponse> responses = new ArrayList<>();
 
-        responses.addAll(reservedQueryService.getReservations(memberId));
+        responses.addAll(reservationQueryService.getReservations(memberId));
         responses.addAll(waitingQueryService.getMyWaitings(memberId));
 
         return responses;

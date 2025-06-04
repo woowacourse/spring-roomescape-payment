@@ -23,7 +23,7 @@ import roomescape.global.response.PageResponse;
 import roomescape.reservation.controller.request.ReserveByAdminRequest;
 import roomescape.reservation.controller.response.ReservationResponse;
 import roomescape.reservation.service.ReservationService;
-import roomescape.reservation.service.ReservedQueryService;
+import roomescape.reservation.service.ReservationQueryService;
 import roomescape.reservation.service.command.ReserveCommand;
 
 @RequiredArgsConstructor
@@ -32,7 +32,7 @@ import roomescape.reservation.service.command.ReserveCommand;
 public class ReservationAdminApiController {
 
     private final ReservationService reservationService;
-    private final ReservedQueryService reservedQueryService;
+    private final ReservationQueryService reservationQueryService;
 
     @PostMapping
     public ResponseEntity<ApiResponse<ReservationResponse>> reserve(
@@ -54,7 +54,7 @@ public class ReservationAdminApiController {
             @RequestParam(required = false) LocalDate to,
             Pageable pageable
     ) {
-        Page<ReservationResponse> responses = reservedQueryService.getFilteredReserved(themeId, memberId, from,
+        Page<ReservationResponse> responses = reservationQueryService.getFilteredReserved(themeId, memberId, from,
                 to, pageable);
 
         PageResponse<ReservationResponse> pageResponse = PageResponse.from(responses);

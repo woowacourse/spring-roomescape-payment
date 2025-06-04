@@ -98,17 +98,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     boolean existsByDateAndTimeIdAndStatus(@Param("date") LocalDate date, @Param("timeId") Long timeId,
                                            @Param("status") ReservationStatus status);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("""
-                select r from Reservation r
-                            where r.reservationDateTime.reservationDate.date = :date
-                            and r.reservationDateTime.reservationTime.id = :timeId
-                            and r.status = :status
-            """)
-    List<Reservation> findByDateAndTimeIdAndStatusWithLock(
-            @Param("date") LocalDate date, @Param("timeId") Long timeId,
-            @Param("status") ReservationStatus status);
-
     @Query("""
             select r
             from Reservation r

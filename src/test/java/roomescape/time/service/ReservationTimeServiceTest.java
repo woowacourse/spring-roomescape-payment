@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -103,7 +102,7 @@ class ReservationTimeServiceTest {
         ReservationDateTime reservationDateTime = reservationDateTimeDbFixture.내일_열시();
         Theme theme = themeDbFixture.공포();
 
-        Reservation reservation = reservationRepository.save(Reservation.reserve(reserver, reservationDateTime, theme));
+        Reservation reservation = reservationRepository.save(Reservation.reserved(reserver, reservationDateTime, theme));
         assertThatThrownBy(
                 () -> reservationTimeService.deleteById(reservation.getReservationTime().getId())).isInstanceOf(
                 InvalidArgumentException.class).hasMessage("해당 시간에 이미 예약이 존재하여 삭제할 수 없습니다.");
@@ -117,8 +116,8 @@ class ReservationTimeServiceTest {
         Theme theme = themeDbFixture.공포();
 
         Reservation reservation1 = reservationRepository.save(
-                Reservation.reserve(reserver, reservationDateTime1, theme));
-        reservationRepository.save(Reservation.reserve(reserver, reservationDateTime2, theme));
+                Reservation.reserved(reserver, reservationDateTime1, theme));
+        reservationRepository.save(Reservation.reserved(reserver, reservationDateTime2, theme));
 
         AvailableReservationTimeRequest request = new AvailableReservationTimeRequest(reservation1.getDate(),
                 reservation1.getTimeId());

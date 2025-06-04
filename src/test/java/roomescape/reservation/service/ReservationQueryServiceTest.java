@@ -30,10 +30,10 @@ import roomescape.time.controller.response.ReservationTimeResponse;
 import roomescape.time.domain.ReservationTime;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
-public class ReservedQueryServiceTest {
+public class ReservationQueryServiceTest {
 
     @Autowired
-    private ReservedQueryService reservedQueryService;
+    private ReservationQueryService reservationQueryService;
     @Autowired
     private ReservationTimeDbFixture reservationTimeDbFixture;
     @Autowired
@@ -62,10 +62,10 @@ public class ReservedQueryServiceTest {
         ReservationDateTime reservationDateTime = reservationDateTimeDbFixture.내일_열시();
         Theme theme = themeDbFixture.공포();
 
-        Reservation reservation = reservationRepository.save(Reservation.reserve(reserver, reservationDateTime, theme));
+        Reservation reservation = reservationRepository.save(Reservation.reserved(reserver, reservationDateTime, theme));
 
-        Page<ReservationResponse> responses = reservedQueryService.getFilteredReserved(null, null, null, null,
-                pageable);
+        Page<ReservationResponse> responses = reservationQueryService.getFilteredReserved(null, null, null, null,
+                                                                                          pageable);
         ReservationResponse response = responses.getContent().get(0);
 
         SoftAssertions.assertSoftly(softly -> {
@@ -89,39 +89,39 @@ public class ReservedQueryServiceTest {
         ReservationTime 열시 = reservationTimeDbFixture.열시();
         ReservationTime 열한시 = reservationTimeDbFixture.열한시();
 
-        Reservation reservation1 = Reservation.reserve(member1, ReservationDateTime.create(reservationDate, 열시), theme);
-        Reservation reservation2 = Reservation.reserve(member1, ReservationDateTime.create(reservationDate, 열한시),
-                theme);
-        Reservation reservation3 = Reservation.reserve(member2, ReservationDateTime.create(reservationDate, 열시), theme);
+        Reservation reservation1 = Reservation.reserved(member1, ReservationDateTime.create(reservationDate, 열시), theme);
+        Reservation reservation2 = Reservation.reserved(member1, ReservationDateTime.create(reservationDate, 열한시),
+                                                       theme);
+        Reservation reservation3 = Reservation.reserved(member2, ReservationDateTime.create(reservationDate, 열시), theme);
 
         reservationRepository.saveAll(List.of(reservation1, reservation2, reservation3));
         // when & then
         // 공포 필터링
 
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(reservedQueryService.getFilteredReserved(theme.getId(), null, null, null, pageable))
+            softly.assertThat(reservationQueryService.getFilteredReserved(theme.getId(), null, null, null, pageable))
                     .hasSize(3);
             // 사용자1 필터링
-            softly.assertThat(reservedQueryService.getFilteredReserved(null, member1.getId(), null, null, pageable))
+            softly.assertThat(reservationQueryService.getFilteredReserved(null, member1.getId(), null, null, pageable))
                     .hasSize(2);
             // 오늘 필터링
-            softly.assertThat(reservedQueryService.getFilteredReserved(null, null, today, today, pageable)).isEmpty();
+            softly.assertThat(reservationQueryService.getFilteredReserved(null, null, today, today, pageable)).isEmpty();
             // 공포 테마 & 내일 필터링
             softly.assertThat(
-                            reservedQueryService.getFilteredReserved(theme.getId(), null, tomorrow, tomorrow, pageable))
+                            reservationQueryService.getFilteredReserved(theme.getId(), null, tomorrow, tomorrow, pageable))
                     .hasSize(3);
             // 모든 필터 조합
             softly.assertThat(
-                            reservedQueryService.getFilteredReserved(theme.getId(), member2.getId(), tomorrow, tomorrow,
-                                    pageable))
+                            reservationQueryService.getFilteredReserved(theme.getId(), member2.getId(), tomorrow, tomorrow,
+                                                                        pageable))
                     .hasSize(1);
             // 일치하는 결과가 없는 필터 조합
             softly.assertThat(
-                            reservedQueryService.getFilteredReserved(theme.getId(), member2.getId(), today, today, pageable))
+                            reservationQueryService.getFilteredReserved(theme.getId(), member2.getId(), today, today, pageable))
                     .isEmpty();
 
             // 모든 결과 조회
-            softly.assertThat(reservedQueryService.getFilteredReserved(null, null, null, null, pageable)).hasSize(3);
+            softly.assertThat(reservationQueryService.getFilteredReserved(null, null, null, null, pageable)).hasSize(3);
         });
     }
 
@@ -132,13 +132,13 @@ public class ReservedQueryServiceTest {
         ReservationDateTime reservationDateTime = reservationDateTimeDbFixture.내일_열시();
         Theme theme = themeDbFixture.공포();
 
-        reservationRepository.save(Reservation.reserve(reserver, reservationDateTime, theme));
+        reservationRepository.save(Reservation.reserved(reserver, reservationDateTime, theme));
 
         LocalDate pastDate = LocalDate.now().minusDays(10);
         LocalDate pastDateEnd = LocalDate.now().minusDays(5);
 
-        Page<ReservationResponse> responses = reservedQueryService.getFilteredReserved(null, null, pastDate,
-                pastDateEnd, pageable);
+        Page<ReservationResponse> responses = reservationQueryService.getFilteredReserved(null, null, pastDate,
+                                                                                          pastDateEnd, pageable);
 
         assertThat(responses.getContent()).isEmpty();
     }
@@ -152,14 +152,14 @@ public class ReservedQueryServiceTest {
         ReservationDateTime reservationDateTime = reservationDateTimeDbFixture.내일_열시();
         Theme theme = themeDbFixture.공포();
 
-        Reservation reservation1 = Reservation.reserve(member1, reservationDateTime, theme);
-        Reservation reservation2 = Reservation.reserve(member2, reservationDateTime, theme);
+        Reservation reservation1 = Reservation.reserved(member1, reservationDateTime, theme);
+        Reservation reservation2 = Reservation.reserved(member2, reservationDateTime, theme);
 
         reservationRepository.saveAll(List.of(reservation1, reservation2));
 
         // when
-        Page<ReservationResponse> responses = reservedQueryService.getFilteredReserved(null, null, null, null,
-                pageable);
+        Page<ReservationResponse> responses = reservationQueryService.getFilteredReserved(null, null, null, null,
+                                                                                          pageable);
 
         // then
         assertThat(responses.getContent()).hasSize(2);
@@ -175,14 +175,14 @@ public class ReservedQueryServiceTest {
         ReservationDateTime tomorrow10 = reservationDateTimeDbFixture.내일_열시();
 
         // 두 개의 다른 테마로 예약
-        Reservation horrorReservation = Reservation.reserve(member, tomorrow10, horror);
-        Reservation adventureReservation = Reservation.reserve(member, tomorrow10, adventure);
+        Reservation horrorReservation = Reservation.reserved(member, tomorrow10, horror);
+        Reservation adventureReservation = Reservation.reserved(member, tomorrow10, adventure);
 
         reservationRepository.saveAll(List.of(horrorReservation, adventureReservation));
 
         // when - 공포 테마만 필터링
-        Page<ReservationResponse> result = reservedQueryService.getFilteredReserved(horror.getId(), null, null,
-                null, pageable);
+        Page<ReservationResponse> result = reservationQueryService.getFilteredReserved(horror.getId(), null, null,
+                                                                                       null, pageable);
 
         // then
         List<ReservationResponse> horrorOnly = result.getContent();
@@ -199,11 +199,11 @@ public class ReservedQueryServiceTest {
         Theme theme = themeDbFixture.공포();
         ReservationDateTime 내일_열시 = reservationDateTimeDbFixture.내일_열시();
 
-        Reservation reservation = Reservation.reserve(member, 내일_열시, theme);
+        Reservation reservation = Reservation.reserved(member, 내일_열시, theme);
         reservationRepository.save(reservation);
 
         // when
-        boolean result = reservedQueryService.existsReserved(member.getId(), 내일_열시.getDate(), 내일_열시.getTimeId());
+        boolean result = reservationQueryService.existsReserved(member.getId(), 내일_열시.getDate(), 내일_열시.getTimeId());
 
         // then
         assertThat(result).isTrue();

@@ -2,7 +2,7 @@ package roomescape.payment.exception;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
-import roomescape.payment.toss.dto.TossPaymentErrorResponse;
+import roomescape.payment.dto.TossPaymentErrorResponse;
 
 @Getter
 public class PaymentProcessException extends RuntimeException {

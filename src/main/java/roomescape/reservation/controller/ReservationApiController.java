@@ -36,7 +36,7 @@ public class ReservationApiController {
             @RequestBody @Valid ReservePaymentRequest request,
             @Authenticated Long memberId
     ) {
-        ReservationResponse response = reservationService.reserve(
+        ReservationResponse response = reservationService.pending(
                 request, memberId
         );
 
