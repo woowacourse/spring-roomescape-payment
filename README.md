@@ -34,4 +34,4 @@ host: localhost:8080
 - [x] 클라이언트 코드를 수정한다. [2단계 클라이언트 코드 커밋](https://github.com/woowacourse/spring-roomescape-member/commit/38b69424e37d267e555f2efed2de148d94b637ce)
 
 ## 3단계 - 배포하기
-- [ ] 셸 스크립트를 작성하여 코드를 서버에 배포한다.
+- [x] 셸 스크립트를 작성하여 코드를 서버에 배포한다.
