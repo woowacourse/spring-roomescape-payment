@@ -1,15 +1,10 @@
 package roomescape.payment.domain.client;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.domain.dto.PaymentRequestDto;
 import roomescape.payment.domain.dto.PaymentResponseDto;
-import roomescape.payment.exception.InvalidPaymentException;
-
-import java.nio.charset.StandardCharsets;
 
 @Component("tossApiClient")
 public class TossRestClient {
@@ -25,11 +20,6 @@ public class TossRestClient {
                 .uri("/v1/payments/confirm")
                 .body(requestDto)
                 .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, (req, res) -> {
-                    String body = new String(res.getBody().readAllBytes(), StandardCharsets.UTF_8);
-                    HttpStatus httpStatus = HttpStatus.valueOf(res.getStatusCode().value());
-                    throw new InvalidPaymentException(body, httpStatus);
-                })
                 .body(PaymentResponseDto.class);
     }
 }

@@ -42,6 +42,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InvalidPaymentException.class)
     public ResponseEntity<ErrorResponse> handlePaymentException(InvalidPaymentException e) {
-        return ResponseEntity.status(e.getStatus()).body(new ErrorResponse(e.getMessage()));
+        return ResponseEntity.status(e.getStatusCode()).body(new ErrorResponse(e.getMessage()));
     }
 }
