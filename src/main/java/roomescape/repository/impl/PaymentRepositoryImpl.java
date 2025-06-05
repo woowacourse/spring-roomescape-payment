@@ -23,4 +23,9 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     public Optional<Payment> findByReservationId(final Long reservationId) {
         return repository.findByReservation_Id(reservationId);
     }
+
+    @Override
+    public void deleteByReservationId(Long reservationId) {
+        repository.deleteByReservation_Id(reservationId);
+    }
 }

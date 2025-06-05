@@ -46,6 +46,13 @@ public class AdminReservationController implements AdminReservationApi {
         List<PendingReservationResponse> response = reservationService.getAllPendings();
         return ResponseEntity.ok(response);
     }
+    
+    @Override
+    @DeleteMapping("/reservations/{reservationId}")
+    public ResponseEntity<Void> remove(@PathVariable long reservationId) {
+        reservationService.remove(reservationId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 
     @Override
     @DeleteMapping("/reservations/pending/{reservationId}/deny")

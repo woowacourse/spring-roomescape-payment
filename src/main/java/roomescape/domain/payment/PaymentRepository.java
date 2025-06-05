@@ -7,4 +7,6 @@ public interface PaymentRepository {
     void save(Payment payment);
 
     Optional<Payment> findByReservationId(Long reservationId);
+
+    void deleteByReservationId(Long reservationId);
 }

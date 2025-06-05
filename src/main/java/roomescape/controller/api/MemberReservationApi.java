@@ -49,13 +49,4 @@ public interface MemberReservationApi {
     ResponseEntity<List<MyPageReservationResponse>> getMines(
             @Parameter(hidden = true) LoginInfo loginInfo
     );
-
-    @Operation(summary = "내 예약 삭제")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "정상 응답"),
-            @ApiResponse(responseCode = "404", description = "id에 해당하는 예약이 없는 경우", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-    })
-    ResponseEntity<Void> remove(
-            @Parameter(example = "1", required = true) long reservationId
-    );
 }

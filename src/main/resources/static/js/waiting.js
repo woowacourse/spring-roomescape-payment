@@ -57,8 +57,7 @@ function deny(event) {
     const row = event.target.closest('tr');
     const id = row.cells[0].textContent;
 
-    const endpoint = `/admin/reservations/pending/${id}/deny`;
-    return fetch(endpoint, {
+    return fetch(`/api/admin/reservations/pending/${id}/deny`, {
         method: 'DELETE'
     }).then(response => {
         if (response.status === 200) return;

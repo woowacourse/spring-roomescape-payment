@@ -41,4 +41,14 @@ public class ReservationItemHelper {
     public void delete(ReservationItem reservationItem) {
         reservationItemRepository.delete(reservationItem);
     }
+
+    @Transactional
+    public void deleteAllReservationItemByThemeId(long themeId) {
+        reservationItemRepository.deleteAllReservationItemByThemeId(themeId);
+    }
+
+    @Transactional
+    public void deleteAllReservationItemByTimeId(long timeId) {
+        reservationItemRepository.deleteAllReservationItemByTimeId(timeId);
+    }
 }

@@ -19,4 +19,9 @@ public class PaymentHelper {
         return paymentRepository.findByReservationId(reservationId)
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 결제 정보입니다."));
     }
+
+    @Transactional
+    public void deleteByReservationIdIfExist(Long reservationId) {
+        paymentRepository.deleteByReservationId(reservationId);
+    }
 }

@@ -7,6 +7,7 @@ import roomescape.domain.reservationitem.ReservationTheme;
 import roomescape.domain.reservationitem.ReservationThemeRepository;
 import roomescape.dto.request.ReservationThemeRequest;
 import roomescape.dto.response.ReservationThemeResponse;
+import roomescape.service.helper.ReservationItemHelper;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,6 +22,7 @@ public class ReservationThemeService {
     public static final int POPULAR_THEME_DATE_TO = 1;
 
     private final ReservationThemeRepository reservationThemeRepository;
+    private final ReservationItemHelper reservationItemHelper;
 
     @Transactional
     public ReservationThemeResponse save(final ReservationThemeRequest request) {
@@ -64,6 +66,7 @@ public class ReservationThemeService {
         if (!reservationThemeRepository.isAvailableToRemove(id)) {
             throw new IllegalArgumentException("[ERROR] 예약이 존재해 테마를 삭제할 수 없습니다.");
         }
+        reservationItemHelper.deleteAllReservationItemByThemeId(id);
         reservationThemeRepository.deleteById(id);
     }
 }

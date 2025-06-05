@@ -21,6 +21,7 @@ public class ReservationTimeService {
 
     private final ReservationTimeRepository reservationTimeRepository;
     private final ReservationItemHelper itemHelper;
+    private final ReservationItemHelper reservationItemHelper;
 
     @Transactional
     public ReservationTimeResponse save(final ReservationTimeRequest request) {
@@ -62,6 +63,7 @@ public class ReservationTimeService {
         if (!reservationTimeRepository.isAvailableToRemove(id)) {
             throw new IllegalArgumentException("[ERROR] 예약이 존재해 예약 시간을 삭제할 수 없습니다.");
         }
+        reservationItemHelper.deleteAllReservationItemByTimeId(id);
         reservationTimeRepository.deleteById(id);
     }
 }

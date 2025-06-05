@@ -139,6 +139,7 @@ public class ReservationService {
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 예약입니다."));
 
         targetReservation.denyAndChangeNextReservationToNotPaid();
+        paymentHelper.deleteByReservationIdIfExist(reservationId);
         reservationRepository.deleteById(targetReservation.getId());
     }
 }

@@ -46,6 +46,15 @@ public interface AdminReservationApi {
     })
     ResponseEntity<List<PendingReservationResponse>> getAllPendings();
 
+    @Operation(summary = "예약 삭제")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "정상 응답"),
+            @ApiResponse(responseCode = "404", description = "id에 해당하는 예약이 없는 경우", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
+    ResponseEntity<Void> remove(
+            @Parameter(example = "1", required = true) long reservationId
+    );
+
     @Operation(summary = "대기 예약 거절")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "정상 응답"),
