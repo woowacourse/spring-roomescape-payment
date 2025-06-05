@@ -19,7 +19,7 @@ spring:
 toss:
   payments:
     base-url: https://api.tosspayments.com
-    widget-secret-key: test_sk_nRQoOaPz8LK6ZxMR2BZNry47BMw6
+    widget-secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
     payment-approve-url: /v1/payments/confirm
     payment-check-url: /v1/payments/{paymentKey}
     payment-cancel-url: /v1/payments/{paymentKey}/check
