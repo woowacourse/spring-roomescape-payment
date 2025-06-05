@@ -95,6 +95,7 @@ main() {
 
   echo ""
   echo "=== Spring 서버 실행 시작 ==="
+  export SPRING_PROFILES_ACTIVE=deploy
   java -jar spring-roomescape-payment-0.0.1-SNAPSHOT.jar
 }
 
