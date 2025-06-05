@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
-import roomescape.annotation.SecurityDocs;
+import roomescape.controller.apidocs.annotation.SecurityDocs;
 import roomescape.dto.request.AvailableTimeRequest;
 import roomescape.dto.request.CreateReservationTimeRequest;
 import roomescape.dto.response.ReservationTimeResponse;

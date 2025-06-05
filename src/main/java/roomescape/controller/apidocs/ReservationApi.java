@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
-import roomescape.annotation.SecurityDocs;
+import roomescape.controller.apidocs.annotation.SecurityDocs;
 import roomescape.dto.request.ConfirmWaitReservationRequest;
 import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.request.CreateWaitReservationRequest;

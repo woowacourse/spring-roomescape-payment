@@ -1,4 +1,4 @@
-package roomescape.annotation;
+package roomescape.controller.apidocs.annotation;
 
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
