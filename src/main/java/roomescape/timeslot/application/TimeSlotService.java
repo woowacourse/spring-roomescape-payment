@@ -7,10 +7,10 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.timeslot.domain.TimeSlot;
 import roomescape.timeslot.domain.TimeSlotRepository;
-import roomescape.timeslot.dto.request.TimeSlotRequest;
-import roomescape.timeslot.dto.response.TimeSlotResponse;
 import roomescape.timeslot.dto.request.TimeSlotConditionRequest;
+import roomescape.timeslot.dto.request.TimeSlotRequest;
 import roomescape.timeslot.dto.response.TimeSlotConditionResponse;
+import roomescape.timeslot.dto.response.TimeSlotResponse;
 import roomescape.timeslot.exception.TimeSlotException;
 
 @Service
@@ -21,7 +21,7 @@ public class TimeSlotService {
     private final TimeSlotRepository reservationTimeRepository;
 
     public TimeSlotService(final ReservationRepository reservationRepository,
-                                  final TimeSlotRepository reservationTimeRepository) {
+                           final TimeSlotRepository reservationTimeRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
     }
@@ -29,7 +29,7 @@ public class TimeSlotService {
     @Transactional
     public TimeSlotResponse createTimeSlot(final TimeSlotRequest request) {
         TimeSlot timeSlot = reservationTimeRepository.save(
-            TimeSlot.createWithoutId(request.startAt()));
+                TimeSlot.createWithoutId(request.startAt()));
 
         return TimeSlotResponse.from(timeSlot);
     }
@@ -53,12 +53,13 @@ public class TimeSlotService {
     }
 
     public List<TimeSlotConditionResponse> getTimesWithCondition(final TimeSlotConditionRequest request) {
-        List<Reservation> reservations = reservationRepository.findAllByDateAndThemeId(request.date(), request.themeId());
+        List<Reservation> reservations = reservationRepository.findAllByDateAndThemeId(request.date(),
+                request.themeId());
         List<TimeSlot> times = reservationTimeRepository.findAll();
 
         return times.stream().map(time -> {
             boolean hasTime = reservations.stream()
-                .anyMatch(reservation -> reservation.isSameTime(time));
+                    .anyMatch(reservation -> reservation.isSameTime(time));
             return new TimeSlotConditionResponse(time.getId(), time.getStartAt(), hasTime);
         }).toList();
     }

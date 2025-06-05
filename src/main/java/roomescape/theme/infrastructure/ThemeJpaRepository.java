@@ -10,13 +10,13 @@ import roomescape.theme.domain.Theme;
 public interface ThemeJpaRepository extends CrudRepository<Theme, Long> {
 
     @Query("""
-        SELECT t 
-        FROM Theme t
-        JOIN Reservation r ON t.id = r.theme.id
-        WHERE r.date BETWEEN :startDate AND :endDate
-        GROUP BY t
-        ORDER BY COUNT(r) DESC
-        """)
+            SELECT t 
+            FROM Theme t
+            JOIN Reservation r ON t.id = r.theme.id
+            WHERE r.date BETWEEN :startDate AND :endDate
+            GROUP BY t
+            ORDER BY COUNT(r) DESC
+            """)
     List<Theme> findPopularThemes(@Param("startDate") LocalDate start, @Param("endDate") LocalDate end);
 
     List<Theme> findAll();

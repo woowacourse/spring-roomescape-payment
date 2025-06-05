@@ -26,12 +26,6 @@ public class TimeSlot {
         this.startAt = startAt;
     }
 
-    private void validateIsNonNull(final Object object) {
-        if (object == null) {
-            throw new BusinessException("시간 정보는 null 일 수 없습니다.");
-        }
-    }
-
     public static TimeSlot createWithoutId(final LocalTime startAt) {
         return new TimeSlot(null, startAt);
     }
@@ -44,6 +38,12 @@ public class TimeSlot {
     private static void validateIdIsNonNull(final Long id) {
         if (id == null) {
             throw new BusinessException("시간 id는 null 일 수 없습니다.");
+        }
+    }
+
+    private void validateIsNonNull(final Object object) {
+        if (object == null) {
+            throw new BusinessException("시간 정보는 null 일 수 없습니다.");
         }
     }
 

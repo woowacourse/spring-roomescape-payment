@@ -8,11 +8,11 @@ public record WaitingResponse(Long id, String name, String theme, LocalDate date
 
     public static WaitingResponse from(Waiting waiting) {
         return new WaitingResponse(
-            waiting.getId(),
-            waiting.getMember().getName(),
-            waiting.getReservation().getTheme().getName(),
-            waiting.getReservation().getDate(),
-            waiting.getReservation().getTime().getStartAt()
+                waiting.getId(),
+                waiting.getMember().getName(),
+                waiting.getReservation().getTheme().getName(),
+                waiting.getReservation().getDate(),
+                waiting.getReservation().getTime().getStartAt()
         );
     }
 }

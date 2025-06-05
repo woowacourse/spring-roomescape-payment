@@ -17,7 +17,7 @@ public class LoginAdminArgumentResolver implements HandlerMethodArgumentResolver
 
     private final JwtTokenManager jwtTokenManager;
 
-    public LoginAdminArgumentResolver(JwtTokenManager jwtTokenManager) {
+    public LoginAdminArgumentResolver(final JwtTokenManager jwtTokenManager) {
         this.jwtTokenManager = jwtTokenManager;
     }
 

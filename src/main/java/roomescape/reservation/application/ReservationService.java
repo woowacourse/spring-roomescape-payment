@@ -6,33 +6,33 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.info.LoginMemberInfo;
-import roomescape.reservation.domain.Status;
-import roomescape.reservation.dto.ReservationSearchCondition;
 import roomescape.common.util.time.DateTime;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.member.dto.response.MemberResponse;
-import roomescape.reservation.dto.response.ReservationMineResponse;
 import roomescape.member.exception.MemberNotFound;
-import roomescape.payment.dto.request.PaymentRequest;
 import roomescape.payment.application.PaymentService;
+import roomescape.payment.dto.request.PaymentRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
+import roomescape.reservation.domain.Status;
 import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.domain.WaitingRepository;
+import roomescape.reservation.dto.ReservationSearchCondition;
+import roomescape.reservation.dto.WaitingWithRank;
 import roomescape.reservation.dto.request.ReservationRequest;
+import roomescape.reservation.dto.response.ReservationMineResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.WaitingResponse;
-import roomescape.reservation.dto.WaitingWithRank;
 import roomescape.reservation.exception.ReservationException;
-import roomescape.timeslot.domain.TimeSlot;
-import roomescape.timeslot.domain.TimeSlotRepository;
-import roomescape.timeslot.dto.response.TimeSlotResponse;
-import roomescape.timeslot.exception.TimeSlotException;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeRepository;
 import roomescape.theme.dto.response.ThemeResponse;
 import roomescape.theme.exception.ThemeException;
+import roomescape.timeslot.domain.TimeSlot;
+import roomescape.timeslot.domain.TimeSlotRepository;
+import roomescape.timeslot.dto.response.TimeSlotResponse;
+import roomescape.timeslot.exception.TimeSlotException;
 
 @Service
 @Transactional(readOnly = true)
@@ -47,13 +47,13 @@ public class ReservationService {
     private final PaymentService paymentService;
 
     public ReservationService(
-        final DateTime dateTime,
-        final ReservationRepository reservationRepository,
-        final TimeSlotRepository reservationTimeRepository,
-        final ThemeRepository themeRepository,
-        final MemberRepository memberRepository,
-        final WaitingRepository waitingRepository,
-        final PaymentService paymentService
+            final DateTime dateTime,
+            final ReservationRepository reservationRepository,
+            final TimeSlotRepository reservationTimeRepository,
+            final ThemeRepository themeRepository,
+            final MemberRepository memberRepository,
+            final WaitingRepository waitingRepository,
+            final PaymentService paymentService
     ) {
         this.dateTime = dateTime;
         this.reservationRepository = reservationRepository;
@@ -67,13 +67,14 @@ public class ReservationService {
     @Transactional
     public ReservationResponse createReservation(final ReservationRequest request, final Long memberId) {
         TimeSlot time = reservationTimeRepository.findById(request.timeId())
-            .orElseThrow(() -> new TimeSlotException("예약 시간을 찾을 수 없습니다."));
+                .orElseThrow(() -> new TimeSlotException("예약 시간을 찾을 수 없습니다."));
         Theme theme = themeRepository.findById(request.themeId())
-            .orElseThrow(() -> new ThemeException("테마를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ThemeException("테마를 찾을 수 없습니다."));
         Member member = memberRepository.findById(memberId)
-            .orElseThrow(() -> new MemberNotFound("멤버를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MemberNotFound("멤버를 찾을 수 없습니다."));
 
-        List<Reservation> reservations = reservationRepository.findAllByDateAndThemeId(request.date(), request.themeId());
+        List<Reservation> reservations = reservationRepository.findAllByDateAndThemeId(request.date(),
+                request.themeId());
         validateExistDuplicateReservation(reservations, time);
 
         Reservation reservation = Reservation.createWithoutId(request.date(), time, theme, member, Status.RESERVED);
@@ -90,10 +91,10 @@ public class ReservationService {
     @Transactional
     public WaitingResponse createWaiting(final ReservationRequest request, final Long memberId) {
         Reservation reservation = reservationRepository.findBy(request.date(), request.timeId(), request.themeId())
-            .orElseThrow(() -> new ReservationException("예약 정보가 없습니다."));
+                .orElseThrow(() -> new ReservationException("예약 정보가 없습니다."));
 
         Member member = memberRepository.findById(memberId)
-            .orElseThrow(() -> new MemberNotFound("멤버를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MemberNotFound("멤버를 찾을 수 없습니다."));
 
         validateNotReservationOwner(reservation, member);
         validateCanReserveDateTime(reservation, dateTime.now());
@@ -109,7 +110,7 @@ public class ReservationService {
         }
     }
 
-    private void validateDuplicateWaiting(Reservation reservation, Member member) {
+    private void validateDuplicateWaiting(final Reservation reservation, final Member member) {
         if (waitingRepository.existsByReservationIdAndMemberId(reservation.getId(), member.getId())) {
             throw new ReservationException("이미 예약대기 중입니다.");
         }
@@ -117,7 +118,7 @@ public class ReservationService {
 
     private void validateExistDuplicateReservation(final List<Reservation> reservations, final TimeSlot time) {
         boolean isBooked = reservations.stream()
-            .anyMatch(reservation -> reservation.isSameTime(time));
+                .anyMatch(reservation -> reservation.isSameTime(time));
 
         if (isBooked) {
             throw new ReservationException("이미 예약이 존재합니다.");
@@ -132,14 +133,14 @@ public class ReservationService {
 
     public List<ReservationResponse> getReservations() {
         return reservationRepository.findAll().stream()
-            .map(ReservationResponse::from)
-            .toList();
+                .map(ReservationResponse::from)
+                .toList();
     }
 
     @Transactional
     public void deleteReservationById(final Long id) {
         Reservation reservation = reservationRepository.findById(id)
-            .orElseThrow(() -> new ReservationException("예약을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ReservationException("예약을 찾을 수 없습니다."));
 
         List<Waiting> waitings = waitingRepository.findByReservationId(id);
         if (waitings.isEmpty()) {
@@ -156,40 +157,40 @@ public class ReservationService {
     @Transactional
     public void deleteWaiting(final Long waitingId) {
         waitingRepository.findById(waitingId)
-            .orElseThrow(() -> new ReservationException("예약 대기를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ReservationException("예약 대기를 찾을 수 없습니다."));
 
         waitingRepository.deleteById(waitingId);
     }
 
     public List<ReservationResponse> searchReservationWithCondition(final ReservationSearchCondition condition) {
         List<Reservation> reservations = reservationRepository.findAllByMemberIdAndThemeIdAndDateBetween(
-            condition.memberId(), condition.themeId(),
-            condition.dateFrom(), condition.dateTo()
+                condition.memberId(), condition.themeId(),
+                condition.dateFrom(), condition.dateTo()
         );
 
         return reservations.stream()
-            .map(reservation -> new ReservationResponse(
-                reservation.getId(),
-                reservation.getDate(),
-                new TimeSlotResponse(reservation.getTime().getId(), reservation.getTime().getStartAt()),
-                new ThemeResponse(reservation.getTheme().getId(), reservation.getTheme().getName(),
-                    reservation.getTheme().getDescription(), reservation.getTheme().getThumbnail()),
-                new MemberResponse(reservation.getMember().getId(), reservation.getMember().getName())
-            ))
-            .toList();
+                .map(reservation -> new ReservationResponse(
+                        reservation.getId(),
+                        reservation.getDate(),
+                        new TimeSlotResponse(reservation.getTime().getId(), reservation.getTime().getStartAt()),
+                        new ThemeResponse(reservation.getTheme().getId(), reservation.getTheme().getName(),
+                                reservation.getTheme().getDescription(), reservation.getTheme().getThumbnail()),
+                        new MemberResponse(reservation.getMember().getId(), reservation.getMember().getName())
+                ))
+                .toList();
     }
 
     public List<ReservationMineResponse> getMemberReservations(final LoginMemberInfo loginMemberInfo) {
         Member member = memberRepository.findById(loginMemberInfo.id())
-            .orElseThrow(() -> new MemberNotFound("멤버를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MemberNotFound("멤버를 찾을 수 없습니다."));
 
         List<Reservation> reservations = reservationRepository.findAllByMemberId(loginMemberInfo.id());
 
         List<WaitingWithRank> waitingWithRanks = waitingRepository.findByMemberId(loginMemberInfo.id());
 
         return Stream.concat(
-            reservations.stream().map(ReservationMineResponse::from),
-            waitingWithRanks.stream().map(ReservationMineResponse::from)
+                reservations.stream().map(ReservationMineResponse::from),
+                waitingWithRanks.stream().map(ReservationMineResponse::from)
         ).toList();
     }
 
@@ -197,7 +198,7 @@ public class ReservationService {
         List<Waiting> waitings = waitingRepository.findAll();
 
         return waitings.stream()
-            .map(ReservationResponse::from)
-            .toList();
+                .map(ReservationResponse::from)
+                .toList();
     }
 }

@@ -12,7 +12,7 @@ public class TossPaymentErrorHandler implements ResponseErrorHandler {
 
     private final ObjectMapper objectMapper;
 
-    public TossPaymentErrorHandler(ObjectMapper objectMapper) {
+    public TossPaymentErrorHandler(final ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 

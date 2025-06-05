@@ -31,7 +31,7 @@ public class Member {
         this.password = password;
     }
 
-    public static Member createWithoutId(String name, String email, String password) {
+    public static Member createWithoutId(final String name, final String email, final String password) {
         return new Member(null, new Name(name), new Email(email), new Password(password));
     }
 
@@ -58,7 +58,9 @@ public class Member {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Member member = (Member) o;
         return Objects.equals(id, member.id);
     }

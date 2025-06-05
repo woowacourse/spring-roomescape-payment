@@ -13,7 +13,8 @@ import roomescape.common.dto.response.ExceptionResponse;
 public class AuthExceptionHandler {
 
     @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ExceptionResponse> handleUnauthorize(final UnauthorizedException exception, final HttpServletRequest request) {
+    public ResponseEntity<ExceptionResponse> handleUnauthorize(final UnauthorizedException exception,
+                                                               final HttpServletRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(
                 HttpStatus.UNAUTHORIZED.value(), "[ERROR] " + exception.getMessage(), request.getRequestURI()
         );
@@ -22,7 +23,8 @@ public class AuthExceptionHandler {
     }
 
     @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<ExceptionResponse> handleForbidden(final ForbiddenException exception, final HttpServletRequest request) {
+    public ResponseEntity<ExceptionResponse> handleForbidden(final ForbiddenException exception,
+                                                             final HttpServletRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(
                 HttpStatus.FORBIDDEN.value(), "[ERROR] " + exception.getMessage(), request.getRequestURI()
         );

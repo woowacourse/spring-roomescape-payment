@@ -23,13 +23,13 @@ public class Waiting {
     protected Waiting() {
     }
 
-    private Waiting(Long id, Reservation reservation, Member member) {
+    private Waiting(final Long id, final Reservation reservation, final Member member) {
         this.id = id;
         this.reservation = reservation;
         this.member = member;
     }
 
-    public static Waiting createWithoutId(Reservation reservation, Member member) {
+    public static Waiting createWithoutId(final Reservation reservation, final Member member) {
         return new Waiting(null, reservation, member);
     }
 

@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.admin.domain.Admin;
 import roomescape.auth.annotation.LoginAdmin;
-import roomescape.auth.dto.info.LoginAdminInfo;
-import roomescape.auth.dto.response.LoginCheckResponse;
-import roomescape.auth.dto.request.LoginRequest;
 import roomescape.auth.application.LoginService;
+import roomescape.auth.dto.info.LoginAdminInfo;
+import roomescape.auth.dto.request.LoginRequest;
+import roomescape.auth.dto.response.LoginCheckResponse;
 
 @RestController
 @RequestMapping("/admin")
@@ -21,12 +21,12 @@ public class AdminLoginController {
 
     private final LoginService loginService;
 
-    public AdminLoginController(LoginService loginService) {
+    public AdminLoginController(final LoginService loginService) {
         this.loginService = loginService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<Void> login(@RequestBody final LoginRequest request) {
         String token = loginService.createAdminToken(request);
 
         ResponseCookie cookie = ResponseCookie.from("token", token)

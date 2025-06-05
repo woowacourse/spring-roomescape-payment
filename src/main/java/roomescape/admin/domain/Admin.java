@@ -18,18 +18,18 @@ public class Admin {
     protected Admin() {
     }
 
-    private Admin(Long id, String name, String email, String password) {
+    private Admin(final Long id, final String name, final String email, final String password) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
     }
 
-    public static Admin createWithoutId (String name, String email, String password) {
+    public static Admin createWithoutId(final String name, final String email, final String password) {
         return new Admin(null, name, email, password);
     }
 
-    public boolean isSamePassword(String password) {
+    public boolean isSamePassword(final String password) {
         return this.password.equals(password);
     }
 

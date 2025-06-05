@@ -19,7 +19,7 @@ public record Email(String email) {
         }
     }
 
-    private static void validateEmailFormat(String email) {
+    private static void validateEmailFormat(final String email) {
         if (!email.matches(EMAIL_REGEX)) {
             throw new EmailException("이메일 형식이 맞지 않습니다.");
         }

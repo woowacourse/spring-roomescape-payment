@@ -19,11 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.annotation.LoginMember;
 import roomescape.auth.dto.info.LoginMemberInfo;
 import roomescape.common.dto.response.ExceptionResponse;
-import roomescape.reservation.dto.response.ReservationMineResponse;
+import roomescape.reservation.application.ReservationService;
 import roomescape.reservation.dto.request.ReservationRequest;
+import roomescape.reservation.dto.response.ReservationMineResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.WaitingResponse;
-import roomescape.reservation.application.ReservationService;
 
 @RestController
 public class MemberReservationController {
@@ -36,31 +36,30 @@ public class MemberReservationController {
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> createReservation(
-        @Valid @RequestBody final ReservationRequest request,
-        @LoginMember final LoginMemberInfo memberInfo)
-    {
+            @Valid @RequestBody final ReservationRequest request,
+            @LoginMember final LoginMemberInfo memberInfo) {
         ReservationResponse response = reservationService.createReservation(request, memberInfo.id());
         return ResponseEntity.created(URI.create("/reservation")).body(response);
     }
 
     @PostMapping("/reservations/waitings")
     public ResponseEntity<WaitingResponse> createWaiting(
-        @RequestBody final ReservationRequest request,
-        @LoginMember final LoginMemberInfo memberInfo
-    )
-    {
+            @RequestBody final ReservationRequest request,
+            @LoginMember final LoginMemberInfo memberInfo
+    ) {
         WaitingResponse response = reservationService.createWaiting(request, memberInfo.id());
         return ResponseEntity.created(URI.create("/reservations/waiting")).body(response);
     }
 
     @DeleteMapping("/reservations/waitings/{id}")
-    public ResponseEntity<Void> deleteWaiting(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deleteWaiting(@PathVariable("id") final Long id) {
         reservationService.deleteWaiting(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/reservations/me")
-    public ResponseEntity<List<ReservationMineResponse>> getMyReservations(@LoginMember LoginMemberInfo loginMemberInfo) {
+    public ResponseEntity<List<ReservationMineResponse>> getMyReservations(
+            @LoginMember final LoginMemberInfo loginMemberInfo) {
         List<ReservationMineResponse> response = reservationService.getMemberReservations(loginMemberInfo);
 
         return ResponseEntity.ok().body(response);
@@ -69,19 +68,20 @@ public class MemberReservationController {
     @ExceptionHandler(value = DateTimeParseException.class)
     public ResponseEntity<ExceptionResponse> noMatchDateType(final HttpServletRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(
-            400, "[ERROR] 요청 날짜 형식이 맞지 않습니다.", request.getRequestURI()
+                400, "[ERROR] 요청 날짜 형식이 맞지 않습니다.", request.getRequestURI()
         );
         return ResponseEntity.badRequest().body(exceptionResponse);
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public ResponseEntity<ExceptionResponse> checkNull(final MethodArgumentNotValidException e, final HttpServletRequest request) {
+    public ResponseEntity<ExceptionResponse> checkNull(final MethodArgumentNotValidException e,
+                                                       final HttpServletRequest request) {
         String message = Optional.ofNullable(e.getBindingResult().getFieldError())
-            .map(FieldError::getDefaultMessage)
-            .orElse("유효하지 않은 요청입니다.");
+                .map(FieldError::getDefaultMessage)
+                .orElse("유효하지 않은 요청입니다.");
 
         ExceptionResponse exceptionResponse = new ExceptionResponse(
-            400, message, request.getRequestURI()
+                400, message, request.getRequestURI()
         );
 
         return ResponseEntity.badRequest().body(exceptionResponse);

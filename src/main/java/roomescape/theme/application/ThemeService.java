@@ -8,8 +8,8 @@ import roomescape.common.util.time.DateTime;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeRepository;
-import roomescape.theme.dto.response.PopularThemeResponse;
 import roomescape.theme.dto.request.ThemeRequest;
+import roomescape.theme.dto.response.PopularThemeResponse;
 import roomescape.theme.dto.response.ThemeResponse;
 import roomescape.theme.exception.ThemeException;
 
@@ -17,10 +17,9 @@ import roomescape.theme.exception.ThemeException;
 @Transactional(readOnly = true)
 public class ThemeService {
 
-    private static final int POPULAR_THEME_COUNT = 10;
     public static final int POPULAR_THEME_RANGE_START_SUBTRACT = 8;
     public static final int POPULAR_THEME_RANGE_END_SUBTRACT = 1;
-
+    private static final int POPULAR_THEME_COUNT = 10;
     private final DateTime dateTime;
     private final ThemeRepository themeRepository;
     private final ReservationRepository reservationRepository;
@@ -36,7 +35,7 @@ public class ThemeService {
     @Transactional
     public ThemeResponse createTheme(final ThemeRequest request) {
         Theme theme = themeRepository.save(
-            Theme.createWithoutId(request.name(), request.description(), request.thumbnail()));
+                Theme.createWithoutId(request.name(), request.description(), request.thumbnail()));
 
         return ThemeResponse.from(theme);
     }
@@ -46,7 +45,7 @@ public class ThemeService {
         validateExistIdToDelete(id);
 
         themeRepository.findById(id)
-            .orElseThrow(() -> new ThemeException("존재하지 않는 테마입니다."));
+                .orElseThrow(() -> new ThemeException("존재하지 않는 테마입니다."));
 
         themeRepository.deleteById(id);
     }
@@ -59,8 +58,8 @@ public class ThemeService {
 
     public List<ThemeResponse> getThemes() {
         return themeRepository.findAll().stream()
-            .map(ThemeResponse::from)
-            .toList();
+                .map(ThemeResponse::from)
+                .toList();
     }
 
     public List<PopularThemeResponse> getPopularThemes() {
@@ -70,8 +69,8 @@ public class ThemeService {
         LocalDate end = now.minusDays(POPULAR_THEME_RANGE_END_SUBTRACT);
 
         return themeRepository.findPopularThemes(start, end).stream()
-            .limit(POPULAR_THEME_COUNT)
-            .map(theme -> new PopularThemeResponse(theme.getName(), theme.getDescription(), theme.getThumbnail()))
-            .toList();
+                .limit(POPULAR_THEME_COUNT)
+                .map(theme -> new PopularThemeResponse(theme.getName(), theme.getDescription(), theme.getThumbnail()))
+                .toList();
     }
 }

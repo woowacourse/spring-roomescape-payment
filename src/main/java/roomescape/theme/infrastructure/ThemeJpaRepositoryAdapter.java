@@ -12,7 +12,7 @@ public class ThemeJpaRepositoryAdapter implements ThemeRepository {
 
     private final ThemeJpaRepository themeJpaRepository;
 
-    public ThemeJpaRepositoryAdapter(ThemeJpaRepository themeJpaRepository) {
+    public ThemeJpaRepositoryAdapter(final ThemeJpaRepository themeJpaRepository) {
         this.themeJpaRepository = themeJpaRepository;
     }
 

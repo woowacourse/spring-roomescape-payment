@@ -20,8 +20,14 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
 
     private final JwtTokenManager jwtTokenManager;
 
-    public LoginMemberArgumentResolver(JwtTokenManager jwtTokenManager) {
+    public LoginMemberArgumentResolver(final JwtTokenManager jwtTokenManager) {
         this.jwtTokenManager = jwtTokenManager;
+    }
+
+    private static void validateRoleIsMember(String role) {
+        if (!role.equals(MEMBER_STRING)) {
+            throw new ForbiddenException("멤버가 아닙니다.");
+        }
     }
 
     @Override
@@ -39,11 +45,5 @@ public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolve
         validateRoleIsMember(role);
 
         return new LoginMemberInfo(jwtTokenManager.getId(token));
-    }
-
-    private static void validateRoleIsMember(String role) {
-        if (!role.equals(MEMBER_STRING)) {
-            throw new ForbiddenException("멤버가 아닙니다.");
-        }
     }
 }

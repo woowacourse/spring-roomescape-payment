@@ -1,13 +1,13 @@
 package roomescape.auth.application;
 
 import org.springframework.stereotype.Service;
-import roomescape.admin.domain.Admin;
 import roomescape.admin.application.AdminService;
+import roomescape.admin.domain.Admin;
 import roomescape.auth.dto.request.LoginRequest;
 import roomescape.auth.exception.UnauthorizedException;
 import roomescape.auth.token.JwtTokenManager;
-import roomescape.member.domain.Member;
 import roomescape.member.application.MemberService;
+import roomescape.member.domain.Member;
 
 @Service
 public class LoginService {
@@ -16,10 +16,23 @@ public class LoginService {
     private final AdminService adminService;
     private final MemberService memberService;
 
-    public LoginService(JwtTokenManager jwtTokenManager, AdminService adminService, MemberService memberService) {
+    public LoginService(final JwtTokenManager jwtTokenManager, final AdminService adminService,
+                        final MemberService memberService) {
         this.jwtTokenManager = jwtTokenManager;
         this.adminService = adminService;
         this.memberService = memberService;
+    }
+
+    private static void validateAdminSamePassword(final LoginRequest request, final Admin admin) {
+        if (!admin.isSamePassword(request.password())) {
+            throw new UnauthorizedException("비밀번호가 틀립니다.");
+        }
+    }
+
+    private static void validateMemberSamePassword(final LoginRequest request, final Member member) {
+        if (!member.isSamePassword(request.password())) {
+            throw new UnauthorizedException("비밀번호가 틀립니다.");
+        }
     }
 
     public String createAdminToken(final LoginRequest request) {
@@ -38,18 +51,6 @@ public class LoginService {
         validateMemberSamePassword(request, member);
 
         return jwtTokenManager.createToken(member.getId(), "MEMBER");
-    }
-
-    private static void validateAdminSamePassword(final LoginRequest request, final Admin admin) {
-        if (!admin.isSamePassword(request.password())) {
-            throw new UnauthorizedException("비밀번호가 틀립니다.");
-        }
-    }
-
-    private static void validateMemberSamePassword(final LoginRequest request, final Member member) {
-        if (!member.isSamePassword(request.password())) {
-            throw new UnauthorizedException("비밀번호가 틀립니다.");
-        }
     }
 
     private void validateAdminExistsAccount(final LoginRequest request) {

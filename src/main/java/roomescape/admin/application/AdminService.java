@@ -22,11 +22,11 @@ public class AdminService {
 
     public Admin findByEmail(final String email) {
         return adminRepository.findByEmail(email)
-            .orElseThrow(() -> new BusinessException("관리자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException("관리자를 찾을 수 없습니다."));
     }
 
     public Admin findById(final Long id) {
         return adminRepository.findById(id)
-            .orElseThrow(() -> new BusinessException("관리자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new BusinessException("관리자를 찾을 수 없습니다."));
     }
 }

@@ -2,7 +2,7 @@ package roomescape.admin.domain;
 
 import java.util.Optional;
 
-public interface AdminRepository  {
+public interface AdminRepository {
 
     Optional<Admin> findById(Long id);
 

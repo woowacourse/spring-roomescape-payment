@@ -10,7 +10,7 @@ public class AdminJpaRepositoryAdapter implements AdminRepository {
 
     private final AdminJpaRepository adminJpaRepository;
 
-    public AdminJpaRepositoryAdapter(AdminJpaRepository adminJpaRepository) {
+    public AdminJpaRepositoryAdapter(final AdminJpaRepository adminJpaRepository) {
         this.adminJpaRepository = adminJpaRepository;
     }
 

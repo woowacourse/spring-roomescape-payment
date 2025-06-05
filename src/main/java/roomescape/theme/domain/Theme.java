@@ -35,6 +35,22 @@ public class Theme {
         this.thumbnail = thumbnail;
     }
 
+    public static Theme createWithoutId(final String name, final String description, final String thumbnail) {
+        return new Theme(null, name, description, thumbnail);
+    }
+
+    public static Theme createWithId(final Long id, final String name, final String description,
+                                     final String thumbnail) {
+        validateIdIsNonNull(id);
+        return new Theme(id, name, description, thumbnail);
+    }
+
+    private static void validateIdIsNonNull(final Long id) {
+        if (id == null) {
+            throw new BusinessException("테마 id는 null 일 수 없습니다.");
+        }
+    }
+
     private void validateIsNonNull(final Object object) {
         if (object == null) {
             throw new BusinessException("테마 정보는 null 일 수 없습니다.");
@@ -44,21 +60,6 @@ public class Theme {
     private void validateIsEmpty(final String something) {
         if (something.isEmpty()) {
             throw new BusinessException("테마 정보는 비어있을 수 없습니다.");
-        }
-    }
-
-    public static Theme createWithoutId(final String name, final String description, final String thumbnail) {
-        return new Theme(null, name, description, thumbnail);
-    }
-
-    public static Theme createWithId(final Long id, final String name, final String description, final String thumbnail) {
-        validateIdIsNonNull(id);
-        return new Theme(id, name, description, thumbnail);
-    }
-
-    private static void validateIdIsNonNull(final Long id) {
-        if (id == null) {
-            throw new BusinessException("테마 id는 null 일 수 없습니다.");
         }
     }
 

@@ -12,7 +12,7 @@ public class WaitingJpaRepositoryAdapter implements WaitingRepository {
 
     private final WaitingJpaRepository waitingJpaRepository;
 
-    public WaitingJpaRepositoryAdapter(WaitingJpaRepository waitingJpaRepository) {
+    public WaitingJpaRepositoryAdapter(final WaitingJpaRepository waitingJpaRepository) {
         this.waitingJpaRepository = waitingJpaRepository;
     }
 

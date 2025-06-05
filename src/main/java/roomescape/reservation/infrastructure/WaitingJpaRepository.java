@@ -12,15 +12,15 @@ public interface WaitingJpaRepository extends CrudRepository<Waiting, Long> {
     boolean existsByReservationIdAndMemberId(Long reservationId, Long memberId);
 
     @Query("""
-        SELECT new roomescape.reservation.dto.WaitingWithRank(
-            w,
-            (SELECT COUNT(w2) + 1
-             FROM Waiting w2
-             WHERE w2.reservation = w.reservation
-                 AND w2.id < w.id))
-        FROM Waiting w
-        WHERE w.member.id = :memberId
-        """
+            SELECT new roomescape.reservation.dto.WaitingWithRank(
+                w,
+                (SELECT COUNT(w2) + 1
+                 FROM Waiting w2
+                 WHERE w2.reservation = w.reservation
+                     AND w2.id < w.id))
+            FROM Waiting w
+            WHERE w.member.id = :memberId
+            """
     )
     List<WaitingWithRank> findByMemberId(@Param("memberId") Long memberId);
 

@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.common.dto.response.ExceptionResponse;
-import roomescape.timeslot.dto.request.TimeSlotRequest;
-import roomescape.timeslot.dto.response.TimeSlotResponse;
-import roomescape.timeslot.dto.request.TimeSlotConditionRequest;
-import roomescape.timeslot.dto.response.TimeSlotConditionResponse;
 import roomescape.timeslot.application.TimeSlotService;
+import roomescape.timeslot.dto.request.TimeSlotConditionRequest;
+import roomescape.timeslot.dto.request.TimeSlotRequest;
+import roomescape.timeslot.dto.response.TimeSlotConditionResponse;
+import roomescape.timeslot.dto.response.TimeSlotResponse;
 
 @RestController
 @RequestMapping("/times")
@@ -46,8 +46,7 @@ public class TimeSlotController {
 
     @PostMapping
     public ResponseEntity<TimeSlotResponse> createTimeSlot(
-        @RequestBody final TimeSlotRequest request)
-    {
+            @RequestBody final TimeSlotRequest request) {
         TimeSlotResponse response = reservationTimeService.createTimeSlot(request);
         return ResponseEntity.created(URI.create(GET_ADMIN_TIME)).body(response);
     }
@@ -61,7 +60,7 @@ public class TimeSlotController {
     @ExceptionHandler(value = DateTimeParseException.class)
     public ResponseEntity<ExceptionResponse> noMatchTimeType(final HttpServletRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(
-            400, "[ERROR] 요청 시간 형식이 맞지 않습니다.", request.getRequestURI()
+                400, "[ERROR] 요청 시간 형식이 맞지 않습니다.", request.getRequestURI()
         );
         return ResponseEntity.badRequest().body(exceptionResponse);
     }

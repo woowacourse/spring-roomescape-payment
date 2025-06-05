@@ -21,6 +21,12 @@ public class AdminRoleInterceptor implements HandlerInterceptor {
         this.jwtTokenManager = jwtTokenManager;
     }
 
+    private static void validateRoleIsAdmin(final String role) {
+        if (!role.equals(ADMIN_STRING)) {
+            throw new ForbiddenException("관리자가 아닙니다.");
+        }
+    }
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String token = TokenExtractor.extract(request);
@@ -32,12 +38,6 @@ public class AdminRoleInterceptor implements HandlerInterceptor {
             return true;
         } catch (final JwtExtractException exception) {
             throw new UnauthorizedException(exception.getMessage());
-        }
-    }
-
-    private static void validateRoleIsAdmin(final String role) {
-        if (!role.equals(ADMIN_STRING)) {
-            throw new ForbiddenException("관리자가 아닙니다.");
         }
     }
 }

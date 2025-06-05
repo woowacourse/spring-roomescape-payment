@@ -12,8 +12,8 @@ import java.util.Objects;
 import roomescape.common.exception.BusinessException;
 import roomescape.member.domain.Member;
 import roomescape.reservation.infrastructure.ReservationStatusConverter;
-import roomescape.timeslot.domain.TimeSlot;
 import roomescape.theme.domain.Theme;
+import roomescape.timeslot.domain.TimeSlot;
 
 @Entity
 public class Reservation {
@@ -60,12 +60,6 @@ public class Reservation {
         this.member = member;
     }
 
-    private void validateIsNonNull(final Object object) {
-        if (object == null) {
-            throw new BusinessException("예약 정보는 null 일 수 없습니다.");
-        }
-    }
-
     public static Reservation createWithoutId(final LocalDate date,
                                               final TimeSlot time,
                                               final Theme theme,
@@ -73,6 +67,12 @@ public class Reservation {
                                               final Status status
     ) {
         return new Reservation(null, date, time, theme, member, status);
+    }
+
+    private void validateIsNonNull(final Object object) {
+        if (object == null) {
+            throw new BusinessException("예약 정보는 null 일 수 없습니다.");
+        }
     }
 
     public boolean isCannotReserveDateTime(final LocalDateTime dateTime) {
@@ -87,12 +87,8 @@ public class Reservation {
         return this.time.isEqual(time.getStartAt());
     }
 
-    public boolean isSameMember(Member member) {
+    public boolean isSameMember(final Member member) {
         return this.member.equals(member);
-    }
-
-    public void setMember(Member member) {
-        this.member = member;
     }
 
     public Long getId() {
@@ -113,6 +109,10 @@ public class Reservation {
 
     public Member getMember() {
         return member;
+    }
+
+    public void setMember(final Member member) {
+        this.member = member;
     }
 
     public Status getStatus() {

@@ -17,8 +17,14 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    public MemberService(MemberRepository memberRepository) {
+    public MemberService(final MemberRepository memberRepository) {
         this.memberRepository = memberRepository;
+    }
+
+    private static void validateEmailExists(final boolean emailExist) {
+        if (emailExist) {
+            throw new EmailException("중복되는 이메일입니다.");
+        }
     }
 
     @Transactional
@@ -27,20 +33,14 @@ public class MemberService {
         validateEmailExists(emailExist);
 
         Member member = memberRepository.save(
-            Member.createWithoutId(request.name(), request.email(), request.password()));
+                Member.createWithoutId(request.name(), request.email(), request.password()));
 
         return new MemberResponse(member.getId(), member.getName());
     }
 
-    private static void validateEmailExists(boolean emailExist) {
-        if (emailExist) {
-            throw new EmailException("중복되는 이메일입니다.");
-        }
-    }
-
     public Member findByEmail(final String email) {
         return memberRepository.findByEmail(new Email(email))
-            .orElseThrow(() -> new MemberNotFound("멤버를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MemberNotFound("멤버를 찾을 수 없습니다."));
     }
 
     public boolean isExistsByEmail(final String email) {
@@ -49,7 +49,7 @@ public class MemberService {
 
     public Member findById(final Long id) {
         return memberRepository.findById(id)
-            .orElseThrow(() -> new MemberNotFound("멤버를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MemberNotFound("멤버를 찾을 수 없습니다."));
     }
 
     public List<MemberResponse> findAll() {

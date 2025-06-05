@@ -12,7 +12,7 @@ public class MemberJpaRepositoryAdapter implements MemberRepository {
 
     private final MemberJpaRepository memberJpaRepository;
 
-    public MemberJpaRepositoryAdapter(MemberJpaRepository memberJpaRepository) {
+    public MemberJpaRepositoryAdapter(final MemberJpaRepository memberJpaRepository) {
         this.memberJpaRepository = memberJpaRepository;
     }
 

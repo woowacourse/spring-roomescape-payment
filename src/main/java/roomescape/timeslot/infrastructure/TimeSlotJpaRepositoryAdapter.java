@@ -11,7 +11,7 @@ public class TimeSlotJpaRepositoryAdapter implements TimeSlotRepository {
 
     private final TimeSlotJpaRepository reservationTimeJpaRepository;
 
-    public TimeSlotJpaRepositoryAdapter(TimeSlotJpaRepository reservationTimeJpaRepository) {
+    public TimeSlotJpaRepositoryAdapter(final TimeSlotJpaRepository reservationTimeJpaRepository) {
         this.reservationTimeJpaRepository = reservationTimeJpaRepository;
     }
 

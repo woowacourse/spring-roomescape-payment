@@ -12,32 +12,33 @@ public class ReservationJpaRepositoryAdapter implements ReservationRepository {
 
     private final ReservationJpaRepository reservationJpaRepository;
 
-    public ReservationJpaRepositoryAdapter(ReservationJpaRepository reservationJpaRepository) {
+    public ReservationJpaRepositoryAdapter(final ReservationJpaRepository reservationJpaRepository) {
         this.reservationJpaRepository = reservationJpaRepository;
     }
 
     @Override
-    public Reservation save(final Reservation reservation) {
+    public Reservation save(Reservation reservation) {
         return reservationJpaRepository.save(reservation);
     }
 
     @Override
-    public void deleteById(final Long id) {
+    public void deleteById(Long id) {
         reservationJpaRepository.deleteById(id);
     }
 
     @Override
-    public Optional<Reservation> findById(final Long id) {
+    public Optional<Reservation> findById(Long id) {
         return reservationJpaRepository.findById(id);
     }
 
     @Override
-    public List<Reservation> findAllByDateAndThemeId(final LocalDate date, final Long themeId) {
+    public List<Reservation> findAllByDateAndThemeId(LocalDate date, Long themeId) {
         return reservationJpaRepository.findByDateAndThemeId(date, themeId);
     }
 
     @Override
-    public List<Reservation> findAllByMemberIdAndThemeIdAndDateBetween(final Long memberId, final Long themeId, final LocalDate from, final LocalDate to) {
+    public List<Reservation> findAllByMemberIdAndThemeIdAndDateBetween(Long memberId, Long themeId, LocalDate from,
+                                                                       LocalDate to) {
         return reservationJpaRepository.findByMemberIdAndThemeIdAndDateBetween(memberId, themeId, from, to);
     }
 
@@ -52,12 +53,12 @@ public class ReservationJpaRepositoryAdapter implements ReservationRepository {
     }
 
     @Override
-    public boolean existsByTimeId(final Long reservationTimeId) {
+    public boolean existsByTimeId(Long reservationTimeId) {
         return reservationJpaRepository.existsByTimeId(reservationTimeId);
     }
 
     @Override
-    public boolean existByThemeId(final Long themeId) {
+    public boolean existByThemeId(Long themeId) {
         return reservationJpaRepository.existsByThemeId(themeId);
     }
 

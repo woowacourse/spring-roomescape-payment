@@ -18,8 +18,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     public WebMvcConfig(final LoginAdminArgumentResolver loginAdminArgumentResolver,
                         final LoginMemberArgumentResolver loginMemberArgumentResolver,
-                        final AdminRoleInterceptor adminRoleInterceptor)
-    {
+                        final AdminRoleInterceptor adminRoleInterceptor) {
         this.loginAdminArgumentResolver = loginAdminArgumentResolver;
         this.loginMemberArgumentResolver = loginMemberArgumentResolver;
         this.adminRoleInterceptor = adminRoleInterceptor;

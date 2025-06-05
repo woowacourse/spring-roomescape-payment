@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.theme.dto.response.PopularThemeResponse;
-import roomescape.theme.dto.request.ThemeRequest;
-import roomescape.theme.dto.response.ThemeResponse;
 import roomescape.theme.application.ThemeService;
+import roomescape.theme.dto.request.ThemeRequest;
+import roomescape.theme.dto.response.PopularThemeResponse;
+import roomescape.theme.dto.response.ThemeResponse;
 
 @RestController
 @RequestMapping("/themes")
@@ -21,7 +21,7 @@ public class ThemeController {
 
     private final ThemeService themeService;
 
-    public ThemeController(ThemeService themeService) {
+    public ThemeController(final ThemeService themeService) {
         this.themeService = themeService;
     }
 

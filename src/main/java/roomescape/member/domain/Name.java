@@ -17,7 +17,7 @@ public record Name(String name) {
         }
     }
 
-    private static void validateNameLength(String name) {
+    private static void validateNameLength(final String name) {
         if (name.isEmpty() || name.length() > 5) {
             throw new NameException("이름은 1-5글자 사이여야 합니다.");
         }

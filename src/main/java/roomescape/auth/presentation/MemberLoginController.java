@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.annotation.LoginMember;
-import roomescape.auth.dto.response.LoginCheckResponse;
+import roomescape.auth.application.LoginService;
 import roomescape.auth.dto.info.LoginMemberInfo;
 import roomescape.auth.dto.request.LoginRequest;
-import roomescape.auth.application.LoginService;
+import roomescape.auth.dto.response.LoginCheckResponse;
 import roomescape.member.domain.Member;
 
 @RestController
@@ -19,12 +19,12 @@ public class MemberLoginController {
 
     private final LoginService loginService;
 
-    public MemberLoginController(LoginService loginService) {
+    public MemberLoginController(final LoginService loginService) {
         this.loginService = loginService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<Void> login(@RequestBody final LoginRequest request) {
         String token = loginService.createMemberToken(request);
 
         ResponseCookie cookie = ResponseCookie.from("token", token)
