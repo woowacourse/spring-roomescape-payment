@@ -12,7 +12,6 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.application.PaymentClient;
-import roomescape.payment.application.PaymentException;
 import roomescape.payment.application.dto.PaymentRequest;
 import roomescape.payment.application.dto.PaymentResponse;
 import roomescape.payment.infrastructure.dto.TossPaymentResponse;
@@ -42,17 +41,17 @@ public class TossPaymentClient implements PaymentClient {
             String code = node.path("code").asText();
             String message = node.path("message").asText();
             if (code.equals("UNAUTHORIZED_KEY")) {
-                throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR,
+                throw new TossPaymentException(HttpStatus.INTERNAL_SERVER_ERROR,
                         "방탈출 예약 서비스 결제 시스템에서 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
             }
-            throw new PaymentException(HttpStatus.BAD_REQUEST, message);
+            throw new TossPaymentException(HttpStatus.BAD_REQUEST, message);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     private void handle5xxError(HttpRequest httpRequest, ClientHttpResponse clientHttpResponse) {
-        throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "토스 결제 시스템에서 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+        throw new TossPaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "토스 결제 시스템에서 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
     }
 }
 
