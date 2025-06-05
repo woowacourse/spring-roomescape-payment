@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import roomescape.client.dto.TossPaymentConfirmResponse;
 import roomescape.client.dto.TossServerErrorResponse;
 import roomescape.dto.reservation.TossPaymentConfirmRequestDto;
 
@@ -41,13 +42,14 @@ public class PaymentClient {
                 .build();
     }
 
-    public void confirmPayment(TossPaymentConfirmRequestDto requestDto) {
-        restClient.post()
+    public TossPaymentConfirmResponse confirmPayment(TossPaymentConfirmRequestDto requestDto) {
+        return restClient.post()
                 .uri(TOSS_API_URL + "/payments/confirm")
                 .header("Authorization", PAYMENT_AUTHORIZATION_HEADER)
                 .body(requestDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
-                .toBodilessEntity();
+                .toEntity(TossPaymentConfirmResponse.class)
+                .getBody();
     }
 }
