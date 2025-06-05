@@ -7,9 +7,9 @@ import roomescape.member.domain.Member;
 import roomescape.member.service.MemberQueryService;
 import roomescape.reservation.controller.dto.AdminCreateReservationRequest;
 import roomescape.reservation.controller.dto.CreateReservationRequest;
-import roomescape.reservation.controller.dto.MyReservationResponse;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.repository.dto.MyReservationWithTossPayment;
 import roomescape.reservation.service.ReservationCommandService;
 import roomescape.reservation.service.ReservationQueryService;
 import roomescape.reservation.service.TossPaymentCommandService;
@@ -73,8 +73,8 @@ public class ReservationService {
         reservationCommandService.deleteReservationById(id);
     }
 
-    public List<MyReservationResponse> findAllMyReservation(final Long memberId) {
-        return MyReservationResponse.from(reservationQueryService.findAllMyReservation(memberId));
+    public List<MyReservationWithTossPayment> findAllMyReservation(final Long memberId) {
+        return reservationQueryService.findAllMyReservationWithTossPayment(memberId);
     }
 
     public List<ReservationResponse> findAllReservationsWithFilter(

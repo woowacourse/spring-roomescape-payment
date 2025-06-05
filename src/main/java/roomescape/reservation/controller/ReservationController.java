@@ -17,6 +17,7 @@ import roomescape.global.dto.SessionMember;
 import roomescape.reservation.controller.dto.CreateReservationRequest;
 import roomescape.reservation.controller.dto.MyReservationResponse;
 import roomescape.reservation.controller.dto.ReservationResponse;
+import roomescape.reservation.repository.dto.MyReservationWithTossPayment;
 
 
 @RestController
@@ -46,10 +47,10 @@ public class ReservationController {
     }
 
     @GetMapping("/mine")
-    public ResponseEntity<List<MyReservationResponse>> findMyReservation(
+    public ResponseEntity<List<MyReservationWithTossPayment>> findMyReservation(
             final SessionMember sessionMember
     ) {
-        final List<MyReservationResponse> response = reservationService.findAllMyReservation(sessionMember.id());
+        final List<MyReservationWithTossPayment> response = reservationService.findAllMyReservation(sessionMember.id());
         return ResponseEntity.ok(response);
     }
 
