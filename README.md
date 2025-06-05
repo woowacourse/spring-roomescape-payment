@@ -50,13 +50,13 @@ erDiagram
     VARCHAR waiting_status  "ENUM('ACCEPTED','CANCELLED','PENDING','REJECTED')"
   }
 
-  MEMBER ||--o{ RESERVATION : makes
-  MEMBER ||--o{ WAITING : waits
-  RESERVATION ||--|{ PAYMENT : has
-  RESERVATION ||--|| RESERVATION_TIME : at
-  RESERVATION ||--|| THEME : for
-  WAITING ||--|| RESERVATION_TIME : at
-  WAITING ||--|| THEME : for
+  MEMBER ||--o{ RESERVATION
+  MEMBER ||--o{ WAITING
+  RESERVATION ||--|{ PAYMENT
+  RESERVATION ||--|| RESERVATION_TIME
+  RESERVATION ||--|| THEME
+  WAITING ||--|| RESERVATION_TIME
+  WAITING ||--|| THEME
 ```
 
 ## 기능 구현 목록
