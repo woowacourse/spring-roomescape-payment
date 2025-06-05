@@ -25,25 +25,29 @@ public class TossPaymentClient {
     }
 
     public TossPaymentResponse confirmPayment(final TossPaymentConfirmRequest request) {
-        return tossRestClient.post()
-                .uri("/payments/confirm")
-                .body(request)
-                .retrieve()
-                .onStatus(
-                        HttpStatusCode::is4xxClientError,
-                        (req, res) -> {
-                            String errorBody = new String(res.getBody().readAllBytes(), StandardCharsets.UTF_8);
-                            TossErrorResponse errorResponse = objectMapper.readValue(errorBody, TossErrorResponse.class);
-                            throw new ClientPaymentException("결제 실패 : " + errorResponse.message());
+        try {
+            return tossRestClient.post()
+                    .uri("/payments/confirm")
+                    .body(request)
+                    .retrieve()
+                    .onStatus(
+                            HttpStatusCode::is4xxClientError,
+                            (req, res) -> {
+                                String errorBody = new String(res.getBody().readAllBytes(), StandardCharsets.UTF_8);
+                                TossErrorResponse errorResponse = objectMapper.readValue(errorBody, TossErrorResponse.class);
+                                throw new ClientPaymentException("결제 실패 : " + errorResponse.message());
 
-                        })
-                .onStatus(
-                        HttpStatusCode::is5xxServerError,
-                        (req, res) -> {
-                            String errorBody = new String(res.getBody().readAllBytes(), StandardCharsets.UTF_8);
-                            TossErrorResponse errorResponse = objectMapper.readValue(errorBody, TossErrorResponse.class);
-                            throw new PaymentException("결제 실패 : " + errorResponse.message());
-                        })
-                .body(TossPaymentResponse.class);
+                            })
+                    .onStatus(
+                            HttpStatusCode::is5xxServerError,
+                            (req, res) -> {
+                                String errorBody = new String(res.getBody().readAllBytes(), StandardCharsets.UTF_8);
+                                TossErrorResponse errorResponse = objectMapper.readValue(errorBody, TossErrorResponse.class);
+                                throw new PaymentException("결제 실패 : " + errorResponse.message());
+                            })
+                    .body(TossPaymentResponse.class);
+        } catch (Exception e) {
+            throw new PaymentException(e.getMessage());
+        }
     }
 }
