@@ -150,7 +150,7 @@ class ReservationServiceTest extends ServiceTest {
 
     @Test
     @DisplayName("예약 대기를 취소한다.")
-    void cancelWaiting() {
+    void cancel() {
         // given
         var anotherUser = repositoryHelper.saveAnyUser();
         service.reserve(anotherUser.id(), tomorrow(), timeSlot.id(), theme.id());
@@ -158,7 +158,7 @@ class ReservationServiceTest extends ServiceTest {
         var waiting = service.waitFor(user.id(), tomorrow(), timeSlot.id(), theme.id());
 
         // when
-        service.cancelWaiting(user.id(), waiting.id());
+        service.cancel(user.id(), waiting.id());
 
         // then
         var reservations = user.reservations();
@@ -167,7 +167,7 @@ class ReservationServiceTest extends ServiceTest {
 
     @Test
     @DisplayName("예약 대기를 취소하면 뒤따라오는 순번의 다른 대기 예약들의 순번이 앞당겨진다.")
-    void cancelWaitingMirrorsQueue() {
+    void cancelMirrorsQueue() {
         // given
         var user1 = repositoryHelper.saveAnyUser();
         var user2 = repositoryHelper.saveAnyUser();
@@ -180,7 +180,7 @@ class ReservationServiceTest extends ServiceTest {
         var third = service.waitFor(user3.id(), tomorrow(), timeSlot.id(), theme.id());
 
         // when
-        service.cancelWaiting(user1.id(), first.id());
+        service.cancel(user1.id(), first.id());
 
         // then
         var waitings = service.findAllWaitings();
@@ -191,17 +191,17 @@ class ReservationServiceTest extends ServiceTest {
     }
 
     @Test
-    @DisplayName("대기 상태가 아닌 예약은 취소할 수 없다.")
-    void cancelWaitingThatIsNotWaiting() {
-        var reserved = service.reserve(user.id(), tomorrow(), timeSlot.id(), theme.id());
+    @DisplayName("확정 상태의 예약은 취소할 수 없다.")
+    void cannotCancelConfirmedReservation() {
+        var confirmedReservation = repositoryHelper.saveReservation(new Reservation(user, RoomescapeSchedule.of(tomorrow(), timeSlot, theme), ReservationStatus.CONFIRMED));
 
-        assertThatThrownBy(() -> service.cancelWaiting(user.id(), reserved.id()))
+        assertThatThrownBy(() -> service.cancel(user.id(), confirmedReservation.id()))
             .isInstanceOf(BusinessRuleViolationException.class);
     }
 
     @Test
     @DisplayName("다른 사용자의 예약 대기를 취소할 수 없다.")
-    void cancelWaitingCanOnlyMine() {
+    void cancelCanOnlyMine() {
         // given
         service.reserve(user.id(), tomorrow(), timeSlot.id(), theme.id());
 
@@ -209,7 +209,7 @@ class ReservationServiceTest extends ServiceTest {
         var waitingByAnotherUser = service.waitFor(anotherUser.id(), tomorrow(), timeSlot.id(), theme.id());
 
         // when & then
-        assertThatThrownBy(() -> service.cancelWaiting(user.id(), waitingByAnotherUser.id()))
+        assertThatThrownBy(() -> service.cancel(user.id(), waitingByAnotherUser.id()))
             .isInstanceOf(NotFoundException.class);
     }
 

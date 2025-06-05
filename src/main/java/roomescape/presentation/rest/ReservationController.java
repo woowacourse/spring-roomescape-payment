@@ -74,13 +74,13 @@ public class ReservationController {
         reservationService.removeById(id);
     }
 
-    @DeleteMapping("/wait/{id}")
+    @PostMapping("/cancel/{id}")
     @ResponseStatus(NO_CONTENT)
-    public void cancelWaiting(
+    public void cancel(
         final AuthenticationInfo authenticationInfo,
         @PathVariable("id") final long reservationId
     ) {
         var userId = authenticationInfo.id();
-        reservationService.cancelWaiting(userId, reservationId);
+        reservationService.cancel(userId, reservationId);
     }
 }

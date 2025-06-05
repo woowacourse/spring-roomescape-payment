@@ -91,8 +91,8 @@ public class Reservation {
     }
 
     public void cancel() {
-        if (!isWaiting()) {
-            throw new BusinessRuleViolationException("대기중인 예약만 취소할 수 있습니다.");
+        if (isConfirmed()) {
+            throw new BusinessRuleViolationException("확정된 예약은 취소할 수 없습니다.");
         }
         this.status = ReservationStatus.CANCELED;
     }

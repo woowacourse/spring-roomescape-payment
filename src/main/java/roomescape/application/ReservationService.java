@@ -77,7 +77,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public void cancelWaiting(final long userId, final long reservationId) {
+    public void cancel(final long userId, final long reservationId) {
         var user = userRepository.getById(userId);
         var reservation = reservationRepository.getById(reservationId);
         user.cancelReservation(reservation);

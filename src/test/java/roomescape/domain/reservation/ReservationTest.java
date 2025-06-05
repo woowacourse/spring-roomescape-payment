@@ -55,17 +55,26 @@ public class ReservationTest {
         assertThat(reservation.isPending()).isTrue();
     }
 
-    @Test
-    @DisplayName("대기 상태의 예약을 취소할 수 있다.")
-    void cancel() {
+    @ParameterizedTest
+    @DisplayName("확정 상태가 아닌 예약을 취소할 수 있다.")
+    @CsvSource({"WAITING", "PENDING"})
+    void cancel(ReservationStatus status) {
         // given
-        var reservation = reservationOf(ReservationStatus.WAITING);
+        var reservation = reservationOf(status);
 
         // when
         reservation.cancel();
 
         // then
         assertThat(reservation.status()).isEqualTo(ReservationStatus.CANCELED);
+    }
+
+    @Test
+    @DisplayName("확정 상태의 예약을 취소하려 하면 예외가 발생한다.")
+    void cannotCancelConfirmedReservation() {
+        var reservation = reservationOf(ReservationStatus.CONFIRMED);
+
+        assertThatThrownBy(reservation::cancel).isInstanceOf(BusinessRuleViolationException.class);
     }
 
     @Test
@@ -104,15 +113,6 @@ public class ReservationTest {
 
         // when & then
         assertThatThrownBy(() -> reservation.confirm(payment)).isInstanceOf(BusinessRuleViolationException.class);
-    }
-
-    @ParameterizedTest
-    @CsvSource({"CONFIRMED", "CANCELED"})
-    @DisplayName("대기 상태가 아닌 예약을 취소하려 하면 예외가 발생한다.")
-    void cancelNotWaitingReservation(final ReservationStatus statusThatNotWaiting) {
-        var reservation = reservationOf(statusThatNotWaiting);
-
-        assertThatThrownBy(reservation::cancel).isInstanceOf(BusinessRuleViolationException.class);
     }
 
     private Reservation reservationOf(final ReservationStatus status) {

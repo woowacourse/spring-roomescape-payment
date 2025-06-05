@@ -128,19 +128,19 @@ class ReservationControllerTest {
     @Test
     @DisplayName("예약 대기 취소 요청시, 주어진 아이디에 해당하는 예약이 있다면 취소하고 NO CONTENT를 응답한다.")
     void cancelWaitingSuccessfully() throws Exception {
-        mockMvc.perform(delete("/reservations/wait/1"))
+        mockMvc.perform(post("/reservations/cancel/1"))
             .andExpect(status().isNoContent());
 
-        Mockito.verify(reservationService, times(1)).cancelWaiting(userId,1L);
+        Mockito.verify(reservationService, times(1)).cancel(userId,1L);
     }
 
     @Test
     @DisplayName("예약 대기 취소 요청시, 주어진 아이디에 해당하는 예약이 없다면 NOT FOUND를 응답한다.")
     void cancelWaitingWhenNotFound() throws Exception {
         Mockito.doThrow(new NotFoundException("should be thrown"))
-            .when(reservationService).cancelWaiting(eq(userId), eq(999L));
+            .when(reservationService).cancel(eq(userId), eq(999L));
 
-        mockMvc.perform(delete("/reservations/wait/999"))
+        mockMvc.perform(post("/reservations/cancel/999"))
             .andExpect(status().isNotFound());
     }
 }
