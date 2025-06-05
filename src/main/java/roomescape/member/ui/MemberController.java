@@ -3,6 +3,7 @@ package roomescape.member.ui;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,7 @@ import roomescape.member.application.dto.MemberResponse;
 @RestController
 @RequestMapping("members")
 @AllArgsConstructor
+@Slf4j
 public class MemberController {
     private final MemberService memberService;
 
@@ -25,6 +27,7 @@ public class MemberController {
     )
     @PostMapping
     public ResponseEntity<ApiResponse<MemberResponse>> create(@Valid @RequestBody MemberRequest request) {
+        log.info("회원가입 요청: email={}", request.email());
         MemberResponse response = memberService.create(request);
         ApiResponse<MemberResponse> apiResponse = ApiResponse.createSuccess(response);
         return ResponseEntity.ok(apiResponse);

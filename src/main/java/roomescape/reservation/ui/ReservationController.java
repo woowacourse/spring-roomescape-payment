@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ import roomescape.reservation.application.dto.UserReservationRequest;
 @RestController
 @AllArgsConstructor
 @RequestMapping("reservations")
+@Slf4j
 public class ReservationController {
     private final ReservationService reservationService;
     private final SessionManager sessionManager;
@@ -41,6 +43,7 @@ public class ReservationController {
             @LoginMemberId Long memberId,
             HttpSession session
     ) {
+        log.info("예약 요청: memberId={}, orderId={}, amount={}", memberId, request.orderId(), request.orderId());
         BigDecimal originAmount = (BigDecimal) sessionManager.getFromSession(session, request.orderId());
         ReservationResponse response = reservationService.createByUser(memberId, request, originAmount);
         sessionManager.removeFromSession(session, request.orderId());

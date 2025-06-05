@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +15,7 @@ import roomescape.payment.application.dto.PrePaymentRequest;
 
 @RestController
 @AllArgsConstructor
+@Slf4j
 public class PaymentController {
     private final SessionManager sessionManager;
 
@@ -24,6 +26,7 @@ public class PaymentController {
     @PostMapping("/prepay")
     public ResponseEntity<ApiResponse<Void>> create(@Valid @RequestBody PrePaymentRequest request,
                                                     HttpSession session) {
+        log.info("결제 준비: orderId={}, amount={}", request.orderId(), request.amount());
         sessionManager.saveToSession(session, request.orderId(), request.amount());
         ApiResponse<Void> apiResponse = ApiResponse.createSuccessWithNoData();
         return ResponseEntity.ok(apiResponse);

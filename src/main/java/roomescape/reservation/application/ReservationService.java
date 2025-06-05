@@ -108,14 +108,17 @@ public class ReservationService {
 
         paymentApprovalService.approvePayment(new PaymentApprovalRequest(orderId, amount, request.paymentKey()));
         Reservation reservation = create(memberId, request.date(), request.timeId(), request.themeId());
-        paymentService.save(new Payment(request.paymentKey(), request.amount(), reservation.getId()));
-
+        log.info("유저 예약 생성 및 저장 완료 reservationId={}", reservation.getId());
+        Payment payment = paymentService.save(new Payment(request.paymentKey(), request.amount(), reservation.getId()));
+        log.info("결제 저장 완료: paymentId={}, paymentKey={}", payment.getId(), payment.getPaymentKey());
         return ReservationResponse.from(reservation);
     }
 
     @Transactional
     public ReservationResponse createByAdmin(AdminReservationRequest request) {
-        return ReservationResponse.from(create(request.memberId(), request.date(), request.timeId(), request.themeId()));
+        Reservation reservation = create(request.memberId(), request.date(), request.timeId(), request.themeId());
+        log.info("어드민 예약 성공: reservationId={}", reservation.getId());
+        return ReservationResponse.from(reservation);
     }
 
     private Reservation create(Long memberId, LocalDate dateInput, Long timeId, Long themeId) {
@@ -150,6 +153,7 @@ public class ReservationService {
     public void deleteById(Long id) {
         Optional<Reservation> reservation = reservationRepository.findById(id);
         reservationRepository.deleteById(id);
+        log.info("예약 삭제 성공 id={}", id);
         publishDeleteEvent(reservation);
     }
 

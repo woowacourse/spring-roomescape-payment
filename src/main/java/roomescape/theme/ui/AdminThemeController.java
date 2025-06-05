@@ -3,6 +3,7 @@ package roomescape.theme.ui;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,6 +20,7 @@ import roomescape.theme.application.dto.ThemeResponse;
 @RestController
 @AllArgsConstructor
 @RequestMapping("admin/themes")
+@Slf4j
 public class AdminThemeController {
     private final ThemeService themeService;
 
@@ -28,6 +30,7 @@ public class AdminThemeController {
     )
     @PostMapping
     public ResponseEntity<ApiResponse<ThemeResponse>> create(@Valid @RequestBody ThemeRequest request) {
+        log.info("테마 생성 요청 name={}, description={}", request.name(), request.description());
         ThemeResponse response = themeService.create(request);
         ApiResponse<ThemeResponse> apiResponse = ApiResponse.createSuccess(response);
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);

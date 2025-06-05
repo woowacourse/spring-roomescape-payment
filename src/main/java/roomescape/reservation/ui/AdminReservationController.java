@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,6 +24,7 @@ import roomescape.reservation.application.dto.ReservationResponse;
 @RestController
 @AllArgsConstructor
 @RequestMapping("admin/reservations")
+@Slf4j
 public class AdminReservationController {
     private final ReservationService reservationService;
 
@@ -34,6 +36,7 @@ public class AdminReservationController {
     public ResponseEntity<ApiResponse<ReservationResponse>> create(
             @Valid @RequestBody AdminReservationRequest request
     ) {
+        log.info("관리자 예약 생성 요청");
         ReservationResponse response = reservationService.createByAdmin(request);
         ApiResponse<ReservationResponse> apiResponse = ApiResponse.createSuccess(response);
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
@@ -58,6 +61,7 @@ public class AdminReservationController {
     )
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable("id") Long id) {
+        log.info("관리자 예약 삭제 요청: id={}", id);
         reservationService.deleteById(id);
         ApiResponse<Void> apiResponse = ApiResponse.createSuccessWithNoData();
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse);

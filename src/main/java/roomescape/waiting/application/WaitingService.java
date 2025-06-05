@@ -3,6 +3,7 @@ package roomescape.waiting.application;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.exception.AccessForbiddenException;
@@ -33,6 +34,7 @@ import roomescape.waiting.exception.WaitingNotFoundException;
 @Service
 @AllArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class WaitingService {
     private static final int MAX_WAITING_COUNT = 100;
 
@@ -58,7 +60,9 @@ public class WaitingService {
         validateMaxWaitingCount(spec);
 
         Waiting waiting = new Waiting(member, spec);
-        return WaitingResponse.from(waitingRepository.save(waiting));
+        Waiting saveWaiting = waitingRepository.save(waiting);
+        log.info("예약 등록 완료 waitingId={}", saveWaiting.getId());
+        return WaitingResponse.from(saveWaiting);
     }
 
     private void validateMaxWaitingCount(ReservationSpec spec) {
@@ -98,6 +102,7 @@ public class WaitingService {
         Waiting waiting = waitingRepository.findById(id).orElseThrow(WaitingNotFoundException::new);
         validateIsOwner(memberId, waiting);
         deleteById(id);
+        log.info("예약 삭제 완료 id={}", id);
     }
 
     private void validateIsOwner(Long memberId, Waiting waiting) {
@@ -113,6 +118,7 @@ public class WaitingService {
 
     private void deleteById(Long id) {
         waitingRepository.deleteById(id);
+        log.info("예약 정보 삭제 완료: id={}", id);
     }
 
     public List<WaitingResponse> findAll() {
