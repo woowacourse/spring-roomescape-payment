@@ -15,7 +15,7 @@ import roomescape.external.payment.TossPaymentClient;
 public class ClientConfiguration {
 
     @Bean
-    public PaymentClient paymentClient(
+    public PaymentClient tossPaymentclient(
             @Value("${toss_payment_base_url}") String paymentUrl,
             @Value("${toss_payment_secret_key}") String secretKey,
             @Value("${toss_payment_authorization_url}") String paymentAuthorizationUrl
