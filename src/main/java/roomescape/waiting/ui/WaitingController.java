@@ -1,5 +1,6 @@
 package roomescape.waiting.ui;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,10 @@ import roomescape.waiting.application.dto.WaitingResponse;
 public class WaitingController {
     private final WaitingService waitingService;
 
+    @Operation(
+            summary = "예약 대기 생성",
+            description = "새로운 예약 대기를 생성합니다."
+    )
     @PostMapping
     public ResponseEntity<ApiResponse<WaitingResponse>> add(
             @LoginMemberId Long memberId,
@@ -35,9 +40,13 @@ public class WaitingController {
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
 
+    @Operation(
+            summary = "예약 대기 삭제",
+            description = "ID에 해당하는 예약 대기를 삭제합니다."
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable("id") Long id, @LoginMemberId Long memberId) {
-        log.info("예약 삭제 요청 memberId={}, waitingId={}", memberId, id);
+        log.info("예약대기 삭제 요청 memberId={}, waitingId={}", memberId, id);
         waitingService.deleteByUser(id, memberId);
         ApiResponse<Void> apiResponse = ApiResponse.createSuccessWithNoData();
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse);
