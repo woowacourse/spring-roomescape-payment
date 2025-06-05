@@ -28,7 +28,7 @@ public class RequestPaymentErrorHandler implements ResponseErrorHandler {
     public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
         String responseBody = new String(response.getBody().readAllBytes(), StandardCharsets.UTF_8);
         JsonNode errorResponse = objectMapper.readTree(responseBody);
-        String message = errorResponse.get("message").asText();
+        String message = errorResponse.path("message").asText();
         throw new PaymentRequestException(message);
     }
 }

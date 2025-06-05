@@ -16,6 +16,9 @@ import roomescape.member.domain.MemberRepository;
 import roomescape.member.infrastructure.JpaMemberRepository;
 import roomescape.member.infrastructure.JpaMemberRepositoryAdapter;
 import roomescape.member.presentation.dto.MyReservationResponse;
+import roomescape.payment.domain.PaymentRepository;
+import roomescape.payment.infrastructure.JpaPaymentRepository;
+import roomescape.payment.infrastructure.JpaPaymentRepositoryAdapter;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.WaitingRepository;
 import roomescape.reservation.exception.ReservationException;
@@ -60,8 +63,27 @@ class ReservationDomainServiceTest {
         List<MyReservationResponse> result = reservationDomainService.getMemberReservations(loginMemberInfo);
 
         List<MyReservationResponse> expected = List.of(
-            new MyReservationResponse(1L, "테마1", LocalDate.of(2025, 4, 28), LocalTime.of(10, 0), "예약"),
-            new MyReservationResponse(2L, "테마1", LocalDate.of(2025, 4, 28), LocalTime.of(11, 0), "예약"));
+            new MyReservationResponse(
+                1L,
+                "테마1",
+                LocalDate.of(2025, 4, 28),
+                LocalTime.of(10, 0),
+                "예약",
+                "abcd",
+                "주문1",
+                1000
+            ),
+            new MyReservationResponse(
+                2L,
+                "테마1",
+                LocalDate.of(2025, 4, 28),
+                LocalTime.of(11, 0),
+                "예약",
+                "abcd",
+                "주문2",
+                1000
+            )
+        );
         assertThat(result).isEqualTo(expected);
     }
 
@@ -146,13 +168,19 @@ class ReservationDomainServiceTest {
         }
 
         @Bean
+        public PaymentRepository paymentRepository(JpaPaymentRepository jpaPaymentRepository) {
+            return new JpaPaymentRepositoryAdapter(jpaPaymentRepository);
+        }
+
+        @Bean
         public ReservationDomainService reservationDomainService(
             DateTime dateTime,
             ReservationRepository reservationRepository,
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
             MemberRepository memberRepository,
-            WaitingRepository waitingRepository
+            WaitingRepository waitingRepository,
+            PaymentRepository paymentRepository
         ) {
             return new ReservationDomainService(
                 dateTime,
@@ -160,7 +188,9 @@ class ReservationDomainServiceTest {
                 reservationTimeRepository,
                 themeRepository,
                 memberRepository,
-                waitingRepository);
+                waitingRepository,
+                paymentRepository
+                );
         }
     }
 }

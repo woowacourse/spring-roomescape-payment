@@ -18,3 +18,8 @@ INSERT INTO reservation (date, time_id, theme_id, member_id, status) VALUES ('20
 INSERT INTO reservation (date, time_id, theme_id, member_id, status) VALUES ('2025-05-12', 1, 2, 3, 'RESERVED');
 INSERT INTO waiting (reservation_id, member_id) VALUES (1, 2);
 INSERT INTO waiting (reservation_id, member_id) VALUES (1, 3);
+
+INSERT INTO payment(payment_key, order_id, amount, reservation_id) VALUES ('abcd', '주문1', 1000, 1L);
+INSERT INTO payment(payment_key, order_id, amount, reservation_id) VALUES ('abcd', '주문2', 1000, 2L);
+INSERT INTO payment(payment_key, order_id, amount, reservation_id) VALUES ('abcd', '주문3', 1000, 3L);
+INSERT INTO payment(payment_key, order_id, amount, reservation_id) VALUES ('abcd', '주문4', 1000, 4L);

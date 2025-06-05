@@ -43,6 +43,7 @@ public class ReservationService {
         PaymentRequest paymentRequest = new PaymentRequest(request.paymentKey(), request.orderId(), request.amount());
         Reservation reservation = reservationDomainService.saveReservation(request, memberId);
         paymentService.confirmPayment(paymentRequest);
+        paymentService.savePayment(reservation, paymentRequest);
         return ReservationResponse.from(reservation);
     }
 

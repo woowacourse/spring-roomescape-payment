@@ -21,7 +21,7 @@ public class TossPaymentClient implements PaymentClient {
     private final RestClient restClient;
 
     public TossPaymentClient(
-        @Value("payment.toss.secret-key") String secretKey, RestClient restClient) {
+        @Value("${payment.toss.secret-key}") String secretKey, RestClient restClient) {
         this.secretKey = secretKey;
         this.restClient = restClient;
     }
