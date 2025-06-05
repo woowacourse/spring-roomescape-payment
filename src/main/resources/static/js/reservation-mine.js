@@ -24,6 +24,8 @@ function render(data) {
     const theme = item.theme;
     const date = item.date;
     const time = item.time;
+    const paymentKey = item.paymentKey;
+    const amount = item.amount;
     const status = `${
       item.status !== "대기" ? item.status : `${item.rank}번째 예약대기`
     }`;
@@ -44,8 +46,14 @@ function render(data) {
       };
       cancelCell.appendChild(cancelButton);
     } else {
-      // 예약 완료 상태일 때
+          /*
+          TODO: [미션4 - 2단계] 내 예약 목록 조회 시,
+           예약 완료 상태일 때 결제 정보를 함께 보여주기
+           결제 정보 필드명은 자신의 response 에 맞게 변경하기Add commentMore actions
+           */
       row.insertCell(4).textContent = "";
+      row.insertCell(5).textContent = paymentKey;
+      row.insertCell(6).textContent = amount;
     }
   });
 }
