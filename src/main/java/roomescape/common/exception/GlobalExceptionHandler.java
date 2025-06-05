@@ -21,52 +21,54 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handle(final Exception e) {
-        LOGGER.error("Unexpected Error occurred: {}", e.getMessage(), e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 내부에 오류가 발생했습니다.");
+        LOGGER.error("Unexpected error occurred", e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("서버 내부에 오류가 발생했습니다.");
     }
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<String> handle(final BadRequestException e) {
-        LOGGER.error("BadRequestException occurred: {}", e.getMessage(), e);
+        LOGGER.warn("BadRequestException: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<String> handle(final NotFoundException e) {
-        LOGGER.error("NotFoundException occurred: {}", e.getMessage(), e);
+        LOGGER.warn("NotFoundException: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<String> handle(final ConflictException e) {
-        LOGGER.error("ConflictException occurred: {}", e.getMessage(), e);
+        LOGGER.warn("ConflictException: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<String> handle(final UnauthorizedException e) {
-        LOGGER.error("UnauthorizedException occurred: {}", e.getMessage(), e);
+        LOGGER.warn("UnauthorizedException: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<String> handle(final ForbiddenException e) {
-        LOGGER.error("ForbiddenException occurred: {}", e.getMessage(), e);
+        LOGGER.warn("ForbiddenException: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handle(final MethodArgumentNotValidException e) {
-        LOGGER.error("MethodArgumentNotValidException occurred: {}", e.getMessage(), e);
+        LOGGER.warn("Validation failed: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘못된 요청입니다.");
     }
 
     @ExceptionHandler(PaymentException.class)
     public ResponseEntity<String> handle(final PaymentException e) {
-        LOGGER.error("PaymentException occurred: {}", e.getMessage(), e);
         if (e.is5xxServerError()) {
+            LOGGER.error("PaymentException (5xx): {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
+        LOGGER.warn("PaymentException (4xx): {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 }
