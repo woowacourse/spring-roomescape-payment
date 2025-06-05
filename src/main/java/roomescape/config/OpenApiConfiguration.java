@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
@@ -14,21 +13,6 @@ import org.springframework.context.annotation.Configuration;
         type = SecuritySchemeType.APIKEY,
         in = SecuritySchemeIn.COOKIE,
         paramName = "token"
-)
-@Schema(name = "ValidationError",
-        description = "입력값 검증 실패 응답",
-        example = """
-                [
-                    {
-                        "field": "필드명1",
-                        "message": "검증 실패 메시지1"
-                    },
-                    {
-                        "field": "필드명2",
-                        "message": "검증 실패 메시지2"
-                    }
-                ]
-                """
 )
 @OpenAPIDefinition(info = @Info(title = "방탈출 예약 API", version = "1.0"))
 @Configuration

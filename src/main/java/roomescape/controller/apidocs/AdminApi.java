@@ -19,6 +19,7 @@ import roomescape.annotation.SecurityDocs;
 import roomescape.dto.request.AdminCreateReservationRequest;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationWaitResponse;
+import roomescape.exception.dto.ErrorResponse;
 
 @SecurityDocs.Unauthorized
 @SecurityDocs.Forbidden
@@ -92,8 +93,26 @@ public interface AdminApi {
                             """))))
     @ApiResponse(responseCode = "201", description = "예약 생성 성공",
             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ReservationResponse.class)))
-    @ApiResponse(responseCode = "400", description = "입력값 검증 실패",
-            content = @Content(schema = @Schema(ref = "#/components/schemas/ValidationError")))
+    @ApiResponse(responseCode = "400", description = "입력값 검증 실패", content = @Content(
+            mediaType = "application/json",
+            array = @ArraySchema(schema = @Schema(implementation = ErrorResponse.class)),
+            examples = @ExampleObject(name = "입력값 검증 실패",
+                    description = "입력값 존재 여부 또는 유효하지 않은 값일 경우 제공되는 오류 메시지입니다.", value = """
+                    [
+                        {
+                            "message": "멤버 ID는 필수입니다."
+                        },
+                        {
+                            "message": "날짜는 현재보다 미래여야합니다."
+                        },
+                        {
+                            "message": "예약 시간 ID는 필수입니다."
+                        },
+                        {
+                            "message": "테마 ID는 필수입니다."
+                        }
+                    ]
+                    """)))
     ResponseEntity<ReservationResponse> createReservationByAdmin(AdminCreateReservationRequest request);
 
     @Operation(summary = "대기 예약 목록 조회", description = "예약 대기 중인 방탈출 예약 목록을 조회합니다. 관리자만 사용 가능합니다.")

@@ -2,6 +2,7 @@ package roomescape.controller.apidocs;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,6 +18,7 @@ import roomescape.dto.request.AvailableTimeRequest;
 import roomescape.dto.request.CreateReservationTimeRequest;
 import roomescape.dto.response.ReservationTimeResponse;
 import roomescape.dto.response.ReservationTimeSlotResponse;
+import roomescape.exception.dto.ErrorResponse;
 
 @Tag(name = "[예약 가능 시간 관리 API]")
 @SecurityRequirement(name = "cookieAuth")
@@ -77,9 +79,18 @@ public interface ReservationTimeApi {
                                 "startAt": "14:00:00"
                             }
                             """)
-            )
-            )
-    )
+            )))
+    @ApiResponse(responseCode = "400", description = "입력값 검증 실패", content = @Content(
+            mediaType = "application/json",
+            array = @ArraySchema(schema = @Schema(implementation = ErrorResponse.class)),
+            examples = @ExampleObject(name = "입력값 검증 실패",
+                    description = "입력값 존재 여부 또는 유효하지 않은 값일 경우 제공되는 오류 메시지입니다.", value = """
+                    [
+                        {
+                            "message": "시간은 비어있을 수 없습니다."
+                        }
+                    ]
+                    """)))
     @ApiResponse(responseCode = "201", description = "시간 추가 성공", content = @Content(mediaType = "application/json",
             examples = @ExampleObject(value = """
                     {

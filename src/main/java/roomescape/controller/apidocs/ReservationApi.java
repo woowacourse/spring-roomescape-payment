@@ -2,6 +2,7 @@ package roomescape.controller.apidocs;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,6 +20,7 @@ import roomescape.dto.request.LoginMemberRequest;
 import roomescape.dto.response.MyReservationResponse;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationWaitResponse;
+import roomescape.exception.dto.ErrorResponse;
 
 @Tag(name = "[방탈출 예약 API]")
 @SecurityRequirement(name = "cookieAuth")
@@ -117,7 +119,9 @@ public interface ReservationApi {
                         "paymentKey": "paymentKeyId",
                         "amount": 1000
                     }
-                    """),
+                    """)
+    }))
+    @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
             @ExampleObject(name = "존재하지 않는 유저가 시도하는 경우 추가 실패", value = """
                     {
                       "message": "존재하지 않는 멤버 ID입니다."
@@ -135,12 +139,26 @@ public interface ReservationApi {
                     """),
             @ExampleObject(name = "유저가 예약한 같은 날짜, 시간, 테마인 예약이 존재하는 경우 추가 실패", value = """
                     {
-                      "message": "중복된 예약신청입니다"
+                      "message": "이미 예약이 존재합니다."
+                    }
+                    """),
+            @ExampleObject(name = "과거 날짜 및 시간으로 예약 시도 시 추가 실패", value = """
+                    {
+                      "message": "과거 날짜 및 시간으로 예약할 수 없습니다."
                     }
                     """)
     }))
-    @ApiResponse(responseCode = "400", description = "입력값 검증 실패",
-            content = @Content(schema = @Schema(ref = "#/components/schemas/ValidationError")))
+    @ApiResponse(responseCode = "400", description = "입력값 검증 실패", content = @Content(
+            mediaType = "application/json",
+            array = @ArraySchema(schema = @Schema(implementation = ErrorResponse.class)),
+            examples = @ExampleObject(name = "입력값 검증 실패",
+                    description = "입력값 존재 여부 또는 유효하지 않은 값일 경우 제공되는 오류 메시지입니다.", value = """
+                    [
+                        {
+                            "message": "시간은 비어있을 수 없습니다."
+                        }
+                    ]
+                    """)))
     ResponseEntity<ReservationResponse> addReservations(CreateReservationRequest request,
                                                         @Parameter(hidden = true) LoginMemberRequest loginMemberRequest);
 
@@ -200,6 +218,17 @@ public interface ReservationApi {
                     }
                     """)
     }))
+    @ApiResponse(responseCode = "400", description = "입력값 검증 실패", content = @Content(
+            mediaType = "application/json",
+            array = @ArraySchema(schema = @Schema(implementation = ErrorResponse.class)),
+            examples = @ExampleObject(name = "입력값 검증 실패",
+                    description = "입력값 존재 여부 또는 유효하지 않은 값일 경우 제공되는 오류 메시지입니다.", value = """
+                    [
+                        {
+                            "message": "시간은 비어있을 수 없습니다."
+                        }
+                    ]
+                    """)))
     ResponseEntity<ReservationWaitResponse> addWaitReservation(CreateWaitReservationRequest request,
                                                                @Parameter(hidden = true) LoginMemberRequest loginMemberRequest);
 
@@ -224,16 +253,31 @@ public interface ReservationApi {
                     }
                     """)
     }))
-    @ApiResponse(responseCode = "400", description = "입력값 검증 실패",
-            content = @Content(schema = @Schema(ref = "#/components/schemas/ValidationError")))
+    @ApiResponse(responseCode = "400", description = "입력값 검증 실패", content = @Content(
+            mediaType = "application/json",
+            array = @ArraySchema(schema = @Schema(implementation = ErrorResponse.class)),
+            examples = @ExampleObject(name = "입력값 검증 실패",
+                    description = "입력값 존재 여부 또는 유효하지 않은 값일 경우 제공되는 오류 메시지입니다.", value = """
+                    [
+                        {
+                            "message": "payment key 는 필수입니다."
+                        },
+                        {
+                            "message": "order ID 는 필수입니다."
+                        },
+                        {
+                            "message": "금액은 음수가 될 수 없습니다."
+                        },
+                        {
+                            "message": "결제 유형은 필수입니다."
+                        }
+                    ]
+                    """)))
     ResponseEntity<ReservationResponse> confirmWaitReservation(Long reservationId,
                                                                ConfirmWaitReservationRequest request,
                                                                @Parameter(hidden = true) LoginMemberRequest loginMemberRequest);
 
     @Operation(summary = "방탈출 예약 취소", description = "방탈출 예약을 취소합니다. 인증된 유저 및 관리자만 사용 가능합니다.")
-    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
-            @ExampleObject(name = "방탈출 예약 취소 성공")
-    }))
     @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
             @ExampleObject(name = "방탈출 예약 취소 성공")
     }))

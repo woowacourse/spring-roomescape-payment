@@ -3,6 +3,7 @@ package roomescape.controller.apidocs;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -14,6 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import roomescape.dto.request.LoginMemberRequest;
 import roomescape.dto.request.LoginRequest;
+import roomescape.exception.dto.ErrorResponse;
 
 @Tag(name = "[인증 API]")
 @SecurityRequirement(name = "cookieAuth")
@@ -42,6 +44,20 @@ public interface AuthApi {
                                     """)
                             )
                     )})
+    @ApiResponse(responseCode = "400", description = "입력값 검증 실패", content = @Content(
+            mediaType = "application/json",
+            array = @ArraySchema(schema = @Schema(implementation = ErrorResponse.class)),
+            examples = @ExampleObject(name = "입력값 검증 실패",
+                    description = "입력값 존재 여부 또는 유효하지 않은 값일 경우 제공되는 오류 메시지입니다.", value = """
+                    [
+                        {
+                            "message": "이메일은 비어있을 수 없습니다."
+                        },
+                        {
+                            "message": "비밀번호는 비어있을 수 없습니다."
+                        }
+                    ]
+                    """)))
     ResponseEntity<Void> login(LoginRequest request, @Parameter(hidden = true) HttpServletResponse response);
 
     @Operation(summary = "유저 정보 검증", description = "사용자 쿠키 토큰을 기반으로 유저 정보를 검증합니다.",

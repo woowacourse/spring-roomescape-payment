@@ -2,6 +2,7 @@ package roomescape.controller.apidocs;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import roomescape.annotation.SecurityDocs;
 import roomescape.dto.request.CreateThemeRequest;
 import roomescape.dto.response.ThemeResponse;
+import roomescape.exception.dto.ErrorResponse;
 
 @Tag(name = "[방탈출 테마 API]")
 @SecurityRequirement(name = "cookieAuth")
@@ -80,11 +82,23 @@ public interface ThemeApi {
                         "message": "이미 존재하는 테마 이름입니다."
                     }
                     """)))
-    @ApiResponse(
-            responseCode = "400",
-            description = "입력값 검증 실패",
-            content = @Content(schema = @Schema(ref = "#/components/schemas/ValidationError"))
-    )
+    @ApiResponse(responseCode = "400", description = "입력값 검증 실패", content = @Content(
+            mediaType = "application/json",
+            array = @ArraySchema(schema = @Schema(implementation = ErrorResponse.class)),
+            examples = @ExampleObject(name = "입력값 검증 실패",
+                    description = "입력값 존재 여부 또는 유효하지 않은 값일 경우 제공되는 오류 메시지입니다.", value = """
+                    [
+                        {
+                            "message": "테마 이름은 비어있을 수 없습니다."
+                        },
+                        {
+                            "message": "설명은 비어있을 수 없습니다."
+                        },
+                        {
+                            "message": "썸네일은 비어있을 수 없습니다."
+                        }
+                    ]
+                    """)))
     ResponseEntity<ThemeResponse> addTheme(CreateThemeRequest request);
 
     @SecurityDocs.Unauthorized
