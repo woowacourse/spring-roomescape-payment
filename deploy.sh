@@ -4,7 +4,7 @@ set -e  # 에러 발생 시 스크립트 중단
 set -o pipefail
 
 ### 변수 설정 ###
-REPO_URL=REPO_URL = "https://github.com/jumdo12/spring-roomescape-payment.git"
+REPO_URL=REPO_URL="https://github.com/jumdo12/spring-roomescape-payment.git"
 APP_NAME="spring-roomescape-payment"
 BUILD_JAR="spring-roomescape-payment-0.0.1-SNAPSHOT.jar"
 DEPLOY_DIR="$HOME/$APP_NAME"
