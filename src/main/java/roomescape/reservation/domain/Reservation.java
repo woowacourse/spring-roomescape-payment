@@ -90,12 +90,12 @@ public class Reservation {
         return reserver.isOwner(userId);
     }
 
-    public void changeReserved() {
+    public void changePaymentPending() {
         if (status != ReservationStatus.WAITING) {
-            throw new InvalidStatusTransitionException("대기 상태에서만 예약으로 변경할 수 있습니다.");
+            throw new InvalidStatusTransitionException("대기 상태에서만 결제 대기로 변경할 수 있습니다.");
         }
 
-        status = ReservationStatus.RESERVED;
+        status = ReservationStatus.PENDING_PAYMENT;
     }
 
     public void cancelReservation() {

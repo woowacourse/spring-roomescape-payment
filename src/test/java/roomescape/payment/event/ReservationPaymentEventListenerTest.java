@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import java.util.concurrent.TimeUnit;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,12 +70,19 @@ class ReservationPaymentEventListenerTest {
         // Assert
         await().atMost(1, TimeUnit.SECONDS)
                 .untilAsserted(() -> {
-                    assertThat(ordersRepository.findByPaymentKey(결제키).isPresent())
-                            .as("결제키로 주문이 저장되어야 합니다.")
-                            .isTrue();
-                    assertThat(reservationRepository.findById(예약대기.getId()).get().getStatus())
-                            .as("예약 상태가 RESERVED로 변경되어야 합니다.")
-                            .isEqualTo(ReservationStatus.RESERVED);
+                    Reservation reservation = reservationRepository.findById(예약대기.getId()).get();
+
+                    SoftAssertions.assertSoftly(softly -> {
+                        softly.assertThat(reservation.getStatus())
+                                .as("예약 상태가 RESERVED로 변경되어야 합니다.")
+                                .isEqualTo(ReservationStatus.RESERVED);
+                        softly.assertThat(reservation.getOrders().getPaymentKey())
+                                .as("결제 성공 시 결제 키가 저장되어야 합니다.")
+                                .isEqualTo(결제키);
+                        assertThat(ordersRepository.findByPaymentKey(결제키).isPresent())
+                                .as("결제키로 주문이 저장되어야 합니다.")
+                                .isTrue();
+                    });
                 });
     }
 
@@ -96,9 +104,13 @@ class ReservationPaymentEventListenerTest {
         // Assert
         await().atMost(1, TimeUnit.SECONDS)
                 .untilAsserted(() -> {
-                    assertThat(reservationRepository.findById(예약대기.getId()).get().getStatus())
+                    Reservation reservation = reservationRepository.findById(예약대기.getId()).get();
+                    assertThat(reservation.getStatus())
                             .as("결제 실패 시 예약 상태가 PAYMENT_FAILED로 변경되어야 합니다.")
                             .isEqualTo(ReservationStatus.PAYMENT_FAILED);
+                    assertThat(reservation.getOrders().getPaymentKey())
+                            .as("결제 실패 시 결제 키가 저장되어야 합니다.")
+                            .isEqualTo(결제키);
                 });
     }
 }

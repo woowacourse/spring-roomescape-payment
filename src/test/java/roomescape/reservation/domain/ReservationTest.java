@@ -5,9 +5,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
 import roomescape.fixture.entity.MemberFixture;
+import roomescape.fixture.entity.OrdersFixture;
 import roomescape.fixture.entity.ReservationDateTimeFixture;
 import roomescape.fixture.entity.ThemeFixture;
 import roomescape.member.domain.Member;
+import roomescape.payment.domain.Orders;
 import roomescape.reservation.exception.InvalidStatusTransitionException;
 import roomescape.theme.domain.Theme;
 
@@ -18,18 +20,18 @@ public class ReservationTest {
     private final ReservationDateTime reservationDateTime = ReservationDateTimeFixture.create();
 
     @Test
-    void 대기상태에서_예약상태로_전환된다() {
+    void 대기상태에서_결제_대기_상태로_전환된다() {
         Reservation reservation = Reservation.waiting(member, reservationDateTime, theme);
 
-        assertThatCode(reservation::changeReserved)
+        assertThatCode(reservation::changePaymentPending)
                 .doesNotThrowAnyException();
     }
 
     @Test
-    void 대기상태가_아니면_예약상태로_전환시_예외가_발생한다() {
+    void 대기상태가_아니면_결제_대기_상태로_전환시_예외가_발생한다() {
         Reservation reservation = Reservation.reserved(member, reservationDateTime, theme);
 
-        assertThatThrownBy(reservation::changeReserved)
+        assertThatThrownBy(reservation::changePaymentPending)
                 .isInstanceOf(InvalidStatusTransitionException.class);
     }
 
@@ -62,6 +64,15 @@ public class ReservationTest {
         Reservation reservation = Reservation.reserved(member, reservationDateTime, theme);
 
         assertThatThrownBy(reservation::cancelWaiting)
+                .isInstanceOf(InvalidStatusTransitionException.class);
+    }
+
+    @Test
+    void 대기_상태가_아니면_예약_상태로_변환할_수_없다() {
+        Reservation reservation = Reservation.reserved(member, reservationDateTime, theme);
+
+        Orders orders = OrdersFixture.create();
+        assertThatThrownBy(() -> reservation.paid(orders))
                 .isInstanceOf(InvalidStatusTransitionException.class);
     }
 }
