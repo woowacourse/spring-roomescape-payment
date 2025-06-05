@@ -131,7 +131,7 @@ class ReservationServiceTest extends ServiceTest {
     }
 
     @Test
-    @DisplayName("예약을 삭제했을 때 뒤따르던 예약 대기가 있으면 뒤따르던 대기를 보류시킨다.")
+    @DisplayName("첫 번째 예약을 삭제했을 때 뒤따르던 예약 대기가 있으면 해당 예약 대기를 보류시킨다.")
     void removeByIdWithFollowingWaitings() {
         // given
         var confirmedReservation = new Reservation(user, RoomescapeSchedule.of(tomorrow(), timeSlot, theme), ReservationStatus.CONFIRMED);

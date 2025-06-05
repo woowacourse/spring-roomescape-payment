@@ -64,23 +64,21 @@ public class ReservationService {
     @Transactional
     public void removeById(final long id) {
         var reservation = reservationRepository.getById(id);
-        if (reservation.isConfirmed()) {
-            pendNextReservationInQueue(reservation);
-        }
+        removeFromQueueById(reservation);
         reservationRepository.delete(reservation);
-    }
-
-    private void pendNextReservationInQueue(final Reservation reservation) {
-        var queues = reservationRepository.findQueuesBySchedules(List.of(reservation.reservedSchedule()));
-        var nextReservation = queues.findNext(reservation);
-        nextReservation.ifPresent(Reservation::pend);
     }
 
     @Transactional
     public void cancel(final long userId, final long reservationId) {
         var user = userRepository.getById(userId);
         var reservation = reservationRepository.getById(reservationId);
+        removeFromQueueById(reservation);
         user.cancelReservation(reservation);
+    }
+
+    private void removeFromQueueById(final Reservation reservation) {
+        var queues = reservationRepository.findQueuesBySchedules(List.of(reservation.reservedSchedule()));
+        queues.remove(reservation);
     }
 
     private Reservation reserve(final long userId, final RoomescapeSchedule schedule, final ReservationStatus status) {

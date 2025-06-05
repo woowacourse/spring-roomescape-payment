@@ -1,5 +1,7 @@
 package roomescape.domain.reservation;
 
+import static java.util.stream.Collectors.toList;
+
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -12,13 +14,13 @@ public class ReservationQueue {
     private final List<Reservation> queue;
 
     public ReservationQueue(final Collection<Reservation> reservations) {
-        this.queue = sorted(reservations);
+        this.queue = sortByCreatedAt(reservations);
     }
 
-    private List<Reservation> sorted(final Collection<Reservation> reservations) {
+    private List<Reservation> sortByCreatedAt(final Collection<Reservation> reservations) {
         return reservations.stream()
             .sorted(Comparator.comparing(Reservation::createdAt))
-            .toList();
+            .collect(toList());
     }
 
     public int orderOf(final Reservation reservation) {
@@ -37,5 +39,12 @@ public class ReservationQueue {
         var indexOfNext = orderOfNext - ORDERING_START_INDEX;
         var next = queue.get(indexOfNext);
         return Optional.of(next);
+    }
+
+    public void remove(final Reservation reservation) {
+        if (orderOf(reservation) == ORDERING_START_INDEX) {
+            findNext(reservation).ifPresent(Reservation::pend);
+        }
+        queue.remove(reservation);
     }
 }

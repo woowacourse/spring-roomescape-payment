@@ -43,6 +43,11 @@ public class ReservationQueues {
         return queue.findNext(reservation);
     }
 
+    public void remove(final Reservation reservation) {
+        var queue = queueOfSchedule(reservation.reservedSchedule());
+        queue.remove(reservation);
+    }
+
     private ReservationQueue queueOfSchedule(final RoomescapeSchedule schedule) {
         return queues.getOrDefault(schedule, new ReservationQueue(Collections.emptyList()));
     }

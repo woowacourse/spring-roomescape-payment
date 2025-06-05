@@ -1,6 +1,7 @@
 package roomescape.domain.reservation;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static roomescape.TestFixtures.anyUserWithNewId;
 
@@ -84,6 +85,27 @@ public class ReservationQueuesTest {
             () -> assertThat(queues.findNext(second)).hasValue(third),
             () -> assertThat(queues.findNext(third)).hasValue(fourth),
             () -> assertThat(queues.findNext(fourth)).isEmpty()
+        );
+    }
+
+    @Test
+    @DisplayName("주어진 예약을 대기열에서 제거한다.")
+    void remove() {
+        // given
+        var first = waitingOfSameDate(time1);
+        var second = waitingOfSameDate(time1);
+        var third = waitingOfSameDate(time1);
+
+        var queues = new ReservationQueues(List.of(first, second, third));
+
+        // when
+        queues.remove(second);
+
+        // then
+        assertAll(
+            () -> assertThatThrownBy(() -> queues.orderOf(second)).isInstanceOf(IllegalArgumentException.class),
+            () -> assertThat(queues.findNext(first)).hasValue(third),
+            () -> assertThat(queues.findNext(third)).isEmpty()
         );
     }
 
