@@ -7,6 +7,7 @@ import roomescape.payment.domain.client.TossRestClient;
 import roomescape.payment.domain.dto.PaymentRequestDto;
 import roomescape.payment.domain.dto.PaymentResponseDto;
 import roomescape.payment.exception.InvalidPaymentException;
+import roomescape.payment.exception.PaymentServerException;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -43,5 +44,19 @@ public class TossPaymentServiceTest {
         Assertions.assertThatThrownBy(
                 () -> tossPaymentService.approve(dto)
         ).isInstanceOf(InvalidPaymentException.class);
+    }
+
+    @Test
+    void 결제_승인_요청시_500에러가_발생하면_PaymentServerException_발생() {
+        PaymentRequestDto dto = new PaymentRequestDto("paymentKey", "orderId", 1000, "NORMAL");
+
+        when(mockRestClient.confirmPayment(any(PaymentRequestDto.class)))
+                .thenThrow(new PaymentServerException(HttpStatus.INTERNAL_SERVER_ERROR));
+
+        TossPaymentService tossPaymentService = new TossPaymentService(mockRestClient);
+
+        Assertions.assertThatThrownBy(
+                () -> tossPaymentService.approve(dto)
+        ).isInstanceOf(PaymentServerException.class);
     }
 }
