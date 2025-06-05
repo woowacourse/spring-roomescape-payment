@@ -6,5 +6,5 @@ public interface TokenProvider {
 
     String createToken(final Member member);
 
-    String extractPrincipal(final String token);
+    String extractLoginMember(final String token);
 }
