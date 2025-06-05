@@ -50,14 +50,21 @@ public class TossPaymentClient {
     }
 
     public void approve(final TossPaymentCommand command) {
-        restClient.post()
-                .uri(CONFIRM_URI)
-                .header(HttpHeaders.AUTHORIZATION, createAuthorizationHeader())
-                .body(command)
-                .retrieve()
-                .onStatus(HttpStatusCode::is4xxClientError, this::handle4xxError)
-                .onStatus(HttpStatusCode::is5xxServerError, this::handle5xxError)
-                .toBodilessEntity();
+        try {
+            restClient.post()
+                    .uri(CONFIRM_URI)
+                    .header(HttpHeaders.AUTHORIZATION, createAuthorizationHeader())
+                    .body(command)
+                    .retrieve()
+                    .onStatus(HttpStatusCode::is4xxClientError, this::handle4xxError)
+                    .onStatus(HttpStatusCode::is5xxServerError, this::handle5xxError)
+                    .toBodilessEntity();
+        } catch (final PaymentException e) {
+            throw e;
+        } catch (final RuntimeException e) {
+            log.error("토스 결제 요청 중 RestClient/네트워크 오류", e);
+            throw new PaymentException("결제 통신 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
+        }
     }
 
     private String createAuthorizationHeader() {
