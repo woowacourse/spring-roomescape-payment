@@ -35,3 +35,19 @@ VALUES (6, '2025-05-20 21:40:03.000000'),
        (7, '2025-05-20 10:40:03.000000'),
        (8, '2025-05-21 10:10:10.000000')
        ;
+
+INSERT INTO payment (payment_key, order_id, total_amount)
+VALUES ('tgen_20250605215543X1111', 'WTESTMC4zNjU0Mjc2MjE1111', 1000),
+       ('tgen_20250605215543X2222', 'WTESTMC4zNjU0Mjc2MjE2222', 1000),
+       ('tgen_20250605215543X3333', 'WTESTMC4zNjU0Mjc2MjE3333', 1000),
+       ('tgen_20250605215543X4444', 'WTESTMC4zNjU0Mjc2MjE4444', 1000),
+       ('tgen_20250605215543X5555', 'WTESTMC4zNjU0Mjc2MjE5555', 1000)
+        ;
+
+INSERT INTO reservation_payment (reservation_id, payment_id)
+VALUES (1, 1),
+       (2, 2),
+       (3, 3),
+       (4, 4),
+       (5, 5)
+        ;
