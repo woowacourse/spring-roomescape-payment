@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -111,8 +112,8 @@ class ReservationServiceTest {
 
         when(memberService.findMemberByEmail(loginMember.email())).thenReturn(member);
         PaymentProcessRequest paymentRequest = request.toPaymentProcessRequest();
-        Payment payment = Payment.create("paymentKey", "orderId");
-        when(paymentService.processPayment(paymentRequest)).thenReturn(payment);
+        Payment payment = Payment.create("paymentKey", "orderId", new BigDecimal("1000"), reservation);
+        when(paymentService.processPayment(paymentRequest, reservation)).thenReturn(payment);
         when(reservationTimeService.findReservationTimeById(request.timeId())).thenReturn(time);
         when(currentTimeService.now()).thenReturn(LocalDateTime.of(2025, 4, 20, 10, 0));
         when(themeService.findThemeById(request.themeId())).thenReturn(theme);

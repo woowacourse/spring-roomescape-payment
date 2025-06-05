@@ -59,7 +59,7 @@ class PaymentRestClientTest {
     @Test
     void 결제가_승인되면_승인응답을_반환한다() throws JsonProcessingException {
         PaymentProcessRequest request = new PaymentProcessRequest("paymentKey", "orderId", "1000");
-        PaymentConfirmResponse response = new PaymentConfirmResponse("paymentKey", "orderId");
+        PaymentConfirmResponse response = new PaymentConfirmResponse("paymentKey", "orderId", "1000");
 
         server.expect(requestTo(TEST_URL))
                 .andRespond(withSuccess(

@@ -9,12 +9,21 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import roomescape.domain.Member;
 import roomescape.domain.Payment;
+import roomescape.domain.Reservation;
+import roomescape.domain.ReservationTime;
+import roomescape.domain.Role;
+import roomescape.domain.Theme;
 import roomescape.infrastructure.repository.PaymentRepository;
 import roomescape.infrastructure.thirdparty.PaymentRestClient;
 import roomescape.infrastructure.thirdparty.dto.PaymentConfirmResponse;
 import roomescape.infrastructure.thirdparty.exception.PaymentException;
 import roomescape.presentation.dto.request.PaymentProcessRequest;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -36,13 +45,20 @@ class PaymentServiceTest {
     @Test
     void 결제를_진행한다() {
         PaymentProcessRequest request = new PaymentProcessRequest("paymentKey", "orderId", "1000");
-        Payment payment = Payment.create("paymentKey", "orderId");
-        PaymentConfirmResponse response = new PaymentConfirmResponse("paymentKey", "orderId");
+
+        Member member = Member.create("듀이", Role.USER, "member@email.com", "password");
+        LocalDate date = LocalDate.of(2025, 4, 21);
+        ReservationTime time = ReservationTime.create(LocalTime.of(10, 0));
+        Theme theme = Theme.create("공포", "공포테마", "공포.jpg");
+        Reservation reservation = Reservation.create(member, date, time, theme);
+
+        Payment payment = Payment.create("paymentKey", "orderId", new BigDecimal("1000"), reservation);
+        PaymentConfirmResponse response = new PaymentConfirmResponse("paymentKey", "orderId", "1000");
 
         when(paymentRestClient.getPaymentResponse(request)).thenReturn(response);
         when(paymentRepository.save(payment)).thenReturn(payment);
 
-        Payment resultPayment = paymentService.processPayment(request);
+        Payment resultPayment = paymentService.processPayment(request, reservation);
         assertThat(resultPayment.getPaymentKey()).isEqualTo(payment.getPaymentKey());
 
         verify(paymentRestClient, times(1)).getPaymentResponse(request);
@@ -52,10 +68,16 @@ class PaymentServiceTest {
     void 결제가_실패하면_예외가_발생한다() {
         PaymentProcessRequest request = new PaymentProcessRequest("paymentKey", "orderId", "1000");
 
+        Member member = Member.create("듀이", Role.USER, "member@email.com", "password");
+        LocalDate date = LocalDate.of(2025, 4, 21);
+        ReservationTime time = ReservationTime.create(LocalTime.of(10, 0));
+        Theme theme = Theme.create("공포", "공포테마", "공포.jpg");
+        Reservation reservation = Reservation.create(member, date, time, theme);
+
         when(paymentRestClient.getPaymentResponse(request))
                 .thenThrow(new PaymentException("결제 실패", HttpStatus.BAD_REQUEST));
 
-        assertThatThrownBy(() -> paymentService.processPayment(request))
+        assertThatThrownBy(() -> paymentService.processPayment(request, reservation))
                 .isInstanceOf(PaymentException.class);
 
         verify(paymentRestClient, times(1)).getPaymentResponse(request);
@@ -66,10 +88,16 @@ class PaymentServiceTest {
     void 토스서버_내부에러가_발생하면_예외가_발생한다() {
         PaymentProcessRequest request = new PaymentProcessRequest("paymentKey", "orderId", "1000");
 
+        Member member = Member.create("듀이", Role.USER, "member@email.com", "password");
+        LocalDate date = LocalDate.of(2025, 4, 21);
+        ReservationTime time = ReservationTime.create(LocalTime.of(10, 0));
+        Theme theme = Theme.create("공포", "공포테마", "공포.jpg");
+        Reservation reservation = Reservation.create(member, date, time, theme);
+
         when(paymentRestClient.getPaymentResponse(request))
                 .thenThrow(new PaymentException("토스 서버 에러", HttpStatus.INTERNAL_SERVER_ERROR));
 
-        assertThatThrownBy(() -> paymentService.processPayment(request))
+        assertThatThrownBy(() -> paymentService.processPayment(request, reservation))
                 .isInstanceOf(PaymentException.class);
 
         verify(paymentRestClient, times(1)).getPaymentResponse(request);
@@ -80,10 +108,16 @@ class PaymentServiceTest {
     void 결제_시스템과_통신이_불가할때_예외가_발생한다() {
         PaymentProcessRequest request = new PaymentProcessRequest("paymentKey", "orderId", "1000");
 
+        Member member = Member.create("듀이", Role.USER, "member@email.com", "password");
+        LocalDate date = LocalDate.of(2025, 4, 21);
+        ReservationTime time = ReservationTime.create(LocalTime.of(10, 0));
+        Theme theme = Theme.create("공포", "공포테마", "공포.jpg");
+        Reservation reservation = Reservation.create(member, date, time, theme);
+
         when(paymentRestClient.getPaymentResponse(request))
                 .thenThrow(new PaymentException("통신 오류", HttpStatus.SERVICE_UNAVAILABLE));
 
-        assertThatThrownBy(() -> paymentService.processPayment(request))
+        assertThatThrownBy(() -> paymentService.processPayment(request, reservation))
                 .isInstanceOf(PaymentException.class);
 
         verify(paymentRestClient, times(1)).getPaymentResponse(request);
