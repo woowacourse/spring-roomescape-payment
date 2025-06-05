@@ -19,7 +19,7 @@ VALUES ('15:40'),
 
 INSERT INTO member (email, password, name, role, session_id)
 VALUES ('admin@email.com', 'MTIzNA==', '어드민', 'ADMIN', NULL),
-       ('phk1138@naver.com', 'MTIzNA==', '윌슨', 'USER', NULL),
+       ('user@email.com', 'MTIzNA==', '윌슨', 'USER', NULL),
        ('phk1148@naver.com', 'MTIzNA==', '호떡', 'USER', NULL),
        ('phk1158@naver.com', 'MTIzNA==', '한스', 'USER', NULL);
 
