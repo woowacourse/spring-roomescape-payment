@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,9 @@ import roomescape.config.TestConfig;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.infrastructure.TossApiClient;
+import roomescape.reservation.domain.ReservationInfo;
 import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.fixture.TestFixture;
@@ -81,5 +84,33 @@ class WaitingFacadeServiceTest {
                 () -> assertThat(response.time().startAt()).isEqualTo(LocalTime.of(9, 0)),
                 () -> assertThat(response.reservedStatus()).isEqualTo(ReservationStatus.WAITING.getName())
         );
+    }
+
+    @Test
+    void findWaitings_shouldReturnAllWaitings() {
+        ReservationInfo info = new ReservationInfo(futureDate, time, theme);
+        Waiting waiting = Waiting.createUpcomingReservationWithUnassignedId(member, 1, info);
+        waitingRepository.save(waiting);
+
+        List<ReservationResponse> result = waitingFacadeService.findWaitings();
+        assertThat(result).hasSize(1);
+    }
+
+    @Test
+    void findWaitings_shouldReturnEmptyList_whenNoWaitings() {
+        List<ReservationResponse> result = waitingFacadeService.findWaitings();
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void deleteWaiting_success() {
+        ReservationInfo info = new ReservationInfo(futureDate, time, theme);
+        Waiting waiting = Waiting.createUpcomingReservationWithUnassignedId(member, 1, info);
+        waiting = waitingRepository.save(waiting);
+
+        waitingFacadeService.deleteWaiting(waiting.getId());
+
+        List<ReservationResponse> result = waitingFacadeService.findWaitings();
+        assertThat(result).isEmpty();
     }
 }

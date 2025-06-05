@@ -17,17 +17,21 @@ import roomescape.config.TestConfig;
 import roomescape.global.auth.dto.UserInfo;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
+import roomescape.member.exception.MemberNotFoundException;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.infrastructure.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationInfo;
+import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.exception.ReservationNotFoundException;
 import roomescape.reservation.fixture.TestFixture;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.dto.ReservationWithPayment;
 import roomescape.reservationtime.domain.ReservationTime;
+import roomescape.reservationtime.exception.ReservationTimeNotFoundException;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
+import roomescape.theme.exception.ThemeNotFoundException;
 import roomescape.theme.repository.ThemeRepository;
 
 @DataJpaTest
@@ -152,5 +156,62 @@ class ReservationServiceTest {
 
         reservationService.delete(reservation.getId());
         assertThat(reservationRepository.findAll()).isEmpty();
+    }
+
+    @Test
+    void isReservationExists_returnTrue() {
+        ReservationRequest request = new ReservationRequest(futureDate, time.getId(), theme.getId());
+        ReservationInfo info = new ReservationInfo(futureDate, time, theme);
+        Reservation reservation = Reservation.createUpcomingReservationWithUnassignedId(member, info);
+        reservationRepository.save(reservation);
+
+        boolean reservationExists = reservationService.isReservationExists(request);
+
+        assertThat(reservationExists).isTrue();
+    }
+
+    @Test
+    void isReservationExists_returnFalse() {
+        ReservationRequest request = new ReservationRequest(futureDate.plusDays(1), time.getId(), theme.getId());
+        ReservationInfo info = new ReservationInfo(futureDate, time, theme);
+        Reservation reservation = Reservation.createUpcomingReservationWithUnassignedId(member, info);
+        reservationRepository.save(reservation);
+
+        boolean reservationExists = reservationService.isReservationExists(request);
+
+        assertThat(reservationExists).isFalse();
+    }
+
+    @Test
+    void createReservation_exception_whenNoReservationTime() {
+        ReservationRequest request = new ReservationRequest(futureDate.plusDays(1), time.getId() + 1, theme.getId());
+
+        assertThatThrownBy(() -> reservationService.createReservation(request, member.getId()))
+                .isInstanceOf(ReservationTimeNotFoundException.class);
+    }
+
+    @Test
+    void createReservation_exception_whenNoMember() {
+        ReservationRequest request = new ReservationRequest(futureDate.plusDays(1), time.getId(), theme.getId());
+
+        assertThatThrownBy(() -> reservationService.createReservation(request, member.getId() + 1))
+                .isInstanceOf(MemberNotFoundException.class);
+    }
+
+    @Test
+    void createReservation_exception_whenNoTheme() {
+        ReservationRequest request = new ReservationRequest(futureDate.plusDays(1), time.getId(), theme.getId() + 1);
+
+        assertThatThrownBy(() -> reservationService.createReservation(request, member.getId()))
+                .isInstanceOf(ThemeNotFoundException.class);
+    }
+
+    @Test
+    void createReservation_success() {
+        ReservationRequest request = new ReservationRequest(futureDate.plusDays(1), time.getId(), theme.getId());
+
+        Reservation reservation = reservationService.createReservation(request, member.getId());
+
+        assertThat(reservation.getId()).isNotNull();
     }
 }
