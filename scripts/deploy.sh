@@ -4,7 +4,7 @@ set -e
 # 🛠️ 배포에 사용할 변수들
 REMOTE_APP_DIR="/home/ec2-moru/spring-roomescape-payment"
 GIT_REPO="https://github.com/Choidongjun0830/spring-roomescape-payment"
-BRANCH="step1"
+BRANCH="step2"
 JAR_NAME="spring-roomescape-payment.jar"
 
 echo "📁 작업 디렉토리로 이동"
