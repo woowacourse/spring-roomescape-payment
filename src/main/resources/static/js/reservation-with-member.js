@@ -194,10 +194,8 @@ function applyFilter(event) {
     const params = new URLSearchParams();
     if (themeId) params.append("themeId", themeId);
     if (memberId) params.append("memberId", memberId);
-    if (dateFrom && dateTo) {
-        params.append("dateFrom", dateFrom);
-        params.append("dateTo", dateTo);
-    }
+    if (dateFrom) params.append("dateFrom", dateFrom);
+    if (dateTo) params.append("dateTo", dateTo);
 
     console.log(params);
     const url = RESERVATION_API_ENDPOINT + '?' + params.toString();
