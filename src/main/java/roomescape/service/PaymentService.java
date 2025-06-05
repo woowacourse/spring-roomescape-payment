@@ -3,7 +3,7 @@ package roomescape.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Payment;
-import roomescape.domain.Reservation;
+import roomescape.domain.reservation.Reservation;
 import roomescape.dto.payment.PaymentConfirmResponse;
 import roomescape.exception.NotFoundException;
 import roomescape.repository.PaymentRepository;

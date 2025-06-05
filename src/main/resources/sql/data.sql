@@ -64,3 +64,33 @@ INSERT INTO waiting (date, time_id, theme_id, member_id)
 VALUES ('2026-05-26', 2, 5, 1);
 INSERT INTO waiting (date, time_id, theme_id, member_id)
 VALUES ('2026-05-27', 2, 5, 1);
+
+INSERT INTO payment (order_id, payment_key, amount, reservation_id)
+VALUES ('ORD-1001', 'PAYKEY-1001', 50000, 1);
+
+INSERT INTO payment (order_id, payment_key, amount, reservation_id)
+VALUES ('ORD-1002', 'PAYKEY-1002', 50000, 2);
+
+INSERT INTO payment (order_id, payment_key, amount, reservation_id)
+VALUES ('ORD-1003', 'PAYKEY-1003', 60000, 3);
+
+INSERT INTO payment (order_id, payment_key, amount, reservation_id)
+VALUES ('ORD-1004', 'PAYKEY-1004', 55000, 4);
+
+INSERT INTO payment (order_id, payment_key, amount, reservation_id)
+VALUES ('ORD-1005', 'PAYKEY-1005', 55000, 5);
+
+INSERT INTO payment (order_id, payment_key, amount, reservation_id)
+VALUES ('ORD-1006', 'PAYKEY-1006', 60000, 6);
+
+INSERT INTO payment (order_id, payment_key, amount, reservation_id)
+VALUES ('ORD-1007', 'PAYKEY-1007', 50000, 7);
+
+INSERT INTO payment (order_id, payment_key, amount, reservation_id)
+VALUES ('ORD-1008', 'PAYKEY-1008', 50000, 8);
+
+INSERT INTO payment (order_id, payment_key, amount, reservation_id)
+VALUES ('ORD-1009', 'PAYKEY-1009', 55000, 9);
+
+INSERT INTO payment (order_id, payment_key, amount, reservation_id)
+VALUES ('ORD-1010', 'PAYKEY-1010', 55000, 10);

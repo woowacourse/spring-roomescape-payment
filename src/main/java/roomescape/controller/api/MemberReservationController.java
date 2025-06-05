@@ -8,7 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import roomescape.dto.auth.CurrentMember;
 import roomescape.dto.auth.LoginInfo;
-import roomescape.dto.reservation.MyReservationAndWaitingsResponse;
+import roomescape.dto.reservation.MyReservationWaitingResponse;
 import roomescape.service.ReservationService;
 import roomescape.service.WaitingService;
 
@@ -30,17 +30,17 @@ public class MemberReservationController {
     }
 
     @GetMapping("/reservations/me")
-    public ResponseEntity<List<MyReservationAndWaitingsResponse>> getMyReservations(
+    public ResponseEntity<List<MyReservationWaitingResponse>> getMyReservations(
             @CurrentMember LoginInfo loginInfo
     ) {
-        List<MyReservationAndWaitingsResponse> reservations = reservationService.findMyReservations(loginInfo.id());
-        List<MyReservationAndWaitingsResponse> waitings = waitingService.findMyWaitings(loginInfo.id());
-        List<MyReservationAndWaitingsResponse> responses = new ArrayList<>();
+        List<MyReservationWaitingResponse> reservations = reservationService.findMyReservations(loginInfo.id());
+        List<MyReservationWaitingResponse> waitings = waitingService.findMyWaitings(loginInfo.id());
+        List<MyReservationWaitingResponse> responses = new ArrayList<>();
 
         responses.addAll(reservations);
         responses.addAll(waitings);
-        responses.sort(Comparator.comparing(MyReservationAndWaitingsResponse::date)
-                .thenComparing(MyReservationAndWaitingsResponse::time));
+        responses.sort(Comparator.comparing(MyReservationWaitingResponse::date)
+                .thenComparing(MyReservationWaitingResponse::time));
 
         return ResponseEntity.ok(responses);
     }

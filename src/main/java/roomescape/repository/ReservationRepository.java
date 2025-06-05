@@ -3,7 +3,7 @@ package roomescape.repository;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
-import roomescape.domain.Reservation;
+import roomescape.domain.reservation.Reservation;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     boolean existsByThemeId(Long id);

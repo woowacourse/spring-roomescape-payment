@@ -4,16 +4,18 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.domain.member.Member;
-import roomescape.dto.reservation.MyReservationAndWaitingsResponse;
+import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationWithPayment;
+import roomescape.dto.reservation.MyReservationWaitingResponse;
 import roomescape.dto.reservation.ReservationCreateRequest;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.exception.DuplicateContentException;
 import roomescape.exception.NotFoundException;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.ReservationQueryRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -26,15 +28,18 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final ReservationQueryRepository reservationQueryRepository;
 
     public ReservationService(final ReservationRepository reservationRepository,
                               final ReservationTimeRepository reservationTimeRepository,
                               final ThemeRepository themeRepository,
-                              final MemberRepository memberRepository) {
+                              final MemberRepository memberRepository,
+                              final ReservationQueryRepository reservationQueryRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.reservationQueryRepository = reservationQueryRepository;
     }
 
     @Transactional
@@ -89,8 +94,8 @@ public class ReservationService {
         reservationRepository.deleteById(id);
     }
 
-    public List<MyReservationAndWaitingsResponse> findMyReservations(Long id) {
-        List<Reservation> reservations = reservationRepository.findReservationsByMemberId(id);
-        return reservations.stream().map(MyReservationAndWaitingsResponse::from).toList();
+    public List<MyReservationWaitingResponse> findMyReservations(Long id) {
+        List<ReservationWithPayment> reservations = reservationQueryRepository.findReservationsWithPaymentByMemberId(id);
+        return reservations.stream().map(MyReservationWaitingResponse::from).toList();
     }
 }
