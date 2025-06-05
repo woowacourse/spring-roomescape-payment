@@ -51,6 +51,23 @@ values (4, 2, '2025-05-23', 2);
 insert into reservation (theme_id, member_id, date, reservation_time_id)
 values (5, 2, '2025-05-25', 2);
 
+insert into payment (payment_key, amount, order_id, reservation_id)
+values ('payment1', 1000, 'orderId1', 1);
+
+insert into payment (payment_key, amount, order_id, reservation_id)
+values ('payment2', 1000, 'orderId2', 2);
+
+insert into payment (payment_key, amount, order_id, reservation_id)
+values ('payment3', 1000, 'orderId3', 3);
+
+insert into payment (payment_key, amount, order_id, reservation_id)
+values ('payment4', 1000, 'orderId4', 4);
+
+insert into payment (payment_key, amount, order_id, reservation_id)
+values ('payment5', 1000, 'orderId5', 5);
+
+
+
 insert into waiting (theme_id, member_id, date, reservation_time_id, create_at)
 values (1, 2, '2025-05-25', 1, '2025-05-24T20:00:00');
 insert into waiting (theme_id, member_id, date, reservation_time_id, create_at)

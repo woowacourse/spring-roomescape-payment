@@ -31,15 +31,15 @@ public class PaymentClientTest {
             .baseUrl("https://api.tosspayments.com")
             .defaultHeader("Authorization", String.format("%s %s", "Basic", Base64.getEncoder()));
 
-    private MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
+    private final MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
 
-    private PaymentClient clientController = new PaymentClient(testBuilder.build(), MAPPER);
+    private final PaymentClient clientController = new PaymentClient(testBuilder.build(), MAPPER);
 
     @Test
     void 결제_요청_응답을_확인한다() throws Exception {
         //given
 
-        PaymentInfo paymentInfo = new PaymentInfo("1", 1000);
+        PaymentInfo paymentInfo = new PaymentInfo("1", 1000, "orderId");
         String paymentInfoJson = MAPPER.writeValueAsString(paymentInfo);
 
         server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))

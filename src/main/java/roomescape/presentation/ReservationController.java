@@ -5,8 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.auth.Authenticated;
 import roomescape.dto.request.ReservationCreateRequest;
-import roomescape.dto.response.ReservationResponse;
-import roomescape.dto.response.ReservationWithStatusResponse;
+import roomescape.dto.response.MyReservationsResponse;
+import roomescape.dto.response.ReservationWithPaymentResponse;
 import roomescape.service.ReservationService;
 
 import java.net.URI;
@@ -23,15 +23,15 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponse> createNewReservation(
+    public ResponseEntity<ReservationWithPaymentResponse> createNewReservation(
             @Authenticated Long memberId,
             @Valid @RequestBody ReservationCreateRequest request) {
-        ReservationResponse reservationResponse = reservationService.createReservationForMember(
+        ReservationWithPaymentResponse response = reservationService.createReservationForMember(
                 memberId, request);
 
         return ResponseEntity
-                .created(URI.create("/reservations/" + reservationResponse.id()))
-                .body(reservationResponse);
+                .created(URI.create("/reservations/" + response.id()))
+                .body(response);
     }
 
     @DeleteMapping("/{id}")
@@ -40,8 +40,9 @@ public class ReservationController {
         return ResponseEntity.noContent().build();
     }
 
+    // 결제 정보도 확인될 수 있도록
     @GetMapping("/my")
-    public List<ReservationWithStatusResponse> getMyBookingHistory(@Authenticated Long id) {
+    public List<MyReservationsResponse> getMyBookingHistory(@Authenticated Long id) {
         return reservationService.findBookingHistory(id);
     }
 }

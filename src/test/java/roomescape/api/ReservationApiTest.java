@@ -75,7 +75,7 @@ public class ReservationApiTest {
         reservation.put("orderId", "1");
         reservation.put("amount", 1000);
 
-        PaymentInfo paymentInfo = new PaymentInfo("1", 1000);
+        PaymentInfo paymentInfo = new PaymentInfo("1", 1000, "orderId");
         BDDMockito.given(paymentClient.postPaymentInfo(any())).willReturn(paymentInfo);
 
         RestAssured.given().log().all()

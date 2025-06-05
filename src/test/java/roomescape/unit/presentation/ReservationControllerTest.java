@@ -11,9 +11,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import roomescape.auth.AuthorizationExtractor;
 import roomescape.domain.PaymentInfo;
 import roomescape.dto.request.ReservationCreateRequest;
-import roomescape.dto.response.ReservationResponse;
+import roomescape.dto.response.MyReservationsResponse;
 import roomescape.dto.response.ReservationTimeResponse;
-import roomescape.dto.response.ReservationWithStatusResponse;
+import roomescape.dto.response.ReservationWithPaymentResponse;
 import roomescape.infrastructure.JwtTokenProvider;
 import roomescape.presentation.ReservationController;
 import roomescape.service.PaymentClient;
@@ -51,12 +51,21 @@ class ReservationControllerTest {
     void 사용자가_예약을_생성한다() throws Exception {
         // given
         ReservationCreateRequest request = new ReservationCreateRequest(LocalDate.of(2025, 1, 1), 1L, 1L, "1", "normal", "1", 1000);
-        ReservationResponse response = new ReservationResponse(1L, "memberName1", LocalDate.of(2025, 1, 1),
-                new ReservationTimeResponse(1L, LocalTime.of(9, 0)), "themeName1");
-        PaymentInfo paymentInfo = new PaymentInfo("1", 1000);
+        ReservationWithPaymentResponse response =
+                new ReservationWithPaymentResponse(
+                        1L,
+                        "memberName1",
+                        LocalDate.of(2025, 1, 1),
+                        new ReservationTimeResponse(1L, LocalTime.of(9, 0)),
+                        "themeName1",
+                        "paymentKey1",
+                        1000
+                );
+
+
+        PaymentInfo paymentInfo = new PaymentInfo("paymentKey1", 1000, "orderId");
         given(paymentClient.postPaymentInfo(any())).willReturn(paymentInfo);
-        given(reservationService.createReservationForMember(1L, request)).willReturn(
-                response);
+        given(reservationService.createReservationForMember(1L, request)).willReturn(response);
         given(tokenProvider.extractSubject("accessToken")).willReturn("1");
         // when & then
         mockMvc.perform(post("/api/reservations")
@@ -70,9 +79,14 @@ class ReservationControllerTest {
     @Test
     void 사용자가_예약을_조회한다() throws Exception {
         // given
-        ReservationWithStatusResponse response = new ReservationWithStatusResponse(1L, "memberName1",
+        MyReservationsResponse response = new MyReservationsResponse(1L,
+                "memberName1",
                 LocalDate.of(2025, 1, 1),
-                new ReservationTimeResponse(1L, LocalTime.of(9, 0)), "themeName1", "예약");
+                new ReservationTimeResponse(1L, LocalTime.of(9, 0)),
+                "themeName1",
+                "예약",
+                "paymentKey1",
+                1000);
 
         given(reservationService.findBookingHistory(1L)).willReturn(List.of(response));
         given(tokenProvider.extractSubject("accessToken")).willReturn("1");
