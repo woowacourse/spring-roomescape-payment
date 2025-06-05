@@ -1086,7 +1086,7 @@ public class ReservationServiceTest {
             final Reservation reservation = Reservation.of(reservationDate, anotherMember, reservationTime, theme,
                     ReservationStatus.PENDING, currentDateTime);
             given(timeManager.todayCurrentTime())
-                    .willReturn(LocalDateTime.of(2025, 12, 30, 12, 40));
+                    .willReturn(LocalDateTime.of(2024, 12, 30, 12, 40));
 
             memberRepositoryFacade.save(member);
             memberRepositoryFacade.save(anotherMember);
@@ -1096,14 +1096,12 @@ public class ReservationServiceTest {
             themeRepositoryFacade.save(theme);
             reservationRepository.save(reservation);
 
-            final ReservationPaymentRequest request = new ReservationPaymentRequest(
-                new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L),
-                new PaymentRequest("BOOSTA-ORDER-016", "dummy-payment-key", 10000L, "CARD")
-            );
+            final ReservationRequest reservationRequest =
+                    new ReservationRequest(LocalDate.of(2025, 12, 30), 1L, 1L);
             final LoginMember loginMember = new LoginMember("boogie", "email", MemberRole.MEMBER);
 
             // when
-            final ReservationResponse actual = reservationService.createWaiting(request.reservationRequest(), loginMember);
+            final ReservationResponse actual = reservationService.createWaiting(reservationRequest, loginMember);
 
             // then
             assertSoftly(s -> {
