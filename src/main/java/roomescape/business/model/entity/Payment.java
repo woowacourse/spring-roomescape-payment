@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import roomescape.business.model.vo.Id;
-import roomescape.infrastructure.payment.PaymentApproveResponseDto;
+import roomescape.presentation.dto.response.PaymentApproveResponseDto;
 
 @ToString
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

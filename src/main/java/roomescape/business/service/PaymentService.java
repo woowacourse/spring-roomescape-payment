@@ -3,12 +3,12 @@ package roomescape.business.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.business.dto.PaymentApproveRequestDto;
 import roomescape.business.model.entity.Payment;
 import roomescape.business.model.entity.Reservation;
 import roomescape.business.model.repository.PaymentRepository;
-import roomescape.infrastructure.payment.PaymentApproveResponseDto;
 import roomescape.infrastructure.payment.TossPaymentClient;
+import roomescape.presentation.dto.request.PaymentApproveRequestDto;
+import roomescape.presentation.dto.response.PaymentApproveResponseDto;
 
 @Service
 @RequiredArgsConstructor

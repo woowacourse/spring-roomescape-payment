@@ -21,7 +21,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.business.dto.PaymentApproveRequestDto;
 import roomescape.business.dto.ReservationDto;
 import roomescape.business.dto.ReservationSpecDto;
 import roomescape.business.dto.ReservationTimeDto;
@@ -41,6 +40,7 @@ import roomescape.business.model.vo.ReservationStatus;
 import roomescape.exception.business.DuplicatedException;
 import roomescape.exception.business.NotFoundException;
 import roomescape.infrastructure.payment.TossPaymentClient;
+import roomescape.presentation.dto.request.PaymentApproveRequestDto;
 
 @ExtendWith(MockitoExtension.class)
 class ReservationServiceTest {

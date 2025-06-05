@@ -8,8 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestClient;
-import roomescape.business.dto.PaymentApproveRequestDto;
 import roomescape.exception.PaymentApproveException;
+import roomescape.presentation.dto.request.PaymentApproveRequestDto;
+import roomescape.presentation.dto.response.PaymentApproveResponseDto;
 
 public class TossPaymentClient {
 

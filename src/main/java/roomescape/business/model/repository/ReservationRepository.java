@@ -4,13 +4,13 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import roomescape.business.dto.UserReservationDetailDto;
 import roomescape.business.model.entity.Reservation;
 import roomescape.business.model.entity.ReservationTime;
 import roomescape.business.model.entity.Theme;
 import roomescape.business.model.vo.Id;
 import roomescape.business.model.vo.ReservationDate;
 import roomescape.business.model.vo.ReservationStatus;
-import roomescape.business.dto.ReservationWithAheadDto;
 
 public interface ReservationRepository {
 
@@ -21,7 +21,7 @@ public interface ReservationRepository {
     List<Reservation> findAllReservationWithFilter(Id themeId, Id memberId, LocalDate dateFrom, LocalDate dateTo,
                                                    ReservationStatus reservationStatus);
 
-    List<ReservationWithAheadDto> findReservationsWithAhead(Id userId);
+    List<UserReservationDetailDto> findAllReservationDetailByUserId(Id userId);
 
     Optional<Reservation> findById(Id id);
 

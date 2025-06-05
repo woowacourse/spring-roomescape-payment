@@ -22,7 +22,7 @@ import roomescape.business.model.repository.ThemeRepository;
 import roomescape.business.model.repository.UserRepository;
 import roomescape.business.model.vo.ReservationStatus;
 import roomescape.business.model.vo.UserRole;
-import roomescape.infrastructure.payment.PaymentApproveResponseDto;
+import roomescape.presentation.dto.response.PaymentApproveResponseDto;
 
 @Component
 @Profile("local")

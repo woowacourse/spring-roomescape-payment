@@ -1,4 +1,4 @@
-package roomescape.infrastructure.payment;
+package roomescape.presentation.dto.response;
 
 public record PaymentApproveResponseDto(String paymentKey,
                                         String orderId,

@@ -11,10 +11,9 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.business.dto.PaymentApproveRequestDto;
 import roomescape.business.dto.ReservationDto;
 import roomescape.business.dto.ReservationSpecDto;
-import roomescape.business.dto.ReservationWithAheadDto;
+import roomescape.business.dto.UserReservationDetailDto;
 import roomescape.business.model.entity.Reservation;
 import roomescape.business.model.entity.ReservationTime;
 import roomescape.business.model.entity.Theme;
@@ -27,6 +26,7 @@ import roomescape.business.model.vo.Id;
 import roomescape.business.model.vo.ReservationStatus;
 import roomescape.exception.business.DuplicatedException;
 import roomescape.exception.business.NotFoundException;
+import roomescape.presentation.dto.request.PaymentApproveRequestDto;
 import roomescape.presentation.dto.response.ReservationResponse;
 
 @Service
@@ -114,9 +114,9 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReservationWithAheadDto> getMyReservations(final String userIdValue) {
+    public List<UserReservationDetailDto> getReservationDetails(final String userIdValue) {
         Id userId = Id.create(userIdValue);
-        return reservationRepository.findReservationsWithAhead(userId);
+        return reservationRepository.findAllReservationDetailByUserId(userId);
     }
 
     @Transactional(readOnly = true)

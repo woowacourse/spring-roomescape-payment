@@ -2,8 +2,10 @@ package roomescape.business.dto;
 
 import roomescape.business.model.entity.Reservation;
 
-public record ReservationWithAheadDto(
+public record UserReservationDetailDto(
         Reservation reservation,
-        Long aheadCount
+        Long aheadCount,
+        String paymentKey,
+        Long totalAmount
 ) {
 }

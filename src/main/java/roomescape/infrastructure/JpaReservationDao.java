@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import roomescape.business.dto.ReservationWithAheadDto;
+import roomescape.business.dto.UserReservationDetailDto;
 import roomescape.business.model.entity.Reservation;
 import roomescape.business.model.entity.ReservationTime;
 import roomescape.business.model.entity.Theme;
@@ -37,7 +37,7 @@ public interface JpaReservationDao extends JpaRepository<Reservation, Id> {
             @Param("reservationStatus") ReservationStatus reservationStatus);
 
     @Query("""
-                SELECT new roomescape.business.dto.ReservationWithAheadDto(
+                SELECT new roomescape.business.dto.UserReservationDetailDto(
                     r,
                     (
                         SELECT COUNT(r2) + 0L
@@ -46,12 +46,15 @@ public interface JpaReservationDao extends JpaRepository<Reservation, Id> {
                           AND r2.date       = r.date
                           AND r2.time       = r.time
                           AND r2.createdAt < r.createdAt
-                    )
+                    ),
+                    p.paymentKey,
+                    p.amount
                 )
                 FROM Reservation r
+                LEFT JOIN Payment p ON p.reservation = r
                 WHERE r.user.id = :userId
             """)
-    List<ReservationWithAheadDto> findReservationsWithAhead(@Param("userId") Id userId);
+    List<UserReservationDetailDto> findAllReservationDetailByUserId(@Param("userId") Id userId);
 
     boolean existsByDateValueAndTimeStartTimeValueAndThemeId(LocalDate date, LocalTime time, Id themeId);
 

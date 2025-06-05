@@ -13,9 +13,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
-import roomescape.business.dto.PaymentApproveRequestDto;
 import roomescape.exception.PaymentApproveException;
 import roomescape.infrastructure.payment.config.ClientConfig;
+import roomescape.presentation.dto.request.PaymentApproveRequestDto;
 
 @RestClientTest(value = {ClientConfig.class, TossPaymentClient.class})
 class TossPaymentClientTest {
