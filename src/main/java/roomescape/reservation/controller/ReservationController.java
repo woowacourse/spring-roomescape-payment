@@ -26,8 +26,10 @@ public class ReservationController {
     private final ReservationService reservationService;
 
     @GetMapping("/{reservationId}")
-    public ReservationResponse getReservationById(@PathVariable(value = "reservationId") Long reservationId) {
-        return reservationService.getById(reservationId);
+    public ReservationResponse getReservationById(
+            @PathVariable(value = "reservationId") Long reservationId,
+            LoginMember loginMember) {
+        return reservationService.getById(reservationId, loginMember);
     }
 
     @PostMapping
