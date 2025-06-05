@@ -21,7 +21,6 @@ echo "==== 4. 애플리케이션 빌드 ===="
 ./gradlew bootJar
 
 echo "==== 5. Spring Boot 앱 실행 (nohup으로 백그라운드 실행) ===="
-cd ..
 nohup java -jar $BUILD_DIR/$JAR_NAME > $LOG_FILE 2>&1 &
 
 echo "==== 6. 배포 완료! ===="
