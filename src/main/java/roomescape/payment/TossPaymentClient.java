@@ -23,7 +23,7 @@ public class TossPaymentClient {
     private final RestClient restClient;
     private final TossPaymentConfirmErrorHandler tossPaymentConfirmErrorHandler;
 
-    public TossPaymentConfirmResponse confirm(final PaymentConfirmRequest request) {
+    public void confirm(final PaymentConfirmRequest request) {
         try {
             ResponseEntity<TossPaymentConfirmResponse> response = restClient.post()
                     .uri(URL_PREFIX + "/confirm")
@@ -35,7 +35,6 @@ public class TossPaymentClient {
             if (response.getStatusCode() != HttpStatus.OK) {
                 throw new PaymentException("결제 승인에 실패하였습니다.");
             }
-            return response.getBody();
         } catch (PaymentException e) {
             throw e;
         } catch (ResourceAccessException e) {

@@ -15,7 +15,6 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import roomescape.booking.reservation.dto.ReservationResponse;
 import roomescape.payment.TossPaymentClient;
-import roomescape.payment.dto.TossPaymentConfirmResponse;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -25,8 +24,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class DataSourceTest {
@@ -174,9 +171,6 @@ public class DataSourceTest {
     }
 
     private void givenCreateReservation(final Cookie cookie) {
-        given(tossPaymentClient.confirm(any()))
-                .willReturn(new TossPaymentConfirmResponse("asjdflkajsdlfkaj", "SURFMAY_abc", 1000L));
-
         RestAssured.given().port(port).log().all()
                 .contentType(ContentType.JSON)
                 .cookie(cookie)

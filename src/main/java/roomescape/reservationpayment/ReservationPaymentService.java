@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.booking.reservation.TossPaymentConfirmCommandFactory;
 import roomescape.payment.TossPaymentAdapter;
 import roomescape.payment.dto.TossPaymentConfirmCommand;
-import roomescape.payment.dto.TossPaymentConfirmResponse;
 import roomescape.reservationpayment.dto.ReservationPaymentRequest;
 
 @Service
@@ -21,16 +20,15 @@ public class ReservationPaymentService {
 
     @Transactional
     public void confirmPayment(final ReservationPaymentRequest request) {
-        TossPaymentConfirmCommand command = tossPaymentConfirmCommandFactory.toPaymentConfirmCommand(request);
-        TossPaymentConfirmResponse response;
+        ReservationPayment reservationPayment = new ReservationPayment(request.paymentKey(), request.amount(), request.orderId(), request.reservation());
+        reservationPaymentRepository.save(reservationPayment);
 
+        TossPaymentConfirmCommand command = tossPaymentConfirmCommandFactory.toPaymentConfirmCommand(request);
         try {
-            response = tossPaymentAdapter.confirmPayment(command);
+            tossPaymentAdapter.confirmPayment(command);
         } catch (Exception e) {
             log.error("결제 승인 실패", e);
             throw e;
         }
-        ReservationPayment reservationPayment = new ReservationPayment(response.paymentKey(), response.totalAmount(), response.orderId(), request.reservation());
-        reservationPaymentRepository.save(reservationPayment);
     }
 }

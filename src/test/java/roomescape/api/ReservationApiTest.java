@@ -15,7 +15,6 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import roomescape.payment.TossPaymentClient;
-import roomescape.payment.dto.TossPaymentConfirmResponse;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -23,8 +22,6 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ReservationApiTest {
@@ -111,9 +108,6 @@ public class ReservationApiTest {
     }
 
     private void givenCreateReservation(final Cookie cookie) {
-        given(tossPaymentClient.confirm(any()))
-                .willReturn(new TossPaymentConfirmResponse("asjdflkajsdlfkaj", "SURFMAY_abc", 1000L));
-
         RestAssured.given().port(port).log().all()
                 .contentType(ContentType.JSON)
                 .cookie(cookie)
@@ -223,9 +217,6 @@ public class ReservationApiTest {
             givenCreateTheme();
             givenCreateSchedule();
             givenOrder(cookie);
-
-            given(tossPaymentClient.confirm(any()))
-                    .willReturn(new TossPaymentConfirmResponse("asjdflkajsdlfkaj", "SURFMAY_abc", 1000L));
 
             // when & then
             RestAssured.given().port(port)
