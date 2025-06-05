@@ -1,4 +1,4 @@
-package roomescape.payment;
+package roomescape.payment.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
