@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS toss_payment;
 DROP TABLE IF EXISTS reservation_wait;
 DROP TABLE IF EXISTS reservation;
 DROP TABLE IF EXISTS reservation_schedule;
@@ -47,9 +48,6 @@ CREATE TABLE reservation
     id   BIGINT       NOT NULL AUTO_INCREMENT,
     schedule_id BIGINT,
     member_id BIGINT,
-    amount BIGINT,
-    order_id VARCHAR(255),
-    payment_key VARCHAR(255),
     FOREIGN KEY (member_id) REFERENCES member (id),
     FOREIGN KEY (schedule_id) REFERENCES reservation_schedule (id),
     UNIQUE (schedule_id),
@@ -68,3 +66,13 @@ CREATE TABLE reservation_wait
     PRIMARY KEY (id)
 );
 
+CREATE TABLE toss_payment
+(
+    id   BIGINT       NOT NULL AUTO_INCREMENT,
+    amount BIGINT,
+    order_id VARCHAR(255),
+    payment_key VARCHAR(255),
+    reservation_id BIGINT,
+    FOREIGN KEY (reservation_id) REFERENCES reservation (id),
+    PRIMARY KEY (id)
+);

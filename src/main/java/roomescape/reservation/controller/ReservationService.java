@@ -9,10 +9,10 @@ import roomescape.reservation.controller.dto.AdminCreateReservationRequest;
 import roomescape.reservation.controller.dto.CreateReservationRequest;
 import roomescape.reservation.controller.dto.MyReservationResponse;
 import roomescape.reservation.controller.dto.ReservationResponse;
-import roomescape.reservation.external.toss.TossPaymentRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.service.ReservationCommandService;
 import roomescape.reservation.service.ReservationQueryService;
+import roomescape.reservation.service.TossPaymentCommandService;
 import roomescape.schedule.domain.ReservationDate;
 import roomescape.schedule.domain.ReservationSchedule;
 import roomescape.schedule.service.ScheduleQueryService;
@@ -20,16 +20,19 @@ import roomescape.schedule.service.ScheduleQueryService;
 @Service
 public class ReservationService {
     private final ReservationCommandService reservationCommandService;
+    private final TossPaymentCommandService tossPaymentCommandService;
     private final ScheduleQueryService scheduleQueryService;
     private final MemberQueryService memberQueryService;
     private final ReservationQueryService reservationQueryService;
 
     public ReservationService(
             final ReservationCommandService reservationCommandService,
+            final TossPaymentCommandService tossPaymentCommandService,
             final ScheduleQueryService scheduleQueryService,
             final MemberQueryService memberQueryService,
             final ReservationQueryService reservationQueryService) {
         this.reservationCommandService = reservationCommandService;
+        this.tossPaymentCommandService = tossPaymentCommandService;
         this.scheduleQueryService = scheduleQueryService;
         this.memberQueryService = memberQueryService;
         this.reservationQueryService = reservationQueryService;
@@ -53,9 +56,8 @@ public class ReservationService {
                 new ReservationDate(request.date())
         );
         Member member = memberQueryService.getById(memberId);
-        TossPaymentRequest tossPaymentRequest = request.toPaymentRequest();
-        Reservation reservation = reservationCommandService.createReservationWithPayment(schedule, member,
-                tossPaymentRequest);
+        tossPaymentCommandService.createTossPayment(request.toPaymentRequest());
+        Reservation reservation = reservationCommandService.createReservation(schedule, member);
         return ReservationResponse.from(reservation);
     }
 
