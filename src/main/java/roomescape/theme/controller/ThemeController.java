@@ -1,5 +1,6 @@
 package roomescape.theme.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,22 +25,26 @@ public class ThemeController {
 
     private final ThemeService themeService;
 
+    @Operation(summary = "테마 저장 API")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ThemeResponse saveTheme(@Valid @RequestBody final ThemeRequest request) {
         return themeService.saveTheme(request);
     }
 
+    @Operation(summary = "테마 조회 API")
     @GetMapping
     public List<ThemeResponse> findAll() {
         return themeService.findAll();
     }
 
+    @Operation(summary = "테마 순위권 조회 API")
     @GetMapping("/ranking")
     public List<PopularThemeResponse> findAllPopular() {
         return themeService.findAllPopular();
     }
 
+    @Operation(summary = "테마 삭제 API")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable final Long id) {

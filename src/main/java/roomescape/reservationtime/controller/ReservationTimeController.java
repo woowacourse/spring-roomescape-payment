@@ -1,5 +1,6 @@
 package roomescape.reservationtime.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -23,17 +24,20 @@ public class ReservationTimeController {
 
     private final ReservationTimeService reservationTimeService;
 
+    @Operation(summary = "예약 시간 저장 API")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ReservationTimeResponse saveTime(@Valid @RequestBody final ReservationTimeRequest request) {
         return reservationTimeService.saveTime(request);
     }
 
+    @Operation(summary = "예약 시간 조회 API")
     @GetMapping
     public List<ReservationTimeResponse> findAll() {
         return reservationTimeService.findAll();
     }
 
+    @Operation(summary = "예약 시간 삭제 API")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable final Long id) {
