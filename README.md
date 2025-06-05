@@ -1,3 +1,64 @@
+## ERD
+
+```mermaid
+erDiagram
+  MEMBER {
+    BIGINT id PK
+    VARCHAR email
+    VARCHAR name
+    VARCHAR password
+    VARCHAR role  "ENUM('ADMIN','MEMBER')"
+  }
+
+  PAYMENT {
+    BIGINT id PK
+    NUMERIC amount
+    BIGINT reservation_id FK
+    VARCHAR order_id
+    VARCHAR payment_key
+    VARCHAR payment_status  "ENUM('AWAIT','FAILED','PENDING','SUCCESS')"
+  }
+
+  RESERVATION {
+    BIGINT id PK
+    DATE date
+    BIGINT member_id FK
+    BIGINT theme_id FK
+    BIGINT time_id FK
+  }
+
+  RESERVATION_TIME {
+    BIGINT id PK
+    TIME start_at
+  }
+
+  THEME {
+    BIGINT id PK
+    VARCHAR name
+    VARCHAR description
+    VARCHAR thumbnail
+    NUMERIC price
+  }
+
+  WAITING {
+    BIGINT id PK
+    DATE date
+    TIMESTAMP created_at
+    BIGINT member_id FK
+    BIGINT theme_id FK
+    BIGINT time_id FK
+    VARCHAR waiting_status  "ENUM('ACCEPTED','CANCELLED','PENDING','REJECTED')"
+  }
+
+  MEMBER ||--o{ RESERVATION : makes
+  MEMBER ||--o{ WAITING : waits
+  RESERVATION ||--|{ PAYMENT : has
+  RESERVATION ||--|| RESERVATION_TIME : at
+  RESERVATION ||--|| THEME : for
+  WAITING ||--|| RESERVATION_TIME : at
+  WAITING ||--|| THEME : for
+```
+
 ## 기능 구현 목록
 
 ### 어드민 페이지
