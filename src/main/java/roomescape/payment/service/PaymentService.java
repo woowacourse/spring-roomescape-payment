@@ -17,7 +17,8 @@ import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.util.IdempotencyKeyGenerator;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.ReservationResponse;
-import roomescape.reservation.service.ReservationService;
+import roomescape.reservation.service.ReservationCommandService;
+import roomescape.reservation.service.ReservationQueryService;
 
 @Slf4j
 @Service
@@ -25,7 +26,8 @@ import roomescape.reservation.service.ReservationService;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
-    private final ReservationService reservationService;
+    private final ReservationQueryService reservationQueryService;
+    private final ReservationCommandService reservationCommandService;
     private final TossRestClient restClient;
 
     @Transactional
@@ -40,7 +42,7 @@ public class PaymentService {
         } catch (RuntimeException e) {
             payment.failPayment();
             final Reservation reservation = payment.getReservation();
-            reservationService.findById(reservation.getId());
+            reservationQueryService.findById(reservation.getId());
             throw e;
         }
     }
@@ -50,8 +52,8 @@ public class PaymentService {
         log.debug("ReservationPaymentRequest: {}", request);
         log.debug("LoginMember: {}", loginMember);
 
-        final ReservationResponse reservationResponse = reservationService.resisterReservation(request.toReservationRequest(), loginMember);
-        final Reservation reservation = reservationService.findById(reservationResponse.id());
+        final ReservationResponse reservationResponse = reservationCommandService.resisterReservation(request.toReservationRequest(), loginMember);
+        final Reservation reservation = reservationQueryService.findById(reservationResponse.id());
         log.debug("Reservation ID: {}", reservation.getId());
 
         final Payment payment = Payment.builder()

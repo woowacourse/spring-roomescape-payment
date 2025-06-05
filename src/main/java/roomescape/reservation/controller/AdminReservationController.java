@@ -17,7 +17,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.reservation.dto.AdminReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
-import roomescape.reservation.service.ReservationService;
+import roomescape.reservation.service.ReservationCommandService;
+import roomescape.reservation.service.ReservationQueryService;
 import roomescape.reservation.service.WaitingReservationService;
 
 
@@ -27,28 +28,29 @@ import roomescape.reservation.service.WaitingReservationService;
 @RequestMapping("/admin/reservations")
 public class AdminReservationController {
 
-    private final ReservationService reservationService;
+    private final ReservationCommandService reservationCommandService;
+    private final ReservationQueryService reservationQueryService;
     private final WaitingReservationService waitingReservationService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ReservationResponse saveReservation(@Valid @RequestBody final AdminReservationRequest request) {
-        return reservationService.saveAdminReservation(request);
+        return reservationCommandService.saveAdminReservation(request);
     }
 
     @GetMapping("/waiting")
     public List<ReservationResponse> getWaitingReservations() {
-        return reservationService.findAllWaitingReservation();
+        return reservationQueryService.findAllWaitingReservation();
     }
 
     @PatchMapping("/{id}")
     public void approveWaitingReservation(@PathVariable @NotNull final Long id) {
-        reservationService.approveWaitingReservation(id);
+        reservationCommandService.approveWaitingReservation(id);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteWaitingReservation(@PathVariable @NotNull final Long id) {
-        waitingReservationService.deleteById(id);
+    public void cancel(@PathVariable @NotNull final Long id) {
+        waitingReservationService.cancel(id);
     }
 }

@@ -1,8 +1,6 @@
 package roomescape.reservation.controller;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoginMember;
@@ -22,29 +19,27 @@ import roomescape.reservation.dto.MyReservationResponse;
 import roomescape.reservation.dto.ReservationRequest;
 import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSearchRequest;
-import roomescape.reservation.service.ReservationService;
-import roomescape.reservationtime.dto.AvailableReservationTimeResponse;
+import roomescape.reservation.service.ReservationCommandService;
+import roomescape.reservation.service.ReservationQueryService;
 
+@Validated
 @RestController
 @RequestMapping("/reservations")
 @RequiredArgsConstructor
-@Validated
 public class ReservationController {
 
-    private final ReservationService reservationService;
+    private final ReservationQueryService reservationQueryService;
+    private final ReservationCommandService reservationCommandService;
 
     @GetMapping
     public List<ReservationResponse> findReservationsByCriteria(
             @ModelAttribute final ReservationSearchRequest request) {
-        return reservationService.findReservationsByCriteria(request);
+        return reservationQueryService.findReservationsByCriteria(request);
     }
 
-    @GetMapping("/times")
-    public List<AvailableReservationTimeResponse> findAllAvailableTimes(
-            @NotNull @RequestParam final LocalDate date,
-            @NotNull @RequestParam final Long themeId
-    ) {
-        return reservationService.findAllReservationTime(date, themeId);
+    @GetMapping("/mine")
+    public List<MyReservationResponse> findMyReservations(final LoginMember loginMember) {
+        return reservationQueryService.findMyReservations(loginMember);
     }
 
     @PostMapping
@@ -53,17 +48,12 @@ public class ReservationController {
             @Valid @RequestBody final ReservationRequest request,
             final LoginMember member
     ) {
-        return reservationService.resisterReservation(request, member);
+        return reservationCommandService.resisterReservation(request, member);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteReservation(@PathVariable final Long id) {
-        reservationService.deleteById(id);
-    }
-
-    @GetMapping("/mine")
-    public List<MyReservationResponse> findMyReservations(final LoginMember loginMember) {
-        return reservationService.findMyReservations(loginMember);
+    public void cancel(@PathVariable final Long id) {
+        reservationCommandService.cancel(id);
     }
 }

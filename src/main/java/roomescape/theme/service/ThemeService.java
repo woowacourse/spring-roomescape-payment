@@ -20,9 +20,13 @@ public class ThemeService {
     private final ThemeRepository themeRepository;
     private final RoomEscapeInformationRepository roomEscapeInformationRepository;
 
-    public ThemeResponse saveTheme(final ThemeRequest request) {
-        final Theme theme = themeRepository.save(Theme.of(request.name(), request.description(), request.thumbnail()));
-        return new ThemeResponse(theme);
+    public List<PopularThemeResponse> findAllPopular() {
+        final LocalDate startDate = LocalDate.now().minusDays(7);
+        final LocalDate endDate = LocalDate.now().minusDays(1);
+        return themeRepository.findAllPopular(startDate, endDate)
+                .stream()
+                .map(PopularThemeResponse::new)
+                .toList();
     }
 
     public List<ThemeResponse> findAll() {
@@ -32,13 +36,9 @@ public class ThemeService {
                 .toList();
     }
 
-    public List<PopularThemeResponse> findAllPopular() {
-        final LocalDate startDate = LocalDate.now().minusDays(7);
-        final LocalDate endDate = LocalDate.now().minusDays(1);
-        return themeRepository.findAllPopular(startDate, endDate)
-                .stream()
-                .map(PopularThemeResponse::new)
-                .toList();
+    public ThemeResponse saveTheme(final ThemeRequest request) {
+        final Theme theme = themeRepository.save(Theme.of(request.name(), request.description(), request.thumbnail()));
+        return new ThemeResponse(theme);
     }
 
     @Transactional

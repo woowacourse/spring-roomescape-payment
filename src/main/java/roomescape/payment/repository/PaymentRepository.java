@@ -7,5 +7,5 @@ import roomescape.payment.domain.Payment;
 
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
-    List<Payment> findByMember(final Member member);
+    List<Payment> findPaymentsByMember(final Member member);
 }
