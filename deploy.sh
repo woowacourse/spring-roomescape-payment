@@ -17,7 +17,7 @@ sudo docker-compose -f $DOCKER_COMPOSE_FILE up -d
 echo "==== 3. 실행 중인 Spring 애플리케이션 종료 (중복 방지) ===="
 pkill -f $JAR_NAME || true
 
-echo "==== 4. 애플리케이션 빌드 (./gradlew bootJar) ===="
+echo "==== 4. 애플리케이션 빌드 ===="
 ./gradlew bootJar
 
 echo "==== 5. Spring Boot 앱 실행 (nohup으로 백그라운드 실행) ===="
