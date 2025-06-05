@@ -12,20 +12,22 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoginMember;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.ReservationPaymentRequest;
-import roomescape.payment.service.TossPaymentService;
+import roomescape.payment.service.TossConfirmationService;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/payments")
 public class PaymentController {
 
-    private final TossPaymentService tossPaymentService;
+    private final TossConfirmationService tossConfirmationService;
 
     @ResponseStatus(HttpStatus.CREATED)
+    //TODO: 프론트에서 받는 paymentType을 경로로 주입받도록
     @PostMapping("/confirm/tossPay")
-    public void createReservationAndConfirmPayment(@RequestBody @Valid final ReservationPaymentRequest request, final LoginMember loginMember) {
-        tossPaymentService.saveReservationAndPayment(request, loginMember);
-        tossPaymentService.confirmPayment(request);
+    public void createReservationAndConfirmPayment(
+            @RequestBody @Valid final ReservationPaymentRequest request,
+            final LoginMember loginMember) {
+        tossConfirmationService.reserveAndPay(request, loginMember);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -35,6 +37,6 @@ public class PaymentController {
             @RequestBody @Valid final PaymentRequest request,
             final LoginMember loginMember
     ) {
-        tossPaymentService.completePaymentForReservation(reservationId, request, loginMember);
+        tossConfirmationService.proceedPaymentForNotPaidReservation(reservationId, request, loginMember);
     }
 }

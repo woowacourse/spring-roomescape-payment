@@ -84,10 +84,6 @@ public class Payment {
         this.receiptUrl = receiptUrl;
     }
 
-    public boolean canConfirmPaymentStatus() {
-        return this.status == PaymentStatus.NOT_PAID || this.status == PaymentStatus.PENDING;
-    }
-
     public void assignPaymentInformation(String paymentKey, String orderId, Long amount) {
         this.paymentKey = paymentKey;
         this.orderId = orderId;

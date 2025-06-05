@@ -12,4 +12,7 @@ public record ReservationPaymentRequest(
         @NotNull Long amount,
         @NotNull String paymentType
 ) {
+    public PaymentRequest toPaymentRequest() {
+        return new PaymentRequest(paymentKey, orderId, amount, paymentType);
+    }
 }
