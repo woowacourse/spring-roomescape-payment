@@ -30,6 +30,7 @@ import roomescape.infrastructure.JwtTokenProvider;
 import roomescape.infrastructure.payment.PaymentClient;
 import roomescape.presentation.ReservationController;
 import roomescape.service.PaymentService;
+import roomescape.service.ReservationFacade;
 import roomescape.service.ReservationService;
 
 @WebMvcTest(value = {ReservationController.class, AuthorizationExtractor.class})
@@ -51,6 +52,9 @@ class ReservationControllerTest {
     private ReservationService reservationService;
 
     @MockitoBean
+    private ReservationFacade reservationFacade;
+
+    @MockitoBean
     private JwtTokenProvider tokenProvider;
 
     @Test
@@ -66,7 +70,7 @@ class ReservationControllerTest {
         given(paymentService.createPaymentInfo(any())).willReturn(paymentInfo);
         given(reservationService.createReservationForMember(1L, request.timeId(), request.themeId(), request.date(),
                 paymentInfo)).willReturn(response);
-        given(reservationService.processReservationForMember(1L, request.timeId(), request.themeId(), request.date(),
+        given(reservationFacade.processReservationForMember(1L, request.timeId(), request.themeId(), request.date(),
                 paymentRequest)).willReturn(response);
         given(tokenProvider.extractSubject("accessToken")).willReturn("1");
         // when & then

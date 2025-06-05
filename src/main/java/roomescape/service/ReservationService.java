@@ -17,7 +17,6 @@ import roomescape.domain.repository.ReservationRepository;
 import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ThemeRepository;
 import roomescape.domain.repository.WaitingRepository;
-import roomescape.dto.request.PaymentRequest;
 import roomescape.dto.request.ReservationCondition;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationWithStatusResponse;
@@ -92,15 +91,6 @@ public class ReservationService {
 
         Reservation savedReservation = reservationRepository.save(reservation);
         return ReservationResponse.from(savedReservation);
-    }
-
-    public ReservationResponse processReservationForMember(Long memberId,
-                                                           Long timeId,
-                                                           Long themeId,
-                                                           LocalDate date,
-                                                           PaymentRequest request) {
-        PaymentInfo paymentInfo = paymentService.createPaymentInfo(request);
-        return createReservationForMember(memberId, timeId, themeId, date, paymentInfo);
     }
 
     @Transactional
