@@ -8,8 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
+import roomescape.payment.domain.vo.PaymentInfo;
 import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.exception.PaymentApiException;
 
 @Component
@@ -19,13 +19,13 @@ public class PaymentClient {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    public PaymentResponse confirmPayment(final PaymentRequest request) {
+    public PaymentInfo confirmPayment(final PaymentRequest request) {
         try {
             return restClient.post()
                     .uri("/v1/payments/confirm")
                     .body(request)
                     .retrieve()
-                    .body(PaymentResponse.class);
+                    .body(PaymentInfo.class);
         } catch (RestClientResponseException e) {
             exceptionable(e);
         }
