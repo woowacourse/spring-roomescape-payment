@@ -21,43 +21,43 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleException(RuntimeException e) {
-        log.error("RuntimeException : {}", e.getMessage());
+//        log.error("RuntimeException : {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
     }
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<String> notFound(NotFoundException e) {
-        log.error("NotFoundException : {}", e.getMessage());
+//        log.error("NotFoundException : {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<String> badRequest(BadRequestException e) {
-        log.error("BadRequestException : {}", e.getMessage());
+//        log.error("BadRequestException : {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<String> conflict(ConflictException e) {
-        log.error("ConflictException : {}", e.getMessage());
+//        log.error("ConflictException : {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<String> unauthorized(UnauthorizedException e) {
-        log.error("UnauthorizedException : {}", e.getMessage());
+//        log.error("UnauthorizedException : {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<String> forbidden(ForbiddenException e) {
-        log.error("ForbiddenException : {}", e.getMessage());
+//        log.error("ForbiddenException : {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<String> handleValidationException(MethodArgumentNotValidException e) {
-        log.error("ValidationException : {}", e.getMessage());
+//        log.error("ValidationException : {}", e.getMessage());
         String errorMessage = e.getBindingResult().getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.joining(" / "));
