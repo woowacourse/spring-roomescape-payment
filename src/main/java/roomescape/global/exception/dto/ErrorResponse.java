@@ -1,13 +1,14 @@
-package roomescape.payment.presentation.dto;
+package roomescape.global.exception.dto;
 
-public class PaymentErrorResponse {
+public class ErrorResponse {
+
     private String code;
     private String message;
 
-    private PaymentErrorResponse() {
+    private ErrorResponse() {
     }
 
-    public PaymentErrorResponse(final String code, final String message) {
+    public ErrorResponse(final String code, final String message) {
         this.code = code;
         this.message = message;
     }
