@@ -23,25 +23,32 @@ public class Payment {
     private String paymentKey;
 
     @Column(nullable = false)
-    private Long totalAmount;
+    private Long amount;
 
     @Column(nullable = false)
     private Long reservationId;
 
-    public Payment(final String orderId, final String paymentKey, final Long totalAmount, final Long reservationId) {
+    private Payment(final String orderId, final String paymentKey, final Long amount, final Long reservationId) {
         this.orderId = orderId;
         this.paymentKey = paymentKey;
-        this.totalAmount = totalAmount;
+        this.amount = amount;
         this.reservationId = reservationId;
     }
 
     public static Payment of(
             final String orderId,
             final String paymentKey,
-            final Long totalAmount,
+            final Long amount,
             final Long reservationId
     ) {
-        return new Payment(orderId, paymentKey, totalAmount, reservationId);
+        return new Payment(orderId, paymentKey, amount, reservationId);
     }
 
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public Long getAmount() {
+        return amount;
+    }
 }

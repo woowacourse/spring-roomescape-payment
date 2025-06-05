@@ -2,7 +2,7 @@ package roomescape.application;
 
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static roomescape.reservation.model.entity.vo.ReservationStatus.CONFIRMED;
 
 import java.time.LocalDate;
@@ -20,6 +20,7 @@ import roomescape.ReservationTestFixture;
 import roomescape.member.model.Member;
 import roomescape.member.model.MemberRepository;
 import roomescape.member.model.Role;
+import roomescape.payment.application.dto.response.TossPaymentsResponse;
 import roomescape.payment.infrastructure.client.TossPaymentRestClient;
 import roomescape.reservation.application.UserReservationService;
 import roomescape.reservation.application.dto.request.CreateReservationServiceRequest;
@@ -76,10 +77,20 @@ class UserReservationServiceTest extends IntegrationTestSupport {
         reservationThemeRepository.save(theme);
         memberRepository.save(member);
 
-        doNothing().when(tossPaymentRestClient).requestConfirm(any());
+        TossPaymentsResponse mockResponse = new TossPaymentsResponse(
+                "test",
+                "test",
+                "test",
+                1000L,
+                "test",
+                1L
+        );
+
+        when(tossPaymentRestClient.requestConfirm(any()))
+                .thenReturn(mockResponse);
     }
 
-    @DisplayName("요청된 예약 정보로 예약을 진행할 수 있다")
+    @DisplayName("요청된 예약 정보로 예약을 진행할 수 있다, 결제 API 호출은 하지 않는다.")
     @Test
     void createFuture() {
         // given
@@ -87,8 +98,9 @@ class UserReservationServiceTest extends IntegrationTestSupport {
         Long timeId = 1L;
         Long themeId = 1L;
         Long memberId = 1L;
-        CreateReservationServiceRequest request = new CreateReservationServiceRequest(memberId, date, timeId, themeId,
-                null, null, null);
+        CreateReservationServiceRequest request = new CreateReservationServiceRequest(
+                memberId, date, timeId, themeId,
+                "test", "test", 1000L);
 
         // when
         ReservationServiceResponse response = userReservationService.create(request);

@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.payment.application.dto.response.TossPaymentsResponse;
 import roomescape.payment.model.PaymentClient;
+import roomescape.payment.model.UserReservationWithPaymentInfoResponse;
+import roomescape.payment.model.entity.Payment;
+import roomescape.payment.model.repository.PaymentRepository;
 import roomescape.payment.model.service.PaymentOperation;
 import roomescape.reservation.application.dto.request.CreateReservationServiceRequest;
 import roomescape.reservation.application.dto.response.ReservationServiceResponse;
@@ -26,6 +29,7 @@ public class UserReservationService {
 
     private final ReservationRepository reservationRepository;
     private final ReservationWaitingRepository reservationWaitingRepository;
+    private final PaymentRepository paymentRepository;
     private final ReservationOperation reservationOperation;
     private final PaymentOperation paymentOperation;
     private final PaymentClient paymentClient;
@@ -40,15 +44,42 @@ public class UserReservationService {
 
     public List<UserReservationServiceResponse> getAllByMemberId(Long memberId) {
         List<Reservation> reservations = reservationRepository.findAllByMemberId(memberId);
+        List<UserReservationWithPaymentInfoResponse> reservationWithPaymentInfo = getReservationWithPaymentInfoResponse(
+                reservations);
         List<ReservationWaitingWithRank> waitingWithRanks = reservationWaitingRepository.findAllWithRankByMemberId(
                 memberId);
 
         List<UserReservationServiceResponse> responses = createUserReservationServiceResponse(
-                reservations,
+                reservationWithPaymentInfo,
                 waitingWithRanks
         );
 
         return sortByDateTime(responses);
+    }
+
+    private List<UserReservationWithPaymentInfoResponse> getReservationWithPaymentInfoResponse(
+            final List<Reservation> reservations) {
+
+        List<UserReservationWithPaymentInfoResponse> userReservationWithPaymentInfo = new ArrayList<>();
+        for (Reservation reservation : reservations) {
+            Payment payment = getPaymentBy(reservation.getId());
+            UserReservationWithPaymentInfoResponse userReservationWithPaymentInfoResponse = new UserReservationWithPaymentInfoResponse(
+                    reservation.getId(),
+                    reservation.getDate(),
+                    reservation.getTime().getStartAt(),
+                    reservation.getTheme().getName(),
+                    reservation.getStatus().name(),
+                    payment.getPaymentKey(),
+                    payment.getAmount()
+            );
+            userReservationWithPaymentInfo.add(userReservationWithPaymentInfoResponse);
+        }
+        return userReservationWithPaymentInfo;
+    }
+
+    private Payment getPaymentBy(final Long reservationId) {
+        return paymentRepository.findByReservationId(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("결제 정보가 없습니다."));
     }
 
     @Transactional
@@ -59,11 +90,11 @@ public class UserReservationService {
     }
 
     private List<UserReservationServiceResponse> createUserReservationServiceResponse(
-            List<Reservation> reservations,
+            List<UserReservationWithPaymentInfoResponse> payments,
             List<ReservationWaitingWithRank> reservationWaitingWithRanks
     ) {
         List<UserReservationServiceResponse> responses = new ArrayList<>();
-        for (Reservation reservation : reservations) {
+        for (UserReservationWithPaymentInfoResponse reservation : payments) {
             responses.add(UserReservationServiceResponse.of(reservation));
         }
         for (ReservationWaitingWithRank waitingWithRank : reservationWaitingWithRanks) {

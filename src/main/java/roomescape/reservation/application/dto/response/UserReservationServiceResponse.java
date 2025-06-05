@@ -2,7 +2,7 @@ package roomescape.reservation.application.dto.response;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import roomescape.reservation.model.entity.Reservation;
+import roomescape.payment.model.UserReservationWithPaymentInfoResponse;
 import roomescape.reservation.model.entity.ReservationWaiting;
 
 public record UserReservationServiceResponse(
@@ -11,18 +11,21 @@ public record UserReservationServiceResponse(
         LocalDate date,
         LocalTime time,
         String status,
-        int rank
+        int rank,
+        String paymentKey,
+        Long amount
 ) {
 
-    // TODO : rank default값 처리하기
-    public static UserReservationServiceResponse of(Reservation reservation) {
+    public static UserReservationServiceResponse of(UserReservationWithPaymentInfoResponse reservation) {
         return new UserReservationServiceResponse(
-                reservation.getId(),
-                reservation.getTheme().getName(),
-                reservation.getDate(),
-                reservation.getTime().getStartAt(),
-                reservation.getStatus().name(),
-                -1
+                reservation.id(),
+                reservation.theme(),
+                reservation.date(),
+                reservation.time(),
+                reservation.status(),
+                -1,
+                reservation.paymentKey(),
+                reservation.amount()
         );
     }
 
@@ -33,7 +36,10 @@ public record UserReservationServiceResponse(
                 reservationWaiting.getDate(),
                 reservationWaiting.getTime().getStartAt(),
                 reservationWaiting.getStatus().name(),
-                rank
+                rank,
+                null,
+                null
+
         );
     }
 }
