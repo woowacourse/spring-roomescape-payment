@@ -8,9 +8,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.TossPaymentClient;
-import roomescape.payment.toss.PaymentErrorHandler;
-import roomescape.payment.toss.TossErrorMapper;
+import roomescape.payment.toss.TossPaymentClient;
+import roomescape.payment.toss.exception.PaymentErrorHandler;
+import roomescape.payment.toss.exception.TossErrorMapper;
 import roomescape.payment.toss.TossPaymentRestClient;
 import roomescape.util.Base64Utils;
 
@@ -18,8 +18,8 @@ import roomescape.util.Base64Utils;
 @Profile("!test")
 public class TossPaymentRestClientConfig {
 
-    private static final int CONNECTION_TIMEOUT_SECOND = 1;
-    private static final int RESPONSE_TIMEOUT_SECOND = 2;
+    private static final int CONNECTION_TIMEOUT_SECOND = 15;
+    private static final int RESPONSE_TIMEOUT_SECOND = 30;
 
     @Bean
     public TossPaymentClient tossPaymentClient(
