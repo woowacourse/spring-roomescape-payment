@@ -100,7 +100,7 @@ class AdminReservationApiTest {
     }
 
     @Test
-    void PENDING_예약을_ACCEPTED로_변경한다() {
+    void 대기를_예약으로_승격한다() {
         RestAssured.given().log().all()
                 .cookie(TokenCookieService.COOKIE_TOKEN_KEY, token)
                 .when().delete("/admin/reservations/7")
