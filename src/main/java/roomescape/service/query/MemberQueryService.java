@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
 import roomescape.dto.response.MemberProfileResponse;
-import roomescape.exception.LoginFailException;
 import roomescape.exception.NotFoundException;
 import roomescape.repository.MemberRepository;
 
@@ -33,7 +32,7 @@ public class MemberQueryService {
 
     public Member getMemberByEmail(String email) {
         return memberRepository.findOneByEmail(email)
-                .orElseThrow(() -> new LoginFailException("이메일에 해당하는 회원이 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException("이메일에 해당하는 회원을 찾을 수 없습니다."));
     }
 
     public boolean existsMemberInEmail(String email) {
