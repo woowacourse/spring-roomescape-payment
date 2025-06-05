@@ -20,8 +20,10 @@ import roomescape.payment.application.PaymentClient;
 import roomescape.payment.application.PaymentException;
 import roomescape.payment.application.dto.PaymentConfirmRequest;
 import roomescape.payment.application.dto.PaymentDataRequest;
+import roomescape.payment.application.dto.PaymentRequest;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentStatus;
+import roomescape.payment.infrastructure.dto.TossPaymentRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.theme.domain.Theme;
 
@@ -141,24 +143,16 @@ class TossPaymentServiceTest {
     @Test
     void 결제_요청이_실패하면_3번_재시도한다() {
         // given
-        final String orderId = "retryId";
-        final PaymentDataRequest paymentDataRequest = new PaymentDataRequest(
-                orderId,
-                "orderName",
-                BigDecimal.valueOf(1000)
+        final PaymentRequest paymentRequest = new TossPaymentRequest(
+                BigDecimal.valueOf(1000),
+                "retryId",
+                "retryKey"
         );
-        final PaymentConfirmRequest paymentConfirmRequest = new PaymentConfirmRequest(
-                "retryKey",
-                orderId,
-                BigDecimal.valueOf(1000)
-        );
-        final Reservation reservation = new Reservation(1L, null, null, null, null);
-
         when(paymentClient.requestPayment(any())).thenThrow(
                 new TossPaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "재시도 테스트 실패"));
 
         // when & then
-        assertThatThrownBy(() -> paymentService.pay(paymentDataRequest, paymentConfirmRequest, reservation))
+        assertThatThrownBy(() -> paymentService.paymentClientWithRetry(paymentRequest))
                 .isInstanceOf(TossPaymentException.class)
                 .hasMessage("재시도 테스트 실패");
 

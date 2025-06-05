@@ -25,17 +25,13 @@ public class TossPaymentService implements PaymentService {
     private final PaymentClient paymentClient;
     private final PaymentRepository paymentRepository;
 
-    @Retryable(
-            value = {RestClientException.class, SocketTimeoutException.class, TossPaymentException.class},
-            maxAttempts = 3,
-            backoff = @Backoff(delay = 1000, multiplier = 2, maxDelay = 10000)
-    )
     public Payment pay(
             final PaymentDataRequest paymentDataRequest,
             final PaymentConfirmRequest request,
             final Reservation reservation
     ) {
         validatePaymentData(request, paymentDataRequest);
+
         final PaymentRequest paymentRequest = new TossPaymentRequest(
                 request.amount(),
                 request.orderId(),
@@ -48,14 +44,25 @@ public class TossPaymentService implements PaymentService {
                 reservation
         );
         paymentRepository.save(payment);
+
         try {
-            paymentClient.requestPayment(paymentRequest);
+            paymentClientWithRetry(paymentRequest);
             payment.success();
         } catch (PaymentException e) {
             payment.fail();
             throw e;
         }
+
         return payment;
+    }
+
+    @Retryable(
+            value = {RestClientException.class, SocketTimeoutException.class, TossPaymentException.class},
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 1000, multiplier = 2, maxDelay = 10000)
+    )
+    public void paymentClientWithRetry(PaymentRequest request) {
+        paymentClient.requestPayment(request);
     }
 
     public Payment await(final Reservation reservation) {
