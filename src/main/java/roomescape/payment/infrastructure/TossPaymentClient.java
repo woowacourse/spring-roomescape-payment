@@ -2,7 +2,6 @@ package roomescape.payment.infrastructure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.io.InputStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -13,7 +12,6 @@ import org.springframework.web.client.RestClient;
 import roomescape.payment.application.PaymentClient;
 import roomescape.payment.application.dto.PaymentRequest;
 import roomescape.payment.application.dto.PaymentResponse;
-import roomescape.payment.infrastructure.dto.TossErrorResponse;
 import roomescape.payment.infrastructure.dto.TossPaymentResponse;
 
 @RequiredArgsConstructor
@@ -37,13 +35,13 @@ public class TossPaymentClient implements PaymentClient {
                 .body(TossPaymentResponse.class);
     }
 
-    private void handleException(final ClientHttpResponse res) {
-        try (InputStream is = res.getBody()) {
-            TossErrorResponse error = objectMapper.readValue(is, TossErrorResponse.class);
-            throw new TossPaymentException(HttpStatus.valueOf(error.code()), error.message());
-        } catch (IOException e) {
-            throw new RuntimeException("에러 응답 파싱 실패", e);
+    private void handleException(final ClientHttpResponse res) throws IOException {
+        final String status = res.getStatusCode().toString();
+        final int code = Integer.parseInt(status.substring(0, 3));
+        if (code == 401) {
+            throw new TossPaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "secret key가 유효하지 않습니다");
         }
+        throw new TossPaymentException(HttpStatus.BAD_REQUEST, "유효하지 않은 결제방식입니다.");
     }
 }
 
