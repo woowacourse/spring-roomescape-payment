@@ -23,8 +23,14 @@ VALUES ('admin@email.com', 'MTIzNA==', '어드민', 'ADMIN', NULL),
        ('phk1148@naver.com', 'MTIzNA==', '호떡', 'USER', NULL),
        ('phk1158@naver.com', 'MTIzNA==', '한스', 'USER', NULL);
 
-INSERT INTO reservation (member_id, date, time_id, theme_id)
-VALUES (2, '2025-05-07', 1, 8),
-       (3, '2025-05-06', 3, 6),
-       (4, '2025-05-05', 1, 7),
-       (1, '2025-05-01', 2, 7)
+INSERT INTO payment (order_id, payment_key, amount)
+VALUES ('1', '1', 1000),
+       ('2', '2', 1000),
+       ('3', '3', 1000),
+       ('4', '4', 1000);
+
+INSERT INTO reservation (member_id, date, time_id, theme_id, payment_id)
+VALUES (2, '2025-05-07', 1, 8, 1),
+       (3, '2025-05-06', 3, 6, 2),
+       (4, '2025-05-05', 1, 7, 3),
+       (1, '2025-05-01', 2, 7, 4)

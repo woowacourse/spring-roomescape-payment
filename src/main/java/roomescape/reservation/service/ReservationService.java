@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.AdminReservationPaymentRequest;
@@ -38,7 +39,9 @@ public class ReservationService {
     @Transactional
     public ReservationResponse addReservation(long memberId, ReservationPaymentRequest request) {
         Reservation reservation = saveReservation(memberId, request.timeId(), request.themeId(), request.date());
-        paymentService.approvePayment(request.orderId(), request.paymentKey(), request.amount(), reservation);
+        Payment payment = paymentService.approvePayment(request.orderId(), request.paymentKey(), request.amount(),
+                reservation);
+        reservation.setPayment(payment);
         return ReservationResponse.from(reservation);
     }
 

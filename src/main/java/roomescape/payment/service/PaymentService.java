@@ -18,7 +18,7 @@ public class PaymentService {
     private final TossPaymentClient tossPaymentClient;
 
     @Transactional
-    public void approvePayment(String orderId, String paymentKey, Long amount, Reservation reservation) {
+    public Payment approvePayment(String orderId, String paymentKey, Long amount, Reservation reservation) {
         TossPaymentRequest request = new TossPaymentRequest(orderId, paymentKey, amount);
         TossPaymentResponse response = tossPaymentClient.requestPaymentApprove(request);
         Payment payment = new Payment(
@@ -27,6 +27,6 @@ public class PaymentService {
                 response.paymentKey(),
                 response.totalAmount(),
                 response.type());
-        paymentRepository.save(payment);
+        return paymentRepository.save(payment);
     }
 }

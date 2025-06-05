@@ -2,6 +2,7 @@ package roomescape.reservation.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,13 +19,14 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import roomescape.member.domain.Member;
 import roomescape.payment.domain.Payment;
 import roomescape.theme.domain.ReservationTheme;
 import roomescape.time.domain.ReservationTime;
 
 @Entity
-@Table(name = "reservaiton")
+@Table(name = "reservation")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Reservation {
@@ -52,7 +54,9 @@ public class Reservation {
     @NotNull
     private ReservationTheme theme;
 
-    @OneToOne(mappedBy = "reservation")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_id")
+    @Setter
     private Payment payment;
 
     public Reservation(Long id, Member member, LocalDate date, ReservationTime time, ReservationTheme theme) {
