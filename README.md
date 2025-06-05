@@ -1,6 +1,6 @@
 ## ERD
 
-```mermaid
+```mermaidAdd commentMore actions
 erDiagram
   MEMBER {
     BIGINT id PK
@@ -50,13 +50,13 @@ erDiagram
     VARCHAR waiting_status  "ENUM('ACCEPTED','CANCELLED','PENDING','REJECTED')"
   }
 
-  MEMBER ||--o{ RESERVATION : 
-  MEMBER ||--o{ WAITING : 
-  RESERVATION ||--|{ PAYMENT : 
-  RESERVATION ||--|| RESERVATION_TIME : 
-  RESERVATION ||--|| THEME : 
-  WAITING ||--|| RESERVATION_TIME : 
-  WAITING ||--|| THEME : 
+  MEMBER ||--o{ RESERVATION
+  MEMBER ||--o{ WAITING
+  RESERVATION ||--|{ PAYMENT
+  RESERVATION ||--|| RESERVATION_TIME
+  RESERVATION ||--|| THEME
+  WAITING ||--|| RESERVATION_TIME
+  WAITING ||--|| THEME
 ```
 
 ## 기능 구현 목록
