@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.client.RestClient;
-import roomescape.business.dto.PaymentApproveDto;
+import roomescape.business.dto.PaymentApproveRequestDto;
 import roomescape.exception.PaymentApproveException;
 
 public class TossPaymentClient {
@@ -24,11 +24,11 @@ public class TossPaymentClient {
         this.secretKey = secretKey;
     }
 
-    public PaymentApproveResponseDto approvePayment(PaymentApproveDto paymentApproveDto) {
+    public PaymentApproveResponseDto approvePayment(PaymentApproveRequestDto paymentApproveRequestDto) {
         String encodedSecretKey = Base64.getEncoder().encodeToString((secretKey + ":").getBytes());
         return restClient.post()
                 .uri("/v1/payments/confirm")
-                .body(paymentApproveDto)
+                .body(paymentApproveRequestDto)
                 .header("Authorization", "Basic " + encodedSecretKey)
                 .retrieve()
                 .onStatus(HttpStatusCode::isError, (request, response) -> {

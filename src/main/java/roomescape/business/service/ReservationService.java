@@ -11,7 +11,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.business.dto.PaymentApproveDto;
+import roomescape.business.dto.PaymentApproveRequestDto;
 import roomescape.business.dto.ReservationDto;
 import roomescape.business.dto.ReservationSpecDto;
 import roomescape.business.dto.ReservationWithAheadDto;
@@ -43,25 +43,35 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
 
     public ReservationDto addAndGet(final ReservationSpecDto reservationSpecDto,
-                                    final PaymentApproveDto paymentApproveDto) {
+                                    final PaymentApproveRequestDto paymentApproveRequestDto) {
         User user = getUser(reservationSpecDto.userIdValue());
         ReservationTime reservationTime = getReservationTime(reservationSpecDto.timeIdValue());
         Theme theme = getTheme(reservationSpecDto.themeIdValue());
         ReservationStatus reservationStatus = reservationSpecDto.reservationStatus();
 
+        validDuplicatedReservation(reservationSpecDto, reservationStatus, reservationTime, theme);
+        Reservation reservation = Reservation.create(user, reservationSpecDto.date(), reservationTime, theme,
+                reservationStatus, LocalDateTime.now());
+        reservationRepository.save(reservation);
+        pay(paymentApproveRequestDto, reservationStatus, reservation);
+        return ReservationDto.fromEntity(reservation);
+    }
+
+    private void validDuplicatedReservation(ReservationSpecDto reservationSpecDto, ReservationStatus reservationStatus,
+                                            ReservationTime reservationTime, Theme theme) {
         if (reservationStatus == ReservationStatus.RESERVED &&
                 reservationRepository.isDuplicateDateAndTimeAndTheme(reservationSpecDto.date(),
                         reservationTime.startTimeValue(),
                         theme.getId())) {
             throw new DuplicatedException(RESERVATION_DUPLICATED);
         }
-        Reservation reservation = Reservation.create(user, reservationSpecDto.date(), reservationTime, theme,
-                reservationStatus, LocalDateTime.now());
-        reservationRepository.save(reservation);
-        if (reservationStatus == ReservationStatus.RESERVED && paymentApproveDto != null) {
-            paymentService.pay(reservation, paymentApproveDto);
+    }
+
+    private void pay(PaymentApproveRequestDto paymentApproveRequestDto, ReservationStatus reservationStatus,
+                     Reservation reservation) {
+        if (reservationStatus == ReservationStatus.RESERVED && paymentApproveRequestDto != null) {
+            paymentService.pay(reservation, paymentApproveRequestDto);
         }
-        return ReservationDto.fromEntity(reservation);
     }
 
     public ReservationDto addAndGetWithoutPayment(final ReservationSpecDto reservationSpecDto) {

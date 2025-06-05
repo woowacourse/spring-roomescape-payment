@@ -21,7 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.business.dto.PaymentApproveDto;
+import roomescape.business.dto.PaymentApproveRequestDto;
 import roomescape.business.dto.ReservationDto;
 import roomescape.business.dto.ReservationSpecDto;
 import roomescape.business.dto.ReservationTimeDto;
@@ -258,22 +258,22 @@ class ReservationServiceTest {
         ReservationTime reservationTime = ReservationTime.restore(timeIdValue, LocalTime.of(10, 0));
         Theme theme = Theme.restore(themeIdValue, "Test Theme", "Description", "thumbnail.jpg");
 
-        PaymentApproveDto paymentApproveDto = PaymentApproveDto.of("paymentKey", "orderId", 1000L);
+        PaymentApproveRequestDto paymentApproveRequestDto = PaymentApproveRequestDto.of("paymentKey", "orderId", 1000L);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(reservationTimeRepository.findById(timeId)).thenReturn(Optional.of(reservationTime));
         when(themeRepository.findById(themeId)).thenReturn(Optional.of(theme));
         when(reservationRepository.isDuplicateDateAndTimeAndTheme(eq(date), eq(LocalTime.of(10, 0)), eq(theme.getId())))
                 .thenReturn(false);
-        doNothing().when(paymentService).pay(any(Reservation.class), any(PaymentApproveDto.class));
+        doNothing().when(paymentService).pay(any(Reservation.class), any(PaymentApproveRequestDto.class));
 
         // when
         ReservationDto result = sut.addAndGet(ReservationSpecDto.of(date, timeIdValue, themeIdValue, userIdValue,
-                ReservationStatus.RESERVED), paymentApproveDto);
+                ReservationStatus.RESERVED), paymentApproveRequestDto);
 
         // then
         assertThat(result).isNotNull();
-        verify(paymentService).pay(any(Reservation.class), eq(paymentApproveDto));
+        verify(paymentService).pay(any(Reservation.class), eq(paymentApproveRequestDto));
         verify(userRepository).findById(userId);
         verify(reservationTimeRepository).findById(timeId);
         verify(themeRepository).findById(themeId);
@@ -302,7 +302,7 @@ class ReservationServiceTest {
 
         // when
         ReservationDto result = sut.addAndGet(ReservationSpecDto.of(date, timeIdValue, themeIdValue, userIdValue,
-                ReservationStatus.WAITING), PaymentApproveDto.of("paymentKey", "orderId", 1000L));
+                ReservationStatus.WAITING), PaymentApproveRequestDto.of("paymentKey", "orderId", 1000L));
 
         // then
         assertThat(result).isNotNull();

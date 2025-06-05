@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.AuthRequired;
 import roomescape.auth.LoginInfo;
 import roomescape.auth.Role;
-import roomescape.business.dto.PaymentApproveDto;
+import roomescape.business.dto.PaymentApproveRequestDto;
 import roomescape.business.dto.ReservationDto;
 import roomescape.business.dto.ReservationSpecDto;
 import roomescape.business.dto.ReservationWithAheadDto;
@@ -41,7 +41,7 @@ public class ReservationApiController {
         ReservationDto reservationDto = reservationService.addAndGet(
                 ReservationSpecDto.of(request.date(), request.timeId(),
                         request.themeId(), loginInfo.id(), request.reservationStatus()),
-                PaymentApproveDto.of(request.paymentKey(), request.orderId(),
+                PaymentApproveRequestDto.of(request.paymentKey(), request.orderId(),
                         request.amount()));
         ReservationResponse response = ReservationResponse.from(reservationDto);
         return ResponseEntity.created(URI.create("/reservations")).body(response);
