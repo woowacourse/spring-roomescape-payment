@@ -28,7 +28,7 @@ security:
     token:
       secret-key: s8R$kQz3nZ!L5pT7c@J#xM9vB1&uD6hE
       access:
-        expire-length: 600000 # 10 분
+        expire-length: 60000000
 
 payment:
   toss:

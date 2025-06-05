@@ -1,7 +1,19 @@
 package roomescape.payment.domain.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentStatus;
 
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
+
+
+    @Query("""
+            SELECT p
+            FROM Payment p
+            JOIN FETCH p.reservation r
+            WHERE r.id = :id
+                AND p.status = :paymentStatus
+            """)
+    Payment findByReservationIdAndPaymentStatus(Long id, PaymentStatus paymentStatus);
 }

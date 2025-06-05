@@ -59,3 +59,9 @@ INSERT INTO waiting (date, time_id, theme_id, member_id, waiting_status, created
 VALUES (DATEADD('DAY', +4, CURRENT_DATE), 3, 1, 3, 'PENDING', TIMESTAMPADD(HOUR, 10, DATEADD('DAY', +4, CURRENT_DATE)));
 INSERT INTO waiting (date, time_id, theme_id, member_id, waiting_status, created_at)
 VALUES (DATEADD('DAY', +4, CURRENT_DATE), 3, 1, 1, 'PENDING', TIMESTAMPADD(HOUR, 11, DATEADD('DAY', +3, CURRENT_DATE)));
+
+-- 결제
+INSERT INTO payment (order_id, payment_key, amount, reservation_id, status)
+VALUES (1, 'pay_1234567890', 10000, 1, 'SUCCESS');
+INSERT INTO payment (order_id, payment_key, amount, reservation_id, status)
+VALUES (2, 'pay_1234567891', 20000, 2, 'SUCCESS');

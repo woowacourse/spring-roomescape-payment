@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,19 +27,12 @@ import roomescape.reservation.application.dto.MyHistoryResponse;
 import roomescape.reservation.application.dto.ReservationResponse;
 import roomescape.reservation.application.dto.WaitingResponse;
 
+@RequiredArgsConstructor
 @RestController
 public class UserReservationController {
 
     private final ReservationCommandService reservationCommandService;
     private final ReservationQueryService reservationQueryService;
-
-    public UserReservationController(
-            final ReservationCommandService reservationCommandService,
-            final ReservationQueryService reservationQueryService
-    ) {
-        this.reservationCommandService = reservationCommandService;
-        this.reservationQueryService = reservationQueryService;
-    }
 
     @GetMapping("/mine")
     public ResponseEntity<List<MyHistoryResponse>> findMyReservation(final LoginCheckRequest request) {
