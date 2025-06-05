@@ -18,14 +18,17 @@ public class Payment {
     @Column(name = "payment_id")
     private Long id;
 
+    @Column(nullable = false)
     private String orderId;
 
+    @Column(nullable = false)
     private String paymentKey;
 
+    @Column(nullable = false)
     private Integer amount;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST})
-    @JoinColumn(name = "reservation_id")
+    @JoinColumn(name = "reservation_id", nullable = false)
     private Reservation reservation;
 
     protected Payment() {
