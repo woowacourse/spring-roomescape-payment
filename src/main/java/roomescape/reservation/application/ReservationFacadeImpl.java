@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.exception.DuplicateException;
+import roomescape.payment.domain.vo.PaymentInfo;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.resolver.PaymentClient;
 import roomescape.reservation.application.dto.AvailableReservationTimeServiceRequest;
@@ -27,6 +28,7 @@ import roomescape.reservation.ui.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.ui.dto.CreateReservationWithUserIdWebRequest;
 import roomescape.reservation.ui.dto.ReservationResponse;
 import roomescape.reservation.ui.dto.ReservationSearchWebRequest;
+import roomescape.reservation.ui.dto.ReservationWithPaymentInfoResponse;
 import roomescape.reservation.ui.dto.WaitingReservationResponse;
 import roomescape.user.application.service.UserQueryService;
 import roomescape.user.domain.User;
@@ -90,19 +92,18 @@ public class ReservationFacadeImpl implements ReservationFacade {
 
     @Override
     @Transactional
-    public ReservationResponse create(final CreateReservationWithUserIdWebRequest request) {
+    public ReservationWithPaymentInfoResponse create(final CreateReservationWithUserIdWebRequest request) {
         final User user = userQueryService.getById(request.userId());
-        final Reservation reservation = reservationCommandService.create(
-                request.toServiceRequest());
+        final Reservation reservation = reservationCommandService.createWithPayment(request.toPaymentServiceRequest());
 
-        paymentClient.confirmPayment(
+        PaymentInfo paymentInfo = paymentClient.confirmPayment(
                 new PaymentRequest(request.paymentKey(),
                         request.amount(),
                         request.orderId(),
                         request.paymentType())
         );
-
-        return ReservationResponse.from(reservation, user);
+        paymentInfo.checkPaymentInfoMatch(request.paymentKey(), request.amount());
+        return ReservationWithPaymentInfoResponse.from(reservation, user, paymentInfo);
     }
 
     @Override

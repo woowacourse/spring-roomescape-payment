@@ -5,6 +5,7 @@ import lombok.experimental.FieldNameConstants;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.validate.Validator;
 import roomescape.reservation.application.dto.CreateReservationServiceRequest;
+import roomescape.reservation.application.dto.CreateReservationWithPaymentServiceRequest;
 import roomescape.reservation.domain.ReservationDate;
 
 import java.time.LocalDate;
@@ -30,6 +31,17 @@ public record CreateReservationWithUserIdWebRequest(LocalDate date,
                 ReservationDate.from(date),
                 timeId,
                 themeId
+        );
+    }
+
+    public CreateReservationWithPaymentServiceRequest toPaymentServiceRequest() {
+        return new CreateReservationWithPaymentServiceRequest(
+                userId,
+                ReservationDate.from(date),
+                timeId,
+                themeId,
+                paymentKey,
+                amount
         );
     }
 
