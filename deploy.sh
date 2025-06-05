@@ -23,7 +23,9 @@ fi
 
 mv "$TEMP_DIR" "$DEPLOY_DIR"
 
-cd build/libs
+echo "[INFO] Gradle 빌드 시작"
+cd "$DEPLOY_DIR"
+./gradlew bootJar
 
 echo "[INFO] 기존 프로세스 종료 시도"
 PID=$(pgrep -f "$BUILD_JAR")
@@ -34,6 +36,7 @@ if [ -n "$PID" ]; then
 fi
 
 echo "[INFO] 앱 실행 시작"
+cd build/libs
 nohup java -jar "$BUILD_JAR" > "$LOG_FILE" 2>&1 &
 
 echo "[INFO] 배포 완료: 로그는 $LOG_FILE 확인"
