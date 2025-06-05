@@ -49,7 +49,7 @@ CREATE TABLE payment(
     order_id VARCHAR  NOT NULL,
     amount  BIGINT    NOT NULL,
     status  VARCHAR   NOT NULL,
-    reservation_id  BIGINT NOT NULL,
+    reservation_id  BIGINT,
     payment_key VARCHAR NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (reservation_id) REFERENCES reservation(id)
