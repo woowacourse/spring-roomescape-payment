@@ -2,7 +2,10 @@ package roomescape.controller.api;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
@@ -18,22 +21,38 @@ import javax.naming.AuthenticationException;
 public interface MemberAuthApi {
 
     @Operation(summary = "회원가입")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "정상 응답"),
+            @ApiResponse(responseCode = "400", description = "이메일이 중복된 경우", content = @Content),
+            @ApiResponse(responseCode = "400", description = "이름이 중복된 경우", content = @Content),
+    })
     ResponseEntity<MemberRegisterResponse> register(
             @RequestBody(required = true) MemberRegisterRequest request
     );
 
     @Operation(summary = "로그인")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "정상 응답"),
+            @ApiResponse(responseCode = "400", description = "비밀번호가 일치하지 않는 경우", content = @Content),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 이메일인 경우", content = @Content),
+    })
     ResponseEntity<Void> login(
             @RequestBody(required = true) LoginRequest loginRequest,
             @Parameter(hidden = true) HttpSession session
     ) throws AuthenticationException;
 
     @Operation(summary = "로그인 정보 확인")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "정상 응답"),
+    })
     ResponseEntity<LoginResponse> loginCheck(
             @Parameter(hidden = true) LoginInfo loginInfo
     );
 
     @Operation(summary = "로그아웃")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "정상 응답"),
+    })
     ResponseEntity<Void> logout(
             @Parameter(hidden = true) HttpSession session
     );
