@@ -2,11 +2,13 @@ package roomescape.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.ReservationWithRank;
+import roomescape.domain.ReservationDetail;
 import roomescape.dto.request.AddReservationRequest;
 import roomescape.dto.request.AdminCreateReservationRequest;
 import roomescape.dto.request.CreateWaitReservationRequest;
@@ -15,6 +17,7 @@ import roomescape.dto.response.MyReservationResponse;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationWaitResponse;
 import roomescape.entity.Member;
+import roomescape.entity.Payment;
 import roomescape.entity.Reservation;
 import roomescape.entity.ReservationTime;
 import roomescape.entity.Theme;
@@ -24,6 +27,7 @@ import roomescape.exception.custom.InvalidReservationTimeException;
 import roomescape.exception.custom.InvalidThemeException;
 import roomescape.global.ReservationStatus;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -36,16 +40,16 @@ public class ReservationService {
         private final ReservationRepository reservationRepository;
         private final ReservationTimeRepository reservationTimeRepository;
         private final ThemeRepository themeRepository;
+        private final PaymentRepository paymentRepository;
 
-        public ReservationService(
-                        MemberRepository memberRepository,
-                        ReservationRepository reservationRepository,
-                        ReservationTimeRepository reservationTimeRepository,
-                        ThemeRepository themeRepository) {
+        public ReservationService(MemberRepository memberRepository, ReservationRepository reservationRepository,
+                                  ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository,
+                                  PaymentRepository paymentRepository) {
                 this.memberRepository = memberRepository;
                 this.reservationRepository = reservationRepository;
                 this.reservationTimeRepository = reservationTimeRepository;
                 this.themeRepository = themeRepository;
+                this.paymentRepository = paymentRepository;
         }
 
         public ReservationResponse addReservationByMember(
@@ -142,10 +146,21 @@ public class ReservationService {
         public List<MyReservationResponse> findAllReservationOfMember(Long memberId) {
                 Member member = memberRepository.findFetchById(memberId)
                                 .orElseThrow(() -> new InvalidMemberException("존재하지 않는 멤버 ID입니다."));
-                List<Reservation> reservations = reservationRepository.findAll();
-                List<ReservationWithRank> reservationWithRanks = member.calculateReservationRanks(reservations);
+                List<Reservation> reservations = member.getReservations();
+                List<Payment> payments = paymentRepository.findAllByReservations(reservations);
 
-                return reservationWithRanks.stream()
+                Map<Reservation, Payment> reservationsWithPayment = payments.stream()
+                        .collect(Collectors.toMap(Payment::getReservation, payment->payment));
+
+                List<ReservationDetail> details = member.calculateReservationRanks(reservations).stream()
+                        .map(rank -> new ReservationDetail(
+                                rank.getReservation(),
+                                reservationsWithPayment.get(rank.getReservation()),
+                                rank.getRank()
+                        ))
+                        .toList();
+
+                return details.stream()
                                 .map(MyReservationResponse::from)
                                 .toList();
         }

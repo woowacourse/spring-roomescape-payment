@@ -28,6 +28,7 @@ import roomescape.exception.custom.InvalidReservationException;
 import roomescape.global.ReservationStatus;
 import roomescape.global.Role;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -54,6 +55,9 @@ class ReservationServiceTest {
 
     @Mock
     private ThemeRepository themeRepository;
+
+    @Mock
+    private PaymentRepository paymentRepository;
 
     @InjectMocks
     private ReservationService reservationService;
@@ -178,7 +182,10 @@ class ReservationServiceTest {
                 reservation2.getTheme().getName(),
                 reservation2.getDate(),
                 reservation2.getStartAt(),
-                reservation2.getStatus().renderText(0));
+                reservation2.getStatus().renderText(0),
+                null,
+                0
+        );
 
         assertAll(
                 () -> assertThat(actual).hasSize(1),

@@ -66,7 +66,7 @@ class PaymentServiceTest {
                     "paymentKey": "testPaymentKey",
                     "orderId": "testOrderId",
                     "totalAmount": "1000",
-                    "paymentType": "paymentType"
+                    "type": "paymentType"
                 }
                 """;
 

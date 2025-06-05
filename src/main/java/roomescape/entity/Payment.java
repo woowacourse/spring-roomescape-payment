@@ -42,4 +42,28 @@ public class Payment {
         this.paymentType = paymentType;
         this.reservation = reservation;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public String getPaymentType() {
+        return paymentType;
+    }
+
+    public Reservation getReservation() {
+        return reservation;
+    }
 }
