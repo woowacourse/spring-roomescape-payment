@@ -1,0 +1,36 @@
+spring:
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        ddl-auto: create-drop
+    defer-datasource-initialization: true
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  datasource:
+    url: jdbc:h2:mem:DATABASE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  sql:
+    init:
+      mode: never
+
+jwt:
+  secret: test-jwt-secret-key-for-testing-only
+
+
+toss:
+  payment:
+    base-url: test-payment-url-not-real
+    auth-scheme: Basic
+    timeout:
+      connect: 2
+      read: 30
+    secret-key: test-payment-key-not-real

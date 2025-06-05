@@ -17,6 +17,8 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
+#**/src/main/resources/application-secret.yml # 리뷰 편의를 위한 주석처리
+
 ### IntelliJ IDEA ###
 .idea
 *.iws
