@@ -1,9 +1,11 @@
 package roomescape.presentation.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.Waiting;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Comparator;
@@ -23,17 +25,37 @@ public record MyReservationResponse(
 
         String status,
 
-        boolean isWaiting
-        ) {
+        boolean isWaiting,
 
-    public static MyReservationResponse from(Reservation reservation) {
+        String paymentKey,
+
+        BigDecimal amount
+) {
+
+    public static MyReservationResponse fromAdminReservation(Reservation reservation) {
         return new MyReservationResponse(
                 reservation.getId(),
                 reservation.getTheme().getName(),
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
                 reservation.getStatus().getName(),
-                false
+                false,
+                null,
+                null
+        );
+    }
+
+    public static MyReservationResponse fromMemberReservation(Payment payment) {
+        Reservation reservation = payment.getReservation();
+        return new MyReservationResponse(
+                reservation.getId(),
+                reservation.getTheme().getName(),
+                reservation.getDate(),
+                reservation.getTime().getStartAt(),
+                reservation.getStatus().getName(),
+                false,
+                payment.getPaymentKey(),
+                payment.getAmount()
         );
     }
 
@@ -44,14 +66,23 @@ public record MyReservationResponse(
                 waiting.getReservationInfo().getDate(),
                 waiting.getReservationInfo().getTime().getStartAt(),
                 waiting.getRank() + "번째 예약대기",
-                true
+                true,
+                null,
+                null
         );
     }
 
-    public static List<MyReservationResponse> from(List<Reservation> reservations, List<Waiting> waitings) {
-        return Stream.concat(
-                reservations.stream().map(MyReservationResponse::from),
-                waitings.stream().map(MyReservationResponse::from))
+    public static List<MyReservationResponse> from(
+            List<Reservation> reservations,
+            List<Payment> payments,
+            List<Waiting> waitings
+    ) {
+        return Stream.of(
+                reservations.stream().map(MyReservationResponse::fromAdminReservation),
+                payments.stream().map(MyReservationResponse::fromMemberReservation),
+                waitings.stream().map(MyReservationResponse::from)
+        )
+        .flatMap(stream -> stream)
         .sorted(Comparator.comparing(MyReservationResponse::date)
                 .thenComparing(MyReservationResponse::time))
         .toList();

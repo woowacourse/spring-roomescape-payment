@@ -2,6 +2,7 @@ package roomescape.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.domain.Payment;
 import roomescape.presentation.dto.request.PaymentProcessRequest;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
@@ -22,6 +23,8 @@ import roomescape.presentation.dto.response.ReservationResponse;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -66,7 +69,7 @@ public class ReservationService {
         Member member = memberService.findMemberByEmail(loginMember.email());
 
         Reservation created = createReservation(request.date(), request.timeId(), request.themeId(), member);
-        paymentService.processPayment(paymentProcessRequest);
+        paymentService.processPayment(paymentProcessRequest, created);
 
         return ReservationResponse.from(created);
     }
@@ -140,7 +143,20 @@ public class ReservationService {
     public List<MyReservationResponse> getMyReservations(LoginMember loginMember) {
         Member member = memberService.findMemberById(loginMember.id());
         List<Reservation> reservations = reservationRepository.findAllByMember(member);
+        List<Payment> payments = paymentService.findPaymentsByMember(member);
+        List<Reservation> notPaidReservations = notPaidReservations(reservations, payments);
         List<Waiting> waitings = waitingService.findWaitingsByMember(member);
-        return MyReservationResponse.from(reservations, waitings);
+
+        return MyReservationResponse.from(notPaidReservations, payments, waitings);
+    }
+
+    private List<Reservation> notPaidReservations(List<Reservation> allReservations, List<Payment> payments) {
+        Set<Reservation> paidReservations = payments.stream()
+                .map(Payment::getReservation)
+                .collect(Collectors.toSet());
+
+        return allReservations.stream()
+                .filter(reservation -> !paidReservations.contains(reservation))
+                .toList();
     }
 }
