@@ -14,7 +14,9 @@
 - [x] 클라우드 서버에 방탈출 예약 서비스를 배포
     - [x] http://54.180.201.204:8080
 
-- [ ] 문서화, 로깅
-    - [ ] API 문서 작성 
-    - [ ] Database ERD 작성
+- [x] 문서화, 로깅
+    - [x] API 문서 작성 
+        - [x] http://54.180.201.204:8080/swagger-ui/index.html
+    - [x] Database ERD 작성
+      ![ERD](/src/main/resources/images/ReservationERD.png)
     - [ ] 적절한 로그 라이브러리를 선택 및 기록
