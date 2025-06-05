@@ -239,11 +239,8 @@ async function fetchReservationPayment(paymentData, reservationId) {
         window.alert(errorBody.message);
       });
     } else {
-      response.json().then(successBody => {
-        console.log("예약 결제 성공 : ");
-        // console.log("예약 결제 성공 : " + JSON.stringify(successBody));
-        window.location.reload();
-      });
+      window.alert("예약 결제에 성공하였습니다.");
+      window.location.reload();
     }
   }).catch(error => {
     console.error(error.message);
