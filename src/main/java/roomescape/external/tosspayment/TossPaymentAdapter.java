@@ -1,11 +1,11 @@
-package roomescape.payment;
+package roomescape.external.tosspayment;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.payment.dto.PaymentConfirmRequest;
-import roomescape.payment.dto.TossPaymentConfirmCommand;
+import roomescape.external.tosspayment.dto.PaymentConfirmRequest;
+import roomescape.external.tosspayment.dto.TossPaymentConfirmCommand;
 
 @Component
 @RequiredArgsConstructor

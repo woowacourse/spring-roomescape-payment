@@ -1,4 +1,4 @@
-package roomescape.payment;
+package roomescape.external.tosspayment;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,8 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import roomescape.exception.custom.reason.payment.PaymentException;
-import roomescape.payment.dto.PaymentConfirmRequest;
-import roomescape.payment.dto.TossPaymentConfirmResponse;
+import roomescape.external.tosspayment.dto.PaymentConfirmRequest;
+import roomescape.external.tosspayment.dto.TossPaymentConfirmResponse;
 
 import java.util.Base64;
 

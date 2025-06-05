@@ -14,7 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.jdbc.core.JdbcTemplate;
 import roomescape.booking.reservation.dto.ReservationResponse;
-import roomescape.payment.TossPaymentClient;
+import roomescape.external.tosspayment.TossPaymentClient;
 
 import java.sql.Connection;
 import java.sql.SQLException;

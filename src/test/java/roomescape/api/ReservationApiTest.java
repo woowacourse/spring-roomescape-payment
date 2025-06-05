@@ -14,7 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
-import roomescape.payment.TossPaymentClient;
+import roomescape.external.tosspayment.TossPaymentClient;
 
 import java.time.LocalDate;
 import java.util.HashMap;
