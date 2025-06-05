@@ -15,9 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.common.CleanUp;
 import roomescape.fixture.db.ReservationDbFixture;
-import roomescape.payment.client.TossPaymentClient;
-import roomescape.payment.dto.TossPaymentResponse;
+import roomescape.payment.infra.toss.client.TossPaymentClient;
 import roomescape.payment.exception.PaymentServerException;
+import roomescape.payment.infra.toss.dto.TossPaymentResponse;
 import roomescape.payment.repository.OrdersRepository;
 import roomescape.reservation.controller.request.PaymentInfoRequest;
 import roomescape.reservation.domain.Reservation;
@@ -56,7 +56,7 @@ class ReservationPaymentEventListenerTest {
         Reservation 예약대기 = reservationDbFixture.pending();
         String 결제키 = "paymentKey";
         String 주문ID = "orderId";
-        TossPaymentRequestedEvent 결제이벤트 = new TossPaymentRequestedEvent(
+        PaymentRequestedEvent 결제이벤트 = new PaymentRequestedEvent(
                 예약대기.getId(),
                 new PaymentInfoRequest(결제키, 주문ID, 10000L, "NORMAL")
         );
@@ -92,11 +92,11 @@ class ReservationPaymentEventListenerTest {
         Reservation 예약대기 = reservationDbFixture.pending();
         String 결제키 = "failPaymentKey";
         String 주문ID = "failOrderId";
-        TossPaymentRequestedEvent 결제이벤트 = new TossPaymentRequestedEvent(
+        PaymentRequestedEvent 결제이벤트 = new PaymentRequestedEvent(
                 예약대기.getId(),
                 new PaymentInfoRequest(결제키, 주문ID, 10000L, "NORMAL")
         );
-        given(tossPaymentClient.getPayment(any())).willThrow(new PaymentServerException("결제 실패"));
+        given(tossPaymentClient.getPaymentConfirm(any())).willThrow(new PaymentServerException("결제 실패"));
 
         // Act
         reservationPaymentEventListener.handlePaymentEvent(결제이벤트);

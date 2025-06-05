@@ -7,9 +7,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ReservationStatus {
 
-    RESERVED,
-    WAITING,
-    CANCELED,
-    PENDING_PAYMENT,
-    PAYMENT_FAILED,
+    RESERVED("예약"),
+    WAITING("대기"),
+    CANCELED("취소"),
+    PENDING_PAYMENT("결제 대기"),
+    PAYMENT_FAILED("결제 실패"),
+    ;
+
+    private final String description;
 }

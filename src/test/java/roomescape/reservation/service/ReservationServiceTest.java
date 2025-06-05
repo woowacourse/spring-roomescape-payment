@@ -27,9 +27,9 @@ import roomescape.fixture.entity.ReservationDateFixture;
 import roomescape.global.exception.InvalidArgumentException;
 import roomescape.global.exception.NotFoundException;
 import roomescape.member.domain.Member;
-import roomescape.payment.client.TossPaymentClient;
-import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.payment.exception.PaymentServerException;
+import roomescape.payment.infra.toss.client.TossPaymentClient;
+import roomescape.payment.infra.toss.dto.TossPaymentResponse;
 import roomescape.reservation.controller.request.PaymentInfoRequest;
 import roomescape.reservation.controller.request.ReservePaymentRequest;
 import roomescape.reservation.controller.response.MyReservationResponse;
@@ -99,7 +99,8 @@ class ReservationServiceTest {
         reservationRepository.save(reservation);
 
         ReserveCommand command = new ReserveCommand(reservation.getDate(), reservation.getTheme().getId(),
-                reservation.getReservationTime().getId(), reservation.getReserver().getId());
+                                                    reservation.getReservationTime().getId(),
+                                                    reservation.getReserver().getId());
 
         assertThatThrownBy(() -> reservationService.reserve(command))
                 .isInstanceOf(InAlreadyReservationException.class);
@@ -392,12 +393,13 @@ class ReservationServiceTest {
                 "NORMAL"
         );
         ReservePaymentRequest reservePaymentRequest = new ReservePaymentRequest(내일_열시.getDate(), 공포.getId(),
-                내일_열시.getReservationTime().getId(), paymentInfoRequest);
+                                                                                내일_열시.getReservationTime().getId(),
+                                                                                paymentInfoRequest);
 
-        TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(orderId, paymentKey);
+        TossPaymentResponse paymentResponse = new TossPaymentResponse(orderId, paymentKey);
 
-        given(tossPaymentClient.getPaymentConfirm(any())).willReturn(tossPaymentResponse);
-        given(tossPaymentClient.getPayment(any())).willReturn(tossPaymentResponse);
+        given(tossPaymentClient.getPaymentConfirm(any())).willReturn(paymentResponse);
+        given(tossPaymentClient.getPayment(any())).willReturn(paymentResponse);
 
         // when
         ReservationResponse result = reservationService.pending(reservePaymentRequest, 유저2.getId());
@@ -428,9 +430,10 @@ class ReservationServiceTest {
                 "NORMAL"
         );
         ReservePaymentRequest reservePaymentRequest = new ReservePaymentRequest(내일_열시.getDate(), 공포.getId(),
-                내일_열시.getReservationTime().getId(), paymentInfoRequest);
+                                                                                내일_열시.getReservationTime().getId(),
+                                                                                paymentInfoRequest);
 
-        TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(orderId, paymentKey);
+        TossPaymentResponse paymentResponse = new TossPaymentResponse(orderId, paymentKey);
 
         given(tossPaymentClient.getPaymentConfirm(any())).willThrow(new PaymentServerException("결제 실패"));
 

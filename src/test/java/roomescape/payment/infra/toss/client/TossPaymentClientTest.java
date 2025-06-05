@@ -1,4 +1,4 @@
-package roomescape.payment.service;
+package roomescape.payment.infra.toss.client;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
@@ -18,15 +18,14 @@ import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import roomescape.payment.client.TossPaymentClient;
-import roomescape.payment.config.TestTossPaymentConfig;
-import roomescape.payment.config.TossPaymentConfigProperties;
-import roomescape.payment.dto.TossPaymentRequest;
-import roomescape.payment.dto.TossPaymentResponse;
+import roomescape.payment.infra.toss.config.TestTossPaymentConfig;
+import roomescape.payment.infra.toss.config.TossPaymentConfigProperties;
 import roomescape.payment.exception.PaymentProcessException;
 import roomescape.payment.exception.PaymentServerException;
 import roomescape.payment.exception.PaymentTemporaryException;
-import roomescape.payment.interceptor.TossPaymentResponseInterceptor;
+import roomescape.payment.infra.toss.dto.TossPaymentRequest;
+import roomescape.payment.infra.toss.dto.TossPaymentResponse;
+import roomescape.payment.infra.toss.interceptor.TossPaymentResponseInterceptor;
 
 
 @RestClientTest(TossPaymentClient.class)
@@ -42,7 +41,7 @@ class TossPaymentClientTest extends TossPaymentMockSupport {
         String orderId = "orderId";
         Long amount = 10000L;
 
-        TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(orderId, paymentKey);
+        TossPaymentResponse paymentResponse = new TossPaymentResponse(orderId, paymentKey);
         TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount);
         String json = objectMapper.writeValueAsString(request);
 
@@ -50,7 +49,7 @@ class TossPaymentClientTest extends TossPaymentMockSupport {
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().json(json))
                 .andRespond(
-                        withSuccess(objectMapper.writeValueAsString(tossPaymentResponse), MediaType.APPLICATION_JSON));
+                        withSuccess(objectMapper.writeValueAsString(paymentResponse), MediaType.APPLICATION_JSON));
 
         TossPaymentResponse result = tossPaymentClient.getPaymentConfirm(request);
 

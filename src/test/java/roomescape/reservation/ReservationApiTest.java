@@ -29,9 +29,9 @@ import roomescape.config.AuthServiceTestConfig;
 import roomescape.fixture.db.MemberDbFixture;
 import roomescape.fixture.db.ReservationDateTimeDbFixture;
 import roomescape.fixture.db.ThemeDbFixture;
-import roomescape.payment.client.TossPaymentClient;
-import roomescape.payment.dto.TossPaymentResponse;
-import roomescape.payment.service.TossPaymentService;
+import roomescape.payment.infra.toss.client.TossPaymentClient;
+import roomescape.payment.dto.PaymentResponse;
+import roomescape.payment.infra.toss.dto.TossPaymentResponse;
 import roomescape.reservation.controller.exception.ReservationExceptionHandler;
 import roomescape.reservation.controller.request.PaymentInfoRequest;
 import roomescape.reservation.controller.request.ReservePaymentRequest;
@@ -83,11 +83,11 @@ class ReservationApiTest {
 
         String orderId = "orderId";
         String paymentKey = "paymentKey";
-        TossPaymentResponse tossPaymentResponse = new TossPaymentResponse(orderId, paymentKey);
+        TossPaymentResponse paymentResponse = new TossPaymentResponse(orderId, paymentKey);
         given(tossPaymentClient.getPaymentConfirm(any()))
-                .willReturn(tossPaymentResponse);
+                .willReturn(paymentResponse);
         given(tossPaymentClient.getPayment(any()))
-                .willReturn(tossPaymentResponse);
+                .willReturn(paymentResponse);
 
         PaymentInfoRequest paymentInfoRequest = new PaymentInfoRequest(
                 paymentKey,
@@ -127,13 +127,13 @@ class ReservationApiTest {
         Long timeId = reservationDateTime.getReservationTime().getId();
 
         String paymentKey = "paymentKey";
-        TossPaymentResponse tossPaymentResponse1 = new TossPaymentResponse("orderId1", paymentKey);
-        TossPaymentResponse tossPaymentResponse2 = new TossPaymentResponse("orderId2", paymentKey);
+        TossPaymentResponse paymentResponse1 = new TossPaymentResponse("orderId1", paymentKey);
+        TossPaymentResponse paymentResponse2 = new TossPaymentResponse("orderId2", paymentKey);
 
         given(tossPaymentClient.getPaymentConfirm(any()))
-                .willReturn(tossPaymentResponse1);
+                .willReturn(paymentResponse1);
         given(tossPaymentClient.getPayment(any()))
-                .willReturn(tossPaymentResponse2);
+                .willReturn(paymentResponse2);
 
         PaymentInfoRequest paymentInfoRequest = new PaymentInfoRequest(
                 paymentKey,

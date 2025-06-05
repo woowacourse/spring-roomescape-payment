@@ -1,4 +1,4 @@
-package roomescape.payment.service;
+package roomescape.payment.infra.toss.client;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -15,8 +15,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.ResourceAccessException;
-import roomescape.payment.client.TossPaymentClient;
-import roomescape.payment.dto.TossPaymentRequest;
+import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.infra.toss.dto.TossPaymentRequest;
 
 @ActiveProfiles("timeout")
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
@@ -44,14 +44,14 @@ public class TossPaymentTimeoutTest {
         String orderId = "orderId";
         Long amount = 10000L;
 
-        TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount);
+        PaymentRequest request = new PaymentRequest(paymentKey, orderId, amount);
 
         mockWebServer.enqueue(
                 new MockResponse()
                         .setHeader("Content-Type", "application/json")
                         .setHeadersDelay(200, TimeUnit.MILLISECONDS));
 
-        assertThatThrownBy(() -> tossPaymentClient.getPaymentConfirm(request))
+        assertThatThrownBy(() -> tossPaymentClient.getPaymentConfirm(TossPaymentRequest.from(request)))
                 .isInstanceOf(ResourceAccessException.class);
     }
 
@@ -61,11 +61,11 @@ public class TossPaymentTimeoutTest {
         String orderId = "orderId";
         Long amount = 10000L;
 
-        TossPaymentRequest request = new TossPaymentRequest(paymentKey, orderId, amount);
+        PaymentRequest request = new PaymentRequest(paymentKey, orderId, amount);
 
         mockWebServer.enqueue(new MockResponse().setBodyDelay(1, TimeUnit.MILLISECONDS));
 
-        assertThatCode(() -> tossPaymentClient.getPaymentConfirm(request))
+        assertThatCode(() -> tossPaymentClient.getPaymentConfirm(TossPaymentRequest.from(request)))
                 .doesNotThrowAnyException();
     }
 }

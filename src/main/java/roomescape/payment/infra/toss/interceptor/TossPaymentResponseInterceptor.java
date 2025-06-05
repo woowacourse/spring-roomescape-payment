@@ -1,4 +1,4 @@
-package roomescape.payment.interceptor;
+package roomescape.payment.infra.toss.interceptor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -8,7 +8,7 @@ import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
-import roomescape.payment.dto.TossPaymentErrorResponse;
+import roomescape.payment.infra.toss.dto.TossPaymentErrorResponse;
 import roomescape.payment.exception.PaymentProcessException;
 import roomescape.payment.exception.PaymentServerException;
 import roomescape.payment.exception.PaymentTemporaryException;

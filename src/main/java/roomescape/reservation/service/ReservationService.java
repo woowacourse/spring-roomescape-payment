@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.InvalidArgumentException;
-import roomescape.payment.event.TossPaymentRequestedEvent;
+import roomescape.payment.event.PaymentRequestedEvent;
 import roomescape.reservation.controller.request.ReservePaymentRequest;
 import roomescape.reservation.controller.response.MyReservationResponse;
 import roomescape.reservation.controller.response.ReservationResponse;
@@ -48,7 +48,7 @@ public class ReservationService {
     public ReservationResponse pending(ReservePaymentRequest request, Long memberId) {
         ReserveCommand reserveCommand = ReserveCommand.byPayment(request, memberId);
         Reservation reserved = reservationManager.pending(reserveCommand);
-        eventPublisher.publishEvent(new TossPaymentRequestedEvent(reserved.getId(), request.payment()));
+        eventPublisher.publishEvent(new PaymentRequestedEvent(reserved.getId(), request.payment()));
 
         return ReservationResponse.from(reserved);
     }

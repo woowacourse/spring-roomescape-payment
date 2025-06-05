@@ -15,18 +15,20 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.common.CleanUp;
-import roomescape.payment.client.TossPaymentClient;
-import roomescape.payment.dto.TossPaymentRequest;
-import roomescape.payment.dto.TossPaymentResponse;
+import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.exception.PaymentTemporaryException;
+import roomescape.payment.infra.toss.client.TossPaymentClient;
+import roomescape.payment.infra.toss.dto.TossPaymentRequest;
+import roomescape.payment.infra.toss.dto.TossPaymentResponse;
 import roomescape.payment.repository.OrdersRepository;
 
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
-class TossPaymentServiceTest {
+class PaymentServiceTest {
 
     @Autowired
-    private TossPaymentService tossPaymentService;
+    private PaymentService paymentService;
 
     @Autowired
     private OrdersRepository ordersRepository;
@@ -46,13 +48,14 @@ class TossPaymentServiceTest {
     void 일시적인_결제_오류가_발생하면_재시도한다() {
 
         // given
-        TossPaymentRequest request = new TossPaymentRequest("paymentId", "orderId", 1000L);
+        PaymentRequest request = new PaymentRequest("paymentId", "orderId", 1000L);
+        TossPaymentRequest tossRequest = TossPaymentRequest.from(request);
 
-        given(tossPaymentClient.getPaymentConfirm(request))
+        given(tossPaymentClient.getPaymentConfirm(tossRequest))
                 .willThrow(new PaymentTemporaryException("Temporary error"));
 
         // when & then
-        assertThatThrownBy(() -> tossPaymentService.confirmPayment(request))
+        assertThatThrownBy(() -> paymentService.confirmPayment(request))
                 .isInstanceOf(PaymentTemporaryException.class);
 
         verify(tossPaymentClient, times(2)).getPaymentConfirm(any(TossPaymentRequest.class));
@@ -63,15 +66,16 @@ class TossPaymentServiceTest {
         // given
         String orderId = "orderId";
         String paymentId = "paymentId";
-        TossPaymentRequest request = new TossPaymentRequest(paymentId, orderId, 1000L);
+        PaymentRequest request = new PaymentRequest(paymentId, orderId, 1000L);
+        TossPaymentRequest tossPaymentRequest = TossPaymentRequest.from(request);
 
         TossPaymentResponse response = new TossPaymentResponse(orderId, paymentId);
-        given(tossPaymentClient.getPaymentConfirm(request))
+        given(tossPaymentClient.getPaymentConfirm(tossPaymentRequest))
                 .willThrow(new PaymentTemporaryException("Temporary error"))
                 .willReturn(response);
 
         // when & then
-        assertThat(tossPaymentService.confirmPayment(request)).isEqualTo(response);
+        assertThat(paymentService.confirmPayment(request)).isEqualTo(response.toPaymentResponse());
 
         verify(tossPaymentClient, times(2)).getPaymentConfirm(any(TossPaymentRequest.class));
     }
@@ -79,18 +83,17 @@ class TossPaymentServiceTest {
     @Test
     void 결제_정보를_저장한다() {
         // given
-        TossPaymentRequest tossPaymentRequest = new TossPaymentRequest("paymentKey", "orderId", 1000L);
+        PaymentRequest paymentRequest = new PaymentRequest("paymentKey", "orderId", 1000L);
 
         // when
-        TossPaymentResponse result = tossPaymentService.createOrder(tossPaymentRequest);
+        PaymentResponse result = paymentService.createOrder(paymentRequest);
 
         // then
         SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(result.orderId()).isEqualTo(tossPaymentRequest.orderId());
-            softly.assertThat(result.paymentKey()).isEqualTo(tossPaymentRequest.paymentKey());
+            softly.assertThat(result.orderId()).isEqualTo(paymentRequest.orderId());
+            softly.assertThat(result.paymentKey()).isEqualTo(paymentRequest.paymentKey());
         });
 
         assertThat(ordersRepository.findByPaymentKey(result.paymentKey())).isPresent();
     }
-
 }

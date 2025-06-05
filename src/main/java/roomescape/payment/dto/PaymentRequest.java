@@ -2,10 +2,10 @@ package roomescape.payment.dto;
 
 import roomescape.reservation.controller.request.PaymentInfoRequest;
 
-public record TossPaymentRequest(String paymentKey, String orderId, Long amount) {
+public record PaymentRequest(String paymentKey, String orderId, Long amount) {
 
-    public static TossPaymentRequest from(PaymentInfoRequest request) {
-        return new TossPaymentRequest(
+    public static PaymentRequest from(PaymentInfoRequest request) {
+        return new PaymentRequest(
                 request.paymentKey(),
                 request.orderId(),
                 request.amount()

@@ -21,7 +21,7 @@ public record MyReservationResponse(Long id,
                 reservation.getTheme().getName(),
                 reservation.getDate(),
                 reservation.getStartAt(),
-                "예약",
+                reservation.getStatus().getDescription(),
                 OrdersResponse.from(reservation.getOrders())
         );
     }

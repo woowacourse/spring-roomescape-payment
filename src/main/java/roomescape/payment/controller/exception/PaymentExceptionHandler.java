@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import roomescape.global.response.ApiResponse;
-import roomescape.payment.controller.response.TossPaymentErrorCode;
+import roomescape.payment.controller.response.PaymentErrorCode;
 import roomescape.payment.exception.PaymentProcessException;
 import roomescape.payment.exception.PaymentServerException;
 
@@ -17,19 +17,19 @@ public class PaymentExceptionHandler {
 
     @ExceptionHandler(PaymentServerException.class)
     public ResponseEntity<ApiResponse<Void>> handlePaymentServerException(PaymentServerException e) {
-        TossPaymentErrorCode tossPaymentErrorCode = new TossPaymentErrorCode(SERVER_ERROR_CODE, e.getMessage());
+        PaymentErrorCode paymentErrorCode = new PaymentErrorCode(SERVER_ERROR_CODE, e.getMessage());
 
         return ResponseEntity
                 .status(HttpStatus.BAD_GATEWAY)
-                .body(ApiResponse.fail(tossPaymentErrorCode));
+                .body(ApiResponse.fail(paymentErrorCode));
     }
 
     @ExceptionHandler(PaymentProcessException.class)
     public ResponseEntity<ApiResponse<Void>> handlePaymentProcessException(PaymentProcessException e) {
-        TossPaymentErrorCode tossPaymentErrorCode = new TossPaymentErrorCode(PROCESS_ERROR_CODE, e.getMessage());
+        PaymentErrorCode paymentErrorCode = new PaymentErrorCode(PROCESS_ERROR_CODE, e.getMessage());
 
         return ResponseEntity
                 .status(e.getStatus())
-                .body(ApiResponse.fail(tossPaymentErrorCode));
+                .body(ApiResponse.fail(paymentErrorCode));
     }
 }
