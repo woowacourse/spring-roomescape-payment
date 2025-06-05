@@ -26,4 +26,7 @@ INSERT INTO reservation (member_id, date, time_id, theme_id)
 VALUES (2, '2025-05-07', 1, 8),
        (3, '2025-05-06', 3, 6),
        (4, '2025-05-05', 1, 7),
-       (1, '2025-05-01', 2, 7)
+       (1, '2025-05-01', 2, 7);
+
+INSERT INTO payment (reservation_id, order_id, payment_key, amount, type)
+VALUES (1, 'test', 'test', 1000, 'NORMAL');

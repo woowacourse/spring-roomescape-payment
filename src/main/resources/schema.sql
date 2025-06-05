@@ -78,43 +78,23 @@ CREATE TABLE IF NOT EXISTS member
 
 CREATE TABLE IF NOT EXISTS reservation
 (
-    id
-    BIGINT
-    NOT
-    NULL
-    AUTO_INCREMENT,
-    member_id
-    BIGINT,
-    date
-    VARCHAR
-(
-    255
-) NOT NULL,
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    member_id BIGINT,
+    date VARCHAR(255) NOT NULL,
     time_id BIGINT,
     theme_id BIGINT,
-    PRIMARY KEY
-(
-    id
-),
-    FOREIGN KEY
-(
-    time_id
-) REFERENCES reservation_time
-(
-    id
-),
-    FOREIGN KEY
-(
-    member_id
-) REFERENCES member
-(
-    id
-),
-    FOREIGN KEY
-(
-    theme_id
-) REFERENCES reservation_theme
-(
-    id
-)
+    PRIMARY KEY(id),
+    FOREIGN KEY(time_id) REFERENCES reservation_time(id),
+    FOREIGN KEY(member_id) REFERENCES member(id),
+    FOREIGN KEY(theme_id) REFERENCES reservation_theme(id)
     );
+
+CREATE TABLE IF NOT EXISTS payment
+(
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    reservation_id BIGINT,
+    order_id VARCHAR(255),
+    payment_key VARCHAR(255),
+    amount BIGINT,
+    type VARCHAR(255)
+);
