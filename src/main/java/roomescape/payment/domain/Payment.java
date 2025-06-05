@@ -36,7 +36,7 @@ public class Payment {
     @Enumerated(value = EnumType.STRING)
     private PaymentStatus paymentStatus = PaymentStatus.PENDING;
 
-    public Payment() {
+    protected Payment() {
     }
 
     public Payment(final String paymentKey, final String orderId, final Long amount, final PaymentType paymentType) {
