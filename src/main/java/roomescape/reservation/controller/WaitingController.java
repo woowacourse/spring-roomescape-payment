@@ -14,25 +14,22 @@ import roomescape.global.auth.dto.UserInfo;
 import roomescape.member.domain.MemberRole;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
-import roomescape.reservation.service.ReservationFacadeService;
-import roomescape.reservation.service.WaitingService;
+import roomescape.reservation.service.WaitingFacadeService;
 
 @RestController
 public class WaitingController {
 
-    private final WaitingService waitingService;
-    private final ReservationFacadeService reservationFacadeService;
+    private final WaitingFacadeService waitingFacadeService;
 
-    public WaitingController(final WaitingService waitingService,
-                             final ReservationFacadeService reservationFacadeService) {
-        this.waitingService = waitingService;
-        this.reservationFacadeService = reservationFacadeService;
+    public WaitingController(WaitingFacadeService waitingFacadeService) {
+        this.waitingFacadeService = waitingFacadeService;
     }
+
 
     @GetMapping("/waiting")
     public ResponseEntity<List<ReservationResponse>> findWaitings(
     ) {
-        return ResponseEntity.ok(waitingService.findWaitings());
+        return ResponseEntity.ok(waitingFacadeService.findWaitings());
     }
 
     @RequireRole(MemberRole.USER)
@@ -40,7 +37,7 @@ public class WaitingController {
     public ResponseEntity<Void> deleteReservations(
             @PathVariable("id") Long id
     ) {
-        waitingService.delete(id);
+        waitingFacadeService.deleteWaiting(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -50,7 +47,7 @@ public class WaitingController {
             @RequestBody ReservationRequest request,
             UserInfo userInfo
     ) {
-        ReservationResponse dto = reservationFacadeService.createWaiting(request, userInfo.id());
-        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+        ReservationResponse response = waitingFacadeService.createWaiting(request, userInfo.id());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

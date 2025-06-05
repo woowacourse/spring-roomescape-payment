@@ -26,12 +26,9 @@ import roomescape.reservation.service.ReservationService;
 public class ReservationController {
 
     private final ReservationFacadeService reservationFacadeService;
-    private final ReservationService reservationService;
 
-    public ReservationController(final ReservationFacadeService reservationFacadeService,
-                                 ReservationService reservationService) {
+    public ReservationController(final ReservationFacadeService reservationFacadeService) {
         this.reservationFacadeService = reservationFacadeService;
-        this.reservationService = reservationService;
     }
 
     @GetMapping("/reservations")
@@ -41,7 +38,7 @@ public class ReservationController {
             @RequestParam(required = false) LocalDate dateFrom,
             @RequestParam(required = false) LocalDate dateTo
     ) {
-        return ResponseEntity.ok(reservationService.findReservations(themeId, memberId, dateFrom, dateTo));
+        return ResponseEntity.ok(reservationFacadeService.findReservations(themeId, memberId, dateFrom, dateTo));
     }
 
     @RequireRole(MemberRole.USER)
