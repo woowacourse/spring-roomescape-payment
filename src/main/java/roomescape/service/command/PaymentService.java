@@ -5,8 +5,8 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Payment;
 import roomescape.dto.business.PaymentHistoryCreationContent;
 import roomescape.dto.business.PaymentResult;
+import roomescape.external.payment.PaymentClient;
 import roomescape.repository.PaymentRepository;
-import roomescape.utility.payment.PaymentClient;
 
 @Service
 @Transactional

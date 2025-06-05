@@ -1,7 +1,7 @@
 package roomescape.test.stub;
 
 import roomescape.dto.business.PaymentResult;
-import roomescape.utility.payment.PaymentClient;
+import roomescape.external.payment.PaymentClient;
 
 public class PaymentClientStub implements PaymentClient {
 

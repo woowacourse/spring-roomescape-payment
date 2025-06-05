@@ -1,4 +1,4 @@
-package roomescape.utility.payment;
+package roomescape.external.payment;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
