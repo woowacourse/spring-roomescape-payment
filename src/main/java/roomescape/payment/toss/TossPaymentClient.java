@@ -1,4 +1,4 @@
-package roomescape.payment;
+package roomescape.payment.toss;
 
 import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;

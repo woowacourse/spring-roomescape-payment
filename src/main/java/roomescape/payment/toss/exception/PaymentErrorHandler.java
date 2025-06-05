@@ -1,4 +1,4 @@
-package roomescape.payment.toss;
+package roomescape.payment.toss.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
