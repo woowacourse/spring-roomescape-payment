@@ -63,16 +63,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
-    @ExceptionHandler(PaymentClientException.class)
-    public ResponseEntity<String> handlePaymentClientException(PaymentClientException e)
-            throws JsonProcessingException {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(objectMapper.writeValueAsString(e));
-    }
-
     @ExceptionHandler(PaymentForbiddenException.class)
     public ResponseEntity<String> handlePaymentForbiddenException(PaymentForbiddenException e)
             throws JsonProcessingException {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(objectMapper.writeValueAsString(e));
+    }
+
+    @ExceptionHandler(PaymentClientException.class)
+    public ResponseEntity<String> handlePaymentClientException(PaymentClientException e)
+            throws JsonProcessingException {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(objectMapper.writeValueAsString(e));
     }
 
     @ExceptionHandler(PaymentServerException.class)

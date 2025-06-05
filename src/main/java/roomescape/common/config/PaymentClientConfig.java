@@ -7,11 +7,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.web.client.RestClient;
 import roomescape.common.properties.PaymentClientProperties;
 import roomescape.payment.exception.handler.PaymentExceptionHandler;
 
 @Configuration
+@EnableRetry
 @EnableConfigurationProperties(PaymentClientProperties.class)
 public class PaymentClientConfig {
 

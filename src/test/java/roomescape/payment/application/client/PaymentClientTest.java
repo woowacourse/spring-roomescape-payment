@@ -1,6 +1,7 @@
 package roomescape.payment.application.client;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.springframework.test.web.client.ExpectedCount.times;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -88,7 +89,7 @@ class PaymentClientTest {
                 50_000L, null);
         String errorResponse = objectMapper.writerWithDefaultPrettyPrinter()
                 .writeValueAsString(new TossErrorResponse("REJECT_CARD_PAYMENT", "한도초과 혹은 잔액부족으로 결제에 실패했습니다."));
-        mockServer.expect(requestTo(url))
+        mockServer.expect(times(3), requestTo(url))
                 .andRespond(withStatus(HttpStatus.FORBIDDEN)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(errorResponse));
@@ -106,7 +107,7 @@ class PaymentClientTest {
         String errorResponse = objectMapper.writerWithDefaultPrettyPrinter()
                 .writeValueAsString(
                         new TossErrorResponse("", "신용카드는 결제금액이 100원 이상, 계좌는 200원이상부터 결제가 가능합니다."));
-        mockServer.expect(requestTo(url))
+        mockServer.expect(times(3), requestTo(url))
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(errorResponse));
