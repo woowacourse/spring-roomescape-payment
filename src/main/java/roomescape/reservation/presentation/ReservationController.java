@@ -21,7 +21,7 @@ import roomescape.common.exceptionHandler.dto.ExceptionResponse;
 import roomescape.member.dto.request.LoginMember;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
 import roomescape.reservation.dto.request.ReservationWithPaymentRequest;
-import roomescape.reservation.dto.response.MyReservationResponse;
+import roomescape.reservation.dto.response.MyReservationWithPaymentResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationWithPaymentResponse;
 import roomescape.reservation.service.ReservationPaymentFacade;
@@ -76,8 +76,8 @@ public class ReservationController {
     }
 
     @GetMapping("/mine")
-    public ResponseEntity<List<MyReservationResponse>> getMyReservations(@Login LoginMember loginMember) {
-        List<MyReservationResponse> myReservationResponses = reservationService.getMyReservations(loginMember.id());
-        return ResponseEntity.ok().body(myReservationResponses);
+    public ResponseEntity<List<MyReservationWithPaymentResponse>> getMyReservations(@Login LoginMember loginMember) {
+        List<MyReservationWithPaymentResponse> myReservationWithPaymentRespons = reservationService.getMyReservations(loginMember.id());
+        return ResponseEntity.ok().body(myReservationWithPaymentRespons);
     }
 }

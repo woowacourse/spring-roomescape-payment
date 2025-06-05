@@ -30,7 +30,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
 import roomescape.reservation.dto.request.ReservationWithPaymentRequest;
-import roomescape.reservation.dto.response.MyReservationResponse;
+import roomescape.reservation.dto.response.MyReservationWithPaymentResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.reservationTime.domain.ReservationTimeRepository;
@@ -186,13 +186,13 @@ class ReservationServiceMockTest {
         List<Waiting> waitings = createWaitings();
         when(waitingRepository.findByMemberId(1L))
                 .thenReturn(waitings);
-        MyReservationResponse expected1 = MyReservationResponse.from(reservations.get(0));
-        MyReservationResponse expected2 = MyReservationResponse.from(reservations.get(1));
-        MyReservationResponse expected3 = MyReservationResponse.from(reservations.get(2));
-        MyReservationResponse expected4 = MyReservationResponse.fromWaiting(waitings.get(0), 1L);
+        MyReservationWithPaymentResponse expected1 = MyReservationWithPaymentResponse.from(reservations.get(0));
+        MyReservationWithPaymentResponse expected2 = MyReservationWithPaymentResponse.from(reservations.get(1));
+        MyReservationWithPaymentResponse expected3 = MyReservationWithPaymentResponse.from(reservations.get(2));
+        MyReservationWithPaymentResponse expected4 = MyReservationWithPaymentResponse.fromWaiting(waitings.get(0), 1L);
 
         // when
-        List<MyReservationResponse> responses = reservationService.getMyReservations(1L);
+        List<MyReservationWithPaymentResponse> responses = reservationService.getMyReservations(1L);
         // then
         assertThat(responses).hasSize(4);
         assertThat(responses).containsExactlyInAnyOrder(expected1, expected2, expected3, expected4);

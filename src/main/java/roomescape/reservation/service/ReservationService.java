@@ -1,5 +1,6 @@
 package roomescape.reservation.service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -15,7 +16,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
 import roomescape.reservation.dto.request.ReservationWithPaymentRequest;
-import roomescape.reservation.dto.response.MyReservationResponse;
+import roomescape.reservation.dto.response.MyReservationWithPaymentResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationWithPaymentResponse;
 import roomescape.reservationTime.domain.ReservationTime;
@@ -82,8 +83,11 @@ public class ReservationService {
                     .map(ReservationResponse::from)
                     .toList();
         }
-        return reservationRepository.findByMemberIdAndThemeIdAndDate(request.memberId(), request.themeId(),
-                        request.dateFrom(), request.dateTo())
+        return reservationRepository.findByMemberIdAndThemeIdAndDate(
+                        request.memberId(),
+                        request.themeId(),
+                        request.dateFrom(),
+                        request.dateTo())
                 .stream()
                 .map(ReservationResponse::from)
                 .toList();
@@ -91,7 +95,6 @@ public class ReservationService {
 
     @Transactional
     public void deleteReservationById(final Long id) {
-        List<Reservation> reservations = reservationRepository.findAll();
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new InvalidReservationException("존재하지 않는 예약입니다."));
         Payment payment = paymentRepository.findByReservationId(id)
@@ -128,23 +131,34 @@ public class ReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<MyReservationResponse> getMyReservations(final Long id) {
+    public List<MyReservationWithPaymentResponse> getMyReservations(final Long id) {
         List<Reservation> confirmedReservations = reservationRepository.findByMemberId(id);
-        List<MyReservationResponse> confirmedResponses = confirmedReservations.stream()
-                .map(MyReservationResponse::from)
-                .toList();
+        List<MyReservationWithPaymentResponse> confirmedResponses = getReservationsWithPayment(confirmedReservations);
+//        List<MyReservationWithPaymentResponse> confirmedResponses = confirmedReservations.stream()
+//                .map(MyReservationWithPaymentResponse::from)
+//                .toList();
 
         List<Waiting> waitingReservations = waitingRepository.findByMemberId(id);
-        List<MyReservationResponse> waitingResponses = waitingReservations.stream()
+        List<MyReservationWithPaymentResponse> waitingResponses = waitingReservations.stream()
                 .map(waiting -> {
                     long rank = calculateWaitingRank(waiting);
-                    return MyReservationResponse.fromWaiting(waiting, rank);
+                    return MyReservationWithPaymentResponse.fromWaiting(waiting, rank);
                 })
                 .toList();
 
         return Stream.concat(confirmedResponses.stream(), waitingResponses.stream())
-                .sorted(Comparator.comparing(MyReservationResponse::date))
+                .sorted(Comparator.comparing(MyReservationWithPaymentResponse::date))
                 .toList();
+    }
+
+    private List<MyReservationWithPaymentResponse> getReservationsWithPayment(List<Reservation> confirmedReservations) {
+        List<MyReservationWithPaymentResponse> responses = new ArrayList<>();
+        for (Reservation reservation : confirmedReservations) {
+            Payment payment = paymentRepository.findByReservationId(reservation.getId())
+                    .orElseThrow(() -> new InvalidReservationException("존재하지 않는 결제입니다."));
+            responses.add(MyReservationWithPaymentResponse.from(reservation, payment));
+        }
+        return responses;
     }
 
     private long calculateWaitingRank(Waiting waiting) {
