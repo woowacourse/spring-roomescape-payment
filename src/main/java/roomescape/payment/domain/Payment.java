@@ -1,12 +1,13 @@
 package roomescape.payment.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
-import java.time.LocalDateTime;
 import roomescape.reservation.domain.Reservation;
 
 @Entity
@@ -22,29 +23,29 @@ public class Payment {
 
     private Integer amount;
 
-    private LocalDateTime paymentAt;
+    @Enumerated(value = EnumType.STRING)
+    private PaymentStatus status;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reservation_id")
     private Reservation reservation;
 
-    private Payment(Long id, String paymentKey, String orderId, Integer amount, LocalDateTime paymentAt,
+    private Payment(Long id, String paymentKey, String orderId, Integer amount, PaymentStatus status,
                     Reservation reservation) {
         this.id = id;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
-        this.paymentAt = paymentAt;
         this.reservation = reservation;
+        this.status = status;
     }
 
     protected Payment() {
     }
 
-    public static Payment createPaymentWithoutId(String paymentKey, String orderId, Integer amount,
-                                                 LocalDateTime paymentAt,
-                                                 Reservation reservation) {
-        return new Payment(null, paymentKey, orderId, amount, paymentAt, reservation);
+    public static Payment createPendingPaymentWithoutId(String paymentKey, String orderId, Integer amount,
+                                                        Reservation reservation) {
+        return new Payment(null, paymentKey, orderId, amount, PaymentStatus.PENDING, reservation);
     }
 
     public Long getId() {
@@ -63,7 +64,19 @@ public class Payment {
         return amount;
     }
 
+    public PaymentStatus getStatus() {
+        return status;
+    }
+
     public Reservation getReservation() {
         return reservation;
+    }
+
+    public void changeToFail() {
+        this.status = PaymentStatus.FAIL;
+    }
+
+    public void changeToSuccess() {
+        this.status = PaymentStatus.SUCCESS;
     }
 }
