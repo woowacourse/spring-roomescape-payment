@@ -47,14 +47,14 @@ public class Payment {
     }
 
     public void approve() {
-        if (paymentStatus != PaymentStatus.PENDING) {
+        if (paymentStatus.isFinished()) {
             throw new PaymentStatusException("결제 승인은 PENDING 상태에서만 가능합니다.");
         }
         this.paymentStatus = PaymentStatus.APPROVED;
     }
 
     public void fail() {
-        if (paymentStatus != PaymentStatus.PENDING) {
+        if (paymentStatus.isFinished()) {
             throw new PaymentStatusException("결제 실패는 PENDING 상태에서만 가능합니다");
         }
         this.paymentStatus = PaymentStatus.FAILED;
@@ -78,9 +78,5 @@ public class Payment {
 
     public PaymentType getPaymentType() {
         return paymentType;
-    }
-
-    public PaymentStatus getPaymentStatus() {
-        return paymentStatus;
     }
 }
