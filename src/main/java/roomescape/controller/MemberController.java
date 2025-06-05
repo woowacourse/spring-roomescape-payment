@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.configuration.annotation.Authority;
+import roomescape.configuration.annotation.docs.DocsAuthorizationExceptionResponse;
+import roomescape.configuration.annotation.docs.DocsSuccessResponse;
 import roomescape.domain.Role;
 import roomescape.dto.response.MemberProfileResponse;
 import roomescape.service.query.MemberQueryService;
@@ -23,6 +25,8 @@ public class MemberController {
     }
 
     @Operation(summary = "Find All Member", description = "모든 회원 조회")
+    @DocsSuccessResponse
+    @DocsAuthorizationExceptionResponse
     @GetMapping
     @Authority(Role.ADMIN)
     public List<MemberProfileResponse> findAllMember() {

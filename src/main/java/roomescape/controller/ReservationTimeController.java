@@ -1,12 +1,16 @@
 package roomescape.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +21,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.configuration.annotation.Authority;
+import roomescape.configuration.annotation.docs.DocsAuthorizationExceptionResponse;
+import roomescape.configuration.annotation.docs.DocsDeletableDataNotFoundExceptionResponse;
+import roomescape.configuration.annotation.docs.DocsDuplicatedDateCreationResponse;
+import roomescape.configuration.annotation.docs.DocsSuccessResponse;
 import roomescape.domain.Role;
 import roomescape.dto.business.ReservationTimeCreationContent;
 import roomescape.dto.business.ReservationTimeWithBookState;
@@ -59,6 +67,9 @@ public class ReservationTimeController {
     }
 
     @Operation(summary = "Add Reservation Time", description = "예약 시간 추가")
+    @DocsSuccessResponse
+    @DocsAuthorizationExceptionResponse
+    @DocsDuplicatedDateCreationResponse
     @PostMapping
     @Authority(Role.ADMIN)
     public ResponseEntity<ReservationTimeResponse> addReservationTime(
@@ -72,6 +83,11 @@ public class ReservationTimeController {
     }
 
     @Operation(summary = "Delete Reservation Time By Id", description = "ID를 통해 예약 시간 삭제")
+    @DocsSuccessResponse
+    @DocsAuthorizationExceptionResponse
+    @DocsDeletableDataNotFoundExceptionResponse
+    @ApiResponse(responseCode = "400", description = "예약 시간에 대한 예약과 대기가 이미 존재하는 경우",
+            content = @Content(schema = @Schema(implementation = ProblemDetail.class)))
     @DeleteMapping("/{reservationTimeId}")
     @Authority(Role.ADMIN)
     public ResponseEntity<Void> deleteReservationTimeById(

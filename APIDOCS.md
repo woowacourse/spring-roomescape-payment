@@ -200,7 +200,6 @@
     - 권한이 맞지 않는 경우 : 403 FORBIDDEN
     - 중복되 예약을 생성하는 경우 : 400 BAD_REQUEST
     - 과거 에약을 생성하는 경우 : 400 BAD_REQUEST
-    - 결제 승인에 실패하는 경우 : 400 BAD_REQUEST
 
 ### 회원의 예약 생성
 
@@ -237,7 +236,7 @@
     - access 토큰이 올바르지 않은 경우 : 401 UNAUTHORIZED
     - 권한이 맞지 않는 경우 : 403 FORBIDDEN
     - 중복되 예약을 생성하는 경우 : 400 BAD_REQUEST
-    - 과거 에약을 생성하는 경우 : 400 BAD_REQUEST
+    - 과거 예약을 생성하는 경우 : 400 BAD_REQUEST
     - 결제 승인에 실패하는 경우 : 400 BAD_REQUEST
 
 ### 예약 삭제
@@ -329,7 +328,7 @@
     - access 토큰이 올바르지 않은 경우 : 401 UNAUTHORIZED
     - 권한이 맞지 않는 경우 : 403 FORBIDDEN
     - 삭제할 예약 시간이 존재하지 않는 경우 : 404 NOT_FOUND
-    - 예약 시간에 대한 예약과 대기가 이미 존재하는 경우 : BAD_REQUEST
+    - 예약 시간에 대한 예약과 대기가 이미 존재하는 경우 : 400 BAD_REQUEST
 
 ---
 
@@ -410,6 +409,7 @@
     - 쿠키가 존재하지 않는 경우 : 404 NOT_FOUND
     - access 토큰이 올바르지 않은 경우 : 401 UNAUTHORIZED
     - 권한이 맞지 않는 경우 : 403 FORBIDDEN
+    - 존재하지 않는 테마를 삭제하려고 하는 경우 : 404 NOT_FOUND
     - 테마에 대한 예약과 대기가 이미 존재하는 경우 : 400 BAD_REQUEST
 
 ---
@@ -479,10 +479,10 @@
     - 쿠키가 존재하지 않는 경우 : 404 NOT_FOUND
     - access 토큰이 올바르지 않은 경우 : 401 UNAUTHORIZED
     - 권한이 맞지 않는 경우 : 403 FORBIDDEN
+    - 중복된 예약을 생성하는 경우 : 400 BAD_REQUEST
     - 결제 승인에 실패하는 경우 : 400 BAD_REQUEST
     - 대기를 추가할 예약이 존재하지 않는 경우 : 400 BAD_REQUEST
     - 과거 날짜와 시간으로 대기를 생성하는 경우 : 400 BAD_REQUEST
-    - 중복된 예약을 생성하는 경우 : 400 BAD_REQUEST
 
 ### 대기 삭제
 

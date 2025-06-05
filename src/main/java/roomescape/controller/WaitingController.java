@@ -1,10 +1,15 @@
 package roomescape.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +20,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.configuration.annotation.Authority;
 import roomescape.configuration.annotation.RequiredAccessToken;
+import roomescape.configuration.annotation.docs.DocsAuthorizationExceptionResponse;
+import roomescape.configuration.annotation.docs.DocsDeletableDataNotFoundExceptionResponse;
+import roomescape.configuration.annotation.docs.DocsDuplicatedDateCreationResponse;
+import roomescape.configuration.annotation.docs.DocsSuccessResponse;
 import roomescape.domain.Role;
 import roomescape.dto.business.AccessTokenContent;
 import roomescape.dto.business.PaymentHistoryCreationContent;
@@ -38,6 +47,8 @@ public class WaitingController {
     }
 
     @Operation(summary = "Find All Waiting", description = "모든 예약 대기 조회")
+    @DocsSuccessResponse
+    @DocsAuthorizationExceptionResponse
     @GetMapping
     @Authority(Role.ADMIN)
     public List<WaitingResponse> findAllWaiting() {
@@ -45,6 +56,16 @@ public class WaitingController {
     }
 
     @Operation(summary = "Add Waiting", description = "예약 대기 추가")
+    @DocsSuccessResponse
+    @DocsAuthorizationExceptionResponse
+    @DocsDuplicatedDateCreationResponse
+    @ApiResponses({
+            @ApiResponse(responseCode = "400", description = "결제 승인에 실패하는 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "400", description = "대기를 추가할 예약이 존재하지 않는 경우",
+                    content = @Content(schema = @Schema(implementation = ProblemDetail.class))),
+            @ApiResponse(responseCode = "400", description = "과거 날짜와 시간으로 대기를 생성하는 경우")
+    })
     @PostMapping
     @Authority(Role.GENERAL)
     public ResponseEntity<WaitingResponse> addWaiting(
@@ -60,6 +81,9 @@ public class WaitingController {
     }
 
     @Operation(summary = "Delete Waiting By Id", description = "예약 대기 삭제")
+    @DocsSuccessResponse
+    @DocsAuthorizationExceptionResponse
+    @DocsDeletableDataNotFoundExceptionResponse
     @DeleteMapping("/{id}")
     @Authority(Role.GENERAL)
     public ResponseEntity<Void> deleteWaitingById(
