@@ -17,50 +17,56 @@ import roomescape.payment.application.PaymentException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handle(final Exception e) {
-        log.error("Unexpected error occured", e);
-        return new ResponseEntity<>("서버 내부에 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+        LOGGER.error("Unexpected Error occurred: {}", e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 내부에 오류가 발생했습니다.");
     }
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<String> handle(final BadRequestException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        LOGGER.error("BadRequestException occurred: {}", e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<String> handle(final NotFoundException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        LOGGER.error("NotFoundException occurred: {}", e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<String> handle(final ConflictException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        LOGGER.error("ConflictException occurred: {}", e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     }
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<String> handle(final UnauthorizedException e) {
-        log.warn("인증 실패: {}", e.getMessage());
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        LOGGER.error("UnauthorizedException occurred: {}", e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<String> handle(final ForbiddenException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
+        LOGGER.error("ForbiddenException occurred: {}", e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handle(final MethodArgumentNotValidException e) {
-        return new ResponseEntity<>("잘못된 요청입니다.", HttpStatus.BAD_REQUEST);
+        LOGGER.error("MethodArgumentNotValidException occurred: {}", e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘못된 요청입니다.");
     }
 
     @ExceptionHandler(PaymentException.class)
     public ResponseEntity<String> handle(final PaymentException e) {
+        LOGGER.error("PaymentException occurred: {}", e.getMessage(), e);
         if (e.is5xxServerError()) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 }
