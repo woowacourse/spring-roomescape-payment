@@ -88,7 +88,7 @@ public class PaymentServiceTest {
         reservationRepository.save(reservation);
         Reservation paymentReservation = reservationRepository.save(reservation);
         // 결제 객체 생성
-        Payment payment = new Payment(key, amount, paymentReservation);
+        Payment payment = new Payment(key, amount, paymentReservation.getId());
 
         // when
         Payment resultPayment = paymentService.save(payment);
@@ -98,7 +98,7 @@ public class PaymentServiceTest {
         assertThat(resultPayment.getId()).isNotNull();
         assertThat(resultPayment.getPaymentKey()).isEqualTo(key);
         assertThat(resultPayment.getAmount()).isEqualByComparingTo(amount);
-        assertThat(resultPayment.getReservation()).isEqualTo(paymentReservation);
+        assertThat(resultPayment.getReservationId()).isEqualTo(paymentReservation.getId());
     }
 
     @DisplayName("회원 ID로 결제 목록 조회 - 성공")
@@ -123,8 +123,8 @@ public class PaymentServiceTest {
         Reservation reservation1 = reservationRepository.save(new Reservation(member, spec1));
         Reservation reservation2 = reservationRepository.save(new Reservation(member, spec2));
 
-        Payment payment1 = new Payment("payKey-1", BigDecimal.valueOf(1500), reservation1);
-        Payment payment2 = new Payment("payKey-2", BigDecimal.valueOf(2000), reservation2);
+        Payment payment1 = new Payment("payKey-1", BigDecimal.valueOf(1500), reservation1.getId());
+        Payment payment2 = new Payment("payKey-2", BigDecimal.valueOf(2000), reservation2.getId());
 
         paymentService.save(payment1);
         paymentService.save(payment2);

@@ -28,13 +28,12 @@ public class Payment {
     @Column(nullable = false)
     BigDecimal amount;
 
-    @OneToOne
-    @JoinColumn(name = "reservation_id", nullable = false)
-    Reservation reservation;
+    @Column(nullable = false)
+    Long reservationId;
 
-    public Payment (String paymentKey, BigDecimal amount, Reservation reservation){
+    public Payment (String paymentKey, BigDecimal amount, Long reservationId){
         this.paymentKey = paymentKey;
         this.amount = amount;
-        this.reservation = reservation;
+        this.reservationId = reservationId;
     }
 }

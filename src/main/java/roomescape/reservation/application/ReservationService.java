@@ -70,7 +70,7 @@ public class ReservationService {
         List<Payment> myPayments = paymentService.findAllByMemberId(memberId);
         return myPayments.stream()
                 .collect(Collectors.toMap(
-                        payment -> payment.getReservation().getId(),
+                        Payment::getReservationId,
                         payment -> payment
                 ));
     }
@@ -108,7 +108,7 @@ public class ReservationService {
 
         paymentApprovalService.approvePayment(new PaymentApprovalRequest(orderId, amount, request.paymentKey()));
         Reservation reservation = create(memberId, request.date(), request.timeId(), request.themeId());
-        paymentService.save(new Payment(request.paymentKey(), request.amount(), reservation));
+        paymentService.save(new Payment(request.paymentKey(), request.amount(), reservation.getId()));
 
         return ReservationResponse.from(reservation);
     }
