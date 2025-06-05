@@ -1,7 +1,7 @@
 package roomescape.service;
 
 import org.springframework.stereotype.Service;
-import roomescape.config.RoomescapeLockInitializer;
+import roomescape.external.lock.RoomescapeLockInitializer;
 import roomescape.repository.RoomescapeLockRepository;
 
 @Service

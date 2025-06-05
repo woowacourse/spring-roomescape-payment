@@ -1,7 +1,6 @@
-package roomescape.config;
+package roomescape.external.lock;
 
 import org.springframework.stereotype.Component;
-import roomescape.repository.RoomescapeLock;
 import roomescape.repository.RoomescapeLockRepository;
 
 @Component

@@ -1,4 +1,4 @@
-package roomescape.repository;
+package roomescape.external.lock;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
