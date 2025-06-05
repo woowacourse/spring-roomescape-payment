@@ -39,9 +39,10 @@ public class Payment {
     private String requestedAt;
 
 
-    public Payment(final String paymentKey, final String orderId, final String type,
+    public Payment(final Reservation reservation, final String paymentKey, final String orderId, final String type,
                    final Integer totalAmount, final String status,
                    final String requestedAt) {
+        this.reservation = reservation;
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.type = type;

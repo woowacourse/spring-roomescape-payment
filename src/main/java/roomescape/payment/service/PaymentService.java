@@ -17,7 +17,7 @@ public class PaymentService {
 
 
     public void create(final PaymentResponse response, final Reservation reservation) {
-        Payment payment = new Payment(response.paymentKey(), response.orderId(), response.type(),
+        Payment payment = new Payment(reservation, response.paymentKey(), response.orderId(), response.type(),
                 response.totalAmount(), response.status(), response.requestedAt());
 
         paymentRepository.save(payment);
