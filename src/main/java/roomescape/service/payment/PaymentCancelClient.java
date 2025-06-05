@@ -16,6 +16,8 @@ import java.util.Queue;
 @Component
 public class PaymentCancelClient {
 
+    private final static Queue<CancelData> cancelQueue = new ArrayDeque<>();
+
     private final RestClient restClient;
     private final String widgetSecretKey;
     private final String paymentCancelUrl;
@@ -52,20 +54,16 @@ public class PaymentCancelClient {
         return "Basic " + new String(encodedBytes);
     }
 
-    private static Queue<CancelData> cancelQueue = new ArrayDeque<>();
-
-    private record CancelData(
-            String paymentKey,
-            String idempotencyKey
-    ) {
-    }
-
     public void addToCancelSchedule(String paymentKey, String idempotencyKey) {
         cancelQueue.add(new CancelData(paymentKey, idempotencyKey));
     }
 
     @Scheduled(cron = "0 */5 * * * *")
     private void cancelCronJob() {
+        if (cancelQueue.isEmpty()) {
+            return;
+        }
+        
         final Queue<CancelData> remainQueue = new ArrayDeque<>();
         for (CancelData cancelData : cancelQueue) {
             try {
@@ -74,6 +72,13 @@ public class PaymentCancelClient {
                 remainQueue.add(cancelData);
             }
         }
-        cancelQueue = remainQueue;
+        cancelQueue.clear();
+        cancelQueue.addAll(remainQueue);
+    }
+
+    private record CancelData(
+            String paymentKey,
+            String idempotencyKey
+    ) {
     }
 }
