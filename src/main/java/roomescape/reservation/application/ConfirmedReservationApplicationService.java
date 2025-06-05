@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.application.MemberDataService;
 import roomescape.member.domain.Member;
-import roomescape.payment.application.PaymentService;
+import roomescape.payment.application.PaymentApplicationService;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
 import roomescape.reservation.application.dto.request.ConfirmedReservationByCriteriaWebRequest;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
@@ -28,20 +28,20 @@ public class ConfirmedReservationApplicationService {
     private final ThemeDataService themeDataService;
     private final MemberDataService memberDataService;
     private final ReservationDataService reservationDataService;
-    private final PaymentService paymentService;
+    private final PaymentApplicationService paymentApplicationService;
 
     public ConfirmedReservationApplicationService(final ReservationSlotDataService reservationSlotDataService,
                                                   final ReservationTimeDataService reservationTimeDataService,
                                                   final ThemeDataService themeDataService,
                                                   final MemberDataService memberDataService,
                                                   final ReservationDataService slotReservationDataService,
-                                                  PaymentService paymentService) {
+                                                  PaymentApplicationService paymentApplicationService) {
         this.reservationSlotDataService = reservationSlotDataService;
         this.reservationTimeDataService = reservationTimeDataService;
         this.themeDataService = themeDataService;
         this.memberDataService = memberDataService;
         this.reservationDataService = slotReservationDataService;
-        this.paymentService = paymentService;
+        this.paymentApplicationService = paymentApplicationService;
     }
 
     public ConfirmedReservationWebResponse create(final ConfirmedReservationCreateRequest request) {
@@ -60,7 +60,7 @@ public class ConfirmedReservationApplicationService {
     @Transactional
     public ConfirmedReservationWebResponse createWithPayment(final ConfirmedReservationCreateRequest confirmedReservationCreateRequest, final PaymentApproveRequest paymentApproveRequest) {
         ConfirmedReservationWebResponse confirmedReservationWebResponse = create(confirmedReservationCreateRequest);
-        paymentService.approvePayment(paymentApproveRequest);
+        paymentApplicationService.approvePayment(paymentApproveRequest);
         return confirmedReservationWebResponse;
     }
 

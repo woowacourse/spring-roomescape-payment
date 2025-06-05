@@ -26,8 +26,10 @@ import roomescape.member.domain.Member;
 import roomescape.member.infrastructure.MemberRepository;
 import roomescape.member.presentation.dto.request.SignupWebRequest;
 import roomescape.member.presentation.dto.response.SignUpWebResponse;
-import roomescape.payment.application.PaymentService;
+import roomescape.payment.application.PaymentDataService;
+import roomescape.payment.application.PaymentApplicationService;
 import roomescape.payment.application.client.PaymentClient;
+import roomescape.payment.infrastructure.PaymentRepository;
 import roomescape.reservation.application.ConfirmedReservationApplicationService;
 import roomescape.reservation.application.ReservationDataService;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
@@ -66,6 +68,9 @@ class ThemeApplicationServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     @MockitoBean
     private PaymentClient paymentClient;
 
@@ -99,9 +104,10 @@ class ThemeApplicationServiceTest {
                         reservationSlotDataService));
         reservationTimeDataService = new ReservationTimeDataService(reservationTimeRepository,
                 reservationSlotDataService);
-        PaymentService paymentService = new PaymentService(paymentClient);
+        PaymentDataService paymentDataService = new PaymentDataService(paymentRepository);
+        PaymentApplicationService paymentApplicationService = new PaymentApplicationService(paymentDataService, paymentClient);
         confirmedReservationApplicationService = new ConfirmedReservationApplicationService(reservationSlotDataService,
-                reservationTimeDataService, themeDataService, memberDataService, reservationDataService, paymentService);
+                reservationTimeDataService, themeDataService, memberDataService, reservationDataService, paymentApplicationService);
     }
 
     @Test

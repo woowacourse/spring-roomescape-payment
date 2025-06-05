@@ -23,8 +23,10 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.exception.MemberNotFoundException;
 import roomescape.member.infrastructure.MemberRepository;
-import roomescape.payment.application.PaymentService;
+import roomescape.payment.application.PaymentDataService;
+import roomescape.payment.application.PaymentApplicationService;
 import roomescape.payment.application.client.PaymentClient;
+import roomescape.payment.infrastructure.PaymentRepository;
 import roomescape.reservation.application.dto.request.ConfirmedReservationByCriteriaWebRequest;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
 import roomescape.reservation.infrastructure.ReservationRepository;
@@ -65,6 +67,9 @@ class ConfirmedReservationApplicationServiceTest {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     @MockitoBean
     private PaymentClient paymentClient;
 
@@ -84,12 +89,13 @@ class ConfirmedReservationApplicationServiceTest {
         ThemeDataService themeDataService = new ThemeDataService(themeRepository);
         ReservationTimeDataService reservationTimeDataService = new ReservationTimeDataService(
                 reservationTimeRepository, reservationSlotDataService);
-        PaymentService paymentService = new PaymentService(paymentClient);
+        PaymentDataService paymentDataService = new PaymentDataService(paymentRepository);
+        PaymentApplicationService paymentApplicationService = new PaymentApplicationService(paymentDataService, paymentClient);
         confirmedReservationApplicationService = new ConfirmedReservationApplicationService(
                 reservationSlotDataService,
                 reservationTimeDataService, themeDataService,
                 memberDataService, reservationDataService,
-                paymentService);
+                paymentApplicationService);
         waitingReservationApplicationService = new WaitingReservationApplicationService(reservationSlotDataService,
                 memberDataService, reservationDataService);
 

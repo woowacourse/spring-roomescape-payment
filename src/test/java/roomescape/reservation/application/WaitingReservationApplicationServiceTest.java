@@ -20,8 +20,10 @@ import roomescape.member.application.MemberDataService;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.infrastructure.MemberRepository;
-import roomescape.payment.application.PaymentService;
+import roomescape.payment.application.PaymentDataService;
+import roomescape.payment.application.PaymentApplicationService;
 import roomescape.payment.application.client.PaymentClient;
+import roomescape.payment.infrastructure.PaymentRepository;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
 import roomescape.reservation.exception.ReservationNotFoundException;
 import roomescape.reservation.infrastructure.ReservationRepository;
@@ -58,6 +60,9 @@ class WaitingReservationApplicationServiceTest {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     @MockitoBean
     private PaymentClient paymentClient;
 
@@ -79,10 +84,11 @@ class WaitingReservationApplicationServiceTest {
                 reservationTimeRepository, reservationSlotDataService);
         waitingReservationApplicationService = new WaitingReservationApplicationService(
                 reservationSlotDataService, memberDataService, reservationDataService);
-        PaymentService paymentService = new PaymentService(paymentClient);
+        PaymentDataService paymentDataService = new PaymentDataService(paymentRepository);
+        PaymentApplicationService paymentApplicationService = new PaymentApplicationService(paymentDataService, paymentClient);
         ConfirmedReservationApplicationService confirmedReservationApplicationService = new ConfirmedReservationApplicationService(
                 reservationSlotDataService, reservationTimeDataService, themeDataService, memberDataService,
-                reservationDataService, paymentService);
+                reservationDataService, paymentApplicationService);
 
         timeId = reservationTimeRepository.save(new ReservationTime(LocalTime.of(9, 0))).getId();
         themeId = themeRepository.save(TestFixture.makeTheme()).getId();
