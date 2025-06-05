@@ -30,7 +30,9 @@ class ReservationViewTest {
                         ThemeThumbnail.from("https://example.com/image.jpg")
                 ),
                 ReservationStatus.CONFIRMED,
-                1
+                1,
+                "",
+                0
         );
         assertThatThrownBy(reservationView::getId)
                 .isInstanceOf(InvalidInputException.class)

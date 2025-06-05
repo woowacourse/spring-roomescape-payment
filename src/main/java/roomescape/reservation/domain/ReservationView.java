@@ -30,7 +30,9 @@ import roomescape.time.domain.ReservationTime;
                r.time_id,
                r.theme_id,
                'CONFIRMED' as status,
-               0 as waiting_order
+               0 as waiting_order,
+               r.payment_key,
+               r.total_amount
         FROM reservations r
         
         UNION ALL
@@ -41,7 +43,9 @@ import roomescape.time.domain.ReservationTime;
                wr.time_id,
                wr.theme_id,
                'WAITING' as status,
-               wr.waiting_order
+               wr.waiting_order,
+               wr.payment_key,
+               wr.total_amount
         FROM waiting_reservations wr
         """)
 @Synchronize({"reservations", "waiting_reservations"})
@@ -75,13 +79,21 @@ public class ReservationView {
     @Column
     private int waitingOrder;
 
+    @Column
+    private String paymentKey;
+
+    @Column
+    private int totalAmount;
+
     public ReservationView(final String compositeId,
                            final Long userId,
                            final ReservationDate date,
                            final ReservationTime time,
                            final Theme theme,
                            final ReservationStatus status,
-                           final int waitingOrder) {
+                           final int waitingOrder,
+                           final String paymentKey,
+                           final int totalAmount) {
         this.compositeId = compositeId;
         this.userId = userId;
         this.date = date;
@@ -89,6 +101,8 @@ public class ReservationView {
         this.theme = theme;
         this.status = status;
         this.waitingOrder = waitingOrder;
+        this.paymentKey = paymentKey;
+        this.totalAmount = totalAmount;
     }
 
     public Long getId() {
