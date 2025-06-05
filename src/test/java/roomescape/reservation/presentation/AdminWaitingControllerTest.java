@@ -98,17 +98,6 @@ public class AdminWaitingControllerTest {
                 adminCookies
         );
 
-        reservationFixture.createReservation(
-                LocalDate.of(2025, 8, 5),
-                1L,
-                1L,
-                "test",
-                "testOrderId",
-                1000,
-                "NORMAL",
-                adminCookies
-        );
-
         reservationFixture.createWaiting(LocalDate.of(2025, 8, 5), 1L, 1L, userCookies);
 
         // when
