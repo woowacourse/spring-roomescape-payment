@@ -37,6 +37,10 @@ dependencies {
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.5'
 }
 
+bootJar {
+    archiveFileName = 'spring-roomescape-payment.jar'
+}
+
 test {
     useJUnitPlatform()
 }
