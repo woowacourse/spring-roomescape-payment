@@ -3,7 +3,7 @@
 set -e
 set -o pipefail
 
-REPO_URL=REPO_URL="https://github.com/jumdo12/spring-roomescape-payment.git"
+REPO_URL="https://github.com/jumdo12/spring-roomescape-payment.git"
 APP_NAME="spring-roomescape-payment"
 BUILD_JAR="spring-roomescape-payment-0.0.1-SNAPSHOT.jar"
 DEPLOY_DIR="$HOME/$APP_NAME"
