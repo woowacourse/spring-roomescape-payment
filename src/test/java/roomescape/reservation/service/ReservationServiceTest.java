@@ -19,7 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
-import roomescape.auth.dto.LoginMember;
+import roomescape.auth.presentation.dto.LoginMember;
 import roomescape.global.exception.NotFoundException;
 import roomescape.global.exception.PaymentClientException;
 import roomescape.global.exception.ReservationException;

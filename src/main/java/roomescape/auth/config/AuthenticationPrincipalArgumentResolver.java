@@ -1,4 +1,4 @@
-package roomescape.auth.infrastructure;
+package roomescape.auth.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -8,8 +8,8 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import roomescape.auth.dto.LoginMember;
-import roomescape.auth.service.AuthService;
+import roomescape.auth.application.service.AuthService;
+import roomescape.auth.presentation.dto.LoginMember;
 import roomescape.global.exception.NotFoundException;
 import roomescape.global.exception.UnauthorizedException;
 

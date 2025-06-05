@@ -12,7 +12,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import roomescape.auth.dto.LoginMember;
+import roomescape.auth.presentation.dto.LoginMember;
 
 @Getter
 @Entity

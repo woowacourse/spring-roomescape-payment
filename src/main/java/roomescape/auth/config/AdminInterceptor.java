@@ -1,4 +1,4 @@
-package roomescape.auth.infrastructure;
+package roomescape.auth.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
-import roomescape.auth.service.AuthService;
+import roomescape.auth.application.service.AuthService;
 
 @Component
 @RequiredArgsConstructor

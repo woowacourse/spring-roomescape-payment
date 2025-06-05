@@ -1,4 +1,4 @@
-package roomescape.auth.infrastructure.jwt;
+package roomescape.auth.config;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

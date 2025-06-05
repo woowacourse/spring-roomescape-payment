@@ -1,4 +1,4 @@
-package roomescape.auth.controller;
+package roomescape.auth.presentation;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -12,10 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import roomescape.auth.dto.LoginCheckResponse;
-import roomescape.auth.dto.LoginRequest;
-import roomescape.auth.infrastructure.util.CookieManager;
-import roomescape.auth.service.AuthService;
+import roomescape.auth.application.service.AuthService;
+import roomescape.auth.presentation.dto.LoginCheckResponse;
+import roomescape.auth.presentation.dto.LoginRequest;
 import roomescape.global.exception.UnauthorizedException;
 
 @RestController
@@ -28,13 +27,13 @@ public class AuthController {
     private final CookieManager cookieManager;
 
     @PostMapping("/login")
-    public void login(@RequestBody @Valid final LoginRequest request, final HttpServletResponse response) {
-
+    public void login(@RequestBody @Valid final LoginRequest request, final HttpServletResponse servletResponse) {
         String token = authService.createToken(request);
+        authService.getMemberByLoginRequest(request);
 
         ResponseCookie cookie = cookieManager.generateLoginCookie(token);
 
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+        servletResponse.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     @PostMapping("/logout")

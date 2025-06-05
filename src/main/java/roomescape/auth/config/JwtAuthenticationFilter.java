@@ -1,4 +1,4 @@
-package roomescape.auth.infrastructure;
+package roomescape.auth.config;
 
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -11,8 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import roomescape.auth.infrastructure.jwt.JwtTokenProvider;
-import roomescape.auth.infrastructure.util.CookieManager;
+import roomescape.auth.infrastructure.JwtTokenProvider;
+import roomescape.auth.presentation.CookieManager;
 
 @RequiredArgsConstructor
 @Component

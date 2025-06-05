@@ -1,4 +1,4 @@
-package roomescape.auth.service;
+package roomescape.auth.application.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -7,19 +7,21 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import roomescape.auth.dto.LoginCheckResponse;
-import roomescape.auth.dto.LoginMember;
-import roomescape.auth.dto.LoginRequest;
+import roomescape.auth.application.exception.InvalidEmailException;
+import roomescape.auth.application.exception.InvalidPasswordException;
 import roomescape.auth.infrastructure.TokenProvider;
+import roomescape.auth.presentation.dto.LoginCheckResponse;
+import roomescape.auth.presentation.dto.LoginMember;
+import roomescape.auth.presentation.dto.LoginRequest;
 import roomescape.global.exception.ForbiddenException;
 import roomescape.global.exception.NotFoundException;
 import roomescape.global.exception.UnauthorizedException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class AuthService {
 
     private static final String MEMBER_ID = "memberId";
@@ -28,8 +30,24 @@ public class AuthService {
     private final MemberRepository memberRepository;
 
     public String createToken(final LoginRequest loginRequest) {
-        final Member member = memberRepository.getByEmailAndPassword(loginRequest.email(), loginRequest.password());
-        return jwtTokenProvider.createToken(createClaims(member));
+//        Member member = memberRepository.getByEmailAndPassword(loginRequest.email(), loginRequest.password());
+//        return jwtTokenProvider.createToken(createClaims(member));
+        return "!@#";
+    }
+
+    public Member getMemberByLoginRequest(final LoginRequest request) {
+        Member member = memberRepository.findByEmail(request.email())
+                .orElseThrow(() -> new InvalidEmailException(request.email()));
+
+        validateMemberPassword(request, member);
+
+        return member;
+    }
+
+    private void validateMemberPassword(LoginRequest request, Member member) {
+        if (!member.matchesPassword(request.password())) {
+            throw new InvalidPasswordException(request.password());
+        }
     }
 
     private Claims createClaims(final Member member) {

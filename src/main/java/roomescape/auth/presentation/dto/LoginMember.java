@@ -1,4 +1,4 @@
-package roomescape.auth.dto;
+package roomescape.auth.presentation.dto;
 
 import lombok.NonNull;
 import roomescape.member.domain.MemberRole;

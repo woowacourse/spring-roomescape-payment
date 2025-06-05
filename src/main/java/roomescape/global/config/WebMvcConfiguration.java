@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import roomescape.auth.infrastructure.AdminInterceptor;
-import roomescape.auth.infrastructure.AuthenticationPrincipalArgumentResolver;
+import roomescape.auth.config.AdminInterceptor;
+import roomescape.auth.config.AuthenticationPrincipalArgumentResolver;
 
 @Configuration
 @RequiredArgsConstructor

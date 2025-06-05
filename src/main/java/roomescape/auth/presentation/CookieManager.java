@@ -1,22 +1,22 @@
-package roomescape.auth.infrastructure.util;
+package roomescape.auth.presentation;
 
 import jakarta.servlet.http.Cookie;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
-import roomescape.auth.infrastructure.jwt.JwtProperties;
+import roomescape.auth.config.JwtProperties;
 
 @Component
 @RequiredArgsConstructor
 public final class CookieManager {
 
-    private static final String LOGIN_TOKEN_NAME = "token";
+    private static final String LOGIN_COOKIE_NAME = "token";
 
     private final JwtProperties jwtProperties;
 
-    public ResponseCookie generateLoginCookie(String token) {
-        return ResponseCookie.from(LOGIN_TOKEN_NAME, token)
+    public ResponseCookie generateLoginCookie(final String token) {
+        return ResponseCookie.from(LOGIN_COOKIE_NAME, token)
                 .httpOnly(true)
                 .path("/")
                 .maxAge(jwtProperties.getExpireLength())
@@ -24,7 +24,7 @@ public final class CookieManager {
     }
 
     public ResponseCookie generateLogoutCookie() {
-        return ResponseCookie.from(LOGIN_TOKEN_NAME, "")
+        return ResponseCookie.from(LOGIN_COOKIE_NAME, "")
                 .httpOnly(true)
                 .path("/")
                 .maxAge(0)
@@ -36,7 +36,7 @@ public final class CookieManager {
             return null;
         }
         return Arrays.stream(cookies)
-                .filter(c -> LOGIN_TOKEN_NAME.equals(c.getName()))
+                .filter(c -> LOGIN_COOKIE_NAME.equals(c.getName()))
                 .findFirst()
                 .map(Cookie::getValue)
                 .orElse(null);
