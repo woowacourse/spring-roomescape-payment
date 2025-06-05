@@ -44,7 +44,11 @@ public class LoggingAspect {
 
     }
 
-    // [TODO] : HTTP 요청과 응답 로그 (INFO 레벨)
+    @Pointcut("execution(* roomescape.external..*.*(..))")
+    public void allExternalApiClient() {
+
+    }
+
     @Around("allController()")
     public Object logAllRequestAndResponse(ProceedingJoinPoint joinPoint) throws Throwable {
         List<String> args = Arrays.stream(joinPoint.getArgs()).map(Object::toString).toList();
@@ -54,7 +58,15 @@ public class LoggingAspect {
         return returnValue;
     }
 
-    // [TODO] : 컨트롤러/서비스/레파지토리 메서드에 대한 인자와 리턴값
+    @Around("allExternalApiClient()")
+    public Object logAllExternalApiRequest(ProceedingJoinPoint joinPoint) throws Throwable {
+        List<String> args = Arrays.stream(joinPoint.getArgs()).map(Object::toString).toList();
+        log.info("[INFO][{}][IN][{}] {}", LocalDateTime.now(), joinPoint.getSignature(), String.join(",", args));
+        Object returnValue = joinPoint.proceed();
+        log.info("[INFO][{}][OUT][{}] {}", LocalDateTime.now(), joinPoint.getSignature(), returnValue);
+        return returnValue;
+    }
+
     @Around("allController() || allService() || allRepository()")
     public Object logLayerMethod(ProceedingJoinPoint joinPoint) throws Throwable {
         List<String> args = Arrays.stream(joinPoint.getArgs()).map(Object::toString).toList();
@@ -64,7 +76,6 @@ public class LoggingAspect {
         return returnValue;
     }
 
-    // [TODO] : 작성된 모든 메서드에 대한 인자와 리턴값 (TRACE 레벨)
     @Around("allWithoutAopPackage()")
     public Object logAllMethod(ProceedingJoinPoint joinPoint) throws Throwable {
         List<String> args = Arrays.stream(joinPoint.getArgs()).map(Object::toString).toList();
