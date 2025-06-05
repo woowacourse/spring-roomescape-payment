@@ -15,7 +15,9 @@ public record MyReservationsResponse(long id,
                                      LocalDate date,
                                      ReservationTime time,
                                      ThemeResponse theme,
-                                     int sequence) {
+                                     int sequence,
+                                     String paymentKey,
+                                     int totalAmount) {
 
     public MyReservationsResponse {
         validate(id, date, time, theme, sequence);
@@ -27,7 +29,9 @@ public record MyReservationsResponse(long id,
                 domain.getDate().getValue(),
                 domain.getTime(),
                 ThemeResponse.from(domain.getTheme()),
-                domain.getWaitingOrder()
+                domain.getWaitingOrder(),
+                domain.getPaymentKey(),
+                domain.getTotalAmount()
         );
     }
 

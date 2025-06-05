@@ -19,6 +19,7 @@ import roomescape.reservation.application.dto.SimpleWaitingReservationResponse;
 import roomescape.reservation.ui.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.ui.dto.CreateReservationWebRequest;
 import roomescape.reservation.ui.dto.ReservationResponse;
+import roomescape.reservation.ui.dto.ReservationWithPaymentInfoResponse;
 import roomescape.reservation.ui.dto.WaitingReservationResponse;
 
 import java.net.URI;
@@ -50,10 +51,10 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponse> create(
+    public ResponseEntity<ReservationWithPaymentInfoResponse> create(
             @RequestBody final CreateReservationWebRequest request,
             @UserSession final Session session) {
-        final ReservationResponse reservationResponse = reservationFacade.create(
+        final ReservationWithPaymentInfoResponse reservationResponse = reservationFacade.create(
                 request.toRequestWithUserId(session.userId()));
         final URI location = UriFactory.buildPath(BASE_PATH, String.valueOf(reservationResponse.reservationId()));
         return ResponseEntity.created(location)

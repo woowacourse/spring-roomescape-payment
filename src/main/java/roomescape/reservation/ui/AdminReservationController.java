@@ -18,6 +18,7 @@ import roomescape.reservation.ui.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.ui.dto.CreateReservationWithUserIdWebRequest;
 import roomescape.reservation.ui.dto.ReservationResponse;
 import roomescape.reservation.ui.dto.ReservationSearchWebRequest;
+import roomescape.reservation.ui.dto.ReservationWithPaymentInfoResponse;
 import roomescape.user.domain.UserRole;
 
 import java.net.URI;
@@ -56,10 +57,10 @@ public class AdminReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponse> create(
+    public ResponseEntity<ReservationWithPaymentInfoResponse> create(
             @RequestBody final CreateReservationWithUserIdWebRequest request
     ) {
-        final ReservationResponse reservationResponse = reservationFacade.create(request);
+        ReservationWithPaymentInfoResponse reservationResponse = reservationFacade.create(request);
         final URI location = UriFactory.buildPath(BASE_PATH, String.valueOf(reservationResponse.reservationId()));
         return ResponseEntity.created(location)
                 .body(reservationResponse);
