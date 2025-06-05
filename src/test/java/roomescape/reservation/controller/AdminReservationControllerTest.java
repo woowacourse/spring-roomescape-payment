@@ -1,7 +1,6 @@
 package roomescape.reservation.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -54,7 +53,12 @@ class AdminReservationControllerTest extends IntegrationTest {
     TossRestClient tossRestClient;
 
     @Test
-    void 예약_조회_성공() {
+    void 관리자_예약_생성_성공() {
+
+    }
+
+    @Test
+    void 관리자_예약_조회_성공() {
         // given
         Member adminMember = createAdminMember("관리자", "admin@naver.com", "1234");
         dbHelper.insertMember(adminMember);
@@ -75,7 +79,7 @@ class AdminReservationControllerTest extends IntegrationTest {
     }
 
     @Test
-    void 예약_삭제_성공() {
+    void 관리자_예약_삭제_성공() {
         // given
         Member adminMember = createAdminMember("관리자", "admin@naver.com", "1234");
         dbHelper.insertMember(adminMember);

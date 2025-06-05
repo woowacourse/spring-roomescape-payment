@@ -1,6 +1,7 @@
-package roomescape.auth;
+package roomescape.auth.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static roomescape.TestFixture.createAdminMember;
 import static roomescape.TestFixture.createClaims;
 import static roomescape.TestFixture.createMember;
@@ -16,7 +17,7 @@ import roomescape.IntegrationTest;
 import roomescape.auth.infrastructure.jwt.JwtTokenProvider;
 import roomescape.member.domain.Member;
 
-class AuthTest extends IntegrationTest {
+class AuthControllerTest extends IntegrationTest {
 
     @Autowired
     JwtTokenProvider jwtTokenProvider;
@@ -138,4 +139,5 @@ class AuthTest extends IntegrationTest {
                 .then().log().all()
                 .statusCode(401);
     }
+
 }

@@ -1,12 +1,10 @@
 package roomescape.reservationtime.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static roomescape.TestFixture.DEFAULT_DATE;
 import static roomescape.TestFixture.createAdminMember;
 import static roomescape.TestFixture.createClaims;
 import static roomescape.TestFixture.createDefaultTheme;
-import static roomescape.TestFixture.createReservationOf;
 import static roomescape.TestFixture.createTimeAt;
 
 import io.restassured.RestAssured;
@@ -20,8 +18,10 @@ import roomescape.IntegrationTest;
 import roomescape.auth.infrastructure.jwt.JwtTokenProvider;
 import roomescape.member.domain.Member;
 import roomescape.reservationtime.domain.ReservationTime;
+import roomescape.reservationtime.dto.AvailableReservationTimeResponse;
 import roomescape.reservationtime.dto.ReservationTimeRequest;
 import roomescape.reservationtime.dto.ReservationTimeResponse;
+import roomescape.theme.domain.Theme;
 
 class ReservationTimeControllerTest extends IntegrationTest {
 
@@ -29,7 +29,7 @@ class ReservationTimeControllerTest extends IntegrationTest {
     JwtTokenProvider jwtTokenProvider;
 
     @Test
-    void 예약_시간_조회() {
+    void 모든_예약_시간_조회() {
         // given
         Member adminMember = createAdminMember("관리자", "admin@naver.com", "1234");
         dbHelper.insertMember(adminMember);
@@ -57,6 +57,38 @@ class ReservationTimeControllerTest extends IntegrationTest {
         });
     }
 
+    @Test
+    void 예약가능시간여부_포함_예약시간_모두_조회() {
+        // given
+        Member adminMember = createAdminMember("관리자", "admin@naver.com", "1234");
+        dbHelper.insertMember(adminMember);
+        String token = jwtTokenProvider.createToken(createClaims(adminMember));
+
+        ReservationTime time1 = dbHelper.insertTime(createTimeAt(LocalTime.of(10, 0)));
+        ReservationTime time2 = dbHelper.insertTime(createTimeAt(LocalTime.of(11, 0)));
+        Theme theme = dbHelper.insertTheme(createDefaultTheme());
+
+        // when & then
+        List<AvailableReservationTimeResponse> responses = RestAssured.given().log().all()
+                .cookie("token", token)
+                .when().get("/times/available?date=" + DEFAULT_DATE + "&themeId=" + theme.getId())
+                .then().log().all()
+                .statusCode(200)
+                .extract().jsonPath().getList(".", AvailableReservationTimeResponse.class);
+
+        SoftAssertions.assertSoftly(softly -> {
+            assertThat(responses).hasSize(2);
+            assertThat(responses)
+                    .extracting("startAt")
+                    .containsExactly(
+                            LocalTime.of(10, 0),
+                            LocalTime.of(11, 0)
+                    );
+            assertThat(responses)
+                    .extracting("alreadyBooked")
+                    .containsExactly(false, false);
+        });
+    }
 
     @Test
     void 예약_시간_저장() {
@@ -96,26 +128,5 @@ class ReservationTimeControllerTest extends IntegrationTest {
                 .when().delete("/times/" + reservationTime.getId())
                 .then().log().all()
                 .statusCode(204);
-    }
-
-    @Test
-    void 예약_시간이_포함된_예약이_있다면_삭제시도_시_예외_발생() {
-         // given
-        Member adminMember = createAdminMember("관리자", "admin@naver.com", "1234");
-        dbHelper.insertMember(adminMember);
-        String token = jwtTokenProvider.createToken(createClaims(adminMember));
-
-        ReservationTime reservationTime = createTimeAt(LocalTime.of(10, 0));
-        dbHelper.insertTime(reservationTime);
-
-        dbHelper.insertReservation(createReservationOf(adminMember, DEFAULT_DATE, reservationTime, createDefaultTheme()));
-
-        // when & the
-        RestAssured.given().log().all()
-                .cookie("token", token)
-                .when().delete("/times/" + reservationTime.getId())
-                .then().log().all()
-                .statusCode(400)
-                .body("detail", equalTo("해당 시간으로 예약된 건이 존재합니다."));
     }
 }

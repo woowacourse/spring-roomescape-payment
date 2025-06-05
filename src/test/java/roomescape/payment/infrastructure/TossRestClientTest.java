@@ -5,8 +5,9 @@ import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static roomescape.payment.PaymentFixture.CANCEL_SUCCESS_RESPONSE_BODY;
 import static roomescape.payment.PaymentFixture.ERROR_RESPONSE_BODY;
-import static roomescape.payment.PaymentFixture.SUCCESS_RESPONSE_BODY;
+import static roomescape.payment.PaymentFixture.CONFIRM_SUCCESS_RESPONSE_BODY;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import org.assertj.core.api.SoftAssertions;
@@ -20,10 +21,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
+import roomescape.DBHelper;
+import roomescape.TestFixture;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.dto.TossPaymentCancelRequest;
 import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.payment.exception.PaymentTimeoutException;
 import roomescape.payment.exception.TossPaymentException;
+import roomescape.reservation.domain.Reservation;
 
 @SpringBootTest
 @TestPropertySource(properties = "toss-payment.base-url=http://localhost:8089")
@@ -32,7 +38,13 @@ class TossRestClientTest {
     @Autowired
     private TossRestClient tossRestClient;
 
+    @Autowired
+    TossErrorHandler tossErrorHandler;
+
     private static WireMockServer wireMockServer;
+
+    @Autowired
+    DBHelper dbHelper;
 
     @BeforeAll
     static void setup() {
@@ -53,7 +65,7 @@ class TossRestClientTest {
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody(SUCCESS_RESPONSE_BODY)
+                        .withBody(CONFIRM_SUCCESS_RESPONSE_BODY)
                 ));
 
         String paymentKey = "test_key";
@@ -102,7 +114,7 @@ class TossRestClientTest {
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody(SUCCESS_RESPONSE_BODY)
+                        .withBody(CONFIRM_SUCCESS_RESPONSE_BODY)
                         .withFixedDelay(1_000) // 테스트 타임아웃 설정시간 2초
                 ));
 
@@ -130,7 +142,7 @@ class TossRestClientTest {
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody(SUCCESS_RESPONSE_BODY)
+                        .withBody(CONFIRM_SUCCESS_RESPONSE_BODY)
                         .withFixedDelay(2_000) // 테스트 타임아웃 설정시간 2초
                 ));
 
@@ -153,6 +165,7 @@ class TossRestClientTest {
                 .baseUrl("http://localhost:9999") // 잘못된 포트
                 .build();
         TossRestClient brokenTossClient = new TossRestClient(brokenRestClient,
+                tossErrorHandler,
                 new TossPaymentProperties(
                         "secret-key",
                         "https://api.tosspayments.com",
@@ -166,7 +179,7 @@ class TossRestClientTest {
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
-                        .withBody(SUCCESS_RESPONSE_BODY)
+                        .withBody(CONFIRM_SUCCESS_RESPONSE_BODY)
                 ));
 
         String paymentKey = "test_key";
@@ -207,5 +220,31 @@ class TossRestClientTest {
         assertThatThrownBy(() -> tossRestClient.confirm(request))
                 .isInstanceOf(TossPaymentException.class)
                 .hasMessage("토스 오류 응답을 파싱할 수 없습니다.");
+    }
+
+    @DisplayName("결제 승인 정상 처리")
+    @Test
+    void cancel_Success() {
+        // given
+        Reservation reservation = dbHelper.insertReservation(TestFixture.createReservation_1());
+        Payment payment = dbHelper.insertCompletedPayment(reservation);
+        String paymentKey = payment.getPaymentKey();
+
+        wireMockServer.stubFor(post(urlEqualTo("/v1/payments/" + paymentKey + "/cancel"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(CANCEL_SUCCESS_RESPONSE_BODY)
+                ));
+
+        TossPaymentCancelRequest cancelRequest = new TossPaymentCancelRequest("구매자 변심");
+
+        // when
+        TossPaymentResponse response = tossRestClient.cancel(paymentKey, cancelRequest);
+
+        // then
+        SoftAssertions.assertSoftly(soft -> {
+            assertThat(response.status()).isEqualTo("CANCELED");
+        });
     }
 }

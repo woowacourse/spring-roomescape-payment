@@ -86,8 +86,8 @@ public class DBHelper {
                 .status(PaymentStatus.COMPLETED)
                 .reservation(reservation)
                 .member(reservation.getMember())
-                .paymentKey("test-payment-key" + UUID.randomUUID().toString())
-                .orderId("test-orderId" + UUID.randomUUID().toString())
+                .paymentKey("test-payment-key" + UUID.randomUUID())
+                .orderId("test-orderId" + UUID.randomUUID())
                 .build();
         em.persist(payment);
         em.flush();
@@ -95,4 +95,17 @@ public class DBHelper {
         return payment;
     }
 
+    public Payment insertNotPaidPayment(Reservation reservation) {
+        Payment payment = Payment.builder()
+                .status(PaymentStatus.NOT_PAID)
+                .reservation(reservation)
+                .member(reservation.getMember())
+                .paymentKey("test-payment-key" + UUID.randomUUID())
+                .orderId("test-orderId" + UUID.randomUUID())
+                .build();
+        em.persist(payment);
+        em.flush();
+
+        return payment;
+    }
 }

@@ -4,9 +4,14 @@ import static roomescape.TestFixture.DEFAULT_DATE;
 import static roomescape.TestFixture.createClaims;
 import static roomescape.TestFixture.createDefaultTheme;
 import static roomescape.TestFixture.createTimeAt_10;
+import static org.assertj.core.api.Assertions.assertThat;
+import static roomescape.TestFixture.createDefaultMember_1;
+import static roomescape.TestFixture.createTimeAt;
+import static roomescape.TestFixture.createReservationOf;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +29,10 @@ import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.dto.ReservationResponse;
+
+import java.time.LocalTime;
 
 class ReservationControllerTest extends IntegrationTest {
 
@@ -47,6 +56,34 @@ class ReservationControllerTest extends IntegrationTest {
 
     @MockitoBean
     TossRestClient tossRestClient;
+
+    @DisplayName("유저 본인의 예약 조회 성공")
+    @Test
+    void getReservationById() {
+        // given
+        Member member = dbHelper.insertMember(createDefaultMember_1());
+        String token = jwtTokenProvider.createToken(createClaims(member));
+
+        ReservationTime time = dbHelper.insertTime(createTimeAt(LocalTime.of(10, 0)));
+        Theme theme = dbHelper.insertTheme(createDefaultTheme());
+        Reservation reservation = dbHelper.insertReservation(
+            createReservationOf(member, DEFAULT_DATE, time, theme)
+        );
+
+        // when & then
+        ReservationResponse response = RestAssured.given().log().all()
+                .cookie("token", token)
+                .when().get("/reservations/" + reservation.getId())
+                .then().log().all()
+                .statusCode(200)
+                .extract().as(ReservationResponse.class);
+
+        assertThat(response.id()).isEqualTo(reservation.getId());
+        assertThat(response.date()).isEqualTo(DEFAULT_DATE);
+        assertThat(response.time().startAt()).isEqualTo(time.getStartAt());
+        assertThat(response.theme().name()).isEqualTo(theme.getName());
+        assertThat(response.member().name()).isEqualTo(member.getName());
+    }
 
     @Test
     void 유저_예약_생성_성공() {

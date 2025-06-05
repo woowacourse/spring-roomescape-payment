@@ -24,7 +24,8 @@ import roomescape.theme.domain.Theme;
 
 @DataJpaTest
 @Import(DBHelper.class)
-class RegistrationQueryRepositoryTest {
+class
+RegistrationQueryRepositoryTest {
 
     @Autowired
     DBHelper dbHelper;
