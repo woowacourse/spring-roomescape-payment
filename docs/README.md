@@ -47,14 +47,6 @@
 
 ---
 
-### 결제시 발생할 수 있는 예외
-
-- 예외상태, 메시지는 api측에 위임합니다.
-  https://docs.tosspayments.com/reference/error-codes
-- 서버가 요청시 발생하는 timeout,connection 실패 등은 PaymentException으로 다음과 같이 출력됩니다
-
-> 결제 서버에 연결이 실패하였습니다. 이 현상이 지속되는 경우 어드민에게 문의해주세요.
-
 # 예약 API 문서
 
 스웨거 같은 추가적인 도구들을 도입하지 않고 다음과 같이 작성해보았습니다 with gpt ㅎㅎ..
@@ -279,74 +271,3 @@ DELETE /reservations/{reservationId}
 ### 응답
 
 - 상태 코드: 204 No Content
-
----
-
-# ERD
-
-![img_1.png](img_1.png)
-
-- RoomescapeLock을 이용해서 예약에 대한 동시성을 제어합니다.
-
-# 배포 스크립트 쉘
-
-배포 스크립트쉘은 다음과 같이 작성하였습니다.
-
-```shell
-#!/bin/bash
-
-# 배포 스크립트
-# 사용법: ./deploy.sh
-
-echo "=== 배포 시작 ==="
-
-# 1. Git Pull
-echo "1. Git Pull 진행 중..."
-git pull origin praisebak
-if [ $? -ne 0 ]; then
-echo "❌ Git pull 실패"
-exit 1
-fi
-echo "✅ Git pull 완료"
-
-# 2. Gradle Build
-echo "2. Gradle Build 진행 중..."
-./gradlew build
-if [ $? -ne 0 ]; then
-echo "❌ Build 실패"
-exit 1
-fi
-echo "✅ Build 완료"
-
-# 3. 기존 프로세스 종료
-echo "3. 기존 프로세스 확인 및 종료..."
-PID=$(pgrep -f "java.*jar")
-if [ ! -z "$PID" ]; then
-echo "기존 프로세스 종료 중... (PID: $PID)"
-kill -15 $PID
-sleep 5
-# 강제 종료가 필요한 경우
-if pgrep -f "java.*jar" > /dev/null; then
-kill -9 $PID
-echo "강제 종료 완료"
-fi
-fi
-
-# 4. 애플리케이션 실행
-echo "4. 애플리케이션 실행 중..."
-JAR_FILE=$(find build/libs -name "*.jar" | grep -v plain | head -1)
-
-if [ -z "$JAR_FILE" ]; then
-echo "❌ JAR 파일을 찾을 수 없습니다"
-exit 1
-fi
-
-# nohup으로 백그라운드 실행 및 로그 저장
-nohup java -jar $JAR_FILE > server.log 2>&1 &
-
-echo "✅ 애플리케이션 실행 완료"
-echo "📝 로그 확인: tail -f server.log"
-echo "🔍 프로세스 확인: ps aux | grep java"
-
-echo "=== 배포 완료 ==="
-```
