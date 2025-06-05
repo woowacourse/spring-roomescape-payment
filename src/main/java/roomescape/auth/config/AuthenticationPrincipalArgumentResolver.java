@@ -9,9 +9,9 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import roomescape.auth.application.service.AuthService;
+import roomescape.auth.exception.UnauthorizedException;
 import roomescape.auth.presentation.dto.LoginMember;
 import roomescape.global.exception.NotFoundException;
-import roomescape.global.exception.UnauthorizedException;
 
 @Component
 @RequiredArgsConstructor

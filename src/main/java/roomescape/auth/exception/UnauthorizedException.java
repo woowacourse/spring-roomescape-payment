@@ -1,8 +1,8 @@
-package roomescape.global.exception;
+package roomescape.auth.exception;
 
 public class UnauthorizedException extends RuntimeException {
 
-    public UnauthorizedException(String message) {
+    public UnauthorizedException(final String message) {
         super(message);
     }
 
