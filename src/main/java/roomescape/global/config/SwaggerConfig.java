@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SwaggerConfig {
     @Bean
-    public OpenAPI springShopOpenAPI() {
+    public OpenAPI roomEscapeOpenAPI() {
         String title = "RoomEscape Application Swagger";
         String description = "방탈출 서비스의 API 문서입니다.";
 
