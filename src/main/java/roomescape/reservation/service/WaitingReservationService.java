@@ -31,28 +31,24 @@ public class WaitingReservationService {
         final RoomEscapeInformation roomEscapeInformation = roomEscapeInformationRepository.findByDateAndTimeIdAndThemeId(
                         request.date(), request.timeId(), request.themeId())
                 .orElseThrow(() -> new NotFoundException("방탈출 정보가 존재하지 않습니다."));
-
-        final WaitingReservation waitingReservation = WaitingReservation.builder()
-                .roomEscapeInformation(roomEscapeInformation)
-                .member(member)
-                .build();
+        final WaitingReservation waitingReservation = WaitingReservation.of(roomEscapeInformation, member);
         return new WaitingReservationResponse(waitingReservationRepository.save(waitingReservation));
     }
 
     @Transactional
-    public void deleteById(final Long id) {
-        final WaitingReservation waitingReservation = waitingReservationRepository.findById(id)
-                .orElse(null);
-        if (waitingReservation == null) {
-            return;
-        }
-        final Long infoId = waitingReservation.getRoomEscapeInformation().getId();
-        waitingReservationRepository.delete(waitingReservation);
-
-        boolean hasBooked = reservationRepository.existsByRoomEscapeInformationId(infoId);
-        boolean hasWaiting = waitingReservationRepository.existsByRoomEscapeInformationId(infoId);
-        if (!hasBooked && !hasWaiting) {
-            roomEscapeInformationRepository.deleteById(infoId);
-        }
+    public void cancel(final Long id) {
+        waitingReservationRepository
+            .findById(id)
+            .ifPresent(waiting -> {
+                Long infoId = waiting.getRoomEscapeInformation().getId();
+                waitingReservationRepository.delete(waiting);
+                boolean hasBooked = reservationRepository
+                        .existsByRoomEscapeInformationId(infoId);
+                boolean hasWaiting = waitingReservationRepository
+                        .existsByRoomEscapeInformationId(infoId);
+                if (!hasBooked && !hasWaiting) {
+                    roomEscapeInformationRepository.deleteById(infoId);
+                }
+            });
     }
 }

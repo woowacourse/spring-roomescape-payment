@@ -35,7 +35,7 @@ public class WaitingReservationController {
 
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@NotNull @PathVariable final Long id) {
-        waitingReservationService.deleteById(id);
+    public void cancel(@NotNull @PathVariable final Long id) {
+        waitingReservationService.cancel(id);
     }
 }
