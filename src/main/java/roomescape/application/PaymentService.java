@@ -16,7 +16,7 @@ public class PaymentService {
     private final ReservationRepository reservationRepository;
 
     @Transactional
-    public void pay(final long reservationId, final String paymentKey, final String orderId, final long amount) {
+    public void pay(final long reservationId, final String paymentKey, final String orderId, final int amount) {
         var reservation = reservationRepository.getById(reservationId);
         if (!reservation.isPending()) {
             throw PaymentFailedException.byClient("보류중인 예약만 결제할 수 있습니다.");

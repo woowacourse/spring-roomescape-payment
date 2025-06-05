@@ -13,7 +13,7 @@ public record ReservationPaymentRequest(
     String orderId,
 
     @NotNull
-    Long amount
+    Integer amount
 ) {
 
 }

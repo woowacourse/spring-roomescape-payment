@@ -54,10 +54,18 @@ class TossPaymentProviderTest {
     void requestToConfirm() {
         // given
         var request = new PaymentRequest("a", "1", 1000);
+        var response = """
+            {
+                "paymentKey": "a",
+                "orderId": 1,
+                "orderName": "name",
+                "totalAmount": 1000
+            }
+            """;
 
         server.expect(requestTo(EXPECTED_CONFIRM_URI))
             .andExpect(method(HttpMethod.POST))
-            .andRespond(withSuccess());
+            .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
 
         // when
         paymentProvider.confirm(request);
