@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
+import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationStatus;
@@ -24,6 +25,7 @@ import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.WaitingReservationResponse;
 import roomescape.global.exception.roomescape.RoomEscapeException;
 import roomescape.service.member.MemberService;
+import roomescape.service.payment.PaymentService;
 
 @RequiredArgsConstructor
 @Service
@@ -34,6 +36,7 @@ public class ReservationService {
     private final MemberService memberService;
     private final ReservationThemeService reservationThemeService;
     private final ReservationTimeService reservationTimeService;
+    private final PaymentService paymentService;
 
     public ReservationResponse addReservation(final CreateReservationRequest request) {
         return createReservation(request, ReservationStatus.ACCEPTED, false);
@@ -127,6 +130,11 @@ public class ReservationService {
         return myReservations.stream()
                 .map(reservation -> {
                             final int priority = calculatePriority(reservation);
+                            if (paymentService.isReservationPaid(reservation)) {
+                                final Payment payment = paymentService.getPaymentByReservation(
+                                        reservation);
+                                return MyPageReservationResponse.from(reservation, priority, payment);
+                            }
                             return MyPageReservationResponse.from(reservation, priority);
                         }
                 )

@@ -1,5 +1,6 @@
 package roomescape.repository.impl;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import roomescape.domain.payment.Payment;
@@ -15,5 +16,15 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     @Override
     public void save(Payment payment) {
         repository.save(payment);
+    }
+
+    @Override
+    public boolean existsPaymentByReservationId(Long reservationId) {
+        return repository.existsPaymentByReservationId(reservationId);
+    }
+
+    @Override
+    public Optional<Payment> findPaymentByReservationId(Long reservationId) {
+        return repository.findPaymentByReservationId(reservationId);
     }
 }

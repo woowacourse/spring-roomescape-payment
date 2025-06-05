@@ -1,6 +1,7 @@
 package roomescape.dto.response;
 
 public record PaymentSuccessResponse(
-        String paymentKey
+        String paymentKey,
+        int totalAmount
 ) {
 }

@@ -51,6 +51,7 @@ class PaymentApproveClientTest {
 
         // then
         assertThat(response.paymentKey()).isEqualTo(PAYMENT_KEY);
+        assertThat(response.totalAmount()).isEqualTo(AMOUNT);
     }
 
     @Test

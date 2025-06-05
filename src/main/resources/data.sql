@@ -119,3 +119,34 @@ VALUES
     -- reservation_item_id: 25 (6일후, 윌슨이 확정)에 대한 대기 목록
     (4, 25, 'PENDING'),   -- 한스 - 1번째 대기
     (3, 25, 'PENDING');   -- 호떡 - 2번째 대기
+
+INSERT INTO payment (reservation_id, payment_key, amount)
+VALUES
+    -- 과거 예약들 (모두 확정) - reservation id: 1~11
+    (1, 'paymentKey_001_' || CAST(RANDOM() * 1000000 AS INT), 25000),
+    (2, 'paymentKey_002_' || CAST(RANDOM() * 1000000 AS INT), 28000),
+    (3, 'paymentKey_003_' || CAST(RANDOM() * 1000000 AS INT), 30000),
+    (4, 'paymentKey_004_' || CAST(RANDOM() * 1000000 AS INT), 32000),
+    (5, 'paymentKey_005_' || CAST(RANDOM() * 1000000 AS INT), 27000),
+    (6, 'paymentKey_006_' || CAST(RANDOM() * 1000000 AS INT), 29000),
+    (7, 'paymentKey_007_' || CAST(RANDOM() * 1000000 AS INT), 31000),
+    (8, 'paymentKey_008_' || CAST(RANDOM() * 1000000 AS INT), 26000),
+    (9, 'paymentKey_009_' || CAST(RANDOM() * 1000000 AS INT), 33000),
+    (10, 'paymentKey_010_' || CAST(RANDOM() * 1000000 AS INT), 24000),
+    (11, 'paymentKey_011_' || CAST(RANDOM() * 1000000 AS INT), 35000),
+
+    -- ACCEPTED 예약들 - reservation id: 12~25 (PENDING 제외)
+    (12, 'paymentKey_012_' || CAST(RANDOM() * 1000000 AS INT), 28000),
+    (13, 'paymentKey_013_' || CAST(RANDOM() * 1000000 AS INT), 25000),
+    (14, 'paymentKey_014_' || CAST(RANDOM() * 1000000 AS INT), 27000),
+    (15, 'paymentKey_015_' || CAST(RANDOM() * 1000000 AS INT), 30000),
+    (16, 'paymentKey_016_' || CAST(RANDOM() * 1000000 AS INT), 32000),
+    (17, 'paymentKey_017_' || CAST(RANDOM() * 1000000 AS INT), 29000),
+    (18, 'paymentKey_018_' || CAST(RANDOM() * 1000000 AS INT), 31000),
+    (19, 'paymentKey_019_' || CAST(RANDOM() * 1000000 AS INT), 26000),
+    (20, 'paymentKey_020_' || CAST(RANDOM() * 1000000 AS INT), 33000),
+    (21, 'paymentKey_021_' || CAST(RANDOM() * 1000000 AS INT), 28000),
+    (22, 'paymentKey_022_' || CAST(RANDOM() * 1000000 AS INT), 25000),
+    (23, 'paymentKey_023_' || CAST(RANDOM() * 1000000 AS INT), 34000),
+    (24, 'paymentKey_024_' || CAST(RANDOM() * 1000000 AS INT), 27000),
+    (25, 'paymentKey_025_' || CAST(RANDOM() * 1000000 AS INT), 30000);
