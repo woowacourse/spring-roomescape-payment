@@ -32,9 +32,7 @@ public class TossPaymentClient implements PaymentClient {
                 .body(TossPaymentRequest.from(request))
                 .retrieve()
                 .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
-                        (req, res) -> {
-                            handleException(res);
-                        })
+                        (req, res) -> handleException(res))
                 .body(TossPaymentResponse.class);
     }
 

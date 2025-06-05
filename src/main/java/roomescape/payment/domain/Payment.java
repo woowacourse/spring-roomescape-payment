@@ -32,16 +32,16 @@ public class Payment {
     private Reservation reservation;
 
     @Enumerated(value = EnumType.STRING)
-    private PaymentStatus status;
+    private PaymentStatus paymentStatus;
 
     private Payment(final Long id, final String orderId, final String paymentKey, final BigDecimal amount,
-                    final Reservation reservation, final PaymentStatus status) {
+                    final Reservation reservation, final PaymentStatus paymentStatus) {
         this.id = id;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.amount = amount;
         this.reservation = reservation;
-        this.status = status;
+        this.paymentStatus = paymentStatus;
     }
 
     public static Payment pending(
@@ -62,10 +62,14 @@ public class Payment {
     }
 
     public void success() {
-        this.status = PaymentStatus.SUCCESS;
+        this.paymentStatus = PaymentStatus.SUCCESS;
     }
 
     public void fail() {
-        this.status = PaymentStatus.FAILED;
+        this.paymentStatus = PaymentStatus.FAILED;
+    }
+
+    public void removeReservation() {
+        this.reservation = null;
     }
 }

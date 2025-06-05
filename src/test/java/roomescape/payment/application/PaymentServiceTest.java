@@ -49,7 +49,7 @@ class PaymentServiceTest {
         final Payment payment = paymentService.pay(prePaymentRequest, paymentConfirmRequest, reservation);
 
         // then
-        assertThat(payment.getStatus()).isEqualTo(PaymentStatus.SUCCESS);
+        assertThat(payment.getPaymentStatus()).isEqualTo(PaymentStatus.SUCCESS);
     }
 
     @Test
@@ -130,6 +130,6 @@ class PaymentServiceTest {
         final Payment payment = paymentService.await(prePaymentRequest, reservation);
 
         // then
-        assertThat(payment.getStatus()).isEqualTo(PaymentStatus.AWAIT);
+        assertThat(payment.getPaymentStatus()).isEqualTo(PaymentStatus.AWAIT);
     }
 }

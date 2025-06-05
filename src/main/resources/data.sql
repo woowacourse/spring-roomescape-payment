@@ -60,8 +60,19 @@ VALUES (DATEADD('DAY', +4, CURRENT_DATE), 3, 1, 3, 'PENDING', TIMESTAMPADD(HOUR,
 INSERT INTO waiting (date, time_id, theme_id, member_id, waiting_status, created_at)
 VALUES (DATEADD('DAY', +4, CURRENT_DATE), 3, 1, 1, 'PENDING', TIMESTAMPADD(HOUR, 11, DATEADD('DAY', +3, CURRENT_DATE)));
 
--- 결제
-INSERT INTO payment (order_id, payment_key, amount, reservation_id, status)
-VALUES (1, 'pay_1234567890', 10000, 1, 'SUCCESS');
-INSERT INTO payment (order_id, payment_key, amount, reservation_id, status)
-VALUES (2, 'pay_1234567891', 20000, 2, 'SUCCESS');
+INSERT INTO payment (order_id, payment_key, amount, reservation_id, payment_status)
+VALUES ('WEB_RESV_DUMMY_1', 'tgen_dummy_1', 20000, 1, 'SUCCESS');
+INSERT INTO payment (order_id, payment_key, amount, reservation_id, payment_status)
+VALUES ('WEB_RESV_DUMMY_2', 'tgen_dummy_2', 20000, 2, 'SUCCESS');
+INSERT INTO payment (order_id, payment_key, amount, reservation_id, payment_status)
+VALUES ('WEB_RESV_DUMMY_3', 'tgen_dummy_3', 20000, 3, 'SUCCESS');
+INSERT INTO payment (order_id, payment_key, amount, reservation_id, payment_status)
+VALUES ('WEB_RESV_DUMMY_4', 'tgen_dummy_4', 10000, 4, 'SUCCESS');
+INSERT INTO payment (order_id, payment_key, amount, reservation_id, payment_status)
+VALUES ('WEB_RESV_DUMMY_5', 'tgen_dummy_5', 10000, 5, 'SUCCESS');
+INSERT INTO payment (order_id, payment_key, amount, reservation_id, payment_status)
+VALUES ('WEB_RESV_DUMMY_6', 'tgen_dummy_6', 30000, 6, 'SUCCESS');
+INSERT INTO payment (order_id, payment_key, amount, reservation_id, payment_status)
+VALUES ('WEB_RESV_DUMMY_7', 'tgen_dummy_7', 20000, 7, 'SUCCESS');
+INSERT INTO payment (order_id, payment_key, amount, reservation_id, payment_status)
+VALUES ('WEB_RESV_DUMMY_8', 'tgen_dummy_8', 10000, 8, 'SUCCESS');
