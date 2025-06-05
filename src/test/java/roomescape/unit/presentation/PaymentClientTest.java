@@ -17,7 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
-import roomescape.domain.PaymentInfo;
+import roomescape.domain.Payment;
 import roomescape.dto.request.PaymentRequest;
 import roomescape.exception.FilteredPaymentException;
 import roomescape.infrastructure.payment.PaymentClient;
@@ -39,8 +39,8 @@ public class PaymentClientTest {
     void 결제_요청_응답을_확인한다() throws Exception {
         //given
         ObjectMapper objectMapper = new ObjectMapper();
-        PaymentInfo paymentInfo = new PaymentInfo("1", 1000);
-        String paymentInfoJson = objectMapper.writeValueAsString(paymentInfo);
+        Payment payment = Payment.createPaymentWithoutId("10", "1", 1000);
+        String paymentInfoJson = objectMapper.writeValueAsString(payment);
 
         server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))
@@ -48,9 +48,9 @@ public class PaymentClientTest {
 
         //when
         PaymentRequest paymentRequest = new PaymentRequest(1000, "1", "10");
-        PaymentInfo result = clientController.postPaymentInfo(paymentRequest);
+        Payment result = clientController.postPaymentInfo(paymentRequest);
 
-        assertThat(paymentInfo).isEqualTo(result);
+        assertThat(payment).isEqualTo(result);
     }
 
     @ParameterizedTest

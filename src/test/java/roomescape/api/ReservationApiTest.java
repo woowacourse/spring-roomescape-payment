@@ -20,7 +20,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.auth.Role;
 import roomescape.domain.Member;
-import roomescape.domain.PaymentInfo;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
@@ -82,8 +82,8 @@ public class ReservationApiTest {
         reservation.put("orderId", "1");
         reservation.put("amount", 1000);
 
-        PaymentInfo paymentInfo = new PaymentInfo("1", 1000);
-        BDDMockito.given(paymentClient.postPaymentInfo(any())).willReturn(paymentInfo);
+        Payment payment = Payment.createPaymentWithoutId("1", "1", 1000);
+        BDDMockito.given(paymentClient.postPaymentInfo(any())).willReturn(payment);
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)

@@ -1,7 +1,7 @@
 package roomescape.service;
 
 import org.springframework.stereotype.Service;
-import roomescape.domain.PaymentInfo;
+import roomescape.domain.Payment;
 import roomescape.dto.request.PaymentRequest;
 import roomescape.infrastructure.payment.PaymentClient;
 
@@ -13,7 +13,7 @@ public class PaymentService {
         this.paymentClient = paymentClient;
     }
 
-    public PaymentInfo createPaymentInfo(PaymentRequest paymentRequest) {
+    public Payment createPaymentInfo(PaymentRequest paymentRequest) {
         return paymentClient.postPaymentInfo(paymentRequest);
     }
 }
