@@ -22,7 +22,7 @@ import roomescape.domain.ReservationTime;
 import roomescape.domain.Role;
 import roomescape.domain.Theme;
 import roomescape.domain.Waiting;
-import roomescape.dto.business.PaymentHistoryCreationContent;
+import roomescape.dto.business.PaymentCreationContent;
 import roomescape.dto.business.PaymentResult;
 import roomescape.dto.business.ReservationCreationContent;
 import roomescape.dto.response.ReservationResponse;
@@ -187,12 +187,12 @@ class ReservationServiceTest {
 
             ReservationCreationContent reservationCreationContent =
                     new ReservationCreationContent(theme.getId(), NEXT_DAY, reservationTime.getId());
-            PaymentHistoryCreationContent paymentHistoryCreationContent =
-                    new PaymentHistoryCreationContent("order_id", "payment_key", "NORMAL", 1000);
+            PaymentCreationContent paymentCreationContent =
+                    new PaymentCreationContent("order_id", "payment_key", 1000);
 
             // when
             ReservationResponse reservationResponse = reservationService.addReservation(
-                    member.getId(), reservationCreationContent, paymentHistoryCreationContent);
+                    member.getId(), reservationCreationContent, paymentCreationContent);
 
             // then
             assertAll(
@@ -210,13 +210,13 @@ class ReservationServiceTest {
 
             ReservationCreationContent reservationCreationContent =
                     new ReservationCreationContent(theme.getId(), NEXT_DAY, reservationTime.getId());
-            PaymentHistoryCreationContent paymentHistoryCreationContent =
-                    new PaymentHistoryCreationContent("order_id", "payment_key", "NORMAL", 1000);
+            PaymentCreationContent paymentCreationContent =
+                    new PaymentCreationContent("order_id", "payment_key", 1000);
 
             // when & then
             assertAll(
                     () -> assertThatThrownBy(() -> reservationService.addReservation(
-                            member.getId(), reservationCreationContent, paymentHistoryCreationContent))
+                            member.getId(), reservationCreationContent, paymentCreationContent))
                             .isInstanceOf(PaymentException.class),
                     () -> assertThat(reservationRepository.findAll()).hasSize(0)
             );

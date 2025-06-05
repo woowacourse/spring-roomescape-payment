@@ -29,7 +29,7 @@ import roomescape.configuration.annotation.docs.DocsDuplicatedDateCreationRespon
 import roomescape.configuration.annotation.docs.DocsSuccessResponse;
 import roomescape.domain.Role;
 import roomescape.dto.business.AccessTokenContent;
-import roomescape.dto.business.PaymentHistoryCreationContent;
+import roomescape.dto.business.PaymentCreationContent;
 import roomescape.dto.business.ReservationCreationContent;
 import roomescape.dto.request.AdminReservationRequest;
 import roomescape.dto.request.ReservationCreationRequest;
@@ -130,10 +130,10 @@ public class ReservationController {
             @RequiredAccessToken AccessTokenContent accessTokenContent
     ) {
         ReservationCreationContent creationContent = new ReservationCreationContent(request);
-        PaymentHistoryCreationContent paymentHistoryCreationContent = new PaymentHistoryCreationContent(request);
+        PaymentCreationContent paymentCreationContent = new PaymentCreationContent(request);
 
         ReservationResponse reservationResponse = reservationService.addReservation(accessTokenContent.id(),
-                creationContent, paymentHistoryCreationContent);
+                creationContent, paymentCreationContent);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(URI.create("/reservation/" + reservationResponse.id()))
                 .body(reservationResponse);

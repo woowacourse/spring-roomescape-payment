@@ -7,7 +7,7 @@ import roomescape.domain.Payment;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.domain.Waiting;
-import roomescape.dto.business.PaymentHistoryCreationContent;
+import roomescape.dto.business.PaymentCreationContent;
 import roomescape.dto.business.WaitingCreationContent;
 import roomescape.dto.response.WaitingResponse;
 import roomescape.exception.BadRequestException;
@@ -51,13 +51,13 @@ public class WaitingService {
     @Transactional
     public WaitingResponse addWaiting(
             WaitingCreationContent content,
-            PaymentHistoryCreationContent paymentHistoryCreationContent
+            PaymentCreationContent paymentCreationContent
     ) {
         Theme theme = themeQueryService.getThemeById(content.themeId());
         ReservationTime time = timeQueryService.getTimeById(content.timeId());
         Member member = memberQueryService.getMemberById(content.memberId());
 
-        Payment paymentHistory = paymentService.savePayment(paymentHistoryCreationContent);
+        Payment paymentHistory = paymentService.savePayment(paymentCreationContent);
         Waiting waiting = Waiting.createWithoutId(content.date(), theme, time, member, paymentHistory);
 
         validateEmptyReservation(waiting);

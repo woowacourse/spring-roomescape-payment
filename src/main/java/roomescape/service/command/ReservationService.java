@@ -10,7 +10,7 @@ import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
 import roomescape.domain.Waiting;
-import roomescape.dto.business.PaymentHistoryCreationContent;
+import roomescape.dto.business.PaymentCreationContent;
 import roomescape.dto.business.ReservationCreationContent;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.exception.BadRequestException;
@@ -71,13 +71,13 @@ public class ReservationService {
     public ReservationResponse addReservation(
             long memberId,
             ReservationCreationContent reservationCreationContent,
-            PaymentHistoryCreationContent paymentHistoryCreationContent
+            PaymentCreationContent paymentCreationContent
     ) {
         Member member = memberQueryService.getMemberById(memberId);
         Theme theme = themeQueryService.getThemeById(reservationCreationContent.themeId());
         ReservationTime time = timeQueryService.getReservationTimeById(reservationCreationContent.timeId());
 
-        Payment paymentHistory = paymentService.savePayment(paymentHistoryCreationContent);
+        Payment paymentHistory = paymentService.savePayment(paymentCreationContent);
         Reservation reservation = Reservation.createWithoutId(reservationCreationContent.date(), time, theme, member,
                 paymentHistory);
 

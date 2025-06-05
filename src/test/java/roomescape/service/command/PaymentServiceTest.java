@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
-import roomescape.dto.business.PaymentHistoryCreationContent;
+import roomescape.dto.business.PaymentCreationContent;
 import roomescape.dto.business.PaymentResult;
 import roomescape.exception.PaymentException;
 import roomescape.repository.PaymentRepository;
@@ -41,8 +41,8 @@ class PaymentServiceTest {
             PaymentResult paymentResult = new PaymentResult("order_id", "payment_key", 1000L);
             paymentClientStub.setAuthorizePayment(paymentResult);
 
-            PaymentHistoryCreationContent creationContent = new PaymentHistoryCreationContent(
-                    paymentResult.orderId(), paymentResult.paymentKey(), "NORMAL",
+            PaymentCreationContent creationContent = new PaymentCreationContent(
+                    paymentResult.orderId(), paymentResult.paymentKey(),
                     Integer.parseInt(paymentResult.totalAmount().toString()));
 
             // when
@@ -59,8 +59,8 @@ class PaymentServiceTest {
             PaymentException exception = new PaymentException("결제 승인 실패");
             paymentClientStub.setAuthorizePayment(exception);
 
-            PaymentHistoryCreationContent creationContent = new PaymentHistoryCreationContent(
-                    "order_id", "payment_key", "NORMAL", 1000);
+            PaymentCreationContent creationContent = new PaymentCreationContent(
+                    "order_id", "payment_key", 1000);
 
             // when & then
             assertAll(

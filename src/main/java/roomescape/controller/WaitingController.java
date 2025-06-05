@@ -26,7 +26,7 @@ import roomescape.configuration.annotation.docs.DocsDuplicatedDateCreationRespon
 import roomescape.configuration.annotation.docs.DocsSuccessResponse;
 import roomescape.domain.Role;
 import roomescape.dto.business.AccessTokenContent;
-import roomescape.dto.business.PaymentHistoryCreationContent;
+import roomescape.dto.business.PaymentCreationContent;
 import roomescape.dto.business.WaitingCreationContent;
 import roomescape.dto.request.WaitingCreationRequest;
 import roomescape.dto.response.WaitingResponse;
@@ -74,9 +74,9 @@ public class WaitingController {
     ) {
         WaitingCreationContent creationContent =
                 new WaitingCreationContent(request.date(), request.themeId(), request.timeId(), token.id());
-        PaymentHistoryCreationContent paymentHistoryCreationContent = new PaymentHistoryCreationContent(request);
+        PaymentCreationContent paymentCreationContent = new PaymentCreationContent(request);
 
-        WaitingResponse waitingResponse = waitingService.addWaiting(creationContent, paymentHistoryCreationContent);
+        WaitingResponse waitingResponse = waitingService.addWaiting(creationContent, paymentCreationContent);
         return ResponseEntity.created(URI.create("/waiting/" + waitingResponse.id())).body(waitingResponse);
     }
 

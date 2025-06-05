@@ -21,7 +21,7 @@ import roomescape.domain.ReservationTime;
 import roomescape.domain.Role;
 import roomescape.domain.Theme;
 import roomescape.domain.Waiting;
-import roomescape.dto.business.PaymentHistoryCreationContent;
+import roomescape.dto.business.PaymentCreationContent;
 import roomescape.dto.business.WaitingCreationContent;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.NotFoundException;
@@ -84,11 +84,11 @@ class WaitingServiceTest {
             // given
             WaitingCreationContent creationContent =
                     new WaitingCreationContent(NEXT_DAY, theme.getId(), time.getId(), member.getId());
-            PaymentHistoryCreationContent paymentHistoryCreationContent =
-                    new PaymentHistoryCreationContent("312313", "12312re", "NORMAL", 1000);
+            PaymentCreationContent paymentCreationContent =
+                    new PaymentCreationContent("312313", "12312re", 1000);
 
             // when
-            waitingService.addWaiting(creationContent, paymentHistoryCreationContent);
+            waitingService.addWaiting(creationContent, paymentCreationContent);
 
             // then
             assertAll(
@@ -105,13 +105,13 @@ class WaitingServiceTest {
 
             WaitingCreationContent waitingCreationContent =
                     new WaitingCreationContent(NEXT_DAY, theme.getId(), time.getId(), member.getId());
-            PaymentHistoryCreationContent paymentHistoryCreationContent =
-                    new PaymentHistoryCreationContent("312313", "12312re", "NORMAL", 1000);
+            PaymentCreationContent paymentCreationContent =
+                    new PaymentCreationContent("312313", "12312re", 1000);
 
             // when & then
             assertAll(
                     () -> assertThatThrownBy(() ->
-                            waitingService.addWaiting(waitingCreationContent, paymentHistoryCreationContent))
+                            waitingService.addWaiting(waitingCreationContent, paymentCreationContent))
                             .isInstanceOf(PaymentException.class),
                     () -> assertThat(waitingRepository.findAll()).hasSize(0),
                     () -> assertThat(paymentRepository.findAll()).hasSize(0)
@@ -124,11 +124,11 @@ class WaitingServiceTest {
             // given
             WaitingCreationContent creationContent =
                     new WaitingCreationContent(NEXT_DAY, theme.getId() + 100, time.getId(), member.getId());
-            PaymentHistoryCreationContent paymentHistoryCreationContent =
-                    new PaymentHistoryCreationContent("312313", "12312re", "NORMAL", 1000);
+            PaymentCreationContent paymentCreationContent =
+                    new PaymentCreationContent("312313", "12312re", 1000);
 
             // when & then
-            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentHistoryCreationContent))
+            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentCreationContent))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage("ID에 해당하는 테마는 존재하지 않습니다.");
 
@@ -140,11 +140,11 @@ class WaitingServiceTest {
             // given
             WaitingCreationContent creationContent =
                     new WaitingCreationContent(NEXT_DAY, theme.getId(), time.getId() + 100, member.getId());
-            PaymentHistoryCreationContent paymentHistoryCreationContent =
-                    new PaymentHistoryCreationContent("312313", "12312re", "NORMAL", 1000);
+            PaymentCreationContent paymentCreationContent =
+                    new PaymentCreationContent("312313", "12312re", 1000);
 
             // when & then
-            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentHistoryCreationContent))
+            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentCreationContent))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage("ID에 해당하는 예약시간이 존재하지 않습니다.");
         }
@@ -155,11 +155,11 @@ class WaitingServiceTest {
             // given
             WaitingCreationContent creationContent =
                     new WaitingCreationContent(NEXT_DAY, theme.getId(), time.getId(), member.getId() + 100);
-            PaymentHistoryCreationContent paymentHistoryCreationContent =
-                    new PaymentHistoryCreationContent("312313", "12312re", "NORMAL", 1000);
+            PaymentCreationContent paymentCreationContent =
+                    new PaymentCreationContent("312313", "12312re", 1000);
 
             // when & then
-            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentHistoryCreationContent))
+            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentCreationContent))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage("ID에 해당하는 회원을 찾을 수 없습니다.");
         }
@@ -175,11 +175,11 @@ class WaitingServiceTest {
 
             WaitingCreationContent creationContent =
                     new WaitingCreationContent(YESTERDAY, theme.getId(), time.getId(), member.getId());
-            PaymentHistoryCreationContent paymentHistoryCreationContent =
-                    new PaymentHistoryCreationContent("312313", "12312re", "NORMAL", 1000);
+            PaymentCreationContent paymentCreationContent =
+                    new PaymentCreationContent("312313", "12312re", 1000);
 
             // when & then
-            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentHistoryCreationContent))
+            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentCreationContent))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage("과거 날짜와 시간으로 예약 대기를 생성할 수 없습니다.");
         }
@@ -194,11 +194,11 @@ class WaitingServiceTest {
 
             WaitingCreationContent creationContent =
                     new WaitingCreationContent(NEXT_DAY, theme.getId(), time.getId(), member.getId());
-            PaymentHistoryCreationContent paymentHistoryCreationContent =
-                    new PaymentHistoryCreationContent("312313", "12312re", "NORMAL", 1000);
+            PaymentCreationContent paymentCreationContent =
+                    new PaymentCreationContent("312313", "12312re", 1000);
 
             // when & then
-            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentHistoryCreationContent))
+            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentCreationContent))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage("중복된 예약 대기는 허용하지 않습니다.");
         }
@@ -209,11 +209,11 @@ class WaitingServiceTest {
             // given
             WaitingCreationContent creationContent =
                     new WaitingCreationContent(NEXT_DAY.plusDays(100), theme.getId(), time.getId(), member.getId());
-            PaymentHistoryCreationContent paymentHistoryCreationContent =
-                    new PaymentHistoryCreationContent("312313", "12312re", "NORMAL", 1000);
+            PaymentCreationContent paymentCreationContent =
+                    new PaymentCreationContent("312313", "12312re", 1000);
 
             // when & then
-            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentHistoryCreationContent))
+            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentCreationContent))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage("예약이 존재하지 않는 예약 대기는 허용하지 않습니다.");
         }
