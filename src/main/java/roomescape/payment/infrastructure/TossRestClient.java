@@ -1,14 +1,9 @@
 package roomescape.payment.infrastructure;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
@@ -16,25 +11,17 @@ import roomescape.payment.dto.TossPaymentCancelRequest;
 import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.payment.exception.PaymentTimeoutException;
-import roomescape.payment.exception.TossErrorResponse;
-import roomescape.payment.exception.TossPaymentException;
 
 @Slf4j
 public class TossRestClient {
 
-    private static final List<String> SERVER_ERROR_CODE_LIST = List.of(
-            "INVALID_API_KEY",
-            "UNAUTHORIZED_KEY",
-            "INCORRECT_BASIC_AUTH_FORMAT",
-            "INVALID_AUTHORIZE_AUTH"
-    );
-
     private final RestClient restClient;
+    private final TossErrorHandler tossErrorHandler;
     private final String authHeaderValue;
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public TossRestClient(final RestClient restClient, final TossPaymentProperties tossPaymentProperties) {
+    public TossRestClient(final RestClient restClient, final TossErrorHandler tossErrorHandler, final TossPaymentProperties tossPaymentProperties) {
         this.restClient = restClient;
+        this.tossErrorHandler = tossErrorHandler;
         this.authHeaderValue = "Basic " +
                 Base64.getEncoder().encodeToString((tossPaymentProperties.getWidgetSecretKey() + ":").getBytes(StandardCharsets.UTF_8));
     }
@@ -59,13 +46,7 @@ public class TossRestClient {
                     .retrieve()
                     .onStatus(
                             status -> status.is4xxClientError() || status.is5xxServerError(),
-                            (request, response) -> {
-                                TossErrorResponse tossErrorResponse = extractResponseFrom(response.getBody());
-                                boolean isServerError = isServerError(tossErrorResponse.code());
-                                log.error("토스 API error: {}", tossErrorResponse);
-                                throw new TossPaymentException(
-                                        response.getStatusCode(), tossErrorResponse.message(), isServerError);
-                            }
+                            tossErrorHandler
                     )
                     .body(TossPaymentResponse.class);
         } catch (ResourceAccessException ex) {
@@ -76,19 +57,5 @@ public class TossRestClient {
             }
             throw ex;
         }
-    }
-
-    private TossErrorResponse extractResponseFrom(InputStream errorStream) {
-        try (errorStream) {
-            String errorBody = new String(errorStream.readAllBytes(), StandardCharsets.UTF_8);
-            return objectMapper.readValue(errorBody, TossErrorResponse.class);
-        } catch (IOException e) {
-            boolean isServerError = true;
-            throw new TossPaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "토스 오류 응답을 파싱할 수 없습니다.", isServerError);
-        }
-    }
-
-    private boolean isServerError(String code) {
-        return SERVER_ERROR_CODE_LIST.contains(code);
     }
 }

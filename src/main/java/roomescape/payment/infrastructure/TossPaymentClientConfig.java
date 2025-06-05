@@ -14,6 +14,7 @@ import org.springframework.web.client.RestClient;
 public class TossPaymentClientConfig {
 
     private final TossPaymentProperties tossPaymentProperties;
+    private final TossErrorHandler tossErrorHandler;
 
     @Bean
     public TossRestClient tossRestClient(final TossPaymentProperties tossPaymentProperties) {
@@ -22,7 +23,7 @@ public class TossPaymentClientConfig {
                 .baseUrl(tossPaymentProperties.getBaseUrl())
                 .build();
 
-        return new TossRestClient(restClient, tossPaymentProperties);
+        return new TossRestClient(restClient, tossErrorHandler, tossPaymentProperties);
     }
 
     private ClientHttpRequestFactory clientHttpRequestFactory() {
