@@ -5,6 +5,7 @@ import static org.springframework.web.client.RestClient.Builder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Base64.Encoder;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.common.config.TossPaymentsProperties;
@@ -17,8 +18,11 @@ public class TossPaymentClient implements PaymentClient {
 
     private RestClient restClient;
 
-    public TossPaymentClient(TossPaymentsProperties properties, Builder tossRestClientBuilder) {
-            restClient = tossRestClientBuilder
+    public TossPaymentClient(
+            TossPaymentsProperties properties,
+            @Qualifier("tossRestClientBuilder") Builder builder
+    ) {
+        restClient = builder
                 .defaultStatusHandler(new TossPaymentErrorHandler())
                 .defaultHeader("Authorization", getAuthorization(properties.getSecretKey()))
                 .defaultHeader("Content-Type", "application/json")
