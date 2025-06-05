@@ -38,6 +38,7 @@ public class ReservationPaymentFacade {
         ResponseEntity<TossPaymentResponse> response = tossPaymentClient.confirmPayment(confirmRequest);
 
         if (response.getStatusCode().is2xxSuccessful()) {
+            // TODO: 승인 요청한 정보와 요청 받은 정보 일치하는가
             paymentService.confirm(reservationWithPendingPayment.paymentId());
             return reservationWithPendingPayment;
         }
@@ -45,7 +46,7 @@ public class ReservationPaymentFacade {
         reservationService.deleteReservationById(reservationWithPendingPayment.id());
         paymentService.cancel(reservationWithPendingPayment.paymentId());
 
-        tossPaymentClient.handleTosPamentException(response);
+        tossPaymentClient.handleTosPaymentException(response);
         throw new InternalServerException();
     }
 }
