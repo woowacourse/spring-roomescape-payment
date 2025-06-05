@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.PaymentHistory;
 import roomescape.domain.PaymentResult;
 import roomescape.dto.business.PaymentHistoryCreationContent;
-import roomescape.exception.aspect.ReservationLogging;
+import roomescape.exception.aspect.PaymentLogging;
 import roomescape.external.payment.PaymentClient;
 import roomescape.repository.PaymentHistoryRepository;
 import roomescape.repository.PaymentResultRepository;
@@ -25,7 +25,7 @@ public class PaymentService {
         this.paymentResultRepository = paymentResultRepository;
     }
 
-    @ReservationLogging
+    @PaymentLogging
     public PaymentResult pay(PaymentHistoryCreationContent content) {
         return requestPay(content);
     }
@@ -36,7 +36,7 @@ public class PaymentService {
         paymentHistoryRepository.save(paymentHistory);
     }
 
-    @ReservationLogging
+    @PaymentLogging
     private PaymentResult requestPay(PaymentHistoryCreationContent content) {
         PaymentResult payResult = paymentClient.pay(content.paymentKey(), content.orderId(), content.amount(),
                 content.paymentType());

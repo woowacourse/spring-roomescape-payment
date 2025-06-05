@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
-public class ReservationLoggingAspect {
+public class PaymentLoggingAspect {
 
-    private static final Logger logger = LoggerFactory.getLogger(ReservationLoggingAspect.class);
+    private static final Logger logger = LoggerFactory.getLogger(PaymentLoggingAspect.class);
 
-    @Around("@annotation(roomescape.exception.aspect.ReservationLogging)")
+    @Around("@annotation(roomescape.exception.aspect.PaymentLogging)")
     public Object logPaymentExecution(ProceedingJoinPoint joinPoint) throws Throwable {
         String methodName = joinPoint.getSignature().getName();
         String className = joinPoint.getTarget().getClass().getSimpleName();
@@ -23,13 +23,8 @@ public class ReservationLoggingAspect {
         long startTime = System.currentTimeMillis();
 
         try {
-            logger.info("{}.{} 시작", className, methodName);
-
+            logger.info("{}.{} 요청", className, methodName);
             Object result = joinPoint.proceed();
-
-            long executionTime = System.currentTimeMillis() - startTime;
-            logger.info("{} 완료 - 소요시간: {}ms", methodName, executionTime);
-
             return result;
 
         } catch (Exception e) {

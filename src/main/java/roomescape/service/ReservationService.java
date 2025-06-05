@@ -20,7 +20,6 @@ import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationStatusResponse;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.NotFoundException;
-import roomescape.exception.aspect.ReservationLogging;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
@@ -86,7 +85,6 @@ public class ReservationService {
                 .toList();
     }
 
-    @ReservationLogging
     public ReservationResponse addReservation(long memberId, ReservationCreationContent request) {
         Member member = getMemberById(memberId);
         Theme theme = getThemeById(request.themeId());
@@ -102,7 +100,6 @@ public class ReservationService {
         return new ReservationResponse(savedReservation);
     }
 
-    @ReservationLogging
     public ReservationResponse addReservation(long memberId,
                                               ReservationCreationContent reservationCreationContent,
                                               PaymentHistoryCreationContent paymentHistoryCreationContent) {
