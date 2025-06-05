@@ -115,12 +115,13 @@ VALUES
 (CURRENT_DATE - 3, 2, 8, 3, 'RESERVED'),
 (CURRENT_DATE - 3, 1, 8, 4, 'RESERVED'),
 
--- theme_id 9: 2건
+-- theme_id 9: 4건
 (CURRENT_DATE - 2, 2, 9, 2, 'RESERVED'),
 (CURRENT_DATE - 2, 1, 9, 3, 'RESERVED'),
 (CURRENT_DATE + 1, 2, 9, 4, 'RESERVED'),
+(CURRENT_DATE + 1, 1, 9, 3, 'RESERVED'),
 
--- theme_id 10: 1건
+-- theme_id 10: 2건
 (CURRENT_DATE - 1, 1, 10, 2, 'RESERVED'),
 (CURRENT_DATE + 2, 1, 10, 2, 'RESERVED');
 
@@ -133,3 +134,8 @@ VALUES
 
 (57, CURRENT_DATE + 2, 1, 10, 3, 1),
 (57, CURRENT_DATE + 2, 1, 10, 4, 2);
+
+-- payment
+INSERT INTO payment (reservation_id, order_id, payment_key, amount)
+values
+(56, 'ORDER_MC44MTkyMzU2MDMxNjk5', 'tgen_20250605205138XmSm8', 1000);
