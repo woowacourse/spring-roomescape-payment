@@ -20,33 +20,32 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.config.TestConfig;
 import roomescape.global.auth.dto.UserInfo;
-import roomescape.global.auth.service.MyPasswordEncoder;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.member.repository.MemberRepository;
-import roomescape.member.service.MemberService;
 import roomescape.payment.infrastructure.PaymentRepository;
 import roomescape.payment.infrastructure.TossApiClient;
 import roomescape.payment.infrastructure.dto.response.PaymentResponse;
 import roomescape.payment.service.PaymentService;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationInfo;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.dto.request.PaymentRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
-import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.MyReservationResponse;
+import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponseWithPayment;
 import roomescape.reservation.exception.ReservationAlreadyExistsException;
 import roomescape.reservation.fixture.TestFixture;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.WaitingRepository;
+import roomescape.reservation.service.transaction.ReservationTransactionService;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.exception.ReservationTimeNotFoundException;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
-import roomescape.reservationtime.service.ReservationTimeService;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
-import roomescape.theme.service.ThemeService;
 
 @DataJpaTest
 @Import(TestConfig.class)
@@ -78,6 +77,7 @@ class ReservationFacadeServiceTest {
     @Autowired
     private PaymentRepository paymentRepository;
 
+    private WaitingFacadeService waitingFacadeService;
     private ReservationFacadeService reservationFacadeService;
     private ReservationTime time;
     private Theme theme;
@@ -85,14 +85,17 @@ class ReservationFacadeServiceTest {
 
     @BeforeEach
     void setUp() {
-        reservationFacadeService = new ReservationFacadeService(
-                new ReservationService(reservationRepository, paymentRepository),
-                new WaitingService(waitingRepository),
-                new MemberService(memberRepository, new MyPasswordEncoder()),
-                new ThemeService(themeRepository, reservationRepository),
-                new ReservationTimeService(reservationTimeRepository, reservationRepository),
-                new PaymentService(tossApiClient, paymentRepository)
-        );
+        ReservationService reservationService = new ReservationService(reservationRepository, reservationTimeRepository,
+                themeRepository,
+                memberRepository, paymentRepository);
+        WaitingService waitingService = new WaitingService(waitingRepository, reservationTimeRepository,
+                memberRepository, themeRepository);
+        PaymentService paymentService = new PaymentService(tossApiClient, paymentRepository);
+        ReservationTransactionService reservationTransactionService = new ReservationTransactionService(
+                reservationService, paymentService);
+        reservationFacadeService = new ReservationFacadeService(reservationService, waitingService,
+                paymentService, reservationTransactionService);
+        waitingFacadeService = new WaitingFacadeService(waitingService);
 
         ReservationTime time2 = ReservationTime.withUnassignedId(LocalTime.of(9, 0));
         time = reservationTimeRepository.save(time2);
@@ -124,20 +127,6 @@ class ReservationFacadeServiceTest {
                 .hasMessageContaining("요청한 id와 일치하는 예약 시간 정보가 없습니다.");
     }
 
-    @Test
-    void createWaiting_shouldCreateWaiting() {
-        ReservationResponse response = reservationFacadeService.createWaiting(
-                new ReservationRequest(futureDate, time.getId(), theme.getId()),
-                member.getId()
-        );
-
-        assertAll(
-                () -> assertThat(response.member().name()).isEqualTo("Mint"),
-                () -> assertThat(response.date()).isEqualTo(futureDate),
-                () -> assertThat(response.time().startAt()).isEqualTo(LocalTime.of(9, 0)),
-                () -> assertThat(response.reservedStatus()).isEqualTo(ReservationStatus.WAITING.getName())
-        );
-    }
 
     @Test
     void create_shouldThrowException_whenReservationExists() {
@@ -166,7 +155,7 @@ class ReservationFacadeServiceTest {
                 new ReservationRequest(futureDate, time.getId(), theme.getId()),
                 member.getId()
         );
-        reservationFacadeService.createWaiting(
+        waitingFacadeService.createWaiting(
                 new ReservationRequest(futureDate, time.getId(), theme.getId()),
                 member.getId()
         );
@@ -225,7 +214,7 @@ class ReservationFacadeServiceTest {
                 member.getId()
         );
 
-        reservationFacadeService.createWaiting(
+        waitingFacadeService.createWaiting(
                 new ReservationRequest(futureDate, time.getId(), theme.getId()),
                 member.getId()
         );
@@ -257,4 +246,46 @@ class ReservationFacadeServiceTest {
 
         assertThat(result).isEmpty();
     }
+
+    @Test
+    void findReservations_shouldReturnAllReservations() {
+        ReservationInfo info = new ReservationInfo(futureDate, time, theme);
+        Reservation reservation = Reservation.createUpcomingReservationWithUnassignedId(member, info);
+        reservationRepository.save(reservation);
+
+        List<ReservationResponse> result = reservationFacadeService.findReservations(null, null, null, null);
+        assertThat(result).hasSize(1);
+    }
+
+    @Test
+    void findReservations_shouldFilterByThemeId() {
+        ReservationInfo info = new ReservationInfo(futureDate, time, theme);
+        Reservation reservation = Reservation.createUpcomingReservationWithUnassignedId(member, info);
+        reservationRepository.save(reservation);
+
+        List<ReservationResponse> result = reservationFacadeService.findReservations(theme.getId(), null, null, null);
+        assertThat(result).hasSize(1);
+    }
+
+    @Test
+    void findReservations_shouldFilterByMemberId() {
+        ReservationInfo info = new ReservationInfo(futureDate, time, theme);
+        Reservation reservation = Reservation.createUpcomingReservationWithUnassignedId(member, info);
+        reservationRepository.save(reservation);
+
+        List<ReservationResponse> result = reservationFacadeService.findReservations(null, member.getId(), null, null);
+        assertThat(result).hasSize(1);
+    }
+
+    @Test
+    void findReservations_shouldFilterByDateRange() {
+        ReservationInfo info = new ReservationInfo(futureDate, time, theme);
+        Reservation reservation = Reservation.createUpcomingReservationWithUnassignedId(member, info);
+        reservationRepository.save(reservation);
+
+        List<ReservationResponse> result = reservationFacadeService.findReservations(
+                null, null, futureDate, futureDate.plusDays(1));
+        assertThat(result).hasSize(1);
+    }
+
 } 

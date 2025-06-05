@@ -56,14 +56,9 @@ class ThemeServiceTest {
     @Autowired
     private MemberRepository memberRepository;
 
-    @Autowired
-    private PaymentRepository paymentRepository;
-
     private ThemeService themeService;
 
     private MemberService memberService;
-
-    private ReservationService reservationService;
 
     private ReservationTimeService reservationTimeService;
 
@@ -73,7 +68,6 @@ class ThemeServiceTest {
         memberService = new MemberService(memberRepository, myPasswordEncoder);
         reservationTimeService = new ReservationTimeService(reservationTimeRepository,
                 reservationRepository);
-        reservationService = new ReservationService(reservationRepository, paymentRepository);
     }
 
     @Test

@@ -21,11 +21,9 @@ import roomescape.member.repository.MemberRepository;
 import roomescape.payment.infrastructure.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationInfo;
-import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.exception.ReservationNotFoundException;
 import roomescape.reservation.fixture.TestFixture;
 import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservation.repository.WaitingRepository;
 import roomescape.reservation.repository.dto.ReservationWithPayment;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
@@ -43,9 +41,6 @@ class ReservationServiceTest {
 
     @Autowired
     private ReservationRepository reservationRepository;
-
-    @Autowired
-    private WaitingRepository waitingRepository;
 
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
@@ -66,7 +61,8 @@ class ReservationServiceTest {
 
     @BeforeEach
     void setUp() {
-        reservationService = new ReservationService(reservationRepository,paymentRepository);
+        reservationService = new ReservationService(reservationRepository, reservationTimeRepository, themeRepository,
+                memberRepository, paymentRepository);
 
         ReservationTime time2 = ReservationTime.withUnassignedId(LocalTime.of(9, 0));
         time = reservationTimeRepository.save(time2);
@@ -80,7 +76,7 @@ class ReservationServiceTest {
         Reservation reservation = Reservation.createUpcomingReservationWithUnassignedId(member, info);
         reservationRepository.save(reservation);
 
-        List<ReservationResponse> result = reservationService.findReservations(null, null, null, null);
+        List<Reservation> result = reservationService.getReservations(null, null, null, null);
         assertThat(result).hasSize(1);
     }
 
@@ -90,7 +86,7 @@ class ReservationServiceTest {
         Reservation reservation = Reservation.createUpcomingReservationWithUnassignedId(member, info);
         reservationRepository.save(reservation);
 
-        List<ReservationResponse> result = reservationService.findReservations(theme.getId(), null, null, null);
+        List<Reservation> result = reservationService.getReservations(theme.getId(), null, null, null);
         assertThat(result).hasSize(1);
     }
 
@@ -100,7 +96,7 @@ class ReservationServiceTest {
         Reservation reservation = Reservation.createUpcomingReservationWithUnassignedId(member, info);
         reservationRepository.save(reservation);
 
-        List<ReservationResponse> result = reservationService.findReservations(null, member.getId(), null, null);
+        List<Reservation> result = reservationService.getReservations(null, member.getId(), null, null);
         assertThat(result).hasSize(1);
     }
 
@@ -110,7 +106,7 @@ class ReservationServiceTest {
         Reservation reservation = Reservation.createUpcomingReservationWithUnassignedId(member, info);
         reservationRepository.save(reservation);
 
-        List<ReservationResponse> result = reservationService.findReservations(
+        List<Reservation> result = reservationService.getReservations(
                 null, null, futureDate, futureDate.plusDays(1));
         assertThat(result).hasSize(1);
     }

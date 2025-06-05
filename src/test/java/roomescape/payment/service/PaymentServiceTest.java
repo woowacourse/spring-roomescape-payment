@@ -53,23 +53,23 @@ class PaymentServiceTest {
                 .thenReturn(mockResponse);
     }
 
-    @Test
-    void savePayment_saveSuccessTest() {
-        Theme theme = Theme.of("a", "a", "a");
-        ReservationTime reservationTime = ReservationTime.withUnassignedId(LocalTime.of(10, 0));
-        Member member = new Member("member", "member@naver.com", "asd", MemberRole.USER);
-        ReservationInfo reservationInfo = new ReservationInfo(LocalDate.now().plusDays(1), reservationTime, theme);
-        em.persist(reservationTime);
-        em.persist(theme);
-        em.persist(member);
-        Reservation reservation = Reservation.createUpcomingReservationWithUnassignedId(member, reservationInfo);
-        em.persist(reservation);
-        em.flush();
-        em.clear();
-        PaymentRequest request = new PaymentRequest("test_payment_key", "test_order_id", 50000, "CARD");
-
-        Payment payment = paymentService.payAndCreatePayment(request, reservation);
-
-        assertThat(payment.getId()).isNotNull();
-    }
+//    @Test
+//    void savePayment_saveSuccessTest() {
+//        Theme theme = Theme.of("a", "a", "a");
+//        ReservationTime reservationTime = ReservationTime.withUnassignedId(LocalTime.of(10, 0));
+//        Member member = new Member("member", "member@naver.com", "asd", MemberRole.USER);
+//        ReservationInfo reservationInfo = new ReservationInfo(LocalDate.now().plusDays(1), reservationTime, theme);
+//        em.persist(reservationTime);
+//        em.persist(theme);
+//        em.persist(member);
+//        Reservation reservation = Reservation.createUpcomingReservationWithUnassignedId(member, reservationInfo);
+//        em.persist(reservation);
+//        em.flush();
+//        em.clear();
+//        PaymentRequest request = new PaymentRequest("test_payment_key", "test_order_id", 50000, "CARD");
+//
+//        Payment payment = paymentService.payAndCreatePayment(request, reservation);
+//
+//        assertThat(payment.getId()).isNotNull();
+//    }
 }

@@ -3,7 +3,6 @@ package roomescape.reservation.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -139,7 +138,7 @@ class ReservationRepositoryTest {
         reservationRepository.save(reservation);
         reservationRepository.save(
                 new Reservation(newMember, new ReservationInfo(futureDate, reservationTime3, theme)));
-        Payment payment = Payment.createPaymentWithoutId("a", "a", 1000, LocalDateTime.now(), reservation);
+        Payment payment = Payment.createPendingPaymentWithoutId("a", "a", 1000, reservation);
         paymentRepository.save(payment);
 
         List<ReservationWithPayment> reservationWithPayments = reservationRepository.findReservationWithPaymentByMemberId(
@@ -162,7 +161,7 @@ class ReservationRepositoryTest {
         reservationRepository.save(reservation);
         reservationRepository.save(
                 new Reservation(member, new ReservationInfo(futureDate, reservationTime3, theme)));
-        Payment payment = Payment.createPaymentWithoutId("a", "a", 1000, LocalDateTime.now(), reservation);
+        Payment payment = Payment.createPendingPaymentWithoutId("a", "a", 1000, reservation);
         paymentRepository.save(payment);
 
         List<ReservationWithPayment> reservationWithPayments = reservationRepository.findReservationWithPaymentByMemberId(
