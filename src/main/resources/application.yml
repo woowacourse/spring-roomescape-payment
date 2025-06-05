@@ -23,7 +23,7 @@ spring:
 
 toss:
   payment:
-    base-url: https://api.tosspayments.com/v1/payments
+    base-url: https://api.tosspayments.com/v1
     auth-scheme: Basic
     timeout:
       connect: 2

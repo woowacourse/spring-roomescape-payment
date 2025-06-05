@@ -28,7 +28,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @Import(TestPaymentConfiguration.class)
 class PaymentClientMockRestServiceServerTest {
 
-    private static final String PATH = "/confirm";
+    private static final String PATH = "/payments/confirm";
 
     @Autowired
     private MockRestServiceServer mockServer;
