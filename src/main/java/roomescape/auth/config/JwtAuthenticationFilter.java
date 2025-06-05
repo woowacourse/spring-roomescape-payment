@@ -38,7 +38,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         Long memberId = null;
         try {
-            final String subject = jwtTokenProvider.extractPrincipal(token);
+            final String subject = jwtTokenProvider.extractLoginMember(token);
             memberId = Long.valueOf(subject);
             request.setAttribute(MEMBER_ID_ATTRIBUTE, memberId);
         } catch (JwtException e) {
