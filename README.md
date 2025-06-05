@@ -1,6 +1,6 @@
 ## ERD
 
-```mermaidAdd commentMore actions
+```mermaid
 erDiagram
   MEMBER {
     BIGINT id PK
