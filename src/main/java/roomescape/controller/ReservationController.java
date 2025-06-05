@@ -1,5 +1,7 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
@@ -27,6 +29,7 @@ import roomescape.dto.response.ReservationStatusResponse;
 import roomescape.service.command.ReservationService;
 import roomescape.service.query.ReservationQueryService;
 
+@Tag(name = "ReservationController", description = "예약 관련 API")
 @RestController
 @RequestMapping("/reservations")
 public class ReservationController {
@@ -42,12 +45,14 @@ public class ReservationController {
         this.reservationQueryService = reservationQueryService;
     }
 
+    @Operation(summary = "Find All Reservation", description = "모든 예약 조회")
     @GetMapping
     @Authority(Role.ADMIN)
     public List<ReservationResponse> findAllReservations() {
         return reservationQueryService.findAllReservations();
     }
 
+    @Operation(summary = "Find All Reservation By Filter", description = "필터를 통해 예약 조회")
     @GetMapping(params = {"memberId", "themeId", "from", "to"})
     @Authority(Role.ADMIN)
     public List<ReservationResponse> searchReservationsByFilter(
@@ -59,6 +64,7 @@ public class ReservationController {
         return reservationQueryService.findReservationsByFilter(memberId, themeId, from, to);
     }
 
+    @Operation(summary = "Find Member's ALL Reservation States", description = "회원의 예약 상태를 모두 조회")
     @GetMapping("/state")
     @Authority(Role.GENERAL)
     public ReservationStatusResponse findAllReservationStateByMember(
@@ -67,6 +73,7 @@ public class ReservationController {
         return reservationQueryService.findAllReservationStatusByMember(accessTokenContent.id());
     }
 
+    @Operation(summary = "Add Reservation By Admin", description = "관리자의 예약 추가")
     @PostMapping
     @Authority(Role.ADMIN)
     public ResponseEntity<ReservationResponse> addReservationByAdmin(
@@ -80,6 +87,7 @@ public class ReservationController {
                 .body(reservationResponse);
     }
 
+    @Operation(summary = "Add Reservation By Member", description = "회원의 예약 추가")
     @PostMapping("/mine")
     @Authority(Role.GENERAL)
     public ResponseEntity<ReservationResponse> addReservationByMember(
@@ -96,6 +104,7 @@ public class ReservationController {
                 .body(reservationResponse);
     }
 
+    @Operation(summary = "DELETE RESERVATION BY ID", description = "ID를 기준으로 예약 삭제")
     @DeleteMapping("/{reservationId}")
     @Authority(Role.ADMIN)
     public ResponseEntity<Void> deleteReservationById(

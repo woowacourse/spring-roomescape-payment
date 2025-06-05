@@ -1,5 +1,7 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
@@ -24,6 +26,7 @@ import roomescape.dto.response.ReservationTimeWithBookingResponse;
 import roomescape.service.command.ReservationTimeService;
 import roomescape.service.query.ReservationTimeQueryService;
 
+@Tag(name = "ReservationTimeController", description = "예약 시간 관련 API")
 @RestController
 @RequestMapping("/times")
 public class ReservationTimeController {
@@ -36,11 +39,13 @@ public class ReservationTimeController {
         this.timeQueryService = timeQueryService;
     }
 
+    @Operation(summary = "Find All Reservation Times", description = "모든 예약 시간 조회")
     @GetMapping
     public List<ReservationTimeResponse> findAllReservationTimes() {
         return timeQueryService.findAllReservationTimes();
     }
 
+    @Operation(summary = "Find All Reservation Times With Booking", description = "예약 가능 여부와 함께 모든 예약 시간 조회")
     @GetMapping(params = {"themeId", "date"})
     public List<ReservationTimeWithBookingResponse> findReservationTimesWithBooking(
             @RequestParam("themeId") Long themeId,
@@ -53,6 +58,7 @@ public class ReservationTimeController {
                 .toList();
     }
 
+    @Operation(summary = "Add Reservation Time", description = "예약 시간 추가")
     @PostMapping
     @Authority(Role.ADMIN)
     public ResponseEntity<ReservationTimeResponse> addReservationTime(
@@ -65,6 +71,7 @@ public class ReservationTimeController {
                 .body(reservationTimeResponse);
     }
 
+    @Operation(summary = "Delete Reservation Time By Id", description = "ID를 통해 예약 시간 삭제")
     @DeleteMapping("/{reservationTimeId}")
     @Authority(Role.ADMIN)
     public ResponseEntity<Void> deleteReservationTimeById(

@@ -1,5 +1,7 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.Duration;
 import org.springframework.http.HttpHeaders;
@@ -18,6 +20,7 @@ import roomescape.dto.response.AccessTokenResponse;
 import roomescape.dto.response.MemberProfileResponse;
 import roomescape.service.command.AuthService;
 
+@Tag(name = "AuthController", description = "인증/인가 관련 API")
 @RestController
 public class AuthController {
 
@@ -27,6 +30,7 @@ public class AuthController {
         this.authService = authService;
     }
 
+    @Operation(summary = "Login", description = "로그인 수행")
     @PostMapping("/login")
     public ResponseEntity<Void> login(
             @Valid @RequestBody LoginRequest loginRequest
@@ -44,6 +48,7 @@ public class AuthController {
                 .build();
     }
 
+    @Operation(summary = "Check Login", description = "로그인 여부 체크")
     @GetMapping("/login/check")
     @Authority(Role.GENERAL)
     public MemberProfileResponse checkLogin(
@@ -52,6 +57,7 @@ public class AuthController {
         return new MemberProfileResponse(accessTokenContent);
     }
 
+    @Operation(summary = "Logout", description = "로그인 아웃")
     @PostMapping("/logout")
     @Authority(Role.GENERAL)
     public ResponseEntity<Void> logout() {

@@ -1,5 +1,7 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
@@ -21,6 +23,7 @@ import roomescape.dto.response.ThemeResponse;
 import roomescape.service.command.ThemeService;
 import roomescape.service.query.ThemeQueryService;
 
+@Tag(name = "ThemeController", description = "테마 관련 API")
 @RestController
 @RequestMapping("/themes")
 public class ThemeController {
@@ -33,11 +36,13 @@ public class ThemeController {
         this.themeQueryService = themeQueryService;
     }
 
+    @Operation(summary = "Find All Theme", description = "모든 테마 조회")
     @GetMapping
     public List<ThemeResponse> findAllTheme() {
         return themeQueryService.findAllThemes();
     }
 
+    @Operation(summary = "Find Top Theme", description = "인기 테마 조회")
     @GetMapping("/ranking")
     public List<ThemeResponse> findTopTheme(@RequestParam("size") int size) {
         LocalDate to = LocalDate.now();
@@ -45,6 +50,7 @@ public class ThemeController {
         return themeQueryService.findTopThemes(from, to, size);
     }
 
+    @Operation(summary = "Add Theme", description = "테마 추가")
     @PostMapping
     @Authority(Role.ADMIN)
     public ResponseEntity<ThemeResponse> addTheme(
@@ -55,6 +61,7 @@ public class ThemeController {
         return ResponseEntity.created(URI.create("/themes/" + resDto.id())).body(resDto);
     }
 
+    @Operation(summary = "Delete Theme By Id", description = "ID를 활용한 테마 삭제")
     @DeleteMapping("/{id}")
     @Authority(Role.ADMIN)
     public ResponseEntity<Void> deleteThemeById(

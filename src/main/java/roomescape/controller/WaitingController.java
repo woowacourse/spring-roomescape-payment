@@ -1,5 +1,7 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -22,6 +24,7 @@ import roomescape.dto.response.WaitingResponse;
 import roomescape.service.command.WaitingService;
 import roomescape.service.query.WaitingQueryService;
 
+@Tag(name = "WaitingController", description = "예약 대기 관련 API")
 @RestController
 @RequestMapping("/waiting")
 public class WaitingController {
@@ -34,12 +37,14 @@ public class WaitingController {
         this.waitingQueryService = waitingQueryService;
     }
 
+    @Operation(summary = "Find All Waiting", description = "모든 예약 대기 조회")
     @GetMapping
     @Authority(Role.ADMIN)
     public List<WaitingResponse> findAllWaiting() {
         return waitingQueryService.findAllWaiting();
     }
 
+    @Operation(summary = "Add Waiting", description = "예약 대기 추가")
     @PostMapping
     @Authority(Role.GENERAL)
     public ResponseEntity<WaitingResponse> addWaiting(
@@ -54,6 +59,7 @@ public class WaitingController {
         return ResponseEntity.created(URI.create("/waiting/" + waitingResponse.id())).body(waitingResponse);
     }
 
+    @Operation(summary = "Delete Waiting By Id", description = "예약 대기 삭제")
     @DeleteMapping("/{id}")
     @Authority(Role.GENERAL)
     public ResponseEntity<Void> deleteWaitingById(

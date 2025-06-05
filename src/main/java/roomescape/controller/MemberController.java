@@ -1,5 +1,7 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,6 +11,7 @@ import roomescape.domain.Role;
 import roomescape.dto.response.MemberProfileResponse;
 import roomescape.service.query.MemberQueryService;
 
+@Tag(name = "MemberController", description = "회원 관련 API")
 @RestController
 @RequestMapping("/members")
 public class MemberController {
@@ -19,6 +22,7 @@ public class MemberController {
         this.memberQueryService = memberQueryService;
     }
 
+    @Operation(summary = "Find All Member", description = "모든 회원 조회")
     @GetMapping
     @Authority(Role.ADMIN)
     public List<MemberProfileResponse> findAllMember() {
