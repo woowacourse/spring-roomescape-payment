@@ -99,7 +99,7 @@ public class ReservationControllerTest {
     void myReservationTest() throws Exception {
         when(reservationQueryService.findMyReservations(any(LoginInfo.class))).thenReturn(
                 List.of(new MyReservationResponseDto(
-                        1L, null, null, null, null
+                        1L, null, null, null, null, null, null
                 ))
         );
         mockMvc.perform(get("/reservations/me")
