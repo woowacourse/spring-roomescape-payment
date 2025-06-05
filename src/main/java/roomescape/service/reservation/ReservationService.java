@@ -17,6 +17,7 @@ import roomescape.service.helper.MemberHelper;
 import roomescape.service.helper.PaymentHelper;
 import roomescape.service.helper.ReservationItemHelper;
 
+import javax.naming.AuthenticationException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -137,6 +138,21 @@ public class ReservationService {
     public void remove(Long reservationId) {
         Reservation targetReservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 예약입니다."));
+
+        targetReservation.denyAndChangeNextReservationToNotPaid();
+        paymentHelper.deleteByReservationIdIfExist(reservationId);
+        reservationRepository.deleteById(targetReservation.getId());
+    }
+
+    @Transactional
+    public void remove(Long reservationId, Long memberId) throws AuthenticationException {
+        Reservation targetReservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 예약입니다."));
+        Member member = memberHelper.getById(memberId);
+
+        if (!targetReservation.isCreatedBy(member)) {
+            throw new AuthenticationException("[ERROR] 해당 예약을 제거할 권한이 없습니다.]");
+        }
 
         targetReservation.denyAndChangeNextReservationToNotPaid();
         paymentHelper.deleteByReservationIdIfExist(reservationId);

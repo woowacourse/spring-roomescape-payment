@@ -51,4 +51,8 @@ public class Reservation {
         }
         this.reservationStatus = ReservationStatus.DENIED;
     }
+
+    public boolean isCreatedBy(Member member) {
+        return this.member.getId().equals(member.getId());
+    }
 }

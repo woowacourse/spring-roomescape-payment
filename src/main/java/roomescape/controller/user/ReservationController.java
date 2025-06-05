@@ -15,6 +15,7 @@ import roomescape.global.LoginInfo;
 import roomescape.service.reservation.ReservationService;
 import roomescape.service.reservation.ReservingService;
 
+import javax.naming.AuthenticationException;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -51,5 +52,12 @@ public class ReservationController implements MemberReservationApi {
     public ResponseEntity<List<MyPageReservationResponse>> getMines(LoginInfo loginInfo) {
         List<MyPageReservationResponse> response = reservationService.getAllBy(loginInfo.memberId());
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    @DeleteMapping("/reservations/{reservationId}")
+    public ResponseEntity<Void> remove(@PathVariable long reservationId, LoginInfo loginInfo) throws AuthenticationException {
+        reservationService.remove(reservationId, loginInfo.memberId());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
