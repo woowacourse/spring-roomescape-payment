@@ -35,30 +35,4 @@ public class ApiLogger {
             log.info("API 요청 소요시간 " + (endTime - startTime) + "ms");
         }
     }
-
-//    @Around("@within(org.springframework.web.bind.annotation.RestController) || " +
-//            "@within(org.springframework.stereotype.Controller)")
-//    public Object logApiRequestAndResponse(ProceedingJoinPoint joinPoint) throws Throwable {
-//        HttpServletRequest request =
-//                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-//
-//        String uri = request.getRequestURI();
-//        String method = request.getMethod();
-//        String handler = joinPoint.getSignature().toShortString();
-//
-//        System.out.println("🔵 API 요청: [" + method + "] " + uri + " → " + handler);
-//
-//        long startTime = System.currentTimeMillis();
-//        try {
-//            Object result = joinPoint.proceed();  // 실제 컨트롤러 메서드 실행
-//            System.out.println("🟢 API 응답: " + result);
-//            return result;
-//        } catch (Throwable e) {
-//            System.out.println("🔴 API 예외 발생: " + e.getMessage());
-//            throw e;
-//        } finally {
-//            long endTime = System.currentTimeMillis();
-//            System.out.println("⏱ 처리 시간: " + (endTime - startTime) + "ms");
-//        }
-//    }
 }
