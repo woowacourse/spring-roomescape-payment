@@ -1,7 +1,6 @@
 package roomescape.exception;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -9,38 +8,37 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import roomescape.exception.auth.AuthenticationException;
 import roomescape.exception.auth.AuthorizationException;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
     @ExceptionHandler(RootBusinessException.class)
     public ResponseEntity<ErrorResponse> handle(RootBusinessException e) {
-        logger.warn("Handled RootException: {}", e.getMessage(), e);
+        log.warn("RootException: message={}", e.getMessage());
         return ErrorResponse.plainResponse(HttpStatus.BAD_REQUEST, e.code()).toResponseEntity();
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handle(AuthenticationException e) {
-        logger.warn("Handled AuthenticatedException: {}", e.detailMessage(), e);
+        log.warn("AuthenticatedException: message={}", e.detailMessage());
         return ErrorResponse.securedResponse(HttpStatus.UNAUTHORIZED, e.clientMessage()).toResponseEntity();
     }
 
     @ExceptionHandler(AuthorizationException.class)
     public ResponseEntity<ErrorResponse> handle(AuthorizationException e) {
-        logger.warn("Handled AuthorizationException: {}", e.detailMessage(), e);
+        log.warn("AuthorizationException: message={}", e.detailMessage());
         return ErrorResponse.securedResponse(HttpStatus.FORBIDDEN, e.clientMessage()).toResponseEntity();
     }
 
     @ExceptionHandler(ExternalApiErrorException.class)
     public ResponseEntity<ErrorResponse> handle(ExternalApiErrorException e) {
-        logger.warn("Handled ExternalApiErrorException: {}", e.getMessage());
+        log.warn("ExternalApiErrorException: message={}", e.getMessage());
         return ErrorResponse.externalApiErrorResponse().toResponseEntity();
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handle(Exception e) {
-        logger.error("Handled Exception: {}", e.getMessage(), e);
+        log.error("Exception: message={}", e.getMessage(), e);
         return ErrorResponse.securedResponse().toResponseEntity();
     }
 }

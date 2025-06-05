@@ -7,6 +7,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import roomescape.auth.jwt.JwtUtil;
+import roomescape.log.HttpLogInterceptor;
 
 @Configuration
 @RequiredArgsConstructor
@@ -16,6 +17,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(final InterceptorRegistry registry) {
+        registry.addInterceptor(new HttpLogInterceptor());
         registry.addInterceptor(new AuthenticationInterceptor(jwtUtil));
         registry.addInterceptor(new AuthorizationInterceptor(jwtUtil));
     }
