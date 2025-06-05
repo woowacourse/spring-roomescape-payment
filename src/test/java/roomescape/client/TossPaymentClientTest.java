@@ -10,6 +10,7 @@ import static roomescape.fixture.MockServerTestFixture.BASE_URL;
 import static roomescape.fixture.MockServerTestFixture.BUILDER;
 import static roomescape.fixture.MockServerTestFixture.SERVER;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class TossPaymentClientTest {
-    private final TossPaymentClient tossPaymentClient = new TossPaymentClient(BUILDER.build());
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final TossPaymentClient tossPaymentClient = new TossPaymentClient(BUILDER.build(), objectMapper);
 
     @BeforeEach
     void setUp() {

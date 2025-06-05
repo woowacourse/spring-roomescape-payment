@@ -19,6 +19,7 @@ public class TossPaymentClient {
 
     private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.class);
     private final RestClient tossRestClient;
+    private final ObjectMapper objectMapper;
 
     private static final List<String> IGNORABLE_CODE = List.of(
             "INCORRECT_BASIC_AUTH_FORMAT",
@@ -27,8 +28,9 @@ public class TossPaymentClient {
             "UNAUTHORIZED_KEY"
     );
 
-    public TossPaymentClient(RestClient tossRestClient) {
+    public TossPaymentClient(RestClient tossRestClient, ObjectMapper objectMapper) {
         this.tossRestClient = tossRestClient;
+        this.objectMapper = objectMapper;
     }
 
     public ResponseEntity<TossPaymentResponse> confirmPayment(TossPaymentConfirmRequest request) {
@@ -42,8 +44,7 @@ public class TossPaymentClient {
             String rawResponse = e.getResponseBodyAsString();
             log.error("Toss 서버 에러 응답: {}", rawResponse);
             try {
-                ObjectMapper mapper = new ObjectMapper();
-                TossPaymentResponse errorBody = mapper.readValue(e.getResponseBodyAsString(), TossPaymentResponse.class);
+                TossPaymentResponse errorBody = objectMapper.readValue(e.getResponseBodyAsString(), TossPaymentResponse.class);
                 return ResponseEntity.status(e.getStatusCode()).body(errorBody);
             } catch (Exception parseError) {
                 log.error("json 파싱 실패: {}", parseError.getMessage());
