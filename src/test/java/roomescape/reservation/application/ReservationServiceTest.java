@@ -16,6 +16,7 @@ import roomescape.member.application.dto.MemberResponse;
 import roomescape.reservation.application.dto.AvailableReservationTimeResponse;
 import roomescape.reservation.application.dto.MemberReservationRequest;
 import roomescape.reservation.application.dto.MyReservation;
+import roomescape.reservation.application.dto.MyReservationAndPaymentInfo;
 import roomescape.reservation.application.dto.ReservationResponse;
 import roomescape.reservation.application.dto.ReservationTimeResponse;
 import roomescape.theme.application.dto.ThemeResponse;
@@ -108,7 +109,7 @@ class ReservationServiceTest {
         final long memberId = 1L;
 
         // when
-        final List<MyReservation> responses = reservationService.findByMemberId(memberId);
+        List<MyReservationAndPaymentInfo> responses = reservationService.findByMemberId(memberId);
 
         // then
         assertThat(responses).hasSize(2);
@@ -125,7 +126,7 @@ class ReservationServiceTest {
             memberReservationRequest, 1L);
 
         // 기존 member2의 예약 내역
-        List<MyReservation> beforeMemberReservations = reservationService.findByMemberId(2L);
+        List<MyReservationAndPaymentInfo> beforeMemberReservations = reservationService.findByMemberId(2L);
         assertThat(beforeMemberReservations).hasSize(2);
 
         WaitingIdResponse waitingIdResponse = waitingService.addWaiting(memberReservationRequest,
@@ -135,7 +136,7 @@ class ReservationServiceTest {
         reservationService.deleteReservationAndGetFirstWaiting(reservationResponse.id());
 
         //then
-        List<MyReservation> reservations = reservationService.findByMemberId(1L);
+        List<MyReservationAndPaymentInfo> reservations = reservationService.findByMemberId(1L);
         boolean hasReservation = reservations.stream()
             .anyMatch(reservation -> reservation.id().equals(reservationResponse.id()));
 
@@ -143,7 +144,7 @@ class ReservationServiceTest {
         boolean hasWaiting = waitingsFromMember.stream()
             .anyMatch(waiting -> waiting.id().equals(waitingIdResponse.waitingId()));
 
-        List<MyReservation> findReservations = reservationService.findByMemberId(2L);
+        List<MyReservationAndPaymentInfo> findReservations = reservationService.findByMemberId(2L);
 
         //then
         assertThat(hasReservation).isFalse();
