@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import roomescape.auth.config.JwtProperties;
 import roomescape.global.exception.TokenCreationException;
 import roomescape.global.exception.UnauthorizedException;
+import roomescape.member.domain.Member;
 
 @Component
 public class JwtTokenProvider implements TokenProvider {
@@ -38,11 +39,11 @@ public class JwtTokenProvider implements TokenProvider {
     }
 
     @Override
-    public String createToken(final Claims claims) {
+    public String createToken(final Member member) {
         final Instant now = clock.instant();
         try {
             return Jwts.builder()
-                    .claims(claims)
+                    .claims(createClaims(member))
                     .issuedAt(Date.from(now))
                     .expiration(Date.from(now.plus(validity)))
                     .signWith(key)
@@ -55,6 +56,14 @@ public class JwtTokenProvider implements TokenProvider {
     @Override
     public String extractPrincipal(final String token) {
         return parseAllClaims(token).getSubject();
+    }
+
+    private Claims createClaims(final Member member) {
+        return Jwts.claims()
+                .subject(member.getId().toString())
+                .add("name", member.getName())
+                .add("role", member.getRole().name())
+                .build();
     }
 
     private Claims parseAllClaims(final String token) {

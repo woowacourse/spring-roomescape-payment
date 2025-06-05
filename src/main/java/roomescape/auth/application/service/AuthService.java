@@ -50,12 +50,6 @@ public class AuthService {
         }
     }
 
-    private Claims createClaims(final Member member) {
-        return Jwts.claims()
-                .subject(member.getId().toString())
-                .build();
-    }
-
     public LoginCheckResponse checkLogin(final String token) {
         final Long memberId = parseMemberId(token);
         final Member member = memberRepository.findById(memberId)
