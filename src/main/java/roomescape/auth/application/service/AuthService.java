@@ -1,21 +1,19 @@
 package roomescape.auth.application.service;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import roomescape.auth.application.exception.InvalidEmailException;
-import roomescape.auth.application.exception.InvalidPasswordException;
+import roomescape.auth.exception.InvalidEmailException;
+import roomescape.auth.exception.InvalidPasswordException;
+import roomescape.auth.exception.UnauthorizedException;
 import roomescape.auth.infrastructure.TokenProvider;
 import roomescape.auth.presentation.dto.LoginCheckResponse;
 import roomescape.auth.presentation.dto.LoginMember;
 import roomescape.auth.presentation.dto.LoginRequest;
 import roomescape.global.exception.ForbiddenException;
 import roomescape.global.exception.NotFoundException;
-import roomescape.global.exception.UnauthorizedException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 
@@ -30,23 +28,21 @@ public class AuthService {
     private final MemberRepository memberRepository;
 
     public String createToken(final LoginRequest loginRequest) {
-//        Member member = memberRepository.getByEmailAndPassword(loginRequest.email(), loginRequest.password());
-//        return jwtTokenProvider.createToken(createClaims(member));
-        return "!@#";
+        Member member = getMemberByLoginRequest(loginRequest);
+        return jwtTokenProvider.createToken(member);
     }
 
     public Member getMemberByLoginRequest(final LoginRequest request) {
-        Member member = memberRepository.findByEmail(request.email())
-                .orElseThrow(() -> new InvalidEmailException(request.email()));
-
+        String email = request.email();
+        Member member = getMemberByEmail(email);
         validateMemberPassword(request, member);
-
         return member;
     }
 
     private void validateMemberPassword(LoginRequest request, Member member) {
         if (!member.matchesPassword(request.password())) {
-            throw new InvalidPasswordException(request.password());
+            log.warn("비밀번호 불일치 시도 - 회원 ID: {}", member.getId());
+            throw new InvalidPasswordException("아이디 또는 비밀번호가 일치하지 않습니다.");
         }
     }
 
@@ -57,9 +53,17 @@ public class AuthService {
         return new LoginCheckResponse(member);
     }
 
+    private Member getMemberByEmail(String email) {
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> {
+                    log.error("인증 실패: 존재하지 않는 이메일 - email: {}", email);
+                    return new InvalidEmailException("등록이 되지 않은 유저 이메일 입니다.");
+                });
+    }
+
     private Long parseMemberId(final String token) {
         try {
-            return Long.valueOf(jwtTokenProvider.extractPrincipal(token));
+            return Long.valueOf(jwtTokenProvider.extractLoginMember(token));
         } catch (NumberFormatException e) {
             throw new UnauthorizedException("유효하지 않은 토큰입니다.");
         }
