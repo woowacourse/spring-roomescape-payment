@@ -134,9 +134,6 @@ public class ReservationService {
     public List<MyReservationWithPaymentResponse> getMyReservations(final Long id) {
         List<Reservation> confirmedReservations = reservationRepository.findByMemberId(id);
         List<MyReservationWithPaymentResponse> confirmedResponses = getReservationsWithPayment(confirmedReservations);
-//        List<MyReservationWithPaymentResponse> confirmedResponses = confirmedReservations.stream()
-//                .map(MyReservationWithPaymentResponse::from)
-//                .toList();
 
         List<Waiting> waitingReservations = waitingRepository.findByMemberId(id);
         List<MyReservationWithPaymentResponse> waitingResponses = waitingReservations.stream()

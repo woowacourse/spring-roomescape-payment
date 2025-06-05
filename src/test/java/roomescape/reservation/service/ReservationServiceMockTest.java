@@ -17,7 +17,9 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import roomescape.common.exception.InvalidReservationException;
 import roomescape.common.util.DateTime;
 import roomescape.fixture.TestFixture;
@@ -26,6 +28,7 @@ import roomescape.member.domain.MemberRepository;
 import roomescape.member.domain.Role;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentRepository;
+import roomescape.payment.domain.PaymentStatus;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
@@ -181,14 +184,19 @@ class ReservationServiceMockTest {
     void getMyReservations_dto_test() {
         // given
         List<Reservation> reservations = createReservationsWithPendingPayment();
+        List<Waiting> waitings = createWaitings();
+        Payment payment = new Payment("orderId", "paymentKey", 1000L, PaymentStatus.DONE, null);
+
         when(reservationRepository.findByMemberId(1L))
                 .thenReturn(reservations);
-        List<Waiting> waitings = createWaitings();
         when(waitingRepository.findByMemberId(1L))
                 .thenReturn(waitings);
-        MyReservationWithPaymentResponse expected1 = MyReservationWithPaymentResponse.from(reservations.get(0));
-        MyReservationWithPaymentResponse expected2 = MyReservationWithPaymentResponse.from(reservations.get(1));
-        MyReservationWithPaymentResponse expected3 = MyReservationWithPaymentResponse.from(reservations.get(2));
+        when(paymentRepository.findByReservationId(Mockito.anyLong()))
+                .thenReturn(Optional.of(payment));
+
+        MyReservationWithPaymentResponse expected1 = MyReservationWithPaymentResponse.from(reservations.get(0), payment);
+        MyReservationWithPaymentResponse expected2 = MyReservationWithPaymentResponse.from(reservations.get(1), payment);
+        MyReservationWithPaymentResponse expected3 = MyReservationWithPaymentResponse.from(reservations.get(2), payment);
         MyReservationWithPaymentResponse expected4 = MyReservationWithPaymentResponse.fromWaiting(waitings.get(0), 1L);
 
         // when
@@ -215,6 +223,10 @@ class ReservationServiceMockTest {
         Reservation reservation3 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2024, 10, 8),
                 reservationTime1, theme2);
+
+        ReflectionTestUtils.setField(reservation1, "id", 1L);
+        ReflectionTestUtils.setField(reservation2, "id", 2L);
+        ReflectionTestUtils.setField(reservation3, "id", 3L);
 
         return List.of(reservation1, reservation2, reservation3);
     }
