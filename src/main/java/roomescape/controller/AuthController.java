@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.controller.apidocs.AuthApi;
 import roomescape.dto.request.LoginMemberRequest;
 import roomescape.dto.request.LoginRequest;
 import roomescape.entity.Member;
@@ -15,7 +16,7 @@ import roomescape.service.MemberService;
 import roomescape.util.CookieUtil;
 
 @RestController
-public class AuthController {
+public class AuthController implements AuthApi {
 
     private final MemberService memberService;
     private final AuthService authService;

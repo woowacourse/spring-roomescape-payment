@@ -93,7 +93,10 @@ public class Member {
     }
 
     private void validatePastDateTime(Reservation reservation) {
-        reservation.isBefore(LocalDateTime.now());
+        boolean isBefore = reservation.isBefore(LocalDateTime.now());
+        if (isBefore) {
+            throw new InvalidReservationException("과거 날짜 및 시간으로 예약할 수 없습니다.");
+        }
     }
 
     public void waitToPending(LocalDate date, ReservationTime time, Theme theme) {

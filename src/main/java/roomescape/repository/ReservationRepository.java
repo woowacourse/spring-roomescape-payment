@@ -49,6 +49,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     boolean existsByThemeId(Long themeId);
 
+    boolean existsByDateAndReservationTimeIdAndThemeId(LocalDate date, Long reservationTimeId, Long themeId);
+
     @Query(value = """
             select new roomescape.domain.ReservationWithRank(r,
                         (select count(rw)

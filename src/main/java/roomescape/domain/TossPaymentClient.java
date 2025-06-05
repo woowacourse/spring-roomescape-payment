@@ -15,6 +15,9 @@ import roomescape.dto.response.RefundPaymentResponse;
 import roomescape.entity.Payment;
 import roomescape.exception.custom.PaymentException;
 
+/**
+ * <a href="https://docs.tosspayments.com/reference">toss api 문서</a>
+ */
 @Component
 public class TossPaymentClient implements PaymentClient {
 

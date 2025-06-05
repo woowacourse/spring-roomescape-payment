@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import roomescape.annotation.CheckRole;
+import roomescape.controller.apidocs.ReservationApi;
 import roomescape.dto.request.ConfirmWaitReservationRequest;
 import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.request.CreateWaitReservationRequest;
@@ -26,7 +27,7 @@ import roomescape.service.ReservationFacadeService;
 
 @RestController
 @RequestMapping("/reservations")
-public class ReservationController {
+public class ReservationController implements ReservationApi {
 
     private final ReservationFacadeService reservationFacadeService;
 

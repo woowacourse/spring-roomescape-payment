@@ -70,9 +70,7 @@ public class ReservationService {
         Reservation waitReservation = reservationRepository.findById(waitReservationId)
                 .orElseThrow(() -> new InvalidReservationException("존재하지 않는 예약 대기입니다."));
 
-        if (waitReservation.getStatus() == ReservationStatus.RESERVED) {
-            throw new InvalidReservationException("이미 예약 처리 되었습니다.");
-        }
+        checkStatus(waitReservation);
 
         Optional<Reservation> cancelTargetOptional = reservationRepository.findByDateAndReservationTimeAndThemeAndStatus(
                 waitReservation.getDate(),
@@ -87,7 +85,16 @@ public class ReservationService {
     public void rejectWaitReservationByAdmin(long waitReservationId) {
         Reservation waitReservation = reservationRepository.findById(waitReservationId)
                 .orElseThrow(() -> new InvalidReservationException("존재하지 않는 예약 대기입니다."));
+
+        checkStatus(waitReservation);
+
         waitReservation.cancel();
+    }
+
+    private void checkStatus(final Reservation waitReservation) {
+        if (waitReservation.getStatus() != ReservationStatus.WAIT) {
+            throw new InvalidReservationException("대기 중인 예약이 아닙니다.");
+        }
     }
 
     private Reservation createReservation(long memberId,
@@ -102,7 +109,18 @@ public class ReservationService {
         Theme theme = themeRepository.findById(themeId)
                 .orElseThrow(() -> new InvalidThemeException("존재하지 않는 테마입니다."));
 
+        if (status == ReservationStatus.RESERVED) {
+            checkExistedReservation(date, timeId, themeId);
+        }
+
         return member.reserve(date, reservationTime, theme, status);
+    }
+
+    private void checkExistedReservation(LocalDate date, long timeId, long themeId) {
+        boolean exists = reservationRepository.existsByDateAndReservationTimeIdAndThemeId(date, timeId, themeId);
+        if (exists) {
+            throw new InvalidReservationException("이미 예약이 존재합니다.");
+        }
     }
 
     public List<ReservationResponse> findAllReserved() {
