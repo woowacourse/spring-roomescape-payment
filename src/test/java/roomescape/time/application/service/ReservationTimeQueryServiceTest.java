@@ -29,12 +29,12 @@ class ReservationTimeQueryServiceTest {
     @DisplayName("예약 시간을 조회할 수 있다")
     void getReservationTime() {
         // given
-        final LocalTime time = LocalTime.of(10, 0);
-        final ReservationTime savedTime = reservationTimeRepository.save(ReservationTime.from(time));
-        final Long id = savedTime.getId();
+        LocalTime time = LocalTime.now().plusMinutes(2);
+        ReservationTime savedTime = reservationTimeRepository.save(ReservationTime.from(time));
+        Long id = savedTime.getId();
 
         // when
-        final ReservationTime reservationTime = reservationTimeQueryService.get(id);
+        ReservationTime reservationTime = reservationTimeQueryService.get(id);
 
         // then
         assertThat(reservationTime.getStartAt()).isEqualTo(time);
@@ -44,11 +44,11 @@ class ReservationTimeQueryServiceTest {
     @DisplayName("예약 시간을 전체 조회할 수 있다")
     void getAllReservationTimes() {
         // given
-        reservationTimeRepository.save(ReservationTime.from(LocalTime.of(10, 0)));
+        reservationTimeRepository.save(ReservationTime.from(LocalTime.now().plusMinutes(2)));
         reservationTimeRepository.save(ReservationTime.from(LocalTime.of(11, 0)));
 
         // when
-        final List<ReservationTime> times = reservationTimeQueryService.getAll();
+        List<ReservationTime> times = reservationTimeQueryService.getAll();
 
         // then
         assertThat(times).hasSize(2);

@@ -35,7 +35,7 @@ class UserCommandServiceImplTest {
         Email email = Email.from("email@email.com");
         Password password = Password.fromEncoded("1234");
         CreateUserRequest request = new CreateUserRequest(userName, email, password);
-        final User user = userCommandService.create(request);
+        User user = userCommandService.create(request);
 
         Long userId = user.getId();
 

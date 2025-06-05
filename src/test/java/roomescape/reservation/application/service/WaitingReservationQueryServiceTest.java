@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.sign.password.Password;
 import roomescape.common.domain.Email;
 import roomescape.reservation.domain.ReservationDate;
-import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.WaitingReservation;
 import roomescape.reservation.domain.WaitingReservationRepository;
 import roomescape.theme.domain.Theme;
@@ -42,9 +41,6 @@ class WaitingReservationQueryServiceTest {
     private WaitingReservationQueryService waitingReservationQueryService;
 
     @Autowired
-    private ReservationRepository reservationRepository;
-
-    @Autowired
     private ReservationTimeRepository reservationTimeRepository;
 
     @Autowired
@@ -57,7 +53,7 @@ class WaitingReservationQueryServiceTest {
     @DisplayName("모든 예약 대기를 조회할 수 있다")
     void getAll() {
         // given
-        ReservationTime reservationTime = createAndSaveReservationTime(LocalTime.of(10, 0));
+        ReservationTime reservationTime = createAndSaveReservationTime(LocalTime.now().plusMinutes(2));
         Theme theme = createAndSaveTheme("공포", "지구별 방탈출 최고");
         User user = createAndSaveUser();
         Long userId = user.getId();
@@ -84,7 +80,7 @@ class WaitingReservationQueryServiceTest {
     @DisplayName("유저 Id가 같은 모든 예약 대기를 조회할 수 있다")
     void findUserIdById() {
         // given
-        ReservationTime reservationTime = createAndSaveReservationTime(LocalTime.of(10, 0));
+        ReservationTime reservationTime = createAndSaveReservationTime(LocalTime.now().plusMinutes(2));
         Theme theme = createAndSaveTheme("공포", "지구별 방탈출 최고");
         User user = createAndSaveUser();
         Long userId = user.getId();

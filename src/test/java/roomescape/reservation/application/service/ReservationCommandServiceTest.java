@@ -69,21 +69,21 @@ class ReservationCommandServiceTest {
     @DisplayName("예약을 생성할 수 있다")
     void createAndFindReservation() {
         // given
-        final ReservationTime reservationTime = createAndSaveReservationTime(LocalTime.of(10, 0));
-        final Theme theme = createAndSaveTheme();
-        final User user = createAndSaveUser();
+        ReservationTime reservationTime = createAndSaveReservationTime(LocalTime.now().plusMinutes(2));
+        Theme theme = createAndSaveTheme();
+        User user = createAndSaveUser();
 
-        final CreateReservationServiceRequest requestDto = createReservationRequest(
+        CreateReservationServiceRequest requestDto = createReservationRequest(
                 user.getId(),
-                LocalDate.of(2025, 8, 5),
+                LocalDate.now().plusDays(1),
                 reservationTime.getId(),
                 theme.getId());
 
         // when
-        final Reservation reservation = reservationCommandService.create(requestDto);
+        Reservation reservation = reservationCommandService.create(requestDto);
 
         // then
-        final Reservation found = reservationRepository.findById(reservation.getId())
+        Reservation found = reservationRepository.findById(reservation.getId())
                 .orElseThrow(NoSuchElementException::new);
 
         assertThat(reservation).isEqualTo(found);
@@ -98,19 +98,20 @@ class ReservationCommandServiceTest {
     @DisplayName("중복된 예약을 생성할 수 없다.")
     void existsReservation() {
         // given
-        final ReservationTime reservationTime = createAndSaveReservationTime(LocalTime.of(10, 0));
-        final Theme theme = createAndSaveTheme();
-        final User user = createAndSaveUser();
+        ReservationTime reservationTime = createAndSaveReservationTime(LocalTime.now().plusMinutes(2));
+        Theme theme = createAndSaveTheme();
+        User user = createAndSaveUser();
 
-        final CreateReservationServiceRequest requestDto = createReservationRequest(
+        CreateReservationServiceRequest requestDto = createReservationRequest(
                 user.getId(),
-                LocalDate.of(2025, 8, 5),
+                LocalDate.now().plusDays(1),
                 reservationTime.getId(),
                 theme.getId());
 
-        final Reservation savedReservation = reservationCommandService.create(requestDto);
+        Reservation savedReservation = reservationCommandService.create(requestDto);
 
-        // when & then
+        // when
+        // then
         assertThatThrownBy(() -> reservationCommandService.create(requestDto))
                 .isInstanceOf(DuplicateException.class)
                 .hasMessageContainingAll(
@@ -125,14 +126,14 @@ class ReservationCommandServiceTest {
     @DisplayName("예약을 삭제할 수 있다")
     void deleteReservation() {
         // given
-        final ReservationTime reservationTime = createAndSaveReservationTime(LocalTime.of(10, 0));
-        final Theme theme = createAndSaveTheme();
-        final User user = createAndSaveUser();
+        ReservationTime reservationTime = createAndSaveReservationTime(LocalTime.now().plusMinutes(5));
+        Theme theme = createAndSaveTheme();
+        User user = createAndSaveUser();
 
-        final Reservation reservation = reservationRepository.save(
+        Reservation reservation = reservationRepository.save(
                 Reservation.of(
                         user.getId(),
-                        ReservationDate.from(LocalDate.of(2025, 8, 5)),
+                        ReservationDate.from(LocalDate.now().plusDays(1)),
                         reservationTime,
                         theme));
 
@@ -147,23 +148,23 @@ class ReservationCommandServiceTest {
     @DisplayName("지나간 날짜/시간에 대한 예약을 생성할 수 없다")
     void cannotCreatePastDateTimeReservation() {
         // given
-        final LocalDateTime now = timeProvider.now();
+        LocalDateTime now = timeProvider.now();
 
-        final ReservationTime validReservationTime = createAndSaveReservationTime(
-                now.toLocalTime().plusNanos(1));
-        final ReservationTime pastReservationTime = createAndSaveReservationTime(
-                now.toLocalTime().minusNanos(1));
+        ReservationTime validReservationTime = createAndSaveReservationTime(
+                now.toLocalTime().plusMinutes(2));
+        ReservationTime pastReservationTime = createAndSaveReservationTime(
+                now.toLocalTime().minusMinutes(2));
 
-        final User user = createAndSaveUser();
-        final Theme theme = createAndSaveTheme();
+        User user = createAndSaveUser();
+        Theme theme = createAndSaveTheme();
 
-        final CreateReservationServiceRequest pastDateReservationRequest = createReservationRequest(
+        CreateReservationServiceRequest pastDateReservationRequest = createReservationRequest(
                 user.getId(),
                 now.toLocalDate().minusDays(1),
                 validReservationTime.getId(),
                 theme.getId());
 
-        final CreateReservationServiceRequest pastTimeReservationRequest = createReservationRequest(
+        CreateReservationServiceRequest pastTimeReservationRequest = createReservationRequest(
                 user.getId(),
                 now.toLocalDate(),
                 pastReservationTime.getId(),
@@ -185,7 +186,7 @@ class ReservationCommandServiceTest {
     @DisplayName("존재하지 않는 예약을 삭제하려 하면 예외가 발생한다")
     void deleteNonExistentReservation() {
         // given
-        final Long id = -1L;
+        Long id = -1L;
 
         // when & then
         assertThatThrownBy(() -> reservationCommandService.delete(id))

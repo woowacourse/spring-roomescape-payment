@@ -44,5 +44,4 @@ public class ThemeQueryService {
                 .map(ThemeToBookCountServiceResponse::theme)
                 .toList();
     }
-
 }

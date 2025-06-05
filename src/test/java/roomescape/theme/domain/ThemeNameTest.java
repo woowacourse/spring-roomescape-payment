@@ -40,7 +40,7 @@ class ThemeNameTest {
     @DisplayName("유효한 테마 이름으로 ThemeName 객체를 생성할 수 있다")
     void createValidThemeName() {
         // when
-        final ThemeName themeName = ThemeName.from("방탈출 테마");
+        ThemeName themeName = ThemeName.from("방탈출 테마");
 
         // then
         assertAll(() -> {

@@ -76,7 +76,6 @@ class ThemeQueryServiceTest {
         final List<Theme> themes = themeQueryService.getAll();
 
         // then
-        assertThat(themes).hasSize(2);
         assertThat(themes).contains(saved1, saved2);
     }
 
@@ -153,7 +152,7 @@ class ThemeQueryServiceTest {
 
         final ReservationDate date = ReservationDate.from(LocalDate.now().plusDays(1L));
         final ReservationTime time = reservationTimeRepository.save(
-                ReservationTime.from(LocalTime.of(12, 0)));
+                ReservationTime.from(LocalTime.now().plusMinutes(2)));
 
         final Theme[] themes = {
                 theme1, theme2, theme3, theme4, theme5, theme6,

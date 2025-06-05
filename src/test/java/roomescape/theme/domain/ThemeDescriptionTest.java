@@ -40,7 +40,7 @@ class ThemeDescriptionTest {
     @DisplayName("유효한 테마 설명으로 ThemeDescription 객체를 생성할 수 있다")
     void createValidThemeDescription() {
         // when
-        final ThemeDescription themeDescription = ThemeDescription.from("테마 설명입니다.");
+        ThemeDescription themeDescription = ThemeDescription.from("테마 설명입니다.");
 
         // then
         assertAll(() -> {

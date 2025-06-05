@@ -57,10 +57,10 @@ class ReservationTimeCommandServiceTest {
     @DisplayName("예약 시간을 생성할 수 있다")
     void createReservationTime() {
         // given
-        final CreateReservationTimeServiceRequest request = new CreateReservationTimeServiceRequest(LocalTime.of(12, 30));
+        CreateReservationTimeServiceRequest request = new CreateReservationTimeServiceRequest(LocalTime.of(12, 30));
 
         // when
-        final ReservationTime reservationTime = reservationTimeCommandService.create(request);
+        ReservationTime reservationTime = reservationTimeCommandService.create(request);
 
         // then
         assertThat(reservationTime.getStartAt()).isEqualTo(LocalTime.of(12, 30));
@@ -72,10 +72,10 @@ class ReservationTimeCommandServiceTest {
     @DisplayName("예약 시간을 삭제할 수 있다")
     void deleteReservationTime() {
         // given
-        final ReservationTime saved =
+        ReservationTime saved =
                 reservationTimeRepository.save(
                         ReservationTime.from(LocalTime.of(14, 0)));
-        final Long id = saved.getId();
+        Long id = saved.getId();
 
         // when
         reservationTimeCommandService.delete(id);
@@ -88,7 +88,7 @@ class ReservationTimeCommandServiceTest {
     @DisplayName("존재하지 않는 예약 시간을 삭제하려 하면 예외가 발생한다")
     void deleteNonExistentReservationTime() {
         // given
-        final Long id = -1L;
+        Long id = -1L;
 
         // when
         // then
@@ -101,23 +101,23 @@ class ReservationTimeCommandServiceTest {
     @DisplayName("참조 중인 예약 시간을 삭제하려 하면 예외가 발생한다")
     void deleteRefReservationTime() {
         // given
-        final ReservationTime savedTime =
+        ReservationTime savedTime =
                 reservationTimeRepository.save(ReservationTime.from(
                         LocalTime.of(14, 0)));
 
-        final Theme theme = themeRepository.save(Theme.of(
+        Theme theme = themeRepository.save(Theme.of(
                 ThemeName.from("공포"),
                 ThemeDescription.from("지구별 방탈출 최고"),
                 ThemeThumbnail.from("www.making.com")));
 
-        final User user = userRepository.save(
+        User user = userRepository.save(
                 User.of(
                         UserName.from("강산"),
                         Email.from("email@email.com"),
                         Password.fromEncoded("1234"),
                         UserRole.NORMAL));
 
-        final Reservation reservation = reservationRepository.save(Reservation.of(
+        Reservation reservation = reservationRepository.save(Reservation.of(
                 user.getId(),
                 ReservationDate.from(LocalDate.now().plusDays(1L)),
                 savedTime,
@@ -136,11 +136,10 @@ class ReservationTimeCommandServiceTest {
     @DisplayName("추가하려는 시간이 이미 존재한다면, 예외가 발생한다")
     void existsTime() {
         // given
-
-        final LocalTime time = LocalTime.of(14, 0);
+        LocalTime time = LocalTime.of(14, 0);
         reservationTimeRepository.save(ReservationTime.from(time));
 
-        final CreateReservationTimeServiceRequest sameTimeRequest = new CreateReservationTimeServiceRequest(time);
+        CreateReservationTimeServiceRequest sameTimeRequest = new CreateReservationTimeServiceRequest(time);
 
         // when
         // then

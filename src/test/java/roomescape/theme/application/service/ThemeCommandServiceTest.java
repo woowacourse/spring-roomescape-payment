@@ -34,19 +34,19 @@ class ThemeCommandServiceTest {
     @DisplayName("테마를 저장할 수 있다")
     void create() {
         // given
-        final String name = "시소";
-        final String description = "공포 방탈출 대표 테마";
-        final String url = "https://www.naver.com";
-        final CreateThemeServiceRequest request = new CreateThemeServiceRequest(
+        String name = "시소";
+        String description = "공포 방탈출 대표 테마";
+        String url = "https://www.naver.com";
+        CreateThemeServiceRequest request = new CreateThemeServiceRequest(
                 ThemeName.from(name),
                 ThemeDescription.from(description),
                 ThemeThumbnail.from(url));
 
         // when
-        final Theme theme = themeCommandService.create(request);
+        Theme theme = themeCommandService.create(request);
 
         // then
-        final Theme foundTheme = themeRepository.findById(theme.getId())
+        Theme foundTheme = themeRepository.findById(theme.getId())
                 .orElseThrow();
         assertAll(() -> {
             assertThat(foundTheme.getName().getValue())
@@ -62,15 +62,15 @@ class ThemeCommandServiceTest {
     @DisplayName("존재하는 테마 이름으로 테마를 저장할 수 없다")
     void cannotCreateWithSameThemeName() {
         // given
-        final String name = "이름이같다";
-        final CreateThemeServiceRequest request1 = new CreateThemeServiceRequest(
+        String name = "이름이같다";
+        CreateThemeServiceRequest request1 = new CreateThemeServiceRequest(
                 ThemeName.from(name),
                 ThemeDescription.from("des"),
                 ThemeThumbnail.from("uri"));
 
-        final Theme theme = themeCommandService.create(request1);
+        themeCommandService.create(request1);
 
-        final CreateThemeServiceRequest request2 = new CreateThemeServiceRequest(
+        CreateThemeServiceRequest request2 = new CreateThemeServiceRequest(
                 ThemeName.from(name),
                 ThemeDescription.from("des는 같아도 되고 달라도 되는 것"),
                 ThemeThumbnail.from("uricansametoo"));
@@ -86,11 +86,11 @@ class ThemeCommandServiceTest {
     @DisplayName("테마를 삭제할 수 있다")
     void delete() {
         // given
-        final String name = "시소";
-        final String description = "공포 방탈출 대표 테마";
-        final String url = "https://www.naver.com";
+        String name = "시소";
+        String description = "공포 방탈출 대표 테마";
+        String url = "https://www.naver.com";
 
-        final Theme saved = themeRepository.save(Theme.of(
+        Theme saved = themeRepository.save(Theme.of(
                 ThemeName.from(name),
                 ThemeDescription.from(description),
                 ThemeThumbnail.from(url)));
@@ -106,7 +106,7 @@ class ThemeCommandServiceTest {
     @DisplayName("저장되지 않은 테마를 삭제할 수 없다")
     void cannotDelete() {
         // given
-        final Long unassigned = Long.MAX_VALUE;
+        Long unassigned = Long.MAX_VALUE;
 
         // when
         // then

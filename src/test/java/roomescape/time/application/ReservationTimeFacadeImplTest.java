@@ -38,7 +38,7 @@ class ReservationTimeFacadeImplTest {
     @DisplayName("모든 예약 시간을 조회한다")
     void getAll() {
         List<ReservationTime> reservationTimes = List.of(
-                createReservationTime(1L, LocalTime.of(10, 0)),
+                createReservationTime(1L, LocalTime.now().plusMinutes(2)),
                 createReservationTime(2L, LocalTime.of(14, 0))
         );
         given(reservationTimeQueryService.getAll()).willReturn(reservationTimes);

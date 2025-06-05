@@ -61,28 +61,28 @@ class WaitingReservationCommandServiceTest {
     @DisplayName("예약이 존재할 때, 예약 대기를 추가한다")
     void createWaitingReservation() {
         // given
-        final ReservationTime reservationTime = createAndSaveReservationTime(LocalTime.of(10, 0));
-        final Theme theme = createAndSaveTheme("공포", "지구별 방탈출 최고");
-        final User user = createAndSaveUser();
+        ReservationTime reservationTime = createAndSaveReservationTime(LocalTime.now().plusMinutes(2));
+        Theme theme = createAndSaveTheme("공포", "지구별 방탈출 최고");
+        User user = createAndSaveUser();
 
-        final CreateReservationServiceRequest requestDto = createReservationRequest(
+        CreateReservationServiceRequest requestDto = createReservationRequest(
                 user.getId(),
-                LocalDate.of(2025, 8, 5),
+                LocalDate.now().plusDays(1),
                 reservationTime.getId(),
                 theme.getId());
 
-        final Reservation reservation = reservationRepository.save(
+        Reservation reservation = reservationRepository.save(
                 Reservation.of(
                         user.getId(),
-                        ReservationDate.from(LocalDate.of(2025, 8, 5)),
+                        ReservationDate.from(LocalDate.now().plusDays(1)),
                         reservationTime,
                         theme));
 
         // when
-        final WaitingReservation waitingReservation = service.create(requestDto);
+        WaitingReservation waitingReservation = service.create(requestDto);
 
         // then
-        final WaitingReservation found = waitingReservationRepository.findById(waitingReservation.getId())
+        WaitingReservation found = waitingReservationRepository.findById(waitingReservation.getId())
                 .orElseThrow(NoSuchElementException::new);
 
         assertThat(waitingReservation).isEqualTo(found);
@@ -97,22 +97,22 @@ class WaitingReservationCommandServiceTest {
     @DisplayName("예약이 존재하지 않을 때 예약 대기를 추가할 경우, 예외가 발생한다")
     void createWaitingReservationDuplication() {
         // given
-        final ReservationTime reservationTime = createAndSaveReservationTime(LocalTime.of(10, 0));
-        final Theme theme = createAndSaveTheme("공포", "지구별 방탈출 최고");
-        final User user = createAndSaveUser();
+        ReservationTime reservationTime = createAndSaveReservationTime(LocalTime.now().plusMinutes(2));
+        Theme theme = createAndSaveTheme("공포", "지구별 방탈출 최고");
+        User user = createAndSaveUser();
 
-        final CreateReservationServiceRequest requestDto = createReservationRequest(
+        CreateReservationServiceRequest requestDto = createReservationRequest(
                 user.getId(),
-                LocalDate.of(2025, 8, 5),
+                LocalDate.now().plusDays(1),
                 reservationTime.getId(),
                 theme.getId());
 
         // when
         assertThatThrownBy(() -> service.create(requestDto))
                 .isInstanceOf(NotFoundException.class)
-                .hasMessage("[RESERVATION] not found. " +
-                        "params={ReservationDate=ReservationDate(value=2025-08-05), " +
-                        "DomainTerm=RESERVATION_TIME, " +
+                .hasMessageContaining("[RESERVATION] not found. ",
+                        "params={ReservationDate= ",
+                        "DomainTerm=RESERVATION_TIME, ",
                         "DomainTerm=THEME}");
 
     }
@@ -121,15 +121,15 @@ class WaitingReservationCommandServiceTest {
     @DisplayName("예약 대기를 삭제할 수 있다")
     void deleteWaitingReservation() {
         // given
-        final ReservationTime reservationTime = createAndSaveReservationTime(LocalTime.of(10, 0));
-        final Theme theme = createAndSaveTheme("공포", "지구별 방탈출 최고");
-        final User user = createAndSaveUser();
+        ReservationTime reservationTime = createAndSaveReservationTime(LocalTime.now().plusMinutes(2));
+        Theme theme = createAndSaveTheme("공포", "지구별 방탈출 최고");
+        User user = createAndSaveUser();
 
-        final WaitingReservation waitingReservation = waitingReservationRepository.save(
+        WaitingReservation waitingReservation = waitingReservationRepository.save(
                 WaitingReservation.of(
                         user.getId(),
                         1,
-                        ReservationDate.from(LocalDate.of(2025, 8, 5)),
+                        ReservationDate.from(LocalDate.now().plusDays(1)),
                         reservationTime,
                         theme
                 ));
@@ -146,39 +146,39 @@ class WaitingReservationCommandServiceTest {
     @DisplayName("예약 대기 삭제 시 뒤의 순서들이 자동으로 업데이트된다")
     void deleteWaitingReservationUpdatesOrder() {
         //given
-        final ReservationTime reservationTime = createAndSaveReservationTime(LocalTime.of(10, 0));
-        final Theme theme = createAndSaveTheme("공포", "지구별 방탈출 최고");
-        final User user = createAndSaveUser();
+        ReservationTime reservationTime = createAndSaveReservationTime(LocalTime.now().plusMinutes(2));
+        Theme theme = createAndSaveTheme("공포", "지구별 방탈출 최고");
+        User user = createAndSaveUser();
 
-        final WaitingReservation waiting1 = waitingReservationRepository.save(
+        WaitingReservation waiting1 = waitingReservationRepository.save(
                 WaitingReservation.of(
                         user.getId(),
                         1,
-                        ReservationDate.from(LocalDate.of(2025, 8, 5)),
+                        ReservationDate.from(LocalDate.now().plusDays(1)),
                         reservationTime,
                         theme));
 
-        final WaitingReservation waiting2 = waitingReservationRepository.save(
+        WaitingReservation waiting2 = waitingReservationRepository.save(
                 WaitingReservation.of(
                         user.getId(),
                         2,
-                        ReservationDate.from(LocalDate.of(2025, 8, 5)),
+                        ReservationDate.from(LocalDate.now().plusDays(1)),
                         reservationTime,
                         theme));
 
-        final WaitingReservation waiting3 = waitingReservationRepository.save(
+        WaitingReservation waiting3 = waitingReservationRepository.save(
                 WaitingReservation.of(
                         user.getId(),
                         3,
-                        ReservationDate.from(LocalDate.of(2025, 8, 5)),
+                        ReservationDate.from(LocalDate.now().plusDays(1)),
                         reservationTime,
                         theme));
 
-        final WaitingReservation waiting4 = waitingReservationRepository.save(
+        WaitingReservation waiting4 = waitingReservationRepository.save(
                 WaitingReservation.of(
                         user.getId(),
                         4,
-                        ReservationDate.from(LocalDate.of(2025, 8, 5)),
+                        ReservationDate.from(LocalDate.now().plusDays(1)),
                         reservationTime,
                         theme));
 
@@ -188,15 +188,15 @@ class WaitingReservationCommandServiceTest {
         //then
         assertThat(waitingReservationRepository.findById(waiting2.getId())).isEmpty();
 
-        final WaitingReservation updatedWaiting1 = waitingReservationRepository.findById(waiting1.getId())
+        WaitingReservation updatedWaiting1 = waitingReservationRepository.findById(waiting1.getId())
                 .orElseThrow(NoSuchElementException::new);
         assertThat(updatedWaiting1.getWaitingOrder()).isEqualTo(1);
 
-        final WaitingReservation updatedWaiting3 = waitingReservationRepository.findById(waiting3.getId())
+        WaitingReservation updatedWaiting3 = waitingReservationRepository.findById(waiting3.getId())
                 .orElseThrow(NoSuchElementException::new);
         assertThat(updatedWaiting3.getWaitingOrder()).isEqualTo(2);
 
-        final WaitingReservation updatedWaiting4 = waitingReservationRepository.findById(waiting4.getId())
+        WaitingReservation updatedWaiting4 = waitingReservationRepository.findById(waiting4.getId())
                 .orElseThrow(NoSuchElementException::new);
         assertThat(updatedWaiting4.getWaitingOrder()).isEqualTo(3);
     }

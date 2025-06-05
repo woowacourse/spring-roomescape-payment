@@ -56,32 +56,32 @@ class ReservationQueryServiceTest {
     @DisplayName("예약을 조회할 수 있다")
     void createAndFindReservation() {
         // given
-        final ReservationTime reservationTime = createAndSaveReservationTime(LocalTime.of(10, 0));
-        final Theme theme = createAndSaveTheme("공포", "지구별 방탈출 최고");
-        final User user = createAndSaveUser();
+        ReservationTime reservationTime = createAndSaveReservationTime(LocalTime.now().plusMinutes(2));
+        Theme theme = createAndSaveTheme("공포", "지구별 방탈출 최고");
+        User user = createAndSaveUser();
 
-        final Reservation given1 = Reservation.of(
+        Reservation given1 = Reservation.of(
                 user.getId(),
                 ReservationDate.from(LocalDate.now().plusDays(1)),
                 reservationTime,
                 theme);
 
-        final Reservation given2 = Reservation.of(
+        Reservation given2 = Reservation.of(
                 user.getId(),
                 ReservationDate.from(LocalDate.now().plusDays(1)),
                 reservationTime,
                 theme);
 
-        final Reservation saved1 = reservationRepository.save(given1);
-        final Reservation saved2 = reservationRepository.save(given2);
+        Reservation saved1 = reservationRepository.save(given1);
+        Reservation saved2 = reservationRepository.save(given2);
 
         // when
-        final List<Reservation> reservations = reservationQueryService.getAll();
+        List<Reservation> reservations = reservationQueryService.getAll();
 
         // then
         assertThat(reservations).hasSize(2);
-        final Reservation found1 = reservations.getFirst();
-        final Reservation found2 = reservations.get(1);
+        Reservation found1 = reservations.getFirst();
+        Reservation found2 = reservations.get(1);
 
         assertAll(() -> {
             assertThat(found1).isEqualTo(saved1);
@@ -93,17 +93,16 @@ class ReservationQueryServiceTest {
     @DisplayName("특정 날짜와 테마에 대한 예약 가능 여부가 포함된 시간 정보를 받을 수 있다")
     void getTimesWithAvailability() {
         // given
-        final ReservationTime booked = createAndSaveReservationTime(LocalTime.of(10, 0));
-        final ReservationTime unbooked = createAndSaveReservationTime(LocalTime.of(11, 0));
-        final Theme theme = createAndSaveTheme("공포", "지구별 방탈출 최고");
-        final User user = createAndSaveUser();
+        ReservationTime booked = createAndSaveReservationTime(LocalTime.now().plusMinutes(2));
+        ReservationTime unbooked = createAndSaveReservationTime(LocalTime.of(11, 0));
+        Theme theme = createAndSaveTheme("공포", "지구별 방탈출 최고");
+        User user = createAndSaveUser();
 
-        final ReservationDate date = ReservationDate.from(LocalDate.now().plusDays(1));
+        ReservationDate date = ReservationDate.from(LocalDate.now().plusDays(1));
 
-        final Reservation reservation = reservationRepository.save(
-                Reservation.of(user.getId(), date, booked, theme));
+        reservationRepository.save(Reservation.of(user.getId(), date, booked, theme));
         // when
-        final List<AvailableReservationTimeServiceResponse> timesWithAvailability = reservationQueryService.getTimesWithAvailability(
+        List<AvailableReservationTimeServiceResponse> timesWithAvailability = reservationQueryService.getTimesWithAvailability(
                 new AvailableReservationTimeServiceRequest(date, theme.getId()));
 
         // then

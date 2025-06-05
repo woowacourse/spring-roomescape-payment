@@ -59,24 +59,24 @@ class ReservationViewQueryServiceTest {
     @DisplayName("유저 Id가 같은 모든 예약 대기를 조회할 수 있다")
     void getAllWaitingByUserId() {
         // given
-        final User user1 = createAndSaveUser();
-        final User user2 = userRepository.save(
+        User user1 = createAndSaveUser();
+        User user2 = userRepository.save(
                 User.of(
                         UserName.from("강"),
                         Email.from("emailemail@email.com"),
                         Password.fromEncoded("1234"),
                         UserRole.NORMAL));
-        final ReservationDate date = ReservationDate.from(LocalDate.now().plusDays(1));
-        final ReservationTime time = createAndSaveReservationTime(LocalTime.of(10, 0));
-        final Theme theme1 = createAndSaveTheme("공포2", "지구별 방탈출 최고2");
-        final Theme theme2 = createAndSaveTheme("공포2", "지구별 방탈출 최고2");
+        ReservationDate date = ReservationDate.from(LocalDate.now().plusDays(1));
+        ReservationTime time = createAndSaveReservationTime(LocalTime.now().plusMinutes(2));
+        Theme theme1 = createAndSaveTheme("공포2", "지구별 방탈출 최고2");
+        Theme theme2 = createAndSaveTheme("공포2", "지구별 방탈출 최고2");
         Long userId = user1.getId();
 
-        final Reservation reservation1 = createAndSaveReservation(user2.getId(), date, time, theme1);
-        final Reservation reservation2 = createAndSaveReservation(user2.getId(), date, time, theme2);
-        final WaitingReservation waitingReservation1 = waitingReservationRepository.save(
+        createAndSaveReservation(user2.getId(), date, time, theme1);
+        createAndSaveReservation(user2.getId(), date, time, theme2);
+        WaitingReservation waitingReservation1 = waitingReservationRepository.save(
                 WaitingReservation.of(userId, 1, date, time, theme1));
-        final WaitingReservation waitingReservation2 = waitingReservationRepository.save(
+        WaitingReservation waitingReservation2 = waitingReservationRepository.save(
                 WaitingReservation.of(userId, 1, date, time, theme2));
         // when
         List<ReservationView> reservations = service.getAllByUserId(userId);

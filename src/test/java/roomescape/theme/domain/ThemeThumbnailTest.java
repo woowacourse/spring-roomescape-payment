@@ -56,9 +56,9 @@ class ThemeThumbnailTest {
     @DisplayName("유효한 테마 썸네일 URI로 ThemeThumbnail 객체를 생성할 수 있다")
     void createValidThemeThumbnail() {
         // when
-        final ThemeThumbnail themeThumbnail1 = ThemeThumbnail.from("https://example.com/image.jpg");
-        final ThemeThumbnail themeThumbnail2 = ThemeThumbnail.from("http://example.com/image.jpg");
-        final ThemeThumbnail themeThumbnail3 = ThemeThumbnail.from("file:///path/to/image.jpg");
+        ThemeThumbnail themeThumbnail1 = ThemeThumbnail.from("https://example.com/image.jpg");
+        ThemeThumbnail themeThumbnail2 = ThemeThumbnail.from("http://example.com/image.jpg");
+        ThemeThumbnail themeThumbnail3 = ThemeThumbnail.from("file:///path/to/image.jpg");
 
         // then
         Assertions.assertAll(() -> {
