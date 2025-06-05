@@ -11,10 +11,14 @@ VALUES ('10:00'),
 INSERT INTO themes (name, description, thumbnail)
 VALUES ('레벨2 탈출',
         '우테코 레벨2를 탈출하는 내용입니다.',
-        'https://example.com/image.jpg'),
+        'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg'),
        ('지하 감옥',
         '깊은 감옥에서 탈출하라!',
-        'https://example.com/jail.jpg');
+        'https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg');
 
 INSERT INTO reservations (user_id, date, time_id, theme_id)
-VALUES (2, CURRENT_DATE + 1, 1, 1);
+VALUES (2, CURRENT_DATE + 1, 1, 1),
+       (2, CURRENT_DATE - 1, 1, 1),
+       (2, CURRENT_DATE - 2 , 1, 2),
+       (2, CURRENT_DATE - 2, 1, 2);
+
