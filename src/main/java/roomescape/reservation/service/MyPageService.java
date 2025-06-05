@@ -3,7 +3,7 @@ package roomescape.reservation.service;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import roomescape.reservation.dto.MyReservationResponse;
+import roomescape.reservation.dto.MyRegistrationResponse;
 import roomescape.reservation.repository.RegistrationQueryRepository;
 import roomescape.reservation.repository.dto.MemberRegistrationProjection;
 
@@ -12,10 +12,10 @@ import roomescape.reservation.repository.dto.MemberRegistrationProjection;
 public class MyPageService {
     private final RegistrationQueryRepository registrationQueryRepository;
 
-    public List<MyReservationResponse> getMyRegistrations(Long memberId) {
+    public List<MyRegistrationResponse> getMyRegistrations(Long memberId) {
         List<MemberRegistrationProjection> registrationsData =
                 registrationQueryRepository.findAllRegistrationsByMemberId(memberId);
 
-        return MyReservationResponse.from(registrationsData);
+        return MyRegistrationResponse.from(registrationsData);
     }
 }

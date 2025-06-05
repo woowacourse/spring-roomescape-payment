@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoginMember;
-import roomescape.reservation.dto.MyReservationResponse;
+import roomescape.reservation.dto.MyRegistrationResponse;
 import roomescape.reservation.service.MyPageService;
 import roomescape.reservation.service.WaitingReservationService;
 
@@ -25,7 +25,7 @@ public class MyPageController {
     }
 
     @GetMapping("/registrations")
-    public List<MyReservationResponse> getMyBookings(LoginMember loginMember) {
+    public List<MyRegistrationResponse> getMyRegistrations(LoginMember loginMember) {
         return myPageService.getMyRegistrations(loginMember.id());
     }
 
