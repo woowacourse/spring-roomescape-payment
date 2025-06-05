@@ -71,13 +71,13 @@ public class Reservation {
     }
 
     public void waitForPayment() {
-        if (this.reservationStatus != ReservationStatus.REQUESTED) {
+        if (reservationStatus.isFinished()) {
             throw new ReservationStatusException("결제 대기 상태로 변경 불가능합니다.");
         }
     }
 
     public void confirm(final Payment payment) {
-        if (this.reservationStatus == ReservationStatus.CONFIRMED) {
+        if (reservationStatus.isConfirmed()) {
             throw new ReservationStatusException("확정할 수 없는 상태입니다.");
         }
         this.reservationStatus = ReservationStatus.CONFIRMED;
@@ -85,7 +85,7 @@ public class Reservation {
     }
 
     public void paymentFailed(final Payment payment) {
-        if (this.reservationStatus != ReservationStatus.REQUESTED) {
+        if (reservationStatus.isFinished()) {
             throw new ReservationStatusException("취소할 수 없는 상태입니다.");
         }
         this.reservationStatus = ReservationStatus.FAILED;
@@ -131,14 +131,6 @@ public class Reservation {
 
     public String getOrderId() {
         return orderId;
-    }
-
-    public void setReservationStatus(final ReservationStatus reservationStatus) {
-        this.reservationStatus = reservationStatus;
-    }
-
-    public ReservationStatus getReservationStatus() {
-        return reservationStatus;
     }
 
     public Payment getPayment() {
