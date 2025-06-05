@@ -41,11 +41,12 @@ public class PaymentServiceTest {
     @Test
     void 결제를_진행한다() throws JsonProcessingException {
         PaymentProcessRequest paymentProcessRequest = new PaymentProcessRequest("test", "test", "1000");
-        Payment payment = Payment.create("test", "test");
+        Payment payment = Payment.create("test", "test", 1000);
         String paymentString = """
                 {
                     "paymentKey": "test",
-                    "orderId": "test"
+                    "orderId": "test",
+                    "totalAmount": 1000
                 }
                 """;
         ResponseEntity<String> responseEntity = new ResponseEntity<>(paymentString, HttpStatus.OK);

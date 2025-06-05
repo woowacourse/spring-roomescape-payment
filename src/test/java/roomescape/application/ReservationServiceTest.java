@@ -21,7 +21,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.presentation.dto.request.PaymentProcessRequest;
 import roomescape.domain.Member;
 import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
@@ -34,6 +33,7 @@ import roomescape.domain.Waiting;
 import roomescape.infrastructure.repository.ReservationRepository;
 import roomescape.presentation.dto.request.AdminReservationCreateRequest;
 import roomescape.presentation.dto.request.LoginMember;
+import roomescape.presentation.dto.request.PaymentProcessRequest;
 import roomescape.presentation.dto.request.ReservationWithPaymentRequest;
 import roomescape.presentation.dto.response.MemberResponse;
 import roomescape.presentation.dto.response.MyReservationResponse;
@@ -111,7 +111,7 @@ class ReservationServiceTest {
 
         when(memberService.findMemberByEmail(loginMember.email())).thenReturn(member);
         PaymentProcessRequest paymentRequest = request.toPaymentProcessRequest();
-        Payment payment = Payment.create("paymentKey", "orderId");
+        Payment payment = Payment.create("paymentKey", "orderId", 1000);
         when(paymentService.process(paymentRequest)).thenReturn(payment);
         when(reservationTimeService.findReservationTimeById(request.timeId())).thenReturn(time);
         when(currentTimeService.now()).thenReturn(LocalDateTime.of(2025, 4, 20, 10, 0));
@@ -185,7 +185,8 @@ class ReservationServiceTest {
         when(reservationRepository.existsByDateAndTimeAndThemeAndStatus(date, time, theme,
                 ReservationStatus.RESERVED)).thenReturn(true);
 
-        assertThatThrownBy(() -> reservationService.createMemberReservation(request, request.toPaymentProcessRequest(), loginMember))
+        assertThatThrownBy(() -> reservationService.createMemberReservation(request, request.toPaymentProcessRequest(),
+                loginMember))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 

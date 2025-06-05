@@ -33,7 +33,8 @@ public class PaymentService {
         JsonNode jsonNode = getJsonNode(paymentResponse.getBody());
         String paymentKey = jsonNode.get("paymentKey").asText();
         String orderId = jsonNode.get("orderId").asText();
-        Payment payment = Payment.create(paymentKey, orderId);
+        int totalAmount = jsonNode.get("totalAmount").asInt();
+        Payment payment = Payment.create(paymentKey, orderId, totalAmount);
         return paymentRepository.save(payment);
     }
 

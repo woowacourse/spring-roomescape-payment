@@ -24,8 +24,10 @@ public class Payment {
 
     private String orderId;
 
-    public static Payment create(String paymentKey, String orderId) {
-        return new Payment(null, paymentKey, orderId);
+    private int totalAmount;
+
+    public static Payment create(String paymentKey, String orderId, int totalAmount) {
+        return new Payment(null, paymentKey, orderId, totalAmount);
     }
 
     @Override
