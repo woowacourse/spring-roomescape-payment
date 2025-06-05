@@ -4,6 +4,6 @@ public record ConfirmPaymentResponse(
         String paymentKey,
         String orderId,
         int totalAmount,
-        String paymentType
+        String type
 ) {
 }

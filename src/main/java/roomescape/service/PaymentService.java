@@ -51,7 +51,7 @@ public class PaymentService {
                 .toEntity(ConfirmPaymentResponse.class)
                 .getBody();
 
-        Payment payment = new Payment(body.orderId(), body.totalAmount(), body.paymentKey(), paymentRequest.paymentType(), reservation);
+        Payment payment = new Payment(body.orderId(), body.totalAmount(), body.paymentKey(), body.type(), reservation);
         paymentRepository.save(payment);
 
         return body;
