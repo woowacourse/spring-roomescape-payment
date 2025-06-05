@@ -3,6 +3,8 @@ package roomescape.waiting.controller;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +23,7 @@ import roomescape.waiting.dto.response.WaitingCreateResponse;
 import roomescape.waiting.dto.response.WaitingReadResponse;
 import roomescape.waiting.service.WaitingService;
 
+@Tag(name = "Waiting", description = "대기열 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/waitings")
@@ -28,6 +31,7 @@ public class WaitingController {
 
     private final WaitingService waitingService;
 
+    @Operation(summary = "예약 대기 등록", description = "ADMIN 및 USER 권한으로 예약 대기열에 등록합니다.")
     @PostMapping
     @RoleRequired(roleType = {RoleType.ADMIN, RoleType.USER})
     public ResponseEntity<WaitingCreateResponse> waitReservation(
@@ -39,6 +43,7 @@ public class WaitingController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Operation(summary = "모든 대기열 조회", description = "ADMIN 권한으로 모든 대기열 목록을 조회합니다.")
     @GetMapping
     @RoleRequired(roleType = RoleType.ADMIN)
     public ResponseEntity<List<WaitingReadResponse>> getAllWaitings() {
@@ -46,6 +51,7 @@ public class WaitingController {
         return ResponseEntity.ok(responses);
     }
 
+    @Operation(summary = "대기 승인", description = "ADMIN 권한으로 대기 요청을 승인합니다.")
     @PostMapping("/accept/{id}")
     @RoleRequired(roleType = RoleType.ADMIN)
     public ResponseEntity<Void> acceptWaiting(@PathVariable Long id) {
@@ -53,6 +59,7 @@ public class WaitingController {
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "대기 취소", description = "ADMIN 및 USER 권한으로 대기 요청을 취소합니다.")
     @DeleteMapping("/{id}")
     @RoleRequired(roleType = {RoleType.ADMIN, RoleType.USER})
     public ResponseEntity<Void> deleteWaitingById(

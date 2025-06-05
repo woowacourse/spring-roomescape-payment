@@ -3,6 +3,8 @@ package roomescape.reservation.controller;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +26,7 @@ import roomescape.reservation.dto.response.ReservationReadFilteredResponse;
 import roomescape.reservation.dto.response.ReservationReadResponse;
 import roomescape.reservation.service.ReservationService;
 
+@Tag(name = "Reservation", description = "예약 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/reservations")
@@ -31,6 +34,7 @@ public class ReservationController {
 
     private final ReservationService reservationService;
 
+    @Operation(summary = "예약 생성", description = "로그인된 사용자의 예약을 생성합니다.")
     @PostMapping
     public ResponseEntity<ReservationCreateResponse> createReservation(
             @AuthenticationPrincipal LoginMember loginMember,
@@ -40,12 +44,14 @@ public class ReservationController {
         return ResponseEntity.ok().body(response);
     }
 
+    @Operation(summary = "모든 예약 조회", description = "모든 예약 목록을 조회합니다.")
     @GetMapping
     public ResponseEntity<List<ReservationReadResponse>> getAllReservations() {
         List<ReservationReadResponse> responses = reservationService.getAllReservations();
         return ResponseEntity.ok().body(responses);
     }
 
+    @Operation(summary = "내 예약 조회", description = "로그인된 사용자의 예약 목록을 조회합니다.")
     @GetMapping("/mine")
     public ResponseEntity<List<ReservationByMemberResponse>> getMyReservations(
             @AuthenticationPrincipal LoginMember loginMember
@@ -54,6 +60,7 @@ public class ReservationController {
         return ResponseEntity.ok(responses);
     }
 
+    @Operation(summary = "예약 삭제", description = "ADMIN 권한으로 예약을 삭제합니다.")
     @DeleteMapping("/{id}")
     @RoleRequired(roleType = RoleType.ADMIN)
     public ResponseEntity<Void> deleteReservation(
@@ -63,6 +70,7 @@ public class ReservationController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "예약 필터 조회", description = "ADMIN 권한으로 필터 조건에 맞는 예약 목록을 조회합니다.")
     @GetMapping("/filtered")
     @RoleRequired(roleType = RoleType.ADMIN)
     public ResponseEntity<List<ReservationReadFilteredResponse>> getFilteredReservations(
