@@ -29,9 +29,9 @@ public class ReservationDataService {
         return reservationRepository.findAllWaitingReservations();
     }
 
-    public List<Reservation> findFirstByCriteria(final Long themeId, final Long memberId,
-                                                 final LocalDate startDate, final LocalDate endDate) {
-        return reservationRepository.findFirstByCriteria(themeId, startDate, endDate, memberId);
+    public List<Reservation> findConfirmedByCriteria(final Long themeId, final Long memberId,
+                                                     final LocalDate startDate, final LocalDate endDate) {
+        return reservationRepository.findConfirmedByCriteria(themeId, startDate, endDate, memberId);
     }
 
     public Reservation getByReservationSlotIdAndMemberId(final Long reservationSlotId, final Long memberId) {

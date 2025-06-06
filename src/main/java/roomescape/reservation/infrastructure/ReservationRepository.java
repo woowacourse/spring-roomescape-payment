@@ -24,11 +24,12 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                 SELECT MIN(r2.id)
                 FROM Reservation r2
                 GROUP BY r2.reservationSlot.id
-              )             
+              )
+              AND r.status = 'CONFIRMED'
             ORDER BY rs.id, r.createdAt asc 
             """)
-    List<Reservation> findFirstByCriteria(Long themeId, LocalDate startDate,
-                                          LocalDate endDate, Long memberId);
+    List<Reservation> findConfirmedByCriteria(Long themeId, LocalDate startDate,
+                                              LocalDate endDate, Long memberId);
 
     @Query("""
             SELECT r 

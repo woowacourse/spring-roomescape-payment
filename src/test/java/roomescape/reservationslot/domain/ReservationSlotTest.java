@@ -16,6 +16,7 @@ import roomescape.fixture.TestFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRole;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.exception.ReservationDuplicatedException;
 import roomescape.reservation.exception.ReservationNotFoundException;
 import roomescape.reservationslot.exception.InvalidReservationSlotException;
@@ -100,7 +101,7 @@ class ReservationSlotTest {
         // given
         Member member1 = new Member("Free", "free@gmail.com", "password", MemberRole.REGULAR);
         ReflectionTestUtils.setField(member1, "id", 4L);
-        Reservation reservation = new Reservation(member1, reservationSlot);
+        Reservation reservation = new Reservation(member1, reservationSlot, ReservationStatus.WAITING);
 
         // when & then
         assertThatThrownBy(() -> reservationSlot.findRank(reservation))

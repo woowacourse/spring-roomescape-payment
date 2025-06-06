@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Objects;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.exception.ReservationDuplicatedException;
 import roomescape.reservation.exception.ReservationNotFoundException;
 import roomescape.reservationslot.exception.InvalidReservationSlotException;
@@ -65,14 +66,21 @@ public class ReservationSlot {
     public Reservation addReservation(final Member member, final LocalDateTime now) {
         validateDateTime(date, time.getStartAt(), now);
         validateMemberNotReserved(member);
-        Reservation reservation = new Reservation(member, this);
+        Reservation reservation = generateReservation(member);
         reservations.add(reservation);
         return reservation;
     }
 
+    private Reservation generateReservation(final Member member) {
+        if (reservations.isEmpty()) {
+            return new Reservation(member, this, ReservationStatus.CONFIRMED);
+        }
+        return new Reservation(member, this, ReservationStatus.WAITING);
+    }
+
     public Member findConfirmedMember() {
         return reservations.stream()
-                .sorted(Comparator.comparing(Reservation::getCreatedAt))
+                .filter(reservation -> reservation.getStatus() == ReservationStatus.CONFIRMED)
                 .map(Reservation::getMember)
                 .findFirst()
                 .orElseThrow(() -> new ReservationSlotNotFoundException("현재 예약한 멤버가 없습니다."));
@@ -89,8 +97,21 @@ public class ReservationSlot {
 
     public Reservation findConfirmedReservation() {
         return reservations.stream()
-                .min(Comparator.comparing(Reservation::getCreatedAt))
+                .filter(reservation -> reservation.getStatus() == ReservationStatus.CONFIRMED)
+                .findFirst()
                 .orElseThrow(() -> new ReservationNotFoundException("예약이 존재하지 않습니다."));
+    }
+
+    public Reservation findPaymentPendingReservation() {
+        return reservations.stream()
+                .filter(reservation -> reservation.getStatus() == ReservationStatus.PAYMENT_PENDING)
+                .findFirst()
+                .orElseThrow(() -> new ReservationNotFoundException("예약이 존재하지 않습니다."));
+    }
+
+    public boolean isConfirmedReservationExist() {
+        return reservations.stream()
+                .anyMatch(reservation -> reservation.getStatus() == ReservationStatus.CONFIRMED);
     }
 
     private void validateDateTime(LocalDate date, LocalTime time, LocalDateTime now) {

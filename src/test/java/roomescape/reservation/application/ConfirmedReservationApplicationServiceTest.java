@@ -29,11 +29,15 @@ import roomescape.payment.application.client.PaymentClient;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.ProductType;
 import roomescape.payment.infrastructure.PaymentRepository;
+import roomescape.reservation.application.dto.request.WaitingReservationCreateRequest;
 import roomescape.reservation.application.dto.request.ConfirmedReservationByCriteriaWebRequest;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
+import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.infrastructure.ReservationRepository;
 import roomescape.reservation.presentation.dto.response.ConfirmedReservationWebResponse;
 import roomescape.reservationslot.application.ReservationSlotDataService;
+import roomescape.reservationslot.domain.ReservationSlot;
 import roomescape.reservationslot.exception.ReservationSlotDuplicatedException;
 import roomescape.reservationslot.infrastructure.ReservationSlotRepository;
 import roomescape.reservationslot.presentation.dto.response.MyReservationResponse;
@@ -99,7 +103,7 @@ class ConfirmedReservationApplicationServiceTest {
                 memberDataService, reservationDataService,
                 paymentApplicationService);
         waitingReservationApplicationService = new WaitingReservationApplicationService(reservationSlotDataService,
-                memberDataService, reservationDataService);
+                memberDataService, reservationDataService, paymentApplicationService);
 
         timeId = reservationTimeRepository.save(new ReservationTime(LocalTime.of(9, 0))).getId();
         themeId = themeRepository.save(TestFixture.makeTheme()).getId();
@@ -234,6 +238,27 @@ class ConfirmedReservationApplicationServiceTest {
     }
 
     @Test
+    void cancel_whenWaitingExists_hasToUpdateFirstWaitingToPaymentPending() {
+        // Given
+        ReservationSlot reservationSlot = reservationRepository.findById(reservationId).get().getReservationSlot();
+        Member member = new Member("phree", "phree@gmail.com", "password", MemberRole.REGULAR);
+        memberRepository.save(member);
+        Reservation reservation = reservationSlot.addReservation(member, LocalDateTime.now().plusMinutes(1));
+        reservationRepository.save(reservation);
+
+        // When
+        confirmedReservationApplicationService.cancel(reservationId);
+
+        // Then
+        List<ConfirmedReservationWebResponse> result = confirmedReservationApplicationService.findByCriteria(
+                new ConfirmedReservationByCriteriaWebRequest(themeId, member.getId(), FUTURE_DATE, FUTURE_DATE.plusDays(1)));
+        SoftAssertions.assertSoftly(softAssertions -> {
+            softAssertions.assertThat(result).hasSize(0);
+            softAssertions.assertThat(reservationSlot.getReservations().stream().findFirst().get().getStatus()).isEqualTo(ReservationStatus.PAYMENT_PENDING);
+        });
+    }
+
+    @Test
     void findMyReservations_shouldReturnMemberReservations() {
         // given
         Long themeId2 = themeRepository.save(new Theme("논리", "논리 게임 with Danny", "image.png")).getId();
@@ -251,6 +276,7 @@ class ConfirmedReservationApplicationServiceTest {
         SoftAssertions.assertSoftly(softAssertions -> {
                     softAssertions.assertThat(result).hasSize(1);
                     softAssertions.assertThat(result.getFirst().theme()).isEqualTo("논리");
+                    softAssertions.assertThat(result.getFirst().status()).isEqualTo(ReservationStatus.CONFIRMED);
                     softAssertions.assertThat(result.getFirst().paymentKey()).isEqualTo("testtest");
                     softAssertions.assertThat(result.getFirst().amount()).isEqualTo(1000L);
                 }

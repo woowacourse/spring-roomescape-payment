@@ -37,6 +37,7 @@ import roomescape.common.security.dto.response.CheckLoginResponse;
 import roomescape.payment.application.client.PaymentClient;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
 import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservationslot.presentation.dto.response.MyReservationResponse;
 import roomescape.reservationslot.presentation.dto.response.ReservationResponse;
 
@@ -147,7 +148,7 @@ class RegularMemberE2ETest {
 
         SoftAssertions.assertSoftly(softAssertions -> {
             softAssertions.assertThat(responses.size()).isEqualTo(1);
-            softAssertions.assertThat(responses.getFirst().isReserved()).isTrue();
+            softAssertions.assertThat(responses.getFirst().status()).isEqualTo(ReservationStatus.CONFIRMED);
             softAssertions.assertThat(responses.getFirst().paymentKey()).isEqualTo("testtest");
             softAssertions.assertThat(responses.getFirst().amount()).isEqualTo(1000L);
         });

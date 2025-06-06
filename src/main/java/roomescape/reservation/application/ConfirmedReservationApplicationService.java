@@ -1,6 +1,8 @@
 package roomescape.reservation.application;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.application.MemberDataService;
@@ -67,7 +69,7 @@ public class ConfirmedReservationApplicationService {
 
     public List<ConfirmedReservationWebResponse> findByCriteria(
             final ConfirmedReservationByCriteriaWebRequest request) {
-        List<Reservation> reservations = reservationDataService.findFirstByCriteria(request.themeId(),
+        List<Reservation> reservations = reservationDataService.findConfirmedByCriteria(request.themeId(),
                 request.memberId(), request.startDate(), request.endDate());
         return reservations
                 .stream()
@@ -83,16 +85,20 @@ public class ConfirmedReservationApplicationService {
                 .map(reservation -> {
                     Payment payment = paymentApplicationService.findReservationPayment(reservation.getId());
                     ReservationSlot reservationSlot = reservation.getReservationSlot();
-                    return new MyReservationResponse(reservationSlot.getId(), reservationSlot.getTheme().getName(), reservationSlot.getDate().toString(),
-                            reservationSlot.getTime().getStartAt().toString(), payment.getPaymentKey(), payment.getAmount(), reservation.isReserved(), reservationSlot.findRank(reservation));
+                    return new MyReservationResponse(reservationSlot.getId(), reservationSlot.getTheme().getName(),
+                            reservationSlot.getDate().toString(), reservationSlot.getTime().getStartAt().toString(), reservation.getStatus(),
+                            payment.getPaymentKey(), payment.getAmount(), reservationSlot.findRank(reservation));
                 })
                 .toList();
     }
 
     public void cancel(final Long reservationId) {
         Reservation reservation = reservationDataService.getById(reservationId);
-        cleanupEmptyReservationSlot(reservation.getReservationSlot().getId());
         reservationDataService.deleteById(reservationId);
+        ReservationSlot reservationSlot = reservation.getReservationSlot();
+        cleanupEmptyReservationSlot(reservationSlot.getId());
+        reservationSlot.getReservations().remove(reservation);
+        updateFirstWaiting(reservationSlot);
     }
 
     private ReservationSlot createReservationSlot(final ReservationCreateWebRequest reservationCreateWebRequest) {
@@ -105,5 +111,10 @@ public class ConfirmedReservationApplicationService {
         if (reservationSlotDataService.hasSingleReservation(slotId)) {
             reservationSlotDataService.deleteById(slotId);
         }
+    }
+
+    private void updateFirstWaiting(ReservationSlot reservationSlot) {
+        Optional<Reservation> firstWaiting = reservationSlot.getReservations().stream().findFirst();
+        firstWaiting.ifPresent(Reservation::toPaymentPending);
     }
 }
