@@ -2,9 +2,11 @@ package roomescape.presentation.dto.response;
 
 import java.time.LocalDate;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import roomescape.business.model.entity.Waiting;
 
 @Getter
+@RequiredArgsConstructor
 public class WaitingWithRankResponse {
 
     private final String id;

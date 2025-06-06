@@ -2,10 +2,12 @@ package roomescape.presentation.dto.response;
 
 import java.time.LocalDate;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import roomescape.business.model.entity.Payment;
 import roomescape.business.model.entity.Reservation;
 
 @Getter
+@RequiredArgsConstructor
 public class ReservationWithPaymentResponse {
 
     private final String id;
