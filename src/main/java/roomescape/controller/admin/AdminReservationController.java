@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.controller.docs.admin.AdminReservationControllerDocs;
 import roomescape.dto.request.CreateReservationRequest;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.WaitingReservationResponse;
@@ -22,7 +23,7 @@ import roomescape.service.reservation.ReservationService;
 @RequiredArgsConstructor
 @RequestMapping("/admin/reservations")
 @RestController
-public class AdminReservationController {
+public class AdminReservationController implements AdminReservationControllerDocs {
 
     private final ReservationService reservationService;
 
