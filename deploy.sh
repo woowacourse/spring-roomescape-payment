@@ -2,7 +2,6 @@
 
 SCRIPT_PATH="$(readlink -f "$0")"
 SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
-PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 
 is_java_installed() {
   if command -v java >/dev/null 2>&1; then
@@ -74,7 +73,7 @@ main() {
   # git 세팅
   echo ""
   echo "setting git project..."
-  cd "$PROJECT_DIR" || { echo "$PROJECT_DIR error"; exit 1; }
+  cd "$SCRIPT_DIR" || { echo "$SCRIPT_DIR error"; exit 1; }
 
   # step2 브랜치 체크아웃
   echo "checkout step2"
@@ -92,7 +91,7 @@ main() {
   ./gradlew bootJar
 
   # 빌드 결과물이 위치한 디렉터리로 이동
-  cd "$PROJECT_DIR/build/libs" || { echo "error"; exit 1; }
+  cd "$SCRIPT_DIR/build/libs" || { echo "error"; exit 1; }
 
   # Spring 서버 백그라운드 실행
   echo ""
