@@ -107,7 +107,7 @@ public class Reservation {
     }
 
     private void validateFutureOrPresent(LocalDateTime currentDateTime) {
-        final LocalDateTime reservationDateTime = LocalDateTime.of(date, time.getStartAt());
+        LocalDateTime reservationDateTime = LocalDateTime.of(date, time.getStartAt());
         if (reservationDateTime.isBefore(currentDateTime)) {
             throw new ReservationException("예약은 현재 시간 이후로 가능합니다.");
         }

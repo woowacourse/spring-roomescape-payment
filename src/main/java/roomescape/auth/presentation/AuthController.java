@@ -37,7 +37,7 @@ public class AuthController {
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void logout(final HttpServletResponse response) {
-        final ResponseCookie cookie = cookieManager.generateLogoutCookie();
+        ResponseCookie cookie = cookieManager.generateLogoutCookie();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 

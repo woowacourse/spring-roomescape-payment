@@ -18,12 +18,12 @@ public class ReservationTimeService {
     private final ReservationRepository reservationRepository;
 
     public ReservationTimeResponse saveTime(final ReservationTimeRequest request) {
-        final ReservationTime reservationTime = reservationTimeRepository.save(ReservationTime.from(request.startAt()));
+        ReservationTime reservationTime = reservationTimeRepository.save(ReservationTime.from(request.startAt()));
         return new ReservationTimeResponse(reservationTime);
     }
 
     public List<ReservationTimeResponse> findAll() {
-        final List<ReservationTime> reservationTimes = reservationTimeRepository.findAll();
+        List<ReservationTime> reservationTimes = reservationTimeRepository.findAll();
         return reservationTimes.stream()
                 .map(ReservationTimeResponse::new)
                 .toList();

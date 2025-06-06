@@ -22,21 +22,21 @@ public class ThemeService {
     private final ReservationRepository reservationRepository;
 
     public ThemeResponse saveTheme(final ThemeRequest request) {
-        final Theme theme = themeRepository.save(Theme.of(request.name(), request.description(), request.thumbnail()));
+        Theme theme = themeRepository.save(Theme.of(request.name(), request.description(), request.thumbnail()));
         return new ThemeResponse(theme);
     }
 
     public List<ThemeResponse> findAll() {
-        final List<Theme> themes = themeRepository.findAll();
+        List<Theme> themes = themeRepository.findAll();
         return themes.stream()
                 .map(ThemeResponse::new)
                 .toList();
     }
 
     public List<PopularThemeResponse> findAllPopular() {
-        final LocalDate nowDate = LocalDate.now(clock);
-        final LocalDate startDate = nowDate.minusDays(7);
-        final LocalDate endDate = nowDate.minusDays(1);
+        LocalDate nowDate = LocalDate.now(clock);
+        LocalDate startDate = nowDate.minusDays(7);
+        LocalDate endDate = nowDate.minusDays(1);
         return themeRepository.findAllPopular(startDate, endDate)
                 .stream()
                 .map(PopularThemeResponse::new)

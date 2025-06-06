@@ -40,7 +40,7 @@ public class ReservationService {
     private final MemberService memberService;
 
     public List<ReservationResponse> findReservationsByCriteria(final ReservationSearchRequest request) {
-        final List<Reservation> reservations = reservationRepository.findByCriteria(request.themeId(),
+        List<Reservation> reservations = reservationRepository.findByCriteria(request.themeId(),
                 request.memberId(), request.dateFrom(), request.dateTo());
         return reservations.stream()
                 .map(ReservationResponse::new)
@@ -52,8 +52,8 @@ public class ReservationService {
     }
 
     public ReservationResponse saveReservation(final ReservationRequest request, final LoginMember loginMember) {
-        final ReservationTime reservationTime = reservationTimeRepository.getById(request.timeId());
-        final Theme theme = themeRepository.getById(request.themeId());
+        ReservationTime reservationTime = reservationTimeRepository.getById(request.timeId());
+        Theme theme = themeRepository.getById(request.themeId());
 
         paymentClient.approvePayment(
                 new PaymentApprovalRequest(request.paymentKey(), request.orderId(), request.amount()));
@@ -86,15 +86,15 @@ public class ReservationService {
     }
 
     public ReservationResponse saveAdminReservation(final AdminReservationRequest request) {
-        final ReservationTime reservationTime = reservationTimeRepository.getById(request.timeId());
-        final Theme theme = themeRepository.getById(request.themeId());
-        final Member member = memberRepository.getById(request.memberId());
+        ReservationTime reservationTime = reservationTimeRepository.getById(request.timeId());
+        Theme theme = themeRepository.getById(request.themeId());
+        Member member = memberRepository.getById(request.memberId());
         if (reservationRepository.existsByDateAndTimeAndTheme(request.date(), reservationTime, theme)) {
             throw new ReservationException("해당 시간은 이미 예약되어있습니다.");
         }
-        final Reservation reservation = Reservation.of(request.date(), reservationTime, theme, member,
+        Reservation reservation = Reservation.of(request.date(), reservationTime, theme, member,
                 LocalDateTime.now(clock));
-        final Reservation newReservation = reservationRepository.save(reservation);
+        Reservation newReservation = reservationRepository.save(reservation);
         return new ReservationResponse(newReservation);
     }
 
