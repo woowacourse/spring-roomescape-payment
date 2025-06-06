@@ -1,5 +1,6 @@
 package roomescape.reservation.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -111,4 +112,8 @@ public class ReservationFacadeService {
         waitingService.delete(waiting.getId());
     }
 
+    public List<ReservationResponse> findReservations(final Long themeId, final Long memberId, final LocalDate dateFrom,
+                                                      final LocalDate dateTo) {
+        return reservationService.findReservations(themeId, memberId, dateFrom, dateTo);
+    }
 }

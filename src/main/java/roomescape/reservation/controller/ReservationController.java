@@ -21,18 +21,14 @@ import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationsResponse;
 import roomescape.reservation.service.ReservationFacadeService;
-import roomescape.reservation.service.ReservationService;
 
 @RestController
 public class ReservationController {
 
     private final ReservationFacadeService reservationFacadeService;
-    private final ReservationService reservationService;
 
-    public ReservationController(final ReservationFacadeService reservationFacadeService,
-                                 ReservationService reservationService) {
+    public ReservationController(final ReservationFacadeService reservationFacadeService) {
         this.reservationFacadeService = reservationFacadeService;
-        this.reservationService = reservationService;
     }
 
     @GetMapping("/reservations")
@@ -42,7 +38,7 @@ public class ReservationController {
             @RequestParam(required = false) LocalDate dateFrom,
             @RequestParam(required = false) LocalDate dateTo
     ) {
-        List<ReservationResponse> reservations = reservationService.findReservations(themeId, memberId, dateFrom,
+        List<ReservationResponse> reservations = reservationFacadeService.findReservations(themeId, memberId, dateFrom,
                 dateTo);
         return ResponseEntity.ok(ReservationsResponse.of(reservations));
     }
