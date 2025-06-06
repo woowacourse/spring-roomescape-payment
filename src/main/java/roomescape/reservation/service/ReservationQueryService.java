@@ -65,6 +65,10 @@ public class ReservationQueryService {
     private List<MyReservationResponse> findBookedReservations(final Member member) {
         final List<PaymentReservation> paymentReservations = paymentReservationRepository.findByReservationMember(member);
         return paymentReservations.stream()
+                .filter(paymentReservation -> {
+                    final Reservation reservation = paymentReservation.getReservation();
+                    return reservation.isBooked();
+                })
                 .map(MyReservationResponse::of)
                 .toList();
     }

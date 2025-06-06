@@ -6,7 +6,6 @@ import java.time.LocalTime;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentReservation;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.domain.ReservationStatus;
 
 public record MyReservationResponse(
         Long reservationId,
@@ -19,7 +18,7 @@ public record MyReservationResponse(
         Long amount
 ) {
 
-    public MyReservationResponse(final Reservation reservation, final Payment payment, final ReservationStatus status) {
+    public MyReservationResponse(final Reservation reservation, final Payment payment, final ReservationStatusResponse status) {
         this(
                 reservation.getId(),
                 reservation.getRoomEscapeInformation().getTheme().getName(),
@@ -33,7 +32,7 @@ public record MyReservationResponse(
     }
 
     public MyReservationResponse(final WaitingReservationWithRank waitingReservationWithRank,
-                                 final ReservationStatus status) {
+                                 final ReservationStatusResponse status) {
         this(
                 waitingReservationWithRank.reservationId(),
                 waitingReservationWithRank.theme(),
@@ -47,10 +46,10 @@ public record MyReservationResponse(
     }
 
     public static MyReservationResponse of(final PaymentReservation paymentReservation) {
-        return new MyReservationResponse(paymentReservation.getReservation(), paymentReservation.getPayment(), ReservationStatus.BOOKED);
+        return new MyReservationResponse(paymentReservation.getReservation(), paymentReservation.getPayment(), ReservationStatusResponse.BOOKED);
     }
 
     public static MyReservationResponse from(final WaitingReservationWithRank waiting) {
-        return new MyReservationResponse(waiting, ReservationStatus.WAITING);
+        return new MyReservationResponse(waiting, ReservationStatusResponse.WAITING);
     }
 }

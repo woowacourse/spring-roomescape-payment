@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 
@@ -31,8 +32,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     boolean existsByRoomEscapeInformationId(Long roomEscapeInformationId);
 
-    boolean existsByRoomEscapeInformationDateAndRoomEscapeInformationTimeAndRoomEscapeInformationTheme(
+    boolean existsByRoomEscapeInformationDateAndRoomEscapeInformationTimeAndRoomEscapeInformationThemeAndStatus(
             LocalDate date,
             ReservationTime time,
-            Theme theme);
+            Theme theme,
+            ReservationStatus status);
 }

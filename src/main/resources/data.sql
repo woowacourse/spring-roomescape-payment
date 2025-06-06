@@ -19,11 +19,11 @@ VALUES ('2025-05-11', 1, 1);
 INSERT INTO room_escape_information(date, time_id, theme_id)
 VALUES ('2099-05-11', 1, 1);
 
-INSERT INTO reservation(room_escape_information_id, member_id)
-VALUES (1, 1);
+INSERT INTO reservation(room_escape_information_id, member_id, status)
+VALUES (1, 1, 'BOOKED');
 
-INSERT INTO reservation(room_escape_information_id, member_id)
-VALUES (2, 1);
+INSERT INTO reservation(room_escape_information_id, member_id, status)
+VALUES (2, 1, 'BOOKED');
 
 INSERT INTO  payment_reservation(payment_id, reservation_id)
 VALUES (null, 1);

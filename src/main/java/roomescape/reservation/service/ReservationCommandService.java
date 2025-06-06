@@ -13,6 +13,7 @@ import roomescape.lock.service.LockService;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.RoomEscapeInformation;
 import roomescape.reservation.domain.WaitingReservation;
 import roomescape.reservation.dto.AdminReservationRequest;
@@ -95,7 +96,7 @@ public class ReservationCommandService {
 
         final RoomEscapeInformation slot = findSlot(date, reservationTime, theme);
         validateAlreadyBooked(date, reservationTime, theme);
-        final Reservation reservation = reservationRepository.save(Reservation.of(slot, member));
+        final Reservation reservation = reservationRepository.save(Reservation.booked(slot, member));
         return new ReservationResponse(reservation);
     }
 
@@ -131,14 +132,18 @@ public class ReservationCommandService {
 
     private boolean isAlreadyBooked(final LocalDate date, final ReservationTime reservationTime, final Theme theme) {
         return reservationRepository
-                .existsByRoomEscapeInformationDateAndRoomEscapeInformationTimeAndRoomEscapeInformationTheme(
-                        date, reservationTime, theme);
+                .existsByRoomEscapeInformationDateAndRoomEscapeInformationTimeAndRoomEscapeInformationThemeAndStatus(
+                        date, reservationTime, theme, ReservationStatus.BOOKED);
     }
 
     private boolean hasReservation(final RoomEscapeInformation roomEscapeInformation) {
         return reservationRepository
-                .existsByRoomEscapeInformationDateAndRoomEscapeInformationTimeAndRoomEscapeInformationTheme(
-                        roomEscapeInformation.getDate(), roomEscapeInformation.getTime(), roomEscapeInformation.getTheme());
+                .existsByRoomEscapeInformationDateAndRoomEscapeInformationTimeAndRoomEscapeInformationThemeAndStatus(
+                        roomEscapeInformation.getDate(),
+                        roomEscapeInformation.getTime(),
+                        roomEscapeInformation.getTheme(),
+                        ReservationStatus.BOOKED
+                );
     }
 
     private Member findMemberById(final Long id) {

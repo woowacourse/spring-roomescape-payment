@@ -25,8 +25,8 @@ VALUES ('2999-05-01', 1, 1);
 INSERT INTO room_escape_information(date, time_id, theme_id)
 VALUES ('2999-05-05', 1, 2);
 
-INSERT INTO reservation(room_escape_information_id, member_id)
-VALUES (1, 1);
+INSERT INTO reservation(room_escape_information_id, member_id, status)
+VALUES (1, 1, 'BOOKED');
 
-INSERT INTO reservation(room_escape_information_id, member_id)
-VALUES (2, 1);
+INSERT INTO reservation(room_escape_information_id, member_id, status)
+VALUES (2, 1, 'BOOKED');

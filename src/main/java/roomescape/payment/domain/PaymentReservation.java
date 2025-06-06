@@ -13,11 +13,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.util.BaseTimeEntity;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PaymentReservation {
+public class PaymentReservation extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,8 +28,8 @@ public class PaymentReservation {
     @JoinColumn(name = "payment_id")
     private Payment payment;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reservation_id")
+    @ManyToOne(fetch = FetchType.LAZY,   optional = false)
+    @JoinColumn(name = "reservation_id",  nullable = false)
     private Reservation reservation;
 
     @Builder
@@ -43,9 +44,5 @@ public class PaymentReservation {
                 .payment(payment)
                 .reservation(reservation)
                 .build();
-    }
-
-    public void cancelReservation() {
-        this.reservation = null;
     }
 }
