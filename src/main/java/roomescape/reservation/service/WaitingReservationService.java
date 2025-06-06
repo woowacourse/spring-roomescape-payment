@@ -2,6 +2,7 @@ package roomescape.reservation.service;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
@@ -25,6 +26,7 @@ import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class WaitingReservationService {
@@ -55,6 +57,7 @@ public class WaitingReservationService {
         waitingValidator.validateCanWaiting(waitingReservation);
         WaitingReservation saved = waitingReservationRepository.save(waitingReservation);
 
+        log.info("대기 예약 등록 완료 - waitingId={}", saved.getId());
         return new WaitingReservationResponse(saved);
     }
 
@@ -68,12 +71,15 @@ public class WaitingReservationService {
         eventPublisher.raise(new WaitingApprovedEvent(approvedReservation));
 
         waitingReservationRepository.deleteById(waitingReservation.getId());
+        log.info("대기 승인 완료 - reservationId={}, waitingId={}",
+                approvedReservation.getId(), waitingReservation.getId());
     }
 
     @Transactional
     public void denyWaitingByIdForAdmin(Long waitingId) {
         WaitingReservation waiting = getWaitingById(waitingId);
         waitingReservationRepository.delete(waiting);
+        log.info("관리자 거절 완료 - waitingId={}", waitingId);
     }
 
     @Transactional
@@ -82,6 +88,8 @@ public class WaitingReservationService {
         validateCancelPermission(loginMember, waiting);
 
         waitingReservationRepository.delete(waiting);
+        log.info("회원 요청에 의한 대기 취소 완료 - waitingId={}, memberId={}",
+                waitingId, loginMember.id());
     }
 
     private void validateCancelPermission(LoginMember loginMember, WaitingReservation waiting) {

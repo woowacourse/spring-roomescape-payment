@@ -2,6 +2,7 @@ package roomescape.reservation.service;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
@@ -24,6 +25,7 @@ import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
@@ -69,6 +71,7 @@ public class ReservationService {
 
         validateCanRegistration(reservation);
         final Reservation saved = reservationRepository.save(reservation);
+        log.info("예약 등록 완료 - reservationId={}", saved.getId());
         return new ReservationResponse(saved);
     }
 
@@ -83,10 +86,12 @@ public class ReservationService {
         final Reservation reservation = reservationRepository.findById(id)
                 .orElse(null);
         if (reservation == null) {
+            log.warn("예약 삭제 시도 실패 - 존재하지 않음, id={}", id);
             return;
         }
         reservation.delete();
         eventPublisher.raise(new ReservationDeleteEvent(id));
+        log.info("예약 삭제 완료 - id={}", id);
     }
 
     private Reservation getReservationById(Long reservationId) {

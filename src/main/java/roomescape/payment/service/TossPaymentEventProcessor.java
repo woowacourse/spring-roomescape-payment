@@ -32,6 +32,9 @@ public class TossPaymentEventProcessor implements PaymentEventProcessor {
                 .status(PaymentStatus.NOT_PAID)
                 .build();
         paymentRepository.save(payment);
+
+        log.info("NOT_PAID 결제 저장 - reservationId={}, memberId={}",
+                reservation.getId(), reservation.getMember().getId());
     }
 
     @Transactional
@@ -42,8 +45,10 @@ public class TossPaymentEventProcessor implements PaymentEventProcessor {
 
         TossPaymentCancelRequest cancelRequest = new TossPaymentCancelRequest("모종의 이유");
         TossPaymentResponse cancelResponse = tossRestClient.cancel(payment.getPaymentKey(), cancelRequest);
-        validateCancelSuccess(cancelResponse);
+        validateCancelSuccess(cancelResponse, payment);
         payment.updateStatusTo(PaymentStatus.REFUNDED);
+
+        log.info("결제 취소 성공 - paymentKey={}", payment.getPaymentKey());
     }
 
     private void validateReservationExists(Long reservationId) {
@@ -53,10 +58,12 @@ public class TossPaymentEventProcessor implements PaymentEventProcessor {
         throw new NotFoundException("존재하지 않는 예약입니다, id: " + reservationId);
     }
 
-    private void validateCancelSuccess(TossPaymentResponse cancelResponse) {
+    private void validateCancelSuccess(TossPaymentResponse cancelResponse, Payment payment) {
         if (cancelResponse.status().equals("CANCELED")) {
             return;
         }
+        log.warn("결제 취소 실패 - status={}, paymentKey={}",
+                cancelResponse.status(), payment.getPaymentKey());
         throw new TossPaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 취소 실패", true);
     }
 

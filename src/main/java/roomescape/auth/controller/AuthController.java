@@ -31,16 +31,9 @@ public class AuthController {
 
     @PostMapping("/login")
     public void login(@RequestBody @Valid final LoginRequest request, final HttpServletResponse response) {
-        log.debug("로그인 시작");
-
         final String token = authService.createToken(request);
-        log.debug("토큰 생성 완료");
-
         final ResponseCookie cookie = cookieManager.generateLoginCookie(token);
-        log.debug("쿠키 생성 완료");
-
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-        log.debug("로그인 성공");
     }
 
     @PostMapping("/logout")

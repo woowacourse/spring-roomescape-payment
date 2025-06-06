@@ -31,6 +31,9 @@ public class TossConfirmationService {
     public void reserveAndPay(ReservationPaymentRequest reservationPaymentRequest, LoginMember loginMember) {
         reservationPaymentCreator.saveReservationAndPayment(reservationPaymentRequest, loginMember);
         confirmPayment(reservationPaymentRequest.toPaymentRequest());
+
+        log.info("예약+결제 완료 - memberId={}, paymetKey={}",
+                loginMember.id(), reservationPaymentRequest.paymentKey());
     }
 
     private void confirmPayment(final PaymentRequest request) {
@@ -38,6 +41,7 @@ public class TossConfirmationService {
         Payment payment = getPaymentByKey(tossPaymentRequest);
         validateCanConfirmStatus(payment);
         confirmToTossWithFallBack(payment, tossPaymentRequest);
+        log.info("결제 승인 완료 - paymentId = {}", payment.getId());
     }
 
     private void validateCanConfirmStatus(Payment payment) {
@@ -71,10 +75,17 @@ public class TossConfirmationService {
         try {
             TossPaymentResponse response = tossRestClient.confirm(tossPaymentRequest);
             updatePaymentInfoAfterConfirm(payment, response);
+
+            log.info("결제 승인 성공 - paymentKey={}, orderId={}",
+                    payment.getPaymentKey(), response.orderId());
         } catch (PaymentTimeoutException e) {
+            log.warn("결제 승인 타임아웃 - paymentKey={}, orderId={}",
+                    tossPaymentRequest.paymentKey(), tossPaymentRequest.orderId());
             // 결제 상태 조회 후 결제 취소 API 호출 (필요 시 구현)
             throw e;
         } catch (TossPaymentException e) {
+            log.warn("결제 승인 실패 - paymentKey={}, message={}",
+                    tossPaymentRequest.paymentKey(), e.getMessage());
             payment.updateStatusTo(PaymentStatus.FAILED);
             throw e;
         }

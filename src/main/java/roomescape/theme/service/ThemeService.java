@@ -3,6 +3,7 @@ package roomescape.theme.service;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.ReservationException;
@@ -13,6 +14,7 @@ import roomescape.theme.dto.ThemeRequest;
 import roomescape.theme.dto.ThemeResponse;
 import roomescape.theme.repository.ThemeRepository;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ThemeService {
@@ -22,6 +24,7 @@ public class ThemeService {
 
     public ThemeResponse saveTheme(final ThemeRequest request) {
         final Theme theme = themeRepository.save(Theme.of(request.name(), request.description(), request.thumbnail()));
+        log.info("테마 생성 완료 - id={}, name={}", theme.getId(), theme.getName());
         return new ThemeResponse(theme);
     }
 
@@ -47,5 +50,6 @@ public class ThemeService {
             throw new ReservationException("해당 테마로 예약된 건이 존재합니다.");
         }
         themeRepository.deleteById(id);
+        log.info("테마 삭제 완료 - id={}", id);
     }
 }

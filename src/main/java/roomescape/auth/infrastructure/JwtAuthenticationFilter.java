@@ -38,7 +38,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/h2-console"
     );
 
-
     private final JwtTokenProvider jwtTokenProvider;
     private final CookieManager cookieManager;
 
@@ -51,6 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String token = cookieManager.extractLoginToken(request.getCookies());
 
         if (!StringUtils.hasText(token)) {
+            log.info("비로그인 사용자 요청 - URI={}", request.getRequestURI());
             filterChain.doFilter(request, response);
             return;
         }
@@ -59,29 +59,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             final String subject = jwtTokenProvider.extractPrincipal(token);
             Long memberId = Long.valueOf(subject);
             request.setAttribute(MEMBER_ID_ATTRIBUTE, memberId);
+            log.debug("토큰 인증 성공 - memberId={} URI={}", memberId, request.getRequestURI());
         } catch (Exception e) {
-            handleException(response, e);
+            handleException(response, request, e);
             return;
         }
 
         filterChain.doFilter(request, response);
     }
 
-    private void handleException(HttpServletResponse response, Exception e) throws IOException {
-        log.error("인증 중 오류 발생", e);
+    private void handleException(HttpServletResponse response,HttpServletRequest request, Exception e) throws IOException {
+        final String uri = request.getRequestURI();
 
         if (e instanceof UnauthorizedException) {
+            log.warn("로그인 만료 또는 인증 실패 - URI={} message={}", uri, e.getMessage());
             writeJsonErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
             return;
         }
         if (e instanceof JwtException) {
+            log.warn("잘못된 토큰 - URI={} message={}", uri, e.getMessage());
             writeJsonErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "인증에 실패했습니다.");
             return;
         }
         if (e instanceof NumberFormatException) {
+            log.warn("토큰 파싱 실패 - 잘못된 숫자 형식 - URI={} message={}", uri, e.getMessage());
             writeJsonErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "잘못된 요청입니다.");
             return;
         }
+
+        // 예기치 못한 시스템 오류
+        log.error("인증 처리 중 서버 오류 - URI={} message={}", uri, e.getMessage(), e);
         writeJsonErrorResponse(response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "서버 오류가 발생했습니다.");
     }
 

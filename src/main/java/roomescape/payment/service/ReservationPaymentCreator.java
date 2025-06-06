@@ -28,17 +28,16 @@ public class ReservationPaymentCreator {
 
     @Transactional
     public void saveReservationAndPayment(final ReservationPaymentRequest request, final LoginMember loginMember) {
-        log.debug("ReservationPaymentRequest: {}", request);
-        log.debug("LoginMember: {}", loginMember);
-
         final ReservationResponse reservationResponse = reservationService.registerReservation(
                 new CreateRegistrationCommand(loginMember.id(), request.date(), request.timeId(), request.themeId())
         );
         final Reservation reservation = getReservationById(reservationResponse.id());
-        log.debug("Reservation ID: {}", reservation.getId());
 
         final Payment payment = createPendingPayment(request, reservation);
         paymentRepository.save(payment);
+
+        log.info("예약 및 결제 저장 완료 - reservationId={}, paymentKey={}",
+                reservation.getId(), payment.getPaymentKey());
     }
 
     private Payment createPendingPayment(ReservationPaymentRequest request, Reservation reservation) {

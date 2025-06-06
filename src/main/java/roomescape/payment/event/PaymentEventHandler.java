@@ -11,9 +11,9 @@ import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.service.dto.ReservationDeleteEvent;
 import roomescape.reservation.service.dto.WaitingApprovedEvent;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class PaymentEventHandler {
 
     private final ReservationRepository reservationRepository;
@@ -21,16 +21,29 @@ public class PaymentEventHandler {
 
     @EventListener(WaitingApprovedEvent.class)
     public void handleWaitingApproved(WaitingApprovedEvent event) {
-        Reservation reservation = reservationRepository.findById(event.reservationId())
-                .orElseThrow(() -> new NotFoundException("예약이 존재하지 않습니다, id: " + event.reservationId()));
+        log.info("WaitingApprovedEvent 수신 - reservationId={}", event.reservationId());
 
+        Reservation reservation = getReservationById(event.reservationId());
+
+        log.info("NotPaid 결제 저장 시작 - reservationId={}", reservation.getId());
         paymentEventProcessor.saveNotPaidPayment(reservation);
     }
 
     @EventListener(ReservationDeleteEvent.class)
     public void handleReservationDelete(ReservationDeleteEvent event) {
-        Reservation reservation = reservationRepository.findById(event.reservationId())
-                .orElseThrow(() -> new NotFoundException("예약이 존재하지 않습니다, id: " + event.reservationId()));
+        log.info("ReservationDeleteEvent 수신 - reservationId={}", event.reservationId());
+
+        Reservation reservation = getReservationById(event.reservationId());
+
+        log.info("결제 취소 처리 시작 - reservationId={}", reservation.getId());
         paymentEventProcessor.cancelPayment(reservation.getId());
+    }
+
+    private Reservation getReservationById(Long reservationId) {
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> {
+                    log.warn("예약 조회 실패 - reservationId={}", reservationId);
+                    return new NotFoundException("예약이 존재하지 않습니다, id: " + reservationId);
+                });
     }
 }
