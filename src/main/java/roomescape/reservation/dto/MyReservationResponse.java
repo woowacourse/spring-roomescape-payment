@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentReservation;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 
@@ -45,11 +46,11 @@ public record MyReservationResponse(
         );
     }
 
-    public static MyReservationResponse from(final Reservation reservation, final Payment payment) {
-        return new MyReservationResponse(reservation, payment, ReservationStatus.BOOKED);
+    public static MyReservationResponse of(final PaymentReservation paymentReservation) {
+        return new MyReservationResponse(paymentReservation.getReservation(), paymentReservation.getPayment(), ReservationStatus.BOOKED);
     }
 
-    public static MyReservationResponse from(WaitingReservationWithRank waiting) {
+    public static MyReservationResponse from(final WaitingReservationWithRank waiting) {
         return new MyReservationResponse(waiting, ReservationStatus.WAITING);
     }
 }

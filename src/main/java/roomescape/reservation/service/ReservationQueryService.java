@@ -1,9 +1,6 @@
 package roomescape.reservation.service;
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,8 +9,8 @@ import roomescape.auth.dto.LoginMember;
 import roomescape.exception.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.payment.domain.Payment;
-import roomescape.payment.repository.PaymentRepository;
+import roomescape.payment.domain.PaymentReservation;
+import roomescape.payment.repository.PaymentReservationRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.WaitingReservation;
 import roomescape.reservation.dto.MyReservationResponse;
@@ -27,10 +24,10 @@ import roomescape.reservation.repository.WaitingReservationRepository;
 @RequiredArgsConstructor
 public class ReservationQueryService {
 
-    private final ReservationRepository reservationRepository;
     private final MemberRepository memberRepository;
-    private final PaymentRepository paymentRepository;
+    private final ReservationRepository reservationRepository;
     private final WaitingReservationRepository waitingReservationRepository;
+    private final PaymentReservationRepository paymentReservationRepository;
 
     public Reservation findById(final Long reservationId) {
         return reservationRepository.findById(reservationId)
@@ -66,17 +63,9 @@ public class ReservationQueryService {
     }
 
     private List<MyReservationResponse> findBookedReservations(final Member member) {
-        final List<Payment> payments = paymentRepository.findPaymentsByMember(member);
-        final Map<Long, Payment> paymentByReservationId = payments.stream()
-                .collect(Collectors.toMap(
-                        p -> p.getReservation().getId(),
-                        Function.identity()
-                ));
-        return reservationRepository.findByMember(member).stream()
-                .map(reservation -> {
-                    final Payment payment = paymentByReservationId.get(reservation.getId());
-                    return MyReservationResponse.from(reservation, payment);
-                })
+        final List<PaymentReservation> paymentReservations = paymentReservationRepository.findByReservationMember(member);
+        return paymentReservations.stream()
+                .map(MyReservationResponse::of)
                 .toList();
     }
 

@@ -10,14 +10,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import roomescape.member.domain.Member;
-import roomescape.reservation.domain.Reservation;
 
 @Entity
 @Getter
@@ -31,10 +29,6 @@ public class Payment {
     @JoinColumn(name = "member_id", nullable = false)
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Member member;
-
-    @JoinColumn(name = "reservation_id", nullable = false)
-    @OneToOne(optional = false, fetch = FetchType.LAZY)
-    private Reservation reservation;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -52,14 +46,12 @@ public class Payment {
     @Builder
     public Payment(final Long id,
                    @NonNull final Member member,
-                   @NonNull final Reservation reservation,
                    @NonNull final PaymentStatus paymentStatus,
                    @NonNull final String paymentKey,
                    @NonNull final String orderId,
                    @NonNull final Long amount) {
         this.id = id;
         this.member = member;
-        this.reservation = reservation;
         this.paymentStatus = paymentStatus;
         this.paymentKey = paymentKey;
         this.orderId = orderId;

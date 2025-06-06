@@ -22,14 +22,16 @@ public final class CookieManager {
                 .httpOnly(true)
                 .path(PATH)
                 .maxAge(jwtProperties.getExpireLength())
+                .secure(false)
                 .build();
     }
 
     public ResponseCookie generateLogoutCookie() {
         return ResponseCookie.from(LOGIN_TOKEN_NAME, "")
                 .httpOnly(true)
-                .path("/")
+                .path(PATH)
                 .maxAge(0)
+                .secure(false)
                 .build();
     }
 
