@@ -43,7 +43,6 @@ public class WaitingApiController {
 
     @DeleteMapping("/waitings/{id}")
     @AuthRequired
-    @Role(UserRole.ADMIN)
     public ResponseEntity<Void> deleteWaiting(@PathVariable String id) {
         waitingService.deleteWaitingById(id);
         return ResponseEntity.noContent().build();
