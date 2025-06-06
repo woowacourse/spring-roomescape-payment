@@ -27,6 +27,7 @@ import roomescape.infrastructure.error.exception.PaymentException;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,7 +69,7 @@ class ReservationTossPaymentFacadeTest {
     private Clock clock;
 
     @Test
-    void 결제_이후_예약을_생성할_수_있다() {
+    void 예약과_결제는_API_호출_전_PENDING으로_저장되고_승인_API_성공시_APPROVED로_갱신된다() {
         // given
         final Member member = memberRepository.save(
                 new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
@@ -109,8 +110,10 @@ class ReservationTossPaymentFacadeTest {
     }
 
     @Test
-    void 결제에서_문제가_생기면_예약을_생성할_수_없다() {
+    void 승인_API_실패시_FAILED로_갱신된다() {
         // given
+        reservationRepository.deleteAll();
+
         final Member member = memberRepository.save(
                 new Member("벨로", new Email("test@email.com"), "pw", MemberRole.NORMAL));
         final Theme theme = themeRepository.save(
@@ -138,6 +141,17 @@ class ReservationTossPaymentFacadeTest {
         assertThatCode(() -> reservationTossPaymentFacade.reserveWithPayment(command))
                 .isInstanceOf(PaymentException.class)
                 .hasMessage("toss payment server 예외");
+
+        final List<Reservation> all = reservationRepository.findAll();
+        assertThat(all).hasSize(1);
+        final Reservation reservation = all.getFirst();
+        final Long reservationId = reservation.getId();
+        final Optional<ReservationPayment> reservationPayment =
+                reservationPaymentRepository.findByReservationId(reservationId);
+        assertThat(reservationPayment).isPresent();
+        final Long paymentId = reservationPayment.get().getPaymentId();
+        final Optional<TossPayment> tossPayment = tossPaymentRepository.findById(paymentId);
+        assertThat(tossPayment.get().getPaymentStatus()).isEqualTo(PaymentStatus.FAILED);
     }
 
     @Test

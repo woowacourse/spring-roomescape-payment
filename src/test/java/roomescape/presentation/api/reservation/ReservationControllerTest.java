@@ -7,17 +7,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.transaction.annotation.Transactional;
+import roomescape.domain.member.Email;
+import roomescape.domain.member.Member;
+import roomescape.domain.member.repository.MemberRepository;
 import roomescape.infrastructure.security.JwtProvider;
-import roomescape.presentation.support.methodresolver.AuthInfoArgumentResolver;
-import roomescape.testconfig.TestConfig;
+
+import java.time.Clock;
+import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Transactional
 class ReservationControllerTest {
 
     @LocalServerPort
@@ -26,12 +27,18 @@ class ReservationControllerTest {
     @Autowired
     private JwtProvider jwtProvider;
 
-    @MockitoBean
-    private AuthInfoArgumentResolver authInfoArgumentResolver;
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @Autowired
+    private Clock clock;
+
+    private Member savedMember;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
+        savedMember = memberRepository.save(new Member("tester", new Email("tester@email.com"), "password"));
     }
 
     @Test
@@ -39,7 +46,7 @@ class ReservationControllerTest {
         // given
         final String requestBody = """
                     {
-                        "date": "2024-07-01",
+                        "date": "%s",
                         "timeId": 2,
                         "themeId": 1,
                         "paymentKey": "pk_test_123456789",
@@ -47,11 +54,11 @@ class ReservationControllerTest {
                         "amount": 10000,
                         "paymentType": "NORMAL"
                     }
-                """;
+                """.formatted(LocalDate.now(clock).plusDays(1));
 
         // when
         final var response = RestAssured.given()
-                .cookie("token", jwtProvider.issue(TestConfig.TESTER.memberId()))
+                .cookie("token", jwtProvider.issue(savedMember.getId()).value())
                 .contentType(ContentType.JSON)
                 .body(requestBody)
                 .post("/reservations")
