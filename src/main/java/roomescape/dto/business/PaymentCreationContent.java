@@ -6,7 +6,7 @@ import roomescape.dto.request.WaitingCreationRequest;
 public record PaymentCreationContent(
         String orderId,
         String paymentKey,
-        Integer amount
+        Long amount
 ) {
 
     public PaymentCreationContent(ReservationCreationRequest request) {
