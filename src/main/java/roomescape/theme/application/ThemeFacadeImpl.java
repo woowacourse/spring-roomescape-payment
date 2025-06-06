@@ -1,6 +1,9 @@
 package roomescape.theme.application;
 
+import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.theme.application.service.ThemeCommandService;
@@ -8,9 +11,7 @@ import roomescape.theme.application.service.ThemeQueryService;
 import roomescape.theme.ui.dto.CreateThemeWebRequest;
 import roomescape.theme.ui.dto.ThemeResponse;
 
-import java.time.LocalDate;
-import java.util.List;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ThemeFacadeImpl implements ThemeFacade {
@@ -20,12 +21,14 @@ public class ThemeFacadeImpl implements ThemeFacade {
 
     @Override
     public List<ThemeResponse> getAll() {
+        log.info("[THEME] 전체 테마 조회 요청");
         return ThemeResponse.from(
                 themeQueryService.getAll());
     }
 
     @Override
     public List<ThemeResponse> getRanking() {
+        log.info("[THEME] 테마 랭킹 조회 요청");
         final int count = 10;
         final int dateRange = 7;
         final LocalDate endDate = LocalDate.now();
@@ -40,12 +43,14 @@ public class ThemeFacadeImpl implements ThemeFacade {
 
     @Override
     public ThemeResponse create(final CreateThemeWebRequest request) {
+        log.info("[THEME] 테마 생성 요청: {}", request);
         return ThemeResponse.from(
                 themeCommandService.create(request.toServiceRequest()));
     }
 
     @Override
     public void delete(final Long id) {
+        log.info("[THEME] 테마 삭제 요청: id={}", id);
         themeCommandService.delete(id);
     }
 }
