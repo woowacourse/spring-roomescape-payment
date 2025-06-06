@@ -1,5 +1,7 @@
 package roomescape.reservation.service;
 
+import jakarta.annotation.Resource;
+import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,8 @@ public class ReservationFacadeService {
     private final ReservationTimeService reservationTimeService;
     private final PaymentService paymentService;
     private final PaymentApiClient paymentApiClient;
+    @Resource(name = "reservationFacadeService")
+    private ReservationFacadeService self;
 
     public ReservationFacadeService(final ReservationService reservationService,
                                     final WaitingService waitingService,
@@ -51,6 +55,7 @@ public class ReservationFacadeService {
         this.paymentApiClient = paymentApiClient;
     }
 
+    @Transactional
     public List<MyReservationResponse> findMyReservations(final UserInfo userInfo) {
         List<Reservation> myReservations = reservationService.findMyReservations(userInfo);
         List<WaitingWithRank> waitingWithRanks = waitingService.findMyWaitingsWithRank(userInfo);
@@ -60,22 +65,24 @@ public class ReservationFacadeService {
         ).collect(Collectors.toList());
     }
 
+    @Transactional
     public ReservationResponse createForAdmin(final ReservationRequest request,
                                               final Long memberId) {
         if (!reservationService.isReservationExists(request)) {
-            return ReservationResponse.of(createReservation(request, memberId));
+            return ReservationResponse.of(self.createReservation(request, memberId));
         }
         return createWaiting(request, memberId);
     }
 
     public ReservationResponse create(final ReservationCreateRequest request, final Long memberId) {
         reservationService.checkIfReservationExists(request.reservation());
-        Reservation reservation = createReservation(request.reservation(), memberId);
+        Reservation reservation = self.createReservation(request.reservation(), memberId);
         PaymentResponse paymentResponse = paymentApiClient.authPayment(request.payment());
         paymentService.create(paymentResponse, reservation);
         return ReservationResponse.of(reservation);
     }
 
+    @Transactional
     public Reservation createReservation(final ReservationRequest request, final Long memberId) {
         reservationService.checkIfReservationExists(request);
         ReservationTime time = reservationTimeService.findReservationTime(request.timeId());
@@ -85,6 +92,7 @@ public class ReservationFacadeService {
         return reservationService.save(Reservation.createUpcomingReservationWithUnassignedId(member, reservationInfo));
     }
 
+    @Transactional
     public ReservationResponse createWaiting(final ReservationRequest request, final Long memberId) {
         ReservationTime time = reservationTimeService.findReservationTime(request.timeId());
         Theme theme = themeService.findTheme(request.themeId());
@@ -108,10 +116,11 @@ public class ReservationFacadeService {
             return;
         }
         Waiting waiting = waitingService.findFirstWaitingOfInfo(info);
-        createReservation(ReservationRequest.from(info), waiting.getMemberId());
+        self.createReservation(ReservationRequest.from(info), waiting.getMemberId());
         waitingService.delete(waiting.getId());
     }
 
+    @Transactional
     public List<ReservationResponse> findReservations(final Long themeId, final Long memberId, final LocalDate dateFrom,
                                                       final LocalDate dateTo) {
         return reservationService.findReservations(themeId, memberId, dateFrom, dateTo);
