@@ -2,9 +2,9 @@ package roomescape.payment.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import roomescape.payment.domain.client.TossRestClient;
-import roomescape.payment.domain.dto.PaymentRequestDto;
-import roomescape.payment.domain.dto.PaymentResponseDto;
+import roomescape.payment.external.TossRestClient;
+import roomescape.payment.dto.PaymentRequestDto;
+import roomescape.payment.dto.PaymentResponseDto;
 
 @Service
 @AllArgsConstructor

@@ -3,7 +3,7 @@ package roomescape.reservation.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.admin.domain.dto.SearchReservationRequestDto;
-import roomescape.payment.domain.dto.PaymentRequestDto;
+import roomescape.payment.dto.PaymentRequestDto;
 import roomescape.payment.service.TossPaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.dto.ReservationInfo;

@@ -1,4 +1,4 @@
-package roomescape.payment.domain.client;
+package roomescape.payment.external;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,9 +11,8 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.domain.PaymentType;
-import roomescape.payment.domain.dto.PaymentRequestDto;
-import roomescape.payment.domain.dto.PaymentResponseDto;
+import roomescape.payment.dto.PaymentRequestDto;
+import roomescape.payment.dto.PaymentResponseDto;
 import roomescape.payment.exception.InvalidPaymentException;
 import roomescape.payment.exception.TossPaymentErrorHandler;
 
@@ -43,7 +42,7 @@ class TossRestClientTest {
                 .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
                 .andRespond(MockRestResponseCreators.withSuccess());
 
-        PaymentRequestDto paymentRequestDto = new PaymentRequestDto("paymentKey_test", "orderId123", 10000, PaymentType.NORMAL.name());
+        PaymentRequestDto paymentRequestDto = new PaymentRequestDto("paymentKey_test", "orderId123", 10000);
 
         assertDoesNotThrow(() -> tossRestClient.confirmPayment(paymentRequestDto));
     }
@@ -65,7 +64,7 @@ class TossRestClientTest {
                 .andExpect(MockRestRequestMatchers.content().json(expectedRequest))
                 .andRespond(MockRestResponseCreators.withSuccess(expectedResponse, MediaType.APPLICATION_JSON));
 
-        PaymentRequestDto paymentRequestDto = new PaymentRequestDto("paymentKey_test", "orderId123", 10000, PaymentType.NORMAL.name());
+        PaymentRequestDto paymentRequestDto = new PaymentRequestDto("paymentKey_test", "orderId123", 10000);
 
         PaymentResponseDto responseDto = tossRestClient.confirmPayment(paymentRequestDto);
 
@@ -94,7 +93,7 @@ class TossRestClientTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                 );
 
-        PaymentRequestDto paymentRequestDto = new PaymentRequestDto("paymentKey_test", "orderId123", 10000, PaymentType.NORMAL.name());
+        PaymentRequestDto paymentRequestDto = new PaymentRequestDto("paymentKey_test", "orderId123", 10000);
 
         assertThatThrownBy(() -> tossRestClient.confirmPayment(paymentRequestDto))
                 .isInstanceOf(InvalidPaymentException.class)

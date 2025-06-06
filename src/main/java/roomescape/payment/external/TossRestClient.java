@@ -1,10 +1,10 @@
-package roomescape.payment.domain.client;
+package roomescape.payment.external;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.domain.dto.PaymentRequestDto;
-import roomescape.payment.domain.dto.PaymentResponseDto;
+import roomescape.payment.dto.PaymentRequestDto;
+import roomescape.payment.dto.PaymentResponseDto;
 
 @Component("tossApiClient")
 public class TossRestClient {
