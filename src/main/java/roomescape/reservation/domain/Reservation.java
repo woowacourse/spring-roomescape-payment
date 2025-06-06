@@ -79,6 +79,22 @@ public class Reservation {
         this.theme = theme;
     }
 
+    public Reservation(final Long id,
+                       final Long userId,
+                       final ReservationDate date,
+                       final ReservationTime time,
+                       final Theme theme,
+                       final PaymentInfo paymentInfo) {
+        validate(id);
+        validate(userId, date, time, theme);
+        this.id = id;
+        this.userId = userId;
+        this.date = date;
+        this.time = time;
+        this.theme = theme;
+        this.paymentInfo = paymentInfo;
+    }
+
     public static Reservation withId(final Long id,
                                      final Long userId,
                                      final ReservationDate date,
@@ -95,8 +111,7 @@ public class Reservation {
     }
 
     public Reservation withPaymentInfo(final PaymentInfo paymentInfo) {
-        this.paymentInfo = paymentInfo;
-        return this; // TODO: 불변 변경
+        return new Reservation(this.id, this.userId, this.date, this.time, this.theme, paymentInfo);
     }
 
     private static void validate(final Long userId,
