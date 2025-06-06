@@ -22,9 +22,11 @@ import roomescape.exception.PaymentException;
 import roomescape.mvc.member.domain.Member;
 import roomescape.mvc.member.domain.Role;
 import roomescape.mvc.member.service.MemberQueryService;
+import roomescape.mvc.payment.domain.Payment;
 import roomescape.mvc.payment.dto.PaymentCreationContent;
 import roomescape.mvc.payment.dto.PaymentResult;
 import roomescape.mvc.payment.repository.PaymentRepository;
+import roomescape.mvc.payment.service.PaymentQueryService;
 import roomescape.mvc.payment.service.PaymentService;
 import roomescape.mvc.reservation.domain.Reservation;
 import roomescape.mvc.reservation.dto.ReservationCreationContent;
@@ -44,7 +46,7 @@ import roomescape.test.stub.PaymentClientStub;
 @Import(value = {
         PaymentService.class, MemberQueryService.class, ThemeQueryService.class,
         ReservationTimeQueryService.class, ReservationQueryService.class, WaitingQueryService.class,
-        ReservationService.class, PaymentClientStub.class
+        ReservationService.class, PaymentQueryService.class, PaymentClientStub.class
 })
 class ReservationServiceTest {
 
@@ -89,7 +91,7 @@ class ReservationServiceTest {
 
             // when
             AddReservationByAdmin reservationResponse =
-                    reservationService.addReservationByAdmin(member.getId(), creationContent);
+                    reservationService.addReservationWithoutPayment(member.getId(), creationContent);
 
             // then
             assertAll(
@@ -107,7 +109,7 @@ class ReservationServiceTest {
                     new ReservationCreationContent(theme.getId(), NEXT_DAY, reservationTime.getId());
 
             // when & then
-            assertThatThrownBy(() -> reservationService.addReservationByAdmin(wrongMemberId, creationContent))
+            assertThatThrownBy(() -> reservationService.addReservationWithoutPayment(wrongMemberId, creationContent))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage("ID에 해당하는 회원을 찾을 수 없습니다.");
         }
@@ -121,7 +123,7 @@ class ReservationServiceTest {
                     new ReservationCreationContent(wrongThemeId, NEXT_DAY, reservationTime.getId());
 
             // when & then
-            assertThatThrownBy(() -> reservationService.addReservationByAdmin(member.getId(), creationContent))
+            assertThatThrownBy(() -> reservationService.addReservationWithoutPayment(member.getId(), creationContent))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage("ID에 해당하는 테마는 존재하지 않습니다.");
         }
@@ -135,7 +137,7 @@ class ReservationServiceTest {
                     new ReservationCreationContent(theme.getId(), NEXT_DAY, wrongTimeId);
 
             // when & then
-            assertThatThrownBy(() -> reservationService.addReservationByAdmin(member.getId(), creationContent))
+            assertThatThrownBy(() -> reservationService.addReservationWithoutPayment(member.getId(), creationContent))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage("ID에 해당하는 예약시간은 존재하지 않습니다.");
         }
@@ -157,7 +159,7 @@ class ReservationServiceTest {
 
             // when & then
             assertThatThrownBy(
-                    () -> reservationService.addReservationByAdmin(member.getId(), duplicatedCreationContent))
+                    () -> reservationService.addReservationWithoutPayment(member.getId(), duplicatedCreationContent))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage("중복된 예약 입니다.");
         }
@@ -170,7 +172,8 @@ class ReservationServiceTest {
                     new ReservationCreationContent(theme.getId(), YESTERDAY, reservationTime.getId());
 
             // when & then
-            assertThatThrownBy(() -> reservationService.addReservationByAdmin(member.getId(), creationContentWithPast))
+            assertThatThrownBy(
+                    () -> reservationService.addReservationWithoutPayment(member.getId(), creationContentWithPast))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage("과거 예약은 생성할 수 없습니다.");
         }
@@ -193,7 +196,7 @@ class ReservationServiceTest {
                     new PaymentCreationContent("order_id", "payment_key", 1000L);
 
             // when
-            reservationService.addReservationByMember(
+            reservationService.addReservationWithPayment(
                     member.getId(), reservationCreationContent, paymentCreationContent);
 
             // then
@@ -217,7 +220,7 @@ class ReservationServiceTest {
 
             // when & then
             assertAll(
-                    () -> assertThatThrownBy(() -> reservationService.addReservationByMember(
+                    () -> assertThatThrownBy(() -> reservationService.addReservationWithPayment(
                             member.getId(), reservationCreationContent, paymentCreationContent))
                             .isInstanceOf(PaymentException.class),
                     () -> assertThat(reservationRepository.findAll()).hasSize(0)
@@ -226,8 +229,8 @@ class ReservationServiceTest {
     }
 
     @Nested
-    @DisplayName("예약을 삭제할 수 있다.")
-    class deleteReservationById {
+    @DisplayName("대기가 없는 예약을 삭제할 수 있다.")
+    class deleteReservationWithoutWaiting {
 
         @DisplayName("예약을 성공적으로 삭제할 수 있다.")
         @Test
@@ -258,28 +261,43 @@ class ReservationServiceTest {
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage("ID에 해당하는 예약을 찾을 수 없습니다.");
         }
+    }
 
-        @DisplayName("예약 대기가 존재할 경우 첫번째 예약 대기를 예약으로 등록한다.")
+    @Nested
+    @DisplayName("대기가 존재하는 예약을 삭제할 수 있다.")
+    class deleteReservationWithWaiting {
+
+        private Reservation reservation;
+        private Member firsMember;
+        private Member sercondMember;
+
+
+        @BeforeEach
+        void setup() {
+            reservation = entityManager.persist(
+                    Reservation.createWithoutIdAndPaymentHistory(NEXT_DAY, reservationTime, theme, member));
+
+            firsMember = entityManager.persist(
+                    Member.createWithoutId(Role.GENERAL, "회원1", "waiting1@email.com", "qwer1234!"));
+            sercondMember = entityManager.persist(
+                    Member.createWithoutId(Role.GENERAL, "회원2", "waiting2@email.com", "qwer1234!"));
+
+            entityManager.flush();
+            entityManager.clear();
+        }
+
+        @DisplayName("예약이 삭제될 경우 첫번째 예약 대기를 예약으로 등록한다.")
         @Test
         void canAddNewReservationWithWaiting() {
             // given
-            Reservation reservation = entityManager.persist(
-                    Reservation.createWithoutIdAndPaymentHistory(NEXT_DAY, reservationTime, theme, member));
-
-            Member firstWaitingMember = entityManager.persist(
-                    Member.createWithoutId(Role.GENERAL, "회원1", "waiting1@email.com", "qwer1234!"));
-            Member secondWaitingMember = entityManager.persist(
-                    Member.createWithoutId(Role.GENERAL, "회원2", "waiting2@email.com", "qwer1234!"));
-
             Waiting firstWaiting = entityManager.persist(
                     Waiting.createWithoutIdWithoutPayment(
                             reservation.getDate(), reservation.getTheme(),
-                            reservation.getReservationTime(), firstWaitingMember));
-
-            entityManager.persist(
+                            reservation.getReservationTime(), firsMember));
+            Waiting secondWaiting = entityManager.persist(
                     Waiting.createWithoutIdWithoutPayment(
                             reservation.getDate(), reservation.getTheme(),
-                            reservation.getReservationTime(), secondWaitingMember));
+                            reservation.getReservationTime(), sercondMember));
 
             entityManager.flush();
             entityManager.clear();
@@ -288,7 +306,7 @@ class ReservationServiceTest {
             reservationService.deleteReservationById(reservation.getId());
 
             // then
-            List<Reservation> newReservation = reservationRepository.findByMember(firstWaitingMember);
+            List<Reservation> newReservation = reservationRepository.findByMember(firsMember);
             assertAll(
                     () -> assertThat(newReservation).hasSize(1),
                     () -> assertThat(newReservation.getFirst().getDate()).isEqualTo(firstWaiting.getDate()),
@@ -298,26 +316,18 @@ class ReservationServiceTest {
             );
         }
 
-        @DisplayName("예약 대기가 존재해서 첫번째 예약 대기가 예약으로 등록된 경우 첫번째 예약 대기는 삭제된다.")
+        @DisplayName("첫번째 예약 대기가 예약으로 등록된 경우 첫번째 예약 대기는 삭제된다.")
         @Test
         void canDeleteFirstWaiting() {
             // given
-            Reservation reservation = entityManager.persist(
-                    Reservation.createWithoutIdAndPaymentHistory(NEXT_DAY, reservationTime, theme, member));
-
-            Member firstWaitingMember = entityManager.persist(
-                    Member.createWithoutId(Role.GENERAL, "회원1", "waiting1@email.com", "qwer1234!"));
-            Member secondWaitingMember = entityManager.persist(
-                    Member.createWithoutId(Role.GENERAL, "회원2", "waiting2@email.com", "qwer1234!"));
-
             Waiting firstWaiting = entityManager.persist(
                     Waiting.createWithoutIdWithoutPayment(
                             reservation.getDate(), reservation.getTheme(),
-                            reservation.getReservationTime(), firstWaitingMember));
+                            reservation.getReservationTime(), firsMember));
             Waiting secondWaiting = entityManager.persist(
                     Waiting.createWithoutIdWithoutPayment(
                             reservation.getDate(), reservation.getTheme(),
-                            reservation.getReservationTime(), secondWaitingMember));
+                            reservation.getReservationTime(), sercondMember));
 
             entityManager.flush();
             entityManager.clear();
@@ -328,6 +338,41 @@ class ReservationServiceTest {
             // then
             Waiting deletedFirstWaiting = entityManager.find(Waiting.class, firstWaiting.getId());
             assertThat(deletedFirstWaiting).isNull();
+        }
+
+        @DisplayName("결제데이터가 존재하는 예약 대기를 예약으로 등록할 수 있다.")
+        @Test
+        void canConvertWaitingWithPaymentToReservation() {
+            // given
+            Payment payment = entityManager.persist(
+                    Payment.createWithoutId("order_id", "payment_key", 1000L));
+
+            Waiting firstWaiting = entityManager.persist(
+                    Waiting.createWithoutId(
+                            reservation.getDate(), reservation.getTheme(),
+                            reservation.getReservationTime(), firsMember, payment));
+            Waiting secondWaiting = entityManager.persist(
+                    Waiting.createWithoutIdWithoutPayment(
+                            reservation.getDate(), reservation.getTheme(),
+                            reservation.getReservationTime(), sercondMember));
+
+            entityManager.flush();
+            entityManager.clear();
+
+            // when
+            reservationService.deleteReservationById(reservation.getId());
+
+            // then
+            List<Reservation> newReservation = reservationRepository.findByMember(firsMember);
+
+            assertAll(
+                    () -> assertThat(newReservation).hasSize(1),
+                    () -> assertThat(newReservation.getFirst().getDate()).isEqualTo(firstWaiting.getDate()),
+                    () -> assertThat(newReservation.getFirst().getTheme()).isEqualTo(firstWaiting.getTheme()),
+                    () -> assertThat(newReservation.getFirst().getReservationTime()).isEqualTo(firstWaiting.getTime()),
+                    () -> assertThat(newReservation.getFirst().getMember()).isEqualTo(firstWaiting.getMember()),
+                    () -> assertThat(newReservation.getFirst().getPayment()).isEqualTo(firstWaiting.getPayment())
+            );
         }
     }
 }

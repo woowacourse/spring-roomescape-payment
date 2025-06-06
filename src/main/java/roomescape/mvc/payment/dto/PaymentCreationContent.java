@@ -1,5 +1,6 @@
 package roomescape.mvc.payment.dto;
 
+import roomescape.mvc.payment.domain.Payment;
 import roomescape.mvc.reservation.request.ReservationCreationRequest;
 import roomescape.mvc.waiting.request.WaitingCreationRequest;
 
@@ -15,5 +16,10 @@ public record PaymentCreationContent(
 
     public PaymentCreationContent(WaitingCreationRequest request) {
         this(request.orderId(), request.paymentKey(), request.amount());
+    }
+
+    public PaymentCreationContent(Payment payment) {
+        this(payment.getOrderId(), payment.getPaymentKey(), payment.getAmount());
+
     }
 }

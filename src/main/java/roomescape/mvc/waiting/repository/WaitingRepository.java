@@ -3,6 +3,7 @@ package roomescape.mvc.waiting.repository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,22 +14,43 @@ import roomescape.mvc.waiting.dto.WaitingWithRank;
 
 public interface WaitingRepository extends JpaRepository<Waiting, Long> {
 
-    @Query("""
-            SELECT new roomescape.mvc.waiting.dto.WaitingWithRank (
-                w, (
-                    SELECT COUNT(w2) + 1
-                    FROM Waiting w2
-                    WHERE w2.theme.id = w.theme.id
-                    AND w2.date = w.date
-                    AND w2.time.id = w.time.id
-                    AND w2.createdAt < w.createdAt
-                )
-            )
-            FROM Waiting w
-            WHERE w.member.id = :memberId
-            ORDER BY w.createdAt ASC
-            """)
+    @EntityGraph(attributePaths = {"time", "theme", "member", "payment"})
+    List<Waiting> findAll();
+
+    @Query(value = """
+            SELECT
+                w.id AS id,
+                w.date AS date,
+                t.name AS theme_name,
+                rt.start_at AS start_at,
+                m.name AS member_name,
+                ROW_NUMBER() OVER (PARTITION BY :memberId ORDER BY w.created_at DESC) + 1 AS rank,
+                p.payment_key AS payment_key,
+                p.amount AS amount
+            FROM waiting AS w
+            LEFT JOIN theme AS t ON w.theme_id = t.id
+            LEFT JOIN reservation_time AS rt ON w.time_id = rt.id
+            LEFT JOIN member AS m ON w.member_id = m.id
+            LEFT JOIN payment AS p ON w.payment_id = p.id
+            WHERE w.member_id = :memberId
+            """, nativeQuery = true)
     List<WaitingWithRank> findWithRankingByMember(@Param("memberId") long memberId);
+
+    @EntityGraph(attributePaths = {"time", "theme", "member", "payment"})
+    @Query("""
+            SELECT w
+            FROM Waiting w
+            WHERE w.theme.id = :themeId
+            AND w.date = :date
+            AND w.time.id = :timeId
+            ORDER BY w.createdAt
+            LIMIT 1
+            """)
+    Optional<Waiting> findFirstWaiting(
+            @Param("themeId") long themeId,
+            @Param("date") LocalDate date,
+            @Param("timeId") long timeId
+    );
 
     @Query("""
             SELECT EXISTS(
@@ -45,21 +67,6 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
             @Param("date") LocalDate date,
             @Param("timeId") long timeId,
             @Param("memberId") long memberId
-    );
-
-    @Query("""
-            SELECT w
-            FROM Waiting w
-            WHERE w.theme.id = :themeId
-            AND w.date = :date
-            AND w.time.id = :timeId
-            ORDER BY w.createdAt
-            LIMIT 1
-            """)
-    Optional<Waiting> findFirstWaiting(
-            @Param("themeId") long themeId,
-            @Param("date") LocalDate date,
-            @Param("timeId") long timeId
     );
 
     boolean existsByTheme(Theme theme);

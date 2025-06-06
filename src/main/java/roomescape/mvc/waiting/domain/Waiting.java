@@ -12,11 +12,11 @@ import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import roomescape.audit.AuditedEntity;
 import roomescape.mvc.member.domain.Member;
 import roomescape.mvc.payment.domain.Payment;
 import roomescape.mvc.theme.domain.Theme;
 import roomescape.mvc.time.domain.ReservationTime;
-import roomescape.audit.AuditedEntity;
 
 @Entity
 public class Waiting extends AuditedEntity {
@@ -68,6 +68,18 @@ public class Waiting extends AuditedEntity {
     public boolean isPastWaiting() {
         LocalDateTime dateTime = LocalDateTime.of(date, time.getStartAt());
         return dateTime.isBefore(LocalDateTime.now());
+    }
+
+    public boolean hasEmptyPayment() {
+        return getPayment() == null;
+    }
+
+    public long getMemberIdInWaiting() {
+        return getMember().getId();
+    }
+
+    public long getPaymentIdInWaiting() {
+        return getPayment().getId();
     }
 
     public Long getId() {

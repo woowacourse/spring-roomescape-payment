@@ -9,6 +9,7 @@ import roomescape.mvc.member.domain.Member;
 import roomescape.mvc.member.service.MemberQueryService;
 import roomescape.mvc.payment.domain.Payment;
 import roomescape.mvc.payment.dto.PaymentCreationContent;
+import roomescape.mvc.payment.service.PaymentQueryService;
 import roomescape.mvc.payment.service.PaymentService;
 import roomescape.mvc.reservation.domain.Reservation;
 import roomescape.mvc.reservation.dto.ReservationCreationContent;
@@ -30,6 +31,7 @@ public class ReservationService {
     private final ReservationRepository reservationRepository;
     private final WaitingRepository waitingRepository;
     private final PaymentService paymentService;
+    private final PaymentQueryService paymentQueryService;
     private final MemberQueryService memberQueryService;
     private final ThemeQueryService themeQueryService;
     private final ReservationTimeQueryService timeQueryService;
@@ -39,6 +41,7 @@ public class ReservationService {
     public ReservationService(
             ReservationRepository reservationRepository,
             WaitingRepository waitingRepository,
+            PaymentQueryService paymentQueryService,
             MemberQueryService memberQueryService,
             ThemeQueryService themeQueryService,
             ReservationTimeQueryService timeQueryService,
@@ -47,6 +50,7 @@ public class ReservationService {
     ) {
         this.reservationRepository = reservationRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentQueryService = paymentQueryService;
         this.memberQueryService = memberQueryService;
         this.themeQueryService = themeQueryService;
         this.timeQueryService = timeQueryService;
@@ -55,7 +59,7 @@ public class ReservationService {
         this.waitingQueryService = waitingQueryService;
     }
 
-    public AddReservationByAdmin addReservationByAdmin(
+    public AddReservationByAdmin addReservationWithoutPayment(
             long memberId,
             ReservationCreationContent request
     ) {
@@ -73,7 +77,7 @@ public class ReservationService {
         return new AddReservationByAdmin(savedReservation);
     }
 
-    public AddReservationByMember addReservationByMember(
+    public AddReservationByMember addReservationWithPayment(
             long memberId,
             ReservationCreationContent reservationCreationContent,
             PaymentCreationContent paymentCreationContent
@@ -82,9 +86,29 @@ public class ReservationService {
         Theme theme = themeQueryService.getThemeById(reservationCreationContent.themeId());
         ReservationTime time = timeQueryService.getReservationTimeById(reservationCreationContent.timeId());
 
-        Payment paymentHistory = paymentService.savePayment(paymentCreationContent);
-        Reservation reservation = Reservation.createWithoutId(reservationCreationContent.date(), time, theme, member,
-                paymentHistory);
+        Payment payment = paymentService.savePayment(paymentCreationContent);
+        Reservation reservation = Reservation.createWithoutId(
+                reservationCreationContent.date(), time, theme, member, payment);
+
+        validateDuplicateReservation(reservation.getTheme(), reservation.getDate(), reservation.getReservationTime());
+        validatePastReservationCreation(reservation);
+
+        Reservation savedReservation = reservationRepository.save(reservation);
+        return new AddReservationByMember(savedReservation);
+    }
+
+    public AddReservationByMember addReservationWithPayment(
+            long memberId,
+            long paymentId,
+            ReservationCreationContent reservationCreationContent
+    ) {
+        Member member = memberQueryService.getMemberById(memberId);
+        Theme theme = themeQueryService.getThemeById(reservationCreationContent.themeId());
+        ReservationTime time = timeQueryService.getReservationTimeById(reservationCreationContent.timeId());
+        Payment payment = paymentQueryService.getPaymentById(paymentId);
+
+        Reservation reservation = Reservation.createWithoutId(
+                reservationCreationContent.date(), time, theme, member, payment);
 
         validateDuplicateReservation(reservation.getTheme(), reservation.getDate(), reservation.getReservationTime());
         validatePastReservationCreation(reservation);
@@ -96,18 +120,17 @@ public class ReservationService {
     public void deleteReservationById(long reservationId) {
         Reservation reservation = reservationQueryService.getReservationById(reservationId);
         reservationRepository.delete(reservation);
-        addReservationWithWaiting(reservation);
+        replaceWaitingToReservation(reservation);
     }
 
-    private void addReservationWithWaiting(Reservation deletedReservation) {
+    private void replaceWaitingToReservation(Reservation deletedReservation) {
         Optional<Waiting> firstWaiting = waitingQueryService.findFirstWaitingByReservation(deletedReservation);
-        if (firstWaiting.isPresent()) {
-            Waiting waiting = firstWaiting.get();
-            long memberId = waiting.getMember().getId();
-            ReservationCreationContent creationContent = new ReservationCreationContent(waiting);
-            addReservationByAdmin(memberId, creationContent);
-            waitingRepository.delete(waiting);
+        if (firstWaiting.isEmpty()) {
+            return;
         }
+        Waiting waiting = firstWaiting.get();
+        addReservationWithWaiting(waiting.getMemberIdInWaiting(), waiting);
+        waitingRepository.delete(waiting);
     }
 
     private void validateDuplicateReservation(Theme theme, LocalDate date, ReservationTime time) {
@@ -121,5 +144,14 @@ public class ReservationService {
         if (reservation.isPastDateTime()) {
             throw new BadRequestException("과거 예약은 생성할 수 없습니다.");
         }
+    }
+
+    private void addReservationWithWaiting(long memberId, Waiting waiting) {
+        ReservationCreationContent creationContent = new ReservationCreationContent(waiting);
+        if (waiting.hasEmptyPayment()) {
+            addReservationWithoutPayment(memberId, creationContent);
+            return;
+        }
+        addReservationWithPayment(memberId, waiting.getPaymentIdInWaiting(), creationContent);
     }
 }

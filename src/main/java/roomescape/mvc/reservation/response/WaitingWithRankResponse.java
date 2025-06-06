@@ -18,8 +18,8 @@ public record WaitingWithRankResponse(
         this(
                 waitingWithRank.getId(),
                 waitingWithRank.getDate(),
-                waitingWithRank.getTheme().getName(),
-                waitingWithRank.getTime().getStartAt(),
+                waitingWithRank.getThemeName(),
+                waitingWithRank.getStartAt(),
                 waitingWithRank.getRank(),
                 waitingWithRank.getPaymentKey(),
                 waitingWithRank.getAmount()

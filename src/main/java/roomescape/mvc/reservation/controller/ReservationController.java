@@ -109,7 +109,8 @@ public class ReservationController {
             @Valid @RequestBody AdminReservationRequest request
     ) {
         ReservationCreationContent creationRequest = new ReservationCreationContent(request);
-        AddReservationByAdmin response = reservationService.addReservationByAdmin(request.memberId(), creationRequest);
+        AddReservationByAdmin response = reservationService.addReservationWithoutPayment(request.memberId(),
+                creationRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(URI.create("/reservation/" + response.id()))
                 .body(response);
@@ -134,7 +135,7 @@ public class ReservationController {
         ReservationCreationContent creationContent = new ReservationCreationContent(request);
         PaymentCreationContent paymentCreationContent = new PaymentCreationContent(request);
 
-        AddReservationByMember response = reservationService.addReservationByMember(
+        AddReservationByMember response = reservationService.addReservationWithPayment(
                 accessTokenContent.id(), creationContent, paymentCreationContent);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(URI.create("/reservation/" + response.id()))
