@@ -17,6 +17,7 @@ import roomescape.fake.FakeWaitingRepository;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepositoryInterface;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Waiting;
@@ -36,10 +37,10 @@ class ReservationServiceTest {
     private final MemberRepositoryInterface memberRepository = new FakeMemberRepository();
     private final WaitingRepositoryInterface waitingRepository = new FakeWaitingRepository();
     private final ReservationService reservationService = new ReservationService(
-        reservationRepository,
-        reservationTimeRepository,
-        themeRepository,
-        waitingRepository
+            reservationRepository,
+            reservationTimeRepository,
+            themeRepository,
+            waitingRepository
     );
 
     @Test
@@ -63,21 +64,23 @@ class ReservationServiceTest {
         final ReservationTime savedReservationTime2 = reservationTimeRepository.save(new ReservationTime(time2));
 
         reservationRepository.save(
-            new Reservation(
-                savedMember,
-                date,
-                savedReservationTime1,
-                savedTheme
-            )
+                new Reservation(
+                        savedMember,
+                        date,
+                        savedReservationTime1,
+                        savedTheme,
+                        createPayment()
+                )
         );
 
         reservationRepository.save(
-            new Reservation(
-                savedMember2,
-                date2,
-                savedReservationTime2,
-                savedTheme
-            )
+                new Reservation(
+                        savedMember2,
+                        date2,
+                        savedReservationTime2,
+                        savedTheme,
+                        createPayment()
+                )
         );
 
         // when
@@ -103,8 +106,9 @@ class ReservationServiceTest {
 
         // when & then
         Assertions.assertThatCode(
-                () -> reservationService.save(savedMember, date, savedTime.getId(), savedTheme.getId()))
-            .doesNotThrowAnyException();
+                        () -> reservationService.save(savedMember, date, savedTime.getId(), savedTheme.getId(),
+                                createPayment()))
+                .doesNotThrowAnyException();
     }
 
     @Test
@@ -122,22 +126,23 @@ class ReservationServiceTest {
         final Theme savedTheme = themeRepository.save(new Theme(themeName, description, thumbnail));
 
         final Reservation savedReservation = reservationRepository.save(new Reservation(
-            savedMember,
-            date,
-            savedTime,
-            savedTheme
+                savedMember,
+                date,
+                savedTime,
+                savedTheme,
+                createPayment()
         ));
 
         // when & then
         Assertions.assertThatCode(() -> reservationService.deleteById(savedReservation.getId()))
-            .doesNotThrowAnyException();
+                .doesNotThrowAnyException();
     }
 
     @Test
     void 예약_정보를_삭제하면_첫번째_대기가_예약이_된다() {
         // given
         final Member member = new Member("이스트", "east@email.com", "1234", Role.ADMIN);
-        final Member member2 = new Member("우가", "wooga@gmail.com", "1234", Role.USER);
+        final Member member2 = new Member("우가", "user", "1234", Role.USER);
         final Member savedMember = memberRepository.save(member);
         final Member savedMember2 = memberRepository.save(member2);
         final LocalTime time = LocalTime.parse("20:00");
@@ -150,17 +155,19 @@ class ReservationServiceTest {
         final Theme savedTheme = themeRepository.save(new Theme(themeName, description, thumbnail));
 
         final Reservation savedReservation = reservationRepository.save(new Reservation(
-            savedMember,
-            date,
-            savedTime,
-            savedTheme
+                savedMember,
+                date,
+                savedTime,
+                savedTheme,
+                createPayment()
         ));
 
         waitingRepository.save(new Waiting(
-            savedMember2,
-            savedTime,
-            savedTheme,
-            date
+                savedMember2,
+                savedTime,
+                savedTheme,
+                date,
+                createPayment()
         ));
 
         // when
@@ -168,7 +175,7 @@ class ReservationServiceTest {
 
         // then
         Assertions.assertThat(reservationRepository.findByMember(savedMember2).getFirst().getMember())
-            .isEqualTo(savedMember2);
+                .isEqualTo(savedMember2);
     }
 
     @Test
@@ -186,10 +193,11 @@ class ReservationServiceTest {
         final Theme savedTheme = themeRepository.save(new Theme(themeName, description, thumbnail));
 
         reservationRepository.save(new Reservation(
-            savedMember,
-            date,
-            savedTime,
-            savedTheme
+                savedMember,
+                date,
+                savedTime,
+                savedTheme,
+                createPayment()
         ));
 
         final LocalTime time2 = LocalTime.parse("21:00");
@@ -197,10 +205,10 @@ class ReservationServiceTest {
 
         // when
         final long count =
-            reservationService.findAvailableReservationTimes(date, savedTheme.getId())
-                .stream()
-                .filter(AvailableReservationTime::alreadyBooked)
-                .count();
+                reservationService.findAvailableReservationTimes(date, savedTheme.getId())
+                        .stream()
+                        .filter(AvailableReservationTime::alreadyBooked)
+                        .count();
 
         // then
         assertThat(count).isEqualTo(1);
@@ -222,8 +230,8 @@ class ReservationServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(
-                () -> reservationService.save(member, date, savedTime.getId(), savedTheme.getId()))
-            .isInstanceOf(PastDateException.class);
+                        () -> reservationService.save(member, date, savedTime.getId(), savedTheme.getId(), createPayment()))
+                .isInstanceOf(PastDateException.class);
     }
 
     @Test
@@ -241,18 +249,19 @@ class ReservationServiceTest {
         final Theme savedTheme = themeRepository.save(new Theme(themeName, description, thumbnail));
 
         reservationRepository.save(
-            new Reservation(
-                member,
-                date,
-                savedTime,
-                savedTheme
-            )
+                new Reservation(
+                        member,
+                        date,
+                        savedTime,
+                        savedTheme,
+                        createPayment()
+                )
         );
 
         // when & then
         Assertions.assertThatThrownBy(
-                () -> reservationService.save(member, date, savedTime.getId(), savedTheme.getId()))
-            .isInstanceOf(DataExistException.class);
+                        () -> reservationService.save(member, date, savedTime.getId(), savedTheme.getId(), createPayment()))
+                .isInstanceOf(DataExistException.class);
     }
 
     @Test
@@ -270,24 +279,25 @@ class ReservationServiceTest {
         final Theme savedTheme = themeRepository.save(new Theme(themeName, description, thumbnail));
 
         reservationRepository.save(
-            new Reservation(
-                savedMember,
-                date,
-                savedTime,
-                savedTheme
-            )
+                new Reservation(
+                        savedMember,
+                        date,
+                        savedTime,
+                        savedTheme,
+                        createPayment()
+                )
         );
 
         // when & then
         Assertions.assertThatThrownBy(() -> reservationService.save(
-                new Member(
-                    2L,
-                    "WooGa",
-                    "bowook316@gmail.com",
-                    "1234",
-                    Role.USER
-                ), date, savedTime.getId(), savedTheme.getId()))
-            .isInstanceOf(DataExistException.class);
+                        new Member(
+                                2L,
+                                "WooGa",
+                                "bowook316@gmail.com",
+                                "1234",
+                                Role.USER
+                        ), date, savedTime.getId(), savedTheme.getId(), createPayment()))
+                .isInstanceOf(DataExistException.class);
     }
 
     @Test
@@ -303,12 +313,13 @@ class ReservationServiceTest {
         final String thumbnail = "귀신사진";
         final Theme savedTheme = themeRepository.save(new Theme(themeName, description, thumbnail));
         reservationRepository.save(
-            new Reservation(
-                savedMember,
-                date,
-                savedTime,
-                savedTheme
-            )
+                new Reservation(
+                        savedMember,
+                        date,
+                        savedTime,
+                        savedTheme,
+                        createPayment()
+                )
         );
 
         // when
@@ -316,5 +327,9 @@ class ReservationServiceTest {
 
         // then
         assertThat(reservations.size()).isEqualTo(1);
+    }
+
+    private Payment createPayment() {
+        return new Payment(10000, "orderId", "paymentId");
     }
 }

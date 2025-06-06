@@ -15,6 +15,7 @@ import roomescape.fake.FakeThemeRepository;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepositoryInterface;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.repository.reservation.ReservationRepositoryInterface;
@@ -116,17 +117,17 @@ class ThemeServiceTest {
         memberRepository.save(member);
 
         final Reservation inlineReservation = new Reservation(member, LocalDate.now().minusDays(7), reservationTime,
-            theme1);
+                theme1, createPayment());
         final Reservation outlineReservation = new Reservation(member, LocalDate.now().plusDays(10), reservationTime,
-            theme1);
+                theme1, createPayment());
         final Reservation inlineReservation2 = new Reservation(member, LocalDate.now().minusDays(5), reservationTime,
-            theme1);
+                theme1, createPayment());
         final Reservation inlineReservation3 = new Reservation(member, LocalDate.now().minusDays(4), reservationTime,
-            theme2);
+                theme2, createPayment());
         final Reservation inlineReservation4 = new Reservation(member, LocalDate.now().minusDays(3), reservationTime,
-            theme2);
+                theme2, createPayment());
         final Reservation inlineReservation5 = new Reservation(member, LocalDate.now().minusDays(5), reservationTime,
-            theme2);
+                theme2, createPayment());
         reservationRepository.save(inlineReservation);
         reservationRepository.save(outlineReservation);
         reservationRepository.save(inlineReservation2);
@@ -139,5 +140,9 @@ class ThemeServiceTest {
 
         // then
         Assertions.assertThat(popularThemes.getFirst().getId()).isEqualTo(theme2.getId());
+    }
+
+    private Payment createPayment() {
+        return new Payment(10000, "orderId", "paymentKey");
     }
 }

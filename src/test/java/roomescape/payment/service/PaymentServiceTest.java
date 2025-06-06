@@ -7,15 +7,20 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.processor.toss.TossPaymentConfirmRequest;
 import roomescape.payment.processor.toss.TossPaymentConfirmResponse;
 import roomescape.payment.processor.toss.TossPaymentProcessor;
+import roomescape.payment.repository.PaymentRepositoryInterface;
 
-@SpringBootTest(classes = {PaymentService.class, TossPaymentProcessor.class})
+@SpringBootTest
 class PaymentServiceTest {
 
     @Autowired
     private PaymentService paymentService;
+
+    @MockitoBean
+    private PaymentRepositoryInterface paymentRepository;
 
     @MockitoBean
     private TossPaymentProcessor tossPaymentProcessor;
@@ -24,19 +29,32 @@ class PaymentServiceTest {
     void 결제를_할_수_있다() {
         // given
         final TossPaymentConfirmRequest request = new TossPaymentConfirmRequest(
-            10000,
-            "orderId",
-            "paymentKey"
+                10000,
+                "orderId",
+                "paymentKey"
         );
-        final TossPaymentConfirmResponse expected = new TossPaymentConfirmResponse(
-            "orderId",
-            "paymentKey"
+        final TossPaymentConfirmResponse tossPaymentConfirmResponse = new TossPaymentConfirmResponse(
+                "orderId",
+                "paymentKey"
         );
-        when(tossPaymentProcessor.processPayment(request)).thenReturn(expected);
+        final Payment payment = new Payment(
+                10000,
+                tossPaymentConfirmResponse.orderId(),
+                tossPaymentConfirmResponse.paymentKey()
+        );
+        final Payment expected = new Payment(
+                1L,
+                10000,
+                tossPaymentConfirmResponse.orderId(),
+                tossPaymentConfirmResponse.paymentKey()
+        );
+
+        when(tossPaymentProcessor.processPayment(request)).thenReturn(tossPaymentConfirmResponse);
+        when(paymentRepository.save(payment)).thenReturn(expected);
 
         // when
-        final TossPaymentConfirmResponse actual = paymentService.processPayment(
-            request.amount(), request.orderId(), request.paymentKey()
+        final Payment actual = paymentService.processPayment(
+                request.amount(), request.orderId(), request.paymentKey()
         );
 
         // then

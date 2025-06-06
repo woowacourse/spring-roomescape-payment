@@ -10,6 +10,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.JpaMemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.repository.JpaPaymentRepository;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.repository.time.JpaReservationTimeRepository;
@@ -32,6 +34,9 @@ public class JpaWaitingRepositoryTest {
     @Autowired
     private JpaReservationTimeRepository jpaReservationTimeRepository;
 
+    @Autowired
+    private JpaPaymentRepository paymentRepository;
+
     @Test
     void 대기_저장() {
         // given
@@ -39,11 +44,13 @@ public class JpaWaitingRepositoryTest {
         final ReservationTime reservationTime = new ReservationTime(LocalTime.of(20, 20));
         final Theme theme = new Theme("공포", "설명", "썸네일");
         final LocalDate date = LocalDate.of(2026, 10, 10);
-        final Waiting waiting = new Waiting(member, reservationTime, theme, date);
+        final Payment payment = new Payment(10000, "orderId", "paymentKey");
+        final Waiting waiting = new Waiting(member, reservationTime, theme, date, payment);
 
         jpaMemberRepository.save(member);
         jpaReservationTimeRepository.save(reservationTime);
         themeRepository.save(theme);
+        paymentRepository.save(payment);
 
         // when
         final Waiting savedWaiting = jpaWaitingRepository.save(waiting);
@@ -59,11 +66,13 @@ public class JpaWaitingRepositoryTest {
         final ReservationTime reservationTime = new ReservationTime(LocalTime.of(20, 20));
         final Theme theme = new Theme("공포", "설명", "썸네일");
         final LocalDate date = LocalDate.of(2026, 10, 10);
-        final Waiting waiting = new Waiting(member, reservationTime, theme, date);
+        final Payment payment = new Payment(10000, "orderId", "paymentKey");
+        final Waiting waiting = new Waiting(member, reservationTime, theme, date, payment);
 
         jpaMemberRepository.save(member);
         jpaReservationTimeRepository.save(reservationTime);
         themeRepository.save(theme);
+        paymentRepository.save(payment);
         jpaWaitingRepository.save(waiting);
 
         // when
@@ -81,13 +90,18 @@ public class JpaWaitingRepositoryTest {
         final ReservationTime reservationTime = new ReservationTime(LocalTime.of(20, 20));
         final Theme theme = new Theme("공포", "설명", "썸네일");
         final LocalDate date = LocalDate.of(2026, 10, 10);
-        final Waiting waiting = new Waiting(member, reservationTime, theme, date);
-        final Waiting waiting2 = new Waiting(member2, reservationTime, theme, date);
+        final Payment payment1 = new Payment(10000, "orderId", "paymentKey");
+        final Payment payment2 = new Payment(10000, "orderId", "paymentKey");
+
+        final Waiting waiting = new Waiting(member, reservationTime, theme, date, payment1);
+        final Waiting waiting2 = new Waiting(member2, reservationTime, theme, date, payment2);
 
         jpaMemberRepository.save(member);
         jpaMemberRepository.save(member2);
         jpaReservationTimeRepository.save(reservationTime);
         themeRepository.save(theme);
+        paymentRepository.save(payment1);
+        paymentRepository.save(payment2);
         final Waiting savedWaiting = jpaWaitingRepository.save(waiting);
         jpaWaitingRepository.save(waiting2);
 
@@ -105,11 +119,14 @@ public class JpaWaitingRepositoryTest {
         final ReservationTime reservationTime = new ReservationTime(LocalTime.of(20, 20));
         final Theme theme = new Theme("공포", "설명", "썸네일");
         final LocalDate date = LocalDate.of(2026, 10, 10);
-        final Waiting waiting = new Waiting(member, reservationTime, theme, date);
+        final Payment payment = new Payment(10000, "orderId", "paymentKey");
+
+        final Waiting waiting = new Waiting(member, reservationTime, theme, date, payment);
 
         jpaMemberRepository.save(member);
         jpaReservationTimeRepository.save(reservationTime);
         themeRepository.save(theme);
+        paymentRepository.save(payment);
         final Waiting savedWaiting = jpaWaitingRepository.save(waiting);
 
         // when
@@ -127,20 +144,24 @@ public class JpaWaitingRepositoryTest {
         final ReservationTime reservationTime = new ReservationTime(LocalTime.of(20, 20));
         final Theme theme = new Theme("공포", "설명", "썸네일");
         final LocalDate date = LocalDate.of(2026, 10, 10);
-        final Waiting waiting = new Waiting(member, reservationTime, theme, date);
-        final Waiting waiting2 = new Waiting(member2, reservationTime, theme, date);
+        final Payment payment1 = new Payment(10000, "orderId", "paymentKey");
+        final Payment payment2 = new Payment(10000, "orderId", "paymentKey");
+        final Waiting waiting = new Waiting(member, reservationTime, theme, date, payment1);
+        final Waiting waiting2 = new Waiting(member2, reservationTime, theme, date, payment2);
 
         jpaMemberRepository.save(member);
         jpaMemberRepository.save(member2);
         jpaReservationTimeRepository.save(reservationTime);
+        paymentRepository.save(payment1);
+        paymentRepository.save(payment2);
         themeRepository.save(theme);
         final Waiting savedWaiting = jpaWaitingRepository.save(waiting);
         jpaWaitingRepository.save(waiting2);
 
         // when
         final Waiting foundWaiting = jpaWaitingRepository.findFirstByThemeAndDateAndTimeOrderByIdAsc(theme, date,
-                reservationTime)
-            .orElseThrow();
+                        reservationTime)
+                .orElseThrow();
 
         // then
         Assertions.assertThat(foundWaiting).isEqualTo(savedWaiting);
@@ -153,7 +174,9 @@ public class JpaWaitingRepositoryTest {
         final ReservationTime reservationTime = new ReservationTime(LocalTime.of(20, 20));
         final Theme theme = new Theme("공포", "설명", "썸네일");
         final LocalDate date = LocalDate.of(2026, 10, 10);
-        final Waiting waiting = new Waiting(member, reservationTime, theme, date);
+        final Payment payment = new Payment(10000, "orderId", "paymentKey");
+
+        final Waiting waiting = new Waiting(member, reservationTime, theme, date, payment);
 
         jpaMemberRepository.save(member);
         jpaReservationTimeRepository.save(reservationTime);
@@ -175,12 +198,19 @@ public class JpaWaitingRepositoryTest {
         final ReservationTime reservationTime = new ReservationTime(LocalTime.of(20, 20));
         final Theme theme = new Theme("공포", "설명", "썸네일");
         final LocalDate date = LocalDate.of(2026, 10, 10);
-        final Waiting waiting = new Waiting(member, reservationTime, theme, date);
-        final Waiting waiting2 = new Waiting(member2, reservationTime, theme, date);
+
+        final Payment payment1 = new Payment(10000, "orderId", "paymentKey");
+        final Payment payment2 = new Payment(10000, "orderId", "paymentKey");
+
+        final Waiting waiting = new Waiting(member, reservationTime, theme, date, payment1);
+        final Waiting waiting2 = new Waiting(member2, reservationTime, theme, date, payment2);
 
         jpaMemberRepository.save(member);
         jpaMemberRepository.save(member2);
         jpaReservationTimeRepository.save(reservationTime);
+        paymentRepository.save(payment1);
+        paymentRepository.save(payment2);
+
         themeRepository.save(theme);
         final Waiting savedWaiting = jpaWaitingRepository.save(waiting);
         final Waiting savedWaiting2 = jpaWaitingRepository.save(waiting2);
@@ -199,10 +229,13 @@ public class JpaWaitingRepositoryTest {
         final ReservationTime reservationTime = new ReservationTime(LocalTime.of(20, 20));
         final Theme theme = new Theme("공포", "설명", "썸네일");
         final LocalDate date = LocalDate.of(2026, 10, 10);
-        final Waiting waiting = new Waiting(member, reservationTime, theme, date);
+        final Payment payment = new Payment(10000, "orderId", "paymentKey");
+
+        final Waiting waiting = new Waiting(member, reservationTime, theme, date, payment);
 
         jpaMemberRepository.save(member);
         jpaReservationTimeRepository.save(reservationTime);
+        paymentRepository.save(payment);
         themeRepository.save(theme);
         final Waiting savedWaiting = jpaWaitingRepository.save(waiting);
 

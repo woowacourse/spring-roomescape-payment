@@ -15,6 +15,7 @@ import roomescape.fake.FakeWaitingRepository;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepositoryInterface;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Waiting;
@@ -33,16 +34,16 @@ public class ReservationWaitingServiceTest {
     private final MemberRepositoryInterface memberRepository = new FakeMemberRepository();
     private final WaitingRepositoryInterface waitingRepository = new FakeWaitingRepository();
     private final ReservationWaitingService reservationWaitingService = new ReservationWaitingService(
-        reservationRepository,
-        reservationTimeRepository,
-        themeRepository,
-        waitingRepository
+            reservationRepository,
+            reservationTimeRepository,
+            themeRepository,
+            waitingRepository
     );
 
     @Test
     void 예약_대기_저장() {
         // given
-        final Member savedMember = memberRepository.save(new Member("우가", "wooga@gmail.com", "1234", Role.USER));
+        final Member savedMember = memberRepository.save(new Member("우가", "user", "1234", Role.USER));
         final LocalTime time = LocalTime.parse("20:00");
         final LocalDate date = LocalDate.parse("2026-11-28");
         final ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(time));
@@ -53,14 +54,15 @@ public class ReservationWaitingServiceTest {
         final Theme savedTheme = themeRepository.save(new Theme(themeName, description, thumbnail));
 
         reservationRepository.save(
-            new Reservation(savedMember, date, savedTime, savedTheme)
+                new Reservation(savedMember, date, savedTime, savedTheme, createPayment())
         );
         //when
         final Waiting savedWaiting = reservationWaitingService.createWaitingReservation(
-            savedMember,
-            date,
-            savedTime.getId(),
-            savedTheme.getId()
+                savedMember,
+                date,
+                savedTime.getId(),
+                savedTheme.getId(),
+                createPayment()
         );
 
         //then
@@ -70,7 +72,7 @@ public class ReservationWaitingServiceTest {
     @Test
     void 예약_대기_저장할_때_예약이_존재하지_않으면_예외_발생() {
         // given
-        final Member savedMember = memberRepository.save(new Member("우가", "wooga@gmail.com", "1234", Role.USER));
+        final Member savedMember = memberRepository.save(new Member("우가", "user", "1234", Role.USER));
         final LocalTime time = LocalTime.parse("20:00");
         final LocalDate date = LocalDate.parse("2026-11-28");
         final ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(time));
@@ -82,15 +84,15 @@ public class ReservationWaitingServiceTest {
 
         //when & then
         Assertions.assertThatThrownBy(
-                () -> reservationWaitingService.createWaitingReservation(savedMember, date, savedTime.getId(),
-                    savedTheme.getId()))
-            .isInstanceOf(WaitingNotAllowedException.class);
+                        () -> reservationWaitingService.createWaitingReservation(savedMember, date, savedTime.getId(),
+                                savedTheme.getId(), createPayment()))
+                .isInstanceOf(WaitingNotAllowedException.class);
     }
 
     @Test
     void 멤버를_기준으로_예약_대기_찾기() {
         // given
-        final Member savedMember = memberRepository.save(new Member("우가", "wooga@gmail.com", "1234", Role.USER));
+        final Member savedMember = memberRepository.save(new Member("우가", "user", "1234", Role.USER));
         final LocalTime time = LocalTime.parse("20:00");
         final LocalDate date = LocalDate.parse("2026-11-28");
         final ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(time));
@@ -100,7 +102,8 @@ public class ReservationWaitingServiceTest {
         final String thumbnail = "귀신사진";
         final Theme savedTheme = themeRepository.save(new Theme(themeName, description, thumbnail));
 
-        final Waiting savedWaiting = waitingRepository.save(new Waiting(savedMember, savedTime, savedTheme, date));
+        final Waiting savedWaiting = waitingRepository.save(
+                new Waiting(savedMember, savedTime, savedTheme, date, createPayment()));
 
         // when
         final List<Waiting> waitings = reservationWaitingService.findWaitingByMember(savedMember);
@@ -112,7 +115,7 @@ public class ReservationWaitingServiceTest {
     @Test
     void 아이디를_기준으로_예약_대기_삭제() {
         // given
-        final Member savedMember = memberRepository.save(new Member("우가", "wooga@gmail.com", "1234", Role.USER));
+        final Member savedMember = memberRepository.save(new Member("우가", "user", "1234", Role.USER));
         final LocalTime time = LocalTime.parse("20:00");
         final LocalDate date = LocalDate.parse("2026-11-28");
         final ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(time));
@@ -122,14 +125,15 @@ public class ReservationWaitingServiceTest {
         final String thumbnail = "귀신사진";
         final Theme savedTheme = themeRepository.save(new Theme(themeName, description, thumbnail));
 
-        final Waiting savedWaiting = waitingRepository.save(new Waiting(savedMember, savedTime, savedTheme, date));
+        final Waiting savedWaiting = waitingRepository.save(
+                new Waiting(savedMember, savedTime, savedTheme, date, createPayment()));
 
         // when
         reservationWaitingService.deleteWaitingById(savedWaiting.getId());
 
         // then
         Assertions.assertThat(waitingRepository.findByMember(savedMember))
-            .doesNotContain(savedWaiting);
+                .doesNotContain(savedWaiting);
     }
 
     @Test
@@ -137,13 +141,13 @@ public class ReservationWaitingServiceTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> reservationWaitingService.deleteWaitingById(Long.MAX_VALUE))
-            .isInstanceOf(DataNotFoundException.class);
+                .isInstanceOf(DataNotFoundException.class);
     }
 
     @Test
     void 예약_대기_정보에_따른_순번_조회() {
         // given
-        final Member savedMember = memberRepository.save(new Member("우가", "wooga@gmail.com", "1234", Role.USER));
+        final Member savedMember = memberRepository.save(new Member("우가", "user", "1234", Role.USER));
         final LocalTime time = LocalTime.parse("20:00");
         final LocalDate date = LocalDate.parse("2026-11-28");
         final ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(time));
@@ -153,11 +157,12 @@ public class ReservationWaitingServiceTest {
         final String thumbnail = "귀신사진";
         final Theme savedTheme = themeRepository.save(new Theme(themeName, description, thumbnail));
 
-        waitingRepository.save(new Waiting(savedMember, savedTime, savedTheme, date));
-        waitingRepository.save(new Waiting(savedMember, savedTime, savedTheme, date));
-        waitingRepository.save(new Waiting(savedMember, savedTime, savedTheme, date));
-        waitingRepository.save(new Waiting(savedMember, savedTime, savedTheme, date));
-        final Waiting savedWaiting = waitingRepository.save(new Waiting(savedMember, savedTime, savedTheme, date));
+        waitingRepository.save(new Waiting(savedMember, savedTime, savedTheme, date, createPayment()));
+        waitingRepository.save(new Waiting(savedMember, savedTime, savedTheme, date, createPayment()));
+        waitingRepository.save(new Waiting(savedMember, savedTime, savedTheme, date, createPayment()));
+        waitingRepository.save(new Waiting(savedMember, savedTime, savedTheme, date, createPayment()));
+        final Waiting savedWaiting = waitingRepository.save(
+                new Waiting(savedMember, savedTime, savedTheme, date, createPayment()));
 
         // when
         final long count = reservationWaitingService.getRankInWaiting(savedWaiting);
@@ -169,7 +174,7 @@ public class ReservationWaitingServiceTest {
     @Test
     void 예약_대기_정보에서_앞_번호가_사라지면_번호_당겨지는_순번_조회() {
         // given
-        final Member savedMember = memberRepository.save(new Member("우가", "wooga@gmail.com", "1234", Role.USER));
+        final Member savedMember = memberRepository.save(new Member("우가", "user", "1234", Role.USER));
         final LocalTime time = LocalTime.parse("20:00");
         final LocalDate date = LocalDate.parse("2026-11-28");
         final ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(time));
@@ -179,11 +184,13 @@ public class ReservationWaitingServiceTest {
         final String thumbnail = "귀신사진";
         final Theme savedTheme = themeRepository.save(new Theme(themeName, description, thumbnail));
 
-        waitingRepository.save(new Waiting(savedMember, savedTime, savedTheme, date));
-        waitingRepository.save(new Waiting(savedMember, savedTime, savedTheme, date));
-        final Waiting savedWaiting1 = waitingRepository.save(new Waiting(savedMember, savedTime, savedTheme, date));
-        waitingRepository.save(new Waiting(savedMember, savedTime, savedTheme, date));
-        final Waiting savedWaiting2 = waitingRepository.save(new Waiting(savedMember, savedTime, savedTheme, date));
+        waitingRepository.save(new Waiting(savedMember, savedTime, savedTheme, date, createPayment()));
+        waitingRepository.save(new Waiting(savedMember, savedTime, savedTheme, date, createPayment()));
+        final Waiting savedWaiting1 = waitingRepository.save(
+                new Waiting(savedMember, savedTime, savedTheme, date, createPayment()));
+        waitingRepository.save(new Waiting(savedMember, savedTime, savedTheme, date, createPayment()));
+        final Waiting savedWaiting2 = waitingRepository.save(
+                new Waiting(savedMember, savedTime, savedTheme, date, createPayment()));
 
         waitingRepository.deleteById(savedWaiting1.getId());
 
@@ -192,5 +199,9 @@ public class ReservationWaitingServiceTest {
 
         // then
         Assertions.assertThat(count).isEqualTo(4);
+    }
+
+    private Payment createPayment() {
+        return new Payment(10000, "orderId", "paymentKey");
     }
 }

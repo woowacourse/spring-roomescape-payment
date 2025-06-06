@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.DataExistException;
 import roomescape.common.exception.PastDateException;
 import roomescape.member.domain.Member;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.dto.AvailableReservationTime;
@@ -28,7 +29,13 @@ public class ReservationService {
     private final WaitingRepositoryInterface waitingRepository;
 
     @Transactional
-    public Reservation save(final Member member, final LocalDate date, final Long timeId, final Long themeId) {
+    public Reservation save(
+            final Member member,
+            final LocalDate date,
+            final Long timeId,
+            final Long themeId,
+            final Payment payment
+    ) {
         validatePastDate(date);
 
         final ReservationTime reservationTime = reservationTimeRepository.findById(timeId);
@@ -37,7 +44,7 @@ public class ReservationService {
         validateExistReservation(date, reservationTime, theme);
         validateExistWaiting(date, reservationTime, theme);
 
-        final Reservation reservation = new Reservation(member, date, reservationTime, theme);
+        final Reservation reservation = new Reservation(member, date, reservationTime, theme, payment);
         return reservationRepository.save(reservation);
     }
 
@@ -50,15 +57,16 @@ public class ReservationService {
 
         if (waitingRepository.existsByDateAndTimeAndTheme(date, time, theme)) {
             waitingRepository.findFirstByThemeAndDateAndTimeOrderByIdAsc(theme, date, time)
-                .ifPresent(waiting -> {
-                    reservationRepository.save(new Reservation(
-                        waiting.getMember(),
-                        waiting.getDate(),
-                        waiting.getTime(),
-                        waiting.getTheme()
-                    ));
-                    waitingRepository.deleteById(waiting.getId());
-                });
+                    .ifPresent(waiting -> {
+                        reservationRepository.save(new Reservation(
+                                waiting.getMember(),
+                                waiting.getDate(),
+                                waiting.getTime(),
+                                waiting.getTheme(),
+                                waiting.getPayment()
+                        ));
+                        waitingRepository.deleteById(waiting.getId());
+                    });
         }
 
         reservationRepository.deleteById(id);
@@ -78,9 +86,9 @@ public class ReservationService {
         for (ReservationTime reservationTime : reservationTimes) {
             reservationRepository.existsByDateAndTimeAndTheme(date, reservationTime, theme);
             availableReservationTimes.add(new AvailableReservationTime(
-                reservationTime.getId(),
-                reservationTime.getStartAt(),
-                reservationRepository.existsByDateAndTimeAndTheme(date, reservationTime, theme))
+                    reservationTime.getId(),
+                    reservationTime.getStartAt(),
+                    reservationRepository.existsByDateAndTimeAndTheme(date, reservationTime, theme))
             );
         }
 

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import roomescape.common.exception.ReservationException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
+import roomescape.payment.domain.Payment;
 import roomescape.theme.domain.Theme;
 
 class ReservationTest {
@@ -21,7 +22,7 @@ class ReservationTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> {
-            new Reservation(member, date, reservationTime, theme);
+            new Reservation(member, date, reservationTime, theme, createPayment());
         }).isInstanceOf(ReservationException.class);
     }
 
@@ -35,7 +36,7 @@ class ReservationTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> {
-            new Reservation(member, date, reservationTime, theme);
+            new Reservation(member, date, reservationTime, theme, createPayment());
         }).isInstanceOf(ReservationException.class);
     }
 
@@ -49,7 +50,7 @@ class ReservationTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> {
-            new Reservation(member, date, reservationTime, theme);
+            new Reservation(member, date, reservationTime, theme, createPayment());
         }).isInstanceOf(ReservationException.class);
     }
 
@@ -63,7 +64,11 @@ class ReservationTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> {
-            new Reservation(member, date, reservationTime, theme);
+            new Reservation(member, date, reservationTime, theme, createPayment());
         }).isInstanceOf(ReservationException.class);
+    }
+
+    private Payment createPayment() {
+        return new Payment(10000, "orderId", "paymentKey");
     }
 }

@@ -20,11 +20,12 @@ public class FakeWaitingRepository implements WaitingRepositoryInterface {
     public Waiting save(final Waiting waiting) {
         sequence++;
         final Waiting newWaiting = new Waiting(
-            sequence,
-            waiting.getMember(),
-            waiting.getTime(),
-            waiting.getTheme(),
-            waiting.getDate()
+                sequence,
+                waiting.getMember(),
+                waiting.getTime(),
+                waiting.getTheme(),
+                waiting.getDate(),
+                waiting.getPayment()
         );
         waitings.put(sequence, newWaiting);
 
@@ -33,23 +34,23 @@ public class FakeWaitingRepository implements WaitingRepositoryInterface {
 
     @Override
     public boolean existsByDateAndTimeAndTheme(
-        final LocalDate date,
-        final ReservationTime reservationTime,
-        final Theme theme) {
+            final LocalDate date,
+            final ReservationTime reservationTime,
+            final Theme theme) {
 
         return waitings.values().stream()
-            .anyMatch(waiting ->
-                waiting.getDate().equals(date) &&
-                    waiting.getTime().equals(reservationTime) &&
-                    waiting.getTheme().equals(theme)
-            );
+                .anyMatch(waiting ->
+                        waiting.getDate().equals(date) &&
+                                waiting.getTime().equals(reservationTime) &&
+                                waiting.getTheme().equals(theme)
+                );
     }
 
     @Override
     public List<Waiting> findByMember(final Member member) {
         return waitings.values().stream()
-            .filter(waiting -> waiting.getMember().equals(member))
-            .toList();
+                .filter(waiting -> waiting.getMember().equals(member))
+                .toList();
     }
 
     @Override
@@ -65,11 +66,11 @@ public class FakeWaitingRepository implements WaitingRepositoryInterface {
     @Override
     public long countBefore(final Theme theme, final LocalDate date, final ReservationTime time, final Long id) {
         return waitings.values().stream()
-            .filter(waiting -> waiting.getTheme().equals(theme) &&
-                waiting.getDate().isEqual(date) &&
-                waiting.getTime().equals(time) &&
-                waiting.getId() < id)
-            .count();
+                .filter(waiting -> waiting.getTheme().equals(theme) &&
+                        waiting.getDate().isEqual(date) &&
+                        waiting.getTime().equals(time) &&
+                        waiting.getId() < id)
+                .count();
     }
 
     @Override
@@ -79,13 +80,13 @@ public class FakeWaitingRepository implements WaitingRepositoryInterface {
 
     @Override
     public Optional<Waiting> findFirstByThemeAndDateAndTimeOrderByIdAsc(
-        final Theme theme,
-        final LocalDate date,
-        final ReservationTime time) {
+            final Theme theme,
+            final LocalDate date,
+            final ReservationTime time) {
         return waitings.values().stream()
-            .filter(waiting -> waiting.getTheme().equals(theme) &&
-                waiting.getDate().isEqual(date) &&
-                waiting.getTime().equals(time))
-            .findFirst();
+                .filter(waiting -> waiting.getTheme().equals(theme) &&
+                        waiting.getDate().isEqual(date) &&
+                        waiting.getTime().equals(time))
+                .findFirst();
     }
 }

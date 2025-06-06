@@ -21,11 +21,12 @@ public class FakeReservationRepository implements ReservationRepositoryInterface
     public Reservation save(final Reservation reservation) {
         sequence++;
         Reservation newReservation = new Reservation(
-            sequence,
-            reservation.getMember(),
-            reservation.getTheme(),
-            reservation.getDate(),
-            reservation.getTime()
+                sequence,
+                reservation.getMember(),
+                reservation.getTheme(),
+                reservation.getDate(),
+                reservation.getTime(),
+                reservation.getPayment()
         );
         reservations.put(sequence, newReservation);
         return newReservation;
@@ -33,18 +34,18 @@ public class FakeReservationRepository implements ReservationRepositoryInterface
 
     @Override
     public List<Theme> findPopularThemesByReservationBetween(
-        final LocalDate dateFrom,
-        final LocalDate dateTo,
-        final PageRequest pageRequest) {
+            final LocalDate dateFrom,
+            final LocalDate dateTo,
+            final PageRequest pageRequest) {
 
         return reservations.values().stream()
-            .filter(reservation ->
-                !reservation.getDate().isBefore(dateFrom) &&
-                    !reservation.getDate().isAfter(dateTo)
-            )
-            .map(Reservation::getTheme)
-            .distinct()
-            .toList();
+                .filter(reservation ->
+                        !reservation.getDate().isBefore(dateFrom) &&
+                                !reservation.getDate().isAfter(dateTo)
+                )
+                .map(Reservation::getTheme)
+                .distinct()
+                .toList();
     }
 
     @Override
@@ -64,37 +65,37 @@ public class FakeReservationRepository implements ReservationRepositoryInterface
 
     @Override
     public boolean existsByDateAndTimeAndTheme(
-        final LocalDate date,
-        final ReservationTime time,
-        final Theme theme) {
+            final LocalDate date,
+            final ReservationTime time,
+            final Theme theme) {
         return reservations.values().stream()
-            .anyMatch(reservation ->
-                reservation.getDate().equals(date) &&
-                    reservation.getTime().equals(time) &&
-                    reservation.getTheme().equals(theme)
-            );
+                .anyMatch(reservation ->
+                        reservation.getDate().equals(date) &&
+                                reservation.getTime().equals(time) &&
+                                reservation.getTheme().equals(theme)
+                );
     }
 
     @Override
     public List<Reservation> findByMember(final Member member) {
         return reservations.values().stream()
-            .filter(reservation -> reservation.getMember().equals(member))
-            .toList();
+                .filter(reservation -> reservation.getMember().equals(member))
+                .toList();
     }
 
     @Override
     public List<Reservation> findByThemeAndMemberAndDateBetween(
-        final Theme theme,
-        final Member member,
-        final LocalDate dateFrom,
-        final LocalDate dateTo) {
+            final Theme theme,
+            final Member member,
+            final LocalDate dateFrom,
+            final LocalDate dateTo) {
         return reservations.values().stream()
-            .filter(reservation ->
-                reservation.getTheme().equals(theme) &&
-                    reservation.getMember().equals(member) &&
-                    !reservation.getDate().isBefore(dateFrom) &&
-                    !reservation.getDate().isAfter(dateTo)
-            )
-            .toList();
+                .filter(reservation ->
+                        reservation.getTheme().equals(theme) &&
+                                reservation.getMember().equals(member) &&
+                                !reservation.getDate().isBefore(dateFrom) &&
+                                !reservation.getDate().isAfter(dateTo)
+                )
+                .toList();
     }
 }

@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import lombok.AccessLevel;
@@ -13,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import roomescape.common.exception.WaitingException;
 import roomescape.member.domain.Member;
+import roomescape.payment.domain.Payment;
 import roomescape.theme.domain.Theme;
 
 @Getter
@@ -34,28 +36,46 @@ public class Waiting {
     @ManyToOne(fetch = FetchType.LAZY)
     private Theme theme;
 
-    public Waiting(final Long id, final Member member, final ReservationTime time, final Theme theme,
-                   final LocalDate date) {
+    @OneToOne(fetch = FetchType.LAZY)
+    private Payment payment;
+
+    public Waiting(
+            final Long id,
+            final Member member,
+            final ReservationTime time,
+            final Theme theme,
+            final LocalDate date,
+            final Payment payment
+    ) {
         validateMember(member);
         validateDate(date);
         validateTime(time);
         validateTheme(theme);
+        validatePayment(payment);
         this.id = id;
         this.member = member;
         this.date = date;
         this.time = time;
         this.theme = theme;
+        this.payment = payment;
     }
 
-    public Waiting(final Member member, final ReservationTime time, final Theme theme, final LocalDate date) {
+    public Waiting(
+            final Member member,
+            final ReservationTime time,
+            final Theme theme,
+            final LocalDate date,
+            final Payment payment) {
         validateMember(member);
         validateDate(date);
         validateTime(time);
         validateTheme(theme);
+        validatePayment(payment);
         this.member = member;
         this.date = date;
         this.time = time;
         this.theme = theme;
+        this.payment = payment;
     }
 
     private void validateMember(final Member member) {
@@ -79,6 +99,12 @@ public class Waiting {
     private void validateTheme(final Theme theme) {
         if (theme == null) {
             throw new WaitingException("Theme cannot be null");
+        }
+    }
+
+    private void validatePayment(final Payment payment) {
+        if (payment == null) {
+            throw new WaitingException("Payment cannot be null");
         }
     }
 }

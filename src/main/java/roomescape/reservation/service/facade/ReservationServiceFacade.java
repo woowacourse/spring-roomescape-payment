@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.member.domain.Member;
 import roomescape.member.service.MemberService;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.Waiting;
@@ -42,11 +43,10 @@ public class ReservationServiceFacade {
         final LocalDate date = request.date();
         final Long timeId = request.timeId();
         final Long themeId = request.themeId();
-        final Reservation savedReservation = reservationService.save(member, date, timeId, themeId);
+        final Payment payment = paymentService.processPayment(amount, orderId, paymentKey);
+        final Reservation savedReservation = reservationService.save(member, date, timeId, themeId, payment);
 
-        paymentService.processPayment(amount, orderId, paymentKey);
-
-        return CreateReservationResponse.from(savedReservation);
+        return CreateReservationResponse.of(savedReservation, payment);
     }
 
     @Transactional
@@ -61,11 +61,11 @@ public class ReservationServiceFacade {
         final List<Waiting> waitings = reservationWaitingService.findWaitingByMember(member);
 
         return Stream.concat(
-            reservations.stream().map(ReservationMineResponse::from),
-            waitings.stream().map(waiting -> {
-                final long rank = reservationWaitingService.getRankInWaiting(waiting);
-                return ReservationMineResponse.from(waiting, rank);
-            })
+                reservations.stream().map(ReservationMineResponse::from),
+                waitings.stream().map(waiting -> {
+                    final long rank = reservationWaitingService.getRankInWaiting(waiting);
+                    return ReservationMineResponse.from(waiting, rank);
+                })
         ).toList();
     }
 
@@ -75,8 +75,14 @@ public class ReservationServiceFacade {
         final LocalDate date = request.date();
         final Long time = request.time();
         final Long theme = request.theme();
+        final Payment payment = paymentService.processPayment(
+                request.tossPaymentRequest().amount(),
+                request.tossPaymentRequest().orderId(),
+                request.tossPaymentRequest().paymentKey()
+        );
 
-        final Waiting savedWaiting = reservationWaitingService.createWaitingReservation(member, date, time, theme);
+        final Waiting savedWaiting = reservationWaitingService.createWaitingReservation(member, date, time, theme,
+                payment);
 
         return CreateWaitingResponse.from(savedWaiting);
     }
@@ -91,8 +97,8 @@ public class ReservationServiceFacade {
         final List<Reservation> reservations = reservationService.findAll();
 
         return reservations.stream()
-            .map(CreateReservationResponse::from)
-            .toList();
+                .map(reservation -> CreateReservationResponse.of(reservation, reservation.getPayment()))
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -102,12 +108,12 @@ public class ReservationServiceFacade {
         final Long themeId = request.themeId();
 
         return reservationService.findAvailableReservationTimes(date, themeId)
-            .stream()
-            .map(availableReservationTime -> new AvailableReservationTimeResponse(
-                availableReservationTime.id(),
-                availableReservationTime.startAt(),
-                availableReservationTime.alreadyBooked()
-            ))
-            .toList();
+                .stream()
+                .map(availableReservationTime -> new AvailableReservationTimeResponse(
+                        availableReservationTime.id(),
+                        availableReservationTime.startAt(),
+                        availableReservationTime.alreadyBooked()
+                ))
+                .toList();
     }
 }

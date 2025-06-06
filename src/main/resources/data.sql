@@ -1,8 +1,8 @@
 INSERT INTO member (name, email, password, role)
-VALUES ('엘리', 'yebink@email.com', '1234', 'ADMIN');
+VALUES ('엘리', 'admin', '1234', 'ADMIN');
 
 INSERT INTO member (name, email, password, role)
-VALUES ('WooGa', 'wooga@gmail.com', '1234', 'USER');
+VALUES ('WooGa', 'user', '1234', 'USER');
 
 INSERT INTO reservation_time (start_at)
 VALUES ('10:00'),

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import roomescape.common.exception.WaitingException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
+import roomescape.payment.domain.Payment;
 import roomescape.theme.domain.Theme;
 
 public class WaitingTest {
@@ -21,7 +22,7 @@ public class WaitingTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> {
-            new Waiting(member, reservationTime, theme, date);
+            new Waiting(member, reservationTime, theme, date, createPayment());
         }).isInstanceOf(WaitingException.class);
     }
 
@@ -35,7 +36,7 @@ public class WaitingTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> {
-            new Waiting(member, reservationTime, theme, date);
+            new Waiting(member, reservationTime, theme, date, createPayment());
         }).isInstanceOf(WaitingException.class);
     }
 
@@ -49,7 +50,7 @@ public class WaitingTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> {
-            new Waiting(member, reservationTime, theme, date);
+            new Waiting(member, reservationTime, theme, date, createPayment());
         }).isInstanceOf(WaitingException.class);
     }
 
@@ -63,7 +64,11 @@ public class WaitingTest {
 
         // when & then
         Assertions.assertThatThrownBy(() -> {
-            new Waiting(member, reservationTime, theme, date);
+            new Waiting(member, reservationTime, theme, date, createPayment());
         }).isInstanceOf(WaitingException.class);
+    }
+
+    private Payment createPayment() {
+        return new Payment(10000, "orderId", "paymentKey");
     }
 }

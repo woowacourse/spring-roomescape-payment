@@ -8,31 +8,37 @@ import roomescape.reservation.domain.Status;
 import roomescape.reservation.domain.Waiting;
 
 public record ReservationMineResponse(
-    Long id,
-    String theme,
-    LocalDate date,
-    @JsonFormat(pattern = "HH:mm") LocalTime time,
-    String status
+        Long id,
+        String theme,
+        LocalDate date,
+        @JsonFormat(pattern = "HH:mm") LocalTime time,
+        String status,
+        int amount,
+        String paymentKey
 ) {
 
     public static ReservationMineResponse from(final Reservation reservation) {
         return new ReservationMineResponse(
-            reservation.getId(),
-            reservation.getTheme().getName(),
-            reservation.getDate(),
-            reservation.getTime().getStartAt(),
-            Status.RESERVED.displayName()
+                reservation.getId(),
+                reservation.getTheme().getName(),
+                reservation.getDate(),
+                reservation.getTime().getStartAt(),
+                Status.RESERVED.displayName(),
+                reservation.getPayment().getAmount(),
+                reservation.getPayment().getPaymentKey()
         );
     }
 
 
     public static ReservationMineResponse from(final Waiting waiting, final Long order) {
         return new ReservationMineResponse(
-            waiting.getId(),
-            waiting.getTheme().getName(),
-            waiting.getDate(),
-            waiting.getTime().getStartAt(),
-            order + Status.WAITING.displayName()
+                waiting.getId(),
+                waiting.getTheme().getName(),
+                waiting.getDate(),
+                waiting.getTime().getStartAt(),
+                order + Status.WAITING.displayName(),
+                waiting.getPayment().getAmount(),
+                waiting.getPayment().getPaymentKey()
         );
     }
 }
