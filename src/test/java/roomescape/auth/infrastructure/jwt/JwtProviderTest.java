@@ -13,13 +13,13 @@ import roomescape.member.domain.Member;
 class JwtProviderTest {
 
     @Autowired
-    private JwtProvider jwtProvider;
-    @Autowired
-    private MemberDbFixture memberDbFixture;
+        private JwtProvider jwtProvider;
+        @Autowired
+        private MemberDbFixture memberDbFixture;
 
-    @Test
-    void 토큰을_생성하고_memberId를_파싱한다() {
-        Member member = memberDbFixture.유저1_생성();
+        @Test
+        void 토큰을_생성하고_memberId를_파싱한다() {
+            Member member = memberDbFixture.유저1_생성();
 
         String token = jwtProvider.issue(member);
 

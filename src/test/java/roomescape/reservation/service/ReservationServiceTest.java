@@ -99,8 +99,8 @@ class ReservationServiceTest {
         reservationRepository.save(reservation);
 
         ReserveCommand command = new ReserveCommand(reservation.getDate(), reservation.getTheme().getId(),
-                                                    reservation.getReservationTime().getId(),
-                                                    reservation.getReserver().getId());
+                reservation.getReservationTime().getId(),
+                reservation.getReserver().getId());
 
         assertThatThrownBy(() -> reservationService.reserve(command))
                 .isInstanceOf(InAlreadyReservationException.class);
@@ -135,7 +135,7 @@ class ReservationServiceTest {
 
         ReserveCommand command = new ReserveCommand(date, theme.getId(), reservationTime.getId(), 999L);
 
-        assertThatThrownBy(() -> reservationService.reserve(command)).isInstanceOf(InvalidArgumentException.class)
+        assertThatThrownBy(() -> reservationService.reserve(command)).isInstanceOf(NotFoundException.class)
                 .hasMessage("존재하지 않는 멤버입니다.");
     }
 
@@ -373,7 +373,7 @@ class ReservationServiceTest {
 
         // when & then
         assertThatThrownBy(() -> reservationService.waiting(command))
-                .isInstanceOf(InvalidArgumentException.class)
+                .isInstanceOf(NotFoundException.class)
                 .hasMessage("존재하지 않는 멤버입니다.");
     }
 
@@ -393,8 +393,8 @@ class ReservationServiceTest {
                 "NORMAL"
         );
         ReservePaymentRequest reservePaymentRequest = new ReservePaymentRequest(내일_열시.getDate(), 공포.getId(),
-                                                                                내일_열시.getReservationTime().getId(),
-                                                                                paymentInfoRequest);
+                내일_열시.getReservationTime().getId(),
+                paymentInfoRequest);
 
         TossPaymentResponse paymentResponse = new TossPaymentResponse(orderId, paymentKey);
 
@@ -430,8 +430,8 @@ class ReservationServiceTest {
                 "NORMAL"
         );
         ReservePaymentRequest reservePaymentRequest = new ReservePaymentRequest(내일_열시.getDate(), 공포.getId(),
-                                                                                내일_열시.getReservationTime().getId(),
-                                                                                paymentInfoRequest);
+                내일_열시.getReservationTime().getId(),
+                paymentInfoRequest);
 
         TossPaymentResponse paymentResponse = new TossPaymentResponse(orderId, paymentKey);
 

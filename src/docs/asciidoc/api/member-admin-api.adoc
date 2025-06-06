@@ -1,0 +1,20 @@
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+== 어드민 유저 관리 API
+
+=== 유저 전체 조회
+
+==== 요청
+
+include::{snippets}/member-admin-api-controller-test/모든_멤버를_조회할_수_있다/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/member-admin-api-controller-test/모든_멤버를_조회할_수_있다/http-response.adoc[]
+
+==== 응답 필드
+include::{snippets}/member-admin-api-controller-test/모든_멤버를_조회할_수_있다/response-fields.adoc[]

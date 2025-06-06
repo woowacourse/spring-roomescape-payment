@@ -1,0 +1,76 @@
+= Connect API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+== 예약 시간 API
+
+=== 예약 가능 시간 조회
+
+==== 요청
+
+include::{snippets}/reservation-time-api-controller-test/예약_가능한_시간_목록을_조회할_수_있다/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/reservation-time-api-controller-test/예약_가능한_시간_목록을_조회할_수_있다/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/reservation-time-api-controller-test/예약_가능한_시간_목록을_조회할_수_있다/response-fields.adoc[]
+
+=== 예약 전체 시간 조회
+
+==== 요청
+
+include::{snippets}/reservation-time-api-controller-test/예약_시간_목록을_조회할_수_있다/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/reservation-time-api-controller-test/예약_시간_목록을_조회할_수_있다/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/reservation-time-api-controller-test/예약_시간_목록을_조회할_수_있다/response-fields.adoc[]
+
+=== 예약 시간 생성
+
+==== 요청
+
+include::{snippets}/reservation-time-api-controller-test/예약_시간을_생성할_수_있다/http-request.adoc[]
+
+==== 요청 필드
+
+include::{snippets}/reservation-time-api-controller-test/예약_시간을_생성할_수_있다/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/reservation-time-api-controller-test/예약_시간을_생성할_수_있다/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/reservation-time-api-controller-test/예약_시간을_생성할_수_있다/response-fields.adoc[]
+
+==== 잘못된 예약 시간 생성 시 응답
+
+include::{snippets}/reservation-time-api-controller-test/예약_시간_생성시_유효성_예외가_발생한다/http-response.adoc[]
+
+=== 예약 시간 삭제
+
+==== 요청
+
+include::{snippets}/reservation-time-api-controller-test/예약_시간을_삭제할_수_있다/http-request.adoc[]
+
+==== 요청 바디
+
+include::{snippets}/reservation-time-api-controller-test/예약_시간을_삭제할_수_있다/request-body.adoc[]
+
+==== 응답
+
+include::{snippets}/reservation-time-api-controller-test/예약_시간을_삭제할_수_있다/http-response.adoc[]
+
+
+
+

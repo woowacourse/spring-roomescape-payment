@@ -1,0 +1,54 @@
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+== 인증 관련 API
+
+=== 로그인
+
+==== 요청
+
+include::{snippets}/auth-controller-test/로그인_요청을_할_수_있다/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/auth-controller-test/로그인_요청을_할_수_있다/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/auth-controller-test/로그인_요청을_할_수_있다/response-fields.adoc[]
+
+==== 잘못된 로그인 시 응답
+
+include::{snippets}/auth-controller-test/잘못된_로그인을_할_경우_예외를_반환한다/response-body.adoc[]
+
+=== 로그아웃
+
+==== 요청
+
+include::{snippets}/auth-controller-test/로그아웃_요청을_할_수_있다/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/auth-controller-test/로그아웃_요청을_할_수_있다/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/auth-controller-test/로그아웃_요청을_할_수_있다/response-fields.adoc[]
+
+=== 로그인 상태 확인
+
+==== 요청
+
+include::{snippets}/auth-controller-test/로그인_상태를_확인할_수_있다/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/auth-controller-test/로그인_상태를_확인할_수_있다/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/auth-controller-test/로그인_상태를_확인할_수_있다/response-fields.adoc[]
+

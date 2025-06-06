@@ -15,7 +15,6 @@ java {
 
 repositories {
     mavenCentral()
-    maven { url 'https://jitpack.io' }
 }
 
 configurations {
@@ -70,14 +69,14 @@ asciidoctor {
     outputs.dir file("build/docs/asciidoc")
 }
 
-asciidoctor.doFirst {
-    delete file('src/main/resources/static/docs')
-}
-
 tasks.register('copyDocument', Copy) {
     finalizedBy asciidoctor
     from file("build/docs/asciidoc")
     into file("src/main/resources/static/docs")
+}
+
+copyDocument.doFirst {
+    delete file('src/main/resources/static/docs')
 }
 
 test {

@@ -1,0 +1,58 @@
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+
+== 예약 대기 API
+
+=== 대기 생성
+
+==== 요청
+
+include::{snippets}/waiting-api-controller-test/예약_대기를_생성한다/http-request.adoc[]
+
+==== 요청 필드
+
+include::{snippets}/waiting-api-controller-test/예약_대기를_생성한다/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/waiting-api-controller-test/예약_대기를_생성한다/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/waiting-api-controller-test/예약_대기를_생성한다/response-fields.adoc[]
+
+==== 이미 예약 시 응답
+
+include::{snippets}/waiting-api-controller-test/이미_예약_대기를_했다면_409_상태_코드를_반환한다/http-response.adoc[]
+
+==== 예약자 재 예약 대기 시 응답
+
+include::{snippets}/waiting-api-controller-test/이미_예약한_사람이면_409_상태_코드를_반환한다/http-response.adoc[]
+
+==== 잘못된 인자 시 응답
+
+include::{snippets}/waiting-api-controller-test/잘못된_입력값이면_400_상태_코드와_에러코드를_반환한다/http-response.adoc[]
+
+=== 예약 대기 취소
+
+==== 요청
+
+include::{snippets}/waiting-api-controller-test/예약_대기를_취소할_수_있다/http-request.adoc[]
+
+==== 요청 PATH
+
+include::{snippets}/waiting-api-controller-test/예약_대기를_취소할_수_있다/path-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/waiting-api-controller-test/예약_대기를_취소할_수_있다/http-response.adoc[]
+
+==== 존재하지 않는 예약 대기 취소 시 응답
+
+include::{snippets}/waiting-api-controller-test/존재하지_않는_예약_대기_취소시_예외가_발생한다/http-response.adoc[]
+
+

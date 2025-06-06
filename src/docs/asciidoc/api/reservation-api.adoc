@@ -1,0 +1,67 @@
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+== 사용자 예약 API
+
+=== 내 예약 목록 조회
+
+==== 요청
+
+include::{snippets}/reservation-api-controller-test/내_예약_목록을_조회할_수_있다/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/reservation-api-controller-test/내_예약_목록을_조회할_수_있다/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/reservation-api-controller-test/내_예약_목록을_조회할_수_있다/response-fields.adoc[]
+
+
+==== 인증 실패 시 응답
+
+include::{snippets}/reservation-api-controller-test/본인_예약이_아니라면_예외가_발생한다/http-response.adoc[]
+
+=== 예약 생성
+
+==== 요청
+
+include::{snippets}/reservation-api-controller-test/예약을_생성할_수_있다/http-request.adoc[]
+
+==== 요청 필드
+
+include::{snippets}/reservation-api-controller-test/예약을_생성할_수_있다/request-fields.adoc[]
+
+
+==== 응답
+
+include::{snippets}/reservation-api-controller-test/예약을_생성할_수_있다/http-response.adoc[]
+
+==== 응답 필드
+
+include::{snippets}/reservation-api-controller-test/예약을_생성할_수_있다/response-fields.adoc[]
+
+==== 이미 예약된 날짜 시 예외 응답
+
+include::{snippets}/reservation-api-controller-test/이미_예약된_시간이면_예외가_발생한다/http-response.adoc[]
+
+==== 지난 날짜 예약 시 예외 응답
+
+include::{snippets}/reservation-api-controller-test/지난_날짜_예약시_예외가_발생한다/http-response.adoc[]
+
+=== 예약 취소
+
+==== 요청
+
+include::{snippets}/reservation-api-controller-test/예약을_취소할_수_있다/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/reservation-api-controller-test/예약을_취소할_수_있다/http-response.adoc[]
+
+==== 존재하지 않는 예약 취소 시 예외 응답
+
+include::{snippets}/reservation-api-controller-test/존재하지_않는_예약_취소시_예외가_발생한다/http-response.adoc[]
