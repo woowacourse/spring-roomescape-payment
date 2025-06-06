@@ -18,7 +18,6 @@ spring:
     defer-datasource-initialization: true
 
 cookie:
-  domain: localhost
   max-age: 3600
 
 security:

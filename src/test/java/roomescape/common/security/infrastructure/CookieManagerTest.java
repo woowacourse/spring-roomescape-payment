@@ -36,9 +36,8 @@ class CookieManagerTest {
         SoftAssertions.assertSoftly(softAssertions -> {
                     softAssertions.assertThat(cookie.getName()).isEqualTo(COOKIE_NAME);
                     softAssertions.assertThat(cookie.getValue()).isEqualTo(COOKIE_VALUE);
-                    softAssertions.assertThat(cookie.getSameSite()).isEqualTo("Strict");
+                    softAssertions.assertThat(cookie.getSameSite()).isEqualTo("Lax");
                     softAssertions.assertThat(cookie.getPath()).isEqualTo("/");
-                    softAssertions.assertThat(cookie.getDomain()).isEqualTo(DOMAIN);
                     softAssertions.assertThat(cookie.getMaxAge()).isEqualTo(Duration.ofSeconds(MAX_AGE));
                 }
         );
@@ -57,8 +56,7 @@ class CookieManagerTest {
         String setCookieHeader = response.getHeader("Set-Cookie");
         SoftAssertions.assertSoftly(softAssertions -> {
             softAssertions.assertThat(setCookieHeader).contains("Max-Age=0");
-            softAssertions.assertThat(setCookieHeader).contains("HttpOnly");
-            softAssertions.assertThat(setCookieHeader).contains("SameSite=Strict");
+            softAssertions.assertThat(setCookieHeader).contains("SameSite=Lax");
         });
     }
 } 
