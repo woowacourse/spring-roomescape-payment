@@ -17,10 +17,10 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
-import roomescape.domain.Member;
-import roomescape.domain.Role;
-import roomescape.dto.business.AccessTokenContent;
-import roomescape.repository.MemberRepository;
+import roomescape.mvc.auth.dto.AccessTokenContent;
+import roomescape.mvc.member.domain.Member;
+import roomescape.mvc.member.domain.Role;
+import roomescape.mvc.member.repository.MemberRepository;
 import roomescape.test.stub.PaymentClientStub;
 import roomescape.utility.JwtTokenProvider;
 

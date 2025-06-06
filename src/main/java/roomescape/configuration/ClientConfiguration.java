@@ -7,8 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
-import roomescape.external.payment.PaymentClient;
-import roomescape.external.payment.TossPaymentClient;
+import roomescape.client.payment.PaymentClient;
+import roomescape.client.payment.TossPaymentClient;
 
 @Configuration
 @Profile("product")

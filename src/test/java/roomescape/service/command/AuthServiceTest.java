@@ -10,14 +10,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import roomescape.domain.Member;
-import roomescape.domain.Role;
-import roomescape.dto.business.AccessTokenContent;
-import roomescape.dto.request.LoginRequest;
-import roomescape.dto.response.AccessTokenResponse;
 import roomescape.exception.LoginFailException;
-import roomescape.repository.MemberRepository;
-import roomescape.service.query.MemberQueryService;
+import roomescape.mvc.auth.dto.AccessTokenContent;
+import roomescape.mvc.auth.request.LoginRequest;
+import roomescape.mvc.auth.response.AccessTokenResponse;
+import roomescape.mvc.auth.service.AuthService;
+import roomescape.mvc.member.domain.Member;
+import roomescape.mvc.member.domain.Role;
+import roomescape.mvc.member.repository.MemberRepository;
+import roomescape.mvc.member.service.MemberQueryService;
 import roomescape.utility.JwtTokenProvider;
 
 @DataJpaTest

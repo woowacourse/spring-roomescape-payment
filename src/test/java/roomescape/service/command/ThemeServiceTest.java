@@ -14,18 +14,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
-import roomescape.domain.Member;
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Role;
-import roomescape.domain.Theme;
-import roomescape.domain.Waiting;
-import roomescape.dto.business.ThemeCreationContent;
-import roomescape.dto.response.ThemeResponse;
 import roomescape.exception.BadRequestException;
-import roomescape.service.query.ReservationQueryService;
-import roomescape.service.query.ThemeQueryService;
-import roomescape.service.query.WaitingQueryService;
+import roomescape.mvc.member.domain.Member;
+import roomescape.mvc.member.domain.Role;
+import roomescape.mvc.reservation.domain.Reservation;
+import roomescape.mvc.reservation.service.ReservationQueryService;
+import roomescape.mvc.theme.domain.Theme;
+import roomescape.mvc.theme.dto.ThemeCreationContent;
+import roomescape.mvc.theme.response.AddThemeResponse;
+import roomescape.mvc.theme.service.ThemeQueryService;
+import roomescape.mvc.theme.service.ThemeService;
+import roomescape.mvc.time.domain.ReservationTime;
+import roomescape.mvc.waiting.domain.Waiting;
+import roomescape.mvc.waiting.service.WaitingQueryService;
 
 @DataJpaTest
 @Import(value = {ThemeQueryService.class, ReservationQueryService.class, WaitingQueryService.class, ThemeService.class})
@@ -57,7 +58,7 @@ class ThemeServiceTest {
         ThemeCreationContent creationContent = new ThemeCreationContent("테마", "설명", "섬네일");
 
         // when
-        ThemeResponse response = themeService.addTheme(creationContent);
+        AddThemeResponse response = themeService.addTheme(creationContent);
 
         // then
         Theme expectedTheme = entityManager.find(Theme.class, response.id());

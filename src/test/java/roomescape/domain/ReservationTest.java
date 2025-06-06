@@ -8,6 +8,11 @@ import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import roomescape.mvc.member.domain.Member;
+import roomescape.mvc.member.domain.Role;
+import roomescape.mvc.reservation.domain.Reservation;
+import roomescape.mvc.theme.domain.Theme;
+import roomescape.mvc.time.domain.ReservationTime;
 
 class ReservationTest {
 

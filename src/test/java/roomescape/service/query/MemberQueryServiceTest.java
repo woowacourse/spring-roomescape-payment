@@ -11,9 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
-import roomescape.domain.Member;
-import roomescape.domain.Role;
-import roomescape.dto.response.MemberProfileResponse;
+import roomescape.mvc.member.domain.Member;
+import roomescape.mvc.member.domain.Role;
+import roomescape.mvc.member.response.FindAllMemberResponse;
+import roomescape.mvc.member.service.MemberQueryService;
 import roomescape.exception.NotFoundException;
 
 @DataJpaTest
@@ -70,11 +71,11 @@ class MemberQueryServiceTest {
         entityManager.flush();
 
         // when
-        List<MemberProfileResponse> allMemberProfile = memberQueryService.findAllMemberProfile();
+        List<FindAllMemberResponse> allMemberProfile = memberQueryService.findAllMemberProfile();
 
         // then
         assertThat(allMemberProfile)
-                .extracting(MemberProfileResponse::id)
+                .extracting(FindAllMemberResponse::id)
                 .containsExactlyInAnyOrder(firstMember.getId(), secondMember.getId());
     }
 }

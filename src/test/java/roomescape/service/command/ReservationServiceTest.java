@@ -16,26 +16,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
-import roomescape.domain.Member;
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Role;
-import roomescape.domain.Theme;
-import roomescape.domain.Waiting;
-import roomescape.dto.business.PaymentCreationContent;
-import roomescape.dto.business.PaymentResult;
-import roomescape.dto.business.ReservationCreationContent;
-import roomescape.dto.response.ReservationResponse;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.NotFoundException;
 import roomescape.exception.PaymentException;
-import roomescape.repository.PaymentRepository;
-import roomescape.repository.ReservationRepository;
-import roomescape.service.query.MemberQueryService;
-import roomescape.service.query.ReservationQueryService;
-import roomescape.service.query.ReservationTimeQueryService;
-import roomescape.service.query.ThemeQueryService;
-import roomescape.service.query.WaitingQueryService;
+import roomescape.mvc.member.domain.Member;
+import roomescape.mvc.member.domain.Role;
+import roomescape.mvc.member.service.MemberQueryService;
+import roomescape.mvc.payment.dto.PaymentCreationContent;
+import roomescape.mvc.payment.dto.PaymentResult;
+import roomescape.mvc.payment.repository.PaymentRepository;
+import roomescape.mvc.payment.service.PaymentService;
+import roomescape.mvc.reservation.domain.Reservation;
+import roomescape.mvc.reservation.dto.ReservationCreationContent;
+import roomescape.mvc.reservation.repository.ReservationRepository;
+import roomescape.mvc.reservation.response.AddReservationByAdmin;
+import roomescape.mvc.reservation.service.ReservationQueryService;
+import roomescape.mvc.reservation.service.ReservationService;
+import roomescape.mvc.theme.domain.Theme;
+import roomescape.mvc.theme.service.ThemeQueryService;
+import roomescape.mvc.time.domain.ReservationTime;
+import roomescape.mvc.time.service.ReservationTimeQueryService;
+import roomescape.mvc.waiting.domain.Waiting;
+import roomescape.mvc.waiting.service.WaitingQueryService;
 import roomescape.test.stub.PaymentClientStub;
 
 @DataJpaTest
@@ -86,16 +88,13 @@ class ReservationServiceTest {
                     new ReservationCreationContent(theme.getId(), NEXT_DAY, reservationTime.getId());
 
             // when
-            ReservationResponse reservationResponse =
-                    reservationService.addReservation(member.getId(), creationContent);
+            AddReservationByAdmin reservationResponse =
+                    reservationService.addReservationByAdmin(member.getId(), creationContent);
 
             // then
-            Reservation expectedReservation = entityManager.find(Reservation.class, reservationResponse.id());
             assertAll(
-                    () -> assertThat(reservationResponse.id()).isEqualTo(expectedReservation.getId()),
-                    () -> assertThat(reservationResponse.member().id()).isEqualTo(member.getId()),
-                    () -> assertThat(reservationResponse.date()).isEqualTo(creationContent.date()),
-                    () -> assertThat(reservationResponse.theme().id()).isEqualTo(creationContent.themeId())
+                    () -> assertThat(reservationRepository.findAll()).hasSize(1),
+                    () -> assertThat(paymentRepository.findAll()).hasSize(0)
             );
         }
 
@@ -108,7 +107,7 @@ class ReservationServiceTest {
                     new ReservationCreationContent(theme.getId(), NEXT_DAY, reservationTime.getId());
 
             // when & then
-            assertThatThrownBy(() -> reservationService.addReservation(wrongMemberId, creationContent))
+            assertThatThrownBy(() -> reservationService.addReservationByAdmin(wrongMemberId, creationContent))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage("ID에 해당하는 회원을 찾을 수 없습니다.");
         }
@@ -122,7 +121,7 @@ class ReservationServiceTest {
                     new ReservationCreationContent(wrongThemeId, NEXT_DAY, reservationTime.getId());
 
             // when & then
-            assertThatThrownBy(() -> reservationService.addReservation(member.getId(), creationContent))
+            assertThatThrownBy(() -> reservationService.addReservationByAdmin(member.getId(), creationContent))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage("ID에 해당하는 테마는 존재하지 않습니다.");
         }
@@ -136,7 +135,7 @@ class ReservationServiceTest {
                     new ReservationCreationContent(theme.getId(), NEXT_DAY, wrongTimeId);
 
             // when & then
-            assertThatThrownBy(() -> reservationService.addReservation(member.getId(), creationContent))
+            assertThatThrownBy(() -> reservationService.addReservationByAdmin(member.getId(), creationContent))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage("ID에 해당하는 예약시간은 존재하지 않습니다.");
         }
@@ -157,7 +156,8 @@ class ReservationServiceTest {
             entityManager.clear();
 
             // when & then
-            assertThatThrownBy(() -> reservationService.addReservation(member.getId(), duplicatedCreationContent))
+            assertThatThrownBy(
+                    () -> reservationService.addReservationByAdmin(member.getId(), duplicatedCreationContent))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage("중복된 예약 입니다.");
         }
@@ -170,7 +170,7 @@ class ReservationServiceTest {
                     new ReservationCreationContent(theme.getId(), YESTERDAY, reservationTime.getId());
 
             // when & then
-            assertThatThrownBy(() -> reservationService.addReservation(member.getId(), creationContentWithPast))
+            assertThatThrownBy(() -> reservationService.addReservationByAdmin(member.getId(), creationContentWithPast))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage("과거 예약은 생성할 수 없습니다.");
         }
@@ -193,7 +193,7 @@ class ReservationServiceTest {
                     new PaymentCreationContent("order_id", "payment_key", 1000L);
 
             // when
-            ReservationResponse reservationResponse = reservationService.addReservation(
+            reservationService.addReservationByMember(
                     member.getId(), reservationCreationContent, paymentCreationContent);
 
             // then
@@ -217,7 +217,7 @@ class ReservationServiceTest {
 
             // when & then
             assertAll(
-                    () -> assertThatThrownBy(() -> reservationService.addReservation(
+                    () -> assertThatThrownBy(() -> reservationService.addReservationByMember(
                             member.getId(), reservationCreationContent, paymentCreationContent))
                             .isInstanceOf(PaymentException.class),
                     () -> assertThat(reservationRepository.findAll()).hasSize(0)

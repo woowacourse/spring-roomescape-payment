@@ -10,10 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import roomescape.dto.business.PaymentCreationContent;
-import roomescape.dto.business.PaymentResult;
 import roomescape.exception.PaymentException;
-import roomescape.repository.PaymentRepository;
+import roomescape.mvc.payment.dto.PaymentCreationContent;
+import roomescape.mvc.payment.dto.PaymentResult;
+import roomescape.mvc.payment.repository.PaymentRepository;
+import roomescape.mvc.payment.service.PaymentService;
 import roomescape.test.stub.PaymentClientStub;
 
 @DataJpaTest

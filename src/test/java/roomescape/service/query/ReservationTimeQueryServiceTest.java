@@ -12,13 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
-import roomescape.domain.Member;
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Role;
-import roomescape.domain.Theme;
-import roomescape.dto.business.ReservationTimeWithBookState;
-import roomescape.dto.response.ReservationTimeResponse;
+import roomescape.mvc.member.domain.Member;
+import roomescape.mvc.member.domain.Role;
+import roomescape.mvc.reservation.domain.Reservation;
+import roomescape.mvc.theme.domain.Theme;
+import roomescape.mvc.time.domain.ReservationTime;
+import roomescape.mvc.time.dto.ReservationTimeWithBookState;
+import roomescape.mvc.time.response.FindAllTimeResponse;
+import roomescape.mvc.time.service.ReservationTimeQueryService;
 
 @DataJpaTest
 @Import(value = {ReservationTimeQueryService.class})
@@ -41,7 +42,7 @@ class ReservationTimeQueryServiceTest {
         entityManager.clear();
 
         // when
-        List<ReservationTimeResponse> allReservationTimes = timeQueryService.findAllReservationTimes();
+        List<FindAllTimeResponse> allReservationTimes = timeQueryService.findAllReservationTimes();
 
         // then
         assertThat(allReservationTimes).hasSize(3);

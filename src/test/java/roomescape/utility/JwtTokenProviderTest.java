@@ -7,9 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import roomescape.domain.Member;
-import roomescape.domain.Role;
-import roomescape.dto.business.AccessTokenContent;
+import roomescape.mvc.auth.dto.AccessTokenContent;
+import roomescape.mvc.member.domain.Member;
+import roomescape.mvc.member.domain.Role;
 import roomescape.exception.UnauthorizedException;
 
 class JwtTokenProviderTest {

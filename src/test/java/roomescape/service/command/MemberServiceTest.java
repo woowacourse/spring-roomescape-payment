@@ -11,13 +11,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import roomescape.domain.Member;
-import roomescape.domain.Role;
-import roomescape.dto.business.MemberCreationContent;
-import roomescape.dto.response.MemberProfileResponse;
 import roomescape.exception.BadRequestException;
-import roomescape.repository.MemberRepository;
-import roomescape.service.query.MemberQueryService;
+import roomescape.mvc.member.domain.Member;
+import roomescape.mvc.member.domain.Role;
+import roomescape.mvc.member.dto.MemberCreationContent;
+import roomescape.mvc.member.repository.MemberRepository;
+import roomescape.mvc.member.response.AddMemberResponse;
+import roomescape.mvc.member.service.MemberQueryService;
+import roomescape.mvc.member.service.MemberService;
 
 @DataJpaTest
 class MemberServiceTest {
@@ -48,7 +49,7 @@ class MemberServiceTest {
                     new MemberCreationContent(Role.GENERAL, "회원", "test@test.com", "qwer1234!");
 
             // when
-            MemberProfileResponse response = memberService.addMember(creationContent);
+            AddMemberResponse response = memberService.addMember(creationContent);
 
             // then
             Member expectedMember = entityManager.find(Member.class, response.id());

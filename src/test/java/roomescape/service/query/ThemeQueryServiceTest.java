@@ -15,13 +15,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
-import roomescape.domain.Member;
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Role;
-import roomescape.domain.Theme;
-import roomescape.dto.response.ThemeResponse;
-import roomescape.repository.ThemeRepository;
+import roomescape.mvc.member.domain.Member;
+import roomescape.mvc.member.domain.Role;
+import roomescape.mvc.theme.domain.Theme;
+import roomescape.mvc.theme.repository.ThemeRepository;
+import roomescape.mvc.theme.response.FindAllThemeResponse;
+import roomescape.mvc.theme.service.ThemeQueryService;
+import roomescape.mvc.time.domain.ReservationTime;
+import roomescape.mvc.reservation.domain.Reservation;
 
 @DataJpaTest
 @Import(value = {ThemeQueryService.class})
@@ -63,7 +64,7 @@ class ThemeQueryServiceTest {
         entityManager.clear();
 
         // when
-        List<ThemeResponse> allThemes = themeQueryService.findAllThemes();
+        List<FindAllThemeResponse> allThemes = themeQueryService.findAllThemes();
 
         // then
         assertThat(allThemes).hasSize(3);

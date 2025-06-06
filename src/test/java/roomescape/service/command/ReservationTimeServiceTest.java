@@ -14,18 +14,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
-import roomescape.domain.Member;
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Role;
-import roomescape.domain.Theme;
-import roomescape.domain.Waiting;
-import roomescape.dto.business.ReservationTimeCreationContent;
-import roomescape.dto.response.ReservationTimeResponse;
 import roomescape.exception.BadRequestException;
-import roomescape.service.query.ReservationQueryService;
-import roomescape.service.query.ReservationTimeQueryService;
-import roomescape.service.query.WaitingQueryService;
+import roomescape.mvc.member.domain.Member;
+import roomescape.mvc.member.domain.Role;
+import roomescape.mvc.reservation.domain.Reservation;
+import roomescape.mvc.reservation.service.ReservationQueryService;
+import roomescape.mvc.theme.domain.Theme;
+import roomescape.mvc.time.domain.ReservationTime;
+import roomescape.mvc.time.dto.ReservationTimeCreationContent;
+import roomescape.mvc.time.response.AddTimeResponse;
+import roomescape.mvc.time.service.ReservationTimeQueryService;
+import roomescape.mvc.time.service.ReservationTimeService;
+import roomescape.mvc.waiting.domain.Waiting;
+import roomescape.mvc.waiting.service.WaitingQueryService;
 
 @DataJpaTest
 @Import(value = {
@@ -63,7 +64,7 @@ class ReservationTimeServiceTest {
             ReservationTimeCreationContent creationContent = new ReservationTimeCreationContent(LocalTime.of(10, 0));
 
             // when
-            ReservationTimeResponse response = timeService.addReservationTime(creationContent);
+            AddTimeResponse response = timeService.addReservationTime(creationContent);
 
             // then
             ReservationTime expectedTime = entityManager.find(ReservationTime.class, response.id());

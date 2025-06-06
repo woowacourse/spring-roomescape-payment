@@ -15,24 +15,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
-import roomescape.domain.Member;
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Role;
-import roomescape.domain.Theme;
-import roomescape.domain.Waiting;
-import roomescape.dto.business.PaymentCreationContent;
-import roomescape.dto.business.WaitingCreationContent;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.NotFoundException;
 import roomescape.exception.PaymentException;
-import roomescape.repository.PaymentRepository;
-import roomescape.repository.WaitingRepository;
-import roomescape.service.query.MemberQueryService;
-import roomescape.service.query.ReservationQueryService;
-import roomescape.service.query.ReservationTimeQueryService;
-import roomescape.service.query.ThemeQueryService;
-import roomescape.service.query.WaitingQueryService;
+import roomescape.mvc.member.domain.Member;
+import roomescape.mvc.member.domain.Role;
+import roomescape.mvc.member.service.MemberQueryService;
+import roomescape.mvc.payment.dto.PaymentCreationContent;
+import roomescape.mvc.payment.repository.PaymentRepository;
+import roomescape.mvc.payment.service.PaymentService;
+import roomescape.mvc.reservation.domain.Reservation;
+import roomescape.mvc.reservation.service.ReservationQueryService;
+import roomescape.mvc.theme.domain.Theme;
+import roomescape.mvc.theme.service.ThemeQueryService;
+import roomescape.mvc.time.domain.ReservationTime;
+import roomescape.mvc.time.service.ReservationTimeQueryService;
+import roomescape.mvc.waiting.domain.Waiting;
+import roomescape.mvc.waiting.dto.WaitingCreationContent;
+import roomescape.mvc.waiting.repository.WaitingRepository;
+import roomescape.mvc.waiting.service.WaitingQueryService;
+import roomescape.mvc.waiting.service.WaitingService;
 import roomescape.test.stub.PaymentClientStub;
 
 @DataJpaTest
@@ -79,6 +81,8 @@ class WaitingServiceTest {
         @Test
         void addWaitingTest() {
             // given
+            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(NEXT_DAY, time, theme, member));
+
             WaitingCreationContent creationContent =
                     new WaitingCreationContent(NEXT_DAY, theme.getId(), time.getId(), member.getId());
             PaymentCreationContent paymentCreationContent =
@@ -185,8 +189,10 @@ class WaitingServiceTest {
         @Test
         void cannotAddByDuplicatedWaiting() {
             // given
-            entityManager.persist(Waiting.createWithoutIdWithoutPayment(NEXT_DAY, theme, time, member));
+            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(NEXT_DAY, time, theme, member));
             
+            entityManager.persist(Waiting.createWithoutIdWithoutPayment(NEXT_DAY, theme, time, member));
+
             entityManager.flush();
             entityManager.clear();
 

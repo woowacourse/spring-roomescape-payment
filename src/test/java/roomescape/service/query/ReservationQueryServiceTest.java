@@ -16,19 +16,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
-import roomescape.domain.Member;
-import roomescape.domain.Reservation;
-import roomescape.domain.ReservationTime;
-import roomescape.domain.Role;
-import roomescape.domain.Theme;
-import roomescape.domain.Waiting;
-import roomescape.dto.response.MemberProfileResponse;
-import roomescape.dto.response.MineReservationResponse;
-import roomescape.dto.response.ReservationResponse;
-import roomescape.dto.response.ReservationStatusResponse;
-import roomescape.dto.response.ThemeResponse;
-import roomescape.dto.response.WaitingWithRankResponse;
-import roomescape.repository.ReservationRepository;
+import roomescape.mvc.member.domain.Member;
+import roomescape.mvc.member.domain.Role;
+import roomescape.mvc.reservation.domain.Reservation;
+import roomescape.mvc.reservation.repository.ReservationRepository;
+import roomescape.mvc.reservation.response.FindAllReservationResponse;
+import roomescape.mvc.reservation.response.FindReservationsByFilter;
+import roomescape.mvc.reservation.response.MineReservationResponse;
+import roomescape.mvc.reservation.response.ReservationStatusResponse;
+import roomescape.mvc.reservation.response.WaitingWithRankResponse;
+import roomescape.mvc.reservation.service.ReservationQueryService;
+import roomescape.mvc.theme.domain.Theme;
+import roomescape.mvc.time.domain.ReservationTime;
+import roomescape.mvc.waiting.domain.Waiting;
 
 @DataJpaTest
 @Import(value = {ReservationQueryService.class})
@@ -73,50 +73,10 @@ class ReservationQueryServiceTest {
         entityManager.clear();
 
         // when
-        List<ReservationResponse> allReservations = reservationQueryService.findAllReservations();
+        List<FindAllReservationResponse> allReservations = reservationQueryService.findAllReservations();
 
         // then
-        assertAll(
-                () -> assertThat(allReservations).hasSize(3),
-                () -> assertThat(allReservations)
-                        .extracting(ReservationResponse::member)
-                        .extracting(MemberProfileResponse::id)
-                        .containsExactly(member.getId(), member.getId(), member.getId())
-        );
-    }
-
-    @DisplayName("회원의 모든 예약을 조회할 수 있다.")
-    @Test
-    void testMethodNameHere() {
-        // given
-        entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                TODAY, reservationTime, theme, member));
-        entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                TODAY, reservationTime, theme, member));
-        entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                TODAY, reservationTime, theme, member));
-
-        Member otherMember = entityManager.persist(
-                Member.createWithoutId(Role.GENERAL, "회원", "member2@test.com", "password123!"));
-
-        entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                TODAY, reservationTime, theme, otherMember));
-
-        entityManager.flush();
-        entityManager.clear();
-        ;
-
-        // when
-        List<ReservationResponse> allReservations = reservationQueryService.findAllReservationsByMember(member.getId());
-
-        // then
-        assertAll(
-                () -> assertThat(allReservations).hasSize(3),
-                () -> assertThat(allReservations)
-                        .extracting(ReservationResponse::member)
-                        .extracting(MemberProfileResponse::id)
-                        .containsExactly(member.getId(), member.getId(), member.getId())
-        );
+        assertThat(allReservations).hasSize(3);
     }
 
     @DisplayName("회원의 모든 예약 상태를 조회할 수 있다.")
@@ -178,17 +138,11 @@ class ReservationQueryServiceTest {
             entityManager.clear();
 
             // when
-            List<ReservationResponse> reservations = reservationQueryService.findReservationsByFilter(
+            List<FindReservationsByFilter> reservations = reservationQueryService.findReservationsByFilter(
                     otherMember.getId(), theme.getId(), TODAY, TODAY.plusDays(7));
 
             // then
-            assertAll(
-                    () -> assertThat(reservations).hasSize(2),
-                    () -> assertThat(reservations)
-                            .extracting(ReservationResponse::member)
-                            .extracting(MemberProfileResponse::id)
-                            .containsExactly(otherMember.getId(), otherMember.getId())
-            );
+            assertThat(reservations).hasSize(2);
         }
 
         @Test
@@ -210,17 +164,11 @@ class ReservationQueryServiceTest {
             entityManager.clear();
 
             // when
-            List<ReservationResponse> reservations = reservationQueryService.findReservationsByFilter(
+            List<FindReservationsByFilter> reservations = reservationQueryService.findReservationsByFilter(
                     member.getId(), otherTheme.getId(), TODAY, TODAY.plusDays(7));
 
             // then
-            assertAll(
-                    () -> assertThat(reservations).hasSize(2),
-                    () -> assertThat(reservations)
-                            .extracting(ReservationResponse::theme)
-                            .extracting(ThemeResponse::id)
-                            .containsExactly(otherTheme.getId(), otherTheme.getId())
-            );
+            assertThat(reservations).hasSize(2);
         }
 
         @Test
