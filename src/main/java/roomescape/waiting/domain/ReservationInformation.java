@@ -18,11 +18,11 @@ public class ReservationInformation {
     private LocalDate date;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "time_id", nullable = false)
     private ReservationTime time;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "theme_id", nullable = false)
     private Theme theme;
 
     protected ReservationInformation() {

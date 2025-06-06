@@ -18,7 +18,7 @@ public class Waiting {
     private ReservationInformation reservationInformation;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     private LocalDateTime createdAt;

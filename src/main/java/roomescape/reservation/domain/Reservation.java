@@ -31,7 +31,7 @@ public class Reservation {
     private ReservationInformation reservationInformation;
 
     @ManyToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     protected Reservation() {
