@@ -49,7 +49,7 @@ public class ReservationService {
         final Reservation reservation = createReservedReservation(request.date(), time, theme, member);
 
         paymentDomainService.approvePayment(
-                new PaymentInfo(
+                PaymentInfo.of(
                         request.paymentKey(),
                         request.orderId(),
                         request.amount()
