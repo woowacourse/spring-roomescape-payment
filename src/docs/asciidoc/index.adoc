@@ -1,0 +1,32 @@
+= 사용자 예약 페이지에 사용하는 API 문서
+:toc: left
+:toclevels: 2
+
+== 예약 API
+
+=== 예약 생성
+
+==== HTTP request
+include::{snippets}/create-reservation/http-request.adoc[]
+==== HTTP response
+include::{snippets}/create-reservation/http-response.adoc[]
+
+== 예약 시간 API
+
+=== 예약 가능한 시간 조회
+
+날짜, 시간에 대해 예약 가능 여부를 포함한 시간들을 응답하는 api
+
+==== HTTP request
+include::{snippets}/read-available-times/http-request.adoc[]
+==== HTTP response
+include::{snippets}/read-available-times/http-response.adoc[]
+
+== 테마 API
+
+=== 모든 테마 조회
+
+==== HTTP request
+include::{snippets}/read-themes/http-request.adoc[]
+==== HTTP response
+include::{snippets}/read-themes/http-response.adoc[]

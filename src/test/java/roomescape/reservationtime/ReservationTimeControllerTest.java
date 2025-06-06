@@ -3,11 +3,14 @@ package roomescape.reservationtime;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.auth.JwtProvider;
 import roomescape.reservationtime.dto.AvailableReservationTimeResponse;
@@ -24,11 +27,15 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ReservationTimeController.class)
+@AutoConfigureRestDocs
+@ExtendWith(RestDocumentationExtension.class)
 class ReservationTimeControllerTest {
 
     @Autowired
@@ -135,7 +142,10 @@ class ReservationTimeControllerTest {
                 .andExpect(jsonPath("$[0].alreadyBooked").value(false))
                 .andExpect(jsonPath("$[1].id").value(2))
                 .andExpect(jsonPath("$[1].startAt").value("12:00"))
-                .andExpect(jsonPath("$[1].alreadyBooked").value(true));
+                .andExpect(jsonPath("$[1].alreadyBooked").value(true))
+                .andDo(document("read-available-times",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint())));
     }
 
     @Test

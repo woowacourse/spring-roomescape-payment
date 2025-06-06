@@ -6,11 +6,14 @@ import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import roomescape.auth.JwtProvider;
 import roomescape.auth.TokenBody;
@@ -33,12 +36,16 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ReservationController.class)
+@AutoConfigureRestDocs
+@ExtendWith(RestDocumentationExtension.class)
 class ReservationControllerTest {
 
     @Autowired
@@ -83,7 +90,7 @@ class ReservationControllerTest {
     @DisplayName("예약 생성 요청에 성공할 경우 201을 응답한다")
     void create() throws Exception {
         // given
-        ReservationRequest request = new ReservationRequest(LocalDate.now(), 1L, 1L, "awdawdaw", "adawdaw", 1000L, "NORMAL");
+        ReservationRequest request = new ReservationRequest(LocalDate.now(), 1L, 1L, "pid_12345", "SURFMAY_12345", 1000L, "NORMAL");
         LoginMember loginMember = new LoginMember("사용자", "user@example.com", MemberRole.MEMBER);
 
         Map<String, Object> memberClaims = new HashMap<>();
@@ -98,7 +105,7 @@ class ReservationControllerTest {
 
         MemberResponse memberResponse = new MemberResponse(1L, loginMember.name());
         ReservationTimeResponse timeResponse = new ReservationTimeResponse(1L, LocalTime.of(10, 0));
-        ThemeResponse themeResponse = new ThemeResponse(1L, "테마명", "테마 설명", "abc");
+        ThemeResponse themeResponse = new ThemeResponse(1L, "듄2", "사막 행성에서 살아남기", "timothee.jpg");
         ScheduleResponse scheduleResponse = new ScheduleResponse(1L, LocalDate.now(), timeResponse, themeResponse);
         ReservationResponse response = new ReservationResponse(1L, scheduleResponse, memberResponse);
 
@@ -114,7 +121,10 @@ class ReservationControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.member.id").value(1))
                 .andExpect(jsonPath("$.member.name").value(loginMember.name()))
-                .andExpect(jsonPath("$.schedule.id").value(1));
+                .andExpect(jsonPath("$.schedule.id").value(1))
+                .andDo(document("create-reservation",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint())));
     }
 
     @Test
