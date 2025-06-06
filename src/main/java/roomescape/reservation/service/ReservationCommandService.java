@@ -2,6 +2,7 @@ package roomescape.reservation.service;
 
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,7 +87,11 @@ public class ReservationCommandService {
             final Theme theme,
             final Member member
     ) {
-        lockService.acquireLock(generateLockKey(date, reservationTime, theme));
+        try {
+            lockService.acquireLock(generateLockKey(date, reservationTime, theme));
+        } catch (DataIntegrityViolationException e) {
+            throw new ReservationException("이미 다른분이 예약했습니다.");
+        }
 
         final RoomEscapeInformation slot = findSlot(date, reservationTime, theme);
         validateAlreadyBooked(date, reservationTime, theme);
