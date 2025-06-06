@@ -51,6 +51,20 @@ public class Payment {
         this.requestedAt = requestedAt;
     }
 
+    public Payment(final Reservation reservation, final String paymentKey, final String orderId, final String type,
+                   final Integer totalAmount) {
+        this.reservation = reservation;
+        this.paymentKey = paymentKey;
+        this.orderId = orderId;
+        this.type = type;
+        this.totalAmount = totalAmount;
+    }
+
+    public void confirm(final String status, final String requestedAt) {
+        this.status = status;
+        this.requestedAt = requestedAt;
+    }
+
     public Long getId() {
         return id;
     }
@@ -85,5 +99,4 @@ public class Payment {
 
     public Payment() {
     }
-
 }

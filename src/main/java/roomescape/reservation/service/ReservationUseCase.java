@@ -1,6 +1,5 @@
 package roomescape.reservation.service;
 
-import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -28,25 +27,26 @@ import roomescape.theme.domain.Theme;
 import roomescape.theme.service.ThemeService;
 
 @Service
-public class ReservationFacadeService {
+public class ReservationUseCase {
 
     private final ReservationService reservationService;
+    private final ReservationCreatorService reservationCreatorService;
     private final WaitingService waitingService;
     private final MemberService memberService;
     private final ThemeService themeService;
     private final ReservationTimeService reservationTimeService;
     private final PaymentService paymentService;
     private final PaymentApiClient paymentApiClient;
-    @Resource(name = "reservationFacadeService")
-    private ReservationFacadeService self;
 
-    public ReservationFacadeService(final ReservationService reservationService,
-                                    final WaitingService waitingService,
-                                    final MemberService memberService,
-                                    final ThemeService themeService,
-                                    final ReservationTimeService reservationTimeService,
-                                    final PaymentService paymentService, final PaymentApiClient paymentApiClient) {
+    public ReservationUseCase(final ReservationService reservationService,
+                              final ReservationCreatorService reservationCreatorService,
+                              final WaitingService waitingService,
+                              final MemberService memberService,
+                              final ThemeService themeService,
+                              final ReservationTimeService reservationTimeService,
+                              final PaymentService paymentService, final PaymentApiClient paymentApiClient) {
         this.reservationService = reservationService;
+        this.reservationCreatorService = reservationCreatorService;
         this.waitingService = waitingService;
         this.memberService = memberService;
         this.themeService = themeService;
@@ -69,27 +69,18 @@ public class ReservationFacadeService {
     public ReservationResponse createForAdmin(final ReservationRequest request,
                                               final Long memberId) {
         if (!reservationService.isReservationExists(request)) {
-            return ReservationResponse.of(self.createReservation(request, memberId));
+            return ReservationResponse.of(reservationCreatorService.createReservation(request, memberId));
         }
         return createWaiting(request, memberId);
     }
 
-    public ReservationResponse create(final ReservationCreateRequest request, final Long memberId) {
+    public ReservationResponse executeReservation(final ReservationCreateRequest request, final Long memberId) {
         reservationService.checkIfReservationExists(request.reservation());
-        Reservation reservation = self.createReservation(request.reservation(), memberId);
+        Reservation reservation = reservationCreatorService.createReservation(request.reservation(), memberId);
+        paymentService.createPaymentWithRequest(reservation, request.payment());
         PaymentResponse paymentResponse = paymentApiClient.authPayment(request.payment());
-        paymentService.create(paymentResponse, reservation);
+        paymentService.updatePaymentWithConfirm(paymentResponse, reservation);
         return ReservationResponse.of(reservation);
-    }
-
-    @Transactional
-    public Reservation createReservation(final ReservationRequest request, final Long memberId) {
-        reservationService.checkIfReservationExists(request);
-        ReservationTime time = reservationTimeService.findReservationTime(request.timeId());
-        Theme theme = themeService.findTheme(request.themeId());
-        Member member = memberService.findUserByMemberId(memberId);
-        ReservationInfo reservationInfo = new ReservationInfo(request.date(), time, theme);
-        return reservationService.save(Reservation.createUpcomingReservationWithUnassignedId(member, reservationInfo));
     }
 
     @Transactional
@@ -105,6 +96,7 @@ public class ReservationFacadeService {
         return ReservationResponse.of(newWaiting);
     }
 
+    @Transactional
     public void deleteReservation(final Long reservationId) {
         Reservation reservation = reservationService.findById(reservationId);
         reservationService.delete(reservationId);
@@ -116,7 +108,7 @@ public class ReservationFacadeService {
             return;
         }
         Waiting waiting = waitingService.findFirstWaitingOfInfo(info);
-        self.createReservation(ReservationRequest.from(info), waiting.getMemberId());
+        reservationCreatorService.createReservation(ReservationRequest.from(info), waiting.getMemberId());
         waitingService.delete(waiting.getId());
     }
 

@@ -29,5 +29,24 @@ public class PaymentRestClientConfig {
                 .requestFactory(factory)
                 .build();
     }
+
+    @Bean
+    public RestClient toss2RestClient(
+            RestClient.Builder builder,
+            @Value("${toss.connectionTimeout}") int connectionTimeMs,
+            @Value("${toss.readTimeout}") int readTimeMs,
+            @Value("${toss.secret-key}") String secretKey
+    ) {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(connectionTimeMs);
+        factory.setReadTimeout(readTimeMs);
+
+        return builder
+                .baseUrl("https://api.tosspayments.com/v1")
+                .defaultHeader(HttpHeaders.AUTHORIZATION,
+                        "Basic " + Base64.getEncoder().encodeToString((secretKey + ":").getBytes()))
+                .requestFactory(factory)
+                .build();
+    }
 }
 

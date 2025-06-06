@@ -14,19 +14,19 @@ import roomescape.member.domain.MemberRole;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationsResponse;
-import roomescape.reservation.service.ReservationFacadeService;
+import roomescape.reservation.service.ReservationUseCase;
 import roomescape.reservation.service.WaitingService;
 
 @RestController
 public class WaitingController {
 
     private final WaitingService waitingService;
-    private final ReservationFacadeService reservationFacadeService;
+    private final ReservationUseCase reservationUseCase;
 
     public WaitingController(final WaitingService waitingService,
-                             final ReservationFacadeService reservationFacadeService) {
+                             final ReservationUseCase reservationUseCase) {
         this.waitingService = waitingService;
-        this.reservationFacadeService = reservationFacadeService;
+        this.reservationUseCase = reservationUseCase;
     }
 
     @GetMapping("/waiting")
@@ -50,7 +50,7 @@ public class WaitingController {
             @RequestBody ReservationRequest request,
             UserInfo userInfo
     ) {
-        ReservationResponse dto = reservationFacadeService.createWaiting(request, userInfo.id());
+        ReservationResponse dto = reservationUseCase.createWaiting(request, userInfo.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 }
