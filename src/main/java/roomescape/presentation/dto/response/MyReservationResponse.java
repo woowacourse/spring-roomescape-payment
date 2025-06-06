@@ -1,6 +1,7 @@
 package roomescape.presentation.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
 import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.Waiting;
@@ -13,22 +14,29 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public record MyReservationResponse(
+        @Schema(example = "1")
         Long id,
 
+        @Schema(example = "우테코 레벨1 탈출")
         String theme,
 
         @JsonFormat(pattern = "yyyy-MM-dd")
         LocalDate date,
 
         @JsonFormat(pattern = "HH:mm")
+        @Schema(example = "09:00")
         LocalTime time,
 
+        @Schema(example = "예약")
         String status,
 
+        @Schema(example = "false")
         boolean isWaiting,
 
+        @Schema(example = "paymentKey")
         String paymentKey,
 
+        @Schema(example = "1000")
         BigDecimal amount
 ) {
 

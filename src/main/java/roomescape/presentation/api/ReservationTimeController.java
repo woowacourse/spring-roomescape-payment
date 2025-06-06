@@ -1,5 +1,12 @@
 package roomescape.presentation.api;
 
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +22,12 @@ import roomescape.application.ReservationTimeService;
 import roomescape.presentation.dto.request.AvailableReservationTimeRequest;
 import roomescape.presentation.dto.request.ReservationTimeCreateRequest;
 import roomescape.presentation.dto.response.AvailableReservationTimeResponse;
+import roomescape.presentation.dto.response.ErrorResponse;
 import roomescape.presentation.dto.response.ReservationTimeResponse;
 
 import java.util.List;
 
+@Tag(name = "예약 시간 관련 기능 API")
 @RestController
 @RequestMapping("/times")
 public class ReservationTimeController {
@@ -29,6 +38,7 @@ public class ReservationTimeController {
         this.reservationTimeService = reservationTimeService;
     }
 
+    @Hidden
     @GetMapping
     public ResponseEntity<List<ReservationTimeResponse>> getTimes() {
         List<ReservationTimeResponse> responses = reservationTimeService.getReservationTimes();
@@ -36,6 +46,7 @@ public class ReservationTimeController {
         return ResponseEntity.ok(responses);
     }
 
+    @Hidden
     @PostMapping
     public ResponseEntity<ReservationTimeResponse> createTime(@RequestBody @Valid ReservationTimeCreateRequest request) {
         ReservationTimeResponse response = reservationTimeService.createReservationTime(request);
@@ -45,6 +56,7 @@ public class ReservationTimeController {
                 .body(response);
     }
 
+    @Hidden
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTime(@PathVariable Long id) {
         reservationTimeService.deleteReservationTimeById(id);
@@ -53,6 +65,11 @@ public class ReservationTimeController {
     }
 
     @GetMapping("/available")
+    @Operation(summary = "예약 가능 시간 조회")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "정상 응답"),
+            @ApiResponse(responseCode = "404", description = "선택한 id의 테마가 존재하지 않는 경우", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     public ResponseEntity<List<AvailableReservationTimeResponse>> getAvailableReservationTimes(
             @ModelAttribute @Valid AvailableReservationTimeRequest request
     ) {
