@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.booking.reservation.Reservation;
-import roomescape.booking.reservation.ReservationPaymentStatus;
 import roomescape.booking.reservation.ReservationRepository;
 import roomescape.booking.waiting.Waiting;
 import roomescape.booking.waiting.WaitingRepository;
@@ -79,8 +78,7 @@ class BookingServiceIntegrationTest {
         waitingRepository.save(new Waiting(schedule, member, LocalDateTime.now()));
         Order order = orderRepository.save(
                 new Order(UUID.randomUUID().toString(), 1000L, PaymentStatus.SUCCESS, member, schedule));
-        Reservation reservation = reservationRepository.save(
-                new Reservation(member, schedule, order, ReservationPaymentStatus.SUCCESS));
+        Reservation reservation = reservationRepository.save(new Reservation(member, schedule, order));
 
         // whenR
         bookingService.deleteReservationById(reservation.getId());
@@ -88,7 +86,7 @@ class BookingServiceIntegrationTest {
         // then
         assertThat(waitingRepository.findAll()).hasSize(0);
         assertThat(reservationRepository.findAll()).hasSize(1)
-                .extracting("member", "schedule", "paymentStatus")
-                .containsExactly(Tuple.tuple(member, schedule, ReservationPaymentStatus.WAITING));
+                .extracting("member", "schedule")
+                .containsExactly(Tuple.tuple(member, schedule));
     }
 }

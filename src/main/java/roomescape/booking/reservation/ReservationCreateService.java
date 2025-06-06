@@ -51,12 +51,7 @@ public class ReservationCreateService {
     }
 
     private Reservation saveReservation(final Schedule schedule, final Member member, Order order) {
-        final Reservation notSavedReservation = new Reservation(
-                member,
-                schedule,
-                order,
-                ReservationPaymentStatus.SUCCESS
-        );
+        final Reservation notSavedReservation = new Reservation(member, schedule, order);
         return reservationRepository.save(notSavedReservation);
     }
 

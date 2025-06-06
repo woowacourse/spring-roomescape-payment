@@ -1,7 +1,6 @@
 package roomescape.booking;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,13 +8,9 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
 import roomescape.booking.dto.BookingResponse;
 import roomescape.booking.reservation.Reservation;
-import roomescape.booking.reservation.ReservationPaymentStatus;
 import roomescape.booking.reservation.ReservationService;
 import roomescape.booking.waiting.Waiting;
 import roomescape.booking.waiting.WaitingService;
-import roomescape.order.Order;
-import roomescape.order.OrderRepository;
-import roomescape.order.PaymentStatus;
 import roomescape.schedule.Schedule;
 
 @Service
@@ -24,7 +19,6 @@ public class BookingService {
 
     private final ReservationService reservationService;
     private final WaitingService waitingService;
-    private final OrderRepository orderRepository;
 
     @Transactional(readOnly = true)
     public List<BookingResponse> readAllByMember(final LoginMember loginMember) {
@@ -53,22 +47,7 @@ public class BookingService {
 
     private void changeFirstWaitingToReservation(final Waiting firstWaiting) {
         waitingService.delete(firstWaiting);
-        Order order = createOrder(firstWaiting);
-        Reservation reservation = new Reservation(
-                firstWaiting.getMember(),
-                firstWaiting.getSchedule(),
-                order,
-                ReservationPaymentStatus.WAITING);
+        Reservation reservation = new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), null);
         reservationService.create(reservation);
-    }
-
-    private Order createOrder(Waiting firstWaiting) {
-        Order order = new Order(
-                UUID.randomUUID().toString(),
-                1000L,
-                PaymentStatus.WAITING,
-                firstWaiting.getMember(),
-                firstWaiting.getSchedule());
-        return orderRepository.save(order);
     }
 }

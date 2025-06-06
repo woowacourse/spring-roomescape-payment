@@ -1,8 +1,6 @@
 package roomescape.booking.reservation;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -34,9 +32,6 @@ public class Reservation {
     @ManyToOne
     private Schedule schedule;
 
-    @Enumerated(EnumType.STRING)
-    private ReservationPaymentStatus paymentStatus;
-
     @OneToOne(fetch = FetchType.LAZY)
     private Order order;
 
@@ -44,16 +39,5 @@ public class Reservation {
         this.member = member;
         this.schedule = schedule;
         this.order = order;
-        this.paymentStatus = ReservationPaymentStatus.SUCCESS;
-    }
-
-    public Reservation(final Member member,
-                       final Schedule schedule,
-                       final Order order,
-                       final ReservationPaymentStatus paymentStatus) {
-        this.member = member;
-        this.schedule = schedule;
-        this.order = order;
-        this.paymentStatus = paymentStatus;
     }
 }
