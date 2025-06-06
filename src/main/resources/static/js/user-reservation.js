@@ -216,7 +216,6 @@ async function fetchReservation(paymentData, reservationData) {
             });
         } else {
             response.json().then(async successBody => {
-                console.log("예약 생성 성공 : " + JSON.stringify(successBody));
                 reservationData.reservationId = successBody.id;
                 await fetchReservationPayment(paymentData, reservationData);
             });
@@ -245,12 +244,10 @@ async function fetchReservationPayment(paymentData, reservationData) {
     }).then(response => {
         if (!response.ok) {
             return response.json().then(errorBody => {
-                console.log("예약 결제 실패 : " + JSON.stringify(errorBody));
                 window.alert(errorBody.message);
             });
         } else {
             response.json().then(successBody => {
-                console.log("예약 결제 성공 : " + JSON.stringify(successBody));
                 window.alert("예약 성공하였습니다.");
                 window.location.reload();
             });

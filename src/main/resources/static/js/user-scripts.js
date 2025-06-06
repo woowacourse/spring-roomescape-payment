@@ -129,7 +129,6 @@ function register(event) {
         })
         .then(data => {
             // 성공적인 응답 처리
-            console.log('Signup successful:', data);
             window.location.href = '/login';
         })
         .catch(error => {
