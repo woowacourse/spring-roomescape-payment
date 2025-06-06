@@ -22,6 +22,7 @@ import roomescape.reservation.controller.dto.CreateReservationWithPaymentWebRequ
 import roomescape.reservation.controller.dto.ReservationWaitWebResponse;
 import roomescape.reservation.controller.dto.ReservationWebResponse;
 import roomescape.reservation.controller.dto.ReservationWithStatusResponse;
+import roomescape.reservation.service.ReservationPayService;
 import roomescape.reservation.service.ReservationService;
 
 @RequiredArgsConstructor
@@ -30,6 +31,7 @@ import roomescape.reservation.service.ReservationService;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final ReservationPayService reservationPayService;
 
     @GetMapping("/mine")
     public List<ReservationWithStatusResponse> getAllWithReservationWait(@LoginMember MemberInfo memberInfo) {
@@ -49,7 +51,8 @@ public class ReservationController {
             @RequestBody final CreateReservationWithPaymentWebRequest request,
             @LoginMember final MemberInfo memberInfo
     ) {
-        final ReservationWebResponse reservationWebResponse = reservationService.createAndPay(request, memberInfo);
+        final ReservationWebResponse reservationWebResponse = reservationPayService.createReservationWithPayment(
+                request, memberInfo);
         final URI location = UriFactory.buildPath("/reservations", String.valueOf(reservationWebResponse.id()));
         return ResponseEntity.created(location)
                 .body(reservationWebResponse);

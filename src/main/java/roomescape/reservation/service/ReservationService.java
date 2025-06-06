@@ -6,13 +6,10 @@ import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.auth.vo.MemberInfo;
-import roomescape.payment.PaymentService;
 import roomescape.reservation.controller.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.controller.dto.CreateReservationByAdminWebRequest;
 import roomescape.reservation.controller.dto.CreateReservationWebRequest;
-import roomescape.reservation.controller.dto.CreateReservationWithPaymentWebRequest;
 import roomescape.reservation.controller.dto.ReservationSearchWebRequest;
 import roomescape.reservation.controller.dto.ReservationWaitWebResponse;
 import roomescape.reservation.controller.dto.ReservationWebResponse;
@@ -37,7 +34,6 @@ public class ReservationService {
     private final ReservationCommandUseCase reservationCommandUseCase;
     private final ReservationWaitQueryUseCase reservationWaitQueryUseCase;
     private final ReservationWaitCommandUseCase reservationWaitCommandUseCase;
-    private final PaymentService paymentService;
 
     public List<ReservationWebResponse> getAll() {
         return ReservationConverter.toDto(
@@ -93,19 +89,6 @@ public class ReservationService {
                         createReservationByAdminWebRequest.themeId()
                 )
         );
-
-        return ReservationConverter.toDto(reservation);
-    }
-
-    @Transactional
-    public ReservationWebResponse createAndPay(
-            final CreateReservationWithPaymentWebRequest webRequest,
-            final MemberInfo memberInfo
-    ) {
-        CreateReservationServiceRequest createRequest = webRequest.toCreateServiceRequest(webRequest, memberInfo);
-        Reservation reservation = reservationCommandUseCase.create(createRequest);
-
-        paymentService.confirm(webRequest.toPaymentConfirmRequest());
         return ReservationConverter.toDto(reservation);
     }
 
@@ -121,7 +104,6 @@ public class ReservationService {
                         createReservationWebRequest.themeId()
                 )
         );
-
         return ReservationWaitConverter.toDto(reservationWait);
     }
 

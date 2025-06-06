@@ -3,7 +3,6 @@ package roomescape.payment.dto;
 public record PaymentConfirmResponse(
         String paymentKey,
         String orderId,
-        int totalAmount,
-        String status
+        int totalAmount
 ) {
 }

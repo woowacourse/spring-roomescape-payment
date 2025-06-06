@@ -1,8 +1,10 @@
 package roomescape.reservation.service.usecase;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.BadRequestException;
 import roomescape.common.exception.ConflictException;
@@ -25,27 +27,25 @@ public class ReservationCommandUseCase {
 
     private final ReservationRepository reservationRepository;
     private final ReservationQueryUseCase reservationQueryUseCase;
-    private final ReservationWaitQueryUseCase reservationWaitQueryUseCase;
     private final ReservationWaitCommandUseCase reservationWaitCommandUseCase;
     private final ReservationTimeQueryUseCase reservationTimeQueryUseCase;
     private final ThemeQueryUseCase themeQueryUseCase;
     private final MemberQueryUseCase memberQueryUseCase;
+    private final ReservationWaitQueryUseCase reservationWaitQueryUseCase;
 
     public Reservation create(final CreateReservationServiceRequest createReservationServiceRequest) {
         validateReservationNotExists(createReservationServiceRequest);
-
         final ReservationDate reservationDate = ReservationDate.from(createReservationServiceRequest.date());
         final ReservationTime reservationTime = reservationTimeQueryUseCase.get(
                 createReservationServiceRequest.timeId());
-
         validatePast(reservationDate, reservationTime);
 
         final Theme theme = themeQueryUseCase.get(createReservationServiceRequest.themeId());
         final Member member = memberQueryUseCase.get(createReservationServiceRequest.memberId());
 
-        return reservationRepository.save(
-                ReservationConverter.toDomain(createReservationServiceRequest, member, reservationTime, theme)
-        );
+        Reservation reservation = ReservationConverter.toDomain(createReservationServiceRequest, member,
+                reservationTime, theme);
+        return reservationRepository.save(reservation);
     }
 
     private void validateReservationNotExists(final CreateReservationServiceRequest createReservationServiceRequest) {
@@ -71,31 +71,26 @@ public class ReservationCommandUseCase {
         }
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void delete(final Long id) {
-        // id에 해당하는 예약을 조회하고, 없으면 예외가 발생한다.
-        final Reservation deletedReservation = reservationQueryUseCase.get(id);
+        final Reservation reservation = reservationQueryUseCase.get(id);
+        reservationRepository.delete(reservation);
+        adjustWaitingIfExists(reservation);
+    }
 
-        // 예약을 삭제한다.
-        reservationRepository.deleteById(id);
-
-        // 이에 해당하는 예약 대기가 없다면 메서드를 종료하고, 존재한다면 가장 첫 번째 예약 대기를 승격시킨다.
-        reservationWaitQueryUseCase.findByParamsAt(
-                deletedReservation.getDate(),
-                deletedReservation.getTime().getId(),
-                deletedReservation.getTheme().getId(),
+    private void adjustWaitingIfExists(Reservation reservation) {
+        Optional<ReservationWait> firstWait = reservationWaitQueryUseCase.findByParamsAt(
+                reservation.getDate(),
+                reservation.getTime().getId(),
+                reservation.getTheme().getId(),
                 0
-        ).ifPresent(this::promotionReservationWait);
+        );
+        firstWait.ifPresent(this::promotionReservationWait);
     }
 
     private void promotionReservationWait(final ReservationWait firstReservationWait) {
-        // 해당 예약 대기를 예약 대기에서 삭제한다.
         reservationWaitCommandUseCase.delete(firstReservationWait.getId());
-
-        // 해당 예약 대기를 예약으로 승격한다.
-        final Reservation reservation = firstReservationWait.toReservation();
-
-        // 해당 예약을 추가한다.
+        Reservation reservation = firstReservationWait.toReservation();
         reservationRepository.save(reservation);
     }
 }
