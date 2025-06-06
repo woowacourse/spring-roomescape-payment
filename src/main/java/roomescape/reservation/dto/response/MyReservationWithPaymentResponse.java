@@ -1,6 +1,5 @@
 package roomescape.reservation.dto.response;
 
-import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.waiting.domain.Waiting;
 
@@ -13,15 +12,15 @@ public record MyReservationWithPaymentResponse(
         String paymentKey,
         String amount
 ) {
-    public static MyReservationWithPaymentResponse from(Reservation reservation, Payment payment) {
+    public static MyReservationWithPaymentResponse from(Reservation reservation) {
         return new MyReservationWithPaymentResponse(
                 reservation.getId(),
                 reservation.getThemeName(),
                 reservation.getDate().toString(),
                 reservation.getReservationTime().toString(),
                 "예약",
-                payment.getPaymentKey(),
-                payment.getAmount().toString()
+                reservation.getPayment().getPaymentKey(),
+                reservation.getPayment().getAmount().toString()
         );
     }
 

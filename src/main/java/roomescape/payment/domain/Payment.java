@@ -1,17 +1,12 @@
 package roomescape.payment.domain;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import roomescape.reservation.domain.Reservation;
 
 @Entity
 public class Payment {
@@ -32,24 +27,19 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
-    @OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    @JoinColumn
-    private Reservation reservation;
-
-    public Payment(Long id, String orderId, String paymentKey, Long amount, PaymentStatus status, Reservation reservation) {
+    public Payment(Long id, String orderId, String paymentKey, Long amount, PaymentStatus status) {
         this.id = id;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.amount = amount;
         this.status = status;
-        this.reservation = reservation;
     }
 
     public Payment() {
     }
 
-    public Payment(String orderId, String paymentKey, Long amount, PaymentStatus status, Reservation reservation) {
-        this(null, orderId, paymentKey, amount, status, reservation);
+    public Payment(String orderId, String paymentKey, Long amount, PaymentStatus status) {
+        this(null, orderId, paymentKey, amount, status);
     }
 
     public Long getId() {
@@ -69,10 +59,6 @@ public class Payment {
         return amount;
     }
 
-    public Reservation getReservation() {
-        return reservation;
-    }
-
     public PaymentStatus getStatus() {
         return status;
     }
@@ -82,10 +68,6 @@ public class Payment {
     }
 
     public void cancel() {
-        this.status = PaymentStatus.CANCEL;
-    }
-
-    public void removeReservation() {
-        this.reservation = null;
+        this.status = PaymentStatus.CANCELED;
     }
 }

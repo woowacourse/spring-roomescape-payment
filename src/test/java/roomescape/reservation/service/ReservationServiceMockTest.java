@@ -17,7 +17,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import roomescape.common.exception.InvalidReservationException;
@@ -27,7 +26,6 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.member.domain.Role;
 import roomescape.payment.domain.Payment;
-import roomescape.payment.domain.PaymentRepository;
 import roomescape.payment.domain.PaymentStatus;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
@@ -64,8 +62,6 @@ class ReservationServiceMockTest {
     private MemberRepository memberRepository;
     @Mock
     private WaitingRepository waitingRepository;
-    @Mock
-    private PaymentRepository paymentRepository;
     @Mock
     private DateTime dateTime;
 
@@ -122,9 +118,6 @@ class ReservationServiceMockTest {
         Reservation reservation = mock(Reservation.class);
         when(reservationRepository.findById(1L))
                 .thenReturn(Optional.of(reservation));
-        Payment payment = mock(Payment.class);
-        when(paymentRepository.findByReservationId(1L))
-                .thenReturn(Optional.of(payment));
         // when
         reservationService.deleteReservationById(1L);
         // then
@@ -185,18 +178,16 @@ class ReservationServiceMockTest {
         // given
         List<Reservation> reservations = createReservationsWithPendingPayment();
         List<Waiting> waitings = createWaitings();
-        Payment payment = new Payment("orderId", "paymentKey", 1000L, PaymentStatus.DONE, null);
+        Payment payment = new Payment("orderId", "paymentKey", 1000L, PaymentStatus.DONE);
 
         when(reservationRepository.findByMemberId(1L))
                 .thenReturn(reservations);
         when(waitingRepository.findByMemberId(1L))
                 .thenReturn(waitings);
-        when(paymentRepository.findByReservationId(Mockito.anyLong()))
-                .thenReturn(Optional.of(payment));
 
-        MyReservationWithPaymentResponse expected1 = MyReservationWithPaymentResponse.from(reservations.get(0), payment);
-        MyReservationWithPaymentResponse expected2 = MyReservationWithPaymentResponse.from(reservations.get(1), payment);
-        MyReservationWithPaymentResponse expected3 = MyReservationWithPaymentResponse.from(reservations.get(2), payment);
+        MyReservationWithPaymentResponse expected1 = MyReservationWithPaymentResponse.from(reservations.get(0));
+        MyReservationWithPaymentResponse expected2 = MyReservationWithPaymentResponse.from(reservations.get(1));
+        MyReservationWithPaymentResponse expected3 = MyReservationWithPaymentResponse.from(reservations.get(2));
         MyReservationWithPaymentResponse expected4 = MyReservationWithPaymentResponse.fromWaiting(waitings.get(0), 1L);
 
         // when
@@ -214,15 +205,17 @@ class ReservationServiceMockTest {
 
         Member member = Member.createWithoutId("홍길동", "a", "a", Role.USER);
 
+        Payment payment = new Payment("orderId", "paymentKey", 1000L, PaymentStatus.DONE);
+
         Reservation reservation1 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2024, 10, 6),
-                reservationTime1, theme1);
+                reservationTime1, theme1, payment);
         Reservation reservation2 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2024, 10, 7),
-                reservationTime1, theme2);
+                reservationTime1, theme2, payment);
         Reservation reservation3 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2024, 10, 8),
-                reservationTime1, theme2);
+                reservationTime1, theme2, payment);
 
         ReflectionTestUtils.setField(reservation1, "id", 1L);
         ReflectionTestUtils.setField(reservation2, "id", 2L);

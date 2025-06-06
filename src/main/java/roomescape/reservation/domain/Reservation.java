@@ -5,13 +5,16 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
 import roomescape.common.exception.InvalidReservationException;
 import roomescape.member.domain.Member;
+import roomescape.payment.domain.Payment;
 import roomescape.reservationTime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 
@@ -33,14 +36,19 @@ public class Reservation {
     @ManyToOne(fetch = FetchType.LAZY)
     private Theme theme;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn
+    private Payment payment;
+
     protected Reservation() {
     }
 
-    public Reservation(Member member, LocalDate date, ReservationTime time, Theme theme) {
+    public Reservation(Member member, LocalDate date, ReservationTime time, Theme theme, Payment payment) {
         this.member = member;
         this.date = date;
         this.time = time;
         this.theme = theme;
+        this.payment = payment;
     }
 
     public static Reservation createWithoutId(
@@ -48,10 +56,11 @@ public class Reservation {
             final Member member,
             final LocalDate reservationDate,
             final ReservationTime time,
-            final Theme theme
+            final Theme theme,
+            final Payment payment
     ) {
         validateReservationDateTime(now, reservationDate, time);
-        return new Reservation(member, reservationDate, time, theme);
+        return new Reservation(member, reservationDate, time, theme, payment);
     }
 
     private static void validateReservationDateTime(final LocalDateTime now, final LocalDate reservationDate,
@@ -121,6 +130,10 @@ public class Reservation {
 
     public String getThemeThumbnail() {
         return theme.getThumbnail();
+    }
+
+    public Payment getPayment() {
+        return payment;
     }
 
     @Override

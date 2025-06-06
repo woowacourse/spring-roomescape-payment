@@ -49,14 +49,15 @@ public class ReservationService {
 
     @Transactional
     public ReservationWithPaymentResponse createReservationWithPendingPayment(final ReservationWithPaymentRequest request, final Long memberId) {
-        Reservation reservation = getReservation(request, memberId);
-        Reservation savedReservation = reservationRepository.save(reservation);
-        Payment payment = paymentRepository.save(request.toPendingPayment(savedReservation));
+        Payment payment = paymentRepository.save(request.toPendingPayment());
 
-        return ReservationWithPaymentResponse.from(reservation, payment);
+        Reservation reservation = getReservation(request, memberId, payment);
+        Reservation savedReservation = reservationRepository.save(reservation);
+
+        return ReservationWithPaymentResponse.from(savedReservation, payment);
     }
 
-    private Reservation getReservation(ReservationWithPaymentRequest request, Long memberId) {
+    private Reservation getReservation(ReservationWithPaymentRequest request, Long memberId, Payment payment) {
         ReservationTime time = reservationTimeRepository.findById(request.timeId())
                 .orElseThrow(() -> new InvalidReservationException("존재하지 않는 시간입니다."));
         Theme theme = themeRepository.findById(request.themeId())
@@ -64,7 +65,7 @@ public class ReservationService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new InvalidReservationException("존재 하지 않는 유저입니다."));
 
-        Reservation reservation = Reservation.createWithoutId(dateTime.now(), member, request.date(), time, theme);
+        Reservation reservation = Reservation.createWithoutId(dateTime.now(), member, request.date(), time, theme, payment);
 
         if (reservationRepository.existsByDateAndTimeStartAtAndThemeId(
                 reservation.getDate(),
@@ -97,10 +98,6 @@ public class ReservationService {
     public void deleteReservationById(final Long id) {
         Reservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new InvalidReservationException("존재하지 않는 예약입니다."));
-        Payment payment = paymentRepository.findByReservationId(id)
-                .orElseThrow(() -> new InvalidReservationException("존재하지 않는 결제입니다."));
-
-        payment.removeReservation();
         reservationRepository.deleteById(id);
 
         List<Waiting> waitings = waitingRepository.findByDateAndThemeIdAndTimeIdOrderByCreatedAtAsc(
@@ -123,7 +120,8 @@ public class ReservationService {
                 firstWaiting.getMember(),
                 firstWaiting.getDate(),
                 firstWaiting.getTime(),
-                firstWaiting.getTheme()
+                firstWaiting.getTheme(),
+                null // TODO:대기 예약은 결제 시스템이 없기 때문에 null로 둠
         );
         reservationRepository.save(newReservation);
 
@@ -151,9 +149,7 @@ public class ReservationService {
     private List<MyReservationWithPaymentResponse> getReservationsWithPayment(List<Reservation> confirmedReservations) {
         List<MyReservationWithPaymentResponse> responses = new ArrayList<>();
         for (Reservation reservation : confirmedReservations) {
-            Payment payment = paymentRepository.findByReservationId(reservation.getId())
-                    .orElseThrow(() -> new InvalidReservationException("존재하지 않는 결제입니다."));
-            responses.add(MyReservationWithPaymentResponse.from(reservation, payment));
+            responses.add(MyReservationWithPaymentResponse.from(reservation));
         }
         return responses;
     }

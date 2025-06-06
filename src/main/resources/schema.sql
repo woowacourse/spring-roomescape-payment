@@ -1,6 +1,6 @@
 DROP TABLE waiting IF EXISTS;
-DROP TABLE payment IF EXISTS;
 DROP TABLE reservation IF EXISTS;
+DROP TABLE payment IF EXISTS;
 DROP TABLE reservation_time IF EXISTS;
 DROP TABLE theme IF EXISTS;
 DROP TABLE member IF EXISTS;
@@ -31,28 +31,29 @@ CREATE TABLE member
     PRIMARY KEY (id)
 );
 
+CREATE TABLE payment
+(
+    id          BIGINT  NOT NULL AUTO_INCREMENT,
+    order_id    VARCHAR NOT NULL,
+    amount      BIGINT  NOT NULL,
+    status      VARCHAR NOT NULL,
+    payment_key VARCHAR NOT NULL,
+    PRIMARY KEY (id)
+);
+
 CREATE TABLE reservation
 (
-    id   BIGINT       NOT NULL AUTO_INCREMENT,
-    date VARCHAR(255) NOT NULL,
-    member_id BIGINT,
-    time_id BIGINT,
-    theme_id BIGINT,
+    id         BIGINT       NOT NULL AUTO_INCREMENT,
+    date       VARCHAR(255) NOT NULL,
+    member_id  BIGINT,
+    time_id    BIGINT,
+    theme_id   BIGINT,
+    payment_id BIGINT,
     PRIMARY KEY (id),
     FOREIGN KEY (time_id) REFERENCES reservation_time (id),
     FOREIGN KEY (theme_id) REFERENCES theme (id),
-    FOREIGN KEY (member_id) REFERENCES member (id)
-);
-
-CREATE TABLE payment(
-    id   BIGINT       NOT NULL AUTO_INCREMENT,
-    order_id VARCHAR  NOT NULL,
-    amount  BIGINT    NOT NULL,
-    status  VARCHAR   NOT NULL,
-    reservation_id  BIGINT,
-    payment_key VARCHAR NOT NULL,
-    PRIMARY KEY (id),
-    FOREIGN KEY (reservation_id) REFERENCES reservation(id)
+    FOREIGN KEY (member_id) REFERENCES member (id),
+    FOREIGN KEY (payment_id) REFERENCES payment(id)
 );
 
 CREATE TABLE waiting

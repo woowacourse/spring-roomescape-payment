@@ -177,7 +177,7 @@ public class ReservationPaymentFacadeDataJpaTest {
         assertThat(payments).hasSize(1);
 
         List<Reservation> reservations = reservationRepository.findAll();
-        assertThat(reservations).hasSize(0);
+        assertThat(reservations).hasSize(1);
     }
 
 
@@ -208,6 +208,6 @@ public class ReservationPaymentFacadeDataJpaTest {
         assertThat(payments).hasSize(1);
 
         List<Reservation> reservations = reservationRepository.findAll();
-        assertThat(reservations).hasSize(0);
+        assertThat(reservations).hasSize(1);
     }
 }

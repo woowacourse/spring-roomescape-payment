@@ -41,7 +41,7 @@ public class AdminReservationService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new InvalidReservationException("존재 하지 않는 유저입니다."));
 
-        Reservation reservation = Reservation.createWithoutId(dateTime.now(), member, request.date(), time, theme);
+        Reservation reservation = Reservation.createWithoutId(dateTime.now(), member, request.date(), time, theme, null);
 
         if (reservationRepository.existsByDateAndTimeStartAtAndThemeId(
                 reservation.getDate(),
