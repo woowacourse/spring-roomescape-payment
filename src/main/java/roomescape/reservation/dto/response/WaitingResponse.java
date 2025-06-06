@@ -22,7 +22,7 @@ public record WaitingResponse(
         MemberResponse memberResponse = MemberResponse.fromEntity(waiting.getMember());
 
         return new WaitingResponse(
-                waiting.getId(),
+                waiting.idValue(),
                 memberResponse,
                 waiting.getDate(),
                 reservationTimeResponse,

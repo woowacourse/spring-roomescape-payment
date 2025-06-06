@@ -58,7 +58,7 @@ class PaymentServiceTest {
         );
 
         // when
-        paymentService.savePayment(reservation.getId(), new PaymentRequest("paymentKey", "orderId", 1000L));
+        paymentService.savePayment(reservation.idValue(), new PaymentRequest("paymentKey", "orderId", 1000L));
 
         // then
         assertThat(paymentRepository.findAll()).hasSize(1);

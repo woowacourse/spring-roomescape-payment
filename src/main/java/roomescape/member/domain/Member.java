@@ -9,7 +9,10 @@ import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class Member {
 
@@ -31,8 +34,6 @@ public class Member {
 
     @Enumerated(value = EnumType.STRING)
     private Role role;
-
-    protected Member() {}
 
     public Member(
             final Long id,

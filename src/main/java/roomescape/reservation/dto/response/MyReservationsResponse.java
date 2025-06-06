@@ -19,7 +19,7 @@ public record MyReservationsResponse(
 
     public static MyReservationsResponse from(final Reservation reservation) {
         return new MyReservationsResponse(
-                reservation.getId(),
+                reservation.idValue(),
                 reservation.themeName(),
                 reservation.getDate(),
                 reservation.startTime(),
@@ -29,7 +29,7 @@ public record MyReservationsResponse(
 
     public static MyReservationsResponse from(final WaitingWithRank waitingWithRank) {
         return new MyReservationsResponse(
-                waitingWithRank.getId(),
+                waitingWithRank.waitingIdValue(),
                 waitingWithRank.themeName(),
                 waitingWithRank.getDate(),
                 waitingWithRank.startTime(),

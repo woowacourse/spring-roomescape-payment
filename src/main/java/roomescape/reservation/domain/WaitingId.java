@@ -1,13 +1,18 @@
 package roomescape.reservation.domain;
 
-import java.util.Objects;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.SequenceGenerator;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
+@EqualsAndHashCode(of = "value")
 @Embeddable
 public class WaitingId {
 
@@ -16,30 +21,7 @@ public class WaitingId {
     @SequenceGenerator(name = "sequenceGenerator", sequenceName = "WAITING_ID_SEQUENCE", allocationSize = 1)
     private Long value;
 
-    protected WaitingId() {
-    }
-
     public WaitingId(final Long value) {
         this.value = value;
-    }
-
-    public Long getValue() {
-        return value;
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof WaitingId waitingId)) {
-            return false;
-        }
-        return Objects.equals(getValue(), waitingId.getValue());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(getValue());
     }
 }

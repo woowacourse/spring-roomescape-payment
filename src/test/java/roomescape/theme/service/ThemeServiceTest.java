@@ -110,7 +110,7 @@ class ThemeServiceTest {
     void deleteThemeWhenUsing() {
         // given
         Theme savedTheme = themeRepository.save(new Theme("포스티", "공포", "wwww.um.com"));
-        Long themeId = savedTheme.getId();
+        Long themeId = savedTheme.idValue();
 
         LocalTime time = LocalTime.of(8, 0);
         ReservationTime savedTime = reservationTimeRepository.save(new ReservationTime(time));

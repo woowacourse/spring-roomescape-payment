@@ -121,7 +121,7 @@ public class ReservationService {
         paymentService.confirm(paymentRequest);
 
         Reservation savedReservation = reservationRepository.save(reservation);
-        paymentService.savePayment(savedReservation.getId(), paymentRequest);
+        paymentService.savePayment(savedReservation.idValue(), paymentRequest);
 
         return ReservationResponse.from(savedReservation);
     }
