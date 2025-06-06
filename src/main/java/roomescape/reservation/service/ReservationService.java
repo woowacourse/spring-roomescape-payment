@@ -41,8 +41,8 @@ public class ReservationService {
 
     public ReservationResponse createReservation(final ReservationRequest request, final Long memberId) {
         PaymentRequest paymentRequest = new PaymentRequest(request.paymentKey(), request.orderId(), request.amount());
-        Reservation reservation = reservationDomainService.saveReservation(request, memberId);
         paymentService.confirmPayment(paymentRequest);
+        Reservation reservation = reservationDomainService.saveReservation(request, memberId);
         paymentService.savePayment(reservation, paymentRequest);
         return ReservationResponse.from(reservation);
     }
@@ -59,7 +59,6 @@ public class ReservationService {
         reservationDomainService.deleteReservationById(id);
     }
 
-    @Transactional
     public void deleteWaiting(final Long waitingId) {
         waitingDomainService.deleteWaiting(waitingId);
     }
