@@ -58,6 +58,7 @@ VALUES
 (CURRENT_DATE - 3, 6, 1, 9, 'RESERVED'),
 (CURRENT_DATE - 3, 5, 1, 1, 'RESERVED'),
 (CURRENT_DATE - 3, 4, 1, 1, 'RESERVED'),
+(CURRENT_DATE, 1, 1, 4, 'RESERVED'),
 
 -- theme_id 2: 9건
 (CURRENT_DATE - 2, 11, 2, 2, 'RESERVED'),
@@ -110,7 +111,7 @@ VALUES
 (CURRENT_DATE - 4, 2, 7, 4, 'RESERVED'),
 (CURRENT_DATE - 4, 1, 7, 5, 'RESERVED'),
 
--- theme_id 8: 3건
+-- theme_id 8: 5건
 (CURRENT_DATE - 3, 3, 8, 2, 'RESERVED'),
 (CURRENT_DATE - 3, 2, 8, 3, 'RESERVED'),
 (CURRENT_DATE - 3, 1, 8, 4, 'RESERVED'),
@@ -128,12 +129,12 @@ VALUES
 -- waiting
 INSERT INTO waiting (reservation_id, date, time_id, theme_id, member_id, rank)
 VALUES
-(55, CURRENT_DATE +1, 2, 9, 5, 1),
-(55, CURRENT_DATE +1, 2, 9, 6, 2),
-(55, CURRENT_DATE +1, 2, 9, 7, 3),
+(56, CURRENT_DATE + 1, 2, 9, 5, 1),
+(56, CURRENT_DATE + 1, 2, 9, 6, 2),
+(56, CURRENT_DATE + 1, 2, 9, 7, 3),
 
-(57, CURRENT_DATE + 2, 1, 10, 3, 1),
-(57, CURRENT_DATE + 2, 1, 10, 4, 2);
+(59, CURRENT_DATE + 2, 1, 10, 3, 1),
+(59, CURRENT_DATE + 2, 1, 10, 4, 2);
 
 -- payment
 INSERT INTO payment (reservation_id, order_id, payment_key, amount)
