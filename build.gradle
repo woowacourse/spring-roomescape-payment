@@ -1,7 +1,8 @@
 plugins {
+    id 'java'
     id 'org.springframework.boot' version '3.4.4'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'java'
+    id 'org.asciidoctor.jvm.convert' version '4.0.2'
 }
 
 group = 'nextstep'
@@ -17,8 +18,13 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
+configurations {
+    asciidoctorExt
+}
+
 ext {
     jjwtVersion = "0.12.6"
+    snippetsDir = file('build/generated-snippets')
 }
 
 dependencies {
@@ -37,7 +43,7 @@ dependencies {
     runtimeOnly "io.jsonwebtoken:jjwt-impl:$jjwtVersion"
 
     // 롬복
-    implementation'org.projectlombok:lombok'
+    implementation 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
@@ -50,8 +56,35 @@ dependencies {
 
     // mockWebserver
     testImplementation 'com.squareup.okhttp3:mockwebserver:4.12.0'
+
+    // restdocs
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+}
+
+asciidoctor {
+    configurations 'asciidoctorExt'
+    baseDirFollowsSourceFile()
+    inputs.dir snippetsDir
+    dependsOn test
+    outputs.dir file("build/docs/asciidoc")
+}
+
+asciidoctor.doFirst {
+    delete file('src/main/resources/static/docs')
+}
+
+tasks.register('copyDocument', Copy) {
+    finalizedBy asciidoctor
+    from file("build/docs/asciidoc")
+    into file("src/main/resources/static/docs")
 }
 
 test {
     useJUnitPlatform()
+    outputs.dir snippetsDir
+}
+
+build {
+    finalizedBy copyDocument
 }
