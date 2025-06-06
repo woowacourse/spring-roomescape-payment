@@ -1,6 +1,9 @@
 package roomescape.reservation.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,21 +35,44 @@ public class Reservation extends BaseTimeEntity {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Member member;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReservationStatus status;
+
     @Builder
     private Reservation(
             final Long id,
             @NonNull final RoomEscapeInformation roomEscapeInformation,
-            @NonNull final Member member
+            @NonNull final Member member,
+            @NonNull final ReservationStatus reservationStatus
     ) {
         this.id = id;
         this.roomEscapeInformation = roomEscapeInformation;
         this.member = member;
+        this.status = reservationStatus;
     }
 
     public static Reservation of(final RoomEscapeInformation roomEscapeInformation, final Member member) {
         return Reservation.builder()
                 .roomEscapeInformation(roomEscapeInformation)
                 .member(member)
+                .reservationStatus(ReservationStatus.BOOKED)
                 .build();
+    }
+
+    public static Reservation booked(final RoomEscapeInformation roomEscapeInformation, final Member member) {
+        return Reservation.builder()
+                .roomEscapeInformation(roomEscapeInformation)
+                .member(member)
+                .reservationStatus(ReservationStatus.BOOKED)
+                .build();
+    }
+
+    public void cancel() {
+        this.status = ReservationStatus.CANCELLED;
+    }
+
+    public boolean isBooked() {
+        return this.status.isBooked();
     }
 }

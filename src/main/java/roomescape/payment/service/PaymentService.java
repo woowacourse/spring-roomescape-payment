@@ -47,8 +47,8 @@ public class PaymentService {
             payment.failPayment();
             final PaymentReservation paymentReservation = paymentReservationRepository.findByPaymentId(payment.getId())
                     .orElseThrow(() -> new NotFoundException("예약에 대한 결제 내역이 존재하지 않습니다."));
-            reservationCommandService.cancel(paymentReservation.getReservation().getId());
-            paymentReservation.cancelReservation();
+            final Reservation reservation = paymentReservation.getReservation();
+            reservation.cancel();
             throw e;
         }
     }
