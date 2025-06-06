@@ -36,7 +36,7 @@ public final class CookieManager {
             return null;
         }
         return Arrays.stream(cookies)
-                .filter(c -> LOGIN_COOKIE_NAME.equals(c.getName()))
+                .filter(cookie -> LOGIN_COOKIE_NAME.equals(cookie.getName()))
                 .findFirst()
                 .map(Cookie::getValue)
                 .orElse(null);
