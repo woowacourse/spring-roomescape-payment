@@ -45,6 +45,17 @@ test {
 
 asciidoctor {
     sourceDir 'src/docs/asciidoc'
-    attributes      \
-           'snippets': file('build/generated-snippets')
+    attributes  \
+         'snippets': file('build/generated-snippets')
+}
+
+task copyRestDocs(type: Copy) {
+    dependsOn 'asciidoctor'
+    from("${buildDir}/docs/asciidoc")
+    into("src/main/resources/static/docs")
+}
+
+// test 끝나면 자동 실행
+tasks.named('test') {
+    finalizedBy 'copyRestDocs'
 }
