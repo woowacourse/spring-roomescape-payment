@@ -1,7 +1,7 @@
 package roomescape.payment.service;
 
-import roomescape.payment.domain.dto.PaymentRequestDto;
-import roomescape.payment.domain.dto.PaymentResponseDto;
+import roomescape.payment.dto.PaymentRequestDto;
+import roomescape.payment.dto.PaymentResponseDto;
 
 public interface PaymentService {
 
