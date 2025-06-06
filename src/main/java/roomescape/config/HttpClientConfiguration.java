@@ -39,12 +39,17 @@ public class HttpClientConfiguration {
             "INCORRECT_BASIC_AUTH_FORMAT"
     );
 
+    @Bean
+    public RestClient.Builder builder() {
+        return RestClient.builder();
+    }
+
     @Autowired
     private ObjectMapper objectMapper;
 
     @Bean(value = "tossRestClient")
-    public RestClient tossRestClient(RestClient.Builder builder) {
-        return builder.requestFactory(getRequestFactory())
+    public RestClient tossRestClient() {
+        return builder().requestFactory(getRequestFactory())
                 .baseUrl(BASE_URL)
                 .defaultStatusHandler(HttpStatusCode::is4xxClientError, this::handleClientError)
                 .defaultStatusHandler(HttpStatusCode::is5xxServerError, this::handleServerError)

@@ -17,14 +17,15 @@ public class TossPaymentClient implements PaymentClient{
     private static final String PAYMENT_CONFIRM_URL = "/v1/payments/confirm";
     private static final String BASIC = "Basic ";
 
-    @Value("${toss.payment.confirm.secretKey}")
-    private String PAYMENT_CONFIRM_SECRET_KEY;
+    private final String secretKey;
 
     @Qualifier("tossRestClient")
     private final RestClient restClient;
 
-    public TossPaymentClient(RestClient restClient) {
+    public TossPaymentClient(RestClient restClient,
+                             @Value("${toss.payment.confirm.secretKey}") String secretKey) {
         this.restClient = restClient;
+        this.secretKey = secretKey;
     }
 
     @Override
@@ -32,7 +33,7 @@ public class TossPaymentClient implements PaymentClient{
         return restClient.post()
                 .uri(PAYMENT_CONFIRM_URL)
                 .header(HttpHeaders.AUTHORIZATION, BASIC +
-                        Base64.getEncoder().encodeToString(PAYMENT_CONFIRM_SECRET_KEY.getBytes()))
+                        Base64.getEncoder().encodeToString(secretKey.getBytes()))
                 .body(requestDto)
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
