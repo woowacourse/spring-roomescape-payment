@@ -1,0 +1,79 @@
+= 방탈출 API Document
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+
+== Auth
+=== 로그인
+operation::auth/login/success[snippets='http-request,request-fields,http-response']
+
+=== 인증 정보 조회
+operation::auth/login-check/success[snippets='http-request,http-response,response-fields']
+
+== Member
+=== 회원 가입
+operation::register[snippets='http-request,request-fields,http-response,response-fields']
+
+=== 회원 전체 조회
+operation::get-all-members[snippets='http-request,http-response,response-fields']
+
+== Reservation
+=== 예약 생성
+operation::create-reservation[snippets='http-request,request-fields,http-response,response-fields']
+
+=== 관리자 예약 생성
+operation::admin-create-reservation[snippets='http-request,request-fields,http-response,response-fields']
+
+=== 예약 조회
+operation::find-reservations[snippets='http-request,http-response,response-fields']
+
+=== 내 예약 조회
+operation::get-my-reservations[snippets='http-request,http-response,response-fields']
+
+=== 예약 삭제
+operation::delete-reservation[snippets='http-request,http-response']
+
+== Theme
+=== 테마 생성
+operation::create-theme[snippets='http-request,request-fields,http-response,response-fields']
+
+=== 테마 전체 조회
+operation::get-all-theme[snippets='http-request,http-response,response-fields']
+
+=== 인기 테마 조회
+operation::get-theme-rank[snippets='http-request,http-response,response-fields']
+
+=== 테마 삭제
+operation::delete-theme[snippets='http-request,http-response']
+
+== TimeSlot
+=== 예약 시간 생성
+operation::create-time-slot[snippets='http-request,request-fields,http-response,response-fields']
+
+=== 예약 시간 전체 조회
+operation::get-all-time-slot[snippets='http-request,http-response,response-fields']
+
+=== 예약 시간 및 예약 여부 조회
+operation::get-all-time-slot-with-booked[snippets='http-request,http-response,response-fields']
+
+=== 예약 시간 삭제
+operation::delete-time-slot[snippets='http-request,http-response']
+
+== Waiting
+=== 예약 대기 생성
+operation::create-waiting[snippets='http-request,request-fields,http-response,response-fields']
+
+=== 예약 대기 전체 조회
+operation::get-all-waitings[snippets='http-request,http-response,response-fields']
+
+=== 내 예약 대기 조회
+operation::get-my-waitings[snippets='http-request,http-response,response-fields']
+
+=== 예약 대기 삭제
+operation::delete-waiting[snippets='http-request,http-response']
+
+== Payment
+=== 결제 생성
+operation::create-payment[snippets='http-request,request-fields,http-response']
