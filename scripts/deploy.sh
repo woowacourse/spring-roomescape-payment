@@ -95,8 +95,22 @@ main() {
 
   echo ""
   echo "=== Spring 서버 실행 시작 ==="
+
+  # 로그 디렉터리(프로젝트 최상위/logs) 생성
+  LOG_DIR="$PROJECT_DIR/logs"
+    if [ ! -d "$LOG_DIR" ]; then
+      echo "→ 로그 디렉터리($LOG_DIR) 생성 중..."
+      mkdir -p "$LOG_DIR"
+    else
+      echo "→ 로그 디렉터리($LOG_DIR)가 이미 존재합니다. 생성 생략..."
+    fi
+
+  # Spring 서버 백그라운드 실행
   export SPRING_PROFILES_ACTIVE=deploy
-  java -jar spring-roomescape-payment-0.0.1-SNAPSHOT.jar
+  nohup java -jar spring-roomescape-payment-0.0.1-SNAPSHOT.jar > "$LOG_DIR/application.log" 2>&1 &
+
+  echo "Spring 서버 애플리케이션이 백그라운드로 실행중 (로그: $LOG_DIR/application.log)"
+  echo "Spring 백그라운드 프로세스 PID: $!"
 }
 
 main
