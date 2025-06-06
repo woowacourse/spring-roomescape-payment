@@ -191,7 +191,7 @@ class ReservationApiTest {
 
         ReservationCreationRequest creationContent =
                 new ReservationCreationRequest(theme.getId(), NEXT_DAY, time.getId(),
-                        "asfqwe123!", "setqerwe123!", "NORMAL", 10000);
+                        "asfqwe123!", "setqerwe123!", "NORMAL", 10000L);
 
         // when & then
         RestAssured

@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
@@ -22,42 +23,33 @@ import roomescape.domain.Waiting;
 import roomescape.dto.business.ReservationTimeCreationContent;
 import roomescape.dto.response.ReservationTimeResponse;
 import roomescape.exception.BadRequestException;
-import roomescape.repository.MemberRepository;
-import roomescape.repository.ReservationRepository;
-import roomescape.repository.ReservationTimeRepository;
-import roomescape.repository.WaitingRepository;
 import roomescape.service.query.ReservationQueryService;
 import roomescape.service.query.ReservationTimeQueryService;
 import roomescape.service.query.WaitingQueryService;
 
 @DataJpaTest
+@Import(value = {
+        ReservationTimeQueryService.class, ReservationQueryService.class, WaitingQueryService.class,
+        ReservationTimeService.class})
 class ReservationTimeServiceTest {
 
     @Autowired
     private TestEntityManager entityManager;
     @Autowired
-    private ReservationTimeRepository timeRepository;
-    @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
-    private ReservationRepository reservationRepository;
-    @Autowired
-    private WaitingRepository waitingRepository;
-
-    private ReservationTimeQueryService timeQueryService;
-    private ReservationQueryService reservationQueryService;
-    private WaitingQueryService waitingQueryService;
     private ReservationTimeService timeService;
+
+    private Theme theme;
+    private Member member;
 
     @BeforeEach
     void setup() {
-        timeQueryService = new ReservationTimeQueryService(timeRepository);
-        reservationQueryService = new ReservationQueryService(
-                reservationRepository, memberRepository, waitingRepository);
-        waitingQueryService = new WaitingQueryService(waitingRepository);
+        theme = entityManager.persist(
+                Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
+        member = entityManager.persist(
+                Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "password123!"));
 
-        timeService = new ReservationTimeService(
-                timeRepository, timeQueryService, reservationQueryService, waitingQueryService);
+        entityManager.flush();
+        entityManager.clear();
     }
 
     @Nested
@@ -91,6 +83,7 @@ class ReservationTimeServiceTest {
                     new ReservationTimeCreationContent(savedTime.getStartAt());
 
             entityManager.flush();
+            entityManager.clear();
 
             // when & then
             assertThatThrownBy(() -> timeService.addReservationTime(duplicationCreation))
@@ -110,6 +103,7 @@ class ReservationTimeServiceTest {
             ReservationTime time = entityManager.persist(ReservationTime.createWithoutId(LocalTime.of(10, 0)));
 
             entityManager.flush();
+            entityManager.clear();
 
             // when
             timeService.deleteReservationTimeById(time.getId());
@@ -122,18 +116,12 @@ class ReservationTimeServiceTest {
         @Test
         void cannotDeleteReservedTimeByReservation() {
             // given
-            Theme theme = entityManager.persist(
-                    Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
-
-            Member member = entityManager.persist(
-                    Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "password123!"));
-
             ReservationTime time = entityManager.persist(ReservationTime.createWithoutId(LocalTime.of(10, 0)));
 
-            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                    TODAY, time, theme, member));
+            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(TODAY, time, theme, member));
 
             entityManager.flush();
+            entityManager.clear();
 
             // when & then
             assertThatThrownBy(() -> timeService.deleteReservationTimeById(time.getId()))
@@ -145,17 +133,12 @@ class ReservationTimeServiceTest {
         @Test
         void cannotDeleteReservedTimeByWaiting() {
             // given
-            Theme theme = entityManager.persist(
-                    Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
-
-            Member member = entityManager.persist(
-                    Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "password123!"));
-
             ReservationTime time = entityManager.persist(ReservationTime.createWithoutId(LocalTime.of(10, 0)));
 
             entityManager.persist(Waiting.createWithoutIdWithoutPayment(TODAY, theme, time, member));
 
             entityManager.flush();
+            entityManager.clear();
 
             // when & then
             assertThatThrownBy(() -> timeService.deleteReservationTimeById(time.getId()))

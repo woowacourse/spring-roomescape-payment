@@ -4,33 +4,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import roomescape.domain.Member;
 import roomescape.domain.Role;
 import roomescape.dto.response.MemberProfileResponse;
 import roomescape.exception.NotFoundException;
-import roomescape.repository.MemberRepository;
 
 @DataJpaTest
+@Import(value = {MemberQueryService.class})
 class MemberQueryServiceTest {
 
     @Autowired
     private TestEntityManager entityManager;
     @Autowired
-    private MemberRepository memberRepository;
-
     private MemberQueryService memberQueryService;
-
-    @BeforeEach
-    void setup() {
-        memberQueryService = new MemberQueryService(memberRepository);
-    }
 
     @Nested
     @DisplayName("ID를 통해 유저를 조회할 수 있다.")

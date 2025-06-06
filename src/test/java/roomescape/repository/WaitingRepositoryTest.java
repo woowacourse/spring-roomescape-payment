@@ -7,6 +7,7 @@ import static roomescape.test.fixture.DateFixture.NEXT_DAY;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -31,21 +32,32 @@ class WaitingRepositoryTest {
     @Autowired
     private WaitingRepository waitingRepository;
 
+    private ReservationTime time;
+    private Theme theme;
+    private Member member;
+
+    @BeforeEach
+    void setup() {
+        time = entityManager.persist(
+                ReservationTime.createWithoutId(LocalTime.of(10, 0)));
+        theme = entityManager.persist(
+                Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
+        member = entityManager.persist(
+                Member.createWithoutId(Role.GENERAL, "일반회원", "commonmember@test.com", "qwer1234!"));
+
+        entityManager.flush();
+        entityManager.clear();
+    }
+
     @DisplayName("회원의 예약 대기 목록을 순번과 함께 구할 수 있다.")
     @Test
     void findWithRankingByMember() {
         // given
-        ReservationTime time = entityManager.persist(
-                ReservationTime.createWithoutId(LocalTime.of(10, 0)));
-        Theme theme = entityManager.persist(
-                Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
-
         Member otherMember = entityManager.persist(
                 Member.createWithoutId(Role.GENERAL, "회원2", "member2@test.com", "qwer1234!"));
-        Member targetMember = entityManager.persist(
-                Member.createWithoutId(Role.GENERAL, "회원1", "member1@test.com", "qwer1234!"));
 
         entityManager.flush();
+        entityManager.clear();
 
         jdbcTemplate.update(String.format("""
                 INSERT INTO waiting(date, theme_id, time_id, member_id, created_at, updated_at)
@@ -54,10 +66,10 @@ class WaitingRepositoryTest {
         jdbcTemplate.update(String.format("""
                 INSERT INTO waiting(date, theme_id, time_id, member_id, created_at, updated_at)
                 VALUES ('2025-05-10', %d, %d, %d, '2025-05-23 23:37:43.488281', '2025-05-23 20:37:43.488281')
-                """, theme.getId(), time.getId(), targetMember.getId()));
+                """, theme.getId(), time.getId(), member.getId()));
 
         // when
-        List<WaitingWithRank> waitingWithRankings = waitingRepository.findWithRankingByMember(targetMember.getId());
+        List<WaitingWithRank> waitingWithRankings = waitingRepository.findWithRankingByMember(member.getId());
 
         // then
         assertAll(
@@ -75,16 +87,6 @@ class WaitingRepositoryTest {
         @DisplayName("중복이 아닌 경우 false를 리턴한다.")
         @Test
         void isNotDuplicate() {
-            // given
-            ReservationTime time = entityManager.persist(
-                    ReservationTime.createWithoutId(LocalTime.of(10, 0)));
-            Theme theme = entityManager.persist(
-                    Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
-            Member member = entityManager.persist(
-                    Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "qwer1234!"));
-
-            entityManager.flush();
-
             // when
             boolean isDuplicated = waitingRepository.existsDuplicated(
                     theme.getId(), NEXT_DAY, time.getId(), member.getId());
@@ -97,15 +99,10 @@ class WaitingRepositoryTest {
         @Test
         void isDuplicate() {
             // given
-            ReservationTime time = entityManager.persist(
-                    ReservationTime.createWithoutId(LocalTime.of(10, 0)));
-            Theme theme = entityManager.persist(
-                    Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
-            Member member = entityManager.persist(
-                    Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "qwer1234!"));
             entityManager.persist(Waiting.createWithoutIdWithoutPayment(NEXT_DAY, theme, time, member));
 
             entityManager.flush();
+            entityManager.clear();
 
             // when
             boolean isDuplicated = waitingRepository.existsDuplicated(
@@ -121,18 +118,15 @@ class WaitingRepositoryTest {
     @Test
     void findFirstWaiting() {
         // given
-        ReservationTime time = entityManager.persist(
-                ReservationTime.createWithoutId(LocalTime.of(10, 0)));
-        Theme theme = entityManager.persist(
-                Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
-        Member firstMember = entityManager.persist(
+        Member otherMember = entityManager.persist(
                 Member.createWithoutId(Role.GENERAL, "회원", "member1@test.com", "qwer1234!"));
-        Member secondMember = entityManager.persist(
-                Member.createWithoutId(Role.GENERAL, "회원", "member2@test.com", "qwer1234!"));
         Waiting firstWaiting = entityManager.persist(
-                Waiting.createWithoutIdWithoutPayment(NEXT_DAY, theme, time, firstMember));
+                Waiting.createWithoutIdWithoutPayment(NEXT_DAY, theme, time, member));
         entityManager.persist(
-                Waiting.createWithoutIdWithoutPayment(NEXT_DAY, theme, time, secondMember));
+                Waiting.createWithoutIdWithoutPayment(NEXT_DAY, theme, time, otherMember));
+
+        entityManager.flush();
+        entityManager.clear();
 
         // when
         Optional<Waiting> findWaiting = waitingRepository.findFirstWaiting(theme.getId(), NEXT_DAY, time.getId());

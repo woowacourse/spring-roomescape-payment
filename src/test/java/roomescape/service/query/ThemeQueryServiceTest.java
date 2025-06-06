@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
@@ -23,18 +24,28 @@ import roomescape.dto.response.ThemeResponse;
 import roomescape.repository.ThemeRepository;
 
 @DataJpaTest
+@Import(value = {ThemeQueryService.class})
 class ThemeQueryServiceTest {
 
     @Autowired
     private TestEntityManager entityManager;
     @Autowired
     private ThemeRepository themeRepository;
-
+    @Autowired
     private ThemeQueryService themeQueryService;
+
+    private Member member;
+    private ReservationTime time;
 
     @BeforeEach
     void setup() {
-        themeQueryService = new ThemeQueryService(themeRepository);
+        time = entityManager.persist(
+                ReservationTime.createWithoutId(LocalTime.of(10, 0)));
+        member = entityManager.persist(
+                Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "password123!"));
+
+        entityManager.flush();
+        entityManager.clear();
     }
 
     @DisplayName("모든 테마를 조회할 수 있다.")
@@ -49,6 +60,7 @@ class ThemeQueryServiceTest {
                 Theme.createWithoutId("테마2", "테마 설명", "thumbnail.jpg"));
 
         entityManager.flush();
+        entityManager.clear();
 
         // when
         List<ThemeResponse> allThemes = themeQueryService.findAllThemes();
@@ -65,12 +77,6 @@ class ThemeQueryServiceTest {
         @Test
         void canFindThemeOrderByReservationCount() {
             // given
-            ReservationTime reservationTime = entityManager.persist(
-                    ReservationTime.createWithoutId(LocalTime.of(10, 0)));
-
-            Member member = entityManager.persist(
-                    Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "password123!"));
-
             Theme firstTheme = entityManager.persist(
                     Theme.createWithoutId("테마1", "테마 설명", "thumbnail.jpg"));
             Theme secondTheme = entityManager.persist(
@@ -79,21 +85,22 @@ class ThemeQueryServiceTest {
                     Theme.createWithoutId("테마2", "테마 설명", "thumbnail.jpg"));
 
             entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                    YESTERDAY, reservationTime, firstTheme, member));
+                    YESTERDAY, time, firstTheme, member));
             entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                    TODAY, reservationTime, firstTheme, member));
+                    TODAY, time, firstTheme, member));
             entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                    NEXT_DAY, reservationTime, firstTheme, member));
+                    NEXT_DAY, time, firstTheme, member));
 
             entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                    YESTERDAY, reservationTime, secondTheme, member));
+                    YESTERDAY, time, secondTheme, member));
             entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                    TODAY, reservationTime, secondTheme, member));
+                    TODAY, time, secondTheme, member));
 
             entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                    YESTERDAY, reservationTime, thirdTheme, member));
+                    YESTERDAY, time, thirdTheme, member));
 
             entityManager.flush();
+            entityManager.clear();
 
             // when
             List<Theme> themes = themeRepository.findThemesOrderByReservationCount(YESTERDAY, NEXT_DAY, 3);
@@ -106,23 +113,18 @@ class ThemeQueryServiceTest {
         @Test
         void cannotIncludeOutOfDate() {
             // given
-            ReservationTime reservationTime = entityManager.persist(
-                    ReservationTime.createWithoutId(LocalTime.of(10, 0)));
-
-            Member member = entityManager.persist(
-                    Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "password123!"));
-
             Theme firstTheme = entityManager.persist(
                     Theme.createWithoutId("테마1", "테마 설명", "thumbnail.jpg"));
             Theme secondTheme = entityManager.persist(
                     Theme.createWithoutId("테마2", "테마 설명", "thumbnail.jpg"));
 
             entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                    TODAY, reservationTime, firstTheme, member));
+                    TODAY, time, firstTheme, member));
             entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                    NEXT_DAY, reservationTime, secondTheme, member));
+                    NEXT_DAY, time, secondTheme, member));
 
             entityManager.flush();
+            entityManager.clear();
 
             // when
             List<Theme> themes = themeRepository.findThemesOrderByReservationCount(YESTERDAY, TODAY, 2);
@@ -143,6 +145,7 @@ class ThemeQueryServiceTest {
                     Theme.createWithoutId("테마2", "테마 설명", "thumbnail.jpg"));
 
             entityManager.flush();
+            entityManager.clear();
 
             // when
             List<Theme> themes = themeRepository.findThemesOrderByReservationCount(YESTERDAY, NEXT_DAY, 3);

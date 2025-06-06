@@ -32,6 +32,8 @@ public class AuthServiceTest {
     private MemberQueryService memberQueryService;
     private JwtTokenProvider jwtTokenProvider;
 
+    private Member member;
+
     @BeforeEach
     void beforeEach() {
         jwtTokenProvider = new JwtTokenProvider(
@@ -39,6 +41,12 @@ public class AuthServiceTest {
                 60000);
         memberQueryService = new MemberQueryService(memberRepository);
         authService = new AuthService(jwtTokenProvider, memberQueryService);
+
+        member = entityManager.persist(
+                Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "password123!"));
+
+        entityManager.flush();
+        entityManager.clear();
     }
 
     @Nested
@@ -49,12 +57,10 @@ public class AuthServiceTest {
         @Test
         void canLogin() {
             // given
-            Member member = entityManager.persist(
-                    Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "password123!"));
-
-            LoginRequest loginRequest = new LoginRequest("member@test.com", "password123!");
+            LoginRequest loginRequest = new LoginRequest(member.getEmail(), member.getPassword());
 
             entityManager.flush();
+            entityManager.clear();
 
             // when
             AccessTokenResponse response = authService.login(loginRequest);
@@ -70,12 +76,7 @@ public class AuthServiceTest {
         @Test
         void cannotLoginWithInvalidAccount() {
             // given
-            Member member = entityManager.persist(
-                    Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "password123!"));
-
             LoginRequest wrongLoginRequest = new LoginRequest("wrong@test.com", "password123!");
-
-            entityManager.flush();
 
             // when & then
             assertThatThrownBy(() -> authService.login(wrongLoginRequest))
@@ -87,12 +88,7 @@ public class AuthServiceTest {
         @Test
         void cannotLoginWithInvalidPassword() {
             // given
-            Member member = entityManager.persist(
-                    Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "password123!"));
-
             LoginRequest wrongLoginRequest = new LoginRequest("member@test.com", "wrongPassword123!");
-
-            entityManager.flush();
 
             // when & then
             assertThatThrownBy(() -> authService.login(wrongLoginRequest))

@@ -36,7 +36,6 @@ class MemberServiceTest {
         memberService = new MemberService(memberRepository, memberQueryService);
     }
 
-
     @Nested
     @DisplayName("유저를 추가할 수 있다.")
     public class addMember {
@@ -71,6 +70,7 @@ class MemberServiceTest {
                     new MemberCreationContent(Role.GENERAL, "회원", alreadySavedMember.getEmail(), "qwer1234!");
 
             entityManager.flush();
+            entityManager.clear();
 
             // when & then
             assertThatThrownBy(() -> memberService.addMember(creationContent))

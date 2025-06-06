@@ -6,12 +6,12 @@ import static roomescape.test.fixture.DateFixture.TODAY;
 
 import java.time.LocalTime;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
@@ -19,22 +19,15 @@ import roomescape.domain.Role;
 import roomescape.domain.Theme;
 import roomescape.dto.business.ReservationTimeWithBookState;
 import roomescape.dto.response.ReservationTimeResponse;
-import roomescape.repository.ReservationTimeRepository;
 
 @DataJpaTest
+@Import(value = {ReservationTimeQueryService.class})
 class ReservationTimeQueryServiceTest {
 
     @Autowired
     private TestEntityManager entityManager;
     @Autowired
-    private ReservationTimeRepository timeRepository;
-
     private ReservationTimeQueryService timeQueryService;
-
-    @BeforeEach
-    void setup() {
-        timeQueryService = new ReservationTimeQueryService(timeRepository);
-    }
 
     @DisplayName("모든 예약을 조회할 수 있다.")
     @Test
@@ -45,6 +38,7 @@ class ReservationTimeQueryServiceTest {
         entityManager.persist(ReservationTime.createWithoutId(LocalTime.of(12, 0)));
 
         entityManager.flush();
+        entityManager.clear();
 
         // when
         List<ReservationTimeResponse> allReservationTimes = timeQueryService.findAllReservationTimes();
@@ -73,6 +67,7 @@ class ReservationTimeQueryServiceTest {
                 TODAY, timeAt11, theme, member));
 
         entityManager.flush();
+        entityManager.clear();
 
         // when
         List<ReservationTimeWithBookState> timesWithBookState =

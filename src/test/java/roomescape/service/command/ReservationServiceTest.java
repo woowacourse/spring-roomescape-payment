@@ -69,6 +69,7 @@ class ReservationServiceTest {
                 Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
         member = entityManager.persist(
                 Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "password123!"));
+
         entityManager.flush();
         entityManager.clear();
     }
@@ -153,6 +154,7 @@ class ReservationServiceTest {
                     alreadySavedReservation.getReservationTime().getId());
 
             entityManager.flush();
+            entityManager.clear();
 
             // when & then
             assertThatThrownBy(() -> reservationService.addReservation(member.getId(), duplicatedCreationContent))
@@ -188,7 +190,7 @@ class ReservationServiceTest {
             ReservationCreationContent reservationCreationContent =
                     new ReservationCreationContent(theme.getId(), NEXT_DAY, reservationTime.getId());
             PaymentCreationContent paymentCreationContent =
-                    new PaymentCreationContent("order_id", "payment_key", 1000);
+                    new PaymentCreationContent("order_id", "payment_key", 1000L);
 
             // when
             ReservationResponse reservationResponse = reservationService.addReservation(
@@ -211,7 +213,7 @@ class ReservationServiceTest {
             ReservationCreationContent reservationCreationContent =
                     new ReservationCreationContent(theme.getId(), NEXT_DAY, reservationTime.getId());
             PaymentCreationContent paymentCreationContent =
-                    new PaymentCreationContent("order_id", "payment_key", 1000);
+                    new PaymentCreationContent("order_id", "payment_key", 1000L);
 
             // when & then
             assertAll(
@@ -235,6 +237,7 @@ class ReservationServiceTest {
                     Reservation.createWithoutIdAndPaymentHistory(NEXT_DAY, reservationTime, theme, member));
 
             entityManager.flush();
+            entityManager.clear();
 
             // when
             reservationService.deleteReservationById(reservation.getId());
@@ -279,6 +282,7 @@ class ReservationServiceTest {
                             reservation.getReservationTime(), secondWaitingMember));
 
             entityManager.flush();
+            entityManager.clear();
 
             // when
             reservationService.deleteReservationById(reservation.getId());

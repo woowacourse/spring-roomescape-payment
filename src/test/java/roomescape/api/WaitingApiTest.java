@@ -116,7 +116,7 @@ class WaitingApiTest {
 
         WaitingCreationRequest waitingCreationRequest =
                 new WaitingCreationRequest(theme.getId(), NEXT_DAY, time.getId(), "asdfasdf", "asdfasdf", "asdfasdf",
-                        1000);
+                        1000L);
 
         // when & then
         RestAssured

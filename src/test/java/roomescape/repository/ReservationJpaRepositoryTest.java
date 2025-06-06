@@ -41,6 +41,9 @@ public class ReservationJpaRepositoryTest {
                 Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
         member = entityManager.persist(
                 Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "password123!"));
+
+        entityManager.flush();
+        entityManager.clear();
     }
 
     @Nested
@@ -57,7 +60,9 @@ public class ReservationJpaRepositoryTest {
                     TODAY, reservationTime, theme, member));
             entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
                     TODAY, reservationTime, theme, otherMember));
+
             entityManager.flush();
+            entityManager.clear();
 
             // when
             List<Reservation> reservations = reservationRepository.findReservationsByFilter(
@@ -80,7 +85,9 @@ public class ReservationJpaRepositoryTest {
                     TODAY, reservationTime, theme, member));
             entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
                     TODAY, reservationTime, otherTheme, member));
+
             entityManager.flush();
+            entityManager.clear();
 
             // when
             List<Reservation> reservations = reservationRepository.findReservationsByFilter(
@@ -103,7 +110,9 @@ public class ReservationJpaRepositoryTest {
                     Reservation.createWithoutIdAndPaymentHistory(TODAY, reservationTime, theme, member));
             entityManager.persist(
                     Reservation.createWithoutIdAndPaymentHistory(NEXT_DAY, reservationTime, theme, member));
+
             entityManager.flush();
+            entityManager.clear();
 
             // when
             List<Reservation> reservations = reservationRepository.findReservationsByFilter(

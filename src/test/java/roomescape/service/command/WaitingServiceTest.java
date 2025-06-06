@@ -57,7 +57,6 @@ class WaitingServiceTest {
     private ReservationTime time;
     private Theme theme;
     private Member member;
-    private Reservation reservation;
 
     @BeforeEach
     void setup() {
@@ -67,8 +66,6 @@ class WaitingServiceTest {
                 Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
         member = entityManager.persist(
                 Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "password123!"));
-        reservation = entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                NEXT_DAY, time, theme, member));
 
         entityManager.flush();
         entityManager.clear();
@@ -85,7 +82,7 @@ class WaitingServiceTest {
             WaitingCreationContent creationContent =
                     new WaitingCreationContent(NEXT_DAY, theme.getId(), time.getId(), member.getId());
             PaymentCreationContent paymentCreationContent =
-                    new PaymentCreationContent("312313", "12312re", 1000);
+                    new PaymentCreationContent("312313", "12312re", 1000L);
 
             // when
             waitingService.addWaiting(creationContent, paymentCreationContent);
@@ -106,7 +103,7 @@ class WaitingServiceTest {
             WaitingCreationContent waitingCreationContent =
                     new WaitingCreationContent(NEXT_DAY, theme.getId(), time.getId(), member.getId());
             PaymentCreationContent paymentCreationContent =
-                    new PaymentCreationContent("312313", "12312re", 1000);
+                    new PaymentCreationContent("312313", "12312re", 1000L);
 
             // when & then
             assertAll(
@@ -125,7 +122,7 @@ class WaitingServiceTest {
             WaitingCreationContent creationContent =
                     new WaitingCreationContent(NEXT_DAY, theme.getId() + 100, time.getId(), member.getId());
             PaymentCreationContent paymentCreationContent =
-                    new PaymentCreationContent("312313", "12312re", 1000);
+                    new PaymentCreationContent("312313", "12312re", 1000L);
 
             // when & then
             assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentCreationContent))
@@ -141,7 +138,7 @@ class WaitingServiceTest {
             WaitingCreationContent creationContent =
                     new WaitingCreationContent(NEXT_DAY, theme.getId(), time.getId() + 100, member.getId());
             PaymentCreationContent paymentCreationContent =
-                    new PaymentCreationContent("312313", "12312re", 1000);
+                    new PaymentCreationContent("312313", "12312re", 1000L);
 
             // when & then
             assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentCreationContent))
@@ -156,7 +153,7 @@ class WaitingServiceTest {
             WaitingCreationContent creationContent =
                     new WaitingCreationContent(NEXT_DAY, theme.getId(), time.getId(), member.getId() + 100);
             PaymentCreationContent paymentCreationContent =
-                    new PaymentCreationContent("312313", "12312re", 1000);
+                    new PaymentCreationContent("312313", "12312re", 1000L);
 
             // when & then
             assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentCreationContent))
@@ -168,15 +165,15 @@ class WaitingServiceTest {
         @Test
         void cannotAddByPastWaiting() {
             // given
-            reservation = entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
-                    YESTERDAY, time, theme, member));
+            entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(YESTERDAY, time, theme, member));
+
             entityManager.flush();
             entityManager.clear();
 
             WaitingCreationContent creationContent =
                     new WaitingCreationContent(YESTERDAY, theme.getId(), time.getId(), member.getId());
             PaymentCreationContent paymentCreationContent =
-                    new PaymentCreationContent("312313", "12312re", 1000);
+                    new PaymentCreationContent("312313", "12312re", 1000L);
 
             // when & then
             assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentCreationContent))
@@ -189,13 +186,14 @@ class WaitingServiceTest {
         void cannotAddByDuplicatedWaiting() {
             // given
             entityManager.persist(Waiting.createWithoutIdWithoutPayment(NEXT_DAY, theme, time, member));
+            
             entityManager.flush();
             entityManager.clear();
 
             WaitingCreationContent creationContent =
                     new WaitingCreationContent(NEXT_DAY, theme.getId(), time.getId(), member.getId());
             PaymentCreationContent paymentCreationContent =
-                    new PaymentCreationContent("312313", "12312re", 1000);
+                    new PaymentCreationContent("312313", "12312re", 1000L);
 
             // when & then
             assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentCreationContent))
@@ -210,7 +208,7 @@ class WaitingServiceTest {
             WaitingCreationContent creationContent =
                     new WaitingCreationContent(NEXT_DAY.plusDays(100), theme.getId(), time.getId(), member.getId());
             PaymentCreationContent paymentCreationContent =
-                    new PaymentCreationContent("312313", "12312re", 1000);
+                    new PaymentCreationContent("312313", "12312re", 1000L);
 
             // when & then
             assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentCreationContent))

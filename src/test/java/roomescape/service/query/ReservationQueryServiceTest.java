@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
@@ -27,11 +28,10 @@ import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationStatusResponse;
 import roomescape.dto.response.ThemeResponse;
 import roomescape.dto.response.WaitingWithRankResponse;
-import roomescape.repository.MemberRepository;
 import roomescape.repository.ReservationRepository;
-import roomescape.repository.WaitingRepository;
 
 @DataJpaTest
+@Import(value = {ReservationQueryService.class})
 class ReservationQueryServiceTest {
 
     @Autowired
@@ -39,10 +39,6 @@ class ReservationQueryServiceTest {
     @Autowired
     private ReservationRepository reservationRepository;
     @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
-    private WaitingRepository waitingRepository;
-
     private ReservationQueryService reservationQueryService;
 
     private ReservationTime reservationTime;
@@ -51,15 +47,15 @@ class ReservationQueryServiceTest {
 
     @BeforeEach
     void setup() {
-        reservationQueryService = new ReservationQueryService(
-                reservationRepository, memberRepository, waitingRepository);
-
         reservationTime = entityManager.persist(
                 ReservationTime.createWithoutId(LocalTime.of(10, 0)));
         theme = entityManager.persist(
                 Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
         member = entityManager.persist(
                 Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "password123!"));
+
+        entityManager.flush();
+        entityManager.clear();
     }
 
     @DisplayName("모든 예약을 조회할 수 있다.")
@@ -74,6 +70,7 @@ class ReservationQueryServiceTest {
                 TODAY, reservationTime, theme, member));
 
         entityManager.flush();
+        entityManager.clear();
 
         // when
         List<ReservationResponse> allReservations = reservationQueryService.findAllReservations();
@@ -106,6 +103,8 @@ class ReservationQueryServiceTest {
                 TODAY, reservationTime, theme, otherMember));
 
         entityManager.flush();
+        entityManager.clear();
+        ;
 
         // when
         List<ReservationResponse> allReservations = reservationQueryService.findAllReservationsByMember(member.getId());
@@ -132,10 +131,12 @@ class ReservationQueryServiceTest {
                 entityManager.persist(
                         Reservation.createWithoutIdAndPaymentHistory(TODAY, reservationTime, theme, member)));
         List<Waiting> waitings = List.of(
-                entityManager.persist(
-                        Waiting.createWithoutIdWithoutPayment(TODAY, theme, reservationTime, member)),
+                entityManager.persist(Waiting.createWithoutIdWithoutPayment(TODAY, theme, reservationTime, member)),
                 entityManager.persist(Waiting.createWithoutIdWithoutPayment(TODAY, theme, reservationTime, member)),
                 entityManager.persist(Waiting.createWithoutIdWithoutPayment(TODAY, theme, reservationTime, member)));
+
+        entityManager.flush();
+        entityManager.clear();
 
         // when
         ReservationStatusResponse allReservationState =
@@ -174,6 +175,7 @@ class ReservationQueryServiceTest {
                     NEXT_DAY, reservationTime, theme, otherMember));
 
             entityManager.flush();
+            entityManager.clear();
 
             // when
             List<ReservationResponse> reservations = reservationQueryService.findReservationsByFilter(
@@ -205,6 +207,7 @@ class ReservationQueryServiceTest {
                     NEXT_DAY, reservationTime, otherTheme, member));
 
             entityManager.flush();
+            entityManager.clear();
 
             // when
             List<ReservationResponse> reservations = reservationQueryService.findReservationsByFilter(
@@ -232,6 +235,7 @@ class ReservationQueryServiceTest {
                     Reservation.createWithoutIdAndPaymentHistory(NEXT_DAY, reservationTime, theme, member));
 
             entityManager.flush();
+            entityManager.clear();
 
             // when
             List<Reservation> reservations = reservationRepository.findReservationsByFilter(

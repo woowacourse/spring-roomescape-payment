@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import roomescape.dto.business.PaymentCreationContent;
 import roomescape.dto.business.PaymentResult;
@@ -21,8 +20,6 @@ import roomescape.test.stub.PaymentClientStub;
 @Import(value = {PaymentService.class, PaymentClientStub.class})
 class PaymentServiceTest {
 
-    @Autowired
-    private TestEntityManager testEntityManager;
     @Autowired
     private PaymentRepository paymentRepository;
     @Autowired
@@ -42,8 +39,7 @@ class PaymentServiceTest {
             paymentClientStub.setAuthorizePayment(paymentResult);
 
             PaymentCreationContent creationContent = new PaymentCreationContent(
-                    paymentResult.orderId(), paymentResult.paymentKey(),
-                    Integer.parseInt(paymentResult.totalAmount().toString()));
+                    paymentResult.orderId(), paymentResult.paymentKey(), paymentResult.totalAmount());
 
             // when
             paymentService.savePayment(creationContent);
@@ -60,7 +56,7 @@ class PaymentServiceTest {
             paymentClientStub.setAuthorizePayment(exception);
 
             PaymentCreationContent creationContent = new PaymentCreationContent(
-                    "order_id", "payment_key", 1000);
+                    "order_id", "payment_key", 1000L);
 
             // when & then
             assertAll(

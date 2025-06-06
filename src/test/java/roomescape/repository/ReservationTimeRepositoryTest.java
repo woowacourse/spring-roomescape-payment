@@ -24,6 +24,26 @@ class ReservationTimeRepositoryTest {
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
 
+    @DisplayName("시간순으로 정렬해서 예약 시간을 조회할 수 있다.")
+    @Test
+    void testMethodNameHere() {
+        // given
+        ReservationTime timeAt10 = entityManager.persist(ReservationTime.createWithoutId(LocalTime.of(12, 0)));
+        ReservationTime timeAt11 = entityManager.persist(ReservationTime.createWithoutId(LocalTime.of(11, 0)));
+        ReservationTime timeAt12 = entityManager.persist(ReservationTime.createWithoutId(LocalTime.of(10, 0)));
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // when
+        List<ReservationTime> times = reservationTimeRepository.findAllOrderByStartAt();
+
+        // then
+        assertThat(times)
+                .extracting(ReservationTime::getStartAt)
+                .containsExactly(LocalTime.of(10, 0), LocalTime.of(11, 0), LocalTime.of(12, 0));
+    }
+
     @DisplayName("특정 테마와 날짜의 예약시간을 예약 여부와 함께 조회할 수 있다.")
     @Test
     void canFindReservationTimesWithBooking() {
@@ -43,6 +63,7 @@ class ReservationTimeRepositoryTest {
                 NEXT_DAY, timeAt11, theme, member));
 
         entityManager.flush();
+        entityManager.clear();
 
         // when
         List<ReservationTime> times =

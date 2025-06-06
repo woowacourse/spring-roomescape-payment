@@ -37,8 +37,10 @@ class ThemeRepositoryTest {
                 ReservationTime.createWithoutId(LocalTime.of(10, 0)));
         member = entityManager.persist(
                 Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "password123!"));
-    }
 
+        entityManager.flush();
+        entityManager.clear();
+    }
 
     @Nested
     @DisplayName("특정 기간의 예약 횟수 순으로 테마를 조회할 수 있다.")
@@ -70,6 +72,9 @@ class ThemeRepositoryTest {
             entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
                     YESTERDAY, reservationTime, thirdTheme, member));
 
+            entityManager.flush();
+            entityManager.clear();
+
             // when
             List<Theme> themes = themeRepository.findThemesOrderByReservationCount(YESTERDAY, NEXT_DAY, 3);
 
@@ -91,6 +96,9 @@ class ThemeRepositoryTest {
             entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(
                     NEXT_DAY, reservationTime, secondTheme, member));
 
+            entityManager.flush();
+            entityManager.clear();
+
             // when
             List<Theme> themes = themeRepository.findThemesOrderByReservationCount(YESTERDAY, TODAY, 2);
 
@@ -108,6 +116,9 @@ class ThemeRepositoryTest {
                     Theme.createWithoutId("테마2", "테마 설명", "thumbnail.jpg"));
             Theme thirdTheme = entityManager.persist(
                     Theme.createWithoutId("테마2", "테마 설명", "thumbnail.jpg"));
+
+            entityManager.flush();
+            entityManager.clear();
 
             // when
             List<Theme> themes = themeRepository.findThemesOrderByReservationCount(YESTERDAY, NEXT_DAY, 3);
