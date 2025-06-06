@@ -29,10 +29,10 @@ import roomescape.member.domain.MemberRole;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.controller.ReservationService;
 import roomescape.reservation.controller.dto.CreateReservationRequest;
-import roomescape.reservation.controller.dto.MyReservationResponse;
 import roomescape.reservation.controller.dto.ReservationResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.repository.ReservationRepository;
+import roomescape.reservation.repository.dto.MyReservationWithTossPayment;
 import roomescape.schedule.domain.ReservationDate;
 import roomescape.schedule.domain.ReservationSchedule;
 import roomescape.schedule.repository.ReservationScheduleRepository;
@@ -232,17 +232,16 @@ class ReservationServiceTest {
         Reservation reservation = reservationDbFixture.예약_생성(schedule, member);
 
         // when
-        List<MyReservationResponse> all = service.findAllMyReservation(member.getId());
+        List<MyReservationWithTossPayment> all = service.findAllMyReservation(member.getId());
 
         // then
         SoftAssertions.assertSoftly(softly -> {
             softly.assertThat(all).hasSize(1);
-            MyReservationResponse response = all.get(0);
+            MyReservationWithTossPayment response = all.get(0);
             softly.assertThat(response.reservationId()).isEqualTo(reservation.getId());
             softly.assertThat(response.theme()).isEqualTo(reservation.getTheme().getName().name());
             softly.assertThat(response.date()).isEqualTo(reservation.getDate());
             softly.assertThat(response.time()).isEqualTo(reservation.getStartAt());
-            softly.assertThat(response.status()).isEqualTo("예약");
         });
     }
 }

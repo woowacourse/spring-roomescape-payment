@@ -23,9 +23,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long>,
     boolean existsBySchedule_Theme_Id(Long themeId);
 
     @Query("""
-    SELECT new com.example.reservation.repository.dto.ReservationWithTossPayment(
+    SELECT new roomescape.reservation.repository.dto.MyReservationWithTossPayment(
         r.id,
-        s.theme.name,
+        s.theme.name.name,
         s.reservationDate.date,
         s.reservationTime.startAt,
         p.paymentKey.paymentKey,
