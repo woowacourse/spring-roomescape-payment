@@ -14,12 +14,14 @@ public class TossPaymentService {
     private final TossPaymentClient tossPaymentClient;
     private final TossPaymentRepository tossPaymentRepository;
 
-    public void confirmPayment(Reservation reservation, TossPaymentRequest paymentRequest) {
-        if (tossPaymentRepository.existsByPaymentKeyAndOrderId(paymentRequest.paymentKey(), paymentRequest.orderId())) {
+    public TossPayment savePayment(final Reservation reservation, final TossPaymentRequest request) {
+        return tossPaymentRepository.save(new TossPayment(reservation, request.paymentKey(), request.orderId(), request.amount()));
+    }
+
+    public void confirmPayment(final TossPayment tossPayment) {
+        if (tossPaymentRepository.existsByPaymentKeyAndOrderId(tossPayment.getPaymentKey(), tossPayment.getOrderId())) {
             return;
         }
-
-        tossPaymentRepository.save(new TossPayment(reservation, paymentRequest.paymentKey(), paymentRequest.orderId(), paymentRequest.amount()));
-        tossPaymentClient.getPaymentConfirm(paymentRequest);
+        tossPaymentClient.getPaymentConfirm(TossPaymentRequest.from(tossPayment));
     }
 }

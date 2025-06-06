@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.InvalidArgumentException;
+import roomescape.payment.toss.domain.TossPayment;
 import roomescape.payment.toss.dto.TossPaymentRequest;
 import roomescape.payment.toss.dto.TossPaymentResponse;
 import roomescape.payment.toss.service.TossPaymentService;
@@ -16,6 +17,8 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.exception.InAlreadyReservationException;
 import roomescape.reservation.service.command.ReserveCommand;
 import roomescape.reservation.service.manager.ReservationManager;
+import roomescape.reservation.service.usecase.ReservationWithPaymentRegisterUseCase;
+import roomescape.reservation.service.usecase.ReserveWithPaymentUseCase;
 import roomescape.waiting.exception.InAlreadyWaitingException;
 import roomescape.waiting.service.WaitingQueryService;
 import roomescape.waiting.service.WaitingService;
@@ -28,7 +31,8 @@ public class ReservationService {
     private final ReservationManager reservationManager;
     private final WaitingQueryService waitingQueryService;
     private final ReservedQueryService reservedQueryService;
-    private final TossPaymentService tossPaymentService;
+    private final ReservationWithPaymentRegisterUseCase paymentRegisterUseCase;
+    private final ReserveWithPaymentUseCase reserveWithPaymentUseCase;
 
     @Transactional
     public ReservationResponse reserve(ReserveCommand reserveCommand) {
@@ -48,13 +52,10 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse reserve(ReservePaymentRequest request, Long memberId) {
-        ReserveCommand reserveCommand = ReserveCommand.byPayment(request, memberId);
-        Reservation reserved = reservationManager.reserved(reserveCommand);
+        TossPayment tossPayment = paymentRegisterUseCase.execute(request, memberId);
+        reserveWithPaymentUseCase.execute(tossPayment);
 
-        TossPaymentRequest paymentRequest = new TossPaymentRequest(request.paymentKey(), request.orderId(), request.amount());
-        tossPaymentService.confirmPayment(reserved, paymentRequest);
-
-        return ReservationResponse.from(reserved);
+        return ReservationResponse.from(tossPayment.getReservation());
     }
 
     private void validateAvailableWaiting(ReserveCommand reserveCommand) {
