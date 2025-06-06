@@ -58,8 +58,8 @@ class ReservationControllerTest {
     @DisplayName("모든 예약 정보를 반환한다.")
     @Test
     void test3() {
-        ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
-        ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
+        ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000L);
+        ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000L, "paymentKey", null);
         Mockito.when(
                 mockTossPaymentClient.postConfirmPayment(
                         Mockito.any(ConfirmPaymentRequest.class), 
@@ -97,8 +97,8 @@ class ReservationControllerTest {
     @DisplayName("예약 정보를 추가한다.")
     @Test
     void test4() {
-        ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
-        ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
+        ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000L);
+        ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000L, "paymentKey", null);
         Mockito.when(
                 mockTossPaymentClient.postConfirmPayment(
                         Mockito.any(ConfirmPaymentRequest.class), 
@@ -129,8 +129,8 @@ class ReservationControllerTest {
     @DisplayName("존재하지 않는 예약 시간 ID 를 추가하면 예외를 반환한다.")
     @Test
     void test5() {
-        ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
-        ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
+        ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000L);
+        ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000L, "paymentKey", null);
         Mockito.when(
                 mockTossPaymentClient.postConfirmPayment(
                         Mockito.any(ConfirmPaymentRequest.class), 
@@ -160,8 +160,8 @@ class ReservationControllerTest {
     @DisplayName("존재하지 않는 테마 ID 를 추가하면 예외를 반환한다.")
     @Test
     void notExistThemeId() {
-        ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
-        ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
+        ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000L);
+        ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000L, "paymentKey", null);
         Mockito.when(
                 mockTossPaymentClient.postConfirmPayment(
                         Mockito.any(ConfirmPaymentRequest.class), 
@@ -191,8 +191,8 @@ class ReservationControllerTest {
     @DisplayName("예약을 삭제한다.")
     @Test
     void test6() {
-        ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
-        ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
+        ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000L);
+        ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000L, "paymentKey", null);
         Mockito.when(
                 mockTossPaymentClient.postConfirmPayment(
                         Mockito.any(ConfirmPaymentRequest.class), 
@@ -240,8 +240,8 @@ class ReservationControllerTest {
     @DisplayName("예약 가능한 시간을 반환한다")
     @Test
     void test9() {
-        ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000);
-        ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000, "paymentKey", null);
+        ConfirmPaymentRequest paymentRequest = new ConfirmPaymentRequest("paymentKey", "1234", 1000L);
+        ConfirmPaymentResponse paymentResponse = new ConfirmPaymentResponse(1000L, "paymentKey", null);
         Mockito.when(
                 mockTossPaymentClient.postConfirmPayment(
                         Mockito.any(ConfirmPaymentRequest.class), 

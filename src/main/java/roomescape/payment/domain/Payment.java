@@ -1,11 +1,15 @@
 package roomescape.payment.domain;
 
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import roomescape.payment.domain.vo.Amount;
 import roomescape.payment.domain.vo.PaymentStatus;
 
 @Entity
@@ -17,7 +21,9 @@ public class Payment {
 
     private String paymentKey;
 
-    private Integer amount;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "amount", nullable = false))
+    private Amount amount;
 
     @Enumerated(value = EnumType.STRING)
     private PaymentStatus status;
@@ -26,15 +32,15 @@ public class Payment {
 
     protected Payment() {}
 
-    public Payment(Long id, String paymentKey, Integer amount, PaymentStatus status, Long reservationId) {
+    public Payment(Long id, String paymentKey, Long amount, PaymentStatus status, Long reservationId) {
         this.id = id;
         this.paymentKey = paymentKey;
-        this.amount = amount;
+        this.amount = new Amount(amount);
         this.status = status;
         this.reservationId = reservationId;
     }
 
-    public Payment(String paymentKey, Integer amount, PaymentStatus status, Long reservationId) {
+    public Payment(String paymentKey, Long amount, PaymentStatus status, Long reservationId) {
         this(null, paymentKey, amount, status, reservationId);
     }
 
@@ -54,8 +60,8 @@ public class Payment {
         return paymentKey;
     }
 
-    public Integer getAmount() {
-        return amount;
+    public Long getAmount() {
+        return amount.value();
     }
 
     public PaymentStatus getStatus() {

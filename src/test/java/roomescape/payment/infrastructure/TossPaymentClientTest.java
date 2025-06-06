@@ -37,7 +37,7 @@ class TossPaymentClientTest {
 
     private static final String PAYMENT_KEY = "testKey";
     private static final String ORDER_ID = "testId";
-    private static final int AMOUNT = 1000;
+    private static final long AMOUNT = 1_000;
 
     @Autowired
     private TossPaymentErrorHandler tossPaymentErrorHandler;

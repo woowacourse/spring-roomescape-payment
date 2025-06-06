@@ -65,7 +65,7 @@ class CreateReservationWithPaymentServiceTest {
 
     public static final String PAYMENT_KEY = "testKey";
     public static final String ORDER_ID = "testId";
-    public static final int AMOUNT = 1000;
+    public static final long AMOUNT = 1_000L;
 
     private final LocalDateTime now = LocalDateTime.now();
     private final Theme theme = new Theme("공포", "으악", "www.um.com");
@@ -148,8 +148,6 @@ class CreateReservationWithPaymentServiceTest {
             }).isInstanceOf(CustomException.class);
 
             List<Payment> payments = paymentRepository.findAll();
-            System.out.println("paymentRepository.findAll() = " + paymentRepository.findAll());
-
             softly.assertThat(payments).hasSize(1);
             softly.assertThat(payments.getFirst().getStatus()).isSameAs(PaymentStatus.FAILED);
 

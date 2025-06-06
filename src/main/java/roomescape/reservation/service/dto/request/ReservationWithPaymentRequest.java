@@ -18,7 +18,7 @@ public record ReservationWithPaymentRequest(
         @NotNull Long themeId,
         @NotEmpty String paymentKey,
         @NotEmpty String orderId,
-        @NotNull Integer amount
+        @NotNull Long amount
 ) {
     public Payment toPendingPayment(Reservation reservation) {
         return new Payment(paymentKey, amount, PaymentStatus.PENDING, reservation.getId());

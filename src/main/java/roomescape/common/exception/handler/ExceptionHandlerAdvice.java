@@ -1,5 +1,6 @@
 package roomescape.common.exception.handler;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,5 +16,12 @@ public class ExceptionHandlerAdvice {
         ErrorResponse response = new ErrorResponse(e.getErrorCode().status, e.getMessage());
         ErrorCode errorCode = e.getErrorCode();
         return ResponseEntity.status(errorCode.status).body(response);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ErrorResponse response = new ErrorResponse(status, e.getMessage());
+        return ResponseEntity.status(status).body(response);
     }
 }
