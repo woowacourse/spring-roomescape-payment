@@ -62,7 +62,9 @@ function renderCombined(reservations, waitings) {
       };
       cancelCell.appendChild(cancelButton);
     } else {
-      cancelCell.textContent = '';
+      row.insertCell(4).textContent = '';
+      row.insertCell(5).textContent = item.paymentKey;
+      row.insertCell(6).textContent = item.amount;
     }
   });
 }
