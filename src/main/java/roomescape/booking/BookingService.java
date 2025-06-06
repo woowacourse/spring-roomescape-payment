@@ -9,6 +9,7 @@ import roomescape.auth.dto.LoginMember;
 import roomescape.booking.dto.BookingResponse;
 import roomescape.booking.reservation.Reservation;
 import roomescape.booking.reservation.ReservationService;
+import roomescape.booking.reservation.dto.ReservationPayment;
 import roomescape.booking.waiting.Waiting;
 import roomescape.booking.waiting.WaitingService;
 import roomescape.schedule.Schedule;
@@ -22,7 +23,7 @@ public class BookingService {
 
     @Transactional(readOnly = true)
     public List<BookingResponse> readAllByMember(final LoginMember loginMember) {
-        List<Reservation> reservations = reservationService.getAllByEmail(loginMember.email());
+        List<ReservationPayment> reservations = reservationService.getAllByEmail(loginMember.email());
         List<Waiting> waitings = waitingService.findAllByEmail(loginMember.email());
 
         return Stream.concat(
