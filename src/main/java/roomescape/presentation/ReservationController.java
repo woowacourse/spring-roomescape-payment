@@ -40,7 +40,6 @@ public class ReservationController {
         return ResponseEntity.noContent().build();
     }
 
-    // 결제 정보도 확인될 수 있도록
     @GetMapping("/my")
     public List<MyReservationsResponse> getMyBookingHistory(@Authenticated Long id) {
         return reservationService.findBookingHistory(id);
