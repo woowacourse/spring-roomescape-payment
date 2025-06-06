@@ -107,7 +107,11 @@ POST /api/reservations
 {
     "date": string (YYYY-MM-DD),
     "timeId": number,
-    "themeId": number
+    "themeId": number,
+    "paymentKey": string,
+    "paymentType": string,
+    "orderId": string,
+    "amoun": number
 }
 
 Response
@@ -122,6 +126,8 @@ HTTP/1.1 200
         "startAt" : string (HH:mm)
     },
     "themeName" : string
+    "paymentKey" : string
+    "amount" : number
 }
 
 ```
