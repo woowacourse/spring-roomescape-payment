@@ -7,10 +7,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Payment {
 
@@ -22,7 +24,7 @@ public class Payment {
     private String paymentKey;
 
     @Column(nullable = false)
-    private Long amount;
+    private long amount;
 
     @Builder
     private Payment(
