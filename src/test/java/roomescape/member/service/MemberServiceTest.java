@@ -1,6 +1,5 @@
 package roomescape.member.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static roomescape.fixture.db.MemberDbFixture.RAW_PASSWORD;
 

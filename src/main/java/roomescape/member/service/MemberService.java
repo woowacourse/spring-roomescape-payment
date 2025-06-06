@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.exception.InvalidArgumentException;
+import roomescape.global.exception.NotFoundException;
 import roomescape.member.controller.request.SignUpRequest;
 import roomescape.member.controller.response.MemberResponse;
 import roomescape.member.domain.Member;
@@ -36,13 +37,13 @@ public class MemberService implements MemberQueryService {
     public Member getMember(String email, String password) {
         String encryptPassword = passwordEncryptor.encrypt(password);
         return memberRepository.findByEmailAndPassword(email, encryptPassword)
-                .orElseThrow(() -> new InvalidArgumentException("이메일 또는 비밀번호가 올바르지 않습니다."));
+                .orElseThrow(() -> new NotFoundException("이메일 또는 비밀번호가 올바르지 않습니다."));
     }
 
     @Transactional(readOnly = true)
     public Member getMember(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new InvalidArgumentException("존재하지 않는 멤버입니다."));
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 멤버입니다."));
     }
 
     @Transactional(readOnly = true)
