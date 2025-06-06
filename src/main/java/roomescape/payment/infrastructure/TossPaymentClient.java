@@ -38,6 +38,9 @@ public class TossPaymentClient implements PaymentClient {
         final String encodedSecretKey = getEncodedSecretKey();
 
         try {
+            log.info("결제 승인 요청 시작 - paymentKey: {}, orderId: {}", paymentInfo.getPaymentKey(),
+                    paymentInfo.getOrderId());
+
             restClient.post()
                     .uri(confrimUrl)
                     .header("Authorization", encodedSecretKey)
@@ -55,6 +58,8 @@ public class TossPaymentClient implements PaymentClient {
                         );
                     })
                     .toBodilessEntity();
+            log.info("결제 승인 완료 - paymentKey: {}, orderId: {}", paymentInfo.getPaymentKey(), paymentInfo.getOrderId());
+
         } catch (ResourceAccessException e) {
             log.warn("결제 API 연결 실패: {}", e.getMessage(), e);
 
@@ -66,6 +71,8 @@ public class TossPaymentClient implements PaymentClient {
             throw new PaymentException(HttpStatus.SERVICE_UNAVAILABLE, "결제 서비스에 일시적인 문제가 발생했습니다.");
         }
         catch (Exception e) {
+            log.error("결제 승인 중 알 수 없는 오류 발생 - paymentKey: {}, orderId: {}, 메시지: {}",
+                    paymentInfo.getPaymentKey(), paymentInfo.getOrderId(), e.getMessage(), e);
             throw new PaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 과정중 서버에 문제가 생겼습니다. 고객센터에게 문의하세요");
         }
     }

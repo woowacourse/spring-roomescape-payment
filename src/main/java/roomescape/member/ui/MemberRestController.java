@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,6 +26,7 @@ import roomescape.member.ui.dto.MemberResponse;
 import roomescape.member.ui.dto.MemberResponse.IdName;
 import roomescape.member.ui.dto.SignUpRequest;
 
+@Slf4j
 @Tag(name = "멤버", description = "멤버 관련 api")
 @RestController
 @RequestMapping("/members")
@@ -38,7 +40,11 @@ public class MemberRestController {
     public ResponseEntity<MemberResponse.IdName> create(
             @RequestBody @Valid final SignUpRequest request
     ) {
+        log.info("멤버 생성 요청 수신");
+
         final MemberResponse.IdName response = memberService.create(request);
+
+        log.info("멤버 생성 완료 - 멤버 ID: {}", response.id());
 
         return ResponseEntity.created(URI.create("/members/" + response.id()))
                 .body(response);
@@ -51,27 +57,34 @@ public class MemberRestController {
             @PathVariable final Long id,
             final Member member
     ) {
+        log.info("멤버 삭제 요청 - 요청자 ID: {}, 삭제 대상 ID: {}", member != null ? member.getId() : null, id);
+
         if (id == null || member == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .build();
+            log.info("멤버 삭제 실패 - 잘못된 요청");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         if (!member.getId().equals(id)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .build();
+            log.info("멤버 삭제 실패 - 권한 없음");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+
         memberService.delete(id);
 
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                .build();
+        log.info("멤버 삭제 완료 - 멤버 ID: {}", id);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "모든 멤버 조회", description = "모든 멤버 조회 관련 api")
     @GetMapping
     @RequiresRole(authRoles = {ADMIN})
     public ResponseEntity<List<IdName>> findAll() {
+        log.info("모든 멤버 조회 요청 수신");
+
         final List<IdName> responses = memberService.findAllNames();
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(responses);
+        log.info("모든 멤버 조회 완료 - 개수: {}", responses.size());
+
+        return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
 }
