@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.global.auth.util.AuthUtil;
+import roomescape.payment.dto.PaymentProviderInfo;
 import roomescape.payment.exception.TossPaymentErrorHandler;
 
 import java.util.Optional;
@@ -29,19 +30,19 @@ public class RestClientConfig {
 
     @Bean(name = "tossRestClient")
     public RestClient tossRestClient() {
-        PaymentProperties.Vendor vendor = findVendor(TOSS_VENDOR);
-        return createRestClient(vendor, new TossPaymentErrorHandler());
+        PaymentProviderInfo paymentProviderInfo = findVendor(TOSS_VENDOR);
+        return createRestClient(paymentProviderInfo, new TossPaymentErrorHandler());
     }
 
-    private RestClient createRestClient(PaymentProperties.Vendor vendor, RestClient.ResponseSpec.ErrorHandler errorHandler) {
+    private RestClient createRestClient(PaymentProviderInfo paymentProviderInfo, RestClient.ResponseSpec.ErrorHandler errorHandler) {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        factory.setConnectTimeout(vendor.getConnectTimeout());
-        factory.setReadTimeout(vendor.getReadTimeout());
+        factory.setConnectTimeout(paymentProviderInfo.connectTimeout());
+        factory.setReadTimeout(paymentProviderInfo.readTimeout());
 
         RestClient.Builder builder = RestClient.builder()
                 .requestFactory(factory)
-                .baseUrl(vendor.getBaseUrl())
-                .defaultHeader(HttpHeaders.AUTHORIZATION, AuthUtil.encodeBasicAuth(vendor.getSecretKey()))
+                .baseUrl(paymentProviderInfo.baseUrl())
+                .defaultHeader(HttpHeaders.AUTHORIZATION, AuthUtil.encodeBasicAuth(paymentProviderInfo.secretKey()))
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, APPLICATION_JSON_VALUE);
 
         if (errorHandler != null) {
@@ -51,7 +52,7 @@ public class RestClientConfig {
         return builder.build();
     }
 
-    private PaymentProperties.Vendor findVendor(String vendorName) {
+    private PaymentProviderInfo findVendor(String vendorName) {
         return Optional.ofNullable(paymentProperties.getProperties().get(vendorName))
                 .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 결제 벤더: " + vendorName));
     }
