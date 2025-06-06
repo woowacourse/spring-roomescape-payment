@@ -26,7 +26,6 @@ public class ReservationDateTime {
 
     public ReservationDateTime(
             ReservationDate reservationDate,
-
             ReservationTime reservationTime
     ) {
         this.reservationDate = reservationDate;

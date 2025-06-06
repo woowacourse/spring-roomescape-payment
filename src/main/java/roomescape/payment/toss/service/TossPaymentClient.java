@@ -14,5 +14,5 @@ public interface TossPaymentClient {
 
     @PostExchange("/confirm")
     @Retryable(retryFor = {PaymentTemporaryException.class}, maxAttempts = 3, backoff = @Backoff(delay = 500))
-    void getPaymentConfirm(@RequestBody TossPaymentRequest paymentRequest);
+    TossPaymentResponse getPaymentConfirm(@RequestBody TossPaymentRequest paymentRequest);
 }

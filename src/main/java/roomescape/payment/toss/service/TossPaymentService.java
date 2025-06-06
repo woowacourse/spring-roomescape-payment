@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.payment.toss.domain.TossPayment;
 import roomescape.payment.toss.dto.TossPaymentRequest;
+import roomescape.payment.toss.dto.TossPaymentResponse;
 import roomescape.payment.toss.repository.TossPaymentRepository;
 import roomescape.reservation.domain.Reservation;
 
@@ -18,10 +19,7 @@ public class TossPaymentService {
         return tossPaymentRepository.save(new TossPayment(reservation, request.paymentKey(), request.orderId(), request.amount()));
     }
 
-    public void confirmPayment(final TossPayment tossPayment) {
-        if (tossPaymentRepository.existsByPaymentKeyAndOrderId(tossPayment.getPaymentKey(), tossPayment.getOrderId())) {
-            return;
-        }
-        tossPaymentClient.getPaymentConfirm(TossPaymentRequest.from(tossPayment));
+    public TossPaymentResponse confirmPayment(final TossPayment tossPayment) {
+        return tossPaymentClient.getPaymentConfirm(TossPaymentRequest.from(tossPayment));
     }
 }

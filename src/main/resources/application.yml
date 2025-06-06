@@ -26,5 +26,5 @@ jwt:
 toss:
   payment:
     token: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
-    connection-timeout: 45000
+    connection-timeout: 3000
     read-timeout: 45000
