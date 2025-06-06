@@ -9,6 +9,6 @@ public enum ReservationStatus {
     }
 
     public boolean isConfirmed() {
-        return this != CONFIRMED;
+        return this == CONFIRMED;
     }
 }
