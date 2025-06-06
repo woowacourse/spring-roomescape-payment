@@ -1,5 +1,6 @@
 package roomescape.reservation.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -9,8 +10,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import java.sql.Timestamp;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Objects;
 import roomescape.member.domain.Member;
@@ -42,7 +43,8 @@ public class Reservation {
     @OneToOne(mappedBy = "reservation", fetch = FetchType.LAZY)
     private Payment payment;
 
-    private final Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+    @Column(nullable = false)
+    private final LocalDateTime createdAt = LocalDateTime.now();
 
     protected Reservation() {
 
