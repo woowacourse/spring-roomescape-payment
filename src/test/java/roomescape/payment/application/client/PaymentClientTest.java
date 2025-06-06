@@ -83,7 +83,8 @@ class PaymentClientTest {
     }
 
     @Test
-    void approvePayment_whenForbiddenRequest_throwsException() throws JsonProcessingException {
+    void approvePayment_whenForbiddenRequestAndUserFriendly_throwsExceptionWithTossMessage()
+            throws JsonProcessingException {
         // Given
         PaymentApproveRequest request = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID,
                 50_000L, null);
@@ -96,7 +97,26 @@ class PaymentClientTest {
 
         // When
         assertThatThrownBy(() -> paymentClient.approvePayment(request))
-                .isInstanceOf(PaymentForbiddenException.class);
+                .isInstanceOf(PaymentForbiddenException.class)
+                .hasMessageContaining("REJECT_CARD_PAYMENT");
+    }
+
+    @Test
+    void approvePayment_whenForbiddenRequestNotUserFriendly_throwsExceptionWithOurMessage()
+            throws JsonProcessingException {
+        // Given
+        PaymentApproveRequest request = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID, 50_000L, null);
+        String errorResponse = objectMapper.writerWithDefaultPrettyPrinter()
+                .writeValueAsString(new TossErrorResponse("REJECT_CARD_PAYMENT", "한도초과 혹은 잔액부족으로 결제에 실패했습니다."));
+        mockServer.expect(times(3), requestTo(url))
+                .andRespond(withStatus(HttpStatus.FORBIDDEN)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(errorResponse));
+
+        // When
+        assertThatThrownBy(() -> paymentClient.approvePayment(request))
+                .isInstanceOf(PaymentForbiddenException.class)
+                .hasMessageContaining("REJECT_CARD_PAYMENT");
     }
 
     @Test
