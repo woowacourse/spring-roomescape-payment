@@ -8,6 +8,7 @@ import static roomescape.global.exception.roomescape.RoomEscapeErrorStatus.WAITI
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -125,19 +126,19 @@ public class ReservationService {
     }
 
     public List<MyPageReservationResponse> getReservationsByMemberId(Long memberId) {
-        final Member member = memberService.getMemberById(memberId);
-        List<Reservation> myReservations = reservationRepository.findByMemberId(member.getId());
-        return myReservations.stream()
+        List<Reservation> reservations = reservationRepository.findByMemberId(memberId);
+
+        final Map<Reservation, Payment> reservationAndPayments = paymentService.getPaymentMapByReservations(reservations);
+
+        return reservations.stream()
                 .map(reservation -> {
-                            final int priority = calculatePriority(reservation);
-                            if (paymentService.isReservationPaid(reservation)) {
-                                final Payment payment = paymentService.getPaymentByReservation(
-                                        reservation);
-                                return MyPageReservationResponse.from(reservation, priority, payment);
-                            }
-                            return MyPageReservationResponse.from(reservation, priority);
-                        }
-                )
+                    final int priority = calculatePriority(reservation);
+                    final Payment payment = reservationAndPayments.get(reservation);
+
+                    return payment != null
+                            ? MyPageReservationResponse.from(reservation, priority, payment)
+                            : MyPageReservationResponse.from(reservation, priority);
+                })
                 .toList();
     }
 

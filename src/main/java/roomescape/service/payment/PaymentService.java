@@ -1,5 +1,9 @@
 package roomescape.service.payment;
 
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,8 +11,6 @@ import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
 import roomescape.dto.response.PaymentSuccessResponse;
-import roomescape.global.exception.roomescape.RoomEscapeErrorStatus;
-import roomescape.global.exception.roomescape.RoomEscapeException;
 
 @RequiredArgsConstructor
 @Service
@@ -27,12 +29,17 @@ public class PaymentService {
         paymentRepository.save(new Payment(reservationId, response.paymentKey(), response.totalAmount()));
     }
 
-    public boolean isReservationPaid(Reservation reservation) {
-        return paymentRepository.existsPaymentByReservationId(reservation.getId());
-    }
+    public Map<Reservation, Payment> getPaymentMapByReservations(List<Reservation> reservations) {
+        final Map<Long, Payment> paymentById = paymentRepository
+                .findByReservationIdIn(reservations.stream().map(Reservation::getId).toList())
+                .stream()
+                .collect(Collectors.toMap(Payment::getReservationId, Function.identity()));
 
-    public Payment getPaymentByReservation(Reservation reservation) {
-        return paymentRepository.findPaymentByReservationId(reservation.getId())
-                .orElseThrow(() -> new RoomEscapeException(RoomEscapeErrorStatus.NON_EXIST_PAYMENT));
+        return reservations.stream()
+                .filter(reservation -> paymentById.containsKey(reservation.getId()))
+                .collect(Collectors.toUnmodifiableMap(
+                        Function.identity(),
+                        reservation -> paymentById.get(reservation.getId())
+                ));
     }
 }
