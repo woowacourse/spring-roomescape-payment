@@ -99,3 +99,5 @@ main() {
   echo "start spring server..."
   start_server
 }
+
+main
