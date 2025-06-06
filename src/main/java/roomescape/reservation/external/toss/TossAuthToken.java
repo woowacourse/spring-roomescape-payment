@@ -10,6 +10,6 @@ public record TossAuthToken(String secretKey) {
     }
 
     public String generateToken() {
-        return String.format("basic %s", secretKey);
+        return String.format("basic %s", secretKey());
     }
 }
