@@ -60,7 +60,7 @@ public class ConfirmedReservationApplicationService {
     @Transactional
     public ConfirmedReservationWebResponse createWithPayment(final ConfirmedReservationCreateRequest confirmedReservationCreateRequest, final PaymentApproveRequest paymentApproveRequest) {
         ConfirmedReservationWebResponse confirmedReservationWebResponse = create(confirmedReservationCreateRequest);
-        paymentApplicationService.approvePayment(paymentApproveRequest);
+        paymentApplicationService.approveReservationPayment(paymentApproveRequest, confirmedReservationWebResponse.id());
         return confirmedReservationWebResponse;
     }
 

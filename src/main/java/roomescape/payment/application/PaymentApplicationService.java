@@ -3,6 +3,7 @@ package roomescape.payment.application;
 import org.springframework.stereotype.Service;
 import roomescape.payment.application.client.PaymentClient;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.ProductType;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
 import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
 
@@ -19,9 +20,10 @@ public class PaymentApplicationService {
         this.paymentClient = paymentClient;
     }
 
-    public Payment approvePayment(final PaymentApproveRequest paymentApproveRequest) {
+    public Payment approveReservationPayment(final PaymentApproveRequest paymentApproveRequest, Long reservationId) {
         PaymentApproveResponse paymentApproveResponse = paymentClient.approvePayment(paymentApproveRequest);
-        Payment payment = new Payment(paymentApproveResponse.paymentKey(), paymentApproveResponse.orderId(), paymentApproveResponse.totalAmount(), LocalDateTime.now());
+        Payment payment = new Payment(paymentApproveResponse.paymentKey(), paymentApproveResponse.orderId(), paymentApproveResponse.totalAmount(),
+                ProductType.RESERVATION, reservationId, LocalDateTime.now());
         return paymentDataService.save(payment);
     }
 }

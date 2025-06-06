@@ -47,7 +47,7 @@ class PaymentApplicationServiceTest {
         PaymentApproveRequest paymentApproveRequest = new PaymentApproveRequest("testtest", "orderorder", 1000L);
 
         // When
-        Payment actual = paymentApplicationService.approvePayment(paymentApproveRequest);
+        Payment actual = paymentApplicationService.approveReservationPayment(paymentApproveRequest);
 
         // Then
         SoftAssertions.assertSoftly(softAssertions -> {
@@ -64,10 +64,10 @@ class PaymentApplicationServiceTest {
         PaymentApproveRequest paymentApproveRequest1 = new PaymentApproveRequest("testtest", "orderorder", 1000L);
         PaymentApproveRequest paymentApproveRequest2 = new PaymentApproveRequest("testtest", "orderorder", 1000L);
 
-        paymentApplicationService.approvePayment(paymentApproveRequest1);
+        paymentApplicationService.approveReservationPayment(paymentApproveRequest1);
 
         // When & Then
-        assertThatThrownBy(() -> paymentApplicationService.approvePayment(paymentApproveRequest2))
+        assertThatThrownBy(() -> paymentApplicationService.approveReservationPayment(paymentApproveRequest2))
                 .isInstanceOf(PaymentKeyDuplicatedException.class)
                 .hasMessage("중복된 paymentKey입니다.");
     }
@@ -80,10 +80,10 @@ class PaymentApplicationServiceTest {
 
         // When & Then
         SoftAssertions.assertSoftly(softAssertions -> {
-            softAssertions.assertThatThrownBy(() -> paymentApplicationService.approvePayment(paymentApproveRequestWithPaymentKeyNull))
+            softAssertions.assertThatThrownBy(() -> paymentApplicationService.approveReservationPayment(paymentApproveRequestWithPaymentKeyNull))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("키가 올바르지 않습니다.");
-            softAssertions.assertThatThrownBy(() -> paymentApplicationService.approvePayment(paymentApproveRequestWithPaymentKeyBlank))
+            softAssertions.assertThatThrownBy(() -> paymentApplicationService.approveReservationPayment(paymentApproveRequestWithPaymentKeyBlank))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("키가 올바르지 않습니다.");
         });
@@ -97,10 +97,10 @@ class PaymentApplicationServiceTest {
 
         // When & Then
         SoftAssertions.assertSoftly(softAssertions -> {
-            softAssertions.assertThatThrownBy(() -> paymentApplicationService.approvePayment(paymentApproveRequestWithOrderIdNull))
+            softAssertions.assertThatThrownBy(() -> paymentApplicationService.approveReservationPayment(paymentApproveRequestWithOrderIdNull))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("주문 번호가 올바르지 않습니다.");
-            softAssertions.assertThatThrownBy(() -> paymentApplicationService.approvePayment(paymentApproveRequestWithOrderIdBlank))
+            softAssertions.assertThatThrownBy(() -> paymentApplicationService.approveReservationPayment(paymentApproveRequestWithOrderIdBlank))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("주문 번호가 올바르지 않습니다.");
         });
@@ -112,7 +112,7 @@ class PaymentApplicationServiceTest {
         PaymentApproveRequest paymentApproveRequestWithAmountNull = new PaymentApproveRequest("testtest", "orderorder", null);
 
         // When & Then
-        assertThatThrownBy(() -> paymentApplicationService.approvePayment(paymentApproveRequestWithAmountNull))
+        assertThatThrownBy(() -> paymentApplicationService.approveReservationPayment(paymentApproveRequestWithAmountNull))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("결제 금액은 null이 될 수 없습니다.");
     }
@@ -123,7 +123,7 @@ class PaymentApplicationServiceTest {
         PaymentApproveRequest paymentApproveRequestWithAmountUnderUnitPrice = new PaymentApproveRequest("testtest", "orderorder", 900L);
 
         // When & Then
-        assertThatThrownBy(() -> paymentApplicationService.approvePayment(paymentApproveRequestWithAmountUnderUnitPrice))
+        assertThatThrownBy(() -> paymentApplicationService.approveReservationPayment(paymentApproveRequestWithAmountUnderUnitPrice))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("결제 금액이 잘못되었습니다.");
     }
@@ -134,7 +134,7 @@ class PaymentApplicationServiceTest {
         PaymentApproveRequest paymentApproveRequestWithAmountUnderUnitPrice = new PaymentApproveRequest("testtest", "orderorder", 999L);
 
         // When & Then
-        assertThatThrownBy(() -> paymentApplicationService.approvePayment(paymentApproveRequestWithAmountUnderUnitPrice))
+        assertThatThrownBy(() -> paymentApplicationService.approveReservationPayment(paymentApproveRequestWithAmountUnderUnitPrice))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("결제 금액이 잘못되었습니다.");
     }
