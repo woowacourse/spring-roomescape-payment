@@ -11,17 +11,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.context.ActiveProfiles;
 import roomescape.mvc.auth.dto.AccessTokenContent;
 import roomescape.mvc.member.domain.Member;
 import roomescape.mvc.member.domain.Role;
 import roomescape.mvc.member.repository.MemberRepository;
-import roomescape.test.stub.PaymentClientStub;
 import roomescape.utility.JwtTokenProvider;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@Import(value = {PaymentClientStub.class})
+@ActiveProfiles("test")
 class MemberApiTest {
 
     @LocalServerPort
