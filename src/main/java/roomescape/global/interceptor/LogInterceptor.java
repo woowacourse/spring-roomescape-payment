@@ -14,7 +14,7 @@ public class LogInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String requestURI = request.getRequestURI();
-        log.info("[API REQUEST] " + requestURI);
+        log.info("[API REQUEST] {}", requestURI);
 
         return true;
     }
