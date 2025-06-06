@@ -6,10 +6,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import roomescape.auth.presentation.dto.LoginMember;
+import roomescape.auth.application.LoginMember;
 import roomescape.global.exception.ReservationException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.member.service.MemberService;
 import roomescape.reservation.config.PaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
@@ -36,6 +37,7 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final MemberService memberService;
 
     public List<ReservationResponse> findReservationsByCriteria(final ReservationSearchRequest request) {
         final List<Reservation> reservations = reservationRepository.findByCriteria(request.themeId(),
@@ -64,7 +66,7 @@ public class ReservationService {
 
     private Reservation waitingReservation(LocalDate date, ReservationTime reservationTime,
                                            Theme theme, LoginMember loginMember) {
-        final Member member = Member.from(loginMember);
+        Member member = memberService.getMemberById(loginMember.getId());
         if (reservationRepository.existsByDateAndTimeAndThemeAndMember(date, reservationTime, theme, member)) {
             throw new IllegalArgumentException("이미 예약한 사용자입니다.");
         }
@@ -77,7 +79,7 @@ public class ReservationService {
 
     private Reservation bookedReservation(LocalDate date, ReservationTime reservationTime,
                                           Theme theme, LoginMember loginMember) {
-        final Member member = Member.from(loginMember);
+        Member member = memberService.getMemberById(loginMember.getId());
         Reservation reservation = Reservation.of(date, reservationTime, theme, member, LocalDateTime.now(clock));
 
         return reservationRepository.save(reservation);
@@ -117,7 +119,7 @@ public class ReservationService {
     }
 
     public List<MyReservationResponse> findMyReservations(final LoginMember loginMember) {
-        final Member member = Member.from(loginMember);
+        Member member = memberService.getMemberById(loginMember.getId());
         return reservationRepository.findAllByMember(member).stream()
                 .map(MyReservationResponse::new)
                 .toList();
