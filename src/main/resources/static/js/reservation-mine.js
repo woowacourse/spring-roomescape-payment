@@ -31,7 +31,9 @@ function renderCombined(reservations, waitings) {
       theme: r.theme,
       date: r.date,
       time: r.time,
-      status: r.status
+      status: r.status,
+      paymentKey: r.paymentKey,
+      amount: r.amount
     })),
     ...waitings.map(w => ({
       id: w.id,

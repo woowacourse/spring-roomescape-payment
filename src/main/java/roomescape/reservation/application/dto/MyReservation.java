@@ -1,22 +1,25 @@
 package roomescape.reservation.application.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import roomescape.reservation.domain.Reservation;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.domain.WaitingWithRank;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record MyReservation(
     Long id,
     String theme,
     LocalDate date,
     @JsonFormat(pattern = "HH:mm")
     LocalTime time,
-    String status
+    String status,
+    String paymentKey,
+    Long amount
 ) {
 
-    static final String RESERVED_STATUS = "예약";
     static final String WAITING_STATUS = "%s번째 예약대기";
 
     public static MyReservation from(Reservation reservation) {
@@ -25,7 +28,9 @@ public record MyReservation(
             reservation.getThemeName(),
             reservation.getDate(),
             reservation.getStartAt(),
-            RESERVED_STATUS
+            reservation.getStatus().getTitle(),
+            reservation.getPayment() != null ? reservation.getPayment().getPaymentInfo().getPaymentKey() : null, // NOTE. 가독성이 떨어지는지 여쭤보기
+            reservation.getPayment() != null ? reservation.getPayment().getPaymentInfo().getAmount() : null
         );
     }
 
@@ -36,7 +41,9 @@ public record MyReservation(
             waiting.getThemeName(),
             waiting.getDate(),
             waiting.getReservationStartAt(),
-            WAITING_STATUS.formatted(waitingWithRank.getRank())
+            WAITING_STATUS.formatted(waitingWithRank.getRank()),
+            null,
+            null
         );
     }
 }

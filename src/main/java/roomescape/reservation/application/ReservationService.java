@@ -14,6 +14,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.payment.application.PaymentService;
 import roomescape.payment.application.dto.PaymentRequest;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.AvailableReservationTimeResponse;
 import roomescape.reservation.application.dto.MemberReservationRequest;
@@ -61,18 +62,14 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse addMemberReservation(final MemberReservationRequest request,
-        final Long memberId) {
-        paymentService.addPayment(
-            new PaymentRequest(request.date(), request.timeId(), request.themeId(),
-                request.paymentKey(), request.orderId(), request.amount()), memberId);
-        return addReservation(request.timeId(), request.themeId(), memberId, request.date());
+    public ReservationResponse addMemberReservation(final MemberReservationRequest request, final Long memberId) {
+        Payment payment = paymentService.addPayment(new PaymentRequest(request.paymentKey(), request.orderId(), request.amount()));
+        return addReservation(request.timeId(), request.themeId(), memberId, request.date(), payment);
     }
 
     @Transactional
     public ReservationResponse addAdminReservation(final AdminReservationRequest request) {
-        return addReservation(request.timeId(), request.themeId(), request.memberId(),
-            request.date());
+        return addReservation(request.timeId(), request.themeId(), request.memberId(), request.date(), null);
     }
 
     @Transactional
@@ -129,20 +126,17 @@ public class ReservationService {
     }
 
     private ReservationResponse addReservation(final Long timeId, final Long themeId,
-        final Long memberId,
-        final LocalDate date) {
+        final Long memberId, final LocalDate date, final Payment payment) {
         final ReservationTime reservationTime = getReservationTime(timeId);
         final Theme theme = getTheme(themeId);
         final Member member = getMember(memberId);
 
-        final List<Reservation> sameTimeReservations = reservationRepository.findByDateAndThemeId(
-            date,
-            themeId);
+        final List<Reservation> sameTimeReservations = reservationRepository.findByDateAndThemeId(date, themeId);
 
         validateIsBooked(sameTimeReservations, reservationTime, theme);
         validatePastDateTime(date, reservationTime.getStartAt());
 
-        final Reservation reservation = new Reservation(date, reservationTime, theme, member);
+        final Reservation reservation = new Reservation(date, reservationTime, theme, member, payment);
         final Reservation saved = reservationRepository.save(reservation);
         return ReservationResponse.of(saved);
     }

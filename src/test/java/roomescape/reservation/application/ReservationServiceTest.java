@@ -3,8 +3,6 @@ package roomescape.reservation.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -19,7 +17,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.member.application.dto.MemberResponse;
 import roomescape.payment.application.PaymentService;
-import roomescape.payment.domain.Payment;
 import roomescape.reservation.application.dto.AvailableReservationTimeResponse;
 import roomescape.reservation.application.dto.MemberReservationRequest;
 import roomescape.reservation.application.dto.MyReservation;
@@ -54,8 +51,8 @@ class ReservationServiceTest {
         // given
         final MemberReservationRequest request = createRequest(LocalDate.now().plusDays(1), 1L, 1L);
 
-        when(paymentService.addPayment(any(), anyLong()))
-            .thenReturn(mock(Payment.class));
+        when(paymentService.addPayment(any()))
+            .thenReturn(null);
 
         // when & then
         assertThat(reservationService.addMemberReservation(request, 1L)).isEqualTo(

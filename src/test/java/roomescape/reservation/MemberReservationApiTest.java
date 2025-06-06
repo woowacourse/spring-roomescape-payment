@@ -3,8 +3,6 @@ package roomescape.reservation;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import io.restassured.RestAssured;
@@ -23,7 +21,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.login.application.TokenCookieService;
 import roomescape.login.application.dto.LoginRequest;
 import roomescape.payment.application.PaymentService;
-import roomescape.payment.domain.Payment;
 import roomescape.reservation.application.dto.MemberReservationRequest;
 
 @ActiveProfiles("test")
@@ -61,8 +58,8 @@ public class MemberReservationApiTest {
 
     @Test
     void 예약을_추가한다() {
-        when(paymentService.addPayment(any(), anyLong()))
-            .thenReturn(mock(Payment.class));
+        when(paymentService.addPayment(any()))
+            .thenReturn(null);
 
         final MemberReservationRequest request = createRequest(LocalDate.now().plusDays(1), 1L, 1L);
         RestAssured.given().log().all()
@@ -104,9 +101,9 @@ public class MemberReservationApiTest {
 
     @Test
     void 과거날짜로_예약을_하면_에러를_반환한다() {
-        when(paymentService.addPayment(any(), anyLong()))
-            .thenReturn(mock(Payment.class));
-        
+        when(paymentService.addPayment(any()))
+            .thenReturn(null);
+
         final MemberReservationRequest request = createRequest(LocalDate.now().minusDays(10), 1L,
             1L);
 
@@ -123,8 +120,8 @@ public class MemberReservationApiTest {
 
     @Test
     void 중복된_시간에_예약을_하면_에러가_발생한다() {
-        when(paymentService.addPayment(any(), anyLong()))
-            .thenReturn(mock(Payment.class));
+        when(paymentService.addPayment(any()))
+            .thenReturn(null);
 
         final MemberReservationRequest request1 = createRequest(
             LocalDate.now().plusDays(10),

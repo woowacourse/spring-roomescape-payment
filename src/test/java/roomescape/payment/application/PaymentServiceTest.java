@@ -35,13 +35,7 @@ class PaymentServiceTest {
     void 결제_저장_테스트() {
         // given
         PaymentInfo paymentInfo = new PaymentInfo("key", "orderId", 1000L);
-        MemberReservationRequest request = createRequest(
-            LocalDate.of(2030, 3, 3),
-            1L, 1L, paymentInfo);
-        PaymentRequest paymentRequest = new PaymentRequest(
-            request.date(), request.timeId(), request.themeId(), request.paymentKey(),
-            request.orderId(), request.amount()
-        );
+        PaymentRequest paymentRequest = new PaymentRequest(paymentInfo.getPaymentKey(), paymentInfo.getOrderId(), paymentInfo.getAmount());
         TossConfirmRequest tossConfirmRequest = new TossConfirmRequest(paymentRequest.paymentKey(),
             paymentRequest.orderId(), paymentRequest.amount());
 
@@ -53,20 +47,18 @@ class PaymentServiceTest {
             .thenReturn(tossConfirmResponse);
 
         // when
-        Payment payment = paymentService.addPayment(paymentRequest, 1L);
+        Payment payment = paymentService.addPayment(paymentRequest);
 
         // then
         assertAll(
             () -> assertThat(payment.getId()).isNotNull(),
             () -> assertThat(payment.getPaymentInfo().equals(paymentInfo))
         );
-}
+    }
 
-private MemberReservationRequest createRequest(LocalDate now, Long timeId, Long themeId,
-    PaymentInfo paymentInfo) {
-    return new MemberReservationRequest(now, timeId, themeId, paymentInfo.getPaymentKey(),
-        paymentInfo.getOrderId(), paymentInfo.getAmount());
+    private MemberReservationRequest createRequest(LocalDate now, Long timeId, Long themeId,
+        PaymentInfo paymentInfo) {
+        return new MemberReservationRequest(now, timeId, themeId, paymentInfo.getPaymentKey(),
+            paymentInfo.getOrderId(), paymentInfo.getAmount());
     }
 }
-
-

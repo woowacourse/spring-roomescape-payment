@@ -34,39 +34,47 @@ INSERT INTO theme (name, description, thumbnail)
 VALUES ('컨저링', '실화 기반의 공포가 현실이 된다, 악령이 도사린 집에서 탈출하라!',
         'https://upload.wikimedia.org/wikipedia/ko/c/c6/%EC%BB%A8%EC%A0%80%EB%A7%81.jpg');
 
--- 2 -> 1 -> 3
+INSERT INTO payment (amount, order_id, payment_key, payment_gateway)
+VALUES (30000, 'ORDER-001', 'pay_key_001', 'TOSS_PAYMENTS');
 
-INSERT INTO reservation (date, time_id, theme_id, member_id)
-VALUES (DATEADD('DAY', -2, CURRENT_DATE), 2, 2, 5);
+INSERT INTO payment (amount, order_id, payment_key, payment_gateway)
+VALUES (30000, 'ORDER-002', 'pay_key_002', 'TOSS_PAYMENTS');
 
-INSERT INTO reservation (date, time_id, theme_id, member_id)
-VALUES (DATEADD('DAY', -2, CURRENT_DATE), 3, 2, 5);
+INSERT INTO payment (amount, order_id, payment_key, payment_gateway)
+VALUES (30000, 'ORDER-003', 'pay_key_003', 'TOSS_PAYMENTS');
 
-INSERT INTO reservation (date, time_id, theme_id, member_id)
-VALUES (DATEADD('DAY', -2, CURRENT_DATE), 2, 1, 6);
+INSERT INTO reservation (date, time_id, theme_id, member_id, status, payment_id)
+VALUES (DATEADD('DAY', -4, CURRENT_DATE), 2, 2, 1, 'CONFIRMED', 1);
 
-INSERT INTO reservation (date, time_id, theme_id, member_id)
-VALUES (DATEADD('DAY', -2, CURRENT_DATE), 1, 1, 6);
+INSERT INTO reservation (date, time_id, theme_id, member_id, status, payment_id)
+VALUES (DATEADD('DAY', -3, CURRENT_DATE), 2, 2, 2, 'CANCELED', NULL);
 
-INSERT INTO waiting(date, id, member_id, reservation_time_id, theme_id)
+INSERT INTO reservation (date, time_id, theme_id, member_id, status, payment_id)
+VALUES (DATEADD('DAY', -3, CURRENT_DATE), 3, 1, 2, 'CONFIRMED', 2);
+
+INSERT INTO reservation (date, time_id, theme_id, member_id, status, payment_id)
+VALUES (DATEADD('DAY', -3, CURRENT_DATE), 4, 1, 3, 'CONFIRMED', NULL);
+
+INSERT INTO reservation (date, time_id, theme_id, member_id, status, payment_id)
+VALUES (DATEADD('DAY', -3, CURRENT_DATE), 4, 3, 3, 'CONFIRMED', NULL);
+
+INSERT INTO reservation (date, time_id, theme_id, member_id, status, payment_id)
+VALUES (DATEADD('DAY', -3, CURRENT_DATE), 1, 2, 1, 'CONFIRMED', NULL);
+
+INSERT INTO reservation (date, time_id, theme_id, member_id, status, payment_id)
+VALUES (DATEADD('DAY', -2, CURRENT_DATE), 2, 2, 5, 'CONFIRMED', NULL);
+
+INSERT INTO reservation (date, time_id, theme_id, member_id, status, payment_id)
+VALUES (DATEADD('DAY', -2, CURRENT_DATE), 3, 2, 5, 'CONFIRMED', NULL);
+
+INSERT INTO reservation (date, time_id, theme_id, member_id, status, payment_id)
+VALUES (DATEADD('DAY', -2, CURRENT_DATE), 2, 1, 6, 'CONFIRMED', 3);
+
+INSERT INTO reservation (date, time_id, theme_id, member_id, status, payment_id)
+VALUES (DATEADD('DAY', -2, CURRENT_DATE), 1, 1, 6, 'CONFIRMED', NULL);
+
+INSERT INTO waiting (date, id, member_id, reservation_time_id, theme_id)
 VALUES (DATEADD('DAY', -2, CURRENT_DATE), 1, 6, 2, 2);
 
-INSERT INTO waiting(date, id, member_id, reservation_time_id, theme_id)
+INSERT INTO waiting (date, id, member_id, reservation_time_id, theme_id)
 VALUES (DATEADD('DAY', -2, CURRENT_DATE), 2, 6, 3, 2);
-
-
-
-INSERT INTO reservation (date, time_id, theme_id, member_id)
-VALUES (DATEADD('DAY', -4, CURRENT_DATE), 2, 2, 1);
-INSERT INTO reservation (date, time_id, theme_id, member_id)
-VALUES (DATEADD('DAY', -3, CURRENT_DATE), 2, 2, 2);
-INSERT INTO reservation (date, time_id, theme_id, member_id)
-VALUES (DATEADD('DAY', -3, CURRENT_DATE), 3, 1, 2);
-
-INSERT INTO reservation (date, time_id, theme_id, member_id)
-VALUES (DATEADD('DAY', -3, CURRENT_DATE), 4, 1, 3);
-INSERT INTO reservation (date, time_id, theme_id, member_id)
-VALUES (DATEADD('DAY', -3, CURRENT_DATE), 4, 3, 3);
-
-INSERT INTO reservation (date, time_id, theme_id, member_id)
-VALUES (DATEADD('DAY', -3, CURRENT_DATE), 1, 2, 1);
