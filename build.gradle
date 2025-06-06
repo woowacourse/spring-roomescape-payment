@@ -27,12 +27,15 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 
+    annotationProcessor 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
+
     runtimeOnly 'com.h2database:h2'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.rest-assured:rest-assured:5.3.1'
-    testImplementation('com.squareup.okhttp3:okhttp:4.10.0')
-    testImplementation('com.squareup.okhttp3:mockwebserver:4.10.0')
+    testImplementation 'com.squareup.okhttp3:okhttp:4.10.0'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:4.10.0'
 }
 
 test {
