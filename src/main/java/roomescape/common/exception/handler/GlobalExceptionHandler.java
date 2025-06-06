@@ -19,42 +19,42 @@ import roomescape.payment.exception.PaymentApproveException;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(DateTimeParseException.class)
-    public ResponseEntity<String> handleDateTimeParseException(DateTimeParseException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
+    public ResponseEntity<ErrorResponse> handleDateTimeParseException(DateTimeParseException e) {
+        return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<String> handleValidationException(ValidationException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
+    public ResponseEntity<ErrorResponse> handleValidationException(ValidationException e) {
+        return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(InUseException.class)
-    public ResponseEntity<String> handleInUseException(InUseException e) {
-        return ResponseEntity.badRequest().body(e.getMessage());
+    public ResponseEntity<ErrorResponse> handleInUseException(InUseException e) {
+        return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(UnAuthorizedException.class)
-    public ResponseEntity<String> handleUnAuthorizedException(UnAuthorizedException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+    public ResponseEntity<ErrorResponse> handleUnAuthorizedException(UnAuthorizedException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<String> handleForbiddenException(ForbiddenException e) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+    public ResponseEntity<ErrorResponse> handleForbiddenException(ForbiddenException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<String> handleNotFoundException(NotFoundException e) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(DuplicatedException.class)
-    public ResponseEntity<String> handleDuplicatedException(DuplicatedException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    public ResponseEntity<ErrorResponse> handleDuplicatedException(DuplicatedException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler(PaymentApproveException.class)
-    public ResponseEntity<Map<String, String>> handlePaymentApproveException(PaymentApproveException e) {
-        return ResponseEntity.status(e.getHttpStatusCode()).body(Map.of("message", e.getMessage()));
+    public ResponseEntity<ErrorResponse> handlePaymentApproveException(PaymentApproveException e) {
+        return ResponseEntity.status(e.getHttpStatusCode()).body(new ErrorResponse(e.getMessage()));
     }
 }
