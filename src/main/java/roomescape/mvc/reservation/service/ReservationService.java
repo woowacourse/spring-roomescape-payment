@@ -8,9 +8,7 @@ import roomescape.exception.BadRequestException;
 import roomescape.mvc.member.domain.Member;
 import roomescape.mvc.member.service.MemberQueryService;
 import roomescape.mvc.payment.domain.Payment;
-import roomescape.mvc.payment.dto.PaymentCreationContent;
 import roomescape.mvc.payment.service.PaymentQueryService;
-import roomescape.mvc.payment.service.PaymentService;
 import roomescape.mvc.reservation.domain.Reservation;
 import roomescape.mvc.reservation.dto.ReservationCreationContent;
 import roomescape.mvc.reservation.repository.ReservationRepository;
@@ -30,7 +28,6 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final WaitingRepository waitingRepository;
-    private final PaymentService paymentService;
     private final PaymentQueryService paymentQueryService;
     private final MemberQueryService memberQueryService;
     private final ThemeQueryService themeQueryService;
@@ -45,7 +42,7 @@ public class ReservationService {
             MemberQueryService memberQueryService,
             ThemeQueryService themeQueryService,
             ReservationTimeQueryService timeQueryService,
-            PaymentService paymentService, ReservationQueryService reservationQueryService,
+            ReservationQueryService reservationQueryService,
             WaitingQueryService waitingQueryService
     ) {
         this.reservationRepository = reservationRepository;
@@ -54,7 +51,6 @@ public class ReservationService {
         this.memberQueryService = memberQueryService;
         this.themeQueryService = themeQueryService;
         this.timeQueryService = timeQueryService;
-        this.paymentService = paymentService;
         this.reservationQueryService = reservationQueryService;
         this.waitingQueryService = waitingQueryService;
     }
@@ -79,33 +75,13 @@ public class ReservationService {
 
     public AddReservationByMember addReservationWithPayment(
             long memberId,
-            ReservationCreationContent reservationCreationContent,
-            PaymentCreationContent paymentCreationContent
-    ) {
-        Member member = memberQueryService.getMemberById(memberId);
-        Theme theme = themeQueryService.getThemeById(reservationCreationContent.themeId());
-        ReservationTime time = timeQueryService.getReservationTimeById(reservationCreationContent.timeId());
-
-        Payment payment = paymentService.savePayment(paymentCreationContent);
-        Reservation reservation = Reservation.createWithoutId(
-                reservationCreationContent.date(), time, theme, member, payment);
-
-        validateDuplicateReservation(reservation.getTheme(), reservation.getDate(), reservation.getReservationTime());
-        validatePastReservationCreation(reservation);
-
-        Reservation savedReservation = reservationRepository.save(reservation);
-        return new AddReservationByMember(savedReservation);
-    }
-
-    public AddReservationByMember addReservationWithPayment(
-            long memberId,
             long paymentId,
             ReservationCreationContent reservationCreationContent
     ) {
+        Payment payment = paymentQueryService.getPaymentById(paymentId);
         Member member = memberQueryService.getMemberById(memberId);
         Theme theme = themeQueryService.getThemeById(reservationCreationContent.themeId());
         ReservationTime time = timeQueryService.getReservationTimeById(reservationCreationContent.timeId());
-        Payment payment = paymentQueryService.getPaymentById(paymentId);
 
         Reservation reservation = Reservation.createWithoutId(
                 reservationCreationContent.date(), time, theme, member, payment);

@@ -6,8 +6,7 @@ import roomescape.exception.BadRequestException;
 import roomescape.mvc.member.domain.Member;
 import roomescape.mvc.member.service.MemberQueryService;
 import roomescape.mvc.payment.domain.Payment;
-import roomescape.mvc.payment.dto.PaymentCreationContent;
-import roomescape.mvc.payment.service.PaymentService;
+import roomescape.mvc.payment.service.PaymentQueryService;
 import roomescape.mvc.reservation.service.ReservationQueryService;
 import roomescape.mvc.theme.domain.Theme;
 import roomescape.mvc.theme.service.ThemeQueryService;
@@ -28,7 +27,7 @@ public class WaitingService {
     private final ReservationTimeQueryService timeQueryService;
     private final ReservationQueryService reservationQueryService;
     private final WaitingQueryService waitingQueryService;
-    private final PaymentService paymentService;
+    private final PaymentQueryService paymentQueryService;
 
     public WaitingService(
             WaitingRepository waitingRepository,
@@ -36,8 +35,7 @@ public class WaitingService {
             ThemeQueryService themeQueryService,
             ReservationTimeQueryService timeQueryService,
             ReservationQueryService reservationQueryService,
-            WaitingQueryService waitingQueryService,
-            PaymentService paymentService
+            WaitingQueryService waitingQueryService, PaymentQueryService paymentQueryService
     ) {
         this.waitingRepository = waitingRepository;
         this.memberQueryService = memberQueryService;
@@ -45,20 +43,20 @@ public class WaitingService {
         this.timeQueryService = timeQueryService;
         this.reservationQueryService = reservationQueryService;
         this.waitingQueryService = waitingQueryService;
-        this.paymentService = paymentService;
+        this.paymentQueryService = paymentQueryService;
     }
 
     @Transactional
     public AddWaitingResponse addWaiting(
             WaitingCreationContent content,
-            PaymentCreationContent paymentCreationContent
+            Long paymentId
     ) {
+        Payment payment = paymentQueryService.getPaymentById(paymentId);
         Theme theme = themeQueryService.getThemeById(content.themeId());
         ReservationTime time = timeQueryService.getTimeById(content.timeId());
         Member member = memberQueryService.getMemberById(content.memberId());
 
-        Payment paymentHistory = paymentService.savePayment(paymentCreationContent);
-        Waiting waiting = Waiting.createWithoutId(content.date(), theme, time, member, paymentHistory);
+        Waiting waiting = Waiting.createWithoutId(content.date(), theme, time, member, payment);
 
         validateEmptyReservation(waiting);
         validatePastWaitingCreation(waiting);

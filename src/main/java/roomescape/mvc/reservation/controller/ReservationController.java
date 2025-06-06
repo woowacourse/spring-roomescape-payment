@@ -29,7 +29,9 @@ import roomescape.annotation.docs.DocsDuplicatedDateCreationResponse;
 import roomescape.annotation.docs.DocsSuccessResponse;
 import roomescape.mvc.auth.dto.AccessTokenContent;
 import roomescape.mvc.member.domain.Role;
+import roomescape.mvc.payment.domain.Payment;
 import roomescape.mvc.payment.dto.PaymentCreationContent;
+import roomescape.mvc.payment.service.PaymentService;
 import roomescape.mvc.reservation.dto.ReservationCreationContent;
 import roomescape.mvc.reservation.request.AdminReservationRequest;
 import roomescape.mvc.reservation.request.ReservationCreationRequest;
@@ -48,13 +50,16 @@ public class ReservationController {
 
     private final ReservationService reservationService;
     private final ReservationQueryService reservationQueryService;
+    private final PaymentService paymentService;
 
     public ReservationController(
             ReservationService reservationService,
-            ReservationQueryService reservationQueryService
+            ReservationQueryService reservationQueryService,
+            PaymentService paymentService
     ) {
         this.reservationService = reservationService;
         this.reservationQueryService = reservationQueryService;
+        this.paymentService = paymentService;
     }
 
     @Operation(summary = "Find All Reservation", description = "모든 예약 조회")
@@ -132,11 +137,13 @@ public class ReservationController {
             @Valid @RequestBody ReservationCreationRequest request,
             @RequiredAccessToken AccessTokenContent accessTokenContent
     ) {
-        ReservationCreationContent creationContent = new ReservationCreationContent(request);
         PaymentCreationContent paymentCreationContent = new PaymentCreationContent(request);
+        Payment payment = paymentService.savePayment(paymentCreationContent);
 
+        ReservationCreationContent creationContent = new ReservationCreationContent(request);
         AddReservationByMember response = reservationService.addReservationWithPayment(
-                accessTokenContent.id(), creationContent, paymentCreationContent);
+                accessTokenContent.id(), payment.getId(), creationContent);
+
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(URI.create("/reservation/" + response.id()))
                 .body(response);

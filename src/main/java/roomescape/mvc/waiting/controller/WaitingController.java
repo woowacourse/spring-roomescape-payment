@@ -26,7 +26,9 @@ import roomescape.annotation.docs.DocsDuplicatedDateCreationResponse;
 import roomescape.annotation.docs.DocsSuccessResponse;
 import roomescape.mvc.auth.dto.AccessTokenContent;
 import roomescape.mvc.member.domain.Role;
+import roomescape.mvc.payment.domain.Payment;
 import roomescape.mvc.payment.dto.PaymentCreationContent;
+import roomescape.mvc.payment.service.PaymentService;
 import roomescape.mvc.waiting.dto.WaitingCreationContent;
 import roomescape.mvc.waiting.request.WaitingCreationRequest;
 import roomescape.mvc.waiting.response.AddWaitingResponse;
@@ -39,10 +41,16 @@ import roomescape.mvc.waiting.service.WaitingService;
 @RequestMapping("/waiting")
 public class WaitingController {
 
+    private final PaymentService paymentService;
     private final WaitingService waitingService;
     private final WaitingQueryService waitingQueryService;
 
-    public WaitingController(WaitingService waitingService, WaitingQueryService waitingQueryService) {
+    public WaitingController(
+            PaymentService paymentService,
+            WaitingService waitingService,
+            WaitingQueryService waitingQueryService
+    ) {
+        this.paymentService = paymentService;
         this.waitingService = waitingService;
         this.waitingQueryService = waitingQueryService;
     }
@@ -73,11 +81,12 @@ public class WaitingController {
             @Valid @RequestBody WaitingCreationRequest request,
             @RequiredAccessToken AccessTokenContent token
     ) {
+        PaymentCreationContent paymentCreationContent = new PaymentCreationContent(request);
+        Payment payment = paymentService.savePayment(paymentCreationContent);
+
         WaitingCreationContent creationContent =
                 new WaitingCreationContent(request.date(), request.themeId(), request.timeId(), token.id());
-        PaymentCreationContent paymentCreationContent = new PaymentCreationContent(request);
-
-        AddWaitingResponse response = waitingService.addWaiting(creationContent, paymentCreationContent);
+        AddWaitingResponse response = waitingService.addWaiting(creationContent, payment.getId());
         return ResponseEntity.created(URI.create("/waiting/" + response.id())).body(response);
     }
 

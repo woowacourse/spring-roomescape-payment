@@ -17,13 +17,13 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.NotFoundException;
-import roomescape.exception.PaymentException;
 import roomescape.mvc.member.domain.Member;
 import roomescape.mvc.member.domain.Role;
 import roomescape.mvc.member.service.MemberQueryService;
+import roomescape.mvc.payment.domain.Payment;
 import roomescape.mvc.payment.dto.PaymentCreationContent;
 import roomescape.mvc.payment.repository.PaymentRepository;
-import roomescape.mvc.payment.service.PaymentService;
+import roomescape.mvc.payment.service.PaymentQueryService;
 import roomescape.mvc.reservation.domain.Reservation;
 import roomescape.mvc.reservation.service.ReservationQueryService;
 import roomescape.mvc.theme.domain.Theme;
@@ -35,13 +35,12 @@ import roomescape.mvc.waiting.dto.WaitingCreationContent;
 import roomescape.mvc.waiting.repository.WaitingRepository;
 import roomescape.mvc.waiting.service.WaitingQueryService;
 import roomescape.mvc.waiting.service.WaitingService;
-import roomescape.test.stub.PaymentClientStub;
 
 @DataJpaTest
 @Import(value = {
-        PaymentService.class, MemberQueryService.class, ThemeQueryService.class,
+        PaymentQueryService.class, MemberQueryService.class, ThemeQueryService.class,
         ReservationTimeQueryService.class, ReservationQueryService.class, WaitingQueryService.class,
-        WaitingService.class, PaymentClientStub.class
+        WaitingService.class
 })
 class WaitingServiceTest {
 
@@ -53,12 +52,11 @@ class WaitingServiceTest {
     private PaymentRepository paymentRepository;
     @Autowired
     private WaitingService waitingService;
-    @Autowired
-    private PaymentClientStub paymentClientStub;
 
     private ReservationTime time;
     private Theme theme;
     private Member member;
+    private Payment payment;
 
     @BeforeEach
     void setup() {
@@ -68,6 +66,8 @@ class WaitingServiceTest {
                 Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
         member = entityManager.persist(
                 Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "password123!"));
+        payment = entityManager.persist(
+                Payment.createWithoutId("order_id", "payment_id", 1000L));
 
         entityManager.flush();
         entityManager.clear();
@@ -85,37 +85,17 @@ class WaitingServiceTest {
 
             WaitingCreationContent creationContent =
                     new WaitingCreationContent(NEXT_DAY, theme.getId(), time.getId(), member.getId());
-            PaymentCreationContent paymentCreationContent =
-                    new PaymentCreationContent("312313", "12312re", 1000L);
+
+            entityManager.flush();
+            entityManager.clear();
 
             // when
-            waitingService.addWaiting(creationContent, paymentCreationContent);
+            waitingService.addWaiting(creationContent, payment.getId());
 
             // then
             assertAll(
                     () -> assertThat(waitingRepository.findAll()).hasSize(1),
                     () -> assertThat(paymentRepository.findAll()).hasSize(1)
-            );
-        }
-
-        @DisplayName("결제가 실패하면 예약 대기가 실패한다")
-        @Test
-        void addWaitingFailTest() {
-            PaymentException paymentException = new PaymentException("결제 승인 실패");
-            paymentClientStub.setAuthorizePayment(paymentException);
-
-            WaitingCreationContent waitingCreationContent =
-                    new WaitingCreationContent(NEXT_DAY, theme.getId(), time.getId(), member.getId());
-            PaymentCreationContent paymentCreationContent =
-                    new PaymentCreationContent("312313", "12312re", 1000L);
-
-            // when & then
-            assertAll(
-                    () -> assertThatThrownBy(() ->
-                            waitingService.addWaiting(waitingCreationContent, paymentCreationContent))
-                            .isInstanceOf(PaymentException.class),
-                    () -> assertThat(waitingRepository.findAll()).hasSize(0),
-                    () -> assertThat(paymentRepository.findAll()).hasSize(0)
             );
         }
 
@@ -125,14 +105,11 @@ class WaitingServiceTest {
             // given
             WaitingCreationContent creationContent =
                     new WaitingCreationContent(NEXT_DAY, theme.getId() + 100, time.getId(), member.getId());
-            PaymentCreationContent paymentCreationContent =
-                    new PaymentCreationContent("312313", "12312re", 1000L);
 
             // when & then
-            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentCreationContent))
+            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, payment.getId()))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage("ID에 해당하는 테마는 존재하지 않습니다.");
-
         }
 
         @DisplayName("예약시간이 유효하지 않은 경우 대기 데이터를 추가할 수 없다.")
@@ -145,7 +122,7 @@ class WaitingServiceTest {
                     new PaymentCreationContent("312313", "12312re", 1000L);
 
             // when & then
-            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentCreationContent))
+            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, payment.getId()))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage("ID에 해당하는 예약시간이 존재하지 않습니다.");
         }
@@ -160,7 +137,7 @@ class WaitingServiceTest {
                     new PaymentCreationContent("312313", "12312re", 1000L);
 
             // when & then
-            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentCreationContent))
+            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, payment.getId()))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessage("ID에 해당하는 회원을 찾을 수 없습니다.");
         }
@@ -180,7 +157,7 @@ class WaitingServiceTest {
                     new PaymentCreationContent("312313", "12312re", 1000L);
 
             // when & then
-            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentCreationContent))
+            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, payment.getId()))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage("과거 날짜와 시간으로 예약 대기를 생성할 수 없습니다.");
         }
@@ -190,7 +167,7 @@ class WaitingServiceTest {
         void cannotAddByDuplicatedWaiting() {
             // given
             entityManager.persist(Reservation.createWithoutIdAndPaymentHistory(NEXT_DAY, time, theme, member));
-            
+
             entityManager.persist(Waiting.createWithoutIdWithoutPayment(NEXT_DAY, theme, time, member));
 
             entityManager.flush();
@@ -202,7 +179,7 @@ class WaitingServiceTest {
                     new PaymentCreationContent("312313", "12312re", 1000L);
 
             // when & then
-            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentCreationContent))
+            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, payment.getId()))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage("중복된 예약 대기는 허용하지 않습니다.");
         }
@@ -217,7 +194,7 @@ class WaitingServiceTest {
                     new PaymentCreationContent("312313", "12312re", 1000L);
 
             // when & then
-            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, paymentCreationContent))
+            assertThatThrownBy(() -> waitingService.addWaiting(creationContent, payment.getId()))
                     .isInstanceOf(BadRequestException.class)
                     .hasMessage("예약이 존재하지 않는 예약 대기는 허용하지 않습니다.");
         }

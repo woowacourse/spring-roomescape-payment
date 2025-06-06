@@ -1,6 +1,7 @@
 package roomescape.mvc.payment.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.client.payment.PaymentClient;
 import roomescape.mvc.payment.domain.Payment;
@@ -23,6 +24,7 @@ public class PaymentService {
         this.paymentClient = paymentClient;
     }
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public Payment savePayment(PaymentCreationContent content) {
         PaymentResult paymentResult = requestPaymentAuthorization(content);
         Payment payment = Payment.createWithoutId(

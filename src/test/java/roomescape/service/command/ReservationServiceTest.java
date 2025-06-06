@@ -18,16 +18,11 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.NotFoundException;
-import roomescape.exception.PaymentException;
 import roomescape.mvc.member.domain.Member;
 import roomescape.mvc.member.domain.Role;
 import roomescape.mvc.member.service.MemberQueryService;
 import roomescape.mvc.payment.domain.Payment;
-import roomescape.mvc.payment.dto.PaymentCreationContent;
-import roomescape.mvc.payment.dto.PaymentResult;
-import roomescape.mvc.payment.repository.PaymentRepository;
 import roomescape.mvc.payment.service.PaymentQueryService;
-import roomescape.mvc.payment.service.PaymentService;
 import roomescape.mvc.reservation.domain.Reservation;
 import roomescape.mvc.reservation.dto.ReservationCreationContent;
 import roomescape.mvc.reservation.repository.ReservationRepository;
@@ -40,13 +35,12 @@ import roomescape.mvc.time.domain.ReservationTime;
 import roomescape.mvc.time.service.ReservationTimeQueryService;
 import roomescape.mvc.waiting.domain.Waiting;
 import roomescape.mvc.waiting.service.WaitingQueryService;
-import roomescape.test.stub.PaymentClientStub;
 
 @DataJpaTest
 @Import(value = {
-        PaymentService.class, MemberQueryService.class, ThemeQueryService.class,
+        PaymentQueryService.class, MemberQueryService.class, ThemeQueryService.class,
         ReservationTimeQueryService.class, ReservationQueryService.class, WaitingQueryService.class,
-        ReservationService.class, PaymentQueryService.class, PaymentClientStub.class
+        ReservationService.class, PaymentQueryService.class
 })
 class ReservationServiceTest {
 
@@ -55,15 +49,12 @@ class ReservationServiceTest {
     @Autowired
     private ReservationRepository reservationRepository;
     @Autowired
-    private PaymentRepository paymentRepository;
-    @Autowired
     private ReservationService reservationService;
-    @Autowired
-    private PaymentClientStub paymentClientStub;
 
     private ReservationTime reservationTime;
     private Theme theme;
     private Member member;
+    private Payment payment;
 
     @BeforeEach
     void setup() {
@@ -73,6 +64,8 @@ class ReservationServiceTest {
                 Theme.createWithoutId("테마", "테마 설명", "thumbnail.jpg"));
         member = entityManager.persist(
                 Member.createWithoutId(Role.GENERAL, "회원", "member@test.com", "password123!"));
+        payment = entityManager.persist(
+                Payment.createWithoutId("order_id", "payment_id", 1000L));
 
         entityManager.flush();
         entityManager.clear();
@@ -94,10 +87,7 @@ class ReservationServiceTest {
                     reservationService.addReservationWithoutPayment(member.getId(), creationContent);
 
             // then
-            assertAll(
-                    () -> assertThat(reservationRepository.findAll()).hasSize(1),
-                    () -> assertThat(paymentRepository.findAll()).hasSize(0)
-            );
+            assertThat(reservationRepository.findAll()).hasSize(1);
         }
 
         @DisplayName("유저가 존재하지 않을 경우 예약을 추가할 수 없다.")
@@ -180,51 +170,22 @@ class ReservationServiceTest {
     }
 
     @Nested
-    @DisplayName("결제정보를 포함하여 예약을 추가할 수 있다")
+    @DisplayName("결제정보가 포함된 예약을 추가할 수 있다")
     public class addReservationWithPayment {
 
-        @DisplayName("결제 성공시 예약이 성공한다.")
+        @DisplayName("정상적으로 결제 정보가 포함된 예약을 추가할 수 있다.")
         @Test
         void canReserveWhenPaymentSuccess() {
             // given
-            PaymentResult paymentResult = new PaymentResult("order_id", "payment_key", 1000L);
-            paymentClientStub.setAuthorizePayment(paymentResult);
-
             ReservationCreationContent reservationCreationContent =
                     new ReservationCreationContent(theme.getId(), NEXT_DAY, reservationTime.getId());
-            PaymentCreationContent paymentCreationContent =
-                    new PaymentCreationContent("order_id", "payment_key", 1000L);
 
             // when
             reservationService.addReservationWithPayment(
-                    member.getId(), reservationCreationContent, paymentCreationContent);
+                    member.getId(), payment.getId(), reservationCreationContent);
 
             // then
-            assertAll(
-                    () -> assertThat(reservationRepository.findAll()).hasSize(1),
-                    () -> assertThat(paymentRepository.findAll()).hasSize(1)
-            );
-        }
-
-        @DisplayName("결제 실패시 예약이 실패한다.")
-        @Test
-        void cannotReserveWhenPaymentFail() {
-            // given
-            PaymentException paymentException = new PaymentException("결제 승인 실패");
-            paymentClientStub.setAuthorizePayment(paymentException);
-
-            ReservationCreationContent reservationCreationContent =
-                    new ReservationCreationContent(theme.getId(), NEXT_DAY, reservationTime.getId());
-            PaymentCreationContent paymentCreationContent =
-                    new PaymentCreationContent("order_id", "payment_key", 1000L);
-
-            // when & then
-            assertAll(
-                    () -> assertThatThrownBy(() -> reservationService.addReservationWithPayment(
-                            member.getId(), reservationCreationContent, paymentCreationContent))
-                            .isInstanceOf(PaymentException.class),
-                    () -> assertThat(reservationRepository.findAll()).hasSize(0)
-            );
+            assertThat(reservationRepository.findAll()).hasSize(1);
         }
     }
 
