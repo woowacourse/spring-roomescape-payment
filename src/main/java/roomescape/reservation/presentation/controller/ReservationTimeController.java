@@ -18,9 +18,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import roomescape.global.auth.Auth;
 import roomescape.member.domain.Role;
 import roomescape.reservation.application.service.ReservationTimeService;
-import roomescape.reservation.presentation.dto.AvailableReservationTimeResponse;
-import roomescape.reservation.presentation.dto.ReservationTimeRequest;
-import roomescape.reservation.presentation.dto.ReservationTimeResponse;
+import roomescape.reservation.application.dto.AvailableReservationTimeResponse;
+import roomescape.reservation.application.dto.ReservationTimeRequest;
+import roomescape.reservation.application.dto.ReservationTimeResponse;
 
 @RestController
 @RequestMapping("/times")

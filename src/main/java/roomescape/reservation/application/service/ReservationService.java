@@ -14,8 +14,8 @@ import roomescape.member.domain.repository.MemberRepository;
 import roomescape.payment.application.service.PaymentService;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.repository.PaymentRepository;
-import roomescape.payment.presentation.dto.PaymentRequest;
-import roomescape.reservation.presentation.dto.ReservationRequest;
+import roomescape.payment.application.dto.PaymentRequest;
+import roomescape.reservation.application.dto.ReservationRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
@@ -24,9 +24,9 @@ import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.domain.repository.ThemeRepository;
 import roomescape.reservation.domain.repository.WaitingRepository;
-import roomescape.reservation.presentation.dto.AdminReservationRequest;
-import roomescape.reservation.presentation.dto.ReservationResponse;
-import roomescape.reservation.presentation.dto.UserReservationsResponse;
+import roomescape.reservation.application.dto.AdminReservationRequest;
+import roomescape.reservation.application.dto.ReservationResponse;
+import roomescape.reservation.application.dto.UserReservationsResponse;
 
 @Service
 public class ReservationService {

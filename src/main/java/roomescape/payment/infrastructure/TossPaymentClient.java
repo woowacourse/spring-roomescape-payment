@@ -11,7 +11,7 @@ import roomescape.payment.application.service.PaymentClient;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.infrastructure.dto.TossPaymentErrorResponse;
 import roomescape.payment.infrastructure.dto.TossPaymentRequest;
-import roomescape.payment.presentation.dto.PaymentRequest;
+import roomescape.payment.application.dto.PaymentRequest;
 
 public class TossPaymentClient implements PaymentClient {
 

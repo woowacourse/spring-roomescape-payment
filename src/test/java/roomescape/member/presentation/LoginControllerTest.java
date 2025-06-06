@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.DatabaseCleaner;
-import roomescape.member.presentation.dto.TokenRequest;
+import roomescape.member.application.dto.TokenRequest;
 import roomescape.member.presentation.fixture.MemberFixture;
 
 @ActiveProfiles("test")

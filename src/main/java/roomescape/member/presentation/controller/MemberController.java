@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.global.auth.Auth;
 import roomescape.member.application.service.MemberService;
 import roomescape.member.domain.Role;
-import roomescape.member.presentation.dto.MemberResponse;
-import roomescape.member.presentation.dto.SignUpRequest;
-import roomescape.member.presentation.dto.SignUpResponse;
+import roomescape.member.application.dto.MemberResponse;
+import roomescape.member.application.dto.SignUpRequest;
+import roomescape.member.application.dto.SignUpResponse;
 
 @RestController
 public class MemberController {

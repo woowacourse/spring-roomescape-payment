@@ -8,10 +8,10 @@ import roomescape.global.jwt.TokenProvider;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.domain.repository.MemberRepository;
-import roomescape.member.presentation.dto.MemberResponse;
-import roomescape.member.presentation.dto.SignUpRequest;
-import roomescape.member.presentation.dto.SignUpResponse;
-import roomescape.member.presentation.dto.TokenRequest;
+import roomescape.member.application.dto.MemberResponse;
+import roomescape.member.application.dto.SignUpRequest;
+import roomescape.member.application.dto.SignUpResponse;
+import roomescape.member.application.dto.TokenRequest;
 
 @Service
 public class MemberService {

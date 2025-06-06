@@ -16,12 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.reservation.application.service.ReservationService;
 import roomescape.reservation.application.service.ReservationTimeService;
 import roomescape.reservation.application.service.ThemeService;
-import roomescape.reservation.presentation.dto.AdminReservationRequest;
-import roomescape.reservation.presentation.dto.AvailableReservationTimeResponse;
-import roomescape.reservation.presentation.dto.ReservationTimeRequest;
-import roomescape.reservation.presentation.dto.ReservationTimeResponse;
-import roomescape.reservation.presentation.dto.ThemeRequest;
-import roomescape.reservation.presentation.dto.ThemeResponse;
+import roomescape.reservation.application.dto.AdminReservationRequest;
+import roomescape.reservation.application.dto.AvailableReservationTimeResponse;
+import roomescape.reservation.application.dto.ReservationTimeRequest;
+import roomescape.reservation.application.dto.ReservationTimeResponse;
+import roomescape.reservation.application.dto.ThemeRequest;
+import roomescape.reservation.application.dto.ThemeResponse;
 
 @ActiveProfiles("test")
 @Transactional

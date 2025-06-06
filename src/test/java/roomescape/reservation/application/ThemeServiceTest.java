@@ -19,18 +19,17 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.payment.application.service.PaymentService;
 import roomescape.payment.domain.Payment;
-import roomescape.payment.domain.repository.PaymentRepository;
-import roomescape.payment.presentation.dto.PaymentRequest;
+import roomescape.payment.application.dto.PaymentRequest;
 import roomescape.reservation.application.service.ReservationTimeService;
 import roomescape.reservation.application.service.ThemeService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.repository.ReservationRepository;
-import roomescape.reservation.presentation.dto.ReservationTimeRequest;
-import roomescape.reservation.presentation.dto.ReservationTimeResponse;
-import roomescape.reservation.presentation.dto.ThemeRequest;
-import roomescape.reservation.presentation.dto.ThemeResponse;
+import roomescape.reservation.application.dto.ReservationTimeRequest;
+import roomescape.reservation.application.dto.ReservationTimeResponse;
+import roomescape.reservation.application.dto.ThemeRequest;
+import roomescape.reservation.application.dto.ThemeResponse;
 
 @ActiveProfiles("test")
 @Transactional

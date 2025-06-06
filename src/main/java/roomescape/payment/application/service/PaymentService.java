@@ -3,7 +3,7 @@ package roomescape.payment.application.service;
 import org.springframework.stereotype.Service;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.repository.PaymentRepository;
-import roomescape.payment.presentation.dto.PaymentRequest;
+import roomescape.payment.application.dto.PaymentRequest;
 
 @Service
 public class PaymentService {

@@ -19,10 +19,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import roomescape.global.auth.Auth;
 import roomescape.member.domain.Role;
 import roomescape.member.presentation.resolver.LoginMember;
-import roomescape.reservation.presentation.dto.ReservationRequest;
+import roomescape.reservation.application.dto.ReservationRequest;
 import roomescape.reservation.application.service.ReservationService;
-import roomescape.reservation.presentation.dto.ReservationResponse;
-import roomescape.reservation.presentation.dto.UserReservationsResponse;
+import roomescape.reservation.application.dto.ReservationResponse;
+import roomescape.reservation.application.dto.UserReservationsResponse;
 
 @RestController
 @RequestMapping("/reservations")

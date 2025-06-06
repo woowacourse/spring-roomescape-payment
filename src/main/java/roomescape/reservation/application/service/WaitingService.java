@@ -19,8 +19,8 @@ import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.domain.repository.ThemeRepository;
 import roomescape.reservation.domain.repository.WaitingRepository;
-import roomescape.reservation.presentation.dto.WaitingRequest;
-import roomescape.reservation.presentation.dto.WaitingResponse;
+import roomescape.reservation.application.dto.WaitingRequest;
+import roomescape.reservation.application.dto.WaitingResponse;
 
 @Service
 public class WaitingService {

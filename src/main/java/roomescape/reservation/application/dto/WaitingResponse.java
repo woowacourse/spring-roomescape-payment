@@ -1,7 +1,7 @@
-package roomescape.reservation.presentation.dto;
+package roomescape.reservation.application.dto;
 
 import java.time.LocalDate;
-import roomescape.member.presentation.dto.MemberResponse;
+import roomescape.member.application.dto.MemberResponse;
 import roomescape.reservation.domain.Waiting;
 
 public class WaitingResponse {

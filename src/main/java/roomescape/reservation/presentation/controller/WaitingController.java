@@ -18,8 +18,8 @@ import roomescape.global.auth.Auth;
 import roomescape.member.domain.Role;
 import roomescape.member.presentation.resolver.LoginMember;
 import roomescape.reservation.application.service.WaitingService;
-import roomescape.reservation.presentation.dto.WaitingRequest;
-import roomescape.reservation.presentation.dto.WaitingResponse;
+import roomescape.reservation.application.dto.WaitingRequest;
+import roomescape.reservation.application.dto.WaitingResponse;
 
 @RestController
 @RequestMapping("/reservations/waiting")

@@ -14,8 +14,8 @@ import roomescape.global.auth.Auth;
 import roomescape.global.jwt.AuthorizationExtractor;
 import roomescape.member.application.service.MemberService;
 import roomescape.member.domain.Role;
-import roomescape.member.presentation.dto.MemberResponse;
-import roomescape.member.presentation.dto.TokenRequest;
+import roomescape.member.application.dto.MemberResponse;
+import roomescape.member.application.dto.TokenRequest;
 
 @RestController
 @RequestMapping("/login")
