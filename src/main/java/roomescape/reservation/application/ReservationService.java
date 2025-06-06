@@ -43,6 +43,11 @@ public class ReservationService {
             final CreateBookedReservationWithPaymentRequest request,
             final Long memberId
     ) {
+        final ReservationTime time = getReservationTime(request.date(), request.timeId());
+        final Theme theme = themeRepository.getById(request.themeId());
+        final Member member = memberRepository.getById(memberId);
+        final Reservation reservation = createReservedReservation(request.date(), time, theme, member);
+
         paymentDomainService.approvePayment(
                 new PaymentInfo(
                         request.paymentKey(),
@@ -51,11 +56,7 @@ public class ReservationService {
                 )
         );
 
-        final ReservationTime time = getReservationTime(request.date(), request.timeId());
-        final Theme theme = themeRepository.getById(request.themeId());
-        final Member member = memberRepository.getById(memberId);
-
-        return ReservationResponse.from(createReservedReservation(request.date(), time, theme, member));
+        return ReservationResponse.from(reservation);
     }
 
     private Reservation createReservedReservation(
