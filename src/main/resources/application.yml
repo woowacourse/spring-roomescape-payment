@@ -20,3 +20,20 @@ auth:
     valid-time: 1800000
   cookie:
     max-age: 1800
+
+logging:
+  level:
+    root: info
+    roomescape.service: debug
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/reservation-app.log
+
+  # 로그 파일이 일정 용량 이상 쌓이면 날짜별로 분리해서 관리 (Logback 롤링 정책)
+  logback:
+    rolling policy:
+      max-file-size: 10MB
+      max-history: 30
+      file-name-pattern: logs/reservation-app.%d{yyyy-MM-dd}.%i.log
