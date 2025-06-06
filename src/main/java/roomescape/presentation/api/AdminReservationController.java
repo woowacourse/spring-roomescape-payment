@@ -1,5 +1,6 @@
 package roomescape.presentation.api;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import roomescape.presentation.dto.response.WaitingResponse;
 import java.time.LocalDate;
 import java.util.List;
 
+@Hidden
 @RestController
 @RequestMapping("/admin/reservations")
 public class AdminReservationController {
