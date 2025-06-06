@@ -38,3 +38,14 @@ logging:
 server:
   address: 0.0.0.0
   port: 8080
+
+springdoc:
+  swagger-ui:
+    path: /swagger
+    groups-order: DESC
+    operationsSorter: method
+    display-request-duration: true
+  api-docs:
+    path: /api-docs
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
