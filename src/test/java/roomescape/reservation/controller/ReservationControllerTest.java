@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.IntegrationTest;
-import roomescape.TestFixture;
 import roomescape.auth.infrastructure.jwt.JwtTokenProvider;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
@@ -86,12 +85,9 @@ class ReservationControllerTest extends IntegrationTest {
     @Test
     void 유저_예약_생성_성공() {
         // given
-        Member member1 = TestFixture.createDefaultMember_1();
-        ReservationTime reservationTimeAt10 = createTimeAt_10();
-        Theme theme1 = createDefaultTheme();
-        dbHelper.insertMember(member1);
-        dbHelper.insertTime(reservationTimeAt10);
-        dbHelper.insertTheme(theme1);
+        Member member1 = dbHelper.insertMember(createDefaultMember_1());
+        ReservationTime reservationTimeAt10 = dbHelper.insertTime(createTimeAt_10());
+        Theme theme1 = dbHelper.insertTheme(createDefaultTheme());
         String token = jwtTokenProvider.createToken(createClaims(member1));
 
         ReservationRequest reservationRequest = new ReservationRequest(

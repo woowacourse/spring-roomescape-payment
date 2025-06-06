@@ -83,7 +83,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         if (e instanceof NumberFormatException) {
             log.warn("토큰 파싱 실패 - 잘못된 숫자 형식 - URI={} message={}", uri, e.getMessage());
-            writeJsonErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "잘못된 요청입니다.");
+            writeJsonErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "잘못된 토큰 요청입니다.");
             return;
         }
 

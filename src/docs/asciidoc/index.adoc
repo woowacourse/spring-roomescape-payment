@@ -15,3 +15,5 @@ include::mypage.adoc[]
 include::theme.adoc[]
 
 include::time.adoc[]
+
+includ::exception.adoc[]

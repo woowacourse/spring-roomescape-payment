@@ -1,0 +1,24 @@
+== 예외 (Excpetion)
+
+=== 400 Bad Request
+잘못된 클라이언트 요청, 비즈니스 규칙 위반
+
+==== error response
+include::{snippets}/400-exception/http-response.adoc[]
+
+=== 401 Unauthorized
+인증이 필요한 요청을 인증 없이 호출한 경우, 인증에 실패한 경우
+
+==== error response
+include::{snippets}/401-exception/http-response.adoc[]
+
+=== 403 Forbidden
+해당 요청을 수행할 권한이 없는 경우
+
+include::{snippets}/403-exception/http-response.adoc[]
+
+
+=== 500 Internal Server Error
+그 외 서버 내부 오류가 발생했을 경우
+
+include::{snippets}/500-exception/http-response.adoc[]
