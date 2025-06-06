@@ -39,7 +39,7 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
-    @Nullable
+    @Nullable  // NOTE. 어떻게 생각하시는지 여쭤보기
     @OneToOne(fetch = FetchType.LAZY)
     private Payment payment;
 
@@ -129,5 +129,12 @@ public class Reservation {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
+    }
+
+    public void cancel() {
+        if (status == ReservationStatus.CANCELED) {
+            throw new IllegalStateException("이미 취소된 예약입니다.");
+        }
+        status = ReservationStatus.CANCELED;
     }
 }

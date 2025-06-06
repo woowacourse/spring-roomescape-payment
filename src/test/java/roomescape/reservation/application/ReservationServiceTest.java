@@ -1,7 +1,6 @@
 package roomescape.reservation.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -22,6 +21,7 @@ import roomescape.reservation.application.dto.MemberReservationRequest;
 import roomescape.reservation.application.dto.MyReservation;
 import roomescape.reservation.application.dto.ReservationResponse;
 import roomescape.reservation.application.dto.ReservationTimeResponse;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.theme.application.dto.ThemeResponse;
 import roomescape.waiting.application.WaitingService;
 import roomescape.waiting.application.dto.WaitingIdResponse;
@@ -63,21 +63,6 @@ class ReservationServiceTest {
                 new ThemeResponse(1L, "인터스텔라", "시공간을 넘나들며 인류의 미래를 구해야 하는 극한의 두뇌 미션, 인터스텔라 방탈출!",
                     "https://upload.wikimedia.org/wikipedia/ko/b/b7/%EC%9D%B8%ED%84%B0%EC%8A%A4%ED%85%94%EB%9D%BC.jpg?20150905075839"),
                 new MemberResponse(1L, "엠제이")));
-    }
-
-    @Test
-    void 예약을_삭제한다() {
-
-        // given
-        final MemberReservationRequest request = createRequest(
-            LocalDate.now().plusDays(1), 1L, 1L);
-        reservationService.addMemberReservation(request, 1L);
-
-        // when
-        final Long id = 7L;
-
-        // then
-        assertThatCode(() -> reservationService.deleteById(id)).doesNotThrowAnyException();
     }
 
     @Test
@@ -147,8 +132,9 @@ class ReservationServiceTest {
 
         //then
         List<MyReservation> reservations = reservationService.findByMemberId(1L);
-        boolean hasReservation = reservations.stream()
-            .anyMatch(reservation -> reservation.id().equals(reservationResponse.id()));
+        MyReservation canceledReservation = reservations.stream()
+            .filter(reservation -> reservation.id().equals(reservationResponse.id()))
+            .findFirst().get();
 
         List<MyReservation> waitingsFromMember = waitingService.getWaitingsFromMember(2L);
         boolean hasWaiting = waitingsFromMember.stream()
@@ -157,7 +143,7 @@ class ReservationServiceTest {
         List<MyReservation> findReservations = reservationService.findByMemberId(2L);
 
         //then
-        assertThat(hasReservation).isFalse();
+        assertThat(canceledReservation.status()).isEqualTo(ReservationStatus.CANCELED.getTitle());
         assertThat(hasWaiting).isFalse();
         assertThat(findReservations).hasSize(3);
     }

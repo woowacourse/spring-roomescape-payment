@@ -73,17 +73,9 @@ public class ReservationService {
     }
 
     @Transactional
-    public void deleteById(final Long id) {
-        if (!reservationRepository.existsById(id)) {
-            throw new NotFoundException("존재하지 않는 예약입니다.");
-        }
-        reservationRepository.deleteById(id);
-    }
-
-    @Transactional
     public void deleteReservationAndGetFirstWaiting(final Long reservationId) {
         Reservation reservation = getReservation(reservationId);
-        deleteById(reservation.getId());
+        reservation.cancel();
         waitingRepository.findFirstByThemeIdAndDateAndReservationTimeIdOrderById(
             reservation.getTheme().getId(),
             reservation.getDate(),
