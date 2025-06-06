@@ -6,53 +6,47 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static roomescape.fixture.PaymentFixture.CREATE_PAYMENT_OF;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.restdocs.payload.FieldDescriptor;
+import org.springframework.restdocs.request.ParameterDescriptor;
+import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import roomescape.application.PaymentService;
 import roomescape.application.request.PaymentInfo;
 import roomescape.domain.payment.Payment;
 import roomescape.presentation.response.ReservedResponse;
-import roomescape.presentation.rest.PendingPaymentControllerTest.TestConfig;
 
 
-@Import(TestConfig.class)
-@ActiveProfiles("test")
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class PendingPaymentControllerTest {
 
-    @Autowired
-    private PaymentService paymentService;
-
-    @LocalServerPort
-    private int port;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
-
     @Nested
+    @Import(TestConfig.class)
     @DisplayName("결재 대기 상태의 예약의 결제를 진행한다.")
-    class ConfirmPayment {
+    class ConfirmPayment extends RestDocsTestBase {
+
+        @Autowired
+        private PaymentService paymentService;
 
         @Test
         @DisplayName("예약 ID가 존재하지 않으면 404를 반환한다.")
@@ -62,14 +56,17 @@ class PendingPaymentControllerTest {
             PaymentInfo paymentInfo = new PaymentInfo("paymentKey", "orderId", 1000);
 
             // when & then
-            RestAssured.given().log().all().contentType(ContentType.JSON).body(paymentInfo).when()
-                    .patch("/pending-payments/" + pendingPaymentId + "/payment").then().log().all()
+            RestAssured.given(spec).filter(confirmPayment_WhenPendingPaymentNotExists_ThenReturn404Status_Document())
+                    .log().all().contentType(ContentType.JSON).body(paymentInfo)
+                    .when()
+                    .patch("/pending-payments/{id}/payment", pendingPaymentId)
+                    .then().log().all()
                     .statusCode(HttpStatus.NOT_FOUND.value());
         }
 
         @Test
         @DisplayName("정상적으로 결제를 진행하면 200을 반환한다.")
-        void confirmPayment_WhenPendingPaymentExists_ThenReturn200Status() {
+        void confirmPayment() {
             // given
             Payment payment = CREATE_PAYMENT_OF(null);
             var pendingPaymentId = 6L;
@@ -78,16 +75,81 @@ class PendingPaymentControllerTest {
             Mockito.when(paymentService.savePayment(paymentInfo)).thenReturn(payment);
 
             // when & then
-            ReservedResponse response = RestAssured.given().log().all().contentType(ContentType.JSON).body(paymentInfo)
-                    .when().patch("/pending-payments/" + pendingPaymentId + "/payment").then().log().all()
+            ReservedResponse response = RestAssured.given(spec).filter(confirmPayment_Document()).log().all()
+                    .contentType(ContentType.JSON).body(paymentInfo)
+                    .when().patch("/pending-payments/{id}/payment", pendingPaymentId)
+                    .then().log().all()
                     .statusCode(HttpStatus.OK.value()).extract().body().as(ReservedResponse.class);
 
-            assertAll(() -> assertThat(response.date()).isEqualTo(LocalDate.now().plusDays(2)),
+            assertAll(
+                    () -> assertThat(response.date()).isEqualTo(LocalDate.now().plusDays(2)),
                     () -> assertThat(response.theme().id()).isEqualTo(1),
                     () -> assertThat(response.time().id()).isEqualTo(1),
                     () -> assertThat(response.user().id()).isEqualTo(2),
-                    () -> verify(paymentService).savePayment(any(PaymentInfo.class)));
+                    () -> verify(paymentService).savePayment(any(PaymentInfo.class))
+            );
 
+        }
+
+        RestDocumentationFilter confirmPayment_WhenPendingPaymentNotExists_ThenReturn404Status_Document() {
+            FieldDescriptor[] responseFields = getErrorFieldDescriptors();
+
+            ParameterDescriptor[] pathParameters = {
+                    parameterWithName("id").description("결제 대기 상태 예약 ID")
+            };
+
+            FieldDescriptor[] requestFields = {
+                    fieldWithPath("paymentKey").description("결제 요청 key"),
+                    fieldWithPath("orderId").description("주문 ID"),
+                    fieldWithPath("amount").description("결제 금액")
+            };
+
+            return document(
+                    "pending-payment-confirm-not-found",
+                    preprocessRequest(prettyPrint()),
+                    preprocessResponse(prettyPrint()),
+                    requestFields(requestFields),
+                    pathParameters(pathParameters),
+                    responseFields(responseFields)
+            );
+        }
+
+
+        RestDocumentationFilter confirmPayment_Document() {
+            ParameterDescriptor[] pathParameters = {
+                    parameterWithName("id").description("결제 대기 상태 예약 ID")
+            };
+
+            FieldDescriptor[] requestFields = {
+                    fieldWithPath("paymentKey").description("결제 요청 key"),
+                    fieldWithPath("orderId").description("주문 ID"),
+                    fieldWithPath("amount").description("결제 금액")
+            };
+
+            FieldDescriptor[] responseFields = {
+                    fieldWithPath("id").description("예약 ID"),
+                    fieldWithPath("user").description("예약 사용자 정보"),
+                    fieldWithPath("user.id").description("사용자 ID"),
+                    fieldWithPath("user.name").description("사용자 이름"),
+                    fieldWithPath("date").description("예약 날짜"),
+                    fieldWithPath("time").description("시간 정보"),
+                    fieldWithPath("time.id").description("예약 시간 ID"),
+                    fieldWithPath("time.startAt").description("방탈출 예약 시간"),
+                    fieldWithPath("theme").description("테마 정보"),
+                    fieldWithPath("theme.id").description("테마 정보"),
+                    fieldWithPath("theme.name").description("테마 정보"),
+                    fieldWithPath("theme.description").description("테마 정보"),
+                    fieldWithPath("theme.thumbnail").description("테마 정보")
+            };
+
+            return document(
+                    "pending-payment-confirm",
+                    preprocessRequest(prettyPrint()),
+                    preprocessResponse(prettyPrint()),
+                    requestFields(requestFields),
+                    pathParameters(pathParameters),
+                    responseFields(responseFields)
+            );
         }
     }
 

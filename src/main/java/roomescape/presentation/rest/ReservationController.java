@@ -34,10 +34,14 @@ public class ReservationController {
 
     @PostMapping("/reservations")
     @ResponseStatus(CREATED)
-    public ReservedResponse createReservationWithUserPrivileges(@Authenticated final User user,
-                                                                @RequestBody @Valid final CreateReservationRequest request) {
-        Reserved reservation = reservedService.saveReservedWithPurchase(user.getId(), request.date(), request.timeId(),
-                request.themeId(), request.toPaymentInfo());
+    public ReservedResponse createReservationWithUserPrivileges(
+            @Authenticated final User user,
+            @RequestBody @Valid final CreateReservationRequest request
+    ) {
+        Reserved reservation = reservedService.saveReservedWithPurchase(
+                user.getId(), request.date(), request.timeId(),
+                request.themeId(), request.toPaymentInfo()
+        );
 
         return ReservedResponse.fromReservation(reservation);
     }
@@ -45,19 +49,23 @@ public class ReservationController {
     @PostMapping("/admin/reservations")
     @ResponseStatus(CREATED)
     public ReservedResponse createReservationWithAdminPrivileges(
-            @RequestBody @Valid final CreateReservationAdminRequest request) {
-        Reserved reservation = reservedService.saveReservedWithoutPurchase(request.userId(), request.date(),
-                request.timeId(), request.themeId());
+            @RequestBody @Valid final CreateReservationAdminRequest request
+    ) {
+        Reserved reservation = reservedService.saveReservedWithoutPurchase(
+                request.userId(), request.date(),
+                request.timeId(), request.themeId()
+        );
 
         return ReservedResponse.fromReservation(reservation);
     }
 
     @GetMapping("/reservations")
-    public List<ReservedResponse> readAllReservedReservations(
+    public List<ReservedResponse> findReservations(
             @RequestParam(name = "themeId", required = false) final Long themeId,
             @RequestParam(name = "userId", required = false) final Long userId,
             @RequestParam(name = "dateFrom", required = false) final LocalDate dateFrom,
-            @RequestParam(name = "dateTo", required = false) final LocalDate dateTo) {
+            @RequestParam(name = "dateTo", required = false) final LocalDate dateTo
+    ) {
         ReservedSearchFilter searchFilter = new ReservedSearchFilter(themeId, userId, dateFrom, dateTo);
         List<Reserved> reservations = reservedService.findReservedByFilter(searchFilter);
 
@@ -66,7 +74,7 @@ public class ReservationController {
 
     @DeleteMapping("/reservations/{id}")
     @ResponseStatus(NO_CONTENT)
-    public void deleteReservationById(@PathVariable("id") final long id) {
+    public void deleteReservation(@PathVariable("id") final long id) {
         reservedService.removeById(id);
     }
 }

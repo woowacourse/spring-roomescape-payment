@@ -1,13 +1,27 @@
 package roomescape.presentation.rest;
 
+import static org.springframework.restdocs.cookies.CookieDocumentation.cookieWithName;
+import static org.springframework.restdocs.cookies.CookieDocumentation.requestCookies;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.Map;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.restdocs.cookies.CookieDescriptor;
+import org.springframework.restdocs.payload.FieldDescriptor;
+import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -16,38 +30,84 @@ import org.springframework.test.context.ActiveProfiles;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class UserControllerTest {
 
-    private static final Map<String, String> MEMBER_BODY = Map.of(
-            "email", "razel@email.com",
-            "password", "razel1234",
-            "name", "라젤"
-    );
+    @Nested
+    @DisplayName("사용자를 추가한다.")
+    class CreateUser extends RestDocsTestBase {
 
-    @Test
-    @DisplayName("멤버 추가 요청시, id를 포함한 멤버와 CREATED를 응답한다")
-    void addMember() {
-        RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(MEMBER_BODY)
-                .when().post("/users")
-                .then().log().all()
-                .statusCode(HttpStatus.CREATED.value())
-                .body("name", Matchers.equalTo("라젤"));
+        @Test
+        @DisplayName("id를 포함한 멤버와 CREATED를 응답한다")
+        void createUser() {
+            Map<String, String> requestBody = Map.of(
+                    "email", "razel@email.com",
+                    "password", "razel1234",
+                    "name", "라젤"
+            );
+
+            RestAssured.given(spec).filter(createUser_Document()).log().all()
+                    .contentType(ContentType.JSON)
+                    .body(requestBody)
+                    .when().post("/users")
+                    .then().log().all()
+                    .statusCode(HttpStatus.CREATED.value())
+                    .body("name", Matchers.equalTo("라젤"));
+        }
+
+        RestDocumentationFilter createUser_Document() {
+            FieldDescriptor[] requestFields = {
+                    fieldWithPath("email").description("저장할 사용자의 이메일(ID)"),
+                    fieldWithPath("password").description("저장할 사용자의 비밀번호(PW)"),
+                    fieldWithPath("name").description("저장할 사용자의 이름(ID)")
+            };
+
+            FieldDescriptor[] responseFields = {
+                    fieldWithPath("id").description("사용자의 ID"),
+                    fieldWithPath("name").description("사용자의 이름(ID)")
+            };
+
+            return document(
+                    "user-create",
+                    preprocessRequest(prettyPrint()),
+                    preprocessResponse(prettyPrint()),
+                    requestFields(requestFields),
+                    responseFields(responseFields)
+            );
+        }
     }
 
-    @Test
-    @DisplayName("예약 조회 요청시, 존재하는 모든 예약과 OK를 응답한다")
-    void readAllRecordByUser() {
-        var token = RestAssured.given()
-                .contentType(ContentType.JSON)
-                .body(Map.of("email", "user1@email.com", "password", "password1"))
-                .when().post("/login")
-                .then().statusCode(200)
-                .extract().response().getDetailedCookies().getValue("token");
+    @Nested
+    @DisplayName("모든 사용자를 조회한다.")
+    class ReadAllUsers extends RestDocsTestBase {
 
-        RestAssured.given().log().all()
-                .cookie("token", token)
-                .when().get("/users/reservations")
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value());
+        @Test
+        @DisplayName("모든 사용자를 정상적으로 조회한다.")
+        void readAllUsers() {
+            String token = getAdminToken();
+
+            RestAssured.given(spec).filter(readAllUsers_Document()).log().all()
+                    .cookie("token", token)
+                    .when().get("/admin/users")
+                    .then().log().all()
+                    .statusCode(HttpStatus.OK.value());
+        }
+
+        RestDocumentationFilter readAllUsers_Document() {
+            CookieDescriptor[] requestCookies = {
+                    cookieWithName("token").description("사용자 인증 토큰")
+            };
+
+            FieldDescriptor[] responseFields = {
+                    fieldWithPath("[]").description("조회된 사용자 목록"),
+                    fieldWithPath("[].id").description("사용자의 ID"),
+                    fieldWithPath("[].name").description("사용자의 이름(ID)")
+            };
+
+            return document(
+                    "user-find-all",
+                    preprocessRequest(prettyPrint()),
+                    preprocessResponse(prettyPrint()),
+                    requestCookies(requestCookies),
+                    responseFields(responseFields)
+            );
+        }
     }
 }

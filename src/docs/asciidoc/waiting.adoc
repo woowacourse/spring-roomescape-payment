@@ -1,0 +1,6 @@
+=== 예약 대기 - 생성
+include::{snippets}/pending-payment-confirm/http-request.adoc[]
+operation::waiting-create[snippets="http-request,request-cookies,request-fields,http-response,response-fields"]
+
+=== 예약 대기 - 삭제
+operation::waiting-remove[snippets="http-request,path-parameters,request-cookies,http-response"]

@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.application.WaitingService;
-import roomescape.domain.user.User;
 import roomescape.domain.reservation.waiting.Waiting;
+import roomescape.domain.user.User;
 import roomescape.presentation.auth.Authenticated;
 import roomescape.presentation.request.CreateWaitingRequest;
 import roomescape.presentation.response.WaitingResponse;
@@ -47,7 +47,7 @@ public class WaitingController {
 
     @DeleteMapping("/waitings/{id}")
     @ResponseStatus(NO_CONTENT)
-    public void deleteWaitingById(
+    public void deleteWaiting(
             @PathVariable("id") final long id
     ) {
         waitingService.removeById(id);

@@ -1,0 +1,25 @@
+= 프로젝트 API 문서
+방탈출 예약 API
+:toc:
+:icons: font
+
+== 예약 API
+include::reservation.adoc[]
+
+== 결제 대기 API
+include::pending-payment.adoc[]
+
+== 예약 대기 API
+include::waiting.adoc[]
+
+== 인증 API
+include::auth.adoc[]
+
+== 사용자 API
+include::user.adoc[]
+
+== 테마 API
+include::theme.adoc[]
+
+== 예약 시간 API
+include::time-slot.adoc[]

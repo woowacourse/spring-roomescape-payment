@@ -1,0 +1,3 @@
+=== 결제 대기 - 결제 진행
+include::{snippets}/pending-payment-confirm/http-request.adoc[]
+operation::pending-payment-confirm[snippets="http-request,path-parameters,request-fields,http-response,response-fields"]

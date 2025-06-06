@@ -1,0 +1,15 @@
+=== 예약 시간 - 생성
+include::{snippets}/time-create/http-request.adoc[]
+operation::time-create[snippets="http-request,request-cookies,request-fields,http-response,response-fields"]
+
+=== 예약 시간 - 전체 조회
+operation::time-find-all[snippets="http-request,http-response,response-fields"]
+
+=== 예약 시간 - 삭제
+operation::time-remove[snippets="http-request,request-cookies,path-parameters,http-response"]
+
+=== 예약 시간 - 삭제 시 존재하지 않는 예약 시간일 경우
+operation::time-remove-not-found[snippets="http-request,path-parameters,http-response,response-fields"]
+
+=== 예약 시간 - 삭제 시 사용중인 예약 시간일 경우
+operation::time-remove-conflict[snippets="http-request,path-parameters,http-response,response-fields"]

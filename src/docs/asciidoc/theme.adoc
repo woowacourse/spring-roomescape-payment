@@ -1,0 +1,15 @@
+=== 테마 - 생성
+include::{snippets}/theme-create/http-request.adoc[]
+operation::theme-create[snippets="http-request,request-cookies,request-fields,http-response,response-fields"]
+
+=== 테마 - 전체 조회
+operation::theme-find-all[snippets="http-request,http-response,response-fields"]
+
+=== 테마 - 삭제
+operation::theme-remove[snippets="http-request,request-cookies,path-parameters,http-response"]
+
+=== 테마 - 삭제 시 존재하지 않는 테마일 경우
+operation::theme-remove-not-found[snippets="http-request,path-parameters,http-response,response-fields"]
+
+=== 테마 - 삭제 시 사용중인 테마일 경우
+operation::theme-remove-conflict[snippets="http-request,path-parameters,http-response,response-fields"]
