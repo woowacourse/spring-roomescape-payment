@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 import roomescape.business.model.entity.Payment;
 import roomescape.business.model.entity.Reservation;
 import roomescape.business.model.vo.PaymentStatus;
-import roomescape.exception.ErrorCode;
-import roomescape.exception.RootBusinessException;
+import roomescape.exception.payment.PaymentIntegrityViolationException;
 
 public class PaymentTest {
 
@@ -31,7 +30,6 @@ public class PaymentTest {
         Reservation reservation = Reservation.restore("id", null, null, null, null);
         // when & then
         Assertions.assertThatThrownBy(() -> payment.approve("paymentKey1", 2000L, reservation))
-                .isInstanceOf(RootBusinessException.class)
-                .hasMessage(ErrorCode.INVALID_PAYMENT_AMOUNT.message());
+                .isInstanceOf(PaymentIntegrityViolationException.class);
     }
 }

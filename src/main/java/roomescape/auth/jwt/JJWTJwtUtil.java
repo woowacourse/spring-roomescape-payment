@@ -1,8 +1,5 @@
 package roomescape.auth.jwt;
 
-import static roomescape.exception.SecurityErrorCode.TOKEN_EXPIRED;
-import static roomescape.exception.SecurityErrorCode.TOKEN_INVALID;
-
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -16,7 +13,8 @@ import roomescape.auth.AuthToken;
 import roomescape.auth.LoginInfo;
 import roomescape.business.model.entity.Member;
 import roomescape.business.model.vo.UserRole;
-import roomescape.exception.auth.AuthenticationException;
+import roomescape.exception.auth.AuthenticationExpiredException;
+import roomescape.exception.auth.InvalidTokenException;
 
 @Component
 public class JJWTJwtUtil implements JwtUtil {
@@ -60,9 +58,9 @@ public class JJWTJwtUtil implements JwtUtil {
 
             return new LoginInfo(id, role);
         } catch (ExpiredJwtException e) {
-            throw new AuthenticationException(TOKEN_EXPIRED);
+            throw new AuthenticationExpiredException();
         } catch (Exception e) {
-            throw new AuthenticationException(TOKEN_INVALID);
+            throw new InvalidTokenException();
         }
     }
 }

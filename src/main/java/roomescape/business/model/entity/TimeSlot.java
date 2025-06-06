@@ -1,7 +1,5 @@
 package roomescape.business.model.entity;
 
-import static roomescape.exception.ErrorCode.START_TIME_INVALID;
-
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import java.time.LocalTime;
@@ -11,7 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 import roomescape.business.model.vo.Id;
-import roomescape.exception.business.InvalidCreateArgumentException;
+import roomescape.exception.reservation.TimeSlotStartTimeRangeException;
 
 @ToString
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -43,7 +41,7 @@ public class TimeSlot {
 
     private static void validateAvailableTime(final LocalTime time) {
         if (time.isBefore(START_TIME) || time.isAfter(END_TIME)) {
-            throw new InvalidCreateArgumentException(START_TIME_INVALID, START_TIME, END_TIME);
+            throw new TimeSlotStartTimeRangeException(START_TIME, END_TIME);
         }
     }
 

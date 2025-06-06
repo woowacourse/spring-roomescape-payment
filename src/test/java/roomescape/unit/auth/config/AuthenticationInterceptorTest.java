@@ -20,7 +20,8 @@ import roomescape.auth.AuthToken;
 import roomescape.auth.LoginInfo;
 import roomescape.auth.config.AuthenticationInterceptor;
 import roomescape.auth.jwt.JwtUtil;
-import roomescape.exception.auth.AuthenticationException;
+import roomescape.exception.auth.AuthenticationRequiredException;
+import roomescape.exception.auth.InvalidTokenException;
 
 @ExtendWith(MockitoExtension.class)
 class AuthenticationInterceptorTest {
@@ -91,7 +92,7 @@ class AuthenticationInterceptorTest {
 
         // when, then
         assertThatThrownBy(() -> sut.preHandle(request, response, handlerMethod))
-                .isInstanceOf(AuthenticationException.class);
+                .isInstanceOf(AuthenticationRequiredException.class);
     }
 
     @Test
@@ -103,10 +104,10 @@ class AuthenticationInterceptorTest {
 
         given(handlerMethod.getMethodAnnotation(AuthRequired.class)).willReturn(mock(AuthRequired.class));
         given(request.getCookies()).willReturn(new Cookie[]{cookie});
-        given(jwtUtil.validateAndResolveToken(new AuthToken(token))).willThrow(AuthenticationException.class);
+        given(jwtUtil.validateAndResolveToken(new AuthToken(token))).willThrow(InvalidTokenException.class);
 
         // when, then
         assertThatThrownBy(() -> sut.preHandle(request, response, handlerMethod))
-                .isInstanceOf(AuthenticationException.class);
+                .isInstanceOf(InvalidTokenException.class);
     }
 }

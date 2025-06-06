@@ -1,7 +1,5 @@
 package roomescape.auth.config;
 
-import static roomescape.exception.SecurityErrorCode.AUTHORITY_LACK;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
@@ -13,7 +11,7 @@ import roomescape.auth.LoginInfo;
 import roomescape.auth.Role;
 import roomescape.auth.jwt.JwtUtil;
 import roomescape.business.model.vo.UserRole;
-import roomescape.exception.auth.AuthenticationException;
+import roomescape.exception.auth.AccessDeniedException;
 
 public class AuthorizationInterceptor implements HandlerInterceptor {
 
@@ -28,7 +26,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         final List<UserRole> allowedRoles = Arrays.asList(role.value());
 
         if (!allowedRoles.contains(userRole)) {
-            throw new AuthenticationException(AUTHORITY_LACK);
+            throw new AccessDeniedException();
         }
     }
 

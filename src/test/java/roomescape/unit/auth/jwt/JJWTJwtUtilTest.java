@@ -15,7 +15,7 @@ import roomescape.auth.LoginInfo;
 import roomescape.auth.jwt.JJWTJwtUtil;
 import roomescape.business.model.entity.Member;
 import roomescape.business.model.vo.UserRole;
-import roomescape.exception.auth.AuthenticationException;
+import roomescape.exception.auth.InvalidTokenException;
 
 class JJWTJwtUtilTest {
 
@@ -74,7 +74,7 @@ class JJWTJwtUtilTest {
 
         // when
         assertThatThrownBy(() -> sut.validateAndResolveToken(new AuthToken(invalidToken)))
-                .isInstanceOf(AuthenticationException.class);
+                .isInstanceOf(InvalidTokenException.class);
     }
 
     @Test
@@ -83,7 +83,7 @@ class JJWTJwtUtilTest {
 
         // when
         assertThatThrownBy(() -> sut.validateAndResolveToken(null))
-                .isInstanceOf(AuthenticationException.class);
+                .isInstanceOf(InvalidTokenException.class);
     }
 
     @Test

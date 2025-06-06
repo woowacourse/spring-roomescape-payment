@@ -15,7 +15,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.RequestAttributes;
 import roomescape.auth.LoginInfo;
 import roomescape.auth.config.AuthorizationArgumentResolver;
-import roomescape.exception.auth.AuthorizationException;
+import roomescape.exception.auth.AuthenticationRequiredException;
 
 @ExtendWith(MockitoExtension.class)
 class AuthorizationArgumentResolverTest {
@@ -75,6 +75,6 @@ class AuthorizationArgumentResolverTest {
 
         // when, then
         assertThatThrownBy(() -> sut.resolveArgument(parameter, null, webRequest, null))
-                .isInstanceOf(AuthorizationException.class);
+                .isInstanceOf(AuthenticationRequiredException.class);
     }
 }

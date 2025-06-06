@@ -2,8 +2,7 @@ package roomescape.business.model.vo;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import roomescape.exception.ErrorCode;
-import roomescape.exception.business.InvalidCreateArgumentException;
+import roomescape.exception.reservation.ThemeNameLengthException;
 
 @Embeddable
 public record ThemeName(
@@ -18,7 +17,7 @@ public record ThemeName(
 
     private static void validateMaxLength(final String name) {
         if (name.length() > MAX_LENGTH) {
-            throw new InvalidCreateArgumentException(ErrorCode.THEME_NAME_TOO_LONG, MAX_LENGTH);
+            throw new ThemeNameLengthException(MAX_LENGTH);
         }
     }
 }

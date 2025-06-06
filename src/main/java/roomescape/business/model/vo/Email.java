@@ -1,11 +1,9 @@
 package roomescape.business.model.vo;
 
-import static roomescape.exception.ErrorCode.EMAIL_FORMAT_INVALID;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.util.regex.Pattern;
-import roomescape.exception.business.InvalidCreateArgumentException;
+import roomescape.exception.member.InvalidEmailFormatException;
 
 @Embeddable
 public record Email(
@@ -16,7 +14,7 @@ public record Email(
 
     public Email {
         if (!EMAIL_PATTERN.matcher(value).matches()) {
-            throw new InvalidCreateArgumentException(EMAIL_FORMAT_INVALID);
+            throw new InvalidEmailFormatException();
         }
     }
 }

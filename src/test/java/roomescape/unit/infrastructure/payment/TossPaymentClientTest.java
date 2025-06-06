@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
-import roomescape.exception.ExternalApiErrorException;
+import roomescape.exception.payment.TossApiErrorException;
 import roomescape.infrastructure.payment.dto.PaymentApproveRequest;
 import roomescape.infrastructure.payment.toss.TossPaymentClient;
 import roomescape.infrastructure.payment.toss.dto.TossPaymentApproveErrorResponse;
@@ -44,7 +44,7 @@ class TossPaymentClientTest {
                         .body(objectMapper.writeValueAsString(response)));
         // when
         assertThatThrownBy(() -> paymentClient.approvePayment(paymentApproveRequest))
-                .isInstanceOf(ExternalApiErrorException.class)
+                .isInstanceOf(TossApiErrorException.class)
                 .hasMessage("결제 승인에 실패했습니다.");
     }
 

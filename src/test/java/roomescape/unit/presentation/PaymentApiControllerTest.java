@@ -28,8 +28,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import roomescape.auth.jwt.JJWTJwtUtil;
 import roomescape.business.service.PaymentService;
-import roomescape.exception.ErrorCode;
-import roomescape.exception.business.DuplicatedException;
+import roomescape.exception.payment.PaymentExistsException;
 import roomescape.presentation.api.PaymentApiController;
 import roomescape.presentation.dto.request.PaymentRequest;
 
@@ -81,13 +80,13 @@ public class PaymentApiControllerTest {
     void 중복_결제로_결제_생성에_실패하여_400에러를_응답한다() throws Exception {
         // given
         PaymentRequest request = new PaymentRequest("orderId", 1000L);
-        given(paymentService.createPayment(request)).willThrow(new DuplicatedException(ErrorCode.PAYMENT_DUPLICATED));
+        given(paymentService.createPayment(request)).willThrow(new PaymentExistsException());
         // when
         ResultActions result = mockMvc.perform(post("/payments")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)));
         // then
         result.andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.exceptionType").value("PAYMENT_DUPLICATED"));
+                .andExpect(jsonPath("$.message").value("결제가 존재합니다."));
     }
 }

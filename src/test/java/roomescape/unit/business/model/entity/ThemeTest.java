@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import roomescape.business.model.entity.Theme;
-import roomescape.exception.business.InvalidCreateArgumentException;
+import roomescape.exception.reservation.ThemeNameLengthException;
 
 class ThemeTest {
 
@@ -17,7 +17,7 @@ class ThemeTest {
             final String name = "dompoolemondompoolemon";
 
             assertThatThrownBy(() -> Theme.create(name, "", ""))
-                    .isInstanceOf(InvalidCreateArgumentException.class);
+                    .isInstanceOf(ThemeNameLengthException.class);
         }
     }
 }

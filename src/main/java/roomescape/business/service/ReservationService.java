@@ -1,10 +1,5 @@
 package roomescape.business.service;
 
-import static roomescape.exception.ErrorCode.RESERVATION_DUPLICATED;
-import static roomescape.exception.ErrorCode.RESERVATION_NOT_EXIST;
-import static roomescape.exception.ErrorCode.THEME_NOT_EXIST;
-import static roomescape.exception.ErrorCode.USER_NOT_EXIST;
-
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -18,8 +13,11 @@ import roomescape.business.model.entity.TimeSlot;
 import roomescape.business.model.entity.Waiting;
 import roomescape.business.model.vo.Id;
 import roomescape.business.model.vo.ReservationDate;
-import roomescape.exception.business.DuplicatedException;
-import roomescape.exception.business.NotFoundException;
+import roomescape.exception.member.MemberNotFoundException;
+import roomescape.exception.reservation.ReservationExistsException;
+import roomescape.exception.reservation.ReservationNotFoundException;
+import roomescape.exception.reservation.ThemeNotFoundException;
+import roomescape.exception.reservation.TimeSlotNotFoundException;
 import roomescape.infrastructure.MemberRepository;
 import roomescape.infrastructure.ReservationRepository;
 import roomescape.infrastructure.ReservationTimeRepository;
@@ -45,11 +43,11 @@ public class ReservationService {
 
     public ReservationResponse addAndGet(LoginInfo loginInfo, ReservationRequest request) {
         Member member = memberRepository.findById(Id.create(loginInfo.id()))
-                .orElseThrow(() -> new NotFoundException(USER_NOT_EXIST));
+                .orElseThrow(MemberNotFoundException::new);
         TimeSlot timeSlot = reservationTimeRepository.findById(Id.create(request.timeId()))
-                .orElseThrow(() -> new NotFoundException(RESERVATION_NOT_EXIST));
+                .orElseThrow(ReservationNotFoundException::new);
         Theme theme = themeRepository.findById(Id.create(request.themeId()))
-                .orElseThrow(() -> new NotFoundException(THEME_NOT_EXIST));
+                .orElseThrow(ThemeNotFoundException::new);
 
         validateDuplicatedReservation(request.date(), timeSlot, theme);
         Reservation reservation = reservationRepository.save(
@@ -60,11 +58,11 @@ public class ReservationService {
 
     public ReservationResponse addAndGetWithoutPayment(AdminReservationRequest request) {
         Member member = memberRepository.findById(Id.create(request.userId()))
-                .orElseThrow(() -> new NotFoundException(USER_NOT_EXIST));
+                .orElseThrow(MemberNotFoundException::new);
         TimeSlot timeSlot = reservationTimeRepository.findById(Id.create(request.timeId()))
-                .orElseThrow(() -> new NotFoundException(RESERVATION_NOT_EXIST));
+                .orElseThrow(TimeSlotNotFoundException::new);
         Theme theme = themeRepository.findById(Id.create(request.themeId()))
-                .orElseThrow(() -> new NotFoundException(THEME_NOT_EXIST));
+                .orElseThrow(ThemeNotFoundException::new);
 
         validateDuplicatedReservation(request.date(), timeSlot, theme);
         Reservation reservation = Reservation.create(member, request.date(), timeSlot, theme);
@@ -75,7 +73,7 @@ public class ReservationService {
     private void validateDuplicatedReservation(LocalDate date, TimeSlot timeSlot, Theme theme) {
         if (reservationRepository.existsByDate_ValueAndTimeSlot_StartAtAndThemeId(date, timeSlot.getStartAt(),
                 theme.getId())) {
-            throw new DuplicatedException(RESERVATION_DUPLICATED);
+            throw new ReservationExistsException();
         }
     }
 
@@ -92,7 +90,7 @@ public class ReservationService {
     @Transactional
     public void cancelReservationAndPromoteWait(String id) {
         Reservation reservation = reservationRepository.findById(Id.create(id))
-                .orElseThrow(() -> new NotFoundException(RESERVATION_NOT_EXIST));
+                .orElseThrow(ReservationNotFoundException::new);
         reservationRepository.delete(reservation);
         TimeSlot time = reservation.getTimeSlot();
         ReservationDate date = reservation.getDate();

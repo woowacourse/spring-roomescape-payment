@@ -5,40 +5,29 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import roomescape.exception.auth.AuthenticationException;
-import roomescape.exception.auth.AuthorizationException;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(RootBusinessException.class)
-    public ResponseEntity<ErrorResponse> handle(RootBusinessException e) {
-        log.warn("RootException: message={}", e.getMessage());
-        return ErrorResponse.plainResponse(HttpStatus.BAD_REQUEST, e.code()).toResponseEntity();
+    @ExceptionHandler(SeparatedMessageException.class)
+    public ResponseEntity<ErrorResponse> handle(SeparatedMessageException e) {
+        log.warn("Exception: message={}", e.getMessage());
+        ErrorResponse response = new ErrorResponse(e.getStatus(), e.getClientMessage());
+        return ResponseEntity.status(e.getStatus()).body(response);
     }
 
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ErrorResponse> handle(AuthenticationException e) {
-        log.warn("AuthenticatedException: message={}", e.detailMessage());
-        return ErrorResponse.securedResponse(HttpStatus.UNAUTHORIZED, e.clientMessage()).toResponseEntity();
-    }
-
-    @ExceptionHandler(AuthorizationException.class)
-    public ResponseEntity<ErrorResponse> handle(AuthorizationException e) {
-        log.warn("AuthorizationException: message={}", e.detailMessage());
-        return ErrorResponse.securedResponse(HttpStatus.FORBIDDEN, e.clientMessage()).toResponseEntity();
-    }
-
-    @ExceptionHandler(ExternalApiErrorException.class)
-    public ResponseEntity<ErrorResponse> handle(ExternalApiErrorException e) {
-        log.warn("ExternalApiErrorException: message={}", e.getMessage());
-        return ErrorResponse.externalApiErrorResponse().toResponseEntity();
+    @ExceptionHandler(ApplicationException.class)
+    public ResponseEntity<ErrorResponse> handle(ApplicationException e) {
+        log.warn("Exception: message={}", e.getMessage());
+        ErrorResponse response = new ErrorResponse(e.getStatus(), e.getMessage());
+        return ResponseEntity.status(e.getStatus()).body(response);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handle(Exception e) {
         log.error("Exception: message={}", e.getMessage(), e);
-        return ErrorResponse.securedResponse().toResponseEntity();
+        ErrorResponse response = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "오류가 발생하였습니다. 관리자에게 문의해주세요");
+        return ResponseEntity.internalServerError().body(response);
     }
 }

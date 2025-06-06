@@ -11,7 +11,8 @@ import roomescape.business.model.entity.Member;
 import roomescape.business.model.entity.Reservation;
 import roomescape.business.model.entity.Theme;
 import roomescape.business.model.entity.TimeSlot;
-import roomescape.exception.business.InvalidCreateArgumentException;
+import roomescape.exception.reservation.PastDateReservationException;
+import roomescape.exception.reservation.TooFarDateReservationException;
 
 class ReservationTest {
 
@@ -47,7 +48,7 @@ class ReservationTest {
 
             assertThatThrownBy(
                     () -> Reservation.create(member, pastDate, RESERVATION_TIME, THEME))
-                    .isInstanceOf(InvalidCreateArgumentException.class);
+                    .isInstanceOf(PastDateReservationException.class);
         }
 
         @Test
@@ -57,7 +58,7 @@ class ReservationTest {
 
             assertThatThrownBy(
                     () -> Reservation.create(member, over7DaysDate, RESERVATION_TIME, THEME))
-                    .isInstanceOf(InvalidCreateArgumentException.class);
+                    .isInstanceOf(TooFarDateReservationException.class);
         }
     }
 }

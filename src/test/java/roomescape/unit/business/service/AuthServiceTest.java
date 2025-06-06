@@ -18,7 +18,8 @@ import roomescape.auth.AuthToken;
 import roomescape.auth.jwt.JwtUtil;
 import roomescape.business.model.entity.Member;
 import roomescape.business.service.AuthService;
-import roomescape.exception.auth.AuthenticationException;
+import roomescape.exception.auth.EmailNotRegisteredException;
+import roomescape.exception.auth.InvalidPasswordException;
 import roomescape.infrastructure.MemberRepository;
 import roomescape.presentation.dto.request.LoginRequest;
 
@@ -65,7 +66,7 @@ class AuthServiceTest {
 
         // when, then
         assertThatThrownBy(() -> sut.authenticate(request))
-                .isInstanceOf(AuthenticationException.class);
+                .isInstanceOf(EmailNotRegisteredException.class);
 
         verify(memberRepository).findByEmail_Value(email);
         verifyNoInteractions(jwtUtil);
@@ -85,7 +86,7 @@ class AuthServiceTest {
 
         // when, then
         assertThatThrownBy(() -> sut.authenticate(request))
-                .isInstanceOf(AuthenticationException.class);
+                .isInstanceOf(InvalidPasswordException.class);
 
         verify(memberRepository).findByEmail_Value(email);
         verifyNoInteractions(jwtUtil);

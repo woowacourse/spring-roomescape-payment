@@ -13,8 +13,7 @@ import lombok.Getter;
 import lombok.Setter;
 import roomescape.business.model.vo.Id;
 import roomescape.business.model.vo.PaymentStatus;
-import roomescape.exception.ErrorCode;
-import roomescape.exception.RootBusinessException;
+import roomescape.exception.payment.PaymentIntegrityViolationException;
 
 @EqualsAndHashCode(of = "id")
 @Getter
@@ -61,8 +60,7 @@ public class Payment {
 
     private void validateAmount(Long amount) {
         if (!this.amount.equals(amount)) {
-            throw new RootBusinessException(ErrorCode.INVALID_PAYMENT_AMOUNT) {
-            };
+            throw new PaymentIntegrityViolationException();
         }
     }
 

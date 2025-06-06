@@ -17,8 +17,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.business.model.entity.Member;
 import roomescape.business.service.MemberService;
-import roomescape.exception.business.InvalidCreateArgumentException;
-import roomescape.exception.business.NotFoundException;
+import roomescape.exception.member.DuplicatedEmailException;
+import roomescape.exception.member.MemberNotFoundException;
 import roomescape.infrastructure.MemberRepository;
 import roomescape.presentation.dto.request.RegisterRequest;
 import roomescape.presentation.dto.response.MemberResponse;
@@ -61,7 +61,7 @@ class MemberServiceTest {
 
         // when, then
         assertThatThrownBy(() -> sut.register(request))
-                .isInstanceOf(InvalidCreateArgumentException.class);
+                .isInstanceOf(DuplicatedEmailException.class);
 
         verify(memberRepository).existsByEmail_Value(email);
         verify(memberRepository, never()).save(any(Member.class));
@@ -93,7 +93,7 @@ class MemberServiceTest {
 
         // when, then
         assertThatThrownBy(() -> sut.getByEmail(email))
-                .isInstanceOf(NotFoundException.class);
+                .isInstanceOf(MemberNotFoundException.class);
 
         verify(memberRepository).findByEmail_Value(email);
     }

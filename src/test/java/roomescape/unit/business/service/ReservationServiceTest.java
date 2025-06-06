@@ -26,8 +26,10 @@ import roomescape.business.model.entity.TimeSlot;
 import roomescape.business.model.vo.Id;
 import roomescape.business.service.PaymentService;
 import roomescape.business.service.ReservationService;
-import roomescape.exception.business.DuplicatedException;
-import roomescape.exception.business.NotFoundException;
+import roomescape.exception.member.MemberNotFoundException;
+import roomescape.exception.reservation.ReservationExistsException;
+import roomescape.exception.reservation.ThemeNotFoundException;
+import roomescape.exception.reservation.TimeSlotNotFoundException;
 import roomescape.infrastructure.MemberRepository;
 import roomescape.infrastructure.ReservationRepository;
 import roomescape.infrastructure.ReservationTimeRepository;
@@ -77,7 +79,7 @@ class ReservationServiceTest {
         // when, then
         assertThatThrownBy(
                 () -> sut.addAndGetWithoutPayment(request))
-                .isInstanceOf(NotFoundException.class);
+                .isInstanceOf(MemberNotFoundException.class);
 
         verify(memberRepository).findById(userId);
         verifyNoInteractions(reservationTimeRepository);
@@ -100,7 +102,7 @@ class ReservationServiceTest {
 
         // when, then
         assertThatThrownBy(() -> sut.addAndGetWithoutPayment(request))
-                .isInstanceOf(NotFoundException.class);
+                .isInstanceOf(TimeSlotNotFoundException.class);
 
         verify(memberRepository).findById(Id.create(userId));
         verify(reservationTimeRepository).findById(Id.create(timeId));
@@ -128,7 +130,7 @@ class ReservationServiceTest {
 
         // when, then
         assertThatThrownBy(() -> sut.addAndGetWithoutPayment(request))
-                .isInstanceOf(NotFoundException.class);
+                .isInstanceOf(ThemeNotFoundException.class);
 
         verify(memberRepository).findById(userId);
         verify(reservationTimeRepository).findById(timeId);
@@ -160,7 +162,7 @@ class ReservationServiceTest {
 
         // when, then
         assertThatThrownBy(() -> sut.addAndGetWithoutPayment(request))
-                .isInstanceOf(DuplicatedException.class);
+                .isInstanceOf(ReservationExistsException.class);
 
         verify(memberRepository).findById(userId);
         verify(reservationTimeRepository).findById(timeId);

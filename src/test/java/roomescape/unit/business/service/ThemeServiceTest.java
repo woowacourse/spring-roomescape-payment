@@ -19,8 +19,8 @@ import org.springframework.data.domain.Pageable;
 import roomescape.business.model.entity.Theme;
 import roomescape.business.model.vo.Id;
 import roomescape.business.service.ThemeService;
-import roomescape.exception.business.NotFoundException;
-import roomescape.exception.business.RelatedEntityExistException;
+import roomescape.exception.reservation.ReservationExistsException;
+import roomescape.exception.reservation.ThemeNotFoundException;
 import roomescape.infrastructure.ReservationRepository;
 import roomescape.infrastructure.ThemeRepository;
 import roomescape.presentation.dto.request.ThemeCreateRequest;
@@ -136,7 +136,7 @@ class ThemeServiceTest {
 
         // when, then
         assertThatThrownBy(() -> sut.delete(themeId.value()))
-                .isInstanceOf(NotFoundException.class);
+                .isInstanceOf(ThemeNotFoundException.class);
 
         verify(reservationRepository).existsByThemeId(themeId);
         verify(themeRepository).existsById(themeId);
@@ -152,7 +152,7 @@ class ThemeServiceTest {
 
         // when, then
         assertThatThrownBy(() -> sut.delete(themeId.value()))
-                .isInstanceOf(RelatedEntityExistException.class);
+                .isInstanceOf(ReservationExistsException.class);
 
         verify(reservationRepository).existsByThemeId(themeId);
         verify(themeRepository, never()).existsById(themeId);

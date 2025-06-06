@@ -15,8 +15,7 @@ import roomescape.business.model.entity.Payment;
 import roomescape.business.model.entity.Reservation;
 import roomescape.business.model.vo.PaymentStatus;
 import roomescape.business.service.PaymentService;
-import roomescape.exception.ErrorCode;
-import roomescape.exception.business.NotFoundException;
+import roomescape.exception.payment.PaymentNotFoundException;
 import roomescape.infrastructure.PaymentRepository;
 import roomescape.infrastructure.payment.PaymentClient;
 import roomescape.presentation.dto.request.PaymentRequest;
@@ -63,7 +62,6 @@ class PaymentServiceTest {
         given(paymentRepository.findByOrderId("orderId")).willReturn(Optional.empty());
         // when
         assertThatThrownBy(() -> paymentService.approvePayment(reservation, "paymentKey", "orderId", 1000L))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessage(ErrorCode.PAYMENT_NOT_FOUND.message());
+                .isInstanceOf(PaymentNotFoundException.class);
     }
 }

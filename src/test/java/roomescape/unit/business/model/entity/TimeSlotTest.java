@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import roomescape.business.model.entity.TimeSlot;
-import roomescape.exception.business.InvalidCreateArgumentException;
+import roomescape.exception.reservation.TimeSlotStartTimeRangeException;
 
 class TimeSlotTest {
 
@@ -18,7 +18,7 @@ class TimeSlotTest {
         @CsvSource({"09:59", "23:01"})
         void 예약_가능한_시간이_아닐_때_예약하면_예외가_발생한다(String timeStrValue) {
             assertThatThrownBy(() -> TimeSlot.create(LocalTime.parse(timeStrValue)))
-                    .isInstanceOf(InvalidCreateArgumentException.class);
+                    .isInstanceOf(TimeSlotStartTimeRangeException.class);
         }
     }
 }

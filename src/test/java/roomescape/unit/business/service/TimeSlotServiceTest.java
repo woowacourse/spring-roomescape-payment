@@ -19,10 +19,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.business.model.entity.TimeSlot;
 import roomescape.business.model.vo.Id;
 import roomescape.business.service.ReservationTimeService;
-import roomescape.exception.business.DuplicatedException;
-import roomescape.exception.business.InvalidCreateArgumentException;
-import roomescape.exception.business.NotFoundException;
-import roomescape.exception.business.RelatedEntityExistException;
+import roomescape.exception.reservation.InvalidTimeSlotIntervalException;
+import roomescape.exception.reservation.ReservationExistsException;
+import roomescape.exception.reservation.TimeSlotExistsException;
+import roomescape.exception.reservation.TimeSlotNotFoundException;
 import roomescape.infrastructure.ReservationRepository;
 import roomescape.infrastructure.ReservationTimeRepository;
 import roomescape.presentation.dto.request.ReservationTimeRequest;
@@ -72,7 +72,7 @@ class TimeSlotServiceTest {
 
         // when, then
         assertThatThrownBy(() -> sut.addAndGet(request))
-                .isInstanceOf(DuplicatedException.class);
+                .isInstanceOf(TimeSlotExistsException.class);
 
         verify(reservationTimeRepository).existsByStartAt(time);
         verify(reservationTimeRepository, never()).existsByStartAtBetween(any(LocalTime.class),
@@ -92,7 +92,7 @@ class TimeSlotServiceTest {
 
         // when, then
         assertThatThrownBy(() -> sut.addAndGet(request))
-                .isInstanceOf(InvalidCreateArgumentException.class);
+                .isInstanceOf(InvalidTimeSlotIntervalException.class);
 
         verify(reservationTimeRepository).existsByStartAt(time);
         verify(reservationTimeRepository).existsByStartAtBetween(any(LocalTime.class), any(LocalTime.class));
@@ -172,7 +172,7 @@ class TimeSlotServiceTest {
 
         // when, then
         assertThatThrownBy(() -> sut.delete(timeId.value()))
-                .isInstanceOf(NotFoundException.class);
+                .isInstanceOf(TimeSlotNotFoundException.class);
 
         verify(reservationRepository).existsByTimeSlotId(timeId);
         verify(reservationTimeRepository).existsById(timeId);
@@ -188,7 +188,7 @@ class TimeSlotServiceTest {
 
         // when, then
         assertThatThrownBy(() -> sut.delete(timeId.value()))
-                .isInstanceOf(RelatedEntityExistException.class);
+                .isInstanceOf(ReservationExistsException.class);
 
         verify(reservationRepository).existsByTimeSlotId(timeId);
         verify(reservationTimeRepository, never()).existsById(timeId);

@@ -9,7 +9,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import roomescape.business.model.entity.Member;
 import roomescape.business.model.vo.UserRole;
-import roomescape.exception.business.InvalidCreateArgumentException;
+import roomescape.exception.member.InvalidEmailFormatException;
+import roomescape.exception.member.UserNameFormatException;
+import roomescape.exception.member.UserNameLengthException;
 
 class MemberTest {
 
@@ -39,7 +41,7 @@ class MemberTest {
             final String tooLongName = "이름이너무길어서예외가발생합니다";
 
             assertThatThrownBy(() -> Member.create(tooLongName, VALID_EMAIL, VALID_PASSWORD))
-                    .isInstanceOf(InvalidCreateArgumentException.class);
+                    .isInstanceOf(UserNameLengthException.class);
         }
 
         @ParameterizedTest
@@ -47,14 +49,14 @@ class MemberTest {
         void 이름에_숫자가_포함되면_예외가_발생한다(String nameWithNumber) {
             // when, then
             assertThatThrownBy(() -> Member.create(nameWithNumber, VALID_EMAIL, VALID_PASSWORD))
-                    .isInstanceOf(InvalidCreateArgumentException.class);
+                    .isInstanceOf(UserNameFormatException.class);
         }
 
         @ParameterizedTest
         @ValueSource(strings = {"dompoo", "dompoo@", "dompoo@gmail", "dompoo.com"})
         void 이메일_형식이_아니면_예외가_발생한다(String invalidEmail) {
             assertThatThrownBy(() -> Member.create(VALID_NAME, invalidEmail, VALID_PASSWORD))
-                    .isInstanceOf(InvalidCreateArgumentException.class);
+                    .isInstanceOf(InvalidEmailFormatException.class);
         }
 
         @Test

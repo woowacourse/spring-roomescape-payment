@@ -20,7 +20,8 @@ import roomescape.auth.Role;
 import roomescape.auth.config.AuthorizationInterceptor;
 import roomescape.auth.jwt.JwtUtil;
 import roomescape.business.model.vo.UserRole;
-import roomescape.exception.auth.AuthenticationException;
+import roomescape.exception.auth.AccessDeniedException;
+import roomescape.exception.auth.AuthenticationRequiredException;
 
 @ExtendWith(MockitoExtension.class)
 class AuthorizationInterceptorTest {
@@ -98,7 +99,7 @@ class AuthorizationInterceptorTest {
 
         // when, then
         assertThatThrownBy(() -> sut.preHandle(request, response, handlerMethod))
-                .isInstanceOf(AuthenticationException.class);
+                .isInstanceOf(AccessDeniedException.class);
     }
 
     @Test
@@ -110,7 +111,7 @@ class AuthorizationInterceptorTest {
 
         // when, then
         assertThatThrownBy(() -> sut.preHandle(request, response, handlerMethod))
-                .isInstanceOf(AuthenticationException.class);
+                .isInstanceOf(AuthenticationRequiredException.class);
     }
 
     @Test
@@ -124,7 +125,7 @@ class AuthorizationInterceptorTest {
 
         // when, then
         assertThatThrownBy(() -> sut.preHandle(request, response, handlerMethod))
-                .isInstanceOf(AuthenticationException.class);
+                .isInstanceOf(AuthenticationRequiredException.class);
     }
 
     private Role createRoleAnnotation(UserRole... roles) {
