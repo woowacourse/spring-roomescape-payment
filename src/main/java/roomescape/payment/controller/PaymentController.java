@@ -32,7 +32,7 @@ public class PaymentController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/confirm/tossPay/{reservationId}")
-    public void completePaymentForReservation(
+    public void proceedPaymentForReservation(
             @PathVariable(value = "reservationId") Long reservationId,
             @RequestBody @Valid final PaymentRequest request,
             final LoginMember loginMember

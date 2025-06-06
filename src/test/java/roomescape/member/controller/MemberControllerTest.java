@@ -2,7 +2,6 @@ package roomescape.member.controller;
 
 import static org.hamcrest.Matchers.is;
 
-import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -17,7 +16,7 @@ class MemberControllerTest extends IntegrationTest {
         Map<String, Object> signup = Map.of("name", "newName", "email", "newEmail@naver.com", "password",
                 "newPassword");
 
-        RestAssured.given().log().all()
+        givenWithDocs("member-signup-post")
                 .contentType(ContentType.JSON)
                 .body(signup)
                 .when().post("/members")
@@ -32,7 +31,7 @@ class MemberControllerTest extends IntegrationTest {
         dbHelper.insertMember(TestFixture.createMember("새로이", "test2@email.com", "1234"));
 
         // when & then
-        RestAssured.given().log().all()
+        givenWithDocs("member-get")
                 .contentType(ContentType.JSON)
                 .when().get("/members")
                 .then().log().all()

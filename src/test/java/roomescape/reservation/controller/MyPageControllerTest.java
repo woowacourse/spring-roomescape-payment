@@ -1,14 +1,13 @@
 package roomescape.reservation.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static roomescape.TestFixture.DEFAULT_DATE;
+import static roomescape.TestFixture.createClaims;
 import static roomescape.TestFixture.createDefaultMember_1;
 import static roomescape.TestFixture.createDefaultTheme;
 import static roomescape.TestFixture.createTimeAt;
 import static roomescape.TestFixture.createWaitingOf;
-import static roomescape.TestFixture.DEFAULT_DATE;
-import static roomescape.TestFixture.createClaims;
 
-import io.restassured.RestAssured;
 import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -45,7 +44,7 @@ class MyPageControllerTest extends IntegrationTest {
         );
 
         // when & then
-        List<MyRegistrationResponse> responses = RestAssured.given().log().all()
+        List<MyRegistrationResponse> responses = givenWithDocs("mypage-registrations-get")
                 .cookie("token", token)
                 .when().get("/mypage/registrations")
                 .then().log().all()
@@ -71,7 +70,7 @@ class MyPageControllerTest extends IntegrationTest {
         );
 
         // when & then
-        RestAssured.given().log().all()
+        givenWithDocs("mypage-waitings-delete")
                 .cookie("token", token)
                 .when().delete("/mypage/waitings/" + waitingReservation.getId())
                 .then().log().all()

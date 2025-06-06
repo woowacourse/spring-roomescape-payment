@@ -5,7 +5,6 @@ import static roomescape.TestFixture.createAdminMember;
 import static roomescape.TestFixture.createClaims;
 import static roomescape.TestFixture.createDefaultTheme;
 
-import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.List;
 import org.assertj.core.api.SoftAssertions;
@@ -37,7 +36,7 @@ class ThemeControllerTest extends IntegrationTest {
         Theme theme2 = dbHelper.insertTheme(createDefaultTheme());
 
         // when & then
-        List<ThemeResponse> responses = RestAssured.given().log().all()
+        List<ThemeResponse> responses = givenWithDocs("theme-get")
                 .cookie("token", token)
                 .when().get("/themes")
                 .then().log().all()
@@ -64,7 +63,7 @@ class ThemeControllerTest extends IntegrationTest {
         Theme theme2 = dbHelper.insertTheme(createDefaultTheme());
 
         // when & then
-        List<PopularThemeResponse> responses = RestAssured.given().log().all()
+        List<PopularThemeResponse> responses = givenWithDocs("theme-popular-get")
                 .cookie("token", token)
                 .when().get("/themes/ranking")
                 .then().log().all()
@@ -90,7 +89,7 @@ class ThemeControllerTest extends IntegrationTest {
         ThemeRequest themeRequest = new ThemeRequest("새로운 테마", "테마 설명", "thumbnail.jpg");
 
         // when & then
-        ThemeResponse response = RestAssured.given().log().all()
+        ThemeResponse response = givenWithDocs("theme-create")
                 .cookie("token", token)
                 .contentType(ContentType.JSON)
                 .body(themeRequest)
@@ -115,7 +114,7 @@ class ThemeControllerTest extends IntegrationTest {
         Theme theme = dbHelper.insertTheme(createDefaultTheme());
 
         // when & then
-        RestAssured.given().log().all()
+        givenWithDocs("theme-delete")
                 .cookie("token", token)
                 .when().delete("/themes/" + theme.getId())
                 .then().log().all()

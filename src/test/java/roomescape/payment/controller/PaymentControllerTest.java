@@ -11,7 +11,6 @@ import static roomescape.TestFixture.createDefaultTheme;
 import static roomescape.TestFixture.createReservationOf;
 import static roomescape.TestFixture.createTimeAt_10;
 
-import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.time.LocalDate;
 import org.assertj.core.api.SoftAssertions;
@@ -75,7 +74,7 @@ class PaymentControllerTest extends IntegrationTest {
                 .willReturn(mock(TossPaymentResponse.class));
 
         // when & then
-        RestAssured.given().log().all()
+        givenWithDocs("confirm-payment")
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
                 .body(reservationPaymentRequest)
@@ -110,7 +109,7 @@ class PaymentControllerTest extends IntegrationTest {
                 .willReturn(mock(TossPaymentResponse.class));
 
         // when & then
-        RestAssured.given().log().all()
+        givenWithDocs("proceed-payment")
                 .contentType(ContentType.JSON)
                 .cookie("token", token)
                 .body(paymentRequest)

@@ -1,15 +1,14 @@
 package roomescape.reservation.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static roomescape.TestFixture.DEFAULT_DATE;
 import static roomescape.TestFixture.createAdminMember;
 import static roomescape.TestFixture.createClaims;
 import static roomescape.TestFixture.createDefaultMember_1;
 import static roomescape.TestFixture.createDefaultTheme;
 import static roomescape.TestFixture.createTimeAt;
 import static roomescape.TestFixture.createWaitingOf;
-import static roomescape.TestFixture.DEFAULT_DATE;
 
-import io.restassured.RestAssured;
 import java.time.LocalTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -46,7 +45,7 @@ class AdminWaitingReservationControllerTest extends IntegrationTest {
         );
 
         // when & then
-        List<ReservationResponse> responses = RestAssured.given().log().all()
+        List<ReservationResponse> responses =  givenWithDocs("admin-waiting-get")
                 .cookie("token", token)
                 .when().get("/admin/waitings")
                 .then().log().all()
@@ -72,7 +71,7 @@ class AdminWaitingReservationControllerTest extends IntegrationTest {
         );
 
         // when & then
-        RestAssured.given().log().all()
+        givenWithDocs("admin-waiting-approve")
                 .cookie("token", token)
                 .when().patch("/admin/waitings/" + waitingReservation.getId())
                 .then().log().all()
@@ -96,7 +95,7 @@ class AdminWaitingReservationControllerTest extends IntegrationTest {
         );
 
         // when & then
-        RestAssured.given().log().all()
+        givenWithDocs("admin-waiting-delete")
                 .cookie("token", token)
                 .when().delete("/admin/waitings/" + waitingReservation.getId())
                 .then().log().all()

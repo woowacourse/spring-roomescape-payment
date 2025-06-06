@@ -1,10 +1,11 @@
 package roomescape.payment.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 public record ReservationPaymentRequest(
-        @NotNull LocalDate date,
+        @NotNull @JsonFormat(pattern = "yyyy-MM-dd") LocalDate date,
         @NotNull Long themeId,
         @NotNull Long timeId,
         @NotNull String paymentKey,

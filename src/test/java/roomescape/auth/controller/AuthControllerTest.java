@@ -1,7 +1,6 @@
 package roomescape.auth.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static roomescape.TestFixture.createAdminMember;
 import static roomescape.TestFixture.createClaims;
 import static roomescape.TestFixture.createMember;
@@ -29,7 +28,7 @@ class AuthControllerTest extends IntegrationTest {
 
         // when
         Map<String, String> loginParams = Map.of("email", "test@naver.com", "password", "1234");
-        ExtractableResponse<Response> response = RestAssured.given().log().all()
+        ExtractableResponse<Response> response = givenWithDocs("auth-login-post")
                 .contentType(ContentType.JSON)
                 .body(loginParams)
                 .when()
@@ -108,7 +107,7 @@ class AuthControllerTest extends IntegrationTest {
         String token = jwtTokenProvider.createToken(createClaims(normalMember));
 
         // when & then
-        RestAssured.given().log().all()
+        givenWithDocs("auth-logout-post")
                 .cookie("token", token)
                 .when().post("/logout")
                 .then().log().all()
@@ -124,7 +123,7 @@ class AuthControllerTest extends IntegrationTest {
         String token = jwtTokenProvider.createToken(createClaims(normalMember));
 
         // when & then
-        RestAssured.given().log().all()
+        givenWithDocs("auth-login-check-get")
                 .cookie("token", token)
                 .when().get("/login/check")
                 .then().log().all()

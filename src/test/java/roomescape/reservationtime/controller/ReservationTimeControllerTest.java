@@ -1,6 +1,9 @@
 package roomescape.reservationtime.controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static roomescape.TestFixture.DEFAULT_DATE;
 import static roomescape.TestFixture.createAdminMember;
 import static roomescape.TestFixture.createClaims;
@@ -39,7 +42,7 @@ class ReservationTimeControllerTest extends IntegrationTest {
         dbHelper.insertTime(createTimeAt(LocalTime.of(11, 0)));
 
         // when & then
-        List<ReservationTimeResponse> responses = RestAssured.given().log().all()
+        List<ReservationTimeResponse> responses = givenWithDocs("reservationTime-get")
                 .cookie("token", token)
                 .when().get("/times")
                 .then().log().all()
@@ -69,7 +72,13 @@ class ReservationTimeControllerTest extends IntegrationTest {
         Theme theme = dbHelper.insertTheme(createDefaultTheme());
 
         // when & then
-        List<AvailableReservationTimeResponse> responses = RestAssured.given().log().all()
+        List<AvailableReservationTimeResponse> responses =RestAssured.given(documentationSpec)
+                .filter(document("reservationTime-available-get",
+                        queryParameters(
+                                parameterWithName("themeId").description("테마 ID"),
+                                parameterWithName("date").description("예약 날짜")
+                        )
+                ))
                 .cookie("token", token)
                 .when().get("/times/available?date=" + DEFAULT_DATE + "&themeId=" + theme.getId())
                 .then().log().all()
@@ -100,7 +109,7 @@ class ReservationTimeControllerTest extends IntegrationTest {
         ReservationTimeRequest timeRequest = new ReservationTimeRequest(LocalTime.of(10, 0));
 
         // when & then
-        ReservationTimeResponse timeResponse = RestAssured.given().log().all()
+        ReservationTimeResponse timeResponse = givenWithDocs("reservationTime-create")
                 .cookie("token", token)
                 .contentType(ContentType.JSON)
                 .body(timeRequest)
@@ -123,7 +132,7 @@ class ReservationTimeControllerTest extends IntegrationTest {
         dbHelper.insertTime(reservationTime);
 
         // when & then
-        RestAssured.given().log().all()
+        givenWithDocs("reservationTime-delete")
                 .cookie("token", token)
                 .when().delete("/times/" + reservationTime.getId())
                 .then().log().all()

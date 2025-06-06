@@ -1,16 +1,16 @@
 package roomescape.reservation.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static roomescape.TestFixture.DEFAULT_DATE;
 import static roomescape.TestFixture.createClaims;
-import static roomescape.TestFixture.createDefaultTheme;
-import static roomescape.TestFixture.createTimeAt_10;
-import static org.assertj.core.api.Assertions.assertThat;
 import static roomescape.TestFixture.createDefaultMember_1;
-import static roomescape.TestFixture.createTimeAt;
+import static roomescape.TestFixture.createDefaultTheme;
 import static roomescape.TestFixture.createReservationOf;
+import static roomescape.TestFixture.createTimeAt;
+import static roomescape.TestFixture.createTimeAt_10;
 
-import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,17 +22,15 @@ import roomescape.auth.infrastructure.jwt.JwtTokenProvider;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.infrastructure.TossRestClient;
+import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.ReservationRequest;
+import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.WaitingReservationRepository;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
-import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.dto.ReservationResponse;
-
-import java.time.LocalTime;
 
 class ReservationControllerTest extends IntegrationTest {
 
@@ -71,7 +69,7 @@ class ReservationControllerTest extends IntegrationTest {
         );
 
         // when & then
-        ReservationResponse response = RestAssured.given().log().all()
+        ReservationResponse response = givenWithDocs("reservation-getById")
                 .cookie("token", token)
                 .when().get("/reservations/" + reservation.getId())
                 .then().log().all()
@@ -103,7 +101,7 @@ class ReservationControllerTest extends IntegrationTest {
         );
 
         // when & then
-        RestAssured.given().log().all()
+        givenWithDocs("reservation-create")
                 .cookie("token", token)
                 .contentType(ContentType.JSON)
                 .body(reservationRequest)
