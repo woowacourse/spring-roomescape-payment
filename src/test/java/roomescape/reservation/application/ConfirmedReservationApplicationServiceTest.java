@@ -26,6 +26,8 @@ import roomescape.member.infrastructure.MemberRepository;
 import roomescape.payment.application.PaymentDataService;
 import roomescape.payment.application.PaymentApplicationService;
 import roomescape.payment.application.client.PaymentClient;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.ProductType;
 import roomescape.payment.infrastructure.PaymentRepository;
 import roomescape.reservation.application.dto.request.ConfirmedReservationByCriteriaWebRequest;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
@@ -237,17 +239,20 @@ class ConfirmedReservationApplicationServiceTest {
         Long themeId2 = themeRepository.save(new Theme("논리", "논리 게임 with Danny", "image.png")).getId();
         Long memberId2 = memberRepository.save(new Member("free", "free@gmail.com", "password", MemberRole.REGULAR))
                 .getId();
-        confirmedReservationApplicationService.create(
+        ConfirmedReservationWebResponse confirmedReservationWebResponse = confirmedReservationApplicationService.create(
                 new ConfirmedReservationCreateRequest(FUTURE_DATE, timeId, themeId2, memberId2,
                         afterOneHour));
+        paymentRepository.save(new Payment("testtest", "orderorder", 1000L, ProductType.RESERVATION, confirmedReservationWebResponse.id(), afterOneHour));
 
         // when
-        List<MyReservationResponse> result = confirmedReservationApplicationService.findMyReservations(memberId);
+        List<MyReservationResponse> result = confirmedReservationApplicationService.findMyReservations(memberId2);
 
         // then
         SoftAssertions.assertSoftly(softAssertions -> {
                     softAssertions.assertThat(result).hasSize(1);
-                    softAssertions.assertThat(result.getFirst().theme()).isEqualTo("추리");
+                    softAssertions.assertThat(result.getFirst().theme()).isEqualTo("논리");
+                    softAssertions.assertThat(result.getFirst().paymentKey()).isEqualTo("testtest");
+                    softAssertions.assertThat(result.getFirst().amount()).isEqualTo(1000L);
                 }
         );
     }

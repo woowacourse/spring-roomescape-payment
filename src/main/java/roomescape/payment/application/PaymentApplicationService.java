@@ -26,4 +26,8 @@ public class PaymentApplicationService {
                 ProductType.RESERVATION, reservationId, LocalDateTime.now());
         return paymentDataService.save(payment);
     }
+
+    public Payment findReservationPayment(Long reservationId) {
+        return paymentDataService.findByProductTypeAndProductId(ProductType.RESERVATION, reservationId);
+    }
 }

@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.exception.ReservationNotFoundException;
 import roomescape.reservation.infrastructure.ReservationRepository;
-import roomescape.reservationslot.presentation.dto.response.MyReservationResponse;
 
 @Service
 public class ReservationDataService {
@@ -22,11 +21,8 @@ public class ReservationDataService {
         return reservationRepository.save(reservation);
     }
 
-    public List<MyReservationResponse> findMyReservations(final Long memberId) {
-        return reservationRepository.findByMemberId(memberId)
-                .stream()
-                .map(MyReservationResponse::from)
-                .toList();
+    public List<Reservation> findMemberReservations(final Long memberId) {
+        return reservationRepository.findByMemberId(memberId);
     }
 
     public List<Reservation> findAllWaitingReservations() {

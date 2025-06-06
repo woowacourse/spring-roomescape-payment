@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.application.MemberDataService;
 import roomescape.member.domain.Member;
 import roomescape.payment.application.PaymentApplicationService;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
 import roomescape.reservation.application.dto.request.ConfirmedReservationByCriteriaWebRequest;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
@@ -77,7 +78,15 @@ public class ConfirmedReservationApplicationService {
 
     public List<MyReservationResponse> findMyReservations(final Long memberId) {
         memberDataService.validateExists(memberId);
-        return reservationDataService.findMyReservations(memberId);
+        List<Reservation> reservations = reservationDataService.findMemberReservations(memberId);
+        return reservations.stream()
+                .map(reservation -> {
+                    Payment payment = paymentApplicationService.findReservationPayment(reservation.getId());
+                    ReservationSlot reservationSlot = reservation.getReservationSlot();
+                    return new MyReservationResponse(reservationSlot.getId(), reservationSlot.getTheme().getName(), reservationSlot.getDate().toString(),
+                            reservationSlot.getTime().getStartAt().toString(), payment.getPaymentKey(), payment.getAmount(), reservation.isReserved(), reservationSlot.findRank(reservation));
+                })
+                .toList();
     }
 
     public void cancel(final Long reservationId) {
