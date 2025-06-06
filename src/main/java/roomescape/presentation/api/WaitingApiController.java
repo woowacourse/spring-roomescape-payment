@@ -31,7 +31,7 @@ public class WaitingApiController {
     public ResponseEntity<WaitingResponse> createReservation(@RequestBody @Valid WaitingRequest request,
                                                              LoginInfo loginInfo) {
         WaitingResponse response = waitingService.createWaiting(loginInfo, request);
-        return ResponseEntity.created(URI.create("/reservations")).body(response);
+        return ResponseEntity.created(URI.create("/waitings/" + response.id())).body(response);
     }
 
     @GetMapping("/admin/waitings")

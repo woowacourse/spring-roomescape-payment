@@ -43,7 +43,7 @@ public class ReservationApiController {
     public ResponseEntity<ReservationResponse> adminCreateReservation(
             @RequestBody @Valid AdminReservationRequest request) {
         ReservationResponse response = reservationService.addAndGetWithoutPayment(request);
-        return ResponseEntity.created(URI.create("/reservations" + response.id())).body(response);
+        return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
     }
 
     @GetMapping("/reservations")
