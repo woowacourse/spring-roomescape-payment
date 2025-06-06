@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import roomescape.auth.application.AuthService;
 import roomescape.auth.application.LoginMember;
-import roomescape.auth.application.service.AuthService;
 import roomescape.member.domain.Member;
 import roomescape.member.service.MemberService;
 
