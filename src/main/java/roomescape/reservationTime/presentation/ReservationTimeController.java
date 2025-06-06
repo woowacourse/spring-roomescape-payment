@@ -1,5 +1,6 @@
 package roomescape.reservationTime.presentation;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.time.format.DateTimeParseException;
@@ -34,6 +35,7 @@ public class ReservationTimeController {
     }
 
     @PostMapping
+    @Operation(summary = "예약 시간 추가 API")
     public ResponseEntity<ReservationTimeResponse> createReservationTime(
             @RequestBody final ReservationTimeRequest request) {
         ReservationTimeResponse response = reservationTimeService.createReservationTime(request);
@@ -42,18 +44,21 @@ public class ReservationTimeController {
     }
 
     @GetMapping
+    @Operation(summary = "예약 시간 조회 API")
     public ResponseEntity<List<ReservationTimeResponse>> getReservationTimes() {
         List<ReservationTimeResponse> response = reservationTimeService.getReservationTimes();
         return ResponseEntity.ok(response);
     }
 
     @GetMapping(consumes = {"application/json"})
+    @Operation(summary = "예약 가능 시간 조회 API")
     public ResponseEntity<List<TimeConditionResponse>> getReservationTimes(final TimeConditionRequest request) {
         List<TimeConditionResponse> responses = reservationTimeService.getTimesWithCondition(request);
         return ResponseEntity.ok().body(responses);
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "예약 시간 삭제 API")
     public ResponseEntity<Void> deleteReservationTimeById(@PathVariable("id") final Long id) {
         reservationTimeService.deleteReservationTimeById(id);
         return ResponseEntity.noContent().build();
