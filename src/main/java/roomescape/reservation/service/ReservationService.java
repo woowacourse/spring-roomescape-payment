@@ -11,6 +11,7 @@ import roomescape.global.exception.ReservationException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
 import roomescape.member.service.MemberService;
+import roomescape.payment.application.Payment;
 import roomescape.reservation.config.PaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
@@ -54,33 +55,39 @@ public class ReservationService {
     public ReservationResponse saveReservation(final ReservationRequest request, final LoginMember loginMember) {
         ReservationTime reservationTime = reservationTimeRepository.getById(request.timeId());
         Theme theme = themeRepository.getById(request.themeId());
+        Payment payment = Payment.builder()
+                .paymentKey(request.paymentKey())
+                .amount(request.amount())
+                .build();
 
         paymentClient.approvePayment(
                 new PaymentApprovalRequest(request.paymentKey(), request.orderId(), request.amount()));
 
         if (reservationRepository.existsByDateAndTimeAndTheme(request.date(), reservationTime, theme)) {
-            return new ReservationResponse(waitingReservation(request.date(), reservationTime, theme, loginMember));
+            return new ReservationResponse(
+                    waitingReservation(request.date(), reservationTime, theme, loginMember, payment));
         }
-        return new ReservationResponse(bookedReservation(request.date(), reservationTime, theme, loginMember));
+        return new ReservationResponse(bookedReservation(request.date(), reservationTime, theme, loginMember, payment));
     }
 
     private Reservation waitingReservation(LocalDate date, ReservationTime reservationTime,
-                                           Theme theme, LoginMember loginMember) {
+                                           Theme theme, LoginMember loginMember, Payment payment) {
         Member member = memberService.getMemberById(loginMember.getId());
         if (reservationRepository.existsByDateAndTimeAndThemeAndMember(date, reservationTime, theme, member)) {
             throw new IllegalArgumentException("이미 예약한 사용자입니다.");
         }
         Long lastWaitingRank = reservationRepository.getLastWaitingRank(theme, date, reservationTime).orElse(0L);
         Reservation reservation = Reservation.waiting(date, reservationTime, theme, member, LocalDateTime.now(clock),
-                lastWaitingRank + 1);
+                lastWaitingRank + 1, payment);
 
         return reservationRepository.save(reservation);
     }
 
     private Reservation bookedReservation(LocalDate date, ReservationTime reservationTime,
-                                          Theme theme, LoginMember loginMember) {
+                                          Theme theme, LoginMember loginMember, Payment payment) {
         Member member = memberService.getMemberById(loginMember.getId());
-        Reservation reservation = Reservation.of(date, reservationTime, theme, member, LocalDateTime.now(clock));
+        Reservation reservation = Reservation.of(date, reservationTime, theme, member, LocalDateTime.now(clock),
+                payment);
 
         return reservationRepository.save(reservation);
     }
@@ -93,7 +100,7 @@ public class ReservationService {
             throw new ReservationException("해당 시간은 이미 예약되어있습니다.");
         }
         Reservation reservation = Reservation.of(request.date(), reservationTime, theme, member,
-                LocalDateTime.now(clock));
+                LocalDateTime.now(clock), null);
         Reservation newReservation = reservationRepository.save(reservation);
         return new ReservationResponse(newReservation);
     }
