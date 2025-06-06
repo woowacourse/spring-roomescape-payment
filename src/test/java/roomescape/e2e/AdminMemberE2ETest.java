@@ -6,7 +6,7 @@ import static roomescape.fixture.IntegrationFixture.ADMIN_EMAIL;
 import static roomescape.fixture.IntegrationFixture.FUTURE_DATE_TEXT;
 import static roomescape.fixture.IntegrationFixture.PASSWORD;
 import static roomescape.fixture.IntegrationFixture.TOKEN;
-import static roomescape.fixture.IntegrationFixture.createReservation;
+import static roomescape.fixture.IntegrationFixture.createRegularReservation;
 import static roomescape.fixture.IntegrationFixture.createReservationTime;
 import static roomescape.fixture.IntegrationFixture.createTheme;
 import static roomescape.fixture.IntegrationFixture.findThemesBySize;
@@ -90,7 +90,7 @@ class AdminMemberE2ETest {
     void 예약을_삭제한다() {
         createReservationTime();
         createTheme("추리");
-        createReservation(1L, "testtest", "orderorder", 10000L);
+        createRegularReservation(1L, "testtest", "orderorder", 10000L);
 
         RestAssured.given().log().all()
                 .cookie(TOKEN, ADMIN_TOKEN)
@@ -206,7 +206,7 @@ class AdminMemberE2ETest {
     void 모든_예약을_조회한다() {
         createReservationTime();
         createTheme("추리");
-        createReservation(1L, "testtest", "orderorder", 10000L);
+        createRegularReservation(1L, "testtest", "orderorder", 10000L);
 
         RestAssured.given().log().all()
                 .cookie(TOKEN, ADMIN_TOKEN)
@@ -221,8 +221,8 @@ class AdminMemberE2ETest {
         createReservationTime();
         createTheme("추리");
         createTheme("로맨스");
-        createReservation(1L, "testtest", "orderorder", 10000L);
-        createReservation(2L, "testtest", "orderorder", 10000L);
+        createRegularReservation(1L, "testtest", "orderorder", 10000L);
+        createRegularReservation(2L, "testtest", "orderorder", 10000L);
 
         List<ConfirmedReservationWebResponse> reservationsFilteredByThemeId = RestAssured.given().log().all()
                 .cookie(TOKEN, ADMIN_TOKEN)
