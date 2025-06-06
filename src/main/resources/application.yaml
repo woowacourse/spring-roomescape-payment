@@ -15,7 +15,6 @@ spring:
       data-locations: classpath:data.sql
 
   jpa:
-    show-sql: true
     hibernate:
       ddl-auto: create-drop
     properties:
