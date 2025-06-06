@@ -1,4 +1,4 @@
-# 방탈출 예약 대기
+_# 방탈출 예약 대기
 
 ## 1, 2단계 - JPA 전환
 
@@ -29,56 +29,65 @@
 
 | Method | URL | Description | Request Body | Response | Auth Required |
 |--------|-----|-------------|--------------|----------|---------------|
-| POST | /login | 로그인 | `{ "email": "string", "password": "string" }` | 쿠키에 토큰 저장 | No |
-| GET | /login/check | 로그인 상태 확인 | - | `{ "name": "string" }` | Yes |
+| POST | /login | 로그인 | { "email": "string", "password": "string" } | 쿠키에 토큰 저장 | No |
+| GET | /login/check | 로그인 상태 확인 | - | { "name": "string" } | Yes |
 | POST | /logout | 로그아웃 | - | 쿠키에서 토큰 삭제 | Yes |
 
 ### 회원 (Members)
 
 | Method | URL | Description | Request Body | Response | Auth Required |
 |--------|-----|-------------|--------------|----------|---------------|
-| GET | /members | 모든 회원 조회 | - | `[{ "id": number, "name": "string", "email": "string", "role": "string" }]` | Admin |
-| POST | /members | 회원 가입 | `{ "name": "string", "email": "string", "password": "string" }` | `{ "id": number, "name": "string", "email": "string" }` | No |
+| GET | /members | 모든 회원 조회 | - | [{ "id": number, "name": "string", "email": "string", "role": "string" }] | Admin |
+| POST | /members | 회원 가입 | { "name": "string", "email": "string", "password": "string" } | { "id": number, "name": "string", "email": "string" } | No |
 
 ### 테마 (Themes)
 
 | Method | URL | Description | Request Body | Response | Auth Required |
 |--------|-----|-------------|--------------|----------|---------------|
-| GET | /themes | 모든 테마 조회 | - | `[{ "id": number, "name": "string", "description": "string", "price": number }]` | No |
-| GET | /themes/popular | 인기 테마 조회 | - | `[{ "id": number, "name": "string", "description": "string", "price": number }]` | No |
-| POST | /themes | 테마 생성 | `{ "name": "string", "description": "string", "price": number }` | `{ "id": number, "name": "string", "description": "string", "price": number }` | Admin |
+| GET | /themes | 모든 테마 조회 | - | [{ "id": number, "name": "string", "description": "string", "thumbnail": "string" }] | No |
+| GET | /themes/popular | 인기 테마 조회 | - | [{ "id": number, "name": "string", "description": "string", "thumbnail": "string" }] | No |
+| POST | /themes | 테마 생성 | { "name": "string", "description": "string", "thumbnail": "string" } | { "id": number, "name": "string", "description": "string", "thumbnail": "string" } | Admin |
 | DELETE | /themes/{id} | 테마 삭제 | - | - | Admin |
 
 ### 예약 시간 (Reservation Times)
 
 | Method | URL | Description | Request Body/Params | Response | Auth Required |
-|--------|-----|-------------|--------------|----------|---------------|
-| GET | /times | 모든 예약 시간 조회 | - | `[{ "id": number, "time": "string" }]` | Admin |
-| GET | /times/available | 특정 날짜와 테마에 대한 가능한 예약 시간 조회 | `date=YYYY-MM-DD&themeId=number` | `[{ "id": number, "time": "string", "available": boolean }]` | No |
-| POST | /times | 예약 시간 생성 | `{ "time": "string" }` | `{ "id": number, "time": "string" }` | Admin |
+|--------|-----|-------------|---------------------|----------|---------------|
+| GET | /times | 모든 예약 시간 조회 | - | [{ "id": number, "startAt": "HH:mm" }] | Admin |
+| GET | /times/available | 특정 날짜와 테마에 대한 가능한 예약 시간 조회 | date=YYYY-MM-DD&themeId=number | [{ "id": number, "startAt": "HH:mm", "alreadyBooked": boolean }] | No |
+| POST | /times | 예약 시간 생성 | { "startAt": "HH:mm" } | { "id": number, "startAt": "HH:mm" } | Admin |
 | DELETE | /times/{id} | 예약 시간 삭제 | - | - | Admin |
 
 ### 예약 (Reservations)
 
-| Method | URL | Description | Request Body/Params | Response | Auth Required |
+| Method | URL | Description | Request Body | Response | Auth Required |
 |--------|-----|-------------|--------------|----------|---------------|
-| GET | /reservations | 모든 예약 조회 | - | `[{ "id": number, "date": "YYYY-MM-DD", "time": "string", "theme": "string", "member": "string", "status": "string" }]` | Admin |
-| GET | /reservations/me | 내 예약 조회 | - | `[{ "id": number, "date": "YYYY-MM-DD", "time": "string", "theme": "string", "status": "string", "waitingOrder": number }]` | Yes |
-| POST | /reservations | 예약 생성 | `{ "date": "YYYY-MM-DD", "timeId": number, "themeId": number }` | `{ "id": number, "date": "YYYY-MM-DD", "time": "string", "theme": "string", "member": "string", "status": "string" }` | Yes |
+| GET | /reservations | 모든 예약 조회 | - | [{ "id": number, "member": { "name": "string" }, "date": "YYYY-MM-DD", "theme": { "id": number, "name": "string", "description": "string", "thumbnail": "string" }, "time": { "id": number, "startAt": "HH:mm" }, "status": "string" }] | Admin |
+| GET | /reservations/me | 내 예약 조회 | - | [{ "id": number, "theme": "string", "date": "YYYY-MM-DD", "time": "HH:mm", "statusMessage": "string", "paymentKey": "string", "orderId": "string", "amount": number }] | Yes |
+| POST | /reservations | 예약 생성 | { "date": "YYYY-MM-DD", "timeId": number, "themeId": number, "paymentKey": "string", "orderId": "string", "amount": number } | { "id": number, "member": { "name": "string" }, "date": "YYYY-MM-DD", "theme": { "id": number, "name": "string", "description": "string", "thumbnail": "string" }, "time": { "id": number, "startAt": "HH:mm" }, "status": "string", "orderId": "string", "amount": number } | Yes |
 
 ### 관리자 예약 (Admin Reservations)
 
 | Method | URL | Description | Request Body/Params | Response | Auth Required |
-|--------|-----|-------------|--------------|----------|---------------|
-| GET | /admin/reservations | 예약된 모든 예약 조회 | - | `[{ "id": number, "date": "YYYY-MM-DD", "time": "string", "theme": "string", "member": "string", "status": "string" }]` | Admin |
-| POST | /admin/reservations | 관리자가 예약 생성 | `{ "date": "YYYY-MM-DD", "timeId": number, "themeId": number, "memberId": number }` | `{ "id": number, "date": "YYYY-MM-DD", "time": "string", "theme": "string", "member": "string", "status": "string" }` | Admin |
-| GET | /admin/reservations/search | 기간별 예약 검색 | `themeId=number&memberId=number&dateFrom=YYYY-MM-DD&dateTo=YYYY-MM-DD` | `[{ "id": number, "date": "YYYY-MM-DD", "time": "string", "theme": "string", "member": "string", "status": "string" }]` | Admin |
+|--------|-----|-------------|---------------------|----------|---------------|
+| GET | /admin/reservations | 예약된 모든 예약 조회 | - | [{ "id": number, "member": { "name": "string" }, "date": "YYYY-MM-DD", "theme": { "id": number, "name": "string", "description": "string", "thumbnail": "string" }, "time": { "id": number, "startAt": "HH:mm" }, "status": "string" }] | Admin |
+| POST | /admin/reservations | 관리자가 예약 생성 | { "date": "YYYY-MM-DD", "timeId": number, "themeId": number, "memberId": number } | { "id": number, "member": { "name": "string" }, "date": "YYYY-MM-DD", "theme": { "id": number, "name": "string", "description": "string", "thumbnail": "string" }, "time": { "id": number, "startAt": "HH:mm" }, "status": "string" } | Admin |
+| GET | /admin/reservations/search | 기간별 예약 검색 | themeId=number&memberId=number&dateFrom=YYYY-MM-DD&dateTo=YYYY-MM-DD | [{ "id": number, "member": { "name": "string" }, "date": "YYYY-MM-DD", "theme": { "id": number, "name": "string", "description": "string", "thumbnail": "string" }, "time": { "id": number, "startAt": "HH:mm" }, "status": "string" }] | Admin |
 | DELETE | /admin/reservations/{id} | 예약 삭제 | - | - | Admin |
 
 ### 예약 대기 (Reservation Waitings)
 
 | Method | URL | Description | Request Body | Response | Auth Required |
 |--------|-----|-------------|--------------|----------|---------------|
-| GET | /reservations/waiting | 모든 예약 대기 조회 | - | `[{ "id": number, "date": "YYYY-MM-DD", "time": "string", "theme": "string", "member": "string", "status": "string" }]` | Admin |
-| POST | /reservations/waiting | 예약 대기 생성 | `{ "date": "YYYY-MM-DD", "timeId": number, "themeId": number }` | `{ "id": number, "date": "YYYY-MM-DD", "time": "string", "theme": "string", "member": "string", "status": "string" }` | Yes |
+| GET | /reservations/waiting | 모든 예약 대기 조회 | - | [{ "id": number, "member": { "name": "string" }, "date": "YYYY-MM-DD", "theme": { "id": number, "name": "string", "description": "string", "thumbnail": "string" }, "time": { "id": number, "startAt": "HH:mm" }, "status": "string" }] | Admin |
+| POST | /reservations/waiting | 예약 대기 생성 | { "date": "YYYY-MM-DD", "timeId": number, "themeId": number } | { "id": number, "member": { "name": "string" }, "date": "YYYY-MM-DD", "theme": { "id": number, "name": "string", "description": "string", "thumbnail": "string" }, "time": { "id": number, "startAt": "HH:mm" }, "status": "string" } | Yes |
 | DELETE | /reservations/waiting/{id} | 예약 대기 취소 | - | - | Yes |
+
+### 참고사항
+
+- 모든 날짜는 "YYYY-MM-DD" 형식으로 전송됩니다.
+- 모든 시간은 "HH:mm" 형식으로 전송됩니다.
+- 결제 관련 정보(paymentKey, orderId, amount)는 예약 생성 시에만 포함됩니다.
+- 응답의 status는 예약 상태를 나타내는 문자열입니다.
+- Admin 권한이 필요한 API는 @AdminMember 어노테이션으로 보호됩니다.
+- 로그인이 필요한 API는 @CurrentMember 어노테이션으로 보호됩니다.
