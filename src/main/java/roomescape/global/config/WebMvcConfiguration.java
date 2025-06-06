@@ -13,12 +13,12 @@ import roomescape.auth.config.AuthenticationPrincipalArgumentResolver;
 @RequiredArgsConstructor
 public class WebMvcConfiguration implements WebMvcConfigurer {
 
-    private final AuthenticationPrincipalArgumentResolver authResolver;
+    private final AuthenticationPrincipalArgumentResolver authPrincipalResolver;
     private final AuthCheckInterceptor authCheckInterceptor;
 
     @Override
     public void addArgumentResolvers(final List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(authResolver);
+        resolvers.add(authPrincipalResolver);
     }
 
     @Override
