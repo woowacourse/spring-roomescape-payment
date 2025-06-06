@@ -24,3 +24,9 @@ VALUES (1, 1);
 
 INSERT INTO reservation(room_escape_information_id, member_id)
 VALUES (2, 1);
+
+INSERT INTO  payment_reservation(payment_id, reservation_id)
+VALUES (null, 1);
+
+INSERT INTO  payment_reservation(payment_id, reservation_id)
+VALUES (null, 2);

@@ -5,7 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
+import roomescape.exception.NotFoundException;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentReservation;
 import roomescape.payment.domain.PaymentStatus;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.dto.ReservationPaymentRequest;
@@ -14,6 +16,7 @@ import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.payment.exception.custom.PaymentBadRequestException;
 import roomescape.payment.infrastructure.TossRestClient;
 import roomescape.payment.repository.PaymentRepository;
+import roomescape.payment.repository.PaymentReservationRepository;
 import roomescape.payment.util.IdempotencyKeyGenerator;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.ReservationResponse;
@@ -25,24 +28,27 @@ import roomescape.reservation.service.ReservationQueryService;
 @RequiredArgsConstructor
 public class PaymentService {
 
+    private final PaymentReservationRepository paymentReservationRepository;
     private final PaymentRepository paymentRepository;
     private final ReservationQueryService reservationQueryService;
     private final ReservationCommandService reservationCommandService;
     private final TossRestClient restClient;
 
     @Transactional
-    public TossPaymentResponse confirm(final TossPaymentRequest tossPaymentRequest, final long id) {
-        final Payment payment = paymentRepository.findById(id)
-                .orElseThrow(() -> new PaymentBadRequestException("존재하지 않은 결제입니다."));
+    public TossPaymentResponse confirm(final TossPaymentRequest tossPaymentRequest, final long paymentId) {
+        final Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new PaymentBadRequestException("존재하지 않은 결제입니다. paymentId: " + paymentId));
         final String idempotencyKey = IdempotencyKeyGenerator.generate();
         try {
             final TossPaymentResponse response = restClient.confirm(tossPaymentRequest, idempotencyKey);
             payment.completePayment();
             return response;
-        } catch (RuntimeException e) {
+        } catch (final RuntimeException e) {
             payment.failPayment();
-            final Reservation reservation = payment.getReservation();
-            reservationQueryService.findById(reservation.getId());
+            final PaymentReservation paymentReservation = paymentReservationRepository.findByPaymentId(payment.getId())
+                    .orElseThrow(() -> new NotFoundException("예약에 대한 결제 내역이 존재하지 않습니다."));
+            reservationCommandService.cancel(paymentReservation.getReservation().getId());
+            paymentReservation.cancelReservation();
             throw e;
         }
     }
@@ -61,9 +67,10 @@ public class PaymentService {
                 .orderId(request.orderId())
                 .amount(request.amount())
                 .paymentStatus(PaymentStatus.PENDING)
-                .reservation(reservation)
                 .member(reservation.getMember())
                 .build();
-        return new PaymentResponse(paymentRepository.save(payment));
+        final Payment savedPayment = paymentRepository.save(payment);
+        paymentReservationRepository.save(PaymentReservation.of(savedPayment, reservation));
+        return new PaymentResponse(savedPayment);
     }
 }

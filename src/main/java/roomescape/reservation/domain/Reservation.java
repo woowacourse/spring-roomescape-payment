@@ -49,5 +49,4 @@ public class Reservation extends BaseTimeEntity {
                 .member(member)
                 .build();
     }
-
 }

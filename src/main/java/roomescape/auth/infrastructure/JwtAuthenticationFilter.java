@@ -23,7 +23,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String MEMBER_ID_ATTRIBUTE = "memberId";
     private static final List<String> WHITELIST = List.of("/login", "/logout", "/signup", "/h2-console");
 
-
     private final JwtTokenProvider jwtTokenProvider;
     private final CookieManager cookieManager;
 
