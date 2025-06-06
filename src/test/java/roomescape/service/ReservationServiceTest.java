@@ -32,13 +32,13 @@ import roomescape.dto.response.WaitingWithRankResponse;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.NotFoundException;
 import roomescape.exception.PaymentException;
-import roomescape.external.lock.RoomescapeLockInitializer;
+import roomescape.external.lock.ReservationLockGuard;
+import roomescape.external.lock.RoomescapeLockRepository;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.PaymentHistoryRepository;
 import roomescape.repository.PaymentResultRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
-import roomescape.repository.RoomescapeLockRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.repository.WaitingRepository;
 import roomescape.utility.PaymentClientStub;
@@ -71,12 +71,11 @@ class ReservationServiceTest {
     private Member member;
     private PaymentService paymentService;
     private PaymentClientStub paymentClient;
-    private RoomescapeLockService roomescapeLockService;
+    private ReservationLockService reservationLockService;
 
     @BeforeEach
     void setup() {
-        roomescapeLockService = new RoomescapeLockService(roomescapeLockRepository,
-                new RoomescapeLockInitializer(roomescapeLockRepository));
+        reservationLockService = new ReservationLockService(new ReservationLockGuard(roomescapeLockRepository));
 
         paymentClient = new PaymentClientStub();
         paymentService = new PaymentService(paymentHistoryRepository, paymentClient, paymentResultRepository);
@@ -87,7 +86,7 @@ class ReservationServiceTest {
                 memberRepository,
                 waitingRepository,
                 paymentService,
-                roomescapeLockService);
+                reservationLockService);
 
         reservationTime = entityManager.persist(
                 ReservationTime.createWithoutId(LocalTime.of(10, 0)));

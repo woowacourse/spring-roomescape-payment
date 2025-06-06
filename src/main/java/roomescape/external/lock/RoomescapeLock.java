@@ -18,4 +18,8 @@ public class RoomescapeLock {
     protected RoomescapeLock() {
 
     }
+
+    public String getLockId() {
+        return lockId;
+    }
 }

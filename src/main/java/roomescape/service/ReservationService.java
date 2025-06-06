@@ -38,20 +38,19 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
     private final PaymentService paymentService;
-    private final RoomescapeLockService roomescapeLockService;
+    private final ReservationLockService reservationLockService;
 
     public ReservationService(
             ReservationRepository reservationRepository, ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository, MemberRepository memberRepository, WaitingRepository waitingRepository,
-            PaymentService paymentService, RoomescapeLockService roomescapeLockService
-    ) {
+            PaymentService paymentService, ReservationLockService reservationLockService) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
         this.paymentService = paymentService;
-        this.roomescapeLockService = roomescapeLockService;
+        this.reservationLockService = reservationLockService;
     }
 
     public List<ReservationResponse> findAllReservations() {
@@ -110,7 +109,8 @@ public class ReservationService {
         Theme theme = getThemeById(reservationCreationContent.themeId());
         ReservationTime time = getReservationTimeById(reservationCreationContent.timeId());
 
-        roomescapeLockService.doPersistenceLock();
+        reservationLockService.doPessimisticLock(theme, time, reservationCreationContent.date());
+
         validateDuplicateReservation(theme, reservationCreationContent.date(), time);
 
         Reservation validateReservation = Reservation.createWithoutIdAndPaymentHistory(

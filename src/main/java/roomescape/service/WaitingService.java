@@ -25,7 +25,7 @@ import roomescape.repository.WaitingRepository;
 @Transactional
 public class WaitingService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ReservationService.class);
+    private static final Logger logger = LoggerFactory.getLogger(WaitingService.class);
 
     private final WaitingRepository waitingRepository;
     private final ThemeRepository themeRepository;
