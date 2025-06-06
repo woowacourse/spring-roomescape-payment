@@ -62,12 +62,12 @@ class PaymentApplicationServiceTest {
 
     @BeforeEach
     void setUp() {
+        PaymentDataService paymentDataService = new PaymentDataService(paymentRepository);
+        paymentApplicationService = new PaymentApplicationService(paymentDataService, paymentClient);
         when(paymentClient.approvePayment(any())).thenAnswer(invocation -> {
             PaymentApproveRequest req = invocation.getArgument(0);
             return new PaymentApproveResponse(req.paymentKey(), req.orderId(), req.amount());
         });
-        PaymentDataService paymentDataService = new PaymentDataService(paymentRepository);
-        paymentApplicationService = new PaymentApplicationService(paymentDataService, paymentClient);
     }
 
     @Test
@@ -83,7 +83,7 @@ class PaymentApplicationServiceTest {
         reservationSlotRepository.save(reservationSlot);
         Reservation reservation = reservationRepository.findByReservationSlotIdAndMemberId(reservationSlot.getId(), member.getId()).get();
 
-        PaymentApproveRequest paymentApproveRequest = new PaymentApproveRequest("testtest", "orderorder", 1000L);
+        PaymentApproveRequest paymentApproveRequest = new PaymentApproveRequest("test_payment_key", "RESERVATION_test_order_id", 1_000L);
 
         // When
         Payment actual = paymentApplicationService.approveReservationPayment(paymentApproveRequest, reservation.getId());
@@ -110,8 +110,8 @@ class PaymentApplicationServiceTest {
         reservationSlotRepository.save(reservationSlot);
         Reservation reservation = reservationRepository.findByReservationSlotIdAndMemberId(reservationSlot.getId(), member.getId()).get();
 
-        PaymentApproveRequest paymentApproveRequest1 = new PaymentApproveRequest("testtest", "orderorder", 1000L);
-        PaymentApproveRequest paymentApproveRequest2 = new PaymentApproveRequest("testtest", "orderorder", 1000L);
+        PaymentApproveRequest paymentApproveRequest1 = new PaymentApproveRequest("test_payment_key", "RESERVATION_test_order_id", 1_000L);
+        PaymentApproveRequest paymentApproveRequest2 = new PaymentApproveRequest("test_payment_key", "RESERVATION_test_order_id", 1_000L);
 
         paymentApplicationService.approveReservationPayment(paymentApproveRequest1, reservation.getId());
 
@@ -134,8 +134,8 @@ class PaymentApplicationServiceTest {
         reservationSlotRepository.save(reservationSlot);
         Reservation reservation = reservationRepository.findByReservationSlotIdAndMemberId(reservationSlot.getId(), member.getId()).get();
 
-        PaymentApproveRequest paymentApproveRequestWithPaymentKeyNull = new PaymentApproveRequest(null, "orderorder", 1000L);
-        PaymentApproveRequest paymentApproveRequestWithPaymentKeyBlank = new PaymentApproveRequest("", "orderorder", 1000L);
+        PaymentApproveRequest paymentApproveRequestWithPaymentKeyNull = new PaymentApproveRequest(null, "RESERVATION_test_order_id", 1_000L);
+        PaymentApproveRequest paymentApproveRequestWithPaymentKeyBlank = new PaymentApproveRequest("", "RESERVATION_test_order_id", 1_000L);
 
         // When & Then
         SoftAssertions.assertSoftly(softAssertions -> {
@@ -161,8 +161,8 @@ class PaymentApplicationServiceTest {
         reservationSlotRepository.save(reservationSlot);
         Reservation reservation = reservationRepository.findByReservationSlotIdAndMemberId(reservationSlot.getId(), member.getId()).get();
 
-        PaymentApproveRequest paymentApproveRequestWithOrderIdNull = new PaymentApproveRequest("testtest", null, 1000L);
-        PaymentApproveRequest paymentApproveRequestWithOrderIdBlank = new PaymentApproveRequest("testtest", "", 1000L);
+        PaymentApproveRequest paymentApproveRequestWithOrderIdNull = new PaymentApproveRequest("test_payment_key", null, 1_000L);
+        PaymentApproveRequest paymentApproveRequestWithOrderIdBlank = new PaymentApproveRequest("test_payment_key", "", 1_000L);
 
         // When & Then
         SoftAssertions.assertSoftly(softAssertions -> {
@@ -188,7 +188,7 @@ class PaymentApplicationServiceTest {
         reservationSlotRepository.save(reservationSlot);
         Reservation reservation = reservationRepository.findByReservationSlotIdAndMemberId(reservationSlot.getId(), member.getId()).get();
 
-        PaymentApproveRequest paymentApproveRequestWithAmountNull = new PaymentApproveRequest("testtest", "orderorder", null);
+        PaymentApproveRequest paymentApproveRequestWithAmountNull = new PaymentApproveRequest("test_payment_key", "RESERVATION_test_order_id", null);
 
         // When & Then
         assertThatThrownBy(() -> paymentApplicationService.approveReservationPayment(paymentApproveRequestWithAmountNull, reservation.getId()))
@@ -209,7 +209,7 @@ class PaymentApplicationServiceTest {
         reservationSlotRepository.save(reservationSlot);
         Reservation reservation = reservationRepository.findByReservationSlotIdAndMemberId(reservationSlot.getId(), member.getId()).get();
 
-        PaymentApproveRequest paymentApproveRequestWithAmountUnderUnitPrice = new PaymentApproveRequest("testtest", "orderorder", 900L);
+        PaymentApproveRequest paymentApproveRequestWithAmountUnderUnitPrice = new PaymentApproveRequest("test_payment_key", "RESERVATION_test_order_id", 900L);
 
         // When & Then
         assertThatThrownBy(() -> paymentApplicationService.approveReservationPayment(paymentApproveRequestWithAmountUnderUnitPrice, reservation.getId()))
@@ -230,7 +230,7 @@ class PaymentApplicationServiceTest {
         reservationSlotRepository.save(reservationSlot);
         Reservation reservation = reservationRepository.findByReservationSlotIdAndMemberId(reservationSlot.getId(), member.getId()).get();
 
-        PaymentApproveRequest paymentApproveRequestWithAmountUnderUnitPrice = new PaymentApproveRequest("testtest", "orderorder", 999L);
+        PaymentApproveRequest paymentApproveRequestWithAmountUnderUnitPrice = new PaymentApproveRequest("test_payment_key", "RESERVATION_test_order_id", 999L);
 
         // When & Then
         assertThatThrownBy(() -> paymentApplicationService.approveReservationPayment(paymentApproveRequestWithAmountUnderUnitPrice, reservation.getId()))

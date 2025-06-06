@@ -94,7 +94,7 @@ public class IntegrationFixture {
     public static ReservationResponse makeWaitingReservations() {
         createReservationTime();
         createTheme("추리");
-        createRegularReservation(1L, "testtest", "orderorder", 10000L);
+        createRegularReservation(1L, "test_payment_key", "RESERVATION_test_order_id", 1_000L);
 
         String user2Token = loginAndGetAuthToken(REGULAR2_EMAIL, PASSWORD);
         Map<String, Object> reservation = new HashMap<>();

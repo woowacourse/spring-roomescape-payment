@@ -202,7 +202,7 @@ class WaitingReservationApplicationServiceTest {
         });
 
         // When
-        waitingReservationApplicationService.confirm(new WaitingConfirmRequest(reservationSlot.getId()), new PaymentApproveRequest("testtest", "orderorder", 1000L));
+        waitingReservationApplicationService.confirm(new WaitingConfirmRequest(reservationSlot.getId()), new PaymentApproveRequest("test_payment_key", "RESERVATION_test_order_id", 1_000L));
 
         // Then
         SoftAssertions.assertSoftly(softAssertions -> {
@@ -225,7 +225,7 @@ class WaitingReservationApplicationServiceTest {
         });
 
         // When & Then
-        assertThatThrownBy(() -> waitingReservationApplicationService.confirm(new WaitingConfirmRequest(reservationSlot.getId()), new PaymentApproveRequest("testtest", "orderorder", 1000L)))
+        assertThatThrownBy(() -> waitingReservationApplicationService.confirm(new WaitingConfirmRequest(reservationSlot.getId()), new PaymentApproveRequest("test_payment_key", "RESERVATION_test_order_id", 1_000L)))
                 .isInstanceOf(ConfirmedReservationAlreadyExistsException.class)
                 .hasMessage("이미 예약이 존재하여 진행할 수 없습니다.");
     }
@@ -244,7 +244,7 @@ class WaitingReservationApplicationServiceTest {
         });
 
         // When & Then
-        assertThatThrownBy(() -> waitingReservationApplicationService.confirm(new WaitingConfirmRequest(reservationSlot.getId()), new PaymentApproveRequest("testtest", "orderorder", 1000L)))
+        assertThatThrownBy(() -> waitingReservationApplicationService.confirm(new WaitingConfirmRequest(reservationSlot.getId()), new PaymentApproveRequest("test_payment_key", "RESERVATION_test_order_id", 1_000L)))
                 .isInstanceOf(ReservationNotFoundException.class)
                 .hasMessage("예약이 존재하지 않습니다.");
     }

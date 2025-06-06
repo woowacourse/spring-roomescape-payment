@@ -21,7 +21,7 @@ import java.time.LocalDateTime;
 )
 public class Payment {
 
-    public static final int UNIT_PRICE_OF_RESERVATION = 1000;
+    public static final int UNIT_PRICE_OF_RESERVATION = 1_000;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "payment_id")

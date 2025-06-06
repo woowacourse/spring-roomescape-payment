@@ -5,7 +5,12 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import roomescape.member.application.MemberDataService;
 import roomescape.member.domain.Member;
+import roomescape.payment.application.PaymentApplicationService;
+import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
+import roomescape.reservation.application.dto.request.WaitingConfirmRequest;
+import roomescape.reservation.application.dto.request.WaitingReservationCreateRequest;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.exception.ConfirmedReservationAlreadyExistsException;
 import roomescape.reservation.presentation.dto.response.WaitingWebResponse;
 import roomescape.reservationslot.application.ReservationSlotDataService;
 import roomescape.reservationslot.domain.ReservationSlot;
@@ -17,13 +22,16 @@ public class WaitingReservationApplicationService {
     private final ReservationSlotDataService reservationSlotDataService;
     private final MemberDataService memberDataService;
     private final ReservationDataService reservationDataService;
+    private final PaymentApplicationService paymentApplicationService;
 
     public WaitingReservationApplicationService(final ReservationSlotDataService reservationSlotDataService,
                                                 final MemberDataService memberDataService,
-                                                final ReservationDataService reservationDataService) {
+                                                final ReservationDataService reservationDataService,
+                                                PaymentApplicationService paymentApplicationService) {
         this.reservationSlotDataService = reservationSlotDataService;
         this.memberDataService = memberDataService;
         this.reservationDataService = reservationDataService;
+        this.paymentApplicationService = paymentApplicationService;
     }
 
     public ReservationResponse create(final WaitingReservationCreateRequest createRequest) {
@@ -55,5 +63,19 @@ public class WaitingReservationApplicationService {
         reservationDataService.cancel(reservation);
         ReservationSlot reservationSlot = reservationSlotDataService.getById(reservation.getReservationSlot().getId());
         reservationSlot.getReservations().remove(reservation);
+    }
+
+    public void confirm(WaitingConfirmRequest waitingConfirmRequest, final PaymentApproveRequest paymentApproveRequest) {
+        ReservationSlot reservationSlot = reservationSlotDataService.getById(waitingConfirmRequest.reservationSlotId());
+        validateConfirmedReservationNotExists(reservationSlot);
+        Reservation paymentPendingReservation = reservationSlot.findPaymentPendingReservation();
+        paymentPendingReservation.toConfirmed();
+        paymentApplicationService.approveReservationPayment(paymentApproveRequest, paymentPendingReservation.getId());
+    }
+
+    private void validateConfirmedReservationNotExists(ReservationSlot reservationSlot) {
+        if (reservationSlot.isConfirmedReservationExist()) {
+            throw new ConfirmedReservationAlreadyExistsException("이미 예약이 존재하여 진행할 수 없습니다.");
+        }
     }
 }

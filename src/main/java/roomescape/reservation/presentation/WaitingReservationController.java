@@ -12,9 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.common.security.annotation.RequireRole;
 import roomescape.common.security.dto.request.MemberInfo;
 import roomescape.member.domain.MemberRole;
+import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
 import roomescape.reservation.application.WaitingReservationApplicationService;
-import roomescape.reservation.application.WaitingReservationCreateRequest;
+import roomescape.reservation.application.dto.request.WaitingConfirmRequest;
+import roomescape.reservation.application.dto.request.WaitingReservationCreateRequest;
+import roomescape.reservation.presentation.dto.request.WaitingConfirmWebRequest;
 import roomescape.reservation.presentation.dto.request.WaitingReservationCreateWebRequest;
+import roomescape.reservation.presentation.dto.response.ConfirmedReservationWebResponse;
 import roomescape.reservation.presentation.dto.response.WaitingWebResponse;
 import roomescape.reservationslot.presentation.dto.response.ReservationResponse;
 
@@ -65,5 +69,12 @@ public class WaitingReservationController {
     ) {
         waitingReservationApplicationService.cancel(waitingId);
         return ResponseEntity.noContent().build();
+    }
+
+    @RequireRole(MemberRole.REGULAR)
+    @PostMapping("/waiting-reservations/confirm")
+    public ResponseEntity<Void> confirm(@RequestBody WaitingConfirmWebRequest request) {
+        waitingReservationApplicationService.confirm(WaitingConfirmRequest.of(request), PaymentApproveRequest.from(request));
+        return ResponseEntity.ok().build();
     }
 }

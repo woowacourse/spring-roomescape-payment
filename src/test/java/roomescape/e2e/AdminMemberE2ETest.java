@@ -103,7 +103,7 @@ class AdminMemberE2ETest {
     void 예약을_삭제한다() {
         createReservationTime();
         createTheme("추리");
-        createRegularReservation(1L, "testtest", "orderorder", 10000L);
+        createRegularReservation(1L, "test_payment_key", "RESERVATION_test_order_id", 1_000L);
 
         RestAssured.given().log().all()
                 .cookie(TOKEN, ADMIN_TOKEN)
@@ -219,7 +219,7 @@ class AdminMemberE2ETest {
     void 모든_예약을_조회한다() {
         createReservationTime();
         createTheme("추리");
-        createRegularReservation(1L, "testtest", "orderorder", 10000L);
+        createRegularReservation(1L, "test_payment_key", "RESERVATION_test_order_id", 1_000L);
 
         RestAssured.given().log().all()
                 .cookie(TOKEN, ADMIN_TOKEN)
@@ -234,8 +234,8 @@ class AdminMemberE2ETest {
         createReservationTime();
         createTheme("추리");
         createTheme("로맨스");
-        createRegularReservation(1L, "testtest", "orderorder", 10000L);
-        createRegularReservation(2L, "testtest2", "orderorder", 10000L);
+        createRegularReservation(1L, "test_payment_key", "RESERVATION_test_order_id", 1_000L);
+        createRegularReservation(2L, "test_payment_key2", "RESERVATION_test_order_id", 1_000L);
 
         List<ConfirmedReservationWebResponse> reservationsFilteredByThemeId = RestAssured.given().log().all()
                 .cookie(TOKEN, ADMIN_TOKEN)

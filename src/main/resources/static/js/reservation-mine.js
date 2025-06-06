@@ -98,7 +98,7 @@ function requestWaitingPayment(reservationSlotId) {
         paymentWidget.requestPayment({
             orderId: orderIdPrefix + generateRandomString(),
             orderName: "테스트 방탈출 예약 결제 1건",
-            amount: 1000,
+            amount: 1_000,
         }).then(function (data) {
             console.debug(data);
             fetchReservationPayment(data, reservationData);
@@ -160,7 +160,7 @@ function requestDeleteWaiting(reservationSlotId) {
 // ------  결제위젯 초기화 ------
 // @docs https://docs.tosspayments.com/reference/widget-sdk#sdk-설치-및-초기화
 // @docs https://docs.tosspayments.com/reference/widget-sdk#renderpaymentmethods선택자-결제-금액-옵션
-const paymentAmount = 1000;
+const paymentAmount = 1_000;
 const widgetClientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
 const paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS);
 paymentWidget.renderPaymentMethods(

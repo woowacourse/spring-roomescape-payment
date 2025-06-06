@@ -97,7 +97,7 @@ class RegularMemberE2ETest {
     void 예약을_생성할_수_있다() {
         createReservationTime();
         createTheme("추리");
-        createRegularReservation(1L, "testtest", "orderorder", 1000L);
+        createRegularReservation(1L, "test_payment_key", "RESERVATION_test_order_id", 1_000L);
         String adminToken = loginAndGetAuthToken(ADMIN_EMAIL, PASSWORD);
 
         RestAssured.given().log().all()
@@ -149,8 +149,8 @@ class RegularMemberE2ETest {
         SoftAssertions.assertSoftly(softAssertions -> {
             softAssertions.assertThat(responses.size()).isEqualTo(1);
             softAssertions.assertThat(responses.getFirst().status()).isEqualTo(ReservationStatus.CONFIRMED);
-            softAssertions.assertThat(responses.getFirst().paymentKey()).isEqualTo("testtest");
-            softAssertions.assertThat(responses.getFirst().amount()).isEqualTo(1000L);
+            softAssertions.assertThat(responses.getFirst().paymentKey()).isEqualTo("test_payment_key");
+            softAssertions.assertThat(responses.getFirst().amount()).isEqualTo(1_000L);
         });
     }
 
@@ -158,7 +158,7 @@ class RegularMemberE2ETest {
     void 대기_중인_예약을_삭제할_수_있다() {
         createReservationTime();
         createTheme("추리");
-        createRegularReservation(1L, "testtest", "orderorder", 10000L);
+        createRegularReservation(1L, "test_payment_key", "RESERVATION_test_order_id", 1_000L);
 
         String user2Token = loginAndGetAuthToken(REGULAR2_EMAIL, PASSWORD);
         Map<String, Object> reservation = new HashMap<>();

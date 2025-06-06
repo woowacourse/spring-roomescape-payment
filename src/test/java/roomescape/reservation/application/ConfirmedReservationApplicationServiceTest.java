@@ -267,7 +267,7 @@ class ConfirmedReservationApplicationServiceTest {
         ConfirmedReservationWebResponse confirmedReservationWebResponse = confirmedReservationApplicationService.create(
                 new ConfirmedReservationCreateRequest(FUTURE_DATE, timeId, themeId2, memberId2,
                         afterOneHour));
-        paymentRepository.save(new Payment("testtest", "orderorder", 1000L, ProductType.RESERVATION, confirmedReservationWebResponse.id(), afterOneHour));
+        paymentRepository.save(new Payment("test_payment_key", "RESERVATION_test_order_id", 1_000L, ProductType.RESERVATION, confirmedReservationWebResponse.id(), afterOneHour));
 
         // when
         List<MyReservationResponse> result = confirmedReservationApplicationService.findMyReservations(memberId2);
@@ -277,8 +277,8 @@ class ConfirmedReservationApplicationServiceTest {
                     softAssertions.assertThat(result).hasSize(1);
                     softAssertions.assertThat(result.getFirst().theme()).isEqualTo("논리");
                     softAssertions.assertThat(result.getFirst().status()).isEqualTo(ReservationStatus.CONFIRMED);
-                    softAssertions.assertThat(result.getFirst().paymentKey()).isEqualTo("testtest");
-                    softAssertions.assertThat(result.getFirst().amount()).isEqualTo(1000L);
+                    softAssertions.assertThat(result.getFirst().paymentKey()).isEqualTo("test_payment_key");
+                    softAssertions.assertThat(result.getFirst().amount()).isEqualTo(1_000L);
                 }
         );
     }
