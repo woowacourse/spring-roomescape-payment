@@ -3,6 +3,7 @@ package roomescape.reservation.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.repository.dto.ReservationWithPayment;
 import roomescape.waiting.domain.ReservationInformation;
 
 import java.time.LocalDate;
@@ -14,8 +15,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("SELECT r FROM Reservation r JOIN FETCH r.member JOIN FETCH r.reservationInformation.theme JOIN FETCH r.reservationInformation.time")
     List<Reservation> findAll();
 
-    @Query("SELECT r FROM Reservation r JOIN FETCH r.member m JOIN FETCH r.reservationInformation.theme JOIN FETCH r.reservationInformation.time WHERE m.id = :memberId")
-    List<Reservation> findAllByMemberId(Long memberId);
+    @Query("""
+        SELECT new roomescape.reservation.repository.dto.ReservationWithPayment(r, p)
+        FROM Reservation r
+        JOIN FETCH Payment p
+        ON r.id = p.reservationId
+    """)
+    List<ReservationWithPayment> findAllWithPaymentByMemberId(Long memberId);
 
     Optional<Reservation> findById(Long id);
 

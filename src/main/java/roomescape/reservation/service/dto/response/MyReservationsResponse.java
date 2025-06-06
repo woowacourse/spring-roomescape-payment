@@ -1,8 +1,10 @@
 package roomescape.reservation.service.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import roomescape.payment.service.dto.PaymentResponse;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.repository.dto.ReservationWithPayment;
 import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.repository.dto.WaitingInfoDataResponse;
 
@@ -17,10 +19,12 @@ public record MyReservationsResponse(
         @JsonFormat(pattern = "HH:mm")
         LocalTime time,
         String status,
-        Long rank
+        Long rank,
+        PaymentResponse payment
 ) {
 
-    public static MyReservationsResponse from(Reservation reservation) {
+    public static MyReservationsResponse from(ReservationWithPayment response) {
+        Reservation reservation = response.reservation();
         ReservationStatus reservationStatus = getSavedReservationStatus(reservation);
         return new MyReservationsResponse(
                 reservation.getId(),
@@ -28,7 +32,8 @@ public record MyReservationsResponse(
                 reservation.getDate(),
                 reservation.getTime().getStartAt(),
                 reservationStatus.getDescription(),
-                null
+                null,
+                PaymentResponse.from(response.payment())
         );
     }
 
@@ -47,7 +52,8 @@ public record MyReservationsResponse(
                 waiting.getDate(),
                 waiting.getTime().getStartAt(),
                 ReservationStatus.WAITING.getDescription(),
-                waitingInfoDataResponse.rank().value()
+                waitingInfoDataResponse.rank().value(),
+                null
         );
     }
 }

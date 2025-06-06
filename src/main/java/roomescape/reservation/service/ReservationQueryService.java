@@ -44,7 +44,7 @@ public class ReservationQueryService {
 
     public List<MyReservationsResponse> getAllLoginMemberReservations(LoginMember loginMember) {
         ArrayList<MyReservationsResponse> results = new ArrayList<>(
-                reservationRepository.findAllByMemberId(loginMember.id())
+                reservationRepository.findAllWithPaymentByMemberId(loginMember.id())
                         .stream()
                         .map(MyReservationsResponse::from)
                         .toList()
