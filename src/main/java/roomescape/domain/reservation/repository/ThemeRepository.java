@@ -22,5 +22,5 @@ public interface ThemeRepository extends JpaRepository<Theme, Long> {
                                     @Param("endDate") LocalDate endDate,
                                     Pageable pageable);
 
-    boolean existsByName(@Param("name") String name);
+    boolean existsByName(String name);
 }
