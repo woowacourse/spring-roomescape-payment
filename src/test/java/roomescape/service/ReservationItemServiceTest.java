@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
+import org.springframework.test.context.ActiveProfiles;
 import roomescape.domain.reservationitem.ReservationItem;
 import roomescape.domain.reservationitem.ReservationItemRepository;
 import roomescape.domain.reservationitem.ReservationTheme;
@@ -24,6 +25,7 @@ import roomescape.global.exception.roomescape.RoomEscapeErrorStatus;
 import roomescape.global.exception.roomescape.RoomEscapeException;
 import roomescape.service.reservation.ReservationItemService;
 
+@ActiveProfiles("test")
 @SpringBootTest
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 class ReservationItemServiceTest {

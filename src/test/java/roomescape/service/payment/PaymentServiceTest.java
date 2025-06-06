@@ -12,6 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.MemberRepository;
@@ -28,6 +29,7 @@ import roomescape.domain.reservationitem.ReservationThemeRepository;
 import roomescape.domain.reservationitem.ReservationTime;
 import roomescape.domain.reservationitem.ReservationTimeRepository;
 
+@ActiveProfiles("test")
 @Transactional
 @SpringBootTest
 class PaymentServiceTest {

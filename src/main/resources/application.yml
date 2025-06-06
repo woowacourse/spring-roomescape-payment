@@ -6,15 +6,44 @@ spring:
     url: jdbc:h2:mem:database
     username: sa
   jpa:
+    hibernate:
+      ddl-auto: create
+    defer-datasource-initialization: true
     properties:
       hibernate:
         show_sql: true
         format_sql: true
     show-sql: true
-    hibernate:
-      ddl-auto: create
-    defer-datasource-initialization: true
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: default
 toss:
   payments:
     base-url: https://api.tosspayments.com
-    widget-secret-key: test_sk_nRQoOaPz8LK6ZxMR2BZNry47BMw6
+    widget-secret-key: ${TOSS_SECRET_KEY}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  sql:
+    init:
+      mode: never
+  jpa:
+    properties:
+      hibernate:
+        show_sql: false
+    show-sql: false
+    hibernate:
+      ddl-auto: create-drop
+toss:
+  payments:
+    base-url: http://localhost:8080
+    widget-secret-key: test-toss-secret-key
