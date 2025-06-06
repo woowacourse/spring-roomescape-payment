@@ -145,6 +145,8 @@
 
 > **DELETE /reservations/{id}**
 
+> **⚠️ 관리자만 수행할 수 있습니다.**
+
 ### Request
 
 - **헤더**
