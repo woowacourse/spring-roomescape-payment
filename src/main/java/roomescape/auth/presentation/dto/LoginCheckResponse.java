@@ -1,10 +1,12 @@
 package roomescape.auth.presentation.dto;
 
-import roomescape.member.domain.Member;
+import roomescape.auth.application.LoginMember;
 
-public record LoginCheckResponse(String name) {
+public record LoginCheckResponse(
+        String name
+) {
 
-    public LoginCheckResponse(final Member member) {
-        this(member.getName());
+    public LoginCheckResponse(final LoginMember loginMember) {
+        this(loginMember.getName());
     }
 }

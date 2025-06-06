@@ -8,10 +8,8 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+import roomescape.auth.application.LoginMember;
 import roomescape.auth.application.service.AuthService;
-import roomescape.auth.exception.UnauthorizedException;
-import roomescape.auth.presentation.dto.LoginMember;
-import roomescape.global.exception.NotFoundException;
 
 @Component
 @RequiredArgsConstructor
@@ -21,7 +19,9 @@ public class AuthenticationPrincipalArgumentResolver implements HandlerMethodArg
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType().equals(LoginMember.class);
+        boolean hasAuthenticationAnnotation = parameter.hasParameterAnnotation(AuthenticationPrincipal.class);
+        boolean isAuthMemberType = LoginMember.class.isAssignableFrom(parameter.getParameterType());
+        return hasAuthenticationAnnotation && isAuthMemberType;
     }
 
     @Override
@@ -31,11 +31,7 @@ public class AuthenticationPrincipalArgumentResolver implements HandlerMethodArg
             final NativeWebRequest webRequest,
             final WebDataBinderFactory binderFactory
     ) {
-        final HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
-        try {
-            return authService.extractMemberByRequest(request);
-        } catch (IllegalArgumentException | NotFoundException e) {
-            throw new UnauthorizedException("인증에 실패했습니다.", e);
-        }
+        HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+        return authService.extractMemberByRequest(request);
     }
 }
