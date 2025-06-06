@@ -20,6 +20,7 @@ public class TossPaymentStatusUpdater {
         getTossPayment(tossPaymentId).approve();
     }
 
+    @Transactional
     public void markFailed(final Long tossPaymentId) {
         getTossPayment(tossPaymentId).fail();
     }
