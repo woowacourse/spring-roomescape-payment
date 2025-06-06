@@ -26,6 +26,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.member.domain.Role;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentRepository;
 import roomescape.payment.domain.PaymentStatus;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
@@ -62,6 +63,8 @@ class ReservationServiceMockTest {
     private MemberRepository memberRepository;
     @Mock
     private WaitingRepository waitingRepository;
+    @Mock
+    private PaymentRepository paymentRepository;
     @Mock
     private DateTime dateTime;
 
@@ -105,6 +108,8 @@ class ReservationServiceMockTest {
         when(reservationRepository.existsByDateAndTimeStartAtAndThemeId(any(LocalDate.class), any(LocalTime.class),
                 eq(1L)))
                 .thenReturn(true);
+        when(paymentRepository.save(any(Payment.class)))
+                .thenReturn(any(Payment.class));
         // when & then
         ReservationWithPaymentRequest reservationWithPaymentRequest = new ReservationWithPaymentRequest(LocalDate.of(2024, 10, 6), 1L, 1L, "paymentKey", "orderId", 1000L);
         assertThatThrownBy(() -> reservationService.createReservationWithPendingPayment(reservationWithPaymentRequest, 1L))

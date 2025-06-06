@@ -42,6 +42,7 @@ public class ReservationPaymentFacade {
             return reservationWithPendingPayment;
         }
 
+        reservationService.deleteReservationById(reservationWithPendingPayment.id());
         paymentService.cancel(reservationWithPendingPayment.paymentId());
 
         tossPaymentClient.handleTosPaymentException(response);
