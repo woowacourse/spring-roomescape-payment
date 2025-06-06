@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
-  updateUIBasedOnLogin();
+  if (!window.location.pathname.includes('/login')) {
+    updateUIBasedOnLogin();
+  }
 });
 
 document.getElementById('logout-btn').addEventListener('click', function (event) {
@@ -59,8 +61,15 @@ function login() {
 
   // 입력 필드 검증
   if (!email || !password) {
-    alert('Please fill in all fields.');
-    return; // 필수 입력 필드가 비어있으면 여기서 함수 실행을 중단
+    alert('모든 필드를 입력해주세요.');
+    return;
+  }
+
+  // 이메일 형식 검증
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    alert('올바른 이메일 형식을 입력해주세요.');
+    return;
   }
 
   fetch('/login', {
@@ -73,19 +82,21 @@ function login() {
       password: password
     })
   })
-      .then(response => {
-        if (200 === !response.status) {
-          alert('Login failed'); // 로그인 실패 시 경고창 표시
-          throw new Error('Login failed');
-        }
-      })
-      .then(() => {
-        updateUIBasedOnLogin(); // UI 업데이트
-        window.location.href = '/';
-      })
-      .catch(error => {
-        console.error('Error during login:', error);
+  .then(response => {
+    if (!response.ok) {
+      return response.text().then(text => {
+        throw new Error(text || '로그인에 실패했습니다.');
       });
+    }
+  })
+  .then(() => {
+    updateUIBasedOnLogin();
+    window.location.href = '/';
+  })
+  .catch(error => {
+    console.error('로그인 중 오류 발생:', error);
+    alert(error.message || '로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+  });
 }
 
 function signup() {
