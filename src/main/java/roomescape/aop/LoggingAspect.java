@@ -21,7 +21,7 @@ public class LoggingAspect {
     public void allInPackage() {
     }
 
-    @Pointcut("execution(* roomescape.configuration.aop..*.*(..))")
+    @Pointcut("execution(* roomescape.aop..*.*(..))")
     public void allInAopPackage() {
     }
 
@@ -29,22 +29,22 @@ public class LoggingAspect {
     public void allWithoutAopPackage() {
     }
 
-    @Pointcut("execution(* roomescape.controller..*.*(..))")
+    @Pointcut("execution(* roomescape.mvc..*Controller.*(..))")
     public void allController() {
 
     }
 
-    @Pointcut("execution(* roomescape.service..*.*(..))")
+    @Pointcut("execution(* roomescape.mvc..*Service.*(..))")
     public void allService() {
 
     }
 
-    @Pointcut("execution(* roomescape.repository..*.*(..))")
+    @Pointcut("execution(* roomescape.mvc..*Repository.*(..))")
     public void allRepository() {
 
     }
 
-    @Pointcut("execution(* roomescape.external..*.*(..))")
+    @Pointcut("execution(* roomescape.client..*.*(..))")
     public void allExternalApiClient() {
 
     }
