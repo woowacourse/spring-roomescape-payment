@@ -3,6 +3,8 @@ package roomescape.reservation.ui;
 import static roomescape.auth.domain.AuthRole.ADMIN;
 import static roomescape.auth.domain.AuthRole.MEMBER;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -22,6 +24,7 @@ import roomescape.reservation.ui.dto.request.CreateWaitingRequest;
 import roomescape.reservation.ui.dto.response.WaitingResponse;
 import roomescape.reservation.ui.dto.response.WaitingWithRankResponse;
 
+@Tag(name = "예약 대기", description = "예약 대기 관련 API")
 @RestController
 @RequestMapping("/waitings")
 @RequiredArgsConstructor
@@ -29,6 +32,7 @@ public class WaitingRestController {
 
     private final WaitingService waitingService;
 
+    @Operation(summary = "예약 대기 생성", description = "예약 대기를 생성합니다.")
     @PostMapping
     @RequiresRole(authRoles = {ADMIN, MEMBER})
     public ResponseEntity<WaitingResponse> createWaiting(
@@ -41,6 +45,7 @@ public class WaitingRestController {
                 .body(response);
     }
 
+    @Operation(summary = "예약 대기 삭제", description = "예약 대기를 삭제합니다.")
     @DeleteMapping("/{id}")
     @RequiresRole(authRoles = {ADMIN, MEMBER})
     public ResponseEntity<Void> deleteWaiting(
@@ -52,6 +57,7 @@ public class WaitingRestController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "자신의 예약 대기 조회", description = "자신의 예약 대기 목록을 조회합니다.")
     @GetMapping("/mine")
     @RequiresRole(authRoles = {ADMIN, MEMBER})
     public ResponseEntity<List<WaitingWithRankResponse.ForMember>> findAllWaitingWithRankByMemberId(
