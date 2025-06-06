@@ -4,5 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import roomescape.payment.toss.domain.TossPayment;
 
 public interface TossPaymentRepository extends JpaRepository<TossPayment, Long> {
-    boolean existsByPaymentKeyAndOrderId(String paymentKey, String orderId);
+
+    TossPayment findByReservation_Id(Long reservationId);
 }

@@ -82,7 +82,15 @@ public class ReservationService {
     public List<MyReservationResponse> getAllReservations(Long memberId) {
         List<MyReservationResponse> responses = new ArrayList<>();
 
-        responses.addAll(reservedQueryService.getReservations(memberId));
+        List<Reservation> reservations = reservedQueryService.getReservations(memberId);
+        List<MyReservationResponse> myReservations = reservations.stream()
+                .map(reservation -> {
+                    TossPayment tossPayment = tossPaymentService.findByReservation(reservation);
+                    return MyReservationResponse.from(reservation, tossPayment);
+                })
+                .toList();
+
+        responses.addAll(myReservations);
         responses.addAll(waitingQueryService.getMyWaitings(memberId));
 
         return responses;
