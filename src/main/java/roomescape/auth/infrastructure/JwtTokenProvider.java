@@ -12,15 +12,18 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
 import javax.crypto.SecretKey;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import roomescape.auth.domain.AuthRole;
 import roomescape.auth.domain.AuthTokenProvider;
 
+@Slf4j
 @Component
 public class JwtTokenProvider implements AuthTokenProvider {
 
     private final SecretKey secretKey;
+
     @Value("${security.jwt.access-token.validity-in-milliseconds}")
     private long validityInMilliseconds;
 
@@ -29,19 +32,20 @@ public class JwtTokenProvider implements AuthTokenProvider {
     }
 
     public String createAccessToken(final String principal, final AuthRole role) {
-        Claims claims = Jwts.claims()
-                .subject(principal)
-                .build();
+        Claims claims = Jwts.claims().subject(principal).build();
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
-        return Jwts.builder()
+        String token = Jwts.builder()
                 .claims(claims)
                 .issuedAt(now)
                 .expiration(validity)
                 .claim("role", role.name())
                 .signWith(secretKey)
                 .compact();
+
+        log.info("JWT 생성 완료: subject={}, role={}, 만료일시={}", principal, role.name(), validity);
+        return token;
     }
 
     public String getPrincipal(final String token) {
@@ -49,12 +53,15 @@ public class JwtTokenProvider implements AuthTokenProvider {
             return null;
         }
 
-        return Jwts.parser()
+        String subject = Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
+
+        log.debug("JWT 파싱 완료 - subject 추출: {}", subject);
+        return subject;
     }
 
     public Instant getExpiration(final String token) {
@@ -62,13 +69,16 @@ public class JwtTokenProvider implements AuthTokenProvider {
             return null;
         }
 
-        return Jwts.parser()
+        Instant expiration = Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
                 .getExpiration()
                 .toInstant();
+
+        log.debug("JWT 파싱 완료 - 만료 시간 추출: {}", expiration);
+        return expiration;
     }
 
     public AuthRole getRole(final String token) {
@@ -83,11 +93,13 @@ public class JwtTokenProvider implements AuthTokenProvider {
                 .getPayload()
                 .get("role", String.class);
 
+        log.debug("JWT 파싱 완료 - 사용자 역할 추출: {}", role);
         return AuthRole.valueOf(role);
     }
 
     public boolean isValidToken(final String token) {
         if (token == null || token.isEmpty()) {
+            log.warn("유효성 검사 실패: 토큰이 비어있음");
             return false;
         }
 
@@ -98,20 +110,17 @@ public class JwtTokenProvider implements AuthTokenProvider {
                     .parseSignedClaims(token);
             return true;
         } catch (MalformedJwtException e) {
-            // Header.Payload.Signature 3개 파트로 나누어지지 않은 경우, Base64 디코딩이 불가능한 경우, JSON 형태가 아닌 경우
-            return false;
+            log.warn("토큰 형식 오류: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
-            // 토큰이 만료된 경우
-            return false;
+            log.warn("토큰 만료됨: {}", e.getMessage());
         } catch (UnsupportedJwtException e) {
-            // 지원하지 않는 암호화 방식을 사용한 경우 ("alg" 필드로 검증)
-            return false;
+            log.warn("지원하지 않는 JWT 형식: {}", e.getMessage());
         } catch (SignatureException e) {
-            // 서명이 올바르지 않은 경우(올바른 SecretKey로 서명되지 않은 경우)
-            return false;
+            log.warn("JWT 서명 검증 실패: {}", e.getMessage());
         } catch (JwtException e) {
-            // 기타 예외
-            return false;
+            log.warn("기타 JWT 파싱 예외 발생: {}", e.getMessage());
         }
+
+        return false;
     }
 }
