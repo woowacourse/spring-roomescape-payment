@@ -40,7 +40,7 @@ public class AdminReservationController {
     @GetMapping
     public List<ReservationResponse> findReservationsByCriteria(
             @ModelAttribute final ReservationSearchRequest request) {
-        return reservationService.findReservationsByCriteria(request);
+        return reservationService.searchReservationsByCriteria(request);
     }
 
     @DeleteMapping("/{id}")

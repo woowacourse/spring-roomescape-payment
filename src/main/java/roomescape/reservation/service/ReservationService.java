@@ -38,11 +38,11 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
 
-    public List<ReservationResponse> findReservationsByCriteria(final ReservationSearchRequest request) {
-        //TODO: condition 객체로 매개변수 묶기
+    public List<ReservationResponse> searchReservationsByCriteria(final ReservationSearchRequest request) {
         final List<Reservation> reservations = reservationRepository.findByCriteria(
                 request.themeId(),
-                request.memberId(), request.dateFrom(),
+                request.memberId(),
+                request.dateFrom(),
                 request.dateTo()
         );
         return ReservationResponse.fromReservations(reservations);

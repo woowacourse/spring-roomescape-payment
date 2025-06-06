@@ -64,7 +64,7 @@ class ReservationServiceTest extends IntegrationTest {
         dbHelper.insertReservation(createReservation_2());
 
         // when
-        List<ReservationResponse> responses = service.findReservationsByCriteria(
+        List<ReservationResponse> responses = service.searchReservationsByCriteria(
                 new ReservationSearchRequest(null, null, null, null));
 
         // then
