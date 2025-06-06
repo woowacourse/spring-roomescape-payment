@@ -1,0 +1,42 @@
+package roomescape.waiting.entity;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import roomescape.member.entity.Member;
+import roomescape.reservation.entity.ReservationSlot;
+
+@Entity
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Waiting {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
+    private ReservationSlot reservationSlot;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
+    private Member member;
+
+    public Waiting(ReservationSlot reservationSlot, Member member) {
+        this(null, reservationSlot, member);
+    }
+
+    public boolean matchesMemberById(Long id) {
+        return member.matchesId(id);
+    }
+}
