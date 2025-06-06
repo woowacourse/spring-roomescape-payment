@@ -1,0 +1,7 @@
+=== 📄 페이지 목록
+
+.HTTP Request
+include::{snippets}/page-user/http-request.adoc[]
+
+.HTTP Response
+include::{snippets}/page-user/http-response.adoc[]
