@@ -31,7 +31,7 @@ class WaitingTest {
         // when & then
         assertThatThrownBy(() -> Waiting.register(user, pastDate, timeSlot, theme))
                 .isInstanceOf(BusinessRuleViolationException.class)
-                .hasMessage("이전 날짜로 예약 대기 신청할 수 없습니다.");
+                .hasMessage("이전 날짜로 예약할 수 없습니다.");
     }
 
     @ParameterizedTest

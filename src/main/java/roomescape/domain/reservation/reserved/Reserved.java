@@ -18,7 +18,6 @@ import roomescape.domain.reservation.pendingpayment.PendingPayment;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.user.User;
-import roomescape.exception.BusinessRuleViolationException;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -38,7 +37,6 @@ public class Reserved extends Reservation {
     public static Reserved register(final User user, final LocalDate date, final TimeSlot timeSlot, final Theme theme) {
 
         Reserved reserved = new Reserved(user, date, timeSlot, theme);
-        validateNotPastDateTime(date, timeSlot);
         return reserved;
     }
 
@@ -52,17 +50,4 @@ public class Reserved extends Reservation {
     public void registerPayment(Payment payment) {
         this.payment = payment;
     }
-
-    private static void validateNotPastDateTime(final LocalDate date, final TimeSlot timeSlot) {
-        LocalDate currentDate = LocalDate.now();
-        LocalTime currentTime = LocalTime.now();
-
-        boolean isPastDate = date.isBefore(currentDate);
-        boolean isCurrentDateAndPastTime = date.isEqual(currentDate) && timeSlot.isTimeBefore(currentTime);
-
-        if (isPastDate || isCurrentDateAndPastTime) {
-            throw new BusinessRuleViolationException("이전 날짜로 예약할 수 없습니다.");
-        }
-    }
-
 }

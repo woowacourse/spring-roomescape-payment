@@ -1,4 +1,4 @@
-package roomescape.domain.reservation;
+package roomescape.domain.reserved;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -17,7 +17,7 @@ import roomescape.domain.user.User;
 import roomescape.domain.user.UserRole;
 import roomescape.exception.BusinessRuleViolationException;
 
-class ReservationTest {
+class ReservedTest {
 
     @Test
     @DisplayName("과거 날짜로 예약을 시도하면 예외를 던진다.")

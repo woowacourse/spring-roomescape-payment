@@ -11,6 +11,7 @@ import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.ManyToOne;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,6 +46,7 @@ public abstract class Reservation {
     protected Reservation(final LocalDate date, final TimeSlot timeSlot, final Theme theme, final User user) {
         validateDate(date);
         validateTimeSlot(timeSlot);
+        validateNotPastDateTime(date, timeSlot);
         validateTheme(theme);
         validateUser(user);
 
@@ -54,25 +56,37 @@ public abstract class Reservation {
         this.user = user;
     }
 
-    protected void validateDate(final LocalDate date) {
+    private static void validateNotPastDateTime(final LocalDate date, final TimeSlot timeSlot) {
+        LocalDate currentDate = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+
+        boolean isPastDate = date.isBefore(currentDate);
+        boolean isCurrentDateAndPastTime = date.isEqual(currentDate) && timeSlot.isTimeBefore(currentTime);
+
+        if (isPastDate || isCurrentDateAndPastTime) {
+            throw new BusinessRuleViolationException("이전 날짜로 예약할 수 없습니다.");
+        }
+    }
+
+    private void validateDate(final LocalDate date) {
         if (date == null) {
             throw new BusinessRuleViolationException("예약 날짜는 null일 수 없습니다.");
         }
     }
 
-    protected void validateTimeSlot(final TimeSlot timeSlot) {
+    private void validateTimeSlot(final TimeSlot timeSlot) {
         if (timeSlot == null) {
             throw new BusinessRuleViolationException("시간 정보는 null일 수 없습니다.");
         }
     }
 
-    protected void validateTheme(final Theme theme) {
+    private void validateTheme(final Theme theme) {
         if (theme == null) {
             throw new BusinessRuleViolationException("테마 정보는 null일 수 없습니다.");
         }
     }
 
-    protected void validateUser(final User user) {
+    private void validateUser(final User user) {
         if (user == null) {
             throw new BusinessRuleViolationException("사용자 정보는 null일 수 없습니다.");
         }

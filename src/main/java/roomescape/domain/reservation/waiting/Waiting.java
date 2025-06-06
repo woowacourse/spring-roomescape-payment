@@ -39,19 +39,6 @@ public class Waiting extends Reservation {
                                    final Theme theme) {
 
         Waiting waiting = new Waiting(user, date, timeSlot, theme);
-        validateNotPastDateTime(date, timeSlot);
         return waiting;
-    }
-
-    private static void validateNotPastDateTime(final LocalDate date, final TimeSlot timeSlot) {
-        LocalDate currentDate = LocalDate.now();
-        LocalTime currentTime = LocalTime.now();
-
-        boolean isPastDate = date.isBefore(currentDate);
-        boolean isCurrentDateAndPastTime = date.isEqual(currentDate) && timeSlot.isTimeBefore(currentTime);
-
-        if (isPastDate || isCurrentDateAndPastTime) {
-            throw new BusinessRuleViolationException("이전 날짜로 예약 대기 신청할 수 없습니다.");
-        }
     }
 }
