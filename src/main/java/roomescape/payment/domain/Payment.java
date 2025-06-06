@@ -20,9 +20,9 @@ public class Payment {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String privateKey;
+    private String paymentKey;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String orderId;
 
     @Column(nullable = false)
@@ -34,12 +34,12 @@ public class Payment {
     protected Payment() {
     }
 
-    public Payment(String privateKey, String orderId, Long amount, LocalDateTime createdAt) {
-        validatePrivateKey(privateKey);
+    public Payment(String paymentKey, String orderId, Long amount, LocalDateTime createdAt) {
+        validatePrivateKey(paymentKey);
         validateOrderId(orderId);
         validateAmount(amount);
         validateCreatedAt(createdAt);
-        this.privateKey = privateKey;
+        this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
         this.createdAt = createdAt;
@@ -76,8 +76,8 @@ public class Payment {
         return id;
     }
 
-    public String getPrivateKey() {
-        return privateKey;
+    public String getPaymentKey() {
+        return paymentKey;
     }
 
     public String getOrderId() {
