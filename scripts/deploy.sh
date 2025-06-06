@@ -72,7 +72,6 @@ main() {
   # 스크립트 위치 기준으로 프로젝트 루트로 이동
   cd "$PROJECT_DIR" || { echo "프로젝트 디렉터리($PROJECT_DIR)로 이동 실패"; exit 1; }
 
-  # 이미 clone된 상태이므로 별도 clone 로직 제거
   # step2 브랜치 체크아웃
   echo "→ 'step2' 브랜치 체크아웃"
   git checkout step2
@@ -98,12 +97,12 @@ main() {
 
   # 로그 디렉터리(프로젝트 최상위/logs) 생성
   LOG_DIR="$PROJECT_DIR/logs"
-    if [ ! -d "$LOG_DIR" ]; then
-      echo "→ 로그 디렉터리($LOG_DIR) 생성 중..."
-      mkdir -p "$LOG_DIR"
-    else
-      echo "→ 로그 디렉터리($LOG_DIR)가 이미 존재합니다. 생성 생략..."
-    fi
+  if [ ! -d "$LOG_DIR" ]; then
+    echo "→ 로그 디렉터리($LOG_DIR) 생성 중..."
+    mkdir -p "$LOG_DIR"
+  else
+    echo "→ 로그 디렉터리($LOG_DIR)가 이미 존재합니다. 생성 생략..."
+  fi
 
   # Spring 서버 백그라운드 실행
   export SPRING_PROFILES_ACTIVE=deploy
