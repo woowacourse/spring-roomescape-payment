@@ -2,6 +2,7 @@ package roomescape.presentation.rest;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
 import jakarta.validation.Valid;
 import java.time.LocalDate;
@@ -51,6 +52,7 @@ public class ReservationController {
     }
 
     @GetMapping
+    @ResponseStatus(OK)
     public List<ReservationResponse> getAllReservations(
             @RequestParam(name = "themeId", required = false) final Long themeId,
             @RequestParam(name = "userId", required = false) final Long userId,
