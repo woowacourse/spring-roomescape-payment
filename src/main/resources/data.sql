@@ -2,9 +2,9 @@
 INSERT INTO member (name, email, role)
 VALUES ('관리자', 'admin@email.com', 'ADMIN');
 INSERT INTO member (name, email, role)
-VALUES ('사용자1', 'user1@email.com', 'USER');
+VALUES ('사용자1', 'user1@email.com', 'MEMBER');
 INSERT INTO member (name, email, role)
-VALUES ('사용자2', 'user2@email.com', 'USER');
+VALUES ('사용자2', 'user2@email.com', 'MEMBER');
 
 -- Account 데이터 (비밀번호: qwe123)
 INSERT INTO account (member_id, password)
