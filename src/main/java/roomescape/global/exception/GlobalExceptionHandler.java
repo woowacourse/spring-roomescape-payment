@@ -15,6 +15,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleExternalApi(final BusinessException exception) {
+        log.error(exception.getMessage(), exception);
         return ResponseEntity.status(exception.getErrorCode().status()).body(ErrorResponse.from(exception));
     }
 
