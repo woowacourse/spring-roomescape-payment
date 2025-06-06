@@ -34,3 +34,8 @@ scheduler:
     time: 60000 # 1분
   valid:
     period: 60s
+
+
+logging:
+  level:
+    root: info

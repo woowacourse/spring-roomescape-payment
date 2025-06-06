@@ -7,10 +7,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import roomescape.common.exception.impl.BadRequestException;
 import roomescape.common.exception.impl.ConflictException;
 import roomescape.common.exception.impl.ForbiddenException;
 import roomescape.common.exception.impl.NotFoundException;
+import roomescape.common.exception.impl.TokenExpiredException;
 import roomescape.common.exception.impl.TossConfirmException;
 import roomescape.common.exception.impl.UnauthorizedException;
 import roomescape.payment.exception.TossErrorCode;
@@ -26,6 +28,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("서버 내부에 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<String> handle(final NoResourceFoundException e) {
+        log.warn("cannot found resource or page", e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(TossConfirmException.class)
     public ResponseEntity<String> handle(final TossConfirmException e) {
         log.error(
@@ -39,19 +47,19 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<String> handle(final BadRequestException e) {
-        log.error(e.getMessage());
+        log.warn(e.getMessage());
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<String> handle(final NotFoundException e) {
-        log.error(e.getMessage());
+        log.warn(e.getMessage());
         return new ResponseEntity<>("잘못된 요청입니다.", HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<String> handle(final ConflictException e) {
-        log.error(e.getMessage());
+        log.warn(e.getMessage());
         return new ResponseEntity<>("잘못된 요청입니다.", HttpStatus.CONFLICT);
     }
 
@@ -61,15 +69,21 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("잘못된 요청입니다.", HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler(TokenExpiredException.class)
+    public ResponseEntity<String> handle(final TokenExpiredException e) {
+        log.warn("토큰 만료: {}", e.getMessage());
+        return new ResponseEntity<>("잘못된 요청입니다.", HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<String> handle(final ForbiddenException e) {
-        log.error(e.getMessage());
+        log.warn(e.getMessage());
         return new ResponseEntity<>("잘못된 요청입니다.", HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<String> handleValidation(final MethodArgumentNotValidException e) {
-        log.error(e.getMessage());
+        log.warn(e.getMessage());
         return new ResponseEntity<>("잘못된 요청입니다.", HttpStatus.BAD_REQUEST);
     }
 }
