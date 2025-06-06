@@ -1,12 +1,9 @@
 package roomescape.payment.infrastructure;
 
-import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.HttpStatus.GATEWAY_TIMEOUT;
+import static org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.InputStream;
 import java.util.Base64;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
@@ -61,5 +58,3 @@ public class TossPaymentClient implements PaymentClient {
                 .encodeToString((secretKey + ":").getBytes());
     }
 }
-
-
