@@ -1,5 +1,6 @@
 package roomescape.login.application;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.impl.BadRequestException;
@@ -14,6 +15,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Password;
 import roomescape.member.domain.repository.MemberRepository;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 public class LoginService {
@@ -38,7 +40,7 @@ public class LoginService {
     public LoginCheckResponse checkLogin(final LoginCheckRequest request) {
         final Member member = memberRepository.findById(request.id())
             .orElseThrow(() -> new NotFoundException("회원 정보가 존재하지 않습니다."));
-
+        log.info("member login: ", member.getId());
         return LoginCheckResponse.from(member);
     }
 
