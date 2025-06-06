@@ -29,7 +29,7 @@ public class ClientConfig {
     public OpenAPI openAPI() {
         return new OpenAPI()
             .info(new Info()
-                .title("Room Escape 예약/결제 API 문서")
+                .title("Room Escape API 문서")
                 .version("v1.0.0")
                 .description("방탈출 REST API 명세입니다.")
             );
