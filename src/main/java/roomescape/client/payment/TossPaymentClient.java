@@ -63,7 +63,7 @@ public class TossPaymentClient implements PaymentClient {
                 .body(PaymentResult.class);
     }
 
-    public String createAuthorizationHeaderContent(String secretKey) {
+    private String createAuthorizationHeaderContent(String secretKey) {
         return "Basic " + Base64.getEncoder()
                 .encodeToString((secretKey + ":").getBytes(StandardCharsets.UTF_8));
     }

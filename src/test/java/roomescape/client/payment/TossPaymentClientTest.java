@@ -23,7 +23,6 @@ import roomescape.mvc.payment.dto.PaymentResult;
 class TossPaymentClientTest {
 
     private TossPaymentClient tossPaymentClient;
-
     private MockWebServer mockWebServer;
 
     @BeforeEach
