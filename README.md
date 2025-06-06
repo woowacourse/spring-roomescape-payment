@@ -19,4 +19,5 @@
         - [x] http://54.180.201.204:8080/swagger-ui/index.html
     - [x] Database ERD 작성
       ![ERD](/src/main/resources/images/ReservationERD.png)
-    - [ ] 적절한 로그 라이브러리를 선택 및 기록
+    - [x] 적절한 로그 라이브러리를 선택 및 기록
+        - [x] 로깅 추상화 라이브러리 Slf4j 와 로깅 프레임워크 Logback을 사용하여 로그 기록 
