@@ -1,5 +1,18 @@
 package roomescape.booking.reservation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
+import static roomescape.util.TestFactory.memberWithId;
+import static roomescape.util.TestFactory.reservationTimeWithId;
+import static roomescape.util.TestFactory.reservationWithId;
+import static roomescape.util.TestFactory.themeWithId;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,21 +33,14 @@ import roomescape.member.MemberService;
 import roomescape.order.Order;
 import roomescape.order.OrderReader;
 import roomescape.order.PaymentStatus;
+import roomescape.payment.Payment;
 import roomescape.payment.PaymentClient;
+import roomescape.payment.PaymentRepository;
 import roomescape.payment.dto.PaymentConfirmRequest;
 import roomescape.reservationtime.ReservationTime;
 import roomescape.schedule.Schedule;
 import roomescape.schedule.ScheduleService;
 import roomescape.theme.Theme;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
-import static roomescape.util.TestFactory.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ReservationCreateServiceTest {
@@ -49,6 +55,8 @@ public class ReservationCreateServiceTest {
     private OrderReader orderReader;
     @Mock
     private PaymentClient paymentClient;
+    @Mock
+    private PaymentRepository paymentRepository;
     @InjectMocks
     private ReservationCreateService reservationCreateService;
 
@@ -74,11 +82,13 @@ public class ReservationCreateServiceTest {
                     1000L,
                     "simple");
             loginMember = new LoginMember("boogie", "asd@email.com", MemberRole.MEMBER);
-            ReservationTime reservationTime = reservationTimeWithId(request.timeId(), new ReservationTime(LocalTime.of(12, 40)));
+            ReservationTime reservationTime = reservationTimeWithId(request.timeId(),
+                    new ReservationTime(LocalTime.of(12, 40)));
             Theme theme = themeWithId(request.themeId(), new Theme("야당", "야당당", "123"));
             schedule = new Schedule(request.date(), reservationTime, theme);
             member = memberWithId(1L, new Member(loginMember.email(), "password", "boogie", MemberRole.MEMBER));
-            reservation = reservationWithId(1L, new Reservation(member, schedule));
+            Order order = new Order(UUID.randomUUID().toString(), 1000L, PaymentStatus.SUCCESS, member, schedule);
+            reservation = reservationWithId(1L, new Reservation(member, schedule, order));
             paymentConfirmRequest = new PaymentConfirmRequest("dummyOrderId", 1000L, "dummyKey");
         }
 
@@ -86,16 +96,20 @@ public class ReservationCreateServiceTest {
         @Test
         void create() {
             // given
+            Order order = new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule);
             given(orderReader.getById(request.orderId()))
-                    .willReturn(new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule));
-            given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(), schedule.getTheme().getId()))
+                    .willReturn(order);
+            given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(),
+                    schedule.getTheme().getId()))
                     .willReturn(schedule);
             given(memberService.getByEmail(loginMember.email()))
                     .willReturn(member);
             given(reservationRepository.existsBySchedule(schedule))
                     .willReturn(false);
+            given(paymentRepository.save(any(Payment.class)))
+                    .willReturn(new Payment(1L, 1000L, "paymentKey", order));
             given(reservationRepository.save(
-                    new Reservation(member, schedule)))
+                    new Reservation(member, schedule, order)))
                     .willReturn(reservation);
 
             // when
@@ -110,8 +124,10 @@ public class ReservationCreateServiceTest {
         void create3() {
             // given
             given(orderReader.getById(request.orderId()))
-                    .willReturn(new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule));
-            given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(), schedule.getTheme().getId()))
+                    .willReturn(
+                            new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule));
+            given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(),
+                    schedule.getTheme().getId()))
                     .willReturn(schedule);
             given(memberService.getByEmail(loginMember.email()))
                     .willReturn(member);
@@ -131,8 +147,10 @@ public class ReservationCreateServiceTest {
         void create4() {
             // given
             given(orderReader.getById(request.orderId()))
-                    .willReturn(new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule));
-            given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(), schedule.getTheme().getId()))
+                    .willReturn(
+                            new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule));
+            given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(),
+                    schedule.getTheme().getId()))
                     .willReturn(schedule);
             given(memberService.getByEmail(loginMember.email()))
                     .willReturn(member);
@@ -157,25 +175,27 @@ public class ReservationCreateServiceTest {
         @BeforeEach
         void setUp() {
             request = new AdminReservationRequest(LocalDate.now().plusDays(1), 1L, 1L, 1L);
-            ReservationTime reservationTime = reservationTimeWithId(request.timeId(), new ReservationTime(LocalTime.of(12, 40)));
+            ReservationTime reservationTime = reservationTimeWithId(request.timeId(),
+                    new ReservationTime(LocalTime.of(12, 40)));
             Theme theme = themeWithId(request.themeId(), new Theme("야당", "야당당", "123"));
             schedule = new Schedule(request.date(), reservationTime, theme);
             member = memberWithId(1L, new Member("user@example.com", "password", "boogie", MemberRole.MEMBER));
-            reservation = reservationWithId(1L, new Reservation(member, schedule));
+            reservation = reservationWithId(1L, new Reservation(member, schedule, null));
         }
 
         @DisplayName("reservation request를 생성하면 response 값을 반환한다.")
         @Test
         void create() {
             // given
-            given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(), schedule.getTheme().getId()))
+            given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(),
+                    schedule.getTheme().getId()))
                     .willReturn(schedule);
             given(memberService.getById(request.memberId()))
                     .willReturn(member);
             given(reservationRepository.existsBySchedule(schedule))
                     .willReturn(false);
             given(reservationRepository.save(
-                    new Reservation(member, schedule)))
+                    new Reservation(member, schedule, null)))
                     .willReturn(reservation);
 
             // when
@@ -189,7 +209,8 @@ public class ReservationCreateServiceTest {
         @Test
         void create3() {
             // given
-            given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(), schedule.getTheme().getId()))
+            given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(),
+                    schedule.getTheme().getId()))
                     .willReturn(schedule);
             given(reservationRepository.existsBySchedule(schedule))
                     .willReturn(true);

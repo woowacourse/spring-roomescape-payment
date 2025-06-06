@@ -1,5 +1,16 @@
 package roomescape.booking.reservation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
+import static roomescape.util.TestFactory.memberWithId;
+import static roomescape.util.TestFactory.reservationTimeWithId;
+import static roomescape.util.TestFactory.reservationWithId;
+import static roomescape.util.TestFactory.themeWithId;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -11,17 +22,11 @@ import roomescape.booking.reservation.dto.AdminFilterReservationRequest;
 import roomescape.booking.reservation.dto.ReservationResponse;
 import roomescape.member.Member;
 import roomescape.member.MemberRole;
+import roomescape.order.Order;
+import roomescape.order.PaymentStatus;
 import roomescape.reservationtime.ReservationTime;
 import roomescape.schedule.Schedule;
 import roomescape.theme.Theme;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
-import static roomescape.util.TestFactory.*;
 
 @ExtendWith(MockitoExtension.class)
 public class ReservationServiceTest {
@@ -58,8 +63,9 @@ public class ReservationServiceTest {
             Theme theme = themeWithId(1L, new Theme("야당", "야당당", "123"));
             Schedule schedule = new Schedule(date, reservationTime, theme);
             Member member = memberWithId(1L, new Member("boogie", "password", "boogie", MemberRole.MEMBER));
+            Order order = new Order(UUID.randomUUID().toString(), 1000L, PaymentStatus.SUCCESS, member, schedule);
 
-            Reservation reservation = new Reservation(member, schedule);
+            Reservation reservation = new Reservation(member, schedule, order);
             given(reservationRepository.findAll())
                     .willReturn(List.of(reservationWithId(1L, reservation)));
 
@@ -86,7 +92,8 @@ public class ReservationServiceTest {
                     LocalDate.of(2024, 12, 31)
             );
 
-            given(reservationRepository.findAllByMember_IdAndSchedule_Theme_IdAndSchedule_DateBetween(request.memberId(), request.themeId(), request.from(), request.to())).willReturn(List.of());
+            given(reservationRepository.findAllByMember_IdAndSchedule_Theme_IdAndSchedule_DateBetween(
+                    request.memberId(), request.themeId(), request.from(), request.to())).willReturn(List.of());
 
             // when
             final List<ReservationResponse> responses = reservationService.getAllByMemberAndThemeAndDateRange(request);
@@ -104,15 +111,19 @@ public class ReservationServiceTest {
                     LocalDate.of(2024, 1, 1),
                     LocalDate.of(2024, 12, 31)
             );
-            Member member = memberWithId(request.memberId(), new Member("boogie", "password", "boogie", MemberRole.MEMBER));
+            Member member = memberWithId(request.memberId(),
+                    new Member("boogie", "password", "boogie", MemberRole.MEMBER));
             Theme theme = themeWithId(request.themeId(), new Theme("야당", "야당당", "123"));
             ReservationTime reservationTime = reservationTimeWithId(1L, new ReservationTime(LocalTime.of(12, 40)));
             Schedule schedule1 = new Schedule(LocalDate.of(2024, 6, 13), reservationTime, theme);
             Schedule schedule2 = new Schedule(LocalDate.of(2024, 6, 14), reservationTime, theme);
-            given(reservationRepository.findAllByMember_IdAndSchedule_Theme_IdAndSchedule_DateBetween(request.memberId(), request.themeId(), request.from(), request.to()))
+            Order order1 = new Order(UUID.randomUUID().toString(), 1000L, PaymentStatus.SUCCESS, member, schedule1);
+            Order order2 = new Order(UUID.randomUUID().toString(), 1000L, PaymentStatus.SUCCESS, member, schedule2);
+            given(reservationRepository.findAllByMember_IdAndSchedule_Theme_IdAndSchedule_DateBetween(
+                    request.memberId(), request.themeId(), request.from(), request.to()))
                     .willReturn(List.of(
-                            reservationWithId(1L, new Reservation(member, schedule1)),
-                            reservationWithId(1L, new Reservation(member, schedule2))
+                            reservationWithId(1L, new Reservation(member, schedule1, order1)),
+                            reservationWithId(1L, new Reservation(member, schedule2, order2))
                     ));
 
             // when

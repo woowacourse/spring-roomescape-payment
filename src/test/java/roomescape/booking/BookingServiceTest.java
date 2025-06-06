@@ -1,5 +1,19 @@
 package roomescape.booking;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static roomescape.util.TestFactory.memberWithId;
+import static roomescape.util.TestFactory.reservationTimeWithId;
+import static roomescape.util.TestFactory.reservationWithId;
+import static roomescape.util.TestFactory.scheduleWithId;
+import static roomescape.util.TestFactory.themeWithId;
+import static roomescape.util.TestFactory.waitingWithId;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,17 +28,12 @@ import roomescape.booking.waiting.Waiting;
 import roomescape.booking.waiting.WaitingService;
 import roomescape.member.Member;
 import roomescape.member.MemberRole;
+import roomescape.order.Order;
+import roomescape.order.OrderRepository;
+import roomescape.order.PaymentStatus;
 import roomescape.reservationtime.ReservationTime;
 import roomescape.schedule.Schedule;
 import roomescape.theme.Theme;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-import static roomescape.util.TestFactory.*;
 
 @ExtendWith(MockitoExtension.class)
 class BookingServiceTest {
@@ -33,6 +42,8 @@ class BookingServiceTest {
     private ReservationService reservationService;
     @Mock
     private WaitingService waitingService;
+    @Mock
+    private OrderRepository orderRepository;
     @InjectMocks
     private BookingService bookingService;
 
@@ -52,16 +63,25 @@ class BookingServiceTest {
     void changeFirstWaitingToReservation() {
         // given
         Waiting firstWaiting = waitingWithId(1L, new Waiting(schedule, member, LocalDateTime.now()));
-        Reservation reservation = reservationWithId(1L, new Reservation(member, schedule));
+        Order order = new Order(UUID.randomUUID().toString(), 1000L, PaymentStatus.WAITING, member, schedule);
+        Reservation reservation = reservationWithId(1L, new Reservation(member, schedule, order));
         given(reservationService.getById(1L)).willReturn(reservation);
         given(waitingService.existsBySchedule(schedule)).willReturn(true);
         given(waitingService.findFirstWaitingOfSchedule(schedule)).willReturn(firstWaiting);
+        given(orderRepository.save(any(Order.class))).willReturn(order);
 
         // when
         bookingService.deleteReservationById(1L);
 
         // then
-        then(reservationService).should().create(new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), ReservationPaymentStatus.WAITING));
-        then(reservationService).should().create(new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), ReservationPaymentStatus.WAITING));
+        then(reservationService).should().create(new Reservation(
+                firstWaiting.getMember(),
+                firstWaiting.getSchedule(),
+                order,
+                ReservationPaymentStatus.WAITING));
+        then(reservationService).should().create(new Reservation(
+                firstWaiting.getMember(),
+                firstWaiting.getSchedule(),
+                order, ReservationPaymentStatus.WAITING));
     }
 }

@@ -1,6 +1,12 @@
 package roomescape.booking;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import jakarta.transaction.Transactional;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.UUID;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,18 +22,15 @@ import roomescape.booking.waiting.WaitingRepository;
 import roomescape.member.Member;
 import roomescape.member.MemberRepository;
 import roomescape.member.MemberRole;
+import roomescape.order.Order;
+import roomescape.order.OrderRepository;
+import roomescape.order.PaymentStatus;
 import roomescape.reservationtime.ReservationTime;
 import roomescape.reservationtime.ReservationTimeRepository;
 import roomescape.schedule.Schedule;
 import roomescape.schedule.ScheduleRepository;
 import roomescape.theme.Theme;
 import roomescape.theme.ThemeRepository;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -55,6 +58,9 @@ class BookingServiceIntegrationTest {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    private OrderRepository orderRepository;
+
     private Member member;
     private Schedule schedule;
 
@@ -71,7 +77,10 @@ class BookingServiceIntegrationTest {
     void changeFirstWaitingToReservation() {
         // given
         waitingRepository.save(new Waiting(schedule, member, LocalDateTime.now()));
-        Reservation reservation = reservationRepository.save(new Reservation(member, schedule, ReservationPaymentStatus.SUCCESS));
+        Order order = orderRepository.save(
+                new Order(UUID.randomUUID().toString(), 1000L, PaymentStatus.SUCCESS, member, schedule));
+        Reservation reservation = reservationRepository.save(
+                new Reservation(member, schedule, order, ReservationPaymentStatus.SUCCESS));
 
         // whenR
         bookingService.deleteReservationById(reservation.getId());

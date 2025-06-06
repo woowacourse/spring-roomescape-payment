@@ -1,9 +1,20 @@
 package roomescape.api;
 
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Cookie;
-import org.junit.jupiter.api.*;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -16,14 +27,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import roomescape.payment.PaymentClient;
-
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Stream;
-
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
 
 //TODO: PaymentClient fake 객체로 변경하기
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -92,8 +95,9 @@ public class ReservationApiTest {
 
     @BeforeEach
     void setUp() {
-        jdbcTemplate.update("DELETE FROM orders");
+        jdbcTemplate.update("DELETE FROM PAYMENT");
         jdbcTemplate.update("DELETE FROM reservation");
+        jdbcTemplate.update("DELETE FROM orders");
         jdbcTemplate.update("DELETE FROM schedule");
         jdbcTemplate.update("DELETE FROM reservation_time");
         jdbcTemplate.update("DELETE FROM theme");

@@ -1,8 +1,17 @@
 package roomescape;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.mock;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Cookie;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,16 +25,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import roomescape.booking.reservation.dto.ReservationResponse;
 import roomescape.payment.PaymentClient;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.mock;
 
 //TODO: PaymentClient fake 객체로 변경하기
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -97,8 +96,9 @@ public class DataSourceTest {
 
     @BeforeEach
     void setUp() {
-        jdbcTemplate.update("DELETE FROM ORDERS");
+        jdbcTemplate.update("DELETE FROM PAYMENT");
         jdbcTemplate.update("DELETE FROM RESERVATION");
+        jdbcTemplate.update("DELETE FROM ORDERS");
         jdbcTemplate.update("DELETE FROM SCHEDULE");
         jdbcTemplate.update("DELETE FROM RESERVATION_TIME");
         jdbcTemplate.update("DELETE FROM THEME");
@@ -127,10 +127,13 @@ public class DataSourceTest {
     @Test
     void 오단계() {
         // given
-        jdbcTemplate.update("INSERT INTO member (name, email, password, role) VALUES (?, ?, ?, ?)", "name", "email@email.com", "password", "MEMBER");
-        jdbcTemplate.update("INSERT INTO THEME (name, description, thumbnail) VALUES (?, ?, ?)", "name", "dest", "thumb");
+        jdbcTemplate.update("INSERT INTO member (name, email, password, role) VALUES (?, ?, ?, ?)", "name",
+                "email@email.com", "password", "MEMBER");
+        jdbcTemplate.update("INSERT INTO THEME (name, description, thumbnail) VALUES (?, ?, ?)", "name", "dest",
+                "thumb");
         jdbcTemplate.update("INSERT INTO RESERVATION_TIME (start_at) VALUES (?)", "10:00");
-        jdbcTemplate.update("INSERT INTO SCHEDULE (date, reservation_time_id, theme_id) VALUES (?, ?, ?)", "2023-08-05", "1", "1");
+        jdbcTemplate.update("INSERT INTO SCHEDULE (date, reservation_time_id, theme_id) VALUES (?, ?, ?)", "2023-08-05",
+                "1", "1");
         jdbcTemplate.update("INSERT INTO RESERVATION (member_id, schedule_id) VALUES (?, ?)", "1", "1");
         final Integer count = jdbcTemplate.queryForObject("SELECT count(1) from reservation", Integer.class);
 
