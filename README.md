@@ -61,40 +61,43 @@ host: localhost:8080
 erDiagram
     MEMBER {
         member_id BIGINT PK
-        email VARCHAR(255)
-        name VARCHAR(255)
-        password VARCHAR(255)
-        role ENUM "ADMIN, USER"
+        email VARCHAR(255) "NOT NULL"
+        name VARCHAR(255) "NOT NULL"
+        password VARCHAR(255) "NOT NULL"
+        role ENUM "NOT NULL (ADMIN, USER)"
     }
 
     PAYMENT {
-        paymen_id BIGINT PK
-        amount INT
-        orderId VARCHAR(255)
-        paymentKey VARCHAR(255)
+        payment_id BIGINT PK
+        amount INT "NOT NULL"
+        order_id VARCHAR(255) "NOT NULL"
+        payment_key VARCHAR(255) "NOT NULL"
+        reservation_id BIGINT FK "NOT NULL"
     }
 
     RESERVATION {
         reservation_id BIGINT PK
-        createAt DATETIME
-        date DATE
-        status ENUM "RESERVED, WAIT, PENDING, CANCEL"
+        time_id BIGINT FK "NOT NULL"
+        theme_id BIGINT FK "NOT NULL"
+        create_at TIMESTAMP "NOT NULL"
+        date DATE "NOT NULL"
+        status ENUM "NOT NULL (RESERVED, WAIT, PENDING, CANCELED)"
     }
 
     RESERVATION_TIME {
         time_id BIGINT PK
-        startAt TIME
+        start_at TIME "NOT NULL"
     }
 
     THEME {
         theme_id BIGINT PK
-        description VARCHAR(255)
-        name VARCHAR(255)
-        thumbnail VARCHAR(255)
+        description VARCHAR(255) "NOT NULL"
+        name VARCHAR(255) "NOT NULL"
+        thumbnail VARCHAR(255) "NOT NULL"
     }
 
-    MEMBER ||--o{ RESERVATION: ""
-    RESERVATION ||--o| PAYMENT: ""
-    RESERVATION }o--|| RESERVATION_TIME: ""
-    RESERVATION }o--|| THEME: ""
+    MEMBER ||--|{ RESERVATION: ""
+    RESERVATION |o--|| PAYMENT: ""
+    RESERVATION }|--|| RESERVATION_TIME: ""
+    RESERVATION }|--|| THEME: ""
 ```
