@@ -12,6 +12,7 @@ import static roomescape.util.TestFactory.themeWithId;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,7 +32,7 @@ import roomescape.member.Member;
 import roomescape.member.MemberRole;
 import roomescape.member.MemberService;
 import roomescape.order.Order;
-import roomescape.order.OrderReader;
+import roomescape.order.OrderRepository;
 import roomescape.order.PaymentStatus;
 import roomescape.payment.Payment;
 import roomescape.payment.PaymentClient;
@@ -52,7 +53,7 @@ public class ReservationCreateServiceTest {
     @Mock
     private MemberService memberService;
     @Mock
-    private OrderReader orderReader;
+    private OrderRepository orderRepository;
     @Mock
     private PaymentClient paymentClient;
     @Mock
@@ -97,8 +98,8 @@ public class ReservationCreateServiceTest {
         void create() {
             // given
             Order order = new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule);
-            given(orderReader.getById(request.orderId()))
-                    .willReturn(order);
+            given(orderRepository.findById(request.orderId()))
+                    .willReturn(Optional.of(order));
             given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(),
                     schedule.getTheme().getId()))
                     .willReturn(schedule);
@@ -123,9 +124,9 @@ public class ReservationCreateServiceTest {
         @Test
         void create3() {
             // given
-            given(orderReader.getById(request.orderId()))
-                    .willReturn(
-                            new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule));
+            given(orderRepository.findById(request.orderId()))
+                    .willReturn(Optional.of(
+                            new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule)));
             given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(),
                     schedule.getTheme().getId()))
                     .willReturn(schedule);
@@ -146,9 +147,10 @@ public class ReservationCreateServiceTest {
         @Test
         void create4() {
             // given
-            given(orderReader.getById(request.orderId()))
+            given(orderRepository.findById(request.orderId()))
                     .willReturn(
-                            new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member, schedule));
+                            Optional.of(new Order(request.orderId(), request.amount(), PaymentStatus.WAITING, member,
+                                    schedule)));
             given(scheduleService.getByDateAndTimeIdAndThemeId(request.date(), schedule.getReservationTime().getId(),
                     schedule.getTheme().getId()))
                     .willReturn(schedule);

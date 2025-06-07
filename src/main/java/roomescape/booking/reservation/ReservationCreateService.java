@@ -7,12 +7,13 @@ import roomescape.auth.dto.LoginMember;
 import roomescape.booking.reservation.dto.AdminReservationRequest;
 import roomescape.booking.reservation.dto.ReservationPaymentRequest;
 import roomescape.booking.reservation.dto.ReservationResponse;
+import roomescape.exception.custom.reason.order.OrderNotFoundException;
 import roomescape.exception.custom.reason.reservation.ReservationConflictException;
 import roomescape.exception.custom.reason.reservation.ReservationPastDateException;
 import roomescape.member.Member;
 import roomescape.member.MemberService;
 import roomescape.order.Order;
-import roomescape.order.OrderReader;
+import roomescape.order.OrderRepository;
 import roomescape.payment.Payment;
 import roomescape.payment.PaymentClient;
 import roomescape.payment.PaymentRepository;
@@ -27,13 +28,13 @@ public class ReservationCreateService {
     private final ReservationRepository reservationRepository;
     private final ScheduleService scheduleService;
     private final MemberService memberService;
-    private final OrderReader orderReader;
+    private final OrderRepository orderRepository;
     private final PaymentClient paymentClient;
     private final PaymentRepository paymentRepository;
 
     @Transactional
     public ReservationResponse create(final ReservationPaymentRequest request, final LoginMember loginMember) {
-        final Order order = orderReader.getById(request.orderId());
+        final Order order = getOrderById(request.orderId());
         final Member member = memberService.getByEmail(loginMember.email());
         final Schedule schedule = scheduleService.getByDateAndTimeIdAndThemeId(request.date(), request.timeId(),
                 request.themeId());
@@ -70,6 +71,11 @@ public class ReservationCreateService {
     private void appendPayment(String paymentKey, Order order) {
         Payment payment = Payment.create(order.getAmount(), paymentKey, order);
         paymentRepository.save(payment);
+    }
+
+    private Order getOrderById(final String id) {
+        return orderRepository.findById(id)
+                .orElseThrow(OrderNotFoundException::new);
     }
 
     @Transactional
