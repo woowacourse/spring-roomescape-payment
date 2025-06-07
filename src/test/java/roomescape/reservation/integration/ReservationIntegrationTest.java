@@ -4,13 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -23,16 +23,18 @@ import roomescape.helper.TestConfig;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.entity.Payment;
 import roomescape.reservation.dto.request.ReservationAdminCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationReadFilteredRequest;
 import roomescape.reservation.entity.Reservation;
 import roomescape.reservation.entity.ReservationSlot;
 import roomescape.reservation.entity.ReservationTime;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationSlotRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
-import roomescape.reservation.service.PaymentService;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.service.ReservationService;
 import roomescape.theme.entity.Theme;
 import roomescape.theme.repository.ThemeRepository;
@@ -68,6 +70,9 @@ class ReservationIntegrationTest {
     @Autowired
     private PaymentService paymentService;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     @Test
     @DisplayName("예약을 생성한다.")
     void createReservation() {
@@ -82,12 +87,13 @@ class ReservationIntegrationTest {
                 theme.getId(),
                 "paymentKey",
                 "orderId",
-                1000L,
-                "NORMAL"
+                1000L
         );
-        doNothing().when(paymentService).create(any());
 
         // when
+        Payment payment = new Payment("paymentKey", "1", 1000L);
+        Mockito.when(paymentService.create(any())).thenReturn(payment);
+
         var response = reservationService.createReservation(member.getId(), request);
 
         // then
@@ -135,9 +141,11 @@ class ReservationIntegrationTest {
                 theme.getId(),
                 "paymentKey",
                 "orderId",
-                1000L,
-                "NORMAL"
+                1000L
         );
+
+        Payment payment = new Payment("paymentKey", "1", 1000L);
+        Mockito.when(paymentService.create(any())).thenReturn(payment);
 
         // when & then
         assertThatThrownBy(() -> reservationService.createReservation(member.getId(), request))
@@ -149,6 +157,7 @@ class ReservationIntegrationTest {
     @DisplayName("중복된 시간에 예약을 생성하면 예외가 발생한다.")
     void createReservationWithDuplicateTime() {
         // given
+        paymentRepository.save(new Payment("paymentKey", "1", 1000L));
         var member = memberRepository.save(new Member("미소", "miso@email.com", "password", RoleType.USER));
         var theme = themeRepository.save(new Theme("테마", "설명", "썸네일"));
         var time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
@@ -159,9 +168,13 @@ class ReservationIntegrationTest {
                 theme.getId(),
                 "paymentKey",
                 "orderId",
-                1000L,
-                "NORMAL"
+                1000L
         );
+        Payment payment = new Payment("paymentKey", "1", 1000L);
+        Payment paymentWithId = new Payment(1L, "paymentKey", "1", 1000L);
+
+        Mockito.when(paymentService.create(any())).thenReturn(payment);
+        Mockito.when(paymentService.findById(any())).thenReturn(paymentWithId);
         reservationService.createReservation(member.getId(), request);
 
         // when & then
@@ -184,9 +197,12 @@ class ReservationIntegrationTest {
                 theme.getId(),
                 "paymentKey",
                 "orderId",
-                1000L,
-                "NORMAL"
+                1000L
         );
+
+        Payment payment = new Payment("paymentKey", "1", 1000L);
+        Mockito.when(paymentService.create(any())).thenReturn(payment);
+
         reservationService.createReservation(member.getId(), request);
 
         // when
@@ -218,9 +234,11 @@ class ReservationIntegrationTest {
                 theme.getId(),
                 "paymentKey",
                 "orderId",
-                1000L,
-                "NORMAL"
+                1000L
         );
+        Payment payment = new Payment("paymentKey", "1", 1000L);
+        Mockito.when(paymentService.create(any())).thenReturn(payment);
+
         reservationService.createReservation(member.getId(), request);
 
         var filterRequest = new ReservationReadFilteredRequest(
@@ -259,9 +277,11 @@ class ReservationIntegrationTest {
                 theme.getId(),
                 "paymentKey",
                 "orderId",
-                1000L,
-                "NORMAL"
+                1000L
         );
+        Payment payment = new Payment("paymentKey", "1", 1000L);
+        Mockito.when(paymentService.create(any())).thenReturn(payment);
+
         var response = reservationService.createReservation(member.getId(), request);
 
         // when
@@ -281,7 +301,8 @@ class ReservationIntegrationTest {
         var time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
         var date = LocalDate.now().plusDays(1);
         var reservationSlot = reservationSlotRepository.save(new ReservationSlot(date, time, theme));
-        var reservation = new Reservation(reservationSlot, otherMember);
+        var payment = paymentService.create(new Payment("paymentKey", "1", 1000L));
+        var reservation = new Reservation(reservationSlot, otherMember, payment);
         var savedReservation = reservationRepository.save(reservation);
 
         var member = memberRepository.save(new Member("훌라", "hula@email.com", "password", RoleType.USER));
@@ -304,6 +325,7 @@ class ReservationIntegrationTest {
         var member = memberRepository.save(new Member("테스트", "test@test.com", "password", RoleType.USER));
         var time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
         var theme = themeRepository.save(new Theme("테마1", "테마1 설명", "테마1 썸네일"));
+        paymentRepository.save(new Payment("paymentKey", "1", 1000L));
         var date = LocalDate.now().plusDays(1);
         var request = new ReservationCreateRequest(
                 date,
@@ -311,12 +333,18 @@ class ReservationIntegrationTest {
                 theme.getId(),
                 "paymentKey",
                 "orderId",
-                1000L,
-                "NORMAL"
+                1000L
         );
+        Payment payment = new Payment("paymentKey", "1", 1000L);
+        Mockito.when(paymentService.create(any())).thenReturn(payment);
+        Payment paymentWithId = new Payment(1L, "paymentKey", "1", 1000L);
+        Mockito.when(paymentService.findById(any())).thenReturn(paymentWithId);
+
         reservationService.createReservation(member.getId(), request);
 
         var loginMember = new LoginMember(member.getId(), member.getName(), member.getRole());
+
+
 
         // when
         var response = reservationService.getReservationsByMember(loginMember);

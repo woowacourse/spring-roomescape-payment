@@ -1,4 +1,4 @@
-package roomescape.reservation.entity;
+package roomescape.payment.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,10 +29,7 @@ public class Payment {
     @Column(nullable = false)
     private Long amount;
 
-    @Column(nullable = false)
-    private String paymentType;
-
-    public Payment(String paymentKey, String orderId, Long amount, String paymentType) {
-        this(null, paymentKey, orderId, amount, paymentType);
+    public Payment(String paymentKey, String orderId, Long amount) {
+        this(null, paymentKey, orderId, amount);
     }
 }

@@ -11,6 +11,7 @@ import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
@@ -26,8 +27,10 @@ import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.dto.request.ReservationAdminCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.entity.ReservationTime;
+import roomescape.payment.entity.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
-import roomescape.reservation.service.PaymentService;
+import roomescape.payment.service.PaymentService;
 import roomescape.theme.entity.Theme;
 import roomescape.theme.repository.ThemeRepository;
 
@@ -55,6 +58,9 @@ class ReservationAcceptanceTest {
     @Autowired
     private PaymentService paymentService;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
@@ -64,6 +70,7 @@ class ReservationAcceptanceTest {
         themeRepository.save(theme);
         ReservationTime reservationTime = new ReservationTime(LocalTime.of(10, 0));
         reservationTimeRepository.save(reservationTime);
+        paymentRepository.save(new Payment("paymentKey", "1", 1000L));
     }
 
     @Test
@@ -77,9 +84,11 @@ class ReservationAcceptanceTest {
                 1L,
                 "paymentKey",
                 "orderId",
-                1000L,
-                "NORMAL"
+                1000L
         );
+        Payment payment = new Payment("paymentKey", "1", 1000L);
+        Mockito.when(paymentService.create(any())).thenReturn(payment);
+
 
         // when & then
         TestHelper.postWithToken("/reservations", reservationRequest, token)
@@ -103,9 +112,11 @@ class ReservationAcceptanceTest {
                 1L,
                 "paymentKey",
                 "orderId",
-                1000L,
-                "NORMAL"
+                1000L
         );
+        Payment payment = new Payment("paymentKey", "1", 1000L);
+        Mockito.when(paymentService.create(any())).thenReturn(payment);
+
         TestHelper.postWithToken("/reservations", reservationRequest, token);
 
         // when & then
@@ -126,9 +137,11 @@ class ReservationAcceptanceTest {
                 1L,
                 "paymentKey",
                 "orderId",
-                1000L,
-                "NORMAL"
+                1000L
         );
+        Payment payment = new Payment("paymentKey", "1", 1000L);
+        Mockito.when(paymentService.create(any())).thenReturn(payment);
+
         TestHelper.postWithToken("/reservations", reservationRequest, token);
 
         // when & then
@@ -154,8 +167,7 @@ class ReservationAcceptanceTest {
                 1L,
                 "paymentKey",
                 "orderId",
-                1000L,
-                "NORMAL"
+                1000L
         );
 
         TestHelper.postWithToken("/reservations", reservationRequest, token);
@@ -182,9 +194,11 @@ class ReservationAcceptanceTest {
                 1L,
                 "paymentKey",
                 "orderId",
-                1000L,
-                "NORMAL"
+                1000L
         );
+        Payment payment = new Payment("paymentKey", "1", 1000L);
+        Mockito.when(paymentService.create(any())).thenReturn(payment);
+
         TestHelper.postWithToken("/reservations", reservationRequest, token);
         String url = String.format("/reservations/filtered?themeId=%d&memberId=%d&dateFrom=%s&dateTo=%s",
                 1L, 1L, LocalDate.now(), LocalDate.now().plusDays(7));
@@ -212,9 +226,13 @@ class ReservationAcceptanceTest {
                 1L,
                 "paymentKey",
                 "orderId",
-                1000L,
-                "NORMAL"
+                1000L
         );
+        Payment payment = new Payment("paymentKey", "1", 1000L);
+        Payment paymentWithId = new Payment(1L, "paymentKey", "1", 1000L);
+
+        Mockito.when(paymentService.create(any())).thenReturn(payment);
+        Mockito.when(paymentService.findById(any())).thenReturn(paymentWithId);
 
         TestHelper.postWithToken("/reservations", reservationRequest, token);
 

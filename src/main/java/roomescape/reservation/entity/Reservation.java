@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import roomescape.member.entity.Member;
+import roomescape.payment.entity.Payment;
 
 @Entity
 @Getter
@@ -33,8 +34,11 @@ public class Reservation {
     @JoinColumn(nullable = false)
     private Member member;
 
-    public Reservation(ReservationSlot reservationSlot, Member member) {
-        this(null, reservationSlot, member);
+    @OneToOne(fetch = FetchType.LAZY)
+    private Payment payment;
+
+    public Reservation(ReservationSlot reservationSlot, Member member, Payment payment) {
+        this(null, reservationSlot, member, payment);
     }
 
     public LocalDateTime getDateTime() {

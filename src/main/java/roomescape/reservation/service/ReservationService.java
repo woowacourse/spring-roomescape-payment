@@ -12,6 +12,7 @@ import roomescape.global.error.exception.ConflictException;
 import roomescape.global.error.exception.NotFoundException;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.ReservationAdminCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationReadFilteredRequest;
@@ -20,6 +21,7 @@ import roomescape.reservation.dto.response.ReservationByMemberResponse;
 import roomescape.reservation.dto.response.ReservationCreateResponse;
 import roomescape.reservation.dto.response.ReservationReadFilteredResponse;
 import roomescape.reservation.dto.response.ReservationReadResponse;
+import roomescape.payment.entity.Payment;
 import roomescape.reservation.entity.Reservation;
 import roomescape.reservation.entity.ReservationSlot;
 import roomescape.reservation.entity.ReservationTime;
@@ -46,17 +48,18 @@ public class ReservationService {
     private final ReservationSlotRepository reservationSlotRepository;
 
     public ReservationCreateResponse createReservation(Long memberId, ReservationCreateRequest request) {
-        Reservation saved = create(memberId, request.timeId(), request.themeId(), request.date());
-        paymentService.create(request.toPayment());
+        Payment response = paymentService.create(request.toPayment());
+        Payment payment = paymentService.findById(response.getId());
+        Reservation saved = create(memberId, request.timeId(), request.themeId(), request.date(), payment);
         return ReservationCreateResponse.from(saved);
     }
 
     public ReservationAdminCreateResponse createReservationByAdmin(ReservationAdminCreateRequest request) {
-        Reservation saved = create(request.memberId(), request.timeId(), request.themeId(), request.date());
+        Reservation saved = create(request.memberId(), request.timeId(), request.themeId(), request.date(), null);
         return ReservationAdminCreateResponse.from(saved);
     }
 
-    private Reservation create(Long memberId, Long timeId, Long themeId, LocalDate date) {
+    private Reservation create(Long memberId, Long timeId, Long themeId, LocalDate date, Payment payment) {
         Member member = getMemberById(memberId);
         ReservationTime time = getReservationTimeById(timeId);
         Theme theme = getThemeById(themeId);
@@ -65,7 +68,7 @@ public class ReservationService {
                         date, timeId, themeId)
                 .orElse(reservationSlotRepository.save(new ReservationSlot(date, time, theme)));
 
-        Reservation reservation = new Reservation(reservationSlot, member);
+        Reservation reservation = new Reservation(reservationSlot, member, payment);
         validateDateTime(reservation);
         validateDuplicated(reservation);
 

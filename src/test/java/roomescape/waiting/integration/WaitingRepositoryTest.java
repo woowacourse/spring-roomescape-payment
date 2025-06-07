@@ -8,6 +8,7 @@ import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
@@ -18,6 +19,7 @@ import roomescape.waiting.entity.Waiting;
 import roomescape.waiting.repository.WaitingRepository;
 
 @DataJpaTest
+@EntityScan(basePackages = "roomescape")
 public class WaitingRepositoryTest {
 
     @Autowired

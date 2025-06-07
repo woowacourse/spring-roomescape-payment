@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -20,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import roomescape.global.auth.dto.LoginMember;
 import roomescape.global.error.exception.BadRequestException;
@@ -27,6 +27,7 @@ import roomescape.global.error.exception.ConflictException;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.entity.Payment;
 import roomescape.reservation.dto.request.ReservationAdminCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationReadFilteredRequest;
@@ -36,7 +37,7 @@ import roomescape.reservation.entity.ReservationTime;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationSlotRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
-import roomescape.reservation.service.PaymentService;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.service.ReservationService;
 import roomescape.theme.entity.Theme;
 import roomescape.theme.repository.ThemeRepository;
@@ -77,6 +78,8 @@ class ReservationServiceTest {
     private Member member;
     private LoginMember loginMember;
 
+    private Payment payment;
+
     @BeforeEach
     void setUp() {
         date = LocalDate.now().plusDays(1);
@@ -86,6 +89,8 @@ class ReservationServiceTest {
 
         member = new Member(1L, "훌라", "hula@email.com", "password", RoleType.USER);
         loginMember = new LoginMember(member.getId(), member.getName(), member.getRole());
+
+        payment = new Payment("paymentKey", "1", 1000L);
     }
 
     @Test
@@ -101,8 +106,7 @@ class ReservationServiceTest {
         when(reservationSlotRepository.findByDateAndTimeIdAndThemeId(any(), any(), anyLong()))
                 .thenReturn(Optional.of(reservationSlot));
         when(reservationRepository.save(any(Reservation.class)))
-                .thenReturn(new Reservation(1L, reservationSlot, member));
-        doNothing().when(paymentService).create(any());
+                .thenReturn(new Reservation(1L, reservationSlot, member, payment));
 
         var request = new ReservationCreateRequest(
                 date,
@@ -110,9 +114,14 @@ class ReservationServiceTest {
                 theme.getId(),
                 "paymentKey",
                 "orderId",
-                1000L,
-                "NORMAL"
+                1000L
         );
+
+        Payment payment = new Payment("paymentKey", "1", 1000L);
+        Payment paymentWithId = new Payment(1L, "paymentKey", "1", 1000L);
+
+        Mockito.when(paymentService.create(any())).thenReturn(payment);
+        Mockito.when(paymentService.findById(any())).thenReturn(paymentWithId);
 
         // when
         var response = reservationService.createReservation(member.getId(), request);
@@ -141,7 +150,7 @@ class ReservationServiceTest {
         when(reservationSlotRepository.findByDateAndTimeIdAndThemeId(any(), any(), anyLong()))
                 .thenReturn(Optional.of(reservationSlot));
         when(reservationRepository.save(any(Reservation.class)))
-                .thenReturn(new Reservation(anyLong(), reservationSlot, member));
+                .thenReturn(new Reservation(anyLong(), reservationSlot, member, payment));
 
         var request = new ReservationAdminCreateRequest(
                 LocalDate.now().plusDays(1),
@@ -184,9 +193,14 @@ class ReservationServiceTest {
                 theme.getId(),
                 "paymentKey",
                 "orderId",
-                1000L,
-                "NORMAL"
+                1000L
         );
+
+        Payment payment = new Payment("paymentKey", "1", 1000L);
+        Payment paymentWithId = new Payment(1L, "paymentKey", "1", 1000L);
+
+        Mockito.when(paymentService.create(any())).thenReturn(payment);
+        Mockito.when(paymentService.findById(any())).thenReturn(paymentWithId);
 
         // when & then
         assertThatThrownBy(() -> reservationService.createReservation(1L, request))
@@ -217,9 +231,14 @@ class ReservationServiceTest {
                 theme.getId(),
                 "paymentKey",
                 "orderId",
-                1000L,
-                "NORMAL"
+                1000L
         );
+
+        Payment payment = new Payment("paymentKey", "1", 1000L);
+        Payment paymentWithId = new Payment(1L, "paymentKey", "1", 1000L);
+
+        Mockito.when(paymentService.create(any())).thenReturn(payment);
+        Mockito.when(paymentService.findById(any())).thenReturn(paymentWithId);
 
         // when & then
         assertThatThrownBy(() -> reservationService.createReservation(member.getId(), request))
@@ -234,7 +253,7 @@ class ReservationServiceTest {
     void getAllReservations() {
         // given
         var inDbReservations = List.of(
-                new Reservation(1L, reservationSlot, member)
+                new Reservation(1L, reservationSlot, member, payment)
         );
 
         when(reservationRepository.findAll())
@@ -258,7 +277,7 @@ class ReservationServiceTest {
     void getFilteredReservations() {
         // given
         var inDbReservations = List.of(
-                new Reservation(1L, reservationSlot, member)
+                new Reservation(1L, reservationSlot, member, payment)
         );
         when(reservationRepository.findReservationsInPeriod(anyLong(), anyLong(), any(LocalDate.class), any(LocalDate.class)))
                 .thenReturn(inDbReservations);
@@ -288,7 +307,7 @@ class ReservationServiceTest {
     void deleteAndChangeWaitingToReservation() {
         //given
         var otherMember = new Member("미소", "miso@email.com", "password", RoleType.USER);
-        var reservation = new Reservation(1L, reservationSlot, otherMember);
+        var reservation = new Reservation(1L, reservationSlot, otherMember, payment);
 
         when(reservationRepository.findById(anyLong()))
                 .thenReturn(Optional.of(reservation));
@@ -305,7 +324,7 @@ class ReservationServiceTest {
     void getReservationsByMember() {
         // given
         var inDbReservations = List.of(
-                new Reservation(1L, reservationSlot, member)
+                new Reservation(1L, reservationSlot, member, payment)
         );
         when(memberRepository.findById(anyLong()))
                 .thenReturn(Optional.of(member));
