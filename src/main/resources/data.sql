@@ -21,13 +21,19 @@ VALUES ('어드민', 'admin@email.com', '1234', 'ADMIN'),
        ('유저', 'user@email.com', '1234', 'USER');
 
 INSERT INTO reservation_slot(date, time_id, theme_id)
-VALUES ('2025-04-29', 1, 1),
-       ('2025-04-28', 1, 2),
-       ('2025-04-28', 3, 3),
-       ('2025-04-27', 1, 3);
+VALUES (CURRENT_DATE, 1, 1),
+       (CURRENT_DATE, 1, 2),
+       (CURRENT_DATE + 1, 3, 3),
+       (CURRENT_DATE + 2, 1, 3);
 
-INSERT INTO reservation(reservation_slot_id, member_id)
-VALUES (1, 1),
-       (2, 1),
-       (3, 1),
-       (4, 1);
+INSERT INTO payment(amount, order_id, payment_key)
+VALUES (1000, 1, '12345'),
+       (1000, 2, '12345'),
+       (1000, 2, '12345'),
+       (1000, 2, '12345');
+
+INSERT INTO reservation(reservation_slot_id, member_id, payment_id)
+VALUES (1, 1, 1),
+       (2, 1, 2),
+       (3, 1, 3),
+       (4, 2, 4);
