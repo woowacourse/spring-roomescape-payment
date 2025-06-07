@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(render)
         .catch(error => console.error('Error fetching reservations:', error));
-    fetch('/reservations/waits/mine') // 내 예약 목록 조회 API 호출
+    fetch('/waits/mine') // 내 예약 목록 조회 API 호출
         .then(response => {
             if (response.status === 200) return response.json();
             throw new Error('Read failed');
@@ -71,7 +71,7 @@ function requestDeleteWaiting(id) {
     /*
     TODO: [3단계] 예약 대기 기능 - 예약 대기 취소 API 호출
      */
-    const endpoint = `/reservations/waits/${id}`;
+    const endpoint = `/waits/${id}`;
     return fetch(endpoint, {
         method: 'DELETE'
     }).then(response => {
