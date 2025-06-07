@@ -34,6 +34,17 @@
 
 로그인이 필요한 기능은 Cookie에 `token`이 포함되어 있어야 합니다. `token`은 로그인 후 발급받은 JWT입니다.
 
+## 실패 응답
+
+실패 응답은 알맞은 상태 코드와 함께 아래와 같은 형식으로 반환됩니다.
+
+
+```json
+{
+  "message": "${errorMessage}"
+}
+```
+
 ## Admin Reservation API 명세
 
 관리자가 예약을 생성, 삭제, 조회할 수 있는 API입니다.
