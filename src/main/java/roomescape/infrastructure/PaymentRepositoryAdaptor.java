@@ -1,5 +1,6 @@
 package roomescape.infrastructure;
 
+import java.util.Optional;
 import org.springframework.stereotype.Repository;
 import roomescape.domain.Payment;
 import roomescape.domain.repository.PaymentRepository;
@@ -15,5 +16,10 @@ public class PaymentRepositoryAdaptor implements PaymentRepository {
     @Override
     public Payment save(final Payment payment) {
         return jpaPaymentRepository.save(payment);
+    }
+
+    @Override
+    public Optional<Payment> findByReservationId(final Long reservationId) {
+        return jpaPaymentRepository.findByReservationId(reservationId);
     }
 }

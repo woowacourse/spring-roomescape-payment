@@ -5,6 +5,7 @@ import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.dto.request.PaymentRequest;
 import roomescape.dto.response.PaymentResponse;
+import roomescape.exception.PaymentNotFoundException;
 import roomescape.infrastructure.PaymentRepositoryAdaptor;
 import roomescape.infrastructure.payment.PaymentClient;
 
@@ -27,10 +28,15 @@ public class PaymentService {
                 paymentResponse.orderId(),
                 reservation,
                 paymentResponse.paymentKey(),
-                paymentResponse.amount());
+                paymentResponse.totalAmount());
     }
 
     public Payment save(Payment payment) {
         return paymentRepositoryAdaptor.save(payment);
+    }
+
+    public Payment findPaymentByReservationId(Long reservationId) {
+        return paymentRepositoryAdaptor.findByReservationId(reservationId)
+                .orElseThrow(PaymentNotFoundException::new);
     }
 }
