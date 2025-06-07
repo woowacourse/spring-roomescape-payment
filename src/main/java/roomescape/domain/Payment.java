@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 
 @Table(name = "payment")
 @Entity
@@ -26,6 +27,9 @@ public class Payment {
     @Column(nullable = false)
     private Long amount;
 
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reservation_id")
     private Reservation reservation;
@@ -33,16 +37,19 @@ public class Payment {
     protected Payment() {
     }
 
-    private Payment(Long id, String orderId, String paymentKey, Long amount, Reservation reservation) {
+    public Payment(Long id, String orderId, String paymentKey, Long amount, Reservation reservation,
+                   LocalDateTime createdAt) {
         this.id = id;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.amount = amount;
         this.reservation = reservation;
+        this.createdAt = createdAt;
     }
 
-    public static Payment createWithoutId(String orderId, String paymentKey, Long amount, Reservation reservation) {
-        return new Payment(null, orderId, paymentKey, amount, reservation);
+    public static Payment createWithoutId(String orderId, String paymentKey, Long amount, Reservation reservation,
+                                          LocalDateTime createdAt) {
+        return new Payment(null, orderId, paymentKey, amount, reservation, createdAt);
     }
 
     public Long getId() {
@@ -51,6 +58,10 @@ public class Payment {
 
     public String getOrderId() {
         return orderId;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
     public String getPaymentKey() {
