@@ -10,18 +10,29 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 public class LoggingInterceptor implements HandlerInterceptor {
 
+    private static final String REQUEST_START_TIME_ATTRIBUTE = "requestStartTime";
+
     @Override
     public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) throws Exception {
-        log.info(request.getMethod() + " " + request.getRequestURI() + "요청");
+        request.setAttribute(REQUEST_START_TIME_ATTRIBUTE, System.currentTimeMillis());
+        log.info(request.getMethod() + " " + request.getRequestURI() + " 요청");
         return true;
     }
 
     @Override
     public void afterCompletion(final HttpServletRequest request, final HttpServletResponse response, final Object handler, final Exception ex) throws Exception {
-        if (ex != null) {
-            log.error(request.getMethod() + " " + request.getRequestURI() + "처리 중 예외 발생: {}", ex.getMessage());
+
+        Long startTime = (Long) request.getAttribute(REQUEST_START_TIME_ATTRIBUTE);
+        if (startTime != null) {
+            long duration = System.currentTimeMillis() - startTime;
+
+            if (ex != null) {
+                log.error(request.getMethod() + " " + request.getRequestURI() + " 처리 중 예외 발생: {}", ex.getMessage());
+                return;
+            }
+            log.info(request.getMethod() + " " + request.getRequestURI() + " 처리 성공, 응답까지 소요 시간: {} ms", duration);
             return;
         }
-        log.info(request.getMethod() + " " + request.getRequestURI() + "처리 성공");
+        log.warn(request.getMethod() + " " + request.getRequestURI() + " 처리 성공");
     }
 }
