@@ -1,0 +1,54 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:database;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: create
+    defer-datasource-initialization: true
+
+cookie:
+  max-age: 3600
+
+security:
+  jwt:
+    token:
+      secret-key: ${JWT_TOKEN_SECRET_KEY}
+      expire-length: 900000 # 15분
+
+payment:
+  base-url: "https://api.tosspayments.com"
+  confirm-api: "/v1/payments/confirm"
+  secret-key: ${TOSS_PAYMENT_SECRET_KEY}
+
+server:
+  shutdown: graceful  # graceful shutdown 활성화
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health # health 엔드포인트 노출
+  endpoint:
+    health:
+      show-details: when-authorized  # 상세 정보 표시 조건
+
+logging:
+  level:
+    root: INFO
+    roomescape: DEBUG
+    org.hibernate.SQL: DEBUG
+    sun.rmi: WARN
+    javax.management.remote.rmi: WARN
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%level] [%thread] %logger{40} - %msg%n"

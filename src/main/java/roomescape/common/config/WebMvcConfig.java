@@ -8,6 +8,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import roomescape.common.security.application.AuthService;
 import roomescape.common.security.infrastructure.AuthorizationExtractor;
 import roomescape.common.security.infrastructure.JwtProvider;
+import roomescape.common.security.interceptor.ApiLoggingInterceptor;
 import roomescape.common.security.interceptor.RoleInterceptor;
 import roomescape.common.security.resolver.MemberInfoArgumentResolver;
 
@@ -36,5 +37,16 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new RoleInterceptor(authorizationExtractor, jwtProvider));
+        registry.addInterceptor(new ApiLoggingInterceptor())
+                .excludePathPatterns(
+                        "/actuator/health",
+                        "/css/**",
+                        "/js/**",
+                        "/images/**",
+                        "/img/**",
+                        "/favicon.ico",
+                        "/error",
+                        "/**/*.html"
+                );
     }
 }

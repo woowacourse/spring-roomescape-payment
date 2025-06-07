@@ -12,6 +12,7 @@ PROJECT_PATH="/home/ubuntu/spring-roomescape-payment"   # 프로젝트 경로
 LOG_DIR="/home/ubuntu/logs"                             # 로그 디렉토리
 BACKUP_DIR="/home/ubuntu/backup"                        # 백업 디렉토리
 PORT=8080                                               # 서비스 포트
+PROFILE=${1:-prod}
 
 # 색상 코드 (로그 출력용)
 RED='\033[0;31m'
@@ -158,7 +159,7 @@ start_application() {
   # nohup으로 백그라운드 실행
   # 표준 출력과 에러를 분리하여 저장
   nohup java -jar \
-    -Dspring.profiles.active=prod \
+    -Dspring.profiles.active=$PROFILE \
     -Dserver.port=$PORT \
     -Xmx1024m \
     -Xms512m \
