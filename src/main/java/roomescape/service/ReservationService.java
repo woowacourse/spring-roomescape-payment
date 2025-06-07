@@ -49,7 +49,7 @@ public class ReservationService {
 
     public Reservation addReservation(AddReservationRequest request, LoginMemberRequest loginMemberRequest) {
         return createReservation(loginMemberRequest.id(), request.themeId(), request.date(),
-                request.timeId(), ReservationStatus.RESERVED);
+                request.timeId(), ReservationStatus.PENDING);
     }
 
     public ReservationResponse addReservationByAdmin(AdminCreateReservationRequest request) {
@@ -109,15 +109,18 @@ public class ReservationService {
         Theme theme = themeRepository.findById(themeId)
                 .orElseThrow(() -> new InvalidThemeException("존재하지 않는 테마입니다."));
 
-        if (status == ReservationStatus.RESERVED) {
+        if (status == ReservationStatus.RESERVED || status == ReservationStatus.PENDING) {
             checkExistedReservation(date, timeId, themeId);
         }
 
-        return member.reserve(date, reservationTime, theme, status);
+        Reservation reservation = member.reserve(date, reservationTime, theme, status);
+        reservationRepository.flush();
+        return reservation;
     }
 
     private void checkExistedReservation(LocalDate date, long timeId, long themeId) {
-        boolean exists = reservationRepository.existsByDateAndReservationTimeIdAndThemeId(date, timeId, themeId);
+        boolean exists = reservationRepository.existsAlreadyReservedReservation(date, timeId, themeId,
+                ReservationStatus.RESERVED, ReservationStatus.PENDING);
         if (exists) {
             throw new InvalidReservationException("이미 예약이 존재합니다.");
         }

@@ -30,8 +30,8 @@ public class PaymentService {
                 response.paymentKey(),
                 response.totalAmount(),
                 reservation);
-        paymentRepository.save(payment);
         reservation.payForReservation(payment);
+        paymentRepository.save(payment);
     }
 
     public void refundReservation(Long reservationId) {

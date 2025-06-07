@@ -113,7 +113,8 @@ class ReservationServiceTest {
         assertAll(
                 () -> assertThat(actual.getStartAt()).isEqualTo(time.getStartAt()),
                 () -> assertThat(actual.getThemeName()).isEqualTo(theme.getName()),
-                () -> assertThat(actual.getName()).isEqualTo(member.getName())
+                () -> assertThat(actual.getName()).isEqualTo(member.getName()),
+                () -> assertThat(actual.getStatus()).isEqualTo(ReservationStatus.PENDING)
         );
     }
 
@@ -133,8 +134,10 @@ class ReservationServiceTest {
         reservationService.deleteReservation(1L);
 
         //then
-        assertThat(member.getReservations()).doesNotContain(reservation);
-        assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.CANCELED);
+        assertAll(
+                () -> assertThat(member.getReservations()).doesNotContain(reservation),
+                () -> assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.CANCELED)
+        );
     }
 
     @Test
@@ -234,8 +237,11 @@ class ReservationServiceTest {
         reservationService.deleteReservation(1L);
 
         //then
-        assertThat(member.getReservations()).doesNotContain(reservation);
-        assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.CANCELED);
+        assertAll(
+                () -> assertThat(member.getReservations()).doesNotContain(reservation),
+                () -> assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.CANCELED)
+        );
+
     }
 
     @Test

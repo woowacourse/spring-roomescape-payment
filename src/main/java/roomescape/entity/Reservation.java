@@ -173,10 +173,6 @@ public class Reservation {
         return payment;
     }
 
-    protected void setStatus(ReservationStatus status) {
-        this.status = status;
-    }
-
     @Override
     public boolean equals(final Object o) {
         if (!(o instanceof Reservation that)) {

@@ -36,11 +36,14 @@ class ReservationRepositoryTest {
     ThemeRepository themeRepository;
 
     @Test
-    void 날짜_테마id_상태를_기반으로_모든_예약을_찾는다() {
+    void 날짜_테마id_상태를_기반으로_모든_예약_또는_결제대기인_예약을_찾는다() {
         //given
         //when
-        List<Reservation> actual = reservationRepository.findAllByDateAndThemeIdAndStatus(
-                LocalDate.of(2025, 7, 1), 1L, ReservationStatus.RESERVED);
+        List<Reservation> actual = reservationRepository.findAllAlreadyReservedReservation(
+                LocalDate.of(2025, 7, 1),
+                1L,
+                ReservationStatus.RESERVED,
+                ReservationStatus.PENDING);
 
         //then
         assertThat(actual).hasSize(2);

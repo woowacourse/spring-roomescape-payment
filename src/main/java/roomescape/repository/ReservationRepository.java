@@ -14,12 +14,28 @@ import roomescape.global.ReservationStatus;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    List<Reservation> findAllByDateAndThemeIdAndStatus(LocalDate date, Long themeId, ReservationStatus status);
+    @Query(value = """
+                select r
+                from Reservation r
+                join fetch r.member
+                join fetch r.reservationTime
+                join fetch r.theme
+                where r.date = :date
+                and r.theme.id = :themeId
+                and (r.status = :reserved or r.status = :pending)
+            """)
+    List<Reservation> findAllAlreadyReservedReservation(@Param("date") LocalDate date,
+                                                        @Param("themeId") Long themeId,
+                                                        @Param("reserved") ReservationStatus reserved,
+                                                        @Param("pending") ReservationStatus pending);
 
     List<Reservation> findAllByDateBetween(LocalDate start, LocalDate end);
 
     @Query(value = """
             select r from Reservation r
+            join fetch r.member
+            join fetch r.reservationTime
+            join fetch r.theme
             where (:memberId is null or r.member.id  = :memberId)
             and (:themeId is null or r.theme.id = :themeId)
             and (:dateFrom is null or r.date >= :dateFrom)
@@ -49,7 +65,21 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     boolean existsByThemeId(Long themeId);
 
-    boolean existsByDateAndReservationTimeIdAndThemeId(LocalDate date, Long reservationTimeId, Long themeId);
+    @Query(value = """
+                select exists (
+                    select r
+                    from Reservation r
+                    where r.date = :date
+                    and r.reservationTime.id = :timeId
+                    and r.theme.id = :themeId
+                    and (r.status = "RESERVED" or r.status = "PENDING")
+                )
+            """)
+    boolean existsAlreadyReservedReservation(@Param("date") LocalDate date,
+                                             @Param("timeId") Long timeId,
+                                             @Param("themeId") Long themeId,
+                                             @Param("reserved") ReservationStatus reserved,
+                                             @Param("pending") ReservationStatus pending);
 
     @Query(value = """
             select new roomescape.domain.ReservationWithRank(r,

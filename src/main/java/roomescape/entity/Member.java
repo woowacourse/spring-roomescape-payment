@@ -134,8 +134,7 @@ public class Member {
     public List<Reservation> getReservations() {
         return Collections.unmodifiableList(reservations);
     }
-
-
+    
     @Override
     public boolean equals(final Object o) {
         if (!(o instanceof Member member)) {
