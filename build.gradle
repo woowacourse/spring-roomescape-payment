@@ -20,6 +20,7 @@ repositories {
 
 ext {
     snippetsDir = file("build/generated-snippets")
+    docsDir = file('build/docs/asciidoc')
 }
 
 dependencies {
@@ -52,16 +53,20 @@ tasks.register("prepareSnippetsDir") {
 
 tasks.test {
     dependsOn "prepareSnippetsDir"
+    outputs.dir snippetsDir
     useJUnitPlatform()
 }
 
 tasks.asciidoctor {
     dependsOn test
     inputs.dir snippetsDir
-    doFirst {
-        if (!snippetsDir.exists()) {
-            throw new GradleException("snippetsDir not found: Run `test` first or check your restdocs setup.")
-        }
+    outputDir = file("$buildDir/docs/asciidoc")
+    attributes 'snippets': snippetsDir
+    sources {
+        include("index.adoc")
+    }
+    doLast {
+        println "📄 HTML 생성 완료: file://${docsDir}/index.html"
     }
 }
 
