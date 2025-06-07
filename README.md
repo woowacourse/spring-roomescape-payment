@@ -74,6 +74,18 @@
     - 테마 이름은 10자 이하여야 한다.
     - 테마 설명은 50자 이하여야 한다.
 
+## 📌 REST API 문서
+
+|  기능  |                   문서 링크                   |
+|:----:|:-----------------------------------------:|
+| 사용자  |        [user.md](api_docs/user.md)        |
+|  예약  | [reservation.md](api_docs/reservation.md) |
+|  결제  |     [payment.md](api_docs/payment.md)     |
+|  테마  |       [theme.md](api_docs/theme.md)       |
+| 예약시간 |        [time.md](api_docs/time.md)        |
+| 관리자  |       [admin.md](api_docs/admin.md)       |
+|  예외  |   [exception.md](api_docs/exception.md)   |
+
 ## 📌 예외 처리
 
 - 예외 처리 시, CustomException 클래스를 작성하여 사용한다.
