@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.member.dto.request.MemberCreateRequest;
 import roomescape.member.entity.Member;
-import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
 import roomescape.member.service.MemberService;
 
@@ -31,7 +30,8 @@ class MemberIntegrationTest {
     @DisplayName("회원을 생성한다.")
     void createMember() {
         // given
-        var request = new MemberCreateRequest("미소", "miso@email.com", "password");
+        Member member = MemberFixture.createDefault();
+        var request = new MemberCreateRequest(member.getName(), member.getEmail(), member.getPassword());
 
         // when
         var response = memberService.createMember(request);
@@ -39,10 +39,10 @@ class MemberIntegrationTest {
         // then
         assertAll(
                 () -> assertThat(response.id()).isNotNull(),
-                () -> assertThat(response.name()).isEqualTo("미소"),
-                () -> assertThat(response.email()).isEqualTo("miso@email.com"),
-                () -> assertThat(response.password()).isEqualTo("password"),
-                () -> assertThat(response.role()).isEqualTo(RoleType.USER)
+                () -> assertThat(response.name()).isEqualTo(member.getName()),
+                () -> assertThat(response.email()).isEqualTo(member.getEmail()),
+                () -> assertThat(response.password()).isEqualTo(member.getPassword()),
+                () -> assertThat(response.role()).isEqualTo(member.getRole())
         );
     }
 
