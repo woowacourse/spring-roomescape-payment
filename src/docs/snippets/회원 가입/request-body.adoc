@@ -1,8 +1,0 @@
-[source,json,options="nowrap"]
-----
-{
-  "email" : "example@example.com",
-  "password" : "password",
-  "name" : "홍길동"
-}
-----

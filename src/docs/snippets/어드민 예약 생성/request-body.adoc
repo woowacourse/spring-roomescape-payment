@@ -1,9 +1,0 @@
-[source,json,options="nowrap"]
-----
-{
-  "date" : "2025-06-08",
-  "timeId" : 1,
-  "themeId" : 1,
-  "memberId" : 1
-}
-----

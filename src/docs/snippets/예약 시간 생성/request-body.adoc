@@ -1,7 +1,0 @@
-[source,json,options="nowrap"]
-----
-{
-  "id" : 1,
-  "startAt" : "10:00"
-}
-----

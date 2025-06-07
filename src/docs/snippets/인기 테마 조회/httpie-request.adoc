@@ -1,5 +1,0 @@
-[source,bash]
-----
-$ http GET 'http://docs.api.com/themes/ranking' \
-    'Accept:application/json'
-----

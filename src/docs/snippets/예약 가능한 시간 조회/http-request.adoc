@@ -1,7 +1,0 @@
-[source,http,options="nowrap"]
-----
-GET /reservations/times?date=2025-06-07&themeId=1 HTTP/1.1
-Accept: application/json
-Host: docs.api.com
-
-----

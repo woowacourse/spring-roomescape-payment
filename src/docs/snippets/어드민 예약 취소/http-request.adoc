@@ -1,6 +1,0 @@
-[source,http,options="nowrap"]
-----
-DELETE /admin/reservations/1 HTTP/1.1
-Host: docs.api.com
-
-----

@@ -1,8 +1,0 @@
-.+/themes/{id}+
-|===
-|Parameter|Description
-
-|`+id+`
-|테마 ID
-
-|===
