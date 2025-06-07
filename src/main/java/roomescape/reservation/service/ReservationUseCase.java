@@ -77,7 +77,7 @@ public class ReservationUseCase {
         if (!reservationService.isReservationExists(request)) {
             Reservation reservation = reservationCreatorService.createReservation(request, memberId);
             paymentService.createPendingPayment(reservation);
-            return ReservationResponse.of(reservationCreatorService.createReservation(request, memberId));
+            return ReservationResponse.of(reservation);
         }
         return createWaiting(request, memberId);
     }
