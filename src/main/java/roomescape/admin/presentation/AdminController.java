@@ -29,7 +29,7 @@ public class AdminController {
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody final AdminReservationRequest request) {
-        ReservationResponse response = reservationService.createReservationWithoutPayment(request.getReservationRequest(),
+        ReservationResponse response = reservationService.createPendingReservation(request.getReservationRequest(),
                 request.memberId());
         URI locationUri = URI.create(RESERVATION_BASE_URL + SLASH + response.id());
         return ResponseEntity.created(locationUri).body(response);

@@ -4,6 +4,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import roomescape.common.argumentResolver.Login;
 import roomescape.member.dto.request.LoginMember;
+import roomescape.payment.dto.request.TossPaymentConfirmRequest;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
 import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.MyReservationAndWaitingResponse;
@@ -23,9 +25,11 @@ public class ReservationController {
     private static final String SLASH = "/";
 
     private final ReservationService reservationService;
+    private final PaymentService paymentService;
 
-    public ReservationController(final ReservationService reservationService) {
+    public ReservationController(final ReservationService reservationService, final PaymentService paymentService) {
         this.reservationService = reservationService;
+        this.paymentService = paymentService;
     }
 
     @GetMapping
@@ -40,7 +44,9 @@ public class ReservationController {
             @RequestBody final ReservationRequest request,
             @Login final LoginMember loginMember
     ) {
-        ReservationResponse response = reservationService.createReservation(request, loginMember.id());
+        ReservationResponse response = reservationService.createPendingReservation(request, loginMember.id());
+        TossPaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(request.orderId(), request.amount(), request.paymentKey());
+        paymentService.confirmAndSavePayment(tossPaymentConfirmRequest, response.id());
 
         URI locationUri = URI.create(RESERVATION_BASE_URL + SLASH + response.id());
         return ResponseEntity.created(locationUri).body(response);

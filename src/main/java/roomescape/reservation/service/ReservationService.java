@@ -5,10 +5,6 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.util.DateTime;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
-import roomescape.payment.domain.Payment;
-import roomescape.payment.dto.request.TossPaymentConfirmRequest;
-import roomescape.payment.dto.response.TossPaymentResponse;
-import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.dto.request.ReservationConditionRequest;
@@ -29,16 +25,14 @@ import java.util.stream.Stream;
 public class ReservationService {
 
     private final DateTime dateTime;
-    private final PaymentService paymentService;
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
 
-    public ReservationService(final DateTime dateTime, final PaymentService paymentService, final ReservationRepository reservationRepository, final ReservationTimeRepository reservationTimeRepository, final ThemeRepository themeRepository, final MemberRepository memberRepository, final WaitingRepository waitingRepository) {
+    public ReservationService(final DateTime dateTime, final ReservationRepository reservationRepository, final ReservationTimeRepository reservationTimeRepository, final ThemeRepository themeRepository, final MemberRepository memberRepository, final WaitingRepository waitingRepository) {
         this.dateTime = dateTime;
-        this.paymentService = paymentService;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
@@ -47,7 +41,7 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse createReservation(final ReservationRequest request, final Long memberId) {
+    public ReservationResponse createPendingReservation(final ReservationRequest request, final Long memberId) {
         ReservationTime time = findReservationTime(request.timeId());
         Theme theme = findTheme(request.themeId());
         Member findMember = findMember(memberId);
@@ -60,32 +54,8 @@ public class ReservationService {
             throw new IllegalArgumentException("이미 예약이 존재합니다.");
         }
 
-        TossPaymentConfirmRequest tossPaymentConfirmRequest = new TossPaymentConfirmRequest(request.orderId(), request.amount(), request.paymentKey());
-        TossPaymentResponse paymentResponse = paymentService.confirm(tossPaymentConfirmRequest);
-        Payment savePayment = paymentService.saveReservation(paymentResponse);
-
-        Reservation reservation = Reservation.createWithoutId(dateTime.now(), findMember, request.date(), time, theme, savePayment);
+        Reservation reservation = Reservation.createPendingWithoutId(dateTime.now(), findMember, request.date(), time, theme, null);
         Reservation saveReservation = reservationRepository.save(reservation);
-        return ReservationResponse.from(saveReservation);
-    }
-
-    @Transactional
-    public ReservationResponse createReservationWithoutPayment(final ReservationRequest request, final Long memberId) {
-        ReservationTime time = findReservationTime(request.timeId());
-        Theme theme = findTheme(request.themeId());
-        Member findMember = findMember(memberId);
-
-        if (reservationRepository.existsByDateAndTimeStartAtAndThemeId(
-                request.date(),
-                time.getStartAt(),
-                theme.getId()
-        )) {
-            throw new IllegalArgumentException("이미 예약이 존재합니다.");
-        }
-
-        Reservation reservation = Reservation.createWithoutId(dateTime.now(), findMember, request.date(), time, theme, null);
-        Reservation saveReservation = reservationRepository.save(reservation);
-
         return ReservationResponse.from(saveReservation);
     }
 
@@ -143,7 +113,7 @@ public class ReservationService {
     private void approveWaiting(final List<Waiting> waitings) {
         Waiting firstWaiting = waitings.get(0);
 
-        Reservation newReservation = Reservation.createWithoutId(
+        Reservation newReservation = Reservation.createPendingWithoutId(
                 dateTime.now(),
                 firstWaiting.getMember(),
                 firstWaiting.getDate(),

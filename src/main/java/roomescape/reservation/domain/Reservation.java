@@ -32,23 +32,27 @@ public class Reservation {
     @OneToOne(fetch = FetchType.LAZY)
     private Payment payment;
 
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus reservationStatus;
+
     protected Reservation() {
     }
 
-    public Reservation(final Member member, final LocalDate date, final ReservationTime time, final Theme theme, final Payment payment) {
+    public Reservation(final Member member, final LocalDate date, final ReservationTime time, final Theme theme, final Payment payment, final ReservationStatus reservationStatus) {
         this.member = member;
         this.date = date;
         this.time = time;
         this.theme = theme;
         this.payment = payment;
+        this.reservationStatus = reservationStatus;
     }
 
-    public static Reservation createWithoutId(final LocalDateTime now, final Member member,
-                                              final LocalDate reservationDate,
-                                              final ReservationTime time, final Theme theme, final Payment payment
+    public static Reservation createPendingWithoutId(final LocalDateTime now, final Member member,
+                                                     final LocalDate reservationDate,
+                                                     final ReservationTime time, final Theme theme, final Payment payment
     ) {
         validateReservationDateTime(now, reservationDate, time);
-        return new Reservation(member, reservationDate, time, theme, payment);
+        return new Reservation(member, reservationDate, time, theme, payment, ReservationStatus.PENDING);
     }
 
     private static void validateReservationDateTime(final LocalDateTime now, final LocalDate reservationDate,
@@ -65,9 +69,14 @@ public class Reservation {
     }
 
     public boolean isSameTime(final ReservationTime time) {
-        System.out.println("this.time = " + this.time);
-        System.out.println("time = " + time);
         return this.time.isSameTime(time);
+    }
+
+    public void changePendingToPaid() {
+        if (this.reservationStatus != ReservationStatus.PENDING) {
+            throw new IllegalStateException("현재 예약의 상태를 변경할 수 없습니다. 현재 상태 : " + this.reservationStatus);
+        }
+        this.reservationStatus = ReservationStatus.PAID;
     }
 
     @Override
@@ -130,5 +139,9 @@ public class Reservation {
 
     public Payment getPayment() {
         return payment;
+    }
+
+    public ReservationStatus getReservationStatus() {
+        return reservationStatus;
     }
 }

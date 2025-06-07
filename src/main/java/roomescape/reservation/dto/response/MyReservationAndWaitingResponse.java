@@ -1,6 +1,7 @@
 package roomescape.reservation.dto.response;
 
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.waiting.domain.Waiting;
 
 import java.time.LocalDate;
@@ -15,14 +16,26 @@ public record MyReservationAndWaitingResponse(Long id,
                                               Long amount) {
 
     public static MyReservationAndWaitingResponse from(Reservation reservation) {
+        if (reservation.getReservationStatus() != ReservationStatus.PENDING) {
+            return new MyReservationAndWaitingResponse(
+                    reservation.getId(),
+                    reservation.getThemeName(),
+                    reservation.getDate(),
+                    reservation.getReservationTime(),
+                    reservation.getReservationStatus().getStatus(),
+                    reservation.getPayment().getPaymentKey(),
+                    reservation.getPayment().getAmount()
+            );
+        }
+
         return new MyReservationAndWaitingResponse(
                 reservation.getId(),
                 reservation.getThemeName(),
                 reservation.getDate(),
                 reservation.getReservationTime(),
-                "예약",
-                reservation.getPayment().getPaymentKey(),
-                reservation.getPayment().getAmount()
+                reservation.getReservationStatus().getStatus(),
+                null,
+                null
         );
     }
 

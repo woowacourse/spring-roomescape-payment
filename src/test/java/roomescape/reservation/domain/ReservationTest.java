@@ -37,7 +37,7 @@ class ReservationTest {
         ReservationTime reservationTime1 = ReservationTime.createWithoutId(LocalTime.of(20, 10));
         Theme theme = Theme.createWithoutId("a", "a", "a");
         Member member = Member.createWithoutId("a", "a", "a", Role.USER);
-        Reservation reservation = Reservation.createWithoutId(LocalDateTime.of(2025, 1, 1, 10, 0), member, LocalDate.of(2025, 11, 2), reservationTime1, theme, null);
+        Reservation reservation = Reservation.createPendingWithoutId(LocalDateTime.of(2025, 1, 1, 10, 0), member, LocalDate.of(2025, 11, 2), reservationTime1, theme, null);
         // when
         ReservationTime reservationTime2 = ReservationTime.createWithId(2L, localTime);
         // then
@@ -54,7 +54,7 @@ class ReservationTest {
         Theme theme = Theme.createWithoutId("a", "a", "a");
         Member member = Member.createWithoutId("a", "a", "a", Role.USER);
         // when & then
-        assertThatThrownBy(() -> Reservation.createWithoutId(now, member, date, reservationTime, theme, null))
+        assertThatThrownBy(() -> Reservation.createPendingWithoutId(now, member, date, reservationTime, theme, null))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

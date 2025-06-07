@@ -21,5 +21,5 @@ VALUES ('율무', 'ind07162@naver.com', 'asd', 'USER');
 INSERT INTO member (name, email, password, role)
 VALUES ('ADMIN', 'admin@naver.com', '1234', 'ADMIN');
 
-INSERT INTO reservation (date, member_id, time_id, theme_id, payment_id)
-VALUES ('2025-06-07', 4, 3, 3, null);
+INSERT INTO reservation (date, member_id, time_id, theme_id, payment_id, reservation_status)
+VALUES ('2025-06-07', 4, 3, 3, null, 'PENDING');

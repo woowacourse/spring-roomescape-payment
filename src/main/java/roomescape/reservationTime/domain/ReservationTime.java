@@ -33,9 +33,6 @@ public class ReservationTime {
     }
 
     public boolean isSameTime(final ReservationTime time) {
-        System.out.println(this.startAt);
-        System.out.println(time.getStartAt());
-        System.out.println("----------------");
         return this.startAt.equals(time.startAt);
     }
 

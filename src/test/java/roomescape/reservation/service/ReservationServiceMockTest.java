@@ -169,13 +169,13 @@ class ReservationServiceMockTest {
 
         Member member = Member.createWithoutId("홍길동", "a", "a", Role.USER);
 
-        Reservation reservation1 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
+        Reservation reservation1 = Reservation.createPendingWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2024, 10, 6),
                 reservationTime1, theme1, null);
-        Reservation reservation2 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
+        Reservation reservation2 = Reservation.createPendingWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2024, 10, 7),
                 reservationTime1, theme2, null);
-        Reservation reservation3 = Reservation.createWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
+        Reservation reservation3 = Reservation.createPendingWithoutId(LocalDateTime.of(1999, 11, 2, 20, 10), member,
                 LocalDate.of(2024, 10, 8),
                 reservationTime1, theme2, null);
 
