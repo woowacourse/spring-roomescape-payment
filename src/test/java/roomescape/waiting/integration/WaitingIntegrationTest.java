@@ -86,7 +86,6 @@ public class WaitingIntegrationTest {
         admin = memberRepository.save(new Member("어드민", "admin@email.com", "password", RoleType.ADMIN));
         loginMember = new LoginMember(member.getId(), member.getPassword(), member.getRole());
         payment = paymentRepository.save(new Payment("paymentKey", "1", 1000L));
-
     }
 
     @Test

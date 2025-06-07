@@ -1,6 +1,10 @@
 package roomescape.waiting.entity;
 
+import static roomescape.waiting.entity.ApprovalStatus.REJECT;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -32,8 +36,11 @@ public class Waiting {
     @JoinColumn(nullable = false)
     private Member member;
 
+    @Enumerated(EnumType.STRING)
+    private ApprovalStatus status = REJECT;
+
     public Waiting(ReservationSlot reservationSlot, Member member) {
-        this(null, reservationSlot, member);
+        this(null, reservationSlot, member, REJECT);
     }
 
     public boolean matchesMemberById(Long id) {

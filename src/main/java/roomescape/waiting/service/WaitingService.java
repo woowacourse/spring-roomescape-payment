@@ -10,7 +10,6 @@ import roomescape.global.error.exception.ForbiddenException;
 import roomescape.global.error.exception.NotFoundException;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
-import roomescape.reservation.entity.Reservation;
 import roomescape.reservation.entity.ReservationSlot;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationSlotRepository;
@@ -77,9 +76,7 @@ public class WaitingService {
     }
 
     private void convertWaitingToReservation(Waiting waiting) {
-        waitingRepository.delete(waiting);
-        Reservation reservation = new Reservation(waiting.getReservationSlot(), waiting.getMember());
-        reservationRepository.save(reservation);
+        waitingRepository.approveWaiting(waiting.getId());
     }
 
     private void validateLoginMember(Long waitingId, LoginMember loginMember) {
@@ -93,6 +90,7 @@ public class WaitingService {
     private void validateAvailableWaiting(ReservationSlot reservationSlot, LoginMember loginMember) {
         validateReserved(reservationSlot);
         validateDuplicateWaiting(reservationSlot, loginMember);
+        validateDuplicateReservation(reservationSlot, loginMember);
     }
 
     private void validateReserved(ReservationSlot reservationSlot) {

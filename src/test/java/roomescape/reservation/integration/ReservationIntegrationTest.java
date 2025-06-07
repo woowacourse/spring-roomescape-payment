@@ -24,22 +24,16 @@ import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.entity.Payment;
+import roomescape.payment.repository.PaymentRepository;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.ReservationAdminCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationReadFilteredRequest;
-import roomescape.reservation.entity.Reservation;
-import roomescape.reservation.entity.ReservationSlot;
 import roomescape.reservation.entity.ReservationTime;
-import roomescape.payment.repository.PaymentRepository;
-import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservation.repository.ReservationSlotRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
-import roomescape.payment.service.PaymentService;
 import roomescape.reservation.service.ReservationService;
 import roomescape.theme.entity.Theme;
 import roomescape.theme.repository.ThemeRepository;
-import roomescape.waiting.entity.Waiting;
-import roomescape.waiting.repository.WaitingRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -50,9 +44,6 @@ class ReservationIntegrationTest {
     private ReservationService reservationService;
 
     @Autowired
-    private ReservationSlotRepository reservationSlotRepository;
-
-    @Autowired
     private ReservationTimeRepository reservationTimeRepository;
 
     @Autowired
@@ -60,12 +51,6 @@ class ReservationIntegrationTest {
 
     @Autowired
     private MemberRepository memberRepository;
-
-    @Autowired
-    private WaitingRepository waitingRepository;
-
-    @Autowired
-    private ReservationRepository reservationRepository;
 
     @Autowired
     private PaymentService paymentService;
@@ -290,32 +275,6 @@ class ReservationIntegrationTest {
         // then
         var reservations = reservationService.getAllReservations();
         assertThat(reservations).isEmpty();
-    }
-
-    @DisplayName("예약을 삭제하고, 예약 대기를 예약으로 변환한다.")
-    @Test
-    void deleteAndChangeWaitingToReservation() {
-        //given
-        var otherMember = memberRepository.save(new Member("미소", "miso@email.com", "password", RoleType.USER));
-        var theme = themeRepository.save(new Theme("테마", "설명", "썸네일"));
-        var time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
-        var date = LocalDate.now().plusDays(1);
-        var reservationSlot = reservationSlotRepository.save(new ReservationSlot(date, time, theme));
-        var payment = paymentService.create(new Payment("paymentKey", "1", 1000L));
-        var reservation = new Reservation(reservationSlot, otherMember, payment);
-        var savedReservation = reservationRepository.save(reservation);
-
-        var member = memberRepository.save(new Member("훌라", "hula@email.com", "password", RoleType.USER));
-        var waiting = new Waiting(reservationSlot, member);
-        waitingRepository.save(waiting);
-
-        //when
-        reservationService.deleteReservation(savedReservation.getId());
-
-        //then
-        var found = reservationRepository.findByReservationSlot(reservationSlot)
-                .orElse(null);
-        assertThat(found.getMember().getId()).isEqualTo(member.getId());
     }
 
     @Test
