@@ -1,5 +1,7 @@
 package roomescape.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.web.server.Cookie.SameSite;
@@ -15,6 +17,10 @@ import roomescape.domain.auth.dto.LoginMember;
 import roomescape.domain.auth.dto.LoginRequest;
 import roomescape.domain.auth.dto.LoginResponse;
 
+@Tag(
+        name = "인증 및 인가와 관련된 컨트롤러",
+        description = "사용자 인증 및 인가 API, TOKEN 이름의 쿠키에 JWT를 담아 인증 및 인가 처리를 하고 있다."
+)
 @RestController
 @AllArgsConstructor
 public class AuthController {
@@ -23,6 +29,9 @@ public class AuthController {
 
     private final AuthService authService;
 
+    @Operation(
+            description = "이메일과 비밀번호를 통해 로그인(인증)처리, TOKEN 이름의 쿠키에 JWT를 담아준다."
+    )
     @PostMapping("/login")
     public ResponseEntity<Void> login(
             @RequestBody @Valid final LoginRequest request
@@ -40,6 +49,9 @@ public class AuthController {
                 .build();
     }
 
+    @Operation(
+            description = "TOKEN 이름의 JWT를 통해 정보를 가져와 응답"
+    )
     @GetMapping("/login/check")
     public ResponseEntity<LoginResponse> check(
             @AuthenticationPrincipal final LoginMember loginMember
