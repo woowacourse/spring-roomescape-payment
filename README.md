@@ -177,3 +177,11 @@
 - [x] 예약 기능은 로그인 사용자만 가능
 
 ---
+
+## ERD 다이어그램
+
+![ERD](./src/main/resources/static/image/roomescape-erd.png)
+
+## API 문서
+
+[API 문서](./src/main/resources/static/docs/index.html)
