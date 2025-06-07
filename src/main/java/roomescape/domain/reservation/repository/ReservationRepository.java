@@ -94,11 +94,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     @Query("""
             SELECT r
             FROM Reservation r
-                JOIN FETCH r.member m
-                JOIN FETCH r.time t
-                JOIN FETCH r.theme th
             WHERE r.status != 'CANCEL'
             """)
+    @EntityGraph(attributePaths = {"member", "time", "theme"})
     List<Reservation> findAllWithMemberAndTimeAndTheme();
 
     @Query("""
