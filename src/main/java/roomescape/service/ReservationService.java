@@ -25,6 +25,7 @@ import roomescape.exception.MemberNotFoundException;
 import roomescape.exception.ReservationNotFoundException;
 import roomescape.exception.ReservationTimeNotFoundException;
 import roomescape.exception.ThemeNotFoundException;
+import roomescape.infrastructure.payment.PaymentDto;
 
 @Service
 public class ReservationService {
@@ -94,11 +95,12 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse createReservationForMember(Long memberId,
-                                                          Long timeId,
-                                                          Long themeId,
-                                                          LocalDate date,
-                                                          Payment payment) {
+    public ReservationResponse reserveWithPayment(Long memberId,
+                                                  Long timeId,
+                                                  Long themeId,
+                                                  LocalDate date,
+                                                  PaymentDto paymentDto
+    ) {
         ReservationTime reservationTime = reservationTimeRepository.findById(timeId)
                 .orElseThrow(ReservationTimeNotFoundException::new);
         Theme theme = themeRepository.findById(themeId).orElseThrow(ThemeNotFoundException::new);
@@ -108,7 +110,9 @@ public class ReservationService {
         reservation.validateDateTime();
         validateDuplicate(date, reservationTime, theme);
 
-        Reservation savedReservation = reservationRepository.save(reservation);
+        Reservation savedReservation = reservationRepository.save(reservation); // 예약 생성
+        Payment payment = paymentService.createPaymentWithReservation(paymentDto, savedReservation);
+        paymentService.save(payment);
         return ReservationResponse.from(savedReservation);
     }
 

@@ -5,7 +5,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import java.util.Objects;
+import roomescape.exception.ArgumentNullException;
 
 @Entity
 public class Payment {
@@ -13,6 +15,9 @@ public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToOne
+    private Reservation reservation;
 
     @Column(nullable = false)
     private String orderId;
@@ -23,8 +28,11 @@ public class Payment {
     @Column(nullable = false)
     private int amount;
 
-    public Payment(final Long id, final String orderId, final String paymentKey, final int amount) {
+    public Payment(final Long id, final Reservation reservation, final String orderId, final String paymentKey,
+                   final int amount) {
+        validateNotNull(reservation, orderId, paymentKey);
         this.id = id;
+        this.reservation = reservation;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.amount = amount;
@@ -33,12 +41,31 @@ public class Payment {
     protected Payment() {
     }
 
-    public static Payment createPaymentWithoutId(final String orderId, final String paymentKey, final int amount) {
-        return new Payment(null, orderId, paymentKey, amount);
+    public static Payment createPaymentWithoutId(final String orderId,
+                                                 final Reservation reservation,
+                                                 final String paymentKey,
+                                                 final int amount) {
+        return new Payment(null, reservation, orderId, paymentKey, amount);
+    }
+
+    private void validateNotNull(Reservation reservation, String orderId, String paymentKey) {
+        if (reservation == null) {
+            throw new ArgumentNullException("reservation");
+        }
+        if (orderId == null) {
+            throw new ArgumentNullException("orderId");
+        }
+        if (paymentKey == null) {
+            throw new ArgumentNullException("paymentKey");
+        }
     }
 
     public Long getId() {
         return id;
+    }
+
+    public Reservation getReservation() {
+        return reservation;
     }
 
     public String getOrderId() {

@@ -2,9 +2,9 @@ package roomescape.service;
 
 import java.time.LocalDate;
 import org.springframework.stereotype.Service;
-import roomescape.domain.Payment;
 import roomescape.dto.request.PaymentRequest;
 import roomescape.dto.response.ReservationResponse;
+import roomescape.infrastructure.payment.PaymentDto;
 
 @Service
 public class ReservationFacade {
@@ -21,7 +21,7 @@ public class ReservationFacade {
                                                            Long themeId,
                                                            LocalDate date,
                                                            PaymentRequest request) {
-        Payment payment = paymentService.createPaymentInfo(request);
-        return reservationService.createReservationForMember(memberId, timeId, themeId, date, payment);
+        PaymentDto paymentDto = paymentService.approve(request);
+        return reservationService.reserveWithPayment(memberId, timeId, themeId, date, paymentDto);
     }
 }

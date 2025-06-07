@@ -2,7 +2,6 @@ package roomescape.infrastructure.payment;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import roomescape.domain.Payment;
 import roomescape.dto.request.PaymentRequest;
 
 @Component
@@ -16,12 +15,12 @@ public class PaymentClient {
         this.errorHandler = errorHandler;
     }
 
-    public Payment postPaymentInfo(PaymentRequest paymentRequest) {
+    public PaymentDto approve(PaymentRequest paymentRequest) {
         return restClient.post()
                 .uri("/v1/payments/confirm")
                 .body(paymentRequest)
                 .retrieve()
                 .onStatus(errorHandler)
-                .body(Payment.class);
+                .body(PaymentDto.class);
     }
 }
