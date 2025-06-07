@@ -3,7 +3,7 @@ package roomescape.common.config;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.common.properties.PaymentClientProperties;
 import roomescape.payment.exception.handler.PaymentApproveExceptionHandler;
@@ -12,7 +12,8 @@ import roomescape.payment.exception.handler.PaymentApproveExceptionHandler;
 @EnableConfigurationProperties(PaymentClientProperties.class)
 public class PaymentClientConfig {
 
-    public static final int REQUEST_TIMEOUT_TIME = 3_000;
+    public static final int REQUEST_CONNECT_TIMEOUT_MILLISECOND = 3_000;
+    public static final int REQUEST_READ_TIMEOUT_MILLISECOND = 5_000;
     private final PaymentClientProperties paymentClientProperties;
 
     public PaymentClientConfig(final PaymentClientProperties paymentClientProperties) {
@@ -27,9 +28,10 @@ public class PaymentClientConfig {
                 .build();
     }
 
-    private HttpComponentsClientHttpRequestFactory generateRequestFactory() {
-        HttpComponentsClientHttpRequestFactory  requestFactory = new HttpComponentsClientHttpRequestFactory();
-        requestFactory.setConnectionRequestTimeout(REQUEST_TIMEOUT_TIME);
+    private SimpleClientHttpRequestFactory generateRequestFactory() {
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(REQUEST_CONNECT_TIMEOUT_MILLISECOND);
+        requestFactory.setReadTimeout(REQUEST_READ_TIMEOUT_MILLISECOND);
         return requestFactory;
     }
 
