@@ -33,7 +33,7 @@ public class TimeCommandService {
     @Transactional
     public void deleteTimeById(final Long timeId) {
         if (reservationQueryService.existsReservationInTime(timeId)) {
-            throw new BadRequestException("해당 시간에 이미 예약이 존재하여 삭제할 수 없습니다.");
+            throw new BadRequestException("해당 시간에 예약이 존재하여 삭제할 수 없습니다.");
         }
         reservationTimeRepository.deleteById(timeId);
     }

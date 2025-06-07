@@ -57,7 +57,7 @@ public class ReservationWaitCommandService {
             Member member
     ) {
         if (member.getRole() != MemberRole.ADMIN && !wait.getMember().equals(member)) {
-            throw new AccessDeniedException("예약 대기는 어드민 또는 본인만 취소 가능합니다.");
+            throw new AccessDeniedException("예약 대기는 관리자 또는 본인만 취소 가능합니다.");
         }
         reservationWaitRepository.deleteById(wait.getId());
     }

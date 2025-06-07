@@ -26,7 +26,7 @@ public class AdminOnlyInterceptor implements HandlerInterceptor {
             throw new AuthenticationException("로그인이 필요합니다.");
         }
         if (sessionMember.role() != MemberRole.ADMIN) {
-            throw new AccessDeniedException("어드민이 아닙니다.");
+            throw new AccessDeniedException("관리자가 아닙니다.");
         }
         return true;
     }
