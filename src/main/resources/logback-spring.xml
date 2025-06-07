@@ -1,0 +1,36 @@
+<configuration>
+
+    <!-- 콘솔 출력 설정 (개발용) -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 파일 출력 설정 (운영용) -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 로그 파일 경로 -->
+        <file>logs/app.log</file>
+
+        <!-- 파일 크기 및 개수 관리 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 하루마다 새 파일, 최대 10개까지 보관 -->
+            <fileNamePattern>logs/app-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>10</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 로거 설정 -->
+    <root level="INFO">
+        <!-- 운영에선 파일에 출력 -->
+        <appender-ref ref="FILE" />
+        <!-- 개발 중 콘솔도 보고 싶으면 콘솔도 추가 가능 -->
+         <appender-ref ref="CONSOLE" />
+    </root>
+
+</configuration>
