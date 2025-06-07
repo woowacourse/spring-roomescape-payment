@@ -1,7 +1,9 @@
 package roomescape.global.aop;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.Set;
+import java.lang.reflect.Field;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -16,10 +18,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Component
 public class LogAspect {
 
-    private static final Set<String> SENSITIVE_PATHS = Set.of(
-            "/login",
-            "/members"
-    );
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private static final String MASK_VALUE = "*********";
 
     @Pointcut("execution(* roomescape.controller..*Controller.*(..))")
     public void controllerMethods() {
@@ -37,12 +37,7 @@ public class LogAspect {
                 String queryString = request.getQueryString();
                 String fullUrl = queryString != null ? uri + "?" + queryString : uri;
 
-                boolean isSensitivePath = SENSITIVE_PATHS.contains(uri);
-                String requestBody = null;
-
-                if (!isSensitivePath) {
-                    requestBody = getRequestBody(joinPoint, method);
-                }
+                String requestBody = getRequestBodyWithMasking(joinPoint, method);
 
                 if (requestBody != null && !requestBody.isEmpty()) {
                     log.info("[{}] {} - {} | Body: {}", method, fullUrl, clientIP, requestBody);
@@ -55,7 +50,7 @@ public class LogAspect {
         }
     }
 
-    private String getRequestBody(JoinPoint joinPoint, String httpMethod) {
+    private String getRequestBodyWithMasking(JoinPoint joinPoint, String httpMethod) {
         if ("GET".equals(httpMethod) || "DELETE".equals(httpMethod)) {
             return null;
         }
@@ -67,11 +62,33 @@ public class LogAspect {
 
         for (Object arg : args) {
             if (arg != null && !isPrimitiveOrWrapper(arg) && !isHttpServletRequest(arg)) {
-                return arg.toString();
+                return maskSensitiveFields(arg);
             }
         }
 
         return null;
+    }
+
+    private String maskSensitiveFields(Object obj) {
+        try {
+            String jsonString = objectMapper.writeValueAsString(obj);
+            ObjectNode jsonNode = (ObjectNode) objectMapper.readTree(jsonString);
+
+            Class<?> cls = obj.getClass();
+            Field[] fields = cls.getDeclaredFields();
+
+            for (Field field : fields) {
+                if (field.isAnnotationPresent(Sensitive.class)) {
+                    String fieldName = field.getName();
+                    if (jsonNode.has(fieldName)) {
+                        jsonNode.put(fieldName, MASK_VALUE);
+                    }
+                }
+            }
+            return jsonNode.toString();
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     private boolean isPrimitiveOrWrapper(Object obj) {
