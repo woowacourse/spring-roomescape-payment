@@ -21,7 +21,7 @@ security:
   jwt:
     token:
       secretKey: ${security.jwt.token.secretKey}
-      expireLength: ${3600000}
+      expireLength: ${security.jwt.token.expireLength}
 
 payment:
   toss:
