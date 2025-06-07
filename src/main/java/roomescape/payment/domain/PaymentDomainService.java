@@ -9,7 +9,7 @@ public class PaymentDomainService {
 
     private final PaymentClient paymentClient;
 
-    public void approvePayment(final PaymentInfo paymentInfo) {
-        paymentClient.approvePayment(paymentInfo);
+    public void approvePayment(final Payment payment) {
+        paymentClient.approvePayment(payment);
     }
 }

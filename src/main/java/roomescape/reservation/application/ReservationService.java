@@ -15,7 +15,7 @@ import roomescape.exception.resource.AlreadyExistException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.payment.domain.PaymentDomainService;
-import roomescape.payment.domain.PaymentInfo;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationSlot;
 import roomescape.reservation.domain.ReservationTime;
@@ -49,7 +49,7 @@ public class ReservationService {
         final Reservation reservation = createReservedReservation(request.date(), time, theme, member);
 
         paymentDomainService.approvePayment(
-                PaymentInfo.of(
+                Payment.of(
                         request.paymentKey(),
                         request.orderId(),
                         request.amount()

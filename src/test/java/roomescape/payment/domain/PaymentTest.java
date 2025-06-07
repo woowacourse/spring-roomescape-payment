@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class PaymentInfoTest {
+class PaymentTest {
 
     @Test
     void paymentKey가_null이면_예외가_발생한다() {
@@ -15,7 +15,7 @@ class PaymentInfoTest {
         final Long amount = 10000L;
 
         // when & then
-        Assertions.assertThatThrownBy(() -> PaymentInfo.of(paymentKey, orderId, amount))
+        Assertions.assertThatThrownBy(() -> Payment.of(paymentKey, orderId, amount))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -27,7 +27,7 @@ class PaymentInfoTest {
         final Long amount = 10000L;
 
         // when & then
-        Assertions.assertThatThrownBy(() -> PaymentInfo.of(paymentKey, orderId, amount))
+        Assertions.assertThatThrownBy(() -> Payment.of(paymentKey, orderId, amount))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -39,7 +39,7 @@ class PaymentInfoTest {
         final Long amount = 10000L;
 
         // when & then
-        Assertions.assertThatThrownBy(() -> PaymentInfo.of(paymentKey, orderId, amount))
+        Assertions.assertThatThrownBy(() -> Payment.of(paymentKey, orderId, amount))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -51,7 +51,7 @@ class PaymentInfoTest {
         final Long amount = 10000L;
 
         // when & then
-        Assertions.assertThatThrownBy(() -> PaymentInfo.of(paymentKey, orderId, amount))
+        Assertions.assertThatThrownBy(() -> Payment.of(paymentKey, orderId, amount))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -63,7 +63,7 @@ class PaymentInfoTest {
         final Long amount = null;
 
         // when & then
-        Assertions.assertThatThrownBy(() -> PaymentInfo.of(paymetKey, orderId, amount))
+        Assertions.assertThatThrownBy(() -> Payment.of(paymetKey, orderId, amount))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -75,7 +75,7 @@ class PaymentInfoTest {
         final Long amount = -1000L;
 
         // when & then
-        Assertions.assertThatThrownBy(() -> PaymentInfo.of(paymentKey, orderId, amount))
+        Assertions.assertThatThrownBy(() -> Payment.of(paymentKey, orderId, amount))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

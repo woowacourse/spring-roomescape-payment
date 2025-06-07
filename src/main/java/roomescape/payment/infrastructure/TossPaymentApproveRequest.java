@@ -1,17 +1,17 @@
 package roomescape.payment.infrastructure;
 
-import roomescape.payment.domain.PaymentInfo;
+import roomescape.payment.domain.Payment;
 
 public record TossPaymentApproveRequest(
         String paymentKey,
         String orderId,
         long amount
 ) {
-    public static TossPaymentApproveRequest from(final PaymentInfo paymentInfo) {
+    public static TossPaymentApproveRequest from(final Payment payment) {
         return new TossPaymentApproveRequest(
-                paymentInfo.getPaymentKey(),
-                paymentInfo.getOrderId(),
-                paymentInfo.getAmount()
+                payment.getPaymentKey(),
+                payment.getOrderId(),
+                payment.getAmount()
         );
     }
 }

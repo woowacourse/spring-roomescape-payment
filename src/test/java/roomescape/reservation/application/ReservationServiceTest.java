@@ -34,7 +34,7 @@ import roomescape.fixture.config.TestConfig;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.payment.domain.PaymentClient;
-import roomescape.payment.domain.PaymentInfo;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationSlot;
 import roomescape.reservation.domain.ReservationTime;
@@ -70,7 +70,7 @@ class ReservationServiceTest {
     void setUp() {
         doNothing()
                 .when(paymentClient)
-                .approvePayment(any(PaymentInfo.class));
+                .approvePayment(any(Payment.class));
     }
 
     @Test

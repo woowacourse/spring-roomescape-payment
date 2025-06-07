@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @EqualsAndHashCode(of = {"id"})
-public class PaymentInfo {
+public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +31,7 @@ public class PaymentInfo {
     @Column(nullable = false)
     private Long amount;
 
-    private PaymentInfo(
+    private Payment(
             final String paymentKey,
             final String orderId,
             final Long amount
@@ -45,12 +45,12 @@ public class PaymentInfo {
         this.amount = amount;
     }
 
-    public static PaymentInfo of(
+    public static Payment of(
             final String paymentKey,
             final String orderId,
             final Long amount
     ) {
-        return new PaymentInfo(paymentKey, orderId, amount);
+        return new Payment(paymentKey, orderId, amount);
     }
 
     private void validatePaymentKey(final String paymentKey) {
