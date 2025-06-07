@@ -1,5 +1,7 @@
 package roomescape.presentation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import roomescape.dto.request.ReservationSearchDto;
 import roomescape.dto.request.ReservationTicketPaymentRequestDto;
 import roomescape.dto.response.ReservationTicketResponseDto;
 
+@Tag(name = "예약 관련 API")
 @RestController
 @RequestMapping("/reservations")
 @RequiredArgsConstructor
@@ -28,12 +31,14 @@ public class ReservationTicketController {
     private final ReservationTicketService reservationTicketService;
     private final ReservationTicketPaymentService reservationTicketPaymentService;
 
+    @Operation(summary = "예약 전체 조회")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<ReservationTicketResponseDto> getReservations() {
         return reservationTicketService.getReservationTickets();
     }
 
+    @Operation(summary = "예약 검색")
     @GetMapping("/search")
     @ResponseStatus(HttpStatus.OK)
     public List<ReservationTicketResponseDto> getReservations(
@@ -41,6 +46,7 @@ public class ReservationTicketController {
         return reservationTicketService.searchReservationTickets(reservationSearchDto);
     }
 
+    @Operation(summary = "새로운 예약 저장")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ReservationTicketResponseDto addReservation(
@@ -53,6 +59,7 @@ public class ReservationTicketController {
                 loginMember);
     }
 
+    @Operation(summary = "예약 삭제")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteReservation(@PathVariable("id") Long id) {

@@ -1,5 +1,7 @@
 package roomescape.presentation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -17,6 +19,7 @@ import roomescape.dto.response.MemberResponseDto;
 import roomescape.dto.response.TokenResponseDto;
 import roomescape.presentation.support.CookieUtils;
 
+@Tag(name = "로그인 관련 API")
 @RestController
 @RequestMapping("/login")
 @RequiredArgsConstructor
@@ -25,6 +28,7 @@ public class AuthController {
     private final AuthService authService;
     private final CookieUtils cookieUtils;
 
+    @Operation(summary = "로그인 요청")
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public void login(@RequestBody @Valid LoginRequestDto loginRequestDto, HttpServletResponse httpServletResponse) {

@@ -1,5 +1,7 @@
 package roomescape.presentation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import roomescape.dto.request.ReservationTimeRegisterDto;
 import roomescape.dto.response.AvailableReservationTimeResponseDto;
 import roomescape.dto.response.ReservationTimeResponseDto;
 
+@Tag(name = "예약 시각 관련 API")
 @RestController
 @RequestMapping("/times")
 @RequiredArgsConstructor
@@ -25,12 +28,14 @@ public class ReservationTimeController {
 
     private final ReservationTimeService reservationTimeService;
 
+    @Operation(summary = "예약 시각 전체 조회")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<ReservationTimeResponseDto> getTimes() {
         return reservationTimeService.getAllTimes();
     }
 
+    @Operation(summary = "예약 시각 저장")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ReservationTimeResponseDto addTime(
@@ -38,12 +43,14 @@ public class ReservationTimeController {
         return reservationTimeService.saveTime(reservationTimeRegisterDto);
     }
 
+    @Operation(summary = "예약 시각 삭제")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTime(@PathVariable("id") Long id) {
         reservationTimeService.deleteTime(id);
     }
 
+    @Operation(summary = "날짜와 테마에 따른 예약 가능 시각 조회")
     @GetMapping("/available")
     @ResponseStatus(HttpStatus.OK)
     public List<AvailableReservationTimeResponseDto> findAvailableTimes(@RequestParam String date,
