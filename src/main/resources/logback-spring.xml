@@ -9,7 +9,7 @@
         <file>${LOGS_PATH}/spring.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- 날짜 패턴과 함께 롤링 파일 이름 지정 -->
-            <fileNamePattern>logs/spring-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>${LOGS_PATH}/spring-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <!-- 30일 넘은 파일은 자동 삭제 -->
             <maxHistory>30</maxHistory>
             <!-- 파일 하나당 최대 10MB -->
