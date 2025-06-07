@@ -11,7 +11,7 @@ import roomescape.approval.infrastructure.toss.dto.TossPaymentApprovalRequest;
 
 @Service
 @AllArgsConstructor
-public class TossPaymentCommandCommandService implements ApprovalCommandService<Payment> {
+public class TossPaymentCommandService implements ApprovalCommandService<Payment> {
 
     private final TossPaymentClient tossPaymentClient;
     private final ApprovalRepository approvalRepository;
