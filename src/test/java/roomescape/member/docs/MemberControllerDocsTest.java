@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -41,6 +42,12 @@ import roomescape.member.service.MemberService;
 @ExtendWith(RestDocumentationExtension.class)
 public class MemberControllerDocsTest {
 
+    @Value("${application.ip}")
+    private String ip;
+
+    @Value("${application.port}")
+    private int port;
+
     @MockitoBean
     private MemberService memberService;
 
@@ -67,8 +74,8 @@ public class MemberControllerDocsTest {
                 .apply(documentationConfiguration(provider)
                         .uris()
                         .withScheme("http")
-                        .withHost("123.123.123.123")
-                        .withPort(8080))
+                        .withHost(ip)
+                        .withPort(port))
                 .alwaysDo(restDocs)
                 .build();
     }

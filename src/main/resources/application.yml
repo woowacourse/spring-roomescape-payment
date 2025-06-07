@@ -26,3 +26,7 @@ security:
     - /themes/**
 toss:
   secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+
+application:
+  ip: 54.180.227.202
+  port: 8080
