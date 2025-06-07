@@ -77,7 +77,7 @@ class ThemeApiControllerTest {
     void 테마_생성에_성공한다() throws Exception {
         // given
         ThemeCreateRequest request = new ThemeCreateRequest("theme1", "description1", "thumbnail1");
-        ThemeResponse response = new ThemeResponse("themeId1", "theme1", "description1", "thumbnail1");
+        ThemeResponse response = new ThemeResponse("themeId1", "theme1", "description1", "thumbnail1", 1000L);
         AuthToken token = jwtUtil.createToken(
                 Member.restore("name", UserRole.ADMIN.name(), "admin", "email1@domain.com", "password1"));
         given(themeService.addAndGet(request)).willReturn(response);
@@ -104,7 +104,8 @@ class ThemeApiControllerTest {
                                 fieldWithPath("id").type(JsonFieldType.STRING).description("테마 ID"),
                                 fieldWithPath("name").type(JsonFieldType.STRING).description("테마 이름"),
                                 fieldWithPath("description").type(JsonFieldType.STRING).description("테마 설명"),
-                                fieldWithPath("thumbnail").type(JsonFieldType.STRING).description("썸네일 URL")
+                                fieldWithPath("thumbnail").type(JsonFieldType.STRING).description("썸네일 URL"),
+                                fieldWithPath("price").type(JsonFieldType.NUMBER).description("가격")
                         )
                 ));
     }
@@ -112,7 +113,7 @@ class ThemeApiControllerTest {
     @Test
     void 테마_전체_조회에_성공한다() throws Exception {
         // given
-        ThemeResponse response1 = new ThemeResponse("themeId1", "theme1", "description1", "thumbnail1");
+        ThemeResponse response1 = new ThemeResponse("themeId1", "theme1", "description1", "thumbnail1", 1000L);
         List<ThemeResponse> response = List.of(response1);
         AuthToken token = jwtUtil.createToken(
                 Member.create("name", "email1@domain.com", "password1"));
@@ -131,7 +132,8 @@ class ThemeApiControllerTest {
                                 fieldWithPath("[].id").type(JsonFieldType.STRING).description("테마 ID"),
                                 fieldWithPath("[].name").type(JsonFieldType.STRING).description("테마 이름"),
                                 fieldWithPath("[].description").type(JsonFieldType.STRING).description("테마 설명"),
-                                fieldWithPath("[].thumbnail").type(JsonFieldType.STRING).description("썸네일 URL")
+                                fieldWithPath("[].thumbnail").type(JsonFieldType.STRING).description("썸네일 URL"),
+                                fieldWithPath("[].price").type(JsonFieldType.NUMBER).description("가격")
                         )
                 ));
     }
@@ -139,7 +141,8 @@ class ThemeApiControllerTest {
     @Test
     void 인기_테마_조회에_성공한다() throws Exception {
         // given
-        List<ThemeResponse> response = List.of(new ThemeResponse("themeId1", "theme1", "description1", "thumbnail1"));
+        List<ThemeResponse> response = List.of(
+                new ThemeResponse("themeId1", "theme1", "description1", "thumbnail1", 1000L));
         given(themeService.getPopular()).willReturn(response);
         // when
         ResultActions result = mockMvc.perform(get("/themes/popular"));
@@ -154,7 +157,8 @@ class ThemeApiControllerTest {
                                 fieldWithPath("[].id").type(JsonFieldType.STRING).description("테마 ID"),
                                 fieldWithPath("[].name").type(JsonFieldType.STRING).description("테마 이름"),
                                 fieldWithPath("[].description").type(JsonFieldType.STRING).description("테마 설명"),
-                                fieldWithPath("[].thumbnail").type(JsonFieldType.STRING).description("썸네일 URL")
+                                fieldWithPath("[].thumbnail").type(JsonFieldType.STRING).description("썸네일 URL"),
+                                fieldWithPath("[].price").type(JsonFieldType.NUMBER).description("가격")
                         )
                 ));
     }

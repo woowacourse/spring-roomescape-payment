@@ -90,7 +90,7 @@ class WaitingApiControllerTest {
                 new MemberResponse("memberId1", "name", "email1@domain.com"),
                 LocalDate.of(2025, 1, 1),
                 new TimeSlotResponse("timeSlotId1", LocalTime.of(9, 0)),
-                new ThemeResponse("themeId1", "theme1", "description1", "thumbnail1")
+                new ThemeResponse("themeId1", "theme1", "description1", "thumbnail1", 1000L)
         );
         AuthToken token = jwtUtil.createToken(
                 Member.create("name", "email1@domain.com", "password1"));
@@ -120,6 +120,7 @@ class WaitingApiControllerTest {
                                 fieldWithPath("theme.name").type(JsonFieldType.STRING).description("테마 이름"),
                                 fieldWithPath("theme.description").type(JsonFieldType.STRING).description("테마 설명"),
                                 fieldWithPath("theme.thumbnail").type(JsonFieldType.STRING).description("테마 썸네일 URL"),
+                                fieldWithPath("theme.price").type(JsonFieldType.NUMBER).description("가격"),
                                 fieldWithPath("user").type(JsonFieldType.OBJECT).description("대기자 정보"),
                                 fieldWithPath("user.id").type(JsonFieldType.STRING).description("대기자 ID"),
                                 fieldWithPath("user.name").type(JsonFieldType.STRING).description("대기자 이름"),
@@ -139,7 +140,7 @@ class WaitingApiControllerTest {
                 new MemberResponse("memberId1", "name", "email1@domain.com"),
                 LocalDate.of(2025, 1, 1),
                 new TimeSlotResponse("timeSlotId1", LocalTime.of(9, 0)),
-                new ThemeResponse("themeId1", "theme1", "description1", "thumbnail1")
+                new ThemeResponse("themeId1", "theme1", "description1", "thumbnail1", 1000L)
         );
         List<WaitingResponse> response = List.of(waiting1);
         AuthToken token = jwtUtil.createToken(
@@ -164,6 +165,7 @@ class WaitingApiControllerTest {
                                 fieldWithPath("[].theme.description").type(JsonFieldType.STRING).description("테마 설명"),
                                 fieldWithPath("[].theme.thumbnail").type(JsonFieldType.STRING)
                                         .description("테마 썸네일 URL"),
+                                fieldWithPath("[].theme.price").type(JsonFieldType.NUMBER).description("가격"),
                                 fieldWithPath("[].user").type(JsonFieldType.OBJECT).description("대기자 정보"),
                                 fieldWithPath("[].user.id").type(JsonFieldType.STRING).description("대기자 ID"),
                                 fieldWithPath("[].user.name").type(JsonFieldType.STRING).description("대기자 이름"),
@@ -196,7 +198,7 @@ class WaitingApiControllerTest {
                 new MemberResponse("memberId1", "name", "email1@domain.com"),
                 LocalDate.of(2025, 1, 1),
                 new TimeSlotResponse("timeSlotId1", LocalTime.of(9, 0)),
-                new ThemeResponse("themeId1", "theme1", "description1", "thumbnail1"),
+                new ThemeResponse("themeId1", "theme1", "description1", "thumbnail1", 1000L),
                 1L
         );
         List<WaitingWithRankResponse> response = List.of(waiting1);
@@ -223,6 +225,7 @@ class WaitingApiControllerTest {
                                 fieldWithPath("[].theme.description").type(JsonFieldType.STRING).description("테마 설명"),
                                 fieldWithPath("[].theme.thumbnail").type(JsonFieldType.STRING)
                                         .description("테마 썸네일 URL"),
+                                fieldWithPath("[].theme.price").type(JsonFieldType.NUMBER).description("가격"),
                                 fieldWithPath("[].member").type(JsonFieldType.OBJECT).description("대기자 정보"),
                                 fieldWithPath("[].member.id").type(JsonFieldType.STRING).description("대기자 ID"),
                                 fieldWithPath("[].member.name").type(JsonFieldType.STRING).description("대기자 이름"),

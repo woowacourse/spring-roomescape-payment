@@ -48,7 +48,7 @@ public class JpaTestUtil {
     }
 
     public void insertTheme(final String id, final String name) {
-        themeDao.save(Theme.restore(id, name, "", ""));
+        themeDao.save(Theme.restore(id, name, "", "", 1000L));
     }
 
     public int countReservation() {

@@ -19,7 +19,6 @@ import roomescape.business.model.vo.UserRole;
 import roomescape.business.service.ReservationService;
 import roomescape.presentation.dto.request.AdminReservationRequest;
 import roomescape.presentation.dto.request.ReservationCondition;
-import roomescape.presentation.dto.request.ReservationRequest;
 import roomescape.presentation.dto.response.ReservationResponse;
 import roomescape.presentation.dto.response.ReservationWithPaymentResponse;
 
@@ -28,14 +27,6 @@ import roomescape.presentation.dto.response.ReservationWithPaymentResponse;
 public class ReservationApiController {
 
     private final ReservationService reservationService;
-
-    @PostMapping("/reservations")
-    @AuthRequired
-    public ResponseEntity<ReservationResponse> createReservation(@RequestBody @Valid ReservationRequest request,
-                                                                 LoginInfo loginInfo) {
-        ReservationResponse response = reservationService.addAndGet(loginInfo, request);
-        return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
-    }
 
     @PostMapping("/admin/reservations")
     @AuthRequired

@@ -60,13 +60,13 @@ class ThemeServiceTest {
     void 모든_테마를_조회할_수_있다() {
         // given
         List<Theme> themeData = Arrays.asList(
-                Theme.restore("theme-id-1", "Theme One", "Description One", "thumbnail1.jpg"),
-                Theme.restore("theme-id-2", "Theme Two", "Description Two", "thumbnail2.jpg")
+                Theme.restore("theme-id-1", "Theme One", "Description One", "thumbnail1.jpg", 1000L),
+                Theme.restore("theme-id-2", "Theme Two", "Description Two", "thumbnail2.jpg", 2000L)
         );
 
         List<ThemeResponse> expectedThemes = Arrays.asList(
-                new ThemeResponse("theme-id-1", "Theme One", "Description One", "thumbnail1.jpg"),
-                new ThemeResponse("theme-id-2", "Theme Two", "Description Two", "thumbnail2.jpg")
+                new ThemeResponse("theme-id-1", "Theme One", "Description One", "thumbnail1.jpg", 1000L),
+                new ThemeResponse("theme-id-2", "Theme Two", "Description Two", "thumbnail2.jpg", 2000L)
         );
 
         when(themeRepository.findAll()).thenReturn(themeData);
@@ -83,15 +83,14 @@ class ThemeServiceTest {
     void 인기_테마를_조회할_수_있다() {
         // given
         List<Theme> themeData = Arrays.asList(
-                Theme.restore("theme-id-1", "Popular Theme One", "Description One", "thumbnail1.jpg"),
-                Theme.restore("theme-id-2", "Popular Theme Two", "Description Two", "thumbnail2.jpg"),
-                Theme.restore("theme-id-3", "Popular Theme Three", "Description Three", "thumbnail3.jpg")
-        );
+                Theme.restore("theme-id-1", "Popular Theme One", "Description One", "thumbnail1.jpg", 1000L),
+                Theme.restore("theme-id-2", "Popular Theme Two", "Description Two", "thumbnail2.jpg", 2000L),
+                Theme.restore("theme-id-3", "Popular Theme Three", "Description Three", "thumbnail3.jpg", 3000L));
 
         List<ThemeResponse> expectedThemes = Arrays.asList(
-                new ThemeResponse("theme-id-1", "Popular Theme One", "Description One", "thumbnail1.jpg"),
-                new ThemeResponse("theme-id-2", "Popular Theme Two", "Description Two", "thumbnail2.jpg"),
-                new ThemeResponse("theme-id-3", "Popular Theme Three", "Description Three", "thumbnail3.jpg")
+                new ThemeResponse("theme-id-1", "Popular Theme One", "Description One", "thumbnail1.jpg", 1000L),
+                new ThemeResponse("theme-id-2", "Popular Theme Two", "Description Two", "thumbnail2.jpg", 2000L),
+                new ThemeResponse("theme-id-3", "Popular Theme Three", "Description Three", "thumbnail3.jpg", 3000L)
         );
 
         when(themeRepository.findByDateBetweenOrderByReservationCountDescNameAsc(any(LocalDate.class),

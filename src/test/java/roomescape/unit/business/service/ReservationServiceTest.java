@@ -18,7 +18,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.auth.LoginInfo;
 import roomescape.business.model.entity.Member;
 import roomescape.business.model.entity.Reservation;
 import roomescape.business.model.entity.Theme;
@@ -37,7 +36,6 @@ import roomescape.infrastructure.ThemeRepository;
 import roomescape.infrastructure.WaitingRepository;
 import roomescape.presentation.dto.request.AdminReservationRequest;
 import roomescape.presentation.dto.request.ReservationCondition;
-import roomescape.presentation.dto.request.ReservationRequest;
 import roomescape.presentation.dto.response.MemberResponse;
 import roomescape.presentation.dto.response.ReservationResponse;
 import roomescape.presentation.dto.response.ThemeResponse;
@@ -56,7 +54,6 @@ class ReservationServiceTest {
 
     public ReservationServiceTest() {
         this.sut = new ReservationService(
-                paymentService,
                 memberRepository,
                 reservationRepository,
                 reservationTimeRepository,
@@ -151,7 +148,7 @@ class ReservationServiceTest {
         AdminReservationRequest request = new AdminReservationRequest(date, timeIdValue, themeIdValue, userIdValue);
         Member member = Member.restore(userIdValue, "USER", "Test User", "test@example.com", "password");
         TimeSlot timeSlot = TimeSlot.restore(timeIdValue, LocalTime.of(10, 0));
-        Theme theme = Theme.restore(themeIdValue, "Test Theme", "Description", "thumbnail.jpg");
+        Theme theme = Theme.restore(themeIdValue, "Test Theme", "Description", "thumbnail.jpg", 1000L);
 
         when(memberRepository.findById(userId)).thenReturn(Optional.of(member));
         when(reservationTimeRepository.findById(timeId)).thenReturn(Optional.of(timeSlot));
@@ -188,8 +185,8 @@ class ReservationServiceTest {
         Member member2 = Member.restore("user-id-2", "USER", "User Two", "user2@example.com", "password2");
         TimeSlot time1 = TimeSlot.restore("time-id-1", LocalTime.of(10, 0));
         TimeSlot time2 = TimeSlot.restore("time-id-2", LocalTime.of(14, 0));
-        Theme theme1 = Theme.restore("theme-id-1", "Theme One", "Description One", "thumbnail1.jpg");
-        Theme theme2 = Theme.restore("theme-id-2", "Theme Two", "Description Two", "thumbnail2.jpg");
+        Theme theme1 = Theme.restore("theme-id-1", "Theme One", "Description One", "thumbnail1.jpg", 1000L);
+        Theme theme2 = Theme.restore("theme-id-2", "Theme Two", "Description Two", "thumbnail2.jpg", 2000L);
         List<Reservation> reservationData = Arrays.asList(
                 Reservation.restore("reservation-id-1", member1, dateFrom, time1, theme1),
                 Reservation.restore("reservation-id-2", member2, dateFrom.plusDays(1), time2, theme2));
@@ -210,45 +207,5 @@ class ReservationServiceTest {
         // then
         assertThat(result).isEqualTo(expectedReservations);
         verify(reservationRepository).findAllReservationWithFilter(themeId, userId, dateFrom, dateTo);
-    }
-
-    @Test
-    void 예약을_생성하고_결제승인_요청을_보낸다() {
-        // given
-        LocalDate date = LocalDate.now().plusDays(1);
-        String timeIdValue = "time-id";
-        String themeIdValue = "theme-id";
-        String userIdValue = "user-id";
-        Id timeId = Id.create(timeIdValue);
-        Id themeId = Id.create(themeIdValue);
-        Id userId = Id.create(userIdValue);
-
-        Member member = Member.restore(userIdValue, "USER", "Test User", "test@example.com", "password");
-        TimeSlot timeSlot = TimeSlot.restore(timeIdValue, LocalTime.of(10, 0));
-        Theme theme = Theme.restore(themeIdValue, "Test Theme", "Description", "thumbnail.jpg");
-        LoginInfo loginInfo = new LoginInfo(userIdValue, member.getRole());
-        ReservationRequest request = new ReservationRequest(date, timeIdValue, themeIdValue, "paymentKey",
-                "orderId", 1000L, "paymentType");
-
-        when(memberRepository.findById(userId)).thenReturn(Optional.of(member));
-        when(reservationTimeRepository.findById(timeId)).thenReturn(Optional.of(timeSlot));
-        when(themeRepository.findById(themeId)).thenReturn(Optional.of(theme));
-        when(reservationRepository.existsByDate_ValueAndTimeSlot_StartAtAndThemeId(eq(date),
-                eq(LocalTime.of(10, 0)), eq(theme.getId())))
-                .thenReturn(false);
-        when(reservationRepository.save(any(Reservation.class)))
-                .thenReturn(Reservation.restore("id", member, date, timeSlot, theme));
-        // when
-        ReservationResponse result = sut.addAndGet(loginInfo, request);
-
-        // then
-        assertThat(result.id()).isEqualTo("id");
-        assertThat(result.date()).isEqualTo(date);
-        verify(memberRepository).findById(userId);
-        verify(reservationTimeRepository).findById(timeId);
-        verify(themeRepository).findById(themeId);
-        verify(reservationRepository).existsByDate_ValueAndTimeSlot_StartAtAndThemeId(eq(date),
-                any(LocalTime.class), eq(theme.getId()));
-        verify(reservationRepository).save(any(Reservation.class));
     }
 }

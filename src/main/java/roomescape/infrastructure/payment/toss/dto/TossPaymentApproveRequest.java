@@ -1,5 +1,6 @@
 package roomescape.infrastructure.payment.toss.dto;
 
+import java.util.Objects;
 import roomescape.infrastructure.payment.dto.PaymentApproveRequest;
 
 public class TossPaymentApproveRequest implements PaymentApproveRequest {
@@ -24,5 +25,20 @@ public class TossPaymentApproveRequest implements PaymentApproveRequest {
 
     public Long getAmount() {
         return amount;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        TossPaymentApproveRequest that = (TossPaymentApproveRequest) o;
+        return Objects.equals(paymentKey, that.paymentKey) && Objects.equals(orderId, that.orderId)
+                && Objects.equals(amount, that.amount);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(paymentKey, orderId, amount);
     }
 }

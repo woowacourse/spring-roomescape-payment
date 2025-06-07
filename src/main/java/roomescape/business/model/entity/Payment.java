@@ -24,8 +24,6 @@ public class Payment {
     @EmbeddedId
     private final Id id;
 
-    private String orderId;
-
     @Setter
     private String paymentKey;
 
@@ -42,20 +40,21 @@ public class Payment {
         id = Id.issue();
     }
 
-    public static Payment create(String orderId, Long amount) {
-        return new Payment(Id.issue(), orderId, null, amount, PaymentStatus.IN_PROGRESS, null);
+    public static Payment create(Reservation reservation) {
+        Long amount = reservation.getTheme().getPrice();
+        return new Payment(Id.issue(), null, amount, PaymentStatus.IN_PROGRESS, reservation);
     }
 
-    public static Payment restore(String id, String orderId, String paymentKey, Long amount, PaymentStatus status,
+    public static Payment restore(String id, String paymentKey, Long amount, PaymentStatus status,
                                   Reservation reservation) {
-        return new Payment(Id.create(id), orderId, paymentKey, amount, status, reservation);
+        return new Payment(Id.create(id), paymentKey, amount, status, reservation);
     }
 
-    public void approve(String paymentKey, Long amount, Reservation reservation) {
+    public void approve(String paymentKey, Long amount) {
         validateAmount(amount);
         this.paymentKey = paymentKey;
         this.status = PaymentStatus.DONE;
-        this.reservation = reservation;
+        reservation.confirm();
     }
 
     private void validateAmount(Long amount) {

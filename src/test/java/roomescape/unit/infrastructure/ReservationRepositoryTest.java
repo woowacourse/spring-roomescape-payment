@@ -406,7 +406,7 @@ class ReservationRepositoryTest {
         testUtil.insertReservationTime(timeId, TIME);
         testUtil.insertUser(userId, "돔푸");
         testUtil.insertReservation(reservationId, DATE1, timeId, themeId, userId);
-        Theme theme = Theme.restore(themeId, "호러", "", "");
+        Theme theme = Theme.restore(themeId, "호러", "", "", 1000L);
 
         // when
         final boolean result = sut.existsByDate_ValueAndTimeSlot_StartAtAndThemeId(DATE1, TIME, theme.getId());
