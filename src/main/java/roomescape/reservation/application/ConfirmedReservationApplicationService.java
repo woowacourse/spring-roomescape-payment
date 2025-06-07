@@ -49,7 +49,7 @@ public class ConfirmedReservationApplicationService {
         ReservationSlot slot = getOrCreateReservationSlot(
                 request.reservationDate(), request.timeId(), request.themeId());
         Member member = memberDataService.getById(request.memberId());
-        slot.addReservation(member, request.reservationDateTime(), request.orderId());
+        slot.addReservation(member, request.reservationDateTime());
         ReservationSlot savedSlot = reservationSlotDataService.save(slot);
 
         return ConfirmedReservationWebResponse.of(savedSlot);

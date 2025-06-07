@@ -64,10 +64,10 @@ public class ReservationSlot {
     protected ReservationSlot() {
     }
 
-    public Reservation addReservation(final Member member, final LocalDateTime now, final String orderId) {
+    public Reservation addReservation(final Member member, final LocalDateTime now) {
         validateDateTime(date, time.getStartAt(), now);
         validateMemberNotConfirmed(member);
-        Reservation reservation = new Reservation(member, this, orderId);
+        Reservation reservation = new Reservation(member, this);
         reservations.add(reservation);
         return reservation;
     }

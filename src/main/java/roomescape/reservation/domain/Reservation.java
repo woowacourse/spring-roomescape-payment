@@ -50,13 +50,9 @@ public class Reservation {
     @JoinColumn(name = "payment_id")
     private Payment payment;
 
-    @Column(name = "order_id")
-    private String orderId;
-
-    public Reservation(final Member member, final ReservationSlot reservationSlot, final String orderId) {
+    public Reservation(final Member member, final ReservationSlot reservationSlot) {
         this.member = member;
         this.reservationSlot = reservationSlot;
-        allocateOrderId(orderId);
     }
 
     protected Reservation() {
@@ -92,14 +88,6 @@ public class Reservation {
         this.payment = payment;
     }
 
-    private void allocateOrderId(final String orderId) {
-        if (orderId == null) {
-            this.orderId = OrderIdGenerator.generateOrderId();
-            return;
-        }
-        this.orderId = orderId;
-    }
-
     @Override
     public boolean equals(final Object object) {
         if (!(object instanceof final Reservation reservation)) {
@@ -127,10 +115,6 @@ public class Reservation {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
-    }
-
-    public String getOrderId() {
-        return orderId;
     }
 
     public Payment getPayment() {
