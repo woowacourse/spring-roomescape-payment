@@ -114,7 +114,7 @@ public class ReservationService {
         PaymentInfo paymentInfo = reservation.getPaymentInfo();
         if (paymentInfo != null) {
             log.info("예약 결제 연동 해제 - paymentKey: {}", paymentInfo.getPaymentKey());
-            reservation.getPaymentInfo().disconnectReservation();
+            paymentInfo.disconnectReservation();
         }
 
         if (!Objects.equals(reservation.getMember(), member)) {
