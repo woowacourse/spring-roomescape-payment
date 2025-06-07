@@ -1,5 +1,6 @@
 package roomescape.user.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.dto.ReservationWithStateDto;
@@ -21,10 +22,14 @@ import roomescape.waiting.repository.WaitingRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserService {
 
@@ -32,13 +37,6 @@ public class UserService {
     private final ReservationRepository reservationRepository;
     private final WaitingRepository waitingRepository;
     private final PaymentRepository paymentRepository;
-
-    public UserService(UserRepository userRepository, ReservationRepository reservationRepository, WaitingRepository waitingRepository, PaymentRepository paymentRepository) {
-        this.userRepository = userRepository;
-        this.reservationRepository = reservationRepository;
-        this.waitingRepository = waitingRepository;
-        this.paymentRepository = paymentRepository;
-    }
 
     public List<UserResponseDto> findAll() {
         List<User> users = userRepository.findAll();
@@ -56,8 +54,25 @@ public class UserService {
     public List<ReservationWithStateDto> findAllReservationByMember(User member) {
         validateExistsById(member.getId());
 
+        List<ReservationWithStateDto> reservationDtos = findReservationWithPaymentByMember(member);
+        List<ReservationWithStateDto> waitingDtos = findWaitingsWithRankByMember(member);
+
+        reservationDtos.addAll(waitingDtos);
+        return reservationDtos;
+    }
+
+    private List<ReservationWithStateDto> findWaitingsWithRankByMember(User member) {
+        List<Waiting> waitings = waitingRepository.findByMember(member);
+        List<WaitingWithRank> waitingWithRanks = waitingRepository.findWaitingsWithRankByMemberId(
+                member.getId());
+
+        return convertReservationWithStateDto(waitings, waitingWithRanks);
+    }
+
+    private List<ReservationWithStateDto> findReservationWithPaymentByMember(User member) {
         List<Reservation> reservations = reservationRepository.findByUser(member);
-        ArrayList<ReservationWithStateDto> reservationsWithPayment = reservations.stream()
+
+        return reservations.stream()
                 .map(reservation -> {
                     Optional<Payment> paymentOptional = paymentRepository.findByReservation(reservation);
                     PaymentResponseDto paymentDto = paymentOptional.map(PaymentResponseDto::of).orElse(null);
@@ -65,27 +80,18 @@ public class UserService {
                     return ReservationWithStateDto.of(reservation, paymentDto);
                 })
                 .collect(Collectors.toCollection(ArrayList::new));
-
-        List<Waiting> waitings = waitingRepository.findByMember(member);
-        List<WaitingWithRank> waitingWithRanks = waitingRepository.findWaitingsWithRankByMemberId(
-                member.getId());
-        List<ReservationWithStateDto> dtos2 = convertReservationWithStateDto(waitings, waitingWithRanks);
-
-        reservationsWithPayment.addAll(dtos2);
-        return reservationsWithPayment;
     }
 
     private static List<ReservationWithStateDto> convertReservationWithStateDto(List<Waiting> waitings,
                                                                                 List<WaitingWithRank> waitingWithRanks) {
-        List<ReservationWithStateDto> dtos = new ArrayList<>();
-        for (Waiting waiting : waitings) {
-            WaitingWithRank waitingWithRank = waitingWithRanks.stream()
-                    .filter(o -> o.waiting().equals(waiting))
-                    .findAny()
-                    .get();
-            dtos.add(ReservationWithStateDto.of(waitingWithRank));
-        }
-        return dtos;
+        Map<Waiting, WaitingWithRank> rankMap = waitingWithRanks.stream()
+                .collect(Collectors.toMap(WaitingWithRank::waiting, Function.identity()));
+
+        return waitings.stream()
+                .map(rankMap::get)
+                .filter(Objects::nonNull)
+                .map(ReservationWithStateDto::of)
+                .collect(Collectors.toList());
     }
 
     @Transactional
