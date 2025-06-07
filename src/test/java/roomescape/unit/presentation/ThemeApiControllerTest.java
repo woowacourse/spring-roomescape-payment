@@ -1,6 +1,7 @@
 package roomescape.unit.presentation;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -37,6 +38,7 @@ import roomescape.business.model.entity.Member;
 import roomescape.business.model.vo.UserRole;
 import roomescape.business.service.MemberService;
 import roomescape.business.service.ThemeService;
+import roomescape.exception.reservation.ThemeNotFoundException;
 import roomescape.presentation.api.ThemeApiController;
 import roomescape.presentation.dto.request.ThemeCreateRequest;
 import roomescape.presentation.dto.response.ThemeResponse;
@@ -167,6 +169,28 @@ class ThemeApiControllerTest {
                 .cookie(new Cookie("authToken", token.value())));
         // then
         result.andExpect(status().isNoContent())
-                .andDo(document("delete-theme"));
+                .andDo(document("theme/delete-theme/success"));
+    }
+
+    @Test
+    void 존재하지_않는_테마를_삭제할_경우_400_에러가_발생한다() throws Exception {
+        // given
+        AuthToken token = jwtUtil.createToken(
+                Member.restore("name", UserRole.ADMIN.name(), "admin", "email1@domain.com", "password1"));
+        doThrow(new ThemeNotFoundException()).when(themeService).delete("1");
+
+        // when
+        ResultActions result = mockMvc.perform(delete("/themes/1")
+                .cookie(new Cookie("authToken", token.value())));
+        // then
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("존재하지 않는 테마입니다."))
+                .andDo(document("theme/delete-theme/error/theme-not-found-exception",
+                        responseFields(
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("에러 메시지"),
+                                fieldWithPath("status").type(JsonFieldType.NUMBER).description("HTTP 상태 코드")
+                        )
+                ));
     }
 }
