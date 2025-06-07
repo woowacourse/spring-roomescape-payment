@@ -15,6 +15,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     private final AuthenticationPrincipalArgumentResolver authPrincipalResolver;
     private final AuthCheckInterceptor authCheckInterceptor;
+    private final LoggingInterceptor loggingInterceptor;
 
     @Override
     public void addArgumentResolvers(final List<HandlerMethodArgumentResolver> resolvers) {
@@ -23,6 +24,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(final InterceptorRegistry registry) {
+        registry.addInterceptor(loggingInterceptor)
+                .excludePathPatterns("/css/**", "/image/**", "/js/**");
         registry.addInterceptor(authCheckInterceptor)
                 .addPathPatterns("/admin/**");
     }
