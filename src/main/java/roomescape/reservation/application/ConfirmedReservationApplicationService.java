@@ -52,8 +52,7 @@ public class ConfirmedReservationApplicationService {
         reservationSlotDataService.validateReservationSlotNotExists(request.date(), request.timeId(),
                 request.themeId());
 
-        ReservationSlot slot = createReservationSlot(
-                new ReservationCreateWebRequest(request.date(), request.timeId(), request.themeId()));
+        ReservationSlot slot = createReservationSlot(new ReservationCreateWebRequest(request.date(), request.timeId(), request.themeId()));
         Member member = memberDataService.getById(request.memberId());
         slot.addReservation(member, request.now());
         ReservationSlot savedSlot = reservationSlotDataService.save(slot);
@@ -102,6 +101,7 @@ public class ConfirmedReservationApplicationService {
                 null, null, reservationSlot.findRank(reservation));
     }
 
+    @Transactional
     public void cancel(final Long reservationId) {
         Reservation reservation = reservationDataService.getById(reservationId);
         reservationDataService.deleteById(reservationId);

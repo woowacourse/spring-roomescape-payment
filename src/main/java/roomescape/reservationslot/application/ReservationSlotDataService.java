@@ -25,8 +25,7 @@ public class ReservationSlotDataService {
                 .orElseThrow(() -> new ReservationSlotNotFoundException("해당 시간의 예약 슬롯이 존재하지 않습니다."));
     }
 
-    public ReservationSlot getReservationSlotByDateAndTimeAndTheme(final LocalDate date, final Long timeId,
-                                                                   final Long themeId) {
+    public ReservationSlot getReservationSlotByDateAndTimeAndTheme(final LocalDate date, final Long timeId, final Long themeId) {
         return reservationSlotRepository.findByDateAndTimeIdAndThemeId(date, timeId, themeId)
                 .orElseThrow(() -> new ReservationSlotNotFoundException("해당 시간의 예약 슬롯이 존재하지 않습니다."));
     }

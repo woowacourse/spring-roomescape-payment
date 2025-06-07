@@ -36,8 +36,7 @@ public class WaitingReservationApplicationService {
     }
 
     public ReservationResponse create(final WaitingReservationCreateRequest createRequest) {
-        ReservationSlot slot = reservationSlotDataService.getReservationSlotByDateAndTimeAndTheme(createRequest.date(),
-                createRequest.timeId(), createRequest.themeId());
+        ReservationSlot slot = reservationSlotDataService.getReservationSlotByDateAndTimeAndTheme(createRequest.date(), createRequest.timeId(), createRequest.themeId());
         Member member = memberDataService.getById(createRequest.memberId());
         Reservation reservation = slot.addReservation(member, LocalDateTime.now());
         reservationDataService.save(reservation);

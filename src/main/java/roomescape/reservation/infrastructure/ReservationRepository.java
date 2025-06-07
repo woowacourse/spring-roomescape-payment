@@ -49,11 +49,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             JOIN FETCH r.reservationSlot rs            
             JOIN FETCH rs.time t 
             JOIN FETCH rs.theme th      
-            WHERE r.id NOT IN (
-            SELECT MIN(r2.id)
-                FROM Reservation r2
-                GROUP BY r2.reservationSlot.id
-            )             
+            WHERE r.status != 'CONFIRMED'
             ORDER BY rs.id, r.createdAt asc 
             """)
     List<Reservation> findAllWaitingReservations();
