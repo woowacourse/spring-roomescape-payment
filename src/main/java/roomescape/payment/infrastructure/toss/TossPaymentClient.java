@@ -1,4 +1,4 @@
-package roomescape.payment.infrastructure;
+package roomescape.payment.infrastructure.toss;
 
 import static org.springframework.http.HttpStatus.GATEWAY_TIMEOUT;
 import static org.springframework.http.HttpStatus.UNSUPPORTED_MEDIA_TYPE;
@@ -9,8 +9,8 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.UnknownContentTypeException;
 import roomescape.exception.payment.PaymentException;
-import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentClient;
 
 public class TossPaymentClient implements PaymentClient {
 

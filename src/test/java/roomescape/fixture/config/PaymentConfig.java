@@ -8,7 +8,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.domain.PaymentDomainService;
-import roomescape.payment.infrastructure.TossPaymentClient;
+import roomescape.payment.infrastructure.toss.TossPaymentClient;
 
 @TestConfiguration
 public class PaymentConfig {

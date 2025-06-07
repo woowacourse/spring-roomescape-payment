@@ -1,4 +1,4 @@
-package roomescape.payment.infrastructure;
+package roomescape.payment.infrastructure.toss;
 
 import roomescape.payment.domain.Payment;
 

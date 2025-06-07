@@ -9,6 +9,7 @@ import roomescape.member.domain.MemberRepository;
 import roomescape.member.infrastructure.JpaMemberRepository;
 import roomescape.member.infrastructure.MemberRepositoryImpl;
 import roomescape.payment.domain.PaymentDomainService;
+import roomescape.payment.domain.PaymentRepository;
 import roomescape.reservation.application.AdminReservationService;
 import roomescape.reservation.application.AdminWaitingService;
 import roomescape.reservation.application.ReservationService;
@@ -135,6 +136,7 @@ public class TestConfig {
             final ThemeRepository themeRepository,
             final MemberRepository memberRepository,
             final ReservationRepository reservationRepository,
+            final PaymentRepository paymentRepository,
             final PaymentDomainService paymentDomainService
     ) {
         return new ReservationService(
@@ -142,6 +144,7 @@ public class TestConfig {
                 themeRepository,
                 memberRepository,
                 reservationRepository,
+                paymentRepository,
                 paymentDomainService
         );
     }

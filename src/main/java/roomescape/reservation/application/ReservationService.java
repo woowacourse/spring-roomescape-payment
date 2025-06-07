@@ -14,8 +14,9 @@ import roomescape.exception.auth.AuthorizationException;
 import roomescape.exception.resource.AlreadyExistException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
-import roomescape.payment.domain.PaymentDomainService;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentDomainService;
+import roomescape.payment.domain.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationSlot;
 import roomescape.reservation.domain.ReservationTime;
@@ -36,6 +37,7 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final ReservationRepository reservationRepository;
+    private final PaymentRepository paymentRepository;
     private final PaymentDomainService paymentDomainService;
 
     @Transactional
@@ -47,14 +49,13 @@ public class ReservationService {
         final Theme theme = themeRepository.getById(request.themeId());
         final Member member = memberRepository.getById(memberId);
         final Reservation reservation = createReservedReservation(request.date(), time, theme, member);
-
-        paymentDomainService.approvePayment(
-                Payment.of(
-                        request.paymentKey(),
-                        request.orderId(),
-                        request.amount()
-                )
+        final Payment payment = Payment.of(
+                request.paymentKey(),
+                request.orderId(),
+                request.amount()
         );
+        paymentDomainService.approvePayment(payment);
+        paymentRepository.save(payment);
 
         return ReservationResponse.from(reservation);
     }

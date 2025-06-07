@@ -8,8 +8,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.domain.PaymentClient;
-import roomescape.payment.infrastructure.TossPaymentClient;
-import roomescape.payment.infrastructure.TossPaymentResponseErrorHandler;
+import roomescape.payment.infrastructure.toss.TossPaymentClient;
+import roomescape.payment.infrastructure.toss.TossPaymentResponseErrorHandler;
 
 @Configuration
 public class RestClientConfig {
