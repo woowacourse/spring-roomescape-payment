@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<ErrorResponse> handleNoSuchElementException(NoSuchElementException e) {
         String message = e.getMessage();
-        log.info(message);
+        log.warn(message);
         ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.NOT_FOUND, message);
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
@@ -66,6 +66,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PastReservationException.class)
     public ResponseEntity<ErrorResponse> handlePastReservationException(PastReservationException e) {
         String message = e.getMessage();
+        log.warn(message);
         ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST, message);
         return ResponseEntity.badRequest().body(errorResponse);
     }
