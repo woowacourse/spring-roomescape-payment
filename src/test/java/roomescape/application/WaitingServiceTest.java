@@ -286,7 +286,7 @@ class WaitingServiceTest extends BaseTest {
         Reservation newReservation = reservationDbFixture.예약_생성(firstWaitingMember, ReservationDateFixture.예약날짜_25_4_23, reservationTime, theme);
         ReservationInfo newReservationInfo = ReservationInfo.create(newReservation);
 
-        waitingService.updateWaitings(reservationInfo, newReservationInfo);
+        waitingService.updateWaitingsRankAndReservationInfo(reservationInfo, newReservationInfo);
 
         assertThat(waiting.getRank()).isEqualTo(1L);
     }

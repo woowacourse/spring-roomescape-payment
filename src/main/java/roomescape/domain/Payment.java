@@ -52,4 +52,15 @@ public class Payment {
     public int hashCode() {
         return Objects.hashCode(id);
     }
+
+    @Override
+    public String toString() {
+        return "Payment{" +
+                "id=" + id +
+                ", paymentKey='" + paymentKey + '\'' +
+                ", orderId='" + orderId + '\'' +
+                ", amount=" + amount +
+                ", reservation=" + reservation +
+                '}';
+    }
 }

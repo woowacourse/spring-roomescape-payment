@@ -69,7 +69,7 @@ public class AdminReservationController {
 
     @DeleteMapping("/waitings/{id}")
     public ResponseEntity<Void> deleteWaiting(@PathVariable Long id) {
-        waitingService.deleteWaitingById(id);
+        waitingService.deleteWaitingByIdAndUpdateWaitingsRank(id);
 
         return ResponseEntity.noContent().build();
     }

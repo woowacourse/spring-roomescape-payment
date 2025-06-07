@@ -2,6 +2,7 @@ package roomescape.application;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.aop.ServiceLogging;
 import roomescape.domain.Payment;
 import roomescape.presentation.dto.request.PaymentProcessRequest;
 import roomescape.domain.Member;
@@ -61,6 +62,7 @@ public class ReservationService {
         return ReservationResponse.from(reservations);
     }
 
+    @ServiceLogging
     @Transactional
     public ReservationResponse createMemberReservation(ReservationWithPaymentRequest request,
                                                        PaymentProcessRequest paymentProcessRequest,
@@ -74,6 +76,7 @@ public class ReservationService {
         return ReservationResponse.from(created);
     }
 
+    @ServiceLogging
     @Transactional
     public ReservationResponse createAdminReservation(AdminReservationCreateRequest request) {
         Member member = memberService.findMemberById(request.memberId());
@@ -82,6 +85,7 @@ public class ReservationService {
         return ReservationResponse.from(created);
     }
 
+    @ServiceLogging
     private Reservation createReservation(LocalDate date, Long timeId, Long themeId, Member member) {
         ReservationDate reservationDate = new ReservationDate(date);
         ReservationTime reservationTime = reservationTimeService.findReservationTimeById(timeId);
@@ -100,6 +104,7 @@ public class ReservationService {
         }
     }
 
+    @ServiceLogging
     @Transactional
     public void cancelReservationById(Long id) {
         Reservation reservation = findReservationById(id);
@@ -110,6 +115,7 @@ public class ReservationService {
         }
     }
 
+    @ServiceLogging
     private void processWaitingToReservation(ReservationInfo reservationInfo) {
         Waiting firstRankWaiting = waitingService.findFirstRankWaitingByReservationInfo(reservationInfo);
 
@@ -121,7 +127,7 @@ public class ReservationService {
         ReservationInfo newReservationInfo = ReservationInfo.create(newReservation);
 
         waitingService.deleteWaitingById(firstRankWaiting.getId());
-        waitingService.updateWaitings(reservationInfo, newReservationInfo);
+        waitingService.updateWaitingsRankAndReservationInfo(reservationInfo, newReservationInfo);
     }
 
     private Reservation findReservationById(Long id) {

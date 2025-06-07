@@ -1,6 +1,7 @@
 package roomescape.application;
 
 import org.springframework.stereotype.Service;
+import roomescape.aop.ServiceLogging;
 import roomescape.domain.Member;
 import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
@@ -25,6 +26,7 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
+    @ServiceLogging
     public Payment processPayment(PaymentProcessRequest request, Reservation reservation) {
         PaymentConfirmResponse response = paymentRestClient.getPaymentResponse(request);
         String paymentKey = response.paymentKey();
