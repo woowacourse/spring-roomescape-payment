@@ -36,6 +36,7 @@ import roomescape.auth.jwt.JJWTJwtUtil;
 import roomescape.business.model.entity.Member;
 import roomescape.business.service.AuthService;
 import roomescape.business.service.MemberService;
+import roomescape.exception.auth.EmailNotRegisteredException;
 import roomescape.presentation.api.AuthApiController;
 import roomescape.presentation.dto.request.LoginRequest;
 import roomescape.presentation.dto.response.MemberResponse;
@@ -87,6 +88,27 @@ class AuthApiControllerTest {
                         requestFields(
                                 fieldWithPath("email").type(JsonFieldType.STRING).description("이메일"),
                                 fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
+                        )
+                ));
+    }
+
+    @Test
+    void 로그인에_실패한다() throws Exception {
+        // given
+        LoginRequest request = new LoginRequest("email1@domain.com", "password1");
+        AuthToken response = new AuthToken("accessToken");
+        given(authService.authenticate(request)).willThrow(new EmailNotRegisteredException());
+        // when
+        ResultActions result = mockMvc.perform(post("/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)));
+        // then
+        result.andExpect(status().isBadRequest())
+                .andDo(document("auth/login/error",
+                        responseFields(
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("에러 메시지"),
+                                fieldWithPath("status").type(JsonFieldType.NUMBER).description("HTTP 상태 코드")
                         )
                 ));
     }
