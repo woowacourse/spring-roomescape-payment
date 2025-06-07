@@ -27,6 +27,19 @@ VALUES ('검프', 'email4@naver.com', '1234', 'USER');
 INSERT INTO member (name, email, password, role)
 VALUES ('어드민', 'admin@naver.com', '1234', 'ADMIN');
 
+-- reservation 테이블 초기 데이터
+INSERT INTO reservation (date, time_id, theme_id, member_id, status)
+VALUES ('2025-06-01', 1, 2, 1, 'CONFIRMED'),
+       ('2025-06-01', 2, 1, 2, 'CONFIRMED'),
+       ('2025-06-02', 3, 3, 3, 'CANCELED'),
+       ('2025-06-02', 1, 3, 4, 'CONFIRMED');
+
+INSERT INTO payment (order_id, payment_key, amount, reservation_id)
+VALUES ('abcde1234', 'abcde1234', 1000, 1),
+       ('abcde1235', 'abcde1235', 1000, 2),
+       ('abcde1236', 'abcde1236', 1000, 3),
+       ('abcde1237', 'abcde1237', 1000, 4);
+
 INSERT INTO reservation_waiting (date, time_id, theme_id, member_id, created_at, status)
 VALUES ('2025-06-01', 1, 2, 4, CURRENT_TIMESTAMP, 'PENDING'),
        ('2025-06-01', 1, 2, 3, DATEADD('HOUR', 1, CURRENT_TIMESTAMP), 'PENDING'),
