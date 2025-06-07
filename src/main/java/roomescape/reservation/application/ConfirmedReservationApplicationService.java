@@ -83,7 +83,7 @@ public class ConfirmedReservationApplicationService {
         List<Reservation> reservations = reservationDataService.findMemberReservations(memberId);
         return reservations.stream()
                 .map(reservation -> {
-                    Payment payment = paymentApplicationService.findReservationPayment(reservation.getId());
+                    Payment payment = paymentApplicationService.findPaymentOfReservation(reservation.getId());
                     ReservationSlot reservationSlot = reservation.getReservationSlot();
                     return new MyReservationResponse(reservationSlot.getId(), reservationSlot.getTheme().getName(),
                             reservationSlot.getDate().toString(), reservationSlot.getTime().getStartAt().toString(), reservation.getStatus(),

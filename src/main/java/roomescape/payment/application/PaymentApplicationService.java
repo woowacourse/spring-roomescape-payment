@@ -27,7 +27,7 @@ public class PaymentApplicationService {
         return paymentDataService.save(payment);
     }
 
-    public Payment findReservationPayment(Long reservationId) {
+    public Payment findPaymentOfReservation(Long reservationId) {
         return paymentDataService.findByProductTypeAndProductId(ProductType.RESERVATION, reservationId);
     }
 }
