@@ -1,5 +1,6 @@
 package roomescape.reservation.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -33,7 +34,7 @@ public class Payment {
     @Column(nullable = false)
     private String paymentType;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     private Reservation reservation;
 
     public Payment(String paymentKey, String orderId, Long amount, String paymentType, Reservation reservation) {
