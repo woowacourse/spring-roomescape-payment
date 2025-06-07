@@ -64,6 +64,7 @@ public class Reservation {
         this.reservationTime = reservationTime;
         this.theme = theme;
         this.status = status;
+        this.createAt = LocalDateTime.now();
     }
 
     public Reservation(LocalDate date,

@@ -1,6 +1,7 @@
 package roomescape.unit.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -169,6 +170,7 @@ class ReservationServiceTest {
 
         Reservation reservation2 = new Reservation(2L, new Member(2L, "test2", "test2@email.com", "1234", Role.USER),
                 LocalDate.now(), time, theme, ReservationStatus.RESERVED);
+
 
         AddReservationRequest request = new AddReservationRequest(date, time.getId(), theme.getId());
 
