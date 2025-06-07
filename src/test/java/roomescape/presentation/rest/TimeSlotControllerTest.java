@@ -19,15 +19,19 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import roomescape.application.TimeSlotService;
+import roomescape.domain.auth.AuthenticationInfo;
+import roomescape.domain.user.UserRole;
 import roomescape.exception.InUseException;
 import roomescape.exception.NotFoundException;
 import roomescape.presentation.GlobalExceptionHandler;
+import roomescape.presentation.StubAuthenticationInfoArgumentResolver;
 
 class TimeSlotControllerTest {
 
     private final TimeSlotService timeSlotService = Mockito.mock(TimeSlotService.class);
     private final MockMvc mockMvc = MockMvcBuilders
         .standaloneSetup(new TimeSlotController(timeSlotService))
+        .setCustomArgumentResolvers(new StubAuthenticationInfoArgumentResolver(new AuthenticationInfo(99L, UserRole.ADMIN)))
         .setControllerAdvice(new GlobalExceptionHandler())
         .build();
 
