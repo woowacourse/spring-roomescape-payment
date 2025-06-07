@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import roomescape.domain.reservation.Waiting;
 import roomescape.domain.reservation.WaitingWithRank;
 
@@ -29,10 +28,7 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
     @EntityGraph(attributePaths = {"member", "theme", "time"})
     List<Waiting> findAllWithMemberAndThemeAndTime();
 
-    boolean existsByDateAndTimeIdAndThemeIdAndMemberId(@Param("date") LocalDate date,
-                                                       @Param("timeId") Long timeId,
-                                                       @Param("themeId") Long themeId,
-                                                       @Param("memberId") Long memberId);
+    boolean existsByDateAndTimeIdAndThemeIdAndMemberId(LocalDate date, Long timeId, Long themeId, Long memberId);
 
     @Query("""
             SELECT w
@@ -42,7 +38,5 @@ public interface WaitingRepository extends JpaRepository<Waiting, Long> {
               AND w.theme.id = :themeId
             ORDER BY w.createdAt ASC
             """)
-    List<Waiting> findAllByDateAndTimeIdAndThemeIdOrderByCreatedAtAsc(@Param("date") LocalDate date,
-                                                                      @Param("timeId") Long timeId,
-                                                                      @Param("themeId") Long themeId);
+    List<Waiting> findAllByDateAndTimeIdAndThemeIdOrderByCreatedAtAsc(LocalDate date, Long timeId, Long themeId);
 }

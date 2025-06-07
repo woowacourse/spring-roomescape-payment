@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import roomescape.domain.reservation.Theme;
 
 public interface ThemeRepository extends JpaRepository<Theme, Long> {
@@ -18,9 +17,7 @@ public interface ThemeRepository extends JpaRepository<Theme, Long> {
             GROUP BY t.id
             ORDER BY COUNT(r.id) DESC, t.id ASC
             """)
-    List<Theme> findRankBetweenDate(@Param("startDate") LocalDate startDate,
-                                    @Param("endDate") LocalDate endDate,
-                                    Pageable pageable);
+    List<Theme> findRankBetweenDate(LocalDate startDate, LocalDate endDate, Pageable pageable);
 
     boolean existsByName(String name);
 }

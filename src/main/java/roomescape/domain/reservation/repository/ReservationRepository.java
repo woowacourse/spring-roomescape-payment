@@ -17,7 +17,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             WHERE r.id = :reservationId
               AND r.status != 'CANCEL'
             """)
-    Optional<Reservation> findByIdExcludingCanceled(@Param("reservationId") Long reservationId);
+    Optional<Reservation> findByIdExcludingCanceled(Long reservationId);
 
     @Query("""
             SELECT EXISTS (
@@ -37,9 +37,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                   AND r.status != 'CANCEL'
             )
             """)
-    boolean existsByDateAndTimeIdAndThemeId(@Param("date") LocalDate reservationDate,
-                                            @Param("timeId") Long timeId,
-                                            @Param("themeId") Long themeId);
+    boolean existsByDateAndTimeIdAndThemeId(LocalDate date, Long timeId, Long themeId);
 
     @Query("""
             SELECT r
@@ -48,7 +46,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
               AND r.status != 'CANCEL'
             """)
     @EntityGraph(attributePaths = {"time", "theme"})
-    Optional<Reservation> findByIdWithTimeAndTheme(@Param("id") Long id);
+    Optional<Reservation> findByIdWithTimeAndTheme(Long id);
 
     @Query("""
             SELECT EXISTS (
@@ -57,7 +55,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                   AND r.status != 'CANCEL'
             )
             """)
-    boolean existsByThemeId(@Param("themeId") Long themeId);
+    boolean existsByThemeId(Long themeId);
 
     @Query("""
             SELECT r
@@ -66,7 +64,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
               AND r.date = :date
               AND r.status != 'CANCEL'
             """)
-    List<Reservation> findByThemeIdAndDate(@Param("themeId") Long themeId, @Param("date") LocalDate reservationDate);
+    List<Reservation> findByThemeIdAndDate(Long themeId, LocalDate date);
 
     @Query("""
             SELECT r
@@ -77,10 +75,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
               AND (:from IS NULL OR r.date >= :from)
               AND (:to IS NULL OR r.date <= :to)
             """)
-    List<Reservation> findByThemeIdAndMemberIdAndDateBetween(@Param("themeId") Long themeId,
-                                                             @Param("memberId") Long memberId,
-                                                             @Param("from") LocalDate from,
-                                                             @Param("to") LocalDate to);
+    List<Reservation> findByThemeIdAndMemberIdAndDateBetween(Long themeId, Long memberId, LocalDate from, LocalDate to);
 
     @Query("""
             SELECT r
@@ -89,7 +84,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
               AND r.status != 'CANCEL'
             """)
     @EntityGraph(attributePaths = {"time", "theme"})
-    List<Reservation> findAllByMemberId(@Param("memberId") Long memberId);
+    List<Reservation> findAllByMemberId(Long memberId);
 
     @Query("""
             SELECT r
@@ -109,8 +104,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                   AND r.status != 'CANCEL'
             )
             """)
-    boolean existsByDateAndTimeIdAndThemeIdAndMemberId(@Param("date") LocalDate date,
-                                                       @Param("timeId") Long timeId,
-                                                       @Param("themeId") Long themeId,
-                                                       @Param("memberId") Long memberId);
+    boolean existsByDateAndTimeIdAndThemeIdAndMemberId(LocalDate date, Long timeId, Long themeId, Long memberId);
 }
