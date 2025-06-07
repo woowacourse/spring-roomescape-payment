@@ -28,9 +28,11 @@ public class TossPayment {
     @Column(nullable = false)
     private Long amount;
 
+    @Column(nullable = false)
     Long targetId;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private PaymentTargetType paymentTargetType;
 
     public TossPayment(String paymentKey, String orderId, Long amount, Long targetId,
