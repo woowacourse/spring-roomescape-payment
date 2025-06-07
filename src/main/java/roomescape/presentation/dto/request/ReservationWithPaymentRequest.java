@@ -1,7 +1,6 @@
 package roomescape.presentation.dto.request;
 
 import jakarta.validation.constraints.NotNull;
-
 import java.time.LocalDate;
 
 public record ReservationWithPaymentRequest(
@@ -23,8 +22,7 @@ public record ReservationWithPaymentRequest(
         @NotNull(message = "결제 금액은 필수입니다.")
         String amount
 ) {
-
-        public PaymentProcessRequest toPaymentProcessRequest() {
-                return new PaymentProcessRequest(paymentKey, orderId, amount);
-        }
+    public PaymentProcessRequest toPaymentProcessRequest() {
+        return new PaymentProcessRequest(paymentKey, orderId, amount);
+    }
 }

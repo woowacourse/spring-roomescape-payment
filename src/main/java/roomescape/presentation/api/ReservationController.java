@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.application.ReservationPayService;
 import roomescape.application.ReservationService;
 import roomescape.application.WaitingService;
 import roomescape.presentation.AuthenticationPrincipal;
 import roomescape.presentation.dto.request.LoginMember;
-import roomescape.presentation.dto.request.PaymentProcessRequest;
 import roomescape.presentation.dto.request.ReservationCreateRequest;
 import roomescape.presentation.dto.request.ReservationWithPaymentRequest;
-import roomescape.presentation.dto.response.ReservationResponse;
+import roomescape.presentation.dto.response.InvoiceResponse;
 import roomescape.presentation.dto.response.WaitingResponse;
 
 import java.util.List;
@@ -27,22 +27,25 @@ import java.util.List;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final ReservationPayService reservationPayService;
     private final WaitingService waitingService;
 
-    public ReservationController(ReservationService reservationService,
-                                 WaitingService waitingService
+    public ReservationController(
+            ReservationService reservationService,
+            ReservationPayService reservationPayService,
+            WaitingService waitingService
     ) {
         this.reservationService = reservationService;
+        this.reservationPayService = reservationPayService;
         this.waitingService = waitingService;
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponse> createReservation(
+    public ResponseEntity<InvoiceResponse> createReservation(
             @RequestBody @Valid ReservationWithPaymentRequest request,
             @AuthenticationPrincipal LoginMember loginMember
     ) {
-        PaymentProcessRequest paymentRequest = request.toPaymentProcessRequest();
-        ReservationResponse response = reservationService.createMemberReservation(request, paymentRequest, loginMember);
+        InvoiceResponse response = reservationPayService.createReservationWithPayment(request, loginMember);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

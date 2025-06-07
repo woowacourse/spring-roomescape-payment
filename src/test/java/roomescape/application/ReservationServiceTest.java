@@ -22,21 +22,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
-import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationInfo;
 import roomescape.domain.ReservationStatus;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Role;
 import roomescape.domain.Theme;
-import roomescape.domain.Waiting;
 import roomescape.infrastructure.repository.ReservationRepository;
 import roomescape.presentation.dto.request.AdminReservationCreateRequest;
 import roomescape.presentation.dto.request.LoginMember;
-import roomescape.presentation.dto.request.PaymentProcessRequest;
 import roomescape.presentation.dto.request.ReservationWithPaymentRequest;
 import roomescape.presentation.dto.response.MemberResponse;
-import roomescape.presentation.dto.response.MyReservationResponse;
 import roomescape.presentation.dto.response.ReservationResponse;
 import roomescape.presentation.dto.response.ReservationTimeResponse;
 import roomescape.presentation.dto.response.ThemeResponse;
@@ -109,10 +105,7 @@ class ReservationServiceTest {
                 "10000");
         LoginMember loginMember = new LoginMember(member.getId(), member.getName(), Role.USER, member.getEmail());
 
-        when(memberService.findMemberByEmail(loginMember.email())).thenReturn(member);
-        PaymentProcessRequest paymentRequest = request.toPaymentProcessRequest();
-        Payment payment = Payment.create("paymentKey", "orderId", 1000);
-        when(paymentService.process(paymentRequest)).thenReturn(payment);
+        when(memberService.findMemberById(loginMember.id())).thenReturn(member);
         when(reservationTimeService.findReservationTimeById(request.timeId())).thenReturn(time);
         when(currentTimeService.now()).thenReturn(LocalDateTime.of(2025, 4, 20, 10, 0));
         when(themeService.findThemeById(request.themeId())).thenReturn(theme);
@@ -120,7 +113,7 @@ class ReservationServiceTest {
                 ReservationStatus.RESERVED)).thenReturn(false);
         when(reservationRepository.save(any(Reservation.class))).thenReturn(reservation);
 
-        ReservationResponse response = reservationService.createMemberReservation(request, paymentRequest, loginMember);
+        ReservationResponse response = reservationService.createMemberReservation(request, loginMember);
 
         assertAll(
                 () -> assertThat(response.date()).isEqualTo(date),
@@ -178,15 +171,14 @@ class ReservationServiceTest {
                 "10000");
         LoginMember loginMember = new LoginMember(member.getId(), member.getName(), Role.USER, member.getEmail());
 
-        when(memberService.findMemberByEmail(loginMember.email())).thenReturn(member);
+        when(memberService.findMemberById(loginMember.id())).thenReturn(member);
         when(reservationTimeService.findReservationTimeById(request.timeId())).thenReturn(time);
         when(currentTimeService.now()).thenReturn(LocalDateTime.of(2025, 4, 20, 10, 0));
         when(themeService.findThemeById(request.themeId())).thenReturn(theme);
         when(reservationRepository.existsByDateAndTimeAndThemeAndStatus(date, time, theme,
                 ReservationStatus.RESERVED)).thenReturn(true);
 
-        assertThatThrownBy(() -> reservationService.createMemberReservation(request, request.toPaymentProcessRequest(),
-                loginMember))
+        assertThatThrownBy(() -> reservationService.createMemberReservation(request, loginMember))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -241,44 +233,6 @@ class ReservationServiceTest {
                 () -> assertThat(responses).hasSize(1),
                 () -> assertThat(response.id()).isEqualTo(reservation.getId()),
                 () -> assertThat(response.date()).isEqualTo(reservation.getDate())
-        );
-    }
-
-    @Test
-    void 나의_예약_기록을_조회한다() {
-        Member member = Member.create("한스", Role.USER, "test1@email.com", "pass1");
-        Member anotherMember = Member.create("듀이", Role.USER, "test2@email.com", "pass1");
-        LocalDate date = LocalDate.of(2025, 4, 21);
-        LocalDate anotherDate = LocalDate.of(2025, 4, 22);
-        ReservationTime time = ReservationTime.create(LocalTime.of(10, 0));
-        Theme theme = Theme.create("공포", "공포테마", "공포.jpg");
-        Reservation reservation = Reservation.create(member, date, time, theme);
-        Reservation anotherReservation = Reservation.create(anotherMember, anotherDate, time, theme);
-        ReservationInfo anotherReservationInfo = ReservationInfo.create(anotherReservation);
-        Waiting waiting = Waiting.create(anotherReservationInfo, member, 1);
-        LoginMember loginMember = new LoginMember(member.getId(), member.getName(), Role.USER, member.getEmail());
-
-        when(memberService.findMemberById(loginMember.id())).thenReturn(member);
-        when(reservationRepository.findAllByMember(member)).thenReturn(List.of(reservation));
-        when(waitingService.findWaitingsByMember(member)).thenReturn(List.of(waiting));
-
-        List<MyReservationResponse> responses = reservationService.getMyReservations(loginMember);
-        MyReservationResponse reservationResponse = responses.getFirst();
-        MyReservationResponse waitingResponse = responses.getLast();
-
-        assertAll(
-                () -> assertThat(responses).hasSize(2),
-                () -> assertThat(reservationResponse.id()).isEqualTo(reservation.getId()),
-                () -> assertThat(reservationResponse.date()).isEqualTo(reservation.getDate()),
-                () -> assertThat(reservationResponse.time()).isEqualTo(reservation.getTime().getStartAt()),
-                () -> assertThat(reservationResponse.theme()).isEqualTo(reservation.getTheme().getName()),
-                () -> assertThat(reservationResponse.status()).isEqualTo(reservation.getStatus().getName()),
-
-                () -> assertThat(waitingResponse.id()).isEqualTo(waiting.getId()),
-                () -> assertThat(waitingResponse.date()).isEqualTo(waiting.getReservationInfo().getDate()),
-                () -> assertThat(waitingResponse.time()).isEqualTo(waiting.getReservationInfo().getTime().getStartAt()),
-                () -> assertThat(waitingResponse.theme()).isEqualTo(waiting.getReservationInfo().getTheme().getName()),
-                () -> assertThat(waitingResponse.status()).isEqualTo("1번째 예약대기")
         );
     }
 }

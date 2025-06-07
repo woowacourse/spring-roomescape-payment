@@ -1,8 +1,10 @@
 package roomescape.application;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.presentation.dto.request.PaymentProcessRequest;
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationDate;
@@ -16,12 +18,7 @@ import roomescape.infrastructure.repository.ReservationRepository;
 import roomescape.presentation.dto.request.AdminReservationCreateRequest;
 import roomescape.presentation.dto.request.LoginMember;
 import roomescape.presentation.dto.request.ReservationWithPaymentRequest;
-import roomescape.presentation.dto.response.MyReservationResponse;
 import roomescape.presentation.dto.response.ReservationResponse;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @Transactional(readOnly = true)
@@ -33,15 +30,13 @@ public class ReservationService {
     private final MemberService memberService;
     private final CurrentTimeService currentTimeService;
     private final WaitingService waitingService;
-    private final PaymentService paymentService;
 
     public ReservationService(ReservationRepository reservationRepository,
                               ReservationTimeService reservationTimeService,
                               ThemeService themeService,
                               MemberService memberService,
                               CurrentTimeService currentTimeService,
-                              WaitingService waitingService,
-                              PaymentService paymentService
+                              WaitingService waitingService
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeService = reservationTimeService;
@@ -49,7 +44,6 @@ public class ReservationService {
         this.memberService = memberService;
         this.currentTimeService = currentTimeService;
         this.waitingService = waitingService;
-        this.paymentService = paymentService;
     }
 
     public List<ReservationResponse> getReservations() {
@@ -59,14 +53,11 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse createMemberReservation(ReservationWithPaymentRequest request,
-                                                       PaymentProcessRequest paymentProcessRequest,
-                                                       LoginMember loginMember
+    public ReservationResponse createMemberReservation(ReservationWithPaymentRequest request, LoginMember loginMember
     ) {
-        Member member = memberService.findMemberByEmail(loginMember.email());
+        Member member = memberService.findMemberById(loginMember.id());
 
         Reservation created = createReservation(request.date(), request.timeId(), request.themeId(), member);
-        paymentService.process(paymentProcessRequest);
 
         return ReservationResponse.from(created);
     }
@@ -82,17 +73,20 @@ public class ReservationService {
     private Reservation createReservation(LocalDate date, Long timeId, Long themeId, Member member) {
         ReservationDate reservationDate = new ReservationDate(date);
         ReservationTime reservationTime = reservationTimeService.findReservationTimeById(timeId);
-        ReservationDateTime reservationDateTime = ReservationDateTime.create(reservationDate, reservationTime, currentTimeService.now());
+        ReservationDateTime reservationDateTime = ReservationDateTime.create(reservationDate, reservationTime,
+                currentTimeService.now());
 
         Theme theme = themeService.findThemeById(themeId);
         validateExistsReservation(reservationDate, reservationTime, theme);
 
-        Reservation reservation = Reservation.create(member, reservationDateTime.reservationDate().getDate(), reservationDateTime.reservationTime(), theme);
+        Reservation reservation = Reservation.create(member, reservationDateTime.reservationDate().getDate(),
+                reservationDateTime.reservationTime(), theme);
         return reservationRepository.save(reservation);
     }
 
     private void validateExistsReservation(ReservationDate reservationDate, ReservationTime time, Theme theme) {
-        if (reservationRepository.existsByDateAndTimeAndThemeAndStatus(reservationDate.getDate(), time, theme, ReservationStatus.RESERVED)) {
+        if (reservationRepository.existsByDateAndTimeAndThemeAndStatus(reservationDate.getDate(), time, theme,
+                ReservationStatus.RESERVED)) {
             throw new IllegalArgumentException("[ERROR] 이미 예약이 찼습니다.");
         }
     }
@@ -121,7 +115,7 @@ public class ReservationService {
         waitingService.updateWaitings(reservationInfo, newReservationInfo);
     }
 
-    private Reservation findReservationById(Long id) {
+    public Reservation findReservationById(Long id) {
         return reservationRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 예약을 찾을 수 없습니다."));
     }
@@ -132,15 +126,9 @@ public class ReservationService {
             LocalDate dateFrom,
             LocalDate dateTo
     ) {
-        List<Reservation> reservations = reservationRepository.findAllByThemeAndMemberAndDate(themeId, memberId, dateFrom, dateTo);
+        List<Reservation> reservations = reservationRepository.findAllByThemeAndMemberAndDate(themeId, memberId,
+                dateFrom, dateTo);
 
         return ReservationResponse.from(reservations);
-    }
-
-    public List<MyReservationResponse> getMyReservations(LoginMember loginMember) {
-        Member member = memberService.findMemberById(loginMember.id());
-        List<Reservation> reservations = reservationRepository.findAllByMember(member);
-        List<Waiting> waitings = waitingService.findWaitingsByMember(member);
-        return MyReservationResponse.from(reservations, waitings);
     }
 }

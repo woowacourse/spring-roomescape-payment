@@ -1,5 +1,11 @@
 package roomescape.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
+import java.util.List;
+import java.util.NoSuchElementException;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
@@ -20,19 +26,15 @@ import roomescape.fixture.ReservationDbFixture;
 import roomescape.fixture.ReservationTimeDbFixture;
 import roomescape.fixture.ThemeDbFixture;
 import roomescape.fixture.WaitingDbFixture;
+import roomescape.infrastructure.repository.MemberRepository;
+import roomescape.infrastructure.repository.WaitingRepository;
 import roomescape.presentation.dto.request.LoginMember;
 import roomescape.presentation.dto.request.ReservationCreateRequest;
 import roomescape.presentation.dto.response.MemberResponse;
+import roomescape.presentation.dto.response.MyReservationResponse;
 import roomescape.presentation.dto.response.ReservationTimeResponse;
 import roomescape.presentation.dto.response.ThemeResponse;
 import roomescape.presentation.dto.response.WaitingResponse;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class WaitingServiceTest extends BaseTest {
@@ -54,6 +56,12 @@ class WaitingServiceTest extends BaseTest {
 
     @Autowired
     private WaitingDbFixture waitingDbFixture;
+    @Autowired
+    private MemberService memberService;
+    @Autowired
+    private WaitingRepository waitingRepository;
+    @Autowired
+    private MemberRepository memberRepository;
 
     @Test
     void 예약대기를_생성한다() {
@@ -68,7 +76,8 @@ class WaitingServiceTest extends BaseTest {
                 theme.getId()
         );
         Member waitingMember = memberDbFixture.듀이_사용자();
-        LoginMember loginMember = new LoginMember(waitingMember.getId(), waitingMember.getName(), Role.USER, waitingMember.getEmail());
+        LoginMember loginMember = new LoginMember(waitingMember.getId(), waitingMember.getName(), Role.USER,
+                waitingMember.getEmail());
 
         WaitingResponse response = waitingService.createWaiting(request, loginMember);
 
@@ -95,7 +104,8 @@ class WaitingServiceTest extends BaseTest {
                 theme.getId()
         );
         Member waitingMember = memberDbFixture.듀이_사용자();
-        LoginMember loginMember = new LoginMember(waitingMember.getId(), waitingMember.getName(), Role.USER, waitingMember.getEmail());
+        LoginMember loginMember = new LoginMember(waitingMember.getId(), waitingMember.getName(), Role.USER,
+                waitingMember.getEmail());
 
         assertThatThrownBy(() -> waitingService.createWaiting(request, loginMember))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -132,7 +142,8 @@ class WaitingServiceTest extends BaseTest {
                 theme.getId()
         );
         Member waitingMember = memberDbFixture.듀이_사용자();
-        LoginMember loginMember = new LoginMember(waitingMember.getId(), waitingMember.getName(), Role.USER, waitingMember.getEmail());
+        LoginMember loginMember = new LoginMember(waitingMember.getId(), waitingMember.getName(), Role.USER,
+                waitingMember.getEmail());
         waitingService.createWaiting(request, loginMember);
 
         assertThatThrownBy(() -> waitingService.createWaiting(request, loginMember))
@@ -144,9 +155,11 @@ class WaitingServiceTest extends BaseTest {
         ReservationInfo reservationInfo = createReservationInfo();
 
         Member waitingMember = memberDbFixture.듀이_사용자();
+        LoginMember loginMember = new LoginMember(waitingMember.getId(), waitingMember.getName(), Role.USER,
+                waitingMember.getEmail());
         waitingDbFixture.첫번째_대기(reservationInfo, waitingMember);
 
-        List<Waiting> waitings = waitingService.findWaitingsByMember(waitingMember);
+        List<MyReservationResponse> waitings = waitingService.findMyWaitings(loginMember);
 
         assertThat(waitings).hasSize(1);
     }
@@ -156,12 +169,13 @@ class WaitingServiceTest extends BaseTest {
         ReservationInfo reservationInfo = createReservationInfo();
 
         Member waitingMember = memberDbFixture.듀이_사용자();
-        LoginMember loginMember = new LoginMember(waitingMember.getId(), waitingMember.getName(), Role.USER, waitingMember.getEmail());
+        LoginMember loginMember = new LoginMember(waitingMember.getId(), waitingMember.getName(), Role.USER,
+                waitingMember.getEmail());
         Waiting waiting = waitingDbFixture.첫번째_대기(reservationInfo, waitingMember);
 
         waitingService.deleteWaitingByIdAndMember(waiting.getId(), loginMember);
 
-        List<Waiting> waitings = waitingService.findWaitingsByMember(waitingMember);
+        List<MyReservationResponse> waitings = waitingService.findMyWaitings(loginMember);
 
         assertThat(waitings).isEmpty();
     }
@@ -174,7 +188,8 @@ class WaitingServiceTest extends BaseTest {
         Waiting waiting = waitingDbFixture.첫번째_대기(reservationInfo, waitingMember);
 
         Member notWaitingMember = memberDbFixture.한스_사용자();
-        LoginMember notLoginMember = new LoginMember(notWaitingMember.getId(), notWaitingMember.getName(), Role.USER, notWaitingMember.getEmail());
+        LoginMember notLoginMember = new LoginMember(notWaitingMember.getId(), notWaitingMember.getName(), Role.USER,
+                notWaitingMember.getEmail());
 
         assertThatThrownBy(() -> waitingService.deleteWaitingByIdAndMember(waiting.getId(), notLoginMember))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -187,7 +202,8 @@ class WaitingServiceTest extends BaseTest {
         Member waitingMember = memberDbFixture.듀이_사용자();
         Waiting waiting = waitingDbFixture.첫번째_대기(reservationInfo, waitingMember);
 
-        LoginMember loginMember = new LoginMember(waitingMember.getId(), waitingMember.getName(), Role.USER, waitingMember.getEmail());
+        LoginMember loginMember = new LoginMember(waitingMember.getId(), waitingMember.getName(), Role.USER,
+                waitingMember.getEmail());
         Long notExistsWaitingId = waiting.getId() + 1L;
 
         assertThatThrownBy(() -> waitingService.deleteWaitingByIdAndMember(notExistsWaitingId, loginMember))
@@ -199,11 +215,13 @@ class WaitingServiceTest extends BaseTest {
         ReservationInfo reservationInfo = createReservationInfo();
 
         Member waitingMember = memberDbFixture.듀이_사용자();
+        LoginMember loginMember = new LoginMember(waitingMember.getId(), waitingMember.getName(),
+                waitingMember.getRole(), waitingMember.getEmail());
         Waiting waiting = waitingDbFixture.첫번째_대기(reservationInfo, waitingMember);
 
         waitingService.deleteWaitingById(waiting.getId());
 
-        List<Waiting> waitings = waitingService.findWaitingsByMember(waitingMember);
+        List<MyReservationResponse> waitings = waitingService.findMyWaitings(loginMember);
 
         assertThat(waitings).isEmpty();
     }
@@ -236,6 +254,31 @@ class WaitingServiceTest extends BaseTest {
                 () -> assertThat(response.time()).isEqualTo(ReservationTimeResponse.from(reservationTime)),
                 () -> assertThat(response.theme()).isEqualTo(ThemeResponse.from(theme)),
                 () -> assertThat(response.member()).isEqualTo(MemberResponse.from(waitingMember))
+        );
+    }
+
+    @Test
+    void 특정_사용자의_대기를_조회한다() {
+        Member member = memberDbFixture.한스_사용자();
+        ReservationTime reservationTime = reservationTimeDbFixture.예약시간_10시();
+        Theme theme = themeDbFixture.공포();
+        Reservation reservation = reservationDbFixture.예약_한스_25_4_22_10시_공포(member, reservationTime, theme);
+        Waiting waiting = waitingDbFixture.첫번째_대기(ReservationInfo.create(reservation), member);
+        LoginMember loginMember = new LoginMember(member.getId(), member.getName(), Role.USER, member.getEmail());
+        waitingRepository.save(waiting);
+
+        List<MyReservationResponse> myReservationResponses = waitingService.findMyWaitings(loginMember);
+        MyReservationResponse myReservationResponse = myReservationResponses.getFirst();
+
+        assertAll(
+                () -> assertThat(myReservationResponse.id()).isEqualTo(waiting.getId()),
+                () -> assertThat(myReservationResponse.date()).isEqualTo(
+                        waiting.getReservationInfo().getDate()),
+                () -> assertThat(myReservationResponse.time()).isEqualTo(
+                        waiting.getReservationInfo().getTime().getStartAt()),
+                () -> assertThat(myReservationResponse.theme()).isEqualTo(
+                        waiting.getReservationInfo().getTheme().getName()),
+                () -> assertThat(myReservationResponse.status()).isEqualTo("1번째 예약대기")
         );
     }
 
@@ -283,7 +326,8 @@ class WaitingServiceTest extends BaseTest {
 
         Member firstWaitingMember = memberDbFixture.한스_사용자();
         Waiting waiting = waitingDbFixture.두번째_대기(reservationInfo, firstWaitingMember);
-        Reservation newReservation = reservationDbFixture.예약_생성(firstWaitingMember, ReservationDateFixture.예약날짜_25_4_23, reservationTime, theme);
+        Reservation newReservation = reservationDbFixture.예약_생성(firstWaitingMember, ReservationDateFixture.예약날짜_25_4_23,
+                reservationTime, theme);
         ReservationInfo newReservationInfo = ReservationInfo.create(newReservation);
 
         waitingService.updateWaitings(reservationInfo, newReservationInfo);
@@ -296,7 +340,8 @@ class WaitingServiceTest extends BaseTest {
         ReservationTime reservationTime = reservationTimeDbFixture.예약시간_10시();
         Theme theme = themeDbFixture.공포();
 
-        Reservation reservation = reservationDbFixture.예약_생성(member, ReservationDateFixture.예약날짜_25_4_22, reservationTime, theme);
+        Reservation reservation = reservationDbFixture.예약_생성(member, ReservationDateFixture.예약날짜_25_4_22,
+                reservationTime, theme);
         return ReservationInfo.create(reservation);
     }
 }
