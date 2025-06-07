@@ -8,16 +8,16 @@ public class HomeController {
 
     @GetMapping("/reservation")
     public String reservation() {
-        return "/reservation";
+        return "reservation";
     }
 
     @GetMapping("/reservation-mine")
     public String reservationMinePage() {
-        return "/reservation-mine";
+        return "reservation-mine";
     }
 
     @GetMapping
     public String home() {
-        return "/index";
+        return "index";
     }
 }
