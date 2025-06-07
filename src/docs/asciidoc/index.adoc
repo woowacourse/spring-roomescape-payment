@@ -8,7 +8,7 @@
 == Auth
 === 로그인
 operation::auth/login/success[snippets='http-request,request-fields,http-response']
-
+include::{snippets}/auth/login/error/http-response.adoc[]
 === 인증 정보 조회
 operation::auth/login-check/success[snippets='http-request,http-response,response-fields']
 
@@ -22,9 +22,11 @@ operation::get-all-members[snippets='http-request,http-response,response-fields'
 == Reservation
 === 예약 생성
 operation::create-reservation[snippets='http-request,request-fields,http-response,response-fields']
+include::{snippets}/reservation/create-reservation/error/reservation-exists-exception/http-response.adoc[]
 
 === 관리자 예약 생성
-operation::admin-create-reservation[snippets='http-request,request-fields,http-response,response-fields']
+operation::reservation/admin-create-reservation/success[snippets='http-request,request-fields,http-response,response-fields']
+include::{snippets}/reservation/admin-create-reservation/error/reservation-exists-exception/http-response.adoc[]
 
 === 예약 조회
 operation::find-reservations[snippets='http-request,http-response,response-fields']
@@ -33,7 +35,8 @@ operation::find-reservations[snippets='http-request,http-response,response-field
 operation::get-my-reservations[snippets='http-request,http-response,response-fields']
 
 === 예약 삭제
-operation::delete-reservation[snippets='http-request,http-response']
+operation::reservation/delete-reservation/success[snippets='http-request,http-response']
+include::{snippets}/reservation/delete-reservation/error/reservation-not-found-exception/http-response.adoc[]
 
 == Theme
 === 테마 생성
@@ -46,7 +49,8 @@ operation::get-all-theme[snippets='http-request,http-response,response-fields']
 operation::get-theme-rank[snippets='http-request,http-response,response-fields']
 
 === 테마 삭제
-operation::delete-theme[snippets='http-request,http-response']
+operation::theme/delete-theme/success[snippets='http-request,http-response']
+include::{snippets}/theme/delete-theme/error/theme-not-found-exception/http-response.adoc[]
 
 == TimeSlot
 === 예약 시간 생성
@@ -59,7 +63,8 @@ operation::get-all-time-slot[snippets='http-request,http-response,response-field
 operation::get-all-time-slot-with-booked[snippets='http-request,http-response,response-fields']
 
 === 예약 시간 삭제
-operation::delete-time-slot[snippets='http-request,http-response']
+operation::time-slot/delete-time-slot/success[snippets='http-request,http-response']
+include::{snippets}/time-slot/delete-time-slot/error/time-slot-not-found-exception/http-response.adoc[]
 
 == Waiting
 === 예약 대기 생성
@@ -72,7 +77,8 @@ operation::get-all-waitings[snippets='http-request,http-response,response-fields
 operation::get-my-waitings[snippets='http-request,http-response,response-fields']
 
 === 예약 대기 삭제
-operation::delete-waiting[snippets='http-request,http-response']
+operation::waiting/delete-waiting/success[snippets='http-request,http-response']
+include::{snippets}/waiting/delete-waiting/error/waiting-not-found-exception/http-response.adoc[]
 
 == Payment
 === 결제 생성
