@@ -1,0 +1,53 @@
+:linkcss:
+:stylesheet: asciidoctor.css
+:stylesdir: ../css
+
+== 📄 관리자 페이지 목록
+
+=== 관리자 홈페이지 (/admin)
+
+.HTTP 요청 예제
+include::{snippets}/page-admin/home/httpie-request.adoc[]
+
+.응답 뷰 이름
+`admin/index`
+
+=== 예약 관리 페이지 (/admin/reservation)
+
+관리자용 예약 정보 관리 화면을 표시합니다.
+
+.HTTP 요청 예제
+include::{snippets}/page-admin/reservation/httpie-request.adoc[]
+
+.응답 뷰 이름
+`admin/reservation-new`
+
+=== 대기 관리 페이지 (/admin/waiting)
+
+관리자용 대기 정보 관리 화면을 표시합니다.
+
+.HTTP 요청 예제
+include::{snippets}/page-admin/waiting/httpie-request.adoc[]
+
+.응답 뷰 이름
+`admin/waiting`
+
+=== 테마 관리 페이지 (/admin/theme)
+
+관리자용 테마 관리 화면을 표시합니다.
+
+.HTTP 요청 예제
+include::{snippets}/page-admin/theme/httpie-request.adoc[]
+
+.응답 뷰 이름
+`admin/theme`
+
+=== 시간 관리 페이지 (/admin/time)
+
+관리자용 시간 관리 화면을 표시합니다.
+
+.HTTP 요청 예제
+include::{snippets}/page-admin/time/httpie-request.adoc[]
+
+.응답 뷰 이름
+`admin/time`

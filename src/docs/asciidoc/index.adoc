@@ -4,9 +4,9 @@
 :source-highlighter: highlightjs
 :sectanchors:
 :sectnums:
+:linkcss:
 :stylesheet: asciidoctor.css
 :stylesdir: css
-:linkcss:
 
 == 🧾 개요
 
@@ -30,6 +30,8 @@ API 명세 및 요청/응답 예시를 통해 클라이언트-서버 간 명확�
 |===
 
 == 👤 사용자용 페이지 API
+
+👉 link:page/admin.html[Admin Page API 문서로 이동]
 
 👉 link:page/user.html[User Page API 문서로 이동]
 
