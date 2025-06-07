@@ -23,7 +23,7 @@ import roomescape.infrastructure.error.exception.ReservationTimeException;
 import roomescape.infrastructure.error.exception.ThemeException;
 import roomescape.infrastructure.error.exception.UnauthorizedException;
 import roomescape.infrastructure.error.exception.WaitingException;
-import roomescape.infrastructure.log.ErrorLog;
+import roomescape.infrastructure.log.ExceptionLog;
 import roomescape.infrastructure.log.LogEntry;
 
 @RestControllerAdvice
@@ -126,10 +126,10 @@ public class GlobalExceptionHandler {
         if (stackTrace.length == 0) {
             String className = "UnknownClass";
             String methodName = "UnknownMethod";
-            return new ErrorLog(className, methodName, ex.getMessage(), ex);
+            return new ExceptionLog(className, methodName, ex.getMessage(), ex);
         }
         String className = stackTrace[0].getClassName();
         String methodName = stackTrace[0].getMethodName();
-        return new ErrorLog(className, methodName, ex.getMessage(), ex);
+        return new ExceptionLog(className, methodName, ex.getMessage(), ex);
     }
 }
