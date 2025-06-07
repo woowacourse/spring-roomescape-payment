@@ -25,10 +25,10 @@ import roomescape.time.controller.dto.ReservationTimeResponse;
 @RestController
 @RequestMapping("/times")
 public class ReservationTimeController {
-    private final TimeService timeService;
+    private final ReservationTimeService reservationTimeService;
 
-    public ReservationTimeController(final TimeService timeService) {
-        this.timeService = timeService;
+    public ReservationTimeController(final ReservationTimeService reservationTimeService) {
+        this.reservationTimeService = reservationTimeService;
     }
 
     @Operation(summary = "예약 시간대 생성 API")
@@ -47,7 +47,7 @@ public class ReservationTimeController {
     public ResponseEntity<ReservationTimeResponse> createTime(
             @RequestBody @Valid final CreateReservationTimeRequest request
     ) {
-        ReservationTimeResponse response = timeService.createReservationTime(request);
+        ReservationTimeResponse response = reservationTimeService.createReservationTime(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
@@ -62,7 +62,7 @@ public class ReservationTimeController {
     })
     @GetMapping
     public ResponseEntity<List<ReservationTimeResponse>> getTimes() {
-        List<ReservationTimeResponse> responses = timeService.findAllReservationTimes();
+        List<ReservationTimeResponse> responses = reservationTimeService.findAllReservationTimes();
         return ResponseEntity.ok(responses);
     }
 
@@ -80,7 +80,7 @@ public class ReservationTimeController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTime(@PathVariable final Long id) {
-        timeService.deleteReservationTimeById(id);
+        reservationTimeService.deleteReservationTimeById(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -100,7 +100,7 @@ public class ReservationTimeController {
     public ResponseEntity<List<AvailableReservationTimeResponse>> getAvailableReservationTimes(
             @ModelAttribute @Valid final AvailableReservationTimeRequest request
     ) {
-        List<AvailableReservationTimeResponse> responses = timeService.findAvailableReservationTimes(request);
+        List<AvailableReservationTimeResponse> responses = reservationTimeService.findAvailableReservationTimes(request);
         return ResponseEntity.ok(responses);
     }
 }

@@ -27,11 +27,11 @@ import roomescape.wait.controller.dto.ReservationWaitResponse;
 
 @RestController
 @RequestMapping("/waits")
-public class WaitController {
-    private final WaitService waitService;
+public class ReservationWaitController {
+    private final ReservationWaitService reservationWaitService;
 
-    public WaitController(final WaitService waitService) {
-        this.waitService = waitService;
+    public ReservationWaitController(final ReservationWaitService reservationWaitService) {
+        this.reservationWaitService = reservationWaitService;
     }
 
     @Operation(summary = "예약 대기 생성 API")
@@ -56,7 +56,7 @@ public class WaitController {
             @RequestBody @Valid final CreateReservationWaitRequest request,
             final SessionMember sessionMember
     ) {
-        ReservationWaitResponse response = waitService.createReservationWait(request, sessionMember.id());
+        ReservationWaitResponse response = reservationWaitService.createReservationWait(request, sessionMember.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -90,7 +90,7 @@ public class WaitController {
     @PostMapping("/{id}")
     @CheckRole(MemberRole.ADMIN)
     public ResponseEntity<ReservationResponse> approveReservationWait(@PathVariable("id") Long waitId) {
-        ReservationResponse response = waitService.approveReservationWait(waitId);
+        ReservationResponse response = reservationWaitService.approveReservationWait(waitId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -111,7 +111,7 @@ public class WaitController {
             @PathVariable("id") final Long waitId,
             final SessionMember sessionMember
     ) {
-        waitService.deleteReservationWait(waitId, sessionMember.id());
+        reservationWaitService.deleteReservationWait(waitId, sessionMember.id());
         return ResponseEntity.noContent().build();
     }
 
@@ -124,7 +124,7 @@ public class WaitController {
     })
     @GetMapping
     public ResponseEntity<List<ReservationWaitResponse>> getAllWaitReservation() {
-        final List<ReservationWaitResponse> response = waitService.getAllWaitReservation();
+        final List<ReservationWaitResponse> response = reservationWaitService.getAllWaitReservation();
         return ResponseEntity.ok(response);
     }
 
@@ -142,7 +142,7 @@ public class WaitController {
     })
     @GetMapping("/mine")
     public ResponseEntity<List<MyReservationWaitResponse>> getMyWaitReservation(final SessionMember sessionMember) {
-        final List<MyReservationWaitResponse> response = waitService.findAllMyWaitReservation(
+        final List<MyReservationWaitResponse> response = reservationWaitService.findAllMyWaitReservation(
                 sessionMember.id());
         return ResponseEntity.ok(response);
     }

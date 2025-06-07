@@ -10,11 +10,11 @@ import roomescape.time.domain.ReservationTime;
 import roomescape.time.repository.ReservationTimeRepository;
 
 @Service
-public class TimeCommandService {
+public class ReservationTimeCommandService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ReservationQueryService reservationQueryService;
 
-    public TimeCommandService(
+    public ReservationTimeCommandService(
             final ReservationTimeRepository reservationTimeRepository,
             final ReservationQueryService reservationQueryService
     ) {

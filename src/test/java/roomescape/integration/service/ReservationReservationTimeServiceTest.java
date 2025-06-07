@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.GlobalConfig;
-import roomescape.global.config.ClockConfig;
 import roomescape.global.exception.BadRequestException;
 import roomescape.integration.fixture.ReservationScheduleDbFixture;
 import roomescape.member.domain.Member;
@@ -32,7 +31,7 @@ import roomescape.theme.domain.ThemeDescription;
 import roomescape.theme.domain.ThemeName;
 import roomescape.theme.domain.ThemeThumbnail;
 import roomescape.theme.repository.ThemeRepository;
-import roomescape.time.controller.TimeService;
+import roomescape.time.controller.ReservationTimeService;
 import roomescape.time.controller.dto.CreateReservationTimeRequest;
 import roomescape.time.controller.dto.ReservationTimeResponse;
 import roomescape.time.domain.ReservationTime;
@@ -41,7 +40,7 @@ import roomescape.time.repository.ReservationTimeRepository;
 @Transactional
 @SpringBootTest
 @Import(GlobalConfig.class)
-class ReservationTimeServiceTest {
+class ReservationReservationTimeServiceTest {
 
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
@@ -50,7 +49,7 @@ class ReservationTimeServiceTest {
     private ReservationRepository reservationRepository;
 
     @Autowired
-    private TimeService service;
+    private ReservationTimeService service;
 
     @Autowired
     private MemberRepository memberRepository;

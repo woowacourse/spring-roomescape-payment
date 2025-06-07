@@ -16,7 +16,7 @@ import roomescape.theme.domain.DateRange;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.service.ThemeQueryService;
 import roomescape.time.domain.ReservationTime;
-import roomescape.time.service.TimeQueryService;
+import roomescape.time.service.ReservationTimeQueryService;
 
 @Service
 @Transactional(readOnly = true)
@@ -25,20 +25,20 @@ public class ScheduleCommandService {
     private final ReservationScheduleRepository reservationScheduleRepository;
     private final ScheduleQueryService scheduleQueryService;
     private final ThemeQueryService themeQueryService;
-    private final TimeQueryService timeQueryService;
+    private final ReservationTimeQueryService reservationTimeQueryService;
     private final Clock clock;
 
     public ScheduleCommandService(
             final ReservationScheduleRepository reservationScheduleRepository,
             final ScheduleQueryService scheduleQueryService,
             final ThemeQueryService themeQueryService,
-            final TimeQueryService timeQueryService,
+            final ReservationTimeQueryService reservationTimeQueryService,
             final Clock clock
     ) {
         this.reservationScheduleRepository = reservationScheduleRepository;
         this.scheduleQueryService = scheduleQueryService;
         this.themeQueryService = themeQueryService;
-        this.timeQueryService = timeQueryService;
+        this.reservationTimeQueryService = reservationTimeQueryService;
         this.clock = clock;
     }
 
@@ -58,7 +58,7 @@ public class ScheduleCommandService {
 
 
     private List<ReservationSchedule> generateNewSchedules(final Set<LocalDate> scheduledDates, final DateRange range) {
-        List<ReservationTime> times = timeQueryService.findAll();
+        List<ReservationTime> times = reservationTimeQueryService.findAll();
         List<Theme> themes = themeQueryService.findAll();
         Set<LocalDate> nonContainsSchedule = range.differenceTo(scheduledDates);
         return nonContainsSchedule.stream()

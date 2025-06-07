@@ -28,7 +28,7 @@ import roomescape.reservation.repository.ReservationRepository;
 import roomescape.schedule.domain.ReservationSchedule;
 import roomescape.theme.domain.Theme;
 import roomescape.time.domain.ReservationTime;
-import roomescape.wait.controller.WaitService;
+import roomescape.wait.controller.ReservationWaitService;
 import roomescape.wait.controller.dto.CreateReservationWaitRequest;
 import roomescape.wait.controller.dto.MyReservationWaitResponse;
 import roomescape.wait.controller.dto.ReservationWaitResponse;
@@ -38,10 +38,10 @@ import roomescape.wait.repository.ReservationWaitRepository;
 @Transactional
 @SpringBootTest
 @Import(GlobalConfig.class)
-class ReservationWaitServiceTest {
+class ReservationReservationWaitServiceTest {
 
     @Autowired
-    private WaitService service;
+    private ReservationWaitService service;
 
     @Autowired
     private MemberDbFixture memberDbFixture;

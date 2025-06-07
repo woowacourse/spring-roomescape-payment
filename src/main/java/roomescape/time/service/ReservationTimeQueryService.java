@@ -3,7 +3,6 @@ package roomescape.time.service;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.global.exception.NotFoundException;
 import roomescape.schedule.domain.ReservationDate;
 import roomescape.schedule.repository.ReservationScheduleRepository;
 import roomescape.theme.domain.Theme;
@@ -13,11 +12,11 @@ import roomescape.time.repository.ReservationTimeRepository;
 
 @Service
 @Transactional(readOnly = true)
-public class TimeQueryService {
+public class ReservationTimeQueryService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ReservationScheduleRepository reservationScheduleRepository;
 
-    public TimeQueryService(
+    public ReservationTimeQueryService(
             final ReservationTimeRepository reservationTimeRepository,
             final ReservationScheduleRepository reservationScheduleRepository
     ) {
