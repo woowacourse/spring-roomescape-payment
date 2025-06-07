@@ -1,4 +1,4 @@
-package roomescape.payment.infrastructure.toss.client;
+package roomescape.approval.infrastructure.toss.client;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -17,9 +17,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
-import roomescape.approval.infrastructure.toss.client.TossPaymentClient;
-import roomescape.common.exception.ExternalApiException;
 import roomescape.approval.infrastructure.toss.dto.TossPaymentApprovalRequest;
+import roomescape.common.exception.ExternalApiException;
 
 class TossPaymentClientTest {
     private final RestClient.Builder testBuilder = RestClient.builder()

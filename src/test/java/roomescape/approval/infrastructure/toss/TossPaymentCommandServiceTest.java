@@ -1,4 +1,4 @@
-package roomescape.approval.application.command;
+package roomescape.approval.infrastructure.toss;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.approval.domain.Payment;
 import roomescape.approval.infrastructure.ApprovalRepositoryAdapter;
-import roomescape.approval.infrastructure.toss.TossPaymentCommandService;
 import roomescape.approval.infrastructure.toss.client.FakeTossPaymentClient;
 import roomescape.fixture.MemberFixture;
 import roomescape.member.domain.Member;

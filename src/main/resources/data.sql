@@ -163,3 +163,6 @@ INSERT INTO admin_approval(id, member_id)
 VALUES (14, 1);
 INSERT INTO admin_approval(id, member_id)
 VALUES (16, 1);
+
+ALTER TABLE approval
+    ALTER COLUMN id RESTART WITH 21;

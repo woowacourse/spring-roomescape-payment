@@ -1,10 +1,9 @@
-package roomescape.payment.application;
+package roomescape.approval.application;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import roomescape.approval.application.ApprovalService;
 import roomescape.approval.domain.Approval;
 import roomescape.approval.domain.Onsite;
 import roomescape.reservation.domain.Reservation;
