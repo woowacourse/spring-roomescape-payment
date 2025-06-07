@@ -14,8 +14,8 @@ public class OpenApiConfig {
     public OpenAPI openApiProperties() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("도기의 방탈출 API 목록")
-                        .description("도기의 방탈출 예약 관리 프로그램 Swaager API 문서입니다.")
+                        .title("방탈출 API 목록")
+                        .description("방탈출 예약 관리 프로그램 Swaager API 문서입니다.")
                         .version("v1.0.0")
                 )
                 .servers(List.of(
