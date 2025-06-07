@@ -20,7 +20,6 @@ import roomescape.reservation.dto.response.MyReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponseWithPayment;
 import roomescape.reservation.service.ReservationFacadeService;
-import roomescape.reservation.service.ReservationService;
 
 @RestController
 public class ReservationController {
@@ -75,8 +74,6 @@ public class ReservationController {
     @GetMapping("/reservations-mine")
     public ResponseEntity<List<MyReservationResponse>> findMyReservations(UserInfo userInfo) {
         List<MyReservationResponse> myReservations = reservationFacadeService.findMyReservations(userInfo);
-
-        reservationFacadeService.findMyReservations(userInfo);
 
         return ResponseEntity.ok().body(myReservations);
     }
