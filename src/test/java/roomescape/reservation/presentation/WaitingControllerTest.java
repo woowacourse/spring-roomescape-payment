@@ -19,7 +19,7 @@ import org.springframework.test.context.ActiveProfiles;
 import roomescape.DatabaseCleaner;
 import roomescape.TestConfig;
 import roomescape.member.presentation.fixture.MemberFixture;
-import roomescape.reservation.presentation.dto.WaitingRequest;
+import roomescape.reservation.application.dto.WaitingRequest;
 import roomescape.reservation.presentation.fixture.ReservationFixture;
 
 @ActiveProfiles("test")

@@ -7,9 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
-import roomescape.reservation.presentation.dto.AvailableReservationTimeResponse;
-import roomescape.reservation.presentation.dto.ReservationTimeRequest;
-import roomescape.reservation.presentation.dto.ReservationTimeResponse;
+import roomescape.reservation.application.dto.AvailableReservationTimeResponse;
+import roomescape.reservation.application.dto.ReservationTimeRequest;
+import roomescape.reservation.application.dto.ReservationTimeResponse;
 
 @Service
 public class ReservationTimeService {

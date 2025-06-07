@@ -1,5 +1,6 @@
 package roomescape.member.presentation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -10,9 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.global.auth.Auth;
 import roomescape.member.application.service.MemberService;
 import roomescape.member.domain.Role;
-import roomescape.member.presentation.dto.MemberResponse;
-import roomescape.member.presentation.dto.SignUpRequest;
-import roomescape.member.presentation.dto.SignUpResponse;
+import roomescape.member.application.dto.MemberResponse;
+import roomescape.member.application.dto.SignUpRequest;
+import roomescape.member.application.dto.SignUpResponse;
 
 @RestController
 public class MemberController {
@@ -23,6 +24,7 @@ public class MemberController {
     }
 
     @Auth(Role.GUEST)
+    @Operation(summary = "회원가입 API")
     @PostMapping("/signUp")
     public ResponseEntity<SignUpResponse> signUp(
             @RequestBody @Valid SignUpRequest signUpRequest
@@ -33,6 +35,7 @@ public class MemberController {
     }
 
     @Auth(Role.ADMIN)
+    @Operation(summary = "회원 조회 API")
     @GetMapping("/members")
     public ResponseEntity<List<MemberResponse>> getMembers(
     ) {

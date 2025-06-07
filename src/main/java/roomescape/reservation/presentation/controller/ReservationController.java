@@ -1,5 +1,7 @@
 package roomescape.reservation.presentation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
@@ -17,10 +19,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import roomescape.global.auth.Auth;
 import roomescape.member.domain.Role;
 import roomescape.member.presentation.resolver.LoginMember;
-import roomescape.reservation.presentation.dto.ReservationRequest;
+import roomescape.reservation.application.dto.ReservationRequest;
 import roomescape.reservation.application.service.ReservationService;
-import roomescape.reservation.presentation.dto.ReservationResponse;
-import roomescape.reservation.presentation.dto.UserReservationsResponse;
+import roomescape.reservation.application.dto.ReservationResponse;
+import roomescape.reservation.application.dto.UserReservationsResponse;
 
 @RestController
 @RequestMapping("/reservations")
@@ -33,10 +35,11 @@ public class ReservationController {
     }
 
     @Auth(Role.USER)
+    @Operation(summary = "예약 추가 API")
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(
             final @RequestBody @Valid ReservationRequest reservationRequest,
-            final @LoginMember Long memberId
+            final @Parameter(hidden = true) @LoginMember Long memberId
     ) {
         ReservationResponse reservation = reservationService.createUserReservationAndPayment(reservationRequest, memberId);
 
@@ -45,6 +48,7 @@ public class ReservationController {
     }
 
     @Auth(Role.USER)
+    @Operation(summary = "예약 조회 API")
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> getReservations(
             final @RequestParam(required = false) Long memberId,
@@ -58,9 +62,10 @@ public class ReservationController {
     }
 
     @Auth(Role.USER)
+    @Operation(summary = "내 예약 조회 API")
     @GetMapping("/mine")
     public ResponseEntity<List<UserReservationsResponse>> getUserReservations(
-            final @LoginMember Long memberId
+            final @Parameter(hidden = true) @LoginMember Long memberId
     ) {
         return ResponseEntity.ok().body(
                 reservationService.getUserReservations(memberId)
@@ -68,6 +73,7 @@ public class ReservationController {
     }
 
     @Auth(Role.USER)
+    @Operation(summary = "예약 삭제 API")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservation(
             final @PathVariable Long id

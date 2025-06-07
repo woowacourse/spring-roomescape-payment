@@ -1,4 +1,4 @@
-package roomescape.reservation.presentation.dto;
+package roomescape.reservation.application.dto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -13,6 +13,8 @@ public class UserReservationsResponse {
     private LocalDate date;
     private LocalTime time;
     private String status;
+    private String paymentKey;
+    private Integer amount;
 
     private UserReservationsResponse() {
     }
@@ -23,6 +25,8 @@ public class UserReservationsResponse {
         this.date = reservation.getDate();
         this.time = reservation.getReservationTime().getStartAt();
         this.status = "예약";
+        this.paymentKey = reservation.getPayment().getPaymentKey();
+        this.amount = reservation.getPayment().getAmount();
     }
 
     public UserReservationsResponse(final WaitingWithRank reservation) {
@@ -32,6 +36,8 @@ public class UserReservationsResponse {
         this.date = waiting.getDate();
         this.time = waiting.getReservationTime().getStartAt();
         this.status = reservation.getRank() + "번째 예약대기";
+        this.paymentKey = null;
+        this.amount = null;
     }
 
     public Long getId() {
@@ -52,5 +58,13 @@ public class UserReservationsResponse {
 
     public String getStatus() {
         return status;
+    }
+
+    public String getPaymentKey() {
+        return paymentKey;
+    }
+
+    public Integer getAmount() {
+        return amount;
     }
 }

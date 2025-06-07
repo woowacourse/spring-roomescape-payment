@@ -7,11 +7,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 import roomescape.global.common.TimeStamp;
 import roomescape.member.domain.Member;
+import roomescape.payment.domain.Payment;
 
 @Entity
 @SQLRestriction("deleted_at is NULL")
@@ -29,27 +31,33 @@ public class Reservation extends TimeStamp {
     @Embedded
     private ReservationInfo reservationInfo;
 
+    @JoinColumn(nullable = false)
+    @OneToOne
+    private Payment payment;
+
     public Reservation() {
     }
 
     public Reservation(final Long id, final Member member, final Theme theme, final LocalDate date,
-                       final ReservationTime reservationTime) {
+                       final ReservationTime reservationTime, final Payment payment) {
         this.id = id;
         this.member = member;
         this.reservationInfo = new ReservationInfo(
                 theme, date, reservationTime
         );
+        this.payment = payment;
     }
 
     public Reservation(final Member member, final Theme theme, final LocalDate date,
-                       final ReservationTime reservationTime) {
-        this(null, member, theme, date, reservationTime);
+                       final ReservationTime reservationTime, final Payment payment) {
+        this(null, member, theme, date, reservationTime, payment);
     }
 
-    public Reservation(final Member member, final ReservationInfo reservationInfo) {
+    public Reservation(final Member member, final ReservationInfo reservationInfo, final Payment payment) {
         this.id = null;
         this.member = member;
         this.reservationInfo = reservationInfo;
+        this.payment = payment;
     }
 
     public Long getId() {
@@ -74,5 +82,9 @@ public class Reservation extends TimeStamp {
 
     public ReservationTime getReservationTime() {
         return reservationInfo.getReservationTime();
+    }
+
+    public Payment getPayment() {
+        return payment;
     }
 }

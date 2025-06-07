@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
@@ -17,8 +19,8 @@ import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.domain.repository.ThemeRepository;
 import roomescape.reservation.domain.repository.WaitingRepository;
-import roomescape.reservation.presentation.dto.WaitingRequest;
-import roomescape.reservation.presentation.dto.WaitingResponse;
+import roomescape.reservation.application.dto.WaitingRequest;
+import roomescape.reservation.application.dto.WaitingResponse;
 
 @Service
 public class WaitingService {
@@ -28,16 +30,19 @@ public class WaitingService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentRepository paymentRepository;
 
     public WaitingService(final WaitingRepository waitingRepository,
                           final ReservationRepository reservationRepository,
                           final ReservationTimeRepository reservationTimeRepository,
-                          final ThemeRepository themeRepository, final MemberRepository memberRepository) {
+                          final ThemeRepository themeRepository, final MemberRepository memberRepository,
+                          final PaymentRepository paymentRepository) {
         this.waitingRepository = waitingRepository;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Transactional
@@ -88,7 +93,8 @@ public class WaitingService {
 
         final Reservation reservation = new Reservation(
                 waiting.getMember(),
-                waiting.getReservationInfo()
+                waiting.getReservationInfo(),
+                paymentRepository.save(new Payment())
         );
 
         waitingRepository.delete(waiting);

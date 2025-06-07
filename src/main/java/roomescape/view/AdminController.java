@@ -14,34 +14,34 @@ public class AdminController {
     @GetMapping
     public String admin(
     ) {
-        return "/admin/index";
+        return "admin/index";
     }
 
     @Auth(Role.ADMIN)
     @GetMapping("/reservation")
     public String reservation(
     ) {
-        return "/admin/reservation-new";
+        return "admin/reservation-new";
     }
 
     @Auth(Role.ADMIN)
     @GetMapping("/time")
     public String time(
     ) {
-        return "/admin/time";
+        return "admin/time";
     }
 
     @Auth(Role.ADMIN)
     @GetMapping("/theme")
     public String theme(
     ) {
-        return "/admin/theme";
+        return "admin/theme";
     }
 
     @Auth(Role.ADMIN)
     @GetMapping("/waiting")
     public String waiting(
     ) {
-        return "/admin/waiting";
+        return "admin/waiting";
     }
 }

@@ -1,4 +1,4 @@
-package roomescape.member.presentation.dto;
+package roomescape.member.application.dto;
 
 public class SignUpResponse {
     private final Long id;

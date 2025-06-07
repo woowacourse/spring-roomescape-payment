@@ -1,4 +1,4 @@
-package roomescape.payment.presentation.dto;
+package roomescape.payment.application.dto;
 
 public class PaymentErrorResponse {
     private String code;

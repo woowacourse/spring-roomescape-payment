@@ -11,24 +11,30 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.TestConfig;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
+import roomescape.payment.application.service.PaymentService;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.application.dto.PaymentRequest;
 import roomescape.reservation.application.service.ReservationTimeService;
 import roomescape.reservation.application.service.ThemeService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.repository.ReservationRepository;
-import roomescape.reservation.presentation.dto.ReservationTimeRequest;
-import roomescape.reservation.presentation.dto.ReservationTimeResponse;
-import roomescape.reservation.presentation.dto.ThemeRequest;
-import roomescape.reservation.presentation.dto.ThemeResponse;
+import roomescape.reservation.application.dto.ReservationTimeRequest;
+import roomescape.reservation.application.dto.ReservationTimeResponse;
+import roomescape.reservation.application.dto.ThemeRequest;
+import roomescape.reservation.application.dto.ThemeResponse;
 
 @ActiveProfiles("test")
 @Transactional
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
+@Import(TestConfig.class)
 class ThemeServiceTest {
 
     @Autowired
@@ -39,6 +45,9 @@ class ThemeServiceTest {
 
     @Autowired
     private ReservationRepository reservationRepository;
+
+    @Autowired
+    private PaymentService paymentService;
 
     @Test
     @DisplayName("테마 추가 테스트")
@@ -123,13 +132,20 @@ class ThemeServiceTest {
         final ReservationTimeResponse reservationTime = reservationTimeService.createReservationTime(
                 reservationTimeRequest);
 
+        Payment payment = paymentService.approve(new PaymentRequest(
+                "testkey",
+                "testOrderId",
+                10000,
+                "NORMAL"
+        ));
+
         reservationRepository.save(new Reservation(
                 new Member(2L, "admin@admin.com", "admin", "어드민", Role.ADMIN),
                 new Theme(theme.getId(), "레벨3 탈출",
                         "우테코 레벨3를 탈출하는 내용입니다.",
                         "https://i.pinimg.com/236x/6e/bc/46/6ebc461a94a49f9ea3b8bbe2204145d4.jpg"),
                 LocalDate.now().minusDays(3),
-                new ReservationTime(reservationTime.getId(), LocalTime.of(15, 40))
+                new ReservationTime(reservationTime.getId(), LocalTime.of(15, 40)), payment
         ));
 
         // when

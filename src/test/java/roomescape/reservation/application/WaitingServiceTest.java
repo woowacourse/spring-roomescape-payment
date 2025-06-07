@@ -18,9 +18,9 @@ import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.domain.repository.ThemeRepository;
-import roomescape.reservation.presentation.dto.AdminReservationRequest;
-import roomescape.reservation.presentation.dto.WaitingRequest;
-import roomescape.reservation.presentation.dto.WaitingResponse;
+import roomescape.reservation.application.dto.AdminReservationRequest;
+import roomescape.reservation.application.dto.WaitingRequest;
+import roomescape.reservation.application.dto.WaitingResponse;
 
 @ActiveProfiles("test")
 @Transactional

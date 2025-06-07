@@ -1,5 +1,6 @@
 package roomescape.reservation.presentation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.time.LocalDate;
@@ -17,9 +18,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import roomescape.global.auth.Auth;
 import roomescape.member.domain.Role;
 import roomescape.reservation.application.service.ReservationTimeService;
-import roomescape.reservation.presentation.dto.AvailableReservationTimeResponse;
-import roomescape.reservation.presentation.dto.ReservationTimeRequest;
-import roomescape.reservation.presentation.dto.ReservationTimeResponse;
+import roomescape.reservation.application.dto.AvailableReservationTimeResponse;
+import roomescape.reservation.application.dto.ReservationTimeRequest;
+import roomescape.reservation.application.dto.ReservationTimeResponse;
 
 @RestController
 @RequestMapping("/times")
@@ -32,6 +33,7 @@ public class ReservationTimeController {
     }
 
     @Auth(Role.ADMIN)
+    @Operation(summary = "예약 시간 추가 API")
     @PostMapping
     public ResponseEntity<ReservationTimeResponse> createTime(
             final @RequestBody @Valid ReservationTimeRequest reservationTimeRequest
@@ -43,6 +45,7 @@ public class ReservationTimeController {
     }
 
     @Auth(Role.USER)
+    @Operation(summary = "예약 시간 조회 API")
     @GetMapping
     public ResponseEntity<List<ReservationTimeResponse>> getReservationTimes(
     ) {
@@ -52,6 +55,7 @@ public class ReservationTimeController {
     }
 
     @Auth(Role.USER)
+    @Operation(summary = "예약 가능한 시간 조회 API")
     @GetMapping("/available")
     public ResponseEntity<List<AvailableReservationTimeResponse>> getReservationTimes(
             @RequestParam LocalDate date,
@@ -63,6 +67,7 @@ public class ReservationTimeController {
     }
 
     @Auth(Role.ADMIN)
+    @Operation(summary = "예약 시간 삭제 API")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservationTime(
             final @PathVariable Long id

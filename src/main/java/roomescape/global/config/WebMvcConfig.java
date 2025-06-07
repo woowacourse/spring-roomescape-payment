@@ -37,6 +37,15 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(authorizationInterceptor)
                 .order(2)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/h2-console", "/js/**", "/image/**", "/css/**");
+                .excludePathPatterns(
+                        "/swagger-ui/**",
+                        "/swagger-resources/**",
+                        "/v3/api-docs/**",
+                        "/webjars/**",
+                        "/h2-console",
+                        "/js/**",
+                        "/image/**",
+                        "/css/**"
+                );
     }
 }

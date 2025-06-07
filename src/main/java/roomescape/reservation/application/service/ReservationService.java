@@ -13,8 +13,9 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.payment.application.service.PaymentService;
 import roomescape.payment.domain.Payment;
-import roomescape.payment.presentation.dto.PaymentRequest;
-import roomescape.reservation.presentation.dto.ReservationRequest;
+import roomescape.payment.domain.repository.PaymentRepository;
+import roomescape.payment.application.dto.PaymentRequest;
+import roomescape.reservation.application.dto.ReservationRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.Theme;
@@ -23,9 +24,9 @@ import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
 import roomescape.reservation.domain.repository.ThemeRepository;
 import roomescape.reservation.domain.repository.WaitingRepository;
-import roomescape.reservation.presentation.dto.AdminReservationRequest;
-import roomescape.reservation.presentation.dto.ReservationResponse;
-import roomescape.reservation.presentation.dto.UserReservationsResponse;
+import roomescape.reservation.application.dto.AdminReservationRequest;
+import roomescape.reservation.application.dto.ReservationResponse;
+import roomescape.reservation.application.dto.UserReservationsResponse;
 
 @Service
 public class ReservationService {
@@ -37,18 +38,20 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentRepository paymentRepository;
 
     public ReservationService(final PaymentService paymentService, final WaitingRepository waitingRepository,
                               final ReservationRepository reservationRepository,
                               final ReservationTimeRepository reservationTimeRepository,
                               final ThemeRepository themeRepository,
-                              final MemberRepository memberRepository) {
+                              final MemberRepository memberRepository, final PaymentRepository paymentRepository) {
         this.paymentService = paymentService;
         this.waitingRepository = waitingRepository;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Transactional
@@ -56,22 +59,23 @@ public class ReservationService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchElementException("유저 정보를 찾을 수 없습니다."));
 
-        paymentService.approve(new PaymentRequest(
+        final Payment payment = paymentService.approve(new PaymentRequest(
                 reservationRequest.getPaymentKey(),
                 reservationRequest.getOrderId(),
                 reservationRequest.getAmount(),
                 reservationRequest.getPaymentType()
         ));
 
-        return createUserReservation(reservationRequest, member);
+        return createUserReservation(reservationRequest, member, payment);
     }
 
-    private ReservationResponse createUserReservation(final ReservationRequest reservationRequest, final Member member) {
+    private ReservationResponse createUserReservation(final ReservationRequest reservationRequest, final Member member, final Payment payment) {
         return createReservation(
                 reservationRequest.getTimeId(),
                 reservationRequest.getThemeId(),
                 reservationRequest.getDate(),
-                member
+                member,
+                payment
         );
     }
 
@@ -83,7 +87,8 @@ public class ReservationService {
                 adminReservationRequest.getTimeId(),
                 adminReservationRequest.getThemeId(),
                 adminReservationRequest.getDate(),
-                member
+                member,
+                paymentRepository.save(new Payment())
         );
     }
 
@@ -135,14 +140,15 @@ public class ReservationService {
         waiting.ifPresent(value -> {
             reservationRepository.save(new Reservation(
                     value.getMember(),
-                    value.getReservationInfo()
+                    value.getReservationInfo(),
+                    paymentRepository.save(new Payment())
             ));
 
             waitingRepository.delete(waiting.get());
         });
     }
 
-    private ReservationResponse createReservation(Long timeId, Long themeId, LocalDate date, Member member) {
+    private ReservationResponse createReservation(Long timeId, Long themeId, LocalDate date, Member member, Payment payment) {
         ReservationTime reservationTime = getReservationTime(timeId);
         Theme theme = getTheme(themeId);
         validateReservationDateTime(date, reservationTime);
@@ -151,7 +157,8 @@ public class ReservationService {
                 member,
                 theme,
                 date,
-                reservationTime
+                reservationTime,
+                payment
         );
 
         return new ReservationResponse(reservationRepository.save(reservation));

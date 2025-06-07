@@ -10,10 +10,10 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.application.service.MemberService;
-import roomescape.member.presentation.dto.MemberResponse;
-import roomescape.member.presentation.dto.SignUpRequest;
-import roomescape.member.presentation.dto.SignUpResponse;
-import roomescape.member.presentation.dto.TokenRequest;
+import roomescape.member.application.dto.MemberResponse;
+import roomescape.member.application.dto.SignUpRequest;
+import roomescape.member.application.dto.SignUpResponse;
+import roomescape.member.application.dto.TokenRequest;
 
 @ActiveProfiles("test")
 @Transactional

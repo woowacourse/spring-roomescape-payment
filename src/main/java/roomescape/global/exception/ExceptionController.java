@@ -1,7 +1,6 @@
 package roomescape.global.exception;
 
 import io.jsonwebtoken.JwtException;
-import java.net.SocketTimeoutException;
 import java.time.DateTimeException;
 import java.time.format.DateTimeParseException;
 import java.util.NoSuchElementException;
@@ -14,8 +13,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.ResourceAccessException;
 import roomescape.payment.infrastructure.PaymentException;
-import roomescape.payment.presentation.dto.PaymentErrorResponse;
-import roomescape.payment.presentation.dto.TimeoutErrorResponse;
+import roomescape.payment.application.dto.PaymentErrorResponse;
+import roomescape.payment.application.dto.TimeoutErrorResponse;
 
 @RestControllerAdvice
 public class ExceptionController {

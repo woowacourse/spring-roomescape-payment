@@ -1,4 +1,4 @@
-package roomescape.payment.presentation.dto;
+package roomescape.payment.application.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

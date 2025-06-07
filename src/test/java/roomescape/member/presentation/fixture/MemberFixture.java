@@ -3,7 +3,7 @@ package roomescape.member.presentation.fixture;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.Map;
-import roomescape.member.presentation.dto.TokenRequest;
+import roomescape.member.application.dto.TokenRequest;
 
 public class MemberFixture {
 
