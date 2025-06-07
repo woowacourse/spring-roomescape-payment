@@ -10,6 +10,7 @@ import static roomescape.helper.TestFixture.PAYMENT;
 import io.restassured.RestAssured;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -219,8 +220,8 @@ class ReservationAcceptanceTest {
         );
         TestHelper.postWithToken("/reservations", reservationRequest, token);
 
-        when(paymentService.findByReservation(any()))
-                .thenReturn(PAYMENT);
+        when(paymentService.findAllByReservations(any()))
+                .thenReturn(List.of(PAYMENT));
 
         // when & then
         TestHelper.getWithToken("/reservations/mine", token)

@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -111,10 +114,14 @@ public class ReservationService {
 
     private List<ReservationByMemberResponse> findReservationsWithPaymentByMember(Member member) {
         List<Reservation> reservations = reservationRepository.findAllByMember(member);
+        List<Payment> payments = paymentService.findAllByReservations(reservations);
+        Map<Reservation, Payment> paymentsByReservation = payments.stream()
+                .collect(Collectors.toMap(Payment::getReservation, Function.identity()));
+
         return reservations.stream()
                 .map(reservation -> {
-                    if (paymentService.existsByReservation(reservation)) {
-                        Payment payment = paymentService.findByReservation(reservation);
+                    if (paymentsByReservation.containsKey(reservation)) {
+                        Payment payment = paymentsByReservation.get(reservation);
                         return ReservationByMemberResponse.of(reservation, payment);
                     }
                     return ReservationByMemberResponse.from(reservation);
