@@ -29,7 +29,7 @@ public interface ReservationApi {
     @SecurityDocs.Unauthorized
     @SecurityDocs.Forbidden
     @Operation(summary = "전체 예약 데이터 조회", description = "'예약'된 방탈출 예약 전체를 조회합니다. 관리자만 사용 가능합니다.")
-    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(mediaType = "application/json", examples = {
             @ExampleObject(name = "전체 예약 데이터 조회 성공", value = """
                     [
                         {
@@ -57,7 +57,7 @@ public interface ReservationApi {
 
     @SecurityDocs.Unauthorized
     @Operation(summary = "사용자 전체 예약 데이터 조회", description = "사용자가 예약한 방탈출 예약 전체를 조회합니다. 인증된 유저 및 관리자만 사용 가능합니다.")
-    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(mediaType = "application/json", examples = {
             @ExampleObject(name = "사용자의 전체 예약 데이터 조회 성공", value = """
                     [
                       {
@@ -108,7 +108,7 @@ public interface ReservationApi {
                                 "paymentType": "NORMAL"
                             }
                             """))))
-    @ApiResponse(responseCode = "201", content = @Content(mediaType = "application/json", examples = {
+    @ApiResponse(responseCode = "201", description = "추가 성공", content = @Content(mediaType = "application/json", examples = {
             @ExampleObject(name = "방탈출 예약 추가 성공", value = """
                     {
                         "id": 1,
@@ -121,28 +121,28 @@ public interface ReservationApi {
                     }
                     """)
     }))
-    @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
-            @ExampleObject(name = "존재하지 않는 유저가 시도하는 경우 추가 실패", value = """
+    @ApiResponse(responseCode = "400", description = "추가 실패", content = @Content(mediaType = "application/json", examples = {
+            @ExampleObject(name = "존재하지 않는 멤버 ID로 시도", value = """
                     {
                       "message": "존재하지 않는 멤버 ID입니다."
                     }
                     """),
-            @ExampleObject(name = "존재하지 않는 예약 시간으로 추가 시도하는 경우 추가 실패", value = """
+            @ExampleObject(name = "존재하지 않는 예약 시간으로 추가 시도", value = """
                     {
                       "message": "존재하지 않는 예약 시간입니다."
                     }
                     """),
-            @ExampleObject(name = "존재하지 않는 테마로 추가 시도하는 경우 추가 실패", value = """
+            @ExampleObject(name = "존재하지 않는 테마로 추가 시도", value = """
                     {
                       "message": "존재하지 않는 테마입니다."
                     }
                     """),
-            @ExampleObject(name = "유저가 예약한 같은 날짜, 시간, 테마인 예약이 존재하는 경우 추가 실패", value = """
+            @ExampleObject(name = "유저가 예약한 같은 날짜, 시간, 테마인 예약이 존재", value = """
                     {
                       "message": "이미 예약이 존재합니다."
                     }
                     """),
-            @ExampleObject(name = "과거 날짜 및 시간으로 예약 시도 시 추가 실패", value = """
+            @ExampleObject(name = "과거 날짜 및 시간으로 예약 시도", value = """
                     {
                       "message": "과거 날짜 및 시간으로 예약할 수 없습니다."
                     }
@@ -173,7 +173,7 @@ public interface ReservationApi {
                                 "themeId": 1
                             }
                             """))))
-    @ApiResponse(responseCode = "201", content = @Content(mediaType = "application/json", examples = {
+    @ApiResponse(responseCode = "201", description = "추가 성공", content = @Content(mediaType = "application/json", examples = {
             @ExampleObject(name = "방탈출 예약 대기 추가 성공", value = """
                     {
                         "date": "3000-07-25",
@@ -182,37 +182,28 @@ public interface ReservationApi {
                     }
                     """)
     }))
-    @ApiResponse(responseCode = "201", content = @Content(mediaType = "application/json", examples = {
-            @ExampleObject(name = "방탈출 예약 대기 추가 성공", value = """
-                    {
-                        "date": "3000-07-25",
-                        "timeId": 1,
-                        "themeId": 1
-                    }
-                    """)
-    }))
-    @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
-            @ExampleObject(name = "존재하지 않는 유저가 시도하는 경우 추가 실패", value = """
+    @ApiResponse(responseCode = "400", description = "추가 실패", content = @Content(mediaType = "application/json", examples = {
+            @ExampleObject(name = "존재하지 않는 멤버 ID로 시도", value = """
                     {
                       "message": "존재하지 않는 멤버 ID입니다."
                     }
                     """),
-            @ExampleObject(name = "존재하지 않는 예약 시간으로 추가 시도하는 경우 추가 실패", value = """
+            @ExampleObject(name = "존재하지 않는 예약 시간으로 추가 시도", value = """
                     {
                       "message": "존재하지 않는 예약 시간입니다."
                     }
                     """),
-            @ExampleObject(name = "존재하지 않는 테마로 추가 시도하는 경우 추가 실패", value = """
+            @ExampleObject(name = "존재하지 않는 테마로 추가 시도", value = """
                     {
                       "message": "존재하지 않는 테마입니다."
                     }
                     """),
-            @ExampleObject(name = "유저가 예약한 같은 날짜, 시간, 테마인 예약이 존재하는 경우 추가 실패", value = """
+            @ExampleObject(name = "유저가 예약한 같은 날짜, 시간, 테마인 예약이 존재", value = """
                     {
                       "message": "이미 예약이 존재합니다."
                     }
                     """),
-            @ExampleObject(name = "과거 날짜 및 시간으로 예약 시도 시 추가 실패", value = """
+            @ExampleObject(name = "과거 날짜 및 시간으로 예약 시도", value = """
                     {
                       "message": "과거 날짜 및 시간으로 예약할 수 없습니다."
                     }
@@ -238,12 +229,16 @@ public interface ReservationApi {
                     schema = @Schema(implementation = CreateReservationRequest.class),
                     examples = @ExampleObject(name = "방탈출 예약 추가 요청 예시", value = """
                             {
-                                "name": "apitest",
-                                "email": "apitest@apitest.com",
-                                "password": "apitest"
-                            }
+                                        "name": "apitest",
+                                        "email": "apitest@apitest.com",
+                                        "password": "apitest",
+                                        "paymentKey": "paymentKeyId",
+                                        "orderId": "orderId",
+                                        "amount": 1000,
+                                        "paymentType": "NORMAL"
+                                     }
                             """))))
-    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
+    @ApiResponse(responseCode = "200", description = "확정 성공", content = @Content(mediaType = "application/json", examples = {
             @ExampleObject(name = "방탈출 예약 확정 성공", value = """
                     {
                       "paymentKey": "paymentKeyId",
@@ -277,26 +272,27 @@ public interface ReservationApi {
                                                                ConfirmWaitReservationRequest request,
                                                                @Parameter(hidden = true) LoginMemberRequest loginMemberRequest);
 
+    @SecurityDocs.Unauthorized
     @Operation(summary = "방탈출 예약 취소", description = "방탈출 예약을 취소합니다. 인증된 유저 및 관리자만 사용 가능합니다.")
-    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
-            @ExampleObject(name = "방탈출 예약 취소 성공")
-    }))
-    @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
-            @ExampleObject(name = "존재하지 않는 예약을 삭제 시도 시 실패", value = """
-                    {
-                        "message": "존재하지 않는 예약 입니다."
-                    }
-                    """)
-    }))
+    @ApiResponse(responseCode = "200", description = "취소 성공", content = @Content(mediaType = "application/json",
+            examples = {
+                    @ExampleObject(name = "방탈출 예약 취소 성공")
+            }))
+    @ApiResponse(responseCode = "400", description = "취소 실패", content = @Content(mediaType = "application/json",
+            examples = {
+                    @ExampleObject(name = "존재하지 않는 예약", value = """
+                            {
+                                "message": "존재하지 않는 예약 입니다."
+                            }
+                            """)
+            }))
     ResponseEntity<Void> deleteReservations(Long id);
 
     @SecurityDocs.Unauthorized
     @Operation(summary = "방탈출 예약 대기 취소", description = "방탈출 예약 대기를 취소합니다. 인증된 유저 및 관리자만 사용 가능합니다.")
-    @ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json", examples = {
-            @ExampleObject(name = "방탈출 예약 대기 취소 성공")
-    }))
-    @ApiResponse(responseCode = "400", content = @Content(mediaType = "application/json", examples = {
-            @ExampleObject(name = "방탈출 예약 대기 취소 실패", value = """
+    @ApiResponse(responseCode = "200", description = "취소 성공", content = @Content(mediaType = "application/json"))
+    @ApiResponse(responseCode = "400", description = "취소 실패", content = @Content(mediaType = "application/json", examples = {
+            @ExampleObject(name = "존재하지 않는 예약", value = """
                     {
                         "message": "존재하지 않는 예약 입니다."
                     }

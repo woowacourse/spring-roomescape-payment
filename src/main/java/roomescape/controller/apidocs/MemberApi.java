@@ -60,8 +60,8 @@ public interface MemberApi {
                             }))
             }
     )
-    @ApiResponse(responseCode = "400", description = "이메일 중복 시, 회원 가입 실패", content = @Content(mediaType = "application/json",
-            examples = @ExampleObject(value = """
+    @ApiResponse(responseCode = "400", description = "회원 가입 실패", content = @Content(mediaType = "application/json",
+            examples = @ExampleObject(name = "이메일 중복", value = """
                     {
                         "message": "동일한 이메일로 추가할 수 없습니다."
                     }

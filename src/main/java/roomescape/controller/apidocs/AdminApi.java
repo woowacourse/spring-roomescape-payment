@@ -119,7 +119,7 @@ public interface AdminApi {
     @ApiResponse(responseCode = "200", description = "조회 성공",
             content = @Content(mediaType = "application/json",
                     array = @ArraySchema(schema = @Schema(implementation = ReservationWaitResponse.class)),
-                    examples = @ExampleObject(value = """
+                    examples = @ExampleObject(name = "대기 예약 목록 조회 성공", value = """
                             [
                                 {
                                     "id": 1,
@@ -148,22 +148,20 @@ public interface AdminApi {
             }
     )
     @ApiResponse(responseCode = "200", description = "승인 성공")
-    @ApiResponse(responseCode = "400", description = "대기가 아닌 예약", content = @Content(
+    @ApiResponse(responseCode = "400", description = "승인 실패", content = @Content(
             mediaType = "application/json",
-            examples = @ExampleObject(value = """
-                    {
-                        "message": "대기 중인 예약이 아닙니다."
-                    }
-                    """
-            )))
-    @ApiResponse(responseCode = "400", description = "예약 정보 없음", content = @Content(
-            mediaType = "application/json",
-            examples = @ExampleObject(value = """
-                    {
-                        "message": "존재하지 않는 예약 대기입니다."
-                    }
-                    """
-            )))
+            examples = {
+                    @ExampleObject(name = "대기가 아닌 예약", value = """
+                            {
+                                "message": "대기 중인 예약이 아닙니다."
+                            }
+                            """),
+                    @ExampleObject(name = "예약 정보 없음", value = """
+                            {
+                                "message": "존재하지 않는 예약 대기입니다."
+                            }
+                            """)
+            }))
     ResponseEntity<Void> approveWaitReservation(@PathVariable("id") Long reservationId);
 
     @Operation(
@@ -179,21 +177,21 @@ public interface AdminApi {
             }
     )
     @ApiResponse(responseCode = "204", description = "거절 성공")
-    @ApiResponse(responseCode = "400", description = "대기가 아닌 예약", content = @Content(
+    @ApiResponse(responseCode = "400", description = "거절 실패", content = @Content(
             mediaType = "application/json",
-            examples = @ExampleObject(value = """
-                    {
-                        "message": "대기 중인 예약이 아닙니다."
-                    }
-                    """
-            )))
-    @ApiResponse(responseCode = "400", description = "예약 정보 없음", content = @Content(
-            mediaType = "application/json",
-            examples = @ExampleObject(value = """
-                    {
-                        "message": "존재하지 않는 예약 대기입니다."
-                    }
-                    """
-            )))
+            examples = {
+                    @ExampleObject(name = "대기가 아닌 예약", value = """
+                            {
+                                "message": "대기 중인 예약이 아닙니다."
+                            }
+                            """
+                    ),
+                    @ExampleObject(name = "예약 정보 없음", value = """
+                            {
+                                "message": "존재하지 않는 예약 대기입니다."
+                            }
+                            """
+                    )
+            }))
     ResponseEntity<Void> rejectWaitReservation(@PathVariable("id") Long reservationId);
 }

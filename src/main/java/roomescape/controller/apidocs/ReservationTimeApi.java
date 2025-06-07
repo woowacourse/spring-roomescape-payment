@@ -25,8 +25,8 @@ import roomescape.exception.dto.ErrorResponse;
 public interface ReservationTimeApi {
 
     @Operation(summary = "전체 예약 가능 시간 조회", description = "모든 예약 가능한 시간을 조회합니다.")
-    @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(mediaType = "application/json",
-            examples = @ExampleObject(value = """
+    @ApiResponse(responseCode = "200", description = "전체 예약 가능 시간 조회 성공", content = @Content(mediaType = "application/json",
+            examples = @ExampleObject(name = "조회 성공", value = """
                     [
                         {
                             "id": 1,
@@ -52,7 +52,7 @@ public interface ReservationTimeApi {
             }
     )
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(mediaType = "application/json",
-            examples = @ExampleObject(value = """
+            examples = @ExampleObject(name = "예약 가능 시간 조회 성공", value = """
                     [
                         {
                             "timeId": 1,
@@ -74,12 +74,25 @@ public interface ReservationTimeApi {
     @Operation(summary = "예약 가능 시간 추가", description = "새로운 예약 가능 시간을 추가합니다. 관리자만 사용 가능합니다.",
             requestBody = @RequestBody(required = true, content = @Content(mediaType = "application/json",
                     schema = @Schema(implementation = CreateReservationTimeRequest.class),
-                    examples = @ExampleObject(value = """
+                    examples = @ExampleObject(name = "예약 가능 시간 추가 예시", value = """
                             {
                                 "startAt": "14:00:00"
                             }
                             """)
             )))
+    @ApiResponse(responseCode = "201", description = "예약 가능 시간 추가 성공", content = @Content(mediaType = "application/json",
+            examples = @ExampleObject(name = "시간 추가 성공", value = """
+                    {
+                        "id": 3,
+                        "time": "14:00:00"
+                    }
+                    """)))
+    @ApiResponse(responseCode = "400", description = "시간 추가 실패", content = @Content(mediaType = "application/json",
+            examples = @ExampleObject(name = "이미 존재하는 시간", value = """
+                    {
+                        "message": "이미 존재하는 예약 시간입니다."
+                    }
+                    """)))
     @ApiResponse(responseCode = "400", description = "입력값 검증 실패", content = @Content(
             mediaType = "application/json",
             array = @ArraySchema(schema = @Schema(implementation = ErrorResponse.class)),
@@ -90,19 +103,6 @@ public interface ReservationTimeApi {
                             "message": "시간은 비어있을 수 없습니다."
                         }
                     ]
-                    """)))
-    @ApiResponse(responseCode = "201", description = "시간 추가 성공", content = @Content(mediaType = "application/json",
-            examples = @ExampleObject(value = """
-                    {
-                        "id": 3,
-                        "time": "14:00:00"
-                    }
-                    """)))
-    @ApiResponse(responseCode = "400", description = "중복된 시간", content = @Content(mediaType = "application/json",
-            examples = @ExampleObject(value = """
-                    {
-                        "message": "이미 존재하는 예약 시간입니다."
-                    }
                     """)))
     ResponseEntity<ReservationTimeResponse> addReservationTime(
             @RequestBody CreateReservationTimeRequest request
@@ -118,8 +118,9 @@ public interface ReservationTimeApi {
             }
     )
     @ApiResponse(responseCode = "204", description = "삭제 성공")
-    @ApiResponse(responseCode = "400", description = "존재하지 않는 시간",
-            content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
+    @ApiResponse(responseCode = "400", description = "삭제 실패",
+            content = @Content(mediaType = "application/json", examples =
+            @ExampleObject(name = "존재하지 않는 시간", value = """
                     {
                         "message": "존재하지 않는 예약 시간입니다."
                     }

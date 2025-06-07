@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -66,7 +67,16 @@ public interface ThemeApi {
 
     @SecurityDocs.Unauthorized
     @SecurityDocs.Forbidden
-    @Operation(summary = "테마 추가", description = "새로운 방탈출 테마를 추가합니다. 관리자만 사용 가능합니다.")
+    @Operation(summary = "테마 추가", description = "새로운 방탈출 테마를 추가합니다. 관리자만 사용 가능합니다.",
+            requestBody = @RequestBody(required = true, content = @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CreateThemeRequest.class),
+                    examples = @ExampleObject(name = "방탈출 테마 추가 요청 예시", value = """
+                            {
+                                "name": "테마 추가 테스트",
+                                "description": "테마 추가 테스트 설명",
+                                "thumbnail": "테마 썸네일"
+                            }
+                            """))))
     @ApiResponse(responseCode = "201", description = "테마 추가 성공", content = @Content(mediaType = "application/json",
             examples = @ExampleObject(value = """
                     {
@@ -76,8 +86,8 @@ public interface ThemeApi {
                         "thumbnail": "mystery-room.jpg"
                     }
                     """)))
-    @ApiResponse(responseCode = "400", description = "중복된 테마 이름", content = @Content(mediaType = "application/json",
-            examples = @ExampleObject(value = """
+    @ApiResponse(responseCode = "400", description = "테마 추가 실패", content = @Content(mediaType = "application/json",
+            examples = @ExampleObject(name = "중복된 테마 이름", value = """
                     {
                         "message": "이미 존재하는 테마 이름입니다."
                     }
@@ -110,8 +120,8 @@ public interface ThemeApi {
             }
     )
     @ApiResponse(responseCode = "204", description = "삭제 성공")
-    @ApiResponse(responseCode = "404", description = "테마를 찾을 수 없음", content = @Content(mediaType = "application/json",
-            examples = @ExampleObject(value = """
+    @ApiResponse(responseCode = "404", description = "삭제 실패", content = @Content(mediaType = "application/json",
+            examples = @ExampleObject(name = "존재하지 않는 테마", value = """
                     {
                         "message": "존재하지 않는 테마입니다."
                     }

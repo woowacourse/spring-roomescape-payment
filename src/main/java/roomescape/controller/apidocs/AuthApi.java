@@ -36,12 +36,14 @@ public interface AuthApi {
                                     description = "인증 토큰이 포함된 쿠키",
                                     schema = @Schema(type = "string", example = "token=eyJhbGciOiJ...; HttpOnly; Path=/; Max-Age=3600"))},
                             content = @Content(mediaType = "application/json")),
-                    @ApiResponse(responseCode = "400", description = "잘못된 로그인 정보",
-                            content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
-                                    {
-                                        "message": "이메일 또는 비밀번호가 일치하지 않습니다."
-                                    }
-                                    """)
+                    @ApiResponse(responseCode = "400", description = "로그인 실패",
+                            content = @Content(mediaType = "application/json", examples =
+                            @ExampleObject(name = "잘못된 로그인 정보",
+                                    value = """
+                                            {
+                                                "message": "이메일 또는 비밀번호가 일치하지 않습니다."
+                                            }
+                                            """)
                             )
                     )})
     @ApiResponse(responseCode = "400", description = "입력값 검증 실패", content = @Content(
@@ -61,31 +63,29 @@ public interface AuthApi {
     ResponseEntity<Void> login(LoginRequest request, @Parameter(hidden = true) HttpServletResponse response);
 
     @Operation(summary = "유저 정보 검증", description = "사용자 쿠키 토큰을 기반으로 유저 정보를 검증합니다.",
-            responses = {@ApiResponse(responseCode = "200", content = @Content(mediaType = "application/json",
-                    examples = {@ExampleObject(name = "사용자 토큰 검증 성공", value = """
-                            {
-                                "id": 1,
-                                "name": "플린트",
-                                "role": "USER"
-                            }
-                            """)
-                    })),
-                    @ApiResponse(responseCode = "401", description = "토큰 만료",
-                            content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "검증 성공", content = @Content(mediaType = "application/json",
+                            examples = {@ExampleObject(name = "사용자 토큰 검증 성공", value = """
                                     {
-                                        "message": "토큰이 만료되었습니다."
+                                        "id": 1,
+                                        "name": "플린트",
+                                        "role": "USER"
                                     }
                                     """)
-                            )
-                    ),
-                    @ApiResponse(responseCode = "401", description = "유효하지 않은 토큰 검증 실패",
-                            content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
-                                    {
-                                        "message": "유효하지 않은 토큰입니다."
-                                    }
-                                    """)
-                            )
-                    )
+                            })),
+                    @ApiResponse(responseCode = "401", description = "검증 실패",
+                            content = @Content(mediaType = "application/json", examples = {
+                                    @ExampleObject(name = "토큰 만료", value = """
+                                            {
+                                                "message": "토큰이 만료되었습니다."
+                                            }
+                                            """),
+                                    @ExampleObject(name = "유효하지 않은 토큰", value = """
+                                            {
+                                                "message": "유효하지 않은 토큰입니다."
+                                            }
+                                            """)
+                            }))
             })
     ResponseEntity<LoginMemberRequest> checkLogin(@Parameter(hidden = true) LoginMemberRequest loginMemberRequest);
 
@@ -94,7 +94,7 @@ public interface AuthApi {
             responses = {
                     @ApiResponse(responseCode = "200", description = "로그아웃 성공(기존 토큰은 만료 처리합니다.)",
                             headers = {@Header(name = "Set-Cookie",
-                                    description = "인증 토큰이 포함된 쿠키",
+                                    description = "만료한 인증 토큰이 포함된 쿠키",
                                     schema = @Schema(type = "string", example = "token=\"\"; HttpOnly; Path=/; Max-Age=0"))},
                             content = @Content(mediaType = "application/json")),
             })
