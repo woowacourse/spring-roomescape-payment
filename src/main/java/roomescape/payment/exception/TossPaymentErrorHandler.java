@@ -12,8 +12,8 @@ public class TossPaymentErrorHandler implements ResponseErrorHandler {
 
     private final ObjectMapper objectMapper;
 
-    public TossPaymentErrorHandler(final ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    public TossPaymentErrorHandler() {
+        this.objectMapper = new ObjectMapper();
     }
 
     @Override

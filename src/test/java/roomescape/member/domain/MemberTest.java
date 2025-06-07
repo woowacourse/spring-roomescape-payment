@@ -4,8 +4,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import roomescape.member.exception.EmailException;
-import roomescape.member.exception.NameException;
+import roomescape.member.exception.MemberException;
 
 class MemberTest {
 
@@ -14,7 +13,7 @@ class MemberTest {
     @ValueSource(strings = {".", "kang0@d", "kaw.com", "test@.com"})
     void validate_email_format(final String email) {
         Assertions.assertThatThrownBy(() -> Member.createWithoutId("기석", email, "password"))
-                .isInstanceOf(EmailException.class);
+                .isInstanceOf(MemberException.class);
     }
 
     @DisplayName("이름은 1-5글자 사이만 가능하다.")
@@ -22,6 +21,6 @@ class MemberTest {
     @ValueSource(strings = {"testtest", "testtd", "tdasjiopgrj2", ""})
     void validate_name_length(final String name) {
         Assertions.assertThatThrownBy(() -> Member.createWithoutId(name, "k@email.com", "password"))
-                .isInstanceOf(NameException.class);
+                .isInstanceOf(MemberException.class);
     }
 }

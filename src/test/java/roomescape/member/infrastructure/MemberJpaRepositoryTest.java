@@ -42,7 +42,7 @@ class MemberJpaRepositoryTest {
         List<Member> members = memberJpaRepository.findAll();
 
         assertThat(members)
-            .extracting(Member::getId)
-            .containsExactly(1L, 2L, 3L);
+                .extracting(Member::getId)
+                .containsExactly(1L, 2L, 3L);
     }
 }

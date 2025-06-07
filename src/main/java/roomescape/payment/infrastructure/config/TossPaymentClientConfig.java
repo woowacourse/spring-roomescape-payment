@@ -1,6 +1,5 @@
 package roomescape.payment.infrastructure.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
@@ -34,7 +33,7 @@ public class TossPaymentClientConfig {
 
     @Bean
     public TossPaymentClient tossPaymentClient() {
-        return new TossPaymentClient(createRestClient(), new ObjectMapper());
+        return new TossPaymentClient(createRestClient());
     }
 
     private RestClient createRestClient() {

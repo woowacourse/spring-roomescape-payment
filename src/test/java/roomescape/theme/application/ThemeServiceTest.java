@@ -13,12 +13,12 @@ import roomescape.common.util.time.DateTime;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.infrastructure.ReservationJpaRepository;
 import roomescape.reservation.infrastructure.ReservationJpaRepositoryAdapter;
+import roomescape.theme.application.ThemeServiceTest.ThemeConfig;
 import roomescape.theme.domain.ThemeRepository;
 import roomescape.theme.dto.response.PopularThemeResponse;
 import roomescape.theme.exception.ThemeException;
 import roomescape.theme.infrastructure.ThemeJpaRepository;
 import roomescape.theme.infrastructure.ThemeJpaRepositoryAdapter;
-import roomescape.theme.application.ThemeServiceTest.ThemeConfig;
 
 @DataJpaTest
 @Import(ThemeConfig.class)
@@ -63,7 +63,8 @@ class ThemeServiceTest {
         }
 
         @Bean
-        public ThemeService themeService(DateTime dateTime, ThemeRepository themeRepository, ReservationRepository reservationRepository) {
+        public ThemeService themeService(DateTime dateTime, ThemeRepository themeRepository,
+                                         ReservationRepository reservationRepository) {
             return new ThemeService(dateTime, themeRepository, reservationRepository);
         }
     }

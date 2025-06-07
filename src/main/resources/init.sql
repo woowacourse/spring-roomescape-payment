@@ -18,10 +18,19 @@ INSERT INTO admin (name, email, password) VALUES
 
 INSERT INTO reservation (date, time_id, theme_id, member_id, status) VALUES
     (CURRENT_DATE + 1, 1, 1, 1, 'RESERVED'),
-    (CURRENT_DATE + 1, 2, 1, 1, 'RESERVED'),
-    (CURRENT_DATE - 1, 1, 3, 2, 'RESERVED'),
-    (CURRENT_DATE + 2, 1, 2, 3, 'RESERVED');
+    (CURRENT_DATE + 2, 1, 1, 1, 'RESERVED'),
+    (CURRENT_DATE + 1, 2, 3, 2, 'RESERVED'),
+    (CURRENT_DATE + 3, 2, 2, 2, 'RESERVED'),
+    (CURRENT_DATE + 2, 3, 2, 3, 'RESERVED'),
+    (CURRENT_DATE + 3, 3, 2, 3, 'RESERVED');
+
+INSERT INTO payment (payment_key, order_id, amount, approved_at, reservation_id) VALUES
+    ('tgen_20240513184816ZSAZ9', 'MC4wNDYzMzA0OTc2MDgy', 1000,  CURRENT_TIMESTAMP + INTERVAL '1' HOUR, 1),
+    ('tgen_20240513184816ZSAZ9', 'MC4wNDYzMzA0OTc2MDgy', 2000,  CURRENT_TIMESTAMP + INTERVAL '2' HOUR, 2),
+    ('tgen_20240513184816ZSAZ9', 'MC4wNDYzMzA0OTc2MDgy', 3000,  CURRENT_TIMESTAMP + INTERVAL '3' HOUR, 3);
 
 INSERT INTO waiting (reservation_id, member_id) VALUES
     (1, 2),
-    (1, 3);
+    (3, 3),
+    (3, 1),
+    (4, 1);

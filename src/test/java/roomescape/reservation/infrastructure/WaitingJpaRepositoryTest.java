@@ -20,8 +20,8 @@ class WaitingJpaRepositoryTest {
         List<Waiting> result = waitingJpaRepository.findByReservationIdOrderById(1L);
 
         assertThat(result)
-            .extracting(w -> w.getMember().getId())
-            .containsExactly(2L, 3L);
+                .extracting(w -> w.getMember().getId())
+                .containsExactly(2L, 3L);
     }
 
     @Test

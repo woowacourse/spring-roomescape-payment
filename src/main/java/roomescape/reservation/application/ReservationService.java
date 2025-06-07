@@ -1,7 +1,9 @@
 package roomescape.reservation.application;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,7 +12,7 @@ import roomescape.common.util.time.DateTime;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.member.dto.response.MemberResponse;
-import roomescape.member.exception.MemberNotFound;
+import roomescape.member.exception.MemberException;
 import roomescape.payment.application.PaymentService;
 import roomescape.payment.dto.request.PaymentRequest;
 import roomescape.reservation.domain.Reservation;
@@ -19,8 +21,10 @@ import roomescape.reservation.domain.Status;
 import roomescape.reservation.domain.Waiting;
 import roomescape.reservation.domain.WaitingRepository;
 import roomescape.reservation.dto.ReservationSearchCondition;
+import roomescape.reservation.dto.ReservationWithPayment;
 import roomescape.reservation.dto.WaitingWithRank;
 import roomescape.reservation.dto.request.ReservationRequest;
+import roomescape.reservation.dto.request.ReservationWithPaymentRequest;
 import roomescape.reservation.dto.response.ReservationMineResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.WaitingResponse;
@@ -65,13 +69,31 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse createReservation(final ReservationRequest request, final Long memberId) {
+    public ReservationResponse createReservationWithPayment(final ReservationWithPaymentRequest request,
+                                                            final Long memberId) {
+        ReservationRequest reservationRequest = new ReservationRequest(request.date(), request.timeId(),
+                request.themeId());
+        Reservation reservation = createReservation(reservationRequest, memberId);
+
+        PaymentRequest paymentRequest = new PaymentRequest(request.paymentKey(), request.orderId(), request.amount());
+        paymentService.confirmPayment(paymentRequest, reservation);
+
+        return ReservationResponse.from(reservation);
+    }
+
+    @Transactional
+    public ReservationResponse createReservationWithoutPayment(final ReservationRequest request, final Long memberId) {
+        Reservation reservation = createReservation(request, memberId);
+        return ReservationResponse.from(reservation);
+    }
+
+    private Reservation createReservation(final ReservationRequest request, final Long memberId) {
         TimeSlot time = reservationTimeRepository.findById(request.timeId())
                 .orElseThrow(() -> new TimeSlotException("예약 시간을 찾을 수 없습니다."));
         Theme theme = themeRepository.findById(request.themeId())
                 .orElseThrow(() -> new ThemeException("테마를 찾을 수 없습니다."));
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberNotFound("멤버를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MemberException("멤버를 찾을 수 없습니다."));
 
         List<Reservation> reservations = reservationRepository.findAllByDateAndThemeId(request.date(),
                 request.themeId());
@@ -80,12 +102,9 @@ public class ReservationService {
         Reservation reservation = Reservation.createWithoutId(request.date(), time, theme, member, Status.RESERVED);
         validateCanReserveDateTime(reservation, dateTime.now());
 
-        PaymentRequest paymentRequest = new PaymentRequest(request.paymentKey(), request.orderId(), request.amount());
-        paymentService.confirmPayment(paymentRequest);
-
         reservation = reservationRepository.save(reservation);
 
-        return ReservationResponse.from(reservation);
+        return reservation;
     }
 
     @Transactional
@@ -94,7 +113,7 @@ public class ReservationService {
                 .orElseThrow(() -> new ReservationException("예약 정보가 없습니다."));
 
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberNotFound("멤버를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MemberException("멤버를 찾을 수 없습니다."));
 
         validateNotReservationOwner(reservation, member);
         validateCanReserveDateTime(reservation, dateTime.now());
@@ -182,16 +201,22 @@ public class ReservationService {
 
     public List<ReservationMineResponse> getMemberReservations(final LoginMemberInfo loginMemberInfo) {
         Member member = memberRepository.findById(loginMemberInfo.id())
-                .orElseThrow(() -> new MemberNotFound("멤버를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MemberException("멤버를 찾을 수 없습니다."));
 
-        List<Reservation> reservations = reservationRepository.findAllByMemberId(loginMemberInfo.id());
+        List<ReservationWithPayment> reservationsWithPayment = reservationRepository.findAllWithPaymentByMemberId(
+                member.getId());
+        List<Reservation> reservationsWithoutPayment = reservationRepository.findAllWithoutPaymentByMemberId(
+                member.getId());
+        List<WaitingWithRank> waitingsWithRank = waitingRepository.findByMemberId(member.getId());
 
-        List<WaitingWithRank> waitingWithRanks = waitingRepository.findByMemberId(loginMemberInfo.id());
-
-        return Stream.concat(
-                reservations.stream().map(ReservationMineResponse::from),
-                waitingWithRanks.stream().map(ReservationMineResponse::from)
-        ).toList();
+        return Stream.of(
+                        reservationsWithPayment.stream().map(ReservationMineResponse::from),
+                        reservationsWithoutPayment.stream().map(ReservationMineResponse::from),
+                        waitingsWithRank.stream().map(ReservationMineResponse::from)
+                )
+                .flatMap(Function.identity())
+                .sorted(Comparator.comparing(ReservationMineResponse::date))
+                .toList();
     }
 
     public List<ReservationResponse> findAllWaitings() {

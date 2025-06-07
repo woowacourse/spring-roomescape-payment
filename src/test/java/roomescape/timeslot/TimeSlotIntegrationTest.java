@@ -1,20 +1,24 @@
 package roomescape.timeslot;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.Map;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import roomescape.common.dto.response.ExceptionResponse;
+import roomescape.common.dto.response.ErrorResponse;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -26,7 +30,7 @@ public class TimeSlotIntegrationTest {
         RestAssured.given().log().all()
                 .when().get("/times")
                 .then().log().all()
-                .statusCode(200)
+                .statusCode(OK.value())
                 .body("size()", is(3));
     }
 
@@ -41,12 +45,12 @@ public class TimeSlotIntegrationTest {
                 .body(params)
                 .when().post("/times")
                 .then().log().all()
-                .statusCode(201);
+                .statusCode(CREATED.value());
 
         RestAssured.given().log().all()
                 .when().delete("/times/4")
                 .then().log().all()
-                .statusCode(204);
+                .statusCode(NO_CONTENT.value());
     }
 
     @DisplayName("시간이 null인 상태로 생성 요청 시 400 응답을 준다.")
@@ -55,19 +59,20 @@ public class TimeSlotIntegrationTest {
         Map<String, Object> reservationTime = new HashMap<>();
         reservationTime.put("startAt", null);
 
-        ExceptionResponse expected = new ExceptionResponse(400, "[ERROR] time은 null 일 수 없습니다.", "/times");
-
         Response response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(reservationTime)
                 .when().post("/times")
                 .then().log().all()
-                .statusCode(400)
+                .statusCode(BAD_REQUEST.value())
                 .extract()
                 .response();
 
-        ExceptionResponse actual = response.as(ExceptionResponse.class);
-        Assertions.assertThat(actual).isEqualTo(expected);
+        ErrorResponse actual = response.as(ErrorResponse.class);
+        ErrorResponse expected = new ErrorResponse(actual.timestamp(), BAD_REQUEST.value(),
+                BAD_REQUEST.getReasonPhrase(), "[ERROR] 요청 본문 형식이 올바르지 않습니다.", "/times");
+
+        assertThat(actual).isEqualTo(expected);
     }
 
     @DisplayName("잘못된 시간으로 생성 요청 시 400 응답을 준다.")
@@ -77,18 +82,19 @@ public class TimeSlotIntegrationTest {
         Map<String, Object> reservationTime = new HashMap<>();
         reservationTime.put("startAt", time);
 
-        ExceptionResponse expected = new ExceptionResponse(400, "[ERROR] 요청 시간 형식이 맞지 않습니다.", "/times");
-
         Response response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(reservationTime)
                 .when().post("/times")
                 .then().log().all()
-                .statusCode(400)
+                .statusCode(BAD_REQUEST.value())
                 .extract()
                 .response();
 
-        ExceptionResponse actual = response.as(ExceptionResponse.class);
-        Assertions.assertThat(actual).isEqualTo(expected);
+        ErrorResponse actual = response.as(ErrorResponse.class);
+        ErrorResponse expected = new ErrorResponse(actual.timestamp(), BAD_REQUEST.value(),
+                BAD_REQUEST.getReasonPhrase(), "[ERROR] 요청 본문 형식이 올바르지 않습니다.", "/times");
+
+        assertThat(actual).isEqualTo(expected);
     }
 }

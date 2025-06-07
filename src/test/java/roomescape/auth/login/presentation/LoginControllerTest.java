@@ -14,10 +14,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import roomescape.auth.application.LoginService;
 import roomescape.auth.dto.request.LoginRequest;
 import roomescape.auth.presentation.AdminLoginController;
 import roomescape.auth.presentation.MemberLoginController;
-import roomescape.auth.application.LoginService;
 import roomescape.auth.token.JwtTokenManager;
 
 @WebMvcTest({MemberLoginController.class, AdminLoginController.class})
@@ -39,13 +39,13 @@ class LoginControllerTest {
         String token = "jwt-token";
 
         given(loginService.createMemberToken(any()))
-            .willReturn(token);
+                .willReturn(token);
 
         mockMvc.perform(post("/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk())
-            .andExpect(cookie().exists("token"));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(cookie().exists("token"));
     }
 
     @Test
@@ -54,12 +54,12 @@ class LoginControllerTest {
         String token = "jwt-token";
 
         given(loginService.createAdminToken(any()))
-            .willReturn(token);
+                .willReturn(token);
 
         mockMvc.perform(post("/admin/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-            .andExpect(status().isOk())
-            .andExpect(cookie().exists("token"));
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(cookie().exists("token"));
     }
 } 

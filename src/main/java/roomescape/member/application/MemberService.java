@@ -8,8 +8,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.member.dto.request.MemberRequest;
 import roomescape.member.dto.response.MemberResponse;
-import roomescape.member.exception.EmailException;
-import roomescape.member.exception.MemberNotFound;
+import roomescape.member.exception.MemberException;
 
 @Service
 @Transactional(readOnly = true)
@@ -23,7 +22,7 @@ public class MemberService {
 
     private static void validateEmailExists(final boolean emailExist) {
         if (emailExist) {
-            throw new EmailException("중복되는 이메일입니다.");
+            throw new MemberException("중복되는 이메일입니다.");
         }
     }
 
@@ -40,7 +39,7 @@ public class MemberService {
 
     public Member findByEmail(final String email) {
         return memberRepository.findByEmail(new Email(email))
-                .orElseThrow(() -> new MemberNotFound("멤버를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MemberException("멤버를 찾을 수 없습니다."));
     }
 
     public boolean isExistsByEmail(final String email) {
@@ -49,7 +48,7 @@ public class MemberService {
 
     public Member findById(final Long id) {
         return memberRepository.findById(id)
-                .orElseThrow(() -> new MemberNotFound("멤버를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MemberException("멤버를 찾을 수 없습니다."));
     }
 
     public List<MemberResponse> findAll() {

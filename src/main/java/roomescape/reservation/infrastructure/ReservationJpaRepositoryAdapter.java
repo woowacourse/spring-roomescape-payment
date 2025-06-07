@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Repository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
+import roomescape.reservation.dto.ReservationWithPayment;
 
 @Repository
 public class ReservationJpaRepositoryAdapter implements ReservationRepository {
@@ -14,6 +15,16 @@ public class ReservationJpaRepositoryAdapter implements ReservationRepository {
 
     public ReservationJpaRepositoryAdapter(final ReservationJpaRepository reservationJpaRepository) {
         this.reservationJpaRepository = reservationJpaRepository;
+    }
+
+    @Override
+    public boolean existsByTimeId(Long reservationTimeId) {
+        return reservationJpaRepository.existsByTimeId(reservationTimeId);
+    }
+
+    @Override
+    public boolean existByThemeId(Long themeId) {
+        return reservationJpaRepository.existsByThemeId(themeId);
     }
 
     @Override
@@ -27,39 +38,34 @@ public class ReservationJpaRepositoryAdapter implements ReservationRepository {
     }
 
     @Override
-    public Optional<Reservation> findById(Long id) {
-        return reservationJpaRepository.findById(id);
-    }
-
-    @Override
-    public List<Reservation> findAllByDateAndThemeId(LocalDate date, Long themeId) {
-        return reservationJpaRepository.findByDateAndThemeId(date, themeId);
-    }
-
-    @Override
-    public List<Reservation> findAllByMemberIdAndThemeIdAndDateBetween(Long memberId, Long themeId, LocalDate from,
-                                                                       LocalDate to) {
-        return reservationJpaRepository.findByMemberIdAndThemeIdAndDateBetween(memberId, themeId, from, to);
-    }
-
-    @Override
-    public List<Reservation> findAllByMemberId(Long memberId) {
-        return reservationJpaRepository.findByMemberId(memberId);
-    }
-
-    @Override
     public List<Reservation> findAll() {
         return reservationJpaRepository.findAll();
     }
 
     @Override
-    public boolean existsByTimeId(Long reservationTimeId) {
-        return reservationJpaRepository.existsByTimeId(reservationTimeId);
+    public List<Reservation> findAllByDateAndThemeId(LocalDate date, Long themeId) {
+        return reservationJpaRepository.findAllByDateAndThemeId(date, themeId);
     }
 
     @Override
-    public boolean existByThemeId(Long themeId) {
-        return reservationJpaRepository.existsByThemeId(themeId);
+    public List<Reservation> findAllByMemberIdAndThemeIdAndDateBetween(Long memberId, Long themeId, LocalDate from,
+                                                                       LocalDate to) {
+        return reservationJpaRepository.findAllByMemberIdAndThemeIdAndDateBetween(memberId, themeId, from, to);
+    }
+
+    @Override
+    public List<ReservationWithPayment> findAllWithPaymentByMemberId(final Long memberId) {
+        return reservationJpaRepository.findAllWithPaymentByMemberId(memberId);
+    }
+
+    @Override
+    public List<Reservation> findAllWithoutPaymentByMemberId(final Long memberId) {
+        return reservationJpaRepository.findAllWithoutPaymentByMemberId(memberId);
+    }
+
+    @Override
+    public Optional<Reservation> findById(Long id) {
+        return reservationJpaRepository.findById(id);
     }
 
     @Override

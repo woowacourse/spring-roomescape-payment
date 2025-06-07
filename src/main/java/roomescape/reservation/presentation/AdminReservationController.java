@@ -35,15 +35,9 @@ public class AdminReservationController {
 
     @PostMapping("/admin/reservations")
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody final ReservationAdminRequest request) {
-        ReservationResponse response = reservationService.createReservation(
-                new ReservationRequest(
-                        request.date(),
-                        request.timeId(),
-                        request.themeId(),
-                        request.paymentKey(),
-                        request.orderId(),
-                        request.amount()
-                ), request.memberId());
+        ReservationResponse response = reservationService.createReservationWithoutPayment(
+                new ReservationRequest(request.date(), request.timeId(), request.themeId()), request.memberId()
+        );
 
         return ResponseEntity.created(URI.create("/admin/reservation")).body(response);
     }

@@ -18,12 +18,12 @@ class ReservationJpaRepositoryTest {
 
     @Test
     void 특정_날짜와_테마로_예약을_조회할_수_있다() {
-        List<Reservation> result = reservationJpaRepository.findByDateAndThemeId(
-            LocalDate.of(2025, 4, 28), 1L);
+        List<Reservation> result = reservationJpaRepository.findAllByDateAndThemeId(
+                LocalDate.of(2025, 4, 28), 1L);
 
         assertThat(result)
-            .extracting(Reservation::getId)
-            .containsExactly(1L, 2L);
+                .extracting(Reservation::getId)
+                .containsExactly(1L, 2L);
     }
 
     @Test
@@ -31,21 +31,21 @@ class ReservationJpaRepositoryTest {
         LocalDate from = LocalDate.of(2025, 4, 1);
         LocalDate to = LocalDate.of(2025, 4, 30);
 
-        List<Reservation> result = reservationJpaRepository.findByMemberIdAndThemeIdAndDateBetween(1L, 1L, from, to);
+        List<Reservation> result = reservationJpaRepository.findAllByMemberIdAndThemeIdAndDateBetween(1L, 1L, from, to);
 
         assertThat(result)
-            .extracting(Reservation::getId)
-            .containsExactly(1L, 2L);
+                .extracting(Reservation::getId)
+                .containsExactly(1L, 2L);
     }
 
     @Test
     void 테마_ID와_날짜로_예약을_조회할_수_있다() {
         LocalDate date = LocalDate.of(2025, 4, 28);
 
-        List<Reservation> result = reservationJpaRepository.findByThemeIdAndDate(1L, date);
+        List<Reservation> result = reservationJpaRepository.findAllByThemeIdAndDate(1L, date);
         assertThat(result)
-            .extracting(Reservation::getId)
-            .containsExactly(1L, 2L);
+                .extracting(Reservation::getId)
+                .containsExactly(1L, 2L);
     }
 
     @Test
@@ -67,19 +67,19 @@ class ReservationJpaRepositoryTest {
         LocalDate date = LocalDate.of(2025, 4, 28);
 
         Optional<Reservation> result = reservationJpaRepository.findByDateAndTimeIdAndThemeId(
-            date, 1L, 1L);
+                date, 1L, 1L);
         assertThat(result)
-            .map(Reservation::getId)
-            .contains(1L);
+                .map(Reservation::getId)
+                .contains(1L);
     }
 
     @Test
     void 회원_ID로_예약을_조회할_수_있다() {
-        List<Reservation> result = reservationJpaRepository.findByMemberId(1L);
+        List<Reservation> result = reservationJpaRepository.findAllWithoutPaymentByMemberId(1L);
 
         assertThat(result)
-            .extracting(Reservation::getId)
-            .containsExactly(1L, 2L);
+                .extracting(Reservation::getId)
+                .containsExactly(1L, 2L);
     }
 
     @Test
@@ -87,7 +87,7 @@ class ReservationJpaRepositoryTest {
         List<Reservation> result = reservationJpaRepository.findAll();
 
         assertThat(result)
-            .extracting(Reservation::getId)
-            .containsExactly(1L, 2L, 3L, 4L);
+                .extracting(Reservation::getId)
+                .containsExactly(1L, 2L, 3L, 4L);
     }
 }

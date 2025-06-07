@@ -20,10 +20,10 @@ class TimeSlotJpaRepositoryTest {
         List<TimeSlot> times = reservationTimeJpaRepository.findAll();
 
         assertThat(times)
-            .extracting(TimeSlot::getStartAt)
-            .containsExactly(
-                LocalTime.of(10,0),
-                LocalTime.of(11,0),
-                LocalTime.of(12,0));
+                .extracting(TimeSlot::getStartAt)
+                .containsExactly(
+                        LocalTime.of(10, 0),
+                        LocalTime.of(11, 0),
+                        LocalTime.of(12, 0));
     }
 }

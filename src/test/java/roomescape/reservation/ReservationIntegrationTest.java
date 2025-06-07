@@ -1,5 +1,8 @@
 package roomescape.reservation;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.OK;
+
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.ExtractableResponse;
@@ -13,7 +16,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import roomescape.common.dto.response.ExceptionResponse;
+import roomescape.common.dto.response.ErrorResponse;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -31,19 +34,20 @@ public class ReservationIntegrationTest {
         reservation.put("orderId", "orderId");
         reservation.put("amount", 1000);
 
-        ExceptionResponse expected = new ExceptionResponse(400, "날짜는 null 일 수 없습니다.", "/reservations");
-
         Response response = RestAssured.given().log().all()
-            .cookie("token", extractTokenOfAdminLoginMember())
+                .cookie("token", extractTokenOfAdminLoginMember())
                 .contentType(ContentType.JSON)
                 .body(reservation)
                 .when().post("/reservations")
                 .then().log().all()
-                .statusCode(400)
+                .statusCode(BAD_REQUEST.value())
                 .extract()
                 .response();
 
-        ExceptionResponse actual = response.as(ExceptionResponse.class);
+        ErrorResponse actual = response.as(ErrorResponse.class);
+        ErrorResponse expected = new ErrorResponse(actual.timestamp(), BAD_REQUEST.value(),
+                BAD_REQUEST.getReasonPhrase(), "[ERROR] 날짜는 null 일 수 없습니다.", "/reservations");
+
         Assertions.assertThat(actual).isEqualTo(expected);
     }
 
@@ -56,18 +60,19 @@ public class ReservationIntegrationTest {
         reservation.put("date", date);
         reservation.put("timeId", 1);
 
-        ExceptionResponse expected = new ExceptionResponse(400, "[ERROR] 요청 날짜 형식이 맞지 않습니다.", "/reservations");
-
         Response response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(reservation)
                 .when().post("/reservations")
                 .then().log().all()
-                .statusCode(400)
+                .statusCode(BAD_REQUEST.value())
                 .extract()
                 .response();
 
-        ExceptionResponse actual = response.as(ExceptionResponse.class);
+        ErrorResponse actual = response.as(ErrorResponse.class);
+        ErrorResponse expected = new ErrorResponse(actual.timestamp(), BAD_REQUEST.value(),
+                BAD_REQUEST.getReasonPhrase(), "[ERROR] 요청 본문 형식이 올바르지 않습니다.", "/reservations");
+
         Assertions.assertThat(actual).isEqualTo(expected);
     }
 
@@ -79,18 +84,19 @@ public class ReservationIntegrationTest {
         reservation.put("date", "2024-12-03");
         reservation.put("timeId", "a");
 
-        ExceptionResponse expected = new ExceptionResponse(400, "[ERROR] 요청 입력이 잘못되었습니다.", "/reservations");
-
         Response response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
                 .body(reservation)
                 .when().post("/reservations")
                 .then().log().all()
-                .statusCode(400)
+                .statusCode(BAD_REQUEST.value())
                 .extract()
                 .response();
 
-        ExceptionResponse actual = response.as(ExceptionResponse.class);
+        ErrorResponse actual = response.as(ErrorResponse.class);
+        ErrorResponse expected = new ErrorResponse(actual.timestamp(), BAD_REQUEST.value(),
+                BAD_REQUEST.getReasonPhrase(), "[ERROR] 요청 본문 형식이 올바르지 않습니다.", "/reservations");
+
         Assertions.assertThat(actual).isEqualTo(expected);
     }
 
@@ -106,19 +112,20 @@ public class ReservationIntegrationTest {
         reservation.put("orderId", "orderId");
         reservation.put("amount", 1000);
 
-        ExceptionResponse expected = new ExceptionResponse(400, "예약 시간 번호는 null 일 수 없습니다.", "/reservations");
-
         Response response = RestAssured.given().log().all()
                 .cookie("token", extractTokenOfAdminLoginMember())
                 .contentType(ContentType.JSON)
                 .body(reservation)
                 .when().post("/reservations")
                 .then().log().all()
-                .statusCode(400)
+                .statusCode(BAD_REQUEST.value())
                 .extract()
                 .response();
 
-        ExceptionResponse actual = response.as(ExceptionResponse.class);
+        ErrorResponse actual = response.as(ErrorResponse.class);
+        ErrorResponse expected = new ErrorResponse(actual.timestamp(), BAD_REQUEST.value(),
+                BAD_REQUEST.getReasonPhrase(), "[ERROR] 예약 시간 번호는 null 일 수 없습니다.", "/reservations");
+
         Assertions.assertThat(actual).isEqualTo(expected);
     }
 
@@ -128,7 +135,7 @@ public class ReservationIntegrationTest {
         RestAssured.given().log().all()
                 .when().delete("/reservations/10")
                 .then().log().all()
-                .statusCode(400);
+                .statusCode(BAD_REQUEST.value());
     }
 
     private String extractTokenOfAdminLoginMember() {
@@ -137,12 +144,12 @@ public class ReservationIntegrationTest {
         loginParams.put("password", "password");
 
         final ExtractableResponse<Response> response = RestAssured.given().log().all()
-            .contentType(ContentType.JSON)
-            .body(loginParams)
-            .when().post("/login")
-            .then().log().all()
-            .statusCode(200)
-            .extract();
+                .contentType(ContentType.JSON)
+                .body(loginParams)
+                .when().post("/login")
+                .then().log().all()
+                .statusCode(OK.value())
+                .extract();
 
         String token = response.cookie("token");
         if (token == null) {

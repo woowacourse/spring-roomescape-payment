@@ -2,8 +2,9 @@ package roomescape.member.exception;
 
 import roomescape.common.exception.BusinessException;
 
-public class PasswordException extends BusinessException {
-    public PasswordException(String message) {
+public class MemberException extends BusinessException {
+
+    public MemberException(String message) {
         super(message);
     }
 }

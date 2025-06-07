@@ -13,13 +13,13 @@ import org.springframework.context.annotation.Import;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.infrastructure.ReservationJpaRepository;
 import roomescape.reservation.infrastructure.ReservationJpaRepositoryAdapter;
+import roomescape.timeslot.application.TimeSlotServiceTest.TimeSlotConfig;
 import roomescape.timeslot.domain.TimeSlotRepository;
 import roomescape.timeslot.dto.request.TimeSlotConditionRequest;
 import roomescape.timeslot.dto.response.TimeSlotConditionResponse;
 import roomescape.timeslot.exception.TimeSlotException;
 import roomescape.timeslot.infrastructure.TimeSlotJpaRepository;
 import roomescape.timeslot.infrastructure.TimeSlotJpaRepositoryAdapter;
-import roomescape.timeslot.application.TimeSlotServiceTest.TimeSlotConfig;
 
 @DataJpaTest
 @Import(TimeSlotConfig.class)
@@ -32,7 +32,7 @@ class TimeSlotServiceTest {
     @Test
     void can_not_delete_when_reservation_exists() {
         Assertions.assertThatThrownBy(() -> reservationTimeService.deleteTimeSlotById(1L))
-            .isInstanceOf(TimeSlotException.class);
+                .isInstanceOf(TimeSlotException.class);
     }
 
     @DisplayName("예약 가능 시간 조회 테스트")
@@ -42,12 +42,12 @@ class TimeSlotServiceTest {
         Long themeId = 1L;
 
         List<TimeSlotConditionResponse> responses = reservationTimeService.getTimesWithCondition(
-            new TimeSlotConditionRequest(localDate, themeId));
+                new TimeSlotConditionRequest(localDate, themeId));
 
         Assertions.assertThat(responses).containsExactlyInAnyOrder(
-            new TimeSlotConditionResponse(1L, LocalTime.of(10, 0), true),
-            new TimeSlotConditionResponse(2L, LocalTime.of(11, 0), true),
-            new TimeSlotConditionResponse(3L, LocalTime.of(12, 0), false)
+                new TimeSlotConditionResponse(1L, LocalTime.of(10, 0), true),
+                new TimeSlotConditionResponse(2L, LocalTime.of(11, 0), true),
+                new TimeSlotConditionResponse(3L, LocalTime.of(12, 0), false)
         );
     }
 
@@ -60,13 +60,13 @@ class TimeSlotServiceTest {
 
         @Bean
         public TimeSlotRepository reservationTimeRepository(
-            TimeSlotJpaRepository reservationTimeJpaRepository) {
+                TimeSlotJpaRepository reservationTimeJpaRepository) {
             return new TimeSlotJpaRepositoryAdapter(reservationTimeJpaRepository);
         }
 
         @Bean
         public TimeSlotService reservationTimeService(ReservationRepository reservationRepository,
-                                                             TimeSlotRepository reservationTimeRepository) {
+                                                      TimeSlotRepository reservationTimeRepository) {
             return new TimeSlotService(reservationRepository, reservationTimeRepository);
         }
     }

@@ -23,7 +23,7 @@ class ThemeJpaRepositoryTest {
         List<Theme> popularThemes = themeJpaRepository.findPopularThemes(start, end);
 
         assertThat(popularThemes)
-            .extracting(Theme::getName)
-            .containsExactly("테마1", "테마2", "테마3"); // 테마1(2회), 테마3(1회), 테마2(1회) => 정렬 기준은 COUNT DESC
+                .extracting(Theme::getName)
+                .containsExactly("테마1", "테마2", "테마3"); // 테마1(2회), 테마3(1회), 테마2(1회) => 정렬 기준은 COUNT DESC
     }
 }

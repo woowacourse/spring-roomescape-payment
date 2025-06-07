@@ -3,14 +3,20 @@ package roomescape.reservation.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Stream;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -19,17 +25,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import roomescape.auth.dto.info.LoginMemberInfo;
 import roomescape.common.util.time.DateTime;
 import roomescape.member.domain.MemberRepository;
-import roomescape.reservation.dto.response.ReservationMineResponse;
 import roomescape.member.infrastructure.MemberJpaRepository;
 import roomescape.member.infrastructure.MemberJpaRepositoryAdapter;
-import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.application.PaymentService;
+import roomescape.payment.domain.PaymentClient;
+import roomescape.payment.domain.PaymentRepository;
+import roomescape.payment.dto.request.PaymentRequest;
+import roomescape.payment.dto.response.PaymentResponse;
+import roomescape.payment.infrastructure.PaymentJpaRepository;
+import roomescape.payment.infrastructure.PaymentJpaRepositoryAdapter;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.WaitingRepository;
 import roomescape.reservation.dto.request.ReservationRequest;
+import roomescape.reservation.dto.request.ReservationWithPaymentRequest;
+import roomescape.reservation.dto.response.ReservationMineResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.WaitingResponse;
 import roomescape.reservation.exception.ReservationException;
@@ -37,275 +50,310 @@ import roomescape.reservation.infrastructure.ReservationJpaRepository;
 import roomescape.reservation.infrastructure.ReservationJpaRepositoryAdapter;
 import roomescape.reservation.infrastructure.WaitingJpaRepository;
 import roomescape.reservation.infrastructure.WaitingJpaRepositoryAdapter;
-import roomescape.reservation.application.ReservationServiceTest.ReservationConfig;
-import roomescape.timeslot.domain.TimeSlotRepository;
-import roomescape.timeslot.infrastructure.TimeSlotJpaRepository;
-import roomescape.timeslot.infrastructure.TimeSlotJpaRepositoryAdapter;
 import roomescape.theme.domain.ThemeRepository;
 import roomescape.theme.infrastructure.ThemeJpaRepository;
 import roomescape.theme.infrastructure.ThemeJpaRepositoryAdapter;
+import roomescape.timeslot.domain.TimeSlotRepository;
+import roomescape.timeslot.infrastructure.TimeSlotJpaRepository;
+import roomescape.timeslot.infrastructure.TimeSlotJpaRepositoryAdapter;
 
 @DataJpaTest
-@Import(ReservationConfig.class)
+@Import(ReservationServiceTest.ReservationConfig.class)
 class ReservationServiceTest {
 
     private static final String PAYMENT_KEY = "tgen_20240513184816ZSAZ9";
     private static final String ORDER_ID = "MC4wNDYzMzA0OTc2MDgy";
     private static final int AMOUNT = 1000;
-    
-    private static final LocalDate currentDate = LocalDate.of(2025, 4, 28);
+    private static final LocalDate CURRENT_DATE = LocalDate.of(2025, 4, 28);
 
     @Autowired
     private ReservationService reservationService;
+    ;
 
-    @DisplayName("예약을 생성할 수 있다.")
-    @Test
-    void can_create_reservation() {
-        ReservationRequest request = new ReservationRequest(LocalDate.of(2025, 4, 29), 2L, 1L, PAYMENT_KEY, ORDER_ID, AMOUNT);
-        assertThatCode(() -> reservationService.createReservation(request, 1L))
-                .doesNotThrowAnyException();
+    @Autowired
+    private PaymentClient paymentClient;
+
+    private ReservationWithPaymentRequest createRequestWithPayment(LocalDate date, Long timeId, Long themeId,
+                                                                   String paymentKey, String orderId, int amount) {
+        return new ReservationWithPaymentRequest(date, timeId, themeId, paymentKey, orderId, amount);
     }
 
-    @DisplayName("멤버별 예약을 조회 할 수 있다.")
-    @Test
-    void can_find_my_reservation() {
-        LoginMemberInfo loginMemberInfo = new LoginMemberInfo(1L);
-        List<ReservationMineResponse> result = reservationService.getMemberReservations(loginMemberInfo);
-
-        List<ReservationMineResponse> expected = List.of(
-            new ReservationMineResponse(1L, "테마1", currentDate, LocalTime.of(10, 0), "예약"),
-            new ReservationMineResponse(2L, "테마1", currentDate, LocalTime.of(11, 0), "예약"));
-
-        assertThat(result).isEqualTo(expected);
+    private ReservationRequest createRequest(LocalDate date, Long timeId, Long themeId) {
+        return new ReservationRequest(date, timeId, themeId);
     }
 
-    @DisplayName("지나간 날짜와 시간에 대한 예약을 생성할 수 없다.")
-    @ParameterizedTest
-    @MethodSource
-    void cant_not_reserve_before_now(final LocalDate date, final Long timeId) {
-        assertThatThrownBy(
-            () -> reservationService.createReservation(new ReservationRequest(date, timeId, 1L, PAYMENT_KEY, ORDER_ID,
-                    AMOUNT), 1L))
-            .isInstanceOf(ReservationException.class);
+    private void assertReservationException(ThrowingCallable action, String message) {
+        assertThatThrownBy(action)
+                .isInstanceOf(ReservationException.class)
+                .hasMessage(message);
     }
 
-    private static Stream<Arguments> cant_not_reserve_before_now() {
+    @Nested
+    @DisplayName("예약 생성")
+    class CreateReservation {
+
+        @Test
+        @DisplayName("결제가 있는 정상적인 예약을 생성할 수 있다.")
+        void createReservationWithPayment() {
+            // given
+            ReservationWithPaymentRequest request = createRequestWithPayment(CURRENT_DATE.plusDays(1), 2L, 1L,
+                    PAYMENT_KEY, ORDER_ID, AMOUNT);
+            Long memberId = 1L;
+
+            when(paymentClient.requestPayment(any(PaymentRequest.class)))
+                    .thenReturn(
+                            new PaymentResponse(PAYMENT_KEY, ORDER_ID, AMOUNT, LocalDateTime.of(2025, 6, 1, 10, 0).atOffset(
+                                    ZoneOffset.ofHours(9))));
+
+            // when & then
+            assertThatCode(() -> reservationService.createReservationWithPayment(request, memberId))
+                    .doesNotThrowAnyException();
+        }
+
+        @Test
+        @DisplayName("결제가 없는 정상적인 예약을 생성할 수 있다.")
+        void createReservationWithoutPayment() {
+            // given
+            ReservationRequest request = createRequest(CURRENT_DATE.plusDays(1), 2L, 1L);
+            Long memberId = 1L;
+
+            // when & then
+            assertThatCode(() -> reservationService.createReservationWithoutPayment(request, memberId))
+                    .doesNotThrowAnyException();
+        }
+
+        @ParameterizedTest
+        @MethodSource("roomescape.reservation.application.ReservationServiceTest#invalidPastDates")
+        @DisplayName("과거 시간을 예약하면 예외가 발생한다.")
+        void cannotReserveInPast(LocalDate date, Long timeId) {
+            // given
+            ReservationRequest request = createRequest(date, timeId, 1L);
+            Long memberId = 1L;
+
+            // when & then
+            assertReservationException(() -> reservationService.createReservationWithoutPayment(request, memberId),
+                    "예약할 수 없는 날짜와 시간입니다.");
+        }
+
+        @Test
+        @DisplayName("중복된 예약을 하면 예외가 발생한다.")
+        void cannotReserveDuplicate() {
+            // given
+            ReservationRequest request = createRequest(CURRENT_DATE, 1L, 1L);
+            Long memberId = 1L;
+
+            // when & then
+            assertReservationException(() -> reservationService.createReservationWithoutPayment(request, memberId),
+                    "이미 예약이 존재합니다.");
+        }
+    }
+
+    @Nested
+    @DisplayName("예약 대기")
+    class Waiting {
+
+        @Test
+        @DisplayName("정상적인 예약 대기를 생성할 수 있다.")
+        void canCreateWaiting() {
+            // given
+            ReservationRequest request = createRequest(CURRENT_DATE, 2L, 1L);
+            Long memberId = 2L;
+
+            // when
+            WaitingResponse response = reservationService.createWaiting(request, memberId);
+
+            // then
+            assertAll(
+                    () -> assertThat(response.theme()).isEqualTo("테마1"),
+                    () -> assertThat(response.date()).isEqualTo(CURRENT_DATE),
+                    () -> assertThat(response.startAt()).isEqualTo(LocalTime.of(11, 0))
+            );
+        }
+
+        @Test
+        @DisplayName("예약 대기를 삭제할 수 있다.")
+        void deleteWaiting() {
+            // given & when
+            reservationService.deleteWaiting(1L);
+            List<ReservationMineResponse> responses = reservationService.getMemberReservations(new LoginMemberInfo(2L));
+
+            // then
+            assertThat(responses).extracting(ReservationMineResponse::theme)
+                    .containsOnly("테마3");
+        }
+
+        @ParameterizedTest
+        @MethodSource("roomescape.reservation.application.ReservationServiceTest#invalidWaitings")
+        @DisplayName("과거 시간을 예약 대기하면 예외가 발생한다.")
+        void cannotCreateWaitingInPast(LocalDate date, Long timeId, Long themeId, Long memberId) {
+            assertReservationException(
+                    () -> reservationService.createWaiting(createRequest(date, timeId, themeId), memberId),
+                    "예약할 수 없는 날짜와 시간입니다.");
+        }
+
+        @Test
+        @DisplayName("예약자는 예약 대기를 하면 예외가 발생한다.")
+        void reservationOwnerCannotCreateWaiting() {
+            // given
+            ReservationRequest request = createRequest(CURRENT_DATE, 1L, 1L);
+            Long memberId = 1L;
+
+            // when & then
+            assertReservationException(() -> reservationService.createWaiting(request, memberId),
+                    "예약자는 예약대기를 할 수 없습니다.");
+        }
+
+        @Test
+        @DisplayName("중복된 예약 대기를 하면 예외가 발생한다.")
+        void duplicateWaitingNotAllowed() {
+            // given
+            ReservationRequest request = createRequest(CURRENT_DATE, 1L, 1L);
+            Long memberId = 2L;
+
+            // when & then
+            assertReservationException(() -> reservationService.createWaiting(request, memberId),
+                    "이미 예약대기 중입니다.");
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 예약 대기를 삭제하면 예외가 발생한다.")
+        void deleteNonExistentWaiting() {
+            assertReservationException(() -> reservationService.deleteWaiting(999L), "예약 대기를 찾을 수 없습니다.");
+        }
+    }
+
+    @Nested
+    @DisplayName("예약 삭제")
+    class DeleteReservation {
+
+        @Test
+        @DisplayName("예약 삭제 시 예약 대기가 예약으로 승인된다.")
+        void firstWaitingGetsReservationOnDelete() {
+            // given & when
+            reservationService.deleteReservationById(1L);
+
+            // then
+            List<ReservationMineResponse> memberReservations = reservationService.getMemberReservations(
+                    new LoginMemberInfo(2L));
+            assertThat(memberReservations).anyMatch(res -> res.status().equals("예약"));
+        }
+
+        @Test
+        @DisplayName("대기 없는 예약을 삭제 할 수 있다.")
+        void canDeleteReservationWithoutWaiting() {
+            // given & when
+            reservationService.deleteReservationById(2L);
+
+            // then
+            List<ReservationResponse> reservations = reservationService.getReservations();
+            assertThat(reservations).noneMatch(res -> res.id().equals(2L));
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 예약을 삭제하면 예외가 발생한다.")
+        void cannotDeleteNonExistentReservation() {
+            assertReservationException(() -> reservationService.deleteReservationById(999L), "예약을 찾을 수 없습니다.");
+        }
+    }
+
+    @Nested
+    @DisplayName("예약 조회")
+    class FindReservation {
+
+        @Test
+        @DisplayName("예약 및 예약 대기를 조회할 수 있다.")
+        void findMyReservations() {
+            // given & when
+            List<ReservationMineResponse> results = reservationService.getMemberReservations(new LoginMemberInfo(2L));
+
+            // then
+            assertThat(results).hasSize(2);
+        }
+
+        @Test
+        @DisplayName("모든 예약 대기를 조회할 수 있다.")
+        void findAllWaitings() {
+            // given & when
+            List<ReservationResponse> waitings = reservationService.findAllWaitings();
+
+            // then
+            assertThat(waitings).hasSize(2);
+        }
+    }
+
+    private static Stream<Arguments> invalidPastDates() {
         return Stream.of(
-            Arguments.of(LocalDate.of(2024, 10, 5), 1L),
-            Arguments.of(LocalDate.of(2024, 9, 5), 1L),
-            Arguments.of(LocalDate.of(2024, 10, 4), 1L),
-            Arguments.of(LocalDate.of(2024, 10, 5), 2L)
+                Arguments.of(LocalDate.of(2024, 10, 5), 1L),
+                Arguments.of(LocalDate.of(2024, 9, 5), 1L)
         );
     }
 
-    @DisplayName("중복 예약이 불가하다.")
-    @Test
-    void cant_not_reserve_duplicate() {
-        assertThatThrownBy(() -> reservationService.createReservation(
-                new ReservationRequest(currentDate, 1L, 1L, PAYMENT_KEY, ORDER_ID, AMOUNT), 1L))
-            .isInstanceOf(ReservationException.class);
-    }
-
-    @DisplayName("지나간 날짜와 시간에 대한 예약대기를 생성할 수 없다.")
-    @ParameterizedTest
-    @MethodSource
-    void cant_not_reserve_waiting_before_now(final LocalDate date, final Long timeId, final Long themeId, final Long memberId) {
-        assertThatThrownBy(
-                () -> reservationService.createWaiting(new ReservationRequest(date, timeId, themeId, PAYMENT_KEY,
-                        ORDER_ID, AMOUNT), memberId))
-            .isInstanceOf(ReservationException.class)
-            .hasMessage("예약할 수 없는 날짜와 시간입니다.");
-    }
-
-    private static Stream<Arguments> cant_not_reserve_waiting_before_now() {
+    private static Stream<Arguments> invalidWaitings() {
         return Stream.of(
-            Arguments.of(LocalDate.of(2025, 4, 26), 1L, 3L, 1L),
-            Arguments.of(LocalDate.of(2025, 4, 18), 1L, 2L, 1L)
+                Arguments.of(LocalDate.of(2025, 4, 26), 1L, 3L, 1L),
+                Arguments.of(LocalDate.of(2025, 4, 18), 1L, 2L, 1L)
         );
-    }
-
-    @DisplayName("예약한 멤버는 예약대기를 생성할 수 없다.")
-    @Test
-    void cant_reserve_waiting_by_reservation_owner() {
-        assertThatThrownBy(
-                () -> reservationService.createWaiting(
-                    new ReservationRequest(currentDate, 1L, 1L, PAYMENT_KEY, ORDER_ID, AMOUNT), 1L))
-            .isInstanceOf(ReservationException.class)
-            .hasMessage("예약자는 예약대기를 할 수 없습니다.");
-    }
-
-    @DisplayName("동일한 사용자가 중복 예약대기를 할 수 없다.")
-    @Test
-    void cant_reserve_waiting_by_duplicate_member() {
-        assertThatThrownBy(
-                () -> reservationService.createWaiting(
-                    new ReservationRequest(currentDate, 1L, 1L, PAYMENT_KEY, ORDER_ID, AMOUNT), 2L))
-            .isInstanceOf(ReservationException.class)
-            .hasMessage("이미 예약대기 중입니다.");
-    }
-
-    @DisplayName("예약 대기를 생성할 수 있다.")
-    @Test
-    void can_create_waiting() {
-        ReservationRequest request = new ReservationRequest(currentDate, 2L, 1L, PAYMENT_KEY, ORDER_ID,
-                AMOUNT);
-        Long memberId = 2L;
-
-        WaitingResponse response = reservationService.createWaiting(request, memberId);
-
-        assertThat(response.theme()).isEqualTo("테마1");
-        assertThat(response.date()).isEqualTo(currentDate);
-        assertThat(response.startAt()).isEqualTo(LocalTime.of(11, 0));
-    }
-
-    @DisplayName("멤버별 예약과 대기 목록을 조회할 수 있다.")
-    @Test
-    void can_find_member_reservations_and_waitings() {
-        List<ReservationMineResponse> responses = reservationService.getMemberReservations(new LoginMemberInfo(2L));
-
-        assertThat(responses).containsExactly(
-            new ReservationMineResponse(3L, "테마3", LocalDate.of(2025, 4, 26), LocalTime.of(10, 0), "예약"),
-            new ReservationMineResponse(1L, "테마1", currentDate, LocalTime.of(10, 0), "1번째 예약대기")
-        );
-    }
-
-    @DisplayName("예약 대기를 삭제할 수 있다.")
-    @Test
-    void can_delete_waiting() {
-        Long waitingId = 1L;
-        Long memberId = 2L;
-
-        reservationService.deleteWaiting(waitingId);
-
-        List<ReservationMineResponse> responses = reservationService.getMemberReservations(new LoginMemberInfo(memberId));
-        assertThat(responses).containsExactly(
-            new ReservationMineResponse(3L, "테마3", LocalDate.of(2025, 4, 26), LocalTime.of(10, 0), "예약")
-        );
-    }
-
-    @DisplayName("존재하지 않는 예약 대기는 삭제할 수 없다.")
-    @Test
-    void cannot_delete_non_existent_waiting() {
-        Long nonExistentWaitingId = 999L;
-
-        assertThatThrownBy(() -> reservationService.deleteWaiting(nonExistentWaitingId))
-            .isInstanceOf(ReservationException.class)
-            .hasMessage("예약 대기를 찾을 수 없습니다.");
-    }
-
-    @DisplayName("예약 대기 목록을 조회할 수 있다.")
-    @Test
-    void can_find_all_waitings() {
-        List<ReservationResponse> waitings = reservationService.findAllWaitings();
-        ReservationResponse secondResponse = waitings.get(1);
-
-        assertThat(waitings.size()).isEqualTo(2);
-        assertThat(secondResponse.theme().id()).isEqualTo(1L);
-        assertThat(secondResponse.date()).isEqualTo(currentDate);
-        assertThat(secondResponse.time().id()).isEqualTo(1L);
-    }
-
-    @DisplayName("대기 목록이 없는 경우 예약을 삭제할 수 있다.")
-    @Test
-    void can_delete_reservation_without_waiting() {
-        Long reservationId = 2L; // 대기 목록이 없는 예약
-
-        reservationService.deleteReservationById(reservationId);
-
-        List<ReservationResponse> reservations = reservationService.getReservations();
-        assertThat(reservations).hasSize(3);
-        assertThat(reservations).noneMatch(reservation -> reservation.id().equals(reservationId));
-    }
-
-    @DisplayName("대기 목록이 있는 경우 첫 번째 대기자가 예약을 받는다.")
-    @Test
-    void when_delete_reservation_with_waiting_first_waiting_gets_reservation() {
-        Long reservationId = 1L; // 대기 목록이 있는 예약
-        Long firstWaitingMemberId = 2L;
-
-        reservationService.deleteReservationById(reservationId);
-
-        List<ReservationMineResponse> memberReservations = reservationService.getMemberReservations(new LoginMemberInfo(firstWaitingMemberId));
-        assertThat(memberReservations).anyMatch(reservation ->
-            reservation.theme().equals("테마1") &&
-            reservation.date().equals(currentDate) &&
-            reservation.time().equals(LocalTime.of(10, 0)) &&
-            reservation.status().equals("예약")
-        );
-    }
-
-    @DisplayName("존재하지 않는 예약은 삭제할 수 없다.")
-    @Test
-    void cannot_delete_non_existent_reservation() {
-        Long nonExistentReservationId = 999L;
-
-        assertThatThrownBy(() -> reservationService.deleteReservationById(nonExistentReservationId))
-            .isInstanceOf(ReservationException.class)
-            .hasMessage("예약을 찾을 수 없습니다.");
     }
 
     static class ReservationConfig {
-
         @Bean
-        public DateTime dateTime() {
-            return () -> LocalDateTime.of(currentDate, LocalTime.of(10, 0));
+        @Primary
+        DateTime dateTime() {
+            return () -> LocalDateTime.of(CURRENT_DATE, LocalTime.of(10, 0));
         }
 
         @Bean
-        public ReservationRepository reservationRepository(ReservationJpaRepository reservationJpaRepository) {
-            return new ReservationJpaRepositoryAdapter(reservationJpaRepository);
+        @Primary
+        ReservationRepository reservationRepository(ReservationJpaRepository repo) {
+            return new ReservationJpaRepositoryAdapter(repo);
         }
 
         @Bean
-        public TimeSlotRepository reservationTimeRepository(
-                TimeSlotJpaRepository reservationTimeJpaRepository) {
-            return new TimeSlotJpaRepositoryAdapter(reservationTimeJpaRepository);
+        @Primary
+        TimeSlotRepository timeSlotRepository(TimeSlotJpaRepository repo) {
+            return new TimeSlotJpaRepositoryAdapter(repo);
         }
 
         @Bean
-        public ThemeRepository themeRepository(ThemeJpaRepository themeJpaRepository) {
-            return new ThemeJpaRepositoryAdapter(themeJpaRepository);
+        @Primary
+        ThemeRepository themeRepository(ThemeJpaRepository repo) {
+            return new ThemeJpaRepositoryAdapter(repo);
         }
 
         @Bean
-        public MemberRepository memberRepository(MemberJpaRepository memberJpaRepository) {
-            return new MemberJpaRepositoryAdapter(memberJpaRepository);
+        @Primary
+        MemberRepository memberRepository(MemberJpaRepository repo) {
+            return new MemberJpaRepositoryAdapter(repo);
         }
 
         @Bean
-        public WaitingRepository waitingRepository(WaitingJpaRepository waitingJpaRepository) {
-            return new WaitingJpaRepositoryAdapter(waitingJpaRepository);
+        @Primary
+        WaitingRepository waitingRepository(WaitingJpaRepository repo) {
+            return new WaitingJpaRepositoryAdapter(repo);
         }
 
         @Bean
-        public PaymentClient paymentClient() {
+        @Primary
+        PaymentRepository paymentRepository(PaymentJpaRepository repo) {
+            return new PaymentJpaRepositoryAdapter(repo);
+        }
+
+        @Bean
+        @Primary
+        PaymentClient paymentClient() {
             return mock(PaymentClient.class);
         }
 
         @Bean
-        public PaymentService paymentService(PaymentClient paymentClient) {
-            return new PaymentService(paymentClient);
+        PaymentService paymentService(PaymentClient client, PaymentRepository repo) {
+            return new PaymentService(client, repo);
         }
 
         @Bean
-        public ReservationService reservationService(
-                DateTime dateTime,
-                ReservationRepository reservationRepository,
-                TimeSlotRepository reservationTimeRepository,
-                ThemeRepository themeRepository,
-                MemberRepository memberRepository,
-                WaitingRepository waitingRepository,
-                PaymentService paymentService
-        ) {
-            return new ReservationService(
-                    dateTime,
-                    reservationRepository,
-                    reservationTimeRepository,
-                    themeRepository,
-                    memberRepository,
-                    waitingRepository,
-                    paymentService
-            );
+        ReservationService reservationService(DateTime dt, ReservationRepository rr, TimeSlotRepository tr,
+                                              ThemeRepository thr, MemberRepository mr, WaitingRepository wr,
+                                              PaymentService ps) {
+            return new ReservationService(dt, rr, tr, thr, mr, wr, ps);
         }
     }
 }

@@ -1,16 +1,10 @@
 package roomescape.reservation.presentation;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.net.URI;
-import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.annotation.LoginMember;
 import roomescape.auth.dto.info.LoginMemberInfo;
-import roomescape.common.dto.response.ExceptionResponse;
 import roomescape.reservation.application.ReservationService;
 import roomescape.reservation.dto.request.ReservationRequest;
+import roomescape.reservation.dto.request.ReservationWithPaymentRequest;
 import roomescape.reservation.dto.response.ReservationMineResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.WaitingResponse;
@@ -36,9 +30,9 @@ public class MemberReservationController {
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> createReservation(
-            @Valid @RequestBody final ReservationRequest request,
+            @Valid @RequestBody final ReservationWithPaymentRequest request,
             @LoginMember final LoginMemberInfo memberInfo) {
-        ReservationResponse response = reservationService.createReservation(request, memberInfo.id());
+        ReservationResponse response = reservationService.createReservationWithPayment(request, memberInfo.id());
         return ResponseEntity.created(URI.create("/reservation")).body(response);
     }
 
@@ -63,27 +57,5 @@ public class MemberReservationController {
         List<ReservationMineResponse> response = reservationService.getMemberReservations(loginMemberInfo);
 
         return ResponseEntity.ok().body(response);
-    }
-
-    @ExceptionHandler(value = DateTimeParseException.class)
-    public ResponseEntity<ExceptionResponse> noMatchDateType(final HttpServletRequest request) {
-        ExceptionResponse exceptionResponse = new ExceptionResponse(
-                400, "[ERROR] 요청 날짜 형식이 맞지 않습니다.", request.getRequestURI()
-        );
-        return ResponseEntity.badRequest().body(exceptionResponse);
-    }
-
-    @ExceptionHandler(value = MethodArgumentNotValidException.class)
-    public ResponseEntity<ExceptionResponse> checkNull(final MethodArgumentNotValidException e,
-                                                       final HttpServletRequest request) {
-        String message = Optional.ofNullable(e.getBindingResult().getFieldError())
-                .map(FieldError::getDefaultMessage)
-                .orElse("유효하지 않은 요청입니다.");
-
-        ExceptionResponse exceptionResponse = new ExceptionResponse(
-                400, message, request.getRequestURI()
-        );
-
-        return ResponseEntity.badRequest().body(exceptionResponse);
     }
 }

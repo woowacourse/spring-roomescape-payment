@@ -13,6 +13,39 @@ function render(data) {
     tableBody.innerHTML = '';
 
     data.forEach(item => {
+        const formatDate = (dateStr) => {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+            }); // 예: 2025년 6월 7일
+        };
+
+        const formatTime = (timeStr) => {
+            const time = new Date(`1970-01-01T${timeStr}`); // 시간만 파싱
+            return time.toLocaleTimeString('ko-KR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+            }); // 예: 08:40
+        };
+
+        function formatDateTime(datetimeStr) {
+            if (!datetimeStr) return '-';
+
+            const date = new Date(datetimeStr);
+            return date.toLocaleString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false,
+            });
+        }
+
         const row = tableBody.insertRow();
 
         const theme = item.theme;
@@ -21,8 +54,8 @@ function render(data) {
         const status = item.status;
 
         row.insertCell(0).textContent = theme;
-        row.insertCell(1).textContent = date;
-        row.insertCell(2).textContent = time;
+        row.insertCell(1).textContent = formatDate(date);
+        row.insertCell(2).textContent = formatTime(time);
         row.insertCell(3).textContent = status;
 
         if (status !== '예약') { // 예약 대기 상태일 때 예약 대기 취소 버튼 추가하는 코드, 상태 값은 변경 가능
@@ -35,14 +68,10 @@ function render(data) {
             };
             cancelCell.appendChild(cancelButton);
         } else { // 예약 완료 상태일 때
-            /*
-          TODO: [미션4 - 2단계] 내 예약 목록 조회 시,
-           예약 완료 상태일 때 결제 정보를 함께 보여주기
-           결제 정보 필드명은 자신의 response 에 맞게 변경하기
-           */
             row.insertCell(4).textContent = '';
             row.insertCell(5).textContent = item.paymentKey;
             row.insertCell(6).textContent = item.amount;
+            row.insertCell(7).textContent = formatDateTime(item.approvedAt);
         }
     });
 }
