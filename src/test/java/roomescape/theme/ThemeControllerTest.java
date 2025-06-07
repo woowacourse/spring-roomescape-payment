@@ -90,7 +90,10 @@ class ThemeControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("테마명"))
                 .andExpect(jsonPath("$.description").value("테마 설명"))
-                .andExpect(jsonPath("$.thumbnail").value("abc"));
+                .andExpect(jsonPath("$.thumbnail").value("abc"))
+                .andDo(document("create-theme",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint())));
     }
 
     @Test
@@ -145,7 +148,10 @@ class ThemeControllerTest {
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].name").value("인기테마1"))
                 .andExpect(jsonPath("$[1].id").value(2))
-                .andExpect(jsonPath("$[1].name").value("인기테마2"));
+                .andExpect(jsonPath("$[1].name").value("인기테마2"))
+                .andDo(document("read-popular-themes",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint())));
     }
 
     @Test
@@ -153,7 +159,10 @@ class ThemeControllerTest {
     void deleteById() throws Exception {
         // when & then
         mockMvc.perform(delete("/themes/1"))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andDo(document("delete-theme",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint())));
 
         verify(themeService).deleteById(1L);
     }

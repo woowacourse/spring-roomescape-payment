@@ -131,7 +131,7 @@ class ReservationControllerTest {
     @DisplayName("인증되지 않은 사용자의 예약 생성 요청은 401을 응답한다")
     void createUnauthorized() throws Exception {
         // given
-        ReservationRequest request = new ReservationRequest(LocalDate.now(), 1L, 1L, "awdawdaw", "adawdaw", 1000L, "NORMAL");
+        ReservationRequest request = new ReservationRequest(LocalDate.now(), 1L, 1L, "pid_12345", "SURFMAY_12345", 1000L, "NORMAL");
         given(jwtProvider.isValidToken(any())).willReturn(false);
 
         // when & then
@@ -139,7 +139,10 @@ class ReservationControllerTest {
                         .cookie(new Cookie("token", "invalid"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andDo(document("create-reservation-unauthorized",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint())));
     }
 
     @Test
@@ -147,7 +150,10 @@ class ReservationControllerTest {
     void deleteById() throws Exception {
         // when & then
         mockMvc.perform(delete("/reservations/1"))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andDo(document("delete-reservation",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint())));
 
         verify(bookingService).deleteReservationById(1L);
     }

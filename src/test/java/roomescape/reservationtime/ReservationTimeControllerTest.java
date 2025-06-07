@@ -74,7 +74,10 @@ class ReservationTimeControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.startAt").value("10:00"));
+                .andExpect(jsonPath("$.startAt").value("10:00"))
+                .andDo(document("create-time",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint())));
     }
 
     @Test
@@ -106,7 +109,10 @@ class ReservationTimeControllerTest {
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].startAt").value("10:00"))
                 .andExpect(jsonPath("$[1].id").value(2))
-                .andExpect(jsonPath("$[1].startAt").value("12:00"));
+                .andExpect(jsonPath("$[1].startAt").value("12:00"))
+                .andDo(document("read-times",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint())));
     }
 
     @Test
@@ -153,7 +159,10 @@ class ReservationTimeControllerTest {
     void deleteById() throws Exception {
         // when & then
         mockMvc.perform(delete("/times/1"))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isNoContent())
+                .andDo(document("delete-time",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint())));
 
         verify(reservationTimeService).deleteById(1L);
     }

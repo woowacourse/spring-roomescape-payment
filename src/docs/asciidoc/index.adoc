@@ -11,7 +11,37 @@ include::{snippets}/create-reservation/http-request.adoc[]
 ==== HTTP response
 include::{snippets}/create-reservation/http-response.adoc[]
 
+=== 예약 생성 실패 - 인증 실패
+
+인증되지 않은 사용자가 예약을 시도하는 경우
+
+==== HTTP request
+include::{snippets}/create-reservation-unauthorized/http-request.adoc[]
+==== HTTP response
+include::{snippets}/create-reservation-unauthorized/http-response.adoc[]
+
+=== 예약 삭제
+
+==== HTTP request
+include::{snippets}/delete-reservation/http-request.adoc[]
+==== HTTP response
+include::{snippets}/delete-reservation/http-response.adoc[]
+
 == 예약 시간 API
+
+=== 예약 시간 생성
+
+==== HTTP request
+include::{snippets}/create-time/http-request.adoc[]
+==== HTTP response
+include::{snippets}/create-time/http-response.adoc[]
+
+=== 모든 예약 시간 조회
+
+==== HTTP request
+include::{snippets}/read-times/http-request.adoc[]
+==== HTTP response
+include::{snippets}/read-times/http-response.adoc[]
 
 === 예약 가능한 시간 조회
 
@@ -22,7 +52,21 @@ include::{snippets}/read-available-times/http-request.adoc[]
 ==== HTTP response
 include::{snippets}/read-available-times/http-response.adoc[]
 
+=== 예약 시간 삭제
+
+==== HTTP request
+include::{snippets}/delete-time/http-request.adoc[]
+==== HTTP response
+include::{snippets}/delete-time/http-response.adoc[]
+
 == 테마 API
+
+=== 테마 생성
+
+==== HTTP request
+include::{snippets}/create-theme/http-request.adoc[]
+==== HTTP response
+include::{snippets}/create-theme/http-response.adoc[]
 
 === 모든 테마 조회
 
@@ -30,3 +74,39 @@ include::{snippets}/read-available-times/http-response.adoc[]
 include::{snippets}/read-themes/http-request.adoc[]
 ==== HTTP response
 include::{snippets}/read-themes/http-response.adoc[]
+
+=== 인기 테마 조회
+
+최근 일주일간 예약 수가 가장 많은 상위 10개의 테마 조회
+
+==== HTTP request
+include::{snippets}/read-popular-themes/http-request.adoc[]
+==== HTTP response
+include::{snippets}/read-popular-themes/http-response.adoc[]
+
+=== 테마 삭제
+
+==== HTTP request
+include::{snippets}/delete-theme/http-request.adoc[]
+==== HTTP response
+include::{snippets}/delete-theme/http-response.adoc[]
+
+== 예약 및 대기 API
+
+=== 예약 및 대기 조회
+
+특정 회원의 예약 목록과 대기 목록을 모두 조회
+
+==== HTTP request
+include::{snippets}/read-bookings-of-member/http-request.adoc[]
+==== HTTP response
+include::{snippets}/read-bookings-of-member/http-response.adoc[]
+
+=== 예약 및 대기 조회 실패 - 인증 실패
+
+인증되지 않은 사용자가 예약 및 대기를 조회하려는 경우
+
+==== HTTP request
+include::{snippets}/read-bookings-of-member-unauthorized/http-request.adoc[]
+==== HTTP response
+include::{snippets}/read-bookings-of-member-unauthorized/http-response.adoc[]
