@@ -1,6 +1,6 @@
 spring:
   config:
-    import: classpath:application-secrets-test.yml
+    import: classpath:application-secrets-dev.yml
 
   datasource:
     url: ${db.url}
@@ -15,11 +15,24 @@ spring:
     hibernate:
       ddl-auto: create-drop
     defer-datasource-initialization: true
+
   sql:
     init:
       mode: always
-      data-locations: classpath:testData.sql
+
+security:
+  jwt:
+    token:
+      secret-key: ${security.jwt.token.secretKey}
+      expire-length: ${security.jwt.token.expireLength}
+
+payment:
+  toss:
+    secret-key: ${payment.toss.secret-key}
+    base-url: ${payment.toss.base-url}
 
 logging:
   level:
-    root: off
+    root: debug
+  file:
+    path: logs/

@@ -19,8 +19,8 @@ public class JwtTokenHandler implements AuthenticationTokenHandler {
     private final long validityInMilliseconds;
 
     public JwtTokenHandler(
-            @Value("${security.jwt.token.secret-key}") String secretKey,
-            @Value("${security.jwt.token.expire-length}") long validityInMilliseconds
+            @Value("${security.jwt.token.secretKey}") String secretKey,
+            @Value("${security.jwt.token.expireLength}") long validityInMilliseconds
     ) {
         this.algorithm = Algorithm.HMAC256(secretKey);
         this.validityInMilliseconds = validityInMilliseconds;

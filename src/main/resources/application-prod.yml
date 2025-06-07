@@ -1,0 +1,35 @@
+spring:
+  config:
+    import: classpath:application-secrets-prod.yml
+
+  datasource:
+    url: ${db.url}
+    username: ${db.username}
+    password: ${db.password}
+
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: create
+    defer-datasource-initialization: true
+
+  sql:
+    init:
+      mode: embedded
+
+security:
+  jwt:
+    token:
+      secretKey: ${security.jwt.token.secretKey}
+      expireLength: ${3600000}
+
+payment:
+  toss:
+    secretKey: ${payment.toss.secretKey}
+    baseUrl: ${payment.toss.baseUrl}
+
+logging:
+  level:
+    root: info
+  file:
+    path: /var/log/roomEscape

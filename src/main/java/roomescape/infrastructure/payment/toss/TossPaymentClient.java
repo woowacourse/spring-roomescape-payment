@@ -34,7 +34,7 @@ public class TossPaymentClient implements PaymentClient {
     private final ObjectMapper objectMapper;
 
     public TossPaymentClient(
-            final @Value("${payment.toss.secret-key}") String secretKey,
+            final @Value("${payment.toss.secretKey}") String secretKey,
             final ObjectMapper objectMapper,
             final @Qualifier("tossClientBuilder") RestClient.Builder restClientBuilder
     ) {
