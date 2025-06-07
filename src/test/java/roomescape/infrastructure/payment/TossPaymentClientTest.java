@@ -51,12 +51,12 @@ class TossPaymentClientTest {
     @DisplayName("토스 결제 승인 요청 API를 호출한다.")
     void confirmPayment() {
         // given
-        PaymentInfo paymentInfo = new PaymentInfo("paymentKey", "ROOM_ESCAPE_test_order_id", 1000);
+        PaymentInfo paymentInfo = new PaymentInfo("payment_key_1", "ROOM_ESCAPE_test_order_id", "방탈출 예약 1건", 1000L);
 
         server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm")).andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess("""
                         {
-                            "paymentKey": "paymentKey",
+                            "paymentKey": "payment_key_1",
                             "orderId": "ROOM_ESCAPE_test_order_id",
                             "orderName": "방탈출 예약 1건",
                             "amount": 1000
@@ -77,7 +77,7 @@ class TossPaymentClientTest {
     @DisplayName("토스 결제 승인 요청 API 호출 시 에러가 발생하면 PaymentException 예외가 발생한다.")
     void confirmPayment_WhenExceptionThrown(TossPaymentErrorCode errorCode) {
         // given
-        PaymentInfo paymentInfo = new PaymentInfo("paymentKey", "ROOM_ESCAPE_test_order_id", 1000);
+        PaymentInfo paymentInfo = new PaymentInfo("payment_key_1", "order_id_1", "order_name_1", 10000L);
 
         server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm")).andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(errorCode.getHttpStatus()).contentType(MediaType.APPLICATION_JSON)
@@ -100,7 +100,7 @@ class TossPaymentClientTest {
     @DisplayName("토스 결제 승인 요청 API 호출 시 특정 응답 코드에서 JSON 형식이 아니면 예외가 발생한다.")
     void processErrorResponse_WhenJsonMappingFail(HttpStatus status) {
         // given
-        PaymentInfo paymentInfo = new PaymentInfo("paymentKey", "ROOM_ESCAPE_test_order_id", 1000);
+        PaymentInfo paymentInfo = new PaymentInfo("payment_key_1", "order_id_1", "order_name_1", 10000L);
 
         server.expect(requestTo("https://api.tosspayments.com/v1/payments/confirm"))
                 .andExpect(method(HttpMethod.POST))

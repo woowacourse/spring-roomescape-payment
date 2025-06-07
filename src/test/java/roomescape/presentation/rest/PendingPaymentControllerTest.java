@@ -53,7 +53,7 @@ class PendingPaymentControllerTest {
         void confirmPayment_WhenPendingPaymentNotExists_ThenReturn404Status() {
             // given
             var pendingPaymentId = 10000L;
-            PaymentInfo paymentInfo = new PaymentInfo("paymentKey", "orderId", 1000);
+            PaymentInfo paymentInfo = new PaymentInfo("payment_key_1", "order_id_1", "order_name_1", 10000L);
 
             // when & then
             RestAssured.given(spec).filter(confirmPayment_WhenPendingPaymentNotExists_ThenReturn404Status_Document())
@@ -70,9 +70,7 @@ class PendingPaymentControllerTest {
             // given
             Payment payment = CREATE_PAYMENT_OF(null);
             var pendingPaymentId = 6L;
-            PaymentInfo paymentInfo = new PaymentInfo("paymentKey", "orderId", 1000);
-
-            Mockito.when(paymentService.savePayment(paymentInfo)).thenReturn(payment);
+            PaymentInfo paymentInfo = new PaymentInfo("payment_key_1", "order_id_1", "order_name_1", 10000L);
 
             // when & then
             ReservedResponse response = RestAssured.given(spec).filter(confirmPayment_Document()).log().all()
@@ -101,6 +99,7 @@ class PendingPaymentControllerTest {
             FieldDescriptor[] requestFields = {
                     fieldWithPath("paymentKey").description("결제 요청 key"),
                     fieldWithPath("orderId").description("주문 ID"),
+                    fieldWithPath("orderName").description("주문 명"),
                     fieldWithPath("amount").description("결제 금액")
             };
 
@@ -123,6 +122,7 @@ class PendingPaymentControllerTest {
             FieldDescriptor[] requestFields = {
                     fieldWithPath("paymentKey").description("결제 요청 key"),
                     fieldWithPath("orderId").description("주문 ID"),
+                    fieldWithPath("orderName").description("주문 명"),
                     fieldWithPath("amount").description("결제 금액")
             };
 

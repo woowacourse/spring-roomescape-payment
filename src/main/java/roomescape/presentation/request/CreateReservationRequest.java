@@ -26,13 +26,17 @@ public record CreateReservationRequest(
 
         @NotNull(message = "결제 금액을 입력해주세요.")
         @PositiveOrZero(message = "결제 금액은 음수일 수 없습니다.")
-        Long amount
+        Long amount,
+
+        @NotBlank(message = "주문 명을 입력해주세요.")
+        String orderName
 ) {
 
     public PaymentInfo toPaymentInfo() {
         return new PaymentInfo(
                 paymentKey,
                 orderId,
+                orderName,
                 amount
         );
     }

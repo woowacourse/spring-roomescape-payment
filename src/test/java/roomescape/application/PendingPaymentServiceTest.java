@@ -56,7 +56,7 @@ class PendingPaymentServiceTest {
         void completePayment_WhenPendingPaymentNotExists_ThenThrowException() {
             // given
             Long pendingPaymentId = 1L;
-            PaymentInfo paymentInfo = new PaymentInfo("paymentKey", "orderId", 1000L);
+            PaymentInfo paymentInfo = new PaymentInfo("payment_key_1", "order_id_1", "order_name_1", 10000L);
 
             when(pendingPaymentRepository.findById(pendingPaymentId)).thenReturn(Optional.empty());
 
@@ -81,7 +81,7 @@ class PendingPaymentServiceTest {
 
             PendingPayment pendingPayment = CREATE_PENDING_PAYMENT_OF(1L, user, date, timeSlot, theme);
 
-            PaymentInfo paymentInfo = new PaymentInfo("paymentKey", "orderId", 1000L);
+            PaymentInfo paymentInfo = new PaymentInfo("payment_key_1", "order_id_1", "order_name_1", 10000L);
 
             when(pendingPaymentRepository.findById(pendingPaymentId)).thenReturn(Optional.of(pendingPayment));
 

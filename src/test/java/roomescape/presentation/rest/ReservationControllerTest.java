@@ -21,8 +21,6 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -36,8 +34,6 @@ import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import roomescape.application.request.PaymentInfo;
 import roomescape.application.response.PaymentClientResponse;
 import roomescape.infrastructure.payment.PaymentClient;
-import roomescape.infrastructure.payment.toss.TossPaymentErrorCode;
-import roomescape.infrastructure.payment.toss.TossPaymentException;
 
 class ReservationControllerTest {
 
@@ -60,10 +56,11 @@ class ReservationControllerTest {
                     "memberId", "2",
                     "paymentKey", "paymentKey",
                     "orderId", "orderId",
+                    "orderName", "orderName",
                     "amount", "1000"
             );
 
-            PaymentInfo paymentInfo = new PaymentInfo("paymentKey", "orderId", 1000);
+            PaymentInfo paymentInfo = new PaymentInfo("payment_key_1", "order_id_1", "order_name_1", 10000L);
             PaymentClientResponse response = new PaymentClientResponse(
                     "paymentKey",
                     "orderId",
@@ -120,6 +117,7 @@ class ReservationControllerTest {
                     fieldWithPath("memberId").description("사용자 ID"),
                     fieldWithPath("paymentKey").description("결제 요청 key"),
                     fieldWithPath("orderId").description("주문 ID"),
+                    fieldWithPath("orderName").description("주문 명"),
                     fieldWithPath("amount").description("결제 금액")
             };
 

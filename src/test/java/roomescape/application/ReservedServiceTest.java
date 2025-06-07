@@ -81,7 +81,7 @@ class ReservedServiceTest {
             when(reservationRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(date, timeSlot.getId(),
                     theme.getId(), user.getId())).thenReturn(true);
 
-            PaymentInfo paymentInfo = new PaymentInfo("payment_key_1", "order_id_1", 10000L);
+            PaymentInfo paymentInfo = new PaymentInfo("payment_key_1", "order_id_1", "order_name_1", 10000L);
 
             // when & then
             assertAll(() -> assertThatThrownBy(
@@ -109,9 +109,7 @@ class ReservedServiceTest {
             when(reservedRepository.save(Reserved.register(user, date, timeSlot, theme))).thenReturn(
                     CREATE_RESERVED_OF(1L, user, date, timeSlot, theme));
 
-            PaymentInfo paymentInfo = new PaymentInfo("payment_key_1", "order_id_1", 10000L);
-
-            when(paymentService.savePayment(paymentInfo)).thenReturn(payment);
+            PaymentInfo paymentInfo = new PaymentInfo("payment_key_1", "order_id_1", "order_name_1", 10000L);
 
             // when
             Reserved savedReservation = reservedService.saveReservedWithPurchase(user.getId(), date, timeSlot.getId(),
@@ -122,12 +120,11 @@ class ReservedServiceTest {
                     () -> assertThat(savedReservation.getDate()).isEqualTo(date),
                     () -> assertThat(savedReservation.getTimeSlot()).isEqualTo(timeSlot),
                     () -> assertThat(savedReservation.getTheme()).isEqualTo(theme),
-                    () -> assertThat(savedReservation.getPayment()).isEqualTo(payment),
 
                     () -> verify(userRepository).findById(user.getId()),
                     () -> verify(timeSlotRepository).findById(timeSlot.getId()),
                     () -> verify(themeRepository).findById(theme.getId()),
-                    () -> verify(paymentService).savePayment(any()),
+                    () -> verify(paymentService).requestPayment(savedReservation, paymentInfo),
                     () -> verify(reservedRepository).save(any(Reserved.class)));
         }
     }
@@ -184,9 +181,11 @@ class ReservedServiceTest {
             when(reservedRepository.findById(findId)).thenReturn(Optional.empty());
 
             // when & then
-            assertAll(() -> assertThatThrownBy(() -> reservedService.removeById(findId)).isInstanceOf(
+            assertAll(
+                    () -> assertThatThrownBy(() -> reservedService.removeById(findId)).isInstanceOf(
                             NotFoundException.class).hasMessage("존재하지 않는 예약입니다."),
-                    () -> verify(reservedRepository).findById(findId));
+                    () -> verify(reservedRepository).findById(findId)
+            );
         }
 
         @Test
@@ -206,8 +205,10 @@ class ReservedServiceTest {
             reservedService.removeById(removeId);
 
             // then
-            assertAll(() -> verify(eventPublisher).publishEvent(any(ReservationCancelledEvent.class)),
-                    () -> verify(reservedRepository).deleteById(removeId));
+            assertAll(
+                    () -> verify(eventPublisher).publishEvent(any(ReservationCancelledEvent.class)),
+                    () -> verify(reservedRepository).deleteById(removeId)
+            );
         }
     }
 }
