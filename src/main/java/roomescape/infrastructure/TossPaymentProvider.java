@@ -1,6 +1,7 @@
 package roomescape.infrastructure;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,8 +50,10 @@ public class TossPaymentProvider implements PaymentProvider {
         var json = e.getResponseBodyAsString();
         try {
             return objectMapper.readValue(json, TossFailureResponse.class);
-        } catch (JsonProcessingException jsonEx) {
-            throw new RuntimeException(jsonEx);
+        } catch (JsonMappingException ex) {
+            throw new RuntimeException("토스의 실패 JSON 응답과 필드가 일치하지 않습니다 : " + ex);
+        } catch (JsonProcessingException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
