@@ -1,6 +1,5 @@
 package roomescape.reservation.application;
 
-import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,7 +27,7 @@ public class ReservationScheduler {
     public void checkReservationPaymentExpiredTime() {
         LocalDateTime findTime = LocalDateTime.now().minus(validReservationTimePeriod);
         List<Reservation> reservations = reservationService.findByCreateTimeAndPaymentStatus(
-            Timestamp.valueOf(findTime), PaymentStatus.PENDING);
+            findTime, PaymentStatus.PENDING);
         for (Reservation reservation : reservations) {
             reservationService.deleteById(reservation.getId());
         }

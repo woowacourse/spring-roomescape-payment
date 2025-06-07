@@ -2,7 +2,6 @@ package roomescape.reservation.application;
 
 import static roomescape.reservation.domain.PaymentStatus.PENDING;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -62,7 +61,7 @@ public class ReservationService {
             .toList();
     }
 
-    public List<Reservation> findByCreateTimeAndPaymentStatus(Timestamp createdAtBefore, PaymentStatus paymentStatus) {
+    public List<Reservation> findByCreateTimeAndPaymentStatus(LocalDateTime createdAtBefore, PaymentStatus paymentStatus) {
         return reservationRepository.findByCreatedAtBeforeAndPaymentStatus(createdAtBefore, paymentStatus);
     }
 
