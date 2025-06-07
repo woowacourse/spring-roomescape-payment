@@ -1,8 +1,8 @@
 package roomescape.reservation.external.toss;
 
 public record TossPaymentRequest(
-        String paymentKey,
+        String orderId,
         Long amount,
-        String orderId
+        String paymentKey
 ) {
 }
