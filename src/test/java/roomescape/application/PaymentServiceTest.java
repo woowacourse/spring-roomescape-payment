@@ -24,9 +24,11 @@ import roomescape.presentation.dto.request.PaymentProcessRequest;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.*;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -122,5 +124,28 @@ class PaymentServiceTest {
 
         verify(paymentRestClient, times(1)).getPaymentResponse(request);
         verify(paymentRepository, never()).save(any());
+    }
+
+    @Test
+    void 결제를_모두_조회한다() {
+        Member member = Member.create("듀이", Role.USER, "test@email.com", "pass1");
+        LocalDate date = LocalDate.of(2025, 4, 21);
+        ReservationTime time = ReservationTime.create(LocalTime.of(10, 0));
+        Theme theme = Theme.create("공포", "공포테마", "공포.jpg");
+        Reservation reservation = Reservation.create(member, date, time, theme);
+        Payment payment = Payment.create("paymentKey", "orderId", new BigDecimal("1000"), reservation);
+
+        when(paymentRepository.findAllByMemberId(member.getId()))
+                .thenReturn(List.of(payment));
+
+        List<Payment> responses = paymentService.findPaymentsByMember(member);
+        Payment response = responses.getFirst();
+
+        assertAll(
+                () -> assertThat(responses).hasSize(1),
+                () -> assertThat(response.getPaymentKey()).isEqualTo(payment.getPaymentKey()),
+                () -> assertThat(response.getOrderId()).isEqualTo(payment.getOrderId()),
+                () -> assertThat(response.getAmount()).isEqualTo(payment.getAmount())
+        );
     }
 }
