@@ -1,5 +1,7 @@
 package roomescape.exception;
 
+import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -9,11 +11,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import roomescape.exception.custom.reason.payment.PaymentException;
 import roomescape.exception.custom.status.CustomException;
 
-import java.util.stream.Collectors;
-
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -21,12 +21,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handlerIllegalArgument(
             final CustomException e
     ) {
+        log.info("CustomException: ", e);
         return ResponseEntity.status(e.getStatusValue())
                 .body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler({HttpMessageNotReadableException.class, MissingServletRequestParameterException.class})
-    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException() {
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(RuntimeException e) {
+        log.info("HttpMessageNotReadableException, MissingServletRequestParameterException: ", e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse("잘못된 형식의 요청입니다."));
     }
@@ -36,6 +38,7 @@ public class GlobalExceptionHandler {
             final MethodArgumentNotValidException e,
             final BindingResult bindingResult
     ) {
+        log.info("MethodArgumentNotValidException: ", e);
         final String notValidField = generateNotValidFieldNames(bindingResult);
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -54,7 +57,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleNotCaughtExceptions(
             final Exception e
     ) {
-        e.printStackTrace();
+        log.error("예상치 못한 예외", e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse("서버에서 예기치 못한 예외가 발생하였습니다."));
     }

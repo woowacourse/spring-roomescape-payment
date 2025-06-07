@@ -14,10 +14,6 @@ public record BookingResponse(
         Long amount
 ) {
 
-//    public static BookingResponse of(Reservation reservation) {
-//        return new BookingResponse(reservation.getId(), ScheduleResponse.of(reservation.getSchedule()), "예약");
-//    }
-
     public static BookingResponse of(ReservationPayment reservationPayment) {
         Reservation reservation = reservationPayment.reservation();
         Payment payment = reservationPayment.payment();
