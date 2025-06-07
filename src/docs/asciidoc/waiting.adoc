@@ -1,10 +1,10 @@
 == Waiting API
 
-== 전체 대기 조회
+=== 전체 대기 조회
 operation::waiting-controller-docs-test/find-waitings[snippets='curl-request,http-request,http-response']
 
-== 대기 삭제
+=== 대기 삭제
 operation::waiting-controller-docs-test/delete-waiting[snippets='curl-request,http-request,http-response']
 
-== 대기 생성
+=== 대기 생성
 operation::waiting-controller-docs-test/create-waiting[snippets='curl-request,http-request,http-response']
