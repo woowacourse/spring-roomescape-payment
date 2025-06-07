@@ -2,6 +2,7 @@ package roomescape.controller.api;
 
 import io.restassured.RestAssured;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
@@ -16,6 +18,7 @@ import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
 import roomescape.fixture.InitDatabaseHelper;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -34,6 +37,8 @@ class MemberReservationControllerTest {
     @Autowired
     ReservationTimeRepository reservationTimeRepository;
     @Autowired
+    PaymentRepository paymentRepository;
+    @Autowired
     JwtTokenProvider jwtTokenProvider;
     @Autowired
     InitDatabaseHelper dbHelper;
@@ -50,11 +55,13 @@ class MemberReservationControllerTest {
         ReservationTime time = ReservationTime.createWithoutId(LocalTime.now());
         Theme theme = Theme.createWithoutId("테마A", "", "");
         Reservation reservation = Reservation.createWithoutId(member, LocalDate.now(), time, theme);
+        Payment payment = Payment.createWithoutId("orderId", "paymentKey", 1000L, reservation, LocalDateTime.now());
 
         memberRepository.save(member);
         reservationTimeRepository.save(time);
         themeRepository.save(theme);
         reservationRepository.save(reservation);
+        paymentRepository.save(payment);
 
         Member findMember = memberRepository.findById(member.getId()).get();
         String token = jwtTokenProvider.createToken(findMember);
