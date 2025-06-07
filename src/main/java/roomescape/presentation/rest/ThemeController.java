@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.application.ThemeService;
+import roomescape.domain.auth.AuthenticationInfo;
+import roomescape.exception.AuthorizationException;
 import roomescape.presentation.request.CreateThemeRequest;
 import roomescape.presentation.response.ThemeResponse;
 
@@ -29,7 +31,13 @@ public class ThemeController {
 
     @PostMapping
     @ResponseStatus(CREATED)
-    public ThemeResponse register(@RequestBody @Valid final CreateThemeRequest request) {
+    public ThemeResponse register(
+        final AuthenticationInfo authenticationInfo,
+        @RequestBody @Valid final CreateThemeRequest request
+    ) {
+        if (authenticationInfo.isNotAdmin()) {
+            throw new AuthorizationException("관리자에게만 허용된 작업입니다.");
+        }
         var theme = service.register(request.name(), request.description(), request.thumbnail());
         return ThemeResponse.from(theme);
     }
@@ -41,7 +49,7 @@ public class ThemeController {
     }
 
     @GetMapping(value = "/popular", params = {"startDate", "endDate", "count"})
-    public List<ThemeResponse> getAvailableTimes(
+    public List<ThemeResponse> getPopularThemes(
             @RequestParam("startDate") final LocalDate startDate,
             @RequestParam("endDate") final LocalDate endDate,
             @RequestParam("count") final Integer count
@@ -52,7 +60,13 @@ public class ThemeController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(NO_CONTENT)
-    public void delete(@PathVariable("id") final long id) {
+    public void delete(
+        final AuthenticationInfo authenticationInfo,
+        @PathVariable("id") final long id
+    ) {
+        if (authenticationInfo.isNotAdmin()) {
+            throw new AuthorizationException("관리자에게만 허용된 작업입니다.");
+        }
         service.removeById(id);
     }
 }
