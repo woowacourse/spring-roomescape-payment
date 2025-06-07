@@ -11,7 +11,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     @Query("""
         SELECT p
         FROM Payment p
-        JOIN Reservation r ON r.id = r.id
+        JOIN p.reservation r
         WHERE r.member.id = :memberId
     """)
     List<Payment> findAllByMemberId(Long memberId);
