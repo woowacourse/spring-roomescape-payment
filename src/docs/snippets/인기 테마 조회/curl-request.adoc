@@ -1,0 +1,5 @@
+[source,bash]
+----
+$ curl 'http://docs.api.com/themes/ranking' -i -X GET \
+    -H 'Accept: application/json'
+----

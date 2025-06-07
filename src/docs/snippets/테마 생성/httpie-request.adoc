@@ -1,0 +1,10 @@
+[source,bash]
+----
+$ echo '{
+  "name" : "테마명",
+  "description" : "테마 설명",
+  "thumbnail" : "thumbnail.jpg"
+}' | http POST 'http://docs.api.com/themes' \
+    'Content-Type:application/json' \
+    'Accept:application/json'
+----

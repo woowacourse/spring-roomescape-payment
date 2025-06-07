@@ -1,0 +1,9 @@
+[source,json,options="nowrap"]
+----
+{
+  "id" : 1,
+  "name" : "테마명",
+  "description" : "테마 설명",
+  "thumbnail" : "thumbnail.jpg"
+}
+----
