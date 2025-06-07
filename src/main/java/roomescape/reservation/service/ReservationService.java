@@ -21,6 +21,7 @@ import roomescape.member.domain.MemberId;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationId;
+import roomescape.reservation.domain.ReservationWithPayment;
 import roomescape.reservation.dto.request.FilteringReservationRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.response.BookedReservationTimeResponse;
@@ -28,6 +29,7 @@ import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.reservation.payment.dto.request.PaymentRequest;
+import roomescape.reservation.payment.repository.PaymentRepository;
 import roomescape.reservation.payment.service.PaymentService;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.time.domain.ReservationTime;
@@ -49,6 +51,7 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentRepository paymentRepository;
 
     public ReservationService(
             final PaymentService paymentService,
@@ -56,14 +59,15 @@ public class ReservationService {
             final ReservationTimeRepository reservationTimeRepository,
             final ThemeRepository themeRepository,
             final MemberRepository memberRepository,
-            final WaitingRepository waitingRepository
-    ) {
+            final WaitingRepository waitingRepository,
+            PaymentRepository paymentRepository) {
         this.paymentService = paymentService;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Transactional
@@ -121,14 +125,11 @@ public class ReservationService {
     }
 
     public List<MyReservationsResponse> getAllMyReservations(final LoginMember loginMember) {
-        List<Reservation> reservations = reservationRepository.findAllByMemberId(new MemberId(loginMember.id()))
-                .stream()
-                .toList();
         List<WaitingWithRank> waitingWithRanks = waitingRepository.findAllWaitingWithRankByMemberId(
-                        new MemberId(loginMember.id()))
-                .stream()
-                .toList();
-        return toMyReservationResponses(reservations, waitingWithRanks);
+                new MemberId(loginMember.id()));
+        List<ReservationWithPayment> reservationsWithPayment = reservationRepository.findReservationsWithPayment(
+                new MemberId(loginMember.id()));
+        return toMyReservationResponses(reservationsWithPayment, waitingWithRanks);
     }
 
     public List<BookedReservationTimeResponse> getSortedAvailableTimes(final LocalDate date, final Long themeId) {
@@ -147,6 +148,8 @@ public class ReservationService {
         ReservationId reservationId = new ReservationId(id);
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 예약입니다."));
+
+        paymentRepository.deleteByReservationId(reservationId);
         reservationRepository.deleteById(reservationId);
 
         approveFirstWaiting(reservation);
@@ -184,11 +187,11 @@ public class ReservationService {
     }
 
     private List<MyReservationsResponse> toMyReservationResponses(
-            final List<Reservation> reservations,
+            final List<ReservationWithPayment> reservations,
             final List<WaitingWithRank> waitingWithRanks
     ) {
         List<MyReservationsResponse> responses = new ArrayList<>();
-        for (Reservation reservation : reservations) {
+        for (ReservationWithPayment reservation : reservations) {
             responses.add(MyReservationsResponse.from(reservation));
         }
         for (WaitingWithRank waitingWithRank : waitingWithRanks) {

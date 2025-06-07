@@ -6,9 +6,9 @@ import java.time.LocalTime;
 public class WaitingWithRank {
 
     private final Waiting waiting;
-    private final Long rank;
+    private final long rank;
 
-    public WaitingWithRank(final Waiting waiting, final Long rank) {
+    public WaitingWithRank(final Waiting waiting, final long rank) {
         this.waiting = waiting;
         this.rank = rank;
     }

@@ -2,13 +2,13 @@ package roomescape.reservation.repository;
 
 import java.time.LocalDate;
 import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
+import org.springframework.data.repository.query.Param;
 import roomescape.member.domain.MemberId;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationId;
+import roomescape.reservation.domain.ReservationWithPayment;
 import roomescape.reservation.time.domain.ReservationTimeId;
 import roomescape.theme.domain.ThemeId;
 
@@ -51,6 +51,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, Reserv
             LocalDate dateFrom,
             LocalDate dateTo
     );
+
+    @Query("""
+            SELECT new roomescape.reservation.domain.ReservationWithPayment(r, p)
+            FROM Reservation r
+            JOIN Payment p ON p.reservation = r
+            WHERE r.member.id = :memberId
+            """)
+    List<ReservationWithPayment> findReservationsWithPayment(@Param("memberId") MemberId memberId);
 
     boolean existsByDateAndTimeIdAndThemeId(
             LocalDate date,
