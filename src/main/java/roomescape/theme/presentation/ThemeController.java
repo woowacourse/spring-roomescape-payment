@@ -57,7 +57,7 @@ public class ThemeController {
     @Operation(summary = "모든 테마 조회",
             description = "등록되어 있는 모든 테마를 조회합니다.",
             responses = {
-                    @ApiResponse(description = "조회 성공", responseCode = "201", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ThemeWebResponse.class))))
+                    @ApiResponse(description = "조회 성공", responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ThemeWebResponse.class))))
             }
     )
     @GetMapping("/themes")
@@ -68,7 +68,7 @@ public class ThemeController {
     @Operation(summary = "인기 테마 조회",
             description = "일주일 간 가장 예약이 많은 테마를 순서대로 10개 조회합니다.",
             responses = {
-                    @ApiResponse(description = "조회 성공", responseCode = "201", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ThemeWebResponse.class))))
+                    @ApiResponse(description = "조회 성공", responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ThemeWebResponse.class))))
             }
     )
     @GetMapping("/themes/popular")

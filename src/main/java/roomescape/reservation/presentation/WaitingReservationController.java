@@ -118,7 +118,7 @@ public class WaitingReservationController {
     @Operation(summary = "결제 승인 후 예약 상태로 변경",
             description = "확정된 예약이 존재하지 않는 예약 슬롯의 가장 첫 번째 순서(Payment-Pending)의 예약 대기를 결제 승인 후 예약(CONFIRMED) 상태로 변경합니다.",
             responses = {
-                    @ApiResponse(description = "예약 성공", responseCode = "201"),
+                    @ApiResponse(description = "예약 성공", responseCode = "200"),
                     @ApiResponse(description = "이미 확정된 예약이 존재하는 경우\n\n- Payment-Pending 상태의 예약 대기가 존재하지 않는 경우", responseCode = "400", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
                     @ApiResponse(description = "존재하지 않는 예약 슬롯 id인 경우", responseCode = "404", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
             },
