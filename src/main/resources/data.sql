@@ -1,4 +1,6 @@
 DELETE
+FROM payment;
+DELETE
 FROM reservation;
 DELETE
 FROM reservation_time;
@@ -6,8 +8,6 @@ DELETE
 FROM theme;
 DELETE
 FROM member;
-DELETE
-FROM payment;
 
 -- member 데이터
 INSERT INTO member(name, email, password, role)
