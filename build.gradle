@@ -55,12 +55,22 @@ dependencies {
     // Jackson
     testImplementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
+
+// === Restdocs 설정 ===
 def generatedSnippets = file("${buildDir}/generated-snippets")
-def persistentSnippets = file("${projectDir}/src/docs/snippets")  // Git에 포함되는 위치
+def persistentSnippets = file("${projectDir}/src/docs/snippets")
 def indexAdocPath = file("${projectDir}/src/docs/asciidoc/index.adoc")
+def asciidocOutputDir = file("${buildDir}/docs/asciidoc")
+def staticDocsDir = file("${projectDir}/src/main/resources/static/docs")
+
+tasks.register("deleteSnippets", Delete) {
+    delete generatedSnippets
+    delete persistentSnippets
+}
 
 test {
     useJUnitPlatform()
+    dependsOn "deleteSnippets"
     outputs.dir generatedSnippets
 }
 
@@ -75,22 +85,27 @@ tasks.register("generateIndexAdoc") {
     doLast {
         indexAdocPath.parentFile.mkdirs()
 
-        def includes = []
-        persistentSnippets.eachFileRecurse { file ->
-            if (file.name.endsWith(".adoc")) {
-                def relativePath = persistentSnippets.toPath().relativize(file.toPath()).toString()
-                includes << "include::{snippets}/${relativePath}[]"
-            }
-        }
-
-        indexAdocPath.text = """
-= API 문서
+        def snippetDirs = persistentSnippets.listFiles().findAll { it.isDirectory() }
+        def content = """= 방탈출 서비스 API 문서
 :toc: left
 :source-highlighter: highlightjs
 :snippets: ${persistentSnippets}
 
-${includes.sort().join('\n')}
 """
+
+        snippetDirs.sort { it.name }.each { dir ->
+            content += "== ${dir.name}\n\n"
+            def includes = []
+            dir.eachFile { file ->
+                if (file.name.endsWith(".adoc")) {
+                    def relativePath = persistentSnippets.toPath().relativize(file.toPath()).toString()
+                    includes << "include::{snippets}/${relativePath}[]"
+                }
+            }
+            content += includes.sort().join('\n') + "\n\n"
+        }
+
+        indexAdocPath.text = content
     }
 }
 
@@ -104,10 +119,15 @@ asciidoctor {
     baseDirFollowsSourceDir()
 }
 
+tasks.register("cleanDocs", Delete) {
+    delete staticDocsDir
+}
+
 tasks.register('copyDocs', Copy) {
+    dependsOn cleanDocs
     dependsOn asciidoctor
-    from file("build/docs/asciidoc/")
-    into file("src/main/resources/static/docs")
+    from asciidocOutputDir
+    into staticDocsDir
 }
 
 build {

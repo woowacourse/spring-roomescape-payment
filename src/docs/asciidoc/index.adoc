@@ -1,17 +1,10 @@
-
-= API 문서
+= 방탈출 서비스 API 문서
 :toc: left
 :source-highlighter: highlightjs
 :snippets: /Users/songsunkook/내 드라이브/source/wooteco/spring-roomescape-payment/src/docs/snippets
 
-include::{snippets}/reservation-post/curl-request.adoc[]
-include::{snippets}/reservation-post/http-request.adoc[]
-include::{snippets}/reservation-post/http-response.adoc[]
-include::{snippets}/reservation-post/httpie-request.adoc[]
-include::{snippets}/reservation-post/request-body.adoc[]
-include::{snippets}/reservation-post/request-fields.adoc[]
-include::{snippets}/reservation-post/response-body.adoc[]
-include::{snippets}/reservation-post/response-fields.adoc[]
+== 내 예약 조회
+
 include::{snippets}/내 예약 조회/curl-request.adoc[]
 include::{snippets}/내 예약 조회/http-request.adoc[]
 include::{snippets}/내 예약 조회/http-response.adoc[]
@@ -19,6 +12,9 @@ include::{snippets}/내 예약 조회/httpie-request.adoc[]
 include::{snippets}/내 예약 조회/request-body.adoc[]
 include::{snippets}/내 예약 조회/response-body.adoc[]
 include::{snippets}/내 예약 조회/response-fields.adoc[]
+
+== 어드민 예약 생성
+
 include::{snippets}/어드민 예약 생성/curl-request.adoc[]
 include::{snippets}/어드민 예약 생성/http-request.adoc[]
 include::{snippets}/어드민 예약 생성/http-response.adoc[]
@@ -27,6 +23,9 @@ include::{snippets}/어드민 예약 생성/request-body.adoc[]
 include::{snippets}/어드민 예약 생성/request-fields.adoc[]
 include::{snippets}/어드민 예약 생성/response-body.adoc[]
 include::{snippets}/어드민 예약 생성/response-fields.adoc[]
+
+== 어드민 예약 취소
+
 include::{snippets}/어드민 예약 취소/curl-request.adoc[]
 include::{snippets}/어드민 예약 취소/http-request.adoc[]
 include::{snippets}/어드민 예약 취소/http-response.adoc[]
@@ -34,6 +33,9 @@ include::{snippets}/어드민 예약 취소/httpie-request.adoc[]
 include::{snippets}/어드민 예약 취소/path-parameters.adoc[]
 include::{snippets}/어드민 예약 취소/request-body.adoc[]
 include::{snippets}/어드민 예약 취소/response-body.adoc[]
+
+== 예약 가능한 시간 조회
+
 include::{snippets}/예약 가능한 시간 조회/curl-request.adoc[]
 include::{snippets}/예약 가능한 시간 조회/http-request.adoc[]
 include::{snippets}/예약 가능한 시간 조회/http-response.adoc[]
@@ -42,15 +44,19 @@ include::{snippets}/예약 가능한 시간 조회/query-parameters.adoc[]
 include::{snippets}/예약 가능한 시간 조회/request-body.adoc[]
 include::{snippets}/예약 가능한 시간 조회/response-body.adoc[]
 include::{snippets}/예약 가능한 시간 조회/response-fields.adoc[]
+
+== 예약 삭제
+
 include::{snippets}/예약 삭제/curl-request.adoc[]
 include::{snippets}/예약 삭제/http-request.adoc[]
 include::{snippets}/예약 삭제/http-response.adoc[]
 include::{snippets}/예약 삭제/httpie-request.adoc[]
 include::{snippets}/예약 삭제/path-parameters.adoc[]
 include::{snippets}/예약 삭제/request-body.adoc[]
-include::{snippets}/예약 삭제/request-fields.adoc[]
 include::{snippets}/예약 삭제/response-body.adoc[]
-include::{snippets}/예약 삭제/response-fields.adoc[]
+
+== 예약 생성
+
 include::{snippets}/예약 생성/curl-request.adoc[]
 include::{snippets}/예약 생성/http-request.adoc[]
 include::{snippets}/예약 생성/http-response.adoc[]
@@ -59,6 +65,9 @@ include::{snippets}/예약 생성/request-body.adoc[]
 include::{snippets}/예약 생성/request-fields.adoc[]
 include::{snippets}/예약 생성/response-body.adoc[]
 include::{snippets}/예약 생성/response-fields.adoc[]
+
+== 예약 시간 삭제
+
 include::{snippets}/예약 시간 삭제/curl-request.adoc[]
 include::{snippets}/예약 시간 삭제/http-request.adoc[]
 include::{snippets}/예약 시간 삭제/http-response.adoc[]
@@ -66,6 +75,9 @@ include::{snippets}/예약 시간 삭제/httpie-request.adoc[]
 include::{snippets}/예약 시간 삭제/path-parameters.adoc[]
 include::{snippets}/예약 시간 삭제/request-body.adoc[]
 include::{snippets}/예약 시간 삭제/response-body.adoc[]
+
+== 예약 시간 생성
+
 include::{snippets}/예약 시간 생성/curl-request.adoc[]
 include::{snippets}/예약 시간 생성/http-request.adoc[]
 include::{snippets}/예약 시간 생성/http-response.adoc[]
@@ -74,6 +86,9 @@ include::{snippets}/예약 시간 생성/request-body.adoc[]
 include::{snippets}/예약 시간 생성/request-fields.adoc[]
 include::{snippets}/예약 시간 생성/response-body.adoc[]
 include::{snippets}/예약 시간 생성/response-fields.adoc[]
+
+== 예약 시간 조회
+
 include::{snippets}/예약 시간 조회/curl-request.adoc[]
 include::{snippets}/예약 시간 조회/http-request.adoc[]
 include::{snippets}/예약 시간 조회/http-response.adoc[]
@@ -81,29 +96,20 @@ include::{snippets}/예약 시간 조회/httpie-request.adoc[]
 include::{snippets}/예약 시간 조회/request-body.adoc[]
 include::{snippets}/예약 시간 조회/response-body.adoc[]
 include::{snippets}/예약 시간 조회/response-fields.adoc[]
+
+== 예약 조회(조건 검색)
+
 include::{snippets}/예약 조회(조건 검색)/curl-request.adoc[]
 include::{snippets}/예약 조회(조건 검색)/http-request.adoc[]
 include::{snippets}/예약 조회(조건 검색)/http-response.adoc[]
 include::{snippets}/예약 조회(조건 검색)/httpie-request.adoc[]
 include::{snippets}/예약 조회(조건 검색)/query-parameters.adoc[]
 include::{snippets}/예약 조회(조건 검색)/request-body.adoc[]
-include::{snippets}/예약 조회(조건 검색)/request-fields.adoc[]
 include::{snippets}/예약 조회(조건 검색)/response-body.adoc[]
 include::{snippets}/예약 조회(조건 검색)/response-fields.adoc[]
-include::{snippets}/예약 조회/curl-request.adoc[]
-include::{snippets}/예약 조회/http-request.adoc[]
-include::{snippets}/예약 조회/http-response.adoc[]
-include::{snippets}/예약 조회/httpie-request.adoc[]
-include::{snippets}/예약 조회/request-body.adoc[]
-include::{snippets}/예약 조회/request-fields.adoc[]
-include::{snippets}/예약 조회/response-body.adoc[]
-include::{snippets}/예약 취소/curl-request.adoc[]
-include::{snippets}/예약 취소/http-request.adoc[]
-include::{snippets}/예약 취소/http-response.adoc[]
-include::{snippets}/예약 취소/httpie-request.adoc[]
-include::{snippets}/예약 취소/path-parameters.adoc[]
-include::{snippets}/예약 취소/request-body.adoc[]
-include::{snippets}/예약 취소/response-body.adoc[]
+
+== 인기 테마 조회
+
 include::{snippets}/인기 테마 조회/curl-request.adoc[]
 include::{snippets}/인기 테마 조회/http-request.adoc[]
 include::{snippets}/인기 테마 조회/http-response.adoc[]
@@ -111,6 +117,9 @@ include::{snippets}/인기 테마 조회/httpie-request.adoc[]
 include::{snippets}/인기 테마 조회/request-body.adoc[]
 include::{snippets}/인기 테마 조회/response-body.adoc[]
 include::{snippets}/인기 테마 조회/response-fields.adoc[]
+
+== 테마 삭제
+
 include::{snippets}/테마 삭제/curl-request.adoc[]
 include::{snippets}/테마 삭제/http-request.adoc[]
 include::{snippets}/테마 삭제/http-response.adoc[]
@@ -118,6 +127,9 @@ include::{snippets}/테마 삭제/httpie-request.adoc[]
 include::{snippets}/테마 삭제/path-parameters.adoc[]
 include::{snippets}/테마 삭제/request-body.adoc[]
 include::{snippets}/테마 삭제/response-body.adoc[]
+
+== 테마 생성
+
 include::{snippets}/테마 생성/curl-request.adoc[]
 include::{snippets}/테마 생성/http-request.adoc[]
 include::{snippets}/테마 생성/http-response.adoc[]
@@ -126,6 +138,9 @@ include::{snippets}/테마 생성/request-body.adoc[]
 include::{snippets}/테마 생성/request-fields.adoc[]
 include::{snippets}/테마 생성/response-body.adoc[]
 include::{snippets}/테마 생성/response-fields.adoc[]
+
+== 테마 조회
+
 include::{snippets}/테마 조회/curl-request.adoc[]
 include::{snippets}/테마 조회/http-request.adoc[]
 include::{snippets}/테마 조회/http-response.adoc[]
@@ -133,6 +148,9 @@ include::{snippets}/테마 조회/httpie-request.adoc[]
 include::{snippets}/테마 조회/request-body.adoc[]
 include::{snippets}/테마 조회/response-body.adoc[]
 include::{snippets}/테마 조회/response-fields.adoc[]
+
+== 회원 가입
+
 include::{snippets}/회원 가입/curl-request.adoc[]
 include::{snippets}/회원 가입/http-request.adoc[]
 include::{snippets}/회원 가입/http-response.adoc[]
@@ -140,6 +158,9 @@ include::{snippets}/회원 가입/httpie-request.adoc[]
 include::{snippets}/회원 가입/request-body.adoc[]
 include::{snippets}/회원 가입/request-fields.adoc[]
 include::{snippets}/회원 가입/response-body.adoc[]
+
+== 회원 전체 조회
+
 include::{snippets}/회원 전체 조회/curl-request.adoc[]
 include::{snippets}/회원 전체 조회/http-request.adoc[]
 include::{snippets}/회원 전체 조회/http-response.adoc[]
@@ -147,3 +168,4 @@ include::{snippets}/회원 전체 조회/httpie-request.adoc[]
 include::{snippets}/회원 전체 조회/request-body.adoc[]
 include::{snippets}/회원 전체 조회/response-body.adoc[]
 include::{snippets}/회원 전체 조회/response-fields.adoc[]
+
