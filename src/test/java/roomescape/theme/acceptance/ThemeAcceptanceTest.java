@@ -4,8 +4,12 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 
 import fixture.MemberFixture;
+import fixture.PaymentFixture;
+import fixture.ReservationFixture;
+import fixture.ReservationTimeFixture;
 import fixture.ThemeFixture;
 import io.restassured.RestAssured;
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,8 +24,15 @@ import roomescape.helper.TestHelper;
 import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.entity.Payment;
+import roomescape.payment.repository.PaymentRepository;
+import roomescape.reservation.entity.Reservation;
+import roomescape.reservation.entity.ReservationTime;
+import roomescape.reservation.repository.ReservationRepository;
+import roomescape.reservation.repository.ReservationTimeRepository;
 import roomescape.theme.dto.request.ThemeCreateRequest;
 import roomescape.theme.entity.Theme;
+import roomescape.theme.repository.ThemeRepository;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -34,6 +45,14 @@ class ThemeAcceptanceTest {
     private MemberRepository memberRepository;
 
     Member member;
+    @Autowired
+    private ThemeRepository themeRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
+    @Autowired
+    private ReservationTimeRepository reservationTimeRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     @BeforeEach
     void setUp() {
@@ -43,7 +62,7 @@ class ThemeAcceptanceTest {
     }
 
     @Test
-    @DisplayName("테마를 생성한다.")
+    @DisplayName("테마 생성 요청 - 성공")
     void createTheme() {
         // given
         String token = TestHelper.login(member.getEmail(), member.getPassword());
@@ -64,34 +83,34 @@ class ThemeAcceptanceTest {
     }
 
     @Test
-    @DisplayName("중복되는 테마 이름이 있을 경우 생성할 수 없다.")
+    @DisplayName("테마 생성 요청 - 중복 이름으로 실패")
     void createThemeWithDuplicateName() {
         // given
         String token = TestHelper.login(member.getEmail(), member.getPassword());
         Theme theme = ThemeFixture.createDefault();
-        var request1 = new ThemeCreateRequest(
+        var request = new ThemeCreateRequest(
                 theme.getName(),
                 theme.getDescription(),
                 theme.getThumbnail()
         );
-        var request2 = new ThemeCreateRequest(
+        var duplicatedThemeNameRequest = new ThemeCreateRequest(
                 theme.getName(),
                 theme.getDescription() + "diff",
                 theme.getThumbnail() + "diff"
         );
 
-        TestHelper.postWithToken("/admin/themes", request1, token)
+        TestHelper.postWithToken("/admin/themes", request, token)
                 .then()
                 .statusCode(HttpStatus.CREATED.value());
 
         // when & then
-        TestHelper.postWithToken("/admin/themes", request2, token)
+        TestHelper.postWithToken("/admin/themes", duplicatedThemeNameRequest, token)
                 .then()
                 .statusCode(HttpStatus.CONFLICT.value());
     }
 
     @Test
-    @DisplayName("모든 테마를 조회한다.")
+    @DisplayName("모든 테마 조회 요청")
     void getAllThemes() {
         // given
         String token = TestHelper.login(member.getEmail(), member.getPassword());
@@ -125,28 +144,36 @@ class ThemeAcceptanceTest {
     }
 
     @Test
-    @DisplayName("인기 있는 테마를 조회한다.")
+    @DisplayName("인기 테마 조회 요청 - 인기순 정렬 확인")
     void getPopularThemes() {
         // given
-        String token = TestHelper.login(member.getEmail(), member.getPassword());
-        var request1 = new ThemeCreateRequest(
-                "미소",
-                "미소 테마",
-                "https://miso.com"
-        );
-        var request2 = new ThemeCreateRequest(
-                "우테코",
-                "우테코 테마",
-                "https://wooteco.com"
-        );
+        List<Theme> themes = ThemeFixture.createDefaultList(2);
+        themeRepository.saveAll(themes);
 
-        TestHelper.postWithToken("/admin/themes", request1, token)
-                .then()
-                .statusCode(HttpStatus.CREATED.value());
+        ReservationTime reservationTime = ReservationTimeFixture.createDefault();
+        reservationTimeRepository.save(reservationTime);
 
-        TestHelper.postWithToken("/admin/themes", request2, token)
+        Payment payment = PaymentFixture.createDefault();
+        paymentRepository.save(payment);
+
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        Reservation reservation = ReservationFixture.create(yesterday, reservationTime, themes.get(1), member, payment);
+        reservationRepository.save(reservation);
+
+        // when & then
+        TestHelper.get("/themes/popular?limit=2")
                 .then()
-                .statusCode(HttpStatus.CREATED.value());
+                .statusCode(HttpStatus.OK.value())
+                .body("$", hasSize(2))
+                .body("[0].name", equalTo(themes.get(1).getName()));
+    }
+
+    @Test
+    @DisplayName("인기 테마 조회 요청 - limit 개수 확인")
+    void getPopularThemesWhenExistsLimit() {
+        // given
+        List<Theme> themes = ThemeFixture.createDefaultList(10);
+        themeRepository.saveAll(themes);
 
         // when & then
         TestHelper.get("/themes/popular?limit=2")
@@ -156,19 +183,12 @@ class ThemeAcceptanceTest {
     }
 
     @Test
-    @DisplayName("테마를 삭제한다.")
+    @DisplayName("테마 삭제 요청 - 성공")
     void deleteTheme() {
         // given
+        Theme theme = ThemeFixture.createDefault();
+        themeRepository.save(theme);
         String token = TestHelper.login(member.getEmail(), member.getPassword());
-        var request = new ThemeCreateRequest(
-                "미소",
-                "미소 테마",
-                "https://miso.com"
-        );
-
-        TestHelper.postWithToken("/admin/themes", request, token)
-                .then()
-                .statusCode(HttpStatus.CREATED.value());
 
         // when & then
         TestHelper.deleteWithToken("/admin/themes/1", token)
