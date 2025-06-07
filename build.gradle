@@ -15,6 +15,7 @@ java {
 repositories {
     mavenCentral()
 }
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -30,7 +31,29 @@ dependencies {
     testImplementation 'io.rest-assured:rest-assured:5.3.1'
 }
 
-
 test {
     useJUnitPlatform()
+}
+
+tasks.register('deploy', Exec) {
+    dependsOn bootJar
+    group = 'deployment'
+    description = 'Executes the deployment script.'
+
+    doFirst {
+        def scriptFile = file('./deploy.sh')
+        if (!scriptFile.exists()) {
+            throw new GradleException("The deploy.sh file does not exist.")
+        }
+
+        if (!scriptFile.canExecute()) {
+            println "deploy.sh is not executable. Attempting to run chmod +x..."
+            scriptFile.setExecutable(true)
+            if (!scriptFile.canExecute()) {
+                throw new GradleException("Failed to make deploy.sh executable. Please run chmod +x manually.")
+            }
+        }
+    }
+
+    commandLine './deploy.sh'
 }
