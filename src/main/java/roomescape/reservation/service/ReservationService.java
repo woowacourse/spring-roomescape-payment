@@ -20,7 +20,6 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberId;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.dto.request.PaymentRequest;
-import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationId;
@@ -51,7 +50,6 @@ public class ReservationService {
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
-    private final PaymentRepository paymentRepository;
 
     public ReservationService(
             final PaymentService paymentService,
@@ -59,15 +57,13 @@ public class ReservationService {
             final ReservationTimeRepository reservationTimeRepository,
             final ThemeRepository themeRepository,
             final MemberRepository memberRepository,
-            final WaitingRepository waitingRepository,
-            PaymentRepository paymentRepository) {
+            final WaitingRepository waitingRepository) {
         this.paymentService = paymentService;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
-        this.paymentRepository = paymentRepository;
     }
 
     @Transactional
@@ -149,7 +145,7 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 예약입니다."));
 
-        paymentRepository.deleteByReservationId(reservationId);
+        paymentService.delete(reservationId);
         reservationRepository.deleteById(reservationId);
 
         approveFirstWaiting(reservation);

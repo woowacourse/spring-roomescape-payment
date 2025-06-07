@@ -43,4 +43,9 @@ public class PaymentService {
         PaymentGateway paymentGateway = resolver.resolve(paymentRequest.method());
         paymentGateway.confirm(paymentRequest);
     }
+
+    @Transactional
+    public void delete(final ReservationId reservationId) {
+        paymentRepository.deleteByReservationId(reservationId);
+    }
 }
