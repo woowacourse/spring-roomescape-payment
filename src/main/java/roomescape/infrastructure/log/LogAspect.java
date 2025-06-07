@@ -3,6 +3,7 @@ package roomescape.infrastructure.log;
 import jakarta.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,6 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import roomescape.infrastructure.security.AccessToken;
+import roomescape.infrastructure.security.JwtProperties;
+import roomescape.presentation.support.JwtTokenExtractor;
 
 @Aspect
 @Component
@@ -23,8 +27,20 @@ public final class LogAspect {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LogAspect.class);
 
+    private final JwtTokenExtractor jwtTokenExtractor;
+    private final JwtProperties jwtProperties;
+
+    public LogAspect(JwtTokenExtractor jwtTokenExtractor, JwtProperties jwtProperties) {
+        this.jwtTokenExtractor = jwtTokenExtractor;
+        this.jwtProperties = jwtProperties;
+    }
+
     @Pointcut("execution(* roomescape.presentation..*Controller.*(..))")
     public void controllerMethods() {
+    }
+
+    @Pointcut("execution(* roomescape.application.reservation.command.*Service.*(..))")
+    public void serviceMethods() {
     }
 
     @Around("controllerMethods()")
@@ -47,6 +63,29 @@ public final class LogAspect {
             LOGGER.error(errorLog.toLogMessage());
             throw ex;
         }
+    }
+
+    @Around("serviceMethods()")
+    public Object logAroundServiceMethod(ProceedingJoinPoint joinPoint) throws Throwable {
+        Long memberId = getMemberId();
+        String className = joinPoint.getTarget().getClass().getSimpleName();
+        String methodName = joinPoint.getSignature().getName();
+        try {
+            Object result = joinPoint.proceed();
+            LogEntry responseLog = new InfoLog(memberId, className, methodName, LocalDateTime.now());
+            LOGGER.info(responseLog.toLogMessage());
+            return result;
+        } catch (Throwable ex) {
+            LogEntry errorLog = new ErrorLog(className, methodName, ex.getMessage(), ex);
+            LOGGER.error(errorLog.toLogMessage());
+            throw ex;
+        }
+    }
+
+    private Long getMemberId() {
+        HttpServletRequest request = currentHttpRequest();
+        AccessToken accessToken = jwtTokenExtractor.extract(request);
+        return accessToken.extractMemberId(jwtProperties.secretKey());
     }
 
     private HttpServletRequest currentHttpRequest() {
