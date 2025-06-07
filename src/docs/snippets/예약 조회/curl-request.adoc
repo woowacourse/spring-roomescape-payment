@@ -1,0 +1,5 @@
+[source,bash]
+----
+$ curl 'http://docs.api.com/reservations?themeId=1&memberId=1&dateFrom=2025-06-07&dateTo=2025-06-14' -i -X GET \
+    -H 'Accept: application/json'
+----

@@ -1,0 +1,32 @@
+|===
+|Path|Type|Description
+
+|`+[].reservationId+`
+|`+Number+`
+|예약 아이디
+
+|`+[].theme+`
+|`+String+`
+|테마 이름
+
+|`+[].date+`
+|`+String+`
+|예약 날짜
+
+|`+[].time+`
+|`+String+`
+|예약 시간
+
+|`+[].status+`
+|`+String+`
+|예약 상태
+
+|`+[].paymentKey+`
+|`+String+`
+|결제 키
+
+|`+[].amount+`
+|`+Number+`
+|결제 금액
+
+|===

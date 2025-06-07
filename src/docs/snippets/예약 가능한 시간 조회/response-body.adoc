@@ -1,0 +1,8 @@
+[source,json,options="nowrap"]
+----
+[ {
+  "id" : 1,
+  "startAt" : "00:00",
+  "alreadyBooked" : false
+} ]
+----

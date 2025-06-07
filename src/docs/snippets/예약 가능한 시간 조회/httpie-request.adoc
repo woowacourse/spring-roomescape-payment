@@ -1,0 +1,5 @@
+[source,bash]
+----
+$ http GET 'http://docs.api.com/reservations/times?date=2025-06-07&themeId=1' \
+    'Accept:application/json'
+----

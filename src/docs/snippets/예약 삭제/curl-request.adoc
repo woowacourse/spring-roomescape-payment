@@ -1,5 +1,4 @@
 [source,bash]
 ----
-$ curl 'http://docs.api.com/reservations/1' -i -X DELETE \
-    -H 'Content-Type: application/json'
+$ curl 'http://docs.api.com/reservations/1' -i -X DELETE
 ----

@@ -1,0 +1,8 @@
+.+/admin/reservations/{id}+
+|===
+|Parameter|Description
+
+|`+id+`
+|예약 아이디
+
+|===

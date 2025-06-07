@@ -1,0 +1,24 @@
+[source,json,options="nowrap"]
+----
+[ {
+  "id" : 1,
+  "date" : "2025-06-08",
+  "time" : {
+    "id" : 1,
+    "startAt" : "00:00"
+  },
+  "theme" : {
+    "id" : 1,
+    "name" : "테마명",
+    "description" : "테마 설명",
+    "thumbnail" : "thumbnail.jpg"
+  },
+  "member" : {
+    "id" : 1,
+    "name" : "홍길동",
+    "email" : "example@example.com",
+    "password" : "password",
+    "role" : "MEMBER"
+  }
+} ]
+----

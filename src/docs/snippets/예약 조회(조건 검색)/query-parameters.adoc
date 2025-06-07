@@ -1,0 +1,16 @@
+|===
+|Parameter|Description
+
+|`+themeId+`
+|테마 아이디
+
+|`+memberId+`
+|사용자 아이디
+
+|`+dateFrom+`
+|시작 날짜
+
+|`+dateTo+`
+|종료 날짜
+
+|===

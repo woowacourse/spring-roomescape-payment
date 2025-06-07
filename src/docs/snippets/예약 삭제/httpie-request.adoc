@@ -1,5 +1,4 @@
 [source,bash]
 ----
-$ http DELETE 'http://docs.api.com/reservations/1' \
-    'Content-Type:application/json'
+$ http DELETE 'http://docs.api.com/reservations/1'
 ----

@@ -1,0 +1,5 @@
+[source,bash]
+----
+$ http GET 'http://docs.api.com/reservations/mine' \
+    'Accept:application/json'
+----
