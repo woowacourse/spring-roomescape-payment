@@ -21,7 +21,6 @@ class CookieManagerTest {
     @BeforeEach
     void setUp() {
         CookieProperties cookieProperties = new CookieProperties();
-        cookieProperties.setDomain(DOMAIN);
         cookieProperties.setMaxAge(MAX_AGE);
         cookieManager = new CookieManager(cookieProperties);
     }
