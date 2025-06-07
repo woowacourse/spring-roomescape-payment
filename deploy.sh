@@ -25,3 +25,20 @@ echo "Starting new process..."
 nohup java -jar "$JAR_FILE" > /dev/null 2>&1 &
 
 echo "Deployment complete."
+
+echo "Waiting for service to be healthy..."
+ATTEMPTS=0
+until [ $ATTEMPTS -ge 10 ]
+do
+  STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/health)
+  if [ "$STATUS" == "200" ]; then
+    echo "Health check passed."
+    echo "Deployment complete."
+    exit 0
+  fi
+  ATTEMPTS=$((ATTEMPTS+1))
+  sleep 1
+done
+
+echo "Health check failed after $ATTEMPTS attempts."
+exit 1
