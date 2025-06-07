@@ -4,10 +4,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -47,7 +49,7 @@ public final class LogAspect {
     public Object logAroundControllerMethod(ProceedingJoinPoint joinPoint) throws Throwable {
         String className = joinPoint.getTarget().getClass().getSimpleName();
         String methodName = joinPoint.getSignature().getName();
-        Object[] args = joinPoint.getArgs();
+        Object[] args = getSafeArgs(joinPoint);
         HttpServletRequest request = currentHttpRequest();
         LogEntry requestLog = buildRequestLog(className, methodName, args, request);
         LOGGER.info(requestLog.toLogMessage());
@@ -63,6 +65,13 @@ public final class LogAspect {
             LOGGER.error(errorLog.toLogMessage());
             throw ex;
         }
+    }
+
+    private Object[] getSafeArgs(ProceedingJoinPoint joinPoint) {
+        Object[] args = joinPoint.getArgs();
+        return Arrays.stream(args)
+                .map(PasswordMasker::mask)
+                .toArray();
     }
 
     @Around("serviceMethods()")
