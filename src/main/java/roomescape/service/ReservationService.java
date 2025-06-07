@@ -2,6 +2,7 @@ package roomescape.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Payment;
@@ -96,9 +97,9 @@ public class ReservationService {
     public List<MyReservationAndWaitingsResponse> findMyReservations(Long id) {
         List<Reservation> reservations = reservationRepository.findReservationsByMemberId(id);
         return reservations.stream().map(reservation -> {
-                    Payment payment = paymentRepository.findFirstByReservationOrderByCreatedAtDesc(reservation)
-                            .orElseThrow(() -> new NotFoundException("결제 정보가 없습니다"));
-                    return MyReservationAndWaitingsResponse.of(reservation, payment);
+                    Optional<Payment> payment = paymentRepository.findFirstByReservationOrderByCreatedAtDesc(reservation);
+                    return payment.map(paymentValue -> MyReservationAndWaitingsResponse.of(reservation, paymentValue))
+                            .orElseGet(() -> MyReservationAndWaitingsResponse.from(reservation));
                 }
         ).toList();
     }

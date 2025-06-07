@@ -58,6 +58,9 @@ VALUES ('2025-05-27', 2, 1, 1);
 INSERT INTO reservation (date, time_id, theme_id, member_id)
 VALUES ('2025-05-25', 2, 5, 1);
 
+INSERT INTO payment (order_id, payment_key, amount, reservation_id, created_at)
+VALUES ('order001234','payment-key-001234', 1000, 1, '2025-04-20T11:10:00');
+
 INSERT INTO waiting (date, time_id, theme_id, member_id)
 VALUES ('2026-05-25', 2, 5, 1);
 INSERT INTO waiting (date, time_id, theme_id, member_id)
