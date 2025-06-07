@@ -68,7 +68,7 @@ public class Reservation {
     }
 
     public static Reservation ofWaiting(Waiting waiting) {
-        return new Reservation(null, waiting.getDate(), ReservationStatus.BOOKED, waiting.getTime(), waiting.getTheme(), waiting.getMember());
+        return new Reservation(null, waiting.getDate(), ReservationStatus.PAYMENT_PENDING, waiting.getTime(), waiting.getTheme(), waiting.getMember());
     }
 
     private static void validateTense(LocalDateTime dateTime) {

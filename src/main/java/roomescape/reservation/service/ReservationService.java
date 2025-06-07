@@ -3,13 +3,10 @@ package roomescape.reservation.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.admin.domain.dto.SearchReservationRequestDto;
-import roomescape.payment.dto.PaymentRequestDto;
-import roomescape.payment.service.TossPaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.dto.ReservationInfo;
 import roomescape.reservation.domain.dto.ReservationRequestDto;
 import roomescape.reservation.domain.dto.ReservationResponseDto;
-import roomescape.reservation.domain.dto.ReservationWithPaymentDto;
 import roomescape.reservation.exception.DuplicateReservationException;
 import roomescape.reservation.exception.InvalidReservationTimeException;
 import roomescape.reservation.exception.NotFoundReservationException;
@@ -31,24 +28,25 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class ReservationService {
 
-    private final ReservationRepository repository;
+    private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final WaitingRepository waitingRepository;
-    private final TossPaymentService tossPaymentService;
 
-    public ReservationService(ReservationRepository repository,
-                              ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository,
-                              WaitingRepository waitingRepository, TossPaymentService tossPaymentService) {
-        this.repository = repository;
+    public ReservationService(
+            ReservationRepository reservationRepository,
+            ReservationTimeRepository reservationTimeRepository,
+            ThemeRepository themeRepository,
+            WaitingRepository waitingRepository
+    ) {
+        this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.waitingRepository = waitingRepository;
-        this.tossPaymentService = tossPaymentService;
     }
 
     public List<ReservationResponseDto> findAll() {
-        List<Reservation> reservations = repository.findAll();
+        List<Reservation> reservations = reservationRepository.findAll();
         return reservations.stream()
                 .map(this::convertReservationResponseDto)
                 .collect(Collectors.toList());
@@ -58,33 +56,14 @@ public class ReservationService {
     public ReservationResponseDto add(ReservationRequestDto requestDto, User user) {
         Reservation reservation = convertReservation(requestDto, user);
         validateDuplicateDateTime(reservation);
-        Reservation savedReservation = repository.save(reservation);
+        Reservation savedReservation = reservationRepository.save(reservation);
         return convertReservationResponseDto(savedReservation);
-    }
-
-    @Transactional
-    public ReservationResponseDto addWithPayment(ReservationWithPaymentDto requestDto, User user) {
-        ReservationRequestDto reservationRequestDto = convertReservationRequestDto(requestDto);
-        Reservation reservation = convertReservation(reservationRequestDto, user);
-        validateDuplicateDateTime(reservation);
-        PaymentRequestDto paymentRequestDto = convertPaymentRequestDto(requestDto);
-        tossPaymentService.approve(paymentRequestDto);
-        Reservation savedReservation = repository.save(reservation);
-        return convertReservationResponseDto(savedReservation);
-    }
-
-    private ReservationRequestDto convertReservationRequestDto(ReservationWithPaymentDto requestDto) {
-        return ReservationRequestDto.ofReservationWithPaymentDto(requestDto);
-    }
-
-    private PaymentRequestDto convertPaymentRequestDto(ReservationWithPaymentDto requestDto) {
-        return PaymentRequestDto.ofReservationWithPaymentDto(requestDto);
     }
 
     @Transactional
     public ReservationInfo cancelReservationAndReturnInfo(Long id) {
         Reservation oldReservation = findByIdOrThrow(id);
-        repository.deleteById(id);
+        reservationRepository.deleteById(id);
         return new ReservationInfo(oldReservation.getDate(), oldReservation.getReservationTime(), oldReservation.getTheme());
     }
 
@@ -93,23 +72,23 @@ public class ReservationService {
         Optional<Waiting> waitingOptional = waitingRepository.findOneByReservationInfoDesc(reservationInfo.date(),
                 reservationInfo.time().getId(), reservationInfo.theme().getId());
         if (waitingOptional.isEmpty()) {
-            return ;
+            return;
         }
 
         Waiting waiting = waitingOptional.get();
         waitingRepository.deleteById(waiting.getId());
 
         Reservation newReservation = Reservation.ofWaiting(waiting);
-        repository.save(newReservation);
+        reservationRepository.save(newReservation);
     }
 
     private Reservation findByIdOrThrow(Long id) {
-        return repository.findById(id)
+        return reservationRepository.findById(id)
                 .orElseThrow(() -> new NotFoundReservationException("해당 예약 id가 존재하지 않습니다."));
     }
 
     private void validateDuplicateDateTime(Reservation inputReservation) {
-        boolean exists = repository.existsByDateAndReservationTime(
+        boolean exists = reservationRepository.existsByDateAndReservationTime(
                 inputReservation.getDate(),
                 inputReservation.getReservationTime()
         );
@@ -120,12 +99,12 @@ public class ReservationService {
 
     public List<ReservationResponseDto> findReservationsByUserAndThemeAndFromAndTo(
             SearchReservationRequestDto searchReservationRequestDto) {
-        List<Reservation> reservations = repository.findReservationsByUserAndThemeAndFromAndTo(
+        List<Reservation> reservations = reservationRepository.findReservationsByUserAndThemeAndFromAndTo(
                 searchReservationRequestDto.userId(),
                 searchReservationRequestDto.themeId(),
                 searchReservationRequestDto.from(),
                 searchReservationRequestDto.to()
-                );
+        );
 
         return reservations.stream()
                 .map(this::convertReservationResponseDto)
