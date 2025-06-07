@@ -1,4 +1,4 @@
-package roomescape.payment.dto.response;
+package roomescape.payment.infrastructure.dto.response;
 
 import java.time.OffsetDateTime;
 

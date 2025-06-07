@@ -2,7 +2,7 @@ package roomescape.payment.exception;
 
 import java.util.Arrays;
 
-public enum TossErrorCode {
+public enum TossServerErrorCode {
 
     INVALID_REQUEST,
     INVALID_API_KEY,

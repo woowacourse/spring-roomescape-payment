@@ -16,10 +16,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.dto.request.TossPaymentRequest;
-import roomescape.payment.exception.TossPaymentClientException;
-import roomescape.payment.exception.TossPaymentErrorHandler;
-import roomescape.payment.exception.TossPaymentServerException;
+import roomescape.payment.infrastructure.dto.request.TossPaymentRequest;
+import roomescape.payment.exception.PaymentClientException;
+import roomescape.payment.exception.PaymentErrorHandler;
+import roomescape.payment.exception.PaymentServerException;
 
 class TossPaymentClientTest {
 
@@ -27,7 +27,7 @@ class TossPaymentClientTest {
 
     private final RestClient.Builder testBuilder = RestClient.builder()
             .baseUrl(BASE_URL)
-            .defaultStatusHandler(new TossPaymentErrorHandler());
+            .defaultStatusHandler(new PaymentErrorHandler());
 
     private final MockRestServiceServer server = MockRestServiceServer.bindTo(testBuilder).build();
     private final TossPaymentClient tossPaymentClient = new TossPaymentClient(testBuilder.build());
@@ -67,7 +67,7 @@ class TossPaymentClientTest {
         TossPaymentRequest request = new TossPaymentRequest("paymentKey", "orderId", 1000);
 
         assertThatCode(() -> tossPaymentClient.requestPayment(request))
-                .isInstanceOf(TossPaymentClientException.class)
+                .isInstanceOf(PaymentClientException.class)
                 .hasMessage("이미 처리된 결제 입니다.");
     }
 
@@ -89,7 +89,7 @@ class TossPaymentClientTest {
         TossPaymentRequest request = new TossPaymentRequest("paymentKey", "orderId", 1000);
 
         assertThatCode(() -> tossPaymentClient.requestPayment(request))
-                .isInstanceOf(TossPaymentServerException.class)
+                .isInstanceOf(PaymentServerException.class)
                 .hasMessage("결제 서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
     }
 }

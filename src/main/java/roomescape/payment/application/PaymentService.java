@@ -4,8 +4,8 @@ import org.springframework.stereotype.Service;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.domain.PaymentRepository;
-import roomescape.payment.dto.request.TossPaymentRequest;
-import roomescape.payment.dto.response.TossPaymentResponse;
+import roomescape.payment.infrastructure.dto.request.TossPaymentRequest;
+import roomescape.payment.infrastructure.dto.response.TossPaymentResponse;
 import roomescape.reservation.domain.Reservation;
 
 @Service
