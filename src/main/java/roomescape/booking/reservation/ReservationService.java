@@ -1,6 +1,8 @@
 package roomescape.booking.reservation;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.booking.reservation.dto.AdminFilterReservationRequest;
@@ -15,6 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -74,6 +77,14 @@ public class ReservationService {
 
     @Transactional
     public void deleteById(final Long id) {
+        Reservation reservation = getById(id);
         reservationRepository.deleteById(id);
+        log.info("[{}] EVENT: RESERVATION_DELETED, id={}, memberId={}, themeName={}, date={}, time={}",
+                MDC.get("requestId"),
+                id,
+                reservation.getMember().getId(),
+                reservation.getSchedule().getTheme().getName(),
+                reservation.getSchedule().getDate(),
+                reservation.getSchedule().getReservationTime().getStartAt());
     }
 }

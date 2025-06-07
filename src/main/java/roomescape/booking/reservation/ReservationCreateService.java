@@ -2,6 +2,7 @@ package roomescape.booking.reservation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
@@ -53,7 +54,15 @@ public class ReservationCreateService {
         validatePast(schedule);
         validateDuplication(schedule);
         final Reservation notSavedReservation = new Reservation(member, schedule, ReservationStatus.PENDING);
-        return reservationRepository.save(notSavedReservation);
+        Reservation reservation = reservationRepository.save(notSavedReservation);
+        log.info("[{}] EVENT: RESERVATION_CREATED_BY_MEMBER, id={}, memberId={}, themeName={}, date={}, time={}",
+                MDC.get("requestId"),
+                reservation.getId(),
+                reservation.getMember().getId(),
+                reservation.getSchedule().getTheme().getName(),
+                reservation.getSchedule().getDate(),
+                reservation.getSchedule().getReservationTime().getStartAt());
+        return reservation;
     }
 
     private void confirmPayment(final ReservationRequest request, final Reservation reservation) {
@@ -86,6 +95,14 @@ public class ReservationCreateService {
 
     private Reservation saveReservationForAdmin(final Schedule schedule, final Member member) {
         final Reservation notSavedReservation = new Reservation(member, schedule, ReservationStatus.PROMOTED);
-        return reservationRepository.save(notSavedReservation);
+        Reservation reservation = reservationRepository.save(notSavedReservation);
+        log.info("[{}] EVENT: RESERVATION_CREATED_BY_ADMIN, id={}, memberId={}, themeName={}, date={}, time={}",
+                MDC.get("requestId"),
+                reservation.getId(),
+                reservation.getMember().getId(),
+                reservation.getSchedule().getTheme().getName(),
+                reservation.getSchedule().getDate(),
+                reservation.getSchedule().getReservationTime().getStartAt());
+        return reservation;
     }
 }

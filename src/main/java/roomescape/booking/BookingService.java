@@ -1,6 +1,8 @@
 package roomescape.booking;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.auth.dto.LoginMember;
@@ -19,6 +21,7 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BookingService {
 
     private final ReservationService reservationService;
@@ -56,6 +59,12 @@ public class BookingService {
     private void changeFirstWaitingToReservation(final Waiting firstWaiting) {
         waitingService.delete(firstWaiting);
         Reservation reservation = new Reservation(firstWaiting.getMember(), firstWaiting.getSchedule(), ReservationStatus.PROMOTED);
+        log.info("[{}] EVENT: WAITING_PROMOTED_TO_RESERVATION, memberId={}, themeName={}, date={}, time={}",
+                MDC.get("requestId"),
+                reservation.getMember().getId(),
+                reservation.getSchedule().getTheme().getName(),
+                reservation.getSchedule().getDate(),
+                reservation.getSchedule().getReservationTime().getStartAt());
         reservationService.create(reservation);
     }
 }

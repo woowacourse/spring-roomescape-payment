@@ -1,6 +1,8 @@
 package roomescape.schedule;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.exception.custom.reason.schedule.ScheduleConflictException;
@@ -16,6 +18,7 @@ import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
@@ -30,6 +33,12 @@ public class ScheduleService {
 
         Schedule schedule = new Schedule(request.date(), reservationTime, theme);
         Schedule savedSchedule = scheduleRepository.save(schedule);
+        log.info("[{}] SCHEDULE_CREATED, id={}. date={}, time={}, themeName={}",
+                MDC.get("requestId"),
+                savedSchedule.getId(),
+                savedSchedule.getDate(),
+                savedSchedule.getReservationTime().getStartAt(),
+                savedSchedule.getTheme().getName());
         return ScheduleResponse.of(savedSchedule);
     }
 

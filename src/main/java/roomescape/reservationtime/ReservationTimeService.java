@@ -1,6 +1,8 @@
 package roomescape.reservationtime;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.booking.reservation.ReservationService;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReservationTimeService {
 
     private final ReservationTimeRepository reservationTimeRepository;
@@ -32,6 +35,10 @@ public class ReservationTimeService {
 
         final ReservationTime reservationTime = new ReservationTime(request.startAt());
         final ReservationTime savedReservationTime = reservationTimeRepository.save(reservationTime);
+        log.info("[{}] RESERVATION_TIME_CREATED, id={}, startAt={}",
+                MDC.get("requestId"),
+                savedReservationTime.getId(),
+                savedReservationTime.getStartAt());
         return ReservationTimeResponse.from(savedReservationTime);
     }
 
@@ -77,6 +84,10 @@ public class ReservationTimeService {
         }
 
         reservationTimeRepository.delete(reservationTime);
+        log.info("[{}] RESERVATION_TIME_DELETED, id={}, startAt={}",
+                MDC.get("requestId"),
+                reservationTime.getId(),
+                reservationTime.getStartAt());
     }
 
     private void validateDuplication(final ReservationTimeRequest request) {

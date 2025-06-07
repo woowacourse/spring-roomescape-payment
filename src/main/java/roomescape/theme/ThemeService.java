@@ -1,6 +1,8 @@
 package roomescape.theme;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.booking.reservation.ReservationService;
@@ -14,6 +16,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ThemeService {
 
     private static final int BETWEEN_DAY_START = 7;
@@ -33,6 +36,10 @@ public class ThemeService {
         );
 
         final Theme theme = themeRepository.save(notSavedTheme);
+        log.info("[{}] THEME_CREATED, id={}. name={}",
+                MDC.get("requestId"),
+                theme.getId(),
+                theme.getName());
         return ThemeResponse.from(theme);
     }
 
@@ -67,5 +74,9 @@ public class ThemeService {
         }
 
         themeRepository.delete(theme);
+        log.info("[{}] THEME_DELETED, id={}. name={}",
+                MDC.get("requestId"),
+                theme.getId(),
+                theme.getName());
     }
 }
