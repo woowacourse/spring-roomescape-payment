@@ -100,4 +100,12 @@ public class PaymentService {
         return paymentRepository.findByReservationId(reservationId)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 예약 결제 정보입니다."));
     }
+
+    @Transactional
+    public void deleteByReservationId(final ReservationId reservationId) {
+        if (!paymentRepository.existsByReservationId(reservationId)) {
+            throw new EntityNotFoundException("존재하지 않는 결제 정보입니다.");
+        }
+        paymentRepository.deleteByReservationId(reservationId);
+    }
 }

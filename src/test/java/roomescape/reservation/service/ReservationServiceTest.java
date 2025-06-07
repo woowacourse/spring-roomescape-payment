@@ -29,6 +29,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.dto.MemberResponse;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.request.PaymentRequest;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.service.PaymentService;
@@ -242,6 +243,7 @@ class ReservationServiceTest {
         Member member = memberRepository.save(new Member("포스티", "test@test.com", "12341234", Role.MEMBER));
         LocalDate date = nextDay();
         Reservation reservation = reservationRepository.save(new Reservation(member, date, time, theme));
+        paymentRepository.save(new Payment("paymentKey", "orderId", 1000L, reservation));
         Long reservationId = reservation.idValue();
 
         // when & then
@@ -260,6 +262,7 @@ class ReservationServiceTest {
 
         LocalDate date = nextDay();
         Reservation reservation1 = reservationRepository.save(new Reservation(member1, date, time, theme));
+        paymentRepository.save(new Payment("paymentKey", "orderId", 1000L, reservation1));
         waitingRepository.save(new Waiting(date, member2, time, theme));
 
         // when

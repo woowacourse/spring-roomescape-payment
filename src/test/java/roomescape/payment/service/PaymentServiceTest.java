@@ -103,4 +103,40 @@ class PaymentServiceTest {
         assertThatThrownBy(() -> paymentService.getPaymentByReservation(new ReservationId(0L)))
                 .isInstanceOf(EntityNotFoundException.class);
     }
+
+    @DisplayName("예약 번호를 통해 결제 정보를 삭제한다.")
+    @Test
+    void deletePaymentWithExistsReservation() {
+        // given
+        Member member = memberRepository.save(new Member("피케이", "pk@woowa.com", "12341234", Role.ADMIN));
+        ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.now()));
+        Theme theme = themeRepository.save(new Theme(1L, "테마1", "테마1", "www.m.com"));
+        Reservation reservation = reservationRepository.save(
+                new Reservation(member, LocalDate.now(), reservationTime, theme)
+        );
+        paymentService.savePayment(reservation.idValue(), new PaymentRequest("paymentKey", "orderId", 1000L));
+
+        // when
+        paymentService.deleteByReservationId(reservation.getId());
+
+        // then
+        assertThat(paymentRepository.findByReservationId(reservation.getId())).isEmpty();
+    }
+
+    @DisplayName("존재하지 않는 예약 번호로 결제 정보를 삭제할 수 없다.")
+    @Test
+    void deletePaymentWithNonExistsReservation1() {
+        // given
+        Member member = memberRepository.save(new Member("피케이", "pk@woowa.com", "12341234", Role.ADMIN));
+        ReservationTime reservationTime = reservationTimeRepository.save(new ReservationTime(LocalTime.now()));
+        Theme theme = themeRepository.save(new Theme(1L, "테마1", "테마1", "www.m.com"));
+        Reservation reservation = reservationRepository.save(
+                new Reservation(member, LocalDate.now(), reservationTime, theme)
+        );
+        paymentService.savePayment(reservation.idValue(), new PaymentRequest("paymentKey", "orderId", 1000L));
+
+        // when & then
+        assertThatThrownBy(() -> paymentService.deleteByReservationId(new ReservationId(0L)))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
 }

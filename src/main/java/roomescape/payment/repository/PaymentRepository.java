@@ -11,4 +11,8 @@ import roomescape.reservation.domain.ReservationId;
 public interface PaymentRepository extends CrudRepository<Payment, PaymentId> {
 
     Optional<Payment> findByReservationId(ReservationId reservationId);
+
+    boolean existsByReservationId(ReservationId reservationId);
+
+    void deleteByReservationId(ReservationId reservationId);
 }

@@ -208,6 +208,8 @@ public class ReservationService {
         ReservationId reservationId = new ReservationId(id);
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 예약입니다."));
+
+        paymentService.deleteByReservationId(reservationId);
         reservationRepository.deleteById(reservationId);
 
         approveFirstWaiting(reservation);
