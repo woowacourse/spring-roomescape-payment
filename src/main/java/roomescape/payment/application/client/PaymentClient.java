@@ -20,6 +20,7 @@ public class PaymentClient {
     private final RestClient restClient;
     private final PaymentApproveExceptionHandler paymentApproveExceptionHandler;
     private final PaymentClientProperties paymentClientProperties;
+    private final Base64.Encoder base64Encoder;
 
     public PaymentClient(final RestClient restClient,
                          final PaymentApproveExceptionHandler paymentApproveExceptionHandler,
@@ -27,6 +28,7 @@ public class PaymentClient {
         this.restClient = restClient;
         this.paymentApproveExceptionHandler = paymentApproveExceptionHandler;
         this.paymentClientProperties = paymentClientProperties;
+        this.base64Encoder = Base64.getEncoder();
     }
 
     public PaymentApproveResponse approvePayment(final PaymentApproveRequest paymentApproveRequest) {
@@ -40,6 +42,6 @@ public class PaymentClient {
     }
 
     private String toBase64(String rawText) {
-        return Base64.getEncoder().encodeToString(rawText.getBytes());
+        return base64Encoder.encodeToString(rawText.getBytes());
     }
 }
