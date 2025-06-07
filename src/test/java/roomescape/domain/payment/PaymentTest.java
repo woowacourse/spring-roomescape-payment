@@ -103,7 +103,7 @@ class PaymentTest {
         // when & then
         assertAll(
                 () -> assertThat(payment.getStatus()).isNotEqualTo(PaymentStatus.PENDING),
-                () -> assertThatThrownBy(() -> payment.completePayment())
+                () -> assertThatThrownBy(payment::completePayment)
                         .isInstanceOf(IllegalStateException.class)
                         .hasMessage("결제 대기 상태에서만 성공 상태로 변경할 수 있습니다.")
         );
@@ -147,7 +147,7 @@ class PaymentTest {
         // when & then
         assertAll(
                 () -> assertThat(payment.getStatus()).isNotEqualTo(PaymentStatus.PENDING),
-                () -> assertThatThrownBy(() -> payment.rejectPayment())
+                () -> assertThatThrownBy(payment::rejectPayment)
                         .isInstanceOf(IllegalStateException.class)
                         .hasMessage("결제 대기 상태에서만 실패 상태로 변경할 수 있습니다.")
         );

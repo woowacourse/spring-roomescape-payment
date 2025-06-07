@@ -119,7 +119,7 @@ class ThemeControllerTest {
 
     @Nested
     @DisplayName("테마를 삭제한다.")
-    class removeTheme extends RestDocsTestBase {
+    class RemoveTheme extends RestDocsTestBase {
 
         @Test
         @DisplayName("주어진 아이디에 해당하는 방 테마가 없다면 NOT FOUND를 응답한다.")

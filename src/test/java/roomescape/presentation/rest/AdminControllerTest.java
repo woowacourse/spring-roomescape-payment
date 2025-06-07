@@ -40,7 +40,7 @@ class AdminControllerTest {
 
             String token = getAdminToken();
 
-            RestAssured.given(spec).log().all()
+            RestAssured.given(spec).filter(createReservationWithAdminPrivileges_document()).log().all()
                     .contentType(ContentType.JSON)
                     .cookie("token", token)
                     .body(reservationBody)
@@ -100,7 +100,7 @@ class AdminControllerTest {
         void readAllUsers() {
             var token = getAdminToken();
 
-            RestAssured.given().log().all()
+            RestAssured.given(spec).filter(readAllUsers_document()).log().all()
                     .cookie("token", token)
                     .when().get("/admin/users")
                     .then().log().all()

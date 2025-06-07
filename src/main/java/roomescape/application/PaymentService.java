@@ -16,7 +16,6 @@ import roomescape.infrastructure.payment.PaymentClient;
 @RequiredArgsConstructor
 public class PaymentService {
 
-    private final PaymentClient paymentClient;
     private final PaymentRepository paymentRepository;
     private final ApplicationEventPublisher eventPublisher;
 

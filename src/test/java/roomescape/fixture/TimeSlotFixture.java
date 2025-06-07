@@ -2,7 +2,6 @@ package roomescape.fixture;
 
 import java.time.LocalTime;
 import org.springframework.test.util.ReflectionTestUtils;
-import roomescape.domain.theme.Theme;
 import roomescape.domain.timeslot.TimeSlot;
 
 public class TimeSlotFixture {

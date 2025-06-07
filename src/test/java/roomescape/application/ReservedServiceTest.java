@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static roomescape.fixture.PaymentFixture.CREATE_PAYMENT_1;
 import static roomescape.fixture.ReservedFixture.CREATE_RESERVED_OF;
 import static roomescape.fixture.ThemeFixture.CREATE_THEME_1;
 import static roomescape.fixture.TimeSlotFixture.CREATE_TIME_SLOT_1;
@@ -24,7 +23,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import roomescape.application.event.ReservationCancelledEvent;
 import roomescape.application.request.PaymentInfo;
-import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.reserved.Reserved;
 import roomescape.domain.reservation.reserved.ReservedRepository;
@@ -64,7 +62,6 @@ class ReservedServiceTest {
     @InjectMocks
     ReservedService reservedService;
 
-
     @Nested
     @DisplayName("결제 정보를 통해 예약을 저장한다.")
     class SaveReservationWithPurchase {
@@ -78,18 +75,26 @@ class ReservedServiceTest {
             Theme theme = CREATE_THEME_1();
             LocalDate date = LocalDate.now().plusDays(1);
 
-            when(reservationRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(date, timeSlot.getId(),
-                    theme.getId(), user.getId())).thenReturn(true);
+            when(reservationRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(
+                    date, timeSlot.getId(),
+                    theme.getId(), user.getId()
+            )).thenReturn(true);
 
             PaymentInfo paymentInfo = new PaymentInfo("payment_key_1", "order_id_1", "order_name_1", 10000L);
 
             // when & then
-            assertAll(() -> assertThatThrownBy(
-                            () -> reservedService.saveReservedWithPurchase(user.getId(), date, timeSlot.getId(), theme.getId(),
-                                    paymentInfo)).isInstanceOf(AlreadyExistedException.class)
+            assertAll(
+                    () -> assertThatThrownBy(
+                            () -> reservedService.saveReservedWithPurchase(
+                                    user.getId(), date, timeSlot.getId(), theme.getId(),
+                                    paymentInfo
+                            )).isInstanceOf(AlreadyExistedException.class)
                             .hasMessage("이미 해당 날짜, 시간, 테마에 대한 예약이 존재합니다."),
-                    () -> verify(reservationRepository).existsByDateAndTimeSlotIdAndThemeIdAndUserId(date,
-                            timeSlot.getId(), theme.getId(), user.getId()));
+                    () -> verify(reservationRepository).existsByDateAndTimeSlotIdAndThemeIdAndUserId(
+                            date,
+                            timeSlot.getId(), theme.getId(), user.getId()
+                    )
+            );
 
         }
 
@@ -101,7 +106,6 @@ class ReservedServiceTest {
             TimeSlot timeSlot = CREATE_TIME_SLOT_1();
             Theme theme = CREATE_THEME_1();
             LocalDate date = LocalDate.now().plusDays(1);
-            Payment payment = CREATE_PAYMENT_1();
 
             when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
             when(timeSlotRepository.findById(timeSlot.getId())).thenReturn(Optional.of(timeSlot));
@@ -112,11 +116,14 @@ class ReservedServiceTest {
             PaymentInfo paymentInfo = new PaymentInfo("payment_key_1", "order_id_1", "order_name_1", 10000L);
 
             // when
-            Reserved savedReservation = reservedService.saveReservedWithPurchase(user.getId(), date, timeSlot.getId(),
-                    theme.getId(), paymentInfo);
+            Reserved savedReservation = reservedService.saveReservedWithPurchase(
+                    user.getId(), date, timeSlot.getId(),
+                    theme.getId(), paymentInfo
+            );
 
             // then
-            assertAll(() -> assertThat(savedReservation.getUser()).isEqualTo(user),
+            assertAll(
+                    () -> assertThat(savedReservation.getUser()).isEqualTo(user),
                     () -> assertThat(savedReservation.getDate()).isEqualTo(date),
                     () -> assertThat(savedReservation.getTimeSlot()).isEqualTo(timeSlot),
                     () -> assertThat(savedReservation.getTheme()).isEqualTo(theme),
@@ -125,14 +132,14 @@ class ReservedServiceTest {
                     () -> verify(timeSlotRepository).findById(timeSlot.getId()),
                     () -> verify(themeRepository).findById(theme.getId()),
                     () -> verify(paymentService).requestPayment(savedReservation, paymentInfo),
-                    () -> verify(reservedRepository).save(any(Reserved.class)));
+                    () -> verify(reservedRepository).save(any(Reserved.class))
+            );
         }
     }
 
-
     @Nested
     @DisplayName("결제를 진행하지 않고 예약을 저장한다.")
-    class saveReservationWithoutPurchase {
+    class SaveReservationWithoutPurchase {
 
         @Test
         @DisplayName("결제를 진행하지 않고 정상적으로 예약을 저장한다.")
@@ -151,11 +158,14 @@ class ReservedServiceTest {
             when(reservedRepository.save(Reserved.register(user, date, timeSlot, theme))).thenReturn(reserved);
 
             // when
-            Reserved savedReservation = reservedService.saveReservedWithoutPurchase(user.getId(), date,
-                    timeSlot.getId(), theme.getId());
+            Reserved savedReservation = reservedService.saveReservedWithoutPurchase(
+                    user.getId(), date,
+                    timeSlot.getId(), theme.getId()
+            );
 
             // then
-            assertAll(() -> assertThat(savedReservation.getUser()).isEqualTo(user),
+            assertAll(
+                    () -> assertThat(savedReservation.getUser()).isEqualTo(user),
                     () -> assertThat(savedReservation.getDate()).isEqualTo(date),
                     () -> assertThat(savedReservation.getTimeSlot()).isEqualTo(timeSlot),
                     () -> assertThat(savedReservation.getTheme()).isEqualTo(theme),
@@ -164,14 +174,14 @@ class ReservedServiceTest {
                     () -> verify(userRepository).findById(user.getId()),
                     () -> verify(timeSlotRepository).findById(timeSlot.getId()),
                     () -> verify(themeRepository).findById(theme.getId()),
-                    () -> verify(reservedRepository).save(any(Reserved.class)));
+                    () -> verify(reservedRepository).save(any(Reserved.class))
+            );
         }
     }
 
-
     @Nested
     @DisplayName("ID 값에 해당하는 예약이 없으면 예외를 던진다.")
-    class removeById {
+    class RemoveById {
 
         @Test
         @DisplayName("ID 값에 해당하는 예약이 없으면 예외를 던진다.")

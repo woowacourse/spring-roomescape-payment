@@ -2,11 +2,7 @@ package roomescape.domain.reservation.waiting;
 
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -16,7 +12,6 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.theme.Theme;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.user.User;
-import roomescape.exception.BusinessRuleViolationException;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true, callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,19 +21,22 @@ import roomescape.exception.BusinessRuleViolationException;
 @DiscriminatorValue("WAITING")
 public class Waiting extends Reservation {
 
-    private Waiting(final User user,
-                    final LocalDate date,
-                    final TimeSlot timeSlot,
-                    final Theme theme) {
+    private Waiting(
+            final User user,
+            final LocalDate date,
+            final TimeSlot timeSlot,
+            final Theme theme
+    ) {
         super(date, timeSlot, theme, user);
     }
 
-    public static Waiting register(final User user,
-                                   final LocalDate date,
-                                   final TimeSlot timeSlot,
-                                   final Theme theme) {
+    public static Waiting register(
+            final User user,
+            final LocalDate date,
+            final TimeSlot timeSlot,
+            final Theme theme
+    ) {
 
-        Waiting waiting = new Waiting(user, date, timeSlot, theme);
-        return waiting;
+        return new Waiting(user, date, timeSlot, theme);
     }
 }

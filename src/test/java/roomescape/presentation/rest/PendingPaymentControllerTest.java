@@ -15,7 +15,6 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.response
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
-import static roomescape.fixture.PaymentFixture.CREATE_PAYMENT_OF;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -33,7 +32,6 @@ import org.springframework.restdocs.request.ParameterDescriptor;
 import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import roomescape.application.PaymentService;
 import roomescape.application.request.PaymentInfo;
-import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.reserved.Reserved;
 import roomescape.presentation.response.ReservedResponse;
 
@@ -68,7 +66,6 @@ class PendingPaymentControllerTest {
         @DisplayName("정상적으로 결제를 진행하면 200을 반환한다.")
         void confirmPayment() {
             // given
-            Payment payment = CREATE_PAYMENT_OF(null);
             var pendingPaymentId = 6L;
             PaymentInfo paymentInfo = new PaymentInfo("payment_key_1", "order_id_1", "order_name_1", 10000L);
 

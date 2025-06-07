@@ -35,16 +35,14 @@ public class Reserved extends Reservation {
 
     public static Reserved register(final User user, final LocalDate date, final TimeSlot timeSlot, final Theme theme) {
 
-        Reserved reserved = new Reserved(user, date, timeSlot, theme);
-        return reserved;
+        return new Reserved(user, date, timeSlot, theme);
     }
 
     public static Reserved fromPendingPayment(final PendingPayment pendingPayment) {
-        Reserved reserved = new Reserved(
+        return new Reserved(
                 pendingPayment.getUser(), pendingPayment.getDate(),
                 pendingPayment.getTimeSlot(), pendingPayment.getTheme()
         );
-        return reserved;
     }
 
     public void registerPayment(Payment payment) {

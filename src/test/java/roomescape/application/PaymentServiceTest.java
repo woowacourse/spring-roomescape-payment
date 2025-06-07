@@ -84,7 +84,7 @@ class PaymentServiceTest {
 
     @Nested
     @DisplayName("결제 정보의 상태를 성공으로 변경한다.")
-    class completePayment {
+    class CompletePayment {
 
         @Test
         @DisplayName("해당하는 ID의 결제 정보가 없으면 예외가 발생한다.")
@@ -125,7 +125,7 @@ class PaymentServiceTest {
 
     @Nested
     @DisplayName("결제 정보의 상태를 실패로 변경한다.")
-    class rejectPayment {
+    class RejectPayment {
 
         @Test
         @DisplayName("해당하는 ID의 결제 정보가 없으면 예외가 발생한다.")
