@@ -1,4 +1,4 @@
-package roomescape.reservation.infrastructure;
+package roomescape.reservation.config;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
