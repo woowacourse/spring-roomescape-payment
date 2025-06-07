@@ -3,6 +3,7 @@ package roomescape.unit.presentation;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -41,6 +42,8 @@ import roomescape.auth.jwt.JJWTJwtUtil;
 import roomescape.business.model.entity.Member;
 import roomescape.business.model.vo.UserRole;
 import roomescape.business.service.ReservationService;
+import roomescape.exception.reservation.ReservationExistsException;
+import roomescape.exception.reservation.ReservationNotFoundException;
 import roomescape.presentation.api.ReservationApiController;
 import roomescape.presentation.dto.request.AdminReservationRequest;
 import roomescape.presentation.dto.request.ReservationCondition;
@@ -142,6 +145,50 @@ class ReservationApiControllerTest {
     }
 
     @Test
+    void 같은_예약이_존재하는_경우_예약에_실패한다() throws Exception {
+        // given
+        ReservationRequest request = new ReservationRequest(
+                LocalDate.now().plusDays(1),
+                "timeId1",
+                "themeId1",
+                "payemntKey1",
+                "orderId1",
+                1000L,
+                "paymentType"
+        );
+        AuthToken token = jwtUtil.createToken(
+                Member.create("name", "email1@domain.com", "password1"));
+        given(reservationService.addAndGet(any(LoginInfo.class), any(ReservationRequest.class))).willThrow(
+                new ReservationExistsException());
+        // when
+        ResultActions result = mockMvc.perform(post("/reservations")
+                .cookie(new Cookie("authToken", token.value()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)));
+        // then
+        result.andExpect(status().isBadRequest())
+                .andExpectAll(
+                        jsonPath("$.message").value("예약이 존재합니다."))
+                .andDo(document("reservation/create-reservation/error/reservation-exists-exception",
+                        requestFields(
+                                fieldWithPath("date").type(JsonFieldType.STRING).description("예약 날짜"),
+                                fieldWithPath("timeId").type(JsonFieldType.STRING).description("예약 시간 ID"),
+                                fieldWithPath("themeId").type(JsonFieldType.STRING).description("테마 ID"),
+                                fieldWithPath("paymentKey").type(JsonFieldType.STRING).description("paymentKey"),
+                                fieldWithPath("orderId").type(JsonFieldType.STRING).description("orderId"),
+                                fieldWithPath("amount").type(JsonFieldType.NUMBER).description("금액"),
+                                fieldWithPath("paymentType").type(JsonFieldType.STRING).description("결제 유형")
+                        ),
+                        responseFields(
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("에러 메시지"),
+                                fieldWithPath("status").type(JsonFieldType.NUMBER).description("HTTP 상태 코드")
+                        )
+                ));
+    }
+
+
+    @Test
     void 관리자_권한으로_예약_생성에_성공한다() throws Exception {
         // given
         AdminReservationRequest request = new AdminReservationRequest(
@@ -171,7 +218,7 @@ class ReservationApiControllerTest {
                 .andExpectAll(
                         jsonPath("$.id").value("reservationId1"),
                         jsonPath("$.date").value("2025-01-01"))
-                .andDo(document("admin-create-reservation",
+                .andDo(document("reservation/admin-create-reservation/success",
                         requestFields(
                                 fieldWithPath("date").type(JsonFieldType.STRING).description("예약 날짜"),
                                 fieldWithPath("timeId").type(JsonFieldType.STRING).description("예약 시간 ID"),
@@ -193,6 +240,37 @@ class ReservationApiControllerTest {
                                 fieldWithPath("time").type(JsonFieldType.OBJECT).description("예약 시간 정보"),
                                 fieldWithPath("time.id").type(JsonFieldType.STRING).description("예약 시간 ID"),
                                 fieldWithPath("time.startAt").type(JsonFieldType.STRING).description("예약 시간")
+                        )
+                ));
+    }
+
+    @Test
+    void 같은_예약이_존재하는_경우_관리자_예약에_실패한다() throws Exception {
+        // given
+        AdminReservationRequest request = new AdminReservationRequest(
+                LocalDate.now().plusDays(1),
+                "timeId1",
+                "themeId1",
+                "memberId1"
+        );
+        AuthToken token = jwtUtil.createToken(
+                Member.restore("name", UserRole.ADMIN.name(), "admin", "email1@domain.com", "password1"));
+        given(reservationService.addAndGetWithoutPayment(request)).willThrow(
+                new ReservationExistsException());
+        // when
+        ResultActions result = mockMvc.perform(post("/admin/reservations")
+                .cookie(new Cookie("authToken", token.value()))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)));
+        // then
+        result.andExpect(status().isBadRequest())
+                .andExpect(
+                        jsonPath("$.message").value("예약이 존재합니다."))
+                .andDo(document("reservation/admin-create-reservation/error/reservation-exists-exception",
+                        responseFields(
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("에러 메시지"),
+                                fieldWithPath("status").type(JsonFieldType.NUMBER).description("HTTP 상태 코드")
                         )
                 ));
     }
@@ -311,6 +389,28 @@ class ReservationApiControllerTest {
                 .cookie(new Cookie("authToken", token.value())));
         // then
         result.andExpect(status().isNoContent())
-                .andDo(document("delete-reservation"));
+                .andDo(document("reservation/delete-reservation/success"));
+    }
+
+    @Test
+    void 존재하지_않는_예약을_삭제할_경우_400_에러가_발생한다() throws Exception {
+        // given
+        AuthToken token = jwtUtil.createToken(
+                Member.restore("name", UserRole.ADMIN.name(), "admin", "email1@domain.com", "password1"));
+        doThrow(new ReservationNotFoundException()).when(reservationService).cancelReservationAndPromoteWait("1");
+
+        // when
+        ResultActions result = mockMvc.perform(delete("/reservations/1")
+                .cookie(new Cookie("authToken", token.value())));
+        // then
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("존재하지 않는 예약입니다."))
+                .andDo(document("reservation/delete-reservation/error/reservation-not-found-exception",
+                        responseFields(
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("에러 메시지"),
+                                fieldWithPath("status").type(JsonFieldType.NUMBER).description("HTTP 상태 코드")
+                        )
+                ));
     }
 }
