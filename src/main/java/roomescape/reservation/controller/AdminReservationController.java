@@ -1,5 +1,9 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +27,15 @@ import roomescape.reservation.service.ReservationService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/reservations")
+@Tag(name = "어드민 예약", description = "어드민 예약 관련 API")
 public class AdminReservationController {
 
     private final ReservationService reservationService;
 
+    @Operation(summary = "예약 생성 (어드민 권한)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", useReturnTypeSchema = true),
+    })
     @PostMapping
     @RoleRequired(roleType = RoleType.ADMIN)
     public ResponseEntity<ReservationResponse> createReservationByAdmin(
@@ -36,6 +45,10 @@ public class AdminReservationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Operation(summary = "모든 예약 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", useReturnTypeSchema = true),
+    })
     @GetMapping
     @RoleRequired(roleType = RoleType.ADMIN)
     public ResponseEntity<List<ReservationResponse>> getAllReservations() {
@@ -43,6 +56,10 @@ public class AdminReservationController {
         return ResponseEntity.ok().body(responses);
     }
 
+    @Operation(summary = "필터링된 예약 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", useReturnTypeSchema = true),
+    })
     @GetMapping("/filtered")
     @RoleRequired(roleType = RoleType.ADMIN)
     public ResponseEntity<List<ReservationResponse>> getFilteredReservationsByAdmin(
@@ -52,6 +69,10 @@ public class AdminReservationController {
         return ResponseEntity.ok(responses);
     }
 
+    @Operation(summary = "예약 삭제")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", useReturnTypeSchema = true),
+    })
     @DeleteMapping("/{id}")
     @RoleRequired(roleType = RoleType.ADMIN)
     public ResponseEntity<Void> deleteReservationByAdmin(

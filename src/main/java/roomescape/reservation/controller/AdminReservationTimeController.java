@@ -1,5 +1,9 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,10 +23,15 @@ import roomescape.reservation.service.ReservationTimeService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/times")
+@Tag(name = "어드민 예약 시간", description = "어드민 예약 시간 관련 API")
 public class AdminReservationTimeController {
 
     private final ReservationTimeService reservationTimeService;
 
+    @Operation(summary = "예약 시간 생성")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", useReturnTypeSchema = true),
+    })
     @PostMapping
     @RoleRequired(roleType = RoleType.ADMIN)
     public ResponseEntity<ReservationTimeResponse> createTimeByAdmin(
@@ -32,6 +41,10 @@ public class AdminReservationTimeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Operation(summary = "예약 시간 삭제")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", useReturnTypeSchema = true),
+    })
     @DeleteMapping("/{id}")
     @RoleRequired(roleType = RoleType.ADMIN)
     public ResponseEntity<Void> deleteTimeByAdmin(
