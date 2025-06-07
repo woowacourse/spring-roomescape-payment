@@ -20,10 +20,10 @@ public class Payment {
 
     @Id
     private String paymentKey;
-    private long amount;
+    private int amount;
     private final Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
-    public Payment(final String paymentKey, final long amount) {
+    public Payment(final String paymentKey, final int amount) {
         this.paymentKey = paymentKey;
         this.amount = amount;
     }

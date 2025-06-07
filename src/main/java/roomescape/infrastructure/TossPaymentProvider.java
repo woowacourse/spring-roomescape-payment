@@ -54,7 +54,7 @@ public class TossPaymentProvider implements PaymentProvider {
         }
     }
 
-    private record TossSuccessResponse(String paymentKey, long totalAmount) {}
+    private record TossSuccessResponse(String paymentKey, int totalAmount) {}
     private record TossFailureResponse(String code, String message) {}
 
     private PaymentFailedException newPaymentFailedException(final String tossCode, final String message) {
