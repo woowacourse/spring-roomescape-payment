@@ -257,9 +257,11 @@ class ReservationServiceTest {
         ReservationInfo anotherReservationInfo = ReservationInfo.create(anotherReservation);
         Waiting waiting = Waiting.create(anotherReservationInfo, member, 1);
         LoginMember loginMember = new LoginMember(member.getId(), member.getName(), Role.USER, member.getEmail());
+        Payment payment = Payment.create("paymentKey", "orderId", new BigDecimal("1000"), reservation);
 
         when(memberService.findMemberById(loginMember.id())).thenReturn(member);
         when(reservationRepository.findAllByMember(member)).thenReturn(List.of(reservation));
+        when(paymentService.findPaymentsByMember(member)).thenReturn(List.of(payment));
         when(waitingService.findWaitingsByMember(member)).thenReturn(List.of(waiting));
 
         List<MyReservationResponse> responses = reservationService.getMyReservations(loginMember);
@@ -273,6 +275,8 @@ class ReservationServiceTest {
                 () -> assertThat(reservationResponse.time()).isEqualTo(reservation.getTime().getStartAt()),
                 () -> assertThat(reservationResponse.theme()).isEqualTo(reservation.getTheme().getName()),
                 () -> assertThat(reservationResponse.status()).isEqualTo(reservation.getStatus().getName()),
+                () -> assertThat(reservationResponse.paymentKey()).isEqualTo(payment.getPaymentKey()),
+                () -> assertThat(reservationResponse.amount()).isEqualTo(payment.getAmount()),
 
                 () -> assertThat(waitingResponse.id()).isEqualTo(waiting.getId()),
                 () -> assertThat(waitingResponse.date()).isEqualTo(waiting.getReservationInfo().getDate()),
