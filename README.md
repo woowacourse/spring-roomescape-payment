@@ -86,6 +86,10 @@
 | 관리자  |       [admin.md](api_docs/admin.md)       |
 |  예외  |   [exception.md](api_docs/exception.md)   |
 
+## 📌 ER 다이어그램
+
+![ERD](erd.png)
+
 ## 📌 예외 처리
 
 - 예외 처리 시, CustomException 클래스를 작성하여 사용한다.
