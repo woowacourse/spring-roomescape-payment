@@ -35,7 +35,7 @@ public class ReservationController {
 
     @GetMapping("/mine")
     public List<ReservationWithStatusResponse> getAllWithReservationWait(@LoginMember MemberInfo memberInfo) {
-        return reservationService.getWithReservationWaitByMemberId(memberInfo.id());
+        return reservationService.findMyReservationsWithWaitingByMemberId(memberInfo.id());
     }
 
     @GetMapping("/times")

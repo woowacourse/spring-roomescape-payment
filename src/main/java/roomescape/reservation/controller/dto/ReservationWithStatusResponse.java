@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import roomescape.payment.domain.PaymentHistory;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationWait;
 
@@ -20,29 +21,30 @@ public class ReservationWithStatusResponse {
     private final LocalDate date;
     private final LocalTime time;
     private final String status;
+    private final PaymentHistoryWebResponse paymentHistory;
 
-    public static ReservationWithStatusResponse from(
-            final Reservation reservation
-    ) {
+    public static ReservationWithStatusResponse of(Reservation reservation, PaymentHistory paymentHistory) {
         return new ReservationWithStatusResponse(
                 reservation.getId(),
                 reservation.getTheme().getName().getValue(),
                 reservation.getDate().getValue(),
                 reservation.getTime().getStartAt(),
-                CONFIRMED
+                CONFIRMED,
+                new PaymentHistoryWebResponse(paymentHistory)
         );
     }
 
     public static ReservationWithStatusResponse of(
-            final ReservationWait reservationWait,
-            final Long rank
+            ReservationWait reservationWait,
+            Long rank
     ) {
         return new ReservationWithStatusResponse(
                 reservationWait.getId(),
                 reservationWait.getTheme().getName().getValue(),
                 reservationWait.getDate().getValue(),
                 reservationWait.getTime().getStartAt(),
-                String.format(PENDING_STATUS_FORMAT, rank)
+                String.format(PENDING_STATUS_FORMAT, rank),
+                new PaymentHistoryWebResponse("", 0)
         );
     }
 }
