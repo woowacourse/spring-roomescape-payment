@@ -61,10 +61,12 @@ class PendingPaymentServiceTest {
             when(pendingPaymentRepository.findById(pendingPaymentId)).thenReturn(Optional.empty());
 
             // when & then
-            assertAll(() -> assertThatThrownBy(
-                            () -> pendingPaymentService.completePayment(pendingPaymentId, paymentInfo)).isInstanceOf(
+            assertAll(
+                    () -> assertThatThrownBy(
+                            () -> pendingPaymentService.confirmPayment(pendingPaymentId, paymentInfo)).isInstanceOf(
                             NotFoundException.class).hasMessage("존재하지 않는 결제 대기입니다."),
-                    () -> verify(pendingPaymentRepository).findById(pendingPaymentId));
+                    () -> verify(pendingPaymentRepository).findById(pendingPaymentId)
+            );
         }
 
         @Test
@@ -85,17 +87,19 @@ class PendingPaymentServiceTest {
 
             when(pendingPaymentRepository.findById(pendingPaymentId)).thenReturn(Optional.of(pendingPayment));
 
-            when(reservedRepository.save(Reserved.fromPendingPayment(pendingPayment, payment))).thenReturn(reserved);
+            when(reservedRepository.save(Reserved.fromPendingPayment(pendingPayment))).thenReturn(reserved);
 
             // when
-            pendingPaymentService.completePayment(pendingPaymentId, paymentInfo);
+            pendingPaymentService.confirmPayment(pendingPaymentId, paymentInfo);
 
             // then
-            assertAll(() -> verify(paymentService).savePayment(paymentInfo),
+            assertAll(
+                    () -> verify(paymentService).requestPayment(reserved, paymentInfo),
                     () -> verify(pendingPaymentRepository).findById(pendingPaymentId),
                     () -> verify(reservedRepository).save(any(Reserved.class)),
                     () -> verify(pendingPaymentRepository).deleteById(pendingPaymentId),
-                    () -> verify(reservedRepository).save(any(Reserved.class)));
+                    () -> verify(reservedRepository).save(any(Reserved.class))
+            );
         }
     }
 }

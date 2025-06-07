@@ -36,17 +36,21 @@ public class ReservedService {
 
 
     @Transactional
-    public Reserved saveReservedWithPurchase(final long userId, final LocalDate date, final long timeId,
-                                             final long themeId, final PaymentInfo paymentInfo) {
+    public Reserved saveReservedWithPurchase(
+            final long userId, final LocalDate date, final long timeId,
+            final long themeId, final PaymentInfo paymentInfo
+    ) {
         Reserved reserved = registerReserved(userId, date, timeId, themeId);
-        reserved.registerPayment(paymentService.savePayment(paymentInfo));
+        paymentService.requestPayment(reserved, paymentInfo);
 
         return reserved;
     }
 
     @Transactional
-    public Reserved saveReservedWithoutPurchase(final long userId, final LocalDate date, final long timeId,
-                                                final long themeId) {
+    public Reserved saveReservedWithoutPurchase(
+            final long userId, final LocalDate date, final long timeId,
+            final long themeId
+    ) {
         return registerReserved(userId, date, timeId, themeId);
     }
 
@@ -65,8 +69,10 @@ public class ReservedService {
         Reserved reserved = findById(id);
 
         eventPublisher.publishEvent(
-                new ReservationCancelledEvent(this, reserved.getDate(), reserved.getTimeSlot().getId(),
-                        reserved.getTheme().getId()));
+                new ReservationCancelledEvent(
+                        this, reserved.getDate(), reserved.getTimeSlot().getId(),
+                        reserved.getTheme().getId()
+                ));
 
         reservedRepository.deleteById(id);
     }
@@ -80,10 +86,14 @@ public class ReservedService {
         return reservedRepository.save(Reserved.register(user, date, timeSlot, theme));
     }
 
-    private void validateDuplicateReservation(final LocalDate date, final Long timeSlotId, final Long themeId,
-                                              final Long userId) {
-        boolean hasDuplicatedReservation = reservationRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(date,
-                timeSlotId, themeId, userId);
+    private void validateDuplicateReservation(
+            final LocalDate date, final Long timeSlotId, final Long themeId,
+            final Long userId
+    ) {
+        boolean hasDuplicatedReservation = reservationRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(
+                date,
+                timeSlotId, themeId, userId
+        );
 
         if (hasDuplicatedReservation) {
             throw new AlreadyExistedException("이미 해당 날짜, 시간, 테마에 대한 예약이 존재합니다.");

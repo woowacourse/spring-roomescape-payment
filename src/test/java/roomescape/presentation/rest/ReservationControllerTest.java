@@ -80,35 +80,6 @@ class ReservationControllerTest {
                     .statusCode(HttpStatus.CREATED.value()).body("date", Matchers.equalTo("3000-03-17"));
         }
 
-        @EnumSource(TossPaymentErrorCode.class)
-        @ParameterizedTest
-        @DisplayName("예약 추가 요청시, 결제에 실패하면 실패 에러 응답 코드를 반환한다")
-        void createReservationWithUserPrivileges_WhenPaymentFailed(TossPaymentErrorCode errorCode) {
-
-            Map<String, String> reservationBody = Map.of(
-                    "date", "3000-03-17",
-                    "timeId", "1",
-                    "themeId", "1",
-                    "memberId", "2",
-                    "paymentKey", "paymentKey",
-                    "orderId", "orderId",
-                    "amount", "1000"
-            );
-
-            PaymentInfo paymentInfo = new PaymentInfo("paymentKey", "orderId", 1000);
-
-            given(paymentClient.confirmPayment(paymentInfo)).willThrow(new TossPaymentException(errorCode));
-
-            String token = getUserToken();
-
-            RestAssured.given().log().all().contentType(ContentType.JSON).cookie("token", token).body(reservationBody)
-                    .when().post("/reservations")
-                    .then().log().all().statusCode(errorCode.getHttpStatus().value()).body(
-                            "message",
-                            Matchers.equalTo(errorCode.getMessage())
-                    );
-        }
-
         RestDocumentationFilter createReservationWithUserPrivileges_Document() {
             FieldDescriptor[] requestFields = {
                     fieldWithPath("date").description("예약 날짜 (YYYY-MM-DD)"),

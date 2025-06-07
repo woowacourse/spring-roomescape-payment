@@ -22,7 +22,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import roomescape.application.event.ReservationCancelledEvent;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.pendingpayment.PendingPayment;
 import roomescape.domain.reservation.pendingpayment.PendingPaymentRepository;
@@ -73,10 +72,12 @@ public class WaitingServiceTest {
             when(timeSlotRepository.findById(timeId)).thenReturn(Optional.empty());
 
             // when & then
-            assertAll(() -> assertThatThrownBy(
+            assertAll(
+                    () -> assertThatThrownBy(
                             () -> waitingService.saveWaiting(user, date, timeId, theme.getId())).isInstanceOf(
                             NotFoundException.class).hasMessage("존재하지 않는 타임 슬롯입니다."),
-                    () -> verify(timeSlotRepository).findById(timeId));
+                    () -> verify(timeSlotRepository).findById(timeId)
+            );
         }
 
         @Test
@@ -92,11 +93,13 @@ public class WaitingServiceTest {
             when(themeRepository.findById(theme.getId())).thenReturn(Optional.empty());
 
             // when & then
-            assertAll(() -> assertThatThrownBy(
+            assertAll(
+                    () -> assertThatThrownBy(
                             () -> waitingService.saveWaiting(user, date, timeSlot.getId(), theme.getId())).isInstanceOf(
                             NotFoundException.class).hasMessage("존재하지 않는 테마입니다."),
                     () -> verify(timeSlotRepository).findById(timeSlot.getId()),
-                    () -> verify(themeRepository).findById(theme.getId()));
+                    () -> verify(themeRepository).findById(theme.getId())
+            );
         }
 
         @Test
@@ -111,17 +114,23 @@ public class WaitingServiceTest {
             when(timeSlotRepository.findById(timeSlot.getId())).thenReturn(Optional.of(timeSlot));
             when(themeRepository.findById(theme.getId())).thenReturn(Optional.of(theme));
 
-            when(reservationRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(date, timeSlot.getId(),
-                    theme.getId(), user.getId())).thenReturn(true);
+            when(reservationRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(
+                    date, timeSlot.getId(),
+                    theme.getId(), user.getId()
+            )).thenReturn(true);
 
             // when & then
-            assertAll(() -> assertThatThrownBy(
+            assertAll(
+                    () -> assertThatThrownBy(
                             () -> waitingService.saveWaiting(user, date, timeSlot.getId(), theme.getId())).isInstanceOf(
                             AlreadyExistedException.class).hasMessage("이미 해당 날짜, 시간, 테마에 대한 예약이 존재합니다."),
                     () -> verify(timeSlotRepository).findById(timeSlot.getId()),
                     () -> verify(themeRepository).findById(theme.getId()),
-                    () -> verify(reservationRepository).existsByDateAndTimeSlotIdAndThemeIdAndUserId(date,
-                            timeSlot.getId(), theme.getId(), user.getId()));
+                    () -> verify(reservationRepository).existsByDateAndTimeSlotIdAndThemeIdAndUserId(
+                            date,
+                            timeSlot.getId(), theme.getId(), user.getId()
+                    )
+            );
         }
 
         @Test
@@ -137,8 +146,10 @@ public class WaitingServiceTest {
             when(timeSlotRepository.findById(timeSlot.getId())).thenReturn(Optional.of(timeSlot));
             when(themeRepository.findById(theme.getId())).thenReturn(Optional.of(theme));
 
-            when(reservationRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(date, timeSlot.getId(),
-                    theme.getId(), user.getId())).thenReturn(false);
+            when(reservationRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(
+                    date, timeSlot.getId(),
+                    theme.getId(), user.getId()
+            )).thenReturn(false);
 
             when(waitingRepository.save(Waiting.register(user, date, timeSlot, theme))).thenReturn(waiting);
 
@@ -147,9 +158,12 @@ public class WaitingServiceTest {
                     () -> assertThat(waitingService.saveWaiting(user, date, timeSlot.getId(), theme.getId())).isEqualTo(
                             waiting), () -> verify(timeSlotRepository).findById(timeSlot.getId()),
                     () -> verify(themeRepository).findById(theme.getId()),
-                    () -> verify(reservationRepository).existsByDateAndTimeSlotIdAndThemeIdAndUserId(date,
-                            timeSlot.getId(), theme.getId(), user.getId()),
-                    () -> verify(waitingRepository).save(any(Waiting.class)));
+                    () -> verify(reservationRepository).existsByDateAndTimeSlotIdAndThemeIdAndUserId(
+                            date,
+                            timeSlot.getId(), theme.getId(), user.getId()
+                    ),
+                    () -> verify(waitingRepository).save(any(Waiting.class))
+            );
         }
     }
 
@@ -166,10 +180,12 @@ public class WaitingServiceTest {
             when(waitingRepository.existsById(removeId)).thenReturn(false);
 
             // when & then
-            assertAll(() -> assertThatThrownBy(() -> waitingService.removeById(removeId)).isInstanceOf(
+            assertAll(
+                    () -> assertThatThrownBy(() -> waitingService.removeById(removeId)).isInstanceOf(
                             NotFoundException.class).hasMessage("존재하지 않는 예약 대기입니다."),
                     () -> verify(waitingRepository).existsById(removeId),
-                    () -> verify(waitingRepository, times(0)).deleteById(removeId));
+                    () -> verify(waitingRepository, times(0)).deleteById(removeId)
+            );
         }
 
         @Test
@@ -184,62 +200,71 @@ public class WaitingServiceTest {
             waitingService.removeById(removeId);
 
             // then
-            assertAll(() -> verify(waitingRepository).existsById(removeId),
-                    () -> verify(waitingRepository).deleteById(removeId));
+            assertAll(
+                    () -> verify(waitingRepository).existsById(removeId),
+                    () -> verify(waitingRepository).deleteById(removeId)
+            );
         }
     }
 
     @Nested
     @DisplayName("예약 취소 이벤트 처리")
-    class HandleReservationCancelled {
+    class ApproveNextWaiting {
 
         @Test
-        @DisplayName("예약 취소 이벤트 발생 시 대기 목록이 있으면 다음 대기자를 결제 대기로 전환한다")
-        void handleReservationCancelled_WithWaiting() {
+        @DisplayName("대기 목록이 있으면 다음 대기자를 결제 대기로 전환한다")
+        void approveNextWaiting() {
             // given
             User user = CREATE_USER_1();
             LocalDate date = LocalDate.now().plusDays(1);
             TimeSlot timeSlot = CREATE_TIME_SLOT_1();
             Theme theme = CREATE_THEME_1();
             Waiting waiting = CREATE_WAITING_OF(1L, user, date, timeSlot, theme);
-            ReservationCancelledEvent event = new ReservationCancelledEvent(this, date, timeSlot.getId(),
-                    theme.getId());
 
-            when(waitingRepository.findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(date, timeSlot.getId(),
-                    theme.getId())).thenReturn(Optional.of(waiting));
+            when(waitingRepository.findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(
+                    date, timeSlot.getId(),
+                    theme.getId()
+            )).thenReturn(Optional.of(waiting));
 
             // when
-            waitingService.handleReservationCancelled(event);
+            waitingService.approveNextWaiting(date, timeSlot.getId(), theme.getId());
 
             // then
-            assertAll(() -> verify(waitingRepository, times(1)).findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(date,
-                            timeSlot.getId(), theme.getId()),
+            assertAll(
+                    () -> verify(waitingRepository, times(1)).findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(
+                            date,
+                            timeSlot.getId(), theme.getId()
+                    ),
                     () -> verify(pendingPaymentRepository, times(1)).save(any(PendingPayment.class)),
-                    () -> verify(waitingRepository, times(1)).deleteById(waiting.getId()));
+                    () -> verify(waitingRepository, times(1)).deleteById(waiting.getId())
+            );
         }
 
         @Test
         @DisplayName("예약 취소 이벤트 발생 시 대기 목록이 없으면 아무 작업도 하지 않는다")
-        void handleReservationCancelled_WithoutWaiting() {
+        void approveNextWaiting_WithoutWaiting() {
             // given
             LocalDate date = LocalDate.now().plusDays(1);
             TimeSlot timeSlot = CREATE_TIME_SLOT_1();
             Theme theme = CREATE_THEME_1();
-            ReservationCancelledEvent event = new ReservationCancelledEvent(this, date, timeSlot.getId(),
-                    theme.getId());
 
-            when(waitingRepository.findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(date, timeSlot.getId(),
-                    theme.getId())).thenReturn(Optional.empty());
+            when(waitingRepository.findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(
+                    date, timeSlot.getId(),
+                    theme.getId()
+            )).thenReturn(Optional.empty());
 
             // when
-            waitingService.handleReservationCancelled(event);
+            waitingService.approveNextWaiting(date, timeSlot.getId(), theme.getId());
 
             // then
-            assertAll(() -> verify(waitingRepository, times(1)).findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(date,
-                            timeSlot.getId(), theme.getId()),
+            assertAll(
+                    () -> verify(waitingRepository, times(1)).findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(
+                            date,
+                            timeSlot.getId(), theme.getId()
+                    ),
                     () -> verify(pendingPaymentRepository, never()).save(any(PendingPayment.class)),
-                    () -> verify(waitingRepository, never()).deleteById(any(Long.class)));
-
+                    () -> verify(waitingRepository, never()).deleteById(any(Long.class))
+            );
         }
     }
 }

@@ -8,8 +8,8 @@ import org.springframework.context.ApplicationEvent;
 public class ReservationCancelledEvent extends ApplicationEvent {
 
     private final LocalDate date;
-    private final long timeSlotId;
-    private final long themeId;
+    private final Long timeSlotId;
+    private final Long themeId;
 
     public ReservationCancelledEvent(Object source, LocalDate date, long timeSlotId, long themeId) {
         super(source);

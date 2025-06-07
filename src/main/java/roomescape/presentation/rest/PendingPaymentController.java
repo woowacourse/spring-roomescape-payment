@@ -18,8 +18,10 @@ public class PendingPaymentController {
     }
 
     @PatchMapping("/pending-payments/{reservationId}/payment")
-    public ReservedResponse confirmPayment(@PathVariable(name = "reservationId") final long reservationId,
-                                           @RequestBody PaymentInfo paymentInfo) {
-        return pendingPaymentService.completePayment(reservationId, paymentInfo);
+    public ReservedResponse confirmPayment(
+            @PathVariable(name = "reservationId") final long reservationId,
+            @RequestBody PaymentInfo paymentInfo
+    ) {
+        return pendingPaymentService.confirmPayment(reservationId, paymentInfo);
     }
 }

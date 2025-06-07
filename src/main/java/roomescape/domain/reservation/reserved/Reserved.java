@@ -6,7 +6,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -27,7 +26,7 @@ import roomescape.domain.user.User;
 @DiscriminatorValue("RESERVED")
 public class Reserved extends Reservation {
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Payment payment;
 
     private Reserved(final User user, final LocalDate date, final TimeSlot timeSlot, final Theme theme) {
@@ -40,10 +39,11 @@ public class Reserved extends Reservation {
         return reserved;
     }
 
-    public static Reserved fromPendingPayment(final PendingPayment pendingPayment, final Payment payment) {
-        Reserved reserved = new Reserved(pendingPayment.getUser(), pendingPayment.getDate(),
-                pendingPayment.getTimeSlot(), pendingPayment.getTheme());
-        reserved.registerPayment(payment);
+    public static Reserved fromPendingPayment(final PendingPayment pendingPayment) {
+        Reserved reserved = new Reserved(
+                pendingPayment.getUser(), pendingPayment.getDate(),
+                pendingPayment.getTimeSlot(), pendingPayment.getTheme()
+        );
         return reserved;
     }
 

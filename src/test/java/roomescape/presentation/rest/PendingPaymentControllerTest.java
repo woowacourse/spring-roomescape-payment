@@ -23,7 +23,6 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -35,6 +34,7 @@ import org.springframework.restdocs.restassured.RestDocumentationFilter;
 import roomescape.application.PaymentService;
 import roomescape.application.request.PaymentInfo;
 import roomescape.domain.payment.Payment;
+import roomescape.domain.reservation.reserved.Reserved;
 import roomescape.presentation.response.ReservedResponse;
 
 
@@ -84,7 +84,7 @@ class PendingPaymentControllerTest {
                     () -> assertThat(response.theme().id()).isEqualTo(1),
                     () -> assertThat(response.time().id()).isEqualTo(1),
                     () -> assertThat(response.user().id()).isEqualTo(2),
-                    () -> verify(paymentService).savePayment(any(PaymentInfo.class))
+                    () -> verify(paymentService).requestPayment(any(Reserved.class), any(PaymentInfo.class))
             );
 
         }

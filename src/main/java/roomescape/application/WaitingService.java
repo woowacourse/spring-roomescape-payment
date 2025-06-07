@@ -3,10 +3,8 @@ package roomescape.application;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.application.event.ReservationCancelledEvent;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.pendingpayment.PendingPayment;
 import roomescape.domain.reservation.pendingpayment.PendingPaymentRepository;
@@ -53,21 +51,24 @@ public class WaitingService {
         waitingRepository.deleteById(id);
     }
 
-    @EventListener
     @Transactional
-    public void handleReservationCancelled(ReservationCancelledEvent event) {
-        waitingRepository.findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(event.getDate(), event.getTimeSlotId(),
-                event.getThemeId()).ifPresent(nextWaiting -> {
-            PendingPayment approvedReservation = PendingPayment.fromWaiting(nextWaiting);
-            pendingPaymentRepository.save(approvedReservation);
-            waitingRepository.deleteById(nextWaiting.getId());
-        });
+    public void approveNextWaiting(LocalDate date, Long timeSlotId, Long themeId) {
+        waitingRepository.findFirstByDateAndTimeSlotIdAndThemeIdOrderByIdAsc(date, timeSlotId, themeId).ifPresent(
+                nextWaiting -> {
+                    PendingPayment approvedReservation = PendingPayment.fromWaiting(nextWaiting);
+                    pendingPaymentRepository.save(approvedReservation);
+                    waitingRepository.deleteById(nextWaiting.getId());
+                });
     }
 
-    private void validateDuplicateReservation(final LocalDate date, final Long timeSlotId, final Long themeId,
-                                              final Long userId) {
-        boolean hasDuplicatedReservation = reservationRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(date,
-                timeSlotId, themeId, userId);
+    private void validateDuplicateReservation(
+            final LocalDate date, final Long timeSlotId, final Long themeId,
+            final Long userId
+    ) {
+        boolean hasDuplicatedReservation = reservationRepository.existsByDateAndTimeSlotIdAndThemeIdAndUserId(
+                date,
+                timeSlotId, themeId, userId
+        );
 
         if (hasDuplicatedReservation) {
             throw new AlreadyExistedException("이미 해당 날짜, 시간, 테마에 대한 예약이 존재합니다.");

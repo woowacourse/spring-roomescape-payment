@@ -84,7 +84,6 @@ public class Payment {
         if (this.status != PaymentStatus.PENDING) {
             throw new IllegalStateException("결제 대기 상태에서만 실패 상태로 변경할 수 있습니다.");
         }
-
         this.status = PaymentStatus.FAILED;
     }
 

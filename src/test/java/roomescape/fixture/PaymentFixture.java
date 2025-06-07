@@ -1,6 +1,7 @@
 package roomescape.fixture;
 
 import org.springframework.test.util.ReflectionTestUtils;
+import roomescape.application.request.PaymentInfo;
 import roomescape.domain.payment.Payment;
 
 public class PaymentFixture {
@@ -55,6 +56,17 @@ public class PaymentFixture {
                 "order_id_9999",
                 "방탈출 패키지 1건",
                 99999L
+        );
+        ReflectionTestUtils.setField(payment, "id", id);
+        return payment;
+    }
+
+    public static Payment CREATE_PAYMENT_OF(Long id, PaymentInfo paymentInfo) {
+        Payment payment = Payment.register(
+                paymentInfo.paymentKey(),
+                paymentInfo.orderId(),
+                paymentInfo.orderName(),
+                paymentInfo.amount()
         );
         ReflectionTestUtils.setField(payment, "id", id);
         return payment;

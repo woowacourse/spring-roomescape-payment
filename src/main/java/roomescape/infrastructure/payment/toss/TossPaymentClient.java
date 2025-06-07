@@ -33,13 +33,16 @@ public class TossPaymentClient implements PaymentClient {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    public TossPaymentClient(final @Value("${payment.toss.secret-key}") String secretKey,
-                             final ObjectMapper objectMapper,
-                             final @Qualifier("tossClientBuilder") RestClient.Builder restClientBuilder) {
+    public TossPaymentClient(
+            final @Value("${payment.toss.secret-key}") String secretKey,
+            final ObjectMapper objectMapper,
+            final @Qualifier("tossClientBuilder") RestClient.Builder restClientBuilder
+    ) {
         this.restClient = initRestClient(restClientBuilder, secretKey);
         this.objectMapper = objectMapper;
     }
 
+    @Override
     public PaymentClientResponse confirmPayment(final PaymentInfo paymentInfo) {
         try {
             return restClient.post().uri(TOSS_PAYMENT_CONFIRM_URI).contentType(MediaType.APPLICATION_JSON)
