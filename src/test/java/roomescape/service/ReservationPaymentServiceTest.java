@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -89,7 +90,7 @@ class ReservationPaymentServiceTest {
                 savedTime.getId(), savedMember.getId());
         var paymentConfirmRequest = new PaymentConfirmRequest("orderId", 50000, "paymentKey", "TOSS");
         assertThatThrownBy(() -> reservationPaymentService.confirmPaymentAndAddReservation(
-                reservationCreateRequest, paymentConfirmRequest
+                reservationCreateRequest, paymentConfirmRequest, LocalDateTime.now()
         )).hasMessageContaining("존재하지 않는 결제 입니다.");
     }
 }
