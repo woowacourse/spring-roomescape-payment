@@ -4,11 +4,13 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 
+import fixture.MemberFixture;
+import fixture.PaymentFixture;
+import fixture.ReservationTimeFixture;
+import fixture.ThemeFixture;
 import io.restassured.RestAssured;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +26,7 @@ import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.entity.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.ReservationAdminCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
@@ -37,53 +40,62 @@ import roomescape.theme.repository.ThemeRepository;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class ReservationAcceptanceTest {
 
-    private static final String DEFAULT_EMAIL = "miso@email.com";
-    private static final String DEFAULT_PASSWORD = "miso";
-    private static final String DEFAULT_NAME = "미소";
-
     @LocalServerPort
     private int port;
-
     @Autowired
     private MemberRepository memberRepository;
-
     @Autowired
     private ThemeRepository themeRepository;
-
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
-
+    @Autowired
+    private PaymentRepository paymentRepository;
     @MockitoBean
     private PaymentService paymentService;
+
+    private final LocalDate tomorrow = LocalDate.now().plusDays(1);
+
+    private ReservationTime reservationTime;
+
+    private Member member;
+
+    private Theme theme;
+
+    private Payment payment;
 
     @BeforeEach
     void setUp() {
         RestAssured.port = port;
-        paymentService = mock(PaymentService.class);
+
+        payment = PaymentFixture.createDefault();
+        paymentRepository.save(payment);
         given(paymentService.confirmPayment(any(), any(), any()))
-                .willReturn(new Payment("any", "1", 100L, "any"));
-        Member member = new Member(DEFAULT_NAME, DEFAULT_EMAIL, DEFAULT_PASSWORD, RoleType.ADMIN);
+                .willReturn(payment);
+
+        member = MemberFixture.create(RoleType.ADMIN);
         memberRepository.save(member);
-        Theme theme = new Theme("테마", "설명", "썸네일");
+
+        theme = ThemeFixture.createDefault();
         themeRepository.save(theme);
-        ReservationTime reservationTime = new ReservationTime(LocalTime.of(10, 0));
+
+        reservationTime = ReservationTimeFixture.createDefault();
         reservationTimeRepository.save(reservationTime);
     }
 
     @Test
-    @DisplayName("예약을 생성한다.")
+    @DisplayName("예약 생성 - 성공")
     void createReservation() {
         // given
-        String token = TestHelper.login(DEFAULT_EMAIL, DEFAULT_PASSWORD);
+        String token = TestHelper.login(member.getEmail(), member.getPassword());
         var reservationRequest = new ReservationCreateRequest(
-                LocalDate.now().plusDays(1),
-                1L,
-                1L,
+                tomorrow,
+                reservationTime.getId(),
+                theme.getId(),
                 new PaymentDetail(
-                        "any",
-                        "1",
-                        100L,
-                        "any"
+                        payment.getPaymentKey(),
+                        payment.getOrderId(),
+                        payment.getAmount(),
+                        payment.getPaymentType()
                 )
         );
 
@@ -91,25 +103,25 @@ class ReservationAcceptanceTest {
         TestHelper.postWithToken("/reservations", reservationRequest, token)
                 .then()
                 .statusCode(HttpStatus.OK.value())
-                .body("date", equalTo(LocalDate.now().plusDays(1).toString()))
-                .body("startAt", equalTo("10:00:00"))
-                .body("themeName", equalTo("테마"));
+                .body("date", equalTo(tomorrow.toString()))
+                .body("startAt", equalTo(reservationTime.getStartAt().toString()))
+                .body("themeName", equalTo(theme.getName()));
     }
 
     @Test
-    @DisplayName("중복된 예약을 생성할 수 없다.")
+    @DisplayName("예약 생성 - 중복 예약으로 실패")
     void createDuplicateReservation() {
         // given
-        String token = TestHelper.login(DEFAULT_EMAIL, DEFAULT_PASSWORD);
+        String token = TestHelper.login(member.getEmail(), member.getPassword());
         var reservationRequest = new ReservationCreateRequest(
-                LocalDate.now().plusDays(1),
-                1L,
-                1L,
+                tomorrow,
+                reservationTime.getId(),
+                theme.getId(),
                 new PaymentDetail(
-                        "any",
-                        "1",
-                        100L,
-                        "any"
+                        payment.getPaymentKey(),
+                        payment.getOrderId(),
+                        payment.getAmount(),
+                        payment.getPaymentType()
                 )
         );
         TestHelper.postWithToken("/reservations", reservationRequest, token);
@@ -121,19 +133,19 @@ class ReservationAcceptanceTest {
     }
 
     @Test
-    @DisplayName("모든 예약을 조회한다.")
+    @DisplayName("모든 예약 조회")
     void getAllReservations() {
         // given
-        String token = TestHelper.login(DEFAULT_EMAIL, DEFAULT_PASSWORD);
+        String token = TestHelper.login(member.getEmail(), member.getPassword());
         var reservationRequest = new ReservationCreateRequest(
-                LocalDate.now().plusDays(1),
-                1L,
-                1L,
+                tomorrow,
+                reservationTime.getId(),
+                theme.getId(),
                 new PaymentDetail(
-                        "any",
-                        "1",
-                        100L,
-                        "any"
+                        payment.getPaymentKey(),
+                        payment.getOrderId(),
+                        payment.getAmount(),
+                        payment.getPaymentType()
                 )
         );
         TestHelper.postWithToken("/reservations", reservationRequest, token);
@@ -143,30 +155,28 @@ class ReservationAcceptanceTest {
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("$", hasSize(1))
-                .body("[0].id", equalTo(1))
-                .body("[0].date", equalTo(LocalDate.now().plusDays(1).toString()))
-                .body("[0].startAt", equalTo("10:00:00"))
-                .body("[0].memberName", equalTo(DEFAULT_NAME))
-                .body("[0].themeName", equalTo("테마"));
+                .body("[0].date", equalTo(tomorrow.toString()))
+                .body("[0].startAt", equalTo(reservationTime.getStartAt().toString()))
+                .body("[0].memberName", equalTo(member.getName()))
+                .body("[0].themeName", equalTo(theme.getName()));
     }
 
     @Test
-    @DisplayName("예약을 삭제한다.")
+    @DisplayName("예약 삭제")
     void deleteReservation() {
         // given
-        String token = TestHelper.login(DEFAULT_EMAIL, DEFAULT_PASSWORD);
+        String token = TestHelper.login(member.getEmail(), member.getPassword());
         var reservationRequest = new ReservationCreateRequest(
-                LocalDate.now().plusDays(1),
-                1L,
-                1L,
+                tomorrow,
+                reservationTime.getId(),
+                theme.getId(),
                 new PaymentDetail(
-                        "any",
-                        "1",
-                        100L,
-                        "any"
+                        payment.getPaymentKey(),
+                        payment.getOrderId(),
+                        payment.getAmount(),
+                        payment.getPaymentType()
                 )
         );
-
         TestHelper.postWithToken("/reservations", reservationRequest, token);
 
         // when & then
@@ -181,72 +191,55 @@ class ReservationAcceptanceTest {
     }
 
     @Test
-    @DisplayName("필터링된 예약을 조회할 수 없다.")
+    @DisplayName("예약 조회 - 필터링 성공")
     void getFilteredReservations() {
         // given
-        String token = TestHelper.login(DEFAULT_EMAIL, DEFAULT_PASSWORD);
+        String token = TestHelper.login(member.getEmail(), member.getPassword());
         var reservationRequest = new ReservationCreateRequest(
-                LocalDate.now().plusDays(1),
-                1L,
-                1L,
+                tomorrow,
+                reservationTime.getId(),
+                theme.getId(),
                 new PaymentDetail(
-                        "any",
-                        "1",
-                        100L,
-                        "any"
+                        payment.getPaymentKey(),
+                        payment.getOrderId(),
+                        payment.getAmount(),
+                        payment.getPaymentType()
                 )
         );
         TestHelper.postWithToken("/reservations", reservationRequest, token);
-        String url = String.format("/admin/reservations/filtered?themeId=%d&memberId=%d&dateFrom=%s&dateTo=%s",
-                1L, 1L, LocalDate.now(), LocalDate.now().plusDays(7));
+        String url = String.format(
+                "/admin/reservations/filtered?themeId=%d&memberId=%d&dateFrom=%s&dateTo=%s",
+                1L,
+                1L,
+                LocalDate.now(),
+                LocalDate.now().plusWeeks(1)
+        );
 
         // when & then
         TestHelper.getWithToken(url, token)
                 .then()
                 .statusCode(HttpStatus.OK.value())
                 .body("$", hasSize(1))
-                .body("[0].id", equalTo(1))
-                .body("[0].date", equalTo(LocalDate.now().plusDays(1).toString()))
-                .body("[0].startAt", equalTo("10:00:00"))
-                .body("[0].memberName", equalTo(DEFAULT_NAME))
-                .body("[0].themeName", equalTo("테마"));
+                .body("[0].date", equalTo(tomorrow.toString()))
+                .body("[0].startAt", equalTo(reservationTime.getStartAt().toString()))
+                .body("[0].memberName", equalTo(member.getName()))
+                .body("[0].themeName", equalTo(theme.getName()));
     }
 
     @Test
-    @DisplayName("유저 예약 기록을 확인한다.")
-    void getReservationsByMember() {
-        // given
-        String token = TestHelper.login(DEFAULT_EMAIL, DEFAULT_PASSWORD);
-        var reservationRequest = new ReservationCreateRequest(
-                LocalDate.now().plusDays(1),
-                1L,
-                1L,
-                new PaymentDetail(
-                        "any",
-                        "1",
-                        100L,
-                        "any"
-                )
-        );
-
-        TestHelper.postWithToken("/reservations", reservationRequest, token);
-
-        // when & then
-        TestHelper.getWithToken("/reservations/mine", token)
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("$", hasSize(1));
-    }
-
-    @Test
-    @DisplayName("관리자가 아닌 사용자는 필터링된 예약을 조회할 수 없다.")
+    @DisplayName("예약 조회 - 필터링 (일반 유저 권한 부족) 실패")
     void getFilteredReservationsWithNonAdmin() {
         // given
-        Member nonAdminMember = new Member("일반회원", "user@email.com", "password", RoleType.USER);
-        memberRepository.save(nonAdminMember);
-        String token = TestHelper.login("user@email.com", "password");
-        String url = String.format("/admin/reservations/filtered?themeId=%d&memberId=%d&dateFrom=%s&dateTo=%s",
-                1L, 1L, LocalDate.now(), LocalDate.now().plusDays(7));
+        Member userMember = MemberFixture.create(RoleType.USER);
+        memberRepository.save(userMember);
+        String token = TestHelper.login(userMember.getEmail(), userMember.getPassword());
+        String url = String.format(
+                "/admin/reservations/filtered?themeId=%d&memberId=%d&dateFrom=%s&dateTo=%s",
+                1L,
+                1L,
+                LocalDate.now(),
+                LocalDate.now().plusDays(7)
+        );
 
         // when & then
         TestHelper.getWithToken(url, token)
@@ -255,17 +248,46 @@ class ReservationAcceptanceTest {
     }
 
     @Test
-    @DisplayName("관리자가 다른 회원의 예약을 생성한다.")
+    @DisplayName("예약 조회 - 로그인 사용자 예약 조회")
+    void getReservationsByMember() {
+        // given
+        String token = TestHelper.login(member.getEmail(), member.getPassword());
+        var reservationRequest = new ReservationCreateRequest(
+                tomorrow,
+                reservationTime.getId(),
+                theme.getId(),
+                new PaymentDetail(
+                        payment.getPaymentKey(),
+                        payment.getOrderId(),
+                        payment.getAmount(),
+                        payment.getPaymentType()
+                )
+        );
+        TestHelper.postWithToken("/reservations", reservationRequest, token);
+
+        // when & then
+        TestHelper.getWithToken("/reservations/mine", token)
+                .then()
+                .statusCode(HttpStatus.OK.value())
+                .body("$", hasSize(1))
+                .body("[0].theme", equalTo(theme.getName()))
+                .body("[0].date", equalTo(tomorrow.toString()))
+                .body("[0].time", equalTo(reservationTime.getStartAt().toString()))
+                .body("[0].status", equalTo("예약"));
+    }
+
+    @Test
+    @DisplayName("관리자 예약 생성 - 성공")
     void createReservationByAdmin() {
         // given
-        String token = TestHelper.login(DEFAULT_EMAIL, DEFAULT_PASSWORD);
-        Member userMember = new Member("일반회원", "user@email.com", "password", RoleType.USER);
+        String token = TestHelper.login(member.getEmail(), member.getPassword());
+        Member userMember = MemberFixture.create(RoleType.USER);
         memberRepository.save(userMember);
 
         var adminCreateRequest = new ReservationAdminCreateRequest(
-                LocalDate.now().plusDays(1),
-                1L,
-                1L,
+                tomorrow,
+                theme.getId(),
+                reservationTime.getId(),
                 userMember.getId()
         );
 
@@ -273,24 +295,24 @@ class ReservationAcceptanceTest {
         TestHelper.postWithToken("/admin/reservations", adminCreateRequest, token)
                 .then()
                 .statusCode(HttpStatus.CREATED.value())
-                .body("date", equalTo(LocalDate.now().plusDays(1).toString()))
-                .body("startAt", equalTo("10:00:00"))
-                .body("themeName", equalTo("테마"));
+                .body("date", equalTo(tomorrow.toString()))
+                .body("startAt", equalTo(reservationTime.getStartAt().toString()))
+                .body("themeName", equalTo(theme.getName()));
     }
 
     @Test
-    @DisplayName("관리자가 아닌 사용자는 다른 회원의 예약을 생성할 수 없다.")
+    @DisplayName("관리자 예약 생성 - 일반 유저 권한 부족 실패")
     void createReservationByNonAdmin() {
         // given
-        Member nonAdminMember = new Member("일반회원", "user@email.com", "password", RoleType.USER);
-        memberRepository.save(nonAdminMember);
-        String token = TestHelper.login("user@email.com", "password");
+        Member userMember = MemberFixture.create(RoleType.USER);
+        memberRepository.save(userMember);
+        String token = TestHelper.login(userMember.getEmail(), userMember.getPassword());
 
         var adminCreateRequest = new ReservationAdminCreateRequest(
-                LocalDate.now().plusDays(1),
-                1L,
-                1L,
-                1L
+                tomorrow,
+                theme.getId(),
+                reservationTime.getId(),
+                userMember.getId()
         );
 
         // when & then
