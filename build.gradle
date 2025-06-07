@@ -35,6 +35,9 @@ dependencies {
 
     // 외부 API HTTP 통신용
     implementation 'org.apache.httpcomponents.client5:httpclient5:5.5'
+
+    //swagger
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0'
 }
 
 bootJar {

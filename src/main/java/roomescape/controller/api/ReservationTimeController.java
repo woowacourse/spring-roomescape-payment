@@ -1,17 +1,10 @@
 package roomescape.controller.api;
 
-import java.time.LocalDate;
-import java.util.List;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import roomescape.controller.annotation.AdminMember;
 import roomescape.dto.auth.LoginInfo;
 import roomescape.dto.time.AvailableReservationTimeResponseDto;
@@ -20,6 +13,10 @@ import roomescape.dto.time.ReservationTimeResponseDto;
 import roomescape.service.command.ReservationTimeCommandService;
 import roomescape.service.query.ReservationTimeQueryService;
 
+import java.time.LocalDate;
+import java.util.List;
+
+@Tag(name = "예약 시간 관리 API")
 @RestController
 @RequestMapping("/times")
 public class ReservationTimeController {
@@ -33,6 +30,8 @@ public class ReservationTimeController {
         this.reservationTimeCommandService = reservationTimeCommandService;
     }
 
+    @Operation(summary = "모든 예약 시간 조회")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<ReservationTimeResponseDto> getAllReservationTimes(
@@ -41,6 +40,8 @@ public class ReservationTimeController {
         return reservationTimeQueryService.findAllReservationTimes();
     }
 
+    @Operation(summary = "예약 가능한 시간 조회")
+    @ApiResponse(responseCode = "200", description = "조회 성공")
     @GetMapping("/available")
     @ResponseStatus(HttpStatus.OK)
     public List<AvailableReservationTimeResponseDto> getAllReservationTimesWithAvailability(
@@ -50,6 +51,8 @@ public class ReservationTimeController {
         return reservationTimeQueryService.findAllReservationTimesWithAvailabilityBy(date, themeId);
     }
 
+    @Operation(summary = "예약 시간 추가")
+    @ApiResponse(responseCode = "201", description = "생성 성공")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ReservationTimeResponseDto addReservationTime(
@@ -59,6 +62,8 @@ public class ReservationTimeController {
         return reservationTimeCommandService.createReservationTime(requestDto);
     }
 
+    @Operation(summary = "예약 시간 삭제")
+    @ApiResponse(responseCode = "204", description = "삭제 성공")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteReservationTime(
