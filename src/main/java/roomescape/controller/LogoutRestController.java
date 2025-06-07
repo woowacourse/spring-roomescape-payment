@@ -3,15 +3,13 @@ package roomescape.controller;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.controller.api.LogoutRestControllerInterface;
 
-@RequestMapping("/logout")
 @RestController
-public class LogoutRestController {
+public class LogoutRestController implements LogoutRestControllerInterface {
 
-    @PostMapping
+    @Override
     public ResponseEntity<Void> logout(
             final HttpServletResponse response
     ) {

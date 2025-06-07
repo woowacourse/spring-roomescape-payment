@@ -4,14 +4,11 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.controller.api.ReservationRestControllerInterface;
 import roomescape.domain.auth.dto.LoginMember;
 import roomescape.domain.reservation.dto.CreateReservationRequest;
 import roomescape.domain.reservation.dto.CreateReservationResponse;
@@ -23,13 +20,12 @@ import roomescape.domain.waiting.dto.CreateWaitingRequest;
 import roomescape.domain.waiting.dto.CreateWaitingResponse;
 
 @RequiredArgsConstructor
-@RequestMapping("/reservations")
 @RestController
-public class ReservationRestController {
+public class ReservationRestController implements ReservationRestControllerInterface {
 
     private final ReservationServiceFacade reservationServiceFacade;
 
-    @PostMapping
+    @Override
     public ResponseEntity<CreateReservationResponse> createReservation(
             @RequestBody final CreateReservationRequest createReservationRequest,
             final LoginMember loginMember
@@ -42,14 +38,14 @@ public class ReservationRestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createReservationResponse);
     }
 
-    @GetMapping
+    @Override
     public ResponseEntity<List<CreateReservationResponse>> getReservations() {
         final List<CreateReservationResponse> createReservationResponse = reservationServiceFacade.findAll();
 
         return ResponseEntity.ok(createReservationResponse);
     }
 
-    @GetMapping("/available-times")
+    @Override
     public ResponseEntity<List<AvailableReservationTimeResponse>> getAvailableReservationTimes(
             @ModelAttribute final AvailableReservationTimeRequest request) {
 
@@ -59,7 +55,7 @@ public class ReservationRestController {
         return ResponseEntity.ok(availableTimes);
     }
 
-    @GetMapping("/mine")
+    @Override
     public ResponseEntity<List<ReservationMineResponse>> getMyReservations(final LoginMember member) {
 
         final List<ReservationMineResponse> reservations = reservationServiceFacade.findMyReservations(member);
@@ -67,7 +63,7 @@ public class ReservationRestController {
         return ResponseEntity.ok(reservations);
     }
 
-    @PostMapping("/waitings")
+    @Override
     public ResponseEntity<CreateWaitingResponse> createWaitingReservation(
             @RequestBody final CreateWaitingRequest createWaitingRequest,
             final LoginMember loginMember
@@ -79,7 +75,7 @@ public class ReservationRestController {
         return ResponseEntity.status(HttpStatus.CREATED).body(waitingResponse);
     }
 
-    @DeleteMapping("/waitings/{id}")
+    @Override
     public ResponseEntity<Void> deleteWaitingReservation(@PathVariable final Long id) {
 
         reservationServiceFacade.deleteWaiting(id);

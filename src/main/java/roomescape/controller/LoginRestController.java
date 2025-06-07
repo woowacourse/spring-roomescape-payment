@@ -6,24 +6,21 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.controller.api.LoginRestControllerInterface;
 import roomescape.domain.auth.dto.LoginCheckResponse;
 import roomescape.domain.auth.dto.LoginRequest;
 import roomescape.domain.auth.dto.LoginResponse;
 import roomescape.domain.auth.service.AuthService;
 
 @RequiredArgsConstructor
-@RequestMapping("/login")
 @RestController
-public class LoginRestController {
+public class LoginRestController implements LoginRestControllerInterface {
 
     private final AuthService authService;
 
-    @PostMapping
+    @Override
     public ResponseEntity<LoginResponse> login(
             @RequestBody final LoginRequest loginRequest,
             final HttpServletResponse response
@@ -43,7 +40,7 @@ public class LoginRestController {
         return ResponseEntity.ok(new LoginResponse(accessToken));
     }
 
-    @GetMapping("/check")
+    @Override
     public ResponseEntity<LoginCheckResponse> checkLogin(
             final HttpServletRequest request
     ) {

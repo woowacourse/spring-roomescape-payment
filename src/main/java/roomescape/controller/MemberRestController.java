@@ -3,21 +3,19 @@ package roomescape.controller;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.controller.api.MemberRestControllerInterface;
 import roomescape.domain.member.dto.MemberResponse;
 import roomescape.domain.member.entity.Member;
 import roomescape.domain.member.service.MemberService;
 
 @RequiredArgsConstructor
-@RequestMapping("/members")
 @RestController
-public class MemberRestController {
+public class MemberRestController implements MemberRestControllerInterface {
 
     private final MemberService memberService;
 
-    @GetMapping
+    @Override
     public ResponseEntity<List<MemberResponse>> getMembers() {
         final List<Member> members = memberService.findAll();
         final List<MemberResponse> memberResponses = members.stream()

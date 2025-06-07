@@ -27,6 +27,10 @@ spring:
       connect-timeout: 2000
       read-timeout: 5000
 
+springdoc:
+  swagger-ui:
+    path: /api-docs
+
 security:
   jwt:
     token:
