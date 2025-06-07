@@ -26,6 +26,7 @@ import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeId;
 import roomescape.theme.repository.ThemeRepository;
 
+@Transactional(readOnly = true)
 @Service
 public class WaitingService {
 

@@ -1,6 +1,7 @@
 package roomescape.auth.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import roomescape.auth.dto.LoginMember;
 import roomescape.auth.dto.LoginRequest;
@@ -12,6 +13,7 @@ import roomescape.member.domain.MemberId;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
 
+@Transactional(readOnly = true)
 @Service
 public class AuthService {
 

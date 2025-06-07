@@ -43,6 +43,7 @@ import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeId;
 import roomescape.theme.repository.ThemeRepository;
 
+@Transactional(readOnly = true)
 @Service
 public class ReservationService {
 
@@ -119,8 +120,10 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse createWithPayment(final ReservationCreateRequest request,
-                                                 final PaymentRequest paymentRequest) {
+    public ReservationResponse createWithPayment(
+            final ReservationCreateRequest request,
+            final PaymentRequest paymentRequest
+    ) {
         validateReservationCreate(request);
 
         Reservation reservation = getReservation(request, request.loginMember());

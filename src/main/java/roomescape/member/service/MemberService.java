@@ -15,6 +15,7 @@ import roomescape.member.dto.MemberCreateRequest;
 import roomescape.member.dto.MemberResponse;
 import roomescape.member.repository.MemberRepository;
 
+@Transactional(readOnly = true)
 @Service
 public class MemberService {
 

@@ -14,6 +14,7 @@ import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.ReservationTimeRepository;
 
+@Transactional(readOnly = true)
 @Service
 public class ReservationTimeService {
 

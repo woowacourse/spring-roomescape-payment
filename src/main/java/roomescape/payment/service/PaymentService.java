@@ -29,6 +29,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationId;
 import roomescape.reservation.repository.ReservationRepository;
 
+@Transactional(readOnly = true)
 @Service
 public class PaymentService {
 
