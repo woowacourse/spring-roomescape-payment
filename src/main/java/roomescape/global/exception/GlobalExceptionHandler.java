@@ -27,9 +27,9 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 public class GlobalExceptionHandler {
 
     @ResponseStatus(INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(Exception.class)
-    public ExceptionResponse handleException(Exception e) {
-        log.error("Unhandled exception occurred", e);
+    @ExceptionHandler(RuntimeException.class)
+    public ExceptionResponse handleException(RuntimeException e) {
+        log.warn("Unhandled exception occurred", e);
         return new ExceptionResponse(INTERNAL_SERVER_ERROR.value(), "서버 에러입니다", LocalDateTime.now());
     }
 
