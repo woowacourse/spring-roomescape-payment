@@ -1,6 +1,7 @@
 package roomescape.member.application;
 
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.security.application.MyPasswordEncoder;
@@ -13,6 +14,7 @@ import roomescape.member.presentation.dto.response.SignUpWebResponse;
 
 @Service
 @Transactional
+@Slf4j
 public class MemberApplicationService {
 
     private final MemberDataService memberDataService;
@@ -25,11 +27,16 @@ public class MemberApplicationService {
     }
 
     public SignUpWebResponse signup(final SignupWebRequest signupWebRequest) {
+        log.info("회원가입 시도: email={}, name={}", signupWebRequest.email(), signupWebRequest.name());
+
         String encodedPassword = myPasswordEncoder.encode(signupWebRequest.password());
         Member member = new Member(signupWebRequest.name(), signupWebRequest.email(), encodedPassword,
                 MemberRole.REGULAR);
         validateMemberExists(signupWebRequest);
-        return SignUpWebResponse.from(memberDataService.create(member));
+        Member savedMember = memberDataService.create(member);
+
+        log.info("회원가입 완료: memberId={}, email={}", savedMember.getId(), savedMember.getEmail());
+        return SignUpWebResponse.from(savedMember);
     }
 
     public List<MemberWebResponse> findAllRegular() {
@@ -44,6 +51,7 @@ public class MemberApplicationService {
 
     private void validateMemberExists(final SignupWebRequest signupWebRequest) {
         if (memberDataService.existsByEmail(signupWebRequest.email())) {
+            log.warn("회원가입 실패 - 이미 존재하는 이메일: email={}", signupWebRequest.email());
             throw new MemberDuplicatedException("이미 존재하는 회원입니다.");
         }
     }

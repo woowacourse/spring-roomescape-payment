@@ -1,15 +1,17 @@
 package roomescape.common.security.application;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import roomescape.common.security.dto.request.LoginRequest;
-import roomescape.common.security.dto.response.LoginResponse;
 import roomescape.common.security.dto.request.MemberInfo;
+import roomescape.common.security.dto.response.LoginResponse;
 import roomescape.common.security.exception.UnAuthorizedException;
 import roomescape.common.security.infrastructure.JwtProvider;
 import roomescape.member.domain.Member;
 import roomescape.member.infrastructure.MemberRepository;
 
 @Component
+@Slf4j
 public class AuthService {
 
     private final JwtProvider jwtProvider;
@@ -24,8 +26,10 @@ public class AuthService {
     }
 
     public LoginResponse login(final LoginRequest loginRequest) {
+        log.info("로그인 시도: email={}", loginRequest.email());
         Member member = findValidMember(loginRequest.email(), loginRequest.password());
         String accessToken = jwtProvider.createToken(MemberInfo.from(member));
+        log.info("로그인 성공: memberId={}", member.getId());
         return new LoginResponse(accessToken);
     }
 
@@ -43,17 +47,22 @@ public class AuthService {
 
     private Member findMemberByEmail(final String email) {
         return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new UnAuthorizedException("존재하지 않은 사용자입니다."));
+                .orElseThrow(() -> {
+                    log.warn("로그인 실패 - 존재하지 않는 사용자: email={}", email);
+                    return new UnAuthorizedException("존재하지 않은 사용자입니다.");
+                });
     }
 
     private void checkPassword(final String password, final Member member) {
         if (!myPasswordEncoder.matches(password, member.getPassword())) {
+            log.warn("로그인 실패 - 비밀번호 불일치: email={}", member.getEmail());
             throw new UnAuthorizedException("로그인에 실패하였습니다.");
         }
     }
 
     private void validateToken(final String token) {
         if (jwtProvider.isInvalidToken(token)) {
+            log.warn("토큰 검증 실패: 유효하지 않은 토큰");
             throw new UnAuthorizedException("유효하지 않은 토큰입니다.");
         }
     }

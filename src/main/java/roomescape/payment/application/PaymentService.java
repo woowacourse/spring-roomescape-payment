@@ -1,5 +1,6 @@
 package roomescape.payment.application;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import roomescape.payment.application.client.PaymentClient;
@@ -14,6 +15,7 @@ import roomescape.reservation.application.event.PaymentApprovedEvent;
 import roomescape.reservation.application.event.PaymentFailedEvent;
 
 @Service
+@Slf4j
 public class PaymentService {
 
     private final PaymentClient paymentClient;
@@ -28,15 +30,25 @@ public class PaymentService {
     }
 
     public PaymentApproveResponse approvePayment(final PaymentApproveRequest request) {
+        log.info("결제 승인 시도: orderId={}, amount={}, paymentKey={}",
+                request.orderId(), request.amount(), request.paymentKey());
         Payment payment = new Payment(request.paymentKey(), request.orderId(), request.amount(), PaymentType.NORMAL);
         Payment savedPayment = paymentRepository.save(payment);
 
         try {
             TossPaymentApproveResponse tossPaymentApproveResponse = paymentClient.approvePayment(request);
             applicationEventPublisher.publishEvent(PaymentApprovedEvent.from(request, savedPayment));
+
+            log.info("결제 승인 완료: paymentId={}, orderId={}, amount={}",
+                    savedPayment.getId(), request.orderId(), request.amount());
+
             return PaymentApproveResponse.from(tossPaymentApproveResponse);
         } catch (PaymentException e) {
             applicationEventPublisher.publishEvent(PaymentFailedEvent.from(request, savedPayment));
+
+            log.error("결제 승인 실패: orderId={}, amount={}, error={}",
+                    request.orderId(), request.amount(), e.getMessage(), e);
+
             throw e;
         }
     }
