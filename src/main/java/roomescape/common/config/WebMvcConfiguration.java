@@ -1,4 +1,4 @@
-package roomescape.presentation;
+package roomescape.common.config;
 
 import java.util.List;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +9,7 @@ import roomescape.application.AuthenticationService;
 import roomescape.domain.auth.AuthenticationTokenHandler;
 import roomescape.presentation.auth.CheckAdminInterceptor;
 import roomescape.presentation.auth.UserArgumentResolver;
+import roomescape.presentation.logging.HttpLoggingInterceptor;
 
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
@@ -16,8 +17,10 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     private final AuthenticationService authenticationService;
     private final AuthenticationTokenHandler authenticationTokenHandler;
 
-    public WebMvcConfiguration(final AuthenticationService authenticationService,
-                               final AuthenticationTokenHandler authenticationTokenHandler) {
+    public WebMvcConfiguration(
+            final AuthenticationService authenticationService,
+            final AuthenticationTokenHandler authenticationTokenHandler
+    ) {
         this.authenticationService = authenticationService;
         this.authenticationTokenHandler = authenticationTokenHandler;
     }
@@ -31,5 +34,6 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     public void addInterceptors(final InterceptorRegistry registry) {
         registry.addInterceptor(new CheckAdminInterceptor(authenticationTokenHandler))
                 .addPathPatterns("/admin/**");
+        registry.addInterceptor(new HttpLoggingInterceptor());
     }
 }

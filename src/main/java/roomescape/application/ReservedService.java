@@ -3,6 +3,7 @@ package roomescape.application;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,7 @@ import roomescape.exception.AlreadyExistedException;
 import roomescape.exception.NotFoundException;
 import roomescape.infrastructure.ReservedSpecifications;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReservedService {
@@ -40,9 +42,12 @@ public class ReservedService {
             final long userId, final LocalDate date, final long timeId,
             final long themeId, final PaymentInfo paymentInfo
     ) {
+        log.info("예약 등록 호출 - userId: {}, date: {}, timeId: {}, themeId: {}", userId, date, timeId, themeId);
+
         Reserved reserved = registerReserved(userId, date, timeId, themeId);
         paymentService.requestPayment(reserved, paymentInfo);
 
+        log.info("예약 등록 성공 - 예약ID: {}, userId: {}", reserved.getId(), userId);
         return reserved;
     }
 
@@ -51,7 +56,12 @@ public class ReservedService {
             final long userId, final LocalDate date, final long timeId,
             final long themeId
     ) {
-        return registerReserved(userId, date, timeId, themeId);
+        log.info("관리자 예약 등록 호출 - userId: {}, date: {}, timeId: {}, themeId: {}", userId, date, timeId, themeId);
+
+        Reserved reserved = registerReserved(userId, date, timeId, themeId);
+
+        log.info("관리자 예약 등록 성공 - 예약ID: {}, userId: {}", reserved.getId(), userId);
+        return reserved;
     }
 
     @Transactional(readOnly = true)
@@ -66,6 +76,8 @@ public class ReservedService {
 
     @Transactional
     public void removeById(final long id) {
+        log.info("예약 삭제 호출 - reservationId = {}", id);
+
         Reserved reserved = findById(id);
 
         eventPublisher.publishEvent(
@@ -75,6 +87,8 @@ public class ReservedService {
                 ));
 
         reservedRepository.deleteById(id);
+
+        log.info("예약 삭제 성공 - reservationId = {}", id);
     }
 
     private Reserved registerReserved(final long userId, final LocalDate date, final long timeId, final long themeId) {

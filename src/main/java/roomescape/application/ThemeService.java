@@ -3,6 +3,7 @@ package roomescape.application;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import roomescape.domain.theme.ThemeRepository;
 import roomescape.exception.InUseException;
 import roomescape.exception.NotFoundException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ThemeService {
@@ -24,8 +26,12 @@ public class ThemeService {
 
     @Transactional
     public Theme saveTheme(final String name, final String description, final String thumbnail) {
-        Theme theme = Theme.register(name, description, thumbnail);
-        return themeRepository.save(theme);
+        log.info("테마 저장 호출 - name: {}, description: {}", name, description);
+
+        Theme theme = themeRepository.save(Theme.register(name, description, thumbnail));
+        log.info("테마 저장 성공 - id: {}", theme.getId());
+
+        return theme;
     }
 
     @Transactional(readOnly = true)
@@ -43,10 +49,14 @@ public class ThemeService {
 
     @Transactional
     public void removeById(final long id) {
+        log.info("테마 삭제 호출 - id: {}", id);
+
         validateThemeNotInUse(id);
         validateThemeExists(id);
 
         themeRepository.deleteById(id);
+
+        log.info("테마 삭제 성공 - id: {}", id);
     }
 
     private void validateThemeNotInUse(long id) {

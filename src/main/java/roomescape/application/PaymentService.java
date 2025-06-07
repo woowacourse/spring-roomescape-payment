@@ -1,6 +1,7 @@
 package roomescape.application;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,8 +11,8 @@ import roomescape.domain.payment.Payment;
 import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.reserved.Reserved;
 import roomescape.exception.NotFoundException;
-import roomescape.infrastructure.payment.PaymentClient;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PaymentService {
@@ -21,6 +22,8 @@ public class PaymentService {
 
     @Transactional
     public void requestPayment(final Reserved reserved, final PaymentInfo paymentInfo) {
+        log.info("결제 요청 시작 - 결제키: {}, 예약 ID: {}", paymentInfo.paymentKey(), reserved.getId());
+
         Payment payment = paymentRepository.save(
                 Payment.register(
                         paymentInfo.paymentKey(),

@@ -3,6 +3,7 @@ package roomescape.application;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.pendingpayment.PendingPayment;
@@ -17,6 +18,7 @@ import roomescape.exception.AlreadyExistedException;
 import roomescape.exception.NotFoundException;
 import roomescape.presentation.response.UserReservationRecordsResponse;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -28,10 +30,12 @@ public class UserService {
 
     @Transactional
     public User saveUser(final String email, final String password, final String name) {
+        log.info("사용자 생성 호출 - email: {}", email);
         validateEmailNotRegistered(email);
-        User user = User.register(name, email, password);
 
-        return userRepository.save(user);
+        User user = userRepository.save(User.register(name, email, password));
+        log.info("사용자 생성 성공 - id: {}", user.getId());
+        return user;
     }
 
     @Transactional(readOnly = true)

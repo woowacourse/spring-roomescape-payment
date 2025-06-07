@@ -3,6 +3,7 @@ package roomescape.application;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.ReservationRepository;
@@ -18,6 +19,7 @@ import roomescape.domain.user.User;
 import roomescape.exception.AlreadyExistedException;
 import roomescape.exception.NotFoundException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class WaitingService {
@@ -30,13 +32,17 @@ public class WaitingService {
 
     @Transactional
     public Waiting saveWaiting(final User user, final LocalDate date, final long timeId, final long themeId) {
+        log.info("예약 대기 등록 호출 - userId: {}, date: {}, timeId: {}, themeId: {}", user.getId(), date, timeId, themeId);
+
         TimeSlot timeSlot = getTimeSlotById(timeId);
         Theme theme = getThemeById(themeId);
 
         validateDuplicateReservation(date, timeSlot.getId(), theme.getId(), user.getId());
 
-        Waiting waiting = Waiting.register(user, date, timeSlot, theme);
-        return waitingRepository.save(waiting);
+        Waiting waiting = waitingRepository.save(Waiting.register(user, date, timeSlot, theme));
+
+        log.info("예약 대기 등록 성공 - id: {}", waiting.getId());
+        return waiting;
     }
 
     @Transactional(readOnly = true)
@@ -46,9 +52,11 @@ public class WaitingService {
 
     @Transactional
     public void removeById(final long id) {
+        log.info("예약 대기 삭제 호출 - id: {}", id);
         validateWaitingExists(id);
 
         waitingRepository.deleteById(id);
+        log.info("예약 대기 삭제 성공 - id: {}", id);
     }
 
     @Transactional
@@ -58,6 +66,7 @@ public class WaitingService {
                     PendingPayment approvedReservation = PendingPayment.fromWaiting(nextWaiting);
                     pendingPaymentRepository.save(approvedReservation);
                     waitingRepository.deleteById(nextWaiting.getId());
+                    log.info("예약 대기 -> 결제 대기 변경 - 변경된 예약 ID: {}", approvedReservation.getId());
                 });
     }
 

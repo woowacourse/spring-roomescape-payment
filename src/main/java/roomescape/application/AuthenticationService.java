@@ -1,6 +1,7 @@
 package roomescape.application;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.auth.AuthenticationInfo;
@@ -9,6 +10,7 @@ import roomescape.domain.user.User;
 import roomescape.domain.user.UserRepository;
 import roomescape.exception.AuthenticationException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
@@ -18,6 +20,7 @@ public class AuthenticationService {
 
     @Transactional(readOnly = true)
     public String issueToken(final String email, final String password) {
+        log.info("로그인 시도 - 이메일: {}", email);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AuthenticationException("이메일이 틀렸습니다."));
 

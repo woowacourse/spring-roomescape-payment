@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.reservation.reserved.Reserved;
@@ -14,6 +15,7 @@ import roomescape.domain.timeslot.TimeSlotRepository;
 import roomescape.exception.InUseException;
 import roomescape.exception.NotFoundException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TimeSlotService {
@@ -23,9 +25,12 @@ public class TimeSlotService {
 
     @Transactional
     public TimeSlot saveTimeSlot(final LocalTime startAt) {
-        TimeSlot timeSlot = TimeSlot.register(startAt);
+        log.info("시간 저장 호출 - startAt: {}", startAt);
 
-        return timeSlotRepository.save(timeSlot);
+        TimeSlot timeSlot = timeSlotRepository.save(TimeSlot.register(startAt));
+        log.info("시간 저장 성공 - id: {}", timeSlot.getId());
+
+        return timeSlot;
     }
 
     @Transactional(readOnly = true)
@@ -45,10 +50,12 @@ public class TimeSlotService {
 
     @Transactional
     public void removeById(final long id) {
+        log.info("시간 삭제 호출 - id: {}", id);
         validateTimSlotNotInUse(id);
         validateTimeSlotExists(id);
 
         timeSlotRepository.deleteById(id);
+        log.info("시간 삭제 성공 - id: {}", id);
     }
 
     private void validateTimSlotNotInUse(long id) {
