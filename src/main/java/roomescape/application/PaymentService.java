@@ -3,6 +3,7 @@ package roomescape.application;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.NoSuchElementException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import roomescape.domain.Payment;
 import roomescape.infrastructure.repository.PaymentRepository;
 import roomescape.infrastructure.thirdparty.TossPaymentRestClient;
 import roomescape.presentation.dto.request.PaymentProcessRequest;
+import roomescape.presentation.dto.response.PaymentResponse;
 
 @Service
 public class PaymentService {
@@ -28,14 +30,14 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    public Payment process(PaymentProcessRequest request) {
+    public PaymentResponse process(PaymentProcessRequest request) {
         ResponseEntity<String> paymentResponse = tossPaymentRestClient.getPaymentResponse(request);
         JsonNode jsonNode = getJsonNode(paymentResponse.getBody());
         String paymentKey = jsonNode.get("paymentKey").asText();
         String orderId = jsonNode.get("orderId").asText();
         int totalAmount = jsonNode.get("totalAmount").asInt();
         Payment payment = Payment.create(paymentKey, orderId, totalAmount);
-        return paymentRepository.save(payment);
+        return PaymentResponse.from(paymentRepository.save(payment));
     }
 
     private JsonNode getJsonNode(String body) {
@@ -44,5 +46,10 @@ public class PaymentService {
         } catch (JsonProcessingException e) {
             throw new PaymentException(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public Payment findPaymentById(final Long id) {
+        return paymentRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("[ERROR] 결제 정보를 찾을 수 없습니다."));
     }
 }
