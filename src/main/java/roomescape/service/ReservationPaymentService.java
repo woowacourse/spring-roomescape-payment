@@ -1,5 +1,6 @@
 package roomescape.service;
 
+import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.dto.payment.PaymentConfirmRequest;
@@ -24,10 +25,11 @@ public class ReservationPaymentService {
 
     @Transactional
     public ReservationResponse confirmPaymentAndAddReservation(ReservationCreateRequest reservationRequest,
-                                                               PaymentConfirmRequest paymentRequest) {
+                                                               PaymentConfirmRequest paymentRequest,
+                                                               LocalDateTime createdAt) {
         ReservationResponse reservation = reservationService.createReservation(reservationRequest);
         PaymentConfirmResponse paymentConfirm = paymentClientService.confirm(paymentRequest);
-        paymentService.createPayment(paymentConfirm, reservation.id());
+        paymentService.createPayment(paymentConfirm, reservation.id(), createdAt);
         return reservation;
     }
 }

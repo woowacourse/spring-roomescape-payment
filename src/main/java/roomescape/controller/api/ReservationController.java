@@ -1,6 +1,7 @@
 package roomescape.controller.api;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,11 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.dto.auth.CurrentMember;
 import roomescape.dto.auth.LoginInfo;
 import roomescape.dto.payment.PaymentConfirmRequest;
+import roomescape.dto.reservation.ReservationCreateRequest;
 import roomescape.dto.reservation.ReservationPaymentRequest;
 import roomescape.dto.reservation.ReservationResponse;
 import roomescape.service.ReservationPaymentService;
 import roomescape.service.ReservationService;
-import roomescape.dto.reservation.ReservationCreateRequest;
 
 @RestController
 @RequestMapping("/reservations")
@@ -51,7 +52,8 @@ public class ReservationController {
 
         ReservationResponse response = reservationPaymentService.confirmPaymentAndAddReservation(
                 reservationCreateRequest,
-                paymentConfirmRequest);
+                paymentConfirmRequest,
+                LocalDateTime.now());
 
         return ResponseEntity.created(URI.create("reservations/" + response.id())).body("성공했습니다.");
     }

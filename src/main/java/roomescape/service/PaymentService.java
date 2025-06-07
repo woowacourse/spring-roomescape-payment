@@ -1,5 +1,6 @@
 package roomescape.service;
 
+import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Payment;
@@ -21,11 +22,11 @@ public class PaymentService {
     }
 
     @Transactional
-    public void createPayment(PaymentConfirmResponse paymentConfirm, Long reservationId) {
+    public void createPayment(PaymentConfirmResponse paymentConfirm, Long reservationId, LocalDateTime createdAt) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new NotFoundException("[ERROR] 예약을 찾을 수 없습니다. id : " + reservationId));
         Payment payment = Payment.createWithoutId(paymentConfirm.orderId(), paymentConfirm.paymentKey(),
-                paymentConfirm.totalAmount(), reservation);
+                paymentConfirm.totalAmount(), reservation, createdAt);
         paymentRepository.save(payment);
     }
 }
