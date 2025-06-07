@@ -72,10 +72,11 @@ public class Reservation {
         return this.time.isSameTime(time);
     }
 
-    public void changePendingToPaid() {
+    public void changePendingToPaid(Payment payment) {
         if (this.reservationStatus != ReservationStatus.PENDING) {
             throw new IllegalStateException("현재 예약의 상태를 변경할 수 없습니다. 현재 상태 : " + this.reservationStatus);
         }
+        this.payment = payment;
         this.reservationStatus = ReservationStatus.PAID;
     }
 

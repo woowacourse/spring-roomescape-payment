@@ -2,6 +2,7 @@ package roomescape.payment.service;
 
 import org.springframework.stereotype.Service;
 import roomescape.payment.client.TossPaymentClient;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.request.TossPaymentConfirmRequest;
 import roomescape.payment.dto.response.TossPaymentResponse;
 import roomescape.reservation.domain.ReservationRepository;
@@ -19,7 +20,7 @@ public class PaymentService {
 
     public void confirmAndSavePayment(TossPaymentConfirmRequest request, long reservationId) {
         TossPaymentResponse tossPaymentResponse = paymentClient.confirmPayment(request);
-        paymentTransactionService.savePayment(tossPaymentResponse);
-        paymentTransactionService.confirmReservation(reservationId);
+        Payment payment = paymentTransactionService.savePayment(tossPaymentResponse);
+        paymentTransactionService.confirmReservation(reservationId, payment);
     }
 }

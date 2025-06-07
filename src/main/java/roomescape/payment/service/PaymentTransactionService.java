@@ -21,13 +21,13 @@ public class PaymentTransactionService {
         this.paymentRepository = paymentRepository;
     }
 
-    public void savePayment(final TossPaymentResponse response) {
+    public Payment savePayment(final TossPaymentResponse response) {
         Payment payment = new Payment(response.orderId(), response.approvedAt().toLocalDateTime(), response.totalAmount(), PaymentStatus.DONE, response.paymentKey());
-        paymentRepository.save(payment);
+        return paymentRepository.save(payment);
     }
 
-    public void confirmReservation(long reservationId) {
+    public void confirmReservation(long reservationId, Payment payment) {
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new IllegalArgumentException("예약을 찾을 수 없습니다. id : " + reservationId));
-        reservation.changePendingToPaid();
+        reservation.changePendingToPaid(payment);
     }
 }
