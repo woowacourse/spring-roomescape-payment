@@ -20,6 +20,7 @@ import roomescape.infrastructure.db.ThemeJpaRepository;
 import roomescape.infrastructure.db.TossPaymentJpaRepository;
 import roomescape.infrastructure.jwt.JjwtJwtTokenProvider;
 import roomescape.model.Member;
+import roomescape.model.PaymentTargetType;
 import roomescape.model.Reservation;
 import roomescape.model.ReservationTicket;
 import roomescape.model.ReservationTime;
@@ -74,7 +75,8 @@ class MemberReservationTicketAcceptanceTest {
                         "paymentKey",
                         "orderId",
                         1000L,
-                        savedReservationTicket
+                        savedReservationTicket.getId(),
+                        PaymentTargetType.RESERVATION_TICKET
                 ));
 
         String token = jjwtJwtTokenProvider.createToken(savedMember.getEmail());

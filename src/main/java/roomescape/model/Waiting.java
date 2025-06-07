@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Waiting {
+public class Waiting implements PaymentTarget {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import roomescape.common.exception.NotFoundException;
 import roomescape.infrastructure.db.TossPaymentJpaRepository;
+import roomescape.model.PaymentTargetType;
 import roomescape.model.ReservationTicket;
 import roomescape.model.TossPayment;
 
@@ -20,7 +21,8 @@ public class TossPaymentRepositoryImpl implements TossPaymentRepository {
 
     @Override
     public TossPayment findForReservationTicket(ReservationTicket reservationTicket) {
-        return tossPaymentJpaRepository.findByReservationTicketId(reservationTicket.getId())
+        return tossPaymentJpaRepository.findByTargetIdAndPaymentTargetType(reservationTicket.getId(),
+                        PaymentTargetType.RESERVATION_TICKET)
                 .orElseThrow(() -> new NotFoundException("예약에 해당하는 결제 내역이 존재하지 않습니다."));
     }
 }

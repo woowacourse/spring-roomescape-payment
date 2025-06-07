@@ -2,11 +2,11 @@ package roomescape.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,14 +28,17 @@ public class TossPayment {
     @Column(nullable = false)
     private Long amount;
 
-    @OneToOne
-    @JoinColumn(name = "reservation_ticket_id", nullable = false)
-    private ReservationTicket reservationTicket;
+    Long targetId;
 
-    public TossPayment(String paymentKey, String orderId, Long amount, ReservationTicket reservationTicket) {
+    @Enumerated(EnumType.STRING)
+    private PaymentTargetType paymentTargetType;
+
+    public TossPayment(String paymentKey, String orderId, Long amount, Long targetId,
+                       PaymentTargetType paymentTargetType) {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
-        this.reservationTicket = reservationTicket;
+        this.targetId = targetId;
+        this.paymentTargetType = paymentTargetType;
     }
 }

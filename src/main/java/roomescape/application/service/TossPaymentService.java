@@ -11,6 +11,7 @@ import roomescape.common.exception.PaymentClientException;
 import roomescape.dto.request.TossPaymentConfirmDto;
 import roomescape.dto.request.TossPaymentRequestDto;
 import roomescape.dto.response.TossPaymentConfirmResponseDto;
+import roomescape.model.PaymentTargetType;
 import roomescape.model.ReservationTicket;
 import roomescape.model.TossPayment;
 import roomescape.persistence.repository.TossPaymentRepository;
@@ -35,7 +36,8 @@ public class TossPaymentService {
                 tossPaymentRequestDto.paymentKey(),
                 tossPaymentRequestDto.orderId(),
                 tossPaymentRequestDto.amount(),
-                reservationTicket
+                reservationTicket.getId(),
+                PaymentTargetType.RESERVATION_TICKET
         );
 
         TossPaymentConfirmDto tossPaymentConfirmDto = new TossPaymentConfirmDto(

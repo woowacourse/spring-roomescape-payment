@@ -18,6 +18,7 @@ import roomescape.infrastructure.db.ThemeJpaRepository;
 import roomescape.infrastructure.db.TossPaymentJpaRepository;
 import roomescape.infrastructure.db.WaitingJpaRepository;
 import roomescape.model.Member;
+import roomescape.model.PaymentTargetType;
 import roomescape.model.Reservation;
 import roomescape.model.ReservationTicket;
 import roomescape.model.ReservationTime;
@@ -101,7 +102,8 @@ class ReservationTicketServiceTest extends ServiceTest {
                         "paymentKey",
                         "orderId",
                         1000L,
-                        savedReservationTicket
+                        savedReservationTicket.getId(),
+                        PaymentTargetType.RESERVATION_TICKET
                 ));
 
         LoginMember loginMember = new LoginMember(member);
