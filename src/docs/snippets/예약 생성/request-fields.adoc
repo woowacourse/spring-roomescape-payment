@@ -1,0 +1,28 @@
+|===
+|Path|Type|Description
+
+|`+date+`
+|`+String+`
+|예약 날짜
+
+|`+themeId+`
+|`+Number+`
+|테마 아이디
+
+|`+timeId+`
+|`+Number+`
+|예약 시간 아이디
+
+|`+paymentKey+`
+|`+String+`
+|결제 키
+
+|`+orderId+`
+|`+String+`
+|주문 아이디
+
+|`+amount+`
+|`+Number+`
+|결제 금액
+
+|===

@@ -1,0 +1,14 @@
+[source,bash]
+----
+$ curl 'http://docs.api.com/reservations' -i -X POST \
+    -H 'Content-Type: application/json' \
+    -H 'Accept: application/json' \
+    -d '{
+  "date" : "2025-06-08",
+  "themeId" : 1,
+  "timeId" : 1,
+  "paymentKey" : "payKey",
+  "orderId" : "orderId",
+  "amount" : 1000
+}'
+----
