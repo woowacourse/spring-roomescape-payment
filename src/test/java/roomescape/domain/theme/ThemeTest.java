@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import roomescape.exception.BusinessRuleViolationException;
+import roomescape.exception.InvalidInputException;
 
 class ThemeTest {
 
@@ -50,7 +51,7 @@ class ThemeTest {
 
         // when & then
         assertThatThrownBy(() -> Theme.register(name, description, thumbnail))
-                .isInstanceOf(BusinessRuleViolationException.class)
+                .isInstanceOf(InvalidInputException.class)
                 .hasMessage("테마 이름은 null이거나 공백일 수 없습니다.");
     }
 
@@ -64,7 +65,7 @@ class ThemeTest {
 
         // when & then
         assertThatThrownBy(() -> Theme.register(name, description, thumbnail))
-                .isInstanceOf(BusinessRuleViolationException.class)
+                .isInstanceOf(InvalidInputException.class)
                 .hasMessage("테마 설명은 null이거나 공백일 수 없습니다.");
     }
 
@@ -78,7 +79,7 @@ class ThemeTest {
 
         // when & then
         assertThatThrownBy(() -> Theme.register(name, description, thumbnail))
-                .isInstanceOf(BusinessRuleViolationException.class)
+                .isInstanceOf(InvalidInputException.class)
                 .hasMessage("썸네일은 null이거나 공백일 수 없습니다.");
     }
 

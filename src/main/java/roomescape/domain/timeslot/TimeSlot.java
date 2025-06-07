@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import roomescape.exception.BusinessRuleViolationException;
+import roomescape.exception.InvalidInputException;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -48,7 +48,7 @@ public class TimeSlot {
 
     private void validateStartAt(LocalTime startAt) {
         if (startAt == null) {
-            throw new BusinessRuleViolationException("시간은 null일 수 없습니다.");
+            throw new InvalidInputException("시간은 null일 수 없습니다.");
         }
     }
 }

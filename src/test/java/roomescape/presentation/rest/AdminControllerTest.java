@@ -56,10 +56,7 @@ class AdminControllerTest {
                     fieldWithPath("date").description("예약 날짜 (YYYY-MM-DD)"),
                     fieldWithPath("timeId").description("시간 ID"),
                     fieldWithPath("themeId").description("테마 ID"),
-                    fieldWithPath("memberId").description("사용자 ID"),
-                    fieldWithPath("paymentKey").description("결제 요청 key"),
-                    fieldWithPath("orderId").description("주문 ID"),
-                    fieldWithPath("amount").description("결제 금액")
+                    fieldWithPath("userId").description("사용자 ID")
             };
 
             FieldDescriptor[] responseFields = {

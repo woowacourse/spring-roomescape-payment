@@ -16,6 +16,7 @@ import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.user.User;
 import roomescape.domain.user.UserRole;
 import roomescape.exception.BusinessRuleViolationException;
+import roomescape.exception.InvalidInputException;
 
 class WaitingTest {
 
@@ -45,7 +46,7 @@ class WaitingTest {
 
         // when & then
         assertThatThrownBy(() -> Waiting.register(user, date, timeSlot, theme))
-                .isInstanceOf(BusinessRuleViolationException.class)
+                .isInstanceOf(InvalidInputException.class)
                 .hasMessage("사용자 정보는 null일 수 없습니다.");
     }
 
@@ -60,7 +61,7 @@ class WaitingTest {
 
         // when & then
         assertThatThrownBy(() -> Waiting.register(user, date, timeSlot, theme))
-                .isInstanceOf(BusinessRuleViolationException.class)
+                .isInstanceOf(InvalidInputException.class)
                 .hasMessage("예약 날짜는 null일 수 없습니다.");
     }
 
@@ -75,7 +76,7 @@ class WaitingTest {
 
         // when & then
         assertThatThrownBy(() -> Waiting.register(user, date, timeSlot, theme))
-                .isInstanceOf(BusinessRuleViolationException.class)
+                .isInstanceOf(InvalidInputException.class)
                 .hasMessage("시간 정보는 null일 수 없습니다.");
     }
 
@@ -90,7 +91,7 @@ class WaitingTest {
 
         // when & then
         assertThatThrownBy(() -> Waiting.register(user, date, timeSlot, theme))
-                .isInstanceOf(BusinessRuleViolationException.class)
+                .isInstanceOf(InvalidInputException.class)
                 .hasMessage("테마 정보는 null일 수 없습니다.");
     }
 

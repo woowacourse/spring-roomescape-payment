@@ -10,6 +10,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import roomescape.exception.BusinessRuleViolationException;
+import roomescape.exception.InvalidInputException;
 
 class PaymentTest {
 
@@ -24,7 +25,7 @@ class PaymentTest {
 
         // when & then
         assertThatThrownBy(() -> Payment.register(paymentKey, orderId, orderName, amount))
-                .isInstanceOf(BusinessRuleViolationException.class)
+                .isInstanceOf(InvalidInputException.class)
                 .hasMessage("결제 요청 번호는 null이거나 공백일 수 없습니다.");
     }
 
@@ -39,7 +40,7 @@ class PaymentTest {
 
         // when & then
         assertThatThrownBy(() -> Payment.register(paymentKey, orderId, orderName, amount))
-                .isInstanceOf(BusinessRuleViolationException.class)
+                .isInstanceOf(InvalidInputException.class)
                 .hasMessage("주문 번호는 null이거나 공백일 수 없습니다.");
     }
 
@@ -54,7 +55,7 @@ class PaymentTest {
 
         // when & then
         assertThatThrownBy(() -> Payment.register(paymentKey, orderId, orderName, amount))
-                .isInstanceOf(BusinessRuleViolationException.class)
+                .isInstanceOf(InvalidInputException.class)
                 .hasMessage("주문 이름은 null이거나 공백일 수 없습니다.");
     }
 
@@ -69,7 +70,7 @@ class PaymentTest {
 
         // when & then
         assertThatThrownBy(() -> Payment.register(paymentKey, orderId, orderName, amount))
-                .isInstanceOf(BusinessRuleViolationException.class)
+                .isInstanceOf(InvalidInputException.class)
                 .hasMessage("결제 금액은 null일 수 없습니다.");
     }
 

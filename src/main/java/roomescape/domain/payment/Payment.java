@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import roomescape.exception.BusinessRuleViolationException;
+import roomescape.exception.InvalidInputException;
 
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -89,25 +90,25 @@ public class Payment {
 
     private void validatePaymentKey(final String paymentKey) {
         if (paymentKey == null || paymentKey.isBlank()) {
-            throw new BusinessRuleViolationException("결제 요청 번호는 null이거나 공백일 수 없습니다.");
+            throw new InvalidInputException("결제 요청 번호는 null이거나 공백일 수 없습니다.");
         }
     }
 
     private void validateOrderId(final String orderId) {
         if (orderId == null || orderId.isBlank()) {
-            throw new BusinessRuleViolationException("주문 번호는 null이거나 공백일 수 없습니다.");
+            throw new InvalidInputException("주문 번호는 null이거나 공백일 수 없습니다.");
         }
     }
 
     private void validateOrderName(final String orderName) {
         if (orderName == null || orderName.isBlank()) {
-            throw new BusinessRuleViolationException("주문 이름은 null이거나 공백일 수 없습니다.");
+            throw new InvalidInputException("주문 이름은 null이거나 공백일 수 없습니다.");
         }
     }
 
     private void validateAmount(final Long amount) {
         if (amount == null) {
-            throw new BusinessRuleViolationException("결제 금액은 null일 수 없습니다.");
+            throw new InvalidInputException("결제 금액은 null일 수 없습니다.");
         }
         if (amount < 0) {
             throw new BusinessRuleViolationException("결제 금액은 음수일 수 없습니다.");
@@ -116,7 +117,7 @@ public class Payment {
 
     private void validateStatus(final PaymentStatus status) {
         if (status == null) {
-            throw new BusinessRuleViolationException("결제 상태는 null일 수 없습니다.");
+            throw new InvalidInputException("결제 상태는 null일 수 없습니다.");
         }
     }
 }

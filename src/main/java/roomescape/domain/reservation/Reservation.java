@@ -19,6 +19,7 @@ import roomescape.domain.theme.Theme;
 import roomescape.domain.timeslot.TimeSlot;
 import roomescape.domain.user.User;
 import roomescape.exception.BusinessRuleViolationException;
+import roomescape.exception.InvalidInputException;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -70,25 +71,25 @@ public abstract class Reservation {
 
     private void validateDate(final LocalDate date) {
         if (date == null) {
-            throw new BusinessRuleViolationException("예약 날짜는 null일 수 없습니다.");
+            throw new InvalidInputException("예약 날짜는 null일 수 없습니다.");
         }
     }
 
     private void validateTimeSlot(final TimeSlot timeSlot) {
         if (timeSlot == null) {
-            throw new BusinessRuleViolationException("시간 정보는 null일 수 없습니다.");
+            throw new InvalidInputException("시간 정보는 null일 수 없습니다.");
         }
     }
 
     private void validateTheme(final Theme theme) {
         if (theme == null) {
-            throw new BusinessRuleViolationException("테마 정보는 null일 수 없습니다.");
+            throw new InvalidInputException("테마 정보는 null일 수 없습니다.");
         }
     }
 
     private void validateUser(final User user) {
         if (user == null) {
-            throw new BusinessRuleViolationException("사용자 정보는 null일 수 없습니다.");
+            throw new InvalidInputException("사용자 정보는 null일 수 없습니다.");
         }
     }
 }
