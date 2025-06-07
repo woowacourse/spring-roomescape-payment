@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
                 description = "미미의 방탈출 미션 API 문서입니다.",
                 version = "v1"),
         servers = {
-                @Server(url = "https://배포하고 수정해야", description = "실서버")
+                @Server(url = "http://3.35.170.214:8080/swagger-ui.html", description = "실서버")
         }
 )
 @Configuration
