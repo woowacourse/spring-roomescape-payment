@@ -69,14 +69,17 @@ public class ReservationService {
 
     private List<ReservationWithStatusResponse> findReservationByMemberId(Long memberId) {
         return reservationRepository.findByMemberId(memberId).stream()
-                .map(ReservationWithStatusResponse::from)
+                .map(reservation -> {
+                    Payment payment = paymentService.findPaymentByReservationId(reservation.getId());
+                    return ReservationWithStatusResponse.of(reservation, payment);
+                })
                 .toList();
     }
 
     private List<ReservationWithStatusResponse> findWaitingByMemberId(Long memberId) {
         return waitingRepository.findByMemberIdSortedByCreateAt(memberId)
                 .stream()
-                .map(ReservationWithStatusResponse::from)
+                .map(ReservationWithStatusResponse::of)
                 .toList();
     }
 

@@ -1,6 +1,7 @@
 package roomescape.dto.response;
 
 import java.time.LocalDate;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.Status;
 import roomescape.domain.WaitingWithRank;
@@ -11,21 +12,24 @@ public record ReservationWithStatusResponse(
         LocalDate date,
         ReservationTimeResponse time,
         String themeName,
-        String status
+        String status,
+        PaymentResponse payment
 ) {
-    public static ReservationWithStatusResponse from(Reservation reservation) {
-        ReservationTimeResponse dto = ReservationTimeResponse.from(reservation.getReservationTime());
+    public static ReservationWithStatusResponse of(Reservation reservation, Payment payment) {
+        ReservationTimeResponse timeDto = ReservationTimeResponse.from(reservation.getReservationTime());
+        PaymentResponse paymentDto = PaymentResponse.from(payment);
         return new ReservationWithStatusResponse(
                 reservation.getId(),
                 reservation.getMember().getName(),
                 reservation.getDate(),
-                dto,
+                timeDto,
                 reservation.getTheme().getName(),
-                Status.CONFIRMED.toString()
+                Status.CONFIRMED.toString(),
+                paymentDto
         );
     }
 
-    public static ReservationWithStatusResponse from(WaitingWithRank waitingWithRank) {
+    public static ReservationWithStatusResponse of(WaitingWithRank waitingWithRank) {
         ReservationTimeResponse dto = ReservationTimeResponse.from(waitingWithRank.waiting().getReservationTime());
         return new ReservationWithStatusResponse(
                 waitingWithRank.waiting().getId(),
@@ -33,7 +37,8 @@ public record ReservationWithStatusResponse(
                 waitingWithRank.waiting().getDate(),
                 dto,
                 waitingWithRank.waiting().getTheme().getName(),
-                String.format("%d번째 예약대기", waitingWithRank.rank())
+                String.format("%d번째 예약대기", waitingWithRank.rank()),
+                null
         );
     }
 }
