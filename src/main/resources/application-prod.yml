@@ -32,4 +32,4 @@ logging:
   level:
     root: info
   file:
-    path: /var/log/roomEscape
+    path: ./logs
