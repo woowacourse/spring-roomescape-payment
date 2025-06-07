@@ -2,7 +2,6 @@ package roomescape.presentation.rest;
 
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
 
 import jakarta.validation.Valid;
 import java.time.LocalDate;
@@ -34,8 +33,8 @@ public class ReservationController {
     @PostMapping
     @ResponseStatus(CREATED)
     public ReservationResponse reserve(
-            final AuthenticationInfo authenticationInfo,
-            @RequestBody @Valid final CreateReservationRequest request
+        final AuthenticationInfo authenticationInfo,
+        @RequestBody @Valid final CreateReservationRequest request
     ) {
         var reservation = reservationService.reserve(authenticationInfo.id(), request.date(), request.timeId(), request.themeId());
         return ReservationResponse.from(reservation);
@@ -44,20 +43,20 @@ public class ReservationController {
     @PostMapping("/wait")
     @ResponseStatus(CREATED)
     public ReservationResponse waitFor(
-            final AuthenticationInfo authenticationInfo,
-            @RequestBody @Valid final CreateReservationRequest request
+        final AuthenticationInfo authenticationInfo,
+        @RequestBody @Valid final CreateReservationRequest request
     ) {
-        var reservation = reservationService.waitFor(authenticationInfo.id(), request.date(), request.timeId(), request.themeId());
+        var reservation = reservationService.waitFor(authenticationInfo.id(), request.date(),
+            request.timeId(), request.themeId());
         return ReservationResponse.from(reservation);
     }
 
     @GetMapping
-    @ResponseStatus(OK)
     public List<ReservationResponse> getAllReservations(
-            @RequestParam(name = "themeId", required = false) final Long themeId,
-            @RequestParam(name = "userId", required = false) final Long userId,
-            @RequestParam(name = "dateFrom", required = false) final LocalDate dateFrom,
-            @RequestParam(name = "dateTo", required = false) final LocalDate dateTo
+        @RequestParam(name = "themeId", required = false) final Long themeId,
+        @RequestParam(name = "userId", required = false) final Long userId,
+        @RequestParam(name = "dateFrom", required = false) final LocalDate dateFrom,
+        @RequestParam(name = "dateTo", required = false) final LocalDate dateTo
     ) {
         var searchFilter = new ReservationSearchFilter(themeId, userId, dateFrom, dateTo);
         var reservations = reservationService.findAllReservations(searchFilter);
@@ -70,7 +69,7 @@ public class ReservationController {
         final AuthenticationInfo authenticationInfo,
         @PathVariable("id") final long id
     ) {
-        if (!authenticationInfo.isAdmin()) {
+        if (authenticationInfo.isNotAdmin()) {
             throw new AuthorizationException("관리자에게만 허용된 작업입니다.");
         }
         reservationService.removeById(id);

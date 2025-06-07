@@ -10,4 +10,8 @@ public record AuthenticationInfo(
     public boolean isAdmin() {
         return UserRole.ADMIN == this.role;
     }
+
+    public boolean isNotAdmin() {
+        return !isAdmin();
+    }
 }
