@@ -127,4 +127,44 @@ class ReservationSlotTest {
                 .isInstanceOf(ReservationNotFoundException.class)
                 .hasMessageContaining("예약이 존재하지 않습니다.");
     }
+
+    @Test
+    void findPaymentPendingReservation_whenValidParameters_returnReservation() {
+        // given
+        Member member2 = new Member("phree", "phree@gmail.com", "password", MemberRole.REGULAR);
+        Reservation confirmedReservation = reservationSlot.addReservation(member, NOW_DATETIME);
+        Reservation waitingReservation = reservationSlot.addReservation(member2, NOW_DATETIME);
+        reservationSlot.getReservations().remove(confirmedReservation);
+        waitingReservation.toPaymentPending();
+
+        // when & then
+        assertThat(reservationSlot.findPaymentPendingReservation()).isEqualTo(waitingReservation);
+    }
+
+    @Test
+    void findPaymentPendingReservation_whenReservationsNotExist_throwsException() {
+        // given
+
+        // when & then
+        assertThatThrownBy(reservationSlot::findPaymentPendingReservation)
+                .isInstanceOf(ReservationNotFoundException.class)
+                .hasMessageContaining("예약이 존재하지 않습니다.");
+    }
+
+    @Test
+    void checkIfConfirmedReservationExists_whenConfirmedReservationExist_returnTrue() {
+        // given
+        reservationSlot.addReservation(member, NOW_DATETIME);
+
+        // when & then
+        assertThat(reservationSlot.isConfirmedReservationExist()).isTrue();
+    }
+
+    @Test
+    void checkIfConfirmedReservationExists_whenConfirmedReservationNotExist_returnFalse() {
+        // given
+
+        // when & then
+        assertThat(reservationSlot.isConfirmedReservationExist()).isFalse();
+    }
 }
