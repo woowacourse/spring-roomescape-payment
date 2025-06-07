@@ -1,0 +1,7 @@
+== Member API
+
+=== 회원 가입
+operation::member-controller-docs-test/sign-up[snippets='curl-request,http-request,http-response']
+
+=== 전체 회원 조회
+operation::member-controller-docs-test/find-all-users[snippets='curl-request,http-request,http-response']

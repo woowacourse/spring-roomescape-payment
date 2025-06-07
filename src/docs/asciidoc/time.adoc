@@ -1,0 +1,13 @@
+== ReservationTime API
+
+=== 전체 시간 조회
+operation::reservation-time-controller-docs-test/get-reservation-times[snippets='curl-request,http-request,http-response']
+
+=== 특정 시간 정보 조회
+operation::reservation-time-controller-docs-test/get-available-reservation-times[snippets='curl-request,http-request,http-response']
+
+=== 새로운 시간 생성
+operation::reservation-time-controller-docs-test/create-reservation-time[snippets='curl-request,http-request,http-response']
+
+=== 시간 삭제
+operation::reservation-time-controller-docs-test/delete-reservation-times[snippets='curl-request,http-request,http-response']
