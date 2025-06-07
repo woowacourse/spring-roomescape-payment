@@ -29,15 +29,17 @@ public class TossPaymentProvider implements PaymentProvider {
     public Payment confirm(final PaymentRequest request) {
         for (int tried = 1; tried <= properties.connectionTryCount(); tried++) {
             try {
-                var successResponse = restTemplate.postForObject(properties.confirmUri(), request, TossSuccessResponse.class);
-                return new Payment(successResponse.paymentKey, successResponse.totalAmount);
+                var response = restTemplate.postForObject(properties.confirmUri(), request, TossSuccessResponse.class);
+                logger.info("토스 결제 승인에 성공했습니다. request = {}, response = {}", request, response);
+                return new Payment(response.paymentKey, response.totalAmount);
 
             } catch (RestClientResponseException e) {
-                var failResponse = readTossFailureResponse(e);
-                throw newPaymentFailedException(failResponse.code, failResponse.message);
+                var response = readTossFailureResponse(e);
+                logger.info("토스 결제 승인에 실패했습니다. request = {}, response = {}", request, response);
+                throw newPaymentFailedException(response.code, response.message);
 
             } catch (ResourceAccessException e) {
-                logger.error(e.getMessage());
+                logger.warn("토스 결제 승인 API 연결에 실패했습니다. request = {}, exception = {}", request, e.toString());
             }
         }
 
