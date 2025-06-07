@@ -172,9 +172,9 @@ VALUES
 ('2025-05-24', 2, 2, 1);
 
 -- payment 예시: reservation_id = 1에 대한 결제
-INSERT INTO payment(payment_key, order_id, amount, reservation_id)
-VALUES ('payment-key-001', 'order-001', 1000, 1);
+INSERT INTO payment(payment_key, order_id, amount, reservation_id, status)
+VALUES ('payment-key-001', 'order-001', 1000, 1, 'COMPLETED');
 
 -- reservation_id = 2에 대한 결제
-INSERT INTO payment(payment_key, order_id, amount, reservation_id)
-VALUES ('payment-key-002', 'order-002', 1000, 2);
+INSERT INTO payment(payment_key, order_id, amount, reservation_id, status)
+VALUES ('payment-key-002', 'order-002', 1000, 2, 'COMPLETED');

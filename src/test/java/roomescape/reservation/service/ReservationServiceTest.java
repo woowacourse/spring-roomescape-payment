@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.global.exception.ConflictException;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.dto.ReservationInfo;
 import roomescape.reservation.domain.dto.ReservationRequestDto;
 import roomescape.reservation.fixture.ReservationFixture;
@@ -158,7 +159,7 @@ class ReservationServiceTest {
                 reservationService.cancelReservationAndReturnInfo(savedReservation.getId());
 
                 // then
-                Assertions.assertThat(reservationRepository.findAll()).hasSize(0);
+                Assertions.assertThat(reservationRepository.findById(savedReservation.getId()).get().getStatus()).isEqualTo(ReservationStatus.CANCELLED);
             }
         }
     }
@@ -199,7 +200,7 @@ class ReservationServiceTest {
             reservationService.approveWaiting(reservationInfo);
 
             // then
-            Assertions.assertThat(reservationRepository.findAll()).hasSize(1);
+            Assertions.assertThat(reservationRepository.findById(reservation.getId()).get().getStatus()).isEqualTo(ReservationStatus.CANCELLED);
             Assertions.assertThat(waitingRepository.findAll()).hasSize(1);
             Assertions.assertThat(savedWaiting1.getDate()).isEqualTo(reservation.getDate());
         }

@@ -1,5 +1,6 @@
 package roomescape.facade;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.facade.dto.ReservationWithPaymentResponseDto;
@@ -13,15 +14,11 @@ import roomescape.reservation.service.ReservationService;
 import roomescape.user.domain.User;
 
 @Service
+@RequiredArgsConstructor
 public class ReservationPaymentFacade {
 
     private final ReservationService reservationService;
     private final PaymentService tossPaymentService;
-
-    public ReservationPaymentFacade(ReservationService reservationService, PaymentService tossPaymentService) {
-        this.reservationService = reservationService;
-        this.tossPaymentService = tossPaymentService;
-    }
 
     @Transactional
     public ReservationWithPaymentResponseDto addWithPayment(ReservationWithPaymentDto requestDto, User user) {

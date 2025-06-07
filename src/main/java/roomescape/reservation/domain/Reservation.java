@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
 import roomescape.reservation.exception.InvalidReservationTimeException;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 @Table(name = "reservation")
 public class Reservation {
 
@@ -90,27 +92,7 @@ public class Reservation {
         return LocalDateTime.of(date, reservationTime.getStartAt());
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public LocalDate getDate() {
-        return date;
-    }
-
-    public ReservationStatus getStatus() {
-        return status;
-    }
-
-    public ReservationTime getReservationTime() {
-        return reservationTime;
-    }
-
-    public Theme getTheme() {
-        return theme;
-    }
-
-    public User getUser() {
-        return user;
+    public void changeStatus(ReservationStatus reservationStatus) {
+        this.status = reservationStatus;
     }
 }

@@ -3,7 +3,9 @@ package roomescape.reservation.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.admin.domain.dto.SearchReservationRequestDto;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.dto.ReservationInfo;
 import roomescape.reservation.domain.dto.ReservationRequestDto;
 import roomescape.reservation.domain.dto.ReservationResponseDto;
@@ -32,17 +34,20 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentService paymentService;
 
     public ReservationService(
             ReservationRepository reservationRepository,
             ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository,
-            WaitingRepository waitingRepository
+            WaitingRepository waitingRepository,
+            PaymentService paymentService
     ) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentService = paymentService;
     }
 
     public List<ReservationResponseDto> findAll() {
@@ -63,7 +68,8 @@ public class ReservationService {
     @Transactional
     public ReservationInfo cancelReservationAndReturnInfo(Long id) {
         Reservation oldReservation = findByIdOrThrow(id);
-        reservationRepository.deleteById(id);
+        paymentService.cancelPaymentByReservation(oldReservation);
+        oldReservation.changeStatus(ReservationStatus.CANCELLED);
         return new ReservationInfo(oldReservation.getDate(), oldReservation.getReservationTime(), oldReservation.getTheme());
     }
 
