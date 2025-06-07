@@ -56,25 +56,27 @@ public class ReservationService {
         final ReservationTime reservationTime = reservationTimeRepository.getById(request.timeId());
         final Theme theme = themeRepository.getById(request.themeId());
         final Payment payment = Payment.of(request.paymentKey(), request.orderId(), request.amount());
+        final Member member = Member.from(loginMember);
+        validateAlreadyBookedMember(request, reservationTime, theme, member);
 
         paymentClient.approvePayment(
                 new PaymentApprovalRequest(request.paymentKey(), request.orderId(), request.amount()));
 
         if (reservationRepository.existsByDateAndTimeAndTheme(request.date(), reservationTime, theme)) {
             return new ReservationResponse(
-                    waitingReservation(request.date(), reservationTime, theme, loginMember, payment));
+                    waitingReservation(request.date(), reservationTime, theme, member, payment));
         }
-        return new ReservationResponse(bookedReservation(request.date(), reservationTime, theme, loginMember, payment));
+        return new ReservationResponse(bookedReservation(request.date(), reservationTime, theme, member, payment));
+    }
+
+    private void validateAlreadyBookedMember(ReservationRequest request, ReservationTime reservationTime, Theme theme, Member member) {
+        if (reservationRepository.existsByDateAndTimeAndThemeAndMember(request.date(), reservationTime, theme, member)) {
+            throw new IllegalArgumentException("이미 예약한 사용자입니다.");
+        }
     }
 
     private Reservation waitingReservation(LocalDate date, ReservationTime reservationTime,
-            Theme theme, LoginMember loginMember, Payment payment) {
-        final Member member = Member.from(loginMember);
-        // TODO 예외처리 위치 이동
-        // TODO PaymentApprovalRequest 패키지 변경
-        if (reservationRepository.existsByDateAndTimeAndThemeAndMember(date, reservationTime, theme, member)) {
-            throw new IllegalArgumentException("이미 예약한 사용자입니다.");
-        }
+            Theme theme, Member member, Payment payment) {
         Long lastWaitingRank = reservationRepository.getLastWaitingRank(theme, date, reservationTime).orElse(0L);
         Reservation reservation = Reservation.waiting(date, reservationTime, theme, member, LocalDateTime.now(clock),
                 lastWaitingRank + 1);
@@ -84,8 +86,7 @@ public class ReservationService {
     }
 
     private Reservation bookedReservation(LocalDate date, ReservationTime reservationTime,
-            Theme theme, LoginMember loginMember, Payment payment) {
-        final Member member = Member.from(loginMember);
+            Theme theme, Member member, Payment payment) {
         Reservation reservation = Reservation.booked(date, reservationTime, theme, member, LocalDateTime.now(clock));
         reservation.pay(payment);
 
