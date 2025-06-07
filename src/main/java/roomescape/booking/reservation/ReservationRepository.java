@@ -9,6 +9,7 @@ import roomescape.reservationtime.ReservationTime;
 import roomescape.schedule.Schedule;
 import roomescape.theme.Theme;
 
+
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     List<Reservation> findAllBySchedule_ThemeAndSchedule_Date(Theme theme, LocalDate date);
 
@@ -30,4 +31,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
                 WHERE m.email = :email
             """)
     List<ReservationPayment> findReservationPaymentsByMember_Email(String email);
+
+    List<Reservation> findAllByMember_Email(String email);
 }

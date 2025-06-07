@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 import roomescape.member.Member;
 import roomescape.schedule.Schedule;
 
+
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter

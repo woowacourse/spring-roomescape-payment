@@ -32,6 +32,7 @@ public class Reservation {
     @ManyToOne
     private Schedule schedule;
 
+
     @OneToOne(fetch = FetchType.LAZY)
     private Order order;
 
@@ -39,5 +40,6 @@ public class Reservation {
         this.member = member;
         this.schedule = schedule;
         this.order = order;
+
     }
 }
