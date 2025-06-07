@@ -1,0 +1,40 @@
+== 예약(Reservation) API 목록
+
+'''
+=== 예약 추가 API (POST /reservations)
+
+operation::reservation-api-test/create[snippets='curl-request,http-request,http-response']
+
+'''
+
+=== 어드민 예약 생성 API (POST /admin/reservations)
+
+operation::reservation-api-test/create-by-admin[snippets='curl-request,http-request,http-response']
+
+
+'''
+
+=== 예약 취소 API (DELETE /reservations/+{id}+)
+
+operation::reservation-api-test/delete[snippets='curl-request,http-request,http-response']
+
+
+'''
+
+=== 어드민 예약 목록 조회 API (GET /reservations)
+
+operation::reservation-api-test/find-all[snippets='curl-request,http-request,http-response']
+
+
+'''
+
+=== 내 예약 목록 조회 API (GET /me/reservations)
+
+operation::reservation-api-test/find-all-my-reservations[snippets='curl-request,http-request,http-response']
+
+
+'''
+
+=== 어드민 필터 예약 목록 조회 API (GET /admin/reservations?)
+
+operation::reservation-api-test/find-filtered[snippets='curl-request,http-request,http-response']

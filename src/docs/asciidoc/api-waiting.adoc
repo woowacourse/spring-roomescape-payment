@@ -1,0 +1,24 @@
+== 예약 대기(Waiting) API 목록
+
+'''
+=== 예약 대기 생성 API (POST /waitings)
+
+operation::waiting-api-test/create[snippets='curl-request,http-request,http-response']
+
+'''
+
+=== 어드민 예약 대기 목록 조회 API (GET /admin/waitings)
+
+operation::admin-waiting-api-test/find-all[snippets='curl-request,http-request,http-response']
+
+'''
+
+=== 내 예약 대기 취소 API (GET /waitings/+{id}+)
+
+operation::waiting-api-test/delete[snippets='curl-request,http-request,http-response']
+
+'''
+
+=== 어드민 예약 대기 거절 API (DELETE /admin/waitings/+{id}+)
+
+operation::admin-waiting-api-test/delete[snippets='curl-request,http-request,http-response']

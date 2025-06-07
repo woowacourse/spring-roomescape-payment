@@ -1,0 +1,24 @@
+== 테마(theme) API 목록
+
+'''
+=== 테마 추가 API (POST /themes)
+
+operation::theme-api-test/create[snippets='curl-request,http-request,http-response']
+
+'''
+
+=== 테마 목록 조회 API (GET /themes)
+
+operation::theme-api-test/find-all[snippets='curl-request,http-request,http-response']
+
+'''
+
+=== 인기 테마 목록 조회 API (GET /popular-themes)
+
+operation::theme-api-test/find-popular-themes[snippets='curl-request,http-request,http-response']
+
+'''
+
+=== 테마 삭제 API (DELETE /themes/+{id}+)
+
+operation::theme-api-test/delete[snippets='curl-request,http-request,http-response']
