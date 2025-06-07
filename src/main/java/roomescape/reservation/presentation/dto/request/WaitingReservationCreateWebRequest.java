@@ -12,13 +12,13 @@ public record WaitingReservationCreateWebRequest (
 ) {
     public WaitingReservationCreateWebRequest {
             if (date == null) {
-                throw new IllegalArgumentException("³¯Â¥´Â ¹Ýµå½Ã ÀÔ·ÂÇØ¾ßÇÕ´Ï´Ù.");
+                throw new IllegalArgumentException("ë‚ ì§œëŠ” ë°˜ë“œì‹œ ìž…ë ¥í•´ì•¼í•©ë‹ˆë‹¤.");
             }
             if (timeId == null) {
-                throw new IllegalArgumentException("timeId´Â ¹Ýµå½Ã ÀÔ·ÂÇØ¾ßÇÕ´Ï´Ù.");
+                throw new IllegalArgumentException("timeIdëŠ” ë°˜ë“œì‹œ ìž…ë ¥í•´ì•¼í•©ë‹ˆë‹¤.");
             }
             if (themeId == null) {
-                throw new IllegalArgumentException("themeId´Â ¹Ýµå½Ã ÀÔ·ÂÇØ¾ßÇÕ´Ï´Ù.");
+                throw new IllegalArgumentException("themeIdëŠ” ë°˜ë“œì‹œ ìž…ë ¥í•´ì•¼í•©ë‹ˆë‹¤.");
             }
         }
     }
