@@ -32,3 +32,5 @@ toss:
     timeout:
       connect: 2
       read: 30
+    path:
+      confirm: /payments/confirm

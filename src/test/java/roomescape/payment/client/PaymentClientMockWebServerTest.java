@@ -20,6 +20,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class PaymentClientMockWebServerTest {
 
+    private static final String PATH = "/test-payment-path-not-real";
+
     private MockWebServer mockWebServer;
     private TossPaymentClient paymentClient;
     private ObjectMapper objectMapper;
@@ -34,8 +36,7 @@ class PaymentClientMockWebServerTest {
         RestClient restClient = RestClient.builder()
                 .baseUrl(mockWebServer.url("/").toString())
                 .build();
-
-        paymentClient = new TossPaymentClient(restClient, objectMapper);
+        paymentClient = new TossPaymentClient(restClient, objectMapper, PATH);
     }
 
     @AfterEach
@@ -62,7 +63,7 @@ class PaymentClientMockWebServerTest {
         assertThat(result).isEqualTo(expectedResponse);
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
-        assertThat(recordedRequest.getPath()).isEqualTo("/payments/confirm");
+        assertThat(recordedRequest.getPath()).isEqualTo(PATH);
         assertThat(recordedRequest.getMethod()).isEqualTo("POST");
 
         PaymentRequest actual = objectMapper.readValue(

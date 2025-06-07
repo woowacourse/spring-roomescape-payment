@@ -34,3 +34,5 @@ toss:
       connect: 2
       read: 30
     secret-key: test-payment-key-not-real
+    path:
+      confirm: /test-payment-path-not-real

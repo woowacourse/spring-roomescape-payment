@@ -28,7 +28,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @Import(TestPaymentConfiguration.class)
 class PaymentClientMockRestServiceServerTest {
 
-    private static final String PATH = "/payments/confirm";
+    private static final String PATH = "/test-payment-path-not-real";
 
     @Autowired
     private MockRestServiceServer mockServer;
@@ -36,10 +36,11 @@ class PaymentClientMockRestServiceServerTest {
     @Autowired
     private PaymentClient paymentClient;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Value("${toss.payment.base-url}")
     private String URL;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
     @DisplayName("정상 결제 응답 반환한다")
