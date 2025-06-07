@@ -1,0 +1,24 @@
+|===
+| 권한 | 메서드 | URL | 설명
+
+| 게스트 | GET | /themes | 모든 테마 조회
+| 게스트 | GET | /themes/popular | 인기 테마 조회
+| 관리자 | POST | /admin/themes | 테마 추가
+| 관리자 | DELETE | /admin/themes/{id} | 테마 삭제
+|===
+
+==== 모든 테마 조회
+include::{snippets}/theme/게스트-모든테마-조회/http-request.adoc[]
+include::{snippets}/theme/게스트-모든테마-조회/http-response.adoc[]
+
+==== 인기 테마 조회
+include::{snippets}/theme/게스트-인기테마-조회/http-request.adoc[]
+include::{snippets}/theme/게스트-인기테마-조회/http-response.adoc[]
+
+==== 테마 추가
+include::{snippets}/theme/어드민-테마-생성/http-request.adoc[]
+include::{snippets}/theme/어드민-테마-생성/http-response.adoc[]
+
+==== 테마 삭제
+include::{snippets}/theme/어드민-테마-삭제/http-request.adoc[]
+include::{snippets}/theme/어드민-테마-삭제/http-response.adoc[]

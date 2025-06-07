@@ -72,10 +72,11 @@ tasks.asciidoctor {
     dependsOn test
     inputs.dir snippetsDir
     outputDir = file("$buildDir/docs/asciidoc")
-    attributes 'snippets': snippetsDir
+    attributes 'snippets': snippetsDir, 'docs': file('src/docs/asciidoc')
     sources {
-        include("index.adoc")
+        include("**/*.adoc")
     }
+    baseDirFollowsSourceDir()
     doLast {
         println "📄 HTML 생성 완료: file://${docsDir}/index.html"
     }

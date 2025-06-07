@@ -81,10 +81,27 @@ public class RegularTest {
     }
 
     @Test
+    void login() {
+        RestAssured.given(spec).log().all()
+                .filter(document("member/회원-로그인",
+                        requestFields(
+                                fieldWithPath("email").description("이메일"),
+                                fieldWithPath("password").description("비밀번호")
+                        )))
+                .body(new LoginRequest(REGULAR_EMAIL, PASSWORD))
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().post("/login")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .cookie(TOKEN);
+    }
+
+    @Test
     void logout() {
         // when
         RestAssured.given(spec).log().all()
-                .filter(document("회원-로그아웃"))
+                .filter(document("member/회원-로그아웃"))
                 .body(new LoginRequest(REGULAR_EMAIL, PASSWORD))
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .cookie(TOKEN, regularToken)
@@ -107,7 +124,7 @@ public class RegularTest {
 
         RestAssured.given(spec).log().all()
                 .filter(document(
-                        "회원-예약-생성",
+                        "reservation/회원-예약-생성",
                         requestFields(
                                 fieldWithPath("date").description("예약 날짜"),
                                 fieldWithPath("timeId").description("시간 id"),
@@ -161,7 +178,7 @@ public class RegularTest {
         // when
         ReservationResponse reservationResponse = RestAssured.given(spec).log().all()
                 .filter(document(
-                        "회원-대기예약-생성",
+                        "waiting-reservation/회원-대기예약-생성",
                         requestFields(
                                 fieldWithPath("date").description("예약 날짜 (yyyy-MM-dd)"),
                                 fieldWithPath("timeId").description("예약 시간 ID"),
@@ -196,7 +213,7 @@ public class RegularTest {
         // when
         List<MyReservationResponse> responses = RestAssured.given(spec).log().all()
                 .filter(document(
-                        "회원-내예약목록-조회",
+                        "reservation/회원-내예약목록-조회",
                         responseFields(
                                 fieldWithPath("[].theme").description("테마 이름"),
                                 fieldWithPath("[].date").description("예약 날짜 (yyyy-MM-dd)"),
@@ -251,7 +268,7 @@ public class RegularTest {
 
         RestAssured.given(spec).log().all()
                 .filter(document(
-                        "회원-대기예약-삭제",
+                        "waiting-reservation/회원-대기예약-삭제",
                         pathParameters(
                                 parameterWithName("reservationSlotId").description("삭제할 예약 슬롯 ID")
                         )
@@ -295,7 +312,7 @@ public class RegularTest {
 
         RestAssured.given(spec).log().all()
                 .filter(document(
-                        "회원-결제승인",
+                        "payment/회원-결제승인",
                         requestFields(
                                 fieldWithPath("paymentKey").description("결제 키"),
                                 fieldWithPath("orderId").description("주문 ID"),

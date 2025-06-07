@@ -1,0 +1,9 @@
+|===
+| 권한 | 메서드 | URL | 설명
+
+| 사용자 | POST | /payments/approve | 결제 승인
+|===
+
+==== 결제 승인
+include::{snippets}/payment/회원-결제승인/http-request.adoc[]
+include::{snippets}/payment/회원-결제승인/http-response.adoc[]

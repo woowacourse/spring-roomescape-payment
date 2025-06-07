@@ -2,11 +2,11 @@ package roomescape.e2e;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
-import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 import static roomescape.fixture.IntegrationFixture.PASSWORD;
 import static roomescape.fixture.IntegrationFixture.REGULAR_EMAIL;
 import static roomescape.fixture.IntegrationFixture.TOKEN;
@@ -17,9 +17,11 @@ import static roomescape.fixture.IntegrationFixture.loginAndGetAuthToken;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.specification.RequestSpecification;
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -63,12 +65,25 @@ public class GuestTest {
         // when
         LocalDate now = LocalDate.now();
         RestAssured.given(spec).log().all()
-                .filter(document("게스트-가능한-예약-조회"))
+                .filter(document("time/게스트-예약가능시간-조회"))
                 .when().queryParams("date", now.toString(), "themeId", 1L)
                 .get("/times/available")
                 .then().log().all()
                 .statusCode(200)
                 .body("size()", is(1));
+    }
+
+    @Test
+    @DisplayName("findAllThemes")
+    void findAllThemes() {
+        RestAssured.given(spec).log().all()
+                .filter(document("theme/게스트-모든테마-조회"))
+                .when().get("/themes")
+                .then().log().all()
+                .statusCode(200)
+                .extract()
+                .as(new TypeRef<>() {
+                });
     }
 
     @Test
@@ -91,7 +106,7 @@ public class GuestTest {
 
         // when
         RestAssured.given(spec).log().all()
-                .filter(document("게스트-인기테마-조회"))
+                .filter(document("theme/게스트-인기테마-조회"))
                 .when().get("/themes/popular")
                 .then().log().all()
                 .statusCode(200)
@@ -103,7 +118,7 @@ public class GuestTest {
         // when
         RestAssured.given(spec).log().all()
                 .filter(document(
-                        "게스트-회원가입",
+                        "member/게스트-회원가입",
                         requestFields(
                                 fieldWithPath("email").description("이메일"),
                                 fieldWithPath("password").description("비밀번호"),
@@ -127,7 +142,7 @@ public class GuestTest {
         // when
         CheckLoginResponse checkLoginResponse = RestAssured.given(spec).log().all()
                 .filter(document(
-                        "게스트-로그인확인",
+                        "member/게스트-로그인확인",
                         requestFields(
                                 fieldWithPath("email").description("이메일"),
                                 fieldWithPath("password").description("비밀번호")

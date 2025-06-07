@@ -1,0 +1,80 @@
+==== 🌐 공용 페이지 (게스트)
+
+|===
+| 메서드 | URL | 설명 | 반환 View
+
+| GET | / | 홈 페이지 | index
+| GET | /reservation | 예약 페이지 | reservation
+| GET | /signup | 회원가입 페이지 | signup
+| GET | /login | 로그인 페이지 | login
+|===
+
+===== 홈 페이지
+
+include::{snippets}/view-pages/홈-페이지/http-request.adoc[]
+include::{snippets}/view-pages/홈-페이지/http-response.adoc[]
+
+===== 예약 페이지
+
+include::{snippets}/view-pages/예약-페이지/http-request.adoc[]
+include::{snippets}/view-pages/예약-페이지/http-response.adoc[]
+
+===== 회원가입 페이지
+
+include::{snippets}/view-pages/회원가입-페이지/http-request.adoc[]
+include::{snippets}/view-pages/회원가입-페이지/http-response.adoc[]
+
+===== 로그인 페이지
+
+include::{snippets}/view-pages/로그인-페이지/http-request.adoc[]
+include::{snippets}/view-pages/로그인-페이지/http-response.adoc[]
+
+==== 🔧 관리자 페이지
+
+|===
+| 메서드 | URL | 설명 | 반환 View
+
+| GET | /admin | 관리자 메인 페이지 | admin/index
+| GET | /admin/reservation | 관리자 예약 관리 페이지 | admin/reservation-new
+| GET | /admin/time | 관리자 시간 관리 페이지 | admin/time
+| GET | /admin/theme | 관리자 테마 관리 페이지 | admin/theme
+| GET | /admin/waiting-reservation | 관리자 예약 대기 관리 페이지 | admin/waiting
+|===
+
+===== 어드민 메인 페이지
+
+include::{snippets}/view-pages/어드민-메인-페이지/http-request.adoc[]
+include::{snippets}/view-pages/어드민-메인-페이지/http-response.adoc[]
+
+===== 어드민 예약 관리 페이지
+
+include::{snippets}/view-pages/어드민-예약-관리-페이지/http-request.adoc[]
+include::{snippets}/view-pages/어드민-예약-관리-페이지/http-response.adoc[]
+
+===== 어드민 시간 관리 페이지
+
+include::{snippets}/view-pages/어드민-시간-관리-페이지/http-request.adoc[]
+include::{snippets}/view-pages/어드민-시간-관리-페이지/http-response.adoc[]
+
+===== 어드민 테마 관리 페이지
+
+include::{snippets}/view-pages/어드민-테마-관리-페이지/http-request.adoc[]
+include::{snippets}/view-pages/어드민-테마-관리-페이지/http-response.adoc[]
+
+===== 어드민 예약대기 관리 페이지
+
+include::{snippets}/view-pages/어드민-예약대기-관리-페이지/http-request.adoc[]
+include::{snippets}/view-pages/어드민-예약대기-관리-페이지/http-response.adoc[]
+
+==== 👤 사용자 페이지
+
+|===
+| 메서드 | URL | 설명 | 반환 View
+
+| GET | /reservation-mine | 사용자 예약 관리 페이지 | reservation-mine
+|===
+
+===== 사용자 예약 페이지
+
+include::{snippets}/view-pages/사용자-예약-페이지/http-request.adoc[]
+include::{snippets}/view-pages/사용자-예약-페이지/http-response.adoc[]

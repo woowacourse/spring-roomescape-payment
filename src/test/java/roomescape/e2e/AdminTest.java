@@ -12,6 +12,7 @@ import static org.springframework.restdocs.restassured.RestAssuredRestDocumentat
 import static roomescape.fixture.IntegrationFixture.ADMIN_EMAIL;
 import static roomescape.fixture.IntegrationFixture.FUTURE_DATE_TEXT;
 import static roomescape.fixture.IntegrationFixture.PASSWORD;
+import static roomescape.fixture.IntegrationFixture.REGULAR2_EMAIL;
 import static roomescape.fixture.IntegrationFixture.TOKEN;
 import static roomescape.fixture.IntegrationFixture.createRegularReservation;
 import static roomescape.fixture.IntegrationFixture.createReservationTime;
@@ -61,38 +62,10 @@ public class AdminTest {
     @BeforeEach
     void setUp(RestDocumentationContextProvider provider) {
         RestAssured.port = port;
-        this.spec = new RequestSpecBuilder().addFilter(documentationConfiguration(provider))
+        this.spec = new RequestSpecBuilder()
+                .addFilter(documentationConfiguration(provider))
                 .build();
         adminToken = loginAndGetAuthToken(ADMIN_EMAIL, PASSWORD);
-    }
-
-    @Test
-    void accessAdminPage() {
-        // given
-        String authToken = loginAndGetAuthToken(ADMIN_EMAIL, PASSWORD);
-
-        // when & then
-        RestAssured.given(spec).log().all()
-                .filter(document("어드민-페이지-조회"))
-                .cookie(TOKEN, authToken)
-                .when().get("/admin")
-                .then().log().all()
-                .statusCode(200);
-    }
-
-    @Test
-    void accessAdminReservationPage() {
-        // given
-        String authToken = loginAndGetAuthToken(ADMIN_EMAIL, PASSWORD);
-
-        // when & then: 어드민이 예약 페이지에 접속한다.
-        RestAssured.given(spec).log().all()
-                .filter(document("어드민-예약페이지-조회"))
-                .cookie(TOKEN, authToken)
-                .when()
-                .get("/admin/reservation")
-                .then()
-                .statusCode(200);
     }
 
     @Test
@@ -113,7 +86,7 @@ public class AdminTest {
         // when 예약을 삭제한다.
         RestAssured.given(spec).log().all()
                 .filter(document(
-                        "어드민-예약-삭제",
+                        "reservation/어드민-예약-삭제",
                         pathParameters(
                                 parameterWithName(
                                         "reservationId").description("삭제할 예약 ID")
@@ -148,7 +121,7 @@ public class AdminTest {
 
         RestAssured.given(spec).log().all()
                 .filter(document(
-                        "어드민-테마-생성",
+                        "theme/어드민-테마-생성",
                         requestFields(
                                 fieldWithPath("name").description("테마명"),
                                 fieldWithPath("description").description("설명"),
@@ -175,7 +148,7 @@ public class AdminTest {
         // when
         RestAssured.given(spec).log().all()
                 .filter(document(
-                        "어드민-테마-삭제",
+                        "theme/어드민-테마-삭제",
                         pathParameters(
                                 parameterWithName("id").description("삭제할 테마 ID")
                         )
@@ -190,12 +163,37 @@ public class AdminTest {
     }
 
     @Test
-    void createReservationTimeTest() {
+    void findReservationTimeTest() {
         // when
         createReservationTime();
         // then
         RestAssured.given(spec).log().all()
-                .filter(document("어드민-시간-생성"))
+                .filter(document("time/어드민-시간-조회"))
+                .when().get("/times")
+                .then().log().all()
+                .statusCode(200)
+                .body("size()", is(1));
+    }
+
+    @Test
+    void createReservationTimeTest() {
+        // when
+        String authToken = loginAndGetAuthToken(ADMIN_EMAIL, PASSWORD);
+
+        Map<String, String> reservationTime = new HashMap<>();
+        reservationTime.put("startAt", "10:00");
+
+        RestAssured.given(spec).log().all()
+                .filter(document("time/시간-생성"))
+                .contentType(ContentType.JSON)
+                .body(reservationTime)
+                .cookie(TOKEN, authToken)
+                .when().post("/admin/times")
+                .then().log().all()
+                .statusCode(201);
+
+        // then
+        RestAssured.given().log().all()
                 .when().get("/times")
                 .then().log().all()
                 .statusCode(200)
@@ -215,12 +213,12 @@ public class AdminTest {
         // when
         RestAssured.given(spec).log().all()
                 .filter(document(
-                        "어드민-시간-삭제",
+                        "time/어드민-시간-삭제",
                         pathParameters(
                                 parameterWithName("id").description("삭제할 시간 ID")
                         )
                 )).cookie(TOKEN, adminToken)
-                .pathParam("id",1)
+                .pathParam("id", 1)
                 .when().delete("/admin/times/{id}")
                 .then().log().all()
                 .statusCode(204);
@@ -241,7 +239,7 @@ public class AdminTest {
 
         RestAssured.given(spec).log().all()
                 .filter(document(
-                        "어드민-예약-생성",
+                        "reservation/어드민-예약-생성",
                         requestFields(
                                 fieldWithPath("date").description("예약 날짜 (yyyy-MM-dd)"),
                                 fieldWithPath("timeId").description("예약 시간 ID"),
@@ -258,13 +256,44 @@ public class AdminTest {
     }
 
     @Test
+    void makeWaitingReservation() {
+        createReservationTime();
+        createTheme("추리");
+        createRegularReservation(1L);
+
+        String user2Token = loginAndGetAuthToken(REGULAR2_EMAIL, PASSWORD);
+        Map<String, Object> reservation = new HashMap<>();
+        reservation.put("date", FUTURE_DATE_TEXT);
+        reservation.put("timeId", 1L);
+        reservation.put("themeId", 1L);
+
+        RestAssured.given(spec).log().all()
+                .filter(document(
+                        "waiting-reservation/대기-예약-생성",
+                        requestFields(
+                                fieldWithPath("date").description("예약 날짜 (yyyy-MM-dd)"),
+                                fieldWithPath("timeId").description("예약 시간 ID"),
+                                fieldWithPath("themeId").description("테마 ID")
+                        )
+                ))
+                .contentType(ContentType.JSON)
+                .cookie(TOKEN, user2Token)
+                .body(reservation)
+                .when().post("/waiting-reservations")
+                .then().log().all()
+                .statusCode(201)
+                .extract()
+                .as(ReservationResponse.class);
+    }
+
+    @Test
     void findWaitingReservation() {
         // given
         makeWaitingReservations();
 
         // when & then: 어드민이 대기 예약 목록을 조회한다.
         List<WaitingWebResponse> responses = RestAssured.given(spec).log().all()
-                .filter(document("어드민-대기예약-조회"))
+                .filter(document("waiting-reservation/어드민-대기예약-조회"))
                 .contentType(ContentType.JSON)
                 .cookie(TOKEN, adminToken)
                 .when()
@@ -287,7 +316,7 @@ public class AdminTest {
         // when & then: 대기 예약을 삭제한다.
         RestAssured.given(spec).log().all()
                 .filter(document(
-                        "어드민-대기예약-삭제",
+                        "waiting-reservation/어드민-대기예약-삭제",
                         pathParameters(
                                 parameterWithName("waitingId")
                                         .description("삭제할 대기 예약 ID")
@@ -323,7 +352,7 @@ public class AdminTest {
 
         // when & then: 전체 예약 목록을 조회한다.
         RestAssured.given(spec).log().all()
-                .filter(document("어드민-전체예약-조회"))
+                .filter(document("reservation/어드민-전체예약-조회"))
                 .cookie(TOKEN, adminToken)
                 .when()
                 .get("/admin/reservations")
@@ -344,7 +373,7 @@ public class AdminTest {
         // when & then: 예약 필터링 조회를 한다.
         List<ConfirmedReservationWebResponse> reservationsFilteredByThemeId = RestAssured.given(spec).log().all()
                 .filter(document(
-                        "어드민-필터예약-조회",
+                        "reservation/어드민-필터예약-조회",
                         queryParameters(
                                 parameterWithName("themeId")
                                         .optional().description("테마 ID (필터, optional)"),
@@ -376,7 +405,7 @@ public class AdminTest {
     void findAllRegulars() {
         // when & then: 정규 회원 전체를 조회한다.
         List<MemberWebResponse> memberWebRespons = RestAssured.given(spec).log().all()
-                .filter(document("어드민-정규회원-조회"))
+                .filter(document("member/어드민-정규회원-조회"))
                 .cookie(TOKEN, adminToken)
                 .contentType(ContentType.JSON)
                 .when()

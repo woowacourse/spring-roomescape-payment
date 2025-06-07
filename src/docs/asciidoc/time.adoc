@@ -1,0 +1,26 @@
+|===
+| 권한 | 메서드 | URL | 설명
+
+| 게스트 | GET | /times | 모든 예약 시간 조회
+| 게스트 | GET | /times/available | 예약 가능 시간 조회
+| 관리자 | POST | /admin/times | 예약 시간 추가
+| 관리자 | DELETE | /admin/times/{id} | 예약 시간 삭제
+|===
+
+==== 모든 예약 시간 조회
+include::{snippets}/time/어드민-시간-조회/http-request.adoc[]
+include::{snippets}/time/어드민-시간-조회/http-response.adoc[]
+
+==== 예약 가능 시간 조회
+include::{snippets}/time/게스트-예약가능시간-조회/http-request.adoc[]
+include::{snippets}/time/게스트-예약가능시간-조회/http-response.adoc[]
+
+==== 예약 시간 추가
+include::{snippets}/time/시간-생성/http-request.adoc[]
+include::{snippets}/time/시간-생성/http-response.adoc[]
+
+==== 예약 시간 삭제
+include::{snippets}/time/어드민-시간-삭제/http-request.adoc[]
+include::{snippets}/time/어드민-시간-삭제/http-response.adoc[]
+
+
