@@ -171,7 +171,7 @@ public class ReservationApiTest {
                 .cookie(cookie)
                 .when().post("/orders")
                 .then().log().all()
-                .statusCode(200);
+                .statusCode(201);
     }
 
     @Nested

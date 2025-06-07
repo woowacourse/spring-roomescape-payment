@@ -236,7 +236,7 @@ public class DataSourceTest {
                 .cookie(cookie)
                 .when().post("/orders")
                 .then().log().all()
-                .statusCode(200);
+                .statusCode(201);
     }
 
     @DisplayName("time과 reservation 연결 테스트")
