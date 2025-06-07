@@ -63,10 +63,10 @@ public class ReservationUseCase {
         List<MyReservationResponse> myReservationResponses = new ArrayList<>();
         return Stream.concat(
                 myReservations.stream()
-                        .map(reservation -> {
-                            Payment payment = paymentService.findByReservationIdOrNull(reservation.getId());
-                            return MyReservationResponse.from(reservation, payment);
-                        }),
+                        .map(reservation ->
+                                MyReservationResponse.from(reservation,
+                                        paymentService.findByReservationId(reservation.getId()))
+                        ),
                 waitingWithRanks.stream().map(MyReservationResponse::from)
         ).collect(Collectors.toList());
     }
@@ -75,6 +75,8 @@ public class ReservationUseCase {
     public ReservationResponse createForAdmin(final ReservationRequest request,
                                               final Long memberId) {
         if (!reservationService.isReservationExists(request)) {
+            Reservation reservation = reservationCreatorService.createReservation(request, memberId);
+            paymentService.createPendingPayment(reservation);
             return ReservationResponse.of(reservationCreatorService.createReservation(request, memberId));
         }
         return createWaiting(request, memberId);
@@ -104,6 +106,8 @@ public class ReservationUseCase {
 
     @Transactional
     public void deleteReservation(final Long reservationId) {
+        Payment payment = paymentService.findByReservationId(reservationId);
+        paymentService.deleteById(payment.getId());
         Reservation reservation = reservationService.findById(reservationId);
         reservationService.delete(reservationId);
         promoteWaiting(reservation.getInfo());
@@ -114,7 +118,9 @@ public class ReservationUseCase {
             return;
         }
         Waiting waiting = waitingService.findFirstWaitingOfInfo(info);
-        reservationCreatorService.createReservation(ReservationRequest.from(info), waiting.getMemberId());
+        Reservation reservation = reservationCreatorService.createReservation(ReservationRequest.from(info),
+                waiting.getMemberId());
+        paymentService.createPendingPayment(reservation);
         waitingService.delete(waiting.getId());
     }
 

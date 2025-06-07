@@ -28,14 +28,24 @@ public class PaymentService {
 
     @Transactional
     public void createPaymentWithRequest(final Reservation reservation, final PaymentRequest request) {
-        Payment payment = new Payment(reservation, request.paymentKey(), request.orderId(), request.paymentType(),
+        Payment payment = Payment.createRequestedPayment(reservation, request.paymentKey(), request.orderId(),
+                request.paymentType(),
                 request.amount());
         paymentRepository.save(payment);
     }
 
-    public Payment findByReservationIdOrNull(final Long id) {
-        return paymentRepository.findByReservationId(id)
-                .orElse(null);
+    public void createPendingPayment(final Reservation reservation) {
+        Payment payment = Payment.createPendingPayment(reservation);
+        paymentRepository.save(payment);
+    }
 
+    public Payment findByReservationId(final Long id) {
+        return paymentRepository.findByReservationId(id)
+                .orElseThrow(() -> new PaymentNotFoundException("요청한 reservation_id에 해당하는 결제가 없습니다. "));
+
+    }
+
+    public void deleteById(final Long id) {
+        paymentRepository.deleteById(id);
     }
 }

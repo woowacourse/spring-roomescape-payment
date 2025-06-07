@@ -10,4 +10,6 @@ public interface PaymentRepository {
     Optional<Payment> findByPaymentKey(String s);
 
     Optional<Payment> findByReservationId(Long id);
+
+    void deleteById(Long id);
 }
