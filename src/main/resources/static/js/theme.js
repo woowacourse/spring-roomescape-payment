@@ -1,13 +1,14 @@
 let isEditing = false;
 const API_ENDPOINT = '/themes';
-const cellFields = ['id', 'name', 'description', 'thumbnail'];
-const createCellFields = ['', createInput(), createInput(), createInput()];
+const cellFields = ['id', 'name', 'description', 'thumbnail', 'price'];
+const createCellFields = ['', createInput(), createInput(), createInput(), createInput('number')];
 
 function createBody(inputs) {
     return {
         name: inputs[0].value,
         description: inputs[1].value,
         thumbnail: inputs[2].value,
+        price: parseInt(inputs[3].value, 10),
     };
 }
 
@@ -63,9 +64,10 @@ function createAddField(row) {
     }));
 }
 
-function createInput() {
+function createInput(type = 'text') {
     const input = document.createElement('input');
     input.className = 'form-control';
+    input.type = type;
     return input;
 }
 

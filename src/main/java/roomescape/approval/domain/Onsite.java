@@ -11,10 +11,10 @@ import roomescape.reservation.domain.Reservation;
 @Getter
 @DiscriminatorValue("ONSITE")
 @NoArgsConstructor
-public class OnSite extends Approval {
+public class Onsite extends Approval {
     private BigDecimal amount;
 
-    public OnSite(Reservation reservation, BigDecimal amount) {
+    public Onsite(Reservation reservation, BigDecimal amount) {
         super(reservation);
         this.amount = amount;
     }

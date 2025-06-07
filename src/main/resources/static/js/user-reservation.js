@@ -1,4 +1,5 @@
 const THEME_API_ENDPOINT = '/themes';
+let selectedThemePrice = 0;
 
 document.addEventListener('DOMContentLoaded', () => {
     requestRead(THEME_API_ENDPOINT)
@@ -16,19 +17,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // ------  결제위젯 초기화 ------
     // @docs https://docs.tosspayments.com/reference/widget-sdk#sdk-설치-및-초기화
     // @docs https://docs.tosspayments.com/reference/widget-sdk#renderpaymentmethods선택자-결제-금액-옵션
-    const paymentAmount = 1000;
     const widgetClientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
     const paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS);
-    paymentWidget.renderPaymentMethods(
-        "#payment-method",
-        {value: paymentAmount},
-        {variantKey: "DEFAULT"}
-    );
 
     document.getElementById('theme-slots').addEventListener('click', event => {
         if (event.target.classList.contains('theme-slot')) {
             document.querySelectorAll('.theme-slot').forEach(slot => slot.classList.remove('active'));
             event.target.classList.add('active');
+
+            selectedThemePrice = parseInt(event.target.getAttribute('data-theme-price'), 10); // 💡 가격 설정
+            paymentWidget.renderPaymentMethods(
+                "#payment-method",
+                {value: selectedThemePrice},
+                {variantKey: "DEFAULT"}
+            );
+
             checkDateAndTheme();
         }
     });
@@ -53,10 +56,9 @@ function renderTheme(themes) {
     const themeSlots = document.getElementById('theme-slots');
     themeSlots.innerHTML = '';
     themes.forEach(theme => {
-        const name = theme.name;
-        const themeId = theme.id;
-
-        themeSlots.appendChild(createSlot('theme', name, themeId));
+        const themeSlot = createSlot('theme', `${theme.name} - ₩${theme.price.toLocaleString()}`, theme.id);
+        themeSlot.setAttribute('data-theme-price', theme.price);
+        themeSlots.appendChild(themeSlot);
     });
 }
 
@@ -100,15 +102,11 @@ function checkDateAndTheme() {
 }
 
 function fetchAvailableTimes(date, themeId) {
-
     const query = new URLSearchParams({date, themeId}).toString();
     const url = `/times/available?${query}`;
-
-    fetch(url, { // 예약 가능 시간 조회 API endpoint
+    fetch(url, {
         method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
     }).then(response => {
         if (response.status === 200) return response.json();
         throw new Error('Read failed');
@@ -134,12 +132,7 @@ function renderAvailableTimes(times) {
         return;
     }
     times.forEach(time => {
-
-        const startAt = time.startAt;
-        const timeId = time.timeId;
-        const alreadyBooked = time.alreadyBooked;
-
-        const div = createSlot('time', startAt, timeId, alreadyBooked); // createSlot('time', 시작 시간, time id, 예약 여부)
+        const div = createSlot('time', time.startAt, time.timeId, time.alreadyBooked);
         timeSlots.appendChild(div);
     });
 }
@@ -153,19 +146,15 @@ function checkDateAndThemeAndTime() {
 
     if (selectedDate && selectedThemeElement && selectedTimeElement) {
         if (selectedTimeElement.getAttribute('data-time-booked') === 'true') {
-            // 선택된 시간이 이미 예약된 경우
             reserveButton.classList.add("disabled");
-            waitButton.classList.remove("disabled"); // 예약 대기 버튼 활성화
+            waitButton.classList.remove("disabled");
         } else {
-            // 선택된 시간이 예약 가능한 경우
             reserveButton.classList.remove("disabled");
-            waitButton.classList.add("disabled"); // 예약 대기 버튼 활성화
-
+            waitButton.classList.add("disabled");
         }
     } else {
-        // 날짜, 테마, 시간 중 하나라도 선택되지 않은 경우
         reserveButton.classList.add("disabled");
-        waitButton.classList.add("disabled"); // 예약 대기 버튼 활성화
+        waitButton.classList.add("disabled");
     }
 }
 
@@ -176,7 +165,6 @@ function onReservationButtonClick(event, paymentWidget) {
     const name = document.getElementById('profile-name').value;
 
     if (selectedDate && selectedThemeId && selectedTimeId) {
-
         const reservationData = {
             date: selectedDate,
             themeId: selectedThemeId,
@@ -184,44 +172,27 @@ function onReservationButtonClick(event, paymentWidget) {
         };
         const generateRandomString = () =>
             window.btoa(Math.random()).slice(0, 20);
-        /*
-        [1단계]
-              - orderIdPrefix 를 자신만의 prefix로 변경
-        */
-        // TOSS 결제 위젯 Javascript SDK 연동 방식 중 'Promise로 처리하기'를 적용함
-        // https://docs.tosspayments.com/reference/widget-sdk#promise%EB%A1%9C-%EC%B2%98%EB%A6%AC%ED%95%98%EA%B8%B0
 
         const orderIdPrefix = "WTEST";
         const orderId = orderIdPrefix + generateRandomString();
-        const amount = 1000;
+        const amount = selectedThemePrice;
 
-        // 1, 결제 요청 전 임시 저장 API 호출
         fetch('/payments/prepay', {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                orderId: orderId,
-                amount: amount
-            }),
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({orderId, amount}),
         }).then(response => {
             if (!response.ok) throw new Error("실패");
             return response.json();
         }).then(() => {
-            // 2. TOSS 결제 요청
             return paymentWidget.requestPayment({
                 orderId: orderId,
-                orderName: "테스트 방탈출 예약 결제 1건",
+                orderName: "테마 예약 결제",
                 amount: amount,
             });
         }).then(function (data) {
-            console.debug(data);
-            // 3. 결제 후 최종 예약 저장
             fetchReservationPayment(data, reservationData);
         }).catch(function (error) {
-            // TOSS 에러 처리: 에러 목록을 확인하세요
-            // https://docs.tosspayments.com/reference/error-codes#failurl 로-전달되는-에러
             alert(error.code + " :" + error.message + "/ orderId : " + (error.orderId || orderId));
         });
     } else {
@@ -230,12 +201,6 @@ function onReservationButtonClick(event, paymentWidget) {
 }
 
 async function fetchReservationPayment(paymentData, reservationData) {
-    /*
-    [1단계]
-        - 자신의 예약 API request에 맞게 reservationPaymentRequest 필드명 수정
-        - 내 서버 URL에 맞게 reservationURL 변경
-        - 예약 결제 실패 시, 사용자가 실패 사유를 알 수 있도록 alert 에서 에러 메시지 수정
-    */
     const reservationPaymentRequest = {
         date: reservationData.date,
         themeId: reservationData.themeId,
@@ -244,14 +209,12 @@ async function fetchReservationPayment(paymentData, reservationData) {
         orderId: paymentData.orderId,
         amount: paymentData.amount,
         paymentType: paymentData.paymentType,
-    }
+    };
 
     const reservationURL = "/reservations";
     fetch(reservationURL, {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
+        headers: {"Content-Type": "application/json"},
         body: JSON.stringify(reservationPaymentRequest),
     }).then(response => {
         if (!response.ok) {
@@ -282,14 +245,9 @@ function onWaitButtonClick() {
             timeId: selectedTimeId
         };
 
-        /*
-        [3단계] 예약 대기 생성 요청 API 호출
-         */
         fetch('waitings', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(reservationData)
         })
             .then(response => {
@@ -309,7 +267,6 @@ function onWaitButtonClick() {
     }
 }
 
-
 function requestRead(endpoint) {
     return fetch(endpoint)
         .then(response => {
@@ -323,4 +280,3 @@ function requestRead(endpoint) {
             return apiResponse.data;
         });
 }
-

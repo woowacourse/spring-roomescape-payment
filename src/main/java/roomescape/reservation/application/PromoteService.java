@@ -1,12 +1,11 @@
 package roomescape.reservation.application;
 
-import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.approval.application.ApprovalService;
-import roomescape.approval.domain.OnSite;
+import roomescape.approval.domain.Onsite;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationSpec;
 import roomescape.reservation.domain.repository.ReservationRepository;
@@ -35,6 +34,6 @@ public class PromoteService {
         waitingRepository.deleteById(waiting.getId());
 
         Reservation newReservation = reservationRepository.save(new Reservation(waiting.getMember(), spec));
-        approvalService.approve(new OnSite(newReservation, BigDecimal.valueOf(1000)));
+        approvalService.approve(new Onsite(newReservation, newReservation.getTheme().getPrice()));
     }
 }

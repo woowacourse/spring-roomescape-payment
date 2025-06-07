@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import roomescape.approval.domain.AdminApproval;
 import roomescape.approval.domain.Approval;
 import roomescape.approval.domain.ApprovalType;
-import roomescape.approval.domain.OnSite;
+import roomescape.approval.domain.Onsite;
 import roomescape.approval.domain.Payment;
 
 public record ApprovalResponse(String type, String paymentKey, BigDecimal amount) {
@@ -15,7 +15,7 @@ public record ApprovalResponse(String type, String paymentKey, BigDecimal amount
         }
 
         if (approval.getType() == ApprovalType.ONSITE) {
-            OnSite onSite = (OnSite) approval;
+            Onsite onSite = (Onsite) approval;
             return new ApprovalResponse("현장 결제", null, onSite.getAmount());
         }
 
