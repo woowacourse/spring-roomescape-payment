@@ -1,9 +1,6 @@
 package roomescape.global.ui;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -30,9 +27,42 @@ class UserPageControllerTest {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("index"))
-                .andDo(document("page-user",
-                        preprocessRequest(prettyPrint()),
-                        preprocessResponse(prettyPrint())
-                ));
+                .andDo(document("page-user/home"));
+    }
+
+    @Test
+    @DisplayName("예약 페이지 접속 시 reservation 뷰를 반환한다")
+    void reservationPageTest() throws Exception {
+        mockMvc.perform(get("/reservation"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("reservation"))
+                .andDo(document("page-user/reservation"));
+    }
+
+    @Test
+    @DisplayName("내 예약 페이지 접속 시 reservation-mine 뷰를 반환한다")
+    void reservationsInfoPageTest() throws Exception {
+        mockMvc.perform(get("/reservation-mine"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("reservation-mine"))
+                .andDo(document("page-user/mine"));
+    }
+
+    @Test
+    @DisplayName("로그인 페이지 접속 시 login 뷰를 반환한다")
+    void loginPageTest() throws Exception {
+        mockMvc.perform(get("/login"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("login"))
+                .andDo(document("page-user/login"));
+    }
+
+    @Test
+    @DisplayName("회원가입 페이지 접속 시 signup 뷰를 반환한다")
+    void signupPageTest() throws Exception {
+        mockMvc.perform(get("/signup"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("signup"))
+                .andDo(document("page-user/signup"));
     }
 }
