@@ -20,6 +20,6 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     @Override
     public Payment getById(final Long paymentId) {
         return jpaPaymentRepository.findById(paymentId)
-                .orElseThrow(() -> new ResourceNotFoundException("해당 결제 내역을 찾을 수 없습니다. id = " + paymentId));
+                .orElseThrow(() -> new ResourceNotFoundException("해당 결제 정보를 찾을 수 없습니다. id = " + paymentId));
     }
 }

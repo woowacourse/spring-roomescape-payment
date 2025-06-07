@@ -33,8 +33,8 @@ import roomescape.exception.resource.ResourceNotFoundException;
 import roomescape.fixture.config.TestConfig;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
-import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentClient;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationSlot;
 import roomescape.reservation.domain.ReservationTime;
@@ -122,7 +122,7 @@ class ReservationServiceTest {
                 new MemberAuthInfo(member.getId(), member.getRole());
 
         reservationRepository.save(
-                Reservation.of(ReservationSlot.of(date, time, theme), member, BOOKED));
+                Reservation.offlinePaid(ReservationSlot.of(date, time, theme), member, BOOKED));
 
         // when & then
         Assertions.assertThatThrownBy(() -> reservationService.create(request, memberAuthInfo.id()))
@@ -137,7 +137,8 @@ class ReservationServiceTest {
         final Theme theme1 = themeRepository.save(notSavedTheme1());
         final Member member1 = memberRepository.save(notSavedMember1());
 
-        final Reservation reservation = Reservation.of(ReservationSlot.of(date, time1, theme1), member1,
+        final Reservation reservation = Reservation.offlinePaid(ReservationSlot.of(date, time1, theme1),
+                member1,
                 BOOKED);
         final Long reservationId = reservationRepository.save(reservation).getId();
         final MemberAuthInfo member1AuthInfo = new MemberAuthInfo(member1.getId(), member1.getRole());
@@ -157,7 +158,8 @@ class ReservationServiceTest {
         final Member member1 = memberRepository.save(notSavedMember1());
         final Member member2 = memberRepository.save(notSavedMember2());
 
-        final Reservation reservation = Reservation.of(ReservationSlot.of(date, time1, theme1), member1,
+        final Reservation reservation = Reservation.offlinePaid(ReservationSlot.of(date, time1, theme1),
+                member1,
                 BOOKED);
         final Long reservationId = reservationRepository.save(reservation).getId();
         final MemberAuthInfo member2AuthInfo = new MemberAuthInfo(member2.getId(), member2.getRole());
@@ -175,7 +177,8 @@ class ReservationServiceTest {
         final Theme theme1 = themeRepository.save(notSavedTheme1());
         final Member member1 = memberRepository.save(notSavedMember1());
 
-        final Reservation reservation = Reservation.of(ReservationSlot.of(date, time1, theme1), member1,
+        final Reservation reservation = Reservation.offlinePaid(ReservationSlot.of(date, time1, theme1),
+                member1,
                 BOOKED);
         reservationRepository.save(reservation);
         final MemberAuthInfo member1AuthInfo = new MemberAuthInfo(member1.getId(), member1.getRole());
@@ -201,7 +204,7 @@ class ReservationServiceTest {
                 .filter(AvailableReservationTimeResponse::alreadyBooked)
                 .count();
         reservationRepository.save(
-                Reservation.of(ReservationSlot.of(date, time1, theme), member, BOOKED));
+                Reservation.offlinePaid(ReservationSlot.of(date, time1, theme), member, BOOKED));
 
         // when
         final long afterCount = reservationService.findAvailableReservationTimes(request)
@@ -225,9 +228,11 @@ class ReservationServiceTest {
         final ReservationTime time2 = reservationTimeRepository.save(notSavedReservationTime2());
         final Theme theme2 = themeRepository.save(notSavedTheme2());
 
-        reservationRepository.save(Reservation.of(ReservationSlot.of(date1, time1, theme1), member, BOOKED));
+        reservationRepository.save(
+                Reservation.offlinePaid(ReservationSlot.of(date1, time1, theme1), member, BOOKED));
 
-        reservationRepository.save(Reservation.of(ReservationSlot.of(date2, time2, theme2), member, BOOKED));
+        reservationRepository.save(
+                Reservation.offlinePaid(ReservationSlot.of(date2, time2, theme2), member, BOOKED));
 
         // when
         final List<ForMember> founds = reservationService.findReservationsByMemberId(member.getId());

@@ -148,7 +148,7 @@ class ThemeServiceTest {
         for (int themeIndex = 0; themeIndex < 5; themeIndex++) {
             for (int timeIndex = 0; timeIndex < themeCounts.get(themeIndex); timeIndex++) {
                 reservationRepository.save(
-                        Reservation.of(
+                        Reservation.offlinePaid(
                                 ReservationSlot.of(now.minusDays(themeIndex), times.get(timeIndex),
                                         themes.get(themeIndex)),
                                 member,
@@ -161,7 +161,8 @@ class ThemeServiceTest {
         // theme.get(5)는 weekAgo보다 이전 날짜로 예약 10개 추가 -> weekAgo~now 기간에는 예약 0개로 취급되어야 함
         for (int timeIndex = 0; timeIndex < 10; timeIndex++) {
             reservationRepository.save(
-                    Reservation.of(ReservationSlot.of(weekAgo.minusDays(2), times.get(timeIndex), themes.get(5)),
+                    Reservation.offlinePaid(
+                            ReservationSlot.of(weekAgo.minusDays(2), times.get(timeIndex), themes.get(5)),
                             member,
                             BOOKED
                     )
@@ -171,7 +172,7 @@ class ThemeServiceTest {
         // theme.get(6) 테마는 now날짜에 예약 1개, now보다 이후 날짜에 예약 10개 -> weekAgo~now 기간에는 예약 1개로 취급되어야 함
         for (int timeIndex = 0; timeIndex < 11; timeIndex++) {
             reservationRepository.save(
-                    Reservation.of(
+                    Reservation.offlinePaid(
                             ReservationSlot.of(now.plusDays(timeIndex), times.get(timeIndex), themes.get(6)),
                             member,
                             BOOKED

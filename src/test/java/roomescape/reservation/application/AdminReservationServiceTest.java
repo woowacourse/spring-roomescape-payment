@@ -108,7 +108,8 @@ class AdminReservationServiceTest {
         final Member member = memberRepository.save(notSavedMember1());
 
         reservationRepository.save(
-                Reservation.of(ReservationSlot.of(date, reservationTime, theme), member, BOOKED));
+                Reservation.offlinePaid(ReservationSlot.of(date, reservationTime, theme), member,
+                        BOOKED));
 
         final CreateBookedReservationRequest request =
                 new CreateBookedReservationRequest(date, reservationTime.getId(), theme.getId(), member.getId());
@@ -126,7 +127,8 @@ class AdminReservationServiceTest {
         final Theme theme = themeRepository.save(notSavedTheme1());
         final Member member = memberRepository.save(notSavedMember1());
         final ReservationSlot slot = ReservationSlot.of(date, time, theme);
-        final Reservation reservation = reservationRepository.save(Reservation.of(slot, member, BOOKED));
+        final Reservation reservation = reservationRepository.save(
+                Reservation.offlinePaid(slot, member, BOOKED));
 
         // when
         adminReservationService.deleteAsAdmin(reservation.getId());
@@ -161,10 +163,10 @@ class AdminReservationServiceTest {
         final Theme theme2 = themeRepository.save(notSavedTheme2());
 
         reservationRepository.save(
-                Reservation.of(ReservationSlot.of(date1, time1, theme1), member, BOOKED)
+                Reservation.offlinePaid(ReservationSlot.of(date1, time1, theme1), member, BOOKED)
         );
         reservationRepository.save(
-                Reservation.of(ReservationSlot.of(date2, time2, theme2), member, BOOKED)
+                Reservation.offlinePaid(ReservationSlot.of(date2, time2, theme2), member, BOOKED)
         );
 
         // when
@@ -187,9 +189,12 @@ class AdminReservationServiceTest {
         final LocalDate date2 = LocalDate.now().plusDays(2);
         final LocalDate date3 = LocalDate.now().plusDays(3);
 
-        reservationRepository.save(Reservation.of(ReservationSlot.of(date1, time1, theme), member, BOOKED));
-        reservationRepository.save(Reservation.of(ReservationSlot.of(date2, time2, theme), member, BOOKED));
-        reservationRepository.save(Reservation.of(ReservationSlot.of(date3, time3, theme), member, BOOKED));
+        reservationRepository.save(
+                Reservation.offlinePaid(ReservationSlot.of(date1, time1, theme), member, BOOKED));
+        reservationRepository.save(
+                Reservation.offlinePaid(ReservationSlot.of(date2, time2, theme), member, BOOKED));
+        reservationRepository.save(
+                Reservation.offlinePaid(ReservationSlot.of(date3, time3, theme), member, BOOKED));
 
         final FilteredReservationsRequest request1 =
                 new FilteredReservationsRequest(theme.getId(), member.getId(), date1, date2);
