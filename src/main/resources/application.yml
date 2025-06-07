@@ -18,3 +18,9 @@ api:
   toss:
     secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
     uri: https://api.tosspayments.com/v1
+
+logging:
+  level:
+    root: INFO
+    org.springframework: WARN
+    roomescape: INFO
