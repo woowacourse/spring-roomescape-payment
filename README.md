@@ -28,6 +28,8 @@
 
 ## API
 
+[Swagger를 통한 API 문서화](http://localhost:8080/swagger-ui/index.html)
+
 ### ⭐️Auth
 
 #### 로그인
@@ -181,3 +183,7 @@
     - [x] API 관련 예외 발생 시, 처리하는 코드를 구현
 - [x] 2단계 - 내 예약 목록 조회 시 결제 정보 조회 기능
     - [x] 토스 결제 승인 API의 응답 필드 값을 데이터베이스에 저장
+
+## 🔎 ERD
+
+<img src="docs/images/ERD-roomescape.png" alt="ERD" style="width: 50%; height: auto;">
