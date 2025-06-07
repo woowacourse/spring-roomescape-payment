@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import roomescape.global.auth.dto.UserInfo;
 import roomescape.member.domain.Member;
 import roomescape.member.service.MemberService;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.response.PaymentResponse;
 import roomescape.payment.service.PaymentApiClient;
 import roomescape.payment.service.PaymentService;
@@ -60,7 +61,12 @@ public class ReservationUseCase {
         List<Reservation> myReservations = reservationService.findMyReservations(userInfo);
         List<WaitingWithRank> waitingWithRanks = waitingService.findMyWaitingsWithRank(userInfo);
         List<MyReservationResponse> myReservationResponses = new ArrayList<>();
-        return Stream.concat(myReservations.stream().map(MyReservationResponse::from),
+        return Stream.concat(
+                myReservations.stream()
+                        .map(reservation -> {
+                            Payment payment = paymentService.findByReservationIdOrNull(reservation.getId());
+                            return MyReservationResponse.from(reservation, payment);
+                        }),
                 waitingWithRanks.stream().map(MyReservationResponse::from)
         ).collect(Collectors.toList());
     }

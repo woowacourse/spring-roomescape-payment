@@ -32,4 +32,10 @@ public class PaymentService {
                 request.amount());
         paymentRepository.save(payment);
     }
+
+    public Payment findByReservationIdOrNull(final Long id) {
+        return paymentRepository.findByReservationId(id)
+                .orElse(null);
+
+    }
 }
