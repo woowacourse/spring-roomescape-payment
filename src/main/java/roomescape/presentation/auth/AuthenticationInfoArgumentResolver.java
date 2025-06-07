@@ -30,7 +30,8 @@ public class AuthenticationInfoArgumentResolver implements HandlerMethodArgument
     ) {
         var request = (HttpServletRequest) webRequest.getNativeRequest();
         var tokenCookie = AuthenticationTokenCookie.fromRequest(request);
-        if (tokenCookie.hasToken()) {
+
+        if (tokenCookie.hasToken() && tokenHandler.isValidToken(tokenCookie.token())) {
             return tokenHandler.extractAuthenticationInfo(tokenCookie.token());
         }
         throw new AuthenticationException("사용자 인증이 필요합니다.");
