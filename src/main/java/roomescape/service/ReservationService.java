@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
 import roomescape.domain.Theme;
@@ -14,6 +15,7 @@ import roomescape.dto.reservation.ReservationResponse;
 import roomescape.exception.DuplicateContentException;
 import roomescape.exception.NotFoundException;
 import roomescape.repository.MemberRepository;
+import roomescape.repository.PaymentRepository;
 import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
@@ -26,15 +28,17 @@ public class ReservationService {
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
+    private final PaymentRepository paymentRepository;
 
     public ReservationService(final ReservationRepository reservationRepository,
                               final ReservationTimeRepository reservationTimeRepository,
                               final ThemeRepository themeRepository,
-                              final MemberRepository memberRepository) {
+                              final MemberRepository memberRepository, PaymentRepository paymentRepository) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     @Transactional
@@ -91,6 +95,11 @@ public class ReservationService {
 
     public List<MyReservationAndWaitingsResponse> findMyReservations(Long id) {
         List<Reservation> reservations = reservationRepository.findReservationsByMemberId(id);
-        return reservations.stream().map(MyReservationAndWaitingsResponse::from).toList();
+        return reservations.stream().map(reservation -> {
+                    Payment payment = paymentRepository.findFirstByReservationOrderByCreatedAtDesc(reservation)
+                            .orElseThrow(() -> new NotFoundException("결제 정보가 없습니다"));
+                    return MyReservationAndWaitingsResponse.of(reservation, payment);
+                }
+        ).toList();
     }
 }
