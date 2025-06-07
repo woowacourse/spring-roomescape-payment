@@ -1,11 +1,11 @@
 package roomescape.user.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.dto.ReservationWithStateDto;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.dto.PaymentResponseDto;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.user.domain.User;
@@ -19,6 +19,11 @@ import roomescape.waiting.domain.WaitingWithRank;
 import roomescape.waiting.exception.NotFoundWaitingException;
 import roomescape.waiting.repository.WaitingRepository;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 @Transactional(readOnly = true)
 public class UserService {
@@ -26,12 +31,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
     private final WaitingRepository waitingRepository;
+    private final PaymentRepository paymentRepository;
 
-    public UserService(UserRepository userRepository, ReservationRepository reservationRepository,
-                       WaitingRepository waitingRepository) {
+    public UserService(UserRepository userRepository, ReservationRepository reservationRepository, WaitingRepository waitingRepository, PaymentRepository paymentRepository) {
         this.userRepository = userRepository;
         this.reservationRepository = reservationRepository;
         this.waitingRepository = waitingRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     public List<UserResponseDto> findAll() {
@@ -51,21 +57,22 @@ public class UserService {
         validateExistsById(member.getId());
 
         List<Reservation> reservations = reservationRepository.findByUser(member);
-        List<ReservationWithStateDto> dtos1 = convertReservationWithStateDto(reservations);
+        ArrayList<ReservationWithStateDto> reservationsWithPayment = reservations.stream()
+                .map(reservation -> {
+                    Optional<Payment> paymentOptional = paymentRepository.findByReservation(reservation);
+                    PaymentResponseDto paymentDto = paymentOptional.map(PaymentResponseDto::of).orElse(null);
+
+                    return ReservationWithStateDto.of(reservation, paymentDto);
+                })
+                .collect(Collectors.toCollection(ArrayList::new));
 
         List<Waiting> waitings = waitingRepository.findByMember(member);
         List<WaitingWithRank> waitingWithRanks = waitingRepository.findWaitingsWithRankByMemberId(
                 member.getId());
         List<ReservationWithStateDto> dtos2 = convertReservationWithStateDto(waitings, waitingWithRanks);
 
-        dtos1.addAll(dtos2);
-        return dtos1;
-    }
-
-    private static List<ReservationWithStateDto> convertReservationWithStateDto(List<Reservation> reservations) {
-        return reservations.stream()
-                .map(ReservationWithStateDto::of)
-                .collect(Collectors.toCollection(ArrayList::new));
+        reservationsWithPayment.addAll(dtos2);
+        return reservationsWithPayment;
     }
 
     private static List<ReservationWithStateDto> convertReservationWithStateDto(List<Waiting> waitings,
