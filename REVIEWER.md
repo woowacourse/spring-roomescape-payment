@@ -1,3 +1,5 @@
+### swagger ui
+http://3.36.78.46:8080/swagger-ui/index.html
 
 #### 배포 스트립크는 누가 사용하는지 따로 요구사항이 주어지지 않아 제 local에서만 배포할 수 있도록 설정해놨습니다.
 ### deploy.sh
