@@ -14,12 +14,12 @@ public class LoggingInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        log.info("🚪[Interceptor] 요청 시작 - URI: {}", request.getRequestURI());
+        log.info("🚪[Interceptor] 요청 시작 - [{}] {}", request.getMethod(), request.getRequestURI());
         return true;
     }
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-        log.info("🛬[Interceptor] 요청 종료 - URI: {}, 상태코드: {}", request.getRequestURI(), response.getStatus());
+        log.info("🛬[Interceptor] 요청 종료 - [{}] {}, 상태코드: {}", request.getMethod(), request.getRequestURI(), response.getStatus());
     }
 }
