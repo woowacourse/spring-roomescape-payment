@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- 프로퍼티: 로그 파일 저장 경로 -->
+    <property name="LOGS_PATH" value="./logs"/>
+
+    <!-- 파일 출력 앱엔더 설정 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 파일 이름(패턴) 지정 -->
+        <file>${LOGS_PATH}/spring.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 날짜 패턴과 함께 롤링 파일 이름 지정 -->
+            <fileNamePattern>logs/spring-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 30일 넘은 파일은 자동 삭제 -->
+            <maxHistory>30</maxHistory>
+            <!-- 파일 하나당 최대 10MB -->
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder>
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%logger{36}] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 콘솔 출력 앱엔더 설정 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!-- 색상, 밝기 조절 및 예쁜 포맷 -->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %cyan(%level) %magenta(%logger{36}) - %highlight(%msg) %n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 루트 로그 레벨 INFO 이상만 저장/출력 -->
+    <root level="info">
+        <appender-ref ref="FILE"/>
+        <!-- 개발/테스트 환경에서는 콘솔 로깅도 함께 사용 권장 -->
+        <appender-ref ref="CONSOLE"/> <!-- 주석 해제 시 콘솔 로깅 활성화 -->
+    </root>
+</configuration>

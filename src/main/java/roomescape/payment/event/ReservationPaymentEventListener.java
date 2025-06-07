@@ -1,12 +1,12 @@
 package roomescape.payment.event;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
+import roomescape.logging.aspect.Loggable;
 import roomescape.payment.dto.PaymentRequest;
 import roomescape.payment.dto.PaymentResponse;
 import roomescape.payment.exception.PaymentProcessException;
@@ -14,7 +14,7 @@ import roomescape.payment.exception.PaymentServerException;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.service.ReservationPaymentService;
 
-@Slf4j
+@Loggable
 @Component
 @RequiredArgsConstructor
 public class ReservationPaymentEventListener {
@@ -33,7 +33,6 @@ public class ReservationPaymentEventListener {
             callTossPaymentApi(paymentRequest);
             reservationPaymentService.paid(reservationId, response.paymentKey());
         } catch (PaymentServerException | PaymentProcessException e) {
-            log.error("Payment process failed for reservationId: {}, error: {}", reservationId, e.getMessage());
             reservationPaymentService.failedPayment(reservationId, response.paymentKey());
         }
     }

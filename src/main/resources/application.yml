@@ -9,7 +9,7 @@ spring:
     init:
       mode: always
   jpa:
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -29,3 +29,6 @@ payment:
     token: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
     connection-timeout-ms: 1000
 
+logging:
+  level:
+    root: info
