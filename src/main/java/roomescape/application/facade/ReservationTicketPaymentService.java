@@ -1,13 +1,14 @@
 package roomescape.application.facade;
 
-import jakarta.transaction.Transactional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.service.ReservationTicketService;
 import roomescape.application.service.TossPaymentService;
 import roomescape.dto.LoginMember;
-import roomescape.dto.request.ReservationTicketPaymentWithTossRequestDto;
+import roomescape.dto.request.ReservationTicketPaymentRequestDto;
+import roomescape.dto.request.TossPaymentRequestDto;
 import roomescape.dto.response.ReservationTicketResponseDto;
 import roomescape.model.ReservationTicket;
 
@@ -18,17 +19,31 @@ public class ReservationTicketPaymentService {
     private final ReservationTicketService reservationTicketService;
     private final TossPaymentService tossPaymentService;
 
-    @Transactional
-    public ReservationTicketResponseDto saveReservationWithTossPaymentGateWay(
-            ReservationTicketPaymentWithTossRequestDto reservationTicketPaymentWithTossRequestDto,
+    public void processReservationRegistration(
+            ReservationTicketPaymentRequestDto reservationTicketPaymentRequestDto,
             LoginMember loginMember) {
-        ReservationTicket reservationTicket = reservationTicketService.saveReservation(
-                reservationTicketPaymentWithTossRequestDto.reservationTicketRegisterDto(),
-                loginMember);
+
+        reservationTicketService.validateReservationTicket(
+                reservationTicketPaymentRequestDto.reservationTicketRegisterDto(),
+                loginMember
+        );
 
         String requestKey = UUID.randomUUID().toString();
-        tossPaymentService.processPayment(reservationTicketPaymentWithTossRequestDto.tossPaymentRequestDto(),
-                reservationTicket, requestKey);
+        TossPaymentRequestDto tossPaymentRequestDto = reservationTicketPaymentRequestDto.tossPaymentRequestDto();
+        tossPaymentService.processPayment(tossPaymentRequestDto, requestKey);
+    }
+
+    @Transactional
+    public ReservationTicketResponseDto saveReservationWithPayment(
+            ReservationTicketPaymentRequestDto reservationTicketPaymentRequestDto,
+            LoginMember loginMember) {
+        ReservationTicket reservationTicket = reservationTicketService.saveReservationTicket(
+                reservationTicketPaymentRequestDto.reservationTicketRegisterDto(),
+                loginMember
+        );
+
+        tossPaymentService.saveTossPayment(reservationTicketPaymentRequestDto.tossPaymentRequestDto(),
+                reservationTicket);
 
         return new ReservationTicketResponseDto(reservationTicket);
     }

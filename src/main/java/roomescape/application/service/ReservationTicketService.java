@@ -39,23 +39,28 @@ public class ReservationTicketService {
     private final TossPaymentRepository tossPaymentRepository;
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public ReservationTicket saveReservation(
-            ReservationTicketRegisterDto reservationTicketRegisterDto,
-            LoginMember loginMember) {
-        ReservationTicket reservationTicket = createReservation(reservationTicketRegisterDto,
-                loginMember);
-        assertReservationIsNotDuplicated(reservationTicket);
-
+    public ReservationTicket saveReservationTicket(ReservationTicketRegisterDto reservationTicketRegisterDto,
+                                                   LoginMember loginMember) {
+        ReservationTicket reservationTicket = createReservationTicket(reservationTicketRegisterDto, loginMember);
         return reservationTicketRepository.save(reservationTicket);
     }
 
-    public List<ReservationTicketResponseDto> getAllReservations() {
+    @Transactional(readOnly = true)
+    public void validateReservationTicket
+            (ReservationTicketRegisterDto reservationTicketRegisterDto,
+             LoginMember loginMember) {
+        ReservationTicket reservationTicket = createReservationTicket(reservationTicketRegisterDto,
+                loginMember);
+        assertReservationIsNotDuplicated(reservationTicket);
+    }
+
+    public List<ReservationTicketResponseDto> getReservationTickets() {
         return reservationTicketRepository.findAll().stream()
                 .map(ReservationTicketResponseDto::new)
                 .toList();
     }
 
-    public List<MemberReservationResponseDto> getReservationsOfMember(LoginMember loginMember) {
+    public List<MemberReservationResponseDto> getReservationTicketsOfMember(LoginMember loginMember) {
         List<ReservationTicket> reservationTickets = reservationTicketRepository.findForMember(
                 loginMember.id());
 
@@ -65,7 +70,7 @@ public class ReservationTicketService {
                 .toList();
     }
 
-    public List<ReservationTicketResponseDto> searchReservations(
+    public List<ReservationTicketResponseDto> searchReservationTickets(
             ReservationSearchDto reservationSearchDto) {
         Long themeId = reservationSearchDto.themeId();
         Long memberId = reservationSearchDto.memberId();
@@ -81,14 +86,14 @@ public class ReservationTicketService {
                 .toList();
     }
 
-    public void cancelReservation(Long id) {
+    public void cancelReservationTicket(Long id) {
         ReservationTicket reservationTicket = reservationTicketRepository.findById(id);
         reservationTicketRepository.deleteById(id);
 
-        promoteNextWaitingToReservation(reservationTicket);
+        promoteNextWaitingToReservationTicket(reservationTicket);
     }
 
-    private void promoteNextWaitingToReservation(ReservationTicket reservationTicket) {
+    private void promoteNextWaitingToReservationTicket(ReservationTicket reservationTicket) {
         Optional<Waiting> optionalNextWaiting = waitingRepository.findNextWaiting(
                 reservationTicket.getDate(),
                 reservationTicket.getReservationTime(),
@@ -101,16 +106,16 @@ public class ReservationTicketService {
 
         Waiting nextWaiting = optionalNextWaiting.get();
 
-        promoteToReservation(nextWaiting);
+        promoteToReservationTicket(nextWaiting);
         waitingRepository.delete(nextWaiting);
     }
 
-    private void promoteToReservation(Waiting nextWaiting) {
-        ReservationTicket convertedReservationTicket = convertToReservation(nextWaiting);
+    private void promoteToReservationTicket(Waiting nextWaiting) {
+        ReservationTicket convertedReservationTicket = convertToReservationTicket(nextWaiting);
         reservationTicketRepository.save(convertedReservationTicket);
     }
 
-    private ReservationTicket convertToReservation(Waiting nextWaiting) {
+    private ReservationTicket convertToReservationTicket(Waiting nextWaiting) {
         return new ReservationTicket(
                 new Reservation(
                         nextWaiting.getReservationDate(),
@@ -121,7 +126,7 @@ public class ReservationTicketService {
                 ));
     }
 
-    private ReservationTicket createReservation(
+    private ReservationTicket createReservationTicket(
             ReservationTicketRegisterDto reservationTicketRegisterDto,
             LoginMember loginMember) {
         ReservationTime time = reservationTimeRepository.findById(

@@ -21,6 +21,6 @@ public class MemberReservationTicketController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<MemberReservationResponseDto> getMemberReservations(LoginMember loginMember) {
-        return reservationTicketService.getReservationsOfMember(loginMember);
+        return reservationTicketService.getReservationTicketsOfMember(loginMember);
     }
 }

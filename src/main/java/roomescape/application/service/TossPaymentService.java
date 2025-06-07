@@ -40,6 +40,11 @@ public class TossPaymentService {
                 PaymentTargetType.RESERVATION_TICKET
         );
 
+        tossPaymentRepository.save(tossPayment);
+    }
+
+    public void processPayment(TossPaymentRequestDto tossPaymentRequestDto,
+                               String requestKey) {
         TossPaymentConfirmDto tossPaymentConfirmDto = new TossPaymentConfirmDto(
                 tossPaymentRequestDto.paymentKey(),
                 tossPaymentRequestDto.orderId(),
@@ -52,8 +57,17 @@ public class TossPaymentService {
         if (!tossPaymentConfirmResponseDto.status().equals("DONE")) {
             throw new PaymentClientException("승인되지 않은 결제 내역입니다.");
         }
-
-        tossPaymentRepository.save(tossPayment);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void saveTossPayment(TossPaymentRequestDto tossPaymentRequestDto, ReservationTicket reservationTicket) {
+        TossPayment tossPayment = new TossPayment(
+                tossPaymentRequestDto.paymentKey(),
+                tossPaymentRequestDto.orderId(),
+                tossPaymentRequestDto.amount(),
+                reservationTicket.getId(),
+                PaymentTargetType.RESERVATION_TICKET
+        );
+        tossPaymentRepository.save(tossPayment);
+    }
 }

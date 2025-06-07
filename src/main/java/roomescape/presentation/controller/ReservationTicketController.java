@@ -17,7 +17,7 @@ import roomescape.application.facade.ReservationTicketPaymentService;
 import roomescape.application.service.ReservationTicketService;
 import roomescape.dto.LoginMember;
 import roomescape.dto.request.ReservationSearchDto;
-import roomescape.dto.request.ReservationTicketPaymentWithTossRequestDto;
+import roomescape.dto.request.ReservationTicketPaymentRequestDto;
 import roomescape.dto.response.ReservationTicketResponseDto;
 
 @RestController
@@ -31,29 +31,31 @@ public class ReservationTicketController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<ReservationTicketResponseDto> getReservations() {
-        return reservationTicketService.getAllReservations();
+        return reservationTicketService.getReservationTickets();
     }
 
     @GetMapping("/search")
     @ResponseStatus(HttpStatus.OK)
     public List<ReservationTicketResponseDto> getReservations(
             @ModelAttribute ReservationSearchDto reservationSearchDto) {
-        return reservationTicketService.searchReservations(reservationSearchDto);
+        return reservationTicketService.searchReservationTickets(reservationSearchDto);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ReservationTicketResponseDto addReservation(
-            @RequestBody @Valid ReservationTicketPaymentWithTossRequestDto reservationTicketPaymentWithTossRequestDto,
+            @RequestBody @Valid ReservationTicketPaymentRequestDto reservationTicketPaymentRequestDto,
             LoginMember loginMember) {
 
-        return reservationTicketPaymentService.saveReservationWithTossPaymentGateWay(
-                reservationTicketPaymentWithTossRequestDto, loginMember);
+        reservationTicketPaymentService.processReservationRegistration(reservationTicketPaymentRequestDto, loginMember);
+
+        return reservationTicketPaymentService.saveReservationWithPayment(reservationTicketPaymentRequestDto,
+                loginMember);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteReservation(@PathVariable("id") Long id) {
-        reservationTicketService.cancelReservation(id);
+        reservationTicketService.cancelReservationTicket(id);
     }
 }

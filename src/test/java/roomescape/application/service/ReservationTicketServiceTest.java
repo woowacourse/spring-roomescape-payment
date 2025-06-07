@@ -77,10 +77,10 @@ class ReservationTicketServiceTest extends ServiceTest {
         );
 
         // when
-        this.reservationTicketService.cancelReservation(reservationTicket.getId());
+        this.reservationTicketService.cancelReservationTicket(reservationTicket.getId());
 
         // then
-        List<ReservationTicketResponseDto> reservations = this.reservationTicketService.getAllReservations();
+        List<ReservationTicketResponseDto> reservations = this.reservationTicketService.getReservationTickets();
         assertThat(reservations).isEmpty();
     }
 
@@ -109,7 +109,7 @@ class ReservationTicketServiceTest extends ServiceTest {
         LoginMember loginMember = new LoginMember(member);
 
         //when
-        List<MemberReservationResponseDto> response = reservationTicketService.getReservationsOfMember(
+        List<MemberReservationResponseDto> response = reservationTicketService.getReservationTicketsOfMember(
                 loginMember);
 
         List<MemberReservationResponseDto> comparedResponse = List.of(
@@ -162,7 +162,7 @@ class ReservationTicketServiceTest extends ServiceTest {
                 )));
 
         // when
-        reservationTicketService.cancelReservation(reservationTicket.getId());
+        reservationTicketService.cancelReservationTicket(reservationTicket.getId());
 
         // then
         List<ReservationTicket> allReservationTickets = reservationTicketRepository.findAll();
