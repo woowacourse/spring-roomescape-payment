@@ -22,7 +22,6 @@ public class CookieManager {
                 .httpOnly(true)
                 .sameSite("Strict")
                 .path("/")
-                .domain(cookieProperties.getDomain())
                 .maxAge(cookieProperties.getMaxAge())
                 .build();
     }
@@ -32,7 +31,6 @@ public class CookieManager {
                 .httpOnly(true)
                 .sameSite("Strict")
                 .path("/")
-                .domain(cookieProperties.getDomain())
                 .maxAge(0)
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
