@@ -24,7 +24,7 @@ public class SwaggerConfig {
     public OpenAPI openAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("방탕출 예약 API")
+                        .title("방탈출 예약 API")
                         .version("v1")
                         .description("방탈출 예약 관련 API 명세서"))
                 .servers(List.of(
