@@ -1,6 +1,7 @@
 package roomescape.unit.presentation;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
@@ -38,6 +39,7 @@ import roomescape.auth.jwt.JJWTJwtUtil;
 import roomescape.business.model.entity.Member;
 import roomescape.business.model.vo.UserRole;
 import roomescape.business.service.ReservationTimeService;
+import roomescape.exception.reservation.TimeSlotNotFoundException;
 import roomescape.presentation.api.ReservationTimeApiController;
 import roomescape.presentation.dto.request.ReservationTimeRequest;
 import roomescape.presentation.dto.response.ReservationTimeResponseWithBooked;
@@ -166,6 +168,28 @@ class ReservationTimeApiControllerTest {
                 .cookie(new Cookie("authToken", token.value())));
         // then
         result.andExpect(status().isNoContent())
-                .andDo(document("delete-time-slot"));
+                .andDo(document("time-slot/delete-time-slot/success"));
+    }
+
+    @Test
+    void 존재하지_않는_예약시간을_삭제할_경우_400_에러가_발생한다() throws Exception {
+        // given
+        AuthToken token = jwtUtil.createToken(
+                Member.restore("name", UserRole.ADMIN.name(), "admin", "email1@domain.com", "password1"));
+        doThrow(new TimeSlotNotFoundException()).when(reservationTimeService).delete("1");
+
+        // when
+        ResultActions result = mockMvc.perform(delete("/times/1")
+                .cookie(new Cookie("authToken", token.value())));
+        // then
+        result.andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value("존재하지 않는 예약 시간입니다."))
+                .andDo(document("time-slot/delete-time-slot/error/time-slot-not-found-exception",
+                        responseFields(
+                                fieldWithPath("timestamp").type(JsonFieldType.STRING).description("타임스탬프"),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description("에러 메시지"),
+                                fieldWithPath("status").type(JsonFieldType.NUMBER).description("HTTP 상태 코드")
+                        )
+                ));
     }
 }
