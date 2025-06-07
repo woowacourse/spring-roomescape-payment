@@ -7,6 +7,7 @@ import static roomescape.infrastructure.ReservationSpecs.byStatus;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.RoomescapeSchedule;
@@ -24,6 +25,7 @@ import roomescape.exception.BusinessRuleViolationException;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -66,6 +68,7 @@ public class ReservationService {
         var reservation = reservationRepository.getById(id);
         removeFromQueueById(reservation);
         reservationRepository.delete(reservation);
+        log.info("예약이 삭제되었습니다. 삭제된 reservation = {}", reservation);
     }
 
     @Transactional
@@ -74,6 +77,7 @@ public class ReservationService {
         var reservation = reservationRepository.getById(reservationId);
         removeFromQueueById(reservation);
         user.cancelReservation(reservation);
+        log.info("예약이 취소되었습니다. 취소된 reservation = {}", reservation);
     }
 
     private void removeFromQueueById(final Reservation reservation) {
@@ -85,7 +89,9 @@ public class ReservationService {
         var user = userRepository.getById(userId);
         var reservation = new Reservation(user, schedule, status);
         user.reserve(reservation);
-        return reservationRepository.save(reservation);
+        var savedReservation = reservationRepository.save(reservation);
+        log.info("예약이 생성되었습니다. reservation = {}", savedReservation);
+        return savedReservation;
     }
 
     private RoomescapeSchedule toRoomescapeSchedule(final LocalDate date, final long timeId, final long themeId) {

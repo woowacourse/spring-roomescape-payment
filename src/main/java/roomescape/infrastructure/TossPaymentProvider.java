@@ -3,8 +3,7 @@ package roomescape.infrastructure;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
@@ -17,11 +16,10 @@ import roomescape.exception.PaymentFailedException;
 import roomescape.infrastructure.TossPaymentProviderConfig.TossApiProperties;
 
 @RequiredArgsConstructor
+@Slf4j
 @Component
 @EnableConfigurationProperties(TossApiProperties.class)
 public class TossPaymentProvider implements PaymentProvider {
-
-    private final Logger logger = LoggerFactory.getLogger(TossPaymentProvider.class);
 
     private final RestTemplate restTemplate;
     private final TossApiProperties properties;
@@ -30,16 +28,16 @@ public class TossPaymentProvider implements PaymentProvider {
         for (int tried = 1; tried <= properties.connectionTryCount(); tried++) {
             try {
                 var response = restTemplate.postForObject(properties.confirmUri(), request, TossSuccessResponse.class);
-                logger.info("토스 결제 승인에 성공했습니다. request = {}, response = {}", request, response);
+                log.info("토스 결제 승인에 성공했습니다. request = {}, response = {}", request, response);
                 return new Payment(response.paymentKey, response.totalAmount);
 
             } catch (RestClientResponseException e) {
                 var response = readTossFailureResponse(e);
-                logger.info("토스 결제 승인에 실패했습니다. request = {}, response = {}", request, response);
+                log.info("토스 결제 승인에 실패했습니다. request = {}, response = {}", request, response);
                 throw newPaymentFailedException(response.code, response.message);
 
             } catch (ResourceAccessException e) {
-                logger.warn("토스 결제 승인 API 연결에 실패했습니다. request = {}, exception = {}", request, e.toString());
+                log.warn("토스 결제 승인 API 연결에 실패했습니다. request = {}, exception = {}", request, e.toString());
             }
         }
 
