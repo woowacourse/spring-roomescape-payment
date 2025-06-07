@@ -2,13 +2,12 @@ package roomescape.theme.controller;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import roomescape.theme.repository.ThemeRepository;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -21,8 +20,12 @@ import static org.hamcrest.Matchers.is;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class ThemeControllerTest {
 
-    @Autowired
-    private ThemeRepository themeRepository;
+    private String token;
+
+    @BeforeEach
+    void setup() {
+        token = getAdminLoginTokenValue();
+    }
 
     @DisplayName("테마를 추가한다.")
     @Test
@@ -34,6 +37,7 @@ class ThemeControllerTest {
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .cookie("token", token)
                 .body(params)
                 .when().post("/themes")
                 .then().log().all()
@@ -50,6 +54,7 @@ class ThemeControllerTest {
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .cookie("token", token)
                 .body(params)
                 .when().post("/themes")
                 .then().log().all()
@@ -72,11 +77,13 @@ class ThemeControllerTest {
 
         int themeId = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .cookie("token", token)
                 .body(params)
                 .when().post("/themes")
                 .then().extract().path("id");
 
         RestAssured.given().log().all()
+                .cookie("token", token)
                 .when().delete("/themes/" + themeId)
                 .then().log().all()
                 .statusCode(204);
@@ -88,6 +95,7 @@ class ThemeControllerTest {
         int notFoundStatusCode = 404;
 
         RestAssured.given().log().all()
+                .cookie("token", token)
                 .when().delete("/themes/0")
                 .then().log().all()
                 .statusCode(notFoundStatusCode);
@@ -102,6 +110,7 @@ class ThemeControllerTest {
         int conflictStatusCode = 409;
 
         RestAssured.given().log().all()
+                .cookie("token", token)
                 .when().delete("/themes/" + themeId)
                 .then().log().all()
                 .statusCode(conflictStatusCode);
@@ -150,6 +159,7 @@ class ThemeControllerTest {
 
         return RestAssured.given()
                 .contentType(ContentType.JSON)
+                .cookie("token", token)
                 .body(timeParams)
                 .when().post("/times")
                 .then().extract().path("id");
@@ -158,6 +168,7 @@ class ThemeControllerTest {
     private int addTheme(final Map<String, Object> themeParams) {
         return RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .cookie("token", token)
                 .body(themeParams)
                 .when().post("/themes")
                 .then().extract().path("id");

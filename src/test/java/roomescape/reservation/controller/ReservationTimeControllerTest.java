@@ -22,11 +22,13 @@ class ReservationTimeControllerTest {
     @DisplayName("예약 시간을 추가한다.")
     @Test
     void test1() {
+        String token = getAdminLoginTokenValue();
         Map<String, String> params = new HashMap<>();
         params.put("startAt", "10:00");
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .cookie("token", token)
                 .body(params)
                 .when().post("/times")
                 .then().log().all()
@@ -36,11 +38,13 @@ class ReservationTimeControllerTest {
     @DisplayName("예약 시간 요청에 초가 있으면 Bad Request 반환")
     @Test
     void test2() {
+        String token = getAdminLoginTokenValue();
         Map<String, String> params = new HashMap<>();
         params.put("startAt", "10:00:20");
 
         RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .cookie("token", token)
                 .body(params)
                 .when().post("/times")
                 .then().log().all()
@@ -62,9 +66,11 @@ class ReservationTimeControllerTest {
     @DisplayName("해당 예약 시간을 삭제한다")
     @Test
     void test4() {
-        int timeId = addReservationTime("10:00");
+        String token = getAdminLoginTokenValue();
+        final int timeId = addReservationTime("10:00");
 
         RestAssured.given().log().all()
+                .cookie("token", token)
                 .when().delete("/times/" + timeId)
                 .then().log().all()
                 .statusCode(204);
@@ -73,9 +79,11 @@ class ReservationTimeControllerTest {
     @DisplayName("없는 예약 시간을 삭제하면 NOT FOUND 반환")
     @Test
     void test5() {
-        int notFoundStatusCode = 404;
+        String token = getAdminLoginTokenValue();
+        final int notFoundStatusCode = 404;
 
         RestAssured.given().log().all()
+                .cookie("token", token)
                 .when().delete("/times/0")
                 .then().log().all()
                 .statusCode(notFoundStatusCode);
@@ -84,12 +92,15 @@ class ReservationTimeControllerTest {
     @DisplayName("사용 중인 예약 시간이 있다면 삭제를 하면 409 CONFLICT를 반환한다.")
     @Test
     void test6() {
+        String token = getAdminLoginTokenValue();
+
         int conflictStatusCode = 409;
         int timeId = addReservationTime("10:00");
         int themeId = addTheme();
         addReservation(timeId, themeId);
 
         RestAssured.given().log().all()
+                .cookie("token", token)
                 .when().delete("/times/" + timeId)
                 .then().log().all()
                 .statusCode(conflictStatusCode);
@@ -124,21 +135,25 @@ class ReservationTimeControllerTest {
     }
 
     private int addReservationTime(final String timeValue) {
+        String tokenValue = getAdminLoginTokenValue();
         Map<String, String> timeParams = Map.of("startAt", timeValue);
 
         return RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .cookie("token", tokenValue)
                 .body(timeParams)
                 .when().post("/times")
                 .then().extract().path("id");
     }
 
     private int addTheme() {
+        String tokenValue = getAdminLoginTokenValue();
         Map<String, String> themeParams = Map.of(
                 "name", "테마1", "description", "테마1", "thumbnail", "www.m.com"
         );
         return RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .cookie("token", tokenValue)
                 .body(themeParams)
                 .when().post("/themes")
                 .then().extract().path("id");

@@ -1,5 +1,7 @@
 package roomescape.member.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import roomescape.member.service.dto.response.MemberResponse;
 
 import java.util.List;
 
+@Tag(name = "일반 유저", description = "유저 회원가입 및 조회")
 @RestController
 @RequestMapping("/members")
 public class MemberController {
@@ -24,6 +27,7 @@ public class MemberController {
         this.memberService = memberService;
     }
 
+    @Operation(summary = "회원가입")
     @PostMapping
     public ResponseEntity<Void> create(
             @RequestBody @Valid final MemberCreateRequest request
@@ -34,6 +38,7 @@ public class MemberController {
                 .build();
     }
 
+    @Operation(summary = "가입자 목록 조회", description = "모든 가입자 정보 조회")
     @GetMapping
     public ResponseEntity<List<MemberResponse>> findAll() {
         final List<MemberResponse> responses = memberService.findAll();

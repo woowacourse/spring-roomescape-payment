@@ -1,5 +1,7 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,6 +27,7 @@ import roomescape.reservation.service.dto.response.ReservationWithPaymentRespons
 import java.time.LocalDate;
 import java.util.List;
 
+@Tag(name = "예약 관리")
 @RequestMapping("/reservations")
 @RestController
 public class ReservationController {
@@ -43,6 +46,7 @@ public class ReservationController {
         this.deleteReservationService = deleteReservationService;
     }
 
+    @Operation(summary = "전체 예약 내역 조회")
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> readAllReservations() {
         List<ReservationResponse> response = reservationQueryService.getAll();
@@ -50,6 +54,7 @@ public class ReservationController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "예약 가능 시간 조회", description = "주어진 조건 내에서 생성 가능한 모든 예약 시간을 조회한다.")
     @GetMapping("/times")
     public ResponseEntity<List<ReservationTimeWithBookedResponse>> readAvailableReservationTimes(
             @RequestParam("date") final LocalDate date,
@@ -60,6 +65,7 @@ public class ReservationController {
         return ResponseEntity.ok(responses);
     }
 
+    @Operation(summary = "예약 및 결제 요청", description = "로그인 유저의 결제 정보로 결제를 진행하고, 원하는 예약을 생성한다.")
     @PostMapping
     public ResponseEntity<ReservationResponse> createWithPayment(
             @Valid @RequestBody ReservationWithPaymentRequest request,
@@ -70,12 +76,14 @@ public class ReservationController {
         return ResponseEntity.ok(ReservationResponse.from(response));
     }
 
+    @Operation(summary = "예약 삭제", description = "로그인 유저가 생성한 예약을 삭제한다. 타인의 예약은 삭제할 수 없다.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") final Long id, LoginMember loginMember) {
         deleteReservationService.delete(id, loginMember);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "예약 내역 조건 검색", description = "조건에 해당하는 모든 예약 내역을 조회한다.")
     @GetMapping("/filtering")
     public ResponseEntity<List<ReservationResponse>> findAllByFilter(
             @ModelAttribute @Valid final FilteringReservationRequest request
@@ -85,6 +93,7 @@ public class ReservationController {
         return ResponseEntity.ok(reservationResponses);
     }
 
+    @Operation(summary = "내 예약 조회", description = "로그인 유저가 생성한 모든 예약 내역을 조회한다.")
     @GetMapping("/my")
     public ResponseEntity<List<MyReservationsResponse>> getMyReservations(@Valid LoginMember loginMember) {
         List<MyReservationsResponse> response = reservationQueryService.getAllLoginMemberReservations(loginMember);

@@ -154,11 +154,13 @@ class WaitingControllerTest {
     }
 
     private Long addTheme() {
+        String token = getAdminLoginToken();
         Map<String, String> themeParams = Map.of(
                 "name", "테마1", "description", "테마1", "thumbnail", "www.m.com"
         );
         Number id = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .cookie("token", token)
                 .body(themeParams)
                 .when().post("/themes")
                 .then().extract().body().path("id");
@@ -166,10 +168,12 @@ class WaitingControllerTest {
     }
 
     private Long addReservationTime(final LocalTime time) {
+        String token = getAdminLoginToken();
         Map<String, Object> timeParams = Map.of("startAt", time);
 
         Number id = RestAssured.given()
                 .contentType(ContentType.JSON)
+                .cookie("token", token)
                 .body(timeParams)
                 .when().post("/times")
                 .then().extract().body().path("id");

@@ -1,5 +1,7 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,8 +18,9 @@ import roomescape.reservation.service.dto.response.ReservationResponse;
 
 import java.net.URI;
 
-@RequestMapping("/admin/reservations")
+@Tag(name = "어드민 예약 관리")
 @RestController
+@RequestMapping("/admin/reservations")
 public class AdminReservationController {
 
     private final AuthService authService;
@@ -31,6 +34,7 @@ public class AdminReservationController {
         this.createReservationService = createReservationService;
     }
 
+    @Operation(summary = "어드민 예약 생성", description = "어드민 권한의 예약을 생성하여 결제 정보가 포함되지 않는다.")
     @RequiredAdmin
     @PostMapping
     public ResponseEntity<ReservationResponse> create(

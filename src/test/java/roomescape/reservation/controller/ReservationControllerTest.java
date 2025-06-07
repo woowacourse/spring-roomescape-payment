@@ -290,21 +290,25 @@ class ReservationControllerTest {
     }
 
     private int addReservationTime(final String timeValue) {
+        String tokenValue = getAdminLoginTokenValue();
         Map<String, String> timeParams = Map.of("startAt", timeValue);
 
         return RestAssured.given()
                 .contentType(ContentType.JSON)
+                .cookie("token", tokenValue)
                 .body(timeParams)
                 .when().post("/times")
                 .then().extract().path("id");
     }
 
     private int addTheme() {
+        String tokenValue = getAdminLoginTokenValue();
         Map<String, String> themeParams = Map.of(
                 "name", "테마1", "description", "테마1", "thumbnail", "www.m.com"
         );
         return RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
+                .cookie("token", tokenValue)
                 .body(themeParams)
                 .when().post("/themes")
                 .then().extract().path("id");
