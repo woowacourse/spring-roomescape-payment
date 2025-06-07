@@ -45,6 +45,10 @@ public class Payment {
         this.amount = amount;
     }
 
+    public static Payment ofOfflinePayment() {
+        return new Payment("offline-payment-key", "offline-order-id", 0L);
+    }
+
     public static Payment of(
             final String paymentKey,
             final String orderId,
