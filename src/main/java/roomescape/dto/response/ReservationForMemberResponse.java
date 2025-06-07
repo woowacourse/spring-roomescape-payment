@@ -1,23 +1,27 @@
 package roomescape.dto.response;
 
 import java.time.LocalDate;
+import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 
-public record ReservationResponse(
+public record ReservationForMemberResponse(
         Long id,
         String memberName,
         LocalDate date,
         ReservationTimeResponse time,
-        String themeName
+        String themeName,
+        PaymentResponse payment
 ) {
-    public static ReservationResponse from(Reservation reservation) {
+    public static ReservationForMemberResponse of(Reservation reservation, Payment payment) {
         ReservationTimeResponse timeDto = ReservationTimeResponse.from(reservation.getReservationTime());
-        return new ReservationResponse(
+        PaymentResponse paymentDto = PaymentResponse.from(payment);
+        return new ReservationForMemberResponse(
                 reservation.getId(),
                 reservation.getMember().getName(),
                 reservation.getDate(),
                 timeDto,
-                reservation.getTheme().getName()
+                reservation.getTheme().getName(),
+                paymentDto
         );
     }
 }

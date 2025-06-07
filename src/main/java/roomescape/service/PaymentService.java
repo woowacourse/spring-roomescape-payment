@@ -4,9 +4,9 @@ import org.springframework.stereotype.Service;
 import roomescape.domain.Payment;
 import roomescape.domain.Reservation;
 import roomescape.dto.request.PaymentRequest;
+import roomescape.dto.response.PaymentResponse;
 import roomescape.infrastructure.PaymentRepositoryAdaptor;
 import roomescape.infrastructure.payment.PaymentClient;
-import roomescape.infrastructure.payment.PaymentDto;
 
 @Service
 public class PaymentService {
@@ -18,16 +18,16 @@ public class PaymentService {
         this.paymentRepositoryAdaptor = paymentRepositoryAdaptor;
     }
 
-    public PaymentDto approve(PaymentRequest paymentRequest) {
+    public PaymentResponse approve(PaymentRequest paymentRequest) {
         return paymentClient.approve(paymentRequest);
     }
 
-    public Payment createPaymentWithReservation(PaymentDto paymentDto, Reservation reservation) {
+    public Payment createPaymentWithReservation(PaymentResponse paymentResponse, Reservation reservation) {
         return Payment.createPaymentWithoutId(
-                paymentDto.orderId(),
+                paymentResponse.orderId(),
                 reservation,
-                paymentDto.paymentKey(),
-                paymentDto.amount());
+                paymentResponse.paymentKey(),
+                paymentResponse.amount());
     }
 
     public Payment save(Payment payment) {

@@ -18,6 +18,8 @@ import roomescape.domain.repository.ReservationTimeRepository;
 import roomescape.domain.repository.ThemeRepository;
 import roomescape.domain.repository.WaitingRepository;
 import roomescape.dto.request.ReservationCondition;
+import roomescape.dto.response.PaymentResponse;
+import roomescape.dto.response.ReservationForMemberResponse;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationWithStatusResponse;
 import roomescape.exception.ExistedReservationException;
@@ -25,7 +27,6 @@ import roomescape.exception.MemberNotFoundException;
 import roomescape.exception.ReservationNotFoundException;
 import roomescape.exception.ReservationTimeNotFoundException;
 import roomescape.exception.ThemeNotFoundException;
-import roomescape.infrastructure.payment.PaymentDto;
 
 @Service
 public class ReservationService {
@@ -95,11 +96,11 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse reserveWithPayment(Long memberId,
-                                                  Long timeId,
-                                                  Long themeId,
-                                                  LocalDate date,
-                                                  PaymentDto paymentDto
+    public ReservationForMemberResponse reserveWithPayment(Long memberId,
+                                                           Long timeId,
+                                                           Long themeId,
+                                                           LocalDate date,
+                                                           PaymentResponse paymentResponse
     ) {
         ReservationTime reservationTime = reservationTimeRepository.findById(timeId)
                 .orElseThrow(ReservationTimeNotFoundException::new);
@@ -110,10 +111,10 @@ public class ReservationService {
         reservation.validateDateTime();
         validateDuplicate(date, reservationTime, theme);
 
-        Reservation savedReservation = reservationRepository.save(reservation); // 예약 생성
-        Payment payment = paymentService.createPaymentWithReservation(paymentDto, savedReservation);
+        Reservation savedReservation = reservationRepository.save(reservation);
+        Payment payment = paymentService.createPaymentWithReservation(paymentResponse, savedReservation);
         paymentService.save(payment);
-        return ReservationResponse.from(savedReservation);
+        return ReservationForMemberResponse.of(savedReservation, payment);
     }
 
     private void validateDuplicate(LocalDate date, ReservationTime time, Theme theme) {

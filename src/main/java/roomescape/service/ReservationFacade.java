@@ -3,8 +3,8 @@ package roomescape.service;
 import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 import roomescape.dto.request.PaymentRequest;
-import roomescape.dto.response.ReservationResponse;
-import roomescape.infrastructure.payment.PaymentDto;
+import roomescape.dto.response.PaymentResponse;
+import roomescape.dto.response.ReservationForMemberResponse;
 
 @Service
 public class ReservationFacade {
@@ -16,12 +16,12 @@ public class ReservationFacade {
         this.paymentService = paymentService;
     }
 
-    public ReservationResponse processReservationForMember(Long memberId,
-                                                           Long timeId,
-                                                           Long themeId,
-                                                           LocalDate date,
-                                                           PaymentRequest request) {
-        PaymentDto paymentDto = paymentService.approve(request);
-        return reservationService.reserveWithPayment(memberId, timeId, themeId, date, paymentDto);
+    public ReservationForMemberResponse processReservationForMember(Long memberId,
+                                                                    Long timeId,
+                                                                    Long themeId,
+                                                                    LocalDate date,
+                                                                    PaymentRequest request) {
+        PaymentResponse paymentResponse = paymentService.approve(request);
+        return reservationService.reserveWithPayment(memberId, timeId, themeId, date, paymentResponse);
     }
 }
