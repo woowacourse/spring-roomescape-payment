@@ -2,16 +2,20 @@ package roomescape.payment.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
 import roomescape.payment.dto.PaymentResponseDto;
 import roomescape.reservation.domain.Reservation;
 
 @Entity
+@Getter
 @Table(name = "payment")
 public class Payment {
 
@@ -32,14 +36,19 @@ public class Payment {
     @JoinColumn(name = "reservation_id", nullable = false)
     private Reservation reservation;
 
+    @Column(name = "status", nullable = false)
+    @Enumerated(value = EnumType.STRING)
+    private PaymentStatus status;
+
     protected Payment() {
     }
 
-    public Payment(String paymentKey, String orderId, int amount, Reservation reservation) {
+    public Payment(String paymentKey, String orderId, int amount, Reservation reservation, PaymentStatus paymentStatus) {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
         this.reservation = reservation;
+        this.status = paymentStatus;
     }
 
     public static Payment of(PaymentResponseDto responseDto, Reservation reservation) {
@@ -47,27 +56,12 @@ public class Payment {
                 responseDto.paymentKey(),
                 responseDto.orderId(),
                 responseDto.totalAmount(),
-                reservation
+                reservation,
+                PaymentStatus.COMPLETED
         );
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getPaymentKey() {
-        return paymentKey;
-    }
-
-    public String getOrderId() {
-        return orderId;
-    }
-
-    public int getAmount() {
-        return amount;
-    }
-
-    public Reservation getReservation() {
-        return reservation;
+    public void changeStatus(PaymentStatus paymentStatus) {
+        status = paymentStatus;
     }
 }

@@ -54,7 +54,7 @@ class TossRestClientTest {
                 {
                     "paymentKey": "paymentKey_test",
                     "orderId": "orderId123",
-                    "amount": 10000
+                    "totalAmount": 10000
                 }
                 """;
         String expectedResponse = expectedRequest;
@@ -71,7 +71,7 @@ class TossRestClientTest {
         assertAll(
                 () -> assertThat(responseDto.paymentKey()).isEqualTo("paymentKey_test"),
                 () -> assertThat(responseDto.orderId()).isEqualTo("orderId123"),
-                () -> assertThat(responseDto.amount()).isEqualTo(10000)
+                () -> assertThat(responseDto.totalAmount()).isEqualTo(10000)
         );
     }
 
