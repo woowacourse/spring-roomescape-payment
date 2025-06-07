@@ -14,6 +14,7 @@ import roomescape.reservation.application.dto.request.ConfirmedReservationByCrit
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
 import roomescape.reservation.application.dto.request.ReservationCreateWebRequest;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.presentation.dto.response.ConfirmedReservationWebResponse;
 import roomescape.reservationslot.application.ReservationSlotDataService;
 import roomescape.reservationslot.domain.ReservationSlot;
@@ -83,13 +84,22 @@ public class ConfirmedReservationApplicationService {
         List<Reservation> reservations = reservationDataService.findMemberReservations(memberId);
         return reservations.stream()
                 .map(reservation -> {
-                    Payment payment = paymentApplicationService.findPaymentOfReservation(reservation.getId());
                     ReservationSlot reservationSlot = reservation.getReservationSlot();
-                    return new MyReservationResponse(reservationSlot.getId(), reservationSlot.getTheme().getName(),
-                            reservationSlot.getDate().toString(), reservationSlot.getTime().getStartAt().toString(), reservation.getStatus(),
-                            payment.getPaymentKey(), payment.getAmount(), reservationSlot.findRank(reservation));
+                    Payment payment = paymentApplicationService.findPaymentOfReservation(reservation.getId());
+                    return generateMyReservationResponses(reservation, reservationSlot, payment);
                 })
                 .toList();
+    }
+
+    private MyReservationResponse generateMyReservationResponses(Reservation reservation, ReservationSlot reservationSlot, Payment payment) {
+        if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
+            return new MyReservationResponse(reservationSlot.getId(), reservationSlot.getTheme().getName(),
+                    reservationSlot.getDate().toString(), reservationSlot.getTime().getStartAt().toString(), reservation.getStatus(),
+                    payment.getPaymentKey(), payment.getAmount(), reservationSlot.findRank(reservation));
+        }
+        return new MyReservationResponse(reservationSlot.getId(), reservationSlot.getTheme().getName(),
+                reservationSlot.getDate().toString(), reservationSlot.getTime().getStartAt().toString(), reservation.getStatus(),
+                null, null, reservationSlot.findRank(reservation));
     }
 
     public void cancel(final Long reservationId) {
