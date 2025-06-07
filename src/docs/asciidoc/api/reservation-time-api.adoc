@@ -9,6 +9,8 @@
 
 === 예약 가능 시간 조회
 
+예약 날짜를 통해 예약 가능한 시간을 조회할 수 있다.
+
 ==== 요청
 
 include::{snippets}/reservation-time-api-controller-test/예약_가능한_시간_목록을_조회할_수_있다/http-request.adoc[]
@@ -23,6 +25,8 @@ include::{snippets}/reservation-time-api-controller-test/예약_가능한_시간
 
 === 예약 전체 시간 조회
 
+예약을 할 수 있는 시간 대 전체를 조회할 수 있다. 예약이 가능한 시간은 예약 시간 생성 시에만 가능하다.
+
 ==== 요청
 
 include::{snippets}/reservation-time-api-controller-test/예약_시간_목록을_조회할_수_있다/http-request.adoc[]
@@ -36,6 +40,8 @@ include::{snippets}/reservation-time-api-controller-test/예약_시간_목록을
 include::{snippets}/reservation-time-api-controller-test/예약_시간_목록을_조회할_수_있다/response-fields.adoc[]
 
 === 예약 시간 생성
+
+예약을 할 수 있는 시간을 생성할 수 있다. 예약 시간은 예약이 가능한 시간 대를 의미한다. 예약 시간은 하루에 1개만 존재할 수 있다.
 
 ==== 요청
 
@@ -58,6 +64,8 @@ include::{snippets}/reservation-time-api-controller-test/예약_시간을_생성
 include::{snippets}/reservation-time-api-controller-test/예약_시간_생성시_유효성_예외가_발생한다/http-response.adoc[]
 
 === 예약 시간 삭제
+
+예약을 할 수 있는 시간을 삭제할 수 있다. 예약 시간은 하루에 1개만 존재할 수 있으며, 예약이 없는 경우에만 삭제할 수 있다.
 
 ==== 요청
 

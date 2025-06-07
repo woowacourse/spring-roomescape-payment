@@ -9,6 +9,9 @@
 
 === 대기 생성
 
+예약 대기를 생성할 수 있다. 예약 대기는 예약이 마감된 후에 대기할 수 있는 기능이다.
+예약 대기를 생성하면, 예약이 취소되었을 때 순번에 따라 자동으로 예약이 된다.
+
 ==== 요청
 
 include::{snippets}/waiting-api-controller-test/예약_대기를_생성한다/http-request.adoc[]
@@ -38,6 +41,9 @@ include::{snippets}/waiting-api-controller-test/이미_예약한_사람이면_40
 include::{snippets}/waiting-api-controller-test/잘못된_입력값이면_400_상태_코드와_에러코드를_반환한다/http-response.adoc[]
 
 === 예약 대기 취소
+
+예약 대기를 취소할 수 있다. 예약 대기를 취소하면, 해당 예약 대기는 삭제된다.
+대기 상태에 있을 때만 취소를 할 수 있다.
 
 ==== 요청
 

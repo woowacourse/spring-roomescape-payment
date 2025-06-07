@@ -8,6 +8,8 @@
 
 === 테마 전체 조회
 
+모든 테마의 정보를 전체 조회할 수 있다.
+
 ==== 요청
 
 include::{snippets}/theme-api-controller-test/테마_목록을_조회할_수_있다/http-request.adoc[]
@@ -21,6 +23,7 @@ include::{snippets}/theme-api-controller-test/테마_목록을_조회할_수_있
 include::{snippets}/theme-api-controller-test/테마_목록을_조회할_수_있다/response-fields.adoc[]
 
 === 인기 테마 조회
+
 인기 테마는 최근 일주일 간 예약이 많은 상위 10개를 조회한다.
 
 ==== 요청
@@ -36,6 +39,8 @@ include::{snippets}/theme-api-controller-test/인기_테마_목록을_조회할_
 include::{snippets}/theme-api-controller-test/인기_테마_목록을_조회할_수_있다/response-fields.adoc[]
 
 === 테마 생성
+
+테마를 생성할 수 있다. 테마는 예약을 할 수 있는 공간을 의미한다.
 
 ==== 요청
 
@@ -58,6 +63,8 @@ include::{snippets}/theme-api-controller-test/테마를_생성할_수_있다/res
 include::{snippets}/theme-api-controller-test/테마_생성시_유효성_예외가_발생한다/http-response.adoc[]
 
 === 테마 삭제
+
+존재하는 테마를 삭제할 수 있다.
 
 ==== 요청
 
