@@ -1,0 +1,14 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 80
+
+[ {
+  "id" : 1,
+  "startAt" : "10:00"
+}, {
+  "id" : 2,
+  "startAt" : "11:00"
+} ]
+----

@@ -1,0 +1,9 @@
+[source,bash]
+----
+$ echo '{
+  "id" : 1,
+  "startAt" : "10:00"
+}' | http POST 'http://docs.api.com/times' \
+    'Content-Type:application/json' \
+    'Accept:application/json'
+----

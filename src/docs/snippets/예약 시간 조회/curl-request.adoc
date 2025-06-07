@@ -1,0 +1,5 @@
+[source,bash]
+----
+$ curl 'http://docs.api.com/times' -i -X GET \
+    -H 'Accept: application/json'
+----

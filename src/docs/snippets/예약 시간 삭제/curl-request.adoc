@@ -1,0 +1,4 @@
+[source,bash]
+----
+$ curl 'http://docs.api.com/times/1' -i -X DELETE
+----

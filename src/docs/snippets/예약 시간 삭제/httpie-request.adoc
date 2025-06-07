@@ -1,0 +1,4 @@
+[source,bash]
+----
+$ http DELETE 'http://docs.api.com/times/1'
+----

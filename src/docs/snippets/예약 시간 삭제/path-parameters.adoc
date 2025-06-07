@@ -1,0 +1,8 @@
+.+/times/{id}+
+|===
+|Parameter|Description
+
+|`+id+`
+|예약 시간 아이디
+
+|===
