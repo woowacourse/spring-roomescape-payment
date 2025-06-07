@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.common.config.SwaggerConfig;
 import roomescape.common.exception.handler.ErrorResponse;
 import roomescape.common.security.annotation.RequireRole;
 import roomescape.common.security.application.AuthService;
@@ -63,14 +65,15 @@ public class MemberController {
     @Operation(summary = "모든 멤버 조회",
             description = "사이트에 가입된 모든 멤버의 정보를 조회합니다.",
             responses = {
-                @ApiResponse(description = "조회 성공", responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = MemberWebResponse.class))))
-            })
+                @ApiResponse(description = "조회 성공", responseCode = "200", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = MemberWebResponse.class)))),
+            },
+            security = @SecurityRequirement(name = SwaggerConfig.SECURITY_SCHEME_NAME)
+    )
     @RequireRole(MemberRole.ADMIN)
     @GetMapping("/admin/members")
     public ResponseEntity<List<MemberWebResponse>> findAllRegular() {
         return ResponseEntity.ok(memberApplicationService.findAllRegular());
     }
-
 
     @Operation(summary = "로그인",
             description = "로그인 후, 성공 시 토큰을 쿠키에 자동으로 등록합니다.",
@@ -90,7 +93,9 @@ public class MemberController {
             description = "로그인 여부를 확인하며, 로그인이 되어있는 경우 현재 로그인된 멤버의 이름을 반환합니다.",
             responses = {
                 @ApiResponse(description = "상태 확인 성공", responseCode = "200", content = @Content(mediaType = "application/json", schema = @Schema(implementation = CheckLoginResponse.class)))
-            })
+            },
+            security = @SecurityRequirement(name = SwaggerConfig.SECURITY_SCHEME_NAME)
+    )
     @RequireRole(MemberRole.REGULAR)
     @GetMapping("/login/check")
     public ResponseEntity<CheckLoginResponse> checkLogin(@Parameter(hidden = true) final MemberInfo memberInfo) {
@@ -102,7 +107,9 @@ public class MemberController {
             description = "로그인 되어있는 경우, 쿠키에서 토큰을 삭제하여 로그아웃합니다.",
             responses = {
                 @ApiResponse(description = "로그아웃 성공\n\n(쿠키에서 토큰 자동 삭제)", responseCode = "200")
-            })
+            },
+            security = @SecurityRequirement(name = SwaggerConfig.SECURITY_SCHEME_NAME)
+    )
     @RequireRole(MemberRole.REGULAR)
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(final HttpServletResponse httpServletResponse) {
