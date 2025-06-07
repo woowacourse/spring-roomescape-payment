@@ -27,14 +27,14 @@ class PaymentServiceTest extends ServiceTest {
     private PaymentProvider paymentProvider;
 
     @Test
-    @DisplayName("예약에 대한 결제에 성공한다.")
-    void pay() {
+    @DisplayName("예약에 대한 결제 승인에 성공한다.")
+    void confirm() {
         // given
         var pendingReservation = repositoryHelper.saveAnyReservation(ReservationStatus.PENDING);
         stubPaymentProviderAlwaysSuccess();
 
         // when
-        service.pay(pendingReservation.id(),"a", "1", 1000);
+        service.confirm(pendingReservation.id(),"a", "1", 1000);
 
         // then
         var confirmedReservation = repositoryHelper.findReservation(pendingReservation.id());
@@ -45,28 +45,28 @@ class PaymentServiceTest extends ServiceTest {
     }
 
     @Test
-    @DisplayName("보류 상태가 아닌 예약을 결제하려 하면 예외가 발생한다.")
-    void payNotPendingReservation() {
+    @DisplayName("보류 상태가 아닌 예약을 결제 승인하려 하면 예외가 발생한다.")
+    void confirmNotPendingReservation() {
         // given
         var confirmedReservation = repositoryHelper.saveAnyReservation(ReservationStatus.CONFIRMED);
         stubPaymentProviderAlwaysSuccess();
 
         // when & then
         assertThatThrownBy(
-            () -> service.pay(confirmedReservation.id(),"a", "1", 1000)
+            () -> service.confirm(confirmedReservation.id(),"a", "1", 1000)
         ).isInstanceOf(PaymentFailedException.class);
     }
 
     @Test
-    @DisplayName("결제 실패 시 예외가 발생한다.")
-    void failToPay() {
+    @DisplayName("결제 승인 실패 시 예외가 발생한다.")
+    void failToConfirm() {
         // given
         var pendingReservation = repositoryHelper.saveAnyReservation(ReservationStatus.PENDING);
         stubPaymentProviderAlwaysThrowsException();
 
         // when & then
         assertThatThrownBy(
-            () -> service.pay(pendingReservation.id(),"a", "1", 1000)
+            () -> service.confirm(pendingReservation.id(),"a", "1", 1000)
         ).isInstanceOf(PaymentFailedException.class);
     }
 

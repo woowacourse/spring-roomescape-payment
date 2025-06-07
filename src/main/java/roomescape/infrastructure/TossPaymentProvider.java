@@ -33,7 +33,7 @@ public class TossPaymentProvider implements PaymentProvider {
 
             } catch (RestClientResponseException e) {
                 var response = readTossFailureResponse(e);
-                log.info("토스 결제 승인에 실패했습니다. request = {}, response = {}", request, response);
+                log.warn("토스 결제 승인에 실패했습니다. request = {}, response = {}", request, response);
                 throw newPaymentFailedException(response.code, response.message);
 
             } catch (ResourceAccessException e) {
