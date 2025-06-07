@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -35,7 +36,7 @@ class WaitingTest {
         ReservationTime reservationTime = new ReservationTime(LocalTime.of(10, 0));
         entityManager.persist(reservationTime);
 
-        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg");
+        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg", BigDecimal.valueOf(10000));
         entityManager.persist(theme);
 
         ReservationSpec spec = ReservationSpecFixture.createSpec(LocalDate.now(), reservationTime, theme);

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -41,7 +42,7 @@ class ThemeRepositoryAdapterTest {
         String name = "무서운방";
         String description = "덜덜";
         String thumbnail = "무서운 사진";
-        Theme theme = new Theme(name, description, thumbnail);
+        Theme theme = new Theme(name, description, thumbnail, BigDecimal.valueOf(10000));
 
         // when
         Theme savedTheme = themeRepository.save(theme);
@@ -57,7 +58,7 @@ class ThemeRepositoryAdapterTest {
     @Test
     void deleteById() {
         // given
-        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg");
+        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg", BigDecimal.valueOf(10000));
         Theme savedTheme = themeRepository.save(theme);
         Long themeId = savedTheme.getId();
 
@@ -73,10 +74,10 @@ class ThemeRepositoryAdapterTest {
     @Test
     void findAll() {
         // given
-        Theme theme1 = new Theme("테마1", "테마 설명1", "thumbnail1.jpg");
+        Theme theme1 = new Theme("테마1", "테마 설명1", "thumbnail1.jpg", BigDecimal.valueOf(10000));
         themeRepository.save(theme1);
 
-        Theme theme2 = new Theme("테마2", "테마 설명2", "thumbnail2.jpg");
+        Theme theme2 = new Theme("테마2", "테마 설명2", "thumbnail2.jpg", BigDecimal.valueOf(10000));
         themeRepository.save(theme2);
 
         // when
@@ -90,7 +91,7 @@ class ThemeRepositoryAdapterTest {
     @Test
     void findById() {
         // given
-        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg");
+        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg", BigDecimal.valueOf(10000));
         Theme savedTheme = themeRepository.save(theme);
 
         // when
@@ -109,7 +110,7 @@ class ThemeRepositoryAdapterTest {
     void existsByName() {
         // given
         String name = "테마";
-        Theme theme = new Theme(name, "테마 설명", "thumbnail.jpg");
+        Theme theme = new Theme(name, "테마 설명", "thumbnail.jpg", BigDecimal.valueOf(10000));
         themeRepository.save(theme);
 
         // when
@@ -123,7 +124,7 @@ class ThemeRepositoryAdapterTest {
     @Test
     void existsById() {
         // given
-        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg");
+        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg", BigDecimal.valueOf(10000));
         Theme savedTheme = themeRepository.save(theme);
 
         // when
@@ -143,10 +144,10 @@ class ThemeRepositoryAdapterTest {
         ReservationTime reservationTime = new ReservationTime(LocalTime.of(10, 0));
         entityManager.persist(reservationTime);
 
-        Theme theme1 = new Theme("테마1", "테마 설명1", "thumbnail1.jpg");
+        Theme theme1 = new Theme("테마1", "테마 설명1", "thumbnail1.jpg", BigDecimal.valueOf(10000));
         themeRepository.save(theme1);
 
-        Theme theme2 = new Theme("테마2", "테마 설명2", "thumbnail2.jpg");
+        Theme theme2 = new Theme("테마2", "테마 설명2", "thumbnail2.jpg", BigDecimal.valueOf(10000));
         themeRepository.save(theme2);
 
         LocalDate today = LocalDate.now();

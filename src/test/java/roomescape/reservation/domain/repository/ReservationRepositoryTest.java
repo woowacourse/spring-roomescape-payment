@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import roomescape.approval.domain.Onsite;
 import roomescape.fixture.MemberFixture;
 import roomescape.member.domain.Member;
 import roomescape.reservation.domain.Reservation;
@@ -46,7 +48,7 @@ class ReservationRepositoryTest {
         entityManager.persist(time);
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
         entityManager.persist(theme);
 
         // 내일 날짜로 예약 날짜 설정
@@ -80,7 +82,7 @@ class ReservationRepositoryTest {
         entityManager.persist(time);
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
         entityManager.persist(theme);
 
         // 내일 날짜로 예약 날짜 설정
@@ -121,7 +123,7 @@ class ReservationRepositoryTest {
         entityManager.persist(time2);
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
         entityManager.persist(theme);
 
         // 내일 날짜로 첫 번째 예약 날짜 설정
@@ -131,6 +133,9 @@ class ReservationRepositoryTest {
         // 회원으로 첫 번째 예약 생성 및 저장
         Reservation reservation1 = new Reservation(member, spec1);
         reservationRepository.save(reservation1);
+        Onsite onsite = new Onsite(reservation1, BigDecimal.valueOf(10000));
+        onsite.approve();
+        onsite.approveReservation();
 
         // 모레 날짜로 두 번째 예약 날짜 설정
         LocalDate date2 = LocalDate.now().plusDays(2);
@@ -139,6 +144,9 @@ class ReservationRepositoryTest {
         // 동일 회원으로 두 번째 예약 생성 및 저장
         Reservation reservation2 = new Reservation(member, spec2);
         reservationRepository.save(reservation2);
+        Onsite onsite2 = new Onsite(reservation2, BigDecimal.valueOf(10000));
+        onsite2.approve();
+        onsite2.approveReservation();
 
         // when
         List<Reservation> reservations = reservationRepository.findAllByMemberId(member.getId());
@@ -166,7 +174,7 @@ class ReservationRepositoryTest {
         entityManager.persist(time);
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
         entityManager.persist(theme);
 
         // 내일 날짜로 첫 번째 예약 날짜 설정
@@ -209,11 +217,11 @@ class ReservationRepositoryTest {
         entityManager.persist(time);
 
         // 첫 번째 테마 생성 및 저장
-        Theme theme1 = new Theme("테마1", "설명1", "썸네일1");
+        Theme theme1 = new Theme("테마1", "설명1", "썸네일1", BigDecimal.valueOf(10000));
         entityManager.persist(theme1);
 
         // 두 번째 테마 생성 및 저장
-        Theme theme2 = new Theme("테마2", "설명2", "썸네일2");
+        Theme theme2 = new Theme("테마2", "설명2", "썸네일2", BigDecimal.valueOf(10000));
         entityManager.persist(theme2);
 
         // 내일 날짜로 첫 번째 예약 날짜 설정
@@ -268,7 +276,7 @@ class ReservationRepositoryTest {
         entityManager.persist(time);
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
         entityManager.persist(theme);
 
         // 내일 날짜로 예약 날짜 설정
@@ -301,7 +309,7 @@ class ReservationRepositoryTest {
         entityManager.persist(time);
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
         entityManager.persist(theme);
 
         // 내일 날짜로 예약 날짜 설정
@@ -339,7 +347,7 @@ class ReservationRepositoryTest {
         entityManager.persist(time2);
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
         entityManager.persist(theme);
 
         // 내일 날짜로 예약 날짜 설정
@@ -377,7 +385,7 @@ class ReservationRepositoryTest {
         entityManager.persist(time);
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
         entityManager.persist(theme);
 
         // 내일 날짜로 예약 날짜 설정
@@ -410,7 +418,7 @@ class ReservationRepositoryTest {
         entityManager.persist(time);
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
         entityManager.persist(theme);
 
         // 내일 날짜로 예약 날짜 설정

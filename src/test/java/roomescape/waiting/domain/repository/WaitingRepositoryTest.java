@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -47,7 +48,7 @@ class WaitingRepositoryTest {
         entityManager.persist(reservationTime);
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg");
+        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg", BigDecimal.valueOf(10000));
         entityManager.persist(theme);
 
         // 예약 스펙 생성 (오늘 날짜, 예약 시간, 테마)
@@ -77,7 +78,7 @@ class WaitingRepositoryTest {
         entityManager.persist(reservationTime);
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg");
+        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg", BigDecimal.valueOf(10000));
         entityManager.persist(theme);
 
         // 예약 스펙 생성 (오늘 날짜, 예약 시간, 테마)
@@ -115,7 +116,7 @@ class WaitingRepositoryTest {
         entityManager.persist(reservationTime);
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg");
+        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg", BigDecimal.valueOf(10000));
         entityManager.persist(theme);
 
         // 첫 번째 예약 스펙 생성 (오늘 날짜)
@@ -150,7 +151,7 @@ class WaitingRepositoryTest {
         entityManager.persist(reservationTime);
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg");
+        Theme theme = new Theme("테마", "테마 설명", "thumbnail.jpg", BigDecimal.valueOf(10000));
         entityManager.persist(theme);
 
         // 예약 스펙 생성 (오늘 날짜, 예약 시간, 테마)

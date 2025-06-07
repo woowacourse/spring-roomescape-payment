@@ -15,12 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import roomescape.approval.domain.AdminApproval;
 import roomescape.fixture.MemberFixture;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.member.exception.MemberNotFoundException;
 import roomescape.member.infrastructure.MemberRepositoryAdapter;
-import roomescape.payment.application.FakePaymentCommandService;
+import roomescape.payment.application.FakeApprovalService;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.AdminReservationSearchRequest;
 import roomescape.reservation.application.dto.MyReservationResponse;
@@ -55,7 +56,7 @@ import roomescape.waiting.infrastructure.WaitingRepositoryAdapter;
         ReservationTimeRepositoryAdapter.class,
         ThemeRepositoryAdapter.class,
         WaitingRepositoryAdapter.class,
-        FakePaymentCommandService.class
+        FakeApprovalService.class
 })
 class ReservationServiceTest {
 
@@ -90,7 +91,7 @@ class ReservationServiceTest {
         timeRepository.save(time);
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
         themeRepository.save(theme);
 
         // 내일 날짜로 예약 날짜 설정
@@ -101,6 +102,11 @@ class ReservationServiceTest {
         // 회원으로 예약 생성 및 저장
         Reservation reservation = new Reservation(member, spec);
         reservationRepository.save(reservation);
+
+        // 예약 상태를 APPROVED로 변경
+        AdminApproval adminApproval = new AdminApproval(reservation, member);
+        adminApproval.approve();
+        adminApproval.approveReservation();
 
         // 동일한 회원으로 대기 생성 및 저장
         Waiting waiting = new Waiting(member, spec);
@@ -119,6 +125,8 @@ class ReservationServiceTest {
         assertThat(reservationResponse.id()).isEqualTo(reservation.getId());
         assertThat(reservationResponse.theme()).isEqualTo(theme.getName());
         assertThat(reservationResponse.date()).isEqualTo(date);
+        assertThat(reservationResponse.time()).isEqualTo(time.getStartAt());
+        assertThat(reservationResponse.approval()).isNotNull();
 
         MyReservationResponse waitingResponse = responses.stream()
                 .filter(r -> r.status().endsWith(MyReservationResponse.WAITING))
@@ -127,7 +135,9 @@ class ReservationServiceTest {
         assertThat(waitingResponse.id()).isEqualTo(savedWaiting.getId());
         assertThat(waitingResponse.theme()).isEqualTo(theme.getName());
         assertThat(waitingResponse.date()).isEqualTo(date);
+        assertThat(waitingResponse.time()).isEqualTo(time.getStartAt());
         assertThat(waitingResponse.status()).isEqualTo("1" + MyReservationResponse.WAITING);
+        assertThat(waitingResponse.approval()).isNull();
     }
 
     @DisplayName("필터링된 예약을 조회한다")
@@ -144,7 +154,7 @@ class ReservationServiceTest {
         timeRepository.save(time);
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
         themeRepository.save(theme);
         Long themeId = theme.getId();
 
@@ -284,7 +294,7 @@ class ReservationServiceTest {
         Long timeId = time.getId();
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
         themeRepository.save(theme);
         Long themeId = theme.getId();
 
@@ -319,7 +329,7 @@ class ReservationServiceTest {
         Long timeId = time.getId();
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
         themeRepository.save(theme);
         Long themeId = theme.getId();
 
@@ -355,7 +365,7 @@ class ReservationServiceTest {
         Long timeId = time.getId();
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
         themeRepository.save(theme);
         Long themeId = theme.getId();
 
@@ -365,7 +375,7 @@ class ReservationServiceTest {
         AdminReservationRequest request = new AdminReservationRequest(date, timeId, themeId, memberId);
 
         // when
-        ReservationResponse response = reservationService.createByAdmin(request);
+        ReservationResponse response = reservationService.createByAdmin(request, memberId);
 
         // then
         assertThat(response).isNotNull();
@@ -389,7 +399,7 @@ class ReservationServiceTest {
         timeRepository.save(time);
 
         // 테마 생성 및 저장
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
         themeRepository.save(theme);
 
         // 내일 날짜로 예약 날짜 설정

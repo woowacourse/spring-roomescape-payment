@@ -2,6 +2,7 @@ package roomescape.reservation.application.event;
 
 import static org.mockito.Mockito.verify;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.DisplayName;
@@ -36,7 +37,7 @@ class ReservationEventHandlerTest {
         // given
         Member member = MemberFixture.createMember("회원", "member@example.com", "password123");
         ReservationTime time = new ReservationTime(LocalTime.of(10, 0));
-        Theme theme = new Theme("테마", "설명", "썸네일");
+        Theme theme = new Theme("테마", "설명", "썸네일", BigDecimal.valueOf(10000));
 
         LocalDate date = LocalDate.now().plusDays(1);
         ReservationSpec spec = new ReservationSpec(new ReservationDate(date), time, theme);
