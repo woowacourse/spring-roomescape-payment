@@ -91,7 +91,7 @@ class ReservationServiceTest {
         Theme theme = themeDbFixture.공포();
         ReservationSchedule schedule = reservationScheduleDbFixture.예약_일정_25_4_22(time, theme);
         Member member = memberDbFixture.leehyeonsu4888_지메일_gustn111느낌표두개();
-        reservationRepository.save(new Reservation(null, member, schedule));
+        reservationRepository.save(new Reservation(member, schedule));
 
         // when
         List<ReservationResponse> all = service.findAllReservationsWithFilter(
@@ -157,7 +157,7 @@ class ReservationServiceTest {
                 "key"
         );
 
-        assertThatThrownBy(() -> service.createReservation(request, member.getId()))
+        assertThatThrownBy(() -> service.createReservationWithPayment(request, member.getId()))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -167,7 +167,7 @@ class ReservationServiceTest {
         Theme theme = themeDbFixture.공포();
         ReservationSchedule schedule = reservationScheduleDbFixture.예약_일정_오늘(time, theme);
         Member member = memberDbFixture.leehyeonsu4888_지메일_gustn111느낌표두개();
-        reservationRepository.save(new Reservation(null, member, schedule));
+        reservationRepository.save(new Reservation(member, schedule));
 
         CreateReservationRequest request = new CreateReservationRequest(
                 예약날짜_오늘.date(),
@@ -178,7 +178,7 @@ class ReservationServiceTest {
                 "key"
         );
 
-        assertThatThrownBy(() -> service.createReservation(request, member.getId()))
+        assertThatThrownBy(() -> service.createReservationWithPayment(request, member.getId()))
                 .isInstanceOf(BadRequestException.class);
     }
 
@@ -205,7 +205,7 @@ class ReservationServiceTest {
                 "key"
         );
 
-        assertThatThrownBy(() -> service.createReservation(request, member.getId()))
+        assertThatThrownBy(() -> service.createReservationWithPayment(request, member.getId()))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -215,7 +215,7 @@ class ReservationServiceTest {
         Theme theme = themeDbFixture.공포();
         ReservationSchedule schedule = reservationScheduleDbFixture.예약_일정_25_4_22(time, theme);
         Member member = memberDbFixture.leehyeonsu4888_지메일_gustn111느낌표두개();
-        Reservation reservation = reservationRepository.save(new Reservation(null, member, schedule));
+        Reservation reservation = reservationRepository.save(new Reservation(member, schedule));
 
         service.deleteById(reservation.getId());
 

@@ -132,7 +132,7 @@ class ReservationTimeServiceTest {
                 new ThemeThumbnail("썸네일")
         ));
         ReservationSchedule schedule = reservationScheduleDbFixture.createSchedule(date, time, theme);
-        reservationRepository.save(new Reservation(null, member, schedule));
+        reservationRepository.save(new Reservation(member, schedule));
 
         // when & then
         assertThatThrownBy(() -> service.deleteReservationTimeById(time.getId()))

@@ -143,7 +143,7 @@ class ThemeServiceTest {
         ));
 
         ReservationSchedule schedule = reservationScheduleDbFixture.createSchedule(date, time, theme);
-        reservationRepository.save(new Reservation(null, member, schedule));
+        reservationRepository.save(new Reservation(member, schedule));
 
         // when & then
         assertThatThrownBy(() -> themeService.deleteThemeById(theme.getId()))
@@ -161,8 +161,8 @@ class ThemeServiceTest {
         ReservationSchedule schedule1 = reservationScheduleDbFixture.createSchedule(예약날짜_7일전, time, 공포);
         ReservationSchedule schedule2 = reservationScheduleDbFixture.createSchedule(예약날짜_7일전, time, 로맨스);
 
-        reservationRepository.save(new Reservation(null, member, schedule1));
-        reservationRepository.save(new Reservation(null, member, schedule2));
+        reservationRepository.save(new Reservation(member, schedule1));
+        reservationRepository.save(new Reservation(member, schedule2));
 
         // when
         List<ThemeResponse> result = themeService.getWeeklyPopularThemes();

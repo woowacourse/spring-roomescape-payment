@@ -38,7 +38,7 @@ class ReservationTest {
                 MemberRole.MEMBER
         );
         ReservationSchedule schedule = new ReservationSchedule(1L, ReservationDateFixture.예약날짜_오늘, time, theme);
-        assertThatThrownBy(() -> new Reservation(1L, null, schedule))
+        assertThatThrownBy(() -> new Reservation(null, schedule))
                 .isInstanceOf(NullPointerException.class);
     }
 
@@ -51,7 +51,7 @@ class ReservationTest {
                 new MemberEncodedPassword("dsadsa"),
                 MemberRole.MEMBER
         );
-        assertThatThrownBy(() -> new Reservation(1L, member, null))
+        assertThatThrownBy(() -> new Reservation(member, null))
                 .isInstanceOf(NullPointerException.class);
     }
 
