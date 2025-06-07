@@ -32,12 +32,14 @@ public class PaymentClient {
                     TossServerErrorResponse tossServerErrorResponse = this.objectMapper.readValue(
                             res.getBody(), TossServerErrorResponse.class);
                     if (tossServerErrorResponse.isInvisibleError()) {
-                        throw new PaymentConfirmServerException();
+                        throw new PaymentConfirmServerException(tossServerErrorResponse.getMessage(), tossServerErrorResponse.getCode());
                     }
-                    throw new PaymentConfirmClientException(tossServerErrorResponse.getMessage());
+                    throw new PaymentConfirmClientException(tossServerErrorResponse.getMessage(), tossServerErrorResponse.getCode());
                 })
                 .defaultStatusHandler(HttpStatusCode::is5xxServerError, (req, res) -> {
-                    throw new PaymentConfirmServerException();
+                    TossServerErrorResponse tossServerErrorResponse = this.objectMapper.readValue(
+                            res.getBody(), TossServerErrorResponse.class);
+                    throw new PaymentConfirmServerException(tossServerErrorResponse.getMessage(), tossServerErrorResponse.getCode());
                 })
                 .build();
     }

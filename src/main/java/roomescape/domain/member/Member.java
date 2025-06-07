@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.util.Objects;
+import roomescape.exception.common.BadRequestException;
 
 @Entity
 public class Member {
@@ -49,28 +50,28 @@ public class Member {
 
     private void validateName(String name) {
         if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("이름은 1글자 이상으로 이루어져야 합니다. ");
+            throw new BadRequestException("이름은 1글자 이상으로 이루어져야 합니다.");
         }
         if (name.length() > MAX_NAME_LENGTH) {
-            throw new IllegalArgumentException("이름은 255자를 초과할 수 없습니다. 이름 길이 : " + name.length());
+            throw new BadRequestException("이름은 255자를 초과할 수 없습니다.");
         }
     }
 
     private void validateEmail(String email) {
         if (email == null || email.isBlank()) {
-            throw new IllegalArgumentException("이메일은 1글자 이상으로 이루어져야 합니다. ");
+            throw new BadRequestException("이메일은 1글자 이상으로 이루어져야 합니다.");
         }
         if (email.length() > MAX_NAME_LENGTH) {
-            throw new IllegalArgumentException("이메일은 255자를 초과할 수 없습니다. 이메일 길이 : " + email.length());
+            throw new BadRequestException("이메일은 255자를 초과할 수 없습니다.");
         }
     }
 
     private void validatePassword(String password) {
         if (password == null || password.isBlank()) {
-            throw new IllegalArgumentException("비밀번호는 1글자 이상으로 이루어져야 합니다. ");
+            throw new BadRequestException("비밀번호는 1글자 이상으로 이루어져야 합니다.");
         }
         if (password.length() > MAX_NAME_LENGTH) {
-            throw new IllegalArgumentException("비밀번호는 255자를 초과할 수 없습니다. 비밀번호 길이 : " + password.length());
+            throw new BadRequestException("비밀번호는 255자를 초과할 수 없습니다.");
         }
     }
 

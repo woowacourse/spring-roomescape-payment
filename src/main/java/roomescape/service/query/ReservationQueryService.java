@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.domain.payment.Payment;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.payment.ReservationPayment;
@@ -13,7 +12,7 @@ import roomescape.domain.reservation.waiting.ReservationWaitingTicket;
 import roomescape.dto.auth.LoginInfo;
 import roomescape.dto.reservation.MyReservationResponseDto;
 import roomescape.dto.reservation.ReservationResponseDto;
-import roomescape.exception.NotFoundException;
+import roomescape.exception.common.NotFoundException;
 import roomescape.repository.JpaPaymentRepository;
 import roomescape.repository.JpaReservationPaymentRepository;
 import roomescape.repository.JpaReservationRepository;
@@ -26,16 +25,13 @@ public class ReservationQueryService {
     private final JpaReservationRepository reservationRepository;
     private final JpaReservationWaitingTicketRepository waitingTicketRepository;
     private final JpaReservationPaymentRepository reservationPaymentRepository;
-    private final JpaPaymentRepository paymentRepository;
 
     public ReservationQueryService(JpaReservationRepository reservationRepository,
                                    JpaReservationWaitingTicketRepository waitingTicketRepository,
-                                   JpaReservationPaymentRepository reservationPaymentRepository,
-                                   JpaPaymentRepository paymentRepository) {
+                                   JpaReservationPaymentRepository reservationPaymentRepository) {
         this.reservationRepository = reservationRepository;
         this.waitingTicketRepository = waitingTicketRepository;
         this.reservationPaymentRepository = reservationPaymentRepository;
-        this.paymentRepository = paymentRepository;
     }
 
     public List<ReservationResponseDto> findAllReservations() {
@@ -79,16 +75,14 @@ public class ReservationQueryService {
                 );
             }
             ReservationPayment reservationPayment = reservationPaymentRepository.findByReservationId(
-                    reservation.getId()).orElseThrow(NotFoundException::new);
-            Payment payment = paymentRepository.findById(reservationPayment.getId())
-                    .orElseThrow(NotFoundException::new);
-            return new MyReservationResponseDto(reservation, payment);
+                    reservation.getId()).orElseThrow(() -> new NotFoundException("예약 결제", reservation.getId()));
+            return new MyReservationResponseDto(reservation, reservationPayment.getPayment());
         }).toList();
     }
 
     private ReservationWaitingRank calculateWaitingRank(Reservation reservationWaiting) {
         ReservationWaitingTicket reservationWaitingTicket = waitingTicketRepository.findByReservationId(
-                reservationWaiting.getId()).orElseThrow(NotFoundException::new);
+                reservationWaiting.getId()).orElseThrow(() -> new NotFoundException("예약 대기표", reservationWaiting.getId()));
         return waitingTicketRepository.countReservationWaitingsByThemeIdAndDateAndTimeIdAndCreatedAt(
                 reservationWaiting.getTheme().getId(),
                 reservationWaiting.getDate(),
