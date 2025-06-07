@@ -26,6 +26,7 @@ import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.fixture.TestFixture;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.WaitingRepository;
+import roomescape.reservation.service.ReservationCreatorService;
 import roomescape.reservation.service.ReservationService;
 import roomescape.reservation.service.ReservationUseCase;
 import roomescape.reservation.service.WaitingService;
@@ -68,6 +69,9 @@ class ReservationTimeServiceTest {
     private MemberRepository memberRepository;
 
     @Autowired
+    private MyPasswordEncoder myPasswordEncoder;
+
+    @Autowired
     private WaitingRepository waitingRepository;
 
     @Autowired
@@ -78,16 +82,20 @@ class ReservationTimeServiceTest {
 
     @BeforeEach
     void setUp() {
+        ReservationService reservationService = new ReservationService(reservationRepository);
+        ThemeService themeService = new ThemeService(themeRepository, reservationRepository);
+        MemberService memberService = new MemberService(memberRepository, myPasswordEncoder);
         reservationTimeService = new ReservationTimeService(reservationTimeRepository,
                 reservationRepository);
         theme = themeRepository.save(theme);
         member = memberRepository.save(member);
         reservationUseCase = new ReservationUseCase(
-                new ReservationService(reservationRepository),
+                reservationService,
+                new ReservationCreatorService(reservationService, themeService, memberService, reservationTimeService),
                 new WaitingService(waitingRepository),
-                new MemberService(memberRepository, new MyPasswordEncoder()),
-                new ThemeService(themeRepository, reservationRepository),
-                new ReservationTimeService(reservationTimeRepository, reservationRepository),
+                memberService,
+                themeService,
+                reservationTimeService,
                 new PaymentService(paymentRepository),
                 tossApiClient
         );

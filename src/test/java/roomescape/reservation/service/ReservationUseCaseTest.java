@@ -67,6 +67,9 @@ class ReservationUseCaseTest {
     private MemberRepository memberRepository;
 
     @Autowired
+    private MyPasswordEncoder myPasswordEncoder;
+
+    @Autowired
     private PaymentRepository paymentRepository;
 
     @Mock
@@ -79,12 +82,19 @@ class ReservationUseCaseTest {
 
     @BeforeEach
     void setUp() {
+        ReservationService reservationService = new ReservationService(reservationRepository);
+        ThemeService themeService = new ThemeService(themeRepository, reservationRepository);
+        MemberService memberService = new MemberService(memberRepository, myPasswordEncoder);
+        ReservationTimeService reservationTimeService = new ReservationTimeService(reservationTimeRepository,
+                reservationRepository);
+
         reservationUseCase = new ReservationUseCase(
-                new ReservationService(reservationRepository),
+                reservationService,
+                new ReservationCreatorService(reservationService, themeService, memberService, reservationTimeService),
                 new WaitingService(waitingRepository),
-                new MemberService(memberRepository, new MyPasswordEncoder()),
-                new ThemeService(themeRepository, reservationRepository),
-                new ReservationTimeService(reservationTimeRepository, reservationRepository),
+                memberService,
+                themeService,
+                reservationTimeService,
                 new PaymentService(paymentRepository),
                 tossApiClient
         );
