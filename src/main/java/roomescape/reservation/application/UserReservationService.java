@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.payment.application.dto.response.TossPaymentsResponse;
@@ -23,6 +24,7 @@ import roomescape.reservation.model.repository.dto.ReservationWaitingWithRank;
 import roomescape.reservation.model.service.ReservationOperation;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserReservationService {
@@ -37,8 +39,10 @@ public class UserReservationService {
     @Transactional
     public ReservationServiceResponse create(CreateReservationServiceRequest request) {
         Reservation savedReservation = reservationOperation.reserve(request.toSchedule(), request.memberId());
+        log.info("결제 승인 요청");
         TossPaymentsResponse tossPaymentsResponse = paymentClient.requestConfirm(request.toPaymentInfo());
         paymentOperation.savePayment(tossPaymentsResponse.toEntity(savedReservation.getId()));
+        log.info("결제 승인 완료");
         return ReservationServiceResponse.from(savedReservation);
     }
 
