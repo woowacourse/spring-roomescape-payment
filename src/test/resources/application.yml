@@ -32,3 +32,16 @@ payment:
   base-url: "http://localhost:8080"
   confirm_api: "/v1/payments/confirm"
   secret-key: "test_secret"
+
+
+server:
+  shutdown: graceful  # graceful shutdown 활성화
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health # health 엔드포인트 노출
+  endpoint:
+    health:
+      show-details: when-authorized  # 상세 정보 표시 조건
