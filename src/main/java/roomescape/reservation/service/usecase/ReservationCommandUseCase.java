@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.BadRequestException;
 import roomescape.common.exception.ConflictException;
@@ -33,6 +32,7 @@ public class ReservationCommandUseCase {
     private final MemberQueryUseCase memberQueryUseCase;
     private final ReservationWaitQueryUseCase reservationWaitQueryUseCase;
 
+    @Transactional
     public Reservation create(final CreateReservationServiceRequest createReservationServiceRequest) {
         validateReservationNotExists(createReservationServiceRequest);
         final ReservationDate reservationDate = ReservationDate.from(createReservationServiceRequest.date());
@@ -71,7 +71,7 @@ public class ReservationCommandUseCase {
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void delete(final Long id) {
         final Reservation reservation = reservationQueryUseCase.get(id);
         reservationRepository.delete(reservation);

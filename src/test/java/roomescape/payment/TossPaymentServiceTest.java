@@ -7,14 +7,19 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.test.web.client.MockRestServiceServer.MockRestServiceServerBuilder;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
+import org.springframework.web.client.RestClient;
+import roomescape.common.config.RestClientConfig;
 import roomescape.common.config.TimeoutProperties;
 import roomescape.common.config.TossPaymentsProperties;
 import roomescape.common.exception.PaymentException;
@@ -23,14 +28,26 @@ import roomescape.payment.toss.TossPaymentClient;
 import roomescape.payment.toss.TossPaymentError;
 
 @RestClientTest({PaymentService.class, TossPaymentClient.class})
+@Import(RestClientConfig.class)
 @EnableConfigurationProperties({TossPaymentsProperties.class, TimeoutProperties.class})
 class TossPaymentServiceTest {
 
-    @Autowired
     private PaymentService paymentService;
+    MockRestServiceServer mockServer;
 
     @Autowired
-    MockRestServiceServer mockServer;
+    private RestClient.Builder tossRestClientBuilder;
+
+    @Autowired
+    private TossPaymentsProperties tossPaymentsProperties;
+
+    @BeforeEach
+    void setUp() {
+        MockRestServiceServerBuilder builder = MockRestServiceServer.bindTo(tossRestClientBuilder);
+        mockServer = builder.build();
+        TossPaymentClient tossPaymentClient = new TossPaymentClient(tossPaymentsProperties, tossRestClientBuilder);
+        paymentService = new PaymentService(tossPaymentClient);
+    }
 
     @DisplayName("토스에서 FilteredPaymentErrorCode 외의 에러 코드 응답 시, 동일한 내용의 PaymentException을 던진다")
     @Test
@@ -50,11 +67,10 @@ class TossPaymentServiceTest {
                     assertThat(ex.getStatusCode()).isEqualTo(FORBIDDEN);
                     assertThat(ex.getMessage()).isEqualTo("은행 서비스 시간이 아닙니다.");
                 });
+        mockServer.verify();
     }
 
-    @DisplayName("토스에서 Filva:43)\n"
-            + "\tat java.base/java.lang.reflect.Method.invoke(Method.java:580)\n"
-            + "\tat java.base/java.util.ArrayList.forEach(ArrayList.java:1596)teredPaymentErrorCode 에러 코드 응답 시, INTERNAL_SERVER_ERROR PaymentException을 던진다")
+    @DisplayName("토스에서 FilteredPaymentErrorCode 에러 코드 응답 시, INTERNAL_SERVER_ERROR PaymentException을 던진다")
     @Test
     void test2() throws JsonProcessingException {
         //given
