@@ -20,10 +20,6 @@ operation::register[snippets='http-request,request-fields,http-response,response
 operation::get-all-members[snippets='http-request,http-response,response-fields']
 
 == Reservation
-=== 예약 생성
-operation::create-reservation[snippets='http-request,request-fields,http-response,response-fields']
-include::{snippets}/reservation/create-reservation/error/reservation-exists-exception/http-response.adoc[]
-
 === 관리자 예약 생성
 operation::reservation/admin-create-reservation/success[snippets='http-request,request-fields,http-response,response-fields']
 include::{snippets}/reservation/admin-create-reservation/error/reservation-exists-exception/http-response.adoc[]
@@ -81,5 +77,9 @@ operation::waiting/delete-waiting/success[snippets='http-request,http-response']
 include::{snippets}/waiting/delete-waiting/error/waiting-not-found-exception/http-response.adoc[]
 
 == Payment
-=== 결제 생성
-operation::create-payment[snippets='http-request,request-fields,http-response']
+=== 결제 및 예약 생성
+operation::payment/create-payment/success[snippets='http-request,request-fields,http-response']
+include::{snippets}/payment/create-payment/error/reservation-exists/http-response.adoc[]
+
+=== 결제 승인 및 예약 확정
+operation::payment/approve-payment/success[snippets='http-request,request-fields,http-response']
