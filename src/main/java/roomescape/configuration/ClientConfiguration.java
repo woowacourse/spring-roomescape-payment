@@ -11,7 +11,7 @@ import roomescape.client.payment.PaymentClient;
 import roomescape.client.payment.TossPaymentClient;
 
 @Configuration
-@Profile("product")
+@Profile("!test")
 public class ClientConfiguration {
 
     @Bean
