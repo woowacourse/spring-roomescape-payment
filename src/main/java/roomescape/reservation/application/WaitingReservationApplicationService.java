@@ -3,6 +3,7 @@ package roomescape.reservation.application;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.application.MemberDataService;
 import roomescape.member.domain.Member;
 import roomescape.payment.application.PaymentApplicationService;
@@ -65,6 +66,7 @@ public class WaitingReservationApplicationService {
         reservationSlot.getReservations().remove(reservation);
     }
 
+    @Transactional
     public void confirm(WaitingConfirmRequest waitingConfirmRequest, final PaymentApproveRequest paymentApproveRequest) {
         ReservationSlot reservationSlot = reservationSlotDataService.getById(waitingConfirmRequest.reservationSlotId());
         validateConfirmedReservationNotExists(reservationSlot);

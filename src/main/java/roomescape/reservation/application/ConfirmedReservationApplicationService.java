@@ -98,7 +98,7 @@ public class ConfirmedReservationApplicationService {
         ReservationSlot reservationSlot = reservation.getReservationSlot();
         cleanupEmptyReservationSlot(reservationSlot.getId());
         reservationSlot.getReservations().remove(reservation);
-        updateFirstWaiting(reservationSlot);
+        updateFirstWaitingToPaymentPending(reservationSlot);
     }
 
     private ReservationSlot createReservationSlot(final ReservationCreateWebRequest reservationCreateWebRequest) {
@@ -113,7 +113,7 @@ public class ConfirmedReservationApplicationService {
         }
     }
 
-    private void updateFirstWaiting(ReservationSlot reservationSlot) {
+    private void updateFirstWaitingToPaymentPending(ReservationSlot reservationSlot) {
         Optional<Reservation> firstWaiting = reservationSlot.getReservations().stream().findFirst();
         firstWaiting.ifPresent(Reservation::toPaymentPending);
     }
