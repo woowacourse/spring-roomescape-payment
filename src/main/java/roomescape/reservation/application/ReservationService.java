@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.approval.application.ApprovalService;
 import roomescape.approval.domain.AdminApproval;
+import roomescape.approval.domain.Approval;
 import roomescape.approval.domain.Payment;
 import roomescape.approval.exception.payment.InvalidPaymentAmountException;
 import roomescape.approval.exception.payment.PaymentSessionExpiredException;
@@ -34,7 +35,6 @@ import roomescape.reservationTime.exception.TimeNotFoundException;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.repository.ThemeRepository;
 import roomescape.theme.exception.ThemeNotFoundException;
-import roomescape.waiting.domain.Waiting;
 import roomescape.waiting.domain.WaitingRepository;
 import roomescape.waiting.domain.WaitingWithRank;
 import roomescape.waiting.domain.Waitings;
@@ -53,13 +53,14 @@ public class ReservationService {
 
     public List<MyReservationResponse> findAllByMemberId(Long memberId) {
         List<Reservation> reservations = reservationRepository.findAllByMemberId(memberId);
-        List<Waiting> myWaitings = waitingRepository.findByMemberId(memberId);
-        List<WaitingWithRank> rankedWaitings = getWaitingWithRanks(myWaitings);
-        return MyReservationResponse.of(reservations, rankedWaitings);
+        List<Approval> approvals = approvalService.findAllByReservationIn(reservations);
+        List<WaitingWithRank> rankedWaitings = getWaitingWithRanks(memberId);
+
+        return MyReservationResponse.of(reservations, approvals, rankedWaitings);
     }
 
-    private List<WaitingWithRank> getWaitingWithRanks(List<Waiting> myWaitings) {
-        return myWaitings.stream()
+    private List<WaitingWithRank> getWaitingWithRanks(Long memberId) {
+        return waitingRepository.findByMemberId(memberId).stream()
                 .map(waiting -> {
                     Waitings waitings = new Waitings(waitingRepository.findBySpec(waiting.getSpec()));
                     long rank = waitings.getRankOf(waiting);
@@ -100,8 +101,8 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse createByAdmin(AdminReservationRequest request) {
-        Member admin = memberRepository.findById(request.memberId()).orElseThrow(MemberNotFoundException::new);
+    public ReservationResponse createByAdmin(AdminReservationRequest request, Long adminId) {
+        Member admin = memberRepository.findById(adminId).orElseThrow(MemberNotFoundException::new);
         Reservation reservation = reservationRepository.save(
                 create(request.memberId(), request.date(), request.timeId(), request.themeId()));
         approvalService.approve(new AdminApproval(reservation, admin));

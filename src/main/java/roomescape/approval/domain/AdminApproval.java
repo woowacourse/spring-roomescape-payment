@@ -23,4 +23,9 @@ public class AdminApproval extends Approval {
         super(reservation);
         this.member = member;
     }
+
+    @Override
+    public ApprovalType getType() {
+        return ApprovalType.ADMIN_APPROVAL;
+    }
 }

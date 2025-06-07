@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.auth.annotation.LoginMemberId;
 import roomescape.common.response.ApiResponse;
 import roomescape.reservation.application.ReservationService;
 import roomescape.reservation.application.dto.AdminReservationRequest;
@@ -27,9 +28,10 @@ public class AdminReservationController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<ReservationResponse>> create(
-            @Valid @RequestBody AdminReservationRequest request
+            @Valid @RequestBody AdminReservationRequest request,
+            @LoginMemberId Long adminId
     ) {
-        ReservationResponse response = reservationService.createByAdmin(request);
+        ReservationResponse response = reservationService.createByAdmin(request, adminId);
         ApiResponse<ReservationResponse> apiResponse = ApiResponse.createSuccess(response);
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }

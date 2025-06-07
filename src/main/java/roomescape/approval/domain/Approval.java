@@ -51,4 +51,6 @@ public abstract class Approval {
     public void approveReservation() {
         reservation.approveWith(this);
     }
+
+    public abstract ApprovalType getType();
 }

@@ -1,5 +1,6 @@
 package roomescape.approval.infrastructure;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import roomescape.approval.domain.Approval;
@@ -19,5 +20,10 @@ public class ApprovalRepositoryAdapter implements ApprovalRepository {
     @Override
     public void deleteByReservation(Reservation reservation) {
         approvalJpaRepository.deleteByReservation(reservation);
+    }
+
+    @Override
+    public List<Approval> findAllByReservationsIn(List<Reservation> reservations) {
+        return approvalJpaRepository.findAllByReservationsIn(reservations);
     }
 }

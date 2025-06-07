@@ -22,4 +22,9 @@ public class Payment extends Approval {
         this.paymentKey = paymentKey;
         this.amount = amount;
     }
+
+    @Override
+    public ApprovalType getType() {
+        return ApprovalType.PAYMENT;
+    }
 }

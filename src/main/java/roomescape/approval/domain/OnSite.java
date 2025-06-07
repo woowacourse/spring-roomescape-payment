@@ -18,4 +18,9 @@ public class OnSite extends Approval {
         super(reservation);
         this.amount = amount;
     }
+
+    @Override
+    public ApprovalType getType() {
+        return ApprovalType.ONSITE;
+    }
 }
