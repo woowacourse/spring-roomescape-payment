@@ -14,7 +14,7 @@ import roomescape.member.domain.MemberRepository;
 import roomescape.member.dto.response.MemberResponse;
 import roomescape.member.exception.MemberException;
 import roomescape.payment.application.PaymentService;
-import roomescape.payment.dto.request.PaymentRequest;
+import roomescape.payment.dto.request.TossPaymentRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.Status;
@@ -75,8 +75,8 @@ public class ReservationService {
                 request.themeId());
         Reservation reservation = createReservation(reservationRequest, memberId);
 
-        PaymentRequest paymentRequest = new PaymentRequest(request.paymentKey(), request.orderId(), request.amount());
-        paymentService.confirmPayment(paymentRequest, reservation);
+        TossPaymentRequest tossPaymentRequest = new TossPaymentRequest(request.paymentKey(), request.orderId(), request.amount());
+        paymentService.confirmPayment(tossPaymentRequest, reservation);
 
         return ReservationResponse.from(reservation);
     }

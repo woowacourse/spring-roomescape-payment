@@ -1,9 +1,9 @@
 package roomescape.payment.domain;
 
-import roomescape.payment.dto.request.PaymentRequest;
-import roomescape.payment.dto.response.PaymentResponse;
+import roomescape.payment.dto.request.TossPaymentRequest;
+import roomescape.payment.dto.response.TossPaymentResponse;
 
 public interface PaymentClient {
 
-    PaymentResponse requestPayment(final PaymentRequest paymentRequest);
+    TossPaymentResponse requestPayment(final TossPaymentRequest tossPaymentRequest);
 }

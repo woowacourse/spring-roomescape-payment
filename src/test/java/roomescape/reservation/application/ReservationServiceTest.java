@@ -34,8 +34,8 @@ import roomescape.member.infrastructure.MemberJpaRepositoryAdapter;
 import roomescape.payment.application.PaymentService;
 import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.domain.PaymentRepository;
-import roomescape.payment.dto.request.PaymentRequest;
-import roomescape.payment.dto.response.PaymentResponse;
+import roomescape.payment.dto.request.TossPaymentRequest;
+import roomescape.payment.dto.response.TossPaymentResponse;
 import roomescape.payment.infrastructure.PaymentJpaRepository;
 import roomescape.payment.infrastructure.PaymentJpaRepositoryAdapter;
 import roomescape.reservation.domain.ReservationRepository;
@@ -100,9 +100,9 @@ class ReservationServiceTest {
                     PAYMENT_KEY, ORDER_ID, AMOUNT);
             Long memberId = 1L;
 
-            when(paymentClient.requestPayment(any(PaymentRequest.class)))
+            when(paymentClient.requestPayment(any(TossPaymentRequest.class)))
                     .thenReturn(
-                            new PaymentResponse(PAYMENT_KEY, ORDER_ID, AMOUNT, LocalDateTime.of(2025, 6, 1, 10, 0).atOffset(
+                            new TossPaymentResponse(PAYMENT_KEY, ORDER_ID, AMOUNT, LocalDateTime.of(2025, 6, 1, 10, 0).atOffset(
                                     ZoneOffset.ofHours(9))));
 
             // when & then

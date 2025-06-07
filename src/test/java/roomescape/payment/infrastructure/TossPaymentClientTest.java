@@ -16,7 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.dto.request.PaymentRequest;
+import roomescape.payment.dto.request.TossPaymentRequest;
 import roomescape.payment.exception.TossPaymentClientException;
 import roomescape.payment.exception.TossPaymentErrorHandler;
 import roomescape.payment.exception.TossPaymentServerException;
@@ -44,7 +44,7 @@ class TossPaymentClientTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess());
 
-        PaymentRequest request = new PaymentRequest("paymentKey", "orderId", 1000);
+        TossPaymentRequest request = new TossPaymentRequest("paymentKey", "orderId", 1000);
 
         assertDoesNotThrow(() -> tossPaymentClient.requestPayment(request));
     }
@@ -64,7 +64,7 @@ class TossPaymentClientTest {
                 .andRespond(
                         withStatus(HttpStatus.BAD_REQUEST).body(expectedBody).contentType(MediaType.APPLICATION_JSON));
 
-        PaymentRequest request = new PaymentRequest("paymentKey", "orderId", 1000);
+        TossPaymentRequest request = new TossPaymentRequest("paymentKey", "orderId", 1000);
 
         assertThatCode(() -> tossPaymentClient.requestPayment(request))
                 .isInstanceOf(TossPaymentClientException.class)
@@ -86,7 +86,7 @@ class TossPaymentClientTest {
                 .andRespond(
                         withStatus(HttpStatus.BAD_REQUEST).body(expectedBody).contentType(MediaType.APPLICATION_JSON));
 
-        PaymentRequest request = new PaymentRequest("paymentKey", "orderId", 1000);
+        TossPaymentRequest request = new TossPaymentRequest("paymentKey", "orderId", 1000);
 
         assertThatCode(() -> tossPaymentClient.requestPayment(request))
                 .isInstanceOf(TossPaymentServerException.class)

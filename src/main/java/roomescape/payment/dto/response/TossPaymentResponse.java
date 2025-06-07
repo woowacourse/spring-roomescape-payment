@@ -2,7 +2,7 @@ package roomescape.payment.dto.response;
 
 import java.time.OffsetDateTime;
 
-public record PaymentResponse(
+public record TossPaymentResponse(
         String paymentKey,
         String orderId,
         int totalAmount,

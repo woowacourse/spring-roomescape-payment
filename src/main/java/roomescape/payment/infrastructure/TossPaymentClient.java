@@ -3,8 +3,8 @@ package roomescape.payment.infrastructure;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.domain.PaymentClient;
-import roomescape.payment.dto.request.PaymentRequest;
-import roomescape.payment.dto.response.PaymentResponse;
+import roomescape.payment.dto.request.TossPaymentRequest;
+import roomescape.payment.dto.response.TossPaymentResponse;
 import roomescape.payment.exception.TossPaymentErrorHandler;
 
 public class TossPaymentClient implements PaymentClient {
@@ -18,13 +18,13 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public PaymentResponse requestPayment(final PaymentRequest paymentRequest) {
+    public TossPaymentResponse requestPayment(final TossPaymentRequest tossPaymentRequest) {
         return restClient.post()
                 .uri("/confirm")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(paymentRequest)
+                .body(tossPaymentRequest)
                 .retrieve()
                 .onStatus(errorHandler)
-                .body(PaymentResponse.class);
+                .body(TossPaymentResponse.class);
     }
 }
