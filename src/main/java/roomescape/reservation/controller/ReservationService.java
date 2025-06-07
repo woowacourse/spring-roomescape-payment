@@ -56,7 +56,7 @@ public class ReservationService {
                 new ReservationDate(request.date())
         );
         Member member = memberQueryService.getById(memberId);
-        tossPaymentCommandService.createTossPayment(request.toPaymentRequest());
+        tossPaymentCommandService.createTossPayment(request.toTossPaymentRequest());
         Reservation reservation = reservationCommandService.createReservation(schedule, member);
         return ReservationResponse.from(reservation);
     }

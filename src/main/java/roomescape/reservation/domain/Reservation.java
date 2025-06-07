@@ -44,17 +44,6 @@ public class Reservation {
         this.schedule = Objects.requireNonNull(schedule);
     }
 
-    // TODO: 미사용 생성자 제거
-    public Reservation(
-            final Long id,
-            final Member member,
-            final ReservationSchedule schedule
-    ) {
-        this.id = id;
-        this.member = Objects.requireNonNull(member);
-        this.schedule = Objects.requireNonNull(schedule);
-    }
-
     public Long getId() {
         return id;
     }

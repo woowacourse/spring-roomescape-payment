@@ -1,7 +1,6 @@
 package roomescape.reservation.service;
 
 import org.springframework.stereotype.Service;
-import roomescape.reservation.domain.TossPayment;
 import roomescape.reservation.external.toss.TossApiClient;
 import roomescape.reservation.external.toss.TossPaymentRequest;
 import roomescape.reservation.external.toss.TossPaymentResponse;
@@ -18,8 +17,8 @@ public class TossPaymentCommandService {
         this.tossApiClient = tossApiClient;
     }
 
-    public TossPayment createTossPayment(final TossPaymentRequest tossPaymentRequest) {
+    public void createTossPayment(final TossPaymentRequest tossPaymentRequest) {
         TossPaymentResponse tossPaymentResponse = tossApiClient.requestPayment(tossPaymentRequest);
-        return tossPaymentRepository.save(tossPaymentResponse.toEntity());
+        tossPaymentRepository.save(tossPaymentResponse.toEntity());
     }
 }

@@ -13,7 +13,7 @@ public record CreateReservationRequest(
         @NotNull Long amount,
         @NotBlank String paymentKey
 ) {
-    public TossPaymentRequest toPaymentRequest() {
+    public TossPaymentRequest toTossPaymentRequest() {
         return new TossPaymentRequest(orderId, amount, paymentKey);
     }
 }
