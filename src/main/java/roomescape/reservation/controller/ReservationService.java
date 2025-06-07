@@ -43,10 +43,6 @@ public class ReservationService {
         return createReservation(request.timeId(), request.themeId(), request.date(), request.memberId());
     }
 
-    public ReservationResponse createReservation(final CreateReservationRequest request, final Long memberId) {
-        return createReservation(request.timeId(), request.themeId(), request.date(), memberId);
-    }
-
     @Transactional
     public ReservationResponse createReservationWithPayment(
             final CreateReservationRequest request,

@@ -21,19 +21,6 @@ public class ReservationQueryService {
         this.reservationRepository = reservationRepository;
     }
 
-    public List<Reservation> findAllReservations() {
-        return reservationRepository.findAll();
-    }
-
-    public Reservation getReservation(final Long id) {
-        return reservationRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("예약을 찾을 수 없습니다."));
-    }
-
-    public List<Reservation> findAllMyReservation(final Long memberId) {
-        return reservationRepository.findAllByMember_Id(memberId);
-    }
-
     public List<MyReservationWithTossPayment> findAllMyReservationWithTossPayment(final Long memberId) {
         return reservationRepository.findAllWithPaymentByMemberId(memberId);
     }

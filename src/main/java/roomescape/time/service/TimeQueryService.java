@@ -25,11 +25,6 @@ public class TimeQueryService {
         this.reservationScheduleRepository = reservationScheduleRepository;
     }
 
-    public ReservationTime getReservationTime(final Long id) {
-        return reservationTimeRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("예약 시간을 찾을 수 없습니다."));
-    }
-
     public List<AvailableReservationTime> findAvailableReservationTimes(
             ReservationDate date,
             Theme theme
