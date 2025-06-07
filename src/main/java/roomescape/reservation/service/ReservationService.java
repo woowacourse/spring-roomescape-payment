@@ -19,6 +19,9 @@ import roomescape.common.exception.custom.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberId;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.dto.request.PaymentRequest;
+import roomescape.payment.repository.PaymentRepository;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationId;
 import roomescape.reservation.domain.ReservationWithPayment;
@@ -28,19 +31,16 @@ import roomescape.reservation.dto.response.BookedReservationTimeResponse;
 import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
-import roomescape.reservation.payment.dto.request.PaymentRequest;
-import roomescape.reservation.payment.repository.PaymentRepository;
-import roomescape.reservation.payment.service.PaymentService;
 import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservation.time.domain.ReservationTime;
-import roomescape.reservation.time.domain.ReservationTimeId;
-import roomescape.reservation.time.repository.ReservationTimeRepository;
 import roomescape.reservation.waiting.domain.Waiting;
 import roomescape.reservation.waiting.domain.WaitingWithRank;
 import roomescape.reservation.waiting.repository.WaitingRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeId;
 import roomescape.theme.repository.ThemeRepository;
+import roomescape.time.domain.ReservationTime;
+import roomescape.time.domain.ReservationTimeId;
+import roomescape.time.repository.ReservationTimeRepository;
 
 @Service
 public class ReservationService {

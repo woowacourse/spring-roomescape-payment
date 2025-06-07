@@ -6,13 +6,13 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import roomescape.member.domain.MemberId;
-import roomescape.reservation.time.domain.ReservationTime;
-import roomescape.reservation.time.domain.ReservationTimeId;
 import roomescape.reservation.waiting.domain.Waiting;
 import roomescape.reservation.waiting.domain.WaitingId;
 import roomescape.reservation.waiting.domain.WaitingWithRank;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeId;
+import roomescape.time.domain.ReservationTime;
+import roomescape.time.domain.ReservationTimeId;
 
 public interface WaitingRepository extends JpaRepository<Waiting, WaitingId> {
 

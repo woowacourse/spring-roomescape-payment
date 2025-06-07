@@ -1,12 +1,5 @@
 package roomescape.reservation.waiting.domain;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Objects;
-
-import org.springframework.data.annotation.CreatedDate;
-
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
@@ -14,9 +7,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Objects;
+import org.springframework.data.annotation.CreatedDate;
 import roomescape.member.domain.Member;
 import roomescape.theme.domain.Theme;
-import roomescape.reservation.time.domain.ReservationTime;
+import roomescape.time.domain.ReservationTime;
 
 @Entity
 public class Waiting {
@@ -43,7 +41,8 @@ public class Waiting {
     @CreatedDate
     private LocalDateTime createdAt;
 
-    protected Waiting() {}
+    protected Waiting() {
+    }
 
     public Waiting(
             final Long id,

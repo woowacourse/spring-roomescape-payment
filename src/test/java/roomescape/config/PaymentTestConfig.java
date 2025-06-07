@@ -5,12 +5,12 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import roomescape.common.exception.custom.PaymentClientException;
 import roomescape.common.exception.custom.PaymentServerException;
-import roomescape.reservation.payment.domain.PaymentMethod;
-import roomescape.reservation.payment.dto.request.PaymentRequest;
-import roomescape.reservation.payment.error.ClientErrorCode;
-import roomescape.reservation.payment.error.InternalServerErrorCode;
-import roomescape.reservation.payment.gateway.PaymentGateway;
-import roomescape.reservation.payment.gateway.PaymentGatewayResolver;
+import roomescape.payment.domain.PaymentMethod;
+import roomescape.payment.dto.request.PaymentRequest;
+import roomescape.payment.error.ClientErrorCode;
+import roomescape.payment.error.InternalServerErrorCode;
+import roomescape.payment.gateway.PaymentGateway;
+import roomescape.payment.gateway.PaymentGatewayResolver;
 
 @TestConfiguration
 public class PaymentTestConfig {

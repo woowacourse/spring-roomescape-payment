@@ -1,6 +1,6 @@
 package roomescape.reservation.domain;
 
-import roomescape.reservation.payment.domain.Payment;
+import roomescape.payment.domain.Payment;
 
 public class ReservationWithPayment {
 

@@ -3,8 +3,7 @@ package roomescape.reservation.domain;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import roomescape.reservation.time.domain.ReservationTime;
+import roomescape.time.domain.ReservationTime;
 
 class ReservationTimeTest {
 

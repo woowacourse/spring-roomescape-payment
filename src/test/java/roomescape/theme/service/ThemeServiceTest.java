@@ -7,27 +7,25 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-
 import roomescape.common.exception.custom.AlreadyInUseException;
 import roomescape.common.exception.custom.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
 import roomescape.member.repository.MemberRepository;
 import roomescape.reservation.domain.Reservation;
-import roomescape.reservation.time.domain.ReservationTime;
+import roomescape.reservation.repository.ReservationRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.dto.request.ThemeRequest;
 import roomescape.theme.dto.response.ThemeResponse;
-import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservation.time.repository.ReservationTimeRepository;
 import roomescape.theme.repository.ThemeRepository;
+import roomescape.time.domain.ReservationTime;
+import roomescape.time.repository.ReservationTimeRepository;
 
 @ActiveProfiles("test")
 @DataJpaTest

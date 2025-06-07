@@ -9,8 +9,8 @@ import roomescape.member.domain.MemberId;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationId;
 import roomescape.reservation.domain.ReservationWithPayment;
-import roomescape.reservation.time.domain.ReservationTimeId;
 import roomescape.theme.domain.ThemeId;
+import roomescape.time.domain.ReservationTimeId;
 
 public interface ReservationRepository extends JpaRepository<Reservation, ReservationId> {
 

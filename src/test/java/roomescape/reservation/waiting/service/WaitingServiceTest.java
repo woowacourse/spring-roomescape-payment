@@ -23,12 +23,12 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.request.WaitingCreateRequest;
 import roomescape.reservation.dto.response.WaitingResponse;
 import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservation.time.domain.ReservationTime;
-import roomescape.reservation.time.repository.ReservationTimeRepository;
 import roomescape.reservation.waiting.domain.Waiting;
 import roomescape.reservation.waiting.repository.WaitingRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
+import roomescape.time.domain.ReservationTime;
+import roomescape.time.repository.ReservationTimeRepository;
 
 @ActiveProfiles("test")
 @DataJpaTest

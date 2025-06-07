@@ -1,10 +1,8 @@
 package roomescape.reservation.dto.request;
 
-import java.time.LocalTime;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-
-import roomescape.reservation.time.domain.ReservationTime;
+import java.time.LocalTime;
+import roomescape.time.domain.ReservationTime;
 
 public record ReservationTimeRequest(
         @JsonFormat(pattern = "HH:mm") LocalTime startAt

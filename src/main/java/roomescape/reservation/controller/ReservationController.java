@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.auth.dto.LoginMember;
+import roomescape.payment.domain.PaymentMethod;
+import roomescape.payment.dto.request.PaymentRequest;
 import roomescape.reservation.dto.request.FilteringReservationRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.request.ReservationPaymentRequest;
@@ -22,8 +24,6 @@ import roomescape.reservation.dto.request.ReservationRequest;
 import roomescape.reservation.dto.response.BookedReservationTimeResponse;
 import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
-import roomescape.reservation.payment.domain.PaymentMethod;
-import roomescape.reservation.payment.dto.request.PaymentRequest;
 import roomescape.reservation.service.ReservationService;
 
 @RequestMapping("/reservations")
