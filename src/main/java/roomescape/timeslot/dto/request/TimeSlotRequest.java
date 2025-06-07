@@ -1,12 +1,9 @@
 package roomescape.timeslot.dto.request;
 
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalTime;
 
-public record TimeSlotRequest(LocalTime startAt) {
-
-    public TimeSlotRequest {
-        if (startAt == null) {
-            throw new IllegalArgumentException("time은 null 일 수 없습니다.");
-        }
-    }
+public record TimeSlotRequest(
+        @NotNull(message = "예약 시간은 필수입니다.") LocalTime startAt
+) {
 }

@@ -1,17 +1,10 @@
 package roomescape.member.dto.request;
 
-public record MemberRequest(String email, String password, String name) {
-    public MemberRequest {
-        if (email == null) {
-            throw new IllegalStateException("email은 null 일 수 없습니다.");
-        }
+import jakarta.validation.constraints.NotBlank;
 
-        if (password == null) {
-            throw new IllegalStateException("password는 null 일 수 없습니다.");
-        }
-
-        if (name == null) {
-            throw new IllegalStateException("name은 null 일 수 없습니다.");
-        }
-    }
+public record MemberRequest(
+        @NotBlank(message = "회원 이메일은 비어 있을 수 없습니다.") String email,
+        @NotBlank(message = "회원 비밀번호는 비어 있을 수 없습니다.") String password,
+        @NotBlank(message = "회원 이름은 비어 있을 수 없습니다.") String name
+) {
 }

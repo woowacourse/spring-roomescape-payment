@@ -53,7 +53,7 @@ public class TimeSlotIntegrationTest {
                 .statusCode(NO_CONTENT.value());
     }
 
-    @DisplayName("시간이 null인 상태로 생성 요청 시 400 응답을 준다.")
+    @DisplayName("시간이 없는 상태로 생성 요청 시 400 응답을 준다.")
     @Test
     void when_given_null_time() {
         Map<String, Object> reservationTime = new HashMap<>();
@@ -70,7 +70,7 @@ public class TimeSlotIntegrationTest {
 
         ErrorResponse actual = response.as(ErrorResponse.class);
         ErrorResponse expected = new ErrorResponse(actual.timestamp(), BAD_REQUEST.value(),
-                BAD_REQUEST.getReasonPhrase(), "[ERROR] 요청 본문 형식이 올바르지 않습니다.", "/times");
+                BAD_REQUEST.getReasonPhrase(), "[ERROR] 시간 정보는 필수입니다.", "/times");
 
         assertThat(actual).isEqualTo(expected);
     }

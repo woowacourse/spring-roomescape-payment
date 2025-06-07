@@ -5,7 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.util.Objects;
-import roomescape.common.exception.BusinessException;
+import roomescape.theme.exception.ThemeException;
 
 @Entity
 public class Theme {
@@ -25,9 +25,9 @@ public class Theme {
         validateIsNonNull(description);
         validateIsNonNull(thumbnail);
 
-        validateIsEmpty(name);
-        validateIsEmpty(description);
-        validateIsEmpty(thumbnail);
+        validateIsBlank(name);
+        validateIsBlank(description);
+        validateIsBlank(thumbnail);
 
         this.id = id;
         this.name = name;
@@ -39,27 +39,15 @@ public class Theme {
         return new Theme(null, name, description, thumbnail);
     }
 
-    public static Theme createWithId(final Long id, final String name, final String description,
-                                     final String thumbnail) {
-        validateIdIsNonNull(id);
-        return new Theme(id, name, description, thumbnail);
-    }
-
-    private static void validateIdIsNonNull(final Long id) {
-        if (id == null) {
-            throw new BusinessException("테마 id는 null 일 수 없습니다.");
-        }
-    }
-
     private void validateIsNonNull(final Object object) {
         if (object == null) {
-            throw new BusinessException("테마 정보는 null 일 수 없습니다.");
+            throw new ThemeException("테마 정보는 필수입니다.");
         }
     }
 
-    private void validateIsEmpty(final String something) {
-        if (something.isEmpty()) {
-            throw new BusinessException("테마 정보는 비어있을 수 없습니다.");
+    private void validateIsBlank(final String something) {
+        if (something.isBlank()) {
+            throw new ThemeException("테마 정보는 비어있을 수 없습니다.");
         }
     }
 

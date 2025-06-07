@@ -29,21 +29,10 @@ public class TimeSlot {
     public static TimeSlot createWithoutId(final LocalTime startAt) {
         return new TimeSlot(null, startAt);
     }
-
-    public static TimeSlot createWithId(final Long id, final LocalTime startAt) {
-        validateIdIsNonNull(id);
-        return new TimeSlot(Objects.requireNonNull(id), startAt);
-    }
-
-    private static void validateIdIsNonNull(final Long id) {
-        if (id == null) {
-            throw new BusinessException("시간 id는 null 일 수 없습니다.");
-        }
-    }
-
+    
     private void validateIsNonNull(final Object object) {
         if (object == null) {
-            throw new BusinessException("시간 정보는 null 일 수 없습니다.");
+            throw new BusinessException("시간 정보는 필수입니다.");
         }
     }
 

@@ -16,10 +16,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.infrastructure.dto.request.TossPaymentRequest;
 import roomescape.payment.exception.PaymentClientException;
 import roomescape.payment.exception.PaymentErrorHandler;
 import roomescape.payment.exception.PaymentServerException;
+import roomescape.payment.infrastructure.dto.request.TossPaymentRequest;
 
 class TossPaymentClientTest {
 

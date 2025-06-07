@@ -71,7 +71,7 @@ public class Reservation {
 
     private void validateIsNonNull(final Object object) {
         if (object == null) {
-            throw new BusinessException("예약 정보는 null 일 수 없습니다.");
+            throw new BusinessException("예약 정보는 필수입니다.");
         }
     }
 

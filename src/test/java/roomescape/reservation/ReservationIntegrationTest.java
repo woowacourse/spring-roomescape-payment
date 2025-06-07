@@ -1,5 +1,6 @@
 package roomescape.reservation;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -9,7 +10,6 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.Map;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,7 +22,7 @@ import roomescape.common.dto.response.ErrorResponse;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class ReservationIntegrationTest {
 
-    @DisplayName("날짜가 null인 상태로 생성 요청 시 400 응답을 준다.")
+    @DisplayName("예약 날짜가 없는 상태로 생성 요청 시 400 응답을 준다.")
     @Test
     void when_given_null_date() {
         Map<String, Object> reservation = new HashMap<>();
@@ -46,9 +46,9 @@ public class ReservationIntegrationTest {
 
         ErrorResponse actual = response.as(ErrorResponse.class);
         ErrorResponse expected = new ErrorResponse(actual.timestamp(), BAD_REQUEST.value(),
-                BAD_REQUEST.getReasonPhrase(), "[ERROR] 날짜는 null 일 수 없습니다.", "/reservations");
+                BAD_REQUEST.getReasonPhrase(), "[ERROR] 예약 날짜는 필수입니다.", "/reservations");
 
-        Assertions.assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @DisplayName("잘못된 날짜로 생성 요청 시 400 응답을 준다.")
@@ -73,7 +73,7 @@ public class ReservationIntegrationTest {
         ErrorResponse expected = new ErrorResponse(actual.timestamp(), BAD_REQUEST.value(),
                 BAD_REQUEST.getReasonPhrase(), "[ERROR] 요청 본문 형식이 올바르지 않습니다.", "/reservations");
 
-        Assertions.assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @DisplayName("잘못된 예약 시간 번호로 생성 요청 시 400 응답을 준다.")
@@ -97,10 +97,10 @@ public class ReservationIntegrationTest {
         ErrorResponse expected = new ErrorResponse(actual.timestamp(), BAD_REQUEST.value(),
                 BAD_REQUEST.getReasonPhrase(), "[ERROR] 요청 본문 형식이 올바르지 않습니다.", "/reservations");
 
-        Assertions.assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(expected);
     }
 
-    @DisplayName("예약 시간 번호가 null인 상태로 생성 요청 시 400 응답을 준다.")
+    @DisplayName("예약 시간 번호가 없는 상태로 생성 요청 시 400 응답을 준다.")
     @Test
     void when_given_null_time_id() {
         Map<String, Object> reservation = new HashMap<>();
@@ -124,9 +124,9 @@ public class ReservationIntegrationTest {
 
         ErrorResponse actual = response.as(ErrorResponse.class);
         ErrorResponse expected = new ErrorResponse(actual.timestamp(), BAD_REQUEST.value(),
-                BAD_REQUEST.getReasonPhrase(), "[ERROR] 예약 시간 번호는 null 일 수 없습니다.", "/reservations");
+                BAD_REQUEST.getReasonPhrase(), "[ERROR] 예약 시간 번호는 필수입니다.", "/reservations");
 
-        Assertions.assertThat(actual).isEqualTo(expected);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @DisplayName("잘못된 예약 id로 삭제 요청 시 400 응답을 준다.")

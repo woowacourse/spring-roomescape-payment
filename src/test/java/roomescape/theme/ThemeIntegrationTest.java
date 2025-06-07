@@ -12,10 +12,12 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import roomescape.common.dto.response.ErrorResponse;
@@ -62,14 +64,14 @@ public class ThemeIntegrationTest {
                 .statusCode(NO_CONTENT.value());
     }
 
-    @DisplayName("테마 이름이 null 또는 빈 상태로 생성 요청 시 400 응답을 준다.")
-    @ParameterizedTest
-    @NullAndEmptySource
-    void when_given_null_and_empty_theme_name(final String name) {
+    @DisplayName("테마 생성 시 비어있는 입력값이 있으면 400 에러가 발생한다.")
+    @ParameterizedTest(name = "[{index}] {0} 필드가 비어있을 때")
+    @MethodSource("invalidThemeParams")
+    void when_given_invalid_theme_params(String field, String name, String description, String thumbnail) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);
-        params.put("description", "hi");
-        params.put("thumbnail", "http");
+        params.put("description", description);
+        params.put("thumbnail", thumbnail);
 
         Response response = RestAssured.given().log().all()
                 .contentType(ContentType.JSON)
@@ -81,57 +83,24 @@ public class ThemeIntegrationTest {
                 .response();
 
         ErrorResponse actual = response.as(ErrorResponse.class);
-        ErrorResponse expected = new ErrorResponse(actual.timestamp(), BAD_REQUEST.value(),
-                BAD_REQUEST.getReasonPhrase(), "[ERROR] 요청 본문 형식이 올바르지 않습니다.", "/themes");
+        ErrorResponse expected = new ErrorResponse(
+                actual.timestamp(),
+                BAD_REQUEST.value(),
+                BAD_REQUEST.getReasonPhrase(),
+                "[ERROR] 테마 정보는 비어있을 수 없습니다.",
+                "/themes"
+        );
 
         assertThat(actual).isEqualTo(expected);
     }
 
-    @DisplayName("테마 설명이 null 또는 빈 상태로 생성 요청 시 400 응답을 준다.")
-    @Test
-    void when_given_null_and_empty_theme_description() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", "제목");
-        params.put("description", null);
-        params.put("thumbnail", "http");
-
-        Response response = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(params)
-                .when().post("/themes")
-                .then().log().all()
-                .statusCode(BAD_REQUEST.value())
-                .extract()
-                .response();
-
-        ErrorResponse actual = response.as(ErrorResponse.class);
-        ErrorResponse expected = new ErrorResponse(actual.timestamp(), BAD_REQUEST.value(),
-                BAD_REQUEST.getReasonPhrase(), "[ERROR] 요청 본문 형식이 올바르지 않습니다.", "/themes");
-
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @DisplayName("테마 썸네일이 null 또는 빈 상태로 생성 요청 시 400 응답을 준다.")
-    @Test
-    void when_given_null_and_empty_theme_thumbnail() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", "제목");
-        params.put("description", "hi");
-        params.put("thumbnail", null);
-
-        Response response = RestAssured.given().log().all()
-                .contentType(ContentType.JSON)
-                .body(params)
-                .when().post("/themes")
-                .then().log().all()
-                .statusCode(BAD_REQUEST.value())
-                .extract()
-                .response();
-
-        ErrorResponse actual = response.as(ErrorResponse.class);
-        ErrorResponse expected = new ErrorResponse(actual.timestamp(), BAD_REQUEST.value(),
-                BAD_REQUEST.getReasonPhrase(), "[ERROR] 요청 본문 형식이 올바르지 않습니다.", "/themes");
-
-        assertThat(actual).isEqualTo(expected);
+    private static Stream<Arguments> invalidThemeParams() {
+        return Stream.of(
+                Arguments.of("name", "", "설명", "http"),
+                Arguments.of("name", " ", "설명", "http"),
+                Arguments.of("description", "제목", "", "http"),
+                Arguments.of("description", "제목", " ", "http"),
+                Arguments.of("thumbnail", "제목", "설명", "")
+        );
     }
 }

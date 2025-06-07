@@ -1,6 +1,7 @@
 package roomescape.member.domain;
 
-import org.assertj.core.api.Assertions;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -12,7 +13,7 @@ class MemberTest {
     @ParameterizedTest
     @ValueSource(strings = {".", "kang0@d", "kaw.com", "test@.com"})
     void validate_email_format(final String email) {
-        Assertions.assertThatThrownBy(() -> Member.createWithoutId("기석", email, "password"))
+        assertThatThrownBy(() -> Member.createWithoutId("기석", email, "password"))
                 .isInstanceOf(MemberException.class);
     }
 
@@ -20,7 +21,7 @@ class MemberTest {
     @ParameterizedTest
     @ValueSource(strings = {"testtest", "testtd", "tdasjiopgrj2", ""})
     void validate_name_length(final String name) {
-        Assertions.assertThatThrownBy(() -> Member.createWithoutId(name, "k@email.com", "password"))
+        assertThatThrownBy(() -> Member.createWithoutId(name, "k@email.com", "password"))
                 .isInstanceOf(MemberException.class);
     }
 }

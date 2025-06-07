@@ -1,8 +1,10 @@
 package roomescape.theme.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.time.LocalDateTime;
 import java.util.List;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,7 @@ class ThemeServiceTest {
     @DisplayName("존재하는 예약의 테마는 삭제할 수 없다.")
     @Test
     void can_not_remove_exists_reservation() {
-        Assertions.assertThatThrownBy(() -> themeService.deleteThemeById(1L))
+        assertThatThrownBy(() -> themeService.deleteThemeById(1L))
                 .isInstanceOf(ThemeException.class);
     }
 
@@ -39,7 +41,7 @@ class ThemeServiceTest {
     void can_get_popular_theme() {
         List<PopularThemeResponse> popularThemes = themeService.getPopularThemes();
 
-        Assertions.assertThat(popularThemes).containsExactly(
+        assertThat(popularThemes).containsExactly(
                 new PopularThemeResponse("테마1", "재밌음", "/image/default.jpg"),
                 new PopularThemeResponse("테마3", "놀라움", "/image/default.jpg")
         );

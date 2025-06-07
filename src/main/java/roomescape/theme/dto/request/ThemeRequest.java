@@ -1,17 +1,10 @@
 package roomescape.theme.dto.request;
 
-public record ThemeRequest(String name, String description, String thumbnail) {
-    public ThemeRequest {
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException("테마 이름이 비어있을 수 없습니다.");
-        }
+import jakarta.validation.constraints.NotBlank;
 
-        if (description == null || description.isEmpty()) {
-            throw new IllegalArgumentException("테마 설명이 비어있을 수 없습니다.");
-        }
-
-        if (thumbnail == null || thumbnail.isEmpty()) {
-            throw new IllegalArgumentException("테마 썸네일이 비어있을 수 없습니다.");
-        }
-    }
+public record ThemeRequest(
+        @NotBlank(message = "테마 이름은 비어 있을 수 없습니다.") String name,
+        @NotBlank(message = "테마 설명은 비어 있을 수 없습니다.") String description,
+        @NotBlank(message = "테마 썸네일은 비어 있을 수 없습니다.") String thumbnail
+) {
 }
