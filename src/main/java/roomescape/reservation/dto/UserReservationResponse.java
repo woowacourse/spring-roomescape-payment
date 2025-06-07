@@ -12,7 +12,7 @@ public record UserReservationResponse(
         LocalDate date,
         ReservationTimeResponse time,
         ThemeResponse theme,
-        PaymentResponse paymentResponse
+        PaymentResponse payment
 ) {
 
     public UserReservationResponse(final Reservation reservation) {
