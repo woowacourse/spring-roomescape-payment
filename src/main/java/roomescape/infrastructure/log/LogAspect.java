@@ -41,7 +41,7 @@ public final class LogAspect {
     public void controllerMethods() {
     }
 
-    @Pointcut("execution(* roomescape.application.reservation.command.*Service.*(..))")
+    @Pointcut("execution(* roomescape.application.reservation.command.*Service.*(..)) && !within(roomescape.application.reservation.command.AutoWaitingPromotionService)")
     public void serviceMethods() {
     }
 
@@ -92,9 +92,13 @@ public final class LogAspect {
     }
 
     private Long getMemberId() {
-        HttpServletRequest request = currentHttpRequest();
-        AccessToken accessToken = jwtTokenExtractor.extract(request);
-        return accessToken.extractMemberId(jwtProperties.secretKey());
+        try {
+            HttpServletRequest request = currentHttpRequest();
+            AccessToken accessToken = jwtTokenExtractor.extract(request);
+            return accessToken.extractMemberId(jwtProperties.secretKey());
+        } catch (Exception e) {
+            return -1L; // 문제가 발생한 경우 -1을 반환
+        }
     }
 
     private HttpServletRequest currentHttpRequest() {
