@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import roomescape.exception.common.BadRequestException;
 
 class MemberTest {
 
@@ -24,14 +25,14 @@ class MemberTest {
     @MethodSource("invalidNames")
     void invalidReservationNameTest(String reservationName) {
         assertThatThrownBy(() -> new Member(1L, reservationName, "hello@woowa.com", Role.USER, "password"))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @DisplayName("email 이 존재하지 않으면 생성 불가능하다")
     @Test
     void invalidEmailTest() {
         assertThatThrownBy(() -> new Member(1L, "가이온", null, Role.USER, "password"))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 
     @DisplayName("역할이 존재하지 않으면 생성 불가능하다")
@@ -45,6 +46,6 @@ class MemberTest {
     @Test
     void invalidPasswordTest() {
         assertThatThrownBy(() -> new Member(1L, "가이온", "hello@woowa.com", Role.USER, null))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BadRequestException.class);
     }
 }

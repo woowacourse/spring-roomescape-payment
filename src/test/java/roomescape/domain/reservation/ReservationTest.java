@@ -11,7 +11,8 @@ import roomescape.domain.reservation.slot.ReservationTime;
 import roomescape.domain.reservation.slot.Theme;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.Role;
-import roomescape.exception.InvalidRequestException;
+import roomescape.exception.PastReservationException;
+import roomescape.exception.common.BadRequestException;
 
 class ReservationTest {
 
@@ -27,7 +28,7 @@ class ReservationTest {
         Reservation pastReservation = new Reservation(member, date, reservationTime, theme, status);
         assertThatThrownBy(() -> pastReservation.validateReservableTime(
                 LocalDateTime.of(2025, 5, 1, 10, 1)))
-                .isInstanceOf(InvalidRequestException.class);
+                .isInstanceOf(PastReservationException.class);
     }
 
     @DisplayName("Member가 존재하지 않으면 생성 불가능하다")

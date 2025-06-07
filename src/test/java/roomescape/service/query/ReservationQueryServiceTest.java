@@ -1,6 +1,7 @@
 package roomescape.service.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -14,6 +15,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import roomescape.domain.payment.Payment;
+import roomescape.domain.reservation.payment.ReservationPayment;
 import roomescape.domain.reservation.slot.ReservationTime;
 import roomescape.domain.reservation.slot.Theme;
 import roomescape.domain.member.Member;
@@ -25,6 +28,7 @@ import roomescape.domain.reservation.waiting.ReservationWaitingTicket;
 import roomescape.dto.auth.LoginInfo;
 import roomescape.dto.reservation.MyReservationResponseDto;
 import roomescape.dto.reservation.ReservationResponseDto;
+import roomescape.repository.JpaReservationPaymentRepository;
 import roomescape.repository.JpaReservationRepository;
 import roomescape.repository.JpaReservationWaitingTicketRepository;
 
@@ -35,6 +39,9 @@ class ReservationQueryServiceTest {
 
     @Mock
     private JpaReservationWaitingTicketRepository waitingTicketRepository;
+
+    @Mock
+    private JpaReservationPaymentRepository reservationPaymentRepository;
 
     @InjectMocks
     private ReservationQueryService reservationQueryService;
@@ -139,6 +146,8 @@ class ReservationQueryServiceTest {
 
         when(reservationRepository.findReservationsByMemberId(loginInfo.id()))
                 .thenReturn(myReservations);
+        when(reservationPaymentRepository.findByReservationId(any(Long.class)))
+                .thenReturn(Optional.of(new ReservationPayment(reservation, new Payment(null, null, null))));
 
         // when
         List<MyReservationResponseDto> result = reservationQueryService.findMyReservations(loginInfo);

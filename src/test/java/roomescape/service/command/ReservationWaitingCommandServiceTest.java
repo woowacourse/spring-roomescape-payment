@@ -25,8 +25,10 @@ import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.ReservationStatus;
 import roomescape.domain.reservation.waiting.ReservationWaitingTicket;
 import roomescape.dto.auth.LoginInfo;
-import roomescape.exception.NotFoundException;
-import roomescape.exception.UnauthorizationException;
+import roomescape.exception.AccessDeniedException;
+import roomescape.exception.ReservationWaitingForbiddenException;
+import roomescape.exception.common.NotFoundException;
+import roomescape.exception.common.UnauthorizedException;
 import roomescape.repository.JpaMemberRepository;
 import roomescape.repository.JpaReservationRepository;
 import roomescape.repository.JpaReservationTimeRepository;
@@ -157,7 +159,7 @@ public class ReservationWaitingCommandServiceTest {
         when(clock.getZone()).thenReturn(fixedClock.getZone());
         
         // when & then
-        assertThrows(IllegalArgumentException.class, () -> reservationWaitingCommandService.createReservationWaiting(requestDto));
+        assertThrows(ReservationWaitingForbiddenException.class, () -> reservationWaitingCommandService.createReservationWaiting(requestDto));
     }
     
     @DisplayName("예약 대기 삭제 성공 테스트")
@@ -220,6 +222,6 @@ public class ReservationWaitingCommandServiceTest {
         when(reservationRepository.findById(reservationId)).thenReturn(Optional.of(reservation));
         
         // when & then
-        assertThrows(UnauthorizationException.class, () -> reservationWaitingCommandService.deleteReservationWaiting(reservationId, loginInfo));
+        assertThrows(AccessDeniedException.class, () -> reservationWaitingCommandService.deleteReservationWaiting(reservationId, loginInfo));
     }
 }

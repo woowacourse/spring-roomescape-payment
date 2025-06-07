@@ -21,6 +21,7 @@ import roomescape.dto.auth.LoginInfo;
 import roomescape.dto.reservation.MemberReservationCreateRequestDto;
 import roomescape.dto.reservation.MyReservationResponseDto;
 import roomescape.dto.reservation.ReservationResponseDto;
+import roomescape.service.command.PaymentCommandService;
 import roomescape.service.command.ReservationCommandService;
 import roomescape.service.query.MemberQueryService;
 import roomescape.service.query.ReservationQueryService;
@@ -57,6 +58,9 @@ public class ReservationControllerTest {
 
     @MockitoBean
     private ReservationCommandService reservationCommandService;
+
+    @MockitoBean
+    private PaymentCommandService paymentCommandService;
 
     @Autowired
     private MockMvc mockMvc;
