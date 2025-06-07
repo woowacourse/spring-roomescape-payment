@@ -1,5 +1,6 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import roomescape.reservation.application.dto.response.ReservationThemeServiceRe
 import roomescape.reservation.controller.dto.request.CreateReservationThemeRequest;
 import roomescape.reservation.controller.dto.response.ReservationThemeResponse;
 
+@Tag(name = "Theme", description = "테마 도메인 API")
 @RestController
 @RequestMapping("/admin/themes")
 @RequiredArgsConstructor

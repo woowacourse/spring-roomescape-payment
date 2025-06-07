@@ -1,5 +1,6 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import roomescape.reservation.application.UserReservationThemeService;
 import roomescape.reservation.application.dto.response.ReservationThemeServiceResponse;
 import roomescape.reservation.controller.dto.response.ReservationThemeResponse;
 
+@Tag(name = "Theme", description = "테마 도메인 API")
 @RestController
 @RequestMapping("/themes")
 @RequiredArgsConstructor
@@ -19,7 +21,6 @@ public class UserReservationThemeController {
 
     private final UserReservationThemeService userReservationThemeService;
 
-    // TODO : Admin과 API를 공유하고 있다. 분리를 고민해보자.
     @ResponseStatus(HttpStatus.OK)
     @GetMapping
     public List<ReservationThemeResponse> getAll() {

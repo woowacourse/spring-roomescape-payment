@@ -1,5 +1,6 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import roomescape.reservation.controller.dto.request.UserCreateReservationReques
 import roomescape.reservation.controller.dto.response.ReservationResponse;
 import roomescape.reservation.controller.dto.response.UserReservationResponse;
 
+@Tag(name = "Reservation", description = "예약 도메인 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/reservations")

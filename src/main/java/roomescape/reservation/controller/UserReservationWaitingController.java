@@ -1,5 +1,6 @@
 package roomescape.reservation.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import roomescape.auth.web.resolver.AuthenticationPrincipal;
 import roomescape.reservation.application.UserReservationWaitingService;
 import roomescape.reservation.controller.dto.request.UserCreateReservationWaitingRequest;
 
+@Tag(name = "waiting", description = "대기 도메인 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/reservations/waiting")
