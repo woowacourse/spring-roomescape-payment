@@ -1,0 +1,10 @@
+[source,bash]
+----
+$ echo '{
+  "email" : "example@example.com",
+  "password" : "password",
+  "name" : "홍길동"
+}' | http POST 'http://docs.api.com/members' \
+    'Content-Type:application/json' \
+    'Accept:application/json'
+----
