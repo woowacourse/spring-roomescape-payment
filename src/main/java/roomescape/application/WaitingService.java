@@ -1,5 +1,8 @@
 package roomescape.application;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
@@ -10,11 +13,8 @@ import roomescape.infrastructure.repository.ReservationRepository;
 import roomescape.infrastructure.repository.WaitingRepository;
 import roomescape.presentation.dto.request.LoginMember;
 import roomescape.presentation.dto.request.ReservationCreateRequest;
+import roomescape.presentation.dto.response.MyReservationResponse;
 import roomescape.presentation.dto.response.WaitingResponse;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
 @Transactional(readOnly = true)
@@ -38,7 +38,8 @@ public class WaitingService {
 
     @Transactional
     public WaitingResponse createWaiting(ReservationCreateRequest request, LoginMember loginMember) {
-        ReservationInfo reservationInfo = reservationRepository.findReservationInfo(request.date(), request.timeId(), request.themeId(), ReservationStatus.RESERVED);
+        ReservationInfo reservationInfo = reservationRepository.findReservationInfo(request.date(), request.timeId(),
+                request.themeId(), ReservationStatus.RESERVED);
         validateWaitingTime(reservationInfo);
         Member member = memberService.findMemberByEmail(loginMember.email());
         validateExistsReservationByMember(reservationInfo, member);
@@ -52,14 +53,16 @@ public class WaitingService {
     }
 
     private void validateWaitingTime(ReservationInfo reservationInfo) {
-        LocalDateTime waitingDateTime = LocalDateTime.of(reservationInfo.getDate(), reservationInfo.getTime().getStartAt());
+        LocalDateTime waitingDateTime = LocalDateTime.of(reservationInfo.getDate(),
+                reservationInfo.getTime().getStartAt());
         if (!waitingDateTime.isAfter(currentTimeService.now())) {
             throw new IllegalArgumentException("[ERROR] 현재 시간 이후로 예약 대기할 수 있습니다.");
         }
     }
 
     private void validateExistsReservationByMember(ReservationInfo reservationInfo, Member member) {
-        if (reservationRepository.existsByDateAndTimeAndThemeAndMember(reservationInfo.getDate(), reservationInfo.getTime(), reservationInfo.getTheme(), member)) {
+        if (reservationRepository.existsByDateAndTimeAndThemeAndMember(reservationInfo.getDate(),
+                reservationInfo.getTime(), reservationInfo.getTheme(), member)) {
             throw new IllegalArgumentException("[ERROR] 이미 해당 날짜, 해당 테마, 해당 시간에 예약이 존재합니다.");
         }
     }
@@ -70,8 +73,11 @@ public class WaitingService {
         }
     }
 
-    public List<Waiting> findWaitingsByMember(Member member) {
-        return waitingRepository.findAllByMember(member);
+    public List<MyReservationResponse> findMyWaitings(LoginMember loginMember) {
+        Member member = memberService.findMemberById(loginMember.id());
+        return waitingRepository.findAllByMember(member).stream()
+                .map(MyReservationResponse::from)
+                .toList();
     }
 
     @Transactional
@@ -101,7 +107,6 @@ public class WaitingService {
 
     public List<WaitingResponse> getWaitings() {
         List<Waiting> waitings = waitingRepository.findAll();
-
         return WaitingResponse.from(waitings);
     }
 
