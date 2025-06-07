@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.web.client.ExpectedCount;
 
 import roomescape.reservation.BaseTest;
-import roomescape.reservation.service.PaymentApprovalRequest;
+import roomescape.reservation.dto.PaymentApprovalRequest;
 
 class TossPaymentClientTest extends BaseTest {
 

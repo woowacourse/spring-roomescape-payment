@@ -1,4 +1,4 @@
-package roomescape.reservation.service;
+package roomescape.reservation.dto;
 
 public record PaymentApprovalRequest(
        String paymentKey,
