@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.ResourceAccessException;
 import roomescape.payment.domain.Orders;
@@ -27,11 +28,11 @@ public class TossPaymentService implements PaymentService {
         Orders orders = new Orders(paymentRequest.paymentKey(), paymentRequest.orderId());
 
         Orders save = ordersRepository.save(orders);
-        ordersRepository.flush();
 
         return PaymentResponse.from(save);
     }
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     @Retryable(retryFor = {PaymentTemporaryException.class, ResourceAccessException.class},
             maxAttempts = 2, backoff = @Backoff(delay = 500))
     public PaymentResponse confirmPayment(PaymentRequest paymentRequest) {
@@ -41,6 +42,7 @@ public class TossPaymentService implements PaymentService {
                 .toPaymentResponse();
     }
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     @Retryable(retryFor = {PaymentTemporaryException.class, ResourceAccessException.class},
             maxAttempts = 2, backoff = @Backoff(delay = 500))
     public PaymentResponse getPayment(String paymentKey) {
