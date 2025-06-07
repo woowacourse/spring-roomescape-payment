@@ -1,5 +1,6 @@
 package roomescape.payment.domain;
 
+import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -18,6 +19,7 @@ public class Payment {
     private static final String NON_EXISTS_ERROR_MESSAGE = "%s값이 존재하지 않습니다.";
 
     @EmbeddedId
+    @AttributeOverride(name = "value", column = @Column(name = "id", nullable = false))
     private PaymentId paymentId;
 
     @Column(nullable = false)

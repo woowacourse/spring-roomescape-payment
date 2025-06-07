@@ -94,4 +94,9 @@ public class PaymentService {
                 reservation
         ));
     }
+
+    public Payment getPaymentByReservation(final ReservationId reservationId) {
+        return paymentRepository.findByReservationId(reservationId)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 예약 결제 정보입니다."));
+    }
 }

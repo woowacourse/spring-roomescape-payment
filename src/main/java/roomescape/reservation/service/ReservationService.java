@@ -21,22 +21,23 @@ import roomescape.common.exception.EntityNotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberId;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
+import roomescape.payment.dto.request.PaymentRequest;
+import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationId;
+import roomescape.reservation.domain.ReservationTime;
+import roomescape.reservation.domain.ReservationTimeId;
+import roomescape.reservation.domain.Waiting;
+import roomescape.reservation.domain.WaitingWithRank;
 import roomescape.reservation.dto.request.FilteringReservationRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.response.BookedReservationTimeResponse;
 import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationTimeResponse;
-import roomescape.payment.dto.request.PaymentRequest;
-import roomescape.payment.service.PaymentService;
 import roomescape.reservation.repository.ReservationRepository;
-import roomescape.reservation.domain.ReservationTime;
-import roomescape.reservation.domain.ReservationTimeId;
 import roomescape.reservation.repository.ReservationTimeRepository;
-import roomescape.reservation.domain.Waiting;
-import roomescape.reservation.domain.WaitingWithRank;
 import roomescape.reservation.repository.WaitingRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeId;
@@ -92,12 +93,17 @@ public class ReservationService {
     ) {
         List<MyReservationsResponse> responses = new ArrayList<>();
         for (Reservation reservation : reservations) {
-            responses.add(MyReservationsResponse.from(reservation));
+            Payment payment = getPayment(reservation.getId());
+            responses.add(MyReservationsResponse.of(reservation, payment));
         }
         for (WaitingWithRank waitingWithRank : waitingWithRanks) {
             responses.add(MyReservationsResponse.from(waitingWithRank));
         }
         return responses;
+    }
+
+    private Payment getPayment(final ReservationId reservationId) {
+        return paymentService.getPaymentByReservation(reservationId);
     }
 
     @Transactional
@@ -113,7 +119,8 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationResponse createWithPayment(final ReservationCreateRequest request, final PaymentRequest paymentRequest) {
+    public ReservationResponse createWithPayment(final ReservationCreateRequest request,
+                                                 final PaymentRequest paymentRequest) {
         validateReservationCreate(request);
 
         Reservation reservation = getReservation(request, request.loginMember());
