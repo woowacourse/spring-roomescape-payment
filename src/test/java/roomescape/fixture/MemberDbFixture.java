@@ -31,4 +31,13 @@ public class MemberDbFixture {
 
         return memberRepository.save(Member.create(name, role, email, password));
     }
+
+    public Member 브라운_사용자() {
+        String name ="브라운";
+        Role role = Role.USER;
+        String email = "test3@test.com";
+        String password = "pass3";
+
+        return memberRepository.save(Member.create(name, role, email, password));
+    }
 }
