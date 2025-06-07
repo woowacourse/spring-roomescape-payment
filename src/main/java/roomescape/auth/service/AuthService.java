@@ -23,8 +23,8 @@ public class AuthService {
     private final MemberQueryService memberQueryService;
 
     public String login(LoginRequest request) {
-        log.info("로그인 요청 | 이메일 = {}", MaskingUtil.maskEmail(request.email()));
         try {
+            log.info("로그인 요청 | 이메일 = {}", MaskingUtil.maskEmail(request.email()));
             Member member = memberQueryService.getMember(request.email(), request.password());
             return tokenProvider.issue(member);
         } catch (NotFoundException e) {

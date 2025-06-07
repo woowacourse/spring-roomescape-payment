@@ -6,7 +6,7 @@ public record OrdersResponse(String orderId) {
 
     public static OrdersResponse from(Orders orders) {
         if (orders == null) {
-            return new OrdersResponse(null);
+            return null;
         }
         return new OrdersResponse(orders.getOrderId());
     }

@@ -22,5 +22,16 @@ public class Orders {
     public Orders(String paymentKey, String orderId) {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
+        validate();
+    }
+
+    private void validate() {
+        if (paymentKey == null || paymentKey.isBlank()) {
+            throw new IllegalArgumentException("Payment key cannot be null or blank");
+        }
+
+        if (orderId == null || orderId.isBlank()) {
+            throw new IllegalArgumentException("Order ID cannot be null or blank");
+        }
     }
 }

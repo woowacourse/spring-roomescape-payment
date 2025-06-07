@@ -30,7 +30,7 @@ public class ReservationPaymentService {
     @Transactional
     public void failedPayment(Long id, String paymentKey) {
         Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("예약을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException("예약을 찾을 수 없습니다."));
         Orders orders = getOrders(paymentKey);
 
         reservation.failPayment(orders);

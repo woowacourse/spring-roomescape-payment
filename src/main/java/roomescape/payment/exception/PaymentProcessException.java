@@ -15,9 +15,18 @@ public class PaymentProcessException extends RuntimeException {
 
     private HttpStatus parseStatus(String code) {
         try {
-            return HttpStatus.resolve(Integer.parseInt(code));
+            int parseCode = Integer.parseInt(code);
+            return parseStatus(parseCode);
         } catch (NumberFormatException e) {
             return HttpStatus.BAD_REQUEST;
         }
+    }
+
+    private HttpStatus parseStatus(int code) {
+        HttpStatus status = HttpStatus.resolve(code);
+        if (status == null) {
+            return HttpStatus.BAD_REQUEST;
+        }
+        return status;
     }
 }

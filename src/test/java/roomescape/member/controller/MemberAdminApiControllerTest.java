@@ -25,8 +25,8 @@ class MemberAdminApiControllerTest extends AbstractRestDocsTests {
     void 모든_멤버를_조회할_수_있다() throws Exception {
         // given
         List<MemberResponse> responses = List.of(
-                new MemberResponse(1L, "user1@naver.com", "USER"),
-                new MemberResponse(2L, "admin@naver.com", "ADMIN")
+                new MemberResponse(1L, "user1@naver.com", "이름1"),
+                new MemberResponse(2L, "admin@naver.com", "이름2")
         );
         given(memberService.getMembers()).willReturn(responses);
 
@@ -37,10 +37,10 @@ class MemberAdminApiControllerTest extends AbstractRestDocsTests {
                 .andExpect(jsonPath("$.message").value("모든 회원을 조회하였습니다."))
                 .andExpect(jsonPath("$.data[0].id").value(1L))
                 .andExpect(jsonPath("$.data[0].email").value("user1@naver.com"))
-                .andExpect(jsonPath("$.data[0].name").value("USER"))
+                .andExpect(jsonPath("$.data[0].name").value("이름1"))
                 .andExpect(jsonPath("$.data[1].id").value(2L))
                 .andExpect(jsonPath("$.data[1].email").value("admin@naver.com"))
-                .andExpect(jsonPath("$.data[1].name").value("ADMIN"))
+                .andExpect(jsonPath("$.data[1].name").value("이름2"))
                 .andDo(restDocs.document(
                         responseFields(
                                 fieldWithPath("code").description("응답 코드"),
