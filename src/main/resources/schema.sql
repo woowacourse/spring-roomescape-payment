@@ -69,10 +69,10 @@ CREATE TABLE reservation_wait
 CREATE TABLE toss_payment
 (
     id   BIGINT       NOT NULL AUTO_INCREMENT,
-    amount BIGINT,
-    order_id VARCHAR(255),
-    payment_key VARCHAR(255),
-    reservation_id BIGINT,
+    amount BIGINT NOT NULL,
+    order_id VARCHAR(255) NOT NULL,
+    payment_key VARCHAR(255) NOT NULL,
+    reservation_id BIGINT NOT NULL,
     FOREIGN KEY (reservation_id) REFERENCES reservation (id),
     PRIMARY KEY (id)
 );

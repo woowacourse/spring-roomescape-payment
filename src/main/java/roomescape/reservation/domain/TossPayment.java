@@ -37,11 +37,13 @@ public class TossPayment {
     public TossPayment(
             final OrderId orderId,
             final Amount amount,
-            final PaymentKey paymentKey
+            final PaymentKey paymentKey,
+            final Reservation reservation
     ) {
         this.orderId = orderId;
         this.amount = amount;
         this.paymentKey = paymentKey;
+        this.reservation = reservation;
     }
 
     public Long getId() {

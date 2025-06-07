@@ -3,6 +3,7 @@ package roomescape.reservation.controller;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.member.service.MemberQueryService;
 import roomescape.reservation.controller.dto.AdminCreateReservationRequest;
@@ -46,6 +47,7 @@ public class ReservationService {
         return createReservation(request.timeId(), request.themeId(), request.date(), memberId);
     }
 
+    @Transactional
     public ReservationResponse createReservationWithPayment(
             final CreateReservationRequest request,
             final Long memberId
@@ -56,8 +58,8 @@ public class ReservationService {
                 new ReservationDate(request.date())
         );
         Member member = memberQueryService.getById(memberId);
-        tossPaymentCommandService.createTossPayment(request.toTossPaymentRequest());
         Reservation reservation = reservationCommandService.createReservation(schedule, member);
+        tossPaymentCommandService.createTossPayment(request.toTossPaymentRequest(), reservation);
         return ReservationResponse.from(reservation);
     }
 
