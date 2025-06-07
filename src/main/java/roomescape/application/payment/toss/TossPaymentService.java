@@ -1,9 +1,9 @@
-package roomescape.application.payment;
+package roomescape.application.payment.toss;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import roomescape.application.payment.dto.TossPaymentCommand;
+import roomescape.application.payment.toss.dto.TossPaymentCommand;
 import roomescape.domain.payment.repository.TossPaymentRepository;
 
 @Service

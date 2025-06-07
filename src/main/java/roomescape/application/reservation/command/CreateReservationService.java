@@ -2,10 +2,7 @@ package roomescape.application.reservation.command;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import roomescape.application.payment.TossPaymentService;
 import roomescape.application.reservation.command.dto.CreateReservationCommand;
-import roomescape.application.reservation.command.dto.CreateReservationWithPaymentCommand;
 import roomescape.domain.member.Member;
 import roomescape.domain.member.repository.MemberRepository;
 import roomescape.domain.reservation.Reservation;

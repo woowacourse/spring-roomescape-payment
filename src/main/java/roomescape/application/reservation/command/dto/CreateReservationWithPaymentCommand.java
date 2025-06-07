@@ -1,6 +1,6 @@
 package roomescape.application.reservation.command.dto;
 
-import roomescape.application.payment.dto.TossPaymentCommand;
+import roomescape.application.payment.toss.dto.TossPaymentCommand;
 
 import java.time.LocalDate;
 

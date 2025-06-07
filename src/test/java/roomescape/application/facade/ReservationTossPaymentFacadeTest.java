@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.application.payment.OrderAmountVerificationCache;
-import roomescape.application.payment.TossPaymentClient;
+import roomescape.application.payment.toss.TossPaymentClient;
 import roomescape.application.reservation.command.dto.CreateReservationWithPaymentCommand;
 import roomescape.domain.member.Email;
 import roomescape.domain.member.Member;

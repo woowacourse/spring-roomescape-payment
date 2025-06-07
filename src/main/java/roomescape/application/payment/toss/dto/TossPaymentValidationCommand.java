@@ -1,8 +1,8 @@
-package roomescape.application.payment.dto;
+package roomescape.application.payment.toss.dto;
 
 public record TossPaymentValidationCommand(
         String orderId,
-        Long amount
+        long amount
 ) {
 
 }

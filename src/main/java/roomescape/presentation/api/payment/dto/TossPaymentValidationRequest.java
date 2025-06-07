@@ -2,7 +2,7 @@ package roomescape.presentation.api.payment.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import roomescape.application.payment.dto.TossPaymentValidationCommand;
+import roomescape.application.payment.toss.dto.TossPaymentValidationCommand;
 
 public record TossPaymentValidationRequest(
         @NotBlank(message = "orderId는 필수입니다.")

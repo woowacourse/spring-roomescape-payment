@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.application.facade.dto.ReservationWithPaymentResult;
-import roomescape.application.payment.TossPaymentService;
+import roomescape.application.payment.toss.TossPaymentService;
 import roomescape.application.reservation.command.CreateReservationService;
 import roomescape.application.reservation.command.dto.CreateReservationWithPaymentCommand;
 import roomescape.domain.reservation.PaymentType;

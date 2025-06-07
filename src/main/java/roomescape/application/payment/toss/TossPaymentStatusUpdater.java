@@ -1,4 +1,4 @@
-package roomescape.application.payment;
+package roomescape.application.payment.toss;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package roomescape.application.payment.dto;
+package roomescape.application.payment.toss.dto;
 
 import roomescape.domain.payment.TossPayment;
 
