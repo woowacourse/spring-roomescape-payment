@@ -29,9 +29,7 @@ public class ReservationPaymentFacade {
         ReservationResponseDto reservationResponseDto = reservationService.add(reservationRequestDto, user);
 
         PaymentRequestDto paymentRequestDto = requestDto.toPaymentRequestDto();
-        System.out.println("addWithPayment - paymentRequestDto = " + paymentRequestDto.amount());
         PaymentResponseDto approvedPaymentInfo = tossPaymentService.approve(paymentRequestDto, reservationResponseDto.toReservation());
-        System.out.println("addWithPayment - approvedPaymentInfo = " + approvedPaymentInfo.totalAmount());
         return ReservationWithPaymentResponseDto.of(reservationResponseDto, approvedPaymentInfo);
     }
 }
