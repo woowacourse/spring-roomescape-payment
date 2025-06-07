@@ -45,16 +45,16 @@ function render(apiResponse) {
 
 function fetchTimes() {
     requestRead(`/admin${TIME_API_ENDPOINT}`)
-        .then(data => {
-            timesOptions.push(...data);
+        .then(response => {
+            timesOptions.push(...response.data);
         })
         .catch(error => console.error('Error fetching time:', error));
 }
 
 function fetchThemes() {
     requestRead(THEME_API_ENDPOINT)
-        .then(data => {
-            themesOptions.push(...data);
+        .then(response => {
+            themesOptions.push(...response.data);
             populateSelect('theme', themesOptions, 'name');
         })
         .catch(error => console.error('Error fetching theme:', error));
@@ -62,8 +62,8 @@ function fetchThemes() {
 
 function fetchMembers() {
     requestRead(`/admin${MEMBER_API_ENDPOINT}`)
-        .then(data => {
-            membersOptions.push(...data);
+        .then(response => {
+            membersOptions.push(...response.data);
             populateSelect('member', membersOptions, 'name');
         })
         .catch(error => console.error('Error fetching member:', error));

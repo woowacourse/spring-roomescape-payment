@@ -17,8 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
+import roomescape.approval.infrastructure.toss.client.TossPaymentClient;
 import roomescape.common.exception.ExternalApiException;
-import roomescape.payment.application.dto.PaymentApprovalRequest;
+import roomescape.approval.infrastructure.toss.dto.TossPaymentApprovalRequest;
 
 class TossPaymentClientTest {
     private final RestClient.Builder testBuilder = RestClient.builder()
@@ -43,7 +44,8 @@ class TossPaymentClientTest {
                 .andRespond(withSuccess());
 
         // when & then
-        assertDoesNotThrow(() -> tossPaymentClient.approve(new PaymentApprovalRequest(orderId, amount, paymentKey)));
+        assertDoesNotThrow(
+                () -> tossPaymentClient.approve(new TossPaymentApprovalRequest(orderId, amount, paymentKey)));
     }
 
     @DisplayName("결제 승인 API 호출 - 400에러이면서 메세지 노출이 가능한 경우 ExternalApiException 발생")
@@ -61,7 +63,7 @@ class TossPaymentClientTest {
                 .andRespond(
                         withStatus(HttpStatus.BAD_REQUEST).body(expectedBody).contentType(MediaType.APPLICATION_JSON));
 
-        assertThatCode(() -> tossPaymentClient.approve(new PaymentApprovalRequest(orderId, amount, paymentKey)))
+        assertThatCode(() -> tossPaymentClient.approve(new TossPaymentApprovalRequest(orderId, amount, paymentKey)))
                 .isInstanceOf(ExternalApiException.class);
     }
 
@@ -80,7 +82,7 @@ class TossPaymentClientTest {
                 .andRespond(
                         withStatus(HttpStatus.BAD_REQUEST).body(expectedBody).contentType(MediaType.APPLICATION_JSON));
 
-        assertThatCode(() -> tossPaymentClient.approve(new PaymentApprovalRequest(orderId, amount, paymentKey)))
+        assertThatCode(() -> tossPaymentClient.approve(new TossPaymentApprovalRequest(orderId, amount, paymentKey)))
                 .isInstanceOf(ExternalApiException.class)
                 .hasMessageContaining("결제 승인에 오류가 발생하였습니다. 관리자에게 문의하세요");
     }
@@ -101,7 +103,7 @@ class TossPaymentClientTest {
                         withStatus(HttpStatus.INTERNAL_SERVER_ERROR).body(expectedBody)
                                 .contentType(MediaType.APPLICATION_JSON));
 
-        assertThatCode(() -> tossPaymentClient.approve(new PaymentApprovalRequest(orderId, amount, paymentKey)))
+        assertThatCode(() -> tossPaymentClient.approve(new TossPaymentApprovalRequest(orderId, amount, paymentKey)))
                 .isInstanceOf(ExternalApiException.class);
     }
 

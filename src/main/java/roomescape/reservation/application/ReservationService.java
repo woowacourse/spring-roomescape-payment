@@ -8,13 +8,14 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.approval.application.ApprovalService;
+import roomescape.approval.domain.AdminApproval;
+import roomescape.approval.domain.Payment;
+import roomescape.approval.exception.payment.InvalidPaymentAmountException;
+import roomescape.approval.exception.payment.PaymentSessionExpiredException;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.member.exception.MemberNotFoundException;
-import roomescape.payment.application.PaymentApprovalService;
-import roomescape.payment.application.dto.PaymentApprovalRequest;
-import roomescape.payment.exception.InvalidPaymentAmountException;
-import roomescape.payment.exception.PaymentSessionExpiredException;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.AdminReservationSearchRequest;
 import roomescape.reservation.application.dto.MyReservationResponse;
@@ -48,7 +49,7 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
     private final ApplicationEventPublisher eventPublisher;
-    private final PaymentApprovalService paymentApprovalService;
+    private final ApprovalService approvalService;
 
     public List<MyReservationResponse> findAllByMemberId(Long memberId) {
         List<Reservation> reservations = reservationRepository.findAllByMemberId(memberId);
@@ -78,28 +79,36 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse createByUser(Long memberId, UserReservationRequest request, BigDecimal originAmount) {
+        String orderId = request.orderId();
+        BigDecimal amount = request.amount();
+        validateAmount(originAmount, amount);
+
+        Reservation reservation = reservationRepository.save(
+                create(memberId, request.date(), request.timeId(), request.themeId()));
+        approvalService.approve(new Payment(reservation, orderId, request.paymentKey(), amount));
+        return ReservationResponse.from(reservation);
+    }
+
+    private void validateAmount(BigDecimal originAmount, BigDecimal amount) {
         if (originAmount == null) {
             throw new PaymentSessionExpiredException();
         }
-        String orderId = request.orderId();
-        BigDecimal amount = request.amount();
+
         if (originAmount.compareTo(amount) != 0) {
             throw new InvalidPaymentAmountException();
         }
-
-        ReservationResponse response = create(memberId, request.date(), request.timeId(), request.themeId());
-
-        paymentApprovalService.approvePayment(new PaymentApprovalRequest(orderId, amount, request.paymentKey()));
-
-        return response;
     }
 
     @Transactional
     public ReservationResponse createByAdmin(AdminReservationRequest request) {
-        return create(request.memberId(), request.date(), request.timeId(), request.themeId());
+        Member admin = memberRepository.findById(request.memberId()).orElseThrow(MemberNotFoundException::new);
+        Reservation reservation = reservationRepository.save(
+                create(request.memberId(), request.date(), request.timeId(), request.themeId()));
+        approvalService.approve(new AdminApproval(reservation, admin));
+        return ReservationResponse.from(reservation);
     }
 
-    private ReservationResponse create(Long memberId, LocalDate dateInput, Long timeId, Long themeId) {
+    private Reservation create(Long memberId, LocalDate dateInput, Long timeId, Long themeId) {
         Member member = memberRepository.findById(memberId).orElseThrow(MemberNotFoundException::new);
 
         ReservationDate date = new ReservationDate(dateInput);
@@ -111,8 +120,7 @@ public class ReservationService {
         ReservationSpec spec = new ReservationSpec(date, time, theme);
         validateDuplicated(spec);
 
-        Reservation reservation = new Reservation(member, spec);
-        return ReservationResponse.from(reservationRepository.save(reservation));
+        return new Reservation(member, spec);
     }
 
     private void validateDuplicated(ReservationSpec spec) {
@@ -130,13 +138,12 @@ public class ReservationService {
     @Transactional
     public void deleteById(Long id) {
         Optional<Reservation> reservation = reservationRepository.findById(id);
+        approvalService.deleteByReservation(reservation);
         reservationRepository.deleteById(id);
         publishDeleteEvent(reservation);
     }
 
     private void publishDeleteEvent(Optional<Reservation> reservation) {
-        if (reservation.isPresent()) {
-            eventPublisher.publishEvent(new ReservationDeletedEvent(reservation.get()));
-        }
+        reservation.ifPresent(value -> eventPublisher.publishEvent(new ReservationDeletedEvent(value)));
     }
 }

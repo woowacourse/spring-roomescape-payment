@@ -20,7 +20,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.member.exception.MemberNotFoundException;
 import roomescape.member.infrastructure.MemberRepositoryAdapter;
-import roomescape.payment.application.FakePaymentApprovalService;
+import roomescape.payment.application.FakePaymentCommandService;
 import roomescape.reservation.application.dto.AdminReservationRequest;
 import roomescape.reservation.application.dto.AdminReservationSearchRequest;
 import roomescape.reservation.application.dto.MyReservationResponse;
@@ -55,7 +55,7 @@ import roomescape.waiting.infrastructure.WaitingRepositoryAdapter;
         ReservationTimeRepositoryAdapter.class,
         ThemeRepositoryAdapter.class,
         WaitingRepositoryAdapter.class,
-        FakePaymentApprovalService.class
+        FakePaymentCommandService.class
 })
 class ReservationServiceTest {
 
