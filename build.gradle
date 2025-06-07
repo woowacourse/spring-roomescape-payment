@@ -1,6 +1,7 @@
 plugins {
     id 'org.springframework.boot' version '3.4.4'
     id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
     id 'java'
 }
 
@@ -10,6 +11,10 @@ version = '0.0.1-SNAPSHOT'
 java {
     sourceCompatibility = JavaVersion.VERSION_21
     targetCompatibility = JavaVersion.VERSION_21
+}
+
+configurations {
+    asciidoctorExt
 }
 
 repositories {
@@ -42,8 +47,69 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+
+    // Spring Restdocs
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:2.0.5.RELEASE'
+
+    // Jackson
+    testImplementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
+def generatedSnippets = file("${buildDir}/generated-snippets")
+def persistentSnippets = file("${projectDir}/src/docs/snippets")  // Git에 포함되는 위치
+def indexAdocPath = file("${projectDir}/src/docs/asciidoc/index.adoc")
 
 test {
     useJUnitPlatform()
+    outputs.dir generatedSnippets
+}
+
+tasks.register("copySnippets", Copy) {
+    dependsOn test
+    from generatedSnippets
+    into persistentSnippets
+}
+
+tasks.register("generateIndexAdoc") {
+    dependsOn copySnippets
+    doLast {
+        indexAdocPath.parentFile.mkdirs()
+
+        def includes = []
+        persistentSnippets.eachFileRecurse { file ->
+            if (file.name.endsWith(".adoc")) {
+                def relativePath = persistentSnippets.toPath().relativize(file.toPath()).toString()
+                includes << "include::{snippets}/${relativePath}[]"
+            }
+        }
+
+        indexAdocPath.text = """
+= API 문서
+:toc: left
+:source-highlighter: highlightjs
+:snippets: ${persistentSnippets}
+
+${includes.sort().join('\n')}
+"""
+    }
+}
+
+asciidoctor {
+    dependsOn generateIndexAdoc
+    inputs.dir persistentSnippets
+    configurations 'asciidoctorExt'
+    sources {
+        include 'index.adoc'
+    }
+    baseDirFollowsSourceDir()
+}
+
+tasks.register('copyDocs', Copy) {
+    dependsOn asciidoctor
+    from file("build/docs/asciidoc/")
+    into file("src/main/resources/static/docs")
+}
+
+build {
+    dependsOn copyDocs
 }

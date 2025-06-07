@@ -1,0 +1,11 @@
+[source,json,options="nowrap"]
+----
+{
+  "date" : "2025-06-08",
+  "themeId" : 1,
+  "timeId" : 1,
+  "paymentKey" : "payKey",
+  "orderId" : "orderId",
+  "amount" : 1000
+}
+----
