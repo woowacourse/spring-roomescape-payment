@@ -98,3 +98,17 @@ CREATE TABLE IF NOT EXISTS payment
     amount BIGINT,
     type VARCHAR(255)
 );
+
+CREATE TABLE IF NOT EXISTS reservation_waiting
+(
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    member_id BIGINT,
+    date VARCHAR(255) NOT NULL,
+    time_id BIGINT,
+    theme_id BIGINT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY(id),
+    FOREIGN KEY(time_id) REFERENCES reservation_time(id),
+    FOREIGN KEY(member_id) REFERENCES member(id),
+    FOREIGN KEY(theme_id) REFERENCES reservation_theme(id)
+    );

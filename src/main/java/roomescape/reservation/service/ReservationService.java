@@ -3,6 +3,7 @@ package roomescape.reservation.service;
 import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.domain.Reservation;
@@ -48,18 +50,18 @@ public class ReservationService {
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 예약 시간 입니다."));
         final ReservationTheme theme = reservationThemeRepository.findById(themeId)
                 .orElseThrow(() -> new NoSuchElementException("[ERROR] 존재하지 않는 테마 입니다."));
-        final Reservation reservation = new Reservation(member, date, time, theme);
-        Reservation saved = reservationRepository.save(reservation);
         final TossPaymentResponse tossPaymentResponse = paymentService.approvePayment(request.orderId(),
                 request.paymentKey(), request.amount());
+        final Reservation reservation = new Reservation(member, date, time, theme);
+        Reservation saved = reservationRepository.save(reservation);
         paymentService.savePayment(saved, tossPaymentResponse);
-        return ReservationResponse.fromV2(saved);
+        return ReservationResponse.from(saved);
     }
 
     @Transactional
     public List<ReservationResponse> getAllReservations() {
         return reservationRepository.findAll().stream()
-                .map(ReservationResponse::fromV2)
+                .map(ReservationResponse::from)
                 .toList();
     }
 
@@ -69,7 +71,7 @@ public class ReservationService {
         final List<Reservation> reservations = reservationRepository.findByMemberIdAndThemeIdAndDateFromAndDateTo(
                 memberId, themeId, dateFrom, dateTo);
         return reservations.stream()
-                .map(ReservationResponse::fromV2)
+                .map(ReservationResponse::from)
                 .toList();
     }
 
@@ -95,15 +97,27 @@ public class ReservationService {
         );
     }
 
-    private List<MyPageReservationResponse> getMyPageReservationResponses(final List<Reservation> myReservations,
-                                                                          final List<ReservationWaiting> myReservationWaitings) {
+    private List<MyPageReservationResponse> getMyPageReservationResponses(
+            final List<Reservation> myReservations,
+            final List<ReservationWaiting> myReservationWaitings) {
+
+        final List<Long> reservationIds = myReservations.stream()
+                .map(Reservation::getId)
+                .toList();
+        final Map<Long, Payment> paymentMap = paymentService.getPaymentsByReservationIds(reservationIds);
+
         final List<MyPageReservationResponse> myPageReservationResponses = myReservations.stream()
-                .map(MyPageReservationResponse::from)
+                .map(reservation -> {
+                    Payment payment = paymentMap.getOrDefault(reservation.getId(), Payment.empty());
+                    return MyPageReservationResponse.of(reservation, payment);
+                })
                 .collect(Collectors.toList());
+
         List<MyPageReservationResponse> myPageReservationWaitingResponses = myReservationWaitings.stream()
                 .map(myReservationWaiting -> MyPageReservationResponse.of(myReservationWaiting,
                         getWaitingOrderByMember(myReservationWaiting.getMember())))
                 .toList();
+
         myPageReservationResponses.addAll(myPageReservationWaitingResponses);
         return myPageReservationResponses;
     }

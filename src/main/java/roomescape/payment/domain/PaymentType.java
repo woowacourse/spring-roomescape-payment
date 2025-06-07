@@ -4,5 +4,6 @@ public enum PaymentType {
 
     NORMAL,
     BILLING,
-    BRANDPAY;
+    BRANDPAY,
+    NONE;
 }

@@ -19,7 +19,7 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private long reservation_id;
+    private long reservationId;
 
     private String orderId;
 
@@ -30,11 +30,15 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private PaymentType type;
 
-    public Payment(long reservation_id, String orderId, String paymentKey, long amount, PaymentType type) {
-        this.reservation_id = reservation_id;
+    public Payment(long reservationId, String orderId, String paymentKey, long amount, PaymentType type) {
+        this.reservationId = reservationId;
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.amount = amount;
         this.type = type;
+    }
+
+    public static Payment empty() {
+        return new Payment(0, "", "", 0, PaymentType.NONE);
     }
 }

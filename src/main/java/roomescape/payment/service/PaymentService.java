@@ -1,5 +1,8 @@
 package roomescape.payment.service;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -26,7 +29,18 @@ public class PaymentService {
 
     @Transactional
     public void savePayment(final Reservation reservation, final TossPaymentResponse tossPaymentResponse) {
-        paymentRepository.save(new Payment(reservation, tossPaymentResponse.orderId(), tossPaymentResponse.paymentKey(),
+        paymentRepository.save(new Payment(reservation.getId(), tossPaymentResponse.orderId(), tossPaymentResponse.paymentKey(),
                 tossPaymentResponse.totalAmount(), tossPaymentResponse.type()));
+    }
+
+    @Transactional(readOnly = true)
+    public Map<Long, Payment> getPaymentsByReservationIds(final List<Long> reservationIds) {
+        List<Payment> payments = paymentRepository.findByReservationIdIn(reservationIds);
+        return payments.stream()
+                .collect(Collectors.toMap(
+                        Payment::getReservationId,
+                        payment -> payment,
+                        (existing, replacement) -> existing
+                ));
     }
 }
