@@ -39,7 +39,7 @@ public class Reservation {
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
 
-    @Nullable  // NOTE. 어떻게 생각하시는지 여쭤보기
+    @Nullable  // NOTE. springframework 의존성 어떻게 생각하시는지 여쭤보기
     @OneToOne(fetch = FetchType.LAZY)
     private Payment payment;
 

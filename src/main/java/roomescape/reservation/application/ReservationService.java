@@ -21,6 +21,7 @@ import roomescape.reservation.application.dto.MemberReservationRequest;
 import roomescape.reservation.application.dto.MyReservation;
 import roomescape.reservation.application.dto.ReservationResponse;
 import roomescape.reservation.domain.Reservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
@@ -90,9 +91,8 @@ public class ReservationService {
         final String date) {
         final List<ReservationTime> reservationTimes = reservationTimeRepository.findAll();
         final Theme selectedTheme = getTheme(themeId);
-        final List<Reservation> bookedReservations = reservationRepository.findByDateAndThemeId(
-            LocalDate.parse(date),
-            themeId);
+        final List<Reservation> bookedReservations = reservationRepository.findByDateAndThemeIdAndStatus(
+            LocalDate.parse(date), themeId, ReservationStatus.CONFIRMED);
         return getAvailableReservationTimeResponses(reservationTimes, bookedReservations,
             selectedTheme);
     }
@@ -104,7 +104,7 @@ public class ReservationService {
         final LocalDate end
     ) {
         final List<Reservation> reservations = reservationRepository
-            .findByThemeIdAndMemberIdAndDateBetween(themeId, memberId, start, end);
+            .findByThemeIdAndMemberIdAndDateBetweenAndStatus(themeId, memberId, start, end, ReservationStatus.CONFIRMED);
         return reservations.stream()
             .map(ReservationResponse::of)
             .toList();
@@ -123,7 +123,8 @@ public class ReservationService {
         final Theme theme = getTheme(themeId);
         final Member member = getMember(memberId);
 
-        final List<Reservation> sameTimeReservations = reservationRepository.findByDateAndThemeId(date, themeId);
+        final List<Reservation> sameTimeReservations = reservationRepository.findByDateAndThemeIdAndStatus(date, themeId,
+            ReservationStatus.CONFIRMED);
 
         validateIsBooked(sameTimeReservations, reservationTime, theme);
         validatePastDateTime(date, reservationTime.getStartAt());

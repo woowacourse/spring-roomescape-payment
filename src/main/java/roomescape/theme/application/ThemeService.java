@@ -4,6 +4,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.impl.BadRequestException;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.theme.application.dto.ThemeRequest;
 import roomescape.theme.application.dto.ThemeResponse;
@@ -43,7 +44,7 @@ public class ThemeService {
 
     @Transactional
     public void deleteById(final Long id) {
-        if (reservationRepository.existsByThemeId(id)) {
+        if (reservationRepository.existsByThemeIdAndStatus(id, ReservationStatus.CONFIRMED)) {
             throw new BadRequestException("이 테마의 예약이 존재합니다.");
         }
         themeRepository.deleteById(id);

@@ -9,6 +9,7 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.reservation.application.dto.MemberReservationRequest;
 import roomescape.reservation.application.dto.MyReservation;
+import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.domain.ReservationTime;
 import roomescape.reservation.domain.repository.ReservationRepository;
 import roomescape.reservation.domain.repository.ReservationTimeRepository;
@@ -65,8 +66,8 @@ public class WaitingService {
         final Theme theme,
         final ReservationTime reservationTime
     ) {
-        boolean isAlreadyReserved = reservationRepository.existsByMemberIdAndThemeIdAndTimeIdAndDate(
-            member.getId(), theme.getId(), reservationTime.getId(), request.date());
+        boolean isAlreadyReserved = reservationRepository.existsByMemberIdAndThemeIdAndTimeIdAndDateAndStatus(
+            member.getId(), theme.getId(), reservationTime.getId(), request.date(), ReservationStatus.CONFIRMED);
         if (isAlreadyReserved) {
             throw new IllegalArgumentException("이미 예약이 되어있는 상태에서는, 대기할 수 없습니다.");
         }
