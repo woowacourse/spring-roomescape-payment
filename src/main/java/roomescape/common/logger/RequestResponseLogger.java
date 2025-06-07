@@ -35,7 +35,7 @@ public class RequestResponseLogger extends OncePerRequestFilter {
             String cookieHeader = getCookieHeader(requestWrapper);
 
             logForRequest(request, cookieHeader, requestBody);
-            LogForResponse(response, responseWrapper, duration, responseBody);
+            logForResponse(response, responseWrapper, duration, responseBody);
 
             responseWrapper.copyBodyToResponse();
         }
@@ -66,7 +66,7 @@ public class RequestResponseLogger extends OncePerRequestFilter {
                 request.getMethod(), request.getRequestURI(), cookieHeader, requestBody);
     }
 
-    private void LogForResponse(HttpServletResponse response, ContentCachingResponseWrapper responseWrapper,
+    private void logForResponse(HttpServletResponse response, ContentCachingResponseWrapper responseWrapper,
                                 long duration, String responseBody) {
         String contentType = responseWrapper.getContentType();
         if (contentType != null && contentType.contains("application/json")) {
