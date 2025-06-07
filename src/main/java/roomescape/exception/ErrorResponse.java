@@ -8,12 +8,12 @@ import org.springframework.http.HttpStatus;
 public class ErrorResponse {
 
     private final LocalDateTime timestamp;
-    private final HttpStatus status;
+    private final int status;
     private final String message;
 
     public ErrorResponse(HttpStatus status, String message) {
         this.timestamp = LocalDateTime.now();
-        this.status = status;
+        this.status = status.value();
         this.message = message;
     }
 }
