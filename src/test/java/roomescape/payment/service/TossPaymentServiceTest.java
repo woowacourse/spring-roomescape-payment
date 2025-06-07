@@ -11,6 +11,7 @@ import roomescape.payment.external.TossRestClient;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
+import roomescape.reservation.fixture.ReservationFixture;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
@@ -48,15 +49,13 @@ public class TossPaymentServiceTest {
     }
 
     private Reservation getReservation() {
-        Reservation dummyReservation = new Reservation(
-                1L,
-                LocalDate.of(2025, 5, 24),
+        return ReservationFixture.create(
+                LocalDate.now().plusDays(4),
                 ReservationStatus.BOOKED,
                 new ReservationTime(1L, LocalTime.of(10, 0)),
                 new Theme(2L, "테스트 테마", "공포의 밀실", "무서운 방입니다."),
-                new User(1L, Role.ROLE_MEMBER, "유저1","user@email.com", "user")
+                new User(1L, Role.ROLE_MEMBER, "유저1", "user@email.com", "user")
         );
-        return dummyReservation;
     }
 
     @Test

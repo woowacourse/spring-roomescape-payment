@@ -17,6 +17,7 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationStatus;
 import roomescape.reservation.fixture.ReservationFixture;
 import roomescape.reservation.repository.ReservationRepository;
+import roomescape.reservation.service.ReservationService;
 import roomescape.reservationtime.ReservationTimeTestDataConfig;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.ThemeTestDataConfig;
@@ -41,6 +42,9 @@ class ReservationControllerTest {
 
     @Autowired
     private WaitingRepository waitingRepository;
+
+    @Autowired
+    private ReservationService reservationService;
 
     private static ReservationTime savedReservationTime;
     private static Theme savedTheme;
