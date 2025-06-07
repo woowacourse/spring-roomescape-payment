@@ -19,7 +19,7 @@ import roomescape.exception.dto.ErrorResponse;
 
 @Tag(name = "[방탈출 테마 API]")
 @SecurityRequirement(name = "cookieAuth")
-public interface ThemeApi {
+public interface ThemeController {
 
     @Operation(summary = "전체 테마 조회", description = "모든 방탈출 테마를 조회합니다.")
     @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(mediaType = "application/json",

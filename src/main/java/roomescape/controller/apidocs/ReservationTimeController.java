@@ -22,7 +22,7 @@ import roomescape.exception.dto.ErrorResponse;
 
 @Tag(name = "[예약 가능 시간 관리 API]")
 @SecurityRequirement(name = "cookieAuth")
-public interface ReservationTimeApi {
+public interface ReservationTimeController {
 
     @Operation(summary = "전체 예약 가능 시간 조회", description = "모든 예약 가능한 시간을 조회합니다.")
     @ApiResponse(responseCode = "200", description = "전체 예약 가능 시간 조회 성공", content = @Content(mediaType = "application/json",

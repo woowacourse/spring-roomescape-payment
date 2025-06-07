@@ -19,7 +19,7 @@ import roomescape.exception.dto.ErrorResponse;
 
 @Tag(name = "[인증 API]")
 @SecurityRequirement(name = "cookieAuth")
-public interface AuthApi {
+public interface AuthController {
 
     @Operation(summary = "로그인", description = "사용자가 입력한 이메일, 패스워드를 기반으로 로그인합니다.",
             requestBody = @RequestBody(required = true, content = @Content(mediaType = "application/json",

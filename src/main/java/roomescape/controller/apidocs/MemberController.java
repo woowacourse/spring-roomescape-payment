@@ -18,7 +18,7 @@ import roomescape.exception.dto.ErrorResponse;
 
 @Tag(name = "[사용자 API]")
 @SecurityRequirement(name = "cookieAuth")
-public interface MemberApi {
+public interface MemberController {
 
     @SecurityDocs.Unauthorized
     @SecurityDocs.Forbidden

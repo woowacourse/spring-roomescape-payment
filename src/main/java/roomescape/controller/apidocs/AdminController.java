@@ -25,7 +25,7 @@ import roomescape.exception.dto.ErrorResponse;
 @SecurityDocs.Forbidden
 @Tag(name = "[관리자 API]")
 @SecurityRequirement(name = "cookieAuth")
-public interface AdminApi {
+public interface AdminController {
 
     @Operation(summary = "예약 필터 조회", description = "회원ID, 테마ID, 날짜 범위로 예약을 필터링하여 조회합니다.",
             parameters = {

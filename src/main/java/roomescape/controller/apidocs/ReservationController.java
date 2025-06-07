@@ -24,7 +24,7 @@ import roomescape.exception.dto.ErrorResponse;
 
 @Tag(name = "[방탈출 예약 API]")
 @SecurityRequirement(name = "cookieAuth")
-public interface ReservationApi {
+public interface ReservationController {
 
     @SecurityDocs.Unauthorized
     @SecurityDocs.Forbidden

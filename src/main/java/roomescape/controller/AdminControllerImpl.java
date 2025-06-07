@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import roomescape.annotation.CheckRole;
-import roomescape.controller.apidocs.AdminApi;
+import roomescape.controller.apidocs.AdminController;
 import roomescape.dto.request.AdminCreateReservationRequest;
 import roomescape.dto.response.ReservationResponse;
 import roomescape.dto.response.ReservationWaitResponse;
@@ -28,11 +28,11 @@ import roomescape.service.ReservationService;
 @RestController
 @RequestMapping("/admin")
 @CheckRole(Role.ADMIN)
-public class AdminController implements AdminApi {
+public class AdminControllerImpl implements AdminController {
 
     private final ReservationService reservationService;
 
-    public AdminController(ReservationService reservationService) {
+    public AdminControllerImpl(ReservationService reservationService) {
         this.reservationService = reservationService;
     }
 

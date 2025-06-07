@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import roomescape.annotation.CheckRole;
-import roomescape.controller.apidocs.ReservationTimeApi;
+import roomescape.controller.apidocs.ReservationTimeController;
 import roomescape.domain.ReservationSlot;
 import roomescape.domain.ReservationSlots;
 import roomescape.dto.request.AvailableTimeRequest;
@@ -27,11 +27,11 @@ import roomescape.service.ReservationTimeService;
 
 @RestController
 @RequestMapping("/times")
-public class ReservationTimeController implements ReservationTimeApi {
+public class ReservationTimeControllerImpl implements ReservationTimeController {
 
     private final ReservationTimeService reservationTimeService;
 
-    public ReservationTimeController(ReservationTimeService reservationTimeService) {
+    public ReservationTimeControllerImpl(ReservationTimeService reservationTimeService) {
         this.reservationTimeService = reservationTimeService;
     }
 
