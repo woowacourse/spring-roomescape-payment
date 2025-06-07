@@ -3,7 +3,9 @@ package roomescape.payment.application.client;
 import java.util.Base64;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
+import roomescape.common.exception.RequestTimeOutException;
 import roomescape.common.properties.PaymentClientProperties;
 import roomescape.payment.exception.handler.PaymentApproveExceptionHandler;
 import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
@@ -32,13 +34,17 @@ public class PaymentClient {
     }
 
     public PaymentApproveResponse approvePayment(final PaymentApproveRequest paymentApproveRequest) {
-        return restClient.post()
-                .uri(paymentClientProperties.getConfirmApi())
-                .header(AUTHORIZATION, BASIC + toBase64(paymentClientProperties.getSecretKey() + COLON))
-                .body(paymentApproveRequest)
-                .retrieve()
-                .onStatus(paymentApproveExceptionHandler)
-                .body(PaymentApproveResponse.class);
+        try {
+            return restClient.post()
+                    .uri(paymentClientProperties.getConfirmApi())
+                    .header(AUTHORIZATION, BASIC + toBase64(paymentClientProperties.getSecretKey() + COLON))
+                    .body(paymentApproveRequest)
+                    .retrieve()
+                    .onStatus(paymentApproveExceptionHandler)
+                    .body(PaymentApproveResponse.class);
+        } catch (ResourceAccessException exception) {
+            throw new RequestTimeOutException();
+        }
     }
 
     private String toBase64(String rawText) {
