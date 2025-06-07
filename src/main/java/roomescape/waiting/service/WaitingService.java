@@ -66,11 +66,6 @@ public class WaitingService {
         convertWaitingToReservation(waiting);
     }
 
-    public void changeWaitingToReservation(ReservationSlot reservationSlot) {
-        waitingRepository.findFirstByReservationSlot(reservationSlot)
-                .ifPresent(this::convertWaitingToReservation);
-    }
-
     public List<WaitingWithRank> getWaitingWithRanksByMemberId(Long memberId) {
         return waitingRepository.findWaitingsWithRankByMemberId(memberId);
     }

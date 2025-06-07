@@ -12,6 +12,7 @@ import roomescape.global.error.exception.ConflictException;
 import roomescape.global.error.exception.NotFoundException;
 import roomescape.member.entity.Member;
 import roomescape.member.repository.MemberRepository;
+import roomescape.payment.entity.Payment;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.ReservationAdminCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
@@ -21,7 +22,6 @@ import roomescape.reservation.dto.response.ReservationByMemberResponse;
 import roomescape.reservation.dto.response.ReservationCreateResponse;
 import roomescape.reservation.dto.response.ReservationReadFilteredResponse;
 import roomescape.reservation.dto.response.ReservationReadResponse;
-import roomescape.payment.entity.Payment;
 import roomescape.reservation.entity.Reservation;
 import roomescape.reservation.entity.ReservationSlot;
 import roomescape.reservation.entity.ReservationTime;
@@ -107,7 +107,6 @@ public class ReservationService {
                 .ifPresent(reservation -> {
                     reservationRepository.deleteById(id);
                     reservationRepository.flush();
-                    waitingService.changeWaitingToReservation(reservation.getReservationSlot());
                 });
     }
 
