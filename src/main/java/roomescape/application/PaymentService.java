@@ -28,5 +28,6 @@ public class PaymentService {
         var request = new PaymentRequest(paymentKey, orderId, amount);
         var payment = paymentProvider.confirm(request);
         reservation.confirm(payment);
+        log.info("예약에 대한 결제 승인(예약 확정)에 성공했습니다. reservation = {}", reservation);
     }
 }
