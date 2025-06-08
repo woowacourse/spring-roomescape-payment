@@ -17,22 +17,25 @@ function render(data) {
 
     const reservations = data.reservationResponses;
     reservations.forEach(item => {
-            const row = tableBody.insertRow();
+        const row = tableBody.insertRow();
 
-            /*
-            TODO: [2단계] 내 예약 목록 조회 기능
-                  response 명세에 맞춰 값 설정
-             */
+        /*
+        TODO: [2단계] 내 예약 목록 조회 기능
+              response 명세에 맞춰 값 설정
+         */
 
-            const theme = item.theme.name;
-            const date = item.date;
-            const time = item.time.startAt;
+        const theme = item.theme.name;
+        const date = item.date;
+        const time = item.time.startAt;
+        const payment = item.paymentResultResponse
 
-            row.insertCell(0).textContent = theme;
-            row.insertCell(1).textContent = date;
-            row.insertCell(2).textContent = time;
-            row.insertCell(3).textContent = '예약';
-            row.insertCell(4).textContent = '';
+        row.insertCell(0).textContent = theme;
+        row.insertCell(1).textContent = date;
+        row.insertCell(2).textContent = time;
+        row.insertCell(3).textContent = '예약';
+        row.insertCell(4).textContent = '';
+        row.insertCell(5).textContent = payment.paymentKey;
+        row.insertCell(6).textContent = payment.amount;
     });
 
     const waitingWithRanks = data.waitingWithRankResponses;
@@ -48,23 +51,27 @@ function render(data) {
         const date = item.date;
         const time = item.time.startAt;
         const rank = item.rank;
+        const payment = item.paymentResultResponse
 
         row.insertCell(0).textContent = theme;
         row.insertCell(1).textContent = date;
         row.insertCell(2).textContent = time;
         row.insertCell(3).textContent = rank + '번째 대기';
+        row.insertCell(4).textContent = '';
+        row.insertCell(5).textContent = payment.paymentKey;
+        row.insertCell(6).textContent = payment.amount;
 
         /*
         TODO: [3단계] 예약 대기 기능 - 예약 대기 취소 기능 구현 후 활성화
          */
-         const cancelCell = row.insertCell(4);
-         const cancelButton = document.createElement('button');
-         cancelButton.textContent = '취소';
-         cancelButton.className = 'btn btn-danger';
-         cancelButton.onclick = function () {
-             requestDeleteWaiting(item.id).then(() => window.location.reload());
-         };
-         cancelCell.appendChild(cancelButton);
+        const cancelCell = row.insertCell(4);
+        const cancelButton = document.createElement('button');
+        cancelButton.textContent = '취소';
+        cancelButton.className = 'btn btn-danger';
+        cancelButton.onclick = function () {
+            requestDeleteWaiting(item.id).then(() => window.location.reload());
+        };
+        cancelCell.appendChild(cancelButton);
     });
 }
 

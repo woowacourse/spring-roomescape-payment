@@ -1,4 +1,4 @@
-package roomescape.utility;
+package roomescape.external.payment;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,6 +11,7 @@ import org.springframework.web.client.RestClientException;
 import roomescape.domain.PaymentResult;
 import roomescape.dto.business.PaymentExceptionContent;
 import roomescape.dto.business.TossPaymentRequestBody;
+import roomescape.dto.business.TossPaymentResult;
 import roomescape.exception.PaymentException;
 
 public class TossPaymentClient implements PaymentClient {
@@ -34,17 +35,19 @@ public class TossPaymentClient implements PaymentClient {
     }
 
     @Override
-    public PaymentResult pay(String paymentKey, String orderId, long amount) {
-        TossPaymentRequestBody tossPaymentRequestBody = new TossPaymentRequestBody(paymentKey, orderId, amount);
+    public PaymentResult pay(String paymentKey, String orderId, long amount, String paymentType) {
+        TossPaymentRequestBody tossPaymentRequestBody = new TossPaymentRequestBody(paymentKey, orderId, paymentType,
+                amount);
 
         try {
-            return doPay(tossPaymentRequestBody);
+            TossPaymentResult tossPaymentResult = doPay(tossPaymentRequestBody);
+            return tossPaymentResult.toPaymentResult(tossPaymentResult, tossPaymentRequestBody.paymentType());
         } catch (RestClientException restClientException) {
             throw new RestClientException(CONNECTION_FAIL_ERROR_MESSAGE);
         }
     }
 
-    private PaymentResult doPay(TossPaymentRequestBody requestBody) {
+    private TossPaymentResult doPay(TossPaymentRequestBody requestBody) {
         return restClient.post()
                 .uri(paymentConfirmUri)
                 .body(requestBody)
@@ -58,7 +61,7 @@ public class TossPaymentClient implements PaymentClient {
                 .onStatus(HttpStatusCode::is5xxServerError, ((request, response) -> {
                     throw new PaymentException(CONFIRM_SERVER_FAIL_MESSAGE);
                 }))
-                .body(PaymentResult.class);
+                .body(TossPaymentResult.class);
     }
 
     private String createAuthHeaderFromSecretKey() {

@@ -1,11 +1,14 @@
 package roomescape.service;
 
-import java.time.LocalTime;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static roomescape.test.fixture.DateFixture.NEXT_DAY;
+import static roomescape.test.fixture.DateFixture.TODAY;
+import static roomescape.test.fixture.DateFixture.YESTERDAY;
+
+import java.time.LocalTime;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -13,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-
 import roomescape.domain.Member;
 import roomescape.domain.Reservation;
 import roomescape.domain.ReservationTime;
@@ -30,6 +32,8 @@ import roomescape.dto.response.WaitingWithRankResponse;
 import roomescape.exception.BadRequestException;
 import roomescape.exception.NotFoundException;
 import roomescape.exception.PaymentException;
+import roomescape.external.lock.ReservationLockGuard;
+import roomescape.external.lock.RoomescapeLockRepository;
 import roomescape.repository.MemberRepository;
 import roomescape.repository.PaymentHistoryRepository;
 import roomescape.repository.PaymentResultRepository;
@@ -37,9 +41,6 @@ import roomescape.repository.ReservationRepository;
 import roomescape.repository.ReservationTimeRepository;
 import roomescape.repository.ThemeRepository;
 import roomescape.repository.WaitingRepository;
-import static roomescape.test.fixture.DateFixture.NEXT_DAY;
-import static roomescape.test.fixture.DateFixture.TODAY;
-import static roomescape.test.fixture.DateFixture.YESTERDAY;
 import roomescape.utility.PaymentClientStub;
 
 @DataJpaTest
@@ -50,8 +51,6 @@ class ReservationServiceTest {
     @Autowired
     private ReservationRepository reservationRepository;
     @Autowired
-    private ReservationTimeRepository reservationTimeRepository;
-    @Autowired
     private ThemeRepository themeRepository;
     @Autowired
     private MemberRepository memberRepository;
@@ -59,6 +58,12 @@ class ReservationServiceTest {
     private WaitingRepository waitingRepository;
     @Autowired
     private PaymentHistoryRepository paymentHistoryRepository;
+    @Autowired
+    private PaymentResultRepository paymentResultRepository;
+    @Autowired
+    private ReservationTimeRepository timeRepository;
+    @Autowired
+    private RoomescapeLockRepository roomescapeLockRepository;
 
     private ReservationService reservationService;
     private ReservationTime reservationTime;
@@ -66,20 +71,22 @@ class ReservationServiceTest {
     private Member member;
     private PaymentService paymentService;
     private PaymentClientStub paymentClient;
-    @Autowired
-    private PaymentResultRepository paymentResultRepository;
+    private ReservationLockService reservationLockService;
 
     @BeforeEach
     void setup() {
+        reservationLockService = new ReservationLockService(new ReservationLockGuard(roomescapeLockRepository));
+
         paymentClient = new PaymentClientStub();
         paymentService = new PaymentService(paymentHistoryRepository, paymentClient, paymentResultRepository);
         reservationService = new ReservationService(
                 reservationRepository,
-                reservationTimeRepository,
+                timeRepository,
                 themeRepository,
                 memberRepository,
                 waitingRepository,
-                paymentService);
+                paymentService,
+                reservationLockService);
 
         reservationTime = entityManager.persist(
                 ReservationTime.createWithoutId(LocalTime.of(10, 0)));
@@ -501,31 +508,6 @@ class ReservationServiceTest {
     }
 
     @Test
-    @DisplayName("결제가 실패하더라도 결제 시도 내역은 저장된다")
-    void writePaymentHistoryEvenIfReservationFails() {
-        paymentClient.setErrorCase("error");
-        // given
-        Member member = Member.createWithoutId(Role.GENERAL, "asdfasdf", "asdf@naver.com", "passwordasdf1@");
-        Theme theme = Theme.createWithoutId("테마", "설명", "썸네일");
-        ReservationTime time = ReservationTime.createWithoutId(LocalTime.of(10, 0));
-        entityManager.persist(member);
-        entityManager.persist(theme);
-        entityManager.persist(time);
-
-        ReservationCreationContent reservationContent = new ReservationCreationContent(
-                theme.getId(), NEXT_DAY, time.getId());
-        PaymentHistoryCreationContent paymentContent = new PaymentHistoryCreationContent(
-                "orderId", "paymentKey", "CARD", 1000);
-
-        // when & then
-        assertThatThrownBy(
-                () -> reservationService.addReservation(member.getId(), reservationContent, paymentContent))
-                .isInstanceOf(PaymentException.class);
-
-        assertThat(paymentHistoryRepository.count()).isEqualTo(1);
-    }
-
-    @Test
     @DisplayName("결제가 실패하면 결제 성공 내역은 남지않는다")
     void noPaymentResultIfReservationFails() {
         paymentClient.setErrorCase("error");
@@ -553,7 +535,7 @@ class ReservationServiceTest {
     }
 
     @Test
-    @DisplayName("결제가 성공하면 결제 성공 내역과 결제 이력이 모두 남는다")
+    @DisplayName("결제가 성공하면 결제 성공 내역이 남는다")
     void thereIsPaymentHistoryAndPaymentResultWhenReservationIsSuccessful() {
 
         // given
@@ -572,7 +554,7 @@ class ReservationServiceTest {
         // when & then
         reservationService.addReservation(member.getId(), reservationContent, paymentContent);
 
+        assertThat(reservationRepository.count()).isEqualTo(1L);
         assertThat(paymentResultRepository.count()).isEqualTo(1);
-        assertThat(paymentHistoryRepository.count()).isEqualTo(1);
     }
 }

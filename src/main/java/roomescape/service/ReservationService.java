@@ -3,6 +3,8 @@ package roomescape.service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.Member;
@@ -28,24 +30,27 @@ import roomescape.repository.WaitingRepository;
 @Transactional
 public class ReservationService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ReservationService.class);
+
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
     private final ThemeRepository themeRepository;
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
     private final PaymentService paymentService;
+    private final ReservationLockService reservationLockService;
 
     public ReservationService(
             ReservationRepository reservationRepository, ReservationTimeRepository reservationTimeRepository,
             ThemeRepository themeRepository, MemberRepository memberRepository, WaitingRepository waitingRepository,
-            PaymentService paymentService
-    ) {
+            PaymentService paymentService, ReservationLockService reservationLockService) {
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
         this.themeRepository = themeRepository;
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
         this.paymentService = paymentService;
+        this.reservationLockService = reservationLockService;
     }
 
     public List<ReservationResponse> findAllReservations() {
@@ -97,9 +102,14 @@ public class ReservationService {
     public ReservationResponse addReservation(long memberId,
                                               ReservationCreationContent reservationCreationContent,
                                               PaymentHistoryCreationContent paymentHistoryCreationContent) {
+        logger.info("[유저 정보] memberId= {} \n [예약 요청] : {} \n [결제 정보]: {}", memberId, reservationCreationContent,
+                paymentHistoryCreationContent);
+
         Member member = getMemberById(memberId);
         Theme theme = getThemeById(reservationCreationContent.themeId());
         ReservationTime time = getReservationTimeById(reservationCreationContent.timeId());
+
+        reservationLockService.doPessimisticLock(theme, time, reservationCreationContent.date());
 
         validateDuplicateReservation(theme, reservationCreationContent.date(), time);
 
@@ -108,15 +118,14 @@ public class ReservationService {
                 theme, member);
         validatePastReservationCreation(validateReservation);
 
-        paymentService.writePaymentHistory(paymentHistoryCreationContent);
         PaymentResult paymentResult = paymentService.pay(paymentHistoryCreationContent);
 
-        Reservation reservation = Reservation.createWithoutId(reservationCreationContent.date(), time, theme, member,
+        Reservation newReservation = Reservation.createWithoutId(reservationCreationContent.date(), time, theme, member,
                 paymentResult);
-
-        Reservation savedReservation = reservationRepository.save(reservation);
+        Reservation savedReservation = reservationRepository.save(newReservation);
         return new ReservationResponse(savedReservation);
     }
+
 
     public void deleteReservationById(long reservationId) {
         Reservation reservation = getReservationById(reservationId);

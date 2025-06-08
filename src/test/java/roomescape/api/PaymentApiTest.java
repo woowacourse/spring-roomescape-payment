@@ -9,9 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import roomescape.exception.PaymentException;
-import roomescape.utility.PaymentClient;
+import roomescape.external.payment.PaymentClient;
+import roomescape.external.payment.TossPaymentClient;
 import roomescape.utility.PaymentClientStub;
-import roomescape.utility.TossPaymentClient;
 
 @SpringBootTest(webEnvironment = WebEnvironment.NONE)
 class PaymentApiTest {
@@ -37,7 +37,7 @@ class PaymentApiTest {
     void ifNotValidUrlThenError() {
         RestClient invalidRestClient = RestClient.builder().baseUrl(paymentUrl + "asdf").build();
         PaymentClient invalidPaymentClient = new TossPaymentClient(invalidRestClient, secretKey, confirmServerUrl);
-        assertThatThrownBy(() -> invalidPaymentClient.pay("asdf", "asdf", 1234))
+        assertThatThrownBy(() -> invalidPaymentClient.pay("asdf", "asdf", 1234, "normal"))
                 .isInstanceOf(RestClientException.class);
     }
 
@@ -45,19 +45,19 @@ class PaymentApiTest {
     void ifTimeoutThenError() {
         PaymentClientStub invalidPaymentClient = new PaymentClientStub();
         invalidPaymentClient.setOccurRestClientError(true);
-        assertThatThrownBy(() -> invalidPaymentClient.pay("asdf", "asdf", 1234))
+        assertThatThrownBy(() -> invalidPaymentClient.pay("asdf", "asdf", 1234, "normal"))
                 .isInstanceOf(RestClientException.class);
     }
 
     @Test
     void connectSuccess() {
-        assertThatThrownBy(() -> realPaymentClient.pay("asdf", "asdf", 1234))
+        assertThatThrownBy(() -> realPaymentClient.pay("asdf", "asdf", 1234, "normal"))
                 .isNotInstanceOf(RestClientException.class);
     }
 
     @Test
     void notFoundWhenNotPreparePayment() {
-        assertThatThrownBy(() -> realPaymentClient.pay("asdf", "asdf", 1234))
+        assertThatThrownBy(() -> realPaymentClient.pay("asdf", "asdf", 1234, "normal"))
                 .isInstanceOf(PaymentException.class)
                 .hasMessage("결제 시간이 만료되어 결제 진행 데이터가 존재하지 않습니다.");
     }

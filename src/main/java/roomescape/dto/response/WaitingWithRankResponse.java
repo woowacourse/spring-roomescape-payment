@@ -9,17 +9,19 @@ public record WaitingWithRankResponse(
         ThemeProfileResponse theme,
         ReservationTimeResponse time,
         MemberProfileResponse member,
-        Long rank
+        Long rank,
+        PaymentResultResponse paymentResultResponse
 ) {
 
     public WaitingWithRankResponse(WaitingWithRank waitingWithRank) {
         this(
-                waitingWithRank.id(),
-                waitingWithRank.date(),
-                new ThemeProfileResponse(waitingWithRank.theme()),
-                new ReservationTimeResponse(waitingWithRank.time()),
-                new MemberProfileResponse(waitingWithRank.member()),
-                waitingWithRank.rank()
+                waitingWithRank.getId(),
+                waitingWithRank.getDate(),
+                new ThemeProfileResponse(waitingWithRank.getTheme()),
+                new ReservationTimeResponse(waitingWithRank.getTime()),
+                new MemberProfileResponse(waitingWithRank.getMember()),
+                waitingWithRank.getRank(),
+                waitingWithRank.getPaymentResultResponse()
         );
     }
 }

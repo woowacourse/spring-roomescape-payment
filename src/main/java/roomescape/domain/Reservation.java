@@ -19,10 +19,8 @@ public class Reservation extends AuditedEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column(nullable = false)
     private LocalDate date;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false)
     private ReservationTime reservationTime;
@@ -33,7 +31,7 @@ public class Reservation extends AuditedEntity {
     @JoinColumn(nullable = false)
     private Member member;
     @OneToOne(fetch = FetchType.LAZY)
-    private roomescape.domain.PaymentResult paymentResult;
+    private PaymentResult paymentResult;
 
     private Reservation(LocalDate date, ReservationTime time, Theme theme, Member member,
                         PaymentResult paymentResult) {
@@ -133,5 +131,9 @@ public class Reservation extends AuditedEntity {
         if (member == null) {
             throw new IllegalArgumentException("비어있는 멤버로는 예약을 생성할 수 없습니다.");
         }
+    }
+
+    public PaymentResult getPaymentResult() {
+        return paymentResult;
     }
 }

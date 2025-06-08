@@ -9,8 +9,8 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import roomescape.config.annotation.RequiredAccessToken;
 import roomescape.dto.business.AccessTokenContent;
-import roomescape.utility.CookieUtility;
-import roomescape.utility.JwtTokenProvider;
+import roomescape.external.auth.CookieUtility;
+import roomescape.external.auth.JwtTokenProvider;
 
 public class LoginMemberArgumentResolver implements HandlerMethodArgumentResolver {
 

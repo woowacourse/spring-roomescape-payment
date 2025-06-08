@@ -18,22 +18,25 @@ public class PaymentResult extends AuditedEntity {
     private String paymentKey;
     @Column(nullable = false)
     private String paymentType;
+    @Column(nullable = false)
+    private Long amount;
 
     protected PaymentResult() {
     }
 
-    private PaymentResult(String orderId, String paymentKey, String paymentType) {
-        validate(orderId, paymentKey, paymentType);
+    private PaymentResult(String orderId, String paymentKey, String paymentType, Long amount) {
+        validate(orderId, paymentKey, paymentType, amount);
         this.orderId = orderId;
         this.paymentKey = paymentKey;
         this.paymentType = paymentType;
+        this.amount = amount;
     }
 
     public static PaymentResult createWithoutId(String orderId, String paymentKey, String paymentType, long amount) {
-        return new PaymentResult(orderId, paymentKey, paymentType);
+        return new PaymentResult(orderId, paymentKey, paymentType, amount);
     }
 
-    private void validate(String orderId, String paymentKey, String paymentType) {
+    private void validate(String orderId, String paymentKey, String paymentType, Long amount) {
         if (orderId == null || orderId.isBlank()) {
             throw new IllegalArgumentException("주문 ID는 비어있을 수 없습니다.");
         }
@@ -42,6 +45,9 @@ public class PaymentResult extends AuditedEntity {
         }
         if (paymentType == null || paymentType.isBlank()) {
             throw new IllegalArgumentException("결제 타입은 비어있을 수 없습니다.");
+        }
+        if (amount <= 0L) {
+            throw new IllegalArgumentException("결제 금액은 0원이하일 수 없습니다.");
         }
     }
 
@@ -59,5 +65,9 @@ public class PaymentResult extends AuditedEntity {
 
     public String getPaymentType() {
         return paymentType;
+    }
+
+    public Long getAmount() {
+        return amount;
     }
 }

@@ -16,7 +16,7 @@ import roomescape.domain.Member;
 import roomescape.domain.Role;
 import roomescape.dto.business.AccessTokenContent;
 import roomescape.repository.MemberRepository;
-import roomescape.utility.JwtTokenProvider;
+import roomescape.external.auth.JwtTokenProvider;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class MemberApiTest {

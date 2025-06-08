@@ -8,7 +8,8 @@ public record ReservationResponse(
         LocalDate date,
         ReservationTimeResponse time,
         ThemeResponse theme,
-        MemberProfileResponse member
+        MemberProfileResponse member,
+        PaymentResultResponse paymentResultResponse
 ) {
 
     public ReservationResponse(Reservation reservation) {
@@ -17,7 +18,8 @@ public record ReservationResponse(
                 reservation.getDate(),
                 new ReservationTimeResponse(reservation.getReservationTime()),
                 new ThemeResponse(reservation.getTheme()),
-                new MemberProfileResponse(reservation.getMember())
+                new MemberProfileResponse(reservation.getMember()),
+                new PaymentResultResponse(reservation.getPaymentResult())
         );
     }
 }

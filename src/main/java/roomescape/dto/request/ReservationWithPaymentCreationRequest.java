@@ -2,6 +2,7 @@ package roomescape.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import org.hibernate.validator.constraints.Range;
 
 public record ReservationWithPaymentCreationRequest(
         @NotNull(message = "테마ID는 빈 값을 허용하지 않습니다.")
@@ -23,6 +24,7 @@ public record ReservationWithPaymentCreationRequest(
         String paymentType,
 
         @NotNull(message = "결제 금액은 빈 값을 허용하지 않습니다.")
+        @Range(min = 1L, message = "결제 금액은 0원 이하일 수 없습니다.")
         Integer amount
 ) {
 

@@ -9,4 +9,13 @@ public record WaitingCreationContent(
         Long memberId
 ) {
 
+    @Override
+    public String toString() {
+        return "WaitingCreationContent{" +
+                "date=" + date +
+                ", themeId=" + themeId +
+                ", timeId=" + timeId +
+                ", memberId=" + memberId +
+                '}';
+    }
 }

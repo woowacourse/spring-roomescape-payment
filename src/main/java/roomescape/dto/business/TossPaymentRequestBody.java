@@ -1,4 +1,4 @@
 package roomescape.dto.business;
 
-public record TossPaymentRequestBody(String paymentKey, String orderId, long amount) {
+public record TossPaymentRequestBody(String paymentKey, String orderId, String paymentType, long amount) {
 }
