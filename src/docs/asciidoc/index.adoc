@@ -16,4 +16,4 @@ include::theme.adoc[]
 
 include::time.adoc[]
 
-includ::exception.adoc[]
+include::exception.adoc[]
