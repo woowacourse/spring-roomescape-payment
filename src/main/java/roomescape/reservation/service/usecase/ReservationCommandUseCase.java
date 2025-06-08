@@ -9,9 +9,13 @@ import roomescape.common.exception.BadRequestException;
 import roomescape.common.exception.ConflictException;
 import roomescape.member.domain.Member;
 import roomescape.member.service.usecase.MemberQueryUseCase;
+import roomescape.payment.domain.PaymentHistory;
+import roomescape.payment.repository.PaymentHistoryRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.domain.ReservationWait;
+import roomescape.reservation.log.ReservationProbe;
+import roomescape.reservation.log.ReservationWaitingProbe;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.service.converter.ReservationConverter;
 import roomescape.reservation.service.dto.CreateReservationServiceRequest;
@@ -31,6 +35,9 @@ public class ReservationCommandUseCase {
     private final ThemeQueryUseCase themeQueryUseCase;
     private final MemberQueryUseCase memberQueryUseCase;
     private final ReservationWaitQueryUseCase reservationWaitQueryUseCase;
+    private final ReservationProbe reservationProbe;
+    private final ReservationWaitingProbe reservationWaitingProbe;
+    private final PaymentHistoryRepository paymentHistoryRepository;
 
     @Transactional
     public Reservation create(final CreateReservationServiceRequest createReservationServiceRequest) {
@@ -45,7 +52,9 @@ public class ReservationCommandUseCase {
 
         Reservation reservation = ReservationConverter.toDomain(createReservationServiceRequest, member,
                 reservationTime, theme);
-        return reservationRepository.save(reservation);
+        Reservation savedReservation = reservationRepository.save(reservation);
+        reservationProbe.create(savedReservation);
+        return savedReservation;
     }
 
     private void validateReservationNotExists(final CreateReservationServiceRequest createReservationServiceRequest) {
@@ -74,8 +83,16 @@ public class ReservationCommandUseCase {
     @Transactional
     public void delete(final Long id) {
         final Reservation reservation = reservationQueryUseCase.get(id);
+        cancelPayment(reservation);
         reservationRepository.delete(reservation);
         adjustWaitingIfExists(reservation);
+        reservationProbe.delete(reservation);
+    }
+
+    private void cancelPayment(Reservation reservation) {
+        // 결제 취소했다고 가정
+        paymentHistoryRepository.findByReservation(reservation)
+                .ifPresent(PaymentHistory::cancel);
     }
 
     private void adjustWaitingIfExists(Reservation reservation) {
@@ -90,7 +107,8 @@ public class ReservationCommandUseCase {
 
     private void promotionReservationWait(final ReservationWait firstReservationWait) {
         reservationWaitCommandUseCase.delete(firstReservationWait.getId());
-        Reservation reservation = firstReservationWait.toReservation();
-        reservationRepository.save(reservation);
+        Reservation savedReservation = reservationRepository.save(firstReservationWait.toReservation());
+        reservationWaitingProbe.promote(firstReservationWait);
+        reservationProbe.create(savedReservation);
     }
 }

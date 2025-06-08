@@ -5,11 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.common.exception.BadRequestException;
 import roomescape.common.exception.ConflictException;
+import roomescape.common.exception.NotFoundException;
 import roomescape.member.domain.Member;
 import roomescape.member.service.usecase.MemberQueryUseCase;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.domain.ReservationWait;
+import roomescape.reservation.log.ReservationWaitingProbe;
 import roomescape.reservation.repository.ReservationWaitRepository;
 import roomescape.reservation.service.converter.ReservationWaitConverter;
 import roomescape.reservation.service.dto.CreateReservationServiceRequest;
@@ -27,6 +29,7 @@ public class ReservationWaitCommandUseCase {
     private final ReservationTimeQueryUseCase reservationTimeQueryUseCase;
     private final ThemeQueryUseCase themeQueryUseCase;
     private final MemberQueryUseCase memberQueryUseCase;
+    private final ReservationWaitingProbe reservationWaitingProbe;
 
     public ReservationWait create(final CreateReservationServiceRequest createReservationServiceRequest) {
         validateReservationExists(createReservationServiceRequest);
@@ -41,7 +44,7 @@ public class ReservationWaitCommandUseCase {
         final Theme theme = themeQueryUseCase.get(createReservationServiceRequest.themeId());
         final Member member = memberQueryUseCase.get(createReservationServiceRequest.memberId());
 
-        return reservationWaitRepository.save(
+        ReservationWait waiting = reservationWaitRepository.save(
                 ReservationWaitConverter.toDomain(
                         createReservationServiceRequest,
                         member,
@@ -49,6 +52,8 @@ public class ReservationWaitCommandUseCase {
                         theme
                 )
         );
+        reservationWaitingProbe.create(waiting);
+        return waiting;
     }
 
     private void validateReservationExists(final CreateReservationServiceRequest createReservationServiceRequest) {
@@ -88,7 +93,14 @@ public class ReservationWaitCommandUseCase {
         }
     }
 
-    public void delete(final Long id) {
-        reservationWaitRepository.deleteById(id);
+    public void delete(final long waitingId) {
+        ReservationWait waiting = getById(waitingId);
+        reservationWaitRepository.delete(waiting);
+        reservationWaitingProbe.delete(waiting);
+    }
+
+    private ReservationWait getById(final long waitingId) {
+        return reservationWaitRepository.findById(waitingId)
+                .orElseThrow(NotFoundException::new);
     }
 }

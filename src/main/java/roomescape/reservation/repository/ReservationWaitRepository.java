@@ -24,4 +24,6 @@ public interface ReservationWaitRepository {
     );
 
     Optional<ReservationWait> findByParamsAt(ReservationDate date, Long timeId, Long themeId, int index);
+    Optional<ReservationWait> findById(Long id);
+    void delete(ReservationWait waiting);
 }

@@ -2,6 +2,7 @@ package roomescape.reservation.service;
 
 import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import roomescape.common.exception.PaymentException;
 import roomescape.member.auth.vo.MemberInfo;
@@ -16,6 +17,7 @@ import roomescape.reservation.service.converter.ReservationConverter;
 import roomescape.reservation.service.dto.CreateReservationServiceRequest;
 import roomescape.reservation.service.usecase.ReservationCommandUseCase;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReservationPayService {
@@ -54,7 +56,10 @@ public class ReservationPayService {
             PaymentHistory paymentHistory = webRequest.toPaymentHistory(savedReservation, PaymentStatus.DONE);
             paymentHistoryRepository.save(paymentHistory);
         } catch (IllegalArgumentException | OptimisticLockException e) {
-            // TODO 로깅
+            log.atError().log("결제 내역 DB 저장 실패 - 사용자에게는 정상 응답. "
+                            + "paymentKey:{}, orderId:{}, amount:{}, reservationId:{}",
+                    webRequest.paymentKey(), webRequest.orderId(), webRequest.amount(), savedReservation.getId()
+            );
         }
     }
 }

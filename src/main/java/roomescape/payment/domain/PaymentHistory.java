@@ -34,4 +34,9 @@ public class PaymentHistory {
     public PaymentHistory(String orderId, int amount, String paymentKey, PaymentStatus status, Reservation reservation) {
         this(null, orderId, amount, paymentKey, status, reservation);
     }
+
+    public void cancel() {
+        reservation = null;
+        status = PaymentStatus.CANCEL;
+    }
 }

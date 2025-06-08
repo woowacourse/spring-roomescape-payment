@@ -11,7 +11,7 @@ spring:
     url: jdbc:h2:mem:DATABASE
 
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: create-drop
     defer-datasource-initialization: true
@@ -34,3 +34,7 @@ pay:
     timeout:
       connection: 2000
       read: 8000
+
+logging:
+  level:
+    root: info
