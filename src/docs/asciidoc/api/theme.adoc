@@ -87,14 +87,34 @@ include::{snippets}/theme/delete/http-response.adoc[]
 
 == 데이터 모델
 
-=== Theme
+== 데이터 모델
+
+=== ThemeRequest
+
+|===
+|필드명|타입|설명
+
+|name
+|String
+|테마 이름
+
+|description
+|String
+|테마 설명
+
+|thumbnail
+|String
+|테마 썸네일 URL
+|===
+
+=== ThemeResponse
 
 |===
 |필드명|타입|설명
 
 |id
 |Long
-|테마 ID (자동 생성)
+|테마 ID
 
 |name
 |String

@@ -1,0 +1,81 @@
+:linkcss:
+:stylesheet: asciidoctor.css
+:stylesdir: ../css
+
+= 📅 관리자 예약 API 문서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+
+== 개요
+
+이 문서는 방탈출 예약 시스템의 관리자용 예약 관리 REST API를 설명합니다.
+
+== 관리자 예약 API
+
+=== 예약 추가
+
+관리자가 새로운 예약을 추가합니다.
+
+==== 요청
+
+include::{snippets}/reservation/admin/reservation-save/http-request.adoc[]
+
+===== 요청 필드
+
+include::{snippets}/reservation/admin/reservation-save/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/reservation/admin/reservation-save/http-response.adoc[]
+
+===== 응답 필드
+
+include::{snippets}/reservation/admin/reservation-save/response-fields.adoc[]
+
+=== 예약 취소
+
+관리자가 지정된 ID의 예약을 취소합니다.
+
+==== 요청
+
+include::{snippets}/reservation/admin/reservation-delete/http-request.adoc[]
+
+===== 경로 변수
+
+include::{snippets}/reservation/admin/reservation-delete/path-parameters.adoc[]
+
+==== 응답
+
+include::{snippets}/reservation/admin/reservation-delete/http-response.adoc[]
+
+== 데이터 모델
+
+=== ReservationResponse
+
+|===
+|필드명|타입|설명
+
+|id
+|Long
+|예약 ID
+
+|date
+|String
+|예약 날짜 (YYYY-MM-DD 형식)
+
+|time
+|ReservationTimeResponse
+|예약 시간 정보
+
+|theme
+|ThemeResponse
+|테마 정보
+
+|member
+|MemberResponse
+|회원 정보
+|===

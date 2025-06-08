@@ -1,0 +1,95 @@
+:linkcss:
+:stylesheet: asciidoctor.css
+:stylesdir: ../css
+
+= 🔐 인증 API 문서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+
+== 개요
+
+이 문서는 방탈출 예약 시스템의 인증 관련 REST API를 설명합니다.
+
+== 인증 API
+
+=== 로그인
+
+사용자 로그인을 수행합니다.
+
+==== 요청
+
+include::{snippets}/auth/login/http-request.adoc[]
+
+===== 요청 필드
+
+include::{snippets}/auth/login/request-fields.adoc[]
+
+==== 응답
+
+include::{snippets}/auth/login/http-response.adoc[]
+
+===== 응답 헤더
+
+include::{snippets}/auth/login/response-headers.adoc[]
+
+=== 로그아웃
+
+사용자 로그아웃을 수행합니다.
+
+==== 요청
+
+include::{snippets}/auth/logout/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/auth/logout/http-response.adoc[]
+
+===== 응답 헤더
+
+include::{snippets}/auth/logout/response-headers.adoc[]
+
+=== 로그인 상태 확인
+
+현재 로그인된 사용자의 정보를 확인합니다.
+
+==== 요청
+
+include::{snippets}/auth/check-login/http-request.adoc[]
+
+==== 응답
+
+include::{snippets}/auth/check-login/http-response.adoc[]
+
+===== 응답 필드
+
+include::{snippets}/auth/check-login/response-fields.adoc[]
+
+== 데이터 모델
+
+=== LoginRequest
+
+|===
+|필드명|타입|설명
+
+|email
+|String
+|사용자 이메일
+
+|password
+|String
+|사용자 비밀번호
+|===
+
+=== LoginMember
+
+|===
+|필드명|타입|설명
+
+|name
+|String
+|회원 이름
+|=== 
