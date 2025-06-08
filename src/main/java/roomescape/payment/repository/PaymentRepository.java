@@ -8,6 +8,4 @@ public interface PaymentRepository {
     Payment save(Payment payment);
 
     List<Payment> findAll();
-
-    Payment saveAndFlush(Payment payment);
 }
