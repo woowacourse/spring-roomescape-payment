@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldNameConstants;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.validate.Validator;
-import roomescape.payment.dto.PaymentRequest;
+import roomescape.payment.infrastructure.client.dto.PaymentRequest;
 
 import java.time.LocalDate;
 

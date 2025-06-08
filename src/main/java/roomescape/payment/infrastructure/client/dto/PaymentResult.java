@@ -1,4 +1,4 @@
-package roomescape.payment.dto;
+package roomescape.payment.infrastructure.client.dto;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldNameConstants;

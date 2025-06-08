@@ -20,6 +20,7 @@ public enum DomainTerm {
 
     // Payment 도메인
     PAYMENT("결제"),
+    PAYMENT_ID("결제 식별자"),
     PAYMENT_KEY("결제 키"),
     PAYMENT_ORDER_ID("결제 주문 식별자"),
     PAYMENT_AMOUNT("결제 금액"),

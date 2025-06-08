@@ -10,10 +10,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestClient;
-import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResult;
 import roomescape.payment.exception.PaymentException;
 import roomescape.payment.exception.PaymentInternalServerException;
+import roomescape.payment.infrastructure.client.TossPaymentClient;
+import roomescape.payment.infrastructure.client.dto.PaymentRequest;
+import roomescape.payment.infrastructure.client.dto.PaymentResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

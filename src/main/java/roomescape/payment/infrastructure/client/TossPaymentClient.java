@@ -1,4 +1,4 @@
-package roomescape.payment.client;
+package roomescape.payment.infrastructure.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,12 +11,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
-import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResult;
+import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.exception.PaymentException;
 import roomescape.payment.exception.PaymentInternalServerException;
 import roomescape.payment.exception.PaymentNetworkException;
 import roomescape.payment.exception.TossPaymentErrorCodeForServer;
+import roomescape.payment.infrastructure.client.dto.PaymentRequest;
+import roomescape.payment.infrastructure.client.dto.PaymentResult;
 
 import java.io.IOException;
 import java.io.InputStream;

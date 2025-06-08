@@ -12,9 +12,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import roomescape.payment.client.config.TestPaymentConfiguration;
-import roomescape.payment.dto.PaymentRequest;
-import roomescape.payment.dto.PaymentResult;
+import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.exception.PaymentInternalServerException;
+import roomescape.payment.infrastructure.client.dto.PaymentRequest;
+import roomescape.payment.infrastructure.client.dto.PaymentResult;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
