@@ -58,6 +58,6 @@ public class TossPaymentGatewayClient {
             .accept(APPLICATION_JSON)
             .body(request)
             .retrieve()
-            .body(TossConfirmResponse.class);
+            .body(TossConfirmResponse.class);  // NOTE. 역직렬화 로직에 대한 책임을 분리하여 단위테스트를 작성할 수 있으나, SRP를 고려하여 하지 않음 파랑에게 여쭤보기
     }
 }
