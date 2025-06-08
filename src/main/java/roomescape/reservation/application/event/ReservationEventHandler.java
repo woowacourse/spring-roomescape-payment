@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 import roomescape.payment.domain.Payment;
 import roomescape.reservation.application.ReservationDataService;
 import roomescape.reservation.domain.Reservation;
@@ -50,7 +52,7 @@ public class ReservationEventHandler {
     }
 
     @EventListener
-    @Transactional
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void promoteReservation(final ReservationPromoteEvent event) {
         log.info("예약 승격 이벤트 처리: reservationId={}", event.reservationId());
 
