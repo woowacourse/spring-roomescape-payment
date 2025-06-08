@@ -17,9 +17,8 @@ public record MyReservationResponseDto(
         Long amount
 ) {
 
-    //TODO 생성자가 너무 불명확해서 용도를 이름으로 드러내줘야 할듯
-    public MyReservationResponseDto(Reservation reservation, Payment payment) {
-        this(
+    public static MyReservationResponseDto fromReservedReservation(Reservation reservation, Payment payment) {
+        return new MyReservationResponseDto(
                 reservation.getId(),
                 reservation.getTheme().getName(),
                 reservation.getDate(),
@@ -30,8 +29,8 @@ public record MyReservationResponseDto(
         );
     }
 
-    public MyReservationResponseDto(Reservation reservation, ReservationWaitingRank rank) {
-        this(
+    public static MyReservationResponseDto fromWaitingReservation(Reservation reservation, ReservationWaitingRank rank) {
+        return new MyReservationResponseDto(
                 reservation.getId(),
                 reservation.getTheme().getName(),
                 reservation.getDate(),

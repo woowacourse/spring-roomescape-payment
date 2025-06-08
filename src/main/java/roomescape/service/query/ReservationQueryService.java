@@ -13,7 +13,6 @@ import roomescape.dto.auth.LoginInfo;
 import roomescape.dto.reservation.MyReservationResponseDto;
 import roomescape.dto.reservation.ReservationResponseDto;
 import roomescape.exception.common.NotFoundException;
-import roomescape.repository.JpaPaymentRepository;
 import roomescape.repository.JpaReservationPaymentRepository;
 import roomescape.repository.JpaReservationRepository;
 import roomescape.repository.JpaReservationWaitingTicketRepository;
@@ -70,13 +69,15 @@ public class ReservationQueryService {
         return reservations.stream().map(reservation -> {
             if (reservation.isReservationWaiting()) {
                 ReservationWaitingRank rank = calculateWaitingRank(reservation);
-                return new MyReservationResponseDto(
+                return MyReservationResponseDto.fromWaitingReservation(
                         reservation, rank
                 );
             }
             ReservationPayment reservationPayment = reservationPaymentRepository.findByReservationId(
                     reservation.getId()).orElseThrow(() -> new NotFoundException("예약 결제", reservation.getId()));
-            return new MyReservationResponseDto(reservation, reservationPayment.getPayment());
+            return MyReservationResponseDto.fromReservedReservation(
+                    reservation, reservationPayment.getPayment()
+            );
         }).toList();
     }
 
