@@ -17,11 +17,4 @@ public class PaymentRepositoryImpl implements PaymentRepository {
     public PaymentInfo save(PaymentInfo paymentInfo) {
         return jpaPaymentRepository.save(paymentInfo);
     }
-
-    @Override
-    public PaymentInfo findById(Long paymentId) {
-        return jpaPaymentRepository.findById(paymentId).orElseThrow(() -> {
-            throw new PaymentException(HttpStatus.BAD_REQUEST, "결제 되지 않은 예약입니다.");
-        });
-    }
 }
