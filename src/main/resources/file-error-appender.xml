@@ -7,7 +7,11 @@
             <onMismatch>DENY</onMismatch>
         </filter>
         <encoder>
-            <pattern>${LOG_PATTERN}</pattern>
+            <layout class="roomescape.support.logging.MaskingPatternLayout">
+                <pattern>${LOG_PATTERN}</pattern>
+                <maskPattern>email\s*=\s*([^\],\s]+)</maskPattern>
+                <maskPattern>password\s*=\s*([^\],\s]+)</maskPattern>
+            </layout>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>./backup/error/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
