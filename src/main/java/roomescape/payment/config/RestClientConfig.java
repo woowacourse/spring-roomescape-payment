@@ -17,8 +17,8 @@ public class RestClientConfig {
     @Bean
     public RestClient.Builder paymentRestClientBuilder() {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(Duration.ofSeconds(2));
-        requestFactory.setReadTimeout(Duration.ofSeconds(2));
+        requestFactory.setConnectTimeout(Duration.ofSeconds(3));
+        requestFactory.setReadTimeout(Duration.ofSeconds(5));
 
         return RestClient.builder()
                 .baseUrl(baseUrl)
