@@ -14,7 +14,7 @@ public class WaitingValidator {
     private final ReservationRepository reservationRepository;
     private final WaitingReservationRepository waitingRepository;
 
-    public void validateCanWaiting(WaitingReservation waiting) {
+    public void validateCanRegisterWaiting(WaitingReservation waiting) {
         validateNotPast(waiting);
         validateSlotEmpty(waiting);
     }
@@ -43,7 +43,7 @@ public class WaitingValidator {
         return hasReservation || hasWaiting;
     }
 
-    public void validateCanWaitingApprove(WaitingReservation waitingReservation) {
+    public void validateCanApproveWaiting(WaitingReservation waitingReservation) {
         if(existsAlreadyInSlot(waitingReservation)) {
             throw new ReservationException("이미 해당 날짜에 예약이 존재합니다.");
         }
