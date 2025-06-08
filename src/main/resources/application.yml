@@ -1,6 +1,6 @@
 spring:
   profiles:
-    default: local
+    default: prod
 
 api:
   toss:
@@ -15,7 +15,7 @@ api:
 spring:
   config:
     activate:
-      on-profile: local
+      on-profile: prod
   h2:
     console:
       enabled: true
