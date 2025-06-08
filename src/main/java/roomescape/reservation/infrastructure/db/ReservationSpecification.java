@@ -6,6 +6,9 @@ import roomescape.reservation.model.entity.Reservation;
 
 public class ReservationSpecification {
 
+    private ReservationSpecification() {
+    }
+
     public static Specification<Reservation> themeIdEquals(Long themeId) {
         return (root, query, criteriaBuilder) -> {
             if (themeId == null) {
