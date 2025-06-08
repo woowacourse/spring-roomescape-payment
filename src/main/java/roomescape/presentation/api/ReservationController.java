@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import roomescape.application.ReservationPayService;
 import roomescape.application.ReservationService;
-import roomescape.application.WaitingService;
 import roomescape.presentation.AuthenticationPrincipal;
 import roomescape.presentation.dto.request.LoginMember;
 import roomescape.presentation.dto.request.ReservationWithPaymentRequest;
@@ -35,13 +34,10 @@ public class ReservationController {
 
     private final ReservationPayService reservationPayService;
     private final ReservationService reservationService;
-    private final WaitingService waitingService;
 
-    public ReservationController(ReservationPayService reservationPayService,
-                                 final ReservationService reservationService, final WaitingService waitingService) {
+    public ReservationController(ReservationPayService reservationPayService, ReservationService reservationService) {
         this.reservationPayService = reservationPayService;
         this.reservationService = reservationService;
-        this.waitingService = waitingService;
     }
 
     @Operation(summary = "예약 목록 조회", description = "모든 예약을 조회합니다.")
@@ -60,7 +56,7 @@ public class ReservationController {
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "생성 성공",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ReservationResponse.class))),
+                            schema = @Schema(implementation = InvoiceResponse.class))),
             @ApiResponse(responseCode = "400", description = "잘못된 요청",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ErrorResponse.class))),

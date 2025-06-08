@@ -22,7 +22,7 @@ import roomescape.presentation.dto.request.ReservationCreateRequest;
 import roomescape.presentation.dto.response.ErrorResponse;
 import roomescape.presentation.dto.response.WaitingResponse;
 
-@Tag(name = "테마", description = "방탈출 테마 관리 API")
+@Tag(name = "대기", description = "방탈출 대기 관리 API")
 @RestController
 public class WaitingController {
 
@@ -59,10 +59,10 @@ public class WaitingController {
     @Operation(summary = "대기 삭제", description = "대기를 삭제합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "삭제 성공"),
-            @ApiResponse(responseCode = "400", description = "삭제할 수 없는 예약",
+            @ApiResponse(responseCode = "400", description = "삭제할 수 없는 대기",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "존재하지 않는 예약",
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 대기",
                     content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
