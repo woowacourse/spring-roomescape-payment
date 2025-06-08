@@ -37,7 +37,6 @@ import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.response.BookedReservationTimeResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
-import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.waiting.domain.Waiting;
 import roomescape.reservation.waiting.repository.WaitingRepository;
@@ -45,6 +44,7 @@ import roomescape.theme.domain.Theme;
 import roomescape.theme.dto.response.ThemeResponse;
 import roomescape.theme.repository.ThemeRepository;
 import roomescape.time.domain.ReservationTime;
+import roomescape.time.dto.response.ReservationTimeResponse;
 import roomescape.time.repository.ReservationTimeRepository;
 
 @ActiveProfiles("test")

@@ -6,11 +6,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.custom.AlreadyInUseException;
 import roomescape.common.exception.custom.EntityNotFoundException;
-import roomescape.reservation.dto.request.ReservationTimeRequest;
-import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.time.domain.ReservationTime;
 import roomescape.time.domain.ReservationTimeId;
+import roomescape.time.dto.request.ReservationTimeRequest;
+import roomescape.time.dto.response.ReservationTimeResponse;
 import roomescape.time.repository.ReservationTimeRepository;
 
 @Slf4j

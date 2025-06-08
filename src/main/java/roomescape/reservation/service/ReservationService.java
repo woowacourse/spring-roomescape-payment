@@ -30,7 +30,6 @@ import roomescape.reservation.dto.request.ReservationCreateRequest;
 import roomescape.reservation.dto.response.BookedReservationTimeResponse;
 import roomescape.reservation.dto.response.MyReservationsResponse;
 import roomescape.reservation.dto.response.ReservationResponse;
-import roomescape.reservation.dto.response.ReservationTimeResponse;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.waiting.domain.Waiting;
 import roomescape.reservation.waiting.domain.WaitingWithRank;
@@ -40,6 +39,7 @@ import roomescape.theme.domain.ThemeId;
 import roomescape.theme.repository.ThemeRepository;
 import roomescape.time.domain.ReservationTime;
 import roomescape.time.domain.ReservationTimeId;
+import roomescape.time.dto.response.ReservationTimeResponse;
 import roomescape.time.repository.ReservationTimeRepository;
 
 @Slf4j

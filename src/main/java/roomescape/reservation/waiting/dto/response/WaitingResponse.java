@@ -1,10 +1,10 @@
-package roomescape.reservation.dto.response;
+package roomescape.reservation.waiting.dto.response;
 
 import java.time.LocalDate;
-
 import roomescape.member.dto.MemberResponse;
 import roomescape.reservation.waiting.domain.Waiting;
 import roomescape.theme.dto.response.ThemeResponse;
+import roomescape.time.dto.response.ReservationTimeResponse;
 
 public record WaitingResponse(
         Long id,
