@@ -25,6 +25,13 @@ spring:
   config:
     import: optional:classpath:application-secret.yml
 
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
 toss:
   payment:
     base-url: https://api.tosspayments.com/v1
