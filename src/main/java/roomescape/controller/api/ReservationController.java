@@ -55,7 +55,7 @@ public class ReservationController {
     @ResponseStatus(HttpStatus.CREATED)
     public ReservationResponseDto addReservation(
             @CurrentMember LoginInfo loginInfo,
-            @RequestBody final MemberReservationCreateRequestDto requestDto
+            @RequestBody MemberReservationCreateRequestDto requestDto
     ) {
         ReservationCreateDto reservationCreateDto = new ReservationCreateDto(
                 requestDto.date(), requestDto.timeId(), requestDto.themeId(), loginInfo.id());
