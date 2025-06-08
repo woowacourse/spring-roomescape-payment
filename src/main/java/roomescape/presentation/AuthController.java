@@ -1,5 +1,7 @@
 package roomescape.presentation;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -15,6 +17,7 @@ import roomescape.dto.request.LoginRequest;
 import roomescape.dto.response.AuthenticatedUserResponse;
 import roomescape.service.AuthService;
 
+@Tag(name = "유저 인증 API", description = "유저 인증 API 입니다.")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -30,6 +33,7 @@ public class AuthController {
         this.cookieMaxAge = cookieMaxAge;
     }
 
+    @Operation(summary = "로그인", description = "유저가 로그인하면 인증 토큰을 발급합니다.")
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody @Valid LoginRequest request) {
         String token = authService.createToken(request);
@@ -42,11 +46,13 @@ public class AuthController {
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).build();
     }
 
+    @Operation(summary = "유저 인증 확인", description = "유저가 인증된 상태인지 확인하고 인증 정보를 반환합니다.")
     @GetMapping("/check")
     public AuthenticatedUserResponse getAuthenticatedUser(@Authenticated Long memberId) {
         return authService.getAuthenticatedUser(memberId);
     }
 
+    @Operation(summary = "로그아웃", description = "유저가 로그아웃하면 인증 토큰을 만료시킵니다.")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout() {
         ResponseCookie cookie = ResponseCookie.from("token")

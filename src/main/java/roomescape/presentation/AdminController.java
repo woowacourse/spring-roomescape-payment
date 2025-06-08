@@ -1,5 +1,7 @@
 package roomescape.presentation;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -17,6 +19,7 @@ import roomescape.dto.response.WaitingResponse;
 import roomescape.service.ReservationService;
 import roomescape.service.WaitingService;
 
+@Tag(name = "관리자용 API", description = "관리자용 API 입니다.")
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
@@ -29,6 +32,7 @@ public class AdminController {
         this.waitingService = waitingService;
     }
 
+    @Operation(summary = "관리자용 예약 생성", description = "관리자가 예약을 생성합니다.")
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponse> createReservation(
             @Valid @RequestBody AdminReservationCreateRequest request) {
@@ -40,11 +44,13 @@ public class AdminController {
                 .body(reservationResponse);
     }
 
+    @Operation(summary = "관리자용 예약 조회", description = "관리자가 예약을 조회합니다.")
     @GetMapping("/reservations")
     public List<ReservationResponse> getReservations(@ModelAttribute ReservationCondition cond) {
         return reservationService.findReservations(cond);
     }
 
+    @Operation(summary = "관리자용 대기 조회", description = "관리자가 대기를 조회합니다.")
     @GetMapping("/waitings")
     public List<WaitingResponse> getWaitings() {
         return waitingService.findAll();

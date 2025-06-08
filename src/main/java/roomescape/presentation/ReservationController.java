@@ -1,5 +1,7 @@
 package roomescape.presentation;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -19,6 +21,7 @@ import roomescape.dto.response.ReservationWithStatusResponse;
 import roomescape.service.ReservationFacade;
 import roomescape.service.ReservationService;
 
+@Tag(name = "예약 API", description = "예약 API 입니다.")
 @RestController
 @RequestMapping(value = "/api/reservations")
 public class ReservationController {
@@ -32,6 +35,7 @@ public class ReservationController {
         this.reservationFacade = reservationFacade;
     }
 
+    @Operation(summary = "회원 예약 생성", description = "결제와 함께 회원의 예약을 저장합니다.")
     @PostMapping
     public ResponseEntity<ReservationForMemberResponse> createNewReservation(
             @Authenticated Long memberId,
@@ -47,12 +51,14 @@ public class ReservationController {
                 .body(reservationResponse);
     }
 
+    @Operation(summary = "예약 삭제", description = "예약을 삭제합니다.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {
         reservationService.deleteReservationById(id);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "내 예약 조회", description = "특정 회원의 예약을 조회합니다.")
     @GetMapping("/my")
     public List<ReservationWithStatusResponse> getMyBookingHistory(@Authenticated Long id) {
         return reservationService.findBookingHistory(id);

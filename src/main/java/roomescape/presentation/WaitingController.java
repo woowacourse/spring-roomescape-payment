@@ -1,5 +1,7 @@
 package roomescape.presentation;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +16,7 @@ import roomescape.dto.request.WaitingCreateRequest;
 import roomescape.dto.response.WaitingResponse;
 import roomescape.service.WaitingService;
 
+@Tag(name = "예약 대기 API", description = "예약 대기 API 입니다.")
 @RestController
 @RequestMapping(value = "/api/waiting")
 public class WaitingController {
@@ -23,6 +26,7 @@ public class WaitingController {
         this.waitingService = waitingService;
     }
 
+    @Operation(summary = "예약 대기 생성", description = "새 예약 대기를 생성합니다.")
     @PostMapping
     public ResponseEntity<WaitingResponse> createNewWaiting(
             @Authenticated Long memberId,
@@ -34,6 +38,7 @@ public class WaitingController {
                 .body(waitingResponse);
     }
 
+    @Operation(summary = "예약 대기 삭제", description = "특정 예약 대기를 삭제합니다.")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteWaiting(@PathVariable Long id) {
         waitingService.deleteWaitingById(id);
