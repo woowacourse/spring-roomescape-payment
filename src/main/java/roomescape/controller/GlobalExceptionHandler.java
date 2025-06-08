@@ -22,6 +22,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequestException(BadRequestException ex) {
+        LOG.error("Fail Response: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getMessage(),
                 HttpStatus.BAD_REQUEST
@@ -31,6 +32,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException ex) {
+        LOG.error("Fail Response: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getMessage(),
                 HttpStatus.NOT_FOUND
@@ -40,6 +42,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ErrorResponse> handleAuthorizationException(UnauthorizedException ex) {
+        LOG.error("Fail Response: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getMessage(),
                 HttpStatus.UNAUTHORIZED
@@ -49,6 +52,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException ex) {
+        LOG.error("Fail Response: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getMessage(),
                 HttpStatus.FORBIDDEN
@@ -58,6 +62,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TossPaymentClientException.class)
     public ResponseEntity<ErrorResponse> handleTossPaymentException(TossPaymentClientException ex) {
+        LOG.error("Fail Response: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getMessage(),
                 HttpStatus.BAD_REQUEST
@@ -67,7 +72,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TossPaymentServerException.class)
     public ResponseEntity<ErrorResponse> handleTossPaymentException(TossPaymentServerException ex) {
-        LOG.error("토스 서버에서 에러가 발생했습니다.", ex);
+        LOG.error("Fail Response: 토스 서버에서 에러가 발생했습니다.", ex);
         ErrorResponse errorResponse = new ErrorResponse(
                 "결제 중 서버 에러가 발생했습니다.",
                 HttpStatus.INTERNAL_SERVER_ERROR
@@ -77,6 +82,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RestClientException.class)
     public ResponseEntity<ErrorResponse> handleRestClientException(RestClientException ex) {
+        LOG.error("Fail Response: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getMessage(),
                 HttpStatus.BAD_REQUEST
@@ -86,6 +92,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleUnexpected(Exception ex) {
+        LOG.error("Fail Response: {}", ex.getMessage(), ex);
         ErrorResponse errorResponse = new ErrorResponse(
                 ex.getMessage(),
                 HttpStatus.INTERNAL_SERVER_ERROR);
