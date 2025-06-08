@@ -27,22 +27,6 @@ public class TossPaymentService {
             maxAttempts = 2,
             backoff = @Backoff(delay = 1_000)
     )
-    @Transactional(propagation = Propagation.REQUIRED)
-    public void processPayment(
-            TossPaymentRequestDto tossPaymentRequestDto,
-            ReservationTicket reservationTicket,
-            String requestKey) {
-        TossPayment tossPayment = new TossPayment(
-                tossPaymentRequestDto.paymentKey(),
-                tossPaymentRequestDto.orderId(),
-                tossPaymentRequestDto.amount(),
-                reservationTicket.getId(),
-                PaymentTargetType.RESERVATION_TICKET
-        );
-
-        tossPaymentRepository.save(tossPayment);
-    }
-
     public void processPayment(TossPaymentRequestDto tossPaymentRequestDto,
                                String requestKey) {
         TossPaymentConfirmDto tossPaymentConfirmDto = new TossPaymentConfirmDto(
