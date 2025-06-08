@@ -1,11 +1,13 @@
 package roomescape.dto.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import roomescape.model.ReservationTime;
 
 public record ReservationTimeRegisterDto(
+        @Schema(description = "등록하고자 하는 예약 시각의 시각", example = "10:30")
         @NotBlank String startAt
 ) {
 

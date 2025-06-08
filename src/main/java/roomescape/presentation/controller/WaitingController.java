@@ -1,6 +1,7 @@
 package roomescape.presentation.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -31,7 +32,7 @@ public class WaitingController {
     @Operation(summary = "웨이팅 저장")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public WaitingResponseDto registerWaiting(LoginMember loginMember,
+    public WaitingResponseDto registerWaiting(@Parameter(hidden = true) LoginMember loginMember,
                                               @RequestBody @Valid WaitingRegisterDto waitingRegisterDto) {
         return waitingService.registerWaiting(loginMember, waitingRegisterDto);
     }
