@@ -1,6 +1,9 @@
 package roomescape.global.exception;
 
 import java.net.SocketTimeoutException;
+import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,8 +25,11 @@ import roomescape.global.exception.dto.ErrorResponse;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler(TossPaymentsException.class)
     public ResponseEntity<ErrorResponse> handleTossPaymentsException(final TossPaymentsException e) {
+        log.warn("TossPaymentsException: {}", e.getMessage());
         return ResponseEntity.status(e.getStatusCode().value())
                 .body(new ErrorResponse(e.getMessage()));
     }
@@ -34,31 +40,36 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleBadRequestException(final BadRequestException e) {
+        log.warn("BadRequestException: {}", e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleJsonParseError() {
+    public ErrorResponse handleJsonParseError(final HttpMessageNotReadableException e) {
+        log.warn("BadRequestException: {}", e.getMessage());
         return new ErrorResponse("요청 형식이 올바르지 않습니다.");
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleTypeMismatch() {
+    public ErrorResponse handleTypeMismatch(final MethodArgumentNotValidException e) {
+        log.warn("BadRequestException: {}", e.getMessage());
         return new ErrorResponse("요청 파라미터의 타입이 올바르지 않습니다.");
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMissingParam(final MissingServletRequestParameterException e) {
+        log.warn("BadRequestException: {}", e.getMessage());
         return new ErrorResponse(String.format("요청 파라미터 '%s'가 누락되었습니다.", e.getParameterName()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleMethodArgumentException(final MethodArgumentNotValidException e) {
-        return new ErrorResponse(e.getBindingResult().getFieldError().getDefaultMessage());
+        log.warn("BadRequestException: {}", e.getMessage());
+        return new ErrorResponse(Objects.requireNonNull(e.getBindingResult().getFieldError()).getDefaultMessage());
     }
 
     /**
@@ -67,6 +78,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorResponse handleUnauthorizedException(final UnauthorizedException e) {
+        log.warn("UnauthorizedException: {}", e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 
@@ -75,7 +87,9 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(ForbiddenException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public void handleForbiddenException(final ForbiddenException e) {
+    public ErrorResponse handleForbiddenException(final ForbiddenException e) {
+        log.warn("ForbiddenException: {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
     }
 
     /**
@@ -84,6 +98,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(final NotFoundException e) {
+        log.warn("NotFoundException: {}", e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
 
@@ -93,12 +108,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataAccessException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleDataAccessException(final DataAccessException e) {
+        log.error("DataAccessException: {}", e.getMessage());
         return new ErrorResponse("데이터베이스 오류가 발생했습니다.");
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleIllegalArgumentException(final IllegalArgumentException e) {
+        log.error("IllegalArgumentException: {}", e.getMessage(), e);
         return new ErrorResponse(e.getMessage());
     }
 
@@ -107,17 +124,19 @@ public class GlobalExceptionHandler {
         Throwable cause = e.getCause();
         while (cause != null) {
             if (cause instanceof SocketTimeoutException) {
+                log.error("SocketTimeoutException: {}", cause.getMessage(), cause);
                 return ResponseEntity.internalServerError().body(new ErrorResponse("시간이 초과되었습니다. 다시 시도해 주세요."));
             }
             cause = cause.getCause();
         }
+        log.error("ResourceAccessException: {}", e.getMessage(), e);
         return ResponseEntity.internalServerError().body(new ErrorResponse("알 수 없는 에러가 발생했습니다."));
     }
 
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleUncaughtException(final RuntimeException e) {
-        e.printStackTrace();
+        log.error("RuntimeException: {}", e.getMessage(), e);
         return new ErrorResponse("알 수 없는 에러가 발생했습니다.");
     }
 }
