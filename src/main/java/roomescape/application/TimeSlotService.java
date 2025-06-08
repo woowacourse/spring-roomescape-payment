@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.timeslot.TimeSlot;
@@ -16,6 +17,7 @@ import roomescape.domain.timeslot.TimeSlotBookStatus;
 import roomescape.domain.timeslot.TimeSlotRepository;
 import roomescape.exception.InUseException;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class TimeSlotService {
@@ -34,6 +36,7 @@ public class TimeSlotService {
 
     public void removeById(final long id) {
         if (reservationRepository.exists(byTimeSlotId(id))) {
+            log.warn("[예외 발생] 삭제할 수 없는 타임 슬롯 id: {}", id);
             throw new InUseException("삭제하려는 타임 슬롯을 사용하는 예약이 있습니다.");
         }
         timeSlotRepository.deleteByIdOrElseThrow(id);

@@ -71,6 +71,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(InUseException.class)
     @ResponseStatus(code = CONFLICT)
     public ProblemDetail handleInUse(final InUseException ex) {
+        logger.warn("예외 유형 - {}: {}", CONFLICT.getReasonPhrase(), ex.getMessage());
         return createProblemDetail(CONFLICT, "사용 중인 값입니다.", ex.getMessage());
     }
 
