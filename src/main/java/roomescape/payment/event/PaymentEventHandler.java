@@ -3,6 +3,7 @@ package roomescape.payment.event;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import roomescape.exception.NotFoundException;
 import roomescape.payment.service.PaymentEventProcessor;
@@ -29,6 +30,7 @@ public class PaymentEventHandler {
         paymentEventProcessor.saveNotPaidPayment(reservation);
     }
 
+    @Async
     @EventListener(ReservationDeleteEvent.class)
     public void handleReservationDelete(ReservationDeleteEvent event) {
         log.info("ReservationDeleteEvent 수신 - reservationId={}", event.reservationId());
@@ -37,6 +39,7 @@ public class PaymentEventHandler {
 
         log.info("결제 취소 처리 시작 - reservationId={}", reservation.getId());
         paymentEventProcessor.cancelPayment(reservation.getId());
+        log.info("결제 취소 처리 완료 - reservationId={}", reservation.getId());
     }
 
     private Reservation getReservationById(Long reservationId) {
