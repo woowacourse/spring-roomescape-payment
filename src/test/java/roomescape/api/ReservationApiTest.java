@@ -96,6 +96,8 @@ public class ReservationApiTest {
         jdbcTemplate.update("ALTER TABLE reservation_time ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE theme ALTER COLUMN id RESTART WITH 1");
         jdbcTemplate.update("ALTER TABLE member ALTER COLUMN id RESTART WITH 1");
+        jdbcTemplate.update("INSERT INTO member (email, password, name, role) VALUES (?, ?, ?, ?)",
+                "admin@email.com", "password", "name", "ADMIN");
     }
 
     private void givenCreateReservationTime() {
@@ -319,24 +321,49 @@ public class ReservationApiTest {
     @DisplayName("예약 삭제")
     class Delete {
 
-//        @DisplayName("주어진 아이디에 해당하는 예약이 있다면 200 OK 응답")
-//        @Test
-//        void remove1() {
-//            // given
-//            givenCreateMember();
-//            final Cookie cookie = givenAuthCookie();
-//            givenCreateReservationTime();
-//            givenCreateTheme();
-//            givenCreateSchedule();
-//            givenOrder(cookie);
-//            givenCreateReservation(cookie);
-//
-//            // when & then
-//            RestAssured.given().port(port).log().all()
-//                    .when().delete("/reservations/1")
-//                    .then().log().all()
-//                    .statusCode(204);
-//        }
+        @DisplayName("주어진 아이디에 해당하는 예약이 있고, 확정되지 않았다면 200 OK 응답")
+        @Test
+        void remove1() {
+            // given
+            givenCreateReservationTime();
+            givenCreateTheme();
+            givenCreateSchedule();
+            final Cookie cookie = givenAdminAuthCookie();
+            givenCreateUnconfirmedReservation(cookie);
+
+            // when & then
+            RestAssured.given().port(port).log().all()
+                    .when().delete("/reservations/1")
+                    .then().log().all()
+                    .statusCode(204);
+        }
+
+        private Cookie givenAdminAuthCookie() {
+            return RestAssured.given().port(port)
+                    .contentType(ContentType.JSON)
+                    .body(Map.of(
+                            "email", "admin@email.com",
+                            "password", "password"
+                    ))
+                    .when().post("/login")
+                    .then()
+                    .extract().detailedCookie("token");
+        }
+
+        private void givenCreateUnconfirmedReservation(final Cookie cookie) {
+            RestAssured.given().port(port).log().all()
+                    .contentType(ContentType.JSON)
+                    .cookie(cookie)
+                    .body(Map.of(
+                            "date", "2026-12-01",
+                            "timeId", 1L,
+                            "themeId", 1L,
+                            "memberId", 1L
+                    ))
+                    .when().post("/admin/reservations")
+                    .then().log().all()
+                    .statusCode(201);
+        }
 
         @DisplayName("주어진 아이디에 해당하는 예약이 없다면 404로 응답한다.")
         @Test
@@ -346,6 +373,25 @@ public class ReservationApiTest {
                     .when().delete("/reservations/1000")
                     .then().log().all()
                     .statusCode(404);
+        }
+
+        @DisplayName("이미 확정된 예약을 삭제하려는 경우 400을 응답한다.")
+        @Test
+        void remove3() {
+            // given
+            givenCreateMember();
+            givenCreateReservationTime();
+            givenCreateTheme();
+            givenCreateSchedule();
+            final Cookie cookie = givenAuthCookie();
+            givenOrder(cookie);
+            givenCreateReservation(cookie);
+
+            // when & then
+            RestAssured.given().port(port).log().all()
+                    .when().delete("/reservations/1")
+                    .then().log().all()
+                    .statusCode(400);
         }
     }
 }

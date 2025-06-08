@@ -135,7 +135,7 @@ public class DataSourceTest {
         assertThat(reservations.size()).isEqualTo(count);
     }
 
-    @DisplayName("reservation 삽입, 삭제 검증")
+    @DisplayName("reservation 삽입, 삭제 검증 - 결제 완료된 예약은 삭제할 수 없음")
     @Test
     void 육단계() {
         // given
@@ -150,16 +150,12 @@ public class DataSourceTest {
         // when
         Integer count = jdbcTemplate.queryForObject("SELECT count(1) from reservation", Integer.class);
         assertThat(count).isEqualTo(1);
-        jdbcTemplate.update("DELETE FROM reservation_payment");
 
         // then
         RestAssured.given().port(port).log().all()
                 .when().delete("/reservations/1")
                 .then().log().all()
-                .statusCode(204);
-
-        Integer countAfterDelete = jdbcTemplate.queryForObject("SELECT count(1) from reservation", Integer.class);
-        assertThat(countAfterDelete).isEqualTo(0);
+                .statusCode(400);
     }
 
     private void givenCreateReservationTime() {
