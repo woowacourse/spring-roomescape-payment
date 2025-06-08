@@ -1,5 +1,6 @@
 package roomescape.common.exception;
 
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -17,57 +18,52 @@ import roomescape.common.exception.impl.UnauthorizedException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handle(final Exception e) {
-        log.error("Unexpected error occured", e);
+        logger.error("Unexpected error occurred", e);
         return new ResponseEntity<>("서버 내부에 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<String> handle(final MethodArgumentNotValidException e) {
+        String errorMessages = e.getBindingResult()
+            .getFieldErrors()
+            .stream()
+            .map(error -> error.getField() + ": " + error.getDefaultMessage())
+            .distinct()
+            .collect(Collectors.joining(", "));
+        return new ResponseEntity<>(errorMessages, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(TossPaymentErrorException.class)
     public ResponseEntity<String> handle(final TossPaymentErrorException e) {
-        log.error("toss api exception : " + "code : " + e.getCode() + ", message :" + e.getMessage());
-
-        if (e.isTreatedAsServerError()) {  // NOTE. 사용자 친화적인 메세지는 GlobalExceptionHandler 책임이라고 생각하여,TossPaymentErrorException에서 처리 X 파랑에게 여쭤보기
-            return new ResponseEntity<>("서버 내부에 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
         return new ResponseEntity<>(e.getMessage(), e.getStatus());
     }
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<String> handle(final BadRequestException e) {
-        log.error(e.getMessage());
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<String> handle(final NotFoundException e) {
-        log.error(e.getMessage());
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<String> handle(final ConflictException e) {
-        log.error(e.getMessage());
         return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<String> handle(final UnauthorizedException e) {
-        log.warn("인증 실패: {}", e.getMessage());
         return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<String> handle(final ForbiddenException e) {
-        log.error(e.getMessage());
         return new ResponseEntity<>(e.getMessage(), HttpStatus.FORBIDDEN);
-    }
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<String> handleValidation(final MethodArgumentNotValidException e) {
-        log.error(e.getMessage());
-        return new ResponseEntity<>("잘못된 요청입니다.", HttpStatus.BAD_REQUEST);
     }
 }

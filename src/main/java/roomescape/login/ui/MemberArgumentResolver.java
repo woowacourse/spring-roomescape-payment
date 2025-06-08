@@ -2,6 +2,8 @@ package roomescape.login.ui;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -15,6 +17,8 @@ import roomescape.login.application.dto.LoginCheckRequest;
 
 @Component
 public class MemberArgumentResolver implements HandlerMethodArgumentResolver {
+
+    private static final Logger logger = LoggerFactory.getLogger(MemberArgumentResolver.class);
 
     private final JwtHandler jwtHandler;
     private final TokenCookieService tokenCookieService;
@@ -45,6 +49,7 @@ public class MemberArgumentResolver implements HandlerMethodArgumentResolver {
         final String accessToken = tokenCookieService.getTokenFromCookies(request.getCookies());
         final Map<String, String> decodedClaims = jwtHandler.decode(accessToken);
         final Long id = Long.valueOf(decodedClaims.get(JwtHandler.CLAIM_ID_KEY));
+        logger.info("Member ID: {}", id);
 
         return LoginCheckRequest.from(id);
     }
