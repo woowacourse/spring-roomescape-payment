@@ -23,7 +23,6 @@ import roomescape.member.domain.repository.MemberRepository;
 import roomescape.member.exception.MemberNotFoundException;
 import roomescape.member.infrastructure.MemberRepositoryAdapter;
 import roomescape.reservation.application.dto.AdminReservationRequest;
-import roomescape.reservation.application.dto.AdminReservationSearchRequest;
 import roomescape.reservation.application.dto.MyReservationResponse;
 import roomescape.reservation.application.dto.ReservationResponse;
 import roomescape.reservation.application.dto.UserReservationRequest;
@@ -166,11 +165,8 @@ class ReservationServiceTest {
         Reservation reservation = new Reservation(member, spec);
         reservationRepository.save(reservation);
 
-        // 관리자용 예약 검색 요청 객체 생성 (회원 ID, 테마 ID, 시작 날짜, 종료 날짜)
-        AdminReservationSearchRequest request = new AdminReservationSearchRequest(memberId, themeId, date, date);
-
         // when
-        List<ReservationResponse> responses = reservationService.findFiltered(request);
+        List<ReservationResponse> responses = reservationService.findFiltered(memberId, themeId, date, date);
 
         // then
         assertThat(responses).hasSize(1);

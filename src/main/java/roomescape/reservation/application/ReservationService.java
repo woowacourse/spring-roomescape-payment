@@ -18,7 +18,6 @@ import roomescape.member.domain.Member;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.member.exception.MemberNotFoundException;
 import roomescape.reservation.application.dto.AdminReservationRequest;
-import roomescape.reservation.application.dto.AdminReservationSearchRequest;
 import roomescape.reservation.application.dto.MyReservationResponse;
 import roomescape.reservation.application.dto.ReservationResponse;
 import roomescape.reservation.application.dto.UserReservationRequest;
@@ -69,12 +68,7 @@ public class ReservationService {
                 .toList();
     }
 
-    public List<ReservationResponse> findFiltered(AdminReservationSearchRequest request) {
-        Long memberId = request.memberId();
-        Long themeId = request.themeId();
-        LocalDate from = request.from();
-        LocalDate to = request.to();
-
+    public List<ReservationResponse> findFiltered(Long memberId, Long themeId, LocalDate from, LocalDate to) {
         return ReservationResponse.from(reservationRepository.findFiltered(memberId, themeId, from, to));
     }
 
