@@ -1,31 +1,51 @@
 package roomescape.member;
 
 import static org.hamcrest.Matchers.equalTo;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.modifyHeaders;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
+@ExtendWith(RestDocumentationExtension.class)
 public class MemberApiTest {
 
     @LocalServerPort
     private int port;
 
+    private RequestSpecification spec;
+
     @BeforeEach
-    void setUp() {
+    void setUp(final RestDocumentationContextProvider restDocumentation) {
         RestAssured.port = port;
+        this.spec = new RequestSpecBuilder()
+                .addFilter(documentationConfiguration(restDocumentation).operationPreprocessors()
+                        .withRequestDefaults(modifyHeaders().remove("Foo"), prettyPrint())
+                        .withResponseDefaults(prettyPrint()))
+                .build();
     }
 
     @DisplayName("회원 가입 API 테스트")
@@ -39,9 +59,22 @@ public class MemberApiTest {
         @DisplayName("회원가입을 성공할 경우 201을 반환한다.")
         @Test
         void testSignupSuccess() {
-            RestAssured.given().log().all()
+            RestAssured.given(spec).log().all()
                     .contentType(ContentType.JSON)
                     .body(validRequest)
+                    .filter(document(
+                            "register",
+                            requestFields(
+                                    fieldWithPath("name").description("이름"),
+                                    fieldWithPath("email").description("이메일"),
+                                    fieldWithPath("password").description("패스워드")
+                            ),
+                            responseFields(
+                                    fieldWithPath("id").description("회원 ID"),
+                                    fieldWithPath("email").description("이메일"),
+                                    fieldWithPath("name").description("이름")
+                            )
+                    ))
                     .when().post("/members")
                     .then().log().all()
                     .statusCode(201)
@@ -127,6 +160,42 @@ public class MemberApiTest {
                     .when().post("/members")
                     .then().log().all()
                     .statusCode(400);
+        }
+    }
+
+    @DisplayName("회원 목록 조회 API 테스트")
+    @Nested
+    class MembersTest {
+        @DisplayName("회원 목록을 조회한다.")
+        @Test
+        void testGetMembersSuccess() {
+            // given
+            final Map<String, String> validRequest = new HashMap<>(Map.of("name", "노랑",
+                    "email", "aaa@gmail.com",
+                    "password", "1234"));
+
+            RestAssured.given(spec).log().all()
+                    .contentType(ContentType.JSON)
+                    .body(validRequest)
+                    .when().post("/members")
+                    .then().log().all()
+                    .statusCode(201);
+
+            // when & then
+            RestAssured.given(spec).log().all()
+                    .contentType(ContentType.JSON)
+                    .filter(document(
+                            "members",
+                            responseFields(
+                                    fieldWithPath("[].id").description("회원 ID"),
+                                    fieldWithPath("[].email").description("이메일"),
+                                    fieldWithPath("[].name").description("이름")
+                            )
+                    ))
+                    .when().get("/members")
+                    .then().log().all()
+                    .statusCode(200)
+                    .body("[0].email", equalTo("aaa@gmail.com"));
         }
     }
 }
