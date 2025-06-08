@@ -6,6 +6,7 @@ import roomescape.global.api.AuthToken;
 import roomescape.global.api.CustomRequestUri;
 import roomescape.global.api.CustomRestClient;
 import roomescape.reservation.external.toss.dto.PaymentConfirmRequest;
+import roomescape.reservation.external.toss.dto.PaymentConfirmResponse;
 import roomescape.reservation.external.toss.dto.TossApiErrorResponse;
 import roomescape.reservation.domain.PaymentInfo;
 import roomescape.reservation.service.PaymentApiClient;
@@ -31,12 +32,13 @@ public class TossPaymentApiClient implements PaymentApiClient {
     public PaymentInfo paymentReservation(final PaymentConfirmRequest request) {
         CustomRequestUri customRequestUri = new CustomRequestUri(confirmUri);
         AuthToken tossAuthToken = new TossAuthToken(tossSecretKey);
-        return customRestClient.post(
+        PaymentConfirmResponse response = customRestClient.post(
                 customRequestUri,
                 tossAuthToken,
                 request,
-                PaymentInfo.class,
+                PaymentConfirmResponse.class,
                 TossApiErrorResponse.class
         );
+        return response.toPaymentInfo();
     }
 }
