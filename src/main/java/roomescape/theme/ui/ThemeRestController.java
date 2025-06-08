@@ -3,6 +3,8 @@ package roomescape.theme.ui;
 import static roomescape.auth.domain.AuthRole.ADMIN;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
@@ -30,6 +32,9 @@ public class ThemeRestController {
     @PostMapping
     @RequiresRole(authRoles = {ADMIN})
     @Operation(summary = "테마 추가")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", useReturnTypeSchema = true),
+    })
     public ResponseEntity<ThemeResponse> create(
             @RequestBody @Valid final CreateThemeRequest request
     ) {
@@ -42,6 +47,9 @@ public class ThemeRestController {
     @DeleteMapping({"/{id}"})
     @RequiresRole(authRoles = {ADMIN})
     @Operation(summary = "테마 삭제")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", useReturnTypeSchema = true),
+    })
     public ResponseEntity<Void> delete(
             @PathVariable final Long id
     ) {
@@ -52,6 +60,9 @@ public class ThemeRestController {
 
     @GetMapping
     @Operation(summary = "모든 테마 목록 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", useReturnTypeSchema = true),
+    })
     public ResponseEntity<List<ThemeResponse>> findAll() {
         final List<ThemeResponse> themeResponses = themeService.findAll();
 
@@ -60,6 +71,9 @@ public class ThemeRestController {
 
     @GetMapping("/popular-list")
     @Operation(summary = "인기 테마 목록 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", useReturnTypeSchema = true),
+    })
     public ResponseEntity<List<ThemeResponse>> findPopularThemes() {
         final List<ThemeResponse> popularThemes = themeService.findPopularThemes();
 
