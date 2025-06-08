@@ -14,9 +14,9 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import roomescape.common.log.context.RequestContext;
 import roomescape.common.log.context.RequestIdProvider;
 import roomescape.common.log.message.LogMessageProvider;
+import roomescape.common.log.message.RequestInfo;
 
 @Slf4j
 @Aspect
@@ -65,11 +65,7 @@ public class LoggingAspect {
     @Before("allMapping()")
     public void requestLog(final JoinPoint joinPoint) {
         String message = logMessageProvider.getRequestLog(
-                RequestContext.get(
-                        requestIdProvider.getId().toString(),
-                        httpServletRequest,
-                        formatHandlerName(joinPoint)
-                ),
+                getRequestInfo(joinPoint),
                 getHandlerArguments(joinPoint)
         );
 
@@ -79,15 +75,19 @@ public class LoggingAspect {
     @AfterReturning(value = "controllerPointCut() || exceptionHandlerCut()", returning = "response")
     public void responseLog(final JoinPoint joinPoint, final ResponseEntity<?> response) {
         String message = logMessageProvider.getResponseLog(
-                RequestContext.get(
-                        requestIdProvider.getId().toString(),
-                        httpServletRequest,
-                        formatHandlerName(joinPoint)
-                ),
+                getRequestInfo(joinPoint),
                 response
         );
 
         log.info(message);
+    }
+
+    private RequestInfo getRequestInfo(final JoinPoint joinPoint) {
+        return RequestInfo.get(
+                requestIdProvider.getId().toString(),
+                httpServletRequest,
+                formatHandlerName(joinPoint)
+        );
     }
 
     private String formatHandlerName(final JoinPoint joinPoint) {

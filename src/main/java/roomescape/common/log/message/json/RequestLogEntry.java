@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
-import roomescape.common.log.context.RequestContext;
+import roomescape.common.log.message.RequestInfo;
 
 record RequestLogEntry(
-        RequestContext requestContext,
+        RequestInfo requestInfo,
         List<HandlerArgument> handlerArguments
 ) {
 
@@ -19,11 +19,11 @@ record RequestLogEntry(
     );
 
     static RequestLogEntry createWithHandlerArgumentMap(
-            final RequestContext requestContext,
+            final RequestInfo requestInfo,
             final Map<String, Object> handlerArguments
     ) {
         return new RequestLogEntry(
-                requestContext,
+                requestInfo,
                 handlerArguments.entrySet().stream()
                         .filter(entry -> isJsonSerializable(entry.getValue()))
                         .map(HandlerArgument::fromArgumentEntry)

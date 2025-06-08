@@ -1,10 +1,10 @@
 package roomescape.common.log.message.json;
 
 import org.springframework.http.ResponseEntity;
-import roomescape.common.log.context.RequestContext;
+import roomescape.common.log.message.RequestInfo;
 
 record ResponseLogEntry(
-        RequestContext requestContext,
+        RequestInfo requestInfo,
         ResponseEntity<?> response
 ) {
 }

@@ -8,8 +8,8 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import roomescape.common.log.context.RequestContext;
 import roomescape.common.log.message.LogMessageProvider;
+import roomescape.common.log.message.RequestInfo;
 
 @Component
 @RequiredArgsConstructor
@@ -28,11 +28,11 @@ public class JsonLogMessageProvider implements LogMessageProvider {
 
     @Override
     public String getRequestLog(
-            final RequestContext requestContext,
+            final RequestInfo requestInfo,
             final Map<String, Object> handlerArguments
     ) {
         final RequestLogEntry requestLogEntry = RequestLogEntry.createWithHandlerArgumentMap(
-                requestContext,
+                requestInfo,
                 handlerArguments
         );
         try {
@@ -48,11 +48,11 @@ public class JsonLogMessageProvider implements LogMessageProvider {
 
     @Override
     public String getResponseLog(
-            final RequestContext requestContext,
+            final RequestInfo requestInfo,
             final ResponseEntity<?> response
     ) {
         final ResponseLogEntry responseLogEntry = new ResponseLogEntry(
-                requestContext,
+                requestInfo,
                 response
         );
         try {

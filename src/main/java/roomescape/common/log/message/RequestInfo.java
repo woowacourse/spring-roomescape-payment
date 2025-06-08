@@ -1,8 +1,8 @@
-package roomescape.common.log.context;
+package roomescape.common.log.message;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-public record RequestContext(
+public record RequestInfo(
         String id,
         String ip,
         String method,
@@ -10,12 +10,12 @@ public record RequestContext(
         String handlerName
 ) {
 
-    public static RequestContext get(
+    public static RequestInfo get(
             final String id,
             final HttpServletRequest httpServletRequest,
             final String handlerName
     ) {
-        return new RequestContext(
+        return new RequestInfo(
                 id,
                 httpServletRequest.getRemoteAddr(),
                 httpServletRequest.getMethod(),
