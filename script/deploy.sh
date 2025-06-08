@@ -1,13 +1,17 @@
 #!/bin/bash
 set -e
 
+# 스크립트가 위치한 디렉토리의 상위 디렉토리를 프로젝트 루트로 설정
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="$(dirname "$SCRIPT_DIR")"
+
 APP_NAME="spring-roomescape-payment"
-REPO_DIR="/home/ubuntu/$APP_NAME"
 JAR_NAME="spring-roomescape-payment-0.0.1-SNAPSHOT.jar"
 BUILD_DIR="$REPO_DIR/build/libs"
 BRANCH_NAME="step2"
 
 echo "🚀 배포 시작 - $(date '+%Y-%m-%d %H:%M:%S')"
+echo "📂 프로젝트 디렉토리: $REPO_DIR"
 
 # 1. 소스코드 업데이트
 echo "📥 Git Pull"
@@ -16,7 +20,9 @@ git pull origin $BRANCH_NAME
 
 # 2. 빌드
 echo "🏗️ Gradle Build"
-./gradlew clean build -x test
+# REST Docs 디렉토리 생성 (asciidoctor 오류 방지)
+mkdir -p build/generated-snippets
+./gradlew clean build -x test -x asciidoctor
 
 # 3. 기존 프로세스 종료
 echo "🛑 기존 프로세스 종료"
