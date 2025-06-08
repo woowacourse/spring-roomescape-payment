@@ -102,10 +102,6 @@
                 </Delete>
             </DefaultRolloverStrategy>
         </RollingFile>
-
-        <AsyncAppender name="asyncRollingFile">
-            <AppenderRef ref="rollingFile"/>
-        </AsyncAppender>
     </Appenders>
 
     <Loggers>
