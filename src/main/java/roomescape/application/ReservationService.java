@@ -10,7 +10,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.domain.RoomescapeSchedule;
+import roomescape.domain.payment.PaymentRepository;
 import roomescape.domain.reservation.Reservation;
+import roomescape.domain.reservation.ReservationDetail;
 import roomescape.domain.reservation.ReservationQueues;
 import roomescape.domain.reservation.ReservationRepository;
 import roomescape.domain.reservation.ReservationSearchFilter;
@@ -30,6 +32,7 @@ public class ReservationService {
     private final TimeSlotRepository timeSlotRepository;
     private final ThemeRepository themeRepository;
     private final UserRepository userRepository;
+    private final PaymentRepository paymentRepository;
 
     @Transactional
     public Reservation reserve(final long userId, final LocalDate date, final long timeId, final long themeId) {
@@ -81,6 +84,21 @@ public class ReservationService {
         var user = userRepository.getById(userId);
         var reservation = reservationRepository.getById(reservationId);
         user.cancelReservation(reservation);
+    }
+
+    public List<ReservationDetail> getReservationDetails(final List<ReservationWithOrder> waitings) {
+        return waitings.stream()
+                .map(this::getReservationDetail)
+                .toList();
+    }
+
+    private ReservationDetail getReservationDetail(final ReservationWithOrder waiting) {
+        if (waiting.isWaiting()) {
+            return new ReservationDetail(waiting, null, null);
+        }
+
+        var payment = paymentRepository.getById(waiting.reservation().paymentId().get());
+        return new ReservationDetail(waiting, payment.paymentKey(), payment.totalAmount());
     }
 
     private Reservation reserve(final long userId, final RoomescapeSchedule schedule, final ReservationStatus status) {

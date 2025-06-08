@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import roomescape.application.PaymentService;
 import roomescape.application.ReservationService;
 import roomescape.application.RoomescapeService;
+import roomescape.application.UserService;
 import roomescape.domain.auth.AuthenticationInfo;
 import roomescape.domain.user.UserRole;
 import roomescape.exception.NotFoundException;
@@ -39,7 +40,8 @@ class ReservationControllerTest {
 
     private final ReservationService reservationService = Mockito.mock(ReservationService.class);
     private final PaymentService paymentService = Mockito.mock(PaymentService.class);
-    private final RoomescapeService roomescapeService = new RoomescapeService(reservationService, paymentService);
+    private final UserService userService = Mockito.mock(UserService.class);
+    private final RoomescapeService roomescapeService = new RoomescapeService(reservationService, paymentService, userService);
     private final MockMvc mockMvc = MockMvcBuilders
         .standaloneSetup(new ReservationController(reservationService, roomescapeService))
         .setCustomArgumentResolvers(new StubAuthenticationInfoArgumentResolver(new AuthenticationInfo(userId, UserRole.USER)))

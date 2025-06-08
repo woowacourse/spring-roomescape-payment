@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import roomescape.application.RoomescapeService;
 import roomescape.application.UserService;
 import roomescape.domain.auth.AuthenticationInfo;
 import roomescape.domain.reservation.ReservationWithOrder;
@@ -27,8 +28,9 @@ import roomescape.presentation.StubAuthenticationInfoArgumentResolver;
 class UserControllerTest {
 
     private final UserService userService = Mockito.mock(UserService.class);
+    private final RoomescapeService roomescapeService = Mockito.mock(RoomescapeService.class);
     private final MockMvc mockMvc = MockMvcBuilders
-        .standaloneSetup(new UserController(userService))
+        .standaloneSetup(new UserController(userService, roomescapeService))
         .setCustomArgumentResolvers(new StubAuthenticationInfoArgumentResolver(new AuthenticationInfo(1L, UserRole.USER)))
         .build();
 
