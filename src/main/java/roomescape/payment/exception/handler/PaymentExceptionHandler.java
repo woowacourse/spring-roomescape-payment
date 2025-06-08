@@ -39,14 +39,25 @@ public class PaymentExceptionHandler implements ResponseErrorHandler {
     @Override
     public void handleError(final URI url, final HttpMethod method, final ClientHttpResponse response)
             throws IOException {
-        TossErrorResponse errorResponse = objectMapper.readValue(response.getBody(), TossErrorResponse.class);
+        TossErrorResponse errorResponse = parseErrorResponse(response);
         String code = errorResponse.code();
+
+        handleUnrecoverableError(code);
+        handleByStatusCode(response.getStatusCode(), code);
+    }
+
+    private TossErrorResponse parseErrorResponse(ClientHttpResponse response) throws IOException {
+        return objectMapper.readValue(response.getBody(), TossErrorResponse.class);
+    }
+
+    private void handleUnrecoverableError(String code) {
         TossUnrecoverableErrorCode errorCode = TossUnrecoverableErrorCode.fromCode(code);
         if (errorCode.isUnrecoverable()) {
             throw new PaymentServerException(UNRECOVERABLE_EXCEPTION_MESSAGE);
         }
+    }
 
-        HttpStatusCode statusCode = response.getStatusCode();
+    private void handleByStatusCode(HttpStatusCode statusCode, String code) {
         if (statusCode.is4xxClientError()) {
             if (statusCode == HttpStatus.FORBIDDEN) {
                 throw new PaymentForbiddenException(getErrorMessage(code, FORBIDDEN_EXCEPTION_MESSAGE));
