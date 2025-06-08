@@ -16,7 +16,6 @@ function render(data) {
 
     data.forEach(item => {
         const row = tableBody.insertRow();
-        console.log(item)
         const theme = item.theme.name;
         const date = item.date;
         const time = item.time.startAt;
@@ -38,6 +37,10 @@ function render(data) {
             cancelCell.appendChild(cancelButton);
         } else { // 예약 완료 상태일 때
             const cancelCell = row.insertCell(4);
+
+            row.insertCell(5).textContent = item.paymentKey;
+            row.insertCell(6).textContent = item.amount;
+
             const cancelButton = document.createElement('button');
             cancelButton.textContent = '예약 취소';
             cancelButton.className = 'btn btn-danger';
