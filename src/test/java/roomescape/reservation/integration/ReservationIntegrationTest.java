@@ -7,6 +7,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
+import fixture.MemberFixture;
+import fixture.PaymentFixture;
+import fixture.ReservationTimeFixture;
+import fixture.ThemeFixture;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +27,7 @@ import roomescape.member.entity.Member;
 import roomescape.member.entity.RoleType;
 import roomescape.member.repository.MemberRepository;
 import roomescape.payment.entity.Payment;
+import roomescape.payment.repository.PaymentRepository;
 import roomescape.payment.service.PaymentService;
 import roomescape.reservation.dto.request.ReservationAdminCreateRequest;
 import roomescape.reservation.dto.request.ReservationCreateRequest;
@@ -39,24 +44,25 @@ class ReservationIntegrationTest {
 
     @Autowired
     private ReservationService reservationService;
-
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
-
     @Autowired
     private ThemeRepository themeRepository;
-
     @Autowired
     private MemberRepository memberRepository;
-
     @MockitoBean
     private PaymentService paymentService;
+    @Autowired
+    private PaymentRepository paymentRepository;
+
+    private Payment payment;
 
     @BeforeEach
     void setUp() {
-        paymentService = mock(PaymentService.class);
+        payment = PaymentFixture.createDefault();
+        paymentRepository.save(payment);
         given(paymentService.confirmPayment(any(), any(), any()))
-                .willReturn(new Payment("any", "1", 100L, "any"));
+                .willReturn(payment);
     }
 
     @Test
@@ -243,18 +249,30 @@ class ReservationIntegrationTest {
     }
 
     @Test
-    @DisplayName("유저 예약 기록을 확인한다.")
+    @DisplayName("사용자 예약 기록 조회 - 성공")
     void getReservationsByMember() {
         // given
-        var member = memberRepository.save(new Member("테스트", "test@test.com", "password", RoleType.USER));
-        var time = reservationTimeRepository.save(new ReservationTime(LocalTime.of(10, 0)));
-        var theme = themeRepository.save(new Theme("테마1", "테마1 설명", "테마1 썸네일"));
-        var date = LocalDate.now().plusDays(1);
+        Member member = MemberFixture.createDefault();
+        memberRepository.save(member);
+
+        ReservationTime time = ReservationTimeFixture.create(LocalTime.of(10, 0));
+        reservationTimeRepository.save(time);
+
+        Theme theme = ThemeFixture.createDefault();
+        themeRepository.save(theme);
+
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+
         var request = new ReservationCreateRequest(
-                date,
+                tomorrow,
                 time.getId(),
                 theme.getId(),
-                new ReservationCreateRequest.PaymentDetail("any", "1", 100L, "any")
+                new ReservationCreateRequest.PaymentDetail(
+                        payment.getPaymentKey(),
+                        payment.getOrderId(),
+                        payment.getAmount(),
+                        payment.getPaymentType()
+                )
         );
         reservationService.createReservation(member.getId(), request);
 
@@ -262,6 +280,13 @@ class ReservationIntegrationTest {
         var response = reservationService.getReservationsByMember(member.getId());
 
         // then
-        assertThat(response).hasSize(1);
+        assertAll(
+                () -> assertThat(response).hasSize(1),
+                () -> assertThat(response.get(0).theme()).isEqualTo(theme.getName()),
+                () -> assertThat(response.get(0).date()).isEqualTo(tomorrow),
+                () -> assertThat(response.get(0).time()).isEqualTo(time.getStartAt()),
+                () -> assertThat(response.get(0).payment().paymentKey()).isEqualTo(payment.getPaymentKey()),
+                () -> assertThat(response.get(0).payment().amount()).isEqualTo(payment.getAmount())
+        );
     }
 }
