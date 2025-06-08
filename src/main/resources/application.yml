@@ -1,6 +1,8 @@
 spring:
   profiles:
     default: prod
+  jpa:
+    open-in-view: false
 
 api:
   toss:
