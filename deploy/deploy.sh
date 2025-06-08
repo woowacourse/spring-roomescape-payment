@@ -13,6 +13,10 @@ LOG_DIR="/home/ubuntu/logs"                             # 로그 디렉토리
 BACKUP_DIR="/home/ubuntu/backup"                        # 백업 디렉토리
 PORT=8080                                               # 서비스 포트
 PROFILE=${1:-prod}
+JAR_PATH="build/libs/$JAR_NAME"
+DATE=$(date +%Y%m%d)
+APP_LOG="$LOG_DIR/${APP_NAME}_${DATE}.log"
+ERROR_LOG="$LOG_DIR/${APP_NAME}_error_${DATE}.log"
 
 # 색상 코드 (로그 출력용)
 RED='\033[0;31m'
@@ -151,26 +155,19 @@ start_application() {
     exit 1
   fi
 
-  # 로그 파일명 설정 (날짜별로 구분)
-  DATE=$(date +%Y%m%d)
-  APP_LOG="$LOG_DIR/${APP_NAME}_${DATE}.log"
-  ERROR_LOG="$LOG_DIR/${APP_NAME}_error_${DATE}.log"
-
-  # nohup으로 백그라운드 실행
-  # 표준 출력과 에러를 분리하여 저장
-  nohup java -jar \
+  nohup java \
     -Dspring.profiles.active=$PROFILE \
     -Dserver.port=$PORT \
+    -Dlogging.config=classpath:log4j2-spring.xml \
     -Xmx1024m \
     -Xms512m \
-    "$JAR_PATH"
+    -jar "$JAR_PATH" \
+    &> /dev/null &
 
   # 프로세스 ID 저장
   echo $! >"$LOG_DIR/${APP_NAME}.pid"
 
   log_info "애플리케이션이 시작되었습니다. PID: $!"
-  log_info "애플리케이션 로그: $APP_LOG"
-  log_info "에러 로그: $ERROR_LOG"
 }
 
 check_application_status() {
@@ -237,20 +234,6 @@ check_application_status() {
     lsof -i:$PORT
   else
     log_error "포트 $PORT에 실행 중인 프로세스가 없습니다."
-  fi
-
-  # 최근 로그 확인
-  APP_LOG="$LOG_DIR/${APP_NAME}_$(date +%Y%m%d).log"
-  ERROR_LOG="$LOG_DIR/${APP_NAME}_error_$(date +%Y%m%d).log"
-
-  if [ -f "$ERROR_LOG" ]; then
-    log_error "최근 에러 로그 (마지막 20줄):"
-    tail -20 "$ERROR_LOG"
-  fi
-
-  if [ -f "$APP_LOG" ]; then
-    log_error "최근 애플리케이션 로그 (마지막 20줄):"
-    tail -20 "$APP_LOG"
   fi
 
   return 1
