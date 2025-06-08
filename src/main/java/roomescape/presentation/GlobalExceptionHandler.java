@@ -65,6 +65,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(code = NOT_FOUND)
     public ProblemDetail handleNotFound(final NotFoundException ex) {
+        logger.warn("예외 유형 - {}: {}", NOT_FOUND.getReasonPhrase(), ex.getMessage());
         return createProblemDetail(NOT_FOUND, "존재하지 않는 값입니다.", ex.getMessage());
     }
 

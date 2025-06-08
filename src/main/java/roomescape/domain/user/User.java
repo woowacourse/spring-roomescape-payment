@@ -16,11 +16,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 import roomescape.domain.RoomescapeSchedule;
 import roomescape.domain.reservation.Reservation;
 import roomescape.exception.AlreadyExistedException;
 import roomescape.exception.NotFoundException;
 
+@Slf4j
 @EqualsAndHashCode(of = {"id"})
 @Getter
 @Accessors(fluent = true)
@@ -82,6 +84,7 @@ public class User {
 
     public void cancelReservation(final Reservation reservation) {
         if (!reservations.contains(reservation)) {
+            log.warn("[예외 발생] 사용자에게 없는 예약 삭제 시도(사용자 id: {}, 예약 id: {})", this.id, reservation.id());
             throw new NotFoundException("해당 예약 내역이 존재하지 않습니다.");
         }
 
