@@ -1,0 +1,8 @@
+<included>
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <pattern>%clr(%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX}){faint} %clr([%-5level]) %clr([%-36.36X{traceId:-traceId}]){magenta} %clr(---){faint} %clr([%-15.15thread]){faint} %clr(%-40.40logger{36}){cyan} %clr(:){faint} %msg%n</pattern>
+      <charset>utf8</charset>
+    </encoder>
+  </appender>
+</included>
