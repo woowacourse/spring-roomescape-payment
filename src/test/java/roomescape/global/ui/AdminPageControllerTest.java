@@ -5,63 +5,22 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-import jakarta.servlet.http.Cookie;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.ResponseCookie;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import roomescape.auth.infrastructure.TokenProvider;
-import roomescape.auth.presentation.CookieManager;
-import roomescape.member.domain.Member;
-import roomescape.member.domain.MemberRole;
+import roomescape.global.config.AdminAuthBaseTest;
 
 @SpringBootTest
 @AutoConfigureRestDocs
 @AutoConfigureMockMvc
-class AdminPageControllerTest {
+class AdminPageControllerTest extends AdminAuthBaseTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private TokenProvider tokenProvider;
-
-    @Autowired
-    private CookieManager cookieManager;
-
-    private String adminToken;
-
-    @BeforeEach
-    void setUp() {
-        Member adminMember = Member.builder()
-                .id(1L)
-                .email("admin@example.com")
-                .password("password")
-                .name("관리자")
-                .role(MemberRole.ADMIN)
-                .build();
-
-        adminToken = tokenProvider.createToken(adminMember);
-    }
-
-    private MockHttpServletRequestBuilder addAuthCookie(MockHttpServletRequestBuilder request) {
-        ResponseCookie responseCookie = cookieManager.generateLoginCookie(adminToken);
-
-        Cookie cookie = new Cookie(
-                responseCookie.getName(),
-                responseCookie.getValue()
-        );
-
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        return request.cookie(cookie);
-    }
 
     @Test
     @DisplayName("관리자 홈페이지 접속 시 admin/index 뷰를 반환한다")
