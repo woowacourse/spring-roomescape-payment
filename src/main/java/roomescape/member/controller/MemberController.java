@@ -1,6 +1,7 @@
 package roomescape.member.controller;
 
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import roomescape.member.dto.response.MemberResponse;
 import roomescape.member.dto.response.SignUpResponse;
 import roomescape.member.service.MemberService;
 
+@Slf4j
 @RestController
 @RequestMapping("/members")
 public class MemberController {
@@ -30,7 +32,9 @@ public class MemberController {
 
     @PostMapping
     public ResponseEntity<SignUpResponse> signUp(final @RequestBody SignupRequest signupRequest) {
+        log.info("회원 가입 시도 email = {}", signupRequest.email());
         SignUpResponse response = memberService.signup(signupRequest);
+        log.info("회원 가입 성공 email = {}", signupRequest.email());
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

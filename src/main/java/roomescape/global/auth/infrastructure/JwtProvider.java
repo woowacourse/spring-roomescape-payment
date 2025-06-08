@@ -1,6 +1,7 @@
 package roomescape.global.auth.infrastructure;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
@@ -68,8 +69,8 @@ public class JwtProvider {
         try {
             return getAllClaimsFromToken(token).getExpiration()
                     .before(new Date());
-        } catch (IllegalArgumentException e) {
-            return false;
+        } catch (JwtException e) {
+            return true;
         }
     }
 }

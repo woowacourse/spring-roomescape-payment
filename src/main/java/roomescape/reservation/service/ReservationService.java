@@ -2,6 +2,7 @@ package roomescape.reservation.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import roomescape.global.auth.dto.UserInfo;
 import roomescape.member.domain.Member;
@@ -21,6 +22,7 @@ import roomescape.theme.domain.Theme;
 import roomescape.theme.exception.ThemeNotFoundException;
 import roomescape.theme.repository.ThemeRepository;
 
+@Slf4j
 @Service
 public class ReservationService {
 
@@ -76,11 +78,20 @@ public class ReservationService {
 
     public Reservation createReservation(final ReservationRequest request, final Long memberId) {
         ReservationTime time = reservationTimeRepository.findById(request.timeId())
-                .orElseThrow(() -> new ReservationTimeNotFoundException("요청한 id와 일치하는 예약 시간 정보가 없습니다."));
+                .orElseThrow(() -> {
+                    log.info("예약 시간 정보가 유효하지 않아 예약 생성 실패 timeId = {}", request.timeId());
+                    return new ReservationTimeNotFoundException("요청한 id와 일치하는 예약 시간 정보가 없습니다.");
+                });
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberNotFoundException("요청한 id와 일치하는 맴버 정보가 없습니다."));
+                .orElseThrow(() -> {
+                    log.info("맴버 정보가 유효하지 않아 예약 생성 실패 memberId = {}", memberId);
+                    return new MemberNotFoundException("요청한 id와 일치하는 맴버 정보가 없습니다.");
+                });
         Theme theme = themeRepository.findById(request.themeId())
-                .orElseThrow(() -> new ThemeNotFoundException("요청한 id와 일치하는 테마 정보가 없습니다."));
+                .orElseThrow(() -> {
+                    log.info("테마 정보가 유효하지 않아 예약 생성 실패 themeId = {}", request.themeId());
+                    return new ThemeNotFoundException("요청한 id와 일치하는 테마 정보가 없습니다.");
+                });
         ReservationInfo reservationInfo = new ReservationInfo(request.date(), time, theme);
         return reservationRepository.save(
                 Reservation.createUpcomingReservationWithUnassignedId(member, reservationInfo)

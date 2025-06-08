@@ -2,6 +2,7 @@ package roomescape.reservationtime.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservationtime.domain.ReservationTime;
@@ -10,9 +11,9 @@ import roomescape.reservationtime.dto.response.AvailableReservationTimeResponse;
 import roomescape.reservationtime.dto.response.ReservationTimeResponse;
 import roomescape.reservationtime.exception.ReservationTimeAlreadyExistsException;
 import roomescape.reservationtime.exception.ReservationTimeInUseException;
-import roomescape.reservationtime.exception.ReservationTimeNotFoundException;
 import roomescape.reservationtime.repository.ReservationTimeRepository;
 
+@Slf4j
 @Service
 public class ReservationTimeService {
 
@@ -33,6 +34,7 @@ public class ReservationTimeService {
 
     public void delete(Long id) {
         if (reservationRepository.existsByTimeId(id)) {
+            log.info("해당 시간에 대한 예약 존재로 인한 삭제 실패 timeId = {}", id);
             throw new ReservationTimeInUseException("해당 시간에 대한 예약이 존재하여 삭제할 수 없습니다.");
         }
         reservationTimeRepository.deleteById(id);
@@ -46,6 +48,7 @@ public class ReservationTimeService {
 
     void validateIsTimeUnique(final ReservationTimeCreateRequest request) {
         if (reservationTimeRepository.existsByStartAt(request.startAt())) {
+            log.info("중복된 예약 시간으로 인한 예약 시간 생성 실패 startAt = {}", request.startAt());
             throw new ReservationTimeAlreadyExistsException("중복된 예약 시간을 생성할 수 없습니다.");
         }
     }
@@ -53,14 +56,5 @@ public class ReservationTimeService {
     public List<AvailableReservationTimeResponse> getAvailableReservationTimes(final LocalDate date,
                                                                                final Long themeId) {
         return reservationRepository.findBookedTimesByDateAndThemeId(date, themeId);
-    }
-
-    public ReservationTime findReservationTime(final Long reservationTimeId) {
-        return reservationTimeRepository.findById(reservationTimeId)
-                .orElseThrow(() -> new ReservationTimeNotFoundException("요청한 id와 일치하는 예약 시간 정보가 없습니다."));
-    }
-
-    public ReservationTime save(final ReservationTime reservationTime) {
-        return reservationTimeRepository.save(reservationTime);
     }
 }

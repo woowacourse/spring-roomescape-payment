@@ -2,6 +2,7 @@ package roomescape.reservation.controller;
 
 import java.time.LocalDate;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +22,7 @@ import roomescape.reservation.dto.response.ReservationResponse;
 import roomescape.reservation.dto.response.ReservationResponseWithPayment;
 import roomescape.reservation.service.ReservationFacadeService;
 
+@Slf4j
 @RestController
 public class ReservationController {
 
@@ -46,8 +48,10 @@ public class ReservationController {
             @RequestBody ReservationCreateRequest request,
             UserInfo userInfo
     ) {
-
+        log.info("예약 생성 시도 memberId = {}, date = {}, timeId = {}, themeId = {}", userInfo.id(), request.getDate(),
+                request.getTimeId(), request.getThemeId());
         ReservationResponseWithPayment dto = reservationFacadeService.create(request, userInfo.id());
+        log.info("예약 생성 성공 memberId = {}, reservationId = {}", userInfo.id(), dto.id());
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
@@ -56,8 +60,11 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> createReservation(
             @RequestBody AdminReservationRequest request
     ) {
+        log.info("관리자 예약 생성 시도 date = {}, timeId = {}, themeId = {}", request.date(), request.timeId(),
+                request.themeId());
         ReservationResponse dto = reservationFacadeService.createForAdmin(request.getReservationRequest(),
                 request.memberId());
+        log.info("관리자 예약 생성 성공");
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
@@ -66,7 +73,9 @@ public class ReservationController {
     public ResponseEntity<Void> deleteReservations(
             @PathVariable("id") Long id
     ) {
+        log.info("예약 삭제 시도 reservationId = {}", id);
         reservationFacadeService.deleteReservation(id);
+        log.info("예약 삭제 성공 reservationId = {}", id);
         return ResponseEntity.noContent().build();
     }
 

@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.global.auth.dto.UserInfo;
@@ -22,6 +23,7 @@ import roomescape.reservation.exception.ReservationAlreadyExistsException;
 import roomescape.reservation.repository.dto.ReservationWithPayment;
 import roomescape.reservation.service.transaction.ReservationTransactionService;
 
+@Slf4j
 @Service
 public class ReservationFacadeService {
 
@@ -69,13 +71,16 @@ public class ReservationFacadeService {
 
     public ReservationResponseWithPayment create(final ReservationCreateRequest request, final Long memberId) {
         if (reservationService.isReservationExists(request.reservation())) {
+            log.info("기존 예약 존재로 인한 에약 생성 실패 memberId = {}", memberId);
             throw new ReservationAlreadyExistsException("이미 예약이 존재합니다.");
         }
         Payment payment = reservationTransactionService.createPaymentAndReservation(request, memberId);
 
         try {
             paymentService.sendPaymentRequest(request.payment());
+            log.info("예약 결제 성공 memberId = {}, amount = {}", memberId, request.getAmount());
         } catch (Exception e) {
+            log.info("예약 결제 실패 memberId = {}, errorMessage = {}", memberId, e.getMessage());
             paymentService.updatePaymentToFail(payment.getId());
             throw e;
         }
@@ -89,13 +94,17 @@ public class ReservationFacadeService {
         Reservation reservation = reservationService.findById(reservationId);
         reservationService.delete(reservationId);
         promoteWaiting(reservation.getInfo());
+
     }
 
     private void promoteWaiting(final ReservationInfo info) {
         if (waitingService.isWaitingExists(info)) {
             Waiting waiting = waitingService.findFirstWaitingOfInfo(info);
-            reservationService.createReservation(ReservationRequest.from(info), waiting.getMemberId());
+            log.info("대기 승급 시도 waitingId = {}", waiting.getId());
+            Reservation reservation = reservationService.createReservation(ReservationRequest.from(info),
+                    waiting.getMemberId());
             waitingService.delete(waiting.getId());
+            log.info("대기 승급 성공 reservationId = {}", reservation.getId());
         }
     }
 

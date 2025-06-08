@@ -1,5 +1,6 @@
 package roomescape.global.auth.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import roomescape.global.auth.dto.LoginRequest;
 import roomescape.global.auth.dto.LoginResponse;
@@ -9,6 +10,7 @@ import roomescape.global.auth.infrastructure.JwtProvider;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.JpaMemberRepository;
 
+@Slf4j
 @Component
 public class AuthService {
 
@@ -44,17 +46,22 @@ public class AuthService {
 
     private Member findMemberByEmail(final String email) {
         return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new UnAuthorizedException("존재하지 않은 사용자입니다."));
+                .orElseThrow(() -> {
+                    log.info("존재하지 이메일 정보로 로그인 실패 email = {}", email);
+                    return new UnAuthorizedException("존재하지 않은 사용자입니다.");
+                });
     }
 
     private void validateToken(final String token) {
         if (jwtProvider.isInvalidToken(token)) {
+            log.info("유효하지 않은 토큰 token = {}", token);
             throw new UnAuthorizedException("유효하지 않은 토큰입니다.");
         }
     }
 
     private void checkPassword(final String password, final Member member) {
         if (!myPasswordEncoder.matches(password, member.getPassword())) {
+            log.info("패스워드 불일치로 로그인 실패 email = {}", member.getEmail());
             throw new UnAuthorizedException("로그인에 실패하였습니다.");
         }
     }
