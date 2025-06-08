@@ -24,7 +24,7 @@ public record ReservationResponse(
         );
         ThemeResponse themeResponse = ThemeResponse.from(reservation.getTheme());
         MemberResponse memberResponse = MemberResponse.fromEntity(reservation.getMember());
-        PaymentResponse paymentResponse = PaymentResponse.fromEntity(reservation.getPayment());
+        PaymentResponse paymentResponse = getPaymentResponse(reservation);
 
         return new ReservationResponse(reservation.getId(),
                 memberResponse,
@@ -33,6 +33,14 @@ public record ReservationResponse(
                 themeResponse,
                 paymentResponse
         );
+    }
+
+    private static PaymentResponse getPaymentResponse(final Reservation reservation) {
+        PaymentResponse paymentResponse = null;
+        if (reservation.getPayment() != null) {
+            paymentResponse = PaymentResponse.fromEntity(reservation.getPayment());
+        }
+        return paymentResponse;
     }
 
     public static ReservationResponse fromWithoutPayment(final Reservation reservation) {

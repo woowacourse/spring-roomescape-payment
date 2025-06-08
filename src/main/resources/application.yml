@@ -2,6 +2,8 @@ spring:
   profiles:
     default: local
 
+---
+
 springdoc:
   api-docs:
     path: /v3/api-docs
@@ -9,6 +11,15 @@ springdoc:
     path: /swagger-ui.html
     operationsSorter: method
     tagsSorter: alpha
+
+---
+
+logging:
+  level:
+    root: info
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
 
 ---
 
@@ -23,10 +34,10 @@ spring:
   datasource:
     url: jdbc:h2:mem:database
   jpa:
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
     hibernate:
       ddl-auto: create-drop
     defer-datasource-initialization: true

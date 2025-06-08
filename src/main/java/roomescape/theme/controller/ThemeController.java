@@ -3,6 +3,8 @@ package roomescape.theme.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import roomescape.theme.service.ThemeService;
 import roomescape.theme.service.dto.request.ThemeRequest;
 import roomescape.theme.service.dto.response.ThemeResponse;
+import roomescape.waiting.controller.WaitingController;
 
 import java.net.URI;
 import java.util.List;
@@ -22,6 +25,8 @@ import java.util.List;
 @RestController
 @Tag(name = "테마 컨트롤러", description = "테마 관련 API 모음")
 public class ThemeController {
+
+    private static final Logger log = LoggerFactory.getLogger(WaitingController.class);
 
     private final ThemeService themeService;
 
@@ -48,8 +53,20 @@ public class ThemeController {
     @PostMapping
     @Operation(summary = "테마 생성", description = "이름,설명,썸네일을 포함한 테마를 생성합니다.")
     public ResponseEntity<ThemeResponse> create(@Valid @RequestBody final ThemeRequest request) {
+        log.info("[POST / ThemeCreate.Request] name={}, description={}, thumbnail={}",
+                request.name(),
+                request.description(),
+                request.thumbnail()
+        );
+
         ThemeResponse response = themeService.create(request);
 
+        log.info("[POST / ThemeCreate.Response] [SUCCESS] id={}, name={}, description={}, thumbnail={}",
+                response.id(),
+                response.name(),
+                response.description(),
+                response.thumbnail()
+        );
         return ResponseEntity.created(URI.create("/themes/" + response.id()))
                 .body(response);
     }
@@ -57,7 +74,9 @@ public class ThemeController {
     @DeleteMapping("/{id}")
     @Operation(summary = "테마 삭제", description = "선택한 테마를 삭제합니다.")
     public ResponseEntity<Void> delete(@PathVariable("id") final Long id) {
+        log.info("[DELETE / ThemeDelete.Request] id={}", id);
         themeService.delete(id);
+        log.info("[DELETE / ThemeDelete] [SUCCESS]");
 
         return ResponseEntity.noContent().build();
     }

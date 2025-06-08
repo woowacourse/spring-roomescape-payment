@@ -1,5 +1,7 @@
 package roomescape.reservation.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import roomescape.auth.service.dto.LoginMember;
 import roomescape.common.exception.EntityNotFoundException;
@@ -21,6 +23,8 @@ import java.util.List;
 
 @Service
 public class ReservationService {
+
+    private static final Logger log = LoggerFactory.getLogger(ReservationService.class);
 
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -72,6 +76,13 @@ public class ReservationService {
                 .toList();
     }
 
+    public List<ReservationTimeWithBookedResponse> getReservationTimesWithBooked(final LocalDate date, final Long themeId) {
+        return reservationTimeRepository.findAllWithBooked(date, themeId)
+                .stream()
+                .map(ReservationTimeWithBookedResponse::from)
+                .toList();
+    }
+
     public void delete(final Long id, LoginMember loginMember) {
         Reservation reservation = getAuthorizedReservation(id, loginMember);
         reservationRepository.deleteById(id);
@@ -95,12 +106,5 @@ public class ReservationService {
             waitingRepository.delete(firstWaiting);
             reservationRepository.save(Reservation.of(firstWaiting));
         }
-    }
-
-    public List<ReservationTimeWithBookedResponse> getReservationTimesWithBooked(final LocalDate date, final Long themeId) {
-         return reservationTimeRepository.findAllWithBooked(date, themeId)
-                 .stream()
-                 .map(ReservationTimeWithBookedResponse::from)
-                 .toList();
     }
 }
