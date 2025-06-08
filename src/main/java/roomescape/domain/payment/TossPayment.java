@@ -1,6 +1,8 @@
 package roomescape.domain.payment;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +19,7 @@ public class TossPayment extends BaseEntity {
 
     private long amount;
 
+    @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
 
     private TossPayment(
