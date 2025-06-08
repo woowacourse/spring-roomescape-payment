@@ -4,12 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.application.payment.toss.dto.TossPaymentCommand;
@@ -17,41 +15,32 @@ import roomescape.infrastructure.error.exception.PaymentException;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.util.Base64;
 
 @Component
 public class TossPaymentClient {
 
-    private static final String TOSS_PAYMENT_SERVER_URL = "https://api.tosspayments.com/v1/payments";
     private static final String CONFIRM_URI = "/confirm";
     private static final String AUTH_SCHEME = "Basic ";
 
     private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.class);
 
-    private final RestClient restClient;
+    private final RestClient tossPaymentClient;
+    private final String tossPaymentSecretKey;
     private final ObjectMapper objectMapper;
-    private final String secretKey;
 
     public TossPaymentClient(
-            final ObjectMapper objectMapper,
-            @Value("${toss-payment.secret-key}") final String secretKey) {
+            final RestClient tossPaymentClient,
+            final String tossPaymentSecretKey,
+            final ObjectMapper objectMapper) {
+        this.tossPaymentClient = tossPaymentClient;
+        this.tossPaymentSecretKey = tossPaymentSecretKey;
         this.objectMapper = objectMapper;
-        this.secretKey = secretKey;
-
-        final SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(Duration.ofSeconds(30));
-        requestFactory.setReadTimeout(Duration.ofSeconds(60));
-
-        this.restClient = RestClient.builder()
-                .baseUrl(TOSS_PAYMENT_SERVER_URL)
-                .requestFactory(requestFactory)
-                .build();
     }
 
     public void approve(final TossPaymentCommand command) {
         try {
-            restClient.post()
+            tossPaymentClient.post()
                     .uri(CONFIRM_URI)
                     .header(HttpHeaders.AUTHORIZATION, createAuthorizationHeader())
                     .body(command)
@@ -68,12 +57,8 @@ public class TossPaymentClient {
     }
 
     private String createAuthorizationHeader() {
-        final String encoded = Base64.getEncoder().encodeToString(buildSecretKey().getBytes(StandardCharsets.UTF_8));
+        final String encoded = Base64.getEncoder().encodeToString(tossPaymentSecretKey.getBytes(StandardCharsets.UTF_8));
         return AUTH_SCHEME + encoded;
-    }
-
-    private String buildSecretKey() {
-        return secretKey + ":";
     }
 
     private void handle4xxError(final HttpRequest httpRequest, final ClientHttpResponse clientHttpResponse) {
