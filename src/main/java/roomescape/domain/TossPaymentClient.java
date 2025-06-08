@@ -24,7 +24,7 @@ import roomescape.exception.custom.PaymentException;
 public class TossPaymentClient implements PaymentClient {
 
     private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.class);
-    public static String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
+    private static final String WIDGET_SECRET_KEY = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
 
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
