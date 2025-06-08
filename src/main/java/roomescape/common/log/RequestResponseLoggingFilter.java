@@ -7,7 +7,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -26,19 +28,23 @@ public class RequestResponseLoggingFilter extends OncePerRequestFilter {
         ContentCachingRequestWrapper cacheRequest = new ContentCachingRequestWrapper(request);
         ContentCachingResponseWrapper cacheResponse = new ContentCachingResponseWrapper(response);
 
+        String requestId = UUID.randomUUID().toString().substring(0, 8);
+        MDC.put("request_id", requestId);
         chain.doFilter(cacheRequest, cacheResponse);
         if (isNotLoggingUri(cacheRequest.getRequestURI())) {
+            MDC.remove(requestId);
             cacheResponse.copyBodyToResponse();
             return;
         }
-        generateLogging(cacheRequest, cacheResponse);
+        generateLogging(cacheRequest, cacheResponse, requestId);
     }
 
     private void generateLogging(ContentCachingRequestWrapper cacheRequest,
-        ContentCachingResponseWrapper cacheResponse) throws IOException {
+        ContentCachingResponseWrapper cacheResponse, String requestId) throws IOException {
         HttpLogMessage logMessage = HttpLogMessage.createInstance(cacheRequest, cacheResponse);
         log.info(logMessage.toString());
         cacheResponse.copyBodyToResponse();
+        MDC.remove(requestId);
     }
 
     /**
