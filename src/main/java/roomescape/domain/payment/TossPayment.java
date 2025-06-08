@@ -44,4 +44,12 @@ public class TossPayment extends BaseEntity {
     public void fail() {
         paymentStatus = PaymentStatus.FAILED;
     }
+
+    public boolean isApproved() {
+        return paymentStatus.isApproved();
+    }
+
+    public String getStatusDescription() {
+        return paymentStatus.getDescription();
+    }
 }

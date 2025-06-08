@@ -1,24 +1,25 @@
 package roomescape.application.reservation.query;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import roomescape.application.payment.PaymentQueryService;
+import roomescape.application.payment.PaymentResult;
 import roomescape.application.reservation.query.dto.ReservationResult;
 import roomescape.application.reservation.query.dto.ReservationSearchCondition;
+import roomescape.application.reservation.query.dto.ReservationWithStatusAndPaymentResult;
 import roomescape.application.reservation.query.dto.ReservationWithStatusResult;
 import roomescape.domain.reservation.Reservation;
 import roomescape.domain.reservation.repository.ReservationRepository;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
-@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class ReservationQueryService {
 
     private final ReservationRepository reservationRepository;
-
-    public ReservationQueryService(final ReservationRepository reservationRepository) {
-        this.reservationRepository = reservationRepository;
-    }
+    private final PaymentQueryService paymentQueryService;
 
     public List<ReservationResult> findAll() {
         final List<Reservation> reservations = reservationRepository.findAllWithMemberAndTimeAndTheme();
@@ -39,10 +40,24 @@ public class ReservationQueryService {
                 .toList();
     }
 
-    public List<ReservationWithStatusResult> findReservationsWithStatus(final Long memberId) {
-        return reservationRepository.findAllByMemberId(memberId)
-                .stream()
-                .map(ReservationWithStatusResult::from)
+    public List<ReservationWithStatusAndPaymentResult> getReservationsWithStatusAndPayment(final Long memberId) {
+        final List<ReservationWithStatusResult> reservationWithStatusResults =
+                reservationRepository.findAllByMemberId(memberId)
+                        .stream()
+                        .map(ReservationWithStatusResult::from)
+                        .toList();
+
+        final List<Long> reservationIds = reservationWithStatusResults.stream()
+                .map(ReservationWithStatusResult::reservationId)
+                .toList();
+
+        final Map<Long, PaymentResult> paymentResultByReservationId =
+                paymentQueryService.getAllPaymentResultsByReservationIds(reservationIds);
+
+        return reservationWithStatusResults.stream().
+                map(reservationWithStatusResult -> ReservationWithStatusAndPaymentResult.from(
+                        reservationWithStatusResult,
+                        paymentResultByReservationId.get(reservationWithStatusResult.reservationId())))
                 .toList();
     }
 }

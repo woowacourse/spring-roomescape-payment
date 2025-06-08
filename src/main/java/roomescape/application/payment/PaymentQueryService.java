@@ -1,0 +1,56 @@
+package roomescape.application.payment;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import roomescape.domain.payment.TossPayment;
+import roomescape.domain.payment.repository.TossPaymentRepository;
+import roomescape.domain.reservation.PaymentType;
+import roomescape.domain.reservation.ReservationPayment;
+import roomescape.domain.reservation.repository.ReservationPaymentRepository;
+import roomescape.infrastructure.error.exception.PaymentException;
+
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+@RequiredArgsConstructor
+@Service
+public class PaymentQueryService {
+
+    private final TossPaymentRepository tossPaymentRepository;
+    private final ReservationPaymentRepository reservationPaymentRepository;
+
+    public Map<Long, PaymentResult> getAllPaymentResultsByReservationIds(final List<Long> reservationIds) {
+        final List<ReservationPayment> reservationPayments =
+                reservationPaymentRepository.findAllByReservationIdIn(reservationIds);
+
+        final List<Long> paymentIds = reservationPayments.stream()
+                .filter(ReservationPayment::isTossPayment)
+                .map(ReservationPayment::getPaymentId)
+                .toList();
+
+        final Map<Long, TossPayment> tossPaymentById = tossPaymentRepository.findAllById(paymentIds).stream()
+                .collect(Collectors.toMap(TossPayment::getId, Function.identity()));
+
+        return reservationPayments.stream()
+                .collect(Collectors.toMap(
+                        ReservationPayment::getReservationId,
+                        rp -> getPaymentResult(rp, tossPaymentById)
+                ));
+    }
+
+    private PaymentResult getPaymentResult(final ReservationPayment rp, final Map<Long, TossPayment> tossPaymentById) {
+        return switch (rp.getPaymentType()) {
+            case TOSS -> {
+                final TossPayment tossPayment = tossPaymentById.get(rp.getPaymentId());
+                if (tossPayment == null) throw new PaymentException("존재하지 않는 결제입니다");
+                if (tossPayment.isApproved()) yield new PaymentResult(PaymentType.TOSS, tossPayment.getPaymentKey(), tossPayment.getAmount());
+                yield new PaymentResult(PaymentType.TOSS, tossPayment.getStatusDescription(), tossPayment.getAmount());
+            }
+            case ADMIN -> new PaymentResult(PaymentType.ADMIN, rp.getPaymentId() + "번 관리자", 0L);
+            default -> throw new PaymentException("존재하지 않는 결제입니다");
+        };
+    }
+}
+

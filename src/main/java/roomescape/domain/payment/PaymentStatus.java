@@ -16,4 +16,7 @@ public enum PaymentStatus {
 
     private final String description;
 
+    public boolean isApproved() {
+        return this == APPROVED;
+    }
 }

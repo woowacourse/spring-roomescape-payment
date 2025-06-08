@@ -40,7 +40,7 @@ public class PersonalReservationController {
     }
 
     private List<MyReservationResponse> getReservations(final Long memberId) {
-        return reservationQueryService.findReservationsWithStatus(memberId)
+        return reservationQueryService.getReservationsWithStatusAndPayment(memberId)
                 .stream()
                 .map(MyReservationResponse::from)
                 .toList();

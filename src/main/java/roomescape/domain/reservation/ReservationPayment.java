@@ -25,4 +25,12 @@ public class ReservationPayment extends BaseEntity {
         this.paymentType = paymentType;
         this.PaymentId = PaymentId;
     }
+
+    public boolean isTossPayment() {
+        return paymentType == PaymentType.TOSS;
+    }
+
+    public boolean isAdminPayment() {
+        return paymentType == PaymentType.ADMIN;
+    }
 }

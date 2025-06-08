@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum PaymentType {
 
     TOSS("토스"),
+    ADMIN("관리자")
     ;
 
     private final String description;

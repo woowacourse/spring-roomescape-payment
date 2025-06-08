@@ -1,6 +1,6 @@
 package roomescape.presentation.api.reservation.response;
 
-import roomescape.application.reservation.query.dto.ReservationWithStatusResult;
+import roomescape.application.reservation.query.dto.ReservationWithStatusAndPaymentResult;
 import roomescape.application.reservation.query.dto.WaitingWithRankResult;
 import roomescape.domain.reservation.ReservationStatus;
 
@@ -12,28 +12,34 @@ public record MyReservationResponse(
         LocalDate date,
         String time,
         String status,
-        ReservationResponseType type
+        ReservationResponseType type,
+        String paymentKey,
+        Long amount
 ) {
 
-    public static MyReservationResponse from(final ReservationWithStatusResult reservationWithStatusResult) {
+    public static MyReservationResponse from(final ReservationWithStatusAndPaymentResult result) {
         return new MyReservationResponse(
-                reservationWithStatusResult.reservationId(),
-                reservationWithStatusResult.themeName(),
-                reservationWithStatusResult.reservationDate(),
-                ReservationDateTimeFormat.TIME.format(reservationWithStatusResult.reservationTime()),
-                toDisplayStatus(reservationWithStatusResult.status()),
-                ReservationResponseType.RESERVE
+                result.reservationId(),
+                result.themeName(),
+                result.reservationDate(),
+                ReservationDateTimeFormat.TIME.format(result.reservationTime()),
+                toDisplayStatus(result.status()),
+                ReservationResponseType.RESERVE,
+                result.PaymentKey(),
+                result.amount()
         );
     }
 
-    public static MyReservationResponse from(final WaitingWithRankResult waitingWithRankResult) {
+    public static MyReservationResponse from(final WaitingWithRankResult result) {
         return new MyReservationResponse(
-                waitingWithRankResult.waitingId(),
-                waitingWithRankResult.themeName(),
-                waitingWithRankResult.reservationDate(),
-                ReservationDateTimeFormat.TIME.format(waitingWithRankResult.reservationTime()),
-                toDisplayStatus(waitingWithRankResult.waitingCount()),
-                ReservationResponseType.WAITING
+                result.waitingId(),
+                result.themeName(),
+                result.reservationDate(),
+                ReservationDateTimeFormat.TIME.format(result.reservationTime()),
+                toDisplayStatus(result.waitingCount()),
+                ReservationResponseType.WAITING,
+                "대기 중인 예약은 결제할 수 없습니다",
+                0L
         );
     }
 
