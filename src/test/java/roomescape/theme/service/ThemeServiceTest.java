@@ -1,27 +1,22 @@
 package roomescape.theme.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
 import roomescape.common.util.time.DateTime;
-import roomescape.reservation.domain.ReservationRepository;
-import roomescape.reservation.infrastructure.JpaReservationRepository;
-import roomescape.reservation.infrastructure.JpaReservationRepositoryAdapter;
-import roomescape.theme.domain.ThemeRepository;
 import roomescape.theme.exception.ThemeException;
-import roomescape.theme.infrastructure.JpaThemeRepository;
-import roomescape.theme.infrastructure.JpaThemeRepositoryAdaptor;
 import roomescape.theme.presentation.dto.PopularThemeResponse;
-import roomescape.theme.service.ThemeServiceTest.ThemeConfig;
 
-@DataJpaTest
-@Import(ThemeConfig.class)
+import java.time.LocalDateTime;
+import java.util.List;
+
+@SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ThemeServiceTest {
 
     @Autowired
@@ -45,26 +40,12 @@ class ThemeServiceTest {
         );
     }
 
+    @TestConfiguration
     static class ThemeConfig {
 
         @Bean
         public DateTime dateTime() {
             return () -> LocalDateTime.of(2025, 4, 29, 10, 0);
-        }
-
-        @Bean
-        public ThemeRepository themeRepository(JpaThemeRepository jpaThemeRepository) {
-            return new JpaThemeRepositoryAdaptor(jpaThemeRepository);
-        }
-
-        @Bean
-        public ReservationRepository reservationRepository(JpaReservationRepository jpaReservationRepository) {
-            return new JpaReservationRepositoryAdapter(jpaReservationRepository);
-        }
-
-        @Bean
-        public ThemeService themeService(DateTime dateTime, ThemeRepository themeRepository, ReservationRepository reservationRepository) {
-            return new ThemeService(dateTime, themeRepository, reservationRepository);
         }
     }
 }

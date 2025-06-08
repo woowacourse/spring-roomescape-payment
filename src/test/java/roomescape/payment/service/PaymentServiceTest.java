@@ -4,33 +4,28 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import roomescape.member.domain.Member;
+import roomescape.member.domain.MemberRepository;
 import roomescape.payment.domain.Payment;
-import roomescape.payment.domain.PaymentClient;
-import roomescape.payment.domain.PaymentRepository;
 import roomescape.payment.exception.PaymentRequestException;
-import roomescape.payment.infrastructure.JpaPaymentRepository;
-import roomescape.payment.infrastructure.JpaPaymentRepositoryAdapter;
 import roomescape.payment.infrastructure.dto.PaymentRequest;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservation.domain.Status;
-import roomescape.reservation.infrastructure.JpaReservationRepository;
-import roomescape.reservation.infrastructure.JpaReservationRepositoryAdapter;
 import roomescape.reservationTime.domain.ReservationTime;
+import roomescape.reservationTime.domain.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
-import roomescape.member.domain.Member;
+import roomescape.theme.domain.ThemeRepository;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
-@DataJpaTest
-@Import(PaymentServiceTest.PaymentConfig.class)
+@SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class PaymentServiceTest {
 
     private static final String PAYMENT_KEY = "tgen_20240513184816ZSAZ9";
@@ -43,12 +38,21 @@ class PaymentServiceTest {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    private ReservationTimeRepository reservationTimeRepository;
+
+    @Autowired
+    private ThemeRepository themeRepository;
+
+    @Autowired
+    private MemberRepository memberRepository;
+
     @DisplayName("결제 정보를 저장할 수 있다.")
     @Test
     void can_save_payment() {
-        ReservationTime time = ReservationTime.createWithoutId(LocalTime.of(10, 0));
-        Theme theme = Theme.createWithoutId("테마1", "테마1 설명", "테마1 썸네일");
-        Member member = Member.createWithoutId("테스터", "test@test.com", "password");
+        ReservationTime time = reservationTimeRepository.save(ReservationTime.createWithoutId(LocalTime.of(10, 0)));
+        Theme theme = themeRepository.save(Theme.createWithoutId("테마1", "테마1 설명", "테마1 썸네일"));
+        Member member = memberRepository.save(Member.createWithoutId("테스터", "test@test.com", "password"));
 
         Reservation reservation = Reservation.createWithoutId(
             LocalDate.of(2025, 4, 29),
@@ -88,27 +92,5 @@ class PaymentServiceTest {
         Assertions.assertThatThrownBy(() -> paymentService.findByReservationId(nonExistentReservationId))
             .isInstanceOf(PaymentRequestException.class)
             .hasMessage("결제 정보를 찾을 수 없습니다.");
-    }
-
-    static class PaymentConfig {
-        @Bean
-        public PaymentRepository paymentRepository(JpaPaymentRepository jpaPaymentRepository) {
-            return new JpaPaymentRepositoryAdapter(jpaPaymentRepository);
-        }
-
-        @Bean
-        public PaymentClient paymentClient() {
-            return mock(PaymentClient.class);
-        }
-
-        @Bean
-        public PaymentService paymentService(PaymentRepository paymentRepository, PaymentClient paymentClient) {
-            return new PaymentService(paymentClient, paymentRepository);
-        }
-
-        @Bean
-        public ReservationRepository reservationRepository(JpaReservationRepository jpaReservationRepository) {
-            return new JpaReservationRepositoryAdapter(jpaReservationRepository);
-        }
     }
 }

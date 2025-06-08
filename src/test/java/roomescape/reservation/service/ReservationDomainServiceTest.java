@@ -7,33 +7,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.DirtiesContext;
 import roomescape.auth.login.presentation.dto.LoginMemberInfo;
 import roomescape.common.util.time.DateTime;
-import roomescape.member.domain.MemberRepository;
-import roomescape.member.infrastructure.JpaMemberRepository;
-import roomescape.member.infrastructure.JpaMemberRepositoryAdapter;
 import roomescape.member.presentation.dto.MyReservationResponse;
-import roomescape.payment.domain.PaymentRepository;
-import roomescape.payment.infrastructure.JpaPaymentRepository;
-import roomescape.payment.infrastructure.JpaPaymentRepositoryAdapter;
-import roomescape.reservation.domain.ReservationRepository;
-import roomescape.reservation.domain.WaitingRepository;
 import roomescape.reservation.exception.ReservationException;
-import roomescape.reservation.infrastructure.JpaReservationRepository;
-import roomescape.reservation.infrastructure.JpaReservationRepositoryAdapter;
-import roomescape.reservation.infrastructure.JpaWaitingRepository;
-import roomescape.reservation.infrastructure.JpaWaitingRepositoryAdapter;
 import roomescape.reservation.presentation.dto.ReservationRequest;
 import roomescape.reservation.presentation.dto.ReservationResponse;
-import roomescape.reservationTime.domain.ReservationTimeRepository;
-import roomescape.reservationTime.infrastructure.JpaReservationTimeRepository;
-import roomescape.reservationTime.infrastructure.JpaReservationTimeRepositoryAdaptor;
-import roomescape.theme.domain.ThemeRepository;
-import roomescape.theme.infrastructure.JpaThemeRepository;
-import roomescape.theme.infrastructure.JpaThemeRepositoryAdaptor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,10 +25,9 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static roomescape.reservation.service.ReservationDomainServiceTest.*;
 
-@DataJpaTest
-@Import(ReservationDomainConfig.class)
+@SpringBootTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ReservationDomainServiceTest {
 
     private static final String paymentKey = "tgen_20240513184816ZSAZ9";
@@ -135,62 +117,11 @@ class ReservationDomainServiceTest {
             .hasMessage("예약을 찾을 수 없습니다.");
     }
 
+    @TestConfiguration
     static class ReservationDomainConfig {
-
         @Bean
         public DateTime dateTime() {
             return () -> LocalDateTime.of(2025, 4, 28, 10, 0);
-        }
-
-        @Bean
-        public ReservationRepository reservationRepository(JpaReservationRepository jpaReservationRepository) {
-            return new JpaReservationRepositoryAdapter(jpaReservationRepository);
-        }
-
-        @Bean
-        public ReservationTimeRepository reservationTimeRepository(JpaReservationTimeRepository jpaReservationTimeRepository) {
-            return new JpaReservationTimeRepositoryAdaptor(jpaReservationTimeRepository);
-        }
-
-        @Bean
-        public ThemeRepository themeRepository(JpaThemeRepository jpaThemeRepository) {
-            return new JpaThemeRepositoryAdaptor(jpaThemeRepository);
-        }
-
-        @Bean
-        public MemberRepository memberRepository(JpaMemberRepository jpaMemberRepository) {
-            return new JpaMemberRepositoryAdapter(jpaMemberRepository);
-        }
-
-        @Bean
-        public WaitingRepository waitingRepository(JpaWaitingRepository jpaWaitingRepository) {
-            return new JpaWaitingRepositoryAdapter(jpaWaitingRepository);
-        }
-
-        @Bean
-        public PaymentRepository paymentRepository(JpaPaymentRepository jpaPaymentRepository) {
-            return new JpaPaymentRepositoryAdapter(jpaPaymentRepository);
-        }
-
-        @Bean
-        public ReservationDomainService reservationDomainService(
-            DateTime dateTime,
-            ReservationRepository reservationRepository,
-            ReservationTimeRepository reservationTimeRepository,
-            ThemeRepository themeRepository,
-            MemberRepository memberRepository,
-            WaitingRepository waitingRepository,
-            PaymentRepository paymentRepository
-        ) {
-            return new ReservationDomainService(
-                dateTime,
-                reservationRepository,
-                reservationTimeRepository,
-                themeRepository,
-                memberRepository,
-                waitingRepository,
-                paymentRepository
-                );
         }
     }
 }
