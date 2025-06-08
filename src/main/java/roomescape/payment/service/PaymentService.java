@@ -1,5 +1,7 @@
 package roomescape.payment.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.client.dto.response.TossPaymentResponse;
@@ -11,6 +13,7 @@ import roomescape.payment.domain.PaymentStatus;
 @Service
 public class PaymentService {
 
+    private static final Logger log = LoggerFactory.getLogger(PaymentService.class);
     private final PaymentRepository paymentRepository;
 
     public PaymentService(PaymentRepository paymentRepository) {
@@ -37,6 +40,9 @@ public class PaymentService {
     }
 
     private Payment getPayment(Long paymentId) {
-        return paymentRepository.findById(paymentId).orElseThrow(() -> new InvalidReservationException("존재하지 않는 결제입니다."));
+        return paymentRepository.findById(paymentId).orElseThrow(() -> {
+            log.warn("결제 조회 실패 - 존재하지 않는 결제 paymentId: {}", paymentId);
+            return new InvalidReservationException("존재하지 않는 결제입니다.");
+        });
     }
 }

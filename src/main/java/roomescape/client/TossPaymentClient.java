@@ -34,6 +34,8 @@ public class TossPaymentClient {
     }
 
     public ResponseEntity<TossPaymentResponse> confirmPayment(TossPaymentConfirmRequest request) {
+        log.info("Toss 결제 확인 요청 시작 - paymentKey: {}, orderId: {}, amount: {}", request.paymentKey(), request.orderId(), request.amount());
+
         try {
             return tossRestClient.post()
                     .uri("/payments/confirm")
@@ -42,12 +44,13 @@ public class TossPaymentClient {
                     .toEntity(TossPaymentResponse.class);
         } catch (HttpStatusCodeException e) {
             String rawResponse = e.getResponseBodyAsString();
-            log.error("Toss 서버 에러 응답: {}", rawResponse);
+            log.error("Toss 결제 확인 실패 - HTTP 상태: {}, 응답 바디: {}", e.getStatusCode(), rawResponse);
+
             try {
                 TossPaymentResponse errorBody = objectMapper.readValue(e.getResponseBodyAsString(), TossPaymentResponse.class);
                 return ResponseEntity.status(e.getStatusCode()).body(errorBody);
             } catch (Exception parseError) {
-                log.error("json 파싱 실패: {}", parseError.getMessage());
+                log.error("Toss 에러 응답 파싱 실패: {}", parseError.getMessage());
                 throw new InternalServerException();
             }
         }
@@ -62,11 +65,14 @@ public class TossPaymentClient {
         TossErrorResponse failure = response.getBody().failure();
 
         if (response.getStatusCode().is4xxClientError() || response.getStatusCode().is5xxServerError()) {
+            log.error("Toss 결제 실패 처리 - 상태 코드: {}, 실패 코드: {}, 메시지: {}", response.getStatusCode(), failure.code(), failure.message());
             if (IGNORABLE_CODE.contains(failure.code())) {
                 throw new InternalServerException();
             }
+
             throw new PaymentException(response.getStatusCode(), "결제 실패 : " + failure.message());
         }
+        log.error("알 수 없는 Toss 결제 오류 발생 - 상태 코드: {}, 실패 코드: {}, 메시지: {}", response.getStatusCode(), failure != null ? failure.code() : "null", failure != null ? failure.message() : "null");
         throw new InternalServerException();
     }
 }

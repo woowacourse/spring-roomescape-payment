@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.InvalidReservationException;
@@ -29,6 +32,7 @@ import roomescape.waiting.domain.WaitingRepository;
 @Service
 public class ReservationService {
 
+    private static final Logger log = LoggerFactory.getLogger(ReservationService.class);
     private final DateTime dateTime;
     private final ReservationRepository reservationRepository;
     private final ReservationTimeRepository reservationTimeRepository;
@@ -36,8 +40,9 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final WaitingRepository waitingRepository;
     private final PaymentRepository paymentRepository;
+    private final FilterRegistrationBean resourceUrlEncodingFilter;
 
-    public ReservationService(DateTime dateTime, ReservationRepository reservationRepository, ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository, MemberRepository memberRepository, WaitingRepository waitingRepository, PaymentRepository paymentRepository) {
+    public ReservationService(DateTime dateTime, ReservationRepository reservationRepository, ReservationTimeRepository reservationTimeRepository, ThemeRepository themeRepository, MemberRepository memberRepository, WaitingRepository waitingRepository, PaymentRepository paymentRepository, FilterRegistrationBean resourceUrlEncodingFilter) {
         this.dateTime = dateTime;
         this.reservationRepository = reservationRepository;
         this.reservationTimeRepository = reservationTimeRepository;
@@ -45,6 +50,7 @@ public class ReservationService {
         this.memberRepository = memberRepository;
         this.waitingRepository = waitingRepository;
         this.paymentRepository = paymentRepository;
+        this.resourceUrlEncodingFilter = resourceUrlEncodingFilter;
     }
 
     @Transactional
@@ -54,16 +60,26 @@ public class ReservationService {
         Reservation reservation = getReservation(request, memberId, payment);
         Reservation savedReservation = reservationRepository.save(reservation);
 
+        log.info("예약 생성 성공: reservationId={}, paymentId={}", savedReservation.getId(), payment.getId());
         return ReservationWithPaymentResponse.from(savedReservation, payment);
     }
 
     private Reservation getReservation(ReservationWithPaymentRequest request, Long memberId, Payment payment) {
         ReservationTime time = reservationTimeRepository.findById(request.timeId())
-                .orElseThrow(() -> new InvalidReservationException("존재하지 않는 시간입니다."));
+                .orElseThrow(() -> {
+                    log.warn("예약 시간 없음: timeId={}", request.timeId());
+                    return new InvalidReservationException("존재하지 않는 시간입니다.");
+                });
         Theme theme = themeRepository.findById(request.themeId())
-                .orElseThrow(() -> new InvalidReservationException("존재하지 않는 테마입니다."));
+                .orElseThrow(() -> {
+                    log.warn("예약 테마 없음: themeId={}", request.themeId());
+                    return new InvalidReservationException("존재하지 않는 테마입니다.");
+                });
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new InvalidReservationException("존재 하지 않는 유저입니다."));
+                .orElseThrow(() -> {
+                    log.warn("예약 유저 없음: memberId={}", memberId);
+                    return new InvalidReservationException("존재 하지 않는 유저입니다.");
+                });
 
         Reservation reservation = Reservation.createWithoutId(dateTime.now(), member, request.date(), time, theme, payment);
 
@@ -72,6 +88,7 @@ public class ReservationService {
                 reservation.getReservationTime(),
                 reservation.getThemeId()
         )) {
+            log.warn("중복 예약 시도됨: date={}, time={}, themeId={}", reservation.getDate(), reservation.getReservationTime(), reservation.getThemeId());
             throw new InvalidReservationException("이미 예약이 존재합니다.");
         }
         return reservation;
@@ -97,8 +114,12 @@ public class ReservationService {
     @Transactional
     public void deleteReservationById(final Long id) {
         Reservation reservation = reservationRepository.findById(id)
-                .orElseThrow(() -> new InvalidReservationException("존재하지 않는 예약입니다."));
+                .orElseThrow(() -> {
+                    log.warn("삭제 실패 - 예약 존재하지 않음: reservationId={}", id);
+                    return new InvalidReservationException("존재하지 않는 예약입니다.");
+                });
         reservationRepository.deleteById(id);
+        log.info("예약 삭제 완료: reservationId={}", id);
 
         List<Waiting> waitings = waitingRepository.findByDateAndThemeIdAndTimeIdOrderByCreatedAtAsc(
                 reservation.getDate(),
@@ -126,6 +147,7 @@ public class ReservationService {
         reservationRepository.save(newReservation);
 
         waitingRepository.delete(firstWaiting);
+        log.info("대기자 예약 처리 완료: newReservationId={}", newReservation.getId());
     }
 
     @Transactional(readOnly = true)
