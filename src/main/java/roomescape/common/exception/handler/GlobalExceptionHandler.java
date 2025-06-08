@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.SocketTimeoutException;
 import java.time.format.DateTimeParseException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,6 +21,7 @@ import roomescape.payment.exception.PaymentForbiddenException;
 import roomescape.payment.exception.PaymentServerException;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     private final ObjectMapper objectMapper;
@@ -86,5 +88,11 @@ public class GlobalExceptionHandler {
             return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).body("요청 시간이 초과되었습니다.");
         }
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("서비스 연결에 문제가 발생하였습니다.");
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleException(Exception e) {
+        log.error("예상하지 못한 에러가 발생하였습니다.");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("일시적인 문제로 요청이 처리되지 않았습니다. 잠시 후 다시 시도해 주세요.");
     }
 }
