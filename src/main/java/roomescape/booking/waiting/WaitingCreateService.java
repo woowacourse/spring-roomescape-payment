@@ -41,14 +41,15 @@ public class WaitingCreateService {
     private Waiting saveWaiting(final LoginMember loginMember, final Schedule schedule) {
         final Member member = memberService.getByEmail(loginMember.email());
         final Waiting waiting = new Waiting(schedule, member, LocalDateTime.now());
+        Waiting savedWaiting = waitingRepository.save(waiting);
         log.info("[{}] EVENT: WAITING_CREATED, id={}, memberId={}, themeId={}, date={}, time={}",
                 MDC.get("requestId"),
-                waiting.getId(),
-                waiting.getMember().getId(),
-                waiting.getSchedule().getId(),
-                waiting.getSchedule().getDate(),
-                waiting.getSchedule().getReservationTime().getStartAt());
-        return waitingRepository.save(waiting);
+                savedWaiting.getId(),
+                savedWaiting.getMember().getId(),
+                savedWaiting.getSchedule().getId(),
+                savedWaiting.getSchedule().getDate(),
+                savedWaiting.getSchedule().getReservationTime().getStartAt());
+        return savedWaiting;
     }
 
     private void validatePast(final Schedule schedule) {
