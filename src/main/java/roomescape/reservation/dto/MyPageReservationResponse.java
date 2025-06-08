@@ -3,13 +3,16 @@ package roomescape.reservation.dto;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import roomescape.reservation.domain.Reservation;
 import roomescape.waiting.domain.ReservationWaiting;
 
 public record MyPageReservationResponse(
         Long id,
         String theme,
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
         LocalDate date,
+        @DateTimeFormat(pattern = "HH:mm")
         LocalTime time,
         String status,
         String paymentKey,

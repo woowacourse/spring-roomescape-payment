@@ -6,4 +6,8 @@ public class InternalServerException extends RoomEscapeException {
     public InternalServerException(String errorCode, String message) {
         super(HttpStatus.INTERNAL_SERVER_ERROR, errorCode, message);
     }
+
+    public InternalServerException(ErrorCode errorCode) {
+        super(HttpStatus.INTERNAL_SERVER_ERROR, errorCode.name(), errorCode.getMessage());
+    }
 }

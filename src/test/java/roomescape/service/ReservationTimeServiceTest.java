@@ -15,6 +15,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
+import roomescape.exception.BadRequestException;
+import roomescape.exception.NotFoundException;
 import roomescape.reservation.service.ReservationService;
 import roomescape.time.dto.ReservationTimeRequest;
 import roomescape.time.dto.ReservationTimeResponse;
@@ -86,7 +88,7 @@ class ReservationTimeServiceTest {
 
         //should
         assertThatThrownBy(() -> reservationTimeService.removeReservationTime(id)).isInstanceOf(
-                NoSuchElementException.class);
+                BadRequestException.class);
 
     }
 }

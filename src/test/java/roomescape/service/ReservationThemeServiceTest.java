@@ -14,6 +14,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.TestPropertySource;
+import roomescape.exception.BadRequestException;
+import roomescape.exception.NotFoundException;
 import roomescape.theme.dto.ReservationThemeRequest;
 import roomescape.theme.dto.ReservationThemeResponse;
 import roomescape.theme.service.ReservationThemeService;
@@ -72,7 +74,7 @@ class ReservationThemeServiceTest {
 
         //when & then
         assertThatThrownBy(() -> reservationThemeService.removeReservationTheme(id)).isInstanceOf(
-                NoSuchElementException.class);
+                BadRequestException.class);
 
     }
 

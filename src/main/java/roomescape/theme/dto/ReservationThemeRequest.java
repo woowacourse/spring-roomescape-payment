@@ -1,4 +1,9 @@
 package roomescape.theme.dto;
 
-public record ReservationThemeRequest(String name, String description, String thumbnail) {
+public record ReservationThemeRequest(
+        String name,
+        String description,
+        String thumbnail
+) {
+
 }

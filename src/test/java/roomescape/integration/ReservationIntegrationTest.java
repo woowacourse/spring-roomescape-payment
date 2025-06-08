@@ -77,7 +77,7 @@ class ReservationIntegrationTest {
 
     @Nested
     class FailureTest {
-        @DisplayName("존재하지 않는 예약을 삭제하려는 경우 404 Not Found를 던진다")
+        @DisplayName("존재하지 않는 예약을 삭제하려는 경우 400 BadRequest를 던진다")
         @Test
         void reservationRemoveTest() {
             //given
@@ -89,7 +89,7 @@ class ReservationIntegrationTest {
                     .sessionId(sessionId)
                     .when().delete("/reservations/" + notExistId)
                     .then().log().all()
-                    .statusCode(404);
+                    .statusCode(400);
         }
 
         @DisplayName("이전 시각으로 예약을 요청하는 경우 400 Bad Request를 던진다")
@@ -110,7 +110,7 @@ class ReservationIntegrationTest {
                     .statusCode(400);
         }
 
-        @DisplayName("같은 날짜 및 시간 예약이 존재하면 400 Bad Request를 던진다")
+        @DisplayName("같은 날짜 및 시간 예약이 존재하면 409 CONFLICT를 던진다")
         @Test
         void reservationAddDuplicatedTest() {
             //given
@@ -146,7 +146,7 @@ class ReservationIntegrationTest {
                     .body(duplicated)
                     .when().post("/reservations")
                     .then().log().all()
-                    .statusCode(400);
+                    .statusCode(409);
         }
     }
 }

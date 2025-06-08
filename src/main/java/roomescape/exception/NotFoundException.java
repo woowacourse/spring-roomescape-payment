@@ -6,4 +6,8 @@ public class NotFoundException extends RoomEscapeException {
     public NotFoundException(String errorCode, String message) {
         super(HttpStatus.NOT_FOUND, errorCode, message);
     }
+
+    public NotFoundException(ErrorCode errorCode) {
+        super(HttpStatus.NOT_FOUND, errorCode.name(), errorCode.getMessage());
+    }
 }

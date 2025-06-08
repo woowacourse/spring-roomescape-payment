@@ -9,4 +9,5 @@ public record ReservationWaitingRequest(
         long themeId,
         long timeId
 ) {
+
 }

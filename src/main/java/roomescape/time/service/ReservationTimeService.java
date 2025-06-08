@@ -3,8 +3,9 @@ package roomescape.time.service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
+import roomescape.exception.BadRequestException;
+import roomescape.exception.ErrorCode;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.time.domain.ReservationTime;
 import roomescape.time.dto.AvailableReservationTimeResponse;
@@ -45,25 +46,25 @@ public class ReservationTimeService {
 
     public ReservationTime getById(final long id) {
         return reservationTimeRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 예약 시간을 찾을 수 없습니다."));
+                .orElseThrow(() -> new BadRequestException(ErrorCode.TIME_NOT_FOUND));
     }
 
     private void validateUniqueReservationTime(final ReservationTime reservationTime) {
         final LocalTime startAt = reservationTime.getStartAt();
         if (reservationTimeRepository.existsByStartAt(startAt)) {
-            throw new IllegalArgumentException("[ERROR] 이미 존재하는 예약 시간 입니다.");
+            throw new BadRequestException(ErrorCode.TIME_ALREADY_EXISTS);
         }
     }
 
     private void validateExistReservation(final long id) {
         if (reservationRepository.existByTimeId(id)) {
-            throw new IllegalArgumentException("[ERROR] 예약이 존재하는 시간 이므로 삭제할 수 없습니다.");
+            throw new BadRequestException(ErrorCode.TIME_HAS_RESERVATION);
         }
     }
 
     private void validateExistTime(final long id) {
         if (!reservationTimeRepository.existsById(id)) {
-            throw new NoSuchElementException("[ERROR] 존재하지 않는 시간 입니다.");
+            throw new BadRequestException(ErrorCode.TIME_NOT_FOUND);
         }
     }
 

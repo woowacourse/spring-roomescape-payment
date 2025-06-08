@@ -20,6 +20,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import roomescape.exception.BadRequestException;
+import roomescape.exception.ErrorCode;
 import roomescape.member.domain.Member;
 import roomescape.payment.domain.Payment;
 import roomescape.theme.domain.ReservationTheme;
@@ -80,7 +82,7 @@ public class Reservation {
         final LocalDateTime now = LocalDateTime.now();
         final LocalDateTime dateTime = LocalDateTime.of(date, time.getStartAt());
         if (dateTime.isBefore(now) || dateTime.isEqual(now)) {
-            throw new IllegalArgumentException("[ERROR] 예약시간은 과거일 수 없습니다.");
+            throw new BadRequestException(ErrorCode.RESERVATION_MUST_BE_FUTURE);
         }
     }
 }

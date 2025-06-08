@@ -6,10 +6,8 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 import roomescape.time.domain.ReservationTime;
 
-@Repository
 public interface ReservationTimeJpaRepository extends JpaRepository<ReservationTime, Long> {
     boolean existsByStartAt(final LocalTime startAt);
 

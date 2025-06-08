@@ -1,6 +1,7 @@
 package roomescape.reservation.dto;
 
 import java.time.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
 import roomescape.reservation.domain.Reservation;
 import roomescape.theme.dto.ReservationThemeResponse;
 import roomescape.time.dto.ReservationTimeResponse;
@@ -8,6 +9,7 @@ import roomescape.time.dto.ReservationTimeResponse;
 public record ReservationResponse(
         long id,
         String name,
+        @DateTimeFormat(pattern = "yyyy-MM-dd")
         LocalDate date,
         ReservationTimeResponse time,
         ReservationThemeResponse theme) {

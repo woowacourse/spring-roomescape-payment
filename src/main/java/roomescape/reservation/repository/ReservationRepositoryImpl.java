@@ -3,18 +3,16 @@ package roomescape.reservation.repository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 import roomescape.reservation.domain.Reservation;
 
 @Repository
+@RequiredArgsConstructor
 public class ReservationRepositoryImpl implements ReservationRepository {
 
     private final ReservationJpaRepository reservationJpaRepository;
-
-    public ReservationRepositoryImpl(final ReservationJpaRepository reservationJpaRepository) {
-        this.reservationJpaRepository = reservationJpaRepository;
-    }
 
     @Override
     public Optional<Reservation> findById(final long id) {

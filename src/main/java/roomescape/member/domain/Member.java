@@ -52,4 +52,8 @@ public class Member {
     public void updateSessionId(final String sessionId) {
         this.sessionId = sessionId;
     }
+
+    public boolean isAdmin() {
+        return this.role == MemberRole.ADMIN;
+    }
 }

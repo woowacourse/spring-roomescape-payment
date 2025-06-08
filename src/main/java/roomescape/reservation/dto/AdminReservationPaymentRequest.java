@@ -14,4 +14,5 @@ public record AdminReservationPaymentRequest(
         String paymentType,
         long memberId
 ) {
+
 }

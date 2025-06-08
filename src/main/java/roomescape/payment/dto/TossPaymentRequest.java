@@ -5,4 +5,5 @@ public record TossPaymentRequest(
         String paymentKey,
         long amount
 ) {
+
 }

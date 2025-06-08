@@ -2,35 +2,34 @@ package roomescape.member.service;
 
 import jakarta.transaction.Transactional;
 import java.util.Base64;
-import java.util.NoSuchElementException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import roomescape.exception.ErrorCode;
+import roomescape.exception.NotFoundException;
+import roomescape.exception.UnauthorizedException;
 import roomescape.member.domain.Member;
 import roomescape.member.dto.LoginRequest;
 import roomescape.member.repository.MemberRepository;
 
-
 @Service
-@Transactional
+@RequiredArgsConstructor
 public class AuthService {
 
     private final MemberRepository memberRepository;
 
-    public AuthService(final MemberRepository memberRepository) {
-        this.memberRepository = memberRepository;
-    }
-
     public Member getMemberByEmailAndPassword(final LoginRequest loginRequest) {
         final Member member = memberRepository.findByEmail(loginRequest.email())
-                .orElseThrow(() -> new IllegalArgumentException("[ERROR] 사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new UnauthorizedException(ErrorCode.MEMBER_NOT_FOUND));
         if (!matches(loginRequest.password(), member.getPassword())) {
-            throw new IllegalArgumentException("[ERROR] 비밀번호가 일치 하지않습니다.");
+            throw new UnauthorizedException(ErrorCode.PASSWORD_MISMATCH);
         }
         return member;
     }
 
+    @Transactional
     public void updateSessionId(final Member member, final String sessionId) {
         final Member foundMember = memberRepository.findById(member.getId())
-                .orElseThrow(() -> new NoSuchElementException("[ERROR] 회원을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
         foundMember.updateSessionId(sessionId);
         memberRepository.save(foundMember);
     }

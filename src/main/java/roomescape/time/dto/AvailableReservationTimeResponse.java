@@ -9,6 +9,7 @@ public record AvailableReservationTimeResponse(
         @JsonFormat(pattern = "HH:mm") LocalTime startAt,
         boolean isBooked
 ) {
+
     public static AvailableReservationTimeResponse of(final ReservationTime reservationTime, final boolean isBooked) {
         return new AvailableReservationTimeResponse(
                 reservationTime.getId(),

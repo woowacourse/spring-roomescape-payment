@@ -3,6 +3,7 @@ package roomescape.time.controller;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,14 +20,11 @@ import roomescape.time.dto.ReservationTimeResponse;
 import roomescape.time.service.ReservationTimeService;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/times")
 public class ReservationTimeController {
 
     private final ReservationTimeService reservationTimeService;
-
-    public ReservationTimeController(final ReservationTimeService reservationService) {
-        this.reservationTimeService = reservationService;
-    }
 
     @GetMapping()
     public ResponseEntity<List<ReservationTimeResponse>> reservationTimeList() {

@@ -3,11 +3,11 @@ package roomescape.global;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
+import roomescape.exception.ErrorCode;
+import roomescape.exception.UnauthorizedException;
 import roomescape.member.domain.Member;
-import roomescape.member.domain.MemberRole;
 import roomescape.member.service.MemberService;
 
 
@@ -22,29 +22,21 @@ public class AuthInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler)
-            throws Exception {
-
-        final String requestURI = request.getRequestURI();
-
+    public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response,
+                             final Object handler) {
+        String requestURI = request.getRequestURI();
         if (requestURI.startsWith("/admin")) {
             HttpSession session = request.getSession(false);
-
             if (session == null || session.getAttribute(SESSION_KEY) == null) {
-                response.sendError(HttpStatus.UNAUTHORIZED.value(), "[ERROR] 로그인이 필요합니다.");
-                return false;
+                throw new UnauthorizedException(ErrorCode.LOGIN_NEEDED);
             }
-
-            final Long memberId = (Long) session.getAttribute(SESSION_KEY);
-
-            final Member member = memberService.getMemberById(memberId);
-
-            if (MemberRole.ADMIN != member.getRole()) {
-                response.sendError(HttpStatus.UNAUTHORIZED.value(), "[ERROR] 관리자 권한이 필요합니다.");
-                return false;
+            Long memberId = (Long) session.getAttribute(SESSION_KEY);
+            Member member = memberService.getMemberById(memberId);
+            if (member.isAdmin()) {
+                return true;
             }
+            throw new UnauthorizedException(ErrorCode.ADMIN_ONLY);
         }
-
         return true;
     }
 }

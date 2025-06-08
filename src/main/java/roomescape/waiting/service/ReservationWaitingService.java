@@ -1,9 +1,11 @@
 package roomescape.waiting.service;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import roomescape.exception.BadRequestException;
+import roomescape.exception.ConflictException;
+import roomescape.exception.ErrorCode;
 import roomescape.member.domain.Member;
 import roomescape.member.service.MemberService;
 import roomescape.reservation.repository.ReservationRepository;
@@ -42,7 +44,7 @@ public class ReservationWaitingService {
 
     private void validateReservationWaiting(final long id) {
         if (!reservationWaitingRepository.existsById(id)) {
-            throw new NoSuchElementException("[ERROR] 존재하지 않는 예약대기 입니다.");
+            throw new BadRequestException(ErrorCode.WAITING_NOT_FOUND);
         }
     }
 
@@ -60,14 +62,14 @@ public class ReservationWaitingService {
                 request.timeId(),
                 request.date()
         )) {
-            throw new IllegalArgumentException("[ERROR] 중복된 예약 대기 입니다.");
+            throw new ConflictException(ErrorCode.WAITING_ALREADY_EXISTS);
         }
     }
 
     private void validateExistsReservation(final ReservationWaitingRequest request, final long memberId) {
         if (reservationRepository.existsByMemberIdAndDateAndThemeIdAndTimeId(memberId, request.date(),
                 request.themeId(), request.timeId())) {
-            throw new IllegalArgumentException("[ERROR] 이미 예약이 존재합니다.");
+            throw new ConflictException(ErrorCode.WAITING_DUPLICATE_WITH_RESERVATION);
         }
 
     }
