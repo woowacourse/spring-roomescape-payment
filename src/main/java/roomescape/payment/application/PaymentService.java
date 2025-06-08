@@ -6,7 +6,6 @@ import roomescape.common.exception.impl.BadRequestException;
 import roomescape.payment.application.dto.DefaultPaymentRequest;
 import roomescape.payment.application.dto.PaymentConfirmRequest;
 import roomescape.payment.application.dto.PaymentRequest;
-import roomescape.payment.application.dto.PaymentResponse;
 import roomescape.payment.application.dto.PrePaymentRequest;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.domain.repository.PaymentRepository;
@@ -27,7 +26,9 @@ public class PaymentService {
         validatePrePayment(paymentConfirmRequest, prePaymentRequest);
 
         final PaymentRequest paymentRequest = new DefaultPaymentRequest(
-                paymentConfirmRequest.paymentKey(), paymentConfirmRequest.orderId(), paymentConfirmRequest.amount()
+                paymentConfirmRequest.paymentKey(),
+                paymentConfirmRequest.orderId(),
+                paymentConfirmRequest.amount()
         );
         final Payment payment = Payment.pending(
                 paymentConfirmRequest.orderId(),
@@ -36,9 +37,9 @@ public class PaymentService {
                 reservation
         );
         paymentRepository.save(payment);
-        
+
         try {
-            final PaymentResponse paymentResponse = paymentClient.requestPayment(paymentRequest);
+            paymentClient.requestPayment(paymentRequest);
             payment.success();
         } catch (PaymentException e) {
             payment.fail();

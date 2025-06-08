@@ -86,7 +86,8 @@ public class ReservationQueryService {
 
         reservations.forEach(reservation -> {
             Payment payment = paymentRepository.findByReservationIdAndPaymentStatus(
-                    reservation.getId(), PaymentStatus.SUCCESS);
+                            reservation.getId(), PaymentStatus.SUCCESS)
+                    .orElseThrow(() -> new NotFoundException("결제 정보가 존재하지 않습니다."));
 
             responses.add(MyHistoryResponse.ofReservation(reservation, payment));
         });

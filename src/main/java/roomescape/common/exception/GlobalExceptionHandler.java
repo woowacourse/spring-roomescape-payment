@@ -57,9 +57,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TossPaymentException.class)
     public ResponseEntity<String> handle(final TossPaymentException e) {
-        if (e.getCode().equals("500")) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
