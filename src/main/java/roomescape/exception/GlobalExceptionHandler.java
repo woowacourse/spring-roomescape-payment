@@ -81,11 +81,22 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ProblemDetail> handleException(final Exception e) {
+        final Throwable root = getRootCause(e);
         log.error(e.getMessage());
+        log.error("[ROOT CAUSE] {}: {}", root.getClass().getSimpleName(), root.getMessage());
+
         final HttpStatus responseStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         final ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(responseStatus, e.getMessage());
 
         return ResponseEntity.status(responseStatus)
                 .body(problemDetail);
+    }
+
+    private Throwable getRootCause(final Throwable throwable) {
+        Throwable cause = throwable.getCause();
+        while (cause != null && cause.getCause() != null) {
+            cause = cause.getCause();
+        }
+        return (cause != null) ? cause : throwable;
     }
 }
