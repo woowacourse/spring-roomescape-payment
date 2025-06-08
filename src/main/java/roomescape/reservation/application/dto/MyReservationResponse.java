@@ -41,28 +41,50 @@ public record MyReservationResponse(
     public static List<MyReservationResponse> of(
             List<Reservation> reservations,
             List<WaitingWithRank> waitings,
-            Map<Long, Payment> payments) {
+            Map<Long, Payment> payments
+    ) {
+        List<MyReservationResponse> reservationResponses = convertReservationsToResponses(reservations, payments);
+        List<MyReservationResponse> waitingResponses = convertWaitingsToResponses(waitings);
+
+        return Stream.concat(reservationResponses.stream(), waitingResponses.stream())
+                .collect(Collectors.toList());
+    }
+
+    private static List<MyReservationResponse> convertReservationsToResponses(
+            List<Reservation> reservations,
+            Map<Long, Payment> payments
+    ) {
         List<MyReservationResponse> reservationResponses = reservations.stream()
                 .map(reservation -> {
-                    Payment payment = payments.get(reservation.getId());
-                    String paymentKey = null;
-                    BigDecimal amount = null;
-                    if (payment != null) {
-                        paymentKey = payment.getPaymentKey().getValue();
-                        amount = payment.getAmount().getValue();
-                    }
-                    return new MyReservationResponse(
-                            reservation.getId(),
-                            reservation.getTheme().getName(),
-                            reservation.getDate(),
-                            reservation.getTime().getStartAt(),
-                            RESERVED,
-                            paymentKey,
-                            amount
-                    );
+                    return toReservationResponse(payments, reservation);
                 })
                 .toList();
+        return reservationResponses;
+    }
 
+    private static MyReservationResponse toReservationResponse(
+            Map<Long, Payment> payments,
+            Reservation reservation
+    ) {
+        Payment payment = payments.get(reservation.getId());
+        String paymentKey = null;
+        BigDecimal amount = null;
+        if (payment != null) {
+            paymentKey = payment.getPaymentKey().getValue();
+            amount = payment.getAmount().getValue();
+        }
+        return new MyReservationResponse(
+                reservation.getId(),
+                reservation.getTheme().getName(),
+                reservation.getDate(),
+                reservation.getTime().getStartAt(),
+                RESERVED,
+                paymentKey,
+                amount
+        );
+    }
+
+    private static List<MyReservationResponse> convertWaitingsToResponses(List<WaitingWithRank> waitings) {
         List<MyReservationResponse> waitingResponses = waitings.stream()
                 .map(waiting ->
                         new MyReservationResponse(
@@ -75,11 +97,6 @@ public record MyReservationResponse(
                                 null)
                 )
                 .toList();
-
-        return Stream.concat(reservationResponses.stream(), waitingResponses.stream())
-                .collect(Collectors.toList());
-
+        return waitingResponses;
     }
-
-
 }
