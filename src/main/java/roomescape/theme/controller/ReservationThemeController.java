@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.global.logging.LogExecution;
 import roomescape.theme.dto.ReservationThemeRequest;
 import roomescape.theme.dto.ReservationThemeResponse;
 import roomescape.theme.service.ReservationThemeService;
@@ -34,12 +35,24 @@ public class ReservationThemeController {
         return ResponseEntity.status(HttpStatus.OK).body(reservationThemeService.findPopularThemes());
     }
 
+    @LogExecution(
+            description = "테마 생성",
+            content = {LogExecution.LogContent.REQUEST, LogExecution.LogContent.RESPONSE, LogExecution.LogContent.EXECUTION_TIME, LogExecution.LogContent.EXCEPTION},
+            level = LogExecution.LogLevel.INFO,
+            maskSensitiveData = false
+    )
     @PostMapping()
     public ResponseEntity<ReservationThemeResponse> reservationThemeAdd(
             @RequestBody ReservationThemeRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(reservationThemeService.addReservationTheme(request));
     }
 
+    @LogExecution(
+            description = "테마 삭제",
+            content = {LogExecution.LogContent.REQUEST, LogExecution.LogContent.EXECUTION_TIME, LogExecution.LogContent.EXCEPTION},
+            level = LogExecution.LogLevel.WARN,
+            maskSensitiveData = false
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> reservationThemeRemove(@PathVariable(name = "id") long id) {
         reservationThemeService.removeReservationTheme(id);

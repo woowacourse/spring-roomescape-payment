@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.global.logging.LogExecution;
 import roomescape.payment.PaymentClient;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.TossPaymentRequest;
@@ -21,6 +22,11 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final PaymentClient paymentClient;
 
+    @LogExecution(
+            description = "결제 승인 요청",
+            content = {LogExecution.LogContent.REQUEST, LogExecution.LogContent.RESPONSE, LogExecution.LogContent.EXECUTION_TIME, LogExecution.LogContent.EXCEPTION},
+            level = LogExecution.LogLevel.INFO
+    )
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public TossPaymentResponse approvePayment(final String orderId, final String paymentKey, final long amount) {
         return paymentClient.requestPaymentApprove(

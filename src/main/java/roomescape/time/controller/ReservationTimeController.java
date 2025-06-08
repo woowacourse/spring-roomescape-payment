@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import roomescape.global.logging.LogExecution;
 import roomescape.time.dto.AvailableReservationTimeResponse;
 import roomescape.time.dto.ReservationTimeRequest;
 import roomescape.time.dto.ReservationTimeResponse;
@@ -33,6 +34,12 @@ public class ReservationTimeController {
         return ResponseEntity.status(HttpStatus.OK).body(reservationTimeService.findReservationTimes());
     }
 
+    @LogExecution(
+            description = "예약 가능한 시간 조회",
+            content = {LogExecution.LogContent.REQUEST, LogExecution.LogContent.EXECUTION_TIME, LogExecution.LogContent.EXCEPTION},
+            level = LogExecution.LogLevel.DEBUG,
+            maskSensitiveData = false
+    )
     @GetMapping("/available-times")
     public ResponseEntity<List<AvailableReservationTimeResponse>> getAvailableTimes(
             @RequestParam("date") final LocalDate date,
@@ -41,13 +48,24 @@ public class ReservationTimeController {
         return ResponseEntity.status(HttpStatus.OK).body(reservationTimeService.getAvailableTimes(date, themeId));
     }
 
-
+    @LogExecution(
+            description = "예약 시간 생성",
+            content = {LogExecution.LogContent.REQUEST, LogExecution.LogContent.RESPONSE, LogExecution.LogContent.EXECUTION_TIME, LogExecution.LogContent.EXCEPTION},
+            level = LogExecution.LogLevel.INFO,
+            maskSensitiveData = false
+    )
     @PostMapping()
     public ResponseEntity<ReservationTimeResponse> reservationTimeAdd(
             @RequestBody @Valid ReservationTimeRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(reservationTimeService.addReservationTime(request));
     }
 
+    @LogExecution(
+            description = "예약 시간 삭제",
+            content = {LogExecution.LogContent.REQUEST, LogExecution.LogContent.EXECUTION_TIME, LogExecution.LogContent.EXCEPTION},
+            level = LogExecution.LogLevel.WARN,
+            maskSensitiveData = false
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> reservationTimeRemove(@PathVariable(name = "id") long id) {
         reservationTimeService.removeReservationTime(id);
