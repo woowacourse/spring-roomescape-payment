@@ -3,6 +3,7 @@ package roomescape.reservation.service.converter;
 import java.util.List;
 import roomescape.member.domain.Member;
 import roomescape.member.service.MemberConverter;
+import roomescape.payment.domain.Payment;
 import roomescape.reservation.controller.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.controller.dto.ReservationStatus;
 import roomescape.reservation.controller.dto.ReservationWebResponse;
@@ -20,10 +21,12 @@ import roomescape.time.service.converter.ReservationTimeConverter;
 
 public class ReservationConverter {
 
-    public static Reservation toDomain(final CreateReservationServiceRequest request,
-                                       final Member member,
-                                       final ReservationTime time,
-                                       final Theme theme) {
+    public static Reservation toDomain(
+                                        final CreateReservationServiceRequest request,
+                                        final Member member,
+                                        final ReservationTime time,
+                                        final Theme theme
+    ) {
         return Reservation.withoutId(
                 member,
                 ReservationDate.from(request.date()),
@@ -32,12 +35,41 @@ public class ReservationConverter {
     }
 
     public static ReservationWebResponse toDto(final Reservation reservation) {
+        if(reservation.isPaid()) {
+            return new ReservationWebResponse(
+                reservation.getId(),
+                MemberConverter.toDto(reservation.getMember()),
+                reservation.getDate().getValue(),
+                ReservationTimeConverter.toDto(reservation.getTime()),
+                ThemeConverter.toDto(reservation.getTheme()),
+                reservation.getPayment().getPaymentKey(),
+                reservation.getPayment().getAmount()
+            );
+        }
+        return new ReservationWebResponse(
+            reservation.getId(),
+            MemberConverter.toDto(reservation.getMember()),
+            reservation.getDate().getValue(),
+            ReservationTimeConverter.toDto(reservation.getTime()),
+            ThemeConverter.toDto(reservation.getTheme()),
+            null,
+            null
+        );
+    }
+
+    public static ReservationWebResponse toDto(final Reservation reservation, final Payment payment) {
+        if(payment == null) {
+            return toDto(reservation);
+
+        }
         return new ReservationWebResponse(
                 reservation.getId(),
                 MemberConverter.toDto(reservation.getMember()),
                 reservation.getDate().getValue(),
                 ReservationTimeConverter.toDto(reservation.getTime()),
-                ThemeConverter.toDto(reservation.getTheme()));
+                ThemeConverter.toDto(reservation.getTheme()),
+                payment.getPaymentKey(),
+                payment.getAmount());
     }
 
     public static ReservationWebResponse toDto(final Waiting waiting) {
@@ -46,7 +78,10 @@ public class ReservationConverter {
                 MemberConverter.toDto(waiting.getMember()),
                 waiting.getDate().getValue(),
                 ReservationTimeConverter.toDto(waiting.getTime()),
-                ThemeConverter.toDto(waiting.getTheme()));
+                ThemeConverter.toDto(waiting.getTheme()),
+            null,
+            null
+        );
     }
 
     public static List<ReservationWebResponse> toDto(final List<Reservation> reservations) {
@@ -70,7 +105,9 @@ public class ReservationConverter {
                 waiting.getTheme().getName().getValue(),
                 waiting.getDate().getValue(),
                 waiting.getTime().getStartAt(),
-                ReservationStatus.WAITING.getStatus()
+                ReservationStatus.WAITING.getStatus(),
+                null,
+                null
         );
     }
 
@@ -85,12 +122,25 @@ public class ReservationConverter {
     }
 
     public static ReservationWithStatusResponse toDtoWithStatus(Reservation reservation) {
-        return new ReservationWithStatusResponse(
+        if(reservation.isPaid()) {
+            return new ReservationWithStatusResponse(
                 reservation.getId(),
                 reservation.getTheme().getName().getValue(),
                 reservation.getDate().getValue(),
                 reservation.getTime().getStartAt(),
-                ReservationStatus.CONFIRM.getStatus()
+                ReservationStatus.CONFIRM.getStatus(),
+                reservation.getPayment().getPaymentKey(),
+                reservation.getPayment().getAmount()
+            );
+        }
+        return new ReservationWithStatusResponse(
+            reservation.getId(),
+            reservation.getTheme().getName().getValue(),
+            reservation.getDate().getValue(),
+            reservation.getTime().getStartAt(),
+            ReservationStatus.CONFIRM.getStatus(),
+            null,
+            null
         );
     }
 }

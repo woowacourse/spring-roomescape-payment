@@ -2,12 +2,12 @@ package roomescape.reservation.service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.common.exception.AlreadyExistException;
 import roomescape.member.auth.vo.MemberInfo;
+import roomescape.payment.domain.Payment;
 import roomescape.payment.service.PaymentService;
 import roomescape.payment.service.converter.PaymentConverter;
 import roomescape.reservation.controller.dto.AvailableReservationTimeWebResponse;
@@ -40,15 +40,16 @@ public class ReservationService {
     private final PaymentService paymentService;
 
     public List<ReservationWebResponse> getAll() {
-        return ReservationConverter.toDto(
-            reservationQueryUseCase.getAll());
+        List<Reservation> reservations = reservationQueryUseCase.getAll();
+
+        return ReservationConverter.toDto(reservations);
     }
 
     public List<ReservationWithStatusResponse> getByMemberId(final Long memberId) {
         List<ReservationWithStatusResponse> reservationWithStatusResponses = reservationQueryUseCase.getByMemberId(
                 memberId).stream()
             .map(ReservationConverter::toDtoWithStatus)
-            .collect(Collectors.toList());
+                .toList();
 
         waitingQueryUseCase.getWaitingWithRank(memberId).stream()
             .map(ReservationConverter::toDtoWithStatus)
@@ -56,6 +57,7 @@ public class ReservationService {
 
         return reservationWithStatusResponses;
     }
+
 
     public List<ReservationWebResponse> getAllWaiting() {
         return waitingQueryUseCase.getAll().stream()
@@ -97,7 +99,10 @@ public class ReservationService {
                 createReservationWebRequest.timeId(),
                 createReservationWebRequest.themeId()));
 
-        paymentService.confirm(PaymentConverter.toPaymentDto(createReservationWebRequest));
+        Payment payment = paymentService.completePayment(
+            PaymentConverter.toPaymentDto(createReservationWebRequest));
+
+        reservation.confirmPayment(payment);
 
         return ReservationConverter.toDtoWithStatus(reservation);
     }

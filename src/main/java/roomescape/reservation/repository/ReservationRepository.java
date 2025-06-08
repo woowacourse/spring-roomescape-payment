@@ -24,6 +24,10 @@ public interface ReservationRepository {
 
     List<Reservation> findAll();
 
+    List<Reservation> findAllWithPayment();
+
+    List<Reservation> findAllWithPaymentByMemberId(Long memberId);
+
     void deleteById(Long id);
 
     Optional<Reservation> findById(Long id);

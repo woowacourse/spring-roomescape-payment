@@ -25,7 +25,7 @@ public class ReservationQueryUseCase {
     private final ReservationTimeQueryUseCase reservationTimeQueryUseCase;
 
     public List<Reservation> getAll() {
-        return reservationRepository.findAll();
+        return reservationRepository.findAllWithPayment();
     }
 
     public Reservation get(Long id) {
@@ -34,7 +34,7 @@ public class ReservationQueryUseCase {
     }
 
     public List<Reservation> getByMemberId(final Long memberId) {
-        return reservationRepository.findAllByMemberId(memberId);
+        return reservationRepository.findAllWithPaymentByMemberId(memberId);
     }
 
     public List<AvailableReservationTimeServiceResponse> getTimesWithAvailability(

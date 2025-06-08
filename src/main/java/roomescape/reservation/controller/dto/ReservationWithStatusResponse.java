@@ -12,7 +12,9 @@ public record ReservationWithStatusResponse(
         String themeName,
         LocalDate date,
         LocalTime time,
-        String status
+        String status,
+        String paymentKey,
+        Long amount
 ) {
 
     public ReservationWithStatusResponse {
@@ -26,7 +28,7 @@ public record ReservationWithStatusResponse(
             LocalTime time,
             Integer rank
     ) {
-        this(id, themeName, date, time, rank.toString() + "번째 예약대기");
+        this(id, themeName, date, time, rank.toString() + "번째 예약대기", null, null);
     }
 
     private void validate(
