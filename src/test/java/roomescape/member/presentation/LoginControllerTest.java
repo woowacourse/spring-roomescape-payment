@@ -7,7 +7,6 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
-import static org.springframework.restdocs.snippet.Attributes.key;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
