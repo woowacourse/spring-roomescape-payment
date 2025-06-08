@@ -15,14 +15,8 @@ public class WaitingValidator {
     private final WaitingReservationRepository waitingRepository;
 
     public void validateCanRegisterWaiting(WaitingReservation waiting) {
-        validateNotPast(waiting);
         validateSlotEmpty(waiting);
-    }
-
-    private void validateNotPast(WaitingReservation waiting) {
-        if (waiting.isPast()) {
-            throw new ReservationException("지난 날짜와 시간에 대한 대기는 불가능합니다.");
-        }
+        validateNotPast(waiting);
     }
 
     private void validateSlotEmpty(WaitingReservation waiting) {
@@ -44,8 +38,15 @@ public class WaitingValidator {
     }
 
     public void validateCanApproveWaiting(WaitingReservation waitingReservation) {
+        validateNotPast(waitingReservation);
         if(existsAlreadyInSlot(waitingReservation)) {
             throw new ReservationException("이미 해당 날짜에 예약이 존재합니다.");
+        }
+    }
+
+    private void validateNotPast(WaitingReservation waitingReservation) {
+        if (waitingReservation.isPast()) {
+            throw new ReservationException("지난 날짜에 대한 대기입니다.");
         }
     }
 

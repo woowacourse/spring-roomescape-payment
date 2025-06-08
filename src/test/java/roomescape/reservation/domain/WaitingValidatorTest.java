@@ -63,7 +63,7 @@ class WaitingValidatorTest {
             // when & then
             assertThatThrownBy(() -> waitingValidator.validateCanRegisterWaiting(waiting))
                     .isInstanceOf(ReservationException.class)
-                    .hasMessageContaining("지난 날짜와 시간에 대한 대기는 불가능합니다.");
+                    .hasMessageContaining("지난 날짜에 대한 대기입니다.");
         }
 
         @DisplayName("동일한 슬롯에 대해 이미 자신의 예약이 있는데도 대기를 시도할 경우 예외 발생")
@@ -116,6 +116,22 @@ class WaitingValidatorTest {
 
             // when & then
             assertDoesNotThrow(() -> waitingValidator.validateCanApproveWaiting(waiting));
+        }
+
+        @DisplayName("과거 날짜에 대한 대기를 승인할 시 예외 발생")
+        @Test
+        void validateCanRegisterWaiting_past() {
+            // given
+            Member member = dbHelper.insertMember(createDefaultMember_1());
+            Theme theme = dbHelper.insertTheme(createDefaultTheme());
+            ReservationTime time = dbHelper.insertTime(createTimeAt_10());
+            LocalDate pastDate = LocalDate.now().minusDays(1);
+            WaitingReservation waiting = createWaitingOf(member, pastDate, time, theme);
+
+            // when & then
+            assertThatThrownBy(() -> waitingValidator.validateCanApproveWaiting(waiting))
+                    .isInstanceOf(ReservationException.class)
+                    .hasMessageContaining("지난 날짜에 대한 대기입니다.");
         }
 
         @DisplayName("이미 동일한 슬롯에 예약이 존재할 경우 예외 발생")
