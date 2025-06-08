@@ -47,7 +47,8 @@ import roomescape.theme.dto.ThemeResponse;
 
 @Transactional
 @DataJpaTest
-@Import({TossConfirmationService.class, TossPaymentEventProcessor.class, ReservationPaymentCreator.class, NotPaidPaymentProcessor.class, DBHelper.class})
+@Import({TossConfirmationService.class, TossPaymentEventProcessor.class, ReservationPaymentCreator.class,
+        NotPaidPaymentProcessor.class, PaymentCancellationService.class, DBHelper.class})
 class TossConfirmationServiceTest {
 
     @Autowired

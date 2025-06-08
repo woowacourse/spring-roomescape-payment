@@ -5,6 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static roomescape.TestFixture.DEFAULT_DATE;
 import static roomescape.TestFixture.createAdminMember;
 import static roomescape.TestFixture.createDefaultMember_1;
@@ -19,6 +20,8 @@ import static roomescape.constant.TestData.RESERVATION_COUNT;
 import java.time.LocalDate;
 import java.util.List;
 import org.assertj.core.api.SoftAssertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import roomescape.DBHelper;
 import roomescape.IntegrationTest;
 import roomescape.auth.dto.LoginMember;
+import roomescape.common.event.EventPublisher;
 import roomescape.exception.ReservationException;
 import roomescape.member.domain.Member;
 import roomescape.payment.domain.Payment;
@@ -39,6 +43,7 @@ import roomescape.reservation.dto.ReservationResponse;
 import roomescape.reservation.dto.ReservationSearchRequest;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.service.dto.CreateRegistrationCommand;
+import roomescape.reservation.service.dto.ReservationDeleteEvent;
 import roomescape.reservationtime.domain.ReservationTime;
 import roomescape.theme.domain.Theme;
 
@@ -57,117 +62,130 @@ class ReservationServiceTest extends IntegrationTest {
     @MockitoBean
     TossRestClient tossRestClient;
 
-    @Test
-    void 모든_예약을_조회한다() {
-        // given
-        dbHelper.insertReservation(createReservation_1());
-        dbHelper.insertReservation(createReservation_2());
+    @MockitoBean
+    EventPublisher eventPublisher;
 
-        // when
-        List<ReservationResponse> responses = service.searchReservationsByCriteria(
-                new ReservationSearchRequest(null, null, null, null));
+    @Nested
+    @DisplayName("예약 조회")
+    class GetReservation {
+        @Test
+        void 모든_예약을_조회한다() {
+            // given
+            dbHelper.insertReservation(createReservation_1());
+            dbHelper.insertReservation(createReservation_2());
 
-        // then
-        assertThat(responses).hasSize(RESERVATION_COUNT)
-                .extracting(ReservationResponse::id)
-                .doesNotContain(0L);
+            // when
+            List<ReservationResponse> responses = service.searchReservationsByCriteria(
+                    new ReservationSearchRequest(null, null, null, null));
+
+            // then
+            assertThat(responses).hasSize(RESERVATION_COUNT)
+                    .extracting(ReservationResponse::id)
+                    .doesNotContain(0L);
+        }
+
+        @Test
+        void 관리자는_특정예약을_조회할_수_있다() {
+            // given
+            Member adminMember = dbHelper.insertMember(createAdminMember());
+            Reservation reservation = dbHelper.insertReservation(createReservation_1());
+
+            // when
+            ReservationResponse response = service.getById(reservation.getId(), LoginMember.from(adminMember));
+
+            // then
+            SoftAssertions.assertSoftly(softly -> {
+                assertThat(response.id()).isEqualTo(reservation.getId());
+                assertThat(response.date()).isEqualTo(reservation.getDate());
+                assertThat(response.time().startAt()).isEqualTo(reservation.getTime().getStartAt());
+                assertThat(response.theme().name()).isEqualTo(reservation.getTheme().getName());
+            });
+        }
+
+        @Test
+        void 일반회원은_자신의_특정_예약을_조회할_수_있다() {
+            // given
+            Member member = dbHelper.insertMember(createDefaultMember_1());
+            Reservation reservation = dbHelper.insertReservation(
+                    createReservationOf(member, DEFAULT_DATE, createTimeAt_10(), createDefaultTheme()));
+
+            // when
+            ReservationResponse response = service.getById(reservation.getId(), LoginMember.from(member));
+
+            // then
+            SoftAssertions.assertSoftly(softly -> {
+                assertThat(response.id()).isEqualTo(reservation.getId());
+                assertThat(response.date()).isEqualTo(reservation.getDate());
+                assertThat(response.time().startAt()).isEqualTo(reservation.getTime().getStartAt());
+                assertThat(response.theme().name()).isEqualTo(reservation.getTheme().getName());
+            });
+        }
+
+        @Test
+        void 일반회원은_다른회원의_특정예약_조회_시도_시_예외가_발생한다() {
+            // given
+            Member member = dbHelper.insertMember(createMemberByName("회원1"));
+            Member otherMember = dbHelper.insertMember(createMemberByName("다른회원"));
+            Reservation reservation = dbHelper.insertReservation(
+                    createReservationOf(otherMember, DEFAULT_DATE, createTimeAt_10(), createDefaultTheme()));
+
+            // when & then
+            assertThatThrownBy(() -> service.getById(reservation.getId(), LoginMember.from(member)))
+                    .isInstanceOf(ReservationException.class)
+                    .hasMessage("자신의 예약만 조회할 수 있습니다.");
+        }
     }
 
-    @Test
-    void 관리자는_특정예약을_조회할_수_있다() {
-        // given
-        Member adminMember = dbHelper.insertMember(createAdminMember());
-        Reservation reservation = dbHelper.insertReservation(createReservation_1());
+    @Nested
+    @DisplayName("예약 등록")
+    class RegisterReservation {
+        @Test
+        void 새로운_예약은_정상_생성된다() {
+            // given
+            ReservationTime time = dbHelper.insertTime(createTimeAt_10());
+            Theme theme = dbHelper.insertTheme(createDefaultTheme());
 
-        // when
-        ReservationResponse response = service.getById(reservation.getId(), LoginMember.from(adminMember));
+            Member member = dbHelper.insertMember(createDefaultMember_1());
+            LoginMember loginMember = LoginMember.from(member);
 
-        // then
-        SoftAssertions.assertSoftly(softly -> {
-            assertThat(response.id()).isEqualTo(reservation.getId());
-            assertThat(response.date()).isEqualTo(reservation.getDate());
-            assertThat(response.time().startAt()).isEqualTo(reservation.getTime().getStartAt());
-            assertThat(response.theme().name()).isEqualTo(reservation.getTheme().getName());
-        });
+            // when
+            ReservationResponse result = service.registerReservation(
+                    new CreateRegistrationCommand(loginMember.id(), DEFAULT_DATE, time.getId(), theme.getId())
+            );
+
+            // then
+            SoftAssertions.assertSoftly(soft -> {
+                assertThat(reservationRepository.findAll()).hasSize(1);
+                assertThat(result.date()).isEqualTo(DEFAULT_DATE);
+                assertThat(result.time().startAt()).isEqualTo(time.getStartAt());
+                assertThat(result.theme().name()).isEqualTo(theme.getName());
+            });
+        }
+
+        @Test
+        void 지나간_날짜와_시간이면_예외가_발생한다() {
+            // given
+            ReservationTime time = dbHelper.insertTime(createTimeAt_10());
+            Theme theme = dbHelper.insertTheme(createDefaultTheme());
+            LocalDate pastDate = LocalDate.now().minusDays(1);
+            ReservationRequest request = new ReservationRequest(pastDate, time.getId(), theme.getId());
+
+            Member member = dbHelper.insertMember(createDefaultMember_1());
+            LoginMember loginMember = LoginMember.from(member);
+
+            // when & then
+            CreateRegistrationCommand createRegistrationCommand = new CreateRegistrationCommand(member.getId(),
+                    pastDate,
+                    time.getId(), theme.getId());
+            assertThatThrownBy(() -> service.registerReservation(createRegistrationCommand))
+                    .isInstanceOf(ReservationException.class)
+                    .hasMessage("지난 날짜와 시간에 대한 예약은 불가능합니다.");
+        }
     }
 
+    @DisplayName("예약을 삭제하면 예약취소 상태로 변경되고, 예약 취소 이벤트를 발행한다.")
     @Test
-    void 일반회원은_자신의_특정_예약을_조회할_수_있다() {
-        // given
-        Member member = dbHelper.insertMember(createDefaultMember_1());
-        Reservation reservation = dbHelper.insertReservation(
-                createReservationOf(member, DEFAULT_DATE, createTimeAt_10(), createDefaultTheme()));
-
-        // when
-        ReservationResponse response = service.getById(reservation.getId(), LoginMember.from(member));
-
-        // then
-        SoftAssertions.assertSoftly(softly -> {
-            assertThat(response.id()).isEqualTo(reservation.getId());
-            assertThat(response.date()).isEqualTo(reservation.getDate());
-            assertThat(response.time().startAt()).isEqualTo(reservation.getTime().getStartAt());
-            assertThat(response.theme().name()).isEqualTo(reservation.getTheme().getName());
-        });
-    }
-
-    @Test
-    void 일반회원은_다른회원의_특정예약_조회_시도_시_예외가_발생한다() {
-        // given
-        Member member = dbHelper.insertMember(createMemberByName("회원1"));
-        Member otherMember = dbHelper.insertMember(createMemberByName("다른회원"));
-        Reservation reservation = dbHelper.insertReservation(
-                createReservationOf(otherMember, DEFAULT_DATE, createTimeAt_10(), createDefaultTheme()));
-
-        // when & then
-        assertThatThrownBy(() -> service.getById(reservation.getId(), LoginMember.from(member)))
-                .isInstanceOf(ReservationException.class)
-                .hasMessage("자신의 예약만 조회할 수 있습니다.");
-    }
-
-    @Test
-    void 지나간_날짜와_시간이면_예외가_발생한다() {
-        // given
-        ReservationTime time = dbHelper.insertTime(createTimeAt_10());
-        Theme theme = dbHelper.insertTheme(createDefaultTheme());
-        LocalDate pastDate = LocalDate.now().minusDays(1);
-        ReservationRequest request = new ReservationRequest(pastDate, time.getId(), theme.getId());
-
-        Member member = dbHelper.insertMember(createDefaultMember_1());
-        LoginMember loginMember = LoginMember.from(member);
-
-        // when & then
-        CreateRegistrationCommand createRegistrationCommand = new CreateRegistrationCommand(member.getId(), pastDate,
-                time.getId(), theme.getId());
-        assertThatThrownBy(() -> service.registerReservation(createRegistrationCommand))
-                .isInstanceOf(ReservationException.class)
-                .hasMessage("지난 날짜와 시간에 대한 예약은 불가능합니다.");
-    }
-
-    @Test
-    void 새로운_예약은_정상_생성된다() {
-        // given
-        ReservationTime time = dbHelper.insertTime(createTimeAt_10());
-        Theme theme = dbHelper.insertTheme(createDefaultTheme());
-
-        Member member = dbHelper.insertMember(createDefaultMember_1());
-        LoginMember loginMember = LoginMember.from(member);
-
-        // when
-        ReservationResponse result = service.registerReservation(
-                new CreateRegistrationCommand(loginMember.id(), DEFAULT_DATE, time.getId(), theme.getId())
-        );
-
-        // then
-        SoftAssertions.assertSoftly(soft -> {
-            assertThat(reservationRepository.findAll()).hasSize(1);
-            assertThat(result.date()).isEqualTo(DEFAULT_DATE);
-            assertThat(result.time().startAt()).isEqualTo(time.getStartAt());
-            assertThat(result.theme().name()).isEqualTo(theme.getName());
-        });
-    }
-
-    @Test
-    void 예약을_삭제한다() {
+    void deleteReservationById() {
         // given
         Reservation reservation = dbHelper.insertReservation(createReservation_1());
         Payment payment = dbHelper.insertCompletedPayment(reservation);
@@ -186,5 +204,7 @@ class ReservationServiceTest extends IntegrationTest {
         // then
         Reservation findReservation = reservationRepository.findById(reservation.getId()).orElseThrow();
         assertThat(findReservation.getReservationStatus()).isEqualTo(ReservationStatus.CANCELED);
+
+        verify(eventPublisher).raise(any(ReservationDeleteEvent.class));
     }
 }

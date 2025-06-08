@@ -1,5 +1,6 @@
 package roomescape.payment.event;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static roomescape.TestFixture.createWaiting_1;
 
 import org.junit.jupiter.api.DisplayName;
@@ -10,6 +11,7 @@ import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.DBHelper;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentStatus;
 import roomescape.payment.repository.PaymentRepository;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.WaitingReservation;
@@ -47,18 +49,8 @@ class WaitingApprovedEventHandlerTest {
         waitingReservationService.approveWaitingReservation(waiting.getId());
 
         // then
-        System.out.println("waitingReservationRepository.findAll().size() = " + waitingReservationRepository.findAll().size());
-
-        System.out.println("reservationRepository.findAll().size() = " + reservationRepository.findAll().size());
-        for (Reservation reservation : reservationRepository.findAll()) {
-            System.out.println("reservation.getMember().name() = " + reservation.getMember().getName());
-            System.out.println("reservation.getDate() = " + reservation.getDate());
-        }
-
-        System.out.println("paymentRepository.findAll().size() = " + paymentRepository.findAll().size());
-        for (Payment payment : paymentRepository.findAll()) {
-            System.out.println("payment.getStatus() = " + payment.getStatus());
-            System.out.println("payment.getMember().getName() = " + payment.getMember().getName());
-        }
+        Reservation approvedReservation = reservationRepository.findAll().getFirst();
+        Payment payment = paymentRepository.findByReservationId(approvedReservation.getId()).orElseThrow();
+        assertThat(payment.getStatus()).isEqualTo(PaymentStatus.NOT_PAID);
     }
 }
