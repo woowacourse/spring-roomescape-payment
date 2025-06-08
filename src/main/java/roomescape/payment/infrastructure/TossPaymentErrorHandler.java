@@ -44,7 +44,7 @@ public class TossPaymentErrorHandler implements ResponseErrorHandler {
         logBasedOnFailure(failure);
 
         if (INTERNAL_ERROR_CODES.contains(failure.code())) {
-            throw new InternalServerErrorException();
+            throw new InternalServerErrorException(failure.message());
         }
         throw new BadRequestException(failure.message());
     }

@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
 import roomescape.auth.service.dto.LoginMember;
 import roomescape.common.exception.CustomException;
+import roomescape.common.exception.InternalServerErrorException;
 import roomescape.config.PaymentRestClientConfig;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.Role;
@@ -171,7 +172,7 @@ class CreateReservationWithPaymentServiceTest {
         assertSoftly(softly -> {
             softly.assertThatThrownBy(() -> {
                 service.create(request, LoginMember.of(member));
-            }).isInstanceOf(CustomException.class);
+            }).isInstanceOf(InternalServerErrorException.class);
 
             List<Payment> payments = paymentRepository.findAll();
             softly.assertThat(payments).hasSize(1);
