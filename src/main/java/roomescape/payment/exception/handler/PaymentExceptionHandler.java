@@ -43,17 +43,17 @@ public class PaymentExceptionHandler implements ResponseErrorHandler {
         String code = errorResponse.code();
         TossUnrecoverableErrorCode errorCode = TossUnrecoverableErrorCode.fromCode(code);
         if (errorCode.isUnrecoverable()) {
-            throw new PaymentServerException(code, UNRECOVERABLE_EXCEPTION_MESSAGE);
+            throw new PaymentServerException(UNRECOVERABLE_EXCEPTION_MESSAGE);
         }
 
         HttpStatusCode statusCode = response.getStatusCode();
         if (statusCode.is4xxClientError()) {
             if (statusCode == HttpStatus.FORBIDDEN) {
-                throw new PaymentForbiddenException(code, getErrorMessage(code, FORBIDDEN_EXCEPTION_MESSAGE));
+                throw new PaymentForbiddenException(getErrorMessage(code, FORBIDDEN_EXCEPTION_MESSAGE));
             }
-            throw new PaymentClientException(code, getErrorMessage(code, CLIENT_EXCEPTION_DEFAULT_MESSAGE));
+            throw new PaymentClientException(getErrorMessage(code, CLIENT_EXCEPTION_DEFAULT_MESSAGE));
         }
-        throw new PaymentServerException(code, getErrorMessage(code, SERVER_EXCEPTION_DEFAULT_MESSAGE));
+        throw new PaymentServerException(getErrorMessage(code, SERVER_EXCEPTION_DEFAULT_MESSAGE));
     }
 
     private String getErrorMessage(final String code, final String errorMessage) {

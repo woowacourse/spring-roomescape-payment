@@ -2,7 +2,7 @@ package roomescape.payment.exception;
 
 public class PaymentClientException extends PaymentException {
 
-    public PaymentClientException(final String code, final String message) {
-        super(message, code);
+    public PaymentClientException(final String message) {
+        super(message);
     }
 }
