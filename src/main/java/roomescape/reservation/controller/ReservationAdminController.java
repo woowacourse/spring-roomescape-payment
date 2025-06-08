@@ -1,62 +1,46 @@
 package roomescape.reservation.controller;
 
-import java.net.URI;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-import roomescape.common.utils.UriFactory;
-import roomescape.member.auth.RoleRequired;
-import roomescape.member.domain.Role;
+import roomescape.member.controller.dto.SignupRequest;
 import roomescape.reservation.controller.dto.CreateReservationByAdminWebRequest;
 import roomescape.reservation.controller.dto.ReservationSearchWebRequest;
 import roomescape.reservation.controller.dto.ReservationWaitWebResponse;
 import roomescape.reservation.controller.dto.ReservationWebResponse;
-import roomescape.reservation.service.ReservationService;
 
-@RequiredArgsConstructor
-@RestController
-public class ReservationAdminController {
+@Tag(name = "예약 API [관리자 권한]")
+public interface ReservationAdminController {
 
-    public static final String BASE_PATH = "/reservations";
+    @Operation(summary = "예약 목록 조회", security = @SecurityRequirement(name = "loginAuth"))
+    List<ReservationWebResponse> getAll();
 
-    private final ReservationService reservationService;
+    @Operation(summary = "예약 대기 목록 조회", security = @SecurityRequirement(name = "loginAuth"))
+    List<ReservationWaitWebResponse> getAllReservationWait();
 
-    @RoleRequired(value = Role.ADMIN)
-    @GetMapping(BASE_PATH)
-    public List<ReservationWebResponse> getAll() {
-        return reservationService.getAll();
-    }
+    @Operation(summary = "예약 검색", security = @SecurityRequirement(name = "loginAuth"))
+    ResponseEntity<List<ReservationWebResponse>> getReservationsByAdmin(
+            ReservationSearchWebRequest reservationSearchWebRequest
+    );
 
-    @RoleRequired(value = Role.ADMIN)
-    @GetMapping(BASE_PATH + "/wait")
-    public List<ReservationWaitWebResponse> getAllReservationWait() {
-        return reservationService.getAllReservationWait();
-    }
-
-    @RoleRequired(value = Role.ADMIN)
-    @GetMapping("/admin" + BASE_PATH)
-    public ResponseEntity<List<ReservationWebResponse>> getReservationsByAdmin(
-            @ModelAttribute final ReservationSearchWebRequest reservationSearchWebRequest
-    ) {
-        return ResponseEntity.ok(reservationService.search(reservationSearchWebRequest));
-    }
-
-    @RoleRequired(value = Role.ADMIN)
-    @PostMapping("/admin" + BASE_PATH)
-    public ResponseEntity<ReservationWebResponse> createReservationByAdmin(
-            @RequestBody final CreateReservationByAdminWebRequest createReservationByAdminWebRequest
-    ) {
-        final ReservationWebResponse reservationWebResponse = reservationService.create(
-                createReservationByAdminWebRequest
-        );
-        final URI location = UriFactory.buildPath(BASE_PATH, String.valueOf(reservationWebResponse.id()));
-
-        return ResponseEntity.created(location)
-                .body(reservationWebResponse);
-    }
+    @Operation(summary = "예약 생성", security = @SecurityRequirement(name = "loginAuth"))
+    @RequestBody(
+            required = true,
+            content = @Content(
+                    schema = @Schema(implementation = CreateReservationByAdminWebRequest.class),
+                    examples = {
+                            @ExampleObject(name = "sample",
+                                    value = "{\"memberId\":\"1\",\"date\":\"2025-09-20\",\"timeId\":\"1\",\"themeId\":\"1\"}")
+                    }
+            )
+    )
+    ResponseEntity<ReservationWebResponse> createReservationByAdmin(
+            CreateReservationByAdminWebRequest createReservationByAdminWebRequest
+    );
 }

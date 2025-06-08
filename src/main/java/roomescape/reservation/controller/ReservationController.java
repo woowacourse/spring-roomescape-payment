@@ -1,20 +1,16 @@
 package roomescape.reservation.controller;
 
-import java.net.URI;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import roomescape.common.utils.UriFactory;
-import roomescape.member.auth.LoginMember;
 import roomescape.member.auth.vo.MemberInfo;
 import roomescape.reservation.controller.dto.AvailableReservationTimeWebResponse;
 import roomescape.reservation.controller.dto.CreateReservationWebRequest;
@@ -22,66 +18,49 @@ import roomescape.reservation.controller.dto.CreateReservationWithPaymentWebRequ
 import roomescape.reservation.controller.dto.ReservationWaitWebResponse;
 import roomescape.reservation.controller.dto.ReservationWebResponse;
 import roomescape.reservation.controller.dto.ReservationWithStatusResponse;
-import roomescape.reservation.service.ReservationPayService;
-import roomescape.reservation.service.ReservationService;
 
-@RequiredArgsConstructor
-@RestController
-@RequestMapping("/reservations")
-public class ReservationController {
+public interface ReservationController {
 
-    private final ReservationService reservationService;
-    private final ReservationPayService reservationPayService;
+    @Tag(name = "예약 API")
+    @Operation(summary = "내 예약 목록 조회", security = @SecurityRequirement(name = "loginAuth"))
+    List<ReservationWithStatusResponse> getAllWithReservationWait(@Parameter(hidden = true) MemberInfo memberInfo);
 
-    @GetMapping("/mine")
-    public List<ReservationWithStatusResponse> getAllWithReservationWait(@LoginMember MemberInfo memberInfo) {
-        return reservationService.findMyReservationsWithWaitingByMemberId(memberInfo.id());
-    }
+    @Tag(name = "예약 API")
+    @Operation(summary = "예약 가능 여부 및 시간 목록 조회", security = @SecurityRequirement(name = "loginAuth"))
+    List<AvailableReservationTimeWebResponse> getAvailable(
+            @Parameter(description = "yyyy-MM-dd") LocalDate date,
+            Long themeId
+    );
 
-    @GetMapping("/times")
-    public List<AvailableReservationTimeWebResponse> getAvailable(
-            @RequestParam final LocalDate date,
-            @RequestParam final Long themeId
-    ) {
-        return reservationService.getAvailable(date, themeId);
-    }
+    @Tag(name = "예약 API")
+    @Operation(summary = "예약 생성 및 결제", security = @SecurityRequirement(name = "loginAuth"))
+    ResponseEntity<ReservationWebResponse> create(
+            @RequestBody(required = true) CreateReservationWithPaymentWebRequest request,
+            @Parameter(hidden = true) MemberInfo memberInfo
+    );
 
-    @PostMapping
-    public ResponseEntity<ReservationWebResponse> create(
-            @RequestBody final CreateReservationWithPaymentWebRequest request,
-            @LoginMember final MemberInfo memberInfo
-    ) {
-        final ReservationWebResponse reservationWebResponse = reservationPayService.createReservationWithPayment(
-                request, memberInfo);
-        final URI location = UriFactory.buildPath("/reservations", String.valueOf(reservationWebResponse.id()));
-        return ResponseEntity.created(location)
-                .body(reservationWebResponse);
-    }
+    @Tag(name = "예약 API")
+    @Operation(summary = "예약 삭제", security = @SecurityRequirement(name = "loginAuth"))
+    ResponseEntity<Void> delete(Long id);
 
-    @PostMapping("/wait")
-    public ResponseEntity<ReservationWaitWebResponse> createReservationWait(
-            @RequestBody final CreateReservationWebRequest createReservationWebRequest,
-            @LoginMember MemberInfo memberInfo
-    ) {
-        final ReservationWaitWebResponse reservationWebResponse = reservationService.createReservationWait(
-                createReservationWebRequest,
-                memberInfo
-        );
-        final URI location = UriFactory.buildPath("/reservations", String.valueOf(reservationWebResponse.id()));
+    @Tag(name = "대기 API")
+    @Operation(summary = "예약 대기 생성", security = @SecurityRequirement(name = "loginAuth"))
+    @RequestBody(
+            required = true,
+            content = @Content(
+                    schema = @Schema(implementation = CreateReservationWebRequest.class),
+                    examples = {
+                            @ExampleObject(name = "sample",
+                                    value = "{\"date\":\"2025-09-20\",\"timeId\":\"1\",\"themeId\":\"1\"}")
+                    }
+            )
+    )
+    ResponseEntity<ReservationWaitWebResponse> createReservationWait(
+            CreateReservationWebRequest createReservationWebRequest,
+            @Parameter(hidden = true) MemberInfo memberInfo
+    );
 
-        return ResponseEntity.created(location)
-                .body(reservationWebResponse);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable final Long id) {
-        reservationService.delete(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("/wait" + "/{id}")
-    public ResponseEntity<Void> deleteReservationWait(@PathVariable final Long id) {
-        reservationService.deleteReservationWait(id);
-        return ResponseEntity.noContent().build();
-    }
+    @Tag(name = "대기 API")
+    @Operation(summary = "예약 대기 삭제", security = @SecurityRequirement(name = "loginAuth"))
+    ResponseEntity<Void> deleteReservationWait(Long id);
 }

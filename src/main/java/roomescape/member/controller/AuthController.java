@@ -1,56 +1,41 @@
 package roomescape.member.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-import roomescape.member.auth.PermitAll;
-import roomescape.member.auth.jwt.JwtTokenExtractor;
 import roomescape.member.controller.dto.LoginCheckResponse;
 import roomescape.member.controller.dto.LoginRequest;
 import roomescape.member.controller.dto.MemberInfoResponse;
 import roomescape.member.controller.dto.SignupRequest;
-import roomescape.member.service.AuthService;
 
-@Slf4j
-@RequiredArgsConstructor
-@RestController
-public class AuthController {
+@Tag(name = "로그인 API")
+public interface AuthController {
 
-    private final AuthService authService;
-    private final JwtTokenExtractor jwtTokenExtractor;
+    @Operation(summary = "로그인")
+    ResponseEntity<Void> login(@RequestBody(required = true) LoginRequest loginRequest);
 
-    @PermitAll
-    @PostMapping("/login")
-    public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest) {
-        String token = authService.login(loginRequest);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Set-Cookie", "token=" + token + "; Path=/; HttpOnly");
-        headers.add("Keep-Alive", "timeout=60");
-        return ResponseEntity.ok().headers(headers).build();
-    }
+    @Operation(summary = "로그아웃", security = @SecurityRequirement(name = "loginAuth"))
+    ResponseEntity<Void> logout();
 
-    @PostMapping("/logout")
-    public ResponseEntity<Void> logout() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Set-Cookie", "token=; Path=/; HttpOnly; Max-Age=0");
-        return ResponseEntity.ok().headers(headers).build();
-    }
+    @Operation(summary = "로그인 정보 조회", security = @SecurityRequirement(name = "loginAuth"))
+    ResponseEntity<LoginCheckResponse> checkLogin(HttpServletRequest request);
 
-    @GetMapping("/login/check")
-    public ResponseEntity<LoginCheckResponse> checkLogin(HttpServletRequest request) {
-        final String token = jwtTokenExtractor.extractTokenFromCookie(request.getCookies());
-        return ResponseEntity.ok(authService.checkLogin(token));
-    }
-
-    @PermitAll
-    @PostMapping("/signup")
-    public ResponseEntity<MemberInfoResponse> signup(@RequestBody SignupRequest signupRequest) {
-        return ResponseEntity.ok(authService.signup(signupRequest));
-    }
+    @Operation(summary = "회원가입")
+    @RequestBody(
+            required = true,
+            content = @Content(
+                    schema = @Schema(implementation = SignupRequest.class),
+                    examples = {
+                            @ExampleObject(name = "sample",
+                                    value = "{\"email\":\"abc@gmail.com\",\"password\":\"qwe123\",\"name\":\"leo\"}")
+                    }
+            )
+    )
+    ResponseEntity<MemberInfoResponse> signup(SignupRequest signupRequest);
 }
