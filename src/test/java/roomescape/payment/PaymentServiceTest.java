@@ -86,7 +86,6 @@ public class PaymentServiceTest {
 
         // 회원으로 예약 생성 및 저장
         Reservation reservation = new Reservation(member, spec);
-        reservationRepository.save(reservation);
         Reservation paymentReservation = reservationRepository.save(reservation);
         // 결제 객체 생성
         Payment payment = new Payment(new PaymentKey(key), amount, paymentReservation.getId());
@@ -139,6 +138,4 @@ public class PaymentServiceTest {
                 .extracting(PaymentKey::getKey)
                 .containsExactlyInAnyOrder("payKey-1", "payKey-2");
     }
-
-
 }
