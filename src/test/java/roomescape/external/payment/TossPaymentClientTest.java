@@ -1,4 +1,4 @@
-package roomescape.payment;
+package roomescape.external.payment;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
