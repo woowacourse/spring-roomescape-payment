@@ -57,7 +57,7 @@ public class LoggingAspect {
                 .map(Cookie::getValue)
                 .orElse("null");
 
-        if(!jwtProvider.isValidToken(token)){
+        if (!jwtProvider.isValidToken(token)) {
             return token;
         }
 

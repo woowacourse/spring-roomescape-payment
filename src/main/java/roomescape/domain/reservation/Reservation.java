@@ -16,10 +16,10 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import roomescape.exception.custom.reason.reservation.ReservationPastTimeException;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservationtime.ReservationTime;
 import roomescape.domain.theme.Theme;
+import roomescape.exception.custom.reason.reservation.ReservationPastTimeException;
 
 @Entity
 @Getter

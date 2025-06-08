@@ -2,8 +2,8 @@ package roomescape.domain.reservationtime.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalTime;
-import roomescape.exception.custom.reason.ResponseInvalidException;
 import roomescape.domain.reservationtime.ReservationTime;
+import roomescape.exception.custom.reason.ResponseInvalidException;
 
 public record AvailableReservationTimeResponse(
         Long id,

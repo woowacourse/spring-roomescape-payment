@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse("서버에서 예기치 못한 예외가 발생하였습니다."));
     }
 
-    private String formatLoggingMessage(final String exceptionMessage){
+    private String formatLoggingMessage(final String exceptionMessage) {
         final String ip = httpServletRequest.getRemoteAddr();
         final int port = httpServletRequest.getRemotePort();
         final String tokenBody = getTokenBody();
@@ -88,7 +88,7 @@ public class GlobalExceptionHandler {
                 .map(Cookie::getValue)
                 .orElse("null");
 
-        if(!jwtProvider.isValidToken(token)){
+        if (!jwtProvider.isValidToken(token)) {
             return token;
         }
 

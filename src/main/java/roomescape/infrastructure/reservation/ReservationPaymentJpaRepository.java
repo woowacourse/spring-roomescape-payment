@@ -6,14 +6,14 @@ import org.springframework.data.jpa.repository.Query;
 import roomescape.domain.member.Member;
 import roomescape.domain.reservation.ReservationPayment;
 
-public interface ReservationPaymentJpaRepository extends JpaRepository<ReservationPayment, Long>{
+public interface ReservationPaymentJpaRepository extends JpaRepository<ReservationPayment, Long> {
     @Query(value = """
-    SELECT p
-    FROM ReservationPayment p
-        JOIN FETCH p.reservation r
-        JOIN FETCH p.reservation.theme
-        JOIN FETCH p.reservation.reservationTime
-    WHERE r.member = :member
-    """)
+            SELECT p
+            FROM ReservationPayment p
+                JOIN FETCH p.reservation r
+                JOIN FETCH p.reservation.theme
+                JOIN FETCH p.reservation.reservationTime
+            WHERE r.member = :member
+            """)
     List<ReservationPayment> findAllByMember(final Member member);
 }

@@ -1,7 +1,7 @@
 package roomescape.domain.member.dto;
 
-import roomescape.exception.custom.reason.ResponseInvalidException;
 import roomescape.domain.member.Member;
+import roomescape.exception.custom.reason.ResponseInvalidException;
 
 public record MemberResponse(Long id, String name) {
 

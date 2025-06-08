@@ -1,7 +1,7 @@
 package roomescape.domain.theme.dto;
 
-import roomescape.exception.custom.reason.ResponseInvalidException;
 import roomescape.domain.theme.Theme;
+import roomescape.exception.custom.reason.ResponseInvalidException;
 
 public record ThemeResponse(
         Long id,
