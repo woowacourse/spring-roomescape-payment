@@ -22,8 +22,6 @@ import roomescape.reservation.application.service.WaitingReservationCommandServi
 import roomescape.reservation.application.service.WaitingReservationQueryService;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
-import roomescape.reservation.domain.ReservationStatus;
-import roomescape.reservation.domain.ReservationView;
 import roomescape.reservation.domain.WaitingReservation;
 import roomescape.reservation.ui.dto.CreateReservationWithUserIdWebRequest;
 import roomescape.reservation.ui.dto.ReservationResponse;
@@ -33,6 +31,7 @@ import roomescape.theme.domain.Theme;
 import roomescape.theme.domain.ThemeDescription;
 import roomescape.theme.domain.ThemeName;
 import roomescape.theme.domain.ThemeThumbnail;
+import roomescape.theme.ui.dto.ThemeResponse;
 import roomescape.time.domain.ReservationTime;
 import roomescape.user.application.service.UserQueryService;
 import roomescape.user.domain.User;
@@ -145,26 +144,33 @@ class ReservationFacadeTest {
     void getAllByUserId() {
         //then
         Long userId = 1L;
-        List<Reservation> reservations = List.of(createReservation(1L));
-        User user = createUser(userId);
-        List<ReservationView> reservationViews = List.of(new ReservationView(
-                "T-1",
-                userId,
-                reservations.get(0).getDate(),
-                reservations.get(0).getTime(),
-                reservations.get(0).getTheme(),
-                ReservationStatus.CONFIRMED,
-                0
+        List<MyReservationsResponse> given = List.of(new MyReservationsResponse(
+                1L,
+                LocalDate.now().plusDays(1),
+                new ReservationTime(1L, LocalTime.of(15, 0)),
+                ThemeResponse.from(new Theme(
+                        1L,
+                        ThemeName.from("테스트테마"),
+                        ThemeDescription.from("설명"),
+                        ThemeThumbnail.from("thumbnail.jpg")
+                )),
+                0,
+                "paymentKey",
+                10000
         ));
+        User user = createUser(userId);
+
         given(userQueryService.getById(any())).willReturn(user);
-        given(reservationViewQueryService.getAllByUserId(any(Long.class))).willReturn(reservationViews);
+        given(reservationQueryService.findMyReservationsByUserId(any(Long.class))).willReturn(given);
+        given(waitingReservationQueryService.findMyReservationsByUserId(any(Long.class))).willReturn(given);
 
         //when
         List<MyReservationsResponse> result = reservationFacade.getAllByUserId(userId);
 
         //then
-        assertThat(result).hasSize(1);
-        then(reservationViewQueryService).should(times(1)).getAllByUserId(any(Long.class));
+        assertThat(result).hasSize(2);
+        then(reservationQueryService).should(times(1)).findMyReservationsByUserId(any(Long.class));
+        then(waitingReservationQueryService).should(times(1)).findMyReservationsByUserId(any(Long.class));
     }
 
     @Test

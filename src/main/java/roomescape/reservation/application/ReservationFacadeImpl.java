@@ -34,6 +34,7 @@ import roomescape.user.domain.User;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -86,9 +87,10 @@ public class ReservationFacadeImpl implements ReservationFacade {
     @Override
     public List<MyReservationsResponse> getAllByUserId(final Long userId) {
         userQueryService.getById(userId);
-        return reservationViewQueryService.getAllByUserId(userId)
-                .stream()
-                .map(MyReservationsResponse::from)
+        return Stream.of(
+                        reservationQueryService.findMyReservationsByUserId(userId),
+                        waitingReservationQueryService.findMyReservationsByUserId(userId)
+                ).flatMap(List::stream)
                 .sorted(Comparator.comparing(MyReservationsResponse::sequence))
                 .toList();
     }

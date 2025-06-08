@@ -1,5 +1,6 @@
 package roomescape.reservation.domain;
 
+import roomescape.reservation.infrastructure.vo.MyReservation;
 import roomescape.theme.domain.Theme;
 import roomescape.time.domain.ReservationTime;
 
@@ -23,4 +24,6 @@ public interface WaitingReservationRepository {
     int decrementWaitingOrderAfter(ReservationDate date, ReservationTime time, Theme theme, int waitingOrder);
 
     Optional<Long> findUserIdById(Long id);
+
+    List<MyReservation> findMyReservationsByUserId(Long userId);
 }

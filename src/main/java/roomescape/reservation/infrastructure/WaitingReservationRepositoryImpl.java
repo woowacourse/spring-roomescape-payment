@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import roomescape.reservation.domain.ReservationDate;
 import roomescape.reservation.domain.WaitingReservation;
 import roomescape.reservation.domain.WaitingReservationRepository;
+import roomescape.reservation.infrastructure.vo.MyReservation;
 import roomescape.theme.domain.Theme;
 import roomescape.time.domain.ReservationTime;
 
@@ -64,5 +65,10 @@ public class WaitingReservationRepositoryImpl implements WaitingReservationRepos
     @Override
     public int findMaxWaitingByParams(final ReservationDate date, final ReservationTime time, final Theme theme) {
         return jpaWaitingReservationRepository.findMaxWaitingByParams(date, time, theme);
+    }
+
+    @Override
+    public List<MyReservation> findMyReservationsByUserId(final Long userId) {
+        return jpaWaitingReservationRepository.findMyReservationsByUserId(userId);
     }
 }

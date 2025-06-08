@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.reservation.application.dto.AvailableReservationTimeServiceRequest;
 import roomescape.reservation.application.dto.AvailableReservationTimeServiceResponse;
+import roomescape.reservation.application.dto.MyReservationsResponse;
 import roomescape.reservation.application.dto.ReservationSearchRequest;
 import roomescape.reservation.application.dto.ThemeToBookCountServiceResponse;
 import roomescape.reservation.domain.Reservation;
@@ -78,5 +79,12 @@ public class ReservationQueryService {
                                   final Long timeId,
                                   final Long themeId) {
         return reservationRepository.existsByParams(date, timeId, themeId);
+    }
+
+    public List<MyReservationsResponse> findMyReservationsByUserId(final Long userId) {
+        return reservationRepository.findMyReservationsByUserId(userId)
+                .stream()
+                .map(MyReservationsResponse::from)
+                .toList();
     }
 }

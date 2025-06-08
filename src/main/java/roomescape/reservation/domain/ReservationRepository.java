@@ -1,5 +1,6 @@
 package roomescape.reservation.domain;
 
+import roomescape.reservation.infrastructure.vo.MyReservation;
 import roomescape.reservation.infrastructure.vo.ThemeBookingCount;
 
 import java.util.List;
@@ -30,4 +31,6 @@ public interface ReservationRepository {
     List<Reservation> findAllByParams(Long userId, Long themeId, ReservationDate reservationDate, ReservationDate reservationDate1);
 
     void updateUserId(Long id, Long userId);
+
+    List<MyReservation> findMyReservationsByUserId(Long userId);
 }

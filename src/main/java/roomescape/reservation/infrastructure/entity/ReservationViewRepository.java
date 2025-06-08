@@ -1,13 +1,12 @@
-package roomescape.reservation.domain;
+package roomescape.reservation.infrastructure.entity;
 
-import java.util.List;
+import roomescape.reservation.domain.ReservationDate;
+
 import java.util.Optional;
 
 public interface ReservationViewRepository {
 
     boolean existsByParams(ReservationDate date, Long timeId, Long themeId, final Long userId);
-
-    List<ReservationView> findAllByUserId(Long userId);
 
     Optional<Long> findFirstWaitingByReservationId(Long id);
 }
