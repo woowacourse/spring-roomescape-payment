@@ -25,8 +25,7 @@ public class TossPaymentErrorResponseFilter implements ResponseErrorHandler {
     }
 
     @Override
-    public void handleError(@NonNull URI url, @NonNull HttpMethod method, ClientHttpResponse response)
-            throws IOException {
+    public void handleError(final ClientHttpResponse response) throws IOException {
         String body = new String(response.getBody().readAllBytes());
         JsonNode jsonNode = objectMapper.readTree(body);
         String message = jsonNode.get("message").asText();
@@ -34,5 +33,11 @@ public class TossPaymentErrorResponseFilter implements ResponseErrorHandler {
             throw new PaymentException(message, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         throw new PaymentException(message, HttpStatus.valueOf(response.getStatusCode().value()));
+    }
+
+    @Override
+    public void handleError(@NonNull URI url, @NonNull HttpMethod method, ClientHttpResponse response)
+            throws IOException {
+        handleError(response);
     }
 }
