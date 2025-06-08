@@ -31,7 +31,7 @@ public class NotPaidPaymentProcessor {
 
         Payment payment = getPaymentByReservationId(reservationId);
         validateCanProcessStatus(payment);
-        payment.assignPaymentInformation(request.paymentKey(), request.orderId(), request.amount());
+        payment.assignPaymentInformationForPending(request.paymentKey(), request.orderId(), request.amount());
         payment.updateStatusTo(PaymentStatus.PENDING);
         log.info("결제 준비 완료 - 예약ID={}, 상태={}", reservationId, PaymentStatus.PENDING);
         return payment;

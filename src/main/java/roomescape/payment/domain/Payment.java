@@ -84,7 +84,7 @@ public class Payment {
         this.receiptUrl = receiptUrl;
     }
 
-    public void assignPaymentInformation(String paymentKey, String orderId, Long amount) {
+    public void assignPaymentInformationForPending(String paymentKey, String orderId, Long amount) {
         this.paymentKey = paymentKey;
         this.orderId = orderId;
         this.amount = amount;
