@@ -1,5 +1,6 @@
 package roomescape.theme.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -28,17 +29,20 @@ public class ThemeController {
 
     private final ThemeService themeService;
 
+    @Operation(summary = "테마 목록 조회", description = "전체 테마 목록을 조회합니다.")
     @GetMapping
     public List<ThemeWebResponse> getAll() {
         return themeService.getAll();
     }
 
+    @Operation(summary = "테마 랭킹 조회", description = "테마의 상위 랭킹 목록을 조회합니다.")
     @PermitAll
     @GetMapping("/ranking")
     public ResponseEntity<List<ThemeWebResponse>> getRanking() {
         return ResponseEntity.ok(themeService.getRanking());
     }
 
+    @Operation(summary = "테마 생성", description = "어드민 권한으로 테마를 생성합니다.")
     @RoleRequired(value = Role.ADMIN)
     @PostMapping
     public ResponseEntity<ThemeWebResponse> create(@RequestBody final CreateThemeWebRequest createThemeWebRequest) {
@@ -48,6 +52,7 @@ public class ThemeController {
                 .body(themeWebResponse);
     }
 
+    @Operation(summary = "테마 삭제", description = "어드민 권한으로 테마를 삭제합니다.")
     @RoleRequired(value = Role.ADMIN)
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable final Long id) {

@@ -71,7 +71,7 @@ public class MissionStepTest {
         memberToken = authService.login(new LoginRequest(memberEmail, memberPassword));
         adminToken = authService.login(new LoginRequest(adminEmail, adminPassword));
 
-        when(paymentService.completePayment(any(), any())).thenReturn(
+        when(paymentService.completePayment(any())).thenReturn(
             Payment.withId(1L, "paymentKey", "orderId", 1000L, "2024-10-05", "2024-10-05"));
     }
 

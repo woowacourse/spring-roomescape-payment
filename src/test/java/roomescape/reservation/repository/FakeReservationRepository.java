@@ -86,6 +86,18 @@ public class FakeReservationRepository implements ReservationRepository {
     }
 
     @Override
+    public List<Reservation> findAllWithPayment() {
+        return new ArrayList<>(reservations);
+    }
+
+    @Override
+    public List<Reservation> findAllWithPaymentByMemberId(Long memberId) {
+        return reservations.stream()
+            .filter(reservation -> Objects.equals(reservation.getMember().getId(), memberId))
+            .toList();
+    }
+
+    @Override
     public void deleteById(Long id) {
         Reservation reservation = reservations.stream()
                 .filter(value -> Objects.equals(value.getId(), id))
