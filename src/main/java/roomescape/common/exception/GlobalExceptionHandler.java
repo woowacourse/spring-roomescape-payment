@@ -28,6 +28,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(TossPaymentErrorException.class)
     public ResponseEntity<String> handle(final TossPaymentErrorException e) {
         log.error("toss api exception : " + "code : " + e.getCode() + ", message :" + e.getMessage());
+
+        if (e.isTreatedAsServerError()) {  // NOTE. 사용자 친화적인 메세지는 GlobalExceptionHandler 책임이라고 생각하여,TossPaymentErrorException에서 처리 X 파랑에게 여쭤보기
+            return new ResponseEntity<>("서버 내부에 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         return new ResponseEntity<>(e.getMessage(), e.getStatus());
     }
 
