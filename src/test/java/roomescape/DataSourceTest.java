@@ -135,31 +135,32 @@ public class DataSourceTest {
         assertThat(reservations.size()).isEqualTo(count);
     }
 
-//    @DisplayName("reservation 삽입, 삭제 검증")
-//    @Test
-//    void 육단계() {
-//        // given & when
-//        givenCreateTheme();
-//        givenCreateReservationTime();
-//        givenCreateSchedule();
-//        givenCreateMember();
-//        final Cookie cookie = givenAuthCookie();
-//        givenOrder(cookie);
-//        givenCreateReservation(cookie);
-//
-//        // then
-//        Integer count = jdbcTemplate.queryForObject("SELECT count(1) from reservation", Integer.class);
-//        assertThat(count).isEqualTo(1);
-//
-//        // given & when & then
-//        RestAssured.given().port(port).log().all()
-//                .when().delete("/reservations/1")
-//                .then().log().all()
-//                .statusCode(204);
-//
-//        Integer countAfterDelete = jdbcTemplate.queryForObject("SELECT count(1) from reservation", Integer.class);
-//        assertThat(countAfterDelete).isEqualTo(0);
-//    }
+    @DisplayName("reservation 삽입, 삭제 검증")
+    @Test
+    void 육단계() {
+        // given
+        givenCreateTheme();
+        givenCreateReservationTime();
+        givenCreateSchedule();
+        givenCreateMember();
+        final Cookie cookie = givenAuthCookie();
+        givenOrder(cookie);
+        givenCreateReservation(cookie);
+
+        // when
+        Integer count = jdbcTemplate.queryForObject("SELECT count(1) from reservation", Integer.class);
+        assertThat(count).isEqualTo(1);
+        jdbcTemplate.update("DELETE FROM reservation_payment");
+
+        // then
+        RestAssured.given().port(port).log().all()
+                .when().delete("/reservations/1")
+                .then().log().all()
+                .statusCode(204);
+
+        Integer countAfterDelete = jdbcTemplate.queryForObject("SELECT count(1) from reservation", Integer.class);
+        assertThat(countAfterDelete).isEqualTo(0);
+    }
 
     private void givenCreateReservationTime() {
         RestAssured.given().port(port).log().all()
