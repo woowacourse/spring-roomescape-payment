@@ -1,11 +1,13 @@
 package roomescape.reservationpayment.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import roomescape.booking.reservation.Reservation;
 
 public record ReservationPaymentRequest(
-        String orderId,
-        Long amount,
-        String paymentKey,
-        Reservation reservation
+        @NotBlank String orderId,
+        @NotNull Long amount,
+        @NotBlank String paymentKey,
+        @NotNull Reservation reservation
 ) {
 }
