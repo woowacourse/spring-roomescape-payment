@@ -143,11 +143,12 @@ class ReservationQueryServiceTest {
         // given
         LoginInfo loginInfo = new LoginInfo(member);
         List<Reservation> myReservations = List.of(reservation);
+        ReservationPayment reservationPayment = new ReservationPayment(reservation, new Payment("paymentKey", "ORDERID", 1000L));
 
         when(reservationRepository.findReservationsByMemberId(loginInfo.id()))
                 .thenReturn(myReservations);
         when(reservationPaymentRepository.findByReservationId(any(Long.class)))
-                .thenReturn(Optional.of(new ReservationPayment(reservation, new Payment(null, null, null))));
+                .thenReturn(Optional.of(reservationPayment));
 
         // when
         List<MyReservationResponseDto> result = reservationQueryService.findMyReservations(loginInfo);
@@ -156,6 +157,7 @@ class ReservationQueryServiceTest {
         assertThat(result).hasSize(1);
         assertThat(result.get(0).id()).isEqualTo(reservation.getId());
         assertThat(result.get(0).theme()).isEqualTo(theme.getName());
+        assertThat(result.get(0).paymentKey()).isEqualTo(reservationPayment.getPayment().getPaymentKey());
         assertThat(result.get(0).statusMessage()).isEqualTo(ReservationStatus.RESERVED.getMessage());
     }
 
