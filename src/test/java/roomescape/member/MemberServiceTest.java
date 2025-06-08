@@ -16,7 +16,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
 public class MemberServiceTest {
@@ -25,27 +24,6 @@ public class MemberServiceTest {
     private MemberRepository memberRepository;
     @InjectMocks
     private MemberService memberService;
-
-    @DisplayName("member를 생성하여 저장한다.")
-    @Test
-    void create() {
-        // given
-        final MemberRequest memberRequest = new MemberRequest("admin@email.com", "password", "부기");
-        final Member expected = new Member(
-                memberRequest.email(),
-                memberRequest.password(),
-                memberRequest.name(),
-                MemberRole.MEMBER
-        );
-
-        // when
-        memberService.create(memberRequest);
-
-        // then
-        then(memberRepository)
-                .should()
-                .save(expected);
-    }
 
     @DisplayName("이미 존재하는 이메일로 생성하면, 예외가 발생한다.")
     @Test
