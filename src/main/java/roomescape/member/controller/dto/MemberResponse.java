@@ -1,10 +1,19 @@
 package roomescape.member.controller.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import roomescape.member.domain.Member;
 
-public record MemberResponse(Long id, String name) {
+@Schema(description = "멤버 응답 정보")
+public record MemberResponse(
 
+        @Schema(description = "멤버 ID", example = "1")
+        Long id,
+
+        @Schema(description = "멤버 이름", example = "홍길동")
+        String name
+
+) {
     public static MemberResponse from(final Member member) {
         return new MemberResponse(member.getId(), member.getName().name());
     }
