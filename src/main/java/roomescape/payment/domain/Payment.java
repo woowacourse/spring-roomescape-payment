@@ -2,6 +2,8 @@ package roomescape.payment.domain;
 
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.util.Objects;
 
@@ -9,6 +11,10 @@ import java.util.Objects;
 public class Payment {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @Embedded
     private PaymentKey paymentKey;
 
     @Embedded
@@ -20,6 +26,10 @@ public class Payment {
     }
 
     protected Payment() {
+    }
+
+    public long getId() {
+        return id;
     }
 
     public PaymentKey getPaymentKey() {
