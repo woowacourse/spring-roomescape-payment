@@ -32,7 +32,7 @@ public class TossConfirmationService {
         reservationPaymentCreator.saveReservationAndPayment(reservationPaymentRequest, loginMember);
         confirmPayment(reservationPaymentRequest.toPaymentRequest());
 
-        log.info("예약+결제 완료 - memberId={}, paymetKey={}",
+        log.info("예약+결제 완료 - memberId={}, paymentKey={}",
                 loginMember.id(), reservationPaymentRequest.paymentKey());
     }
 

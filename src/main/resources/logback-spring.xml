@@ -2,11 +2,12 @@
 <configuration>
     <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
     <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter" />
+    <conversionRule conversionWord="mask" converterClass="roomescape.common.logging.MaskingConverter"/>
 
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
             <pattern>
-                %clr(${APP_NAME:-}){green} %clr([%X{requestId}]){yellow} %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%-5level) %clr(%logger{36}){cyan} - %msg%n%wEx
+                %clr(${APP_NAME:-}){green} %clr([%thread]){magenta} %clr([%X{requestId}]){yellow} %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%-5level) %clr(%logger{36}){cyan} - %mask%n%wEx
             </pattern>
         </layout>
     </appender>
