@@ -94,3 +94,5 @@ tasks.register('copyApiDocument', Copy) {
 build {
     dependsOn copyApiDocument
 }
+
+processResources.dependsOn copyApiDocument
