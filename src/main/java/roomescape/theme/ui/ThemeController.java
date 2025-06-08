@@ -1,5 +1,6 @@
 package roomescape.theme.ui;
 
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,10 @@ import roomescape.theme.application.dto.ThemeResponse;
 public class ThemeController {
     private final ThemeService themeService;
 
+    @Operation(
+            summary = "전체 테마 목록 조회",
+            description = "저장된 모든 테마를 조회합니다."
+    )
     @GetMapping
     public ResponseEntity<ApiResponse<List<ThemeResponse>>> getAll() {
         List<ThemeResponse> response = themeService.findAll();
@@ -23,6 +28,10 @@ public class ThemeController {
         return ResponseEntity.ok(apiResponse);
     }
 
+    @Operation(
+            summary = "기간별 인기 테마 순위 조회",
+            description = "특정 기간 내 인기 있는 테마를 순위별로 조회합니다."
+    )
     @GetMapping("/ranked")
     public ResponseEntity<ApiResponse<List<ThemeResponse>>> getRankedByPeriod() {
         List<ThemeResponse> response = themeService.findRankedByPeriod();

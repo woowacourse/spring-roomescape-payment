@@ -1,5 +1,6 @@
 package roomescape.reservationTime.ui;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,10 @@ import roomescape.reservationTime.application.dto.AvailableTimeResponse;
 public class ReservationTimeController {
     private final ReservationTimeService timeService;
 
+    @Operation(
+            summary = "예약 가능한 시간 조회",
+            description = "입력된 날짜 및 테마 조건에 맞는 예약 가능한 시간을 반환합니다."
+    )
     @GetMapping("/available")
     public ResponseEntity<ApiResponse<List<AvailableTimeResponse>>> get(
             @Valid @ModelAttribute AvailableTimeRequest request

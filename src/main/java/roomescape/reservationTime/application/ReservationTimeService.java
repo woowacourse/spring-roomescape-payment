@@ -4,6 +4,7 @@ import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.reservation.domain.repository.ReservationRepository;
@@ -19,6 +20,7 @@ import roomescape.reservationTime.exception.UsingTimeException;
 @Service
 @AllArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class ReservationTimeService {
     private final ReservationTimeRepository timeRepository;
     private final ReservationRepository reservationRepository;
@@ -29,7 +31,9 @@ public class ReservationTimeService {
         validateTimeNotExists(startedAt);
 
         ReservationTime reservationTime = new ReservationTime(request.startAt());
-        return TimeResponse.from(timeRepository.save(reservationTime));
+        ReservationTime saveTime = timeRepository.save(reservationTime);
+        log.info("예약 시간 생성 완료 timeId={}, startAt={}", saveTime.getId(), saveTime.getStartAt());
+        return TimeResponse.from(saveTime);
     }
 
     private void validateTimeNotExists(LocalTime startedAt) {
@@ -58,6 +62,7 @@ public class ReservationTimeService {
     public void deleteById(Long id) {
         validateUnUsedTime(id);
         timeRepository.deleteById(id);
+        log.info("예약 시간 삭제 완료 id={}", id);
     }
 
     private void validateUnUsedTime(Long id) {

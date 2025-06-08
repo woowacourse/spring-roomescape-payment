@@ -2,6 +2,7 @@ package roomescape.member.application;
 
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.member.application.dto.MemberRequest;
@@ -13,10 +14,12 @@ import roomescape.member.domain.Password;
 import roomescape.member.domain.PasswordEncoder;
 import roomescape.member.domain.repository.MemberRepository;
 import roomescape.member.exception.EmailAlreadyExistsException;
+import roomescape.reservation.domain.Reservation;
 
 @Service
 @AllArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
@@ -30,7 +33,9 @@ public class MemberService {
                 new Email(request.email()),
                 new Password(request.password(), passwordEncoder)
         );
-        return MemberResponse.from(memberRepository.save(member));
+        Member saveMember = memberRepository.save(member);
+        log.info("회원가입 성공: memberName={} , email={}", member.getName(), member.getEmail());
+        return MemberResponse.from(saveMember);
     }
 
     private void validateEmailDuplicated(MemberRequest request) {

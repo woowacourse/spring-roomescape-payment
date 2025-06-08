@@ -1,10 +1,12 @@
 package roomescape.reservation.ui;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,16 +25,25 @@ import roomescape.reservation.application.dto.UserReservationRequest;
 @RestController
 @AllArgsConstructor
 @RequestMapping("reservations")
+@Slf4j
 public class ReservationController {
     private final ReservationService reservationService;
     private final SessionManager sessionManager;
 
+    @Operation(
+            summary = "예약 생성",
+            description = """
+            사용자가 사전 결제된 정보를 바탕으로 예약을 생성합니다.  
+            세션에서 결제 정보를 가져오며, 예약이 완료되면 세션 정보는 삭제됩니다.
+        """
+    )
     @PostMapping
     public ResponseEntity<ApiResponse<ReservationResponse>> create(
             @Valid @RequestBody UserReservationRequest request,
             @LoginMemberId Long memberId,
             HttpSession session
     ) {
+        log.info("예약 요청: memberId={}, orderId={}, amount={}", memberId, request.orderId(), request.orderId());
         BigDecimal originAmount = (BigDecimal) sessionManager.getFromSession(session, request.orderId());
         ReservationResponse response = reservationService.createByUser(memberId, request, originAmount);
         sessionManager.removeFromSession(session, request.orderId());
@@ -40,10 +51,15 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(apiResponse);
     }
 
+    @Operation(
+            summary = "내 예약 목록 조회",
+            description = "로그인한 사용자의 모든 예약을 조회합니다."
+    )
     @GetMapping
     public ResponseEntity<ApiResponse<List<MyReservationResponse>>> getAll(
             @LoginMemberId Long memberId
     ) {
+        log.info("예약 목록 조회 요청 memberId={}", memberId);
         List<MyReservationResponse> response = reservationService.findAllByMemberId(memberId);
         ApiResponse<List<MyReservationResponse>> apiResponse = ApiResponse.createSuccess(response);
         return ResponseEntity.ok().body(apiResponse);

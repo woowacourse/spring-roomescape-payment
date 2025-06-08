@@ -1,7 +1,9 @@
 package roomescape.waiting.ui;
 
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,9 +18,14 @@ import roomescape.waiting.application.dto.WaitingResponse;
 @RestController
 @AllArgsConstructor
 @RequestMapping("admin/waitings")
+@Slf4j
 public class AdminWaitingController {
     private final WaitingService waitingService;
 
+    @Operation(
+            summary = "모든 대기 목록 조회",
+            description = "관리자가 모든 대기 정보를 조회합니다."
+    )
     @GetMapping
     public ResponseEntity<ApiResponse<List<WaitingResponse>>> getAll() {
         List<WaitingResponse> response = waitingService.findAll();
@@ -26,8 +33,13 @@ public class AdminWaitingController {
         return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
     }
 
+    @Operation(
+            summary = "대기 정보 삭제",
+            description = "관리자가 특정 대기 정보를 ID로 삭제합니다."
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable("id") Long id) {
+        log.info("대기 정보 삭제 요청: deleteId={}", id);
         waitingService.deleteByAdmin(id);
         ApiResponse<Void> apiResponse = ApiResponse.createSuccessWithNoData();
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(apiResponse);
