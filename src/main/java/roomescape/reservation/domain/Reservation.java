@@ -62,7 +62,6 @@ public class Reservation {
         this.paymentKey = Objects.requireNonNull(paymentKey);
     }
 
-    // TODO: 미사용 생성자 제거
     public Reservation(
             final Long id,
             final Member member,
@@ -111,5 +110,13 @@ public class Reservation {
 
     public PaymentKey getPaymentKey() {
         return paymentKey;
+    }
+
+    public String getPaymentKeyasString() {
+        return paymentKey.paymentKey();
+    }
+
+    public Long getAmountAsLong() {
+        return amount.amount();
     }
 }

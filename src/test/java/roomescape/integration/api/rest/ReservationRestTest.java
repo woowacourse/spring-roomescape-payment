@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.is;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import java.util.Map;
+import javax.swing.text.DefaultEditorKit.CopyAction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,10 @@ import roomescape.integration.fixture.ReservationScheduleDbFixture;
 import roomescape.integration.fixture.ReservationTimeDbFixture;
 import roomescape.integration.fixture.ThemeDbFixture;
 import roomescape.member.domain.Member;
+import roomescape.reservation.domain.Amount;
+import roomescape.reservation.domain.OrderId;
+import roomescape.reservation.domain.PaymentInfo;
+import roomescape.reservation.domain.PaymentKey;
 import roomescape.reservation.domain.Reservation;
 import roomescape.schedule.domain.ReservationSchedule;
 import roomescape.theme.domain.Theme;
@@ -117,7 +122,12 @@ class ReservationRestTest extends RestAssuredTestBase {
 
     @Test
     void 내_예약을_조회한다() {
-        Reservation reservation = reservationDbFixture.예약_생성(schedule, restLoginMember.member());
+        PaymentInfo paymentInfo = new PaymentInfo(
+                new OrderId("testId"),
+                new Amount(1000L),
+                new PaymentKey("testKey")
+        );
+        Reservation reservation = reservationDbFixture.예약_생성(schedule, restLoginMember.member(), paymentInfo);
         ReservationSchedule schedule = reservation.getSchedule();
         RestAssured.given().log().all()
                 .cookie("JSESSIONID", restLoginMember.sessionId())
