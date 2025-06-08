@@ -28,7 +28,7 @@ import roomescape.theme.domain.Theme;
 import roomescape.theme.service.ThemeService;
 
 @Service
-public class ReservationUseCase {
+public class ReservationFacadeService {
 
     private final ReservationService reservationService;
     private final ReservationCreatorService reservationCreatorService;
@@ -39,13 +39,13 @@ public class ReservationUseCase {
     private final PaymentService paymentService;
     private final PaymentApiClient paymentApiClient;
 
-    public ReservationUseCase(final ReservationService reservationService,
-                              final ReservationCreatorService reservationCreatorService,
-                              final WaitingService waitingService,
-                              final MemberService memberService,
-                              final ThemeService themeService,
-                              final ReservationTimeService reservationTimeService,
-                              final PaymentService paymentService, final PaymentApiClient paymentApiClient) {
+    public ReservationFacadeService(final ReservationService reservationService,
+                                    final ReservationCreatorService reservationCreatorService,
+                                    final WaitingService waitingService,
+                                    final MemberService memberService,
+                                    final ThemeService themeService,
+                                    final ReservationTimeService reservationTimeService,
+                                    final PaymentService paymentService, final PaymentApiClient paymentApiClient) {
         this.reservationService = reservationService;
         this.reservationCreatorService = reservationCreatorService;
         this.waitingService = waitingService;

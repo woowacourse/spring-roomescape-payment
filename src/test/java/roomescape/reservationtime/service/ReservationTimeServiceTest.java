@@ -27,8 +27,8 @@ import roomescape.reservation.fixture.TestFixture;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservation.repository.WaitingRepository;
 import roomescape.reservation.service.ReservationCreatorService;
+import roomescape.reservation.service.ReservationFacadeService;
 import roomescape.reservation.service.ReservationService;
-import roomescape.reservation.service.ReservationUseCase;
 import roomescape.reservation.service.WaitingService;
 import roomescape.reservationtime.dto.request.ReservationTimeCreateRequest;
 import roomescape.reservationtime.dto.response.AvailableReservationTimeResponse;
@@ -54,7 +54,7 @@ class ReservationTimeServiceTest {
     private Member member = TestFixture.makeMember();
 
     private ReservationTimeService reservationTimeService;
-    private ReservationUseCase reservationUseCase;
+    private ReservationFacadeService reservationFacadeService;
 
     @Autowired
     private ReservationTimeRepository reservationTimeRepository;
@@ -89,7 +89,7 @@ class ReservationTimeServiceTest {
                 reservationRepository);
         theme = themeRepository.save(theme);
         member = memberRepository.save(member);
-        reservationUseCase = new ReservationUseCase(
+        reservationFacadeService = new ReservationFacadeService(
                 reservationService,
                 new ReservationCreatorService(reservationService, themeService, memberService, reservationTimeService),
                 new WaitingService(waitingRepository),
@@ -149,7 +149,7 @@ class ReservationTimeServiceTest {
         ReservationTimeResponse reservationTimeResponse = reservationTimeService.create(
                 new ReservationTimeCreateRequest(LocalTime.now()));
         ReservationRequest request = new ReservationRequest(futureDate, reservationTimeResponse.id(), theme.getId());
-        reservationUseCase.createForAdmin(request, member.getId()
+        reservationFacadeService.createForAdmin(request, member.getId()
         );
         assertThatThrownBy(() -> reservationTimeService.delete(reservationTimeResponse.id()))
                 .isInstanceOf(ReservationTimeInUseException.class)
@@ -163,7 +163,7 @@ class ReservationTimeServiceTest {
         reservationTimeService.create(new ReservationTimeCreateRequest(LocalTime.of(11, 0)));
         reservationTimeService.create(new ReservationTimeCreateRequest(LocalTime.of(12, 0)));
         ReservationRequest request = new ReservationRequest(futureDate, reservationTimeResponse.id(), theme.getId());
-        reservationUseCase.createForAdmin(request, member.getId());
+        reservationFacadeService.createForAdmin(request, member.getId());
 
         List<AvailableReservationTimeResponse> availableReservationTimes = reservationTimeService.getAvailableReservationTimes(
                 futureDate, theme.getId());

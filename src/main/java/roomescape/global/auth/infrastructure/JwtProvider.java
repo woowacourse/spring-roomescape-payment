@@ -69,7 +69,7 @@ public class JwtProvider {
             return getAllClaimsFromToken(token).getExpiration()
                     .before(new Date());
         } catch (IllegalArgumentException e) {
-            return false;
+            return true;
         }
     }
 }

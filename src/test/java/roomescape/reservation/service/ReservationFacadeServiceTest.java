@@ -47,7 +47,7 @@ import roomescape.theme.service.ThemeService;
 @TestPropertySource(properties = {
         "spring.sql.init.mode=never"
 })
-class ReservationUseCaseTest {
+class ReservationFacadeServiceTest {
 
     private static final LocalDate futureDate = TestFixture.makeFutureDate();
 
@@ -75,7 +75,7 @@ class ReservationUseCaseTest {
     @Mock
     private TossApiClient tossApiClient;
 
-    private ReservationUseCase reservationUseCase;
+    private ReservationFacadeService reservationFacadeService;
     private ReservationTime time;
     private Theme theme;
     private Member member;
@@ -88,7 +88,7 @@ class ReservationUseCaseTest {
         ReservationTimeService reservationTimeService = new ReservationTimeService(reservationTimeRepository,
                 reservationRepository);
 
-        reservationUseCase = new ReservationUseCase(
+        reservationFacadeService = new ReservationFacadeService(
                 reservationService,
                 new ReservationCreatorService(reservationService, themeService, memberService, reservationTimeService),
                 new WaitingService(waitingRepository),
@@ -107,7 +107,7 @@ class ReservationUseCaseTest {
 
     @Test
     void createForAdmin_shouldExecuteReservationReservation() {
-        ReservationResponse response = reservationUseCase.createForAdmin(
+        ReservationResponse response = reservationFacadeService.createForAdmin(
                 new ReservationRequest(futureDate, time.getId(), theme.getId()),
                 member.getId()
         );
@@ -122,7 +122,7 @@ class ReservationUseCaseTest {
 
     @Test
     void executeReservationForAdmin_shouldThrowException_whenTimeNotFound() {
-        assertThatThrownBy(() -> reservationUseCase.createForAdmin(
+        assertThatThrownBy(() -> reservationFacadeService.createForAdmin(
                 new ReservationRequest(futureDate, 999L, theme.getId()),
                 member.getId()))
                 .isInstanceOf(ReservationTimeNotFoundException.class)
@@ -131,7 +131,7 @@ class ReservationUseCaseTest {
 
     @Test
     void createWaiting_shouldExecuteReservationWaiting() {
-        ReservationResponse response = reservationUseCase.createWaiting(
+        ReservationResponse response = reservationFacadeService.createWaiting(
                 new ReservationRequest(futureDate, time.getId(), theme.getId()),
                 member.getId()
         );
@@ -146,12 +146,12 @@ class ReservationUseCaseTest {
 
     @Test
     void executeReservation_shouldThrowException_whenReservationExists() {
-        reservationUseCase.createForAdmin(
+        reservationFacadeService.createForAdmin(
                 new ReservationRequest(futureDate, time.getId(), theme.getId()),
                 member.getId()
         );
 
-        assertThatThrownBy(() -> reservationUseCase.executeReservation(
+        assertThatThrownBy(() -> reservationFacadeService.executeReservation(
                 new ReservationCreateRequest(
                         new ReservationRequest(futureDate, time.getId(), theme.getId()),
                         new PaymentRequest(
@@ -167,16 +167,16 @@ class ReservationUseCaseTest {
 
     @Test
     void findMyReservations_shouldReturnAllMemberReservations() {
-        reservationUseCase.createForAdmin(
+        reservationFacadeService.createForAdmin(
                 new ReservationRequest(futureDate, time.getId(), theme.getId()),
                 member.getId()
         );
-        reservationUseCase.createWaiting(
+        reservationFacadeService.createWaiting(
                 new ReservationRequest(futureDate, time.getId(), theme.getId()),
                 member.getId()
         );
 
-        List<MyReservationResponse> result = reservationUseCase.findMyReservations(
+        List<MyReservationResponse> result = reservationFacadeService.findMyReservations(
                 new UserInfo(member.getId(), MemberRole.USER)
         );
 
@@ -189,18 +189,18 @@ class ReservationUseCaseTest {
 
     @Test
     void deleteReservation_shouldPromoteFirstWaiting() {
-        ReservationResponse reserved = reservationUseCase.createForAdmin(
+        ReservationResponse reserved = reservationFacadeService.createForAdmin(
                 new ReservationRequest(futureDate, time.getId(), theme.getId()),
                 member.getId()
         );
-        ReservationResponse waiting = reservationUseCase.createWaiting(
+        ReservationResponse waiting = reservationFacadeService.createWaiting(
                 new ReservationRequest(futureDate, time.getId(), theme.getId()),
                 member.getId()
         );
 
-        reservationUseCase.deleteReservation(reserved.id());
+        reservationFacadeService.deleteReservation(reserved.id());
 
-        List<MyReservationResponse> result = reservationUseCase.findMyReservations(
+        List<MyReservationResponse> result = reservationFacadeService.findMyReservations(
                 new UserInfo(member.getId(), MemberRole.USER)
         );
 
@@ -212,14 +212,14 @@ class ReservationUseCaseTest {
 
     @Test
     void deleteReservation_shouldNotPromote_whenNoWaitingExists() {
-        ReservationResponse reserved = reservationUseCase.createForAdmin(
+        ReservationResponse reserved = reservationFacadeService.createForAdmin(
                 new ReservationRequest(futureDate, time.getId(), theme.getId()),
                 member.getId()
         );
 
-        reservationUseCase.deleteReservation(reserved.id());
+        reservationFacadeService.deleteReservation(reserved.id());
 
-        List<MyReservationResponse> result = reservationUseCase.findMyReservations(
+        List<MyReservationResponse> result = reservationFacadeService.findMyReservations(
                 new UserInfo(member.getId(), MemberRole.USER)
         );
 
