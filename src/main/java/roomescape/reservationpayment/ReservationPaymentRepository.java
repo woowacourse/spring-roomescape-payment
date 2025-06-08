@@ -2,7 +2,9 @@ package roomescape.reservationpayment;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Optional;
+
 public interface ReservationPaymentRepository extends JpaRepository<ReservationPayment, Long> {
 
-    ReservationPayment findByReservationId(Long reservationId);
+    Optional<ReservationPayment> findByReservationId(Long reservationId);
 }

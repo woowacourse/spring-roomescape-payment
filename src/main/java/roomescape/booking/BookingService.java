@@ -13,7 +13,7 @@ import roomescape.booking.reservation.ReservationStatus;
 import roomescape.booking.waiting.Waiting;
 import roomescape.booking.waiting.WaitingService;
 import roomescape.reservationpayment.ReservationPayment;
-import roomescape.reservationpayment.ReservationPaymentRepository;
+import roomescape.reservationpayment.ReservationPaymentService;
 import roomescape.schedule.Schedule;
 
 import java.util.List;
@@ -26,7 +26,7 @@ public class BookingService {
 
     private final ReservationService reservationService;
     private final WaitingService waitingService;
-    private final ReservationPaymentRepository reservationPaymentRepository;
+    private final ReservationPaymentService reservationPaymentService;
 
     @Transactional(readOnly = true)
     public List<BookingResponse> readAllByMember(final LoginMember loginMember) {
@@ -35,7 +35,7 @@ public class BookingService {
 
         return Stream.concat(
                 reservations.stream().map(reservation -> {
-                    ReservationPayment reservationPayment = reservationPaymentRepository.findByReservationId(reservation.getId());
+                    ReservationPayment reservationPayment = reservationPaymentService.getByReservationId(reservation.getId());
                     return BookingResponse.of(reservation, reservationPayment);
                 }),
                 waitings.stream().map((waiting) -> BookingResponse.of(waiting, waitingService.getRank(waiting) + 1))

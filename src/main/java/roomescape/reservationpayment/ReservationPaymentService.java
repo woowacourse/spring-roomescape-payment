@@ -6,6 +6,7 @@ import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import roomescape.booking.reservation.TossPaymentConfirmCommandFactory;
+import roomescape.exception.custom.reason.reservationpayment.ReservationPaymentNotFoundException;
 import roomescape.external.tosspayment.TossPaymentAdapter;
 import roomescape.external.tosspayment.dto.TossPaymentConfirmCommand;
 import roomescape.reservationpayment.dto.ReservationPaymentRequest;
@@ -40,5 +41,10 @@ public class ReservationPaymentService {
                 savedReservationPayment.getReservation().getId(),
                 savedReservationPayment.getPaymentKey(),
                 savedReservationPayment.getOrderId());
+    }
+
+    public ReservationPayment getByReservationId(final Long reservationId) {
+        return reservationPaymentRepository.findByReservationId(reservationId)
+                .orElseThrow(ReservationPaymentNotFoundException::new);
     }
 }
