@@ -40,7 +40,6 @@ public class LoginService {
     public LoginCheckResponse checkLogin(final LoginCheckRequest request) {
         final Member member = memberRepository.findById(request.id())
             .orElseThrow(() -> new NotFoundException("회원 정보가 존재하지 않습니다."));
-        log.info("member login: ", member.getId());
         return LoginCheckResponse.from(member);
     }
 
