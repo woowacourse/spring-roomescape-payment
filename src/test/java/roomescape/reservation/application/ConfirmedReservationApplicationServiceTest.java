@@ -24,9 +24,9 @@ import roomescape.member.domain.MemberRole;
 import roomescape.member.exception.MemberNotFoundException;
 import roomescape.member.infrastructure.MemberRepository;
 import roomescape.payment.application.PaymentService;
-import roomescape.payment.application.client.PaymentClient;
 import roomescape.payment.application.infrastructure.PaymentRepository;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentGateway;
 import roomescape.payment.domain.PaymentType;
 import roomescape.reservation.application.dto.request.ConfirmedReservationByCriteriaWebRequest;
 import roomescape.reservation.application.dto.request.ConfirmedReservationCreateRequest;
@@ -75,7 +75,7 @@ class ConfirmedReservationApplicationServiceTest {
     private PaymentRepository paymentRepository;
 
     @MockitoBean
-    private PaymentClient paymentClient;
+    private PaymentGateway paymentGateway;
 
     @Autowired
     private TestEventPublisher eventPublisher;
@@ -105,7 +105,7 @@ class ConfirmedReservationApplicationServiceTest {
                 memberDataService, reservationDataService, eventPublisher);
         waitingReservationApplicationService = new WaitingReservationApplicationService(reservationSlotDataService,
                 memberDataService, reservationDataService);
-        paymentService = new PaymentService(paymentClient, paymentRepository, eventPublisher);
+        paymentService = new PaymentService(paymentGateway, paymentRepository, eventPublisher);
 
         timeId = reservationTimeRepository.save(new ReservationTime(LocalTime.of(9, 0))).getId();
         themeId = themeRepository.save(TestFixture.makeTheme()).getId();

@@ -7,42 +7,54 @@ import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import roomescape.common.properties.PaymentClientProperties;
+import roomescape.payment.application.dto.PaymentGatewayRequest;
+import roomescape.payment.application.dto.PaymentGatewayResponse;
+import roomescape.payment.application.dto.TossPaymentMapper;
+import roomescape.payment.domain.PaymentGateway;
 import roomescape.payment.exception.PaymentClientException;
 import roomescape.payment.exception.PaymentForbiddenException;
 import roomescape.payment.exception.handler.PaymentExceptionHandler;
-import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
+import roomescape.payment.presentation.dto.request.TossPaymentApproveRequest;
 import roomescape.payment.presentation.dto.response.TossPaymentApproveResponse;
 
 @Component
 @EnableConfigurationProperties(PaymentClientProperties.class)
-public class PaymentClient {
+public class TossPaymentGateway implements PaymentGateway {
 
     private static final String BASIC = "Basic ";
     private static final String COLON = ":";
 
     private final RestClient restClient;
     private final PaymentExceptionHandler paymentExceptionHandler;
-    private final PaymentClientProperties paymentClientProperties;
+    private final PaymentClientProperties tossPaymentClientProperties;
+    private final TossPaymentMapper tossPaymentMapper;
     private final String encodingSecretKey;
 
-    public PaymentClient(final RestClient restClient,
-                         final PaymentExceptionHandler paymentExceptionHandler,
-                         final PaymentClientProperties paymentClientProperties) {
+    public TossPaymentGateway(final RestClient restClient,
+                              final PaymentExceptionHandler paymentExceptionHandler,
+                              final PaymentClientProperties tossPaymentClientProperties,
+                              final TossPaymentMapper tossPaymentMapper) {
         this.restClient = restClient;
         this.paymentExceptionHandler = paymentExceptionHandler;
-        this.paymentClientProperties = paymentClientProperties;
-        this.encodingSecretKey = encode(paymentClientProperties.getSecretKey() + COLON);
+        this.tossPaymentClientProperties = tossPaymentClientProperties;
+        this.tossPaymentMapper = tossPaymentMapper;
+        this.encodingSecretKey = encode(tossPaymentClientProperties.getSecretKey() + COLON);
     }
 
+    @Override
     @Retryable(retryFor = {PaymentClientException.class, PaymentForbiddenException.class})
-    public TossPaymentApproveResponse approvePayment(final PaymentApproveRequest paymentApproveRequest) {
-        return restClient.post()
-                .uri(paymentClientProperties.getConfirmApi())
+    public PaymentGatewayResponse approvePayment(final PaymentGatewayRequest paymentGatewayRequest) {
+        TossPaymentApproveRequest tossRequest = tossPaymentMapper.toTossRequest(paymentGatewayRequest);
+
+        TossPaymentApproveResponse tossResponse = restClient.post()
+                .uri(tossPaymentClientProperties.getConfirmApi())
                 .header(HttpHeaders.AUTHORIZATION, BASIC + encodingSecretKey)
-                .body(paymentApproveRequest)
+                .body(tossRequest)
                 .retrieve()
                 .onStatus(paymentExceptionHandler)
                 .body(TossPaymentApproveResponse.class);
+
+        return tossPaymentMapper.toGatewayResponse(tossResponse);
     }
 
     private String encode(String text) {

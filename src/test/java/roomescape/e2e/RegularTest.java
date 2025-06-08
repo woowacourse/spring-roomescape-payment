@@ -43,11 +43,11 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import roomescape.common.security.dto.request.LoginRequest;
-import roomescape.payment.application.client.PaymentClient;
-import roomescape.payment.domain.PaymentType;
-import roomescape.payment.presentation.dto.request.PaymentApproveRequest;
-import roomescape.payment.presentation.dto.request.PaymentRequest;
-import roomescape.payment.presentation.dto.response.TossPaymentApproveResponse;
+import roomescape.payment.application.dto.PaymentGatewayRequest;
+import roomescape.payment.application.dto.PaymentGatewayResponse;
+import roomescape.payment.domain.PaymentGateway;
+import roomescape.payment.presentation.dto.request.TossPaymentApproveRequest;
+import roomescape.payment.presentation.dto.response.PaymentApproveResponse;
 import roomescape.reservation.application.event.TestEventPublisher;
 import roomescape.reservationslot.presentation.dto.response.MyReservationResponse;
 import roomescape.reservationslot.presentation.dto.response.ReservationResponse;
@@ -61,7 +61,7 @@ import roomescape.reservationslot.presentation.dto.response.ReservationResponse;
 public class RegularTest {
 
     @MockitoBean
-    private PaymentClient paymentClient;
+    private PaymentGateway paymentGateway;
 
     @Autowired
     private TestEventPublisher eventPublisher;
@@ -304,11 +304,10 @@ public class RegularTest {
         long amount = 5000L;
 
         // when & then
-        PaymentRequest paymentRequest = new PaymentRequest(paymentKey, orderId, amount, PaymentType.NORMAL,
-                reservationId);
-        PaymentApproveRequest paymentApproveRequest = PaymentApproveRequest.from(paymentRequest);
-        TossPaymentApproveResponse paymentApproveResponse = new TossPaymentApproveResponse(paymentKey, orderId, amount);
-        Mockito.when(paymentClient.approvePayment(paymentApproveRequest)).thenReturn(paymentApproveResponse);
+        TossPaymentApproveRequest paymentRequest = new TossPaymentApproveRequest(paymentKey, orderId, amount, reservationId);
+        PaymentGatewayRequest paymentGatewayRequest = PaymentGatewayRequest.from(paymentRequest);
+        PaymentGatewayResponse paymentGatewayResponse = new PaymentGatewayResponse(paymentKey, orderId, amount);
+        Mockito.when(paymentGateway.approvePayment(paymentGatewayRequest)).thenReturn(paymentGatewayResponse);
 
         RestAssured.given(spec).log().all()
                 .filter(document(
@@ -317,8 +316,7 @@ public class RegularTest {
                                 fieldWithPath("paymentKey").description("결제 키"),
                                 fieldWithPath("orderId").description("주문 ID"),
                                 fieldWithPath("amount").description("결제 금액"),
-                                fieldWithPath("reservationId").description("예약 ID"),
-                                fieldWithPath("paymentType").description("결제 종류")
+                                fieldWithPath("reservationId").description("예약 ID")
                         ),
                         responseFields(
                                 fieldWithPath("orderId").description("주문 ID"),
@@ -332,6 +330,6 @@ public class RegularTest {
                 .then().log().all()
                 .statusCode(200)
                 .extract()
-                .as(TossPaymentApproveResponse.class);
+                .as(PaymentApproveResponse.class);
     }
 }
