@@ -1,4 +1,4 @@
-package roomescape.common.log.aspect;
+package roomescape.common.log;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;

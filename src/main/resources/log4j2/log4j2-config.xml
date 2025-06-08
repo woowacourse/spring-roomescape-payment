@@ -115,11 +115,11 @@
         </Root>
 
         <!-- 특정 패키지나 클래스에 대한 로거 설정 -->
-        <!-- roomescape.common.log.aspect.LoggingAspect 클래스에 대한 로거 설정 -->
+        <!-- roomescape.common.log.LoggingAspect 클래스에 대한 로거 설정 -->
         <!-- additivity="true"는 이 로거가 상위 로거의 Appender를 상속받도록 한다. -->
         <!-- true 이면 상위 로거의 Appender를 사용하고, false이면 상위 로거의 Appender를 사용하지 않는다. -->
         <!-- true 이면 파일로도 로그가 기록되고, 콘솔로도 로그가 출력된다. -->
-        <Logger name="roomescape.common.log.aspect.LoggingAspect" level="info" additivity="true">
+        <Logger name="roomescape.common.log.LoggingAspect" level="info" additivity="true">
             <AppenderRef ref="rollingFile"/>
         </Logger>
     </Loggers>
