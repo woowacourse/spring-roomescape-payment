@@ -1,5 +1,6 @@
 package roomescape.controller.api;
 
+import io.swagger.v3.oas.annotations.Operation;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -29,6 +30,7 @@ public class MemberReservationController {
         return "reservation-mine";
     }
 
+    @Operation(summary = "내 예약 목록 조회 API")
     @GetMapping("/reservations/me")
     public ResponseEntity<List<MyReservationAndWaitingsResponse>> getMyReservations(
             @CurrentMember LoginInfo loginInfo

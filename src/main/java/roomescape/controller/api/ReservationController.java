@@ -1,5 +1,8 @@
 package roomescape.controller.api;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,12 +36,17 @@ public class ReservationController {
         this.reservationPaymentService = reservationPaymentService;
     }
 
+    @Operation(summary = "예약 전체 조회 API")
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> getAllReservations() {
         List<ReservationResponse> allReservations = reservationService.findAllReservationResponses();
         return ResponseEntity.ok(allReservations);
     }
 
+    @Operation(summary = "예약 추가 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "예약 추가 성공")
+    })
     @PostMapping
     public ResponseEntity<String> addReservation(@CurrentMember LoginInfo loginInfo,
                                                  @RequestBody final ReservationPaymentRequest request) {
@@ -58,6 +66,10 @@ public class ReservationController {
         return ResponseEntity.created(URI.create("reservations/" + response.id())).body("성공했습니다.");
     }
 
+    @Operation(summary = "예약 삭제 API")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "예약 삭제 성공")
+    })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteReservation(@PathVariable("id") final Long id) {
         reservationService.deleteReservation(id);

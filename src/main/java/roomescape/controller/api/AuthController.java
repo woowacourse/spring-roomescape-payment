@@ -1,5 +1,6 @@
 package roomescape.controller.api;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ public class AuthController {
         this.authService = authService;
     }
 
+    @Operation(summary = "로그인 API")
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         String token = authService.publishLoginToken(loginRequest);
@@ -37,12 +39,14 @@ public class AuthController {
         return cookie;
     }
 
+    @Operation(summary = "사용자 확인 API")
     @GetMapping("/login/check")
     public ResponseEntity<MemberNameResponse> checkLogin(@CurrentMember LoginInfo loginMember) {
         MemberNameResponse memberResponse = new MemberNameResponse(loginMember.name());
         return ResponseEntity.ok(memberResponse);
     }
 
+    @Operation(summary = "로그아웃 API")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletResponse response) {
         Cookie cookie = createCookie(null);
