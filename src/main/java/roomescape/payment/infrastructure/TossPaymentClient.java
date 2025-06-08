@@ -20,9 +20,9 @@ public class TossPaymentClient implements PaymentClient {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    public TossPaymentClient(@Qualifier("tossPaymentRestClient") final RestClient restClient,
+    public TossPaymentClient(final RestClient tossPaymentRestClient,
                              final ObjectMapper objectMapper) {
-        this.restClient = restClient;
+        this.restClient = tossPaymentRestClient;
         this.objectMapper = objectMapper;
     }
 
