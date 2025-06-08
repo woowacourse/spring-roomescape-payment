@@ -20,6 +20,7 @@ import roomescape.member.domain.repository.MemberRepository;
 import roomescape.member.infrastructure.MemberRepositoryAdapter;
 import roomescape.payment.application.PaymentService;
 import roomescape.payment.domain.Payment;
+import roomescape.payment.domain.PaymentKey;
 import roomescape.payment.infrastructure.PaymentRepositoryAdapter;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationDate;
@@ -88,7 +89,7 @@ public class PaymentServiceTest {
         reservationRepository.save(reservation);
         Reservation paymentReservation = reservationRepository.save(reservation);
         // 결제 객체 생성
-        Payment payment = new Payment(key, amount, paymentReservation.getId());
+        Payment payment = new Payment(new PaymentKey(key), amount, paymentReservation.getId());
 
         // when
         Payment resultPayment = paymentService.save(payment);
@@ -96,7 +97,7 @@ public class PaymentServiceTest {
         // then
         assertThat(resultPayment).isNotNull();
         assertThat(resultPayment.getId()).isNotNull();
-        assertThat(resultPayment.getPaymentKey()).isEqualTo(key);
+        assertThat(resultPayment.getPaymentKey().getKey()).isEqualTo(key);
         assertThat(resultPayment.getAmount()).isEqualByComparingTo(amount);
         assertThat(resultPayment.getReservationId()).isEqualTo(paymentReservation.getId());
     }
@@ -123,8 +124,8 @@ public class PaymentServiceTest {
         Reservation reservation1 = reservationRepository.save(new Reservation(member, spec1));
         Reservation reservation2 = reservationRepository.save(new Reservation(member, spec2));
 
-        Payment payment1 = new Payment("payKey-1", BigDecimal.valueOf(1500), reservation1.getId());
-        Payment payment2 = new Payment("payKey-2", BigDecimal.valueOf(2000), reservation2.getId());
+        Payment payment1 = new Payment(new PaymentKey("payKey-1"), BigDecimal.valueOf(1500), reservation1.getId());
+        Payment payment2 = new Payment(new PaymentKey("payKey-2"), BigDecimal.valueOf(2000), reservation2.getId());
 
         paymentService.save(payment1);
         paymentService.save(payment2);
@@ -133,9 +134,9 @@ public class PaymentServiceTest {
         List<Payment> result = paymentService.findAllByMemberId(memberId);
 
         // then
-        assertThat(result).hasSize(2);
         assertThat(result)
                 .extracting(Payment::getPaymentKey)
+                .extracting(PaymentKey::getKey)
                 .containsExactlyInAnyOrder("payKey-1", "payKey-2");
     }
 

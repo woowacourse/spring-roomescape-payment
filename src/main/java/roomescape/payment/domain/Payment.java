@@ -23,7 +23,7 @@ public class Payment {
     Long id;
 
     @Column(nullable = false, unique = true)
-    String paymentKey;
+    PaymentKey paymentKey;
 
     @Column(nullable = false)
     BigDecimal amount;
@@ -31,7 +31,7 @@ public class Payment {
     @Column(nullable = false)
     Long reservationId;
 
-    public Payment (String paymentKey, BigDecimal amount, Long reservationId){
+    public Payment (PaymentKey paymentKey, BigDecimal amount, Long reservationId){
         this.paymentKey = paymentKey;
         this.amount = amount;
         this.reservationId = reservationId;

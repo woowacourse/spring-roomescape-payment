@@ -9,9 +9,11 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import roomescape.fixture.MemberFixture;
 import roomescape.fixture.ReservationSpecFixture;
@@ -22,10 +24,13 @@ import roomescape.theme.domain.Theme;
 
 @ActiveProfiles("test")
 @DataJpaTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class WaitingsTest {
 
     @PersistenceContext
     EntityManager entityManager;
+
+
 
     @DisplayName("가장 높은 우선순위의 대기를 반환하고 제거한다")
     @Test

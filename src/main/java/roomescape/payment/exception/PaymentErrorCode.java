@@ -8,7 +8,8 @@ import roomescape.common.exception.ErrorCode;
 public enum PaymentErrorCode implements ErrorCode {
     PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "결제 정보를 찾지 못하였습니다."),
     INCORRECT_PAYMENT_AMOUNT(HttpStatus.BAD_REQUEST, "결제 금액이 일치하지 않습니다."),
-    PAYMENT_SESSION_EXPRIED(HttpStatus.BAD_REQUEST, "결제 요청 시간이 만료되었습니다");
+    PAYMENT_SESSION_EXPRIED(HttpStatus.BAD_REQUEST, "결제 요청 시간이 만료되었습니다"),
+    PAYMENT_KEY_LENGTH_EXCEEDED(HttpStatus.BAD_REQUEST, "결제 키의 길이가 유효하지 않습니다.");
 
     private final HttpStatus status;
     private final String message;
