@@ -66,7 +66,7 @@ public class Reservation {
         return this.reservationStatus == ReservationStatus.FAILED;
     }
 
-    public void waitForPayment() {
+    public void validateTransitionToPaymentPending() {
         if (reservationStatus.isFinished()) {
             throw new ReservationStatusException("결제 대기 상태로 변경 불가능합니다.");
         }

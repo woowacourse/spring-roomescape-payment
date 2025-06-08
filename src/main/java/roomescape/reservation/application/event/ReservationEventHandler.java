@@ -57,7 +57,7 @@ public class ReservationEventHandler {
         log.info("예약 승격 이벤트 처리: reservationId={}", event.reservationId());
 
         Reservation reservation = reservationDataService.getById(event.reservationId());
-        reservation.waitForPayment();
+        reservation.validateTransitionToPaymentPending();
 
         log.info("예약 승격 완료: reservationId={}, status=WAITING_FOR_PAYMENT",
                 reservation.getId());
