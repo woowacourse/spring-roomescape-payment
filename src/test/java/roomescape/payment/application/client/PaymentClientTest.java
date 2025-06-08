@@ -43,17 +43,21 @@ class PaymentClientTest {
     @Autowired
     private PaymentClientProperties paymentClientProperties;
 
+    private String baseUrl;
+    private String confirmApi;
 
     @BeforeEach
     void setUp() {
-        String baseUrl = paymentClientProperties.getBaseUrl();
-        mockServer.expect(requestTo(baseUrl + paymentClientProperties.getConfirmApi()))
-                .andRespond(withSuccess(EXPECTED_RESULT, MediaType.APPLICATION_JSON));
+        baseUrl = paymentClientProperties.getBaseUrl();
+        confirmApi = paymentClientProperties.getConfirmApi();
+        mockServer.reset();
     }
 
     @Test
     void 결제_승인_요청을_보내고_응답을_파싱할_수_있다() {
         // Given
+        mockServer.expect(requestTo(baseUrl + confirmApi))
+                .andRespond(withSuccess(EXPECTED_RESULT, MediaType.APPLICATION_JSON));
         PaymentApproveRequest request = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID,
                 1_000L);
 
@@ -72,9 +76,7 @@ class PaymentClientTest {
     @Test
     void 결제_도중_오류가_발생할_경우_예외를_던져야_한다() {
         // Given
-        PaymentApproveRequest request = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID, 1_000L);
-        mockServer.reset();
-        mockServer.expect(requestTo(paymentClientProperties.getBaseUrl() + paymentClientProperties.getConfirmApi()))
+        mockServer.expect(requestTo(paymentClientProperties.getBaseUrl() + confirmApi))
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body("""
@@ -83,6 +85,7 @@ class PaymentClientTest {
                                   "message": "이미 처리된 결제 입니다."
                                 }
                                 """));
+        PaymentApproveRequest request = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID, 1_000L);
 
         // When & Then
         assertThatThrownBy(() -> paymentClient.approvePayment(request))
@@ -93,9 +96,7 @@ class PaymentClientTest {
     @Test
     void 잘못된_시크릿_키로_요청할_경우_예외_메세지가_숨겨진_상태로_예외가_처리된다() {
         // Given
-        PaymentApproveRequest request = new PaymentApproveRequest("INVALID", ORDER_ID, 1_000L);
-        mockServer.reset();
-        mockServer.expect(requestTo(paymentClientProperties.getBaseUrl() + paymentClientProperties.getConfirmApi()))
+        mockServer.expect(requestTo(paymentClientProperties.getBaseUrl() + confirmApi))
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body("""
@@ -104,6 +105,7 @@ class PaymentClientTest {
                                   "message": "잘못된 시크릿키 연동 정보 입니다."
                                 }
                                 """));
+        PaymentApproveRequest request = new PaymentApproveRequest("INVALID", ORDER_ID, 1_000L);
 
         // When & Then
         assertThatThrownBy(() -> paymentClient.approvePayment(request))
@@ -114,9 +116,7 @@ class PaymentClientTest {
     @Test
     void 잘못된_인증_방식으로_요청할_경우_예외_메세지가_숨겨진_상태로_예외가_처리된다() {
         // Given
-        PaymentApproveRequest request = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID, 1_000L);
-        mockServer.reset();
-        mockServer.expect(requestTo(paymentClientProperties.getBaseUrl() + paymentClientProperties.getConfirmApi()))
+        mockServer.expect(requestTo(paymentClientProperties.getBaseUrl() + confirmApi))
                 .andRespond(withStatus(HttpStatus.BAD_REQUEST)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body("""
@@ -125,6 +125,7 @@ class PaymentClientTest {
                                   "message": "유효하지 않은 인증 방식입니다."
                                 }
                                 """));
+        PaymentApproveRequest request = new PaymentApproveRequest(PAYMENT_KEY, ORDER_ID, 1_000L);
 
         // When & Then
         assertThatThrownBy(() -> paymentClient.approvePayment(request))
@@ -135,9 +136,7 @@ class PaymentClientTest {
     @Test
     void 인증되지_않은_시크릿_키로_요청할_경우_예외_메세지가_숨겨진_상태로_예외가_처리된다() {
         // Given
-        PaymentApproveRequest request = new PaymentApproveRequest("UNAUTHORIZED", ORDER_ID, 1_000L);
-        mockServer.reset();
-        mockServer.expect(requestTo(paymentClientProperties.getBaseUrl() + paymentClientProperties.getConfirmApi()))
+        mockServer.expect(requestTo(paymentClientProperties.getBaseUrl() + confirmApi))
                 .andRespond(withStatus(HttpStatus.UNAUTHORIZED)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body("""
@@ -146,6 +145,7 @@ class PaymentClientTest {
                                   "message": "인증되지 않은 시크릿 키 혹은 클라이언트 키 입니다."
                                 }
                                 """));
+        PaymentApproveRequest request = new PaymentApproveRequest("UNAUTHORIZED", ORDER_ID, 1_000L);
 
         // When & Then
         assertThatThrownBy(() -> paymentClient.approvePayment(request))
