@@ -2,9 +2,11 @@ package roomescape.global.advice;
 
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static roomescape.global.response.GlobalErrorCode.IN_ALREADY_EXCEPTION;
 import static roomescape.global.response.GlobalErrorCode.NO_ELEMENTS;
+import static roomescape.global.response.GlobalErrorCode.UNKNOWN_EXCEPTION;
 import static roomescape.global.response.GlobalErrorCode.WRONG_ARGUMENT;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,6 +44,7 @@ public class RoomescapeExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleMethodArgumentNotValidException(HttpServletRequest request,
                                                                                    MethodArgumentNotValidException e) {
         log.error("{} | {} {}", request.getAttribute("traceId"), e.getClass(), e.getMessage());
+        log.error("{} | {}", request.getAttribute("traceId"), e.getStackTrace());
         return ResponseEntity.status(BAD_REQUEST)
                 .body(ApiResponse.fail(WRONG_ARGUMENT));
     }
@@ -52,5 +55,13 @@ public class RoomescapeExceptionHandler {
         log.info("{} | {} {}", request.getAttribute("traceId"), e.getClass(), e.getMessage());
         return ResponseEntity.status(CONFLICT)
                 .body(ApiResponse.fail(IN_ALREADY_EXCEPTION));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiResponse<Void>> handleException(HttpServletRequest request,
+                                                             Exception e) {
+        log.error("{} | {}", request.getAttribute("traceId"), e.getStackTrace());
+        return ResponseEntity.status(INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.fail(UNKNOWN_EXCEPTION));
     }
 }
