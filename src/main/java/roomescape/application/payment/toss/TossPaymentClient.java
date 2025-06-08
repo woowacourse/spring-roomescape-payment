@@ -25,22 +25,22 @@ public class TossPaymentClient {
 
     private static final Logger log = LoggerFactory.getLogger(TossPaymentClient.class);
 
-    private final RestClient tossPaymentClient;
+    private final RestClient tossPaymentRestClient;
     private final String tossPaymentSecretKey;
     private final ObjectMapper objectMapper;
 
     public TossPaymentClient(
-            final RestClient tossPaymentClient,
+            final RestClient tossPaymentRestClient,
             final String tossPaymentSecretKey,
             final ObjectMapper objectMapper) {
-        this.tossPaymentClient = tossPaymentClient;
+        this.tossPaymentRestClient = tossPaymentRestClient;
         this.tossPaymentSecretKey = tossPaymentSecretKey;
         this.objectMapper = objectMapper;
     }
 
     public void approve(final TossPaymentCommand command) {
         try {
-            tossPaymentClient.post()
+            tossPaymentRestClient.post()
                     .uri(CONFIRM_URI)
                     .header(HttpHeaders.AUTHORIZATION, createAuthorizationHeader())
                     .body(command)

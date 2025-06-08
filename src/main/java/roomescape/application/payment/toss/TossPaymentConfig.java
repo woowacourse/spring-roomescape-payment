@@ -14,7 +14,7 @@ public class TossPaymentConfig {
     private static final String TOSS_PAYMENT_SERVER_URL = "https://api.tosspayments.com/v1/payments";
 
     @Bean
-    public RestClient tossPaymentClient() {
+    public RestClient tossPaymentRestClient() {
         final SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(Duration.ofSeconds(30));
         requestFactory.setReadTimeout(Duration.ofSeconds(60));
