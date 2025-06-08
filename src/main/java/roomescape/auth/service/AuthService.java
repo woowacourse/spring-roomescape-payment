@@ -15,7 +15,6 @@ import roomescape.exception.ForbiddenException;
 import roomescape.exception.NotFoundException;
 import roomescape.exception.UnauthorizedException;
 import roomescape.member.domain.Member;
-import roomescape.member.domain.Password;
 import roomescape.member.repository.MemberRepository;
 
 @Service
@@ -29,12 +28,18 @@ public class AuthService {
     private final MemberRepository memberRepository;
 
     public String createToken(final LoginRequest loginRequest) {
-        final Member member = memberRepository.findByEmailAndPassword(loginRequest.email(),
-                        Password.createForMember(loginRequest.password()))
+        Member member = memberRepository.findByEmail(loginRequest.email())
                 .orElseThrow(() -> {
-                    log.warn("로그인 실패 - 이메일 또는 패스워드 불일치. email={}", loginRequest.email());
+                    log.warn("로그인 실패 - 존재하지 않는 email의 사용자. email={}", loginRequest.email());
                     return new UnauthorizedException("이메일 또는 패스워드가 올바르지 않습니다.");
                 });
+
+        if(!member.matchesPassword(loginRequest.password())) {
+            log.warn("로그인 실패 - 잘못된 비밀번호. memberId={}", member.getId());
+            throw new UnauthorizedException("이메일 또는 패스워드가 올바르지 않습니다.");
+        }
+
+        log.info("로그인 성공 - memberId={}", member.getId());
         return jwtTokenProvider.createToken(createClaims(member));
     }
 

@@ -35,8 +35,8 @@ class MemberServiceTest {
         memberService.signup(request);
 
         // then
-        final Member saved = memberRepository.findByEmailAndPassword(request.email(),
-                Password.createForMember(request.password())).get();
+        final Member saved = memberRepository.findByEmail("hong@example.com").orElseThrow();
+
         SoftAssertions.assertSoftly(soft -> {
             soft.assertThat(saved.getName()).isEqualTo("홍길동");
             soft.assertThat(saved.getEmail()).isEqualTo("hong@example.com");

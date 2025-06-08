@@ -2,12 +2,14 @@ package roomescape;
 
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.modifyHeaders;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.replacePattern;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,8 @@ import org.springframework.test.context.ActiveProfiles;
 @ExtendWith(RestDocumentationExtension.class)
 @ActiveProfiles("test")
 public abstract class IntegrationTest {
+
+    private static final Pattern JWT_PATTERN = Pattern.compile("Bearer\\s+.+");
 
     @LocalServerPort
     protected int port;
@@ -46,9 +50,9 @@ public abstract class IntegrationTest {
         this.documentationSpec = new RequestSpecBuilder()
                 .addFilter(documentationConfiguration(restDocumentation)
                         .operationPreprocessors()
-                        .withRequestDefaults(prettyPrint())
                         .withRequestDefaults(
                                 prettyPrint(),
+                                replacePattern(JWT_PATTERN, "Bearer {ACCESS_TOKEN}"),
                                 modifyHeaders()
                                         .remove("Content-Length")
                         )
