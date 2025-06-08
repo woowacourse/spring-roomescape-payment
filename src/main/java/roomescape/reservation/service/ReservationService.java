@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import roomescape.auth.application.LoginMember;
 import roomescape.global.config.Performance;
@@ -29,6 +30,7 @@ import roomescape.reservationtime.repository.ReservationTimeRepository;
 import roomescape.theme.domain.Theme;
 import roomescape.theme.repository.ThemeRepository;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
@@ -84,7 +86,9 @@ public class ReservationService {
         Reservation reservation = Reservation.waiting(date, reservationTime, theme, member, LocalDateTime.now(clock),
                 lastWaitingRank + 1, payment);
 
-        return reservationRepository.save(reservation);
+        Reservation newReservation = reservationRepository.save(reservation);
+        log.info("[(유저) 예약 대기 성공] reservationId: {}", newReservation.getId());
+        return newReservation;
     }
 
     private Reservation bookedReservation(LocalDate date, ReservationTime reservationTime,
@@ -93,7 +97,9 @@ public class ReservationService {
         Reservation reservation = Reservation.of(date, reservationTime, theme, member, LocalDateTime.now(clock),
                 payment);
 
-        return reservationRepository.save(reservation);
+        Reservation newReservation = reservationRepository.save(reservation);
+        log.info("[(유저) 예약 성공] reservationId: {}", newReservation.getId());
+        return newReservation;
     }
 
     public ReservationResponse saveAdminReservation(final AdminReservationRequest request) {
@@ -106,6 +112,7 @@ public class ReservationService {
         Reservation reservation = Reservation.of(request.date(), reservationTime, theme, member,
                 LocalDateTime.now(clock), null);
         Reservation newReservation = reservationRepository.save(reservation);
+        log.info("[(관리자) 예약 성공] reservationId: {}", newReservation.getId());
         return new ReservationResponse(newReservation);
     }
 
@@ -120,6 +127,7 @@ public class ReservationService {
                 reservation.getTheme());
         reduceWaitingRanks(deleteRank, reservationStatuses);
         reservationRepository.deleteById(id);
+        log.info("[예약 삭제 성공] reservationId: {}", reservation.getId());
     }
 
     private void reduceWaitingRanks(final Long deleteRank, final List<ReservationStatus> reservationStatuses) {

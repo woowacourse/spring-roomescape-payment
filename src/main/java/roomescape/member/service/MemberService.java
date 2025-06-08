@@ -21,12 +21,14 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    public void save(final MemberRequest memberRequest) {
-        if (memberRepository.existsByEmail(memberRequest.email())) {
-            throw new IllegalArgumentException("이미 가입된 이메일입니다. email=" + memberRequest.email());
+    public void save(final MemberRequest request) {
+        if (memberRepository.existsByEmail(request.email())) {
+            throw new IllegalArgumentException("이미 가입된 이메일입니다. email=" + request.email());
         }
         memberRepository.save(
-                Member.withDefaultRole(memberRequest.name(), memberRequest.email(), memberRequest.password()));
+                Member.withDefaultRole(request.name(), request.email(), request.password()));
+
+        log.info("[회원가입 성공] email: {}, password: {}, name: {}", request.email(), request.password(), request.name());
     }
 
     @Performance
