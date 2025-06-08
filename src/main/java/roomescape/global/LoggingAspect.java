@@ -1,27 +1,19 @@
 package roomescape.global;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Aspect
 @Component
 @Slf4j
 public class LoggingAspect {
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Pointcut("within(roomescape.controller.api..*)")
     public void controllerMethods() {}
@@ -31,36 +23,39 @@ public class LoggingAspect {
         long start = System.currentTimeMillis();
 
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-
         HttpServletRequest request = requestAttributes.getRequest();
         String method = request.getMethod();
-
-        Map<String, Object> requestLogData = new HashMap<>();
-        requestLogData.put("Method", request.getMethod());
         String requestURI = request.getRequestURI();
         String queryString = request.getQueryString();
         String fullUri = requestURI + (queryString == null ? "" : "?" + queryString);
-        requestLogData.put("URI", fullUri);
-        requestLogData.put("ARGS", joinPoint.getArgs());
-        log.info(objectMapper.writeValueAsString(requestLogData));
+        Object[] args = joinPoint.getArgs();
+
+        log.info("""
+                [Request]
+                Method: {},
+                Uri: {},
+                Args: {}
+                """, method, fullUri, args);
 
         try {
             Object result = joinPoint.proceed();
 
             long elapsed = System.currentTimeMillis() - start;
-            Map<String, Object> responseLogData = new HashMap<>();
-            responseLogData.put("Method", method);
-            responseLogData.put("Time", elapsed + " ms");
-            responseLogData.put("Result", result);
-            log.info(objectMapper.writeValueAsString(responseLogData));
+            log.info("""
+                    [Response]
+                    Method: {},
+                    Time: {} ms
+                    Result: {}
+                    """, method, elapsed, result);
             return result;
         } catch (Exception e) {
             long elapsed = System.currentTimeMillis() - start;
-            Map<String, Object> errorLogData = new HashMap<>();
-            errorLogData.put("Method", method);
-            errorLogData.put("Time", elapsed + " ms");
-            errorLogData.put("Message", e.getMessage());
-            log.error(objectMapper.writeValueAsString(errorLogData));
+            log.error("""
+                    [Error]
+                    Method: {},
+                    Time: {} ms,
+                    Message: {}
+                    """, method, elapsed, e.getMessage());
             throw e;
         }
     }
