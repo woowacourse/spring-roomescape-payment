@@ -1,6 +1,7 @@
 package roomescape.application.reservation.command;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import roomescape.application.reservation.command.dto.CreateReservationCommand;
 import roomescape.domain.member.Member;
@@ -20,8 +21,9 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Service
+@Slf4j
 @RequiredArgsConstructor
+@Service
 public class CreateReservationService {
 
     private final ReservationRepository reservationRepository;
@@ -38,7 +40,9 @@ public class CreateReservationService {
         final Reservation reservation = new Reservation(member, command.date(), time, theme);
         reservation.validateReservable(LocalDateTime.now(clock));
         final Reservation savedReservation = reservationRepository.save(reservation);
-        return savedReservation.getId();
+        final Long reservationId = savedReservation.getId();
+        log.info("예약 등록 완료 - reservationId: {}", reservationId);
+        return reservationId;
     }
 
     private Member getMember(final Long memberId) {

@@ -10,8 +10,8 @@ import roomescape.domain.reservation.PaymentType;
 import roomescape.domain.reservation.ReservationPayment;
 import roomescape.domain.reservation.repository.ReservationPaymentRepository;
 
-@Service
 @RequiredArgsConstructor
+@Service
 public class RegisterReservationWithTossPaymentUseCase {
 
     private final CreateReservationService createReservationService;

@@ -1,6 +1,7 @@
 package roomescape.application.payment;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import roomescape.domain.payment.TossPayment;
 import roomescape.domain.payment.repository.TossPaymentRepository;
@@ -14,6 +15,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class PaymentQueryService {
@@ -50,6 +52,7 @@ public class PaymentQueryService {
         if (reservationPayment.isAdminPayment()) {
             return getAdminPaymentResult(reservationPayment);
         }
+        log.error("지원하지 않는 결제 유형 - paymentType: {}", reservationPayment.getPaymentType());
         throw new PaymentException("존재하지 않는 결제입니다");
     }
 
@@ -59,6 +62,7 @@ public class PaymentQueryService {
     ) {
         final TossPayment toss = tossPaymentById.get(reservationPayment.getPaymentId());
         if (toss == null) {
+            log.error("TossPayment를 찾을 수 없음 - paymentId: {}", reservationPayment.getPaymentId());
             throw new PaymentException("존재하지 않는 결제입니다");
         }
         if (toss.isApproved()) {

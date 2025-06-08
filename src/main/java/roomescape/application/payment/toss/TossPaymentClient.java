@@ -39,19 +39,22 @@ public class TossPaymentClient {
     }
 
     public void approve(final TossPaymentCommand command) {
+        log.info("토스 결제 승인 요청 시작 - orderId: {}, amount: {}", command.orderId(), command.amount());
         try {
             tossPaymentRestClient.post()
                     .uri(CONFIRM_URI)
                     .header(HttpHeaders.AUTHORIZATION, createAuthorizationHeader())
                     .body(command)
                     .retrieve()
-                    .onStatus(HttpStatusCode::is4xxClientError, this::handle4xxError)
-                    .onStatus(HttpStatusCode::is5xxServerError, this::handle5xxError)
+                    .onStatus(HttpStatusCode::is4xxClientError, this::handleError)
+                    .onStatus(HttpStatusCode::is5xxServerError, this::handleError)
                     .toBodilessEntity();
+            log.info("토스 결제 승인 성공 - orderId: {}, amount: {}", command.orderId(), command.amount());
         } catch (final PaymentException e) {
+            log.error("토스 결제 승인 실패 - orderId: {}, error: {}", command.orderId(), e.getMessage());
             throw e;
         } catch (final RuntimeException e) {
-            log.error("토스 결제 요청 중 RestClient/네트워크 오류", e);
+            log.error("토스 결제 요청 중 RestClient/네트워크 오류 - orderId: {}, error: {}", command.orderId(), e.getMessage(), e);
             throw new PaymentException("결제 통신 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.");
         }
     }
@@ -61,20 +64,10 @@ public class TossPaymentClient {
         return AUTH_SCHEME + encoded;
     }
 
-    private void handle4xxError(final HttpRequest httpRequest, final ClientHttpResponse clientHttpResponse) {
-        try {
-            final JsonNode node = objectMapper.readTree(clientHttpResponse.getBody());
-            final String code = node.path("code").asText();
-            final String message = node.path("message").asText("토스 결제 실패 관리자에게 문의하세요.");
-            log.warn("결제 승인 실패 - code: {}, message: {}", code, message);
-            throw new PaymentException(message);
-        } catch (final IOException e) {
-            log.warn("토스 페이먼트 응답 파싱 에러", e);
-            throw new PaymentException("토스 결제 실패 관리자에게 문의하세요.");
-        }
-    }
-
-    private void handle5xxError(final HttpRequest httpRequest, final ClientHttpResponse clientHttpResponse) {
-        throw new PaymentException("결제 서버 오류, 잠시 후 다시 시도해주세요.");
+    private void handleError(final HttpRequest httpRequest, final ClientHttpResponse clientHttpResponse) throws IOException {
+        final JsonNode node = objectMapper.readTree(clientHttpResponse.getBody());
+        final String code = node.path("code").asText();
+        final String message = code + " : " + node.path("message").asText("토스 결제 실패 관리자에게 문의하세요.");
+        throw new PaymentException(message);
     }
 }
