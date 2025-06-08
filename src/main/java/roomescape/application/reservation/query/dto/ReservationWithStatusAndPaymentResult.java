@@ -21,7 +21,7 @@ public record ReservationWithStatusAndPaymentResult(
     public static ReservationWithStatusAndPaymentResult from(
             final ReservationWithStatusResult reservationWithStatusResult,
             final PaymentResult paymentResult
-            ) {
+    ) {
         return new ReservationWithStatusAndPaymentResult(
                 reservationWithStatusResult.reservationId(),
                 reservationWithStatusResult.themeName(),

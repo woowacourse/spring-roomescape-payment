@@ -40,16 +40,17 @@ public class PaymentQueryService {
                 ));
     }
 
-    private PaymentResult getPaymentResult(final ReservationPayment rp, final Map<Long, TossPayment> tossPaymentById) {
-        return switch (rp.getPaymentType()) {
+    private PaymentResult getPaymentResult(final ReservationPayment reservationPayment, final Map<Long, TossPayment> tossPaymentById) {
+        return switch (reservationPayment.getPaymentType()) {
             case TOSS -> {
-                final TossPayment tossPayment = tossPaymentById.get(rp.getPaymentId());
-                if (tossPayment == null) throw new PaymentException("존재하지 않는 결제입니다");
-                if (tossPayment.isApproved()) yield new PaymentResult(PaymentType.TOSS, tossPayment.getPaymentKey(), tossPayment.getAmount());
+                final TossPayment tossPayment = tossPaymentById.get(reservationPayment.getPaymentId());
+                if (tossPayment == null)
+                    throw new PaymentException("존재하지 않는 결제입니다");
+                if (tossPayment.isApproved())
+                    yield new PaymentResult(PaymentType.TOSS, tossPayment.getPaymentKey(), tossPayment.getAmount());
                 yield new PaymentResult(PaymentType.TOSS, tossPayment.getStatusDescription(), tossPayment.getAmount());
             }
-            case ADMIN -> new PaymentResult(PaymentType.ADMIN, rp.getPaymentId() + "번 관리자", 0L);
-            default -> throw new PaymentException("존재하지 않는 결제입니다");
+            case ADMIN -> new PaymentResult(PaymentType.ADMIN, reservationPayment.getPaymentId() + "번 관리자", 0L);
         };
     }
 }

@@ -1,10 +1,10 @@
-package roomescape.application.payment;
+package roomescape.application.payment.toss;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import roomescape.application.payment.OrderAmountVerificationCache;
 import roomescape.application.payment.toss.dto.TossPaymentValidationCommand;
-import roomescape.application.payment.toss.TossPaymentValidator;
 
 import static org.assertj.core.api.Assertions.assertThatCode;
 
