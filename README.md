@@ -96,18 +96,30 @@
 | GET         | /admin/reservation | ADMIN    | 200 OK  | 관리자의 예약 관리 페이지               |
 | GET         | /admin/waiting     | ADMIN    | 200 OK  | 관리자의 예약 대기 관리 페이지            |
 
+## ✅ 에러 코드
+
+| 예외 종류                        | HTTP 응답 상태 코드             | 설명                           |
+|------------------------------|---------------------------|------------------------------|
+| `PaymentException`           | 4xx                       | 결제 중 발생한 예외                  |
+| `ResourceNotFoundException`  | 404 NOT_FOUND             | 리소스 조회 실패                    |
+| `AlreadyExistException`      | 409 CONFLICT              | 이미 존재하는 리소스를 추가하려고 하는 경우     |
+| `AuthTokenNotFoundException` | 401 UNAUTHORIZED          | 쿠키 헤더에 인증 토큰이 없는 경우          |
+| `AuthenticationException`    | 401 UNAUTHORIZED          | 인증 정보가 유효하지 않은 경우            |
+| `AuthorizationException`     | 403 FORBIDDEN             | 권한이 부족한 경우                   |
+| `IllegalArgumentException`   | 400 BAD_REQUEST           | 사용자 입력 필드에 올바르지 않은 값이 입력된 경우 |
+| `Exception`                  | 500 INTERNAL_SERVER_ERROR | catch하지 못한 모든 예외             |
+
 # 📌비즈니스 로직
 
 ## ✅ 관리자 시스템
 
 ### ▶️ 예약 시간(ReservationTime)
 
-```java
+```java  
 class ReservationTime {
-    Long id; // PK
-    LocalTime time; // 예약 시간
-}
-```
+    Long id; // PK    LocalTime time; // 예약 시간  
+}  
+```  
 
 - 예약 시간 추가
     - 검증
@@ -120,14 +132,13 @@ class ReservationTime {
 
 ### ▶️ 테마(Theme)
 
-```java
+```java  
 class Theme {
-    Long id; // PK
-    String name; // 테마 이름
-    String description; // 테마 설명
-    String thumbnail; // 테마 썸네일
-}
-```
+    Long id; // PK    String name; // 테마 이름  
+    String description; // 테마 설명  
+    String thumbnail; // 테마 썸네일  
+}  
+```  
 
 - 테마 추가
     - 검증
@@ -139,16 +150,15 @@ class Theme {
 
 ### ▶️ 예약(Reservation)
 
-```java
+```java  
 class Reservation {
-    Long id; // PK
-    LocalDate date; // 예약 날짜
-    ReservationTime time; // 예약 시간
-    Theme theme; // 테마
-    Member member; // 예약한 계정
-    ReservationStatus status; // 예약 상태: BOOKED, PAID
-}
-```
+    Long id; // PK    LocalDate date; // 예약 날짜  
+    ReservationTime time; // 예약 시간  
+    Theme theme; // 테마  
+    Member member; // 예약한 계정  
+    ReservationStatus status; // 예약 상태: BOOKED, PAID  
+}  
+```  
 
 - 예약 추가
     - 검증
@@ -162,16 +172,15 @@ class Reservation {
 
 ### ▶️ 예약 대기(Waiting)
 
-```java
+```java  
 class Waiting {
-    Long id; // PK
-    LocalDate date; // 예약 대기 날짜
-    ReservationTime time; // 예약 대기 시간
-    Theme theme; // 테마
-    Member member; // 예약한 계정
-    LocalDateTime createdAt; // 예약 대기 요청 시간
-}
-```
+    Long id; // PK    LocalDate date; // 예약 대기 날짜  
+    ReservationTime time; // 예약 대기 시간  
+    Theme theme; // 테마  
+    Member member; // 예약한 계정  
+    LocalDateTime createdAt; // 예약 대기 요청 시간  
+}  
+```  
 
 - 예약 대기 추가
     - 검증
