@@ -29,7 +29,7 @@ public class TossPayment {
     private Long amount;
 
     @Column(nullable = false)
-    Long targetId;
+    private Long targetId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
