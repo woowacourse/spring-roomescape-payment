@@ -7,6 +7,7 @@ import java.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.RestClient;
 import roomescape.payment.infrastructure.dto.TossPaymentErrorResponse;
@@ -37,7 +38,13 @@ public class TossPaymentClient implements PaymentClient {
                 reservationRequest.getPaymentKey()
         );
 
-        return restClient.post()
+        LOGGER.info("[TOSS API REQUEST] amount: {}, paymentKey: {}, orderId: {}",
+                tossPaymentRequest.getAmount(),
+                tossPaymentRequest.getPaymentKey(),
+                tossPaymentRequest.getOrderId()
+        );
+
+        TossPaymentResponse tossPaymentResponse = restClient.post()
                 .uri("/payments/confirm")
                 .header("Authorization", encodeSecretKey())
                 .body(tossPaymentRequest)
@@ -51,6 +58,21 @@ public class TossPaymentClient implements PaymentClient {
                         }
                 )
                 .body(TossPaymentResponse.class);
+
+        if (tossPaymentResponse == null) {
+            LOGGER.error("[TOSS API RESPONSE] FAILED: TOSS API의 응답 본문이 비어있습니다.");
+            throw new PaymentException(HttpStatus.FORBIDDEN, "시스템 오류로 인해 결제가 실패하였습니다. 고객센터에 문의해주세요.");
+        }
+
+        LOGGER.info("[TOSS API RESPONSE] approvedAt: {}, totalAmount: {}, paymentKey: {}, orderId: {}, type: {}",
+                tossPaymentResponse.getApprovedAt(),
+                tossPaymentResponse.getTotalAmount(),
+                tossPaymentResponse.getPaymentKey(),
+                tossPaymentResponse.getOrderId(),
+                tossPaymentResponse.getType()
+        );
+
+        return tossPaymentResponse;
     }
 
     private String encodeSecretKey() {
@@ -61,7 +83,7 @@ public class TossPaymentClient implements PaymentClient {
 
     private void handleErrorResponse(HttpStatusCode statusCode, TossPaymentErrorResponse errorResponse) {
         if (TossPaymentErrorMessage.contains(errorResponse.getCode())) {
-            LOGGER.warn(errorResponse.getMessage());
+            LOGGER.warn("[TOSS API RESPONSE] FAILED: {}", errorResponse.getMessage());
             throw new PaymentException(statusCode, "시스템 오류로 인해 결제가 실패하였습니다. 고객센터에 문의해주세요.");
         }
         throw new PaymentException(statusCode, errorResponse.getMessage());
