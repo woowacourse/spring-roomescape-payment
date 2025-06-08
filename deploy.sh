@@ -58,7 +58,7 @@ echo "3. 최신 소스 코드 가져오기 끝" | tee -a "$DEPLOY_LOG"
 echo "4. Gradle 빌드 시작" | tee -a "$DEPLOY_LOG"
 cd "$PROJECT_DIR"
 chmod +x gradlew
-./gradlew bootJar -x test >> "$DEPLOY_LOG" 2>&1
+./gradlew bootJar >> "$DEPLOY_LOG" 2>&1
 BUILD_STATUS=$? # 이전 명령어의 종료 코드 저장.
 echo "  - Gradle 빌드 상태 코드: $BUILD_STATUS" | tee -a "$DEPLOY_LOG"
 
