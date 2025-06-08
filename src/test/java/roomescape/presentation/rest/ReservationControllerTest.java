@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static roomescape.TestFixtures.anyPaymentWithNewId;
 import static roomescape.TestFixtures.anyReservationWithNewId;
 
 import java.util.List;
@@ -50,6 +51,8 @@ class ReservationControllerTest {
     void reserve() throws Exception {
         Mockito.when(reservationService.reserve(anyLong(), any(), anyLong(), anyLong()))
             .thenReturn(anyReservationWithNewId());
+        Mockito.when(paymentService.pay(anyString(), anyString(), anyLong()))
+                        .thenReturn(anyPaymentWithNewId());
 
         mockMvc.perform(post("/reservations")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -58,8 +61,8 @@ class ReservationControllerTest {
                         "date": "3000-03-17",
                         "timeId": "1",
                         "themeId": "1",
-                        "paymentKey": "a",
-                        "orderId": "1",
+                        "paymentKey": "paymentKey",
+                        "orderId": "orderId",
                         "amount": 1000
                     }
                     """))
