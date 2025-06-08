@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldNameConstants;
 import roomescape.common.domain.DomainTerm;
 import roomescape.common.validate.Validator;
-import roomescape.reservation.domain.BookedCount;
+import roomescape.reservation.infrastructure.vo.BookedCount;
 import roomescape.theme.domain.Theme;
 
 @FieldNameConstants(level = AccessLevel.PRIVATE)
