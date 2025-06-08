@@ -1,21 +1,35 @@
 package roomescape.reservation.presentation;
 
 import static org.hamcrest.Matchers.is;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document;
+import static org.springframework.restdocs.restassured.RestAssuredRestDocumentation.documentationConfiguration;
 
 import io.restassured.RestAssured;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import roomescape.DatabaseCleaner;
 import roomescape.TestConfig;
 import roomescape.member.presentation.fixture.MemberFixture;
@@ -25,10 +39,13 @@ import roomescape.reservation.presentation.fixture.ReservationFixture;
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Import(TestConfig.class)
+@ExtendWith({SpringExtension.class, RestDocumentationExtension.class})
 class ReservationControllerTest {
     private final DatabaseCleaner databaseCleaner;
     private final ReservationFixture reservationFixture = new ReservationFixture();
     private final MemberFixture memberFixture = new MemberFixture();
+
+    private RequestSpecification spec;
 
     @LocalServerPort
     int port;
@@ -39,10 +56,15 @@ class ReservationControllerTest {
     }
 
     @BeforeEach
-    void setUp() {
+    void setUp(RestDocumentationContextProvider restDocumentation) {
         RestAssured.port = port;
         databaseCleaner.clear();
         databaseCleaner.setUserInfo();
+
+        this.spec = new RequestSpecBuilder()
+                .setPort(port)
+                .addFilter(documentationConfiguration(restDocumentation))
+                .build();
     }
 
     @Test
@@ -70,7 +92,48 @@ class ReservationControllerTest {
         );
 
         // when - then
-        RestAssured.given().log().all()
+        RestAssured.given(this.spec).log().all()
+                .filter(document("{class-name}/{method-name}",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(
+                                fieldWithPath("date")
+                                        .description("예약 날짜 (형식: yyyy-MM-dd)"),
+                                fieldWithPath("themeId")
+                                        .description("테마 식별자"),
+                                fieldWithPath("timeId")
+                                        .description("예약 시간 식별자"),
+                                fieldWithPath("paymentKey")
+                                        .description("외부 결제 API가 발급한 키값"),
+                                fieldWithPath("orderId")
+                                        .description("랜덤으로 생성한 식별자"),
+                                fieldWithPath("amount")
+                                        .description("결제 금액"),
+                                fieldWithPath("paymentType")
+                                        .description("결제 유형")
+                        ),
+                        responseFields(
+                                fieldWithPath("id")
+                                        .description("식별자"),
+                                fieldWithPath("date")
+                                        .description("예약 날짜 (형식: yyyy-MM-dd)"),
+                                fieldWithPath("member.id")
+                                        .description("멤버 식별자"),
+                                fieldWithPath("member.name")
+                                        .description("사용자 이름"),
+                                fieldWithPath("theme.id")
+                                        .description("테마 식별자"),
+                                fieldWithPath("theme.name")
+                                        .description("테마 이름"),
+                                fieldWithPath("theme.description")
+                                        .description("테마 시나리오 설명"),
+                                fieldWithPath("theme.thumbnail")
+                                        .description("썸네일 이미지 주소"),
+                                fieldWithPath("time.id")
+                                        .description("예약 시간 식별자"),
+                                fieldWithPath("time.startAt")
+                                        .description("예약 시간 (형식: HH:mm:ss)")
+                        )))
                 .contentType(ContentType.JSON)
                 .cookies(cookies)
                 .body(reservation)

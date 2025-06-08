@@ -1,0 +1,47 @@
+== 예약
+
+=== `/reservations`
+
+사용자가 선택한 날짜, 테마 및 시간대로 신규 예약을 생성합니다.
+
+operation::reservation-controller-test/create-reservation-test[snippets='http-request,http-response,request-fields,response-fields']
+
+==== 상태코드
+
+[cols="10,~"]
+|===
+|코드 | 설명
+
+|200
+|성공
+
+|400
+|잘못된 요청 파라미터로 인한 실패
+
+|401
+|유효하지 않은 JWT 토큰으로 인한 실패
+|===
+
+'''
+
+=== `/reservations/waiting`
+
+사용자가 선택한 날짜, 테마 및 시간대로 신규 예약 대기를 생성합니다.
+
+operation::waiting-controller-test/create-waiting-test[snippets='http-request,http-response,request-fields,response-fields']
+
+==== 상태코드
+
+[cols="10,~"]
+|===
+|코드 | 설명
+
+|200
+|성공
+
+|400
+|잘못된 요청 파라미터로 인한 실패
+
+|401
+|유효하지 않은 JWT 토큰으로 인한 실패
+|===
