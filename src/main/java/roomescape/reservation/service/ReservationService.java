@@ -7,6 +7,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import roomescape.auth.application.LoginMember;
+import roomescape.global.config.Performance;
 import roomescape.global.exception.ReservationException;
 import roomescape.member.domain.Member;
 import roomescape.member.repository.MemberRepository;
@@ -40,6 +41,7 @@ public class ReservationService {
     private final MemberRepository memberRepository;
     private final MemberService memberService;
 
+    @Performance
     public List<ReservationResponse> findReservationsByCriteria(final ReservationSearchRequest request) {
         List<Reservation> reservations = reservationRepository.findByCriteria(request.themeId(),
                 request.memberId(), request.dateFrom(), request.dateTo());
@@ -48,6 +50,7 @@ public class ReservationService {
                 .toList();
     }
 
+    @Performance
     public List<AvailableReservationTimeResponse> findAllReservationTime(final LocalDate date, final Long themeId) {
         return reservationTimeRepository.findAllAvailable(date, themeId);
     }
@@ -126,6 +129,7 @@ public class ReservationService {
                 .forEach(ReservationStatus::reduceRank);
     }
 
+    @Performance
     public List<MyReservationResponse> findMyReservations(final LoginMember loginMember) {
         Member member = memberService.getMemberById(loginMember.getId());
         return reservationRepository.findAllByMember(member).stream()

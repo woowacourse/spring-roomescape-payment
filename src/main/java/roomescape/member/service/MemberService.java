@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import roomescape.global.config.Performance;
 import roomescape.member.domain.Member;
 import roomescape.member.dto.MemberRequest;
 import roomescape.member.dto.MemberResponse;
@@ -28,6 +29,7 @@ public class MemberService {
                 Member.withDefaultRole(memberRequest.name(), memberRequest.email(), memberRequest.password()));
     }
 
+    @Performance
     public MemberResponses findAllMember() {
         List<MemberResponse> members = memberRepository.findAll()
                 .stream()

@@ -3,6 +3,7 @@ package roomescape.reservationtime.service;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import roomescape.global.config.Performance;
 import roomescape.global.exception.ReservationException;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.reservationtime.domain.ReservationTime;
@@ -22,6 +23,7 @@ public class ReservationTimeService {
         return new ReservationTimeResponse(reservationTime);
     }
 
+    @Performance
     public List<ReservationTimeResponse> findAll() {
         List<ReservationTime> reservationTimes = reservationTimeRepository.findAll();
         return reservationTimes.stream()

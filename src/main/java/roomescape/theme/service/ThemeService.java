@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import roomescape.global.config.Performance;
 import roomescape.global.exception.ReservationException;
 import roomescape.reservation.repository.ReservationRepository;
 import roomescape.theme.domain.Theme;
@@ -26,6 +27,7 @@ public class ThemeService {
         return new ThemeResponse(theme);
     }
 
+    @Performance
     public List<ThemeResponse> findAll() {
         List<Theme> themes = themeRepository.findAll();
         return themes.stream()
@@ -33,6 +35,7 @@ public class ThemeService {
                 .toList();
     }
 
+    @Performance
     public List<PopularThemeResponse> findAllPopular() {
         LocalDate nowDate = LocalDate.now(clock);
         LocalDate startDate = nowDate.minusDays(7);
