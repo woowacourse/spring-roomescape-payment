@@ -33,3 +33,7 @@ logging:
 toss:
   confirm-url: https://api.tosspayments.com/v1/payments/confirm
   secret-key: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+
+springdoc:
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json

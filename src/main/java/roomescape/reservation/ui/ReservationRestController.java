@@ -3,10 +3,13 @@ package roomescape.reservation.ui;
 import static roomescape.auth.domain.AuthRole.ADMIN;
 import static roomescape.auth.domain.AuthRole.MEMBER;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +27,8 @@ import roomescape.reservation.ui.dto.request.CreateBookedReservationWithPaymentR
 import roomescape.reservation.ui.dto.response.AvailableReservationTimeResponse;
 import roomescape.reservation.ui.dto.response.ReservationResponse;
 
+@Slf4j
+@Tag(name = "예약", description = "사용자 예약 api")
 @RestController
 @RequestMapping("/reservations")
 @RequiredArgsConstructor
@@ -31,42 +36,58 @@ public class ReservationRestController {
 
     private final ReservationService reservationService;
 
+    @Operation(summary = "예약 생성", description = "회원이 예약을 생성합니다.")
     @PostMapping
     @RequiresRole(authRoles = {ADMIN, MEMBER})
     public ResponseEntity<ReservationResponse> createReservation(
             @RequestBody @Valid final CreateBookedReservationWithPaymentRequest request,
             final MemberAuthInfo memberAuthInfo
     ) {
+        log.info("예약 생성 요청 수 - 사용자 ID:{}", memberAuthInfo.id());
+
         final ReservationResponse response =
                 reservationService.create(request, memberAuthInfo.id());
+
+        log.info("예약 생성 완료 - 예약 ID: {}, 사용자 ID: {}", response.id(), memberAuthInfo.id());
 
         return ResponseEntity.created(URI.create("/reservations/" + response.id())).body(response);
     }
 
+    @Operation(summary = "예약 삭제", description = "회원이 예약을 삭제합니다.")
     @DeleteMapping("/{id}")
     @RequiresRole(authRoles = {ADMIN, MEMBER})
     public ResponseEntity<Void> deleteReservation(
             @PathVariable final Long id,
             final MemberAuthInfo memberAuthInfo
     ) {
+        log.info("예약 삭제 요청 수신 - 예약 ID: {}, 사용자 ID: {}", id, memberAuthInfo.id());
+
         reservationService.deleteIfOwner(id, memberAuthInfo.id());
+
+        log.info("예약 삭제 완료 - 삭제된 예약 ID : {}", id);
 
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "자신의 예약 확인", description = "회원이 자신의 예약을 확인합니다.")
     @GetMapping("/mine")
     @RequiresRole(authRoles = {ADMIN, MEMBER})
     public ResponseEntity<List<ReservationResponse.ForMember>> findAllMyReservations(
             final MemberAuthInfo memberAuthInfo
     ) {
+        log.info("사용자 예약 목록 요청 - 사용자 ID: {}", memberAuthInfo.id());
+
         return ResponseEntity.ok()
                 .body(reservationService.findReservationsByMemberId(memberAuthInfo.id()));
     }
 
+    @Operation(summary = "예약 가능 시간 확인", description = "회원이 예약 가능한 시간을 확인합니다.")
     @GetMapping("/available-times")
     public ResponseEntity<List<AvailableReservationTimeResponse>> findAllAvailableReservationTimes(
             @ModelAttribute @Valid final AvailableReservationTimeRequest request
     ) {
+        log.info("예약 가능 시간 목록 확인 - 요청 날짜 : {}, 요청 테마 id : {}", request.date(), request.themeId());
+
         final List<AvailableReservationTimeResponse> availableReservationTimes =
                 reservationService.findAvailableReservationTimes(request);
 

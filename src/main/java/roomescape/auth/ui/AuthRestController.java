@@ -31,7 +31,11 @@ public class AuthRestController {
     public ResponseEntity<Void> createAccessToken(
             @RequestBody @Valid final LoginRequest request
     ) {
+        log.info("로그인 요청: email = {}", request.email());
+
         final String authToken = authService.createAccessToken(request);
+
+        log.info("로그인 성공: email = {}", request.email());
 
         final ResponseCookie cookie = ResponseCookie.from("token", authToken)
                 .path("/")
@@ -47,6 +51,8 @@ public class AuthRestController {
     public ResponseEntity<MemberResponse.Name> checkAccessToken(
             final MemberAuthInfo memberAuthInfo
     ) {
+        log.info("토큰 유효성 확인 요청: memberId = {}", memberAuthInfo.id());
+
         final MemberResponse.Name response = new MemberResponse.Name(
                 authService.getMemberNameById(memberAuthInfo.id()));
 
@@ -56,6 +62,8 @@ public class AuthRestController {
     @PostMapping("/logout")
     @RequiresRole(authRoles = {ADMIN, MEMBER})
     public ResponseEntity<Void> logout() {
+        log.info("로그아웃 요청 수신");
+
         final ResponseCookie cookie = ResponseCookie.from("token", "")
                 .path("/")
                 .httpOnly(true)

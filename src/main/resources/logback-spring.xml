@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="false">
+
+    <!-- 1. 로그 파일 경로 및 파일명 설정 -->
+    <property name="LOG_PATH" value="./logs"/>
+    <property name="SERVICE_LOG_FILE" value="${LOG_PATH}/service.log"/>
+
+    <!-- 2. 콘솔 출력 색상 설정 -->
+    <appender name="COLORED_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>
+                %cyan(%d{HH:mm:ss.SSS}) %yellow([%thread]) %highlight(%-5level) %green(%logger{36}) - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!-- 3. 서비스 로그 파일 저장 Appender 설정 -->
+    <appender name="ServiceFileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${SERVICE_LOG_FILE}</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${SERVICE_LOG_FILE}.%d{yyyy-MM-dd}.gz</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 4. 특정 패키지(roomescape.*) 로깅 → 콘솔 + 파일 -->
+    <logger name="roomescape" level="INFO" additivity="false">
+        <appender-ref ref="ServiceFileAppender"/>
+        <appender-ref ref="COLORED_CONSOLE"/>
+    </logger>
+
+    <!-- 5. 전역 로그 설정 (WARN 이상만 콘솔로 출력) -->
+    <root level="WARN">
+        <appender-ref ref="COLORED_CONSOLE"/>
+    </root>
+
+</configuration>

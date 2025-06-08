@@ -2,6 +2,7 @@ package roomescape.reservation.ui.dto.response;
 
 import java.time.LocalDate;
 import roomescape.member.ui.dto.MemberResponse.IdName;
+import roomescape.payment.domain.PaymentInfo;
 import roomescape.reservation.domain.Reservation;
 import roomescape.theme.ui.dto.ThemeResponse;
 
@@ -30,16 +31,29 @@ public record ReservationResponse(
             LocalDate date,
             ReservationTimeResponse time,
             ThemeResponse theme,
-            String status
+            String status,
+            String paymentKey,
+            String amount
     ) {
 
         public static ForMember from(final Reservation reservation) {
+            String paymentKey = "";
+            String amount = "";
+
+            PaymentInfo paymentInfo = reservation.getPaymentInfo();
+            if (paymentInfo != null) {
+                paymentKey = paymentInfo.getPaymentKey();
+                amount = String.valueOf(paymentInfo.getAmount());
+            }
+
             return new ForMember(
                     reservation.getId(),
                     reservation.getReservationSlot().getDate(),
                     ReservationTimeResponse.from(reservation.getReservationSlot().getTime()),
                     ThemeResponse.from(reservation.getReservationSlot().getTheme()),
-                    reservation.getStatus().getDescription()
+                    reservation.getStatus().getDescription(),
+                    paymentKey,
+                    amount
             );
         }
     }

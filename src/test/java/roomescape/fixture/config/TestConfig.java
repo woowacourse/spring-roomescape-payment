@@ -10,6 +10,9 @@ import roomescape.member.infrastructure.JpaMemberRepository;
 import roomescape.member.infrastructure.MemberRepositoryImpl;
 import roomescape.payment.domain.PaymentClient;
 import roomescape.payment.domain.PaymentDomainService;
+import roomescape.payment.domain.PaymentRepository;
+import roomescape.payment.infrastructure.JpaPaymentRepository;
+import roomescape.payment.infrastructure.PaymentRepositoryImpl;
 import roomescape.payment.infrastructure.TossPaymentClient;
 import roomescape.reservation.application.AdminReservationService;
 import roomescape.reservation.application.AdminWaitingService;
@@ -73,6 +76,13 @@ public class TestConfig {
             final JpaWaitingRepository jpaWaitingRepository
     ) {
         return new WaitingRepositoryImpl(jpaWaitingRepository);
+    }
+
+    @Bean
+    public PaymentRepository paymentRepository(
+            final JpaPaymentRepository jpaPaymentRepository
+    ) {
+        return new PaymentRepositoryImpl(jpaPaymentRepository);
     }
 
     @Bean
@@ -165,10 +175,10 @@ public class TestConfig {
     }
 
     @Bean
-    public PaymentDomainService paymentDomainService(
-            final PaymentClient paymentClient
+    public PaymentDomainService paymentDomainService(final PaymentClient paymentClient,
+                                                     final PaymentRepository paymentRepository
     ) {
-        return new PaymentDomainService(paymentClient);
+        return new PaymentDomainService(paymentClient, paymentRepository);
     }
 
     @Bean
