@@ -39,6 +39,7 @@ public class ReservationService {
         this.reservationDomainService = reservationDomainService;
     }
 
+    @Transactional
     public ReservationResponse createReservation(final ReservationRequest request, final Long memberId) {
         PaymentRequest paymentRequest = new PaymentRequest(request.paymentKey(), request.orderId(), request.amount());
         paymentService.confirmPayment(paymentRequest);
