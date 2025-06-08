@@ -24,7 +24,7 @@ public class ReservationPayment {
 
     private String orderId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     private Reservation reservation;
 
     public ReservationPayment(final String paymentKey, final Long amount, final String orderId, final Reservation reservation) {
