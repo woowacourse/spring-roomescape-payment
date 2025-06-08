@@ -1,9 +1,8 @@
 package roomescape.waiting.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.common.logging.LogExecution;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.member.dto.request.LoginMember;
@@ -17,7 +16,11 @@ import roomescape.waiting.domain.WaitingRepository;
 import roomescape.waiting.dto.request.WaitingRequest;
 import roomescape.waiting.dto.response.WaitingResponse;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Service
+@LogExecution
 public class WaitingService {
 
     private static final long MAX_WAITING_COUNT = 10;

@@ -2,6 +2,7 @@ package roomescape.reservation.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.common.logging.LogExecution;
 import roomescape.common.util.DateTime;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Service
+@LogExecution
 public class ReservationService {
 
     private final DateTime dateTime;

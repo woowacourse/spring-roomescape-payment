@@ -1,8 +1,8 @@
 package roomescape.member.service;
 
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.common.logging.LogExecution;
 import roomescape.member.domain.Member;
 import roomescape.member.domain.MemberRepository;
 import roomescape.member.domain.Role;
@@ -10,7 +10,10 @@ import roomescape.member.dto.request.SignupRequest;
 import roomescape.member.dto.response.MemberResponse;
 import roomescape.member.dto.response.SignupResponse;
 
+import java.util.List;
+
 @Service
+@LogExecution
 public class MemberService {
 
     private final MemberRepository memberRepository;

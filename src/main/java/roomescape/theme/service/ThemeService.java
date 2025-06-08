@@ -1,8 +1,8 @@
 package roomescape.theme.service;
 
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.common.logging.LogExecution;
 import roomescape.common.util.DateTime;
 import roomescape.reservation.domain.ReservationPeriod;
 import roomescape.reservation.domain.ReservationRepository;
@@ -12,7 +12,10 @@ import roomescape.theme.dto.request.ThemeRequest;
 import roomescape.theme.dto.response.PopularThemeResponse;
 import roomescape.theme.dto.response.ThemeResponse;
 
+import java.util.List;
+
 @Service
+@LogExecution
 public class ThemeService {
 
     private static final int POPULAR_THEME_COUNT = 10;

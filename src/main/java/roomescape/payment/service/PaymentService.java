@@ -1,6 +1,7 @@
 package roomescape.payment.service;
 
 import org.springframework.stereotype.Service;
+import roomescape.common.logging.LogExecution;
 import roomescape.payment.client.TossPaymentClient;
 import roomescape.payment.domain.Payment;
 import roomescape.payment.dto.request.TossPaymentConfirmRequest;
@@ -8,6 +9,7 @@ import roomescape.payment.dto.response.TossPaymentResponse;
 import roomescape.reservation.domain.ReservationRepository;
 
 @Service
+@LogExecution
 public class PaymentService {
 
     private final TossPaymentClient paymentClient;

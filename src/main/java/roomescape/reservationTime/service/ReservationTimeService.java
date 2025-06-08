@@ -2,6 +2,7 @@ package roomescape.reservationTime.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import roomescape.common.logging.LogExecution;
 import roomescape.reservation.domain.Reservation;
 import roomescape.reservation.domain.ReservationRepository;
 import roomescape.reservationTime.domain.ReservationTime;
@@ -14,6 +15,7 @@ import roomescape.reservationTime.dto.response.TimeConditionResponse;
 import java.util.List;
 
 @Service
+@LogExecution
 public class ReservationTimeService {
 
     private final ReservationRepository reservationRepository;
