@@ -4,6 +4,7 @@ import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
@@ -11,6 +12,7 @@ import roomescape.payment.dto.TossPaymentCancelRequest;
 import roomescape.payment.dto.TossPaymentRequest;
 import roomescape.payment.dto.TossPaymentResponse;
 import roomescape.payment.exception.PaymentTimeoutException;
+import roomescape.payment.exception.TossPaymentException;
 
 @Slf4j
 public class TossRestClient {
@@ -32,7 +34,18 @@ public class TossRestClient {
 
     public TossPaymentResponse cancel(final String paymentKey, final TossPaymentCancelRequest request) {
         log.debug("cancel 중 🔥🔥🔥 paymentKey: {}", paymentKey);
-        return postWithErrorHandling("/v1/payments/{paymentKey}/cancel", request, paymentKey);
+        TossPaymentResponse cancelResponse = postWithErrorHandling("/v1/payments/{paymentKey}/cancel", request,
+                paymentKey);
+        validateCancelSuccess(cancelResponse, paymentKey);
+        return cancelResponse;
+    }
+
+    private void validateCancelSuccess(TossPaymentResponse cancelResponse, String paymentKey) {
+        if (cancelResponse.status().equals("CANCELED")) {
+            return;
+        }
+        log.warn("결제 취소 실패 - status={}, paymentKey={}", cancelResponse.status(), paymentKey);
+        throw new TossPaymentException(HttpStatus.INTERNAL_SERVER_ERROR, "결제 취소 실패", true);
     }
 
     private <T> TossPaymentResponse postWithErrorHandling(String uri, T requestBody, Object... uriVariables) {

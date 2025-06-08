@@ -12,7 +12,8 @@ public enum PaymentStatus {
     FAILED("결제 실패"),
     CANCELED("결제 취소"),
     REFUNDED("환불 완료"),
-    ;
+    REFUND_FAILED("환불 실패"),
+    PENDING_REFUND("환불 진행 중");
 
     private final String description;
 }

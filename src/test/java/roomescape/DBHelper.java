@@ -108,4 +108,18 @@ public class DBHelper {
 
         return payment;
     }
+
+    public Payment insertPaymentOfStatus(Reservation reservation, PaymentStatus paymentStatus) {
+        Payment payment = Payment.builder()
+                .status(paymentStatus)
+                .reservation(reservation)
+                .member(reservation.getMember())
+                .paymentKey("test-payment-key" + UUID.randomUUID())
+                .orderId("test-orderId" + UUID.randomUUID())
+                .build();
+        em.persist(payment);
+        em.flush();
+
+        return payment;
+    }
 }
