@@ -10,12 +10,12 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 public class LoggingInterceptor implements HandlerInterceptor {
 
-    private static final Logger log = LoggerFactory.getLogger(LoggingInterceptor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LoggingInterceptor.class);
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
-        log.info("Request: {} {}", request.getMethod(), request.getRequestURI());
+        LOG.info("Request: {} {}", request.getMethod(), request.getRequestURI());
         return true;
     }
 }
