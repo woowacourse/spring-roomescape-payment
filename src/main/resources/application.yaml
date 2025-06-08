@@ -33,5 +33,5 @@ security:
 payment:
   toss:
     timeout: 3000
-    baseUrl: https://api.tosspayments.com/v1
+    baseUrl: https://api.tosspayments.com/
     secretKey: test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
