@@ -9,6 +9,10 @@ configurations {
     asciidoctorExt
 }
 
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
 group = 'nextstep'
 version = '0.0.1-SNAPSHOT'
 
@@ -60,6 +64,7 @@ asciidoctor {
     outputDir = file("build/docs")
     baseDirFollowsSourceDir()
     dependsOn test
+    inputs.dir snippetsDir
 
     sources {
         include '**/*.adoc'
